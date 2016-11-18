@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.8" icons="true" automaticImage="PNG" always-add-relationships="true" generalizations="true" 
+  realizations="true" associations="true" dependencies="true" nesting-relationships="true">  
+  <package id="1" language="java" name="org.activity.util" project="Geolife01" file="/Geolife01/src/org/activity/util" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="87" width="139" x="3889" y="37"/>    
+    <display autosize="false" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <class id="2" language="java" name="org.activity.util.HTMLStrings" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/HTMLStrings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="113" width="267" x="1432" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="org.activity.util.TestCharNum" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/TestCharNum.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="95" width="114" x="8285" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="org.activity.util.CompareCSV" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/CompareCSV.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="95" width="114" x="3560" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="org.activity.util.CopyOfActivityObject" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/CopyOfActivityObject.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1265" width="411" x="9623" y="3187"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="org.activity.util.DescriptiveStatisticsG" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/DescriptiveStatisticsG.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="95" width="232" x="8658" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="org.activity.util.ActivityObject" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/ActivityObject.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1211" width="373" x="9210" y="3187"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="8" language="java" name="org.activity.util.Timeline" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/Timeline.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="869" width="425" x="9623" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="9" language="java" name="org.activity.util.UserDimension" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/UserDimension.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="293" width="179" x="8439" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="10" language="java" name="org.activity.util.TimestampDefault" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/TimestampDefault.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="95" width="217" x="10640" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="org.activity.util.LocationObject" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/LocationObject.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="365" width="436" x="8930" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="12" language="java" name="org.activity.util.StringCode" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/StringCode.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="311" width="520" x="3000" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="13" language="java" name="org.activity.util.Pair" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/Pair.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="293" width="199" x="5540" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="14" language="java" name="org.activity.util.ResultsetToJson" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/ResultsetToJson.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="95" width="242" x="10897" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="15" language="java" name="org.activity.util.Constant" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/Constant.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="2291" width="591" x="4068" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="16" language="java" name="org.activity.util.DataPointEntry" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/DataPointEntry.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1373" width="316" x="4699" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="17" language="java" name="org.activity.util.SerializableJSONArray" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/SerializableJSONArray.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="185" width="212" x="969" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="18" language="java" name="org.activity.util.TrackListenEntry" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/TrackListenEntry.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1139" width="327" x="11179" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="19" language="java" name="org.activity.util.ActivityTableRow" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/ActivityTableRow.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="509" width="332" x="11905" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="20" language="java" name="org.activity.util.ConnectDatabase" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/ConnectDatabase.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1031" width="461" x="314" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="21" language="java" name="org.activity.util.TrajectoryEntry" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/TrajectoryEntry.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1373" width="319" x="11546" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="22" language="java" name="org.activity.util.StringUtilityBelt" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/StringUtilityBelt.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="113" width="280" x="10320" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="23" language="java" name="org.activity.util.AttributeControlObject" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/AttributeControlObject.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="437" width="303" x="12506" y="3187"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="24" language="java" name="org.activity.util.RecallByActivity" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/RecallByActivity.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="131" width="135" x="3714" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="25" language="java" name="org.activity.util.DimensionControlObject" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/DimensionControlObject.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="203" width="372" x="12506" y="2368"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="26" language="java" name="org.activity.util.HjorthParameters" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/HjorthParameters.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="203" width="177" x="9406" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="27" language="java" name="org.activity.util.CheckTies" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/CheckTies.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="113" width="228" x="2352" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="28" language="java" name="org.activity.util.TimelineWithNext" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/TimelineWithNext.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="185" width="519" x="9083" y="2368"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="29" language="java" name="org.activity.util.LabelEntry" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/LabelEntry.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="221" width="249" x="5779" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="30" language="java" name="org.activity.util.UtilityBelt" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/UtilityBelt.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="2255" width="939" x="7306" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="31" language="java" name="org.activity.util.TestGeoSFC" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/TestGeoSFC.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="95" width="114" x="5386" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="32" language="java" name="org.activity.util.Triple" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/Triple.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="311" width="171" x="1221" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="33" language="java" name="org.activity.util.UserDayTimeline" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/UserDayTimeline.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="779" width="536" x="8507" y="2368"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="34" language="java" name="org.activity.util.MetaBase" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/MetaBase.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="113" width="381" x="12506" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="35" language="java" name="org.activity.util.FlatActivityLogEntry" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/FlatActivityLogEntry.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1859" width="192" x="10088" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="36" language="java" name="org.activity.util.TestExperiments" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/TestExperiments.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="635" width="291" x="5055" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="37" language="java" name="org.activity.util.ReadingFromFile" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/ReadingFromFile.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="239" width="340" x="2620" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="38" language="java" name="org.activity.util.RowDiffs" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/RowDiffs.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="113" width="189" x="12277" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="39" language="java" name="org.activity.util.TestDummy1" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/TestDummy1.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="167" width="114" x="815" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="40" language="java" name="org.activity.util.Dimension" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/Dimension.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="221" width="295" x="9417" y="4492"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="41" language="java" name="org.activity.util.PopUps" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/PopUps.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="131" width="210" x="64" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="42" language="java" name="org.activity.util.Serializer" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/Serializer.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="203" width="573" x="1739" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="43" language="java" name="org.activity.util.WritingToFile" project="Geolife01" 
+    file="/Geolife01/src/org/activity/util/WritingToFile.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1445" width="1198" x="6068" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <dependency id="44">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="22"/>  
+  </dependency>  
+  <dependency id="45">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="22"/>  
+  </dependency>  
+  <dependency id="46">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <generalization id="47">    
+    <end type="SOURCE" refId="28"/>    
+    <end type="TARGET" refId="8"/>  
+  </generalization>  
+  <dependency id="48">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="32"/>  
+  </dependency>  
+  <association id="49">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="50" name="dimensions">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="51" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="40" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="52">    
+    <end type="SOURCE" refId="25" navigable="false">      
+      <attribute id="53" name="attributeControlObjects">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="54" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="55">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="22"/>  
+  </dependency>  
+  <dependency id="56">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <dependency id="57">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="8"/>  
+  </dependency>  
+  <association id="58">    
+    <end type="SOURCE" refId="28" navigable="false">      
+      <attribute id="59" name="nextActivityObject">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="60" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="61">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <dependency id="62">    
+    <end type="SOURCE" refId="33"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <dependency id="63">    
+    <end type="SOURCE" refId="43"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <dependency id="64">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <association id="65">    
+    <end type="SOURCE" refId="34" navigable="false">      
+      <attribute id="66" name="allDimensionControlObjects">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="67" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="25" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="68">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="15"/>  
+  </dependency>  
+  <dependency id="69">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="22"/>  
+  </dependency>  
+  <dependency id="70">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="37"/>  
+  </dependency>  
+  <association id="71">    
+    <bendpoint x="9632" y="2368"/>    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="72" name="activityObjectsInTimeline">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="73" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="74">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <dependency id="75">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="41"/>  
+  </dependency>  
+  <dependency id="76">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="33"/>  
+  </dependency>  
+  <dependency id="77">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="21"/>  
+  </dependency>  
+  <dependency id="78">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="22"/>  
+  </dependency>  
+  <dependency id="79">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <dependency id="80">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <dependency id="81">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="13"/>  
+  </dependency>  
+  <dependency id="82">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <association id="83">    
+    <end type="SOURCE" refId="33" navigable="false">      
+      <attribute id="84" name="ActivityObjectsInDay">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="85" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="86">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="87" name="dimensions">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="88" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="40" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="89">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="30"/>  
+  </dependency>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    sort-features="false" accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
