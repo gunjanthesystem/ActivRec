@@ -79,7 +79,7 @@ public final class Constant
 	
 	// ////************* PARAMETERS TO BE SET ********************//////
 	public static final boolean checkForDistanceTravelledAnomaly = false;
-	public static final boolean checkForHaversineAnomaly = false;
+	public static final boolean checkForHaversineAnomaly = true; // false;
 	/**
 	 * Percentage/100 for training test split of dataset
 	 */

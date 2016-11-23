@@ -35,6 +35,7 @@ import org.activity.ui.PopUps;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.math3.analysis.function.Asin;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
@@ -605,10 +606,12 @@ public class UtilityBelt
 	}
 	
 	/**
-	 * @todo convert it to bigdecimal form source:http://rosettacode.org/wiki/Haversine_formula#Java
+	 * convert it to bigdecimal form source:http://rosettacode.org/wiki/Haversine_formula#Java ? Not converting to BigDecimal for performance concerns,
 	 * 
-	 *       This uses the ‘haversine’ formula to calculate the great-circle distance between two points – that is, the shortest distance over the earth’s surface – giving an
-	 *       ‘as-the-crow-flies’ distance between the points (ignoring any hills they fly over, of course!).
+	 * This uses the ‘haversine’ formula to calculate the great-circle distance between two points – that is, the shortest distance over the earth’s surface – giving an
+	 * ‘as-the-crow-flies’ distance between the points (ignoring any hills they fly over, of course!).</br>
+	 * TODO LATER can use non-native math libraries for faster computation. User jafama or apache common maths.</br>
+	 * 
 	 * @param lat1
 	 * @param lon1
 	 * @param lat2
@@ -625,20 +628,16 @@ public class UtilityBelt
 		double lon2 = Double.parseDouble(lon2s);
 		
 		// System.out.println("inside haversine = " + lat1 + "," + lon1 + "--" + lat2 + "," + lon2);
-		
 		if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90 || Math.abs(lon1) > 180 || Math.abs(lon2) > 180)
 		{
 			new Exception("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + "  "
 					+ lat2s + "," + lon2s);
-			
 			if (Constant.checkForHaversineAnomaly)
 			{
 				PopUps.showError("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + "," + lon1s
 						+ "  " + lat2s + "," + lon2s);
 			}
-			return Constant.unknownDistanceTravelled;
-			// System.exit(-1);
-			
+			return Constant.unknownDistanceTravelled;// System.exit(-1);
 		}
 		
 		double dLat = Math.toRadians(lat2 - lat1);
@@ -659,7 +658,7 @@ public class UtilityBelt
 		// + "," + lon1s + " " + lat2s + "," + lon2), "org.activity.util.UtilityBelt.haversine(String, String, String, String)");
 		// }
 		
-		double c = 2 * Math.asin(Math.sqrt(a));
+		double c = 2 * Math.asin(Math.sqrt(a)); // TODO: #performanceEater
 		// System.out.println("c = " + c);
 		
 		if (Constant.checkForDistanceTravelledAnomaly && (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
@@ -667,6 +666,63 @@ public class UtilityBelt
 			System.err.println("Probable Error: haversine():+ distance >200kms (=" + radiusOfEarthInKMs * c
 					+ " for latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + "  " + lat2s + "," + lon2s);
 		}
+		
+		return UtilityBelt.round(radiusOfEarthInKMs * c, 4);
+	}
+	
+	/**
+	 * Using non-native math libraries for faster computation. User jafama or apache common maths.</br>
+	 * TODO <font color = red>HAVE NOT FINISHED converting java math functions to new libraries. </font>This uses the ‘haversine’ formula to calculate the great-circle distance
+	 * between two points – that is, the shortest distance over the earth’s surface – giving an ‘as-the-crow-flies’ distance between the points (ignoring any hills they fly over,
+	 * of course!).
+	 * 
+	 * @param lat1
+	 * @param lon1
+	 * @param lat2
+	 * @param lon2
+	 * @return distance in Kilometers
+	 */
+	public static double haversineFasterIncomplete(String lat1s, String lon1s, String lat2s, String lon2s)
+	{
+		
+		double lat1 = Double.parseDouble(lat1s);
+		double lon1 = Double.parseDouble(lon1s);
+		
+		double lat2 = Double.parseDouble(lat2s);
+		double lon2 = Double.parseDouble(lon2s);
+		
+		// System.out.println("inside haversine = " + lat1 + "," + lon1 + "--" + lat2 + "," + lon2);
+		if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90 || Math.abs(lon1) > 180 || Math.abs(lon2) > 180)
+		{
+			new Exception("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + "  "
+					+ lat2s + "," + lon2s);
+			if (Constant.checkForHaversineAnomaly)
+			{
+				PopUps.showError("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + "," + lon1s
+						+ "  " + lat2s + "," + lon2s);
+			}
+			return Constant.unknownDistanceTravelled;// System.exit(-1);
+		}
+		
+		double dLat = Math.toRadians(lat2 - lat1);
+		double dLon = Math.toRadians(lon2 - lon1);
+		lat1 = Math.toRadians(lat1);
+		lat2 = Math.toRadians(lat2);
+		
+		// System.out.println("inside haversine = " + dLat + "," + dLon + "--" + lat2 + "," + lon2);
+		
+		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+		
+		// double c = 2 * Math.asin(Math.sqrt(a)); // TODO: #performanceEater
+		double c = 2 * new Asin().value(Math.sqrt(a));
+		// System.out.println("c = " + c);
+		
+		if (Constant.checkForDistanceTravelledAnomaly && (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
+		{
+			System.err.println("Probable Error: haversine():+ distance >200kms (=" + radiusOfEarthInKMs * c
+					+ " for latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + "  " + lat2s + "," + lon2s);
+		}
+		
 		return UtilityBelt.round(radiusOfEarthInKMs * c, 4);
 	}
 	
@@ -844,6 +900,7 @@ public class UtilityBelt
 		}
 		
 		res = sum.divide(new BigDecimal(vals.size()));
+		// res = sum.divide(BigDecimal.valueOf(vals.size()));
 		
 		return res;
 		
@@ -2395,33 +2452,34 @@ public class UtilityBelt
 			
 			// Merge consecutively similar activities
 			while (((counter + 1) < lengthInIntervalsOfSplittedTimelines)
-					&& (activityName.equals(aggregatedSplittedTimeline.get(counter + 1))) && DateTimeUtils.isSameDate(startTimestamp, endTimestamp) // startTimestamp.getDate()
-																																		// ==
-																																		// endTimestamp.getDate()
-																																		// // do
-																																		// not merge
-																																		// activities
-																																		// from
-																																		// different
-																																		// days
-																																		// (because
-																																		// it
-																																		// makes
-																																		// sense and
-																																		// also
-																																		// because
-																																		// it causes
-																																		// problem
-																																		// because
-																																		// this
-																																		// merger
-																																		// would
-																																		// mean we
-																																		// will have
-																																		// to allow
-																																		// (startTimestamp.getHour()
-																																		// >
-																																		// endTimestamp.getHour())
+					&& (activityName.equals(aggregatedSplittedTimeline.get(counter + 1)))
+					&& DateTimeUtils.isSameDate(startTimestamp, endTimestamp) // startTimestamp.getDate()
+			// ==
+			// endTimestamp.getDate()
+			// // do
+			// not merge
+			// activities
+			// from
+			// different
+			// days
+			// (because
+			// it
+			// makes
+			// sense and
+			// also
+			// because
+			// it causes
+			// problem
+			// because
+			// this
+			// merger
+			// would
+			// mean we
+			// will have
+			// to allow
+			// (startTimestamp.getHour()
+			// >
+			// endTimestamp.getHour())
 			) // matching date to identify same day
 			{
 				counter++;
@@ -2709,6 +2767,7 @@ public class UtilityBelt
 	}
 	
 	/**
+	 * <font color = blue> Note: using the preferred way to convert double to BigDecimal</font>
 	 * 
 	 * @param value
 	 * @param places
@@ -2728,7 +2787,7 @@ public class UtilityBelt
 		if (places < 0)
 			throw new IllegalArgumentException();
 		
-		BigDecimal bd = new BigDecimal(value);
+		BigDecimal bd = BigDecimal.valueOf(value);// new BigDecimal(value); //change on 22 Nov 2016
 		bd = bd.setScale(places, RoundingMode.HALF_UP);
 		return bd.doubleValue();
 	}

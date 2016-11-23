@@ -106,6 +106,15 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	public static final int stayPointTimeThresholdInSecs = 10 * 60;
 	public static final int stayPointDistanceThresholdInMeters = 100;
 	
+	// made class variable so that they are compiled only once to improve performance
+	static Pattern patternDoubleQuotes, patternApostropheS, patternND;
+	
+	public static void compileRegexPatterns()
+	{
+		patternDoubleQuotes = Pattern.compile("\"\"");
+		patternApostropheS = Pattern.compile("\'s");
+		patternND = Pattern.compile("n\' D");
+	}
 	// public static final int sandwichFillerDurationInSecs = 10 * 60;
 	
 	// ******************END OF PARAMETERS TO SET*****************************//
@@ -116,7 +125,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	public static void main(String args[])
 	{
 		System.out.println("Running starts");
-		commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov17/";
+		commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June28_2/"; //last past on XPS
 		// June2_finalSameTraj/";// June2_2016_SameTraj/";
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/TrajectorySpace/May17_2016_newDataStruct/" // May17_2016_good2/";
@@ -156,6 +165,8 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			// List<CSVRecord> spotsSubset1Records = ReadingFromFile.getCSVRecords(spotsSubset1FileName);
 			// List<CSVRecord> spotsSubset2Records = ReadingFromFile.getCSVRecords(spotsSubset2FileName);
 			
+			compileRegexPatterns();
+			
 			HashMap<Long, ArrayList<String>> spots1 = readSpotSubset(spotsSubset1FileName);
 			System.out.println("spots1 size =" + spots1.size());
 			HashMap<Long, ArrayList<String>> spots2 = readSpotSubset(spotsSubset2FileName);
@@ -163,7 +174,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			
 			// $$ preprocessCheckInWithDate(checkInFileName, spots1, spots2, commonPath + "checkInPreProcessingLog.txt",
 			// $$ commonPath + "processedCheckIns.csv");
-			preprocessCheckInWithDateCategoryOnlySpots1(checkInFileName, spots1, spots2, commonPath + "checkInPreProcessingLog.txt",
+			preprocessCheckInWithDateCategoryOnlySpots1Faster(checkInFileName, spots1, spots2, commonPath + "checkInPreProcessingLog.txt",
 					commonPath + "processedCheckIns.csv");
 			// $userIDsOriginal = identifyUsers();// identifyOnlyTargetUsers();//
 			
@@ -894,6 +905,207 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 		
 	}
 	
+	//////////////
+	/**
+	 * To generate data with category information (note: category information is only available for data point for spots 1 places.)
+	 * 
+	 * ALERT: currently it is also generating data for non spots 1 data point with -99 values.
+	 * 
+	 * @param checkinFileName
+	 * @param spots1
+	 * @param spots2
+	 * @param logfile
+	 * @param preprocessedFile
+	 */
+	private static void preprocessCheckInWithDateCategoryOnlySpots1Faster(String checkinFileName, HashMap<Long, ArrayList<String>> spots1,
+			HashMap<Long, ArrayList<String>> spots2, String logfile, String preprocessedFile)
+	{
+		long countOfSpots1 = 0, countOfSpots2 = 0, countOfNotFound = 0;
+		// String dlimPatrn = Pattern.quote(",");
+		PopUps.showMessage("preprocessCheckInWithDateCategoryOnlySpots1 called");
+		try
+		{
+			int lineCount = 0;
+			BufferedReader br = new BufferedReader(new FileReader(checkinFileName));
+			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(preprocessedFile);
+			BufferedWriter bw2 = WritingToFile.getBufferedWriterForNewFile(preprocessedFile + "slim");
+			
+			bw.write("UserID, PlaceID,TS,Date,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
+			bw2.write("UserID,Date,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
+			
+			StringBuffer toWriteInBatch = new StringBuffer();
+			StringBuffer toWriteInBatch2 = new StringBuffer();
+			// StringBuffer sequenceOfSpotsFound = new StringBuffer();
+			
+			String currentLineRead;
+			String prevLat = "", prevLon = "", prevUser = "", currUser = "";
+			Timestamp prevTime = null, currentTime = null;
+			String currentDate = "";
+			String currentLat = "", currentLon = "";
+			// String typeOfSpot = "";
+			String spotCatID = "";
+			String spotCatName = ""; /// until here
+			
+			while ((currentLineRead = br.readLine()) != null)
+			{
+				// clearing current variables
+				currUser = "";
+				currentTime = null;
+				currentDate = "";
+				currentLat = "";
+				currentLon = "";
+				spotCatID = "NA";
+				spotCatName = "NA";
+				
+				boolean found = false;
+				lineCount++;
+				if (lineCount == 1)
+				{
+					System.out.println("Skipping first line");
+					continue; // skip the first line
+				}
+				else if (lineCount % 10000 == 0)
+				{
+					System.out.println("Lines read = " + lineCount);
+				}
+				
+				String[] splittedString = currentLineRead.split(",");// dlimPatrn);
+				long placeID = Long.valueOf(splittedString[1]);
+				
+				currentTime = DateTimeUtils.getTimestampLastFMData(splittedString[2]);
+				currentDate = currentTime.toLocalDateTime().toLocalDate().toString();
+				currUser = splittedString[0];
+				
+				// System.out.println("place id to search for " + placeID);
+				
+				ArrayList<String> vals1 = spots1.get(placeID);
+				ArrayList<String> vals2 = spots2.get(placeID);
+				double distFromPrevInMeters = -999;
+				long durationFromPrevInSeconds = -999;
+				
+				if (vals1 != null)
+				{
+					found = true;
+					// sequenceOfSpotsFound.append("1");
+					countOfSpots1++;
+					
+					// System.out.println("found in spots1");
+					
+					currentLat = vals1.get(2);
+					currentLon = vals1.get(1);
+					
+					// spotCatID = getSpotCatID(vals1);
+					// spotCatName = getSpotCatName(vals1);
+					
+					Pair<String, String> spotCatIDName = getSpotCatIDCatName(vals1);
+					
+					spotCatID = spotCatIDName.getFirst();
+					spotCatName = spotCatIDName.getSecond();
+				}
+				
+				/////
+				if (vals2 != null)
+				{
+					if (vals1 != null)
+					{
+						System.out.println("Alert!" + " place id : " + placeID + " is in both spots");
+					}
+					
+					// System.out.println("found in spots2");
+					found = true;
+					// sequenceOfSpotsFound.append("2");
+					
+					countOfSpots2++;
+					
+					currentLat = vals2.get(0);
+					currentLon = vals2.get(1);
+				}
+				if (!found)
+				{
+					countOfNotFound++;
+					
+					currentLat = "-777";
+					currentLon = "-777";
+				}
+				
+				////
+				
+				if (found)
+				{
+					if (prevUser.equals(currUser))// prevLat.length() > 0 && prevLon.length() > 0 &&
+					{
+						// System.out.println("Computin/run/media/gunjan/BoX2/GowallaSpaceSpace/June16/g haversing for" + currentLat + " , " + currentLon + " --- " + prevLat + ","
+						// + prevLon);
+						distFromPrevInMeters = UtilityBelt.haversine(currentLat, currentLon, prevLat, prevLon);//
+						
+						// System.out.println("returned dist in km = " + distFromPrevInMeters);
+						distFromPrevInMeters = distFromPrevInMeters * 1000;
+						distFromPrevInMeters = UtilityBelt.round(distFromPrevInMeters, 2);
+					}
+					
+					else
+					{
+						distFromPrevInMeters = 0;
+						// System.out.println("prevlat=" + prevLat + " prevLon=" + prevLon);
+					}
+					
+					if (prevTime != null && prevUser.equals(currUser))
+					{
+						durationFromPrevInSeconds = -(currentTime.getTime() - prevTime.getTime()) / 1000;
+					}
+					
+					else
+					{
+						durationFromPrevInSeconds = 0;
+						// System.out.println("prevlat=" + prevLat + " prevLon=" + prevLon);
+					}
+				}
+				
+				if (Double.valueOf(currentLat) > -777 && Double.valueOf(currentLon) > -777) // when not found in spots 1 or spots 2
+				{
+					prevLat = currentLat;
+					prevLon = currentLon;
+				}
+				
+				prevTime = currentTime;
+				prevUser = currUser;
+				
+				// bw.write("UserID, PlaceID,TS,Date,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
+				// bw2.write("UserID,Date,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
+				
+				String towrite = currentLineRead + "," + currentDate + "," + currentLat + "," + currentLon + "," + spotCatID + ","
+						+ spotCatName + "," + distFromPrevInMeters + "," + durationFromPrevInSeconds + "\n";
+				String towrite2 = splittedString[0] + "," + currentDate + "," + spotCatID + "," + spotCatName + "," + distFromPrevInMeters
+						+ "," + durationFromPrevInSeconds + "\n";
+				
+				toWriteInBatch.append(towrite);
+				toWriteInBatch2.append(towrite2);
+				
+				if (lineCount % 70870 == 0)// 48260 == 0) // 24130 find divisors of 36001960 using http://www.javascripter.net/math/calculators/divisorscalculator.htm
+				{
+					bw.write(toWriteInBatch.toString());
+					toWriteInBatch.setLength(0);
+					bw2.write(toWriteInBatch2.toString());
+					toWriteInBatch2.setLength(0);
+				}
+				// $$bw.write(towrite);
+			}
+			
+			System.out.println("Count of spots1 = " + countOfSpots1);
+			System.out.println("Count of spots2 = " + countOfSpots2);
+			System.out.println("Count of not found = " + countOfNotFound);
+			br.close();
+			bw.close();
+			bw2.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+	}
+	
+	//////////////
 	/**
 	 * Replace all double and double double quotes in json values with single quote
 	 * 
@@ -908,9 +1120,22 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 		jsonString = jsonString.substring(2, jsonString.length() - 2);
 		
 		// jsonString = StringEscapeUtils.escapeJson(jsonString);
-		jsonString = jsonString.replaceAll("\"\"", "'");
-		jsonString = jsonString.replaceAll("\'s", "^s");
-		jsonString = jsonString.replaceAll("n\' D", "n^ D");
+		/*
+		 * An invocation of this method of the form str.replaceAll(regex, repl) yields exactly the same result as the expression
+		 * java.util.regex.Pattern.compile(regex).matcher(str).replaceAll(repl)
+		 */
+		//
+		
+		jsonString = patternDoubleQuotes.matcher(jsonString).replaceAll("'");// jsonString.replaceAll("\"\"", "'");
+		jsonString = patternApostropheS.matcher(jsonString).replaceAll("^s");
+		jsonString = patternND.matcher(jsonString).replaceAll("n^ D");
+		
+		///// start of replaced 1
+		// // replaced by above for performance concerns
+		// jsonString = jsonString.replaceAll("\"\"", "'");
+		// jsonString = jsonString.replaceAll("\'s", "^s");
+		// jsonString = jsonString.replaceAll("n\' D", "n^ D");
+		///// end of replaced 1
 		
 		// jsonString = jsonString.replaceAll("([a-z]+)(')([s])", "\2\4");
 		// jsonString = jsonString.replaceAll("(\\D+)(')(\\D+)", "\2\4");
@@ -1015,13 +1240,16 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	 * </p>
 	 * 
 	 * @param fileName
+	 *            comma delimited values
 	 * @return map with each lines
 	 */
 	public static HashMap<Long, ArrayList<String>> readSpotSubset(String fileName)
 	{
-		String dlimPatrn = Pattern.quote(",");
+		// String dlimPatrn = Pattern.quote(","); // removed for performance
 		HashMap<Long, ArrayList<String>> map1 = new HashMap<Long, ArrayList<String>>();
 		StringBuffer listOfDuplicateEntries = new StringBuffer();
+		
+		long t1 = System.currentTimeMillis();
 		try
 		{
 			// DB db = DBMaker.fileDB("fileSpotSubset1.db").make();
@@ -1056,7 +1284,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 					System.out.println("Lines read = " + lineCount);
 				}
 				
-				String[] splittedString = currentLine.split(dlimPatrn);
+				String[] splittedString = currentLine.split(",");// dlimPatrn);//StringUtils.split(currentLine,",");//
 				
 				// if (splittedString.length != expectedLength)
 				// {
@@ -1091,7 +1319,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 					if (vals.equals(alreadyInMapValue)) // note: equals here checks if each corresponding val is equal, is order sensitive
 					{
 						// duplicate entry, can safely ignore
-						listOfDuplicateEntries.append(key);
+						listOfDuplicateEntries.append(key + ",");
 					}
 					
 					else
@@ -1122,6 +1350,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			e.printStackTrace();
 		}
 		System.out.println("returned map if of size: " + map1.size());
+		System.out.println("readSpotSubset " + fileName + " took :" + (System.currentTimeMillis() - t1) + " ms");
 		return map1;
 	}
 	
