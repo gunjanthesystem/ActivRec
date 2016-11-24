@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import org.activity.util.StringUtilityBelt;
+import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -871,7 +871,7 @@ public class TrackListenEntry extends DataEntry implements Serializable, IDataEn
 		// serID, musicbrainzartistid, artistname, musicbrainztrackid, trackname, timestamp
 		return userID + "," + timestamp + "," + this.getEndTimestamp() + "," + mbArtistID + "," + artistName + "," + mbTrackID + ","
 				+ trackName + "," + this.differenceWithNextInSeconds + "," + this.durationInSeconds + ","
-				+ StringUtilityBelt.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_") + "," + this.extraComments + ","
+				+ StringUtils.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_") + "," + this.extraComments + ","
 				+ this.breakOverDaysCount;
 		// + ", " + lat.toString().replaceAll(",", "_") + ", " + lon.toString().replaceAll(",", "_") + ", "
 		// + alt.toString().replaceAll(",", "_");
@@ -888,7 +888,7 @@ public class TrackListenEntry extends DataEntry implements Serializable, IDataEn
 		// serID, musicbrainzartistid, artistname, musicbrainztrackid, trackname, timestamp
 		return userID + delimiter + timestamp + delimiter + this.getEndTimestamp() + delimiter + mbArtistID + delimiter + artistName
 				+ delimiter + mbTrackID + delimiter + trackName + delimiter + this.differenceWithNextInSeconds + delimiter
-				+ this.durationInSeconds + delimiter + StringUtilityBelt.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_")
+				+ this.durationInSeconds + delimiter + StringUtils.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_")
 				+ delimiter + this.extraComments + delimiter + this.breakOverDaysCount;
 		// + ", " + lat.toString().replaceAll(",", "_") + ", " + lon.toString().replaceAll(",", "_") + ", "
 		// + alt.toString().replaceAll(",", "_");
@@ -934,7 +934,7 @@ public class TrackListenEntry extends DataEntry implements Serializable, IDataEn
 		// serID, musicbrainzartistid, artistname, musicbrainztrackid, trackname, timestamp
 		return userID + delimiter + timestamp + delimiter + this.getEndTimestamp() + delimiter + artistName + trackName + delimiter
 				+ this.differenceWithNextInSeconds + delimiter + this.durationInSeconds + delimiter
-				+ StringUtilityBelt.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_");
+				+ StringUtils.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_");
 		
 	}
 	// public static String getAverage(ArrayList <String> marks)

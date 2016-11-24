@@ -16,7 +16,6 @@ import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.StayPointsAllDataContainer;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.util.Constant;
-import org.activity.util.TimestampSerializer;
 import org.nustaq.serialization.FSTConfiguration;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;

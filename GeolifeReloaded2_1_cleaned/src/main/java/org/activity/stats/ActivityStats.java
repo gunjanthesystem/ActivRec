@@ -15,7 +15,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.objects.UserDayTimeline;
 import org.activity.util.Constant;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 public class ActivityStats
@@ -43,7 +43,7 @@ public class ActivityStats
 		
 		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines =
 				new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
-		usersDayTimelines = TimelineUtilities.cleanDayTimelines(usersDayTimelinesAll);
+		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
 		
 	}
 	
@@ -68,7 +68,7 @@ public class ActivityStats
 		
 		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines =
 				new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
-		usersDayTimelines = TimelineUtilities.cleanDayTimelines(usersDayTimelinesAll);
+		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
 		
 	}
 	

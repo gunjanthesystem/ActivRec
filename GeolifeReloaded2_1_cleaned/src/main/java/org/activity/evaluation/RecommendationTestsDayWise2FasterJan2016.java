@@ -18,12 +18,11 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterDayWise2FasterJan2016;
-import org.activity.tests.Evaluation;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -224,7 +223,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 						
 						// //////////////////REMOVING SELECTED TIMELINES FROM
 						// DATASET///////////////////////////////////////////////////////
-						userAllDatesTimeslines = TimelineUtilities.cleanUserDayTimelines(userAllDatesTimeslines);
+						userAllDatesTimeslines = TimelineUtils.cleanUserDayTimelines(userAllDatesTimeslines);
 						// ////////////////////////////////////////////////////////////////////////////////
 						
 						boolean hasGeoCoordinates = Constant.hasGeoCoordinates(Constant.getDatabaseName());

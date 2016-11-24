@@ -837,7 +837,7 @@ public class TestExperiments
 			
 			// System.out.println("String representation = " + gunjanSAX.SAXUtilityBelt.getSAXString(vals, stamps, 5,
 			// 10));
-			System.out.println("String representation = " + org.activity.util.SAXUtilityBelt.getSAXString(vals, stamps, 12, 20));
+			System.out.println("String representation = " + org.activity.util.SAXUtils.getSAXString(vals, stamps, 12, 20));
 			
 			// System.out.println(Double.MAX_VALUE);
 		}

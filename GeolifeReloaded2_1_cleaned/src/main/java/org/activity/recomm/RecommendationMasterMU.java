@@ -14,6 +14,7 @@ import org.activity.distances.FeatureWiseEditDistance;
 import org.activity.distances.FeatureWiseWeightedEditDistance;
 import org.activity.distances.HJEditDistance;
 import org.activity.distances.OTMDSAMEditDistance;
+import org.activity.evaluation.Evaluation;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
@@ -21,10 +22,10 @@ import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
-import org.activity.tests.Evaluation;
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
 import org.activity.util.StringCode;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
@@ -670,7 +671,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		int countCandBeforeThresholdPruning = editDistancesMapUnsortedFullCand.size();// distanceScoresSorted.size();
 		
 		editDistancesMapUnsortedFullCand =
-				UtilityBelt.removeAboveThreshold4FullCandISD(editDistancesMapUnsortedFullCand, thresholdAsDistance);// distanceScoresSorted=
+				TimelineUtils.removeAboveThreshold4FullCandISD(editDistancesMapUnsortedFullCand, thresholdAsDistance);// distanceScoresSorted=
 																													// UtilityBelt.removeAboveThreshold2(distanceScoresSorted,thresholdAsDistance);
 		int countCandAfterThresholdPruning = editDistancesMapUnsortedFullCand.size();
 		

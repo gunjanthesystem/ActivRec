@@ -1,4 +1,4 @@
-package org.activity.util;
+package org.activity.objects;
 
 import java.sql.Timestamp;
 import java.util.TimeZone;

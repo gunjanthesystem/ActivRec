@@ -10,14 +10,15 @@ import java.util.regex.Pattern;
 
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
+import org.activity.evaluation.Evaluation;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
-import org.activity.tests.Evaluation;
 import org.activity.util.Constant;
 import org.activity.util.StringCode;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /* Recreating the cleaner version of RecommendationMaster used in IIWAS experiment. This uses daywise timelines*/
@@ -173,7 +174,7 @@ public class RecommendationMasterDayWise2Faster
 		
 		int countCandBeforeThresholdPruning = editDistancesSortedMap.size();
 		
-		editDistancesSortedMap = UtilityBelt.removeAboveThresholdDISD(editDistancesSortedMap, thresholdAsDistance);
+		editDistancesSortedMap = TimelineUtils.removeAboveThresholdDISD(editDistancesSortedMap, thresholdAsDistance);
 		int countCandAfterThresholdPruning = editDistancesSortedMap.size();
 		this.thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
 		// ////////////////////////////////

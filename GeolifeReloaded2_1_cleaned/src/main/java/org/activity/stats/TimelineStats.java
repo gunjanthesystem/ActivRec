@@ -36,10 +36,10 @@ import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.DescriptiveStatisticsG;
-import org.activity.util.GunjanUtils;
+import org.activity.util.HilbertCurveUtils;
 import org.activity.util.HjorthParameters;
 import org.activity.util.StringCode;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.complex.Complex;
@@ -121,8 +121,8 @@ public class TimelineStats
 		// //////////////////
 		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines =
 				new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
-		usersDayTimelines = TimelineUtilities.cleanDayTimelines(usersDayTimelinesAll);
-		usersDayTimelines = TimelineUtilities.rearrangeDayTimelinesOrderForDataset(usersDayTimelines);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
+		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
+		usersDayTimelines = TimelineUtils.rearrangeDayTimelinesOrderForDataset(usersDayTimelines);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
 		WritingToFile.writeUsersDayTimelines(usersDayTimelines, "users", true, true, true);// users
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines);
 		
@@ -1633,7 +1633,7 @@ public class TimelineStats
 					
 					long latitude1AsLong = (long) (latitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
 					long longitude1AsLong = (long) (longitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
-					value = GunjanUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
+					value = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
 					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," + value, "ActivityCodeForSeries");
 					dataToPut.put(time, value);
 					time = new Timestamp(time.getTime() + 1000 * 60 * 60);
@@ -1667,7 +1667,7 @@ public class TimelineStats
 					
 					long latitude1AsLong = (long) (latitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
 					long longitude1AsLong = (long) (longitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
-					value = GunjanUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
+					value = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
 					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," + value, "ActivityCodeForSeries");
 					dataToPut.put(time, value);
 					time = new Timestamp(time.getTime() + 1000 * 60 * 60);

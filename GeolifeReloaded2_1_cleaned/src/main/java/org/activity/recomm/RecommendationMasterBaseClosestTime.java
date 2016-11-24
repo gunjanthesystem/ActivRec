@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.evaluation.Evaluation;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
-import org.activity.tests.Evaluation;
 import org.activity.util.Constant;
 import org.activity.util.UtilityBelt;
 

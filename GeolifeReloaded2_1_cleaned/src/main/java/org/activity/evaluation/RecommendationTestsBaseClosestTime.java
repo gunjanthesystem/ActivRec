@@ -17,12 +17,11 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterBaseClosestTime;
-import org.activity.tests.Evaluation;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 public class RecommendationTestsBaseClosestTime
@@ -254,8 +253,8 @@ public class RecommendationTestsBaseClosestTime
 						userAllDatesTimeslines = userTimelines.get(Integer.toString(userId));// userId);
 						
 						// //////////////////REMOVING SELECTED TIMELINES FROM DATASET///////////////////////////////////////////////////////
-						userAllDatesTimeslines = TimelineUtilities.removeDayTimelinesWithNoValidAct(userAllDatesTimeslines);
-						userAllDatesTimeslines = TimelineUtilities.removeWeekendDayTimelines(userAllDatesTimeslines);
+						userAllDatesTimeslines = TimelineUtils.removeDayTimelinesWithNoValidAct(userAllDatesTimeslines);
+						userAllDatesTimeslines = TimelineUtils.removeWeekendDayTimelines(userAllDatesTimeslines);
 						// userAllDatesTimeslines=UtilityBelt.removeWeekdaysTimelines(userAllDatesTimeslines);
 						// ////////////////////////////////////////////////////////////////////////////////
 						

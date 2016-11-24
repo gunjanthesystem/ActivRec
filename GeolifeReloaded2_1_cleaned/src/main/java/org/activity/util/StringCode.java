@@ -136,7 +136,7 @@ public class StringCode
 		
 		try
 		{
-			resultant = SAXUtilityBelt.getSAXString(vals, stamps, actObjs.size(), Constant.SAXStartTimeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXStartTimeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
 																														// SAXFactory.ts2string(ts,
 																														// actObjs.size(), new
 			// NormalAlphabet(), 10);
@@ -199,7 +199,7 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtilityBelt.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXStartTimeAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXStartTimeAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -242,7 +242,7 @@ public class StringCode
 		
 		try
 		{
-			resultant = SAXUtilityBelt.getSAXString(vals, stamps, actObjs.size(), Constant.SAXDurationAlphabsetSize);// SAXFactory.ts2string(ts, actObjs.size(), new
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXDurationAlphabsetSize);// SAXFactory.ts2string(ts, actObjs.size(), new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
 		}
@@ -307,7 +307,7 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtilityBelt.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXDurationAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXDurationAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -348,7 +348,7 @@ public class StringCode
 		
 		try
 		{
-			resultant = SAXUtilityBelt.getSAXString(vals, stamps, actObjs.size(), Constant.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
 																																// actObjs.size(),
 			// new
 			// NormalAlphabet(), 10);
@@ -414,7 +414,7 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtilityBelt.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXDistanceTravelledAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXDistanceTravelledAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -455,7 +455,7 @@ public class StringCode
 		
 		try
 		{
-			resultant = SAXUtilityBelt.getSAXString(vals, stamps, actObjs.size(), Constant.SAXAvgAltitudeAlphabsetSize);// SAXFactory.ts2string(ts, actObjs.size(),
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXAvgAltitudeAlphabsetSize);// SAXFactory.ts2string(ts, actObjs.size(),
 																														// new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
@@ -521,7 +521,7 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtilityBelt.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXAvgAltitudeAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXAvgAltitudeAlphabsetSize);
 			
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
@@ -573,7 +573,7 @@ public class StringCode
 				long latitude1AsLong = (long) (latitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
 				long longitude1AsLong = (long) (longitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
 				
-				vals1[i] = GunjanUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
+				vals1[i] = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
 				stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
 				if (Constant.verboseHilbert)
 				{
@@ -599,7 +599,7 @@ public class StringCode
 				long latitude2AsLong = (long) (latitude2 * Constant.decimalPlacesInGeocordinatesForComputations);
 				long longitude2AsLong = (long) (longitude2 * Constant.decimalPlacesInGeocordinatesForComputations);
 				
-				vals2[i] = GunjanUtils.getCompactHilbertCurveIndex(latitude2AsLong, longitude2AsLong);
+				vals2[i] = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude2AsLong, longitude2AsLong);
 				stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
 				if (Constant.verboseHilbert)
 				{
@@ -615,7 +615,7 @@ public class StringCode
 			long stampsAll[] = ArrayUtils.addAll(stamps1, stamps2);
 			
 			String resultant;
-			resultant = SAXUtilityBelt.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXAvgAltitudeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXAvgAltitudeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
 			
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
@@ -672,7 +672,7 @@ public class StringCode
 				long latitude1AsLong = (long) (latitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
 				long longitude1AsLong = (long) (longitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
 				
-				vals1[i] = GunjanUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
+				vals1[i] = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
 				stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
 				if (Constant.verboseHilbert)
 				{
@@ -698,7 +698,7 @@ public class StringCode
 				long latitude2AsLong = (long) (latitude2 * Constant.decimalPlacesInGeocordinatesForComputations);
 				long longitude2AsLong = (long) (longitude2 * Constant.decimalPlacesInGeocordinatesForComputations);
 				
-				vals2[i] = GunjanUtils.getCompactHilbertCurveIndex(latitude2AsLong, longitude2AsLong);
+				vals2[i] = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude2AsLong, longitude2AsLong);
 				stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
 				if (Constant.verboseHilbert)
 				{
@@ -714,7 +714,7 @@ public class StringCode
 			long stampsAll[] = ArrayUtils.addAll(stamps1, stamps2);
 			
 			String resultant;
-			resultant = SAXUtilityBelt.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXAvgAltitudeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXAvgAltitudeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
 			
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);

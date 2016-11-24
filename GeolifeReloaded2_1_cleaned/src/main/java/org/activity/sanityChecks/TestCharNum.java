@@ -1,4 +1,4 @@
-package org.activity.util;
+package org.activity.sanityChecks;
 
 public class TestCharNum
 {

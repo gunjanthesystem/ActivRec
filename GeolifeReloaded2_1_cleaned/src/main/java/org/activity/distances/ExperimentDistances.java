@@ -10,7 +10,7 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserDayTimeline;
 import org.activity.util.Constant;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 public class ExperimentDistances
@@ -43,7 +43,7 @@ public class ExperimentDistances
 			String userID = usersTimelinesEntry.getKey();
 			LinkedHashMap<Date, UserDayTimeline> userDayTimelines = usersTimelinesEntry.getValue();
 			// System.out.println("\nUser ID: " + userID);
-			userDayTimelines = TimelineUtilities.cleanUserDayTimelines(userDayTimelines);
+			userDayTimelines = TimelineUtils.cleanUserDayTimelines(userDayTimelines);
 			
 			Timeline timeline = new Timeline(userDayTimelines);
 			

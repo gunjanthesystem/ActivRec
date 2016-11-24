@@ -86,10 +86,10 @@ public class ControllerServlet extends HttpServlet
 				JSONArray jsonArray = ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString, whereQueryString, "");
 				
 				// jsonArray is actually an array of JSON objects
-				HashMap<String, ArrayList<ActivityObject>> timeLines = TimelineUtilities.createTimelinesFromJsonArray(jsonArray);
+				HashMap<String, ArrayList<ActivityObject>> timeLines = TimelineUtils.createTimelinesFromJsonArray(jsonArray);
 				System.out.println("QQQQQQQQ1 timeLines.size() =" + timeLines.size());
 				
-				TimelineUtilities.traverseTimelines(timeLines);
+				TimelineUtils.traverseTimelines(timeLines);
 				System.out.println("QQQQQQQQ2 timeLines.size() =" + timeLines.size());
 				
 				// Timestamp earliestTimestamp = UtilityBelt.getEarliestTimestamp(timeLines.get(0));
@@ -238,7 +238,7 @@ public class ControllerServlet extends HttpServlet
 				
 				ArrayList<ActivityObject> allActivityEvents = UtilityBelt.createActivityObjectsFromJsonArray(jsonArray);
 				
-				LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines = TimelineUtilities.createUserTimelinesFromActivityObjects(allActivityEvents);
+				LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines = TimelineUtils.createUserTimelinesFromActivityObjects(allActivityEvents);
 				
 				System.out.println("userTimelines.size()=" + userTimelines.size());
 				
