@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.activity.util.StringUtilityBelt;
+import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -420,7 +420,7 @@ public class TrajectoryEntry implements Serializable
 		
 		return timestamp.toGMTString() + " , " + endTimestampString + ", " + mode + ", " + this.differenceWithNextInSeconds + ", "
 				+ this.durationInSeconds + ", " + this.breakOverDaysCount + ", " + getNumberOfDistinctTrajectoryIDs() + ","
-				+ getNumberOfTrajectoryIDs() + StringUtilityBelt.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_") + ", "
+				+ getNumberOfTrajectoryIDs() + StringUtils.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_") + ", "
 				+ lat.toString().replaceAll(",", "_") + ", " + lon.toString().replaceAll(",", "_") + ", "
 				+ alt.toString().replaceAll(",", "_");
 		
@@ -443,7 +443,7 @@ public class TrajectoryEntry implements Serializable
 		
 		return timestamp.toGMTString() + " , " + endTimestampString + ", " + mode + ", " + this.differenceWithNextInSeconds + ", "
 				+ this.durationInSeconds + ", " + this.breakOverDaysCount + ", " + getNumberOfDistinctTrajectoryIDs() + ","
-				+ getNumberOfTrajectoryIDs() + "," + StringUtilityBelt.toStringCompactWithoutCount(this.trajectoryID).replaceAll(",", "_")
+				+ getNumberOfTrajectoryIDs() + "," + StringUtils.toStringCompactWithoutCount(this.trajectoryID).replaceAll(",", "_")
 				+ ", " + lat.toString().replaceAll(",", "_") + ", " + lon.toString().replaceAll(",", "_") + ", "
 				+ alt.toString().replaceAll(",", "_");
 		
@@ -640,7 +640,7 @@ public class TrajectoryEntry implements Serializable
 	 */
 	public static String getTrajectoryIDsAsCompactWithCount(TrajectoryEntry te)
 	{
-		return StringUtilityBelt.toStringCompactWithCount(te.getTrajectoryID(), "_");
+		return StringUtils.toStringCompactWithCount(te.getTrajectoryID(), "_");
 	}
 	
 	/**
@@ -651,7 +651,7 @@ public class TrajectoryEntry implements Serializable
 	 */
 	public static String getTrajectoryIDsAsCompactWithoutCount(TrajectoryEntry te)
 	{
-		return StringUtilityBelt.toStringCompactWithoutCount(te.getTrajectoryID(), "_");
+		return StringUtils.toStringCompactWithoutCount(te.getTrajectoryID(), "_");
 	}
 	
 	/**

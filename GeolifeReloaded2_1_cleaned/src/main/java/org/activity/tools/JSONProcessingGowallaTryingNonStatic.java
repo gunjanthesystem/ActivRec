@@ -42,7 +42,8 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
-	String commonPath = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep1/";
+	String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep1/";
+	static String catHierarchyFileNameToRead;
 	
 	TreeMap<Integer, String> catIDNameDictionary;
 	Map<String, TreeMap<Integer, Long>> checkinCountResultsTogether;
@@ -151,17 +152,20 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		// $$PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		
-		String catHierarchyFileNameToRead =
-				"/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
-		String checkinFileNameToRead = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnly.csv";/// gw2CheckinsSpots1Slim1TargetUsersDatesOnly.csv";
-		String checkinFileNameToWrite =
-				"/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnlyWithLevels.csv";
+		catHierarchyFileNameToRead =
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
+		// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
+		String checkinFileNameToRead =
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnly.csv";
+		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnly.csv";/// gw2CheckinsSpots1Slim1TargetUsersDatesOnly.csv";
+		String checkinFileNameToWrite = commonPath + "gw2CheckinsSpots1TargetUsersDatesOnlyWithLevels.csv";
+		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnlyWithLevels.csv";
 		String fileNameToWriteCatLevelDistro = commonPath + "gw2CheckinsSpots1Slim1TargetUsersDatesOnlyCatLevelDistributionJava_";
 		
 		try
 		{
 			Triple<LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>> catIDNamesFor3Levels =
-					getCatIDNamesForEachLevelFromJSON();
+					getCatIDNamesForEachLevelFromJSON(catHierarchyFileNameToRead);
 			
 			LinkedHashMap<Integer, String> level1CatIDNames = (LinkedHashMap<Integer, String>) catIDNamesFor3Levels.getFirst();
 			LinkedHashMap<Integer, String> level2CatIDNames = (LinkedHashMap<Integer, String>) catIDNamesFor3Levels.getSecond();
@@ -419,7 +423,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		
-		Triple catLevelMaps = getCatIDNamesForEachLevelFromJSON();
+		Triple catLevelMaps = getCatIDNamesForEachLevelFromJSON(catHierarchyFileNameToRead);
 		
 		LinkedHashMap<Integer, TreeSet<Integer>> flatMapLevel1 = getTwoLevelCategoryHierarchyFromJSON();
 		TreeMap<Integer, Long> level1OverallDistribution = new TreeMap<Integer, Long>();
@@ -576,7 +580,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	{
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		
-		Triple catLevelMaps = getCatIDNamesForEachLevelFromJSON();
+		Triple catLevelMaps = getCatIDNamesForEachLevelFromJSON(catHierarchyFileNameToRead);
 		
 		LinkedHashMap<Integer, String> level1Map = (LinkedHashMap<Integer, String>) catLevelMaps.getFirst();
 		LinkedHashMap<Integer, String> level2Map = (LinkedHashMap<Integer, String>) catLevelMaps.getSecond();
@@ -772,17 +776,19 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	/**
 	 * Get the three linkedhashmaps, one for each of the three category levels. The map contains (catergryID,categoryName) for that level.
 	 * 
+	 * @param catHierarchyFileNameToRead
+	 * 
 	 * @return a Triple containing the three hashmaps.
 	 */
 	public static Triple<LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>>
-			getCatIDNamesForEachLevelFromJSON()
+			getCatIDNamesForEachLevelFromJSON(String catHierarchyFileNameToRead)
 	{
 		
-		String fileNameToRead =
-				"/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
+		String fileNameToRead = catHierarchyFileNameToRead;
+		// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
 		int countOfLines = -1;
 		
-		System.out.println("Entering getCategoryLevelsMapsFromJSON");
+		System.out.println("Entering getCatIDNamesForEachLevelFromJSON");// getCategoryLevelsMapsFromJSON");
 		// level0Map = new LinkedHashMap<String, Object>();
 		// <CatID,NameOfCategory>
 		LinkedHashMap<Integer, String> level1Map = new LinkedHashMap<Integer, String>();
@@ -916,7 +922,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 			e.printStackTrace();
 		}
 		
-		System.out.println("Exiting getCategoryLevelsMapsFromJSON\n");
+		System.out.println("Exiting getCatIDNamesForEachLevelFromJSON\n");
 		return new Triple<LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>>(level1Map,
 				level2Map, level3Map);
 	}

@@ -10,7 +10,7 @@ import org.activity.jmotif.timeseries.Timeseries;
 import net.seninp.jmotif.sax.SAXException;
 import net.seninp.jmotif.sax.SAXProcessor;
 
-public class SAXUtilityBelt
+public class SAXUtils
 {
 	
 	public static void main(String[] args)

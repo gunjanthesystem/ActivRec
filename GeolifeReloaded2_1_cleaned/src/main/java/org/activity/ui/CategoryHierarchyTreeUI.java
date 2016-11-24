@@ -41,7 +41,7 @@ import javafx.util.Callback;
  */
 public class CategoryHierarchyTreeUI extends Application
 {
-	final String commonPath = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/";
+	final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/";
 	PrintStream consoleLogStream;
 	TreeItem<String> rootNode;
 	
@@ -49,12 +49,13 @@ public class CategoryHierarchyTreeUI extends Application
 	private final TextArea msgLogFld = new TextArea();
 	private ListView<String> listForCatIDsToAdd;// = new ListView();
 	
-	private final String serializedCatTreeFileNamePhrase = "RootOfCategoryTree9Sep2016.DMTreeNode";
+	private final String serializedCatTreeFileNamePhrase = "RootOfCategoryTree24Nov2016.DMTreeNode";// "RootOfCategoryTree9Sep2016.DMTreeNode";
 	
-	private final String whichRootToUse = "updated";// "originalRaw";//"updated
+	private final String whichRootToUse = "originalRaw";// "updated
 	
 	public static void main(String[] args)
 	{
+		System.setProperty("prism.allowhidpi", "true");
 		launch(args);
 	}
 	

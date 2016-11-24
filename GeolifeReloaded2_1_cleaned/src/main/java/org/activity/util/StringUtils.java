@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * @author gunjan
  *
  */
-public class StringUtilityBelt
+public class StringUtils
 {
 	
 	public static void main(String[] args)

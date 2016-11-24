@@ -21,12 +21,11 @@ import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterMU;
-import org.activity.tests.Evaluation;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -283,7 +282,7 @@ public class RecommendationTestsMU
 							
 							// //////////////////REMOVING SELECTED TIMELINES FROM DATASET///////////////////////////////////////////////////////
 							// userAllDatesTimeslines = TimelineUtilities.cleanUserDayTimelines(userAllDatesTimeslines);
-							userAllDatesTimeslines = TimelineUtilities.cleanUserDayTimelines(userAllDatesTimeslines,
+							userAllDatesTimeslines = TimelineUtils.cleanUserDayTimelines(userAllDatesTimeslines,
 									commonPath + "InsideRecommTestCleanUserDayTimelines", String.valueOf(userId));
 							// ////////////////////////////////////////////////////////////////////////////////
 							if (matchingUnitIterator == 0) // write the given day timelines only once

@@ -1,4 +1,4 @@
-package org.activity.tests;
+package org.activity.evaluation;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,7 +21,7 @@ import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -198,10 +198,10 @@ public final class RecommendationTestsDayWise2Faster
 						if (userAllDatesTimeslines == null)
 							continue;
 						// //////////////////REMOVING SELECTED TIMELINES FROM DATASET///////////////////////////////////////////////////////
-						userAllDatesTimeslines = TimelineUtilities.removeDayTimelinesWithNoValidAct(userAllDatesTimeslines);
-						userAllDatesTimeslines = TimelineUtilities.removeDayTimelinesWithOneOrLessDistinctValidAct(userAllDatesTimeslines);
+						userAllDatesTimeslines = TimelineUtils.removeDayTimelinesWithNoValidAct(userAllDatesTimeslines);
+						userAllDatesTimeslines = TimelineUtils.removeDayTimelinesWithOneOrLessDistinctValidAct(userAllDatesTimeslines);
 						
-						userAllDatesTimeslines = TimelineUtilities.removeWeekendDayTimelines(userAllDatesTimeslines);
+						userAllDatesTimeslines = TimelineUtils.removeWeekendDayTimelines(userAllDatesTimeslines);
 						// userAllDatesTimeslines=UtilityBelt.removeWeekdaysTimelines(userAllDatesTimeslines);
 						// ////////////////////////////////////////////////////////////////////////////////
 						

@@ -35,7 +35,7 @@ import org.activity.objects.StayPointsAllDataContainer;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
-import org.activity.util.StringUtilityBelt;
+import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -514,7 +514,7 @@ public class DatabaseCreatorGeolifeQuickerTrajNoMode
 								TrajectoryEntry stayPoint = mergeTrajectoryEntries(
 										new ArrayList<TrajectoryEntry>(dataEntriesForCurrentUser.subList(i, endPoint + 1)));// add i to just before end point ....to j-1 points // j
 																															// + 1)));
-								String trajIDKeyString = StringUtilityBelt.toStringCompactWithoutCount(stayPoint.getTrajectoryID(), "_"); // check for multiple traj id in stay
+								String trajIDKeyString = StringUtils.toStringCompactWithoutCount(stayPoint.getTrajectoryID(), "_"); // check for multiple traj id in stay
 																																			// point
 								// System.out.println("User id: " + userID + "Adding staypoint:"
 								// + stayPoint.toStringWithoutHeadersWithTrajID());

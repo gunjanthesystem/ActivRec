@@ -21,7 +21,7 @@ import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -196,14 +196,14 @@ public class ControllerWithoutServer
 									"/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
 					
 					usersDayTimelinesOriginal =
-							TimelineUtilities.createUserTimelinesFromCheckinEntriesGowalla(mapForAllCheckinData, mapForAllLocationData);
+							TimelineUtils.createUserTimelinesFromCheckinEntriesGowalla(mapForAllCheckinData, mapForAllLocationData);
 				}
 				else
 				{
 					ArrayList<ActivityObject> allActivityEvents = UtilityBelt.createActivityObjectsFromJsonArray(jsonArrayD.getJSONArray());
 					// UtilityBelt.traverseActivityEvents(allActivityEvents); // Debugging Check: OK
 					
-					usersDayTimelinesOriginal = TimelineUtilities.createUserTimelinesFromActivityObjects(allActivityEvents);
+					usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromActivityObjects(allActivityEvents);
 					
 				}
 				
@@ -245,7 +245,7 @@ public class ControllerWithoutServer
 				System.exit(-162);
 			}
 			
-			Pair<Boolean, String> hasDuplicateDates = TimelineUtilities.hasDuplicateDates(usersDayTimelinesOriginal);
+			Pair<Boolean, String> hasDuplicateDates = TimelineUtils.hasDuplicateDates(usersDayTimelinesOriginal);
 			
 			if (hasDuplicateDates.getFirst())
 			{
@@ -267,7 +267,7 @@ public class ControllerWithoutServer
 			System.out.println("Num of users = " + usersDayTimelinesOriginal.size());
 			
 			///// removed days with less than 10 acts per day
-			usersDayTimelinesOriginal = TimelineUtilities.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal, 10,
+			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal, 10,
 					Constant.getCommonPath() + "removeDayTimelinesWithLessThan10ActLog.csv");
 			
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal", false, false, false,
@@ -279,7 +279,7 @@ public class ControllerWithoutServer
 			System.out.println("Num of users reduced1 = " + usersDayTimelinesOriginal.size());
 			
 			///// removed users with less than 50 days
-			usersDayTimelinesOriginal = TimelineUtilities.removeUsersWithLessDays(usersDayTimelinesOriginal, 50,
+			usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal, 50,
 					Constant.getCommonPath() + "removeDayTimelinesWithLessThan50DaysLog.csv");
 			
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal", false, false, false,
@@ -297,7 +297,7 @@ public class ControllerWithoutServer
 			 * all invalid activity objects from the timeline</font></b>
 			 **/
 			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelines =
-					TimelineUtilities.cleanDayTimelines(usersDayTimelinesOriginal);
+					TimelineUtils.cleanDayTimelines(usersDayTimelinesOriginal);
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines, "usersCleanedDayTimelines", false, false, false,
 			// "GowallaUserDayTimelinesCleaned.csv");// users
 			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines, "usersCleanedDayTimelines",
@@ -307,7 +307,7 @@ public class ControllerWithoutServer
 			System.out.println("Num of users cleaned = " + usersCleanedDayTimelines.size());
 			
 			///// again remove users with less than 50 days (there are the clean days)
-			usersCleanedDayTimelines = TimelineUtilities.removeUsersWithLessDays(usersCleanedDayTimelines, 50,
+			usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 50,
 					Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan50DaysLog.csv");
 			
 			WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines, "usersCleanedDayTimelinesReduced3", false, false, false,

@@ -1,4 +1,4 @@
-package org.activity.tests;
+package org.activity.evaluation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

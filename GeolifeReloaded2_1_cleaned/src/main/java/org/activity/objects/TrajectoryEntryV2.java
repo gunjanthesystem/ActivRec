@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.activity.util.StringUtilityBelt;
+import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -369,7 +369,7 @@ public class TrajectoryEntryV2 extends DataEntry implements Serializable
 		
 		return timestamp.toGMTString() + " , " + endTimestampString + ", " + mode + ", " + this.differenceWithNextInSeconds + ", "
 				+ this.durationInSeconds + ", " + this.breakOverDaysCount + ", "
-				+ StringUtilityBelt.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_") + ", "
+				+ StringUtils.toStringCompactWithCount(this.trajectoryID).replaceAll(",", "_") + ", "
 				+ lat.toString().replaceAll(",", "_") + ", " + lon.toString().replaceAll(",", "_") + ", "
 				+ alt.toString().replaceAll(",", "_");
 		

@@ -14,7 +14,7 @@ import com.google.uzaygezen.core.CompactHilbertCurve;
  * @author gunjan
  *
  */
-public class GunjanUtils
+public class HilbertCurveUtils
 {
 	
 	static final int precisionInBits = 70; // 2^31 = 2147483648

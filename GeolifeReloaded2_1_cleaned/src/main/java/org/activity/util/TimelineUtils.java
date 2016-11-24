@@ -22,12 +22,13 @@ import org.activity.objects.CheckinEntry;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.json.JSONArray;
 
 /**
  */
-public class TimelineUtilities
+public class TimelineUtils
 {
 	
 	// public TimelineUtilities()
@@ -727,7 +728,7 @@ public class TimelineUtilities
 			// LinkedHashMap<Date, UserDayTimeline> cleanedDayTimelines =
 			// TimelineUtilities.cleanUserDayTimelines(usersTimelinesEntry.getValue());
 			
-			LinkedHashMap<Date, UserDayTimeline> cleanedDayTimelines = TimelineUtilities.cleanUserDayTimelines(
+			LinkedHashMap<Date, UserDayTimeline> cleanedDayTimelines = TimelineUtils.cleanUserDayTimelines(
 					usersTimelinesEntry.getValue(), Constant.getCommonPath() + "LogCleanedDayTimelines_", usersTimelinesEntry.getKey());
 			
 			if (cleanedDayTimelines.size() > 0)
@@ -760,9 +761,9 @@ public class TimelineUtilities
 	 */
 	public static LinkedHashMap<Date, UserDayTimeline> cleanUserDayTimelines(LinkedHashMap<Date, UserDayTimeline> userDayTimelines)
 	{
-		userDayTimelines = TimelineUtilities.removeDayTimelinesWithNoValidAct(userDayTimelines);
-		userDayTimelines = TimelineUtilities.removeDayTimelinesWithOneOrLessDistinctValidAct(userDayTimelines);
-		userDayTimelines = TimelineUtilities.removeWeekendDayTimelines(userDayTimelines);
+		userDayTimelines = TimelineUtils.removeDayTimelinesWithNoValidAct(userDayTimelines);
+		userDayTimelines = TimelineUtils.removeDayTimelinesWithOneOrLessDistinctValidAct(userDayTimelines);
+		userDayTimelines = TimelineUtils.removeWeekendDayTimelines(userDayTimelines);
 		
 		return userDayTimelines;
 	}
@@ -787,12 +788,12 @@ public class TimelineUtilities
 	{
 		String removeDayTimelinesWithNoValidActLog = logFileNamePhrase + "RemoveDayTimelinesWithNoValidAct.csv";
 		
-		userDayTimelines = TimelineUtilities.removeDayTimelinesWithNoValidAct(userDayTimelines, removeDayTimelinesWithNoValidActLog, user);
+		userDayTimelines = TimelineUtils.removeDayTimelinesWithNoValidAct(userDayTimelines, removeDayTimelinesWithNoValidActLog, user);
 		
-		userDayTimelines = TimelineUtilities.removeDayTimelinesWithOneOrLessDistinctValidAct(userDayTimelines,
+		userDayTimelines = TimelineUtils.removeDayTimelinesWithOneOrLessDistinctValidAct(userDayTimelines,
 				logFileNamePhrase + "RemoveDayTimelinesWithOneOrLessDistinctValidAct.csv", user);
 		userDayTimelines =
-				TimelineUtilities.removeWeekendDayTimelines(userDayTimelines, logFileNamePhrase + "RemoveWeekendDayTimelines.csv", user);
+				TimelineUtils.removeWeekendDayTimelines(userDayTimelines, logFileNamePhrase + "RemoveWeekendDayTimelines.csv", user);
 		
 		return userDayTimelines;
 	}
@@ -1580,6 +1581,261 @@ public class TimelineUtilities
 		WritingToFile.writeToNewFile(log.toString(), fileNameForLog);
 		System.out.println("Exiting removeUsersWithLessDays");
 		return result;
+	}
+
+	/**
+	 * Removes timelines which whose edit distance are above the given threshold
+	 * 
+	 * @param distanceScoresSorted
+	 * @param threshold
+	 * @return a Map of Date (Key) of candidate timelines and their corresponding edit distance(value)
+	 */
+	public static LinkedHashMap<Date, Double> removeAboveThreshold(LinkedHashMap<Date, Double> distanceScoresSorted, double threshold)
+	{
+		LinkedHashMap<Date, Double> pruned = new LinkedHashMap<Date, Double>();
+		
+		System.out.println("Inside removeAboveThreshold");
+		for (Map.Entry<Date, Double> entry : distanceScoresSorted.entrySet()) // Iterate over Users
+		{
+			System.out.print(" __reading:" + entry.getValue());
+			if (entry.getValue() <= threshold)
+			{
+				pruned.put(entry.getKey(), entry.getValue());
+				System.out.print(" keeping entry for:" + entry.getValue());
+			}
+			else
+			{
+				System.out.print(" removing entry for:" + entry.getValue());
+			}
+			System.out.print("~~~~~~~~");
+		}
+		return pruned;
+	}
+
+	/**
+	 * Removes timelines which whose edit distance are above the given threshold
+	 * 
+	 * @param distanceScoresSorted
+	 * @param threshold
+	 * @return a Map of Date (Key) of candidate timelines and their corresponding edit distance(value)
+	 */
+	public static LinkedHashMap<Date, Triple<Integer, String, Double>>
+			removeAboveThresholdDISD(LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScoresSorted, double threshold)
+	{
+		LinkedHashMap<Date, Triple<Integer, String, Double>> pruned = new LinkedHashMap<Date, Triple<Integer, String, Double>>();
+		
+		System.out.println("Inside removeAboveThreshold");
+		for (Map.Entry<Date, Triple<Integer, String, Double>> entry : distanceScoresSorted.entrySet()) // Iterate over Users
+		{
+			System.out.print(" __reading:" + entry.getValue());
+			
+			if (entry.getValue().getThird() <= threshold)
+			{
+				pruned.put(entry.getKey(), entry.getValue());
+				System.out.print(" keeping entry for:" + entry.getValue().toString());
+			}
+			
+			else
+			{
+				System.out.print(" removing entry for:" + entry.getValue().toString());
+			}
+			
+			System.out.print("~~~~~~~~");
+		}
+		return pruned;
+	}
+
+	/**
+	 * Removes timelines which whose edit distance are above the given threshold
+	 * 
+	 * @param distanceScoresSorted
+	 * @param threshold
+	 * @return a Map of String ID (Key) of candidate timelines and their corresponding edit distance(value)
+	 */
+	public static LinkedHashMap<String, Double> removeAboveThreshold2(LinkedHashMap<String, Double> distanceScoresSorted, double threshold)
+	{
+		LinkedHashMap<String, Double> pruned = new LinkedHashMap<String, Double>();
+		int numberOfTimelinesRemoved = 0;
+		System.out.println("Inside removeAboveThreshold2");
+		for (Map.Entry<String, Double> entry : distanceScoresSorted.entrySet())
+		{
+			System.out.print(" __reading:" + entry.getValue());
+			if (entry.getValue() <= threshold)
+			{
+				pruned.put(entry.getKey(), entry.getValue());
+				System.out.print(" keeping entry for:" + entry.getValue());
+			}
+			else
+			{
+				System.out.print(" removing entry for:" + entry.getValue());
+				numberOfTimelinesRemoved += 1;
+			}
+		}
+		
+		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		return pruned;
+	}
+
+	/**
+	 * Removes timelines which whose edit distance are above the given threshold
+	 * 
+	 * @param distanceScoresSorted
+	 * @param threshold
+	 * @return a Map of String ID (Key) of candidate timelines and their corresponding edit distance(value)
+	 */
+	public static LinkedHashMap<String, Pair<Integer, Double>>
+			removeAboveThreshold3(LinkedHashMap<String, Pair<Integer, Double>> distanceScoresSorted, double threshold)
+	{
+		LinkedHashMap<String, Pair<Integer, Double>> pruned = new LinkedHashMap<String, Pair<Integer, Double>>();
+		
+		int numberOfTimelinesRemoved = 0;
+		
+		System.out.println("Inside removeAboveThreshold3");
+		
+		for (Map.Entry<String, Pair<Integer, Double>> entry : distanceScoresSorted.entrySet())
+		{
+			String timelineID = entry.getKey();
+			Pair<Integer, Double> editDistancePair = entry.getValue();
+			double editDistanceEntry = editDistancePair.getSecond();
+			
+			System.out.print(" __reading:" + editDistanceEntry);
+			
+			if (editDistanceEntry <= threshold)
+			{
+				pruned.put(timelineID, editDistancePair);
+				System.out.print(" keeping entry for:" + entry.getValue());
+			}
+			else
+			{
+				System.out.print(" removing entry for:" + entry.getValue());
+				numberOfTimelinesRemoved += 1;
+			}
+		}
+		
+		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		return pruned;
+	}
+
+	// /////
+	// TODO: MAKE IT GENERIC <T> for ID of timeline
+	/**
+	 * Removes timelines which whose edit distance are above the given threshold
+	 * 
+	 * @param distanceScoresSorted
+	 * @param threshold
+	 * @return a Map of TimelineID (Key) and their corresponding edit distance(value)
+	 */
+	public static LinkedHashMap<Integer, Double> removeAboveThreshold4FullCand(LinkedHashMap<Integer, Double> distanceScoresSortedFullCand,
+			double threshold)
+	{
+		LinkedHashMap<Integer, Double> pruned = new LinkedHashMap<Integer, Double>();
+		
+		int numberOfTimelinesRemoved = 0;
+		
+		System.out.println("Inside removeAboveThreshold3");
+		
+		for (Map.Entry<Integer, Double> entry : distanceScoresSortedFullCand.entrySet())
+		{
+			Integer timelineID = entry.getKey();
+			double editDistanceEntry = entry.getValue();
+			
+			System.out.print(" __reading:" + editDistanceEntry);
+			
+			if (editDistanceEntry <= threshold)
+			{
+				pruned.put(timelineID, editDistanceEntry);
+				System.out.print(" keeping entry for:" + editDistanceEntry);
+			}
+			else
+			{
+				System.out.print(" removing entry for:" + editDistanceEntry);
+				numberOfTimelinesRemoved += 1;
+			}
+		}
+		
+		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		return pruned;
+	}
+
+	// /////
+	/**
+	 * Is function
+	 * 
+	 * @param distanceScoresSortedFullCand
+	 * @param threshold
+	 * @return
+	 */
+	public static LinkedHashMap<Integer, Pair<String, Double>>
+			removeAboveThreshold4FullCandISD(LinkedHashMap<Integer, Pair<String, Double>> distanceScoresSortedFullCand, double threshold)
+	{
+		LinkedHashMap<Integer, Pair<String, Double>> pruned = new LinkedHashMap<Integer, Pair<String, Double>>();
+		
+		int numberOfTimelinesRemoved = 0;
+		
+		System.out.println("Inside removeAboveThreshold4FullCandISD");
+		
+		for (Map.Entry<Integer, Pair<String, Double>> entry : distanceScoresSortedFullCand.entrySet())
+		{
+			Integer timelineID = entry.getKey();
+			double editDistanceEntry = entry.getValue().getSecond();
+			
+			// $$System.out.print(" __reading:" + editDistanceEntry);
+			
+			if (editDistanceEntry <= threshold)
+			{
+				pruned.put(timelineID, entry.getValue());
+				// $$System.out.print(" keeping entry for:" + editDistanceEntry);
+			}
+			else
+			{
+				// $$System.out.print(" removing entry for:" + editDistanceEntry);
+				numberOfTimelinesRemoved += 1;
+			}
+		}
+		
+		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		return pruned;
+	}
+
+	// TODO: MAKE IT GENERIC <T> for ID of timeline
+	/**
+	 * Removes timelines which whose edit distance are above the given threshold
+	 * 
+	 * @param distanceScoresSorted
+	 * @param threshold
+	 * @return a Map of TimelineID (Key) and their corresponding edit distance(value)
+	 */
+	public static LinkedHashMap<Integer, Pair<Integer, Double>>
+			removeAboveThreshold4(LinkedHashMap<Integer, Pair<Integer, Double>> distanceScoresSorted, double threshold)
+	{
+		LinkedHashMap<Integer, Pair<Integer, Double>> pruned = new LinkedHashMap<Integer, Pair<Integer, Double>>();
+		
+		int numberOfTimelinesRemoved = 0;
+		
+		System.out.println("Inside removeAboveThreshold3");
+		
+		for (Map.Entry<Integer, Pair<Integer, Double>> entry : distanceScoresSorted.entrySet())
+		{
+			Integer timelineID = entry.getKey();
+			Pair<Integer, Double> editDistancePair = entry.getValue();
+			double editDistanceEntry = editDistancePair.getSecond();
+			
+			System.out.print(" __reading:" + editDistanceEntry);
+			
+			if (editDistanceEntry <= threshold)
+			{
+				pruned.put(timelineID, editDistancePair);
+				System.out.print(" keeping entry for:" + entry.getValue());
+			}
+			else
+			{
+				System.out.print(" removing entry for:" + entry.getValue());
+				numberOfTimelinesRemoved += 1;
+			}
+		}
+		
+		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		return pruned;
 	}
 	
 }

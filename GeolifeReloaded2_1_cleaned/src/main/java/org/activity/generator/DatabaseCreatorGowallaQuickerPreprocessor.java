@@ -32,7 +32,7 @@ import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.StringUtilityBelt;
+import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
@@ -909,7 +909,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	/**
 	 * To generate data with category information (note: category information is only available for data point for spots 1 places.)
 	 * 
-	 * ALERT: currently it is also generating data for non spots 1 data point with -99 values.
+	 * ALERT: currently it is also generating data for non spots 1 data point with catID and cat Name as 'NA'. -99 values.
 	 * 
 	 * @param checkinFileName
 	 * @param spots1
@@ -1584,7 +1584,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 								TrajectoryEntry stayPoint = mergeTrajectoryEntries(
 										new ArrayList<TrajectoryEntry>(dataEntriesForCurrentUser.subList(i, endPoint + 1)));// add i to just before end point ....to j-1 points // j
 																															// + 1)));
-								String trajIDKeyString = StringUtilityBelt.toStringCompactWithoutCount(stayPoint.getTrajectoryID(), "_"); // check for multiple traj id in stay
+								String trajIDKeyString = StringUtils.toStringCompactWithoutCount(stayPoint.getTrajectoryID(), "_"); // check for multiple traj id in stay
 																																			// point
 								// System.out.println("User id: " + userID + "Adding staypoint:"
 								// + stayPoint.toStringWithoutHeadersWithTrajID());

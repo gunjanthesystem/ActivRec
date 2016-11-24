@@ -22,7 +22,7 @@ import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
-import org.activity.util.StringUtilityBelt;
+import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 
 public class GeolifeDataLoader
@@ -311,13 +311,13 @@ public class GeolifeDataLoader
 					
 					activityLogEntry.setAvgAltitude(UtilityBelt.averageDecimalsAsStrings(UtilityBelt.removeInvalidAlts(te.getAltitude())));// .stream().a//.mapToDouble(a ->
 					
-					String trajectoryIDsCompact = StringUtilityBelt.toStringCompactWithCount(te.getTrajectoryID());
+					String trajectoryIDsCompact = StringUtils.toStringCompactWithCount(te.getTrajectoryID());
 					if (trajectoryIDsCompact.length() > 50)
 					{
 						System.out.println("Alert: trajectoryIDsCompact.length() > 50 = " + trajectoryIDsCompact.length() + " \n"
 								+ trajectoryIDsCompact);
 					}
-					activityLogEntry.setTrajectory_IDs(StringUtilityBelt.toStringCompactWithCount(te.getTrajectoryID()));// Note: there can be multiple trajectoryIDs if the
+					activityLogEntry.setTrajectory_IDs(StringUtils.toStringCompactWithCount(te.getTrajectoryID()));// Note: there can be multiple trajectoryIDs if the
 																															// mergers during data creating was not trajectory
 																															// sensitive.
 					

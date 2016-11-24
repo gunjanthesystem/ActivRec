@@ -1,4 +1,4 @@
-package org.activity.tests;
+package org.activity.evaluation;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,19 +22,18 @@ import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.TimelineUtilities;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
  * Executes the experiments for generating recommendations Works for daywise matching Taking the recommendation tests for MU experiment and modifying it for daywise experiments
  * 
- * THIS IS ALL CORRECT AS OF 26 April 2016.
- * 
  * @author gunjan
  *
  */
-public class RecommendationTestsDayWise2FasterJan2016
+public class RecommendationTestsMTMDayWise2FasterApr2016
 {
+	int cutOffForNumOfNextActivites;
 	double percentageInTraining;// = 0.8;
 	// String fullCandOrSubCand="fullCand";
 	/**
@@ -56,7 +55,8 @@ public class RecommendationTestsDayWise2FasterJan2016
 	
 	int thresholdsArray[];
 	
-	public RecommendationTestsDayWise2FasterJan2016(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+	public RecommendationTestsMTMDayWise2FasterApr2016(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines,
+			int cutOffForNumOfNextActivites)
 	{
 		System.out.println("**********Entering Recommendation Tests**********");
 		
@@ -67,7 +67,9 @@ public class RecommendationTestsDayWise2FasterJan2016
 		this.caseType = Constant.caseType;
 		this.typeOfThresholds = Constant.typeOfThresholds;
 		this.userIDs = Constant.getUserIDs();
+		this.cutOffForNumOfNextActivites = cutOffForNumOfNextActivites;
 		
+		System.out.println("cutOffForNumOfNextActivites = " + cutOffForNumOfNextActivites);
 		// check if directory is empty to prevent overwriting of results
 		// if (UtilityBelt.isDirectoryEmpty(Constant.outputCoreResultsPath) == false)
 		// {
@@ -113,6 +115,10 @@ public class RecommendationTestsDayWise2FasterJan2016
 							WritingToFile.getBufferedWriterForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
 					BufferedWriter rtsInvalidWriter =
 							WritingToFile.getBufferedWriterForNewFile(commonPath + "recommPointsInvalidBecuzNoValidActivityAfterThis.csv");
+					BufferedWriter rtsNotEnoughAfterInvalidWriter = WritingToFile
+							.getBufferedWriterForNewFile(commonPath + "recommPointsInvalidBecuzNotEnoughActivityAfterThis.csv"); // recommendation points with less than 4
+																																	// activtity objects after it.
+					
 					BufferedWriter rtsWithNoCands =
 							WritingToFile.getBufferedWriterForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
 					BufferedWriter rankedRecommWithScore =
@@ -141,6 +147,10 @@ public class RecommendationTestsDayWise2FasterJan2016
 					
 					rtsInvalidWriter
 							.write("User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity\n");
+					
+					rtsNotEnoughAfterInvalidWriter.write(
+							"User_ID,Date,Index_of_Activity Object,Start_Timestamp,numOfValidsAfterThisRT,Week_Day,Time_Category,Current_Activity\n");
+					
 					rtsWithNoCands
 							.write("User_ID,Date,Index_of_Activity Object,End_Timestamp,Week_Day,Time_Category,Current_Activity,TotalNumOfPossibleCands,"
 									+ "NumCandsRejectedDueToNoCurrentActivityAtNonLast,NumCandsRejectedDueToNoNextActivity\n");
@@ -181,8 +191,8 @@ public class RecommendationTestsDayWise2FasterJan2016
 					WritingToFile.writeDistanceScoresSortedMapHeader(); // writes EditDistancePerRtPerCand.csv
 					WritingToFile.writeEditSimilarityCalculationsHeader(); // writes the edit similarity calculations
 																			// for this recommendation master
-					System.out.println(Constant.getAllGlobalConstants());
-					System.out.println(Constant.getCommonPath());
+					System.out.println("Constant.getAllGlobalConstants(): \n" + Constant.getAllGlobalConstants());
+					System.out.println("Constant.getCommonPath() = " + Constant.getCommonPath());
 					
 					/** Can be used to select users above 10 RTs **/
 					LinkedHashMap<Integer, Integer> numOfValidRTs = new LinkedHashMap<Integer, Integer>();
@@ -223,7 +233,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 						
 						// //////////////////REMOVING SELECTED TIMELINES FROM
 						// DATASET///////////////////////////////////////////////////////
-						userAllDatesTimeslines = TimelineUtilities.cleanUserDayTimelines(userAllDatesTimeslines);
+						userAllDatesTimeslines = TimelineUtils.cleanUserDayTimelines(userAllDatesTimeslines);
 						// ////////////////////////////////////////////////////////////////////////////////
 						
 						boolean hasGeoCoordinates = Constant.hasGeoCoordinates(Constant.getDatabaseName());
@@ -321,6 +331,34 @@ public class RecommendationTestsDayWise2FasterJan2016
 									continue;
 								}
 								
+								// Added on April 26 2016
+								int numOfValidsAfterThisRT = eachDayTimelineForUser.getNumOfValidActivityObjectAfterThisTime(endTimeStamp);
+								
+								WritingToFile.appendLineToFileAbsolute(
+										userId + "," + dateToRecomm + "," + endTimeStamp + "," + numOfValidsAfterThisRT + "\n",
+										commonPath + "numOfValidsAfterRTs.csv");
+								
+								if (numOfValidsAfterThisRT < cutOffForNumOfNextActivites) // skip those recommendation times which hav less than p valid activities after it in the
+																							// day
+								{
+									System.out.println(
+											"Skipping this recommendation point (" + endTimeStamp + ") because there are less than "
+													+ cutOffForNumOfNextActivites + " valid activity Objects after this in the day");
+									rtsNotEnoughAfterInvalidWriter.write(userId + "," + dateToRecomm + "," + j + "," + endTimeStamp + ","
+											+ numOfValidsAfterThisRT + "," + weekDay + "," + timeCategory + activityNameInThatDay);
+									rtsNotEnoughAfterInvalidWriter.newLine();
+									continue;
+								}
+								else
+								{
+									WritingToFile.appendLineToFileAbsolute(
+											userId + "," + dateToRecomm + "," + endTimeStamp + "," + numOfValidsAfterThisRT + "\n",
+											commonPath + "numOfValidsAfterRTsGEQ4.csv");
+									
+								}
+								// rtsWithMoreThan4ValidsAfter.put(userId, new Pair(endTimeStamp, numOfValidsAfterIt));
+								// End of added on April 26 2016
+								
 								// Recommendation is made at the end time of the activity object in consideration
 								// (activityObjectInThatDay) (i.e., current
 								// activity object)
@@ -348,23 +386,6 @@ public class RecommendationTestsDayWise2FasterJan2016
 								
 								System.out.println("Recommendation point at this Activity Object are:- End time: " + endTimeString);// +" ,and Middle: "+middleTimeString);
 								
-								// Added on April 26 2016
-								int numOfValidsAfterIt = eachDayTimelineForUser.getNumOfValidActivityObjectAfterThisTime(endTimeStamp);
-								
-								WritingToFile.appendLineToFileAbsolute(
-										userId + "," + dateToRecomm + "," + endTimeStamp + "," + numOfValidsAfterIt + "\n",
-										commonPath + "numOfValidsAfterRTs.csv");
-								
-								if (numOfValidsAfterIt >= 4)
-								{
-									WritingToFile.appendLineToFileAbsolute(
-											userId + "," + dateToRecomm + "," + endTimeStamp + "," + numOfValidsAfterIt + "\n",
-											commonPath + "numOfValidsAfterRTsGEQ4.csv");
-									
-								}
-								
-								// rtsWithMoreThan4ValidsAfter.put(userId, new Pair(endTimeStamp, numOfValidsAfterIt));
-								// End of added on April 26 2016
 								// ///////////
 								// Now we have those recommendation times which are valid for making recommendations
 								// ///////////////////Start//////////////////////////////////
@@ -618,6 +639,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 					topRecommWithDistance.close();
 					
 					rtsInvalidWriter.close();
+					rtsNotEnoughAfterInvalidWriter.close();// added on April 26 2016
 					rtsWithNoCands.close();
 					
 					rankedRecommWithScore.close();

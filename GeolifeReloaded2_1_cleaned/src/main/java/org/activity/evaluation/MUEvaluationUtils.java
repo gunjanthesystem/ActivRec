@@ -1,4 +1,4 @@
-package org.activity.tests;
+package org.activity.evaluation;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
