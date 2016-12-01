@@ -1988,32 +1988,37 @@ public class WritingToFile
 			bw.write(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candidateTimelineId + "," + editDistance + "," + dAct
 					+ "," + dFeat + "," + trace + ",");
 			
-			String activityObjects1String = "", activityObjects2String = "";
+			// String activityObjects1String = "", activityObjects2String = "";
+			
+			StringBuilder activityObjects1String = new StringBuilder();
+			StringBuilder activityObjects2String = new StringBuilder();
 			
 			if (Constant.WriteActivityObjectsInEditSimilarityCalculations)
 			{
 				for (int i = 0; i < ActivityObjects1.size(); i++)
 				{
 					// bw.write("ActsFirst:,");
-					activityObjects1String = activityObjects1String + ">>"
-							+ (ActivityObjects1.get(i).getActivityName() + "_" + ActivityObjects1.get(i).getStartTimestamp().getHours()
+					// activityObjects1String = activityObjects1String +
+					activityObjects1String.append(
+							">>" + (ActivityObjects1.get(i).getActivityName() + "_" + ActivityObjects1.get(i).getStartTimestamp().getHours()
 									+ ":" + ActivityObjects1.get(i).getStartTimestamp().getMinutes() + ":"
 									+ ActivityObjects1.get(i).getStartTimestamp().getSeconds() + "_"
-									+ +ActivityObjects1.get(i).getDurationInSeconds());
+									+ +ActivityObjects1.get(i).getDurationInSeconds()));
 				}
 				
 				for (int i = 0; i < ActivityObjects2.size(); i++)
 				{
 					// bw.write("ActsSecond:,");
-					activityObjects2String = activityObjects2String + ">>"
-							+ (ActivityObjects2.get(i).getActivityName() + "_" + ActivityObjects2.get(i).getStartTimestamp().getHours()
+					// activityObjects2String = activityObjects2String +
+					activityObjects2String.append(
+							">>" + (ActivityObjects2.get(i).getActivityName() + "_" + ActivityObjects2.get(i).getStartTimestamp().getHours()
 									+ ":" + ActivityObjects2.get(i).getStartTimestamp().getMinutes() + ":"
 									+ ActivityObjects2.get(i).getStartTimestamp().getSeconds() + "_"
-									+ +ActivityObjects2.get(i).getDurationInSeconds());
+									+ +ActivityObjects2.get(i).getDurationInSeconds()));
 				}
 			}
 			
-			bw.write(activityObjects1String + "," + activityObjects2String);
+			bw.write(activityObjects1String.toString() + "," + activityObjects2String.toString());
 			bw.newLine();
 			bw.close();
 		}
@@ -2638,32 +2643,37 @@ public class WritingToFile
 			boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled, boolean writeAvgAltitude)
 	{
 		commonPath = Constant.getCommonPath();//
+		
 		try
 		{
+			StringBuilder toWrite = new StringBuilder();
 			String fileName = commonPath + userName + "DayTimelines" + timelinesPhrase + ".csv";
 			// PopUps.showMessage("Writing day timelines to" + fileName);
 			System.out.println("writing " + userName + "DayTimelines" + timelinesPhrase + ".csv");
 			
-			File file = new File(fileName);
-			file.delete();
+			// File file = new File(fileName);
+			// file.delete();
+			//
+			// FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+			// BufferedWriter bw = new BufferedWriter(fw);
 			
-			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-			BufferedWriter bw = new BufferedWriter(fw);
-			
-			bw.write("Date, DayTimeline");
-			bw.newLine();
+			// bw.write
+			toWrite.append("Date, DayTimeline\n");
+			// bw.newLine();
 			
 			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
 			{
 				
-				bw.write(entry.getKey() + ",");
+				// bw.write
+				toWrite.append(entry.getKey() + ",");
 				ArrayList<ActivityObject> ActivityObjects = entry.getValue().getActivityObjectsInDay();
 				
 				// if(!writeStartEndGeoCoordinates && !distanceTravelled && !)
 				for (int i = 0; i < ActivityObjects.size(); i++)
 				{
-					bw.write(ActivityObjects.get(i).getActivityName() + "__" + ActivityObjects.get(i).getStartTimestamp().getHours() + ":"
-							+ ActivityObjects.get(i).getStartTimestamp().getMinutes() + ":"
+					// bw.write
+					toWrite.append(ActivityObjects.get(i).getActivityName() + "__" + ActivityObjects.get(i).getStartTimestamp().getHours()
+							+ ":" + ActivityObjects.get(i).getStartTimestamp().getMinutes() + ":"
 							+ ActivityObjects.get(i).getStartTimestamp().getSeconds() + "_to_"
 							+ ActivityObjects.get(i).getEndTimestamp().getHours() + ":"
 							+ ActivityObjects.get(i).getEndTimestamp().getMinutes() + ":"
@@ -2673,26 +2683,32 @@ public class WritingToFile
 					{
 						if (writeStartEndGeoCoordinates)
 						{
-							bw.write("__(" + ActivityObjects.get(i).getStartLatitude() + "-" + ActivityObjects.get(i).getStartLongitude()
-									+ ") to (" + ActivityObjects.get(i).getEndLatitude() + "-" + ActivityObjects.get(i).getEndLongitude()
-									+ ")");
+							// bw.write
+							toWrite.append("__(" + ActivityObjects.get(i).getStartLatitude() + "-"
+									+ ActivityObjects.get(i).getStartLongitude() + ") to (" + ActivityObjects.get(i).getEndLatitude() + "-"
+									+ ActivityObjects.get(i).getEndLongitude() + ")");
 						}
 						if (writeDistanceTravelled)
 						{
-							bw.write("__" + ActivityObjects.get(i).getDistanceTravelled());
+							// bw.write
+							toWrite.append("__" + ActivityObjects.get(i).getDistanceTravelled());
 						}
 						if (writeAvgAltitude)
 						{
-							bw.write("__" + ActivityObjects.get(i).getAvgAltitude());
+							// bw.write
+							toWrite.append("__" + ActivityObjects.get(i).getAvgAltitude());
 						}
 					}
 					
-					bw.write(",");
+					// bw.write
+					toWrite.append(",");
 				}
-				bw.newLine();
+				// bw.newLine();
+				// bw.write
+				toWrite.append("\n");
 			}
-			
-			bw.close();
+			WritingToFile.writeToNewFile(toWrite.toString(), fileName);
+			// bw.close();
 		}
 		catch (Exception e)
 		{
@@ -2999,6 +3015,9 @@ public class WritingToFile
 	{
 		commonPath = Constant.getCommonPath();//
 		
+		if (Constant.verbose)
+			System.out.println("Inside writeActivityCountsInGivenDayTimelines");
+		
 		/* <Activity Name, count over all days> */
 		LinkedHashMap<String, Long> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Long>(); // count over all the days
 		String[] activityNames = Constant.getActivityNames();// .activityNames;
@@ -3009,8 +3028,11 @@ public class WritingToFile
 			String fileName = commonPath + userName + "ActivityCounts" + fileNamePhrase + ".csv";
 			System.out.println("writing " + userName + "ActivityCounts" + fileNamePhrase + ".csv");
 			
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileName);// new BufferedWriter(fw);
-			bw.write(",");
+			// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileName);// new BufferedWriter(fw);
+			
+			StringBuilder bwString = new StringBuilder();
+			bwString.append(",");
+			// bw.write(",");
 			
 			for (String activityName : activityNames)
 			{
@@ -3018,16 +3040,21 @@ public class WritingToFile
 				{
 					continue;
 				}
-				bw.write("," + activityName);
+				// bw.write("," + activityName);
+				bwString.append("," + activityName);
 				activityNameCountPairsOverAllDayTimelines.put(activityName, new Long(0));
 			}
-			bw.newLine();
+			// bw.newLine();
+			bwString.append("\n");
 			
 			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
 			{
 				// System.out.println("Date =" + entry.getKey());
-				bw.write(entry.getKey().toString());
-				bw.write("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
+				// bw.write(entry.getKey().toString());
+				// bw.write("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
+				
+				bwString.append(entry.getKey().toString());
+				bwString.append("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
 				
 				ArrayList<ActivityObject> activitiesInDay = entry.getValue().getActivityObjectsInDay();
 				
@@ -3040,6 +3067,7 @@ public class WritingToFile
 					if (UtilityBelt.isValidActivityName(activityName))
 					// if((activityName.equalsIgnoreCase("Not Available")||activityName.equalsIgnoreCase("Unknown"))==false)
 					{
+						// System.out.println(" putting down -" + activityName + "- in activityNameCountPairs");
 						activityNameCountPairs.put(activityName, 0);
 					}
 				}
@@ -3053,7 +3081,21 @@ public class WritingToFile
 						String actName = actEvent.getActivityName();
 						// System.out.println(activityNameCountPairs.size());
 						
+						// Integer val;
+						// if (activityNameCountPairs.get(actName) == null)
+						// {
+						// val = 0;
+						// }
+						// else
+						// {
+						// val = activityNameCountPairs.get(actName);
+						// }
 						Integer val = activityNameCountPairs.get(actName);
+						if (val == null)
+						{
+							System.out.println("actName = " + actName);
+						}
+						
 						// System.out.println("val:" + val);
 						Integer newVal = new Integer(val.intValue() + 1);
 						// count for current day
@@ -3068,12 +3110,16 @@ public class WritingToFile
 				// write the activityNameCountPairs to the file
 				for (Map.Entry<String, Integer> entryWrite : activityNameCountPairs.entrySet())
 				{
-					bw.write("," + entryWrite.getValue());
+					// bw.write("," + entryWrite.getValue());
+					bwString.append("," + entryWrite.getValue());
 				}
 				
-				bw.newLine();
+				bwString.append("\n");
+				// bw.newLine();
 			}
-			bw.close();
+			WritingToFile.writeToNewFile(bwString.toString(), fileName);
+			// bw.write(bwString.toString());
+			// bw.close();
 		}
 		catch (Exception e)
 		{
@@ -3083,6 +3129,9 @@ public class WritingToFile
 		
 		writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
 				"ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count"); // TODO check if it indeed should be an append
+		
+		if (Constant.verbose)
+			System.out.println("Exiting writeActivityCountsInGivenDayTimelines");
 		
 		return activityNameCountPairsOverAllDayTimelines;
 		

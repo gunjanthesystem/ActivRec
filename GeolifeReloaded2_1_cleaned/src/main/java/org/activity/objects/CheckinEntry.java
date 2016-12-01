@@ -29,7 +29,7 @@ public class CheckinEntry extends DataEntry implements Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String userID, workingLevelCatIDs;
+	private String userID, workingLevelCatIDs; // note: working level catid can be multiple "36_60"
 	private int locationID;
 	private String startLatitude;
 	private String startLongitude;

@@ -20,6 +20,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
+import org.activity.util.CSVUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.UtilityBelt;
 
@@ -196,7 +197,7 @@ public class GowallaWeatherPreprocessing
 		{
 			for (String APIKey : APIKeys)
 			{
-				int startIndexToReadNext = Integer.valueOf(ReadingFromFile.getCellValueFromCSVFile(1, 1, startIndexToReadFileName));
+				int startIndexToReadNext = Integer.valueOf(CSVUtils.getCellValueFromCSVFile(1, 1, startIndexToReadFileName));
 				// PopUps.showMessage("Start index to read " + startIndexToReadNext);
 				
 				// String allResult = new String();

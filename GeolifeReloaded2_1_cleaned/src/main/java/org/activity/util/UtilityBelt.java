@@ -776,8 +776,17 @@ public class UtilityBelt
 		
 	}
 	
+	/**
+	 * 
+	 * @param toCheck
+	 * @return
+	 */
 	public static boolean isValidActivityName(String toCheck)
 	{
+		if (Constant.getDatabaseName().equals("gowalla1")) // gowalla has no invalid activity names
+		{// to speed up
+			return true;
+		}
 		if ((toCheck.trim().equalsIgnoreCase(Constant.INVALID_ACTIVITY1)) || (toCheck.trim().equalsIgnoreCase(Constant.INVALID_ACTIVITY2)))
 		{
 			return false;
@@ -1490,8 +1499,6 @@ public class UtilityBelt
 	 * Map result = new LinkedHashMap(); for (Iterator it = list.iterator(); it.hasNext();) { Map.Entry entry = (Map.Entry)it.next(); result.put(entry.getKey(), entry.getValue());
 	 * } return result; }
 	 */
-	
-	
 	
 	// ////
 	

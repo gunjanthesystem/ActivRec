@@ -34,8 +34,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public final Pair<String, Double> getHJEditDistanceWithoutEndCurrentActivity(ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, Long candidateTimelineId)
+	public final Pair<String, Double> getHJEditDistanceWithoutEndCurrentActivity(ArrayList<ActivityObject> activityObjects1Original,
+			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
+			Long candidateTimelineId)
 	{
 		ArrayList<ActivityObject> activityObjects1 = new ArrayList<ActivityObject>();
 		activityObjects1.addAll(activityObjects1Original);
@@ -64,10 +65,12 @@ public class HJEditDistance extends AlignmentBasedDistance
 			activityObjects1.remove(activityObjects1.size() - 1);
 			activityObjects2.remove(activityObjects2.size() - 1);
 			
-			result = getHJEditDistanceWithTrace(activityObjects1, activityObjects2, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
+			result = getHJEditDistanceWithTrace(activityObjects1, activityObjects2, userAtRecomm, dateAtRecomm, timeAtRecomm,
+					candidateTimelineId);
 		}
 		
-		// $$WritingToFile.writeEditSimilarityCalculation(activityObjects1, activityObjects2, result.getSecond(), result.getFirst()); //uncomment to write edit distance calculations
+		// $$WritingToFile.writeEditSimilarityCalculation(activityObjects1, activityObjects2, result.getSecond(), result.getFirst()); //uncomment to write edit distance
+		// calculations
 		// $$WritingToFile.writeOnlyTrace(result.getFirst()); //uncomment to write trace to a file
 		
 		return result;
@@ -82,10 +85,12 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public final Pair<String, Double> getHJEditDistanceInvalidsExpunged(ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2, String userAtRecomm,
-			String dateAtRecomm, String timeAtRecomm, Long candidateTimelineId)
+	public final Pair<String, Double> getHJEditDistanceInvalidsExpunged(ArrayList<ActivityObject> activityObjects1,
+			ArrayList<ActivityObject> activityObjects2, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
+			Long candidateTimelineId)
 	{
-		return getHJEditDistanceWithTrace(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2), userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);// similarity;
+		return getHJEditDistanceWithTrace(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2), userAtRecomm, dateAtRecomm,
+				timeAtRecomm, candidateTimelineId);// similarity;
 	}
 	
 	/**
@@ -97,17 +102,19 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public final Pair<String, Double> getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, Long candidateTimelineId)
+	public final Pair<String, Double> getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(ArrayList<ActivityObject> activityObjects1,
+			ArrayList<ActivityObject> activityObjects2, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
+			Long candidateTimelineId)
 	{
-		return getHJEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2), userAtRecomm, dateAtRecomm, timeAtRecomm,
-				candidateTimelineId);// similarity;
+		return getHJEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2),
+				userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);// similarity;
 	}
 	
 	/**
-	 * Calculate the Edit Distance as per HJ's specification. First calculating simple levenshtein distance and then calculating the cost from the trace of operations performed using the assigned
-	 * costs and wts of objects and then adding the distance at feature level. So, while optimisation of distance, the optimisation is done using 112 costs while the resultant cost is calculated
-	 * after the operations have been thus established... using the assigned costs for Activity Objects and features. (dAct and dFeat rounded off to 4 decimal places)
+	 * Calculate the Edit Distance as per HJ's specification. First calculating simple levenshtein distance and then calculating the cost from the trace of operations performed
+	 * using the assigned costs and wts of objects and then adding the distance at feature level. So, while optimisation of distance, the optimisation is done using 112 costs while
+	 * the resultant cost is calculated after the operations have been thus established... using the assigned costs for Activity Objects and features. (dAct and dFeat rounded off
+	 * to 4 decimal places)
 	 * 
 	 * @param activityObjects1Original
 	 *            sequence of activity objects to be compared (usually from a candidate timeline).
@@ -123,12 +130,14 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param candidateTimelineId
 	 * @return Pair<Trace as String, Edit Distance> ///we can also do n Pair<Trace as String, Pair <total Edit Distance, act level edit distance> /
 	 */
-	public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, long candidateTimelineId)
+	public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
+			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
+			long candidateTimelineId)
 	{
 		if (Constant.verboseDistance)
 		{
-			System.out.println("calc HJeditDist between " + activityObjects1Original.size() + " & " + activityObjects2Original.size() + " objs");
+			System.out.println(
+					"calc HJeditDist between " + activityObjects1Original.size() + " & " + activityObjects2Original.size() + " objs");
 		}
 		
 		ArrayList<ActivityObject> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
@@ -138,13 +147,15 @@ public class HJEditDistance extends AlignmentBasedDistance
 		String stringCodeForActivityObjects1 = ActivityObject.getStringCodeForActivityObjects(activityObjects1);
 		String stringCodeForActivityObjects2 = ActivityObject.getStringCodeForActivityObjects(activityObjects2);
 		
-		Pair<String, Double> levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1, stringCodeForActivityObjects2, 1, 1, 2);
+		Pair<String, Double> levenshteinDistance =
+				getMySimpleLevenshteinDistance(stringCodeForActivityObjects1, stringCodeForActivityObjects2, 1, 1, 2);
 		
 		String[] splitted = levenshteinDistance.getFirst().split("_"); // "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
 		
 		if (Constant.verboseDistance)
 		{
-			System.out.println("Trace =" + levenshteinDistance.getFirst() + "  simpleLevenshteinDistance112=" + levenshteinDistance.getSecond());
+			System.out.println(
+					"Trace =" + levenshteinDistance.getFirst() + "  simpleLevenshteinDistance112=" + levenshteinDistance.getSecond());
 		}
 		
 		for (int i = 1; i < splitted.length; i++)
@@ -203,8 +214,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 		{
 			// System.out.println("passing Activity Objects of sizes: " + activityObjects1.size() + " " + activityObjects2.size());
 			
-			WritingToFile.writeEditSimilarityCalculations(activityObjects1, activityObjects2, distanceTotal, levenshteinDistance.getFirst(), dAct, dFeat, userAtRecomm, dateAtRecomm,
-					timeAtRecomm, candidateTimelineId);
+			WritingToFile.writeEditSimilarityCalculations(activityObjects1, activityObjects2, distanceTotal, levenshteinDistance.getFirst(),
+					dAct, dFeat, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
 		}
 		// $ WritingToFile.writeOnlyTrace(levenshteinDistance.getFirst());
 		
@@ -228,13 +239,14 @@ public class HJEditDistance extends AlignmentBasedDistance
 	// String stringCodeForActivityObjects1 = ActivityObject.getStringCodeForActivityObjects(activityObjects1);
 	// String stringCodeForActivityObjects2 = ActivityObject.getStringCodeForActivityObjects(activityObjects2);
 	//
-	// Pair<String, Double> levenshteinDistance = new AlignmentBasedDistance().getMySimpleLevenshteinDistance(stringCodeForActivityObjects1, stringCodeForActivityObjects2, 1, 1, 2);
+	// Pair<String, Double> levenshteinDistance = new AlignmentBasedDistance().getMySimpleLevenshteinDistance(stringCodeForActivityObjects1, stringCodeForActivityObjects2, 1, 1,
+	// 2);
 	//
 	// String[] splitted = levenshteinDistance.getFirst().split("_"); // "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
 	//
 	// if (Constant.verboseDistance)
 	// {
-	// System.out.println("Trace =" + levenshteinDistance.getFirst() + "  simpleLevenshteinDistance112=" + levenshteinDistance.getSecond());
+	// System.out.println("Trace =" + levenshteinDistance.getFirst() + " simpleLevenshteinDistance112=" + levenshteinDistance.getSecond());
 	// }
 	//
 	// for (int i = 1; i < splitted.length; i++)

@@ -188,7 +188,9 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			boolean dummy // counts or hours
 	)
 	{
-		String performanceFileName = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifePerformance/Test/Performance.csv";// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/Test/Performance.csv";
+		String performanceFileName = Constant.getCommonPath() + "Performance.csv";
+		/// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifePerformance/Test/Performance.csv";//
+		/// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/Test/Performance.csv";
 		
 		long recommMasterT0 = System.currentTimeMillis();
 		
@@ -306,7 +308,6 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		// /////////////////////
 		// TODO CHECK: HOW THE EFFECT OF THIS DIFFERS FROM THE EXPERIMENTS DONE FOR IIWAS: in iiWAS normalisation was after thresholding (correct), here
 		// normalisation is before thresholding which should be changed
-		// TODO
 		long recommMasterT3 = System.currentTimeMillis();
 		editDistancesMapUnsortedFullCand = getNormalisedDistancesForCandidateTimelinesFullCand(candidateTimelines, activitiesGuidingRecomm,
 				caseType, this.userIDAtRecomm, this.dateAtRecomm.toString(), this.timeAtRecomm.toString(), Constant.getDistanceUsed());
@@ -472,12 +473,16 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		long recommMasterTEnd = System.currentTimeMillis();
 		// UserAtRecomm,DateAtRecomm,TimeAtRecomm,MatchingUnit,NumOfTrainingDays,NumOfValidActObjsInTrainingTimelines,NumOfValidActObjsInCurrentTimelines,
 		// NumOfCandidateTimelines,SumOfValidActObjsInAllCandTimelines,TotalTimeForRecomm, TimeToGenerateCands,TimeToComputeEdistDistances
-		String performanceString = this.userIDAtRecomm + "," + this.dateAtRecomm + "," + this.timeAtRecomm + ","
-				+ matchingUnitInCountsOrHours + "," + trainingTimelines.size() + "," + this.trainingTimeline.size() + ","
-				+ this.activitiesGuidingRecomm.size() + "," + this.candidateTimelines.size() + ","
-				+ getSumOfActivityObjects(candidateTimelines) + "," + (recommMasterTEnd - recommMasterT0) + ","
-				+ timeTakenToFetchCandidateTimelines + "," + timeTakenToComputeNormEditDistances + "\n";
-		WritingToFile.appendLineToFileAbsolute(performanceString, performanceFileName);
+		
+		// start of curtain for performance string writing
+		// String performanceString = this.userIDAtRecomm + "," + this.dateAtRecomm + "," + this.timeAtRecomm + ","
+		// + matchingUnitInCountsOrHours + "," + trainingTimelines.size() + "," + this.trainingTimeline.size() + ","
+		// + this.activitiesGuidingRecomm.size() + "," + this.candidateTimelines.size() + ","
+		// + getSumOfActivityObjects(candidateTimelines) + "," + (recommMasterTEnd - recommMasterT0) + ","
+		// + timeTakenToFetchCandidateTimelines + "," + timeTakenToComputeNormEditDistances + "\n";
+		// WritingToFile.appendLineToFileAbsolute(performanceString, performanceFileName);
+		// end of curtain for performance string writing
+		
 		// System.out.pri
 		//////////////
 		
@@ -506,7 +511,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 	)
 	{
 		String performanceFileName = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/Test/Performance.csv";
-		StringBuffer performanceString = new StringBuffer();
+		StringBuilder performanceString = new StringBuilder();
 		long recommMasterT0 = System.currentTimeMillis();
 		performanceString.append("Start:" + recommMasterT0);
 		// hjEditDistance = new HJEditDistance();
@@ -672,7 +677,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		
 		editDistancesMapUnsortedFullCand =
 				TimelineUtils.removeAboveThreshold4FullCandISD(editDistancesMapUnsortedFullCand, thresholdAsDistance);// distanceScoresSorted=
-																													// UtilityBelt.removeAboveThreshold2(distanceScoresSorted,thresholdAsDistance);
+																														// UtilityBelt.removeAboveThreshold2(distanceScoresSorted,thresholdAsDistance);
 		int countCandAfterThresholdPruning = editDistancesMapUnsortedFullCand.size();
 		
 		this.thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
@@ -725,7 +730,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			System.out.println("\n" + "\n The candidate timelines  in increasing order of distance are:");
 			traverseCandidateTimelineWithEditDistance();// editDistancesSortedMapFullCand);
 			
-			System.out.println("Top next activities are: ");// +this.topNextRecommendedActivities);
+			System.out.println("\nTop next activities are: ");// +this.topNextRecommendedActivities);
 			traverseTopNextActivities();
 		}
 		// System.out.println("\nDebug note192_308: getActivityNamesGuidingRecommwithTimestamps() " + getActivityNamesGuidingRecommwithTimestamps() +
@@ -1265,7 +1270,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			// numberOfNextAOsAtMaxDistance += 1;
 			// }
 		}
-		StringBuffer editDistances = new StringBuffer(), normalisedEditDistances = new StringBuffer();
+		StringBuilder editDistances = new StringBuilder(), normalisedEditDistances = new StringBuilder();
 		
 		for (int i = 0; i < numberOfTopNextActivityObjects; i++)
 		{
@@ -1372,12 +1377,12 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		int numberOfTopNextActivityObjects = topNextActivityObjectsWithDistance.size();
 		
 		// System.out.println("Debug inside createRankedTopRecommendedActivityObjects: topRecommendationsWithDistance="+topRecommendationsWithDistance);
-		System.out.println(
-				"Debug inside createRankedTopRecommendedActivityObjects: numberOfTopNextActivityEvenst=numberOfTopNextActivityEvenst");
+		System.out.println("\nDebug inside createRankedTopRecommendedActivityObjects:");// numberOfTopNextActivityEvenst=numberOfTopNextActivityEvenst");
 		// System.out.print("Debug inside createRankedTopRecommendedActivityObjects: the read next activity objects are: ");
 		
 		LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs = new LinkedHashMap<String, Double>(); // <ActivityName,RankScore>
 		
+		StringBuilder rankScoreCalc = new StringBuilder();
 		for (int i = 0; i < numberOfTopNextActivityObjects; i++)
 		{
 			String topNextActivityName = topNextActivityObjectsWithDistance.get(i).getFirst().getActivityName();
@@ -1393,7 +1398,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			// simRankScore = (1d - (editDistanceValExceptEnd / maxEditDistanceValExceptEnd)) * simEndPointActivityObject;
 			// System.out.println("Prod RANK SCORE CALC=" + "(1-(" + editDistanceValExceptEnd + "/" + maxEditDistanceValExceptEnd + "))* (" +
 			// simEndPointActivityObject + ")");
-			System.out.println("Simple RANK SCORE CALC=" + "(1-(" + normEditDistanceVal + "))");// * (" + simEndPointActivityObject + ")");
+			rankScoreCalc.append("Simple RANK SCORE (1- normED) =" + "1-" + normEditDistanceVal + "\n");// * (" + simEndPointActivityObject + ")");
 			
 			if (recommendedActivityNamesRankscorePairs.containsKey(topNextActivityName) == false)
 			{
@@ -1407,22 +1412,12 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			}
 		}
 		
+		System.out.println(rankScoreCalc.toString());
+		
+		// Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value of rank)
 		recommendedActivityNamesRankscorePairs =
-				(LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendedActivityNamesRankscorePairs); // Sorted in
-																													// descending
-																													// order of
-																													// ranked
-																													// score:
-																													// higher
-																													// ranked
-																													// score
-																													// means
-																													// more top
-																													// in rank
-																													// (larger
-																													// numeric
-																													// value of
-																													// rank)
+				(LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendedActivityNamesRankscorePairs);
+		
 		// ///////////IMPORTANT //////////////////////////////////////////////////////////
 		this.setRecommendedActivityNamesWithRankscores(recommendedActivityNamesRankscorePairs);
 		
@@ -1492,16 +1487,19 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 	 */
 	public void setRankedRecommendedActivityNamesWithRankScores(LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
 	{
-		StringBuffer topRankedString = new StringBuffer();// String topRankedString= new String();
-		
+		StringBuilder topRankedString = new StringBuilder();// String topRankedString= new String();
+		StringBuilder msg = new StringBuilder();
 		for (Map.Entry<String, Double> entry : recommendedActivityNameRankscorePairs.entrySet())
 		{
-			System.out.println(entry.getKey() + "--" + entry.getValue());
-			topRankedString.append("__" + entry.getKey() + ":" + Evaluation.round(entry.getValue(), 4));// topRankedString+=
-																										// "__"+entry.getKey()+":"+TestStats.round(entry.getValue(),4);
+			String recommAct = entry.getKey();
+			double roundedRankScore = Evaluation.round(entry.getValue(), 4);
+			topRankedString.append("__" + recommAct + ":" + roundedRankScore);
+			msg.append("recomm act:" + recommAct + ", rank score: " + roundedRankScore + "\n");
+			// topRankedString+= "__"+entry.getKey()+":"+TestStats.round(entry.getValue(),4);
 		}
 		
 		this.rankedRecommendedActivityNameWithRankScores = topRankedString.toString();
+		System.out.println(msg.toString() + "\n");
 	}
 	
 	public String getRankedRecommendedActivityNamesWithRankScores()
@@ -1520,7 +1518,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 	 */
 	public void setRankedRecommendedActivityNamesWithoutRankScores(LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
 	{
-		StringBuffer rankedRecommendationWithoutRankScores = new StringBuffer();// String rankedRecommendationWithoutRankScores=new String();
+		StringBuilder rankedRecommendationWithoutRankScores = new StringBuilder();// String rankedRecommendationWithoutRankScores=new String();
 		for (Map.Entry<String, Double> entry : recommendedActivityNameRankscorePairs.entrySet())
 		{
 			rankedRecommendationWithoutRankScores.append("__" + entry.getKey());// rankedRecommendationWithoutRankScores+= "__"+entry.getKey();
@@ -1554,7 +1552,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 	 */
 	public String getTopNextActivityNamesWithoutDistanceString()
 	{
-		StringBuffer result = new StringBuffer("");// String result="";
+		StringBuilder result = new StringBuilder("");// String result="";
 		for (int i = 0; i < this.topNextActivityObjects.size(); i++)
 		{
 			Triple<ActivityObject, Double, Integer> pairAE = this.topNextActivityObjects.get(i);
@@ -1570,7 +1568,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 	 */
 	public String getTopNextActivityNamesWithDistanceString()
 	{
-		StringBuffer result = new StringBuffer(""); // String result="";
+		StringBuilder result = new StringBuilder(""); // String result="";
 		
 		for (int i = 0; i < this.topNextActivityObjects.size(); i++)
 		{
@@ -2345,7 +2343,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
 		
 		int numOfValsAtMax = 0, numOfValsAtMin = 0;
-		StringBuffer editDistances = new StringBuffer(), normalisedEditDistances = new StringBuffer();
+		StringBuilder editDistances = new StringBuilder(), normalisedEditDistances = new StringBuilder();
 		ArrayList<Double> editDistancesList = new ArrayList<Double>();
 		ArrayList<Double> normalisedEditDistancesList = new ArrayList<Double>();
 		
@@ -2808,13 +2806,13 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 				Integer timelineID = entry.getKey();
 				Double editDistance = entry.getValue().getSecond();
 				
-				System.out.println("\n\tTimeline ID is: " + timelineID);
-				System.out.print("\tEdit distance: " + editDistance);
+				System.out.println("\n\tCand timeline ID: " + timelineID);
+				System.out.print("\tEdit dist: " + editDistance);
 				
 				Timeline candidateTimeline = this.candidateTimelines.get(timelineID);
 				
 				ArrayList<ActivityObject> activityObjectsInCand = candidateTimeline.getActivityObjectsInTimeline();
-				
+				System.out.println("\nact objs:");
 				for (int i = 0; i < activityObjectsInCand.size(); i++)
 				{
 					System.out.print(">>" + activityObjectsInCand.get(i).getActivityName());
@@ -2836,6 +2834,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 	 */
 	public int traverseTopNextActivities()
 	{
+		System.out.println();
 		if (this.topNextActivityObjects.size() > 0)
 		{
 			for (int i = 0; i < this.topNextActivityObjects.size(); i++)

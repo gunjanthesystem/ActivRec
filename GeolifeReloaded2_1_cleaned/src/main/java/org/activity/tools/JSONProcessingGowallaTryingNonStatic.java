@@ -42,7 +42,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
-	String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep1/";
+	String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep1/";
 	static String catHierarchyFileNameToRead;
 	
 	TreeMap<Integer, String> catIDNameDictionary;
@@ -66,9 +66,9 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	{
 		catIDNameDictionary = new TreeMap<Integer, String>();
 		
-		LinkedHashMap<Integer, String> level1CatIDName = (LinkedHashMap<Integer, String>) catIDNames3Levels.getFirst();
-		LinkedHashMap<Integer, String> level2CatIDName = (LinkedHashMap<Integer, String>) catIDNames3Levels.getSecond();
-		LinkedHashMap<Integer, String> level3CatIDName = (LinkedHashMap<Integer, String>) catIDNames3Levels.getThird();
+		LinkedHashMap<Integer, String> level1CatIDName = catIDNames3Levels.getFirst();
+		LinkedHashMap<Integer, String> level2CatIDName = catIDNames3Levels.getSecond();
+		LinkedHashMap<Integer, String> level3CatIDName = catIDNames3Levels.getThird();
 		
 		// put call cat id, name present in hierarchy tree, i.e., present in the three levels of hierarchy
 		catIDNameDictionary.putAll(level1CatIDName);
@@ -156,7 +156,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 				"/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
 		// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
 		String checkinFileNameToRead =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnly.csv";
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnly.csv";/// gw2CheckinsSpots1Slim1TargetUsersDatesOnly.csv";
 		String checkinFileNameToWrite = commonPath + "gw2CheckinsSpots1TargetUsersDatesOnlyWithLevels.csv";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnlyWithLevels.csv";
@@ -167,9 +167,9 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 			Triple<LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>> catIDNamesFor3Levels =
 					getCatIDNamesForEachLevelFromJSON(catHierarchyFileNameToRead);
 			
-			LinkedHashMap<Integer, String> level1CatIDNames = (LinkedHashMap<Integer, String>) catIDNamesFor3Levels.getFirst();
-			LinkedHashMap<Integer, String> level2CatIDNames = (LinkedHashMap<Integer, String>) catIDNamesFor3Levels.getSecond();
-			LinkedHashMap<Integer, String> level3CatIDNames = (LinkedHashMap<Integer, String>) catIDNamesFor3Levels.getThird();
+			LinkedHashMap<Integer, String> level1CatIDNames = catIDNamesFor3Levels.getFirst();
+			LinkedHashMap<Integer, String> level2CatIDNames = catIDNamesFor3Levels.getSecond();
+			LinkedHashMap<Integer, String> level3CatIDNames = catIDNamesFor3Levels.getThird();
 			
 			// TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>> catHierarchyMap =
 			// getThreeLevelCategoryHierarchyFromJSON(catHierarchyFileNameToRead);
@@ -179,18 +179,20 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 			categoryHierarchyMap = hierarchyProcessingResult.getFirst();
 			rootOfCategoryHierarchyTree = hierarchyProcessingResult.getSecond();
 			
-			Pair<Map<String, TreeMap<Integer, Long>>, TreeMap<Integer, String>> preProcessingResult = processCheckinData(level1CatIDNames,
-					level2CatIDNames, level3CatIDNames, categoryHierarchyMap, checkinFileNameToRead, checkinFileNameToWrite);
+			Pair<Map<String, TreeMap<Integer, Long>>, TreeMap<Integer, String>> preProcessingResult =
+					getCountsFromCheckinData(level1CatIDNames, level2CatIDNames, level3CatIDNames, categoryHierarchyMap,
+							checkinFileNameToRead, checkinFileNameToWrite);
+			
 			checkinCountResultsTogether = preProcessingResult.getFirst();
 			
 			TreeMap<Integer, String> noneLevelCatIDNames = preProcessingResult.getSecond();
 			
 			setCatIDNameDictionary(catIDNamesFor3Levels, noneLevelCatIDNames);
 			
-			// writeCheckInDistributionOverCatIDs(checkinCountResultsTogether.get("level1CheckinCountMap"),
-			// checkinCountResultsTogether.get("level2CheckinCountMap"), checkinCountResultsTogether.get("level3CheckinCountMap"),
-			// checkinCountResultsTogether.get("noneLevelCheckinCountMap"),
-			// checkinCountResultsTogether.get("level1OverallDistribution"), fileNameToWriteCatLevelDistro);
+			writeCheckInDistributionOverCatIDs(checkinCountResultsTogether.get("level1CheckinCountMap"),
+					checkinCountResultsTogether.get("level2CheckinCountMap"), checkinCountResultsTogether.get("level3CheckinCountMap"),
+					checkinCountResultsTogether.get("noneLevelCheckinCountMap"),
+					checkinCountResultsTogether.get("level1OverallDistribution"), fileNameToWriteCatLevelDistro);
 			System.out.print("catIDNameDictionary.size:" + catIDNameDictionary.size() + "\n");
 			System.out.println(toStringCatIDNameDictionary());
 			System.out.println("Exiting JSONProcessingGowallaTryingNonStatic()");
@@ -224,7 +226,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	 *         - a map of (catid,name**) for categories not in any of the levels, to be added to catid,name dictionary (note: ** added to these cat names to mark them as ones not
 	 *         in category hierarchy.)
 	 */
-	public static Pair<Map<String, TreeMap<Integer, Long>>, TreeMap<Integer, String>> processCheckinData(
+	public static Pair<Map<String, TreeMap<Integer, Long>>, TreeMap<Integer, String>> getCountsFromCheckinData(
 			LinkedHashMap<Integer, String> level1Map, LinkedHashMap<Integer, String> level2Map, LinkedHashMap<Integer, String> level3Map,
 			TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>> catHierarchyMap, String checkinFileNameToRead,
 			String checkinFileNameToWrite)// earlier called writeCatLevelInfo3()
@@ -250,7 +252,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		// String fileNameToWriteCatLevelDistro = commonPath + "gw2CheckinsSpots1Slim1TargetUsersDatesOnlyCatLevelDistributionJava_";
 		
 		int countOfLines = 0;
-		StringBuffer sbuf = new StringBuffer();
+		// StringBuffer sbuf = new StringBuffer();
 		String lineRead;
 		
 		int l1Count = 0, l2Count = 0, l3Count = 0, notFoundInAnyLevelCount = 0;
@@ -324,16 +326,13 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 				// {
 				// // then search it in the category hierarchy tree
 				// if()
-				//
 				// }
-				//
 				// for (Integer level1KeyID : catHierarchyMap.keySet())
 				// {
 				// if (isInCategoryHierarchy == true)
 				// {
 				// // break;
 				// }
-				//
 				// if (catID == level1KeyID) // is level 1 ID
 				// {
 				// long count = 0;
@@ -342,12 +341,10 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 				// count = level1OverallDistribution.get(level1KeyID);
 				// }
 				// level1OverallDistribution.put(level1KeyID, count + 1);
-				//
 				// isInCategoryHierarchy = true;
 				// foundInFlatMap++;
 				// break;
 				// }
-				//
 				// for (Integer childID : catHierarchyMap.get(level1KeyID)) // is child of level1 id
 				// {
 				// if (catID == childID)
@@ -389,6 +386,9 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 			// System.out.println("Num of checkins found at one of the levels = " + foundInFlatMap);
 			// System.out.println("Num of checkins not found in hierarchy map = " + notFoundInFlatMap.size());
 			System.out.println("-----------------------------------------");
+			
+			br.close();
+			bw.close();
 		} // end
 			// of
 			// try
@@ -410,7 +410,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		countResultsTogether.put("noneLevelCheckinCountMap", noneLevelCheckinCountMap);
 		countResultsTogether.put("level1OverallDistribution", level1OverallDistribution);
 		
-		return new Pair(countResultsTogether, noneLevelCatIDNameMap);
+		return new Pair<Map<String, TreeMap<Integer, Long>>, TreeMap<Integer, String>>(countResultsTogether, noneLevelCatIDNameMap);
 		// return noneLevelCheckinCountMap;
 	}
 	
@@ -1274,7 +1274,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		 **/
 		TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>> categoryHierarchyMapLevel1 =
 				new TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>>();
-		TreeItem<String> root = new TreeItem("-1:root"); // (catid:catName)
+		TreeItem<String> root = new TreeItem<String>("-1:root"); // (catid:catName)
 		
 		try
 		{
@@ -1592,9 +1592,9 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	// return null;// categoryHierarchyMapLevel1;
 	// }
 	
-	public static Set getIntersection(Set s1, Set s2)
+	public static Set<Integer> getIntersection(Set<Integer> s1, Set<Integer> s2)
 	{
-		Set intersection = new HashSet(s1);
+		Set<Integer> intersection = new HashSet<Integer>(s1);
 		intersection.retainAll(s2);
 		
 		return intersection;

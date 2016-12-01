@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
+import org.activity.util.CSVUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.UtilityBelt;
@@ -335,7 +335,7 @@ public class EvaluationPostExperiment
 					int fileReadCounter = 0;
 					for (String fileToRead : absCSVFileNamesToRead)
 					{
-						String val = ReadingFromFile.getCellValueFromCSVFile(row, col, fileToRead);
+						String val = CSVUtils.getCellValueFromCSVFile(row, col, fileToRead);
 						
 						if (val.length() == 0 || val == null)
 						{
@@ -357,7 +357,7 @@ public class EvaluationPostExperiment
 					{ // check if there were no RTs
 						// int numOfRTs = 0;
 						
-						String whetherThisCellPosIsValid = ReadingFromFile.getCellValueFromCSVFile(row, col, fileToReadForNullifyingZeros);
+						String whetherThisCellPosIsValid = CSVUtils.getCellValueFromCSVFile(row, col, fileToReadForNullifyingZeros);
 						
 						// numOfRTs = Integer.valueOf(ReadingFromFile.getCellValueFromCSVFile(row, col, fileToReadForNullifyingZeros));
 						
@@ -463,7 +463,7 @@ public class EvaluationPostExperiment
 				
 				System.out.println("User " + user + " optimal mu:" + optimalMuForUser + "Have to read " + absfileNameToRead);
 				
-				CSVRecord rowRecord = ReadingFromFile.getRowFromCSVFile(absfileNameToRead, user);
+				CSVRecord rowRecord = CSVUtils.getRowFromCSVFile(absfileNameToRead, user);
 				MRRAtOptimalMUForRTsFile.write(UtilityBelt.CSVRecordToString(rowRecord, ",") + "\n");
 				
 				// brRR.close();

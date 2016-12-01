@@ -59,7 +59,7 @@ public class StringCode
 	public static String getActivityNameFromStringCode(String code)
 	{
 		String name = null;
-		;
+		
 		char[] charCode = code.toCharArray();
 		if (charCode.length > 1)
 		{
@@ -84,6 +84,7 @@ public class StringCode
 	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID and hence is guaranteed to be unique for at least 107
 	 * activities.
 	 * 
+	 * @deprecated used for dcu and geolife where num of uniques activities was <=10
 	 * @param activityName
 	 * @return
 	 */
@@ -108,6 +109,48 @@ public class StringCode
 			}
 			return code;
 		}
+	}
+	
+	/**
+	 * Returns the 1-character code to be used for the Activity Name.
+	 * <p>
+	 * This code is derived from the ActivityID and hence is guaranteed to be unique for at least 400 activities. Will use unicode char sfrom 192-591
+	 * <p>
+	 * 65-90: A-Z Latin Alphabet: Uppercase
+	 * <p>
+	 * 91-96: ASCII Punctuation & Symbols
+	 * <p>
+	 * 97-122: a-z Latin Alphabet: Lowercase
+	 * <p>
+	 * 123-126: ASCII Punctuation & Symbols
+	 * 
+	 * <p>
+	 * 192-255: Letters and math symbols of Latin 1 supplement
+	 * <p>
+	 * 256-383:Latin Extended-A - 128 chars
+	 * <p>
+	 * 384-591:Latin Extended-B - 208 chars
+	 * <p>
+	 * <font color = blue>So, 62 chars from 65-126 and 400 chars from 192 - 591</font>
+	 * 
+	 * @param activityName
+	 * @return
+	 */
+	public static char getCharCodeFromActivityID(int activityID)
+	{
+		
+		// uncode char from 127 to 159 are non printable, hence do not use them
+		char code = '\u0000';// null character new String();
+		try
+		{
+			code = (char) (activityID + 192); // 65 is A
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return code;
+		
 	}
 	
 	/**
@@ -137,8 +180,8 @@ public class StringCode
 		try
 		{
 			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXStartTimeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
-																														// SAXFactory.ts2string(ts,
-																														// actObjs.size(), new
+																												// SAXFactory.ts2string(ts,
+																												// actObjs.size(), new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
 		}
@@ -349,7 +392,7 @@ public class StringCode
 		try
 		{
 			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
-																																// actObjs.size(),
+																														// actObjs.size(),
 			// new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
@@ -456,7 +499,7 @@ public class StringCode
 		try
 		{
 			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXAvgAltitudeAlphabsetSize);// SAXFactory.ts2string(ts, actObjs.size(),
-																														// new
+																													// new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
 		}

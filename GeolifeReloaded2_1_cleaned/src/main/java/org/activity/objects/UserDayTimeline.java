@@ -16,6 +16,10 @@ public class UserDayTimeline implements Serializable
 	private String dateID, userID;
 	
 	private String dayName; // sunday, monday, etc..
+	
+	/**
+	 * java.sql.Date -> java.lang.LocalDate -> java.sql.Date has been done while creating timelines to remove the time component of sql date
+	 */
 	private Date date; // changed from java.sql.date to LocalDate on 18 Sep 2016 since sql.date takes time into account as well.
 	
 	public UserDayTimeline()
