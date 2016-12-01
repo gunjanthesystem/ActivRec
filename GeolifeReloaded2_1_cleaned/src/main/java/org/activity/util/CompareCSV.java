@@ -50,7 +50,8 @@ public class CompareCSV
 					String columns2[] = currentLine2.split(Pattern.quote(","));
 					String columnsMeta[] = currentLineMeta.split(Pattern.quote(","));
 					
-					System.out.println("count colums1=" + columns1.length + " count columns2=" + columns2.length + " count meta columns=" + columnsMeta.length);
+					System.out.println("count colums1=" + columns1.length + " count columns2=" + columns2.length + " count meta columns="
+							+ columnsMeta.length);
 					for (int j = 0; j < columns2.length; j++)
 					{
 						if (columns1[j].equals(columns2[j]))

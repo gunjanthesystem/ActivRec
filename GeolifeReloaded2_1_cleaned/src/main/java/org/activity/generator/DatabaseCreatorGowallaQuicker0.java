@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.activity.io.Serializer;
+import org.activity.io.WritingToFile;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.LabelEntry;
 import org.activity.objects.LocationGowalla;
@@ -56,21 +57,25 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 	
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Dec1/DatabaseCreation/";
+	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";
+	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/";
 	// Data Works/";
 	public static final String rawPathToRead =
-			"/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/";
+			"/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/";
+	// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/";
 	
 	public static final String checkinDataFileName =
-			"/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9DataGenerationR/gw2CheckinsSpots1TargetUsersDatesOnly.csv";
+			"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
+	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9DataGenerationR/gw2CheckinsSpots1TargetUsersDatesOnly.csv";
 	
-	public static final String userDataFileName =
-			"/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_userinfo.csv";
+	public static final String userDataFileName = rawPathToRead + "gowalla_userinfo.csv";
 	
-	public static final String userLocationFileName =
-			"/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_spots_subset1.csv";
+	public static final String userLocationFileName = rawPathToRead + "gowalla_spots_subset1.csv";
 	
-	static String nameForMapToBeSerialised = "mapForGowallaData9Sep2016.map";
+	public static final String categoryHierarchyTreeFileName =
+			"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode";
+	static String nameForMapToBeSerialised = "mapForGowallaData25Nov2016.map";// "mapForGowallaData9Sep2016.map";
 	
 	// $$public static final int continuityThresholdInSeconds = 5 * 60; // changed from 30 min in DCU dataset...., if two timestamps are separated by less than equal to this value
 	// and
@@ -112,13 +117,14 @@ public class DatabaseCreatorGowallaQuicker0
 			
 			//// start of curtian1
 			// get root of the category hierarchy tree
-			DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
-					.deSerializeThis("/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/RootOfCategoryTree9Sep2016.DMTreeNode");
+			DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer.deSerializeThis(categoryHierarchyTreeFileName);
 			//
 			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
-					.kryoDeSerializeThis("/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/CatIDNameDictionary2.kryo");
+					.kryoDeSerializeThis("/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
+			// commonPath + "CatIDNameDictionary.kryo");
 			
-			int workingCatLevel = 2;
+			int workingCatLevel = Constant.gowallaWorkingCatLevel;
+			
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict =
 					getWorkingLevelCatIDsForAllCatIDs(catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
 			
@@ -214,6 +220,9 @@ public class DatabaseCreatorGowallaQuicker0
 			int workingCatLevel, DefaultMutableTreeNode rootOfCategoryTree)
 	{
 		TreeMap<Integer, String> res = new TreeMap<>();
+		StringBuilder sb = new StringBuilder();
+		int numOfCatsWithMultipleWorkingLevelCats = 0, numOfCatsNotInHierarchyTree = 0, numOfCatsInHierarchyTree = 0;
+		
 		for (Entry<Integer, String> cat : catIDNameDictionary.entrySet())
 		{
 			Set<String> givenLevelOrAboveCatIDs =
@@ -223,10 +232,28 @@ public class DatabaseCreatorGowallaQuicker0
 			if (givenLevelOrAboveCatIDs.size() > 0)
 			{
 				workingLevelCatIDs = givenLevelOrAboveCatIDs.stream().reduce((t, u) -> t + "__" + u).get();
+				numOfCatsInHierarchyTree += 1;
+				
+				if (givenLevelOrAboveCatIDs.size() > 1)
+				{
+					numOfCatsWithMultipleWorkingLevelCats += 1;
+				}
+			}
+			else
+			{
+				numOfCatsNotInHierarchyTree += 1;
 			}
 			res.put(cat.getKey(), workingLevelCatIDs);
+			sb.append(cat.getKey() + "," + workingLevelCatIDs + "\n");
 		}
 		//
+		WritingToFile.writeToNewFile(sb.toString(), commonPath + "MapForgetWorkingLevelCatIDsForAllCatIDs.csv");
+		
+		String s = "numOfCatsWithMultipleWorkingLevelCats = " + numOfCatsWithMultipleWorkingLevelCats + "\nnumOfCatsNotInHierarchyTree = "
+				+ numOfCatsNotInHierarchyTree + "\nnumOfCatsInHierarchyTree = " + numOfCatsInHierarchyTree;
+		
+		WritingToFile.appendLineToFileAbsolute(s, commonPath + "MapForgetWorkingLevelCatIDsForAllCatIDs.csv");
+		
 		return res;
 	}
 	
@@ -263,6 +290,9 @@ public class DatabaseCreatorGowallaQuicker0
 		
 		ArrayList<Integer> notFoundInFlatMap = new ArrayList<Integer>();
 		ArrayList<Integer> catIDsNotFoundInAnyLevel = new ArrayList<Integer>();
+		
+		StringBuffer logRejectedCheckins = new StringBuffer();
+		long countOfRejectedCheckinNotInHierarchy = 0, countOfRejectedCHeckinBelowLevel2 = 0;
 		System.out.println("----Inside createCheckinEntries----------------");
 		try
 		{
@@ -301,6 +331,25 @@ public class DatabaseCreatorGowallaQuicker0
 				// workingLevelCatIDs = givenLevelOrAboveCatIDs.stream().reduce((t, u) -> t + "__" + u).get();
 				// }
 				// // String workingLevelCatIDs =
+				Pair<Boolean, String> isAcceptableDirectCatID = IsAcceptableDirectCatID(catIDDirect, rootOfCategoryTree);
+				
+				if (isAcceptableDirectCatID.getFirst() == false)
+				{
+					String reason = isAcceptableDirectCatID.getSecond();
+					// maintaining a log of rejected checkins with the reason for rejection
+					logRejectedCheckins.append(countOfLines + "-" + reason + "\n");
+					if (reason.equals("NotInHierarchy"))
+					{
+						countOfRejectedCheckinNotInHierarchy += 1;
+					}
+					else if (reason.equals("LevelNotAcceptable"))
+					{
+						countOfRejectedCHeckinBelowLevel2 += 1;
+					}
+					// int countOfRejectedCheckinNotInHierarchy = 0, countOfRejectedCHeckinBelowLevel2 = 0;
+					continue;
+				}
+				
 				String workingLevelCatIDs = catIDWorkingLevelCatIDsDict.get(catIDDirect);
 				
 				CheckinEntry cobj = new CheckinEntry(userID, locationID, ts, latitude, longitude, catIDDirect, workingLevelCatIDs);
@@ -322,16 +371,58 @@ public class DatabaseCreatorGowallaQuicker0
 			System.out.println("num of users = " + result.size());
 			System.out.println("num of lines read = " + countOfLines);
 			
-			System.out.println("num of CheckinEntry objects = " + countOfCheckinEntryObjects);
+			System.out.println("num of lines NotInHierarchy = " + countOfRejectedCheckinNotInHierarchy);
+			System.out.println("num of lines LevelNotAcceptable = " + countOfRejectedCHeckinBelowLevel2);
+			System.out.println("num of CheckinEntry objects created = " + countOfCheckinEntryObjects);
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 		
-		System.out.println("----Exiting createCheckinEntries----------------");
-		return new Pair(result, locationIDsInCheckinData);
+		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
 		
+		System.out.println("----Exiting createCheckinEntries----------------");
+		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>>(result, locationIDsInCheckinData);
+		
+	}
+	
+	/**
+	 * Checks if the category id is present in hierarchy tree and if the level is more than level 1.
+	 * 
+	 * @param catIDDirect
+	 * @param rootOfCategoryTree
+	 * @return pair which can be either of (true, "Acceptable"),(false, "NotInHierarchy"),(false, "LevelNotAcceptable")
+	 */
+	private static Pair<Boolean, String> IsAcceptableDirectCatID(Integer catIDToSearch, DefaultMutableTreeNode rootOfCategoryTree)
+	{
+		ArrayList<DefaultMutableTreeNode> foundNodes = UIUtilityBox.recursiveDfsMulipleOccurences2OnlyCatID(rootOfCategoryTree,
+				catIDToSearch.toString(), new ArrayList<DefaultMutableTreeNode>());
+		
+		// System.out.println("num of matching nodes found = " + foundNodes2.size());
+		boolean isLevelAcceptable = false;
+		
+		if (foundNodes.size() > 0) // is it there in hierarchy tree
+		{
+			
+			for (DefaultMutableTreeNode foundnode : foundNodes)
+			{
+				if (foundnode.getLevel() >= 2) // atleast level 2
+				{
+					isLevelAcceptable = true;
+					return new Pair<Boolean, String>(true, "Acceptable");
+				}
+				// System.out.println("Foundnode = " + foundnode.toString());
+				// System.out.println("Foundnode depth = " + foundnode.getLevel());
+				// System.out.println("Foundnode path = " + Arrays.toString(foundnode.getPath()));
+			}
+		}
+		else
+		{
+			return new Pair<Boolean, String>(false, "NotInHierarchy");
+		}
+		
+		return new Pair<Boolean, String>(false, "LevelNotAcceptable");
 	}
 	
 	/**

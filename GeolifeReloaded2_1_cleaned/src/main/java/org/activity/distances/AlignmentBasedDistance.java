@@ -34,6 +34,8 @@ public class AlignmentBasedDistance
 	double wtStartGeo;// = 0.3d;
 	double wtEndGeo;// = 0.3d;
 	double wtAvgAltitude;// = 0.2d;
+	double wtLocation;
+	double wtLocPopularity;
 	
 	double[][][] distMatrix;
 	
@@ -53,6 +55,7 @@ public class AlignmentBasedDistance
 	double startGeoTolerance;// = 0.2d;
 	double endGeoTolerance;// = 0.2d;
 	double avgAltTolerance;// / = 5d;// feets since raw data is in this unit
+	double locationPopularityTolerance;
 	
 	int numberOfInsertions = 0;
 	int numberOfDeletions = 0;
@@ -93,30 +96,38 @@ public class AlignmentBasedDistance
 	public void setWeightsAndCosts()
 	{
 		wtActivityName = 3d;
-		wtStartTime = 1d;// 0.6d;
+		wtStartTime = 0.8d;// 0.6d;
+		
 		wtDuration = 0.5d;// 0.2d;
 		wtDistanceTravelled = 3d;// //1d;
 		wtStartGeo = 0.3d;
 		wtEndGeo = 0.3d;
 		wtAvgAltitude = 0.2d;
 		
+		wtLocation = 1d;
+		wtLocPopularity = 1d;
+		
 		switch (Constant.getDatabaseName())
 		{
 			case "geolife1":
-				wtFullActivityObject =
-						UtilityBelt.round(wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled + wtStartGeo + wtEndGeo
-								+ +wtAvgAltitude, 4);
+				wtFullActivityObject = UtilityBelt
+						.round(wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled + wtStartGeo + wtEndGeo + +wtAvgAltitude, 4);
 				break;
 			case "dcu_data_2":
 				wtFullActivityObject = UtilityBelt.round(wtActivityName + wtStartTime + wtDuration, 4);
 				break;
 			
+			case "gowalla1":
+				wtFullActivityObject = UtilityBelt.round(wtActivityName + wtStartTime + wtLocation + wtLocPopularity, 4);
+				break;
+			
 			default:
-				System.err
-						.println("Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised database name:"
+				System.err.println(
+						"Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised database name:"
 								+ Constant.getDatabaseName());
-				PopUps.showError("Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised database name:"
-						+ Constant.getDatabaseName());
+				PopUps.showError(
+						"Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised database name:"
+								+ Constant.getDatabaseName());
 				break;
 		}
 		
@@ -132,11 +143,10 @@ public class AlignmentBasedDistance
 	 */
 	public String getAllWeightsOfFeatures()
 	{
-		String allWts =
-				"\nWt of Activity Name:" + wtActivityName + "\nWt of Start Time:" + wtStartTime + "\nWt of Duration:" + wtDuration
-						+ "\nWt of Distance Travelled:" + wtDistanceTravelled + "\nWt of Start Geo Location:" + wtStartGeo
-						+ "\nWt of End Geo Location:" + wtEndGeo + "\nWt of Avg Altitude:" + wtAvgAltitude
-						+ "\nWt of full Activity Object:" + wtFullActivityObject;
+		String allWts = "\nWt of Activity Name:" + wtActivityName + "\nWt of Start Time:" + wtStartTime + "\nWt of Duration:" + wtDuration
+				+ "\nWt of Distance Travelled:" + wtDistanceTravelled + "\nWt of Start Geo Location:" + wtStartGeo
+				+ "\nWt of End Geo Location:" + wtEndGeo + "\nWt of Avg Altitude:" + wtAvgAltitude + "\nWt of full Activity Object:"
+				+ wtFullActivityObject;
 		return allWts;
 	}
 	
@@ -170,12 +180,27 @@ public class AlignmentBasedDistance
 	public void setTolerancesToDefault()
 	{
 		System.out.println("Setting default tolerances");
-		startTimeToleranceInSeconds = 120; // in seconds
-		durationToleranceInSeconds = 120; // in seconds
-		distanceTravelledTolerance = 0.2d; // Kilometers, as our Haversine distance calculation uses this unit
-		startGeoTolerance = 0.2d;
-		endGeoTolerance = 0.2d;
-		avgAltTolerance = 5d;// feets since raw data is in this unit
+		
+		if (Constant.getDatabaseName().equals("geolife1"))
+		{
+			startTimeToleranceInSeconds = 120; // in seconds
+			durationToleranceInSeconds = 120; // in seconds
+			distanceTravelledTolerance = 0.2d; // Kilometers, as our Haversine distance calculation uses this unit
+			startGeoTolerance = 0.2d;
+			endGeoTolerance = 0.2d;
+			avgAltTolerance = 5d;// feets since raw data is in this unit
+		}
+		
+		if (Constant.getDatabaseName().equals("gowalla1"))
+		{
+			startTimeToleranceInSeconds = 3600; // in seconds
+			durationToleranceInSeconds = 3600; // //actually not needed , in seconds
+			distanceTravelledTolerance = 0.2d; // Kilometers, as our Haversine distance calculation uses this unit
+			startGeoTolerance = 0.5d; // actually not needed
+			endGeoTolerance = 0.5d;// actually not needed
+			avgAltTolerance = 5d;// //actually not needed, feets since raw data is in this unit
+			locationPopularityTolerance = 0.2d;
+		}
 	}
 	
 	/**
@@ -219,37 +244,32 @@ public class AlignmentBasedDistance
 		// ////////////////////////
 		
 		int ui = UtilityBelt.getIndexOfUserID(userID);
-		double startTimeSimComponent = 0, durationSimComponent = 0, distanceTravelledSimComponent = 0, startGeoSimComponent = 0, endGeoSimComponent =
-				0, avgAltSimComponent = 0;
+		double startTimeSimComponent = 0, durationSimComponent = 0, distanceTravelledSimComponent = 0, startGeoSimComponent = 0,
+				endGeoSimComponent = 0, avgAltSimComponent = 0;
 		
 		// /////////////////////////////////////////////////////////////////////
-		double startTimeAct1InSecs =
-				activityObject1.getStartTimestamp().getHours() * 60 * 60 + (activityObject1.getStartTimestamp().getMinutes()) * 60
-						+ (activityObject1.getStartTimestamp().getSeconds());
-		double startTimeAct2InSecs =
-				activityObject2.getStartTimestamp().getHours() * 60 * 60 + (activityObject2.getStartTimestamp().getMinutes()) * 60
-						+ (activityObject2.getStartTimestamp().getSeconds());
+		double startTimeAct1InSecs = activityObject1.getStartTimestamp().getHours() * 60 * 60
+				+ (activityObject1.getStartTimestamp().getMinutes()) * 60 + (activityObject1.getStartTimestamp().getSeconds());
+		double startTimeAct2InSecs = activityObject2.getStartTimestamp().getHours() * 60 * 60
+				+ (activityObject2.getStartTimestamp().getMinutes()) * 60 + (activityObject2.getStartTimestamp().getSeconds());
 		
 		startTimeSimComponent =
 				getCaseSimilarityComponent(startTimeAct1InSecs, startTimeAct2InSecs, startTimeToleranceInSeconds, "StartTime");
 		
-		durationSimComponent =
-				getCaseSimilarityComponent(activityObject1.getDurationInSeconds(), activityObject2.getDurationInSeconds(),
-						durationToleranceInSeconds, "Duration");// (1 -
-																// absDifferenceOfDuration
-																// /
-																// maxOfDurationInSeconds);
-		distanceTravelledSimComponent =
-				getCaseSimilarityComponent(activityObject1.getDistanceTravelled(), activityObject2.getDistanceTravelled(),
-						distanceTravelledTolerance, "DistanceTravelled");
+		durationSimComponent = getCaseSimilarityComponent(activityObject1.getDurationInSeconds(), activityObject2.getDurationInSeconds(),
+				durationToleranceInSeconds, "Duration");// (1 -
+														// absDifferenceOfDuration
+														// /
+														// maxOfDurationInSeconds);
+		distanceTravelledSimComponent = getCaseSimilarityComponent(activityObject1.getDistanceTravelled(),
+				activityObject2.getDistanceTravelled(), distanceTravelledTolerance, "DistanceTravelled");
 		
 		startGeoSimComponent =
 				getCaseSimilarityComponentForGeoLocation(activityObject1.getStartLatitude(), activityObject1.getStartLongitude(),
 						activityObject2.getStartLatitude(), activityObject2.getStartLongitude(), startGeoTolerance, "StartGeo", ui);
 		
-		endGeoSimComponent =
-				getCaseSimilarityComponentForGeoLocation(activityObject1.getEndLatitude(), activityObject1.getEndLongitude(),
-						activityObject2.getEndLatitude(), activityObject2.getEndLongitude(), endGeoTolerance, "EndGeo", ui);
+		endGeoSimComponent = getCaseSimilarityComponentForGeoLocation(activityObject1.getEndLatitude(), activityObject1.getEndLongitude(),
+				activityObject2.getEndLatitude(), activityObject2.getEndLongitude(), endGeoTolerance, "EndGeo", ui);
 		
 		if (Double.parseDouble(activityObject1.getAvgAltitude()) <= 0 || Double.parseDouble(activityObject1.getAvgAltitude()) <= 0)
 		{
@@ -257,15 +277,13 @@ public class AlignmentBasedDistance
 		}
 		else
 		{
-			avgAltSimComponent =
-					getCaseSimilarityComponent(Double.parseDouble(activityObject1.getAvgAltitude()),
-							Double.parseDouble(activityObject2.getAvgAltitude()), avgAltTolerance, "AvgAltitude");
+			avgAltSimComponent = getCaseSimilarityComponent(Double.parseDouble(activityObject1.getAvgAltitude()),
+					Double.parseDouble(activityObject2.getAvgAltitude()), avgAltTolerance, "AvgAltitude");
 		}
 		
-		double weightedSum =
-				wtStartTime * startTimeSimComponent + wtDuration * durationSimComponent + wtDistanceTravelled
-						* distanceTravelledSimComponent + wtStartGeo * startGeoSimComponent + wtEndGeo * endGeoSimComponent + wtAvgAltitude
-						* avgAltSimComponent;
+		double weightedSum = wtStartTime * startTimeSimComponent + wtDuration * durationSimComponent
+				+ wtDistanceTravelled * distanceTravelledSimComponent + wtStartGeo * startGeoSimComponent + wtEndGeo * endGeoSimComponent
+				+ wtAvgAltitude * avgAltSimComponent;
 		
 		double sumOfWeights = wtStartTime + wtDuration + wtDistanceTravelled + wtStartGeo + wtEndGeo + wtAvgAltitude;
 		
@@ -303,22 +321,19 @@ public class AlignmentBasedDistance
 		double startTimeSimComponent = 0, durationSimComponent = 0;
 		
 		// /////////////////////////////////////////////////////////////////////
-		double startTimeAct1InSecs =
-				activityObject1.getStartTimestamp().getHours() * 60 * 60 + (activityObject1.getStartTimestamp().getMinutes()) * 60
-						+ (activityObject1.getStartTimestamp().getSeconds());
-		double startTimeAct2InSecs =
-				activityObject2.getStartTimestamp().getHours() * 60 * 60 + (activityObject2.getStartTimestamp().getMinutes()) * 60
-						+ (activityObject2.getStartTimestamp().getSeconds());
+		double startTimeAct1InSecs = activityObject1.getStartTimestamp().getHours() * 60 * 60
+				+ (activityObject1.getStartTimestamp().getMinutes()) * 60 + (activityObject1.getStartTimestamp().getSeconds());
+		double startTimeAct2InSecs = activityObject2.getStartTimestamp().getHours() * 60 * 60
+				+ (activityObject2.getStartTimestamp().getMinutes()) * 60 + (activityObject2.getStartTimestamp().getSeconds());
 		
 		startTimeSimComponent =
 				getCaseSimilarityComponent(startTimeAct1InSecs, startTimeAct2InSecs, startTimeToleranceInSeconds, "StartTime");
 		
-		durationSimComponent =
-				getCaseSimilarityComponent(activityObject1.getDurationInSeconds(), activityObject2.getDurationInSeconds(),
-						durationToleranceInSeconds, "Duration");// (1 -
-																// absDifferenceOfDuration
-																// /
-																// maxOfDurationInSeconds);
+		durationSimComponent = getCaseSimilarityComponent(activityObject1.getDurationInSeconds(), activityObject2.getDurationInSeconds(),
+				durationToleranceInSeconds, "Duration");// (1 -
+														// absDifferenceOfDuration
+														// /
+														// maxOfDurationInSeconds);
 		double weightedSum = wtStartTime * startTimeSimComponent + wtDuration * durationSimComponent;
 		
 		double sumOfWeights = wtStartTime + wtDuration;
@@ -335,8 +350,9 @@ public class AlignmentBasedDistance
 	
 	/**
 	 * Return the feature level distance between the two given Activity Objects. (note: this is NOT case-based) (note: DCU data has only two features while Geolife Data has 4
-	 * additional features. Alert: this method needs to be modified for different datasets. TODO To make it generic, store the feature names in a data structure at the start of
-	 * experiments.) NOT GENERIC
+	 * additional features. Alert: this method needs to be modified for different datasets.
+	 * <p>
+	 * TODO To make it generic, store the feature names in a data structure at the start of experiments.) NOT GENERIC
 	 * 
 	 * this is exactly same as HJEditDistance.getFeatureLevelDistance()
 	 * 
@@ -348,34 +364,56 @@ public class AlignmentBasedDistance
 	{
 		double dfeat = 0;
 		// if(ao1.getStartTimestamp().getTime() != (ao2.getStartTimestamp().getTime()) )//is wrong since its comparing timestamps and not time of days...however, results for our
-		// experiments do
-		// not
-		// show any visible difference in results { dfeat+=costReplaceStartTime; }
-		if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(), startTimeToleranceInSeconds) == false)
+		// experiments do not show any visible difference in results { dfeat+=costReplaceStartTime; }
+		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
 		{
-			dfeat += wtStartTime;
+			if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(), startTimeToleranceInSeconds) == false)
+			{
+				dfeat += wtStartTime;
+			}
+			
+			if (ao1.getLocationID() != ao2.getLocationID())
+			{
+				dfeat += wtLocation;
+			}
+			
+			double c1 = ao1.getCheckins_count();
+			double c2 = ao2.getCheckins_count();
+			double popularityDistance = 1 - (Math.abs(c1 - c2) / Math.max(c1, c2));
+			
+			dfeat += popularityDistance * this.wtLocPopularity;
 		}
-		if (Math.abs(ao1.getDurationInSeconds() - ao2.getDurationInSeconds()) > durationToleranceInSeconds)
+		
+		else
 		{
-			dfeat += wtDuration;
-		}
-		if (Constant.getDatabaseName().equals("geolife1"))// (Constant.DATABASE_NAME.equals("geolife1"))
-		{
-			if (Math.abs(ao1.getDistanceTravelled() - ao2.getDistanceTravelled()) > distanceTravelledTolerance)
+			if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(), startTimeToleranceInSeconds) == false)
 			{
-				dfeat += wtDistanceTravelled;
+				dfeat += wtStartTime;
 			}
-			if (Math.abs(ao1.getDifferenceStartingGeoCoordinates(ao2)) > startGeoTolerance)
+			
+			if (Math.abs(ao1.getDurationInSeconds() - ao2.getDurationInSeconds()) > durationToleranceInSeconds)
 			{
-				dfeat += wtStartGeo;
+				dfeat += wtDuration;
 			}
-			if (Math.abs(ao1.getDifferenceEndingGeoCoordinates(ao2)) > endGeoTolerance)
+			
+			if (Constant.getDatabaseName().equals("geolife1"))// (Constant.DATABASE_NAME.equals("geolife1"))
 			{
-				dfeat += wtEndGeo;
-			}
-			if (Math.abs(Double.parseDouble(ao1.getAvgAltitude()) - Double.parseDouble((ao2.getAvgAltitude()))) > avgAltTolerance)
-			{
-				dfeat += wtAvgAltitude;
+				if (Math.abs(ao1.getDistanceTravelled() - ao2.getDistanceTravelled()) > distanceTravelledTolerance)
+				{
+					dfeat += wtDistanceTravelled;
+				}
+				if (Math.abs(ao1.getDifferenceStartingGeoCoordinates(ao2)) > startGeoTolerance)
+				{
+					dfeat += wtStartGeo;
+				}
+				if (Math.abs(ao1.getDifferenceEndingGeoCoordinates(ao2)) > endGeoTolerance)
+				{
+					dfeat += wtEndGeo;
+				}
+				if (Math.abs(Double.parseDouble(ao1.getAvgAltitude()) - Double.parseDouble((ao2.getAvgAltitude()))) > avgAltTolerance)
+				{
+					dfeat += wtAvgAltitude;
+				}
 			}
 		}
 		return dfeat;
@@ -565,7 +603,7 @@ public class AlignmentBasedDistance
 	// {
 	// if (Constant.verbose || Constant.verboseLevenstein)
 	// {
-	// System.out.println("inside getSimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2 + " with insertWt=" + insertWt + " with deleteWt=" + deleteWt
+	// System.out.println("inside getSimpleLevenshteinDistance for word1=" + word1 + " word2=" + word2 + " with insertWt=" + insertWt + " with deleteWt=" + deleteWt
 	// + " with replaceWt=" + replaceWt);
 	// }
 	// int len1 = word1.length();
@@ -653,7 +691,7 @@ public class AlignmentBasedDistance
 	// if (Constant.verboseLevenstein)
 	// // iterate though, and check last char
 	// {
-	// System.out.println("  Trace Matrix: ");
+	// System.out.println(" Trace Matrix: ");
 	// for (int i = 0; i <= len1; i++)
 	// {
 	// for (int j = 0; j <= len2; j++)
@@ -662,7 +700,7 @@ public class AlignmentBasedDistance
 	// }
 	// System.out.println();
 	// }
-	// System.out.println("  Distance Matrix: ");
+	// System.out.println(" Distance Matrix: ");
 	// for (int i = 0; i <= len1; i++)
 	// {
 	// for (int j = 0; j <= len2; j++)
@@ -705,8 +743,9 @@ public class AlignmentBasedDistance
 	/**
 	 * Computes Weighted Levenshtein distance between the given strings.</br>
 	 * 
-	 * Weight of insertion = insertWt * abs(haversinediff(insertedVal - medianValOfOtherString)) </br> Weight of deletion = deleteWt * abs(haversinediff(deletedVal -
-	 * medianValOfOtherString)) </br> Weight of replacement = replaceWt * abs(haversinediff(replaceVal - original))
+	 * Weight of insertion = insertWt * abs(haversinediff(insertedVal - medianValOfOtherString)) </br>
+	 * Weight of deletion = deleteWt * abs(haversinediff(deletedVal - medianValOfOtherString)) </br>
+	 * Weight of replacement = replaceWt * abs(haversinediff(replaceVal - original))
 	 * 
 	 * right to left: insertion? top to down: deletion
 	 * 
@@ -759,19 +798,15 @@ public class AlignmentBasedDistance
 		
 		for (int i = 1; i <= len1; i++)
 		{
-			dp[i][0] =
-					dp[i - 1][0]
-							+ UtilityBelt.haversine(vals1[i - 1].getFirst(), vals1[i - 1].getSecond(), centroid2.getFirst(),
-									centroid2.getSecond());
+			dp[i][0] = dp[i - 1][0]
+					+ UtilityBelt.haversine(vals1[i - 1].getFirst(), vals1[i - 1].getSecond(), centroid2.getFirst(), centroid2.getSecond());
 			traceMatrix[i][0].append(traceMatrix[i - 1][0] + "_D(" + (i) + "-" + "0)");
 		}
 		
 		for (int j = 1; j <= len2; j++)
 		{
-			dp[0][j] =
-					dp[0][j - 1]
-							+ UtilityBelt.haversine(vals2[j - 1].getFirst(), vals2[j - 1].getSecond(), centroid2.getFirst(),
-									centroid2.getSecond());// j * distBetweenCentroids;
+			dp[0][j] = dp[0][j - 1]
+					+ UtilityBelt.haversine(vals2[j - 1].getFirst(), vals2[j - 1].getSecond(), centroid2.getFirst(), centroid2.getSecond());// j * distBetweenCentroids;
 			traceMatrix[0][j].append(traceMatrix[0][j - 1] + "_I(0" + "-" + j + ")");
 		}
 		
@@ -785,7 +820,7 @@ public class AlignmentBasedDistance
 				if (Constant.verboseLevenstein)
 				{
 					System.out.println("\nComparing " + c1 + " and " + c2);
-				}// if last two chars equal
+				} // if last two chars equal
 				if (c1 == c2)
 				{
 					// update dp value for +1 length
@@ -821,7 +856,7 @@ public class AlignmentBasedDistance
 					if (Constant.verboseLevenstein)
 					{
 						System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
-					}// int min = replace > insert ? insert : replace;
+					} // int min = replace > insert ? insert : replace;
 						// min = delete > min ? min : delete;
 						//
 					double min = -9999;
@@ -915,7 +950,8 @@ public class AlignmentBasedDistance
 	/**
 	 * Computes Weighted Levenshtein distance between the given strings.</br>
 	 * 
-	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br> Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
+	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br>
+	 * Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
 	 * Weight of replacement = replaceWt * abs(diff(replaceVal - original))
 	 * 
 	 * right to left: insertion? top to down: deletion
@@ -933,8 +969,8 @@ public class AlignmentBasedDistance
 	 *            feature timeline vals for current timeline
 	 * @return
 	 */
-	public Pair<String, Double> getWeightedLevenshteinDistanceRawVals(String word1, String word2, int insertWt, int deleteWt,
-			int replaceWt, double[] vals1, double[] vals2)
+	public Pair<String, Double> getWeightedLevenshteinDistanceRawVals(String word1, String word2, int insertWt, int deleteWt, int replaceWt,
+			double[] vals1, double[] vals2)
 	{
 		double median2 = getMedian(vals2);// new DescriptiveStatistics(vals2).getPercentile(50); // median of seconds word, as word1 is being transformed to word2, this destroys
 											// the symmetry of
@@ -943,9 +979,9 @@ public class AlignmentBasedDistance
 		
 		if (Constant.verbose || Constant.verboseLevenstein)
 		{
-			System.out.println("inside getSimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2 + " with insertWt="
-					+ insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt + " vals1 = " + Arrays.toString(vals2)
-					+ " vals2 = " + Arrays.toString(vals2) + "  median of vals2= " + median2);
+			System.out.println("inside getSimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2 + " with insertWt=" + insertWt
+					+ " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt + " vals1 = " + Arrays.toString(vals2) + " vals2 = "
+					+ Arrays.toString(vals2) + "  median of vals2= " + median2);
 		}
 		
 		int len1 = word1.length();
@@ -1009,7 +1045,7 @@ public class AlignmentBasedDistance
 					{
 						System.out.println("Difference of vals = " + Math.abs(vals1[i] - vals2[j]));//
 						System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
-					}// int min = replace > insert ? insert : replace;
+					} // int min = replace > insert ? insert : replace;
 						// min = delete > min ? min : delete;
 						//
 					double min = -9999;
@@ -1104,7 +1140,7 @@ public class AlignmentBasedDistance
 	// {
 	// if (Constant.verbose || Constant.verboseLevenstein)
 	// {
-	// System.out.println("inside getSimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2 + " with insertWt=" + insertWt + " with deleteWt=" + deleteWt
+	// System.out.println("inside getSimpleLevenshteinDistance for word1=" + word1 + " word2=" + word2 + " with insertWt=" + insertWt + " with deleteWt=" + deleteWt
 	// + " with replaceWt=" + replaceWt);
 	// }
 	// int len1 = word1.length();
@@ -1200,7 +1236,7 @@ public class AlignmentBasedDistance
 	// if (Constant.verboseLevenstein)
 	// // iterate though, and check last char
 	// {
-	// System.out.println("  Trace Matrix: ");
+	// System.out.println(" Trace Matrix: ");
 	// for (int i = 0; i <= len1; i++)
 	// {
 	// for (int j = 0; j <= len2; j++)
@@ -1209,7 +1245,7 @@ public class AlignmentBasedDistance
 	// }
 	// System.out.println();
 	// }
-	// System.out.println("  Distance Matrix: ");
+	// System.out.println(" Distance Matrix: ");
 	// for (int i = 0; i <= len1; i++)
 	// {
 	// for (int j = 0; j <= len2; j++)
@@ -1230,7 +1266,8 @@ public class AlignmentBasedDistance
 	/**
 	 * Computes Levenshtein distance between the given strings.</br>
 	 * 
-	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br> Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
+	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br>
+	 * Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
 	 * Weight of replacement = replaceWt * abs(diff(replaceVal - original))
 	 * 
 	 * right to left: insertion? top to down: deletion
@@ -1255,12 +1292,12 @@ public class AlignmentBasedDistance
 		// len1+1, len2+1, because finally return dp[len1][len2]
 		int[][] dist = new int[len1 + 1][len2 + 1];
 		
-		StringBuffer[][] traceMatrix = new StringBuffer[len1 + 1][len2 + 1];
+		StringBuilder[][] traceMatrix = new StringBuilder[len1 + 1][len2 + 1];
 		for (int i = 0; i <= len1; i++)
 		{
 			for (int j = 0; j <= len2; j++)
 			{
-				traceMatrix[i][j] = new StringBuffer();
+				traceMatrix[i][j] = new StringBuilder();
 			}
 		}
 		
@@ -1370,7 +1407,8 @@ public class AlignmentBasedDistance
 	/**
 	 * Computes Levenshtein distance between the given strings.</br>
 	 * 
-	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br> Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
+	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br>
+	 * Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
 	 * Weight of replacement = replaceWt * abs(diff(replaceVal - original))
 	 * 
 	 * right to left: insertion? top to down: deletion
@@ -1481,7 +1519,7 @@ public class AlignmentBasedDistance
 		if (Constant.verboseLevenstein)
 		// iterate though, and check last char
 		{
-			// System.out.println("  Trace Matrix: ");
+			// System.out.println(" Trace Matrix: ");
 			// for (int i = 0; i <= len1; i++)
 			// {
 			// for (int j = 0; j <= len2; j++)

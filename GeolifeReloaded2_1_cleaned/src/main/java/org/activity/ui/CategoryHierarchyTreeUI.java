@@ -49,9 +49,9 @@ public class CategoryHierarchyTreeUI extends Application
 	private final TextArea msgLogFld = new TextArea();
 	private ListView<String> listForCatIDsToAdd;// = new ListView();
 	
-	private final String serializedCatTreeFileNamePhrase = "RootOfCategoryTree24Nov2016.DMTreeNode";// "RootOfCategoryTree9Sep2016.DMTreeNode";
+	private final String serializedCatTreeFileNamePhrase = "RootOfCategoryTree25Nov2016.DMTreeNode";// "RootOfCategoryTree9Sep2016.DMTreeNode";
 	
-	private final String whichRootToUse = "originalRaw";// "updated
+	private final String whichRootToUse = "updated";// "originalRaw";// "updated
 	
 	public static void main(String[] args)
 	{
@@ -71,6 +71,10 @@ public class CategoryHierarchyTreeUI extends Application
 			
 			JSONProcessingGowallaTryingNonStatic preProcessGowalla = new JSONProcessingGowallaTryingNonStatic(commonPath);
 			
+			/////////
+			TreeMap<Integer, String> dict = preProcessGowalla.getCatIDNameDictionary();
+			Serializer.kryoSerializeThis(dict, commonPath + "CatIDNameDictionary.kryo");
+			/////////
 			// Serializer.serializeThis(preProcessGowalla, commonPath + "SerializedPreProcessGowalla24Aug.obj");
 			// JSONProcessingGowallaTryingNonStatic preProcessGowalla =
 			// (JSONProcessingGowallaTryingNonStatic) Serializer.deSerializeThis(commonPath + "SerializedPreProcessGowalla24Aug.obj");
@@ -78,8 +82,9 @@ public class CategoryHierarchyTreeUI extends Application
 			// ~~~~~~` get deserialised tree.. (the one in which we have already manually added some nodes)
 			if (whichRootToUse.equals("updated"))
 			{
-				DefaultMutableTreeNode rootOfCategoryTreeTN = (DefaultMutableTreeNode) Serializer
-						.deSerializeThis("/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/RootOfCategoryTree9Sep2016.DMTreeNode");
+				DefaultMutableTreeNode rootOfCategoryTreeTN = (DefaultMutableTreeNode) Serializer.deSerializeThis(
+						"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode");
+				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/RootOfCategoryTree9Sep2016.DMTreeNode");
 				
 				TreeItem<String> rootOfCategoryTree = UIUtilityBox.convertTreeNodesToTreeItems(rootOfCategoryTreeTN);
 				

@@ -24,12 +24,12 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import org.activity.featureExtraction.TimelinesAttributesExtraction;
-import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
+import org.activity.util.CSVUtils;
 import org.activity.util.Constant;
 import org.activity.util.UtilityBelt;
 import org.activity.util.weka.WekaUtilityBelt;
@@ -632,7 +632,7 @@ public class TimelineWEKAClusteringController
 			int userID = e.getKey();
 			
 			double mrrForPredictedBestMRR = Double.parseDouble(
-					ReadingFromFile.getCellValueFromCSVFile((predictedBestMU + 2), (userID + 1), getAllMRRFileNameToRead(groundTruth)));
+					CSVUtils.getCellValueFromCSVFile((predictedBestMU + 2), (userID + 1), getAllMRRFileNameToRead(groundTruth)));
 			
 			String msg = "User_" + e.getKey() + "," + instanceIDToUserID(e.getKey()) + ", " + e.getValue() + "," + predictedBestMU + ","
 					+ mrrForPredictedBestMRR + "\n";
@@ -703,23 +703,23 @@ public class TimelineWEKAClusteringController
 		fileSampEn3 = pathToWrite + "SetOf25SampEn3PredictedClasses.csv";
 		fileKGram = pathToWrite + "SetOf25KGramPredictedClasses.csv";
 		
-		List<CSVRecord> allAttRecords = ReadingFromFile.getCSVRecords(fileAll);
+		List<CSVRecord> allAttRecords = CSVUtils.getCSVRecords(fileAll);
 		colNumActualClassAll = getColumnNumberOfHeader("actual", allAttRecords.get(0));
 		colNumPredictedClassAll = getColumnNumberOfHeader("predicted", allAttRecords.get(0));
 		colNumUserIDAll = getColumnNumberOfHeader("UserID", allAttRecords.get(0));
 		allAttRecords.remove(0);// removing header
 		
-		List<CSVRecord> sampEn2AttRecords = ReadingFromFile.getCSVRecords(fileSampEn2);
+		List<CSVRecord> sampEn2AttRecords = CSVUtils.getCSVRecords(fileSampEn2);
 		colNumPredictedClassSampEn2 = getColumnNumberOfHeader("predicted", sampEn2AttRecords.get(0));
 		colNumUserIDSampEn2 = getColumnNumberOfHeader("UserID", sampEn2AttRecords.get(0));
 		sampEn2AttRecords.remove(0);// removing header
 		
-		List<CSVRecord> sampEn3AttRecords = ReadingFromFile.getCSVRecords(fileSampEn3);
+		List<CSVRecord> sampEn3AttRecords = CSVUtils.getCSVRecords(fileSampEn3);
 		colNumPredictedClassSampEn3 = getColumnNumberOfHeader("predicted", sampEn3AttRecords.get(0));
 		colNumUserIDSampEn3 = getColumnNumberOfHeader("UserID", sampEn3AttRecords.get(0));
 		sampEn3AttRecords.remove(0);// removing header
 		
-		List<CSVRecord> kGramAttRecords = ReadingFromFile.getCSVRecords(fileKGram);
+		List<CSVRecord> kGramAttRecords = CSVUtils.getCSVRecords(fileKGram);
 		colNumPredictedClassKGram = getColumnNumberOfHeader("predicted", kGramAttRecords.get(0));
 		colNumUserIDKGram = getColumnNumberOfHeader("UserID", kGramAttRecords.get(0));
 		kGramAttRecords.remove(0);// removing header
@@ -2210,7 +2210,7 @@ public class TimelineWEKAClusteringController
 		
 		try
 		{
-			List<CSVRecord> records = ReadingFromFile.getCSVRecords(absoluteFileNameToRead);
+			List<CSVRecord> records = CSVUtils.getCSVRecords(absoluteFileNameToRead);
 			// PopUps.showMessage("Number of records = " + records.size());
 			
 			int rowNumber = 0, numOfInconsistentRecords = 0;

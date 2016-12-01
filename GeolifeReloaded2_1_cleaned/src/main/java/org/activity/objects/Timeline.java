@@ -452,7 +452,7 @@ public class Timeline
 	
 	public String getActivityObjectNamesInSequence()
 	{
-		StringBuffer res = new StringBuffer("");
+		StringBuilder res = new StringBuilder("");
 		
 		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
 		{
@@ -472,7 +472,7 @@ public class Timeline
 	
 	public String getActivityObjectNamesWithTimestampsInSequence()
 	{
-		StringBuffer res = new StringBuffer("");
+		StringBuilder res = new StringBuilder();
 		
 		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
 		{
@@ -487,7 +487,7 @@ public class Timeline
 	
 	public String getActivityObjectNamesWithoutTimestampsInSequence()
 	{
-		StringBuffer res = new StringBuffer("");
+		StringBuilder res = new StringBuilder("");
 		
 		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
 		{
@@ -501,6 +501,10 @@ public class Timeline
 		return res.toString();
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public ArrayList<ActivityObject> getActivityObjectsInTimeline()
 	{
 		return this.activityObjectsInTimeline;
@@ -547,7 +551,7 @@ public class Timeline
 	 */
 	public String getActivityObjectsAsStringCode()
 	{
-		StringBuffer stringCodeForTimeline = new StringBuffer();// changed from String to StringBuffer on 20 Sep 2016
+		StringBuilder stringCodeForTimeline = new StringBuilder();// changed from String to StringBuilder on 20 Sep 2016
 		
 		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
 		{

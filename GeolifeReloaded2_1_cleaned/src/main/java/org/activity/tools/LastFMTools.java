@@ -2,7 +2,7 @@ package org.activity.tools;
 
 import java.util.ArrayList;
 
-import org.activity.io.ReadingFromFile;
+import org.activity.util.CSVUtils;
 
 public class LastFMTools
 {
@@ -30,8 +30,8 @@ public class LastFMTools
 			listOfOutputFileNamesSlimmer.add(commonPathToReadResults + "Split" + i + "AfterMergingContinuousSlimmer.csv");
 		}
 		
-		ReadingFromFile.concatenateCSVFiles(listOfOutputFileNames, true, pathToWriteResults + "AllUsersAfterMergingContinuous.csv", '\t');
-		ReadingFromFile.concatenateCSVFiles(listOfOutputFileNamesSlimmer, true,
+		CSVUtils.concatenateCSVFiles(listOfOutputFileNames, true, pathToWriteResults + "AllUsersAfterMergingContinuous.csv", '\t');
+		CSVUtils.concatenateCSVFiles(listOfOutputFileNamesSlimmer, true,
 				pathToWriteResults + "AllUsersAfterMergingContinuousSlimmer.csv", '\t');
 	}
 }

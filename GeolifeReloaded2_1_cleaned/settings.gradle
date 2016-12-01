@@ -16,4 +16,4 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'Geolife02'
+rootProject.name = 'GeolifeReloaded2_1_cleaned'

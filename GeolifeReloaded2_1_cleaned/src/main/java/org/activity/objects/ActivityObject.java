@@ -32,7 +32,7 @@ public class ActivityObject implements Serializable
 	int activityID, locationID;
 	String activityName, locationName, workingLevelCatIDs;// workingLevelCatIDs are "__" separated catID for the given working level in hierarhcy
 	
-	Timestamp startTimestamp, endTimestamp;
+	private Timestamp startTimestamp, endTimestamp;
 	
 	/**
 	 * Not available in Gowalla dataset
@@ -77,11 +77,17 @@ public class ActivityObject implements Serializable
 			String startLatitude, String startLongitude, String startAltitude, String userID, int photos_count, int checkins_count,
 			int users_count, int radius_meters, int highlights_count, int items_count, int max_items_count, String workingLevelCatIDs)
 	{
-		this.activityID = activityID;
+		
+		// this.activityID = activityID;
+		
+		String splittedwlci[] = workingLevelCatIDs.split("__");
+		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only considering one working level cat id
+		
 		this.locationID = locationID;
-		this.activityName = activityName;
+		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
 		this.startTimestamp = startTimestamp;
+		this.endTimestamp = startTimestamp;
 		this.startLatitude = startLatitude;
 		this.startLongitude = startLongitude;
 		this.startAltitude = startAltitude;
@@ -94,6 +100,7 @@ public class ActivityObject implements Serializable
 		this.items_count = items_count;
 		this.max_items_count = max_items_count;
 		this.workingLevelCatIDs = workingLevelCatIDs;
+		
 	}
 	
 	public String toStringAll()
@@ -400,6 +407,15 @@ public class ActivityObject implements Serializable
 	}
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public int getLocationID()
+	{
+		return locationID;
+	}
+	
+	/**
 	 * Create empty Activity Object
 	 */
 	public ActivityObject()
@@ -472,10 +488,10 @@ public class ActivityObject implements Serializable
 		return equal;
 	}
 	
-	public String getWorkingLevelCatIDs()
-	{
-		return workingLevelCatIDs;
-	}
+	// public String getWorkingLevelCatIDs()
+	// {
+	// return workingLevelCatIDs;
+	// }
 	
 	public void setWorkingLevelCatIDs(String workingLevelCatIDs)
 	{
@@ -483,17 +499,35 @@ public class ActivityObject implements Serializable
 	}
 	
 	/**
-	 * Returns the 1-character string code from the Activity Name. This code is derived from the ActivityID and hence is guaranteed to be unique for at least 107 activities.
+	 * @deprecated Used for the iiwas and geolife experiment where the num of unique activities were <=10
+	 *             <p>
+	 *             Returns the 1-character string code from the Activity Name. This code is derived from the ActivityID and hence is guaranteed to be unique for at least 107
+	 *             activities.
 	 * 
 	 * @return
 	 */
-	public String getStringCode()
+	public String getStringCode_v0()
 	{
 		/*
 		 * String code = new String(); String activityName= this.activityName; int activityID= generateSyntheticData.getActivityid(activityName); code= Character.toString
 		 * ((char)(activityID+65));
 		 */
 		return StringCode.getStringCodeFromActivityName(this.activityName);
+	}
+	
+	/**
+	 * Returns the 1-character string code from the ActivityID and hence is guaranteed to be unique for at least 107 activities.
+	 * 
+	 * @since 30 Nov 2016
+	 * @return
+	 */
+	public char getStringCode()
+	{
+		/*
+		 * String code = new String(); String activityName= this.activityName; int activityID= generateSyntheticData.getActivityid(activityName); code= Character.toString
+		 * ((char)(activityID+65));
+		 */
+		return StringCode.getCharCodeFromActivityID(this.activityID);
 	}
 	
 	/**
@@ -505,7 +539,7 @@ public class ActivityObject implements Serializable
 	 */
 	public static String getStringCodeForActivityObjects(ArrayList<ActivityObject> ActivityObjects)
 	{
-		StringBuffer code = new StringBuffer();
+		StringBuilder code = new StringBuilder();
 		
 		if (Constant.verboseSAX)
 			System.out.println("Inside getStringCodeForActivityObjects");

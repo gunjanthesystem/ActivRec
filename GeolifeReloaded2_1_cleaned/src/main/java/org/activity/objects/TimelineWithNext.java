@@ -61,13 +61,13 @@ public class TimelineWithNext extends Timeline
 	 * @param matchingUnitInHours
 	 * @return
 	 */
-	public static TimelineWithNext getCurrentTimelineFromLongerTimelineMUHours(Timeline longerTimeline, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm,
-			double matchingUnitInHours)
+	public static TimelineWithNext getCurrentTimelineFromLongerTimelineMUHours(Timeline longerTimeline, Date dateAtRecomm,
+			Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInHours)
 	{
 		System.out.println("------- Inside getCurrentTimelineFromLongerTimelineMUHours");
 		
-		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(), dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(),
-				timeAtRecomm.getSeconds(), 0);
+		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(), dateAtRecomm.getDate(),
+				timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(), 0);
 		long currentEndTime = currentEndTimestamp.getTime();
 		
 		// this is a safe cast in this case
@@ -80,7 +80,8 @@ public class TimelineWithNext extends Timeline
 		
 		// identify the recommendation point in longer timeline
 		
-		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline.getActivityObjectsBetweenTime(currentStartTimestamp, currentEndTimestamp);
+		ArrayList<ActivityObject> activityObjectsInCurrentTimeline =
+				longerTimeline.getActivityObjectsBetweenTime(currentStartTimestamp, currentEndTimestamp);
 		
 		ActivityObject nextValidActivityObject = longerTimeline.getNextValidActivityAfterActivityAtThisTime(currentEndTimestamp);
 		ActivityObject nextActivityObject = longerTimeline.getNextActivityAfterActivityAtThisTime(currentEndTimestamp);
@@ -110,23 +111,24 @@ public class TimelineWithNext extends Timeline
 	 * @param matchingUnitInCounts
 	 * @return
 	 */
-	public static TimelineWithNext getCurrentTimelineFromLongerTimelineMUCount(Timeline longerTimeline, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm,
-			double matchingUnitInCountsD)
+	public static TimelineWithNext getCurrentTimelineFromLongerTimelineMUCount(Timeline longerTimeline, Date dateAtRecomm,
+			Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsD)
 	{
 		int matchingUnitInCounts = (int) matchingUnitInCountsD;
 		System.out.println("------Inside getCurrentTimelineFromLongerTimelineMUCount");
 		System.out.println("longer timeline=" + longerTimeline.getActivityObjectNamesWithTimestampsInSequence());// getActivityObjectNamesInSequence());
 		
-		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(), dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(),
-				timeAtRecomm.getSeconds(), 0);
+		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(), dateAtRecomm.getDate(),
+				timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(), 0);
 		// long currentEndTime=currentEndTimestamp.getTime();
 		
 		int indexOfCurrentEnd = longerTimeline.getIndexOfActivityObjectsAtTime(currentEndTimestamp);
 		
 		if (indexOfCurrentEnd - matchingUnitInCounts < 0)
 		{
-			System.out.println("Warning: reducing matching units since don't have enough past to look in past,indexOfCurrentEnd(" + indexOfCurrentEnd + ")" + "- matchingUnitInCounts("
-					+ matchingUnitInCounts + ")=" + (indexOfCurrentEnd - matchingUnitInCounts));
+			System.out.println(
+					"Warning: reducing matching units since don't have enough past to look in past,indexOfCurrentEnd(" + indexOfCurrentEnd
+							+ ")" + "- matchingUnitInCounts(" + matchingUnitInCounts + ")=" + (indexOfCurrentEnd - matchingUnitInCounts));
 			matchingUnitInCounts = indexOfCurrentEnd;
 		}
 		
@@ -142,7 +144,8 @@ public class TimelineWithNext extends Timeline
 		
 		// identify the recommendation point in longer timeline
 		
-		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
+		ArrayList<ActivityObject> activityObjectsInCurrentTimeline =
+				longerTimeline.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
 		
 		ActivityObject nextValidActivityObject = longerTimeline.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 		ActivityObject nextActivityObject = longerTimeline.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
@@ -159,7 +162,7 @@ public class TimelineWithNext extends Timeline
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
 		
 		// System.out.println("Current timeline="+currentTimeline.getActivityObjectNamesInSequence());
-		if (currentTimeline.getActivityObjectsInTimeline().size() != (matchingUnitInCounts + 1)) // note: this is matchung unit in counts reduced
+		if (currentTimeline.getActivityObjectsInTimeline().size() != (matchingUnitInCounts + 1)) // note: this is matching unit in counts reduced
 		{
 			System.err.println("Error: the current timeline does have #activity objs = adjusted matching unit");
 		}

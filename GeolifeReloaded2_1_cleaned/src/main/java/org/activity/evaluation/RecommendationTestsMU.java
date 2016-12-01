@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class RecommendationTestsMU
 	
 	public RecommendationTestsMU(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
 	{
-		System.out.println("**********Entering Recommendation Tests**********");
+		System.out.println("\n\n **********Entering Recommendation Tests**********");
 		// PopUps.showMessage("**********Entering Recommendation Tests**********\n with output path = " + Constant.outputCoreResultsPath);
 		
 		long recommTestsStarttime = System.currentTimeMillis();
@@ -81,15 +82,19 @@ public class RecommendationTestsMU
 		this.typeOfThresholds = Constant.typeOfThresholds;
 		this.userIDs = Constant.getUserIDs();
 		
-		if (userIDs == null || userIDs.length == 0) // if userid is not set in constant class
+		if (userIDs == null || userIDs.length == 0) // if userid is not set in constant class, in case of gowalla
 		{
 			userIDs = new int[usersTimelines.size()];
+			// System.out.println("usersTimelines.size() = " + usersTimelines.size());
+			System.out.println("UserIDs not set, hence extracting user ids from usersTimelines keyset");
 			int count = 0;
 			for (String userS : usersTimelines.keySet())
 			{
-				userIDs[count] = Integer.valueOf(userS);
+				userIDs[count++] = Integer.valueOf(userS);
 			}
 		}
+		
+		System.out.println("User ids = " + Arrays.toString(userIDs));
 		// allUsersMRRForAllMUs = new LinkedHashMap<String, ArrayList<Double>>();
 		
 		// Rts not used in daywise matching owing to unavailability of cand timelines for them
@@ -245,9 +250,12 @@ public class RecommendationTestsMU
 						/** Can be used to select users above 10 RTs **/
 						LinkedHashMap<Integer, Integer> numOfValidRTs = new LinkedHashMap<Integer, Integer>();
 						
+						// int userCount = 0;
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{
 							// int numberOfValidRTs = 0;
+							// userCount += 1;
+							
 							System.out.println("\nUser id=" + userId);
 							String userName = "";
 							if (Constant.getDatabaseName().equals("gowalla1"))
@@ -279,6 +287,11 @@ public class RecommendationTestsMU
 							bwRecommTimesWithEditDistances.newLine();
 							
 							userAllDatesTimeslines = usersTimelines.get(Integer.toString(userId));// userId);
+							
+							if (userAllDatesTimeslines == null)
+							{
+								System.err.println("userAllDatesTimeslines = " + userAllDatesTimeslines + " user " + userId);
+							}
 							
 							// //////////////////REMOVING SELECTED TIMELINES FROM DATASET///////////////////////////////////////////////////////
 							// userAllDatesTimeslines = TimelineUtilities.cleanUserDayTimelines(userAllDatesTimeslines);
@@ -425,7 +438,7 @@ public class RecommendationTestsMU
 									
 									RecommendationMasterMU recommP1 = new RecommendationMasterMU(userTrainingTimelines, userTestTimelines,
 											dateToRecomm, endTimeString, userId, thresholdValue, typeOfThreshold, matchingUnit, caseType,
-											this.lookPastType, true);// LAST PARAM TRUE IS DUMMY FOR CALLING PERFORMANCE CONSTRUCTOR, REMOVE IT FOR EXPERIMENTS
+											this.lookPastType, false);// LAST PARAM TRUE IS DUMMY FOR CALLING PERFORMANCE CONSTRUCTOR, REMOVE IT FOR EXPERIMENTS
 									// ,fullCandOrSubCand);
 									
 									LinkedHashMap<Integer, TimelineWithNext> candidateTimelines = recommP1.getCandidateTimeslines();
@@ -436,18 +449,22 @@ public class RecommendationTestsMU
 									
 									if (Constant.WriteNumActsPerRTPerCand)
 									{
+										StringBuilder tmpWriter = new StringBuilder();
 										for (Map.Entry<Integer, TimelineWithNext> entryAjooba : candidateTimelines.entrySet())
 										{
 											Timeline candtt1 = entryAjooba.getValue(); // ArrayList<ActivityObject> aa1=candtt1.getActivityObjectsInTimeline();
 											int sizez1 = candtt1.countNumberOfValidActivities() - 1; // excluding the current activity at the end of the
 																										// candidate timeline
 											// System.out.println("Number of activity Objects in this timeline (except the end current activity) is: "+sizez1);
-											numActsInEachCandbw.write(String.valueOf(sizez1) + "," + candtt1.getTimelineID().toString()
-													+ "," + userId + "," + dateToRecomm + "," + endTimeString + ","
-													+ candtt1.getActivityObjectNamesWithTimestampsInSequence());
-											numActsInEachCandbw.newLine();
+											// numActsInEachCandbw.write
+											tmpWriter.append(String.valueOf(sizez1) + "," + candtt1.getTimelineID().toString() + ","
+													+ userId + "," + dateToRecomm + "," + endTimeString + ","
+													+ candtt1.getActivityObjectNamesWithTimestampsInSequence() + "\n");
+											// numActsInEachCandbw.newLine();
 										}
+										numActsInEachCandbw.write(tmpWriter.toString());
 									}
+									
 									double thresholdAsDistance = recommP1.getThresholdAsDistance();
 									
 									if (recommP1.hasThresholdPruningNoEffect() == false)
@@ -464,9 +481,9 @@ public class RecommendationTestsMU
 										rtsWithNoCands.newLine();
 										System.out.println("Cannot make recommendation at this point as there are no candidate timelines");
 										
-										bwNumOfCandTimelinesBelowThreshold.write(
-												dateToRecomm + "," + endTimeStamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
-										bwNumOfCandTimelinesBelowThreshold.newLine();
+										bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp + "," + weekDay + ","
+												+ thresholdAsDistance + "," + 0 + "\n");
+										// bwNumOfCandTimelinesBelowThreshold.newLine();
 										
 										continue;
 									}
@@ -595,6 +612,8 @@ public class RecommendationTestsMU
 									LinkedHashMap<Integer, Pair<String, Double>> editDistancesSortedMapFullCand =
 											recommP1.getEditDistancesSortedMapFullCand();
 									
+									StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
+									
 									for (Map.Entry<Integer, Pair<String, Double>> entryDistance : editDistancesSortedMapFullCand.entrySet())
 									{
 										Integer candidateTimelineID = entryDistance.getKey();
@@ -615,18 +634,19 @@ public class RecommendationTestsMU
 														- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
 										
 										// ("DateOfRecomm"+",TimeOfRecomm,"+"TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,CandidateTimeline,WeekDayOfRecomm");
-										bwRecommTimesWithEditDistances.write(dateToRecomm + "," + endTimeStamp.getHours() + ":"
+										// bwRecommTimesWithEditDistances.write
+										rtsWithEditDistancesMsg.append(dateToRecomm + "," + endTimeStamp.getHours() + ":"
 												+ endTimeStamp.getMinutes() + ":" + endTimeStamp.getSeconds() + "," + candidateTimelineID
 												+ "," + actActualDone + "," + entryDistance.getValue().getSecond() + ","
 												// +dateOfCand+","
 												+ diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
 												+ diffEndTimeForEndPointsCand_n_GuidingInSecs + "," + endPointIndexThisCandidate + ","
-												+ candidateTimeline.getActivityObjectNamesInSequence() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
-										// +","
-										// +UtilityBelt.getWeekDayFromWeekDayInt(entryScore.getKey().getDay())
-										);
-										bwRecommTimesWithEditDistances.newLine();
+												+ candidateTimeline.getActivityObjectNamesInSequence() + "," + weekDay + "\n");
+										// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
+										// +"," +UtilityBelt.getWeekDayFromWeekDayInt(entryScore.getKey().getDay())
+										// bwRecommTimesWithEditDistances.newLine();
 									}
+									bwRecommTimesWithEditDistances.write(rtsWithEditDistancesMsg + "\n");
 									System.out.println("// end of for loop over all activity objects in test date");
 								} // end of for loop over all activity objects in test date
 								System.out.println("/end of for loop over all test dates");

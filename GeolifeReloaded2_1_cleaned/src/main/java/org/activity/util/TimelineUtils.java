@@ -375,7 +375,7 @@ public class TimelineUtils
 		}
 		
 		long ct4 = System.currentTimeMillis();
-		System.out.println("created timelines in " + ((ct4 - ct1) / 1000) + " seconds");
+		System.out.println("created timelines for" + userDaytimelines.size() + " users in " + ((ct4 - ct1) / 1000) + " seconds");
 		
 		System.out.println("exiting createUserTimelinesFromCheckinEntriesGowalla");
 		return userDaytimelines;
@@ -497,6 +497,9 @@ public class TimelineUtils
 	{
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>();
 		System.out.println("starting convertCheckinEntriesToActivityObjectsGowalla");
+		
+		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
+		
 		// convert checkinentries to activity objects
 		for (Entry<String, TreeMap<Date, ArrayList<CheckinEntry>>> userEntry : checkinEntriesDatewise.entrySet()) // over users
 		{
@@ -543,7 +546,7 @@ public class TimelineUtils
 					ActivityObject ao = new ActivityObject(activityID, locationID, activityName, locationName, startTimestamp,
 							startLatitude, startLongitude, startAltitude, userID, photos_count, checkins_count, users_count, radius_meters,
 							highlights_count, items_count, max_items_count, e.getWorkingLevelCatIDs());
-					
+					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
 				}
 				dayWiseForThisUser.put(date, activityObjectsForThisUserThisDate);
@@ -722,21 +725,21 @@ public class TimelineUtils
 		{
 			if (Constant.verboseTimelineCleaning)
 			{
-				System.out.println("for user: " + usersTimelinesEntry.getKey());
+				System.out.println("for user: " + usersTimelinesEntry.getKey() + "\n");
 			}
 			
 			// LinkedHashMap<Date, UserDayTimeline> cleanedDayTimelines =
 			// TimelineUtilities.cleanUserDayTimelines(usersTimelinesEntry.getValue());
 			
-			LinkedHashMap<Date, UserDayTimeline> cleanedDayTimelines = TimelineUtils.cleanUserDayTimelines(
-					usersTimelinesEntry.getValue(), Constant.getCommonPath() + "LogCleanedDayTimelines_", usersTimelinesEntry.getKey());
+			LinkedHashMap<Date, UserDayTimeline> cleanedDayTimelines = TimelineUtils.cleanUserDayTimelines(usersTimelinesEntry.getValue(),
+					Constant.getCommonPath() + "LogCleanedDayTimelines_", usersTimelinesEntry.getKey());
 			
 			if (cleanedDayTimelines.size() > 0)
 			{
 				cleanedUserDayTimelines.put(usersTimelinesEntry.getKey(), cleanedDayTimelines);
 			}
 			
-			System.out.println();
+			// System.out.println();
 		}
 		System.out.println("\ttotal num of users after cleaning = " + cleanedUserDayTimelines.size());
 		
@@ -1509,6 +1512,7 @@ public class TimelineUtils
 		System.out.println("Inside removeDayTimelinesWithLessValidAct");
 		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> result = new LinkedHashMap<>();
 		StringBuffer log = new StringBuffer();
+		StringBuffer datesRemoved = new StringBuffer();
 		log.append("User, #days(daytimelines) removed\n");
 		
 		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersDayTimelinesOriginal.entrySet())
@@ -1527,13 +1531,13 @@ public class TimelineUtils
 				else
 				{
 					countOfDatesRemovedForThisUser += 1;
-					
+					datesRemoved.append(dateEntry.getKey().toString() + "_");
 				}
 			}
 			
 			if (countOfDatesRemovedForThisUser > 0)
 			{
-				log.append(user + "," + countOfDatesRemovedForThisUser + "\n");
+				log.append(user + "," + countOfDatesRemovedForThisUser + "," + datesRemoved.toString() + "\n");
 				// System.out.println("For user:" + user + " #days(/daytimelines) removed = " + countOfDatesRemovedForThisUser + " (having <"
 				// + lowerLimit + " aos per day)");
 			}
@@ -1582,7 +1586,7 @@ public class TimelineUtils
 		System.out.println("Exiting removeUsersWithLessDays");
 		return result;
 	}
-
+	
 	/**
 	 * Removes timelines which whose edit distance are above the given threshold
 	 * 
@@ -1611,7 +1615,7 @@ public class TimelineUtils
 		}
 		return pruned;
 	}
-
+	
 	/**
 	 * Removes timelines which whose edit distance are above the given threshold
 	 * 
@@ -1644,7 +1648,7 @@ public class TimelineUtils
 		}
 		return pruned;
 	}
-
+	
 	/**
 	 * Removes timelines which whose edit distance are above the given threshold
 	 * 
@@ -1675,7 +1679,7 @@ public class TimelineUtils
 		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
 		return pruned;
 	}
-
+	
 	/**
 	 * Removes timelines which whose edit distance are above the given threshold
 	 * 
@@ -1715,7 +1719,7 @@ public class TimelineUtils
 		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
 		return pruned;
 	}
-
+	
 	// /////
 	// TODO: MAKE IT GENERIC <T> for ID of timeline
 	/**
@@ -1756,7 +1760,7 @@ public class TimelineUtils
 		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
 		return pruned;
 	}
-
+	
 	// /////
 	/**
 	 * Is function
@@ -1796,7 +1800,7 @@ public class TimelineUtils
 		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
 		return pruned;
 	}
-
+	
 	// TODO: MAKE IT GENERIC <T> for ID of timeline
 	/**
 	 * Removes timelines which whose edit distance are above the given threshold

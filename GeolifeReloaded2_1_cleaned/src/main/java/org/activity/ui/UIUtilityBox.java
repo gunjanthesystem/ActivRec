@@ -3,6 +3,7 @@ package org.activity.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -24,16 +25,20 @@ public class UIUtilityBox
 		
 		try
 		{
+			checkNodesAtGivenDepth(1);
+			// checkNodesAtGivenDepth(2);
+			// checkNodesAtGivenDepth(3);
 			// $$checkConversionOfTreeItemToTreeNode();
 			// checkTreeSearch();
-			// $checkTreeSearch_1();
-			Set<String> s = new HashSet<>();
-			s.add("gunjan");
-			s.add("supertramp");
-			s.add("synergy");
-			s.add("monaco");
-			System.out.println(s.stream().reduce((t, u) -> t + "__" + u).get());
-			serialiseCatIDNameDictionary();
+			// checkTreeSearch_1();
+			// Set<String> s = new HashSet<>();
+			// s.add("gunjan");
+			// s.add("supertramp");
+			// s.add("synergy");
+			// s.add("monaco");
+			// System.out.println(s.stream().reduce((t, u) -> t + "__" + u).get());
+			
+			// $$serialiseCatIDNameDictionary();
 			
 		}
 		catch (Exception e)
@@ -42,11 +47,59 @@ public class UIUtilityBox
 		}
 	}
 	
+	public static void checkNodesAtGivenDepth(int depth)
+	{
+		// int depth = 3;
+		
+		String categoryHierarchyTreeFileName = org.activity.generator.DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName;
+		DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer.deSerializeThis(categoryHierarchyTreeFileName);
+		
+		LinkedHashSet<String> res = getNodesAtGivenDepth(depth, rootOfCategoryTree);
+		
+		System.out.println("num of nodes at depth " + depth + " are: " + res.size());
+		
+		// for (String s : res)
+		// {
+		// System.out.println(s.toString());
+		// }
+	}
+	
+	/**
+	 * 
+	 * @param givenDepth
+	 * @param rootOfCategoryTree
+	 * @return set of cat ids at level depth
+	 */
+	public static LinkedHashSet<String> getNodesAtGivenDepth(int givenDepth, DefaultMutableTreeNode rootOfCategoryTree)
+	{
+		LinkedHashSet<String> res = new LinkedHashSet<String>();
+		
+		String serialisableTreeAsString = treeToString(0, rootOfCategoryTree, new StringBuffer());
+		String serialisableTreeAsStringNoTabs = serialisableTreeAsString.replaceAll("\t", "");
+		
+		String[] splitted = serialisableTreeAsStringNoTabs.split("\n");
+		
+		for (String s : splitted)
+		{
+			if (s.contains("depth" + givenDepth) == true)
+			{
+				String[] splittedLine = s.split(":");
+				res.add(splittedLine[1].trim());// [2] is cat name
+			}
+		}
+		
+		return res;
+	}
+	
+	/**
+	 * Check sanity of tree search
+	 */
 	public static void checkTreeSearch_1()
 	{
-		final String commonPath = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15CatTree/";
-		DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
-				.deSerializeThis("/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/RootOfCategoryTree9Sep2016.DMTreeNode");
+		final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/TreeSanity/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15CatTree/";
+		DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer.deSerializeThis(
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode");
+		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/RootOfCategoryTree9Sep2016.DMTreeNode");
 		
 		String serialisableTreeAsString = treeToString(0, rootOfCategoryTree, new StringBuffer());
 		
@@ -93,6 +146,13 @@ public class UIUtilityBox
 		}
 	}
 	
+	/**
+	 * 
+	 * @param catIDToSearh
+	 * @param rootOfCategoryTree
+	 * @param level
+	 * @return
+	 */
 	public static Set<String> getGivenLevelOrAboveCatID(String catIDToSearh, DefaultMutableTreeNode rootOfCategoryTree, int level)
 	{
 		ArrayList<DefaultMutableTreeNode> foundNodes2 =
@@ -288,6 +348,13 @@ public class UIUtilityBox
 		return foundNodes;
 	}
 	
+	/**
+	 * 
+	 * @param node
+	 * @param valueToSearch
+	 * @param foundNodes
+	 * @return
+	 */
 	public static ArrayList<DefaultMutableTreeNode> recursiveDfsMulipleOccurences2OnlyCatID(DefaultMutableTreeNode node,
 			String valueToSearch, ArrayList<DefaultMutableTreeNode> foundNodes)
 	{
@@ -314,7 +381,8 @@ public class UIUtilityBox
 	
 	/**
 	 * Convert a tree of javafx.scene.control.TreeItem(s) to a tree of javax.swing.tree.DefaultMutableTreeNode(s). A primary motivation for this could be that TreeNode is
-	 * serializable (though not thread safe) while TreeItem is not serializable. </br>
+	 * serializable (though not thread safe) while TreeItem is not serializable.
+	 * <p>
 	 * ref:https://stackoverflow.com/questions/16098362/how-to-deep-copy-a-tree
 	 * 
 	 * @param root
@@ -367,13 +435,20 @@ public class UIUtilityBox
 	}
 	
 	/**
-	 * Return a string representation of the tree of TreeItem nodes. </br>
-	 * Each line represents a node as shown below.</br>
-	 * depth0:TreeItem [ value: -1:root ]</br>
-	 * \tdepth1:TreeItem [ value: 934:Community ]</br>
-	 * \t\tdepth2:TreeItem [ value: 133:Campus Spot ]</br>
-	 * \t\t\tdepth3:TreeItem [ value: 135:Administration ]</br>
-	 * \t\t\tdepth3:TreeItem [ value: 138:Campus Commons ]</br>
+	 * Return a string representation of the tree of TreeItem nodes.
+	 * <p>
+	 * Each line represents a node as shown below.
+	 * <p>
+	 * depth0:TreeItem [ value: -1:root ]
+	 * <p>
+	 * \tdepth1:TreeItem [ value: 934:Community ]
+	 * <p>
+	 * \t\tdepth2:TreeItem [ value: 133:Campus Spot ]
+	 * <p>
+	 * \t\t\tdepth3:TreeItem [ value: 135:Administration ]
+	 * <p>
+	 * \t\t\tdepth3:TreeItem [ value: 138:Campus Commons ]
+	 * <p>
 	 * \t\t\tdepth3:TreeItem [ value: 153:Campus - Other ]
 	 * 
 	 * @param depth
@@ -417,9 +492,12 @@ public class UIUtilityBox
 	}
 	
 	/**
-	 * Return a string representation of the tree of TreeItem nodes. </br>
-	 * Each line represents a node as shown below.</br>
-	 * depth0: -1:root ]</br>
+	 * Return a string representation of the tree of TreeItem nodes.
+	 * <p>
+	 * Each line represents a node as shown below.
+	 * <p>
+	 * depth0: -1:root ]
+	 * <p>
 	 * 
 	 * @param depth
 	 * @param node
@@ -455,14 +533,22 @@ public class UIUtilityBox
 	}
 	
 	/**
-	 * <font color = red>INCOMPLETE</font> </br>
-	 * Construct a tree of TreeItems from a file containing the string tree produced by UIUtilityBox.treeToString() </br>
-	 * Expecting each line to represent a node as shown below.</br>
-	 * depth0:TreeItem [ value: -1:root ]</br>
-	 * \tdepth1:TreeItem [ value: 934:Community ]</br>
-	 * \t\tdepth2:TreeItem [ value: 133:Campus Spot ]</br>
-	 * \t\t\tdepth3:TreeItem [ value: 135:Administration ]</br>
-	 * \t\t\tdepth3:TreeItem [ value: 138:Campus Commons ]</br>
+	 * <font color = red>INCOMPLETE</font>
+	 * <p>
+	 * Construct a tree of TreeItems from a file containing the string tree produced by UIUtilityBox.treeToString()
+	 * <p>
+	 * Expecting each line to represent a node as shown below.
+	 * <p>
+	 * depth0:TreeItem [ value: -1:root ]
+	 * <p>
+	 * \tdepth1:TreeItem [ value: 934:Community ]
+	 * <p>
+	 * \t\tdepth2:TreeItem [ value: 133:Campus Spot ]
+	 * <p>
+	 * \t\t\tdepth3:TreeItem [ value: 135:Administration ]
+	 * <p>
+	 * \t\t\tdepth3:TreeItem [ value: 138:Campus Commons ]
+	 * <p>
 	 * \t\t\tdepth3:TreeItem [ value: 153:Campus - Other ]
 	 * 
 	 * @param stringTree
@@ -533,7 +619,7 @@ public class UIUtilityBox
 	 */
 	public static String treeToString(int depth, DefaultMutableTreeNode node, StringBuffer str)
 	{
-		System.out.println("Inside treeToString");
+		// System.out.println("Inside treeToString");
 		
 		if (node == null)
 		{
@@ -543,7 +629,7 @@ public class UIUtilityBox
 		
 		else
 		{
-			System.out.println("node has " + node.getChildCount() + " children");
+			// $$ System.out.println("node has " + node.getChildCount() + " children");
 		}
 		
 		for (int i = 0; i < depth; i++)
@@ -567,5 +653,132 @@ public class UIUtilityBox
 		
 		return str.toString();// + "\najooba DefaultMutableTreeNode";
 	}
+	
+	///
+	
+	// /**
+	// * Return a string representation of the tree of DefaultMutableTreeNode nodes.
+	// *
+	// * @param depth
+	// * @param node
+	// * @param str
+	// * @return
+	// */
+	// public static LinkedHashSet<String> getNodesAtGivenDepth(int depth, int depthToSearch, DefaultMutableTreeNode node,
+	// LinkedHashSet<String> res)
+	// {
+	// System.out.println("Inside getNodesAtGivenDepth");
+	//
+	// if (node == null)
+	// {
+	// new Exception("Inside getNodesAtGivenDepth: the received node is null");
+	// return null;
+	// }
+	//
+	// else
+	// {
+	// // / System.out.println("node has " + node.getChildCount() + " children");
+	// }
+	//
+	// if (node.getDepth() == depthToSearch)
+	// {
+	// res.add(node.toString());
+	// }
+	//
+	// depth += 1;// going down one level
+	// for (int i = 0; i < node.getChildCount(); i++)// DefaultMutableTreeNode child : node.getChildren())
+	// // for (DefaultMutableTreeNode child : node.getChildren())
+	// {
+	// DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+	// getNodesAtGivenDepth(depth, depthToSearch, child, res);
+	// }
+	//
+	// return res;// + "\najooba DefaultMutableTreeNode";
+	// }
+	//
+	// public static LinkedHashSet<String> getNodesAtGivenDepth(int depthToSearch, DefaultMutableTreeNode node, LinkedHashSet<String> res)
+	// {
+	// // System.out.println("Inside getNodesAtGivenDepth");
+	//
+	// if (node == null)
+	// {
+	// new Exception("Inside getNodesAtGivenDepth: the received node is null");
+	// return null;
+	// }
+	//
+	// // else
+	// // {
+	// // // System.out.println("node has " + node.getChildCount() + " children");
+	// // }
+	// System.out.print("Current node: " + node.toString() + " depth:" + node.getDepth());
+	// if (node.getDepth() == depthToSearch)
+	// {
+	// res.add(node.toString());
+	// System.out.print("adding");
+	// }
+	// System.out.println();
+	//
+	// // if (node.isLeaf())
+	// // {
+	// // return res;
+	// // }
+	//
+	// // depth += 1;// going down one level
+	// depthToSearch = node.getDepth() + 1;
+	// for (int i = 0; i < node.getChildCount(); i++)// DefaultMutableTreeNode child : node.getChildren())
+	// // for (DefaultMutableTreeNode child : node.getChildren())
+	// {
+	// DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+	// getNodesAtGivenDepth(depthToSearch, child, res);
+	// }
+	//
+	// // System.out.println("Num of nodes at depth " + depth + " = " + res.size());
+	// return res;// + "\najooba DefaultMutableTreeNode";
+	// }
+	//
+	// /**
+	// * // * Return a list of nodes (as string) as given level. // * // * @param depth // * @param node // * @param str // * @return //
+	// */
+	// public static Set<String> getNodesAtGivenLevel(int depth, DefaultMutableTreeNode node, StringBuilder str)
+	// {
+	// System.out.println("Inside getNodesAtGivenLevel");
+	// Set<String> res = new LinkedHashSet<String>();
+	// boolean depthReached = false;
+	// if (node == null)
+	// {
+	// new Exception("Inside getNodesAtGivenLevel: the received node is null");
+	// return null;
+	// }
+	//
+	// else
+	// {
+	// System.out.println("node has " + node.getChildCount() + " children");
+	// }
+	//
+	// if (node.getDepth() == depth)
+	// {
+	// res.add(node.toString());
+	// depthReached = true;
+	// }
+	// // str.append("depth" + depth + ":" + node.toString() + "\n");
+	//
+	// // while(depthReached==false)
+	// // {
+	// //
+	// // }
+	// if (node.isLeaf())
+	// {
+	// return res;
+	// }
+	//
+	// depth += 1;// going down one level
+	// for (int i = 0; i < node.getChildCount(); i++)// DefaultMutableTreeNode child : node.getChildren())
+	// {
+	// DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+	// treeToString(depth, child, str);
+	// }
+	//
+	// return str.toString();// + "\najooba DefaultMutableTreeNode";
+	// }
 	
 }

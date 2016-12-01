@@ -1698,7 +1698,7 @@ public class TimelineStats
 			
 			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
 			{
-				String value = "X";
+				char value = 'X';
 				ActivityObject ao = dataEntry.getValue();
 				
 				if (ao == null) // is ao is null, will happen if the timestamp corresponds to a place where an invalid was there but has now been removed.
@@ -1709,7 +1709,7 @@ public class TimelineStats
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
 					value = dataEntry.getValue().getStringCode();
-					dataToPut.put(dataEntry.getKey(), value);
+					dataToPut.put(dataEntry.getKey(), String.valueOf(value));
 				}
 				
 			}
@@ -1751,7 +1751,7 @@ public class TimelineStats
 				
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = dataEntry.getValue().getStringCode();
+					value = String.valueOf(dataEntry.getValue().getStringCode());
 					dataToPut.append(value);
 				}
 				

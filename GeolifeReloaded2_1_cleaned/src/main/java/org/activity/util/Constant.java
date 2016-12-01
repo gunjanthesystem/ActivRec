@@ -2,12 +2,18 @@ package org.activity.util;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import org.activity.distances.AlignmentBasedDistance;
+import org.activity.generator.DatabaseCreatorGowallaQuicker0;
+import org.activity.io.Serializer;
 import org.activity.ui.PopUps;
+import org.activity.ui.UIUtilityBox;
 
 import weka.classifiers.Classifier;
 
@@ -25,8 +31,8 @@ public final class Constant
 	// toSerializeTimelines = false, toDeSerializeTimelines = true;
 	
 	// **** Parameters to set for runtime performance **** DO NOT CHANGE ****//
-	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = false,
-			toSerializeTimelines = false, toDeSerializeTimelines = true;
+	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = true, // false,
+			toSerializeTimelines = false, toDeSerializeTimelines = false;
 	
 	// **** Parameters to set **** DO NOT CHANGE ****//
 	// public static final boolean toSerializeJSONArray = true, toDeSerializeJSONArray = true, toCreateTimelines = true,
@@ -97,8 +103,13 @@ public final class Constant
 	public static final boolean useThreshold = false;
 	/**
 	 * Determines whether tolerance is used for comparing features when calculating edit distance
+	 * <p>
+	 * Not sure whether i used tolerance in the geolife experiments or not. I think i was using it and then i was told to not use it, I don't remember what was the setting for
+	 * final experiment. But it could be the case that I was using tolerance. I think I was.
+	 * <p>
+	 * But i don't want to waste time on investigating this now as I critically need to move my research "Forward"
 	 */
-	public static final boolean useTolerance = false;
+	public static final boolean useTolerance = true;// false;
 	/**
 	 * Determines whether the sorting of candiates is stable or unstable
 	 */
@@ -111,11 +122,11 @@ public final class Constant
 	/**
 	 * Controlling the verbosity of console log output
 	 */
-	public static boolean verbose = false;
-	public static final boolean verboseTimelineCleaning = true;// false;// false; // verbosity level 2: if false it further
-																// minimises verbosity
+	public static boolean verbose = true;// false;
+	public static final boolean verboseTimelineCleaning = false;// true;// false;// false; // verbosity level 2: if false it further
+	// minimises verbosity
 	public static final boolean verboseSAX = false;// false;
-	public static boolean verboseLevenstein = false;
+	public static boolean verboseLevenstein = true;// false;
 	public static final boolean verboseNormalisation = false;
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;
@@ -132,7 +143,7 @@ public final class Constant
 	public static final boolean WriteRedundant = false;
 	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;
 	
-	public static final boolean WriteEditSimilarityCalculations = false;
+	public static final boolean WriteEditSimilarityCalculations = true;// false;
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;
 	
 	public static final boolean WriteNormalisation = false;
@@ -143,11 +154,13 @@ public final class Constant
 	/**
 	 * Expunge the invalid Activity Objects even before the recommendation process starts
 	 */
-	public static final boolean EXPUNGE_INVALIDS_B4_RECOMM_PROCESS = true;
+	public static final boolean EXPUNGE_INVALIDS_B4_RECOMM_PROCESS = true;// false;// true; NOT NEEDED IN CASE OF GOWALLA //TODO check the places where this is involved so that it
+																			// can safely be set to false
 	
-	public static final boolean BLACKLISTING = true;// true; // to have the same RTs in daywise and MU, some RTs in MU have to be blacklisted as they did not had any cand timeline
-													// in
-													// daywise
+	public static final boolean BLACKLISTING = false;// true;// true; // to have the same RTs in daywise and MU, some RTs in MU have to be blacklisted as they did not had any cand
+														// timeline
+														// in
+														// daywise
 	
 	// Clustering0
 	public static final int cluster1Min = 0, cluster1Max = 1, cluster2Min = 2, cluster2Max = 5, cluster3Min = 6,
@@ -167,12 +180,17 @@ public final class Constant
 					161, 117, 170 /* ,114, 110, 107 */ };
 	public static final int above10RTsUserIDsGeolifeData[] =
 			{ 62, 84, 52, 68, 167, 179, 153, 85, 128, 10, 126, 111, 163, 65, 91, 82, 139, 108 };
+	static int[] gowallaUserIDs = null;
 	
 	public static final int userIDsDCUData[] = { 0, 1, 2, 3, 4 };
 	public static final String userNamesDCUData[] = { "Stefan", "Tengqi", "Cathal", "Zaher", "Rami" };
 	
 	static final String[] GeolifeActivityNames = { "Not Available", "Unknown", "airplane", "bike", "boat", "bus", "car", "motorcycle",
 			"run", "subway", "taxi", "train", "walk" };
+	
+	static final String[] gowallaActivityNames = null;
+	public static final int gowallaWorkingCatLevel = 2;
+	
 	// static final String[] GeolifeActivityNames = { "Not Available", "Unknown", /* "airplane", */"bike", /* "boat", */"bus", "car", /* "motorcycle", */
 	/* "run", */// "subway", "taxi", "train", "walk" };
 	
@@ -183,7 +201,8 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 5, 6 };// , 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30 };// , 32,
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 4, 6, 8, 10 };// { 0, 1, 2, 3, 4, 5, 6 };// , 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+																					// 24, 26, 28, 30 };// , 32,
 																					// 34, 36, 38, 40, 42 };
 	
 	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
@@ -493,6 +512,9 @@ public final class Constant
 		WriteNumActsPerRTPerCand = value;
 	}
 	
+	/**
+	 * <font color = red>not yet set for gowalla </font>
+	 */
 	public static void setUserIDs()
 	{
 		try
@@ -519,6 +541,9 @@ public final class Constant
 					break;
 				case "dcu_data_2":
 					userIDs = userIDsDCUData;
+					break;
+				case "gowalla1":
+					userIDs = gowallaUserIDs;
 					break;
 				default:
 					System.out.println(DATABASE_NAME.equals("dcu_data_2"));
@@ -564,6 +589,12 @@ public final class Constant
 					INVALID_ACTIVITY1 = "Unknown";
 					INVALID_ACTIVITY2 = "Others";
 					break;
+				
+				case "gowalla1":
+					INVALID_ACTIVITY1 = "Unknown";
+					INVALID_ACTIVITY2 = "Not Available";
+					break;
+				
 				default:
 					System.err.println("Error in setInvalidNames: unrecognised database name:" + DATABASE_NAME);
 					throw new Exception();
@@ -587,6 +618,14 @@ public final class Constant
 					break;
 				case "dcu_data_2":
 					activityNames = DCUDataActivityNames;
+					break;
+				case "gowalla1":
+					DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
+							.deSerializeThis(DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName);
+					LinkedHashSet<String> res = UIUtilityBox.getNodesAtGivenDepth(gowallaWorkingCatLevel, rootOfCategoryTree);
+					System.out.println("num of nodes at depth " + gowallaWorkingCatLevel + " are: " + res.size());
+					activityNames = res.toArray(new String[res.size()]);
+					// gowallaActivityNames;
 					break;
 				default:
 					System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
@@ -688,7 +727,7 @@ public final class Constant
 		}
 		else
 		{
-			System.err.println("Error in Constant.getUserIDs: userIDs is NULL");
+			System.err.println("Alert! in Constant.getUserIDs: userIDs is NULL"); // user ids are not set set beforehand in some case such as for gowalla dataset
 			return null;
 		}
 		
