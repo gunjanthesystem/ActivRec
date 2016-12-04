@@ -122,35 +122,42 @@ public final class Constant
 	/**
 	 * Controlling the verbosity of console log output
 	 */
-	public static boolean verbose = true;// false;
+	public static boolean verbose = false;// false;
 	public static final boolean verboseTimelineCleaning = false;// true;// false;// false; // verbosity level 2: if false it further
 	// minimises verbosity
 	public static final boolean verboseSAX = false;// false;
-	public static boolean verboseLevenstein = true;// false;
-	public static final boolean verboseNormalisation = false;
+	public static boolean verboseLevenstein = false;// false;
+	public static final boolean verboseNormalisation = false;// false;
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;
 	public static final boolean checkArrayOfFeatures = false;
 	public static final boolean verboseOTMDSAM = false;
 	public static final boolean verboseDistance = false;
+	public static final boolean verboseRankScoreCalcToConsole = false;
+	public static final boolean verboseEvaluationMetricsToConsole = false;
 	/**
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv and EditDistancePerRtPerCand.csv have some similar
 	 * information and have corresponding records.
 	 */
-	public static final boolean WriteEditDistancePerRtPerCand = false; //
-	public static final boolean WriteCandInEditDistancePerRtPerCand = false;// false;
-	public static boolean WriteNumActsPerRTPerCand = false; // this information is redundant as well
+	public static final boolean WriteEditDistancePerRtPerCand = false;// false; //
+	public static final boolean WriteCandInEditDistancePerRtPerCand = false;// false;// false;
+	public static boolean WriteNumActsPerRTPerCand = false;// false; // this information is redundant as well
 	public static final boolean WriteRedundant = false;
-	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;
+	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;// false;
 	
-	public static final boolean WriteEditSimilarityCalculations = true;// false;
-	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;
+	public static final boolean WriteEditSimilarityCalculations = false;// false;
+	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;
 	
-	public static final boolean WriteNormalisation = false;
+	public static final boolean WriteNormalisation = false;// false;
 	/**
 	 * Write each cand of each RT in separate line
 	 */
-	public static final boolean WriteNormalisationsSeparateLines = false;
+	public static final boolean WriteNormalisationsSeparateLines = false;// false;
+	
+	/**
+	 * This is a useful file to write, disable it only when faster experiments are needed.
+	 */
+	public static final boolean WriteRecommendationTimesWithEditDistance = false;
 	/**
 	 * Expunge the invalid Activity Objects even before the recommendation process starts
 	 */
@@ -201,9 +208,9 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 4, 6, 8, 10 };// { 0, 1, 2, 3, 4, 5, 6 };// , 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-																					// 24, 26, 28, 30 };// , 32,
-																					// 34, 36, 38, 40, 42 };
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 0, 1, 2, 3, 4, 5, 6 };// , 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+	// 24, 26, 28, 30 };// , 32,
+	// 34, 36, 38, 40, 42 };
 	
 	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 			22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
@@ -272,6 +279,8 @@ public final class Constant
 	// ///************* END OF PARAMETERS TO BE SET ********************//////
 	public static Classifier classifierUsed;
 	
+	public static boolean UsingSQLDatabase;
+	
 	/**
 	 * Don't let anyone instantiate this class.
 	 */
@@ -319,6 +328,7 @@ public final class Constant
 	public static void initialise(String givenCommonpath, String databaseName)
 	{
 		Constant.setDatabaseName(databaseName);
+		Constant.UsingSQLDatabase = false;
 		Constant.setUserIDs();
 		Constant.setInvalidNames();
 		Constant.setActivityNames();

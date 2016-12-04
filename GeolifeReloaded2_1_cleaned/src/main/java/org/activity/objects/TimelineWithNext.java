@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 //import java.rmi.server.UID;
 import java.util.ArrayList;
 
+import org.activity.util.Constant;
+
 /**
  * Timeline is a chronological sequence of Activity Objects with the next Activity Object to be considered after this sequence of Activity Objects
  * 
@@ -116,7 +118,11 @@ public class TimelineWithNext extends Timeline
 	{
 		int matchingUnitInCounts = (int) matchingUnitInCountsD;
 		System.out.println("------Inside getCurrentTimelineFromLongerTimelineMUCount");
-		System.out.println("longer timeline=" + longerTimeline.getActivityObjectNamesWithTimestampsInSequence());// getActivityObjectNamesInSequence());
+		
+		if (Constant.verbose)
+		{
+			System.out.println("longer timeline=" + longerTimeline.getActivityObjectNamesWithTimestampsInSequence());// getActivityObjectNamesInSequence());
+		}
 		
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(), dateAtRecomm.getDate(),
 				timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(), 0);

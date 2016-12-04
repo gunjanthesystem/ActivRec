@@ -456,7 +456,7 @@ public class Timeline
 		
 		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
 		{
-			res.append(" >>" + activityObjectsInTimeline.get(i).getActivityName());
+			res.append(">" + activityObjectsInTimeline.get(i).getActivityName());
 		}
 		return res.toString();
 	}
@@ -465,7 +465,7 @@ public class Timeline
 	{
 		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
 		{
-			System.out.print(" >>" + activityObjectsInTimeline.get(i).getActivityName() + "--"
+			System.out.print(">>" + activityObjectsInTimeline.get(i).getActivityName() + "--"
 					+ activityObjectsInTimeline.get(i).getStartTimestamp() + "--" + activityObjectsInTimeline.get(i).getEndTimestamp());
 		}
 	}
@@ -476,7 +476,7 @@ public class Timeline
 		
 		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
 		{
-			res.append(" >>" + activityObjectsInTimeline.get(i).getActivityName() + "--"
+			res.append(">>" + activityObjectsInTimeline.get(i).getActivityName() + "--"
 					+ activityObjectsInTimeline.get(i).getStartTimestamp() + "--" + activityObjectsInTimeline.get(i).getEndTimestamp());
 			// System.out.print(" >>"+activityObjectsInTimeline.get(i).getActivityName()+"--"
 			// +activityObjectsInTimeline.get(i).getStartTimestamp()+"--"

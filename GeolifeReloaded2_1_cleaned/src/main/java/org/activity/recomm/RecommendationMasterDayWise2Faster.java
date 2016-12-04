@@ -603,7 +603,8 @@ public class RecommendationMasterDayWise2Faster
 		System.out.println("Inside getDistanceScoreModifiedEdit");
 		// find the end points in the userDayTimeline
 		// ///////
-		String activityAtRecommPointAsStringCode = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1).getStringCode();
+		String activityAtRecommPointAsStringCode =
+				String.valueof(activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1).getStringCode());
 		String activitiesGuidingAsStringCode = ActivityObject.getStringCodeForActivityObjects(activitiesGuidingRecomm);
 		String userDayTimelineAsStringCode = userDayTimeline.getActivityObjectsAsStringCode();
 		
@@ -673,10 +674,10 @@ public class RecommendationMasterDayWise2Faster
 		{
 			endPointIndexForSubsequenceWithHighestSimilarity = entry1.getKey().intValue();
 			
-			if (getNextValidActivityNameAsCode(userDayTimelineAsStringCode, endPointIndexForSubsequenceWithHighestSimilarity) == null)/*
-																																		 * there DOES NOT exists a valid activity
-																																		 * after this end point
-																																		 */
+			if (getNextValidActivityNameAsCode(userDayTimelineAsStringCode,
+					endPointIndexForSubsequenceWithHighestSimilarity) == null)/*
+																				 * there DOES NOT exists a valid activity after this end point
+																				 */
 			{
 				continue;
 			}

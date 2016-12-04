@@ -1412,7 +1412,10 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			}
 		}
 		
-		System.out.println(rankScoreCalc.toString());
+		if (Constant.verboseRankScoreCalcToConsole)
+		{
+			System.out.println(rankScoreCalc.toString());
+		}
 		
 		// Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value of rank)
 		recommendedActivityNamesRankscorePairs =
@@ -1499,7 +1502,12 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		}
 		
 		this.rankedRecommendedActivityNameWithRankScores = topRankedString.toString();
-		System.out.println(msg.toString() + "\n");
+		
+		if (Constant.verboseRankScoreCalcToConsole)
+		{
+			System.out.println(msg.toString() + "\n");
+		}
+		
 	}
 	
 	public String getRankedRecommendedActivityNamesWithRankScores()
@@ -2324,7 +2332,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 	}
 	
 	/**
-	 * Normalises the given edit distance over the candidates, i.e., does a mim-max normalisation over the set of edit distance passed to it.
+	 * Normalises the given edit distance over the candidates, i.e., does a min-max normalisation over the set of edit distance passed to it.
 	 * 
 	 * @param setOfDistances
 	 * @param userAtRecomm

@@ -95,8 +95,8 @@ public class AlignmentBasedDistance
 	 */
 	public void setWeightsAndCosts()
 	{
-		wtActivityName = 3d;
-		wtStartTime = 0.8d;// 0.6d;
+		wtActivityName = 2d;// 3d;
+		wtStartTime = 1d;// 0.8d;// 0.6d;
 		
 		wtDuration = 0.5d;// 0.2d;
 		wtDistanceTravelled = 3d;// //1d;
@@ -1281,7 +1281,7 @@ public class AlignmentBasedDistance
 	 */
 	public Pair<String, Double> getMySimpleLevenshteinDistance(String word1, String word2, int insertWt, int deleteWt, int replaceWt)
 	{
-		if (Constant.verbose || Constant.verboseLevenstein)
+		if (Constant.verboseLevenstein)// Constant.verbose ||
 		{
 			System.out.println("inside getMySimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2 + " with insertWt="
 					+ insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt);
