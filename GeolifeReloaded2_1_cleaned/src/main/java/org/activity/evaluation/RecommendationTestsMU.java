@@ -612,41 +612,47 @@ public class RecommendationTestsMU
 									LinkedHashMap<Integer, Pair<String, Double>> editDistancesSortedMapFullCand =
 											recommP1.getEditDistancesSortedMapFullCand();
 									
-									StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
-									
-									for (Map.Entry<Integer, Pair<String, Double>> entryDistance : editDistancesSortedMapFullCand.entrySet())
+									if (Constant.WriteRecommendationTimesWithEditDistance)
 									{
-										Integer candidateTimelineID = entryDistance.getKey();
+										StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
 										
-										TimelineWithNext candidateTimeline = recommP1.getCandidateTimeslines().get(candidateTimelineID);
-										
-										int endPointIndexThisCandidate = candidateTimeline.getActivityObjectsInTimeline().size() - 1;
-										ActivityObject endPointActivityInCandidate =
-												candidateTimeline.getActivityObjectsInTimeline().get(endPointIndexThisCandidate);
-										
-										// difference in start time of end point activity of candidate and start time of current activity
-										long diffStartTimeForEndPointsCand_n_GuidingInSecs =
-												(activityAtRecommPoint.getStartTimestamp().getTime()
-														- endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
-										// difference in end time of end point activity of candidate and end time of current activity
-										long diffEndTimeForEndPointsCand_n_GuidingInSecs =
-												(activityAtRecommPoint.getEndTimestamp().getTime()
-														- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
-										
-										// ("DateOfRecomm"+",TimeOfRecomm,"+"TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,CandidateTimeline,WeekDayOfRecomm");
-										// bwRecommTimesWithEditDistances.write
-										rtsWithEditDistancesMsg.append(dateToRecomm + "," + endTimeStamp.getHours() + ":"
-												+ endTimeStamp.getMinutes() + ":" + endTimeStamp.getSeconds() + "," + candidateTimelineID
-												+ "," + actActualDone + "," + entryDistance.getValue().getSecond() + ","
-												// +dateOfCand+","
-												+ diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
-												+ diffEndTimeForEndPointsCand_n_GuidingInSecs + "," + endPointIndexThisCandidate + ","
-												+ candidateTimeline.getActivityObjectNamesInSequence() + "," + weekDay + "\n");
-										// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
-										// +"," +UtilityBelt.getWeekDayFromWeekDayInt(entryScore.getKey().getDay())
-										// bwRecommTimesWithEditDistances.newLine();
+										for (Map.Entry<Integer, Pair<String, Double>> entryDistance : editDistancesSortedMapFullCand
+												.entrySet())
+										{
+											Integer candidateTimelineID = entryDistance.getKey();
+											
+											TimelineWithNext candidateTimeline = recommP1.getCandidateTimeslines().get(candidateTimelineID);
+											
+											int endPointIndexThisCandidate = candidateTimeline.getActivityObjectsInTimeline().size() - 1;
+											ActivityObject endPointActivityInCandidate =
+													candidateTimeline.getActivityObjectsInTimeline().get(endPointIndexThisCandidate);
+											
+											// difference in start time of end point activity of candidate and start time of current activity
+											long diffStartTimeForEndPointsCand_n_GuidingInSecs =
+													(activityAtRecommPoint.getStartTimestamp().getTime()
+															- endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
+											// difference in end time of end point activity of candidate and end time of current activity
+											long diffEndTimeForEndPointsCand_n_GuidingInSecs =
+													(activityAtRecommPoint.getEndTimestamp().getTime()
+															- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
+											
+											// ("DateOfRecomm"+",TimeOfRecomm,"+"TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,CandidateTimeline,WeekDayOfRecomm");
+											// bwRecommTimesWithEditDistances.write
+											rtsWithEditDistancesMsg
+													.append(dateToRecomm + "," + endTimeStamp.getHours() + ":" + endTimeStamp.getMinutes()
+															+ ":" + endTimeStamp.getSeconds() + "," + candidateTimelineID + ","
+															+ actActualDone + "," + entryDistance.getValue().getSecond() + ","
+															// +dateOfCand+","
+															+ diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
+															+ diffEndTimeForEndPointsCand_n_GuidingInSecs + "," + endPointIndexThisCandidate
+															+ "," + candidateTimeline.getActivityObjectNamesInSequence() + "," + weekDay
+															+ "\n");
+											// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
+											// +"," +UtilityBelt.getWeekDayFromWeekDayInt(entryScore.getKey().getDay())
+											// bwRecommTimesWithEditDistances.newLine();
+										}
+										bwRecommTimesWithEditDistances.write(rtsWithEditDistancesMsg + "\n");
 									}
-									bwRecommTimesWithEditDistances.write(rtsWithEditDistancesMsg + "\n");
 									System.out.println("// end of for loop over all activity objects in test date");
 								} // end of for loop over all activity objects in test date
 								System.out.println("/end of for loop over all test dates");

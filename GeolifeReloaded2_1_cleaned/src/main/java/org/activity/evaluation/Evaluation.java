@@ -11,7 +11,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 
 /**
@@ -152,8 +151,8 @@ public class Evaluation
 				countOfLinesActual++;
 			}
 			System.out.println("\n number of actual lines =" + countOfLinesTopK);
-			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size() + "   size of actual array="
-					+ arrayActual.size());
+			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
+					+ "   size of actual array=" + arrayActual.size());
 			// //////////////////////////// finished creating and populating the data structures needed
 			
 			for (String timeCategory : timeCategories)
@@ -257,8 +256,8 @@ public class Evaluation
 			
 			// bwAccuracy = new BufferedWriter(new FileWriter(fileAccuracy.getAbsoluteFile()));
 			
-			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size() + "   size of actual array="
-					+ arrayActual.size());
+			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
+					+ "   size of actual array=" + arrayActual.size());
 			
 			// bwNumberOfRecommendationTimes.write("," + timeCategory);
 			// bwNumberOfRecommendationTimes.newLine();
@@ -321,7 +320,8 @@ public class Evaluation
 						
 						// if (countOfOccurence > 1)
 						// {
-						// System.err.println("Error: in writePrecisionRecallFMeasure(): the actual string appears multiple times in topK, which should not be the case as per our current algorithm.");
+						// System.err.println("Error: in writePrecisionRecallFMeasure(): the actual string appears multiple times in topK, which should not be the case as per our
+						// current algorithm.");
 						// }
 						// if (countOfOccurence > 0)
 						// {
@@ -344,7 +344,7 @@ public class Evaluation
 						}
 						
 					}
-				}// end of current line array
+				} // end of current line array
 				
 				bwRR.write("\n");
 				// bwNumberOfRecommendationTimes.write(countOfRecommendationTimesConsidered + "\n");
@@ -386,8 +386,8 @@ public class Evaluation
 	 * @param arrayTopK
 	 * @param arrayActual
 	 */
-	public static void writePrecisionRecallFMeasure(String fileNamePhrase, String timeCategory, int theKOriginal, ArrayList<ArrayList<String>> arrayMeta,
-			ArrayList<ArrayList<String>> arrayTopK, ArrayList<ArrayList<String>> arrayActual)
+	public static void writePrecisionRecallFMeasure(String fileNamePhrase, String timeCategory, int theKOriginal,
+			ArrayList<ArrayList<String>> arrayMeta, ArrayList<ArrayList<String>> arrayTopK, ArrayList<ArrayList<String>> arrayActual)
 	{
 		// BufferedReader brMeta = null, brTopK = null, brActual = null;
 		String commonPath = Constant.getCommonPath();
@@ -442,8 +442,8 @@ public class Evaluation
 			
 			// bwAccuracy = new BufferedWriter(new FileWriter(fileAccuracy.getAbsoluteFile()));
 			
-			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size() + "   size of actual array="
-					+ arrayActual.size());
+			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
+					+ "   size of actual array=" + arrayActual.size());
 			
 			bwNumberOfRecommendationTimes.write("," + timeCategory);
 			bwNumberOfRecommendationTimes.newLine();
@@ -454,7 +454,11 @@ public class Evaluation
 				
 				double topKPrecisionVal = -99, topKRecallVal = -99, accuracy = -99, topKFVal = -99;
 				
-				bwNumberOfRecommendationTimes.write(ConnectDatabase.getUserNameFromDatabase(i) + ",");
+				// bwNumberOfRecommendationTimes.write(ConnectDatabase.getUserNameFromDatabase(i) + ",");
+				
+				int[] userIDs = Constant.getUserIDs();
+				bwNumberOfRecommendationTimes.write(userIDs[i] + ",");
+				
 				// int theK=0;
 				int countOfRecommendationTimesConsidered = 0; // =count of meta entries considered
 				
@@ -475,7 +479,8 @@ public class Evaluation
 						if (topKStrings.length - 1 < theK) // for this RT we are not able to make K recommendations as less than K recommendations are present.
 						{
 							System.err.println("Warning: For " + currentLineArray.get(j) + ", Only top " + (topKStrings.length - 1)
-									+ " recommendation present while the asked for K is " + theK + "\nDecreasing asked for K to " + (topKStrings.length - 1));
+									+ " recommendation present while the asked for K is " + theK + "\nDecreasing asked for K to "
+									+ (topKStrings.length - 1));
 							// +"\nWriting -999 values");
 							theK = topKStrings.length - 1;
 							// $topKPrecisionVal=-9999;
@@ -503,8 +508,8 @@ public class Evaluation
 						
 						if (countOfOccurence > 1)
 						{
-							System.err
-									.println("Error: in writePrecisionRecallFMeasure(): the actual string appears multiple times in topK, which should not be the case as per our current algorithm.");
+							System.err.println(
+									"Error: in writePrecisionRecallFMeasure(): the actual string appears multiple times in topK, which should not be the case as per our current algorithm.");
 						}
 						if (countOfOccurence > 0)
 						{
@@ -530,15 +535,16 @@ public class Evaluation
 						// bwAccuracy.write(accuracy+",");
 						if (Constant.verbose)
 						{
-							System.out.println("count-of-occurence-used=" + countOfOccurence + "         " + "k-used=" + theK + " k-Original=" + theKOriginal);// +
-																																								// " / ="+round((double)countOfOccurence/theK,4));
+							System.out.println("count-of-occurence-used=" + countOfOccurence + "         " + "k-used=" + theK
+									+ " k-Original=" + theKOriginal);// +
+																		// " / ="+round((double)countOfOccurence/theK,4));
 							// $}
-							System.out.println("top-" + theKOriginal + "-precision=" + topKPrecisionVal + "    " + "top-" + theKOriginal + "-recall="
-									+ topKRecallVal + "   top" + theKOriginal + "F=" + topKFVal + "   accuracy=" + accuracy);
+							System.out.println("top-" + theKOriginal + "-precision=" + topKPrecisionVal + "    " + "top-" + theKOriginal
+									+ "-recall=" + topKRecallVal + "   top" + theKOriginal + "F=" + topKFVal + "   accuracy=" + accuracy);
 						}
 						
 					}
-				}// end of current line array
+				} // end of current line array
 				
 				bwTopKPrecision.write("\n");
 				bwTopKRecall.write("\n");
@@ -626,9 +632,12 @@ public class Evaluation
 					if (lineNumber == user)
 					{
 						String[] rrValuesForThisUser = currentLine.split(","); // get avg of all these rr values concern: splitting on empty lines gives an array of length1, also
-																				// splitting on one values
-																				// line gives an array of length 1
-						System.out.println("the current rrValues line read=" + currentLine + " trimmed length=" + currentLine.trim().length());
+																				// splitting on one values line gives an array of length 1
+						if (Constant.verboseEvaluationMetricsToConsole)
+						{
+							System.out.println(
+									"the current rrValues line read=" + currentLine + " trimmed length=" + currentLine.trim().length());
+						}
 						System.out.println("The number of rr values for user(" + user + ") = " + rrValuesForThisUser.length);
 						
 						// double[] pValuesForThisUserForThisK = new double[tokensInCurrentLine.length];
@@ -639,8 +648,8 @@ public class Evaluation
 						
 						if (currentLine.trim().length() == 0)
 						{
-							System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath + fileNamePhrase + timeCategory
-									+ "ReciprocalRank.csv");
+							System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath + fileNamePhrase
+									+ timeCategory + "ReciprocalRank.csv");
 						}
 						
 						else
@@ -724,8 +733,10 @@ public class Evaluation
 				bwValidRTCount.write("User_" + user + ",");
 				for (int K = theKOriginal; K > 0; K--)
 				{
-					BufferedReader br = new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "top" + K + "Precision.csv"));
-					System.out.println(("reading for avg precision: " + commonPath + fileNamePhrase + timeCategory + "top" + K + "Precision.csv"));
+					BufferedReader br =
+							new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "top" + K + "Precision.csv"));
+					System.out.println(
+							("reading for avg precision: " + commonPath + fileNamePhrase + timeCategory + "top" + K + "Precision.csv"));
 					String currentLine;
 					
 					int lineNumber = 0;
@@ -737,7 +748,8 @@ public class Evaluation
 																							// of length1, also
 																							// splitting on one values
 																							// line gives an array of length 1
-							System.out.println("the current pValues line read=" + currentLine + " trimmed length=" + currentLine.trim().length());
+							System.out.println(
+									"the current pValues line read=" + currentLine + " trimmed length=" + currentLine.trim().length());
 							System.out.println("The number of p values for user(" + user + ") = " + pValuesForThisUserForThisK.length);
 							
 							// double[] pValuesForThisUserForThisK = new double[tokensInCurrentLine.length];
@@ -748,8 +760,8 @@ public class Evaluation
 							
 							if (currentLine.trim().length() == 0)
 							{
-								System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath + fileNamePhrase + timeCategory + "top" + K
-										+ "Precision.csv");
+								System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath + fileNamePhrase
+										+ timeCategory + "top" + K + "Precision.csv");
 							}
 							
 							else
@@ -793,7 +805,10 @@ public class Evaluation
 								countOfValidPValues = 1;
 							avgPValueForThisUserForThisK = round((double) sum / countOfValidPValues, 4);
 							
-							System.out.println("Calculating avg precision (K=" + K + "):" + sum + "/" + countOfValidPValues);
+							if (Constant.verboseEvaluationMetricsToConsole)
+							{
+								System.out.println("Calculating avg precision (K=" + K + "):" + sum + "/" + countOfValidPValues);
+							}
 							bw.write(avgPValueForThisUserForThisK + ",");
 							
 							break;
@@ -859,7 +874,8 @@ public class Evaluation
 				
 				for (int K = theKOriginal; K > 0; K--)
 				{
-					BufferedReader br = new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "top" + K + "Recall.csv"));
+					BufferedReader br =
+							new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "top" + K + "Recall.csv"));
 					
 					String currentLine;
 					
@@ -876,8 +892,8 @@ public class Evaluation
 							double countOfValidRValues = 0;
 							if (currentLine.trim().length() == 0)
 							{
-								System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath + fileNamePhrase + timeCategory + "top" + K
-										+ "Precision.csv");
+								System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath + fileNamePhrase
+										+ timeCategory + "top" + K + "Precision.csv");
 							}
 							else
 							{
@@ -899,7 +915,10 @@ public class Evaluation
 							if (countOfValidRValues == 0) // to avoid divide by zero exception
 								countOfValidRValues = 1;
 							avgRValueForThisUserForThisK = round((double) sum / countOfValidRValues, 4);
-							System.out.println("Calculating avg recall (K=" + K + "):" + sum + "/" + countOfValidRValues);
+							if (Constant.verboseEvaluationMetricsToConsole)
+							{
+								System.out.println("Calculating avg recall (K=" + K + "):" + sum + "/" + countOfValidRValues);
+							}
 							bw.write(avgRValueForThisUserForThisK + ",");
 							break;
 						}
@@ -959,7 +978,8 @@ public class Evaluation
 				bwValidRTCount.write("User_" + user + ",");
 				for (int K = theKOriginal; K > 0; K--)
 				{
-					BufferedReader br = new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "top" + K + "FMeasure.csv"));
+					BufferedReader br =
+							new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "top" + K + "FMeasure.csv"));
 					
 					String currentLine;
 					
@@ -977,8 +997,8 @@ public class Evaluation
 							
 							if (currentLine.trim().length() == 0)
 							{
-								System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath + fileNamePhrase + timeCategory + "top" + K
-										+ "Precision.csv");
+								System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath + fileNamePhrase
+										+ timeCategory + "top" + K + "Precision.csv");
 							}
 							
 							else
@@ -1002,7 +1022,10 @@ public class Evaluation
 							if (countOfValidFValues == 0) // to avoid divide by zero exception
 								countOfValidFValues = 1;
 							avgFValueForThisUserForThisK = round((double) sum / countOfValidFValues, 4);
-							System.out.println("Calculating avg FMeasure (K=" + K + "):" + sum + "/" + countOfValidFValues);
+							if (Constant.verboseEvaluationMetricsToConsole)
+							{
+								System.out.println("Calculating avg FMeasure (K=" + K + "):" + sum + "/" + countOfValidFValues);
+							}
 							bw.write(avgFValueForThisUserForThisK + ",");
 							break;
 						}

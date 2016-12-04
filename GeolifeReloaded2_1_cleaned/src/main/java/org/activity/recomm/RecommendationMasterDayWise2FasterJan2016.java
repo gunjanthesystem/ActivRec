@@ -749,7 +749,9 @@ public class RecommendationMasterDayWise2FasterJan2016
 		System.out.println("Inside getDistanceScoreModifiedEdit");
 		// find the end points in the userDayTimeline
 		// ///////
-		String activityAtRecommPointAsStringCode = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1).getStringCode();
+		
+		String activityAtRecommPointAsStringCode =
+				String.valueOf(activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1).getStringCode());
 		String activitiesGuidingAsStringCode = ActivityObject.getStringCodeForActivityObjects(activitiesGuidingRecomm);
 		String userDayTimelineAsStringCode = userDayTimeline.getActivityObjectsAsStringCode();
 		
