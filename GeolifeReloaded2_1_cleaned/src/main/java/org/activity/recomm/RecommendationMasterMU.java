@@ -796,9 +796,19 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		return recommendedActivityNamesWithRankscores.size();
 	}
 	
+	public Date getDateAtRecomm()
+	{
+		return dateAtRecomm;
+	}
+	
 	public ActivityObject getActivityObjectAtRecomm()
 	{
 		return this.activityAtRecommPoint;
+	}
+	
+	public ArrayList<ActivityObject> getActivitiesGuidingRecomm()
+	{
+		return activitiesGuidingRecomm;
 	}
 	
 	public String getActivityNamesGuidingRecomm()
@@ -2891,6 +2901,10 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		return this.editDistancesSortedMapFullCand.size();
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public double getThresholdAsDistance()
 	{
 		return thresholdAsDistance;

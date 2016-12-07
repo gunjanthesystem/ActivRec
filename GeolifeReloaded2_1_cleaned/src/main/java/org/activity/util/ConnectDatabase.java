@@ -2250,10 +2250,19 @@ final public class ConnectDatabase
 		return name;
 	}
 	
+	/**
+	 * 
+	 * @param activityName
+	 * @return -1 for invalid activity name
+	 */
 	public static int getActivityID(String activityName)// eg. of dimension name 'User_Dimension'
 	{
 		if (Constant.getDatabaseName().equals("gowalla1"))
 		{
+			if (activityName.equals(Constant.INVALID_ACTIVITY1) || activityName.equals(Constant.INVALID_ACTIVITY2))
+			{
+				return -1;
+			}
 			return Integer.valueOf(activityName);// because in gowalla dataset, we consider activity id as activity name as of 19 Sep 2016
 		}
 		if (activityNameIDMap.size() == 0)

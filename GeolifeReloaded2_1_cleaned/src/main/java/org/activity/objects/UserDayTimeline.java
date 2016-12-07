@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.activity.util.Constant;
 import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
 
@@ -140,6 +141,11 @@ public class UserDayTimeline implements Serializable
 		return count;
 	}
 	
+	/**
+	 * 
+	 * @param timestamp
+	 * @return
+	 */
 	public int getNumOfValidActivityObjectAfterThisTime(Timestamp timestamp)
 	{
 		int numOfValids = 0;
@@ -150,19 +156,31 @@ public class UserDayTimeline implements Serializable
 			timestamp = getNextValidActivityAfterActivityAtThisTime(timestamp).getEndTimestamp();
 		}
 		
-		System.out.println("Debug: num of valid after timestamp " + timestamp + " is: " + numOfValids);
+		if (Constant.verbose)
+		{
+			System.out.println("Debug: num of valid after timestamp " + timestamp + " is: " + numOfValids);
+		}
 		return numOfValids;
 		
 	}
 	
+	/**
+	 * 
+	 * @param timestamp
+	 * @return
+	 */
 	public ActivityObject getNextValidActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
 		// System.out.println("To find next activity event at :"+timestamp);
 		ActivityObject nextValidActivityObject = null;
 		
 		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectsAtTime(timestamp);
-		System.out.print("inside:getNextValidActivityAfterActivityAtThisTime(): Index of activity event at this timestamp is:"
-				+ indexOfActivityObjectAtGivenTimestamp + " \nNext valid activity after" + timestamp + " is ");
+		
+		if (Constant.verbose)
+		{
+			System.out.print("inside:getNextValidActivityAfterActivityAtThisTime(): Index of activity event at this timestamp is:"
+					+ indexOfActivityObjectAtGivenTimestamp + " \nNext valid activity after" + timestamp + " is ");
+		}
 		if (indexOfActivityObjectAtGivenTimestamp == this.ActivityObjectsInDay.size() - 1)
 		{
 			// there are no next activities
@@ -188,10 +206,15 @@ public class UserDayTimeline implements Serializable
 						"\nWarning: Next Valid activity has same name as current activity (for timestamp:" + timestamp + " userID:" + userID
 								+ ")Activity Name=" + ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName());
 			}
-			
-			System.out.println(nextValidActivityObject.getActivityName());
+			if (Constant.verbose)
+			{
+				System.out.println(nextValidActivityObject.getActivityName());
+			}
 		}
-		System.out.println("Warning: next valid activity after timestamp: " + timestamp + " is null");
+		else
+		{
+			System.out.println("Warning: next valid activity after timestamp: " + timestamp + " is null");
+		}
 		return nextValidActivityObject;
 	}
 	
@@ -231,17 +254,25 @@ public class UserDayTimeline implements Serializable
 		return nextValidActivityObject;
 	}
 	
+	/**
+	 * 
+	 * @param ActivityObjectIndex
+	 * @param theDayTimeline
+	 * @return
+	 */
 	public static boolean isNoValidActivityAfterItInTheDay(int ActivityObjectIndex, UserDayTimeline theDayTimeline)
 	{
 		boolean isNoValidAfter = true;
 		
 		ArrayList<ActivityObject> eventsInDay = theDayTimeline.getActivityObjectsInDay();
 		
-		System.out.println("inside isNoValidActivityAfterItInTheDay");
-		System.out.println("activityIndexAfterWhichToChecl=" + ActivityObjectIndex);
-		
-		theDayTimeline.printActivityObjectNamesInSequence();
-		System.out.println("Number of activities in day=" + eventsInDay.size());
+		if (Constant.verbose)
+		{
+			System.out.println("inside isNoValidActivityAfterItInTheDay");
+			System.out.println("activityIndexAfterWhichToCheck=" + ActivityObjectIndex);
+			theDayTimeline.printActivityObjectNamesInSequence();
+			System.out.println("Number of activities in day=" + eventsInDay.size());
+		}
 		
 		if (ActivityObjectIndex == eventsInDay.size() - 1)
 		{
@@ -252,13 +283,19 @@ public class UserDayTimeline implements Serializable
 		{
 			if (UtilityBelt.isValidActivityName(eventsInDay.get(i).getActivityName()))
 			{
-				System.out.println("Activity making it false=" + eventsInDay.get(i).getActivityName());
+				if (Constant.verbose)
+				{
+					System.out.println("Activity making it false=" + eventsInDay.get(i).getActivityName());
+				}
 				isNoValidAfter = false;
 				break;
 			}
 		}
 		
-		System.out.println("No valid after is:" + isNoValidAfter);
+		if (Constant.verbose)
+		{
+			System.out.println("No valid after is:" + isNoValidAfter);
+		}
 		return isNoValidAfter;
 	}
 	
@@ -425,6 +462,11 @@ public class UserDayTimeline implements Serializable
 		return containsCount;
 	}
 	
+	/**
+	 * 
+	 * @param activityToCheck
+	 * @return
+	 */
 	public boolean hasAValidActivityAfterFirstOccurrenceOfThisActivity(ActivityObject activityToCheck)
 	{
 		boolean hasValidAfter = false;
@@ -433,12 +475,10 @@ public class UserDayTimeline implements Serializable
 		
 		try
 		{
-			
 			if (indexOfFirstOccurrence < 0)
 			{
 				Exception errorException = new Exception(
 						"Error in hasAValidActivityAfterFirstOccurrenceOfThisActivity: No Occurrence of the given activity in the given daytimeline, throwing exception");
-				
 			}
 			
 			if (indexOfFirstOccurrence < this.ActivityObjectsInDay.size() - 1) // not the last activity of the day
@@ -464,6 +504,11 @@ public class UserDayTimeline implements Serializable
 		return hasValidAfter;
 	}
 	
+	/**
+	 * 
+	 * @param activityToCheck
+	 * @return
+	 */
 	public int getIndexOfFirstOccurrenceOfThisActivity(ActivityObject activityToCheck)
 	{
 		String activityName = activityToCheck.getActivityName();
@@ -520,9 +565,15 @@ public class UserDayTimeline implements Serializable
 	 * 
 	 * 
 	 * @param t
-	 * @return a Pair with first value as the index of the found Activity Object in the timeline and the second value is the absolute difference of the start time in day of this
-	 *         Activity Object and the start time of current Activity Object
+	 * 
+	 * @return a Triple (indexOfActivityObject with nearest start time to given timestamp, that activity object, abs time difference in secs between the st of this ao and st of
+	 *         current ao t)
 	 */
+	
+	// *a Pair with first value as the index of the found Activity Object
+	// *in the timeline and the second value is the absolute difference of the start time in day of this
+	// * Activity Object and the start time of current Activity Object
+	// */
 	public Triple<Integer, ActivityObject, Double> getTimeDiffValidActivityObjectWithStartTimeNearestTo(Timestamp t)
 	{
 		/** Seconds in that day before the timestamp t which is start timestamp of the current activity object **/

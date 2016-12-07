@@ -380,6 +380,55 @@ public class TimelineUtils
 		System.out.println("exiting createUserTimelinesFromCheckinEntriesGowalla");
 		return userDaytimelines;
 	}
+	
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 */
+	public static void countConsecutiveSimilarActivities(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+	{
+		// <User__Date, time difference between then in secs>
+		LinkedHashMap<String, Double> mapForConsecutive2s = new LinkedHashMap<>();
+		
+		// <User__Date, time difference between then in secs>
+		LinkedHashMap<String, Double> mapForConsecutive3s = new LinkedHashMap<>();
+		
+		// <User__Date, time difference between then in secs>
+		LinkedHashMap<String, Double> mapForConsecutive4s = new LinkedHashMap<>();
+		
+		// <User__Date, time difference between then in secs>
+		LinkedHashMap<String, Double> mapForConsecutive5s = new LinkedHashMap<>();
+		
+		// <User__Date, time difference between then in secs>
+		LinkedHashMap<String, Double> mapForConsecutive6OrMores = new LinkedHashMap<>();
+		
+		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userE : usersDayTimelines.entrySet())
+		{
+			String user = userE.getKey();
+			
+			for (Entry<Date, UserDayTimeline> dateE : userE.getValue().entrySet())
+			{
+				String date = dateE.getKey().toString();
+				
+				String prevActivityName = "";
+				Timestamp prevActivityStartTimestamp = null;
+				int numOfConsecutives = 0;
+				long timeDiff = 0;
+				for (ActivityObject aos : dateE.getValue().getActivityObjectsInDay())
+				{
+					String activityName = aos.getActivityName();
+					if (activityName.equals(prevActivityName))
+					{
+						numOfConsecutives += 1;
+						timeDiff += aos.getStartTimestamp().getTime() - prevActivityStartTimestamp.getTime();
+					}
+				}
+			}
+			
+		}
+		
+	}
+	
 	// LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>();
 	//
 	// // convert checkinentries to activity objects
@@ -1840,6 +1889,99 @@ public class TimelineUtils
 		
 		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
 		return pruned;
+	}
+	
+	/**
+	 * TODO this method can be improved for performance
+	 * 
+	 * @param dayTimelinesForUser
+	 * @param dateA
+	 * @return
+	 */
+	public static UserDayTimeline getUserDayTimelineByDateFromMap(LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser, Date dateA)
+	{
+		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelinesForUser.entrySet())
+		{
+			// System.out.println("Date ="+entry.getKey());
+			// if(entry.getKey().toString().equals((new Date(2014-1900,4-1,10)).toString()))
+			// System.out.println("!!!!!!!!E U R E K A !!!!!!!");
+			if (entry.getKey().toString().equals(dateA.toString()))
+			{
+				// System.out.println("!!!!!!!FOUND THE O N E!!!!!!");
+				return entry.getValue();
+			}
+		}
+		return null;
+	}
+	
+	public static void traverseMapOfDayTimelines(LinkedHashMap<Date, UserDayTimeline> map)
+	{
+		System.out.println("traversing map of day timelines");
+		for (Map.Entry<Date, UserDayTimeline> entry : map.entrySet())
+		{
+			System.out.print("Date: " + entry.getKey());
+			entry.getValue().printActivityObjectNamesInSequence();
+			System.out.println();
+		}
+		System.out.println("-----------");
+	}
+	
+	/**
+	 * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current Activity). Also, this candidate timeline must contain the
+	 * activityAtRecomm point at non-last position and there is atleast one valid activity after this activityAtRecomm point
+	 * 
+	 * <p>
+	 * converted to a static method on Dec 5 2016
+	 * <p>
+	 * 
+	 * @param dayTimelinesForUser
+	 * @param activitiesGuidingRecomm
+	 * @param dateAtRecomm
+	 * @param activityAtRecommPoint
+	 * @return
+	 */
+	public static LinkedHashMap<Date, UserDayTimeline> extractDaywiseCandidateTimelines(
+			LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser, ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm,
+			ActivityObject activityAtRecommPoint)
+	{
+		LinkedHashMap<Date, UserDayTimeline> candidateTimelines = new LinkedHashMap<Date, UserDayTimeline>();
+		int count = 0;
+		
+		int totalNumberOfProbableCands = 0;
+		int numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
+		int numCandsRejectedDueToNoNextActivity = 0;
+		
+		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelinesForUser.entrySet())
+		{
+			totalNumberOfProbableCands += 1;
+			
+			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for the day to be recommended (this should nt
+			// be the case because test and training set are diffferent)
+			// and there is atleast one valid activity after this activityAtRecomm point
+			if (entry.getValue().countContainsActivityButNotAsLast(activityAtRecommPoint) > 0)// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
+			{
+				if (entry.getKey().toString().equals(dateAtRecomm.toString()) == true)
+				{
+					System.err.println(
+							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
+					continue;
+				}
+				
+				if (entry.getValue().containsOnlySingleActivity() == false
+						&& entry.getValue().hasAValidActivityAfterFirstOccurrenceOfThisActivity(activityAtRecommPoint) == true)
+				{
+					candidateTimelines.put(entry.getKey(), entry.getValue());
+					count++;
+				}
+				else
+					numCandsRejectedDueToNoNextActivity += 1;
+			}
+			else
+				numCandsRejectedDueToNoCurrentActivityAtNonLast += 1;
+		}
+		if (count == 0)
+			System.err.println("No candidate timelines found");
+		return candidateTimelines;
 	}
 	
 }

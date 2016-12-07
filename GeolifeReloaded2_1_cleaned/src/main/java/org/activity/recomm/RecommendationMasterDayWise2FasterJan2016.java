@@ -65,9 +65,9 @@ public class RecommendationMasterDayWise2FasterJan2016
 	
 	private boolean thresholdPruningNoEffect;
 	
-	public int totalNumberOfProbableCands;
-	public int numCandsRejectedDueToNoCurrentActivityAtNonLast;
-	public int numCandsRejectedDueToNoNextActivity;
+	// public int totalNumberOfProbableCands;
+	// public int numCandsRejectedDueToNoCurrentActivityAtNonLast;
+	// public int numCandsRejectedDueToNoNextActivity;
 	
 	private static String commonPath;// = Constant.commonPath;
 	
@@ -101,7 +101,7 @@ public class RecommendationMasterDayWise2FasterJan2016
 		System.out.println("	Time at Recomm = " + this.timeAtRecomm);
 		
 		// $$21Oct
-		currentDayTimeline = UtilityBelt.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
+		currentDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
 		
 		if (currentDayTimeline == null)
 		{
@@ -128,7 +128,8 @@ public class RecommendationMasterDayWise2FasterJan2016
 		System.out.println("\nActivity at Recomm point =" + this.activityAtRecommPoint.getActivityName());
 		
 		// All check OK
-		this.candidateTimelines = getCandidateTimelines(trainingTimelines, this.activitiesGuidingRecomm, this.dateAtRecomm);
+		this.candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines, this.activitiesGuidingRecomm, this.dateAtRecomm,
+				this.activityAtRecommPoint);
 		
 		System.out.println("Number of candidate timelines =" + candidateTimelines.size());
 		System.out.println("the candidate timelines are as follows:");
@@ -543,6 +544,26 @@ public class RecommendationMasterDayWise2FasterJan2016
 		return hasCandidateTimelines;
 	}
 	
+	/**
+	 * Useful for mu breaking of timelines to find if a particular rt will have recommendation for daywise approach so that they can be compared
+	 * 
+	 * @param trainingTimelines
+	 * @param activitiesGuidingRecomm
+	 * @param dateAtRecomm
+	 * @param activityAtRecommPoint
+	 * @return
+	 */
+	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, UserDayTimeline> trainingTimelines,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm, ActivityObject activityAtRecommPoint)
+	{
+		LinkedHashMap<Date, UserDayTimeline> candidateTimelines =
+				TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines, activitiesGuidingRecomm, dateAtRecomm, activityAtRecommPoint);
+		if (candidateTimelines.size() > 0)
+			return true;
+		else
+			return false;
+	}
+	
 	/*
 	 * public String getSingleNextRecommendedActivity() { return this.singleNextRecommendedActivity; }
 	 */
@@ -608,7 +629,7 @@ public class RecommendationMasterDayWise2FasterJan2016
 			Date dateOfCandTimeline = distEntryOfCand.getKey();
 			
 			// fetching the candidate timeline again
-			candUserDayTimeline = UtilityBelt.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfCandTimeline);
+			candUserDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfCandTimeline);
 			
 			ActivityObject nextValidAO = candUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexOfCand);
 			
@@ -656,7 +677,7 @@ public class RecommendationMasterDayWise2FasterJan2016
 			Double distanceOfCandTimeline = distEntryOfCand.getValue().getThird();
 			Date dateOfCandTimeline = distEntryOfCand.getKey();
 			
-			candUserDayTimeline = UtilityBelt.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfCandTimeline);
+			candUserDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfCandTimeline);
 			
 			ActivityObject nextValidAO = candUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexOfCand);
 			
@@ -863,60 +884,6 @@ public class RecommendationMasterDayWise2FasterJan2016
 		
 		return new Triple(endPointIndexForSubsequenceWithHighestSimilarity, traceEditOperationsForSubsequenceWithHighestSimilarity,
 				distanceScoreForSubsequenceWithHighestSimilarity);
-	}
-	
-	/**
-	 * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current Activity). Also, this candidate timeline must contain the
-	 * activityAtRecomm point at non-last position and there is atleast one valid activity after this activityAtRecomm point
-	 * 
-	 * @param dayTimelinesForUser
-	 * @param activitiesGuidingRecomm
-	 * @return
-	 */
-	public LinkedHashMap<Date, UserDayTimeline> getCandidateTimelines(LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm)
-	{
-		LinkedHashMap<Date, UserDayTimeline> candidateTimelines = new LinkedHashMap<Date, UserDayTimeline>();
-		int count = 0;
-		
-		totalNumberOfProbableCands = 0;
-		numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
-		numCandsRejectedDueToNoNextActivity = 0;
-		
-		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelinesForUser.entrySet())
-		{
-			totalNumberOfProbableCands += 1;
-			
-			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for the day to be recommended (this should nt
-			// be the case because test and
-			// trainin set
-			// are diffferent)
-			// and there is atleast one valid activity after this activityAtRecomm point
-			if (entry.getValue().countContainsActivityButNotAsLast(this.activityAtRecommPoint) > 0)// &&
-																									// (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
-			{
-				if (entry.getKey().toString().equals(dateAtRecomm.toString()) == true)
-				{
-					System.err.println(
-							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
-					continue;
-				}
-				
-				if (entry.getValue().containsOnlySingleActivity() == false
-						&& entry.getValue().hasAValidActivityAfterFirstOccurrenceOfThisActivity(this.activityAtRecommPoint) == true)
-				{
-					candidateTimelines.put(entry.getKey(), entry.getValue());
-					count++;
-				}
-				else
-					numCandsRejectedDueToNoNextActivity += 1;
-			}
-			else
-				numCandsRejectedDueToNoCurrentActivityAtNonLast += 1;
-		}
-		if (count == 0)
-			System.err.println("No candidate timelines found");
-		return candidateTimelines;
 	}
 	
 	public ArrayList<Integer> getIndicesOfEndPointActivityInDayButNotAsLast(String userDayActivitiesAsStringCode,

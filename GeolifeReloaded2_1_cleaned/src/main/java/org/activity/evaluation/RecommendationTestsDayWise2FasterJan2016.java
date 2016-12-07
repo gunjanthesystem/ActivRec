@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,20 @@ public class RecommendationTestsDayWise2FasterJan2016
 		// System.err.println("Warning with exit: results' directory not empty");
 		// System.exit(-1);
 		// }
+		
+		// if userid is not set in constant class, in case of gowalla
+		if (userIDs == null || userIDs.length == 0)
+		{
+			userIDs = new int[usersTimelines.size()];// System.out.println("usersTimelines.size() = " + usersTimelines.size());
+			System.out.println("UserIDs not set, hence extracting user ids from usersTimelines keyset");
+			int count = 0;
+			for (String userS : usersTimelines.keySet())
+			{
+				userIDs[count++] = Integer.valueOf(userS);
+			}
+			Constant.setUserIDs(userIDs);
+		}
+		System.out.println("User ids = " + Arrays.toString(userIDs));
 		
 		for (String typeOfThreshold : typeOfThresholds)
 		{
@@ -192,8 +207,22 @@ public class RecommendationTestsDayWise2FasterJan2016
 					for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 					{
 						// int numberOfValidRTs = 0;
+						
 						System.out.println("\nUser id=" + userId);
-						String userName = ConnectDatabase.getUserName(userId);// ConnectDatabase.getUserNameFromDatabase(userId);
+						
+						String userName = "";
+						if (Constant.getDatabaseName().equals("gowalla1"))
+						{
+							userName = String.valueOf(userId);
+						}
+						
+						else
+						{
+							userName = ConnectDatabase.getUserName(userId);// ConnectDatabase.getUserNameFromDatabase(userId);
+							// String userName = ConnectDatabase.getUserNameFromDatabase(userId);
+						}
+						
+						System.out.println("\nUser id=" + userId);
 						
 						BufferedWriter bwMaxNumOfDistinctRecommendations =
 								WritingToFile.getBufferedWriterForNewFile(commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
@@ -550,7 +579,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 									String dateOfCand = dayOfCand + "-" + monthOfCand + "-" + yearOfCand;
 									
 									UserDayTimeline dayTimelineTemp =
-											UtilityBelt.getUserDayTimelineByDateFromMap(userTrainingTimelines, entryScore.getKey());
+											TimelineUtils.getUserDayTimelineByDateFromMap(userTrainingTimelines, entryScore.getKey());
 									
 									Integer endPointIndexWithLeastDistanceForThisCandidate = entryScore.getValue().getFirst(); // UtilityBelt.getIntegerByDateFromMap(recommP1.getEndPointIndexWithLeastDistanceForCandidateTimelines(),
 																																// entryScore.getKey());
