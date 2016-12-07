@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-import org.activity.evaluation.RecommendationTestsMU;
+import org.activity.evaluation.RecommendationTestsMasterMU2;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -332,13 +332,14 @@ public class ControllerWithoutServer
 			/// sample users
 			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> sampledUsers = new LinkedHashMap<>();
 			int countOfSampleUsers = 0;
+			
 			for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
 				countOfSampleUsers += 1;
-				if (countOfSampleUsers > 3)
-				{
-					break;
-				}
+				// if (countOfSampleUsers > 100)
+				// {
+				// break;
+				// }
 				sampledUsers.put(userEntry.getKey(), userEntry.getValue());
 			}
 			
@@ -376,9 +377,12 @@ public class ControllerWithoutServer
 			// RecommendationTestsDayWise recommendationsTest=new RecommendationTestsDayWise(userTimelines);//,userAtRecomm);
 			
 			/** CURRENT: To run the recommendation experiments **/
-			// $$RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new RecommendationTestsDayWise2FasterJan2016(usersDayTimelinesOriginal);
+			// $$ RecommendationTestsDayWise2FasterJan2016 recommendationsTest =
+			// $$ new RecommendationTestsDayWise2FasterJan2016(usersDayTimelinesOriginal);
 			// $$ disabled on 15 Sep 2016RecommendationTestsMU recommendationsTest = new RecommendationTestsMU(usersDayTimelinesOriginal);
-			RecommendationTestsMU recommendationsTest = new RecommendationTestsMU(sampledUsers);// usersCleanedDayTimelines);
+			// $$RecommendationTestsMU recommendationsTest = new RecommendationTestsMU(sampledUsers);// usersCleanedDayTimelines);
+			RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);// usersCleanedDayTimelines);
+			// $$RecommendationTestsBaseClosestTime recommendationsTest = new RecommendationTestsBaseClosestTime(sampledUsers);// usersCleanedDayTimelines);
 			
 			/**** CURRENT END ****/
 			

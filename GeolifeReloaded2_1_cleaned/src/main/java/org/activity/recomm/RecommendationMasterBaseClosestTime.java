@@ -13,6 +13,7 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.util.Constant;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -110,12 +111,12 @@ public class RecommendationMasterBaseClosestTime
 		this.userAtRecomm = Integer.toString(userAtRecomm);
 		this.userIDAtRecomm = Integer.toString(userAtRecomm);
 		
-		System.out.println("\n^^^^^^^^^^^^^^^^Inside Recommendation Master");
+		System.out.println("\n^^^^^^^^^^^^^^^^Inside  RecommendationMasterBaseClosestTime");
 		System.out.println("	User at Recomm = " + this.userAtRecomm);
 		System.out.println("	Date at Recomm = " + this.dateAtRecomm);
 		System.out.println("	Time at Recomm = " + this.timeAtRecomm);
 		
-		userDayTimelineAtRecomm = UtilityBelt.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
+		userDayTimelineAtRecomm = TimelineUtils.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
 		
 		if (userDayTimelineAtRecomm == null)
 		{
@@ -135,7 +136,8 @@ public class RecommendationMasterBaseClosestTime
 		System.out.println("\nActivity at Recomm point =" + this.activityAtRecommPoint.getActivityName());
 		
 		// /////IMPORTANT
-		candidateTimelines = getCandidateTimelines(trainingTimelines, this.activitiesGuidingRecomm, this.dateAtRecomm);// trainingTimelines;
+		candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines, this.activitiesGuidingRecomm,
+				this.dateAtRecomm, this.activityAtRecommPoint);// trainingTimelines;
 		
 		totalNumberOfProbableCands = candidateTimelines.size();
 		numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
@@ -173,16 +175,18 @@ public class RecommendationMasterBaseClosestTime
 		System.out.println("---------startTimeDistanceSortedMap.size()=" + startTimeDistanceSortedMap.size());
 		System.out.println(
 				">>>>>>>>>>>>>>startTimeDistanceSortedMap is:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n Date, Index of nearest, name of nearest, dist of nearest");
+		StringBuilder temp1 = new StringBuilder();
 		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : startTimeDistanceSortedMap.entrySet())
 		{
-			System.out.println("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__"
-					+ entry.getValue().getSecond().getActivityName() + "__" + entry.getValue().getThird());
+			temp1.append("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__" + entry.getValue().getSecond().getActivityName()
+					+ "__" + entry.getValue().getThird() + "\n");
 		}
+		System.out.println(temp1.toString());
 		
 		createRankedTopRecommendedActivityNames(startTimeDistanceSortedMap);
 		
 		WritingToFile.writeStartTimeDistancesSorted(this.startTimeDistanceSortedMap);
-		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
+		System.out.println("\n^^^^^^^^^^^^^^^^Exiting RecommendationMasterBaseClosestTime");
 	}
 	
 	/**
@@ -445,58 +449,58 @@ public class RecommendationMasterBaseClosestTime
 		return hasCandidateTimelines;
 	}
 	
-	/**
-	 * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current Activity). Also, this candidate timeline must contain the
-	 * activityAtRecomm point at non-last position and there is atleast one valid activity after this activityAtRecomm point
-	 * 
-	 * @param dayTimelinesForUser
-	 * @param activitiesGuidingRecomm
-	 * @return
-	 */
-	public LinkedHashMap<Date, UserDayTimeline> getCandidateTimelines(LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm)
-	{
-		LinkedHashMap<Date, UserDayTimeline> candidateTimelines = new LinkedHashMap<Date, UserDayTimeline>();
-		int count = 0;
-		
-		totalNumberOfProbableCands = 0;
-		numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
-		numCandsRejectedDueToNoNextActivity = 0;
-		
-		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelinesForUser.entrySet())
-		{
-			totalNumberOfProbableCands += 1;
-			
-			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for the day to be recommended (this should nt be the case because
-			// test and trainin set
-			// are diffferent)
-			// and there is atleast one valid activity after this activityAtRecomm point
-			if (entry.getValue().countContainsActivityButNotAsLast(this.activityAtRecommPoint) > 0)// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
-			{
-				if (entry.getKey().toString().equals(dateAtRecomm.toString()) == true)
-				{
-					System.err.println(
-							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
-					continue;
-				}
-				
-				if (entry.getValue().containsOnlySingleActivity() == false
-						&& entry.getValue().hasAValidActivityAfterFirstOccurrenceOfThisActivity(this.activityAtRecommPoint) == true)
-				{
-					candidateTimelines.put(entry.getKey(), entry.getValue());
-					count++;
-				}
-				else
-					numCandsRejectedDueToNoNextActivity += 1;
-			}
-			else
-				numCandsRejectedDueToNoCurrentActivityAtNonLast += 1;
-		}
-		if (count == 0)
-			System.err.println("No candidate timelines found");
-		return candidateTimelines;
-	}
-	
+	// /**
+	// * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current Activity). Also, this candidate timeline must contain the
+	// * activityAtRecomm point at non-last position and there is atleast one valid activity after this activityAtRecomm point
+	// *
+	// * @param dayTimelinesForUser
+	// * @param activitiesGuidingRecomm
+	// * @return
+	// */
+	// public LinkedHashMap<Date, UserDayTimeline> getCandidateTimelines(LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser,
+	// ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm)
+	// {
+	// LinkedHashMap<Date, UserDayTimeline> candidateTimelines = new LinkedHashMap<Date, UserDayTimeline>();
+	// int count = 0;
+	//
+	// totalNumberOfProbableCands = 0;
+	// numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
+	// numCandsRejectedDueToNoNextActivity = 0;
+	//
+	// for (Map.Entry<Date, UserDayTimeline> entry : dayTimelinesForUser.entrySet())
+	// {
+	// totalNumberOfProbableCands += 1;
+	//
+	// // Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for the day to be recommended (this should nt be the case because
+	// // test and trainin set
+	// // are diffferent)
+	// // and there is atleast one valid activity after this activityAtRecomm point
+	// if (entry.getValue().countContainsActivityButNotAsLast(this.activityAtRecommPoint) > 0)// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
+	// {
+	// if (entry.getKey().toString().equals(dateAtRecomm.toString()) == true)
+	// {
+	// System.err.println(
+	// "Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
+	// continue;
+	// }
+	//
+	// if (entry.getValue().containsOnlySingleActivity() == false
+	// && entry.getValue().hasAValidActivityAfterFirstOccurrenceOfThisActivity(this.activityAtRecommPoint) == true)
+	// {
+	// candidateTimelines.put(entry.getKey(), entry.getValue());
+	// count++;
+	// }
+	// else
+	// numCandsRejectedDueToNoNextActivity += 1;
+	// }
+	// else
+	// numCandsRejectedDueToNoCurrentActivityAtNonLast += 1;
+	// }
+	// if (count == 0)
+	// System.err.println("No candidate timelines found");
+	// return candidateTimelines;
+	// }
+	//
 	/*
 	 * public String getTopFiveRecommendedActivities() { return this.topRecommendedActivities; }
 	 * 
@@ -519,18 +523,6 @@ public class RecommendationMasterBaseClosestTime
 	 * 
 	 * }
 	 */
-	
-	public void traverseMapOfDayTimelines(LinkedHashMap<Date, UserDayTimeline> map)
-	{
-		System.out.println("traversing map of day timelines");
-		for (Map.Entry<Date, UserDayTimeline> entry : map.entrySet())
-		{
-			System.out.print("Date: " + entry.getKey());
-			entry.getValue().printActivityObjectNamesInSequence();
-			System.out.println();
-		}
-		System.out.println("-----------");
-	}
 	
 	/*
 	 * public void traverseMapOfKeyPair(LinkedHashMap<Date,Pair<Integer,Double>> map) { for (Map.Entry<Date, UserDayTimeline> entry : map.entrySet()) {

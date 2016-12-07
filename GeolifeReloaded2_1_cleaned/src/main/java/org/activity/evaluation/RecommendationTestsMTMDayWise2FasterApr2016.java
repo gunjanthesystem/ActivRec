@@ -571,7 +571,7 @@ public class RecommendationTestsMTMDayWise2FasterApr2016
 									String dateOfCand = dayOfCand + "-" + monthOfCand + "-" + yearOfCand;
 									
 									UserDayTimeline dayTimelineTemp =
-											UtilityBelt.getUserDayTimelineByDateFromMap(userTrainingTimelines, entryScore.getKey());
+											TimelineUtils.getUserDayTimelineByDateFromMap(userTrainingTimelines, entryScore.getKey());
 									
 									Integer endPointIndexWithLeastDistanceForThisCandidate = entryScore.getValue().getFirst(); // UtilityBelt.getIntegerByDateFromMap(recommP1.getEndPointIndexWithLeastDistanceForCandidateTimelines(),
 																																// entryScore.getKey());

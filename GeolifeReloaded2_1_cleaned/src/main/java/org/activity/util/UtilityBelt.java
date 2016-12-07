@@ -2573,25 +2573,6 @@ public class UtilityBelt
 		return res;
 	}
 	
-	public static UserDayTimeline getUserDayTimelineByDateFromMap(LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser, Date dateA)
-	{
-		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelinesForUser.entrySet())
-		{
-			// System.out.println("Date ="+entry.getKey());
-			// if(entry.getKey().toString().equals((new Date(2014-1900,4-1,10)).toString()))
-			// System.out.println("!!!!!!!!E U R E K A !!!!!!!");
-			
-			if (entry.getKey().toString().equals(dateA.toString()))
-			{
-				// System.out.println("!!!!!!!FOUND THE O N E!!!!!!");
-				return entry.getValue();
-			}
-		}
-		
-		return null;
-		
-	}
-	
 	public static Integer getIntegerByDateFromMap(LinkedHashMap<Date, Integer> map, Date dateA)
 	{
 		for (Map.Entry<Date, Integer> entry : map.entrySet())

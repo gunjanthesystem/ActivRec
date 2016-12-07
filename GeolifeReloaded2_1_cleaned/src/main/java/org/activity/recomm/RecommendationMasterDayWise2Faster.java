@@ -97,7 +97,7 @@ public class RecommendationMasterDayWise2Faster
 		System.out.println("	Time at Recomm = " + this.timeAtRecomm);
 		
 		// $$21Oct
-		userDayTimelineAtRecomm = UtilityBelt.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
+		userDayTimelineAtRecomm = TimelineUtils.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
 		
 		if (userDayTimelineAtRecomm == null)
 		{
@@ -491,7 +491,7 @@ public class RecommendationMasterDayWise2Faster
 			Double distanceOfSimilarTimeline = distEntryOfCand.getValue().getThird();
 			Date dateOfSimilarTimeline = distEntryOfCand.getKey();
 			
-			topSimilarUserDayTimeline = UtilityBelt.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfSimilarTimeline);
+			topSimilarUserDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfSimilarTimeline);
 			
 			ActivityObject nextValidAO = topSimilarUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexOfCand);
 			
@@ -528,7 +528,7 @@ public class RecommendationMasterDayWise2Faster
 			Double distanceOfSimilarTimeline = distEntryOfCand.getValue().getThird();
 			Date dateOfSimilarTimeline = distEntryOfCand.getKey();
 			
-			topSimilarUserDayTimeline = UtilityBelt.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfSimilarTimeline);
+			topSimilarUserDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfSimilarTimeline);
 			
 			ActivityObject nextValidAO = topSimilarUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexOfCand);
 			
@@ -804,8 +804,11 @@ public class RecommendationMasterDayWise2Faster
 	{
 		System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotLastValid: userDayActivitiesAsStringCode="
 				+ userDayActivitiesAsStringCode + "  and codeOfEndPointActivity=" + codeOfEndPointActivity);
+		// getCharCodeFromActivityID
+		// String codeUn = StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY1);// "Unknown");
+		String codeUn = StringCode.getCharCodeFromActivityID(activityID)StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY1);// "Unknown");
 		
-		String codeUn = StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY1);// "Unknown");
+		// String codeO = StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY2);// ("Others");
 		String codeO = StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY2);// ("Others");
 		
 		// get indices of valid activity ActivityNames

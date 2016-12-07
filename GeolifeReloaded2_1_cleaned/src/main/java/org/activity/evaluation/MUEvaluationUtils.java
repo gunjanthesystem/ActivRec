@@ -24,7 +24,7 @@ public class MUEvaluationUtils
 	
 	// final static ClustersRangeScheme clusteringRangeScheme = ClustersRangeScheme.CLUSTERING0;
 	
-	public static void main(String args[])
+	public static void main0(String args[])
 	{
 		// executeSingle();
 		// final ClustersRangeScheme clusteringRangeScheme = ClustersRangeScheme.CLUSTERING0;// "CLUSTERING0";
@@ -53,6 +53,53 @@ public class MUEvaluationUtils
 		rootPathToWriteResults = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/GroundTruthComparisonsApril21/Clustering2MUTil30/";// 8/Mod2/";
 		executeForMultipleIterationsOfExperiments(ClustersRangeScheme.CLUSTERING2, iterationRootPath, rootPathToWriteResults);
 		// After UMAP corrected TZ experiments start
+	}
+	
+	public static void main(String args[])
+	{
+		gowallaEvals();
+	}
+	
+	public static void gowallaEvals()
+	{
+		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable2MUButDWCompatibleRTS/";
+		String rootPathToWriteResults =
+				"//home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable2MUButDWCompatibleRTS//";
+		
+		// double[] mus = Constant.matchingUnitAsPastCount;
+		// for (double mu : mus)
+		// {
+		
+		// String iterationMURootPath = iterationRootPath + "Iteration" + iter + "/";
+		
+		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "AllMRR.csv";
+		int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName);
+		
+		String MUsByDescendingMRRFileName = rootPathToWriteResults + "MUsByDescendingMRR.csv";
+		
+		// (UserID, Pair( MUs having Max MRR, max MRR))
+		LinkedHashMap<String, Pair<List<Double>, Double>> usersMaxMUMRRMap =
+				WritingToFile.writeDescendingMRRs(mrrForAllUsersAllMUsFileName, MUsByDescendingMRRFileName, numOfUsers, true, true);
+		// (String absFileNameToRead, String absFileNameToWrite, int numberOfUsers, boolean hasRowHeader, boolean booleanHasColHeader)
+		
+		String MUsWithMaxMRRFileName = rootPathToWriteResults + "MUsWithMaxMRR.csv";
+		WritingToFile.appendLineToFileAbsolute(
+				"User, MUsWithMaxMRR,MaxMRR, MinMUHavingMaxMRR, ClusterLabelAccToMinMUHavMaxMRR,ClusterLabelAccToMajorityMUsHavMaxMRR\n",
+				MUsWithMaxMRRFileName);
+		
+		for (Entry<String, Pair<List<Double>, Double>> entryForUser : usersMaxMUMRRMap.entrySet()) // iterating over users
+		{
+			String user = entryForUser.getKey();
+			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
+			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString).collect(Collectors.joining("__"));
+			
+			Double maxMRR = entryForUser.getValue().getSecond();
+			Double minMUHavingMaxMRR = Collections.min(MUsHavingMaxMRR);
+			
+			WritingToFile.appendLineToFileAbsolute(user + "," + MUsHavingMaxMRRAsString + "," + maxMRR + "," + minMUHavingMaxMRR + "\n",
+					MUsWithMaxMRRFileName);
+			
+		} // end of iteration over users. }
 	}
 	
 	/**

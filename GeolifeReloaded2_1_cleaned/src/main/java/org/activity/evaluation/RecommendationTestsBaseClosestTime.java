@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -43,11 +44,25 @@ public class RecommendationTestsBaseClosestTime
 	 */
 	String typeOfThresholds[] = { "Global" };// Global"};//"Percent",
 	public boolean pruningHasSaturated;
-	
+	int userIDs[];
 	int thresholdsArray[];
 	
 	public RecommendationTestsBaseClosestTime(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines)// /, String userAtRecomm)
 	{
+		// if userid is not set in constant class, in case of gowalla
+		if (userIDs == null || userIDs.length == 0)
+		{
+			userIDs = new int[userTimelines.size()];// System.out.println("usersTimelines.size() = " + usersTimelines.size());
+			System.out.println("UserIDs not set, hence extracting user ids from usersTimelines keyset");
+			int count = 0;
+			for (String userS : userTimelines.keySet())
+			{
+				userIDs[count++] = Integer.valueOf(userS);
+			}
+			Constant.setUserIDs(userIDs);
+		}
+		System.out.println("User ids = " + Arrays.toString(userIDs));
+		
 		for (String typeOfThreshold : typeOfThresholds)
 		{
 			if (typeOfThreshold.equals("Percent"))
@@ -67,8 +82,11 @@ public class RecommendationTestsBaseClosestTime
 			
 			for (int thresholdValue : thresholdsArray)
 			{
-				Constant.setCommonPath("/run/media/gunjan/HOME/gunjan/DCU Data Works Oct Space/Oct 20 BaseClosestST Selective Cands/");
-				commonPath = Constant.getCommonPath();
+				// Constant.setCommonPath("/run/media/gunjan/HOME/gunjan/DCU Data Works Oct Space/Oct 20 BaseClosestST Selective Cands/");
+				commonPath = Constant.outputCoreResultsPath;
+				Constant.setCommonPath(commonPath);
+				System.out.println("Common path=" + Constant.getCommonPath());
+				// commonPath = Constant.getCommonPath();
 				// /////////////////////////////////////////////////////////////////////Core
 				
 				ArrayList<String> userNames = new ArrayList<String>();
@@ -214,12 +232,23 @@ public class RecommendationTestsBaseClosestTime
 					// bwCountInActivitiesGuidingRecomm.write("User,RecommendationTime,TimeCategory,NumberOfValidActivities_in_Current_Timeline,NumberOfActivities_in_Current_Timeline");
 					// bwCountInActivitiesGuidingRecomm.newLine();
 					//
-					for (int userId = 0; userId < 5; userId++)
+					for (int userId : userIDs) // for (int userId = 0; userId < 5; userId++)
 					// for(int userId=3;userId <4;userId++)
 					{
 						
 						System.out.println("\nUser id=" + userId);
-						String userName = ConnectDatabase.getUserNameFromDatabase(userId);
+						
+						String userName = "";
+						if (Constant.getDatabaseName().equals("gowalla1"))
+						{
+							userName = String.valueOf(userId);
+						}
+						
+						else
+						{
+							userName = ConnectDatabase.getUserName(userId);// ConnectDatabase.getUserNameFromDatabase(userId);
+							// String userName = ConnectDatabase.getUserNameFromDatabase(userId);
+						}
 						
 						File maxNumberOfDistinctRecommendations = new File(commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
 						maxNumberOfDistinctRecommendations.delete();
@@ -389,9 +418,9 @@ public class RecommendationTestsBaseClosestTime
 									continue;
 								}
 								
-								Timestamp startTimestamp = activityObjectsInThatDay.get(j).getEndTimestamp();// getStartTimestamp();
+								Timestamp endTimestamp = activityObjectsInThatDay.get(j).getEndTimestamp();// getStartTimestamp();
 								
-								String timeCategory = Evaluation.getTimeCategoryOfTheDay(startTimestamp.getHours());
+								String timeCategory = Evaluation.getTimeCategoryOfTheDay(endTimestamp.getHours());
 								
 								if (UserDayTimeline.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
 								{
@@ -401,30 +430,30 @@ public class RecommendationTestsBaseClosestTime
 									{
 										System.out.println("This was the last activity of the day:" + dateToRecomm + " for user:" + userId);
 									}
-									rtsInvalidWriter.write(userId + "," + dateToRecomm + "," + j + "," + startTimestamp + "," + weekDay
-											+ "," + timeCategory);
+									rtsInvalidWriter.write(userId + "," + dateToRecomm + "," + j + "," + endTimestamp + "," + weekDay + ","
+											+ timeCategory);
 									rtsInvalidWriter.newLine();
 									continue;
 								}
 								
-								String startTimeString =
-										startTimestamp.getHours() + ":" + startTimestamp.getMinutes() + ":" + startTimestamp.getSeconds();
+								String endTimeString =
+										endTimestamp.getHours() + ":" + endTimestamp.getMinutes() + ":" + endTimestamp.getSeconds();
 								
 								ActivityObject nextValidActivityAfteractivityRecommPoint1 = eachDayTimelineForUser
 										.getNextValidActivityAfterActivityAtThisTime(new Timestamp(year - 1900, month - 1, date,
-												startTimestamp.getHours(), startTimestamp.getMinutes(), startTimestamp.getSeconds(), 0));
+												endTimestamp.getHours(), endTimestamp.getMinutes(), endTimestamp.getSeconds(), 0));
 								
 								if (nextValidActivityAfteractivityRecommPoint1 == null)
 								{
-									System.out.println("User id" + userId + " Next activity event after " + startTimestamp + " is null");
+									System.out.println("User id" + userId + " Next activity event after " + endTimestamp + " is null");
 									System.out.println(
 											"Error in Sanity Check RT331: nextValidActivityAfteractivityRecommPoint1 is null, if it was such, we should have not reached this point of execution");
 								}
 								
-								System.out.println("User id" + userId + " Next activity event after " + startTimestamp + " ="
+								System.out.println("User id" + userId + " Next activity event after " + endTimestamp + " ="
 										+ nextValidActivityAfteractivityRecommPoint1.getActivityName());
 								
-								System.out.println("Recommendation point at this Activity Event are:- Start: " + startTimeString);// +" ,and Middle: "+middleTimeString);
+								System.out.println("Recommendation point at this Activity Event are:- Start: " + endTimeString);// +" ,and Middle: "+middleTimeString);
 								
 								// ///////////
 								// Now we have those recommendation times which are valid for making recommendations
@@ -433,7 +462,7 @@ public class RecommendationTestsBaseClosestTime
 								// RecommendationMaster(/*userTimelines,*/userTrainingTimelines,userTestTimelines,dateToRecomm,startTimeString, userId);
 								
 								RecommendationMasterBaseClosestTime recommP1 = new RecommendationMasterBaseClosestTime(
-										userTrainingTimelines, userTestTimelines, dateToRecomm, startTimeString, userId);
+										userTrainingTimelines, userTestTimelines, dateToRecomm, endTimeString, userId);
 								
 								double thresholdAsDistance = recommP1.getThresholdAsDistance();
 								
@@ -445,7 +474,7 @@ public class RecommendationTestsBaseClosestTime
 								
 								if (recommP1.hasCandidateTimeslines() == false)
 								{
-									rtsWithNoCands.write(userId + "," + dateToRecomm + "," + j + "," + startTimestamp + "," + weekDay + ","
+									rtsWithNoCands.write(userId + "," + dateToRecomm + "," + j + "," + endTimestamp + "," + weekDay + ","
 											+ timeCategory + "," + recommP1.getActivityAtRecomm().getActivityName() + ","
 											+ recommP1.totalNumberOfProbableCands + ","
 											+ recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast + ","
@@ -453,8 +482,8 @@ public class RecommendationTestsBaseClosestTime
 									rtsWithNoCands.newLine();
 									System.out.println("Cannot make recommendation at this point as there are no candidate timelines");
 									
-									bwNumOfCandTimelinesBelowThreshold.write(
-											dateToRecomm + "," + startTimestamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
+									bwNumOfCandTimelinesBelowThreshold
+											.write(dateToRecomm + "," + endTimestamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
 									bwNumOfCandTimelinesBelowThreshold.newLine();
 									
 									continue;
@@ -462,8 +491,8 @@ public class RecommendationTestsBaseClosestTime
 								
 								if (recommP1.hasCandidateTimelinesBelowThreshold() == false)
 								{
-									bwNumOfCandTimelinesBelowThreshold.write(
-											dateToRecomm + "," + startTimestamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
+									bwNumOfCandTimelinesBelowThreshold
+											.write(dateToRecomm + "," + endTimestamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
 									bwNumOfCandTimelinesBelowThreshold.newLine();
 									
 									System.out.println(
@@ -471,7 +500,7 @@ public class RecommendationTestsBaseClosestTime
 									continue;
 								}
 								
-								bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + startTimestamp + "," + weekDay + ","
+								bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimestamp + "," + weekDay + ","
 										+ thresholdAsDistance + "," + recommP1.getNumberOfCandidateTimelinesBelowThreshold());
 								bwNumOfCandTimelinesBelowThreshold.newLine();
 								
@@ -483,7 +512,7 @@ public class RecommendationTestsBaseClosestTime
 								
 								if (recommP1.isNextActivityJustAfterRecommPointIsInvalid())
 								{
-									bwNextActInvalid.write(userId + "," + startTimestamp);
+									bwNextActInvalid.write(userId + "," + endTimestamp);
 									bwNextActInvalid.newLine();
 								}
 								
@@ -506,7 +535,7 @@ public class RecommendationTestsBaseClosestTime
 								System.out.println("** Ranked Recommended at Start=" + rankedRecommAtStartWithoutScore
 										+ ", while actual was=" + actActualAtStart);
 								
-								bufferWriter.write(userId + "_" + dateToRecomm + "_" + startTimeString + ",");
+								bufferWriter.write(userId + "_" + dateToRecomm + "_" + endTimeString + ",");
 								bufferActual.write(actActualAtStart + ",");
 								bufferRecommWithoutDistance.write(actRecommAtStartWithoutDistance + ",");
 								topRecommWithDistance.write(actRecommAtStartWithDistance + ",");
@@ -518,12 +547,12 @@ public class RecommendationTestsBaseClosestTime
 								baseLineDuration.write(activityNameDurationPairsOverAllTrainingDaysWithoutDuration + ",");
 								
 								String[] splittedRecomm = rankedRecommAtStartWithoutScore.split(Pattern.quote("__"));
-								bwMaxNumOfDistinctRecommendations.write(dateToRecomm + "," + startTimestamp + "," + weekDay + // UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
+								bwMaxNumOfDistinctRecommendations.write(dateToRecomm + "," + endTimestamp + "," + weekDay + // UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
 										"," + (splittedRecomm.length - 1) + "," + recommP1.getNumberOfCandidateTimelinesBelowThreshold());
 								bwMaxNumOfDistinctRecommendations.newLine();
 								
-								bwRaw.write(userName + "," + dateToRecomm + "," + startTimestamp.getHours() + ":"
-										+ startTimestamp.getMinutes() + ":" + startTimestamp.getSeconds() + "," + timeCategory + ","
+								bwRaw.write(userName + "," + dateToRecomm + "," + endTimestamp.getHours() + ":" + endTimestamp.getMinutes()
+										+ ":" + endTimestamp.getSeconds() + "," + timeCategory + ","
 										+ recommP1.getNumberOfValidActivitiesInActivitesGuidingRecommendation() + ","
 										+ recommP1.getNumberOfActivitiesInActivitesGuidingRecommendation() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
 										+ "," + actActualAtStart + "," + rankedRecommAtStartWithScore + "," + actAtRecommPoint + ","
@@ -552,7 +581,7 @@ public class RecommendationTestsBaseClosestTime
 									String dateOfCand = dayOfCand + "-" + monthOfCand + "-" + yearOfCand;
 									
 									UserDayTimeline dayTimelineTemp =
-											UtilityBelt.getUserDayTimelineByDateFromMap(userTrainingTimelines, entryDistance.getKey());
+											TimelineUtils.getUserDayTimelineByDateFromMap(userTrainingTimelines, entryDistance.getKey());
 									// Integer endPointIndexWithLeastDistanceForThisCandidate =
 									// UtilityBelt.getIntegerByDateFromMap(recommP1.getEndPointIndexWithLeastDistanceForCandidateTimelines(),
 									// entryDistance.getKey());
@@ -566,8 +595,8 @@ public class RecommendationTestsBaseClosestTime
 											- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
 									
 									bwRecommTimesWithEditDistances
-											.write(dateToRecomm + "," + startTimestamp.getHours() + ":" + startTimestamp.getMinutes() + ":"
-													+ startTimestamp.getSeconds() + "," + actActualAtStart + "," + entryDistance.getValue()
+											.write(dateToRecomm + "," + endTimestamp.getHours() + ":" + endTimestamp.getMinutes() + ":"
+													+ endTimestamp.getSeconds() + "," + actActualAtStart + "," + entryDistance.getValue()
 													+ "," + dateOfCand + "," + diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
 													+ diffEndTimeForEndPointsCand_n_GuidingInSecs + ","
 													+ dayTimelineTemp.getActivityObjectNamesInSequence() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
