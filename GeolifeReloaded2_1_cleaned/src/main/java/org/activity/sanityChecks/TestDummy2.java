@@ -1,7 +1,5 @@
 package org.activity.sanityChecks;
 
-import org.activity.util.StringCode;
-
 /**
  * Just to check/run some random snippets of code NOT IMPORTANT
  * 
@@ -18,10 +16,15 @@ public class TestDummy2
 		//
 		// System.out.println("splitted[0] = " + splitted[0]);
 		
-		for (int i = 0; i <= 600; i++)
-		{
-			System.out.println(" i = " + i + " code = " + StringCode.getCharCodeFromActivityID(i));
-		}
+		System.out.println(Double.NaN);
+		
+		System.out.println(("gunjan".equals("gunjan")));
+		
+		System.out.println("gunjan".equals("manali"));
+		// for (int i = 0; i <= 600; i++)
+		// {
+		// System.out.println(" i = " + i + " code = " + StringCode.getCharCodeFromActivityID(i));
+		// }
 	}
 	
 }

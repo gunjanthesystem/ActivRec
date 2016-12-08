@@ -336,10 +336,10 @@ public class ControllerWithoutServer
 			for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
 				countOfSampleUsers += 1;
-				// if (countOfSampleUsers > 100)
-				// {
-				// break;
-				// }
+				if (countOfSampleUsers > 100)
+				{
+					break;
+				}
 				sampledUsers.put(userEntry.getKey(), userEntry.getValue());
 			}
 			
