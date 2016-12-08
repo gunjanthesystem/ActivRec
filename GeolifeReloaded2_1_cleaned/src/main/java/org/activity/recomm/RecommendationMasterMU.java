@@ -1123,7 +1123,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			// System.out.println("Alert: Norm edit similarity and/or sim end activity object are null for caseType =" + Constant.caseType);
 			// }
 			
-			return -99999999;
+			return Double.NaN;// -99999999;
 		}
 		
 		PearsonsCorrelation pc = new PearsonsCorrelation();
@@ -1144,7 +1144,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			// System.out.println("Alert: Norm edit similarity is null for caseType =" + Constant.caseType);
 			// }
 			
-			return -99999999;
+			return Double.NaN;// -99999999;
 		}
 		
 		// PearsonsCorrelation pc = new PearsonsCorrelation();
@@ -1167,7 +1167,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			// }
 			// System.err.println("Error: sim end activity object are null (not set)");
 			
-			return -99999999;
+			return Double.NaN;// -99999999;
 		}
 		
 		// PearsonsCorrelation pc = new PearsonsCorrelation();
@@ -1191,7 +1191,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			// System.out.println("Alert: normEditSimilarity is null for caseType =" + Constant.caseType);
 			// }
 			// System.err.println("Error: Norm edit similarity and sim end activity object are null (not set)");
-			return -99999999;
+			return Double.NaN;// -99999999;
 		}
 		
 		// PearsonsCorrelation pc = new PearsonsCorrelation();
@@ -1216,7 +1216,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			// System.out.println("Alert: sim end activity object is null for caseType =" + Constant.caseType);
 			// }
 			
-			return -99999999;
+			return Double.NaN;// -99999999;
 		}
 		
 		// PearsonsCorrelation pc = new PearsonsCorrelation();

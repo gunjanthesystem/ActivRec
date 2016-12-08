@@ -2481,9 +2481,9 @@ public class WritingToFile
 		
 		try
 		{
-			String fileName = commonPath + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv";
-			
 			System.out.println("writing " + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv");
+			
+			String fileName = commonPath + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv";
 			
 			File file = new File(fileName);
 			file.delete();
@@ -2491,8 +2491,7 @@ public class WritingToFile
 			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
 			BufferedWriter bw = new BufferedWriter(fw);
 			
-			bw.write("Date, Num_of_Distict_Valid_Activities");
-			bw.newLine();
+			bw.write("Date, Num_of_Distict_Valid_Activities\n");// bw.newLine();
 			
 			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
 			{
@@ -2509,7 +2508,6 @@ public class WritingToFile
 			e.printStackTrace();
 			System.exit(-5);
 		}
-		
 	}
 	
 	/**
@@ -2646,10 +2644,11 @@ public class WritingToFile
 		
 		try
 		{
+			System.out.println("writing " + userName + "DayTimelines" + timelinesPhrase + ".csv");
+			
 			StringBuilder toWrite = new StringBuilder();
 			String fileName = commonPath + userName + "DayTimelines" + timelinesPhrase + ".csv";
 			// PopUps.showMessage("Writing day timelines to" + fileName);
-			System.out.println("writing " + userName + "DayTimelines" + timelinesPhrase + ".csv");
 			
 			// File file = new File(fileName);
 			// file.delete();
