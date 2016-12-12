@@ -1133,7 +1133,7 @@ public class UtilityBelt
 	 * @param map
 	 * @return
 	 */
-	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map)
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValueDesc(Map<K, V> map)
 	{
 		List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
 		

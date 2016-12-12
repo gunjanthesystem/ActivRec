@@ -329,24 +329,52 @@ public class ControllerWithoutServer
 					Constant.getCommonPath() + "NumOfDaysPerUserCleanedReduced3.csv");
 			System.out.println("Num of users cleaned reduced3  = " + usersCleanedDayTimelines.size());
 			
-			/// sample users
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> sampledUsers = new LinkedHashMap<>();
-			int countOfSampleUsers = 0;
+			// int countOfSampleUsers = 0;
+			// $$$
+			Constant.outputCoreResultsPath =
+					"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 			
-			for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			String s[] = { "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+			
+			System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
+			// for (int i = 0; i < s.length; i++)
+			// {
+			// int startUserIndex = Integer.valueOf(s[i]) - 1;// 100
+			// int endUserIndex = startUserIndex + 99; // 199
+			//
+			// int countOfSampleUsers = 0;
+			// System.out.println("startUserIndex=" + startUserIndex + " endUserIndex" + endUserIndex);
+			// }
+			for (int i = 8; i < s.length; i++)
 			{
-				countOfSampleUsers += 1;
-				if (countOfSampleUsers > 100)
+				int startUserIndex = Integer.valueOf(s[i]) - 1;// 100
+				int endUserIndex = startUserIndex + 140; // 199
+				Constant.outputCoreResultsPath = Constant.outputCoreResultsPath + s[i] + "/";
+				int indexOfSampleUsers = 0;
+				/// sample users
+				LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> sampledUsers = new LinkedHashMap<>();
+				
+				for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
 				{
-					break;
+					// countOfSampleUsers += 1;
+					if (indexOfSampleUsers < startUserIndex)
+					{
+						indexOfSampleUsers += 1;
+						continue;
+					}
+					if (indexOfSampleUsers > endUserIndex)
+					{
+						indexOfSampleUsers += 1;
+						break;
+					}
+					sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+					System.out.println("putting in user= " + userEntry.getKey());
+					indexOfSampleUsers += 1;
 				}
-				sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+				RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
 			}
 			
-			for (String userS : sampledUsers.keySet())
-			{
-				System.out.println("userS= " + userS);
-			}
+			// $$$
 			// String, LinkedHashMap<Date, UserDayTimeline>
 			//////////// for Gowalla end
 			
@@ -381,10 +409,132 @@ public class ControllerWithoutServer
 			// $$ new RecommendationTestsDayWise2FasterJan2016(usersDayTimelinesOriginal);
 			// $$ disabled on 15 Sep 2016RecommendationTestsMU recommendationsTest = new RecommendationTestsMU(usersDayTimelinesOriginal);
 			// $$RecommendationTestsMU recommendationsTest = new RecommendationTestsMU(sampledUsers);// usersCleanedDayTimelines);
-			RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);// usersCleanedDayTimelines);
+			// $$$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);// usersCleanedDayTimelines);
 			// $$RecommendationTestsBaseClosestTime recommendationsTest = new RecommendationTestsBaseClosestTime(sampledUsers);// usersCleanedDayTimelines);
 			
 			/**** CURRENT END ****/
+			
+			// repeat start
+			// 201-300 users
+			// countOfSampleUsers = 0;
+			// Constant.outputCoreResultsPath =
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_201/";
+			// for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			// {
+			// countOfSampleUsers += 1;
+			// if (countOfSampleUsers <= 200)
+			// {
+			// continue;
+			// }
+			// if (countOfSampleUsers > 300)
+			// {
+			// break;
+			// }
+			// sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+			// }
+			// for (String userS : sampledUsers.keySet())
+			// {
+			// System.out.println("userS= " + userS);
+			// }
+			// recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);// usersCleanedDayTimelines);
+			
+			// 301-400
+			// countOfSampleUsers = 0;
+			// Constant.outputCoreResultsPath =
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_301/";
+			//
+			// for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			// {
+			// countOfSampleUsers += 1;
+			// if (countOfSampleUsers <= 300)
+			// {
+			// continue;
+			// }
+			// if (countOfSampleUsers > 400)
+			// {
+			// break;
+			// }
+			// sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+			// }
+			// for (String userS : sampledUsers.keySet())
+			// {
+			// System.out.println("userS= " + userS);
+			// }
+			// recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);// usersCleanedDayTimelines);
+			//
+			// 401-500
+			// countOfSampleUsers = 0;
+			// Constant.outputCoreResultsPath =
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_401/";
+			//
+			// for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			// {
+			// countOfSampleUsers += 1;
+			// if (countOfSampleUsers <= 400)
+			// {
+			// continue;
+			// }
+			// if (countOfSampleUsers > 500)
+			// {
+			// break;
+			// }
+			// sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+			// }
+			// for (String userS : sampledUsers.keySet())
+			// {
+			// System.out.println("userS= " + userS);
+			// }
+			// recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);// usersCleanedDayTimelines);
+			
+			// 501-600
+			// countOfSampleUsers = 0;
+			// Constant.outputCoreResultsPath =
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_501/";
+			//
+			// for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			// {
+			// countOfSampleUsers += 1;
+			// if (countOfSampleUsers <= 500)
+			// {
+			// continue;
+			// }
+			// if (countOfSampleUsers > 600)
+			// {
+			// break;
+			// }
+			// sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+			// }
+			// for (String userS : sampledUsers.keySet())
+			// {
+			// System.out.println("userS= " + userS);
+			// }
+			// recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);// usersCleanedDayTimelines);
+			
+			// // 601-700
+			// countOfSampleUsers = 0;
+			// Constant.outputCoreResultsPath =
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_601/";
+			//
+			// for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			// {
+			// countOfSampleUsers += 1;
+			// if (countOfSampleUsers <= 600)
+			// {
+			// continue;
+			// }
+			// if (countOfSampleUsers > 700)
+			// {
+			// break;
+			// }
+			// sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+			// }
+			// for (String userS : sampledUsers.keySet())
+			// {
+			// System.out.println("userS= " + userS);
+			// }
+			// recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);// usersCleanedDayTimelines);
+			
+			// repeat end
 			
 			/** To get some stats on the generated timelines **/
 			// TimelineStats.timelineStatsController(usersTimelines);

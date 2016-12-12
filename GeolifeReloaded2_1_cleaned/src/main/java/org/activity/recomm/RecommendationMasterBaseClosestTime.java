@@ -251,7 +251,7 @@ public class RecommendationMasterBaseClosestTime
 		}
 		System.out.println();
 		recommendedActivityNamesRankscorePairs =
-				(LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendedActivityNamesRankscorePairs); // Sorted in descending order of ranked score: higher
+				(LinkedHashMap<String, Double>) UtilityBelt.sortByValueDesc(recommendedActivityNamesRankscorePairs); // Sorted in descending order of ranked score: higher
 																													// ranked score means higher value of rank
 		
 		// ///////////IMPORTANT //////////////////////////////////////////////////////////

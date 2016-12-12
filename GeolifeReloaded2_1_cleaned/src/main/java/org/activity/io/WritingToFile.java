@@ -58,9 +58,13 @@ public class WritingToFile
 	 *            the path to read, i.e., the root path for all MU results
 	 * @param absFileNameToWrite
 	 *            file name to write for MRR for all user and all MUs result
+	 * @param whichAlgo
+	 *            "Algo", or "BaselineOccurrence", etc
+	 * 
 	 * @return number of users
 	 */
-	public static int writeMRRForAllUsersAllMUs(String rootPath, String absFileNameToWrite)
+	
+	public static int writeMRRForAllUsersAllMUs(String rootPath, String absFileNameToWrite, String whichAlgo)
 	{
 		double[] matchingUnitArray = null;
 		int numberOfUsers = -1;
@@ -85,7 +89,7 @@ public class WritingToFile
 			
 			for (double mu : matchingUnitArray)
 			{
-				String fileName = rootPath + "MatchingUnit" + mu + "/AlgoAllMeanReciprocalRank.csv";
+				String fileName = rootPath + "MatchingUnit" + mu + "/" + whichAlgo + "AllMeanReciprocalRank.csv";
 				
 				List<Double> mrrVals = ReadingFromFile.oneColumnReaderDouble(fileName, ",", 1, true);
 				numberOfUsers = mrrVals.size(); // note we need to do this only once, but no harm done if done multiple times, overwriting the same value.
@@ -118,6 +122,7 @@ public class WritingToFile
 	public static LinkedHashMap<String, Pair<List<Double>, Double>> writeDescendingMRRs(String absFileNameToRead, String absFileNameToWrite,
 			int numberOfUsers, boolean hasRowHeader, boolean booleanHasColHeader)
 	{
+		System.out.println("Inside writeDescendingMRRs for file to read:" + absFileNameToRead);
 		int startColIndx = 0, lastColIndx = numberOfUsers - 1;
 		List<Double> rowLabels = new ArrayList<Double>();
 		
@@ -156,7 +161,7 @@ public class WritingToFile
 				serialNum++;
 			}
 			
-			mrrMap = (LinkedHashMap<Double, Double>) UtilityBelt.sortByValue(mrrMap);// sorted by descending vals
+			mrrMap = (LinkedHashMap<Double, Double>) UtilityBelt.sortByValueDesc(mrrMap);// sorted by descending vals
 			
 			double maxMRR = Collections.max(mrrMap.values()); // for this col, i.e., for this user
 			List<Double> MUsHavingMaxMRR = new ArrayList<Double>(); // for this col, i.e., for this user
@@ -221,7 +226,7 @@ public class WritingToFile
 				count++;
 			}
 			
-			mrrMap = (LinkedHashMap<String, Double>) UtilityBelt.sortByValue(mrrMap);// sorted by descending vals
+			mrrMap = (LinkedHashMap<String, Double>) UtilityBelt.sortByValueDesc(mrrMap);// sorted by descending vals
 			
 			Pair<String, Double> maxMUMRR = new Pair<String, Double>("0", 0.0);
 			for (Entry<String, Double> entry : mrrMap.entrySet())
@@ -289,7 +294,7 @@ public class WritingToFile
 		// writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv");
 		writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
-				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv");
+				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv", "Algo");
 		
 		// /
 		//
@@ -3748,13 +3753,13 @@ public class WritingToFile
 				activityNameCountPairsOverAllTrainingDays =
 						WritingToFile.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
 				activityNameCountPairsOverAllTrainingDays =
-						(LinkedHashMap<String, Long>) UtilityBelt.sortByValue(activityNameCountPairsOverAllTrainingDays);
+						(LinkedHashMap<String, Long>) UtilityBelt.sortByValueDesc(activityNameCountPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameCountPairsOverAllTrainingDays", activityNameCountPairsOverAllTrainingDays);
 				
 				activityNameDurationPairsOverAllTrainingDays =
 						WritingToFile.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
 				activityNameDurationPairsOverAllTrainingDays =
-						(LinkedHashMap<String, Long>) UtilityBelt.sortByValue(activityNameDurationPairsOverAllTrainingDays);
+						(LinkedHashMap<String, Long>) UtilityBelt.sortByValueDesc(activityNameDurationPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameDurationPairsOverAllTrainingDays", activityNameDurationPairsOverAllTrainingDays);
 				
 				activityNameOccPercentageOverAllTrainingDays =
