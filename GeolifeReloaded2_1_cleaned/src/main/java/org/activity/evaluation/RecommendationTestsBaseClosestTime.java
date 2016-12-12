@@ -342,7 +342,7 @@ public class RecommendationTestsBaseClosestTime
 						LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays =
 								WritingToFile.writeActivityCountsInGivenDayTimelines(userName, userTrainingTimelines, "TrainingTimelines");
 						activityNameCountPairsOverAllTrainingDays =
-								(LinkedHashMap<String, Long>) UtilityBelt.sortByValue(activityNameCountPairsOverAllTrainingDays);
+								(LinkedHashMap<String, Long>) UtilityBelt.sortByValueDesc(activityNameCountPairsOverAllTrainingDays);
 						String activityNameCountPairsOverAllTrainingDaysWithCount =
 								getActivityNameCountPairsOverAllTrainingDaysWithCount(activityNameCountPairsOverAllTrainingDays);
 						String activityNameCountPairsOverAllTrainingDaysWithoutCount =
@@ -358,7 +358,7 @@ public class RecommendationTestsBaseClosestTime
 						LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = WritingToFile
 								.writeActivityDurationInGivenDayTimelines(userName, userTrainingTimelines, "TrainingTimelines");
 						activityNameDurationPairsOverAllTrainingDays =
-								(LinkedHashMap<String, Long>) UtilityBelt.sortByValue(activityNameDurationPairsOverAllTrainingDays);
+								(LinkedHashMap<String, Long>) UtilityBelt.sortByValueDesc(activityNameDurationPairsOverAllTrainingDays);
 						String activityNameDurationPairsOverAllTrainingDaysWithDuration =
 								getActivityNameDurationPairsOverAllTrainingDaysWithDuration(activityNameDurationPairsOverAllTrainingDays);
 						String activityNameDurationPairsOverAllTrainingDaysWithoutDuration =

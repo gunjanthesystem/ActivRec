@@ -445,7 +445,7 @@ public class RecommendationMasterDayWise2FasterJan2016
 		
 		System.out.println();
 		recommendedActivityNamesWithRankScores =
-				(LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendedActivityNamesWithRankScores); // Sorted in
+				(LinkedHashMap<String, Double>) UtilityBelt.sortByValueDesc(recommendedActivityNamesWithRankScores); // Sorted in
 																													// descending
 																													// order of
 		// ranked score: higher ranked

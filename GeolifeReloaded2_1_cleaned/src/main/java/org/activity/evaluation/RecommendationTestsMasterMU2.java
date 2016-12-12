@@ -599,20 +599,32 @@ public class RecommendationTestsMasterMU2
 									metaToWriteForThisUserDate.append(userId + "_" + dateToRecomm + "_" + endTimeString + ",");
 									// actualBufferWriter.write
 									dataActualToWriteForThisUserDate.append(actActualDone + ",");
-									// top5BufferWriter.write
-									topNextActsWithoutDistToWriteForThisUserDate
-											.append(recommP1.getTopNextActivityNamesWithoutDistanceString() + ",");
-									// topRecommWithDistance.write
-									topNextActsWithDistToWriteForThisUserDate
-											.append(recommP1.getTopNextActivityNamesWithDistanceString() + ",");
 									
+									// top5BufferWriter.write
+									if (Constant.writeTopNextActivitiesWithoutDistance)
+									{
+										topNextActsWithoutDistToWriteForThisUserDate
+												.append(recommP1.getTopNextActivityNamesWithoutDistanceString() + ",");
+									}
+									
+									// topRecommWithDistance.write
+									if (Constant.writeTopNextActivitiesWithDistance)
+									{
+										topNextActsWithDistToWriteForThisUserDate
+												.append(recommP1.getTopNextActivityNamesWithDistanceString() + ",");
+									}
 									// rankedRecommWithScore.write(rankedRecommAtStartWithScore + ",");
 									rankedRecommWithScoreToWriteForThisUserDate.append(rankedRecommAtStartWithScore + ",");
 									
 									// rankedRecommWithoutScore.write(rankedRecommAtStartWithoutScore + ",");
 									rankedRecommWithoutScoreToWriteForThisUserDate.append(rankedRecommAtStartWithoutScore + ",");
 									
-									metaIfCurrentTargetSameToWriteForThisUserDate.append((actAtRecommPoint.equals(actActualDone)) + ",");
+									char isCurrentTargetActSame;
+									if (actAtRecommPoint.equals(actActualDone))
+										isCurrentTargetActSame = 't';
+									else
+										isCurrentTargetActSame = 'f';
+									metaIfCurrentTargetSameToWriteForThisUserDate.append(isCurrentTargetActSame + ",");
 									/* ************************************************************************************ */
 									LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays =
 											(LinkedHashMap<String, Long>) mapsForCountDurationBaselines
@@ -702,8 +714,17 @@ public class RecommendationTestsMasterMU2
 								bwRaw.write(bwRawToWriteForThisUserDate.toString());
 								metaBufferWriter.write(metaToWriteForThisUserDate.toString());
 								actualBufferWriter.write(dataActualToWriteForThisUserDate.toString());
-								topNextActWithoutDist.write(topNextActsWithoutDistToWriteForThisUserDate.toString());
-								topNextActWithDist.write(topNextActsWithDistToWriteForThisUserDate.toString());
+								
+								if (Constant.writeTopNextActivitiesWithoutDistance)
+								{
+									topNextActWithoutDist.write(topNextActsWithoutDistToWriteForThisUserDate.toString());
+								}
+								
+								if (Constant.writeTopNextActivitiesWithDistance)
+								{
+									topNextActWithDist.write(topNextActsWithDistToWriteForThisUserDate.toString());
+								}
+								
 								rankedRecommWithScore.write(rankedRecommWithScoreToWriteForThisUserDate.toString());
 								rankedRecommWithoutScore.write(rankedRecommWithoutScoreToWriteForThisUserDate.toString());
 								baseLineOccurrence.write(baseLineOccurrenceToWriteForThisUserDate.toString());

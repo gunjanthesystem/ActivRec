@@ -250,7 +250,7 @@ public class ReadingFromFile
 			String fileName = commonPath + userID + "StayPoints.csv";
 			fileNamesToConcactenate.add(fileName);
 		}
-		CSVUtils.contactenateCSVFiles(fileNamesToConcactenate, true,
+		CSVUtils.concatenateCSVFiles(fileNamesToConcactenate, true,
 				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/TrajectorySpace/June10ContactednateStayPoints/AllStayPoints.csv");
 	}
 	

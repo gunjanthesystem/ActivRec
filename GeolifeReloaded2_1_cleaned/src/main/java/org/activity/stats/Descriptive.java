@@ -141,7 +141,7 @@ public class Descriptive
 			
 		}
 		
-		fd = UtilityBelt.sortByValue(fd);
+		fd = UtilityBelt.sortByValueDesc(fd);
 		
 		WritingToFile.writeSimpleMapToFile(fd, commonPath + "TimeDifference_Frequency distribution.csv", "Value",
 				"Frequency Count");

@@ -146,19 +146,22 @@ public class UserDayTimeline implements Serializable
 	 * @param timestamp
 	 * @return
 	 */
-	public int getNumOfValidActivityObjectAfterThisTime(Timestamp timestamp)
+	public int getNumOfValidActivityObjectAfterThisTime(Timestamp timestampOriginal)
 	{
 		int numOfValids = 0;
-		
-		while (getNextValidActivityAfterActivityAtThisTime(timestamp) != null)
+		Timestamp timestamp = timestampOriginal;
+		// while ((currentLine = br.readLine()) != null)
+		ActivityObject nextValidAOAfterAOAtThisTime;
+		while ((nextValidAOAfterAOAtThisTime = getNextValidActivityAfterActivityAtThisTime(timestamp)) != null)
+		// while (getNextValidActivityAfterActivityAtThisTime(timestamp) != null)
 		{
 			numOfValids += 1;
-			timestamp = getNextValidActivityAfterActivityAtThisTime(timestamp).getEndTimestamp();
+			timestamp = nextValidAOAfterAOAtThisTime.getEndTimestamp(); // update timestamp
 		}
 		
 		if (Constant.verbose)
 		{
-			System.out.println("Debug: num of valid after timestamp " + timestamp + " is: " + numOfValids);
+			System.out.println("Debug: num of valid after timestamp " + timestampOriginal + " is: " + numOfValids);
 		}
 		return numOfValids;
 		
@@ -202,9 +205,11 @@ public class UserDayTimeline implements Serializable
 			if (nextValidActivityObject.getActivityName()
 					.equals(ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName()))
 			{
-				System.err.println(
-						"\nWarning: Next Valid activity has same name as current activity (for timestamp:" + timestamp + " userID:" + userID
-								+ ")Activity Name=" + ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName());
+				System.err.println("\nWarning: Next Valid AO has same name as given AO (ts:" + timestamp + " userID:" + userID
+						+ ") given Act =" + ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName());
+				// System.err.println(
+				// "\nWarning: Next Valid activity has same name as current activity (for timestamp:" + timestamp + " userID:" + userID
+				// + ")Activity Name=" + ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName());
 			}
 			if (Constant.verbose)
 			{

@@ -951,7 +951,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		}
 		
 		recommendedActivityNamesRankscorePairs =
-				(LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendedActivityNamesRankscorePairs); // Sorted in
+				(LinkedHashMap<String, Double>) UtilityBelt.sortByValueDesc(recommendedActivityNamesRankscorePairs); // Sorted in
 																													// descending
 																													// order of
 																													// ranked
@@ -1070,7 +1070,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		}
 		// // Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value of rank)
 		recommendedActivityNamesRankscorePairs =
-				(LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendedActivityNamesRankscorePairs);
+				(LinkedHashMap<String, Double>) UtilityBelt.sortByValueDesc(recommendedActivityNamesRankscorePairs);
 		// ///////////IMPORTANT //////////////////////////////////////////////////////////
 		this.setRecommendedActivityNamesWithRankscores(recommendedActivityNamesRankscorePairs);
 		
@@ -1326,7 +1326,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		}
 		
 		recommendedActivityNamesRankscorePairs =
-				(LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendedActivityNamesRankscorePairs); // Sorted in
+				(LinkedHashMap<String, Double>) UtilityBelt.sortByValueDesc(recommendedActivityNamesRankscorePairs); // Sorted in
 																													// descending
 																													// order of
 																													// ranked
@@ -1402,7 +1402,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			
 			// Double simEndPointActivityObject = similarityOfEndPointActivityObjectCand.get(candTimelineID);
 			
-			Double simRankScore;// represents similarity
+			double simRankScore;// represents similarity
 			
 			simRankScore = (1d - normEditDistanceVal);// * simEndPointActivityObject;
 			// simRankScore = (1d - (editDistanceValExceptEnd / maxEditDistanceValExceptEnd)) * simEndPointActivityObject;
@@ -1429,7 +1429,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		
 		// Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value of rank)
 		recommendedActivityNamesRankscorePairs =
-				(LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendedActivityNamesRankscorePairs);
+				(LinkedHashMap<String, Double>) UtilityBelt.sortByValueDesc(recommendedActivityNamesRankscorePairs);
 		
 		// ///////////IMPORTANT //////////////////////////////////////////////////////////
 		this.setRecommendedActivityNamesWithRankscores(recommendedActivityNamesRankscorePairs);

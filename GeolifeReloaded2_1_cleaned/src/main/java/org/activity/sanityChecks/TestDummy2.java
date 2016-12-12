@@ -16,15 +16,26 @@ public class TestDummy2
 		//
 		// System.out.println("splitted[0] = " + splitted[0]);
 		
-		System.out.println(Double.NaN);
-		
-		System.out.println(("gunjan".equals("gunjan")));
-		
-		System.out.println("gunjan".equals("manali"));
-		// for (int i = 0; i <= 600; i++)
+		// System.out.println(Double.NaN);
+		//
+		// System.out.println(("gunjan".equals("gunjan")));
+		// System.out.println("gunjan".equals("manali"));
+		// String s[] = { "1", "101", "201", "301", "401", "501", "601" };
+		//
+		// for (int i = 0; i < s.length; i++)
 		// {
-		// System.out.println(" i = " + i + " code = " + StringCode.getCharCodeFromActivityID(i));
+		// int startUserIndex = Integer.valueOf(s[i]) - 1;// 100
+		// int endUserIndex = startUserIndex + 99; // 199
+		//
+		// int countOfSampleUsers = 0;
+		// System.out.println("startUserIndex=" + startUserIndex + " endUserIndex" + endUserIndex);
 		// }
+		
+		byte c = 70;
+		byte c1 = 84;
+		
+		System.out.println("c = " + " c1=" + c1);
+		
 	}
 	
 }

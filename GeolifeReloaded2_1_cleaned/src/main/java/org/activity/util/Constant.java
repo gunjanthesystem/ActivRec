@@ -158,6 +158,12 @@ public final class Constant
 	 * This is a useful file to write, disable it only when faster experiments are needed.
 	 */
 	public static final boolean WriteRecommendationTimesWithEditDistance = false;
+	
+	/**
+	 * to save writing non essential redudant stuffs
+	 */
+	public static final boolean writeTopNextActivitiesWithoutDistance = false;
+	public static final boolean writeTopNextActivitiesWithDistance = false;
 	/**
 	 * Expunge the invalid Activity Objects even before the recommendation process starts
 	 */
@@ -165,9 +171,9 @@ public final class Constant
 																			// can safely be set to false
 	
 	public static final boolean BLACKLISTING = false;// true;// true; // to have the same RTs in daywise and MU, some RTs in MU have to be blacklisted as they did not had any cand
-														// timeline
-														// in
-														// daywise
+														// timeline in daywise
+	
+	public static final boolean doBaselineDuration = false, doBaselineOccurrence = true;
 	
 	// Clustering0
 	public static final int cluster1Min = 0, cluster1Max = 1, cluster2Min = 2, cluster2Max = 5, cluster3Min = 6,
@@ -208,9 +214,9 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12 };// , 14, 16, 18 };// { 0, 1, 2, 3, 4, 5, 6 };// , 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-																							// 17, 18,
-																							// 19, 20, 21, 22,
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18 };// { 0, 1, 2, 3, 4, 5, 6 };// , 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+	// 17, 18,
+	// 19, 20, 21, 22,
 	// 23,
 	// 24, 26, 28, 30 };// , 32,
 	// 34, 36, 38, 40, 42 };

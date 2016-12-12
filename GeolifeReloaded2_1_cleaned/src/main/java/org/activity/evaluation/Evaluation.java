@@ -73,12 +73,17 @@ public class Evaluation
 			brBaseLineDuration = new BufferedReader(new FileReader(commonPath + "dataBaseLineDuration.csv"));
 			
 			int countOfLinesMeta = 0;
+			
+			StringBuilder consoleLogBuilder = new StringBuilder();
+			// consoleLogBuilder.append(
 			while ((metaCurrentLine = brMeta.readLine()) != null)
 			{
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println(metaCurrentLine);
 				String[] tokensInCurrentMetaLine = metaCurrentLine.split(",");
-				System.out.println("number of tokens in this meta line=" + tokensInCurrentMetaLine.length);
+				// System.out.println("number of tokens in this meta line=" + tokensInCurrentMetaLine.length);
+				consoleLogBuilder
+						.append("meta line num:" + (countOfLinesMeta + 1) + "#tokensInLine:" + tokensInCurrentMetaLine.length + "\n");
 				for (int i = 0; i < tokensInCurrentMetaLine.length; i++)
 				{
 					currentLineArray.add(tokensInCurrentMetaLine[i]);
@@ -86,7 +91,7 @@ public class Evaluation
 				arrayMeta.add(currentLineArray);
 				countOfLinesMeta++;
 			}
-			System.out.println("\n number of meta lines =" + countOfLinesMeta);
+			consoleLogBuilder.append("\n number of meta lines =" + countOfLinesMeta + "\n");
 			
 			int countOfLinesTopK = 0;
 			while ((topKCurrentLine = brTopK.readLine()) != null)
@@ -94,7 +99,9 @@ public class Evaluation
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println("topKCurrentLine is" + topKCurrentLine);
 				String[] tokensInCurrentTopKLine = topKCurrentLine.split(",");
-				System.out.println("number of tokens in this topK line=" + tokensInCurrentTopKLine.length);
+				// System.out.println("number of tokens in this topK line=" + tokensInCurrentTopKLine.length);
+				consoleLogBuilder
+						.append("topk line num:" + (countOfLinesTopK + 1) + "#tokensInLine:" + tokensInCurrentTopKLine.length + "\n");
 				for (int i = 0; i < tokensInCurrentTopKLine.length; i++)
 				{
 					currentLineArray.add(tokensInCurrentTopKLine[i]);
@@ -102,7 +109,7 @@ public class Evaluation
 				arrayTopK.add(currentLineArray);
 				countOfLinesTopK++;
 			}
-			System.out.println("\n number of topK lines =" + countOfLinesTopK);
+			consoleLogBuilder.append("\n number of topK lines =" + countOfLinesTopK + "\n");
 			
 			int countOfLinesBaselineOccurrence = 0;
 			while ((baseLineOccurrenceCurrentLine = brBaseLineOccurrence.readLine()) != null)
@@ -110,7 +117,10 @@ public class Evaluation
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println("baseLineOccurrenceCurrentLine is" + baseLineOccurrenceCurrentLine);
 				String[] tokensInCurrentBaseLineOccurrenceLine = baseLineOccurrenceCurrentLine.split(",");
-				System.out.println("number of tokens in this baselineOccurrence line=" + tokensInCurrentBaseLineOccurrenceLine.length);
+				// System.out.println("number of tokens in this baselineOccurrence line=" + tokensInCurrentBaseLineOccurrenceLine.length);
+				consoleLogBuilder.append("baselineOccurrence line num:" + (countOfLinesBaselineOccurrence + 1) + "#tokensInLine:"
+						+ tokensInCurrentBaseLineOccurrenceLine.length + "\n");
+				
 				for (int i = 0; i < tokensInCurrentBaseLineOccurrenceLine.length; i++)
 				{
 					currentLineArray.add(tokensInCurrentBaseLineOccurrenceLine[i]);
@@ -118,7 +128,7 @@ public class Evaluation
 				arrayBaselineOccurrence.add(currentLineArray);
 				countOfLinesBaselineOccurrence++;
 			}
-			System.out.println("\n number of baselineOccurrence lines =" + countOfLinesBaselineOccurrence);
+			consoleLogBuilder.append("\n number of baselineOccurrence lines =" + countOfLinesBaselineOccurrence + "\n");
 			
 			int countOfLinesBaselineDuration = 0;
 			while ((baseLineDurationCurrentLine = brBaseLineDuration.readLine()) != null)
@@ -126,7 +136,10 @@ public class Evaluation
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println("baseLineDurationCurrentLine is" + baseLineDurationCurrentLine);
 				String[] tokensInCurrentBaseLineDurationLine = baseLineDurationCurrentLine.split(",");
-				System.out.println("number of tokens in this baseLineDuration line=" + tokensInCurrentBaseLineDurationLine.length);
+				// System.out.println("number of tokens in this baseLineDuration line=" + tokensInCurrentBaseLineDurationLine.length);
+				consoleLogBuilder.append("baseLineDuration line num:" + (countOfLinesBaselineDuration + 1) + "#tokensInLine:"
+						+ tokensInCurrentBaseLineDurationLine.length + "\n");
+				
 				for (int i = 0; i < tokensInCurrentBaseLineDurationLine.length; i++)
 				{
 					currentLineArray.add(tokensInCurrentBaseLineDurationLine[i]);
@@ -134,7 +147,7 @@ public class Evaluation
 				arrayBaselineDuration.add(currentLineArray);
 				countOfLinesBaselineDuration++;
 			}
-			System.out.println("\n number of baseLineDuration lines =" + countOfLinesBaselineDuration);
+			consoleLogBuilder.append("\n number of baseLineDuration lines =" + countOfLinesBaselineDuration + "\n");
 			
 			int countOfLinesActual = 0;
 			while ((actualCurrentLine = brActual.readLine()) != null)
@@ -142,7 +155,10 @@ public class Evaluation
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println(actualCurrentLine);
 				String[] tokensInCurrentActualLine = actualCurrentLine.split(",");
-				System.out.println("number of token in this actual line=" + tokensInCurrentActualLine.length);
+				// System.out.println("number of token in this actual line=" + tokensInCurrentActualLine.length);
+				consoleLogBuilder
+						.append("actual line num:" + (countOfLinesActual + 1) + "#tokensInLine:" + tokensInCurrentActualLine.length + "\n");
+				
 				for (int i = 0; i < tokensInCurrentActualLine.length; i++)
 				{
 					currentLineArray.add(tokensInCurrentActualLine[i]);
@@ -150,9 +166,13 @@ public class Evaluation
 				arrayActual.add(currentLineArray);
 				countOfLinesActual++;
 			}
-			System.out.println("\n number of actual lines =" + countOfLinesTopK);
-			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
-					+ "   size of actual array=" + arrayActual.size());
+			
+			consoleLogBuilder.append("\n number of actual lines =" + countOfLinesTopK + "\n");
+			consoleLogBuilder.append("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
+					+ "   size of actual array=" + arrayActual.size() + "\n");
+			
+			System.out.println(consoleLogBuilder.toString());
+			consoleLogBuilder.setLength(0); // empty the consolelog stringbuilder
 			// //////////////////////////// finished creating and populating the data structures needed
 			
 			for (String timeCategory : timeCategories)
@@ -392,10 +412,12 @@ public class Evaluation
 		// BufferedReader brMeta = null, brTopK = null, brActual = null;
 		String commonPath = Constant.getCommonPath();
 		BufferedWriter bwTopKPrecision = null, bwTopKRecall = null, bwTopKF = null, bwNumberOfRecommendationTimes = null;
-		;
+		
 		int theK = theKOriginal;
 		try
 		{
+			StringBuilder consoleLogBuilder = new StringBuilder();
+			
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine;
 			/*
 			 * brMeta = new BufferedReader(new FileReader("/home/gunjan/meta.csv")); brTopK = new BufferedReader(new FileReader("/home/gunjan/dataRecommTop5.csv")); brActual = new
@@ -442,8 +464,8 @@ public class Evaluation
 			
 			// bwAccuracy = new BufferedWriter(new FileWriter(fileAccuracy.getAbsoluteFile()));
 			
-			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
-					+ "   size of actual array=" + arrayActual.size());
+			consoleLogBuilder.append("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
+					+ "   size of actual array=" + arrayActual.size() + "\n");
 			
 			bwNumberOfRecommendationTimes.write("," + timeCategory);
 			bwNumberOfRecommendationTimes.newLine();
@@ -478,9 +500,10 @@ public class Evaluation
 						
 						if (topKStrings.length - 1 < theK) // for this RT we are not able to make K recommendations as less than K recommendations are present.
 						{
-							System.err.println("Warning: For " + currentLineArray.get(j) + ", Only top " + (topKStrings.length - 1)
-									+ " recommendation present while the asked for K is " + theK + "\nDecreasing asked for K to "
-									+ (topKStrings.length - 1));
+							// System.err.println
+							consoleLogBuilder.append("Warning: For " + currentLineArray.get(j) + ", Only top " + (topKStrings.length - 1)
+									+ " recommendation present while the asked for K is " + theK + "\tDecreasing asked for K to "
+									+ (topKStrings.length - 1) + "\n");
 							// +"\nWriting -999 values");
 							theK = topKStrings.length - 1;
 							// $topKPrecisionVal=-9999;
@@ -492,8 +515,8 @@ public class Evaluation
 						// ${
 						if (Constant.verbose)
 						{
-							System.out.println("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j));
-							System.out.println("actual string =" + actual);
+							consoleLogBuilder.append("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j) + "\n");
+							consoleLogBuilder.append("actual string =" + actual + "\n");
 						}
 						int countOfOccurence = 0; // the number of times the actual item appears in the top K recommended list. NOTE: in the current case will be always be either 1
 													// or 0.
@@ -508,8 +531,9 @@ public class Evaluation
 						
 						if (countOfOccurence > 1)
 						{
-							System.err.println(
-									"Error: in writePrecisionRecallFMeasure(): the actual string appears multiple times in topK, which should not be the case as per our current algorithm.");
+							// System.err.println
+							consoleLogBuilder.append(
+									"Error: in writePrecisionRecallFMeasure(): the actual string appears multiple times in topK, which should not be the case as per our current algorithm.\n");
 						}
 						if (countOfOccurence > 0)
 						{
@@ -533,14 +557,15 @@ public class Evaluation
 						bwTopKRecall.write(topKRecallVal + ",");
 						bwTopKF.write(topKFVal + ",");
 						// bwAccuracy.write(accuracy+",");
-						if (Constant.verbose)
+						if (Constant.verboseEvaluationMetricsToConsole)
 						{
-							System.out.println("count-of-occurence-used=" + countOfOccurence + "         " + "k-used=" + theK
-									+ " k-Original=" + theKOriginal);// +
-																		// " / ="+round((double)countOfOccurence/theK,4));
+							consoleLogBuilder.append("count-of-occurence-used=" + countOfOccurence + "         " + "k-used=" + theK
+									+ " k-Original=" + theKOriginal + "\n");// +
+																			// " / ="+round((double)countOfOccurence/theK,4));
 							// $}
-							System.out.println("top-" + theKOriginal + "-precision=" + topKPrecisionVal + "    " + "top-" + theKOriginal
-									+ "-recall=" + topKRecallVal + "   top" + theKOriginal + "F=" + topKFVal + "   accuracy=" + accuracy);
+							consoleLogBuilder.append(
+									"top-" + theKOriginal + "-precision=" + topKPrecisionVal + "    " + "top-" + theKOriginal + "-recall="
+											+ topKRecallVal + "   top" + theKOriginal + "F=" + topKFVal + "   accuracy=" + accuracy + "\n");
 						}
 						
 					}
@@ -554,7 +579,7 @@ public class Evaluation
 				// bwAccuracy.write("\n");
 				
 			}
-			
+			System.out.println(consoleLogBuilder.toString());
 		}
 		catch (Exception e)
 		{
@@ -616,15 +641,20 @@ public class Evaluation
 			
 			for (int user = 0; user < numUsers; user++)
 			{
-				System.out.println("Calculating MRR for user:" + user);
+				
 				bw.write("User_" + user + ","); // TODO: currently this starts from User_0, change it to start from User_1 but this will also require necessary changes in other
 												// places
 				// bwValidRTCount.write("User_" + user + ",");
 				// for (int K = theKOriginal; K > 0; K--)
 				// {
 				BufferedReader br = new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
-				System.out.println(("reading for MRR: " + commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
 				String currentLine;
+				
+				if (Constant.verboseEvaluationMetricsToConsole)
+				{
+					System.out.println("Calculating MRR for user:" + user);
+					System.out.println(("reading for MRR: " + commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
+				}
 				
 				int lineNumber = 0;
 				while ((currentLine = br.readLine()) != null)
@@ -636,9 +666,9 @@ public class Evaluation
 						if (Constant.verboseEvaluationMetricsToConsole)
 						{
 							System.out.println(
-									"the current rrValues line read=" + currentLine + " trimmed length=" + currentLine.trim().length());
+									"current rrValues line read=" + currentLine + " trimmed length=" + currentLine.trim().length());
 						}
-						System.out.println("The number of rr values for user(" + user + ") = " + rrValuesForThisUser.length);
+						System.out.println("#rr values for user(" + user + ") = " + rrValuesForThisUser.length);
 						
 						// double[] pValuesForThisUserForThisK = new double[tokensInCurrentLine.length];
 						

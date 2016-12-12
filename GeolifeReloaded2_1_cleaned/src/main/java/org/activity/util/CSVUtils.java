@@ -9,7 +9,9 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.activity.io.WritingToFile;
@@ -29,15 +31,81 @@ public class CSVUtils
 	
 	public static void main(String[] args)
 	{
-		String processedCheckInFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/processedCheckIns.csv";
-		String noDupProcessedCheckinFileName =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/NoDuplicateprocessedCheckIns.csv";
-		String dupLinesCheckinFileName =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/DupLinesFromProcessedCheckins.csv";
+		// testSideConcat();
+		gowallaMain();
+	}
+	
+	public static void testSideConcat()
+	{
 		
-		// removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName, dupLinesCheckinFileName, 0);
-		removeDuplicationRowsUsingCuckoo(processedCheckInFileName, noDupProcessedCheckinFileName, dupLinesCheckinFileName);
-		// UsingCuckoo
+		ArrayList<String> fileNamesToConcat = new ArrayList<String>();
+		fileNamesToConcat.add("/home/gunjan/test/gunjan.csv");
+		fileNamesToConcat.add("/home/gunjan/test/manali.csv");
+		fileNamesToConcat.add("/home/gunjan/test/galadriel.csv");
+		
+		concatenateCSVFilesSideways(fileNamesToConcat, true, "/home/gunjan/test/concat.csv");
+		
+	}
+	
+	public static void gowallaMain()
+	{
+		String fileNameHeadString = "BO";// for baseline occurrence file, empty for algo file
+		// //curtain 1 start
+		// String processedCheckInFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/processedCheckIns.csv";
+		// String noDupProcessedCheckinFileName =
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/NoDuplicateprocessedCheckIns.csv";
+		// String dupLinesCheckinFileName =
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/DupLinesFromProcessedCheckins.csv";
+		//
+		// // removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName, dupLinesCheckinFileName, 0);
+		// removeDuplicationRowsUsingCuckoo(processedCheckInFileName, noDupProcessedCheckinFileName, dupLinesCheckinFileName);
+		// // UsingCuckoo
+		// //curtain 1 end
+		
+		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
+		
+		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+		
+		ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
+		ArrayList<String> listOfAllMUsWithMaxMRRFiles = new ArrayList<String>();
+		ArrayList<String> listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
+		ArrayList<String> listOfAllCountsForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
+		ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
+		ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
+		
+		for (int i = 0; i < s.length; i++)
+		{
+			String pathToRead = commonPathToRead + s[i] + "/CLUSTERING2/";
+			
+			listOfAllMRRFiles.add(pathToRead + fileNameHeadString + "AllMRR.csv");
+			listOfAllMUsWithMaxMRRFiles.add(pathToRead + fileNameHeadString + "MUsWithMaxMRR.csv");
+			listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles
+					.add(pathToRead + fileNameHeadString + "CountsForClusterLabelAccToMinMUHavMaxMRR.csv");
+			listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles
+					.add(pathToRead + fileNameHeadString + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+			listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles
+					.add(pathToRead + fileNameHeadString + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
+			listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles
+					.add(pathToRead + fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+		}
+		
+		concatenateCSVFilesSideways(listOfAllMRRFiles, true, pathToWrite + fileNameHeadString + "AllMRR.csv");
+		concatenateCSVFiles(listOfAllMUsWithMaxMRRFiles, true, pathToWrite + fileNameHeadString + "MUsWithMaxMRR.csv");
+		concatenateCSVFiles(listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles, true,
+				pathToWrite + fileNameHeadString + "CountsForClusterLabelAccToMinMUHavMaxMRR.csv");
+		concatenateCSVFiles(listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles, true,
+				pathToWrite + fileNameHeadString + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+		concatenateCSVFiles(listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles, true,
+				pathToWrite + fileNameHeadString + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
+		concatenateCSVFiles(listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles, true,
+				pathToWrite + fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+		
+		// concatenateCSVFiles(ArrayList<String>, boolean, String)
+	}
+	
+	public static void gowallaMainBaseline()
+	{
 	}
 	
 	/**
@@ -333,7 +401,7 @@ public class CSVUtils
 	 * @param hasColumnHeader
 	 *            to make sure columnHeadersAreNotRepeated
 	 */
-	public static void contactenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader, String absfileToWrite)
+	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader, String absfileToWrite)
 	{
 		int countOfFiles = 0, countOfTotalLines = 0;
 		try
@@ -369,6 +437,121 @@ public class CSVUtils
 		}
 		
 		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @param listOfAbsFileNames
+	 * @param hasColumnHeader
+	 *            to make sure columnHeadersAreNotRepeated
+	 */
+	public static void concatenateCSVFilesSideways(ArrayList<String> listOfAbsFileNames, boolean hasRowHeader, String absfileToWrite)
+	{
+		// read each file
+		// store all lines in a list, size of list = num of rows
+		// read new file. add string from corresponding lines
+		int countOfFiles = 0, countOfTotalLines = 0;
+		
+		// if (hasRowHeader)
+		// {
+		// PopUps.showException(new Exception("row header not allowed"),
+		// "org.activity.util.CSVUtils.concatenateCSVFilesSideways(ArrayList<String>, boolean, String)");
+		// }
+		LinkedHashMap<Integer, String> finalLines = new LinkedHashMap<Integer, String>();
+		try
+		{
+			for (String fileToRead : listOfAbsFileNames)
+			{
+				BufferedReader br = new BufferedReader(new FileReader(fileToRead));
+				
+				int lineIndex = 0;
+				String currentLine;
+				while ((currentLine = br.readLine()) != null)
+				{
+					String res = "";
+					
+					if (hasRowHeader)
+					{
+						String[] splitted = currentLine.split(",");
+						
+						StringBuilder trimmedCurrentLine = new StringBuilder();
+						for (int i = 1; i < splitted.length; i++)
+						{
+							trimmedCurrentLine.append(splitted[i] + ",");
+						}
+						currentLine = trimmedCurrentLine.toString();
+					}
+					
+					if (finalLines.containsKey(lineIndex))
+					{
+						String prev = finalLines.get(lineIndex);
+						res = prev + currentLine;
+					}
+					else
+					{
+						res = currentLine;
+					}
+					
+					finalLines.put(lineIndex, res);
+					lineIndex += 1;
+				}
+				br.close();
+			}
+			
+			BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
+			for (Entry<Integer, String> l : finalLines.entrySet())
+			{
+				bw.write(l.getValue().toString() + "\n");
+			}
+			bw.close();
+		}
+		// try
+		// {
+		// for (String fileToRead : listOfAbsFileNames)
+		// {
+		// countOfFiles += 1;
+		//
+		// List<CSVRecord> csvRecords = CSVUtils.getCSVRecords(fileToRead);
+		// int numOfRow = csvRecords.size();
+		//
+		// // System.out.println("read records from " + fileToRead + " are :");
+		//
+		// BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
+		// CSVPrinter printer = new CSVPrinter(bw, CSVFormat.DEFAULT);
+		//
+		// int countOfLines = 0;
+		// int maxNumOfColumns = 0;
+		//
+		// // find the max number of columns in this file
+		// for (CSVRecord r : csvRecords)
+		// {
+		// countOfLines += 1;
+		//
+		// if (r.size() > maxNumOfColumns)
+		// maxNumOfColumns = r.size();
+		//
+		// // if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first files
+		// // {
+		// // continue;
+		// // }
+		// // // System.out.println(r.toString());
+		// // printer.printRecord(r);
+		//
+		// }
+		// System.out.println(countOfLines + " lines read for this user" + " maxNumOfCoulumns = " + maxNumOfColumns);
+		// countOfTotalLines += countOfLines;
+		//
+		// printer.close();
+		// }
+		// }
+		
+		catch (
+		
+		Exception e)
 		{
 			e.printStackTrace();
 		}

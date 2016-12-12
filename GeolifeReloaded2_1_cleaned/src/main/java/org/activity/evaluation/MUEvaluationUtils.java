@@ -1,5 +1,7 @@
 package org.activity.evaluation;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -57,23 +59,53 @@ public class MUEvaluationUtils
 	
 	public static void main(String args[])
 	{
-		gowallaEvals();
+		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+		try
+		{
+			for (int i = 0; i < s.length; i++)
+			{
+				String pathToRead = commonPathToRead + s[i] + "/";
+				String clustersRangeSchemeTitle = "CLUSTERING2";
+				String pathToWrite = pathToRead + clustersRangeSchemeTitle;
+				Files.createDirectories(Paths.get(pathToWrite));
+				pathToWrite += "/";
+				
+				gowallaEvals(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2);
+				gowallaEvalsBaselineOccurrence(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
-	public static void gowallaEvals()
+	public static void gowallaEvals(String commonPathToRead, String rootPathToWriteResults, ClustersRangeScheme clusteringRangeScheme)
 	{
-		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable2MUButDWCompatibleRTS/";
-		String rootPathToWriteResults =
-				"//home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable2MUButDWCompatibleRTS//";
+		// String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
+		// String rootPathToWriteResults = commonPathToRead;//
+		// "//home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable2MUButDWCompatibleRTS//";
 		
-		// double[] mus = Constant.matchingUnitAsPastCount;
-		// for (double mu : mus)
-		// {
+		//////////////////////
+		WritingToFile.appendLineToFileAbsolute(
+				"commonPathToRead = " + commonPathToRead + "\n\n" + WekaUtilityBelt.getClustersRangeSchemeString(clusteringRangeScheme),
+				rootPathToWriteResults + "ClustersRangeSchemeUsed.txt");
 		
-		// String iterationMURootPath = iterationRootPath + "Iteration" + iter + "/";
+		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
+		// .. here the resultant cluster label for an iteration is the cluster label for minimal MU having max MRR
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(UtilityBelt.getUserIDComparator());
+		
+		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
+		// .. here the resultant cluster label for an iteration is the majority cluster label over all MUs having max MRR
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(UtilityBelt.getUserIDComparator());
+		
+		//////////////////////
 		
 		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "AllMRR.csv";
-		int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName);
+		int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName, "Algo");
 		
 		String MUsByDescendingMRRFileName = rootPathToWriteResults + "MUsByDescendingMRR.csv";
 		
@@ -96,10 +128,110 @@ public class MUEvaluationUtils
 			Double maxMRR = entryForUser.getValue().getSecond();
 			Double minMUHavingMaxMRR = Collections.min(MUsHavingMaxMRR);
 			
-			WritingToFile.appendLineToFileAbsolute(user + "," + MUsHavingMaxMRRAsString + "," + maxMRR + "," + minMUHavingMaxMRR + "\n",
-					MUsWithMaxMRRFileName);
+			////////////
+			String clusterLabelAccToMinMUHavMaxMRR = WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR, clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
+			
+			String clusterLabelAccToMajorityMUsHavMaxMRR = getClusterLabelForMajorityMUs(MUsHavingMaxMRR, clusteringRangeScheme);
+			////////////
+			
+			WritingToFile.appendLineToFileAbsolute(user + "," + MUsHavingMaxMRRAsString + "," + maxMRR + "," + minMUHavingMaxMRR + ","
+					+ clusterLabelAccToMinMUHavMaxMRR + "," + clusterLabelAccToMajorityMUsHavMaxMRR + "\n", MUsWithMaxMRRFileName);
+			
+			TreeMap<String, Integer> mapOfClusterCountsForThisUserMinMU, mapOfClusterCountsForThisUserMajMU;
+			
+			countsForClusterLabelAccToMinMUHavMaxMRR =
+					incrementCount(user, clusterLabelAccToMinMUHavMaxMRR, countsForClusterLabelAccToMinMUHavMaxMRR);
+			countsForClusterLabelAccToMajorityMUsHavMaxMRR =
+					incrementCount(user, clusterLabelAccToMajorityMUsHavMaxMRR, countsForClusterLabelAccToMajorityMUsHavMaxMRR);
 			
 		} // end of iteration over users. }
+		
+		////
+		writeCounts(countsForClusterLabelAccToMinMUHavMaxMRR, rootPathToWriteResults + "CountsForClusterLabelAccToMinMUHavMaxMRR.csv");
+		writeModeDistribution(countsForClusterLabelAccToMinMUHavMaxMRR,
+				rootPathToWriteResults + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
+		
+		writeCounts(countsForClusterLabelAccToMajorityMUsHavMaxMRR,
+				rootPathToWriteResults + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+		writeModeDistribution(countsForClusterLabelAccToMajorityMUsHavMaxMRR,
+				rootPathToWriteResults + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+	}
+	
+	public static void gowallaEvalsBaselineOccurrence(String commonPathToRead, String rootPathToWriteResults,
+			ClustersRangeScheme clusteringRangeScheme)
+	{
+		// String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
+		// String rootPathToWriteResults = commonPathToRead;//
+		// "//home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable2MUButDWCompatibleRTS//";
+		
+		//////////////////////
+		WritingToFile.appendLineToFileAbsolute(
+				"commonPathToRead = " + commonPathToRead + "\n\n" + WekaUtilityBelt.getClustersRangeSchemeString(clusteringRangeScheme),
+				rootPathToWriteResults + "ClustersRangeSchemeUsed.txt");
+		
+		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
+		// .. here the resultant cluster label for an iteration is the cluster label for minimal MU having max MRR
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(UtilityBelt.getUserIDComparator());
+		
+		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
+		// .. here the resultant cluster label for an iteration is the majority cluster label over all MUs having max MRR
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(UtilityBelt.getUserIDComparator());
+		
+		//////////////////////
+		
+		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "BOAllMRR.csv";
+		int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName, "BaselineOccurrence");
+		
+		String MUsByDescendingMRRFileName = rootPathToWriteResults + "BOMUsByDescendingMRR.csv";
+		
+		// (UserID, Pair( MUs having Max MRR, max MRR))
+		LinkedHashMap<String, Pair<List<Double>, Double>> usersMaxMUMRRMap =
+				WritingToFile.writeDescendingMRRs(mrrForAllUsersAllMUsFileName, MUsByDescendingMRRFileName, numOfUsers, true, true);
+		// (String absFileNameToRead, String absFileNameToWrite, int numberOfUsers, boolean hasRowHeader, boolean booleanHasColHeader)
+		
+		String MUsWithMaxMRRFileName = rootPathToWriteResults + "BOMUsWithMaxMRR.csv";
+		WritingToFile.appendLineToFileAbsolute(
+				"User, MUsWithMaxMRR,MaxMRR, MinMUHavingMaxMRR, ClusterLabelAccToMinMUHavMaxMRR,ClusterLabelAccToMajorityMUsHavMaxMRR\n",
+				MUsWithMaxMRRFileName);
+		
+		for (Entry<String, Pair<List<Double>, Double>> entryForUser : usersMaxMUMRRMap.entrySet()) // iterating over users
+		{
+			String user = entryForUser.getKey();
+			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
+			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString).collect(Collectors.joining("__"));
+			
+			Double maxMRR = entryForUser.getValue().getSecond();
+			Double minMUHavingMaxMRR = Collections.min(MUsHavingMaxMRR);
+			
+			////////////
+			String clusterLabelAccToMinMUHavMaxMRR = WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR, clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
+			
+			String clusterLabelAccToMajorityMUsHavMaxMRR = getClusterLabelForMajorityMUs(MUsHavingMaxMRR, clusteringRangeScheme);
+			////////////
+			
+			WritingToFile.appendLineToFileAbsolute(user + "," + MUsHavingMaxMRRAsString + "," + maxMRR + "," + minMUHavingMaxMRR + ","
+					+ clusterLabelAccToMinMUHavMaxMRR + "," + clusterLabelAccToMajorityMUsHavMaxMRR + "\n", MUsWithMaxMRRFileName);
+			
+			TreeMap<String, Integer> mapOfClusterCountsForThisUserMinMU, mapOfClusterCountsForThisUserMajMU;
+			
+			countsForClusterLabelAccToMinMUHavMaxMRR =
+					incrementCount(user, clusterLabelAccToMinMUHavMaxMRR, countsForClusterLabelAccToMinMUHavMaxMRR);
+			countsForClusterLabelAccToMajorityMUsHavMaxMRR =
+					incrementCount(user, clusterLabelAccToMajorityMUsHavMaxMRR, countsForClusterLabelAccToMajorityMUsHavMaxMRR);
+			
+		} // end of iteration over users. }
+		
+		////
+		writeCounts(countsForClusterLabelAccToMinMUHavMaxMRR, rootPathToWriteResults + "BOCountsForClusterLabelAccToMinMUHavMaxMRR.csv");
+		writeModeDistribution(countsForClusterLabelAccToMinMUHavMaxMRR,
+				rootPathToWriteResults + "BOModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
+		
+		writeCounts(countsForClusterLabelAccToMajorityMUsHavMaxMRR,
+				rootPathToWriteResults + "BOCountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+		writeModeDistribution(countsForClusterLabelAccToMajorityMUsHavMaxMRR,
+				rootPathToWriteResults + "BOModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
 	}
 	
 	/**
@@ -134,7 +266,7 @@ public class MUEvaluationUtils
 			String iterationMURootPath = iterationRootPath + "Iteration" + iter + "/";
 			
 			String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "Iteration" + iter + "AllMRR.csv";
-			int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName);
+			int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName, "Algo");
 			
 			String MUsByDescendingMRRFileName = rootPathToWriteResults + "Iteration" + iter + "MUsByDescendingMRR.csv";
 			// (UserID, Pair( MUs having Max MRR, max MRR))
@@ -202,7 +334,7 @@ public class MUEvaluationUtils
 		String iterationMURootPath = iterationRootPath;// + "Iteration" + iter + "/";
 		
 		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "AllMRR.csv";
-		int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName);
+		int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName, "Algo");
 		
 		String MUsByDescendingMRRFileName = rootPathToWriteResults + "MUsByDescendingMRR.csv";
 		
