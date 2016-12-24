@@ -51,7 +51,7 @@ public final class Constant
 	public static String rankScoring = "";// "sum";// default product"; // "sum"
 	public static String caseType = "";// CaseBasedV1";// default " CaseBasedV1 " or SimpleV3
 	
-	public static String howManyUsers = "UsersAbove10RTs";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
+	public static String howManyUsers = "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
 	static double currentMatchingUnit = -99; // stores the current matching unit at all times, used for some sanity
 												// checks
 	/**
@@ -676,6 +676,8 @@ public final class Constant
 			// break;
 			case "dcu_data_2":
 				return 3; // activity name, start time, duration
+			case "gowalla1":
+				return 2; // activity name, start time
 			// break;
 			default:
 				System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
@@ -690,7 +692,8 @@ public final class Constant
 	 */
 	public static String[] getFeatureNames()
 	{
-		if ((Constant.getDatabaseName().equals("geolife1") || Constant.getDatabaseName().equals("dcu_data_2")) == false)
+		if ((Constant.getDatabaseName().equals("geolife1") || Constant.getDatabaseName().equals("dcu_data_2")
+				|| Constant.getDatabaseName().equals("gowalla1")) == false)
 		{
 			PopUps.showError("Error in getFeaturesName: unreliable for databases other than geolife and dcu, current database name ="
 					+ Constant.getDatabaseName());

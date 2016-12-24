@@ -232,4 +232,20 @@ public class StringUtils
 		res = res.substring(0, res.length() - 1); // removing the last stray comma
 		return res;
 	}
+
+	/**
+	 * 
+	 * @param a
+	 * @param delim
+	 * @return
+	 */
+	public static String getArrayAsStringDelimited(int a[], String delim)
+	{
+		String s = new String();
+		for (int d : a)
+		{
+			s += d + delim;
+		}
+		return s;
+	}
 }

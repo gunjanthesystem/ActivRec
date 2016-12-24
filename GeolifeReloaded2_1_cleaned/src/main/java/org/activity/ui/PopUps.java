@@ -29,6 +29,7 @@ public class PopUps
 	}
 	
 	/**
+	 * Displays a popup pane with error message.
 	 * 
 	 * @param msg
 	 */
@@ -43,6 +44,7 @@ public class PopUps
 	 * Displays a popup pane with exception message
 	 * 
 	 * @param e
+	 *            exception
 	 * @param methodName
 	 */
 	public static void showException(Exception e, String methodName)
