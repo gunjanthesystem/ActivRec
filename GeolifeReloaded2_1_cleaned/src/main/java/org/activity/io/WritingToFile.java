@@ -359,6 +359,37 @@ public class WritingToFile
 	}
 	
 	/**
+	 * Returns a BufferedWriter for the file (with append as true). Alert:If the file exists, the old file is deleted and new file is created.
+	 * 
+	 * @param fullAbsolutePath
+	 *            absolute path for the file
+	 * @param bufsize
+	 *            size of bufferwriter
+	 * @return BufferedWriter for given file
+	 */
+	public static BufferedWriter getBufferedWriterForNewFile(String fullPath, int bufsize)
+	{
+		BufferedWriter bw = null;
+		// System.out.println("fullpath =" + fullPath);
+		try
+		{
+			File file = new File(fullPath);
+			file.delete();
+			file.createNewFile();
+			
+			FileWriter writer = new FileWriter(file.getAbsoluteFile(), true);
+			bw = new BufferedWriter(writer, bufsize);
+		}
+		
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-90);
+		}
+		return bw;
+	}
+	
+	/**
 	 * Returns a BufferedWriter for the file (with append as true). Alert:If the file exists, the old file is kept and new values are appended at the end.
 	 * 
 	 * @param fullAbsolutePath

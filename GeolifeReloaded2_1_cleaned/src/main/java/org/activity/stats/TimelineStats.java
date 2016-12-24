@@ -100,6 +100,25 @@ public class TimelineStats
 				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth() + typeOfAnalysis + "_"
 				+ Constant.howManyUsers;
 		
+		//////////////////////////////
+		int[] userIDs = Constant.getUserIDs();
+		
+		// if userid is not set in constant class, in case of gowalla
+		if (userIDs == null || userIDs.length == 0)
+		{
+			userIDs = new int[usersDayTimelinesAll.size()];// System.out.println("usersTimelines.size() = " + usersTimelines.size());
+			System.out.println("UserIDs not set, hence extracting user ids from usersTimelines keyset");
+			int count = 0;
+			for (String userS : usersDayTimelinesAll.keySet())
+			{
+				userIDs[count++] = Integer.valueOf(userS);
+			}
+			Constant.setUserIDs(userIDs);
+		}
+		System.out.println("User ids = " + Arrays.toString(userIDs));
+		
+		////////////////////////////
+		
 		if (typeOfAnalysis.equals("Clustering"))
 		{
 			directoryToWrite += numOfClusters;
@@ -2770,16 +2789,18 @@ public class TimelineStats
 		StringBuffer s = new StringBuffer();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append(
-				"User, User, MeanNumOfDistinctActsPerDay, MedianNumOfDistinctActsPerDay, IQRNumOfDistinctActsPerDay, MaxNumOfDistinctActsPerDay, MinNumOfDistinctActsPerDay");
+				"User, User, MeanNumOfDistinctActsPerDay, MedianNumOfDistinctActsPerDay, IQRNumOfDistinctActsPerDay, MaxNumOfDistinctActsPerDay, MinNumOfDistinctActsPerDay,SumNumOfDistinctActsPerDay,TotalNumOfDistinctActsOverAllTimelines");
 		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
 		{
 			double avgNumOfDistinctActsPerDay = 0;
-			
+			// long totalNumOfDistinctActsOverAllTimelines = 0;
 			ArrayList<Double> numOfDistinctActsPerDay = new ArrayList<Double>();// size= num of days
 			double[] numOfDistinctActsPerDayArray;
+			ArrayList<ActivityObject> allActObjs = new ArrayList<ActivityObject>();
 			
 			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
 			{
+				allActObjs.addAll(entryDay.getValue().getActivityObjectsInDay());
 				numOfDistinctActsPerDay.add((double) entryDay.getValue().countNumberOfValidDistinctActivities());
 			}
 			
@@ -2788,7 +2809,7 @@ public class TimelineStats
 			
 			s.append("\n" + entry.getKey() + "," + (Constant.getIndexOfUserID(Integer.valueOf(entry.getKey())) + 1) + "," + ds.getMean()
 					+ "," + (ds.getPercentile(50)) + "," + (ds.getPercentile(75) - ds.getPercentile(25)) + "," + ds.getMax() + ","
-					+ ds.getMin());
+					+ ds.getMin() + "," + ds.getSum() + "," + TimelineUtils.countNumberOfDistinctActivities(allActObjs));
 		}
 		
 		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
@@ -2858,16 +2879,18 @@ public class TimelineStats
 		StringBuffer s = new StringBuffer();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append(
-				"User, User, MeanNumOfTotalActsPerDay, MedianNumOfTotalActsPerDay, IQRNumOfTotalActsPerDay, MaxNumOfTotalActsPerDay, MinNumOfTotalActsPerDay");
+				"User, User, MeanNumOfTotalActsPerDay, MedianNumOfTotalActsPerDay, IQRNumOfTotalActsPerDay, MaxNumOfTotalActsPerDay, MinNumOfTotalActsPerDay,SumNumOfTotalActsPerDay,TotalNumOfActsOverAllTimelines");
 		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
 		{
 			double avgNumOfTotalActsPerDay = 0;
+			long totalNumOfActsOverAllTimelines = 0;
 			
 			ArrayList<Double> numOfTotalActsPerDay = new ArrayList<Double>();// size= num of days
 			double[] numOfTotalActsPerDayArray;
 			
 			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
 			{
+				totalNumOfActsOverAllTimelines += entryDay.getValue().countNumberOfValidActivities();
 				numOfTotalActsPerDay.add((double) entryDay.getValue().countNumberOfValidActivities());
 			}
 			numOfTotalActsPerDayArray = UtilityBelt.toPrimitive(numOfTotalActsPerDay);
@@ -2875,11 +2898,13 @@ public class TimelineStats
 			
 			s.append("\n" + entry.getKey() + "," + (Constant.getIndexOfUserID(Integer.valueOf(entry.getKey())) + 1) + "," + ds.getMean()
 					+ "," + (ds.getPercentile(50)) + "," + (ds.getPercentile(75) - ds.getPercentile(25)) + "," + ds.getMax() + ","
-					+ ds.getMin());
+					+ ds.getMin() + "," + ds.getSum() + "," + totalNumOfActsOverAllTimelines);
 		}
 		
 		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
+	
+	//
 	
 	public static void writeAllNumOfTotalActsPerDayInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)

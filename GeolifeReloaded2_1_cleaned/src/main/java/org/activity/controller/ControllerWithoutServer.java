@@ -5,11 +5,9 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-import org.activity.evaluation.RecommendationTestsMasterMU2;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -24,6 +22,7 @@ import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
+import org.activity.weather.GowallaWeatherPreprocessing;
 
 /**
  * This class is used for recommending without the web interface (no web server) Note: to run these experiments proper parameters must be set in class org.activity.util.Constant
@@ -34,12 +33,8 @@ import org.activity.util.UtilityBelt;
 public class ControllerWithoutServer
 {
 	// **** Parameters to set **** DO NOT CHANGE ****//
-	// static final boolean toSerializeJSONArray = true, toDeSerializeJSONArray = true, toCreateTimelines = true,
-	// toSerializeTimelines =
-	// true,
-	// toDeSerializeTimelines = true;
+	// static final boolean toSerializeJSONArray = true, toDeSerializeJSONArray = true, toCreateTimelines = true, toSerializeTimelines = true, toDeSerializeTimelines = true;
 	
-	// public static void main(String[] args)
 	public ControllerWithoutServer()
 	{
 		try
@@ -104,13 +99,9 @@ public class ControllerWithoutServer
 									+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + "obj";
 					
 					pathToLatestSerialisedTimelines =
-							"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap"; // "/run/media/gunjan/OS/Users/gunjan/Documents/DCU
-																																		// Data
-																																		// Works/WorkingSet7July/DCUUserTimelinesJUN15.lmap";//
-																																		// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU
-																																		// Data
-																																		// Works/WorkingSet7July/DCUUserTimelinesMAY7.lmap";//
-																																		// DCUUserTimelinesOct29.lmap";
+							"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
+					// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN15.lmap";
+					// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesMAY7.lmap"; DCUUserTimelinesOct29.lmap";
 					pathForLatestSerialisedTimelines =
 							"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
 									+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + ".lmap";
@@ -147,12 +138,11 @@ public class ControllerWithoutServer
 				if (Constant.getDatabaseName().equals("geolife1"))
 				{
 					whereQueryString = "where " + /*
-													 * "activity_fact_table.User_ID in ( 62, 84, 52, 68, 167, 179, 153, 85, 128, 10 ) && " +
+													 * * "activity_fact_table.User_ID in ( 62, 84, 52, 68, 167, 179, 153, 85, 128, 10 ) && " +
 													 */"activity_dimension_table.Activity_Name!='" + Constant.INVALID_ACTIVITY1
 							+ "' && activity_dimension_table.Activity_Name!='" + Constant.INVALID_ACTIVITY2 + "'";// for faster
 				} // "";// "where activity_dimension_table.Activity_Name!='" + Constant.INVALID_ACTIVITY1 +
-					// "' && activity_dimension_table.Activity_Name!='" +
-					// Constant.INVALID_ACTIVITY2 + "'";
+					// "' && activity_dimension_table.Activity_Name!='" + Constant.INVALID_ACTIVITY2 + "'";
 				
 				SerializableJSONArray jsonArray = new SerializableJSONArray(
 						ConnectDatabase.getJSONArrayOfDataTable(selectedAttributes, whereQueryString, orderByString));
@@ -331,12 +321,20 @@ public class ControllerWithoutServer
 			
 			// int countOfSampleUsers = 0;
 			// $$$
-			Constant.outputCoreResultsPath =
-					"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+			// Constant.outputCoreResultsPath =
+			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 			
 			String s[] = { "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 			
 			System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
+			
+			// $$TimelineStats.timelineStatsController(usersCleanedDayTimelines);
+			// $$TimelineWEKAClusteringController clustering = new TimelineWEKAClusteringController(usersCleanedDayTimelines, null);
+			
+			// start of for gowalla weather data generation
+			GowallaWeatherPreprocessing.GowallaWeatherPreprocessingController(usersCleanedDayTimelines, Constant.outputCoreResultsPath);
+			// end of for gowalla weather data generation
+			
 			// for (int i = 0; i < s.length; i++)
 			// {
 			// int startUserIndex = Integer.valueOf(s[i]) - 1;// 100
@@ -345,35 +343,37 @@ public class ControllerWithoutServer
 			// int countOfSampleUsers = 0;
 			// System.out.println("startUserIndex=" + startUserIndex + " endUserIndex" + endUserIndex);
 			// }
-			for (int i = 8; i < s.length; i++)
-			{
-				int startUserIndex = Integer.valueOf(s[i]) - 1;// 100
-				int endUserIndex = startUserIndex + 140; // 199
-				Constant.outputCoreResultsPath = Constant.outputCoreResultsPath + s[i] + "/";
-				int indexOfSampleUsers = 0;
-				/// sample users
-				LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> sampledUsers = new LinkedHashMap<>();
-				
-				for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
-				{
-					// countOfSampleUsers += 1;
-					if (indexOfSampleUsers < startUserIndex)
-					{
-						indexOfSampleUsers += 1;
-						continue;
-					}
-					if (indexOfSampleUsers > endUserIndex)
-					{
-						indexOfSampleUsers += 1;
-						break;
-					}
-					sampledUsers.put(userEntry.getKey(), userEntry.getValue());
-					System.out.println("putting in user= " + userEntry.getKey());
-					indexOfSampleUsers += 1;
-				}
-				RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
-			}
 			
+			// //important curtain 1 start
+			// for (int i = 0; i < s.length; i++)
+			// {
+			// int startUserIndex = Integer.valueOf(s[i]) - 1;// 100
+			// int endUserIndex = startUserIndex + 199;// 140; // 199
+			// Constant.outputCoreResultsPath = Constant.outputCoreResultsPath + s[i] + "/";
+			// int indexOfSampleUsers = 0;
+			// /// sample users
+			// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> sampledUsers = new LinkedHashMap<>();
+			//
+			// for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			// {
+			// // countOfSampleUsers += 1;
+			// if (indexOfSampleUsers < startUserIndex)
+			// {
+			// indexOfSampleUsers += 1;
+			// continue;
+			// }
+			// if (indexOfSampleUsers > endUserIndex)
+			// {
+			// indexOfSampleUsers += 1;
+			// break;
+			// }
+			// sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+			// System.out.println("putting in user= " + userEntry.getKey());
+			// indexOfSampleUsers += 1;
+			// }
+			// RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+			// }
+			// //important curtain 1 end
 			// $$$
 			// String, LinkedHashMap<Date, UserDayTimeline>
 			//////////// for Gowalla end
@@ -552,6 +552,7 @@ public class ControllerWithoutServer
 			
 			/** CURRENT **/
 			// $$ TimelineWEKAClusteringController clustering = new TimelineWEKAClusteringController(usersCleanedRearrangedDayTimelines, null);
+			
 			/** END OF CURRENT **/
 			
 			/** CURRENT **/

@@ -20,6 +20,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.math3.stat.StatUtils;
 
 import com.github.mgunlogson.cuckoofilter4j.CuckooFilter;
 import com.google.common.hash.Funnels;
@@ -1101,5 +1102,102 @@ public class CSVUtils
 		}
 		System.out.println("time taken = " + (t2 - t1) / 1000 + " secs ");
 		System.out.println("Exiting removeDuplicationRows");
+	}
+
+	/**
+	 * Write the max cell value over the csv files reads
+	 * 
+	 * @param absCSVFileNamesToRead
+	 * @param absFileNameToWrite
+	 * @param beginRow
+	 *            start from 1
+	 * @param endRow
+	 * @param beginCol
+	 *            start from 1
+	 * @param endCol
+	 */
+	public static void writeMaxCellOverCSVFiles(String[] absCSVFileNamesToRead, String absFileNameToWrite, int beginRow, int endRow,
+			int beginCol, int endCol, String fileToReadForNullifyingZeros)
+	{
+		int numOfFiles = absCSVFileNamesToRead.length;
+		BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absFileNameToWrite);
+		BufferedWriter bwMU =
+				WritingToFile.getBufferedWriterForNewFile(absFileNameToWrite.substring(0, absFileNameToWrite.length() - 4) + "MU.csv");// stores the value of max mu
+		try
+		{
+			for (int row = beginRow; row <= endRow; row++)
+			{
+				for (int col = beginCol; col <= endCol; col++)
+				{
+					double valuesForThisCellPosition[] = new double[numOfFiles];
+					int fileReadCounter = 0;
+					for (String fileToRead : absCSVFileNamesToRead)
+					{
+						String val = getCellValueFromCSVFile(row, col, fileToRead);
+						
+						if (val.length() == 0 || val == null)
+						{
+							valuesForThisCellPosition[fileReadCounter] = -999;
+						}
+						else
+						{
+							valuesForThisCellPosition[fileReadCounter] = Double.valueOf(val);
+						}
+						System.out.println("reading file: " + fileToRead + " value at (" + row + "," + col + ") = "
+								+ valuesForThisCellPosition[fileReadCounter]);
+						fileReadCounter++;
+					}
+					
+					double maxOfCellsAtThisPosition = StatUtils.max(valuesForThisCellPosition);
+					String maxOfCellsAtThisPositionString = String.valueOf(maxOfCellsAtThisPosition);
+					
+					if (maxOfCellsAtThisPosition == 0)
+					{ // check if there were no RTs
+						// int numOfRTs = 0;
+						
+						String whetherThisCellPosIsValid = getCellValueFromCSVFile(row, col, fileToReadForNullifyingZeros);
+						
+						// numOfRTs = Integer.valueOf(ReadingFromFile.getCellValueFromCSVFile(row, col, fileToReadForNullifyingZeros));
+						
+						if (whetherThisCellPosIsValid.equals("0") || whetherThisCellPosIsValid.equals("")
+								|| whetherThisCellPosIsValid == null)// (numOfRTs == 0)
+						{
+							maxOfCellsAtThisPositionString = "NA";
+						}
+					}
+					
+					bw.write(maxOfCellsAtThisPositionString);
+					// bwMU.write(Arrays.toString(UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition)));
+					
+					// bwMU.write(Arrays.toString(UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition)));
+					// String.join("_", UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition));
+					if (maxOfCellsAtThisPositionString.equals("NA"))// (maxOfCellsAtThisPosition == 0)
+					{
+						bwMU.write("NA");
+					}
+					else
+						bwMU.write(StringUtils.getArrayAsStringDelimited(UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition), "_"));
+					if (col != endCol)
+					{
+						bw.write(",");
+						bwMU.write(",");
+					}
+					else
+					{
+						bw.newLine();
+						bwMU.newLine();
+					}
+				}
+			}
+			bw.close();
+			bwMU.close();
+		}
+		catch (Exception e)
+		{
+			PopUps.showException(e, "writeMaxCellOverCSVFiles");
+			e.printStackTrace();
+		}
+		
+		// BufferedReader brRR = new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
 	}
 }

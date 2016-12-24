@@ -1,16 +1,20 @@
 package org.activity.weather;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -19,6 +23,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
+import org.activity.objects.ActivityObject;
+import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
 import org.activity.util.CSVUtils;
 import org.activity.util.DateTimeUtils;
@@ -32,20 +38,30 @@ import org.activity.util.UtilityBelt;
  */
 public class GowallaWeatherPreprocessing
 {
-	static final String commonPath = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug30/";
-	static String checkinFileNameToRead = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnly.csv";/// gw2CheckinsSpots1Slim1TargetUsersDatesOnly.csv";
+	static final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/";
+	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug30/";
+	static String checkinFileNameToRead = "";
+	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnly.csv";/// gw2CheckinsSpots1Slim1TargetUsersDatesOnly.csv";
 	// static String newline = null;
 	// String checkinFileNameToWrite =
 	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnlyWithLevels.csv";
-	static String fileContainingAPIKeys = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug23/ListOfAPIKeys.txt";
+	static String fileContainingAPIKeys = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/ListOfAPIKeys.txt";
+	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug23/ListOfAPIKeys.txt";
 	static long startIndexToRead = 0;
 	static final String startIndexToReadFileName = commonPath + "startIndexToRead.csv";
 	static String newline = "\n";// = System.lineSeparator();
 	
 	static long httpRequestCount = 0;
-	static final long httpRequestCountLimit = 24;
+	static final long httpRequestCountLimit = 45000;
 	static final int decimalPlacesToKeepForLatLon = 3;
 	static LocalDateTime currentDateTime;
+	
+	public static void GowallaWeatherPreprocessingController(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelines, String commonPathToWrite)
+	{
+		writeLatLongRoundedDateSetFromTimelines(usersCleanedDayTimelines, commonPathToWrite + "LatLongRoundedDateSet.txt",
+				decimalPlacesToKeepForLatLon, false);
+	}
 	
 	public static void main(String args[])
 	{
@@ -59,7 +75,9 @@ public class GowallaWeatherPreprocessing
 			
 			newline = System.lineSeparator();
 			
-			updateStartIndexToReadFile(0);
+			// to be set only once.
+			// $$updateStartIndexToReadFile(0);
+			
 			// WritingToFile.writeToNewFile("0" + newline, startIndexToReadFileName);
 			// .writeToFile(map, fullPath);
 			
@@ -100,18 +118,19 @@ public class GowallaWeatherPreprocessing
 			// $$ End of commenting useful code 3
 			
 			// // $$ Start of commenting useful code 2
-			// List<String> APIKeys = ReadingFromFile.oneColumnReaderString(fileContainingAPIKeys, ",", 0, false);
-			// System.out.println("Num of API Keys = " + APIKeys);
+			List<String> APIKeys = ReadingFromFile.oneColumnReaderString(fileContainingAPIKeys, ",", 0, false);
+			System.out.println("Num of API Keys = " + APIKeys);
 			//
-			// String fetchedWeatherFileName = commonPath + " fetchedWeatherData" + currentDateTime.getMonth().toString().substring(0, 3)
-			// + currentDateTime.getDayOfMonth() + ".json";
-			// String inputLatLonTSDataFileName = commonPath + "latLonTSSet.csv";
+			String fetchedWeatherFileName = commonPath + " fetchedWeatherData" + currentDateTime.getMonth().toString().substring(0, 3)
+					+ currentDateTime.getDayOfMonth() + ".json";
+			
+			String inputLatLonTSDataFileName = commonPath + "LatLongRoundedDateSet.txt";// "latLonTSSet.csv";
 			//
 			// // fetchWeatherData(inputLatLonTSDataFileName, APIKeys, fetchedWeatherFileName);
 			//
-			// List<String> inputLatLonTSData = Files.lines(Paths.get(inputLatLonTSDataFileName)).collect(Collectors.toList());
+			List<String> inputLatLonTSData = Files.lines(Paths.get(inputLatLonTSDataFileName)).collect(Collectors.toList());
 			//
-			// // $$fetchWeatherData(inputLatLonTSData, APIKeys, fetchedWeatherFileName, startIndexToReadFileName);
+			fetchWeatherData(inputLatLonTSData, APIKeys, fetchedWeatherFileName, startIndexToReadFileName);
 			//
 			// // data.stream().limit(10).forEach(e -> System.out.println(e.toString()));
 			// // APIKeys.stream().forEach(APIKey -> System.out.println("API Key = " + APIKey));
@@ -119,7 +138,7 @@ public class GowallaWeatherPreprocessing
 			// // fetchWeatherData(commonPath + "latLonTSSet.csv", "cab767fc679c753b9db70fcbc020462c", commonPath + "fetchedWeatherData.json");
 			// // $$ End of commenting useful code 2
 			
-			checkWeatherUpdateConcern1();
+			// $$checkWeatherUpdateConcern1();
 			// consoleLogStream.close();
 			
 			PopUps.showMessage("httpRequestCount = " + httpRequestCount);
@@ -183,14 +202,11 @@ public class GowallaWeatherPreprocessing
 	public static void fetchWeatherData(List<String> latLonTSInputData, List<String> APIKeys, String absolutePathForResult,
 			String startIndexToReadFileName)
 	{
-		
 		String baseString = "https://api.forecast.io/forecast/";// + APIKey + "/";
 		String optionsString = "?units=si";
 		String apiRequestString = new String();
 		final String newline = System.lineSeparator();
-		
 		String latLonTSInput;
-		
 		int countOfLinesRead = 0;
 		
 		try
@@ -199,9 +215,11 @@ public class GowallaWeatherPreprocessing
 			{
 				int startIndexToReadNext = Integer.valueOf(CSVUtils.getCellValueFromCSVFile(1, 1, startIndexToReadFileName));
 				// PopUps.showMessage("Start index to read " + startIndexToReadNext);
-				
+				System.out.println("Start index to read " + startIndexToReadNext);
 				// String allResult = new String();
 				
+				StringBuilder toWrite = new StringBuilder();
+				int countOfLinesToWrite = 0;
 				while (startIndexToReadNext < latLonTSInputData.size())
 				{
 					latLonTSInput = latLonTSInputData.get(startIndexToReadNext);
@@ -214,33 +232,42 @@ public class GowallaWeatherPreprocessing
 					
 					if (obtainedResultString.length() < 1)// should detect if the rate limit has exceeded, right now not sure of rate limit exceeded msg
 					{
-						PopUps.showMessage("Rate limit exceeded, breaking");
+						// PopUps.showMessage("Rate limit exceeded, breaking");
+						System.out.println("Rate limit exceeded, breaking");
+						// updateStartIndexToReadFile(startIndexToReadNext);
 						httpRequestCount = 0;// resetting httpRequest count for next API Key
 						// startIndexToReadNext += 1;
+						
+						// write whatever is in buffer
+						WritingToFile.appendLineToFileAbsolute(toWrite.toString(), absolutePathForResult);
+						toWrite.setLength(0);
+						
 						break;
 					}
 					
 					String keyToIdentify = String.valueOf(startIndexToReadNext + 1);
-					
 					String resultToWrite = "{\"IN\":" + keyToIdentify + ", \"FW\":" + obtainedResultString + "}" + newline;
 					// allResult = resultToWrite;// countOfLinesRead + "-" + latLonTSInput + "," + obtainedResultString);// index-LatLonTS,{jsonResult}
+					countOfLinesToWrite += 1;
 					startIndexToReadNext += 1;
 					
-					WritingToFile.appendLineToFileAbsolute(resultToWrite, absolutePathForResult);
+					toWrite.append(resultToWrite);
 					
+					if (countOfLinesToWrite % 15 == 0)
+					{
+						WritingToFile.appendLineToFileAbsolute(toWrite.toString(), absolutePathForResult);
+						toWrite.setLength(0);
+					}
 				}
-				
 				updateStartIndexToReadFile(startIndexToReadNext);
 				// WritingToFile.appendLineToFileAbsolute(allResult.toString(), absolutePathForResult);
 			}
-			
 		}
 		
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
 	}
 	
 	//
@@ -624,6 +651,84 @@ public class GowallaWeatherPreprocessing
 	}
 	
 	/**
+	 * Write "rounded lat,rounded long,date" set extracted from the given timelines
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * 
+	 */
+	public static void writeLatLongRoundedDateSetFromTimelines(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelines, String fileNameToWrite,
+			int numOfDecimalPlacesToKeep, boolean dateOrTimestamp)
+	{
+		LinkedHashSet<String> latLongDate = new LinkedHashSet<String>();
+		LinkedHashMap<String, Integer> userNumOfActs = new LinkedHashMap<String, Integer>();
+		
+		int numOfUsers = 0, numOfActivityObjectsOverAllUsers = 0;
+		
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				numOfUsers += 1;
+				int numOfActivityObjectForThisUser = 0;
+				
+				for (Entry<Date, UserDayTimeline> dateEntryForThisUser : userEntry.getValue().entrySet())
+				{
+					Date date = dateEntryForThisUser.getKey();
+					UserDayTimeline timeline = dateEntryForThisUser.getValue();
+					
+					for (ActivityObject aos : timeline.getActivityObjectsInDay())
+					{
+						numOfActivityObjectsOverAllUsers += 1;
+						numOfActivityObjectForThisUser += 1;
+						
+						String lat = UtilityBelt.round(aos.getStartLatitude(), numOfDecimalPlacesToKeep);
+						String lon = UtilityBelt.round(aos.getStartLongitude(), numOfDecimalPlacesToKeep);
+						
+						if (dateOrTimestamp == true)
+						{
+							latLongDate.add(lat + "," + lon + "," + date);
+						}
+						else
+						{
+							java.util.Date utilDate = new java.util.Date(date.getTime());
+							long epochSeconds = utilDate.toInstant().getEpochSecond();
+							long toUseEpochSeconds = epochSeconds + 7 * 60 * 60; // 7 am on that day
+							latLongDate.add(lat + "," + lon + "," + toUseEpochSeconds);
+						}
+					}
+				}
+			}
+			
+			System.out.println("size of latLongDate = " + latLongDate.size());
+			System.out.println("num of aos over all users = " + numOfActivityObjectsOverAllUsers);
+			
+			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileNameToWrite);
+			
+			// StringBuilder sb = new StringBuilder();
+			for (String st : latLongDate)
+			{
+				bw.append(st + "\n");
+			}
+			bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static LinkedHashSet<String> getLatLongRoundedDateSetFromTimelines()
+	{
+		return null;
+		
+	}
+	
+	/**
 	 * Return set of unique "lat||lon||tsInJavaEpochSecs" in the checkins
 	 * 
 	 * @param fileNameToRead
@@ -656,8 +761,8 @@ public class GowallaWeatherPreprocessing
 				// Instant instant = Instant.parse(timestampString);
 				// Timestamp ts = Timestamp.from(instant);
 				String date = splittedLine[4].replaceAll("\"", "");
-				;// ts.toLocalDateTime().toLocalDate().toString();
-					// long epochSeconds = instant.getEpochSecond();
+				// ts.toLocalDateTime().toLocalDate().toString();
+				// long epochSeconds = instant.getEpochSecond();
 				
 				String lat = UtilityBelt.round(splittedLine[5], numOfDecimalPlacesToKeep);
 				String lon = UtilityBelt.round(splittedLine[6], numOfDecimalPlacesToKeep);

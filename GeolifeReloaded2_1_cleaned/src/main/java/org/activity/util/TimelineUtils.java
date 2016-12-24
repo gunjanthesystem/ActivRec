@@ -31,6 +31,20 @@ import org.json.JSONArray;
 public class TimelineUtils
 {
 	
+	/**
+	 * Num of activities with distinct activity names
+	 * 
+	 * @return
+	 */
+	public static int countNumberOfDistinctActivities(ArrayList<ActivityObject> ActivityObjects)
+	{
+		HashSet<String> set = new HashSet<String>();
+		for (int i = 0; i < ActivityObjects.size(); i++)
+		{
+			set.add(ActivityObjects.get(i).getActivityName().trim());
+		}
+		return set.size();
+	}
 	// public TimelineUtilities()
 	// {
 	//

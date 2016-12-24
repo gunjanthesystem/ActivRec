@@ -131,7 +131,8 @@ public class TimelineWEKAClusteringController
 		// NOTE: ground truth labels are used to determine the clustering used. (in TimelineWEKAClusteringController.classToExpectedOptimalMU(String,
 		// String))
 		ArrayList<Pair<String, String>> groundTruthFileNames = new ArrayList<Pair<String, String>>();
-		groundTruthFileNames.add(groundTruth1_1);
+		groundTruthFileNames.add(new Pair("Clustering1MUTil18Min",
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Clustering1Analysis/CountsForClusterLabelAccToMinMUHavMaxMRR.csv"));// groundTruth1_1);
 		// groundTruthFileNames.add(groundTruth2);
 		// groundTruthFileNames.add(groundTruth3);
 		// groundTruthFileNames.add(groundTruth4);
@@ -152,6 +153,25 @@ public class TimelineWEKAClusteringController
 		String nameOfFeatureFile = "";
 		String typeOfDataMining = "Classification";// "KMeans";// EMClustering KMeans
 		
+		//////////////////////////////
+		int[] userIDs = Constant.getUserIDs();
+		
+		// if userid is not set in constant class, in case of gowalla
+		if (userIDs == null || userIDs.length == 0)
+		{
+			userIDs = new int[usersDayTimelinesAll.size()];// System.out.println("usersTimelines.size() = " + usersTimelines.size());
+			System.out.println("UserIDs not set, hence extracting user ids from usersTimelines keyset");
+			int count = 0;
+			for (String userS : usersDayTimelinesAll.keySet())
+			{
+				userIDs[count++] = Integer.valueOf(userS);
+			}
+			Constant.setUserIDs(userIDs);
+		}
+		System.out.println("User ids = " + Arrays.toString(userIDs));
+		
+		////////////////////////////
+		
 		try
 		{
 			// PopUps.showMessage("Num of user timelnes recieved in weka clustering = " + usersDayTimelinesAll.size());
@@ -162,7 +182,8 @@ public class TimelineWEKAClusteringController
 				String groundTruthLabel = gtEntry.getFirst();
 				String groundTruthFileName = gtEntry.getSecond();
 				
-				String directoryToWrite = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/"// TimelinesClustering/"
+				String directoryToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/WekaCLustering/"// "/run/media/gunjan/HOME/gunjan/Geolife Data
+																																// Works/stats/wekaResults/"// TimelinesClustering/"
 						+ Constant.getDatabaseName() + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
 						+ LocalDateTime.now().getDayOfMonth() + "_" + Constant.howManyUsers + "_" + groundTruthLabel;
 				new File(directoryToWrite).mkdir();

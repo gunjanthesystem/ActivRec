@@ -31,7 +31,9 @@ public class Evaluation
 		commonPath = Constant.getCommonPath();
 		System.out.println("Inside Evaluation: common path is:" + commonPath);
 		
-		BufferedReader brMeta = null, brTopK = null, brActual = null, brBaseLineOccurrence = null, brBaseLineDuration = null;
+		BufferedReader brMeta = null, brTopK = null, brActual = null, brBaseLineOccurrence = null, brBaseLineDuration = null,
+				brCurrentTargetSame = null;
+		
 		// ArrayList<ArrayList<String>> arrayMeta, arrayTopK, arrayActual, arrayBaselineOccurrence, arrayBaselineDuration;
 		/**
 		 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation times and a cell contains the meta information
@@ -48,6 +50,9 @@ public class Evaluation
 		 * Name) for the corresponding user for corresponding recommendation time
 		 */
 		ArrayList<ArrayList<String>> arrayActual = new ArrayList<ArrayList<String>>();
+		
+		ArrayList<ArrayList<Boolean>> arrayCurrentTargetSame = new ArrayList<ArrayList<Boolean>>();
+		
 		/**
 		 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation times and a cell contains the topK recommended items for the
 		 * corresponding user for corresponding recommendation time, where the topK recommendations are the top K frequent items in that user's dataset. (note: for a given user,
@@ -63,11 +68,14 @@ public class Evaluation
 		
 		try
 		{
-			String metaCurrentLine, topKCurrentLine, actualCurrentLine, baseLineOccurrenceCurrentLine, baseLineDurationCurrentLine;
+			String metaCurrentLine, topKCurrentLine, actualCurrentLine, baseLineOccurrenceCurrentLine, baseLineDurationCurrentLine,
+					currentTargetSame;
 			
 			brMeta = new BufferedReader(new FileReader(commonPath + "meta.csv"));
 			brTopK = new BufferedReader(new FileReader(commonPath + "dataRankedRecommendationWithoutScores.csv"));// /dataRecommTop5.csv"));
 			brActual = new BufferedReader(new FileReader(commonPath + "dataActual.csv"));
+			
+			brCurrentTargetSame = new BufferedReader(new FileReader(commonPath + "metaIfCurrentTargetSameWriter.csv"));
 			
 			brBaseLineOccurrence = new BufferedReader(new FileReader(commonPath + "dataBaseLineOccurrence.csv"));
 			brBaseLineDuration = new BufferedReader(new FileReader(commonPath + "dataBaseLineDuration.csv"));
@@ -167,9 +175,41 @@ public class Evaluation
 				countOfLinesActual++;
 			}
 			
+			int countOfLinesCurrentTargetSame = 0;
+			while ((actualCurrentLine = brCurrentTargetSame.readLine()) != null)
+			{
+				ArrayList<Boolean> currentLineArray = new ArrayList<Boolean>(); // System.out.println(actualCurrentLine);
+				String[] tokensInCurrentTargetSameLine = actualCurrentLine.split(","); // System.out.println("number of token in this actual line=" +
+																						// tokensInCurrentActualLine.length);
+				consoleLogBuilder.append("current target same line num:" + (countOfLinesCurrentTargetSame + 1) + "#tokensInLine:"
+						+ tokensInCurrentTargetSameLine.length + "\n");
+				
+				for (String val : tokensInCurrentTargetSameLine)
+				{
+					if (val.equals("true") || val.equals("1"))
+					{
+						currentLineArray.add(true);
+					}
+					
+					else if (val.equals("false") || val.equals("0"))
+					{
+						currentLineArray.add(false);
+					}
+					
+					else
+					{
+						new Exception(
+								"Error in org.activity.evaluation.Evaluation.Evaluation(): unknown token for brCurrentTargetSame = " + val);
+					}
+				}
+				arrayCurrentTargetSame.add(currentLineArray);
+				countOfLinesCurrentTargetSame++;
+			}
+			
 			consoleLogBuilder.append("\n number of actual lines =" + countOfLinesTopK + "\n");
-			consoleLogBuilder.append("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
-					+ "   size of actual array=" + arrayActual.size() + "\n");
+			consoleLogBuilder.append(
+					"size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size() + "   size of actual array="
+							+ arrayActual.size() + "   size of current target same array=" + arrayCurrentTargetSame.size() + "\n");
 			
 			System.out.println(consoleLogBuilder.toString());
 			consoleLogBuilder.setLength(0); // empty the consolelog stringbuilder
