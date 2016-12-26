@@ -1,6 +1,7 @@
 package org.activity.sanityChecks;
 
 import java.io.BufferedWriter;
+import java.io.File;
 
 import org.activity.io.WritingToFile;
 
@@ -14,7 +15,17 @@ public class TestDummy2
 {
 	public static void main(String args[])
 	{
-		checkWritePerformance();
+		// checkWritePerformance();
+		
+		String commonPath = "./";
+		
+		String currentPath = System.getProperty("user.dir") + "/";
+		String separator = File.separator;
+		System.out.println(currentPath + separator);
+		
+		WritingToFile.appendLineToFileAbsolute("test", currentPath + separator + "DeleteMe.txt");
+		
+		WritingToFile.appendLineToFileAbsolute("test", "DeleteMe2.txt");
 		// String str = " 112:Music^^ || 12600__2.1891152325934935%";
 		//
 		// String splitted[] = str.split("\\|\\|");
