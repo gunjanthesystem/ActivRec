@@ -38,21 +38,21 @@ import org.activity.util.UtilityBelt;
  */
 public class GowallaWeatherPreprocessing
 {
-	static final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/";
+	static String commonPath;// = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/";
 	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug30/";
-	static String checkinFileNameToRead = "";
+	static String checkinFileNameToRead;// = "";
 	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnly.csv";/// gw2CheckinsSpots1Slim1TargetUsersDatesOnly.csv";
 	// static String newline = null;
 	// String checkinFileNameToWrite =
 	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnlyWithLevels.csv";
-	static String fileContainingAPIKeys = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/ListOfAPIKeys.txt";
+	static String fileContainingAPIKeys;// = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/ListOfAPIKeys.txt";
 	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug23/ListOfAPIKeys.txt";
-	static long startIndexToRead = 0;
-	static final String startIndexToReadFileName = commonPath + "startIndexToRead.csv";
-	static String newline = "\n";// = System.lineSeparator();
+	static long startIndexToRead;// = 0;
+	static String startIndexToReadFileName = commonPath + "startIndexToRead.csv";
+	static String newline;// = "\n";// = System.lineSeparator();
 	
 	static long httpRequestCount = 0;
-	static final long httpRequestCountLimit = 45000;
+	static final long httpRequestCountLimit = 50000;
 	static final int decimalPlacesToKeepForLatLon = 3;
 	static LocalDateTime currentDateTime;
 	
@@ -65,6 +65,10 @@ public class GowallaWeatherPreprocessing
 	
 	public static void main(String args[])
 	{
+		commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/";
+		fileContainingAPIKeys = commonPath + "ListOfAPIKeys.txt";
+		startIndexToReadFileName = commonPath + "startIndexToRead.csv";
+		
 		// extractUserLatLongTSFromCheckins(checkinFileNameToRead, null);
 		// newline = System.getProperty("line.separator");
 		try
@@ -72,7 +76,6 @@ public class GowallaWeatherPreprocessing
 			// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 			TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 			currentDateTime = LocalDateTime.now();
-			
 			newline = System.lineSeparator();
 			
 			// to be set only once.
@@ -118,20 +121,19 @@ public class GowallaWeatherPreprocessing
 			// $$ End of commenting useful code 3
 			
 			// // $$ Start of commenting useful code 2
-			List<String> APIKeys = ReadingFromFile.oneColumnReaderString(fileContainingAPIKeys, ",", 0, false);
-			System.out.println("Num of API Keys = " + APIKeys);
-			//
-			String fetchedWeatherFileName = commonPath + " fetchedWeatherData" + currentDateTime.getMonth().toString().substring(0, 3)
-					+ currentDateTime.getDayOfMonth() + ".json";
+			// String fetchedWeatherFileName = commonPath + " fetchedWeatherData" + currentDateTime.getMonth().toString().substring(0, 3)
+			// + currentDateTime.getDayOfMonth() + ".json";
+			String fetchedWeatherFileName = commonPath + "fetchedWeatherDataDecAll.json";
 			
 			String inputLatLonTSDataFileName = commonPath + "LatLongRoundedDateSet.txt";// "latLonTSSet.csv";
-			//
+			
+			List<String> APIKeys = ReadingFromFile.oneColumnReaderString(fileContainingAPIKeys, ",", 0, false);
+			System.out.println("Num of API Keys = " + APIKeys);
 			// // fetchWeatherData(inputLatLonTSDataFileName, APIKeys, fetchedWeatherFileName);
-			//
 			List<String> inputLatLonTSData = Files.lines(Paths.get(inputLatLonTSDataFileName)).collect(Collectors.toList());
-			//
+			
 			fetchWeatherData(inputLatLonTSData, APIKeys, fetchedWeatherFileName, startIndexToReadFileName);
-			//
+			
 			// // data.stream().limit(10).forEach(e -> System.out.println(e.toString()));
 			// // APIKeys.stream().forEach(APIKey -> System.out.println("API Key = " + APIKey));
 			// // APIKeys.stream().forEach(APIKey -> fetchWeatherData(inputLatLonTSDataFileName, APIKey, fetchedWeatherFileName));
@@ -161,7 +163,7 @@ public class GowallaWeatherPreprocessing
 			List<String> APIKeys = ReadingFromFile.oneColumnReaderString(fileContainingAPIKeys, ",", 0, false);
 			System.out.println("Num of API Keys = " + APIKeys);
 			
-			String fetchedWeatherFileName = commonPath + " fetchedWeatherData" + currentDateTime.getMonth().toString().substring(0, 3)
+			String fetchedWeatherFileName = commonPath + "fetchedWeatherData" + currentDateTime.getMonth().toString().substring(0, 3)
 					+ currentDateTime.getDayOfMonth() + ".json";
 			String inputLatLonTSDataFileName = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug30/sampleConstructed.csv";
 			
@@ -253,10 +255,11 @@ public class GowallaWeatherPreprocessing
 					
 					toWrite.append(resultToWrite);
 					
-					if (countOfLinesToWrite % 15 == 0)
+					if (countOfLinesToWrite % 20 == 0)
 					{
 						WritingToFile.appendLineToFileAbsolute(toWrite.toString(), absolutePathForResult);
 						toWrite.setLength(0);
+						updateStartIndexToReadFile(startIndexToReadNext);
 					}
 				}
 				updateStartIndexToReadFile(startIndexToReadNext);
