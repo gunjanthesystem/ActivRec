@@ -2053,4 +2053,59 @@ public class TimelineUtils
 		return candidateTimelines;
 	}
 
+	/**
+	 * Cleaned , expunge all invalid activity objects and rearrange according to user id order in Constant.userID for
+	 * the current dataset </br>
+	 * <font color="red">NOT NEED ANYMORE AS IT HAS BEEN BROKEN DOWN INTO SMALLER SINGLE PURPOSE FUNCTIONS</font>
+	 * 
+	 * @param usersTimelines
+	 * @return
+	 */
+	public static LinkedHashMap<String, Timeline> dayTimelinesToCleanedExpungedRearrangedTimelines(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+	{
+		LinkedHashMap<String, Timeline> cleanedERTimelines = new LinkedHashMap<String, Timeline>();
+		System.out.println("inside dayTimelinesToCleanedExpungedRearrangedTimelines()");
+		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
+		{
+			String userID = usersTimelinesEntry.getKey();
+			LinkedHashMap<Date, UserDayTimeline> userDayTimelines = usersTimelinesEntry.getValue();
+	
+			userDayTimelines = cleanUserDayTimelines(userDayTimelines);
+	
+			Timeline timelineForUser = new Timeline(userDayTimelines); // converts the day time to continuous dayless
+																		// timeline
+			timelineForUser = UtilityBelt.expungeInvalids(timelineForUser); // expunges invalid activity objects
+	
+			cleanedERTimelines.put(userID, timelineForUser);
+		}
+		System.out.println("\t" + cleanedERTimelines.size() + " timelines created");
+		cleanedERTimelines = rearrangeTimelinesOrderForDataset(cleanedERTimelines);
+		System.out.println("\t" + cleanedERTimelines.size() + " timelines created");
+		return cleanedERTimelines;
+	}
+
+	/**
+	 * 
+	 * @param usersTimelines
+	 * @return LinkedHashMap<User ID as String, Timeline of the user with user id as integer as timeline id>
+	 */
+	public static LinkedHashMap<String, Timeline> dayTimelinesToTimelines(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+	{
+		LinkedHashMap<String, Timeline> timelines = new LinkedHashMap<String, Timeline>();
+		if (usersTimelines.size() == 0 || usersTimelines == null)
+		{
+			new Exception(
+					"Error in org.activity.util.UtilityBelt.dayTimelinesToTimelines(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>): userTimeline.size = "
+							+ usersTimelines.size()).printStackTrace();
+			;
+		}
+		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersTimelines.entrySet())
+		{
+			timelines.put(entry.getKey(), new Timeline(entry.getValue(), Integer.valueOf(entry.getKey())));
+		}
+		return timelines;
+	}
+
 }

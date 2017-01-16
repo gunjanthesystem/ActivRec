@@ -98,8 +98,7 @@ public final class Constant
 	 * whether there threshold should be applied on candidate timelines based on edit distance
 	 */
 	public static final boolean candidateThresholding = false; //
-	public static final String[] typeOfThresholds =
-	{ "Global" };// Global"};//"Percent", "None"
+	public static final String[] typeOfThresholds = { "Global" };// Global"};//"Percent", "None"
 
 	/**
 	 * Determines if thresholding is used to eliminate candidate timelines beyond the threshold distance
@@ -140,7 +139,7 @@ public final class Constant
 	public static final boolean verboseOTMDSAM = false;
 	public static final boolean verboseDistance = false;
 	public static final boolean verboseRankScoreCalcToConsole = false;
-	public static final boolean verboseEvaluationMetricsToConsole = false;
+	public static final boolean verboseEvaluationMetricsToConsole = false;// false;
 	/**
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv
 	 * and EditDistancePerRtPerCand.csv have some similar information and have corresponding records.
@@ -196,25 +195,20 @@ public final class Constant
 	 * Note: 'userID' (ignore case) always refers to the raw user-ids. While index of user id refers to user 1, user
 	 * 2,... or user 0, user 1, ... user-ids.
 	 */
-	public static final int tenUserIDsGeolifeData[] =
-	{ 62, 84, 52, 68, 167, 179, 153, 85, 128, 10 };
-	public static final int allUserIDsGeolifeData[] =
-	{ 62, 84, 52, 68, 167, 179, 153, 85, 128, 10, 105, /* 78, */67, 126, 64, 111, 163, 98, 154, 125, 65, 80, 21, 69,
-			/* 101, 175, */81, 96, 129, /* 115, */56, 91, 58, 82, 141, 112, 53, 139, 102, 20, 138, 108,
-			97, /* 92, 75, */
+	public static final int tenUserIDsGeolifeData[] = { 62, 84, 52, 68, 167, 179, 153, 85, 128, 10 };
+	public static final int allUserIDsGeolifeData[] = { 62, 84, 52, 68, 167, 179, 153, 85, 128, 10, 105, /* 78, */67,
+			126, 64, 111, 163, 98, 154, 125, 65, 80, 21, 69, /* 101, 175, */81, 96, 129, /* 115, */56, 91, 58, 82, 141,
+			112, 53, 139, 102, 20, 138, 108, 97, /* 92, 75, */
 			161, 117, 170 /* ,114, 110, 107 */ };
-	public static final int above10RTsUserIDsGeolifeData[] =
-	{ 62, 84, 52, 68, 167, 179, 153, 85, 128, 10, 126, 111, 163, 65, 91, 82, 139, 108 };
+	public static final int above10RTsUserIDsGeolifeData[] = { 62, 84, 52, 68, 167, 179, 153, 85, 128, 10, 126, 111,
+			163, 65, 91, 82, 139, 108 };
 	static int[] gowallaUserIDs = null;
 
-	public static final int userIDsDCUData[] =
-	{ 0, 1, 2, 3, 4 };
-	public static final String userNamesDCUData[] =
-	{ "Stefan", "Tengqi", "Cathal", "Zaher", "Rami" };
+	public static final int userIDsDCUData[] = { 0, 1, 2, 3, 4 };
+	public static final String userNamesDCUData[] = { "Stefan", "Tengqi", "Cathal", "Zaher", "Rami" };
 
-	static final String[] GeolifeActivityNames =
-	{ "Not Available", "Unknown", "airplane", "bike", "boat", "bus", "car", "motorcycle", "run", "subway", "taxi",
-			"train", "walk" };
+	static final String[] GeolifeActivityNames = { "Not Available", "Unknown", "airplane", "bike", "boat", "bus", "car",
+			"motorcycle", "run", "subway", "taxi", "train", "walk" };
 
 	static final String[] gowallaActivityNames = null;
 	public static final int gowallaWorkingCatLevel = 2;
@@ -223,36 +217,35 @@ public final class Constant
 	// */"bus", "car", /* "motorcycle", */
 	/* "run", */// "subway", "taxi", "train", "walk" };
 
-	static final String[] DCUDataActivityNames =
-	{ "Others", "Unknown", "Commuting", "Computer", "Eating", "Exercising", "Housework", "On the Phone",
-			"Preparing Food", "Shopping", "Socialising", "Watching TV" };
+	static final String[] DCUDataActivityNames = { "Others", "Unknown", "Commuting", "Computer", "Eating", "Exercising",
+			"Housework", "On the Phone", "Preparing Food", "Shopping", "Socialising", "Watching TV" };
 
 	public static final String lookPastType = "Count";// "Count";// "Hrs"
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] =
-	{ 0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18 };// { 0, 1, 2, 3, 4, 5, 6 };// , 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	// 17, 18,
-	// 19, 20, 21, 22,
-	// 23,
-	// 24, 26, 28, 30 };// , 32,
-	// 34, 36, 38, 40, 42 };
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18 };
+	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
+	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 
-	public static final double matchingUnitHrsArray[] =
-	{ 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34,
-			36, 38, 40, 42 };
+	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+			17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
 	// public static final double matchingUnitHrsArray[] = { 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
 
+	/****** SAX Constants Start ***********/
 	public static final int SAXStartTimeAlphabsetSize = 20; // maximum possible aplhabet size for new alphabet
 															// implementation in the sax code
 	public static final int SAXDurationAlphabsetSize = 20;
-
 	public static final int SAXDistanceTravelledAlphabsetSize = 20; // 12;
 	public static final int SAXAvgAltitudeAlphabsetSize = 20;// 12;
+	/****** SAX Constants End ***********/
 
 	public static String distanceUsed = "HJEditDistance"; // "FeatureWiseEditDistance",FeatureWiseEditDistance,
 															// OTMDSAMEditDistance
+
+	/****** Evaluation Constants Start ***********/
+	public static final boolean EvalPrecisionRecallFMeasure = false;
+	/****** Evaluation Constants End ***********/
 
 	static TimeZone timeZoneForExperiments = null;
 
@@ -303,9 +296,8 @@ public final class Constant
 			considerEndGeoCoordinatesInFeatureWiseEditDistance = false,
 			considerAvgAltitudeInFeatureWiseEditDistance = false;
 
-	public static String[] featureNames =
-	{ "ActivityName", "StartTime", "Duration", "DistanceTravelled", "StartGeoCoordinates", "EndGeoCoordinates",
-			"AvgAltitude" };
+	public static String[] featureNames = { "ActivityName", "StartTime", "Duration", "DistanceTravelled",
+			"StartGeoCoordinates", "EndGeoCoordinates", "AvgAltitude" };
 
 	// ///************* END OF PARAMETERS TO BE SET ********************//////
 	public static Classifier classifierUsed;

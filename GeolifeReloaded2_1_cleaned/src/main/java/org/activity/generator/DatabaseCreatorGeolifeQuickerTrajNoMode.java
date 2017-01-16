@@ -35,6 +35,7 @@ import org.activity.objects.StayPointsAllDataContainer;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
+import org.activity.util.StatsUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 
@@ -411,8 +412,7 @@ public class DatabaseCreatorGeolifeQuickerTrajNoMode
 	public static ArrayList<String> identifyOnlyTargetUsers()
 	{
 		ArrayList<String> listOfUsersWhoLabelled = new ArrayList<String>();
-		int userIDs[] =
-		{ 62, 84 };// , 52, 68, 167, 179, 153, 85, 128, 10 };
+		int userIDs[] = { 62, 84 };// , 52, 68, 167, 179, 153, 85, 128, 10 };
 		for (int i : userIDs)
 		{
 			String userID = String.format("%03d", i);
@@ -1178,7 +1178,7 @@ public class DatabaseCreatorGeolifeQuickerTrajNoMode
 
 		long timeDiffInSecs = (nextTrajEntry.getTimestamp().getTime() - tsFirstEntryInPotentialStayPoint.getTime())
 				/ 1000;
-		double distDiffInKms = UtilityBelt.haversine(latFirstEntryInPotentialStayPoint,
+		double distDiffInKms = StatsUtils.haversine(latFirstEntryInPotentialStayPoint,
 				lonFirstEntryInPotentialStayPoint, latNextEntry, lonNextEntry);
 
 		if ((distDiffInKms * 1000) <= stayPointDistanceThresholdInMeters)
@@ -3304,9 +3304,8 @@ public class DatabaseCreatorGeolifeQuickerTrajNoMode
 	public static void listFilesForFolder(final File folder, String path, String userName)
 	{
 		// int count=0;
-		String categories[] =
-		{ "badImages", "Commuting", "Computer", "Eating", "Exercising", "Housework", "On the Phone", "Preparing Food",
-				"Shopping", "Socialising", "Watching TV" };
+		String categories[] = { "badImages", "Commuting", "Computer", "Eating", "Exercising", "Housework",
+				"On the Phone", "Preparing Food", "Shopping", "Socialising", "Watching TV" };
 		int countOfJPG = 0;// , countOfCategoryAssignments=0;;
 		int countOfActivityFilesFound = 0;
 		int countOfJPGFilesMentionedInAllActivityFiles = 0;

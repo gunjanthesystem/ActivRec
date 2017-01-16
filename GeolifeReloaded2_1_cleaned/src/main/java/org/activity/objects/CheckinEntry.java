@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 
 /**
  * For storing checkin entries for Gowalla dataset
@@ -57,8 +57,8 @@ public class CheckinEntry extends DataEntry implements Serializable
 		this.locationID = locationID;
 		this.timestamp = ts;
 
-		this.startLatitude = UtilityBelt.round(latitude, 6);
-		this.startLongitude = UtilityBelt.round(longitude, 6);
+		this.startLatitude = StatsUtils.round(latitude, 6);
+		this.startLongitude = StatsUtils.round(longitude, 6);
 
 		this.activityID = catID;
 		this.setWorkingLevelCatIDs(workingLevelCatIDs);

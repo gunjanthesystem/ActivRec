@@ -15,6 +15,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.objects.UserDayTimeline;
 import org.activity.util.Constant;
+import org.activity.util.StatsUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -153,9 +154,9 @@ public class ActivityStats
 					String startGeoLat2 = validTrajectoryEntries.get(j).getStartLat();
 					String startGeoLon2 = validTrajectoryEntries.get(j).getStartLon();
 
-					double startDiff = UtilityBelt.haversine(startGeoLat1, startGeoLon1, startGeoLat2, startGeoLon2);
+					double startDiff = StatsUtils.haversine(startGeoLat1, startGeoLon1, startGeoLat2, startGeoLon2);
 
-					WritingToFile.appendLineToFile(String.valueOf(UtilityBelt.round(startDiff, 2)), user + "startDiff");
+					WritingToFile.appendLineToFile(String.valueOf(StatsUtils.round(startDiff, 2)), user + "startDiff");
 
 					String endGeoLat1 = validTrajectoryEntries.get(i).getEndLat();
 					String endGeoLon1 = validTrajectoryEntries.get(i).getEndLon();
@@ -163,9 +164,9 @@ public class ActivityStats
 					String endGeoLat2 = validTrajectoryEntries.get(j).getEndLat();
 					String endGeoLon2 = validTrajectoryEntries.get(j).getEndLon();
 
-					double endDiff = UtilityBelt.haversine(endGeoLat1, endGeoLon1, endGeoLat2, endGeoLon2);
+					double endDiff = StatsUtils.haversine(endGeoLat1, endGeoLon1, endGeoLat2, endGeoLon2);
 
-					WritingToFile.appendLineToFile(String.valueOf(UtilityBelt.round(endDiff, 2)), user + "endDiff");
+					WritingToFile.appendLineToFile(String.valueOf(StatsUtils.round(endDiff, 2)), user + "endDiff");
 					// validTrajectoryEntries.get(i),validTrajectoryEntries.get(j)
 				}
 			}

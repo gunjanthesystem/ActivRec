@@ -19,11 +19,11 @@ import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterBaseClosestTime;
 import org.activity.ui.PopUps;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
-import org.activity.util.UtilityBelt;
 
 public class RecommendationTestsBaseClosestTime
 {
@@ -34,10 +34,8 @@ public class RecommendationTestsBaseClosestTime
 
 	public String typeOfThreshold = "Percent";// "Percent"/"Global"
 
-	public int globalThresholds[] =
-	{ 100000 };// 50,100,150,200,250,300,350,400,450,500,550,600,650,700,1000};
-	public int percentThresholds[] =
-	{ 100 };// {50,60,70,80,90,100};
+	public int globalThresholds[] = { 100000 };// 50,100,150,200,250,300,350,400,450,500,550,600,650,700,1000};
+	public int percentThresholds[] = { 100 };// {50,60,70,80,90,100};
 
 	// public final double globalDistanceThresh=1000;
 	/*
@@ -46,8 +44,7 @@ public class RecommendationTestsBaseClosestTime
 	 * 'percentageDistanceThresh' % of Activity Events in the activities guiding recommendation are pruned out from set
 	 * of candidate timelines
 	 */
-	String typeOfThresholds[] =
-	{ "Global" };// Global"};//"Percent",
+	String typeOfThresholds[] = { "Global" };// Global"};//"Percent",
 	public boolean pruningHasSaturated;
 	int userIDs[];
 	int thresholdsArray[];
@@ -366,7 +363,7 @@ public class RecommendationTestsBaseClosestTime
 						LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = WritingToFile
 								.writeActivityCountsInGivenDayTimelines(userName, userTrainingTimelines,
 										"TrainingTimelines");
-						activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) UtilityBelt
+						activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 								.sortByValueDesc(activityNameCountPairsOverAllTrainingDays);
 						String activityNameCountPairsOverAllTrainingDaysWithCount = getActivityNameCountPairsOverAllTrainingDaysWithCount(
 								activityNameCountPairsOverAllTrainingDays);
@@ -386,7 +383,7 @@ public class RecommendationTestsBaseClosestTime
 						LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = WritingToFile
 								.writeActivityDurationInGivenDayTimelines(userName, userTrainingTimelines,
 										"TrainingTimelines");
-						activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) UtilityBelt
+						activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 								.sortByValueDesc(activityNameDurationPairsOverAllTrainingDays);
 						String activityNameDurationPairsOverAllTrainingDaysWithDuration = getActivityNameDurationPairsOverAllTrainingDaysWithDuration(
 								activityNameDurationPairsOverAllTrainingDays);

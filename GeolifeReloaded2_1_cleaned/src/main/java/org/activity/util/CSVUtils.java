@@ -69,8 +69,7 @@ public class CSVUtils
 		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
 
-		String s[] =
-		{ "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 
 		ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
 		ArrayList<String> listOfAllMUsWithMaxMRRFiles = new ArrayList<String>();
@@ -1200,7 +1199,7 @@ public class CSVUtils
 					}
 					else
 						bwMU.write(StringUtils.getArrayAsStringDelimited(
-								UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition), "_"));
+								ComparatorUtils.findLargeNumberIndices(valuesForThisCellPosition), "_"));
 					if (col != endCol)
 					{
 						bw.write(",");
@@ -1224,5 +1223,21 @@ public class CSVUtils
 
 		// BufferedReader brRR = new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory +
 		// "ReciprocalRank.csv"));
+	}
+
+	/**
+	 * 
+	 * @param s
+	 * @param delimiter
+	 * @return
+	 */
+	public static String CSVRecordToString(CSVRecord s, String delimiter)
+	{
+		String res = "";
+		for (int i = 0; i < s.size(); i++)
+		{
+			res += s.get(i) + delimiter;
+		}
+		return res.substring(0, res.length() - delimiter.length());// a,b,c,d, // len = 8 (0,7)
 	}
 }

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 
 /**
  * Contains an assortment of methods useful for different kinds of entropies
@@ -152,7 +152,7 @@ public class EntropyUtilityBelt
 		{
 			char cx = entry.getKey();
 			double p = (double) entry.getValue() / n;
-			e += p * UtilityBelt.log2(p);
+			e += p * StatsUtils.log2(p);
 		}
 
 		System.out.println("\n\nEntropy for string: " + s + "\n\t is " + (-e));

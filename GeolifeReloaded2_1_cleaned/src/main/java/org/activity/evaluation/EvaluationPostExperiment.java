@@ -2,7 +2,9 @@ package org.activity.evaluation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,6 +15,7 @@ import org.activity.ui.PopUps;
 import org.activity.util.CSVUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
+import org.activity.util.StatsUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.csv.CSVRecord;
 
@@ -23,12 +26,12 @@ import org.apache.commons.csv.CSVRecord;
  */
 public class EvaluationPostExperiment
 {
-	public static final String[] timeCategories =
-	{ "All" };// , "Morning", "Afternoon", "Evening" };
+	public static final String[] timeCategories = { "All" };// , "Morning", "Afternoon", "Evening" };
 
 	public static void main(String args[])
 	{
 		GowallaEvalCurrentEqualsTargetPerformance();
+		PopUps.showMessage("All done");
 	}
 
 	/**
@@ -39,14 +42,14 @@ public class EvaluationPostExperiment
 		Constant.setDatabaseName("gowalla1");
 
 		String rootPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
-		String s[] =
-		{ "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+		String s[] = { "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 
 		String path = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 
 		for (String shead : s)
 		{
 			Constant.outputCoreResultsPath = path + shead + "/";
+			// PopUps.showMessage("Constant.outputCoreResultsPath=" + Constant.outputCoreResultsPath);
 			double[] matchingUnitArray = Constant.matchingUnitAsPastCount;
 
 			for (double mu : matchingUnitArray)
@@ -56,13 +59,214 @@ public class EvaluationPostExperiment
 				for (String timeCategory : timeCategories)
 				{
 					System.out.println(" " + Constant.getCommonPath());
-
+					if (shead.equals("901"))
+						writeMRRCurrTargetSameDistinguish("Algo", timeCategory, 134);
+					else
+						writeMRRCurrTargetSameDistinguish("Algo", timeCategory, 100);
 					// writePerActivityMeanReciprocalRank("Algo", timeCategory);
 					// writePerActivityMeanReciprocalRank("BaselineOccurrence", timeCategory);
 					// // writePerActivityMeanReciprocalRank("BaselineDuration", timeCategory);
 				}
 			}
 			Constant.setCommonPath(Constant.outputCoreResultsPath);
+		}
+	}
+
+	/**
+	 * Compute and write MRR as: </br>
+	 * userid, MRR over RTs with current target same activity name, MRR over RTs with current target not same,MRR over
+	 * RTs
+	 * 
+	 * @param fileNamePhrase
+	 * @param timeCategory
+	 * 
+	 *            only works for All time category
+	 * @param numUsers
+	 */
+	public static void writeMRRCurrTargetSameDistinguish(String fileNamePhrase, String timeCategory, int numUsers)
+	{
+		// BufferedReader br= null;
+		String commonPath = Constant.getCommonPath();
+		try
+		{
+			File file = new File(commonPath + fileNamePhrase + timeCategory + "MRRCurrTargetSameDistinguish.csv");
+
+			file.delete();
+			file.createNewFile();
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			BufferedWriter allTogetherForAnalysis = WritingToFile.getBufferedWriterForExistingFile(
+					"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/MRRCurrTargetSameAllUsersAllMUs.csv");
+
+			bw.write("User,MRRCurrTargetSame,MRRCurrTargetDiff,AllMRR\n");
+			// allTogetherForAnalysis.write("User,MRRCurrTargetSame,MRRCurrTargetDiff,AllMRR,FileReadPath\n");
+			// bwValidRTCount.write(",RTCount_RR");
+
+			// bw.newLine();
+			// bwValidRTCount.newLine();
+
+			for (int user = 0; user < numUsers; user++)
+			{
+
+				bw.write("User_" + user + ","); // currently this starts from User_0
+				allTogetherForAnalysis.write("User_" + user + ",");
+				// bwValidRTCount.write("User_" + user + ",");
+				// for (int K = theKOriginal; K > 0; K--)
+				// {
+
+				BufferedReader brRR = new BufferedReader(
+						new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
+
+				BufferedReader brifCurrTargetSame = new BufferedReader(
+						new FileReader(commonPath + "metaIfCurrentTargetSameWriter.csv"));
+				// no time category or filename phrase e.g."Algo" for meta.
+
+				String currentRRLine, currentIfCurrTargetSameLine;
+
+				if (Constant.verboseEvaluationMetricsToConsole)
+				{
+					System.out.println("Calculating MRRCTD for user:" + user);
+					System.out.println(
+							("reading for MRR: " + commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
+				}
+
+				int lineNumber = 0;
+				while ((currentRRLine = brRR.readLine()) != null)
+				{
+					currentIfCurrTargetSameLine = brifCurrTargetSame.readLine();
+					if (currentIfCurrTargetSameLine == null)
+					{
+						PopUps.showError(
+								"Error in org.activity.evaluation.EvaluationPostExperiment.writeMRRCurrTargetSameDistinguish(): currentIfCurrTargetSameLine is null");
+					}
+
+					if (lineNumber == user)
+					{
+						// get avg of all these rr values concern: splitting on empty lines gives an array of length1,
+						// also splitting on one values line gives an array of length 1
+						String[] allrrValuesForThisUser = currentRRLine.split(",");
+						String[] ifCurrTargetSameValuesForThisUser = currentIfCurrTargetSameLine.split(",");
+
+						if (allrrValuesForThisUser.length != ifCurrTargetSameValuesForThisUser.length)
+						{
+							PopUps.showError(
+									"Error in org.activity.evaluation.EvaluationPostExperiment.writeMRRCurrTargetSameDistinguish():allrrValuesForThisUser.length ("
+											+ allrrValuesForThisUser.length
+											+ ") != ifCurrTargetSameValuesForThisUser.length ("
+											+ ifCurrTargetSameValuesForThisUser.length + ")");
+						}
+
+						if (Constant.verboseEvaluationMetricsToConsole)
+						{
+							System.out.println("current rrValues line read=" + currentRRLine + " trimmed length="
+									+ currentRRLine.trim().length());
+							System.out.println("current ifCurrTargetSameValues line read=" + currentIfCurrTargetSameLine
+									+ " trimmed length=" + currentIfCurrTargetSameLine.trim().length());
+						}
+						System.out.println("#rr values for user(" + user + ") = " + allrrValuesForThisUser.length);
+
+						// double[] pValuesForThisUserForThisK = new double[tokensInCurrentLine.length];
+
+						double allMRRValueForThisUser = 0, currTargetSameMRRValueForThisUser = 0,
+								currTargetDiffMRRValueForThisUser = 0;
+
+						double allSum = 0, sumCurrTargetSame = 0, sumCurrTargetDiff = 0;
+						int countOfValidRRValues = 0, countOfCurrTargetSame = 0, countOfCurrentTargetDiff = 0;
+
+						if (currentRRLine.trim().length() == 0)
+						{
+							System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath
+									+ fileNamePhrase + timeCategory + "ReciprocalRank.csv");
+						}
+
+						else
+						{ // calculate sum
+							for (int i = 0; i < allrrValuesForThisUser.length; i++)
+							{
+								double rrValueRead = Double.parseDouble(allrrValuesForThisUser[i]);
+
+								if (rrValueRead >= 0) // negative rr value for a given RT for given K means that we were
+														// unable to make K recommendation at that RT
+								{
+									countOfValidRRValues += 1;
+									allSum += rrValueRead;
+								}
+
+								if (ifCurrTargetSameValuesForThisUser[i].equalsIgnoreCase("true")
+										|| ifCurrTargetSameValuesForThisUser[i].equals("1")
+										|| ifCurrTargetSameValuesForThisUser[i].equals("t"))
+								{
+									countOfCurrTargetSame += 1;
+									sumCurrTargetSame += rrValueRead;
+								}
+
+								else if (ifCurrTargetSameValuesForThisUser[i].equalsIgnoreCase("false")
+										|| ifCurrTargetSameValuesForThisUser[i].equals("0")
+										|| ifCurrTargetSameValuesForThisUser[i].equals("f"))
+								{
+									countOfCurrentTargetDiff += 1;
+									sumCurrTargetDiff += rrValueRead;
+								}
+							}
+						}
+						// bwValidRTCount.write(countOfValidPValues + ",");
+						if (countOfValidRRValues == 0) // to avoid divide by zero exception
+							countOfValidRRValues = 1;
+						if (countOfCurrTargetSame == 0) // to avoid divide by zero exception
+							countOfCurrTargetSame = 1;
+						if (countOfCurrentTargetDiff == 0) // to avoid divide by zero exception
+							countOfCurrentTargetDiff = 1;
+
+						if ((countOfCurrentTargetDiff + countOfCurrTargetSame) != countOfValidRRValues)
+						{
+							PopUps.showError(
+									"Error in org.activity.evaluation.EvaluationPostExperiment.writeMRRCurrTargetSameDistinguish():(countOfCurrentTargetDiff("
+											+ countOfCurrentTargetDiff + ")+ countOfCurrTargetSame("
+											+ countOfCurrTargetSame + ")) != countOfValidRRValues("
+											+ countOfValidRRValues + ")");
+						}
+
+						allMRRValueForThisUser = StatsUtils.round((double) allSum / countOfValidRRValues, 4);
+						currTargetSameMRRValueForThisUser = StatsUtils
+								.round((double) sumCurrTargetSame / countOfCurrTargetSame, 4);
+						currTargetDiffMRRValueForThisUser = StatsUtils
+								.round((double) sumCurrTargetDiff / countOfCurrentTargetDiff, 4);
+
+						System.out.println("Calculating MRR: all = " + allSum + "/" + countOfValidRRValues);
+						System.out.println("Calculating MRR: curr target same = " + sumCurrTargetSame + "/"
+								+ countOfCurrTargetSame);
+						System.out.println("Calculating MRR: curr target diff = " + sumCurrTargetDiff + "/"
+								+ countOfCurrentTargetDiff);
+
+						bw.write(currTargetSameMRRValueForThisUser + "," + currTargetDiffMRRValueForThisUser + ","
+								+ allMRRValueForThisUser + ",");
+						allTogetherForAnalysis
+								.write(currTargetSameMRRValueForThisUser + "," + currTargetDiffMRRValueForThisUser + ","
+										+ allMRRValueForThisUser + "," + countOfCurrTargetSame + ","
+										+ countOfCurrentTargetDiff + "," + countOfValidRRValues + "," + commonPath);
+
+						break;
+					}
+					lineNumber++;
+				}
+
+				brRR.close();
+				brifCurrTargetSame.close();
+
+				// }// end of K loop
+				bw.newLine();
+				allTogetherForAnalysis.newLine();
+				// bwValidRTCount.newLine();
+			}
+			bw.close();
+			allTogetherForAnalysis.close();
+			// bwValidRTCount.close();
+		}
+
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 	}
 
@@ -441,7 +645,7 @@ public class EvaluationPostExperiment
 						"User " + user + " optimal mu:" + optimalMuForUser + "Have to read " + absfileNameToRead);
 
 				CSVRecord rowRecord = CSVUtils.getRowFromCSVFile(absfileNameToRead, user);
-				MRRAtOptimalMUForRTsFile.write(UtilityBelt.CSVRecordToString(rowRecord, ",") + "\n");
+				MRRAtOptimalMUForRTsFile.write(CSVUtils.CSVRecordToString(rowRecord, ",") + "\n");
 
 				// brRR.close();
 
@@ -565,7 +769,7 @@ public class EvaluationPostExperiment
 				for (Map.Entry<String, ArrayList<Double>> e : perActMRR.entrySet())
 				{
 					System.out.println(" number of vals =" + e.getValue().size());
-					bw.write("," + String.valueOf(UtilityBelt.meanOfArrayList(e.getValue(), 4)));
+					bw.write("," + String.valueOf(StatsUtils.meanOfArrayList(e.getValue(), 4)));
 					bwDistri.write("," + String.valueOf(e.getValue().size()));
 				}
 				bw.newLine();

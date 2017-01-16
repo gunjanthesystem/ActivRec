@@ -748,10 +748,10 @@ public class UserDayTimeline_backup17Sep2016 implements Serializable
 
 		if (!sane)
 		{
-			System.err.println(
-					"Error: Day Timeline  contains ActivityObjects from more than one day"); /*
-																								 * with Date_ID:"+ dateID+"
-																								 */
+			System.err.println("Error: Day Timeline  contains ActivityObjects from more than one day"); /*
+																										 * with
+																										 * Date_ID:"+ dateID+"
+																										 */
 			// System.exit(3);
 		}
 		return sane;

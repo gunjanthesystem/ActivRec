@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
 
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
-import org.activity.util.UtilityBelt;
+import org.activity.util.ComparatorUtils;
+import org.activity.util.StatsUtils;
 import org.activity.util.weka.WekaUtilityBelt;
 import org.activity.util.weka.WekaUtilityBelt.ClustersRangeScheme;
 
@@ -73,8 +74,7 @@ public class MUEvaluationUtils
 	public static void main(String args[])
 	{
 		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
-		String s[] =
-		{ "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 		try
 		{
 			for (int i = 0; i < s.length; i++)
@@ -111,13 +111,13 @@ public class MUEvaluationUtils
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the cluster label for minimal MU having max MRR
 		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the majority cluster label over all MUs having max
 		// MRR
 		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		//////////////////////
 
@@ -199,13 +199,13 @@ public class MUEvaluationUtils
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the cluster label for minimal MU having max MRR
 		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the majority cluster label over all MUs having max
 		// MRR
 		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		//////////////////////
 
@@ -295,13 +295,13 @@ public class MUEvaluationUtils
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the cluster label for minimal MU having max MRR
 		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the majority cluster label over all MUs having max
 		// MRR
 		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		for (int iter = 1; iter <= 10/* 20 */; iter++)
 		{
@@ -455,11 +455,11 @@ public class MUEvaluationUtils
 
 			String modeCluster = ""; // to find the maximum occurring clusters, note: allowing for more than one cluster
 										// to occur as max
-			modeCluster += UtilityBelt.isMaximum(countForFirstCluster, countForFirstCluster, countForSecondCluster,
+			modeCluster += StatsUtils.isMaximum(countForFirstCluster, countForFirstCluster, countForSecondCluster,
 					countForThirdCluster) ? "FirstCluster__" : "";
-			modeCluster += UtilityBelt.isMaximum(countForSecondCluster, countForFirstCluster, countForSecondCluster,
+			modeCluster += StatsUtils.isMaximum(countForSecondCluster, countForFirstCluster, countForSecondCluster,
 					countForThirdCluster) ? "SecondCluster__" : "";
-			modeCluster += UtilityBelt.isMaximum(countForThirdCluster, countForFirstCluster, countForSecondCluster,
+			modeCluster += StatsUtils.isMaximum(countForThirdCluster, countForFirstCluster, countForSecondCluster,
 					countForThirdCluster) ? "ThirdCluster__" : "";
 
 			String msg = entryForuser.getKey() + "," + countForFirstCluster + "," + countForSecondCluster + ","
@@ -556,11 +556,11 @@ public class MUEvaluationUtils
 
 			String modeCluster = ""; // to find the maximum occurring clusters, note: allowing for more than one cluster
 										// to occur as max
-			modeCluster += UtilityBelt.isMaximum(countForFirstCluster, countForFirstCluster, countForSecondCluster,
+			modeCluster += StatsUtils.isMaximum(countForFirstCluster, countForFirstCluster, countForSecondCluster,
 					countForThirdCluster) ? "FirstCluster__" : "";
-			modeCluster += UtilityBelt.isMaximum(countForSecondCluster, countForFirstCluster, countForSecondCluster,
+			modeCluster += StatsUtils.isMaximum(countForSecondCluster, countForFirstCluster, countForSecondCluster,
 					countForThirdCluster) ? "SecondCluster__" : "";
-			modeCluster += UtilityBelt.isMaximum(countForThirdCluster, countForFirstCluster, countForSecondCluster,
+			modeCluster += StatsUtils.isMaximum(countForThirdCluster, countForFirstCluster, countForSecondCluster,
 					countForThirdCluster) ? "ThirdCluster__" : "";
 
 			if (modeCluster.contains("FirstCluster"))

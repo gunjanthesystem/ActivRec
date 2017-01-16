@@ -22,6 +22,7 @@ import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
+import org.activity.util.StatsUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 
@@ -350,7 +351,7 @@ public class GeolifeDataLoader
 																	// 1));
 
 					activityLogEntry.setAvgAltitude(
-							UtilityBelt.averageDecimalsAsStrings(UtilityBelt.removeInvalidAlts(te.getAltitude())));// .stream().a//.mapToDouble(a
+							StatsUtils.averageDecimalsAsStrings(UtilityBelt.removeInvalidAlts(te.getAltitude())));// .stream().a//.mapToDouble(a
 																													// ->
 
 					String trajectoryIDsCompact = StringUtils.toStringCompactWithCount(te.getTrajectoryID());

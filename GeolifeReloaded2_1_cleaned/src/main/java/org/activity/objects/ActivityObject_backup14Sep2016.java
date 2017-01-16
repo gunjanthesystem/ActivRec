@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.StatsUtils;
 import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
 
@@ -67,13 +68,13 @@ public class ActivityObject_backup14Sep2016 implements Serializable
 
 	public double getDifferenceStartingGeoCoordinates(ActivityObject_backup14Sep2016 ao2)
 	{
-		return UtilityBelt.haversine(startLatitude, startLongitude, ao2.getStartLatitude(), ao2.getStartLongitude());
+		return StatsUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(), ao2.getStartLongitude());
 
 	}
 
 	public double getDifferenceEndingGeoCoordinates(ActivityObject_backup14Sep2016 ao2)
 	{
-		return UtilityBelt.haversine(endLatitude, endLongitude, ao2.getEndLatitude(), ao2.getEndLongitude());
+		return StatsUtils.haversine(endLatitude, endLongitude, ao2.getEndLatitude(), ao2.getEndLongitude());
 
 	}
 
@@ -167,7 +168,7 @@ public class ActivityObject_backup14Sep2016 implements Serializable
 
 			this.avgAltitude = getDimensionAttributeValue("Location_Dimension", "Avg_Altitude").toString();
 
-			this.distanceTravelled = UtilityBelt.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
+			this.distanceTravelled = StatsUtils.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
 
 			if (distanceTravelled > Constant.distanceTravelledAlert && Constant.checkForDistanceTravelledAnomaly)
 			{

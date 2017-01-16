@@ -23,15 +23,14 @@ public class ActivityTableRow
 
 	public static String[] getNameOfHeaders()
 	{
-		String nameOfHeaders[] =
-		{ "User", "Day", "Activity", "Location", "Start Time", "End Time", "Date" };
+		String nameOfHeaders[] = { "User", "Day", "Activity", "Location", "Start Time", "End Time", "Date" };
 		return nameOfHeaders;
 	}
 
 	public static String[] getVariableNames()
 	{
-		String variableNames[] =
-		{ "user", "day", "activity", "location", "activityStartTime", "activityEndTime", "date" };
+		String variableNames[] = { "user", "day", "activity", "location", "activityStartTime", "activityEndTime",
+				"date" };
 		return variableNames;
 	}
 

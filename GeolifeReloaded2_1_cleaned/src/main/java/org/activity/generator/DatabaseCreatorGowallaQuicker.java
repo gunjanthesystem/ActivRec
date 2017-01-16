@@ -32,6 +32,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
+import org.activity.util.StatsUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 import org.json.JSONObject;
@@ -511,11 +512,11 @@ public class DatabaseCreatorGowallaQuicker
 						// System.out.println("Computin/run/media/gunjan/BoX2/GowallaSpaceSpace/June16/g haversing for"
 						// + currentLat + " , " + currentLon + " --- " + prevLat + ","
 						// + prevLon);
-						distFromPrevInMeters = UtilityBelt.haversine(currentLat, currentLon, prevLat, prevLon);//
+						distFromPrevInMeters = StatsUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
 
 						// System.out.println("returned dist in km = " + distFromPrevInMeters);
 						distFromPrevInMeters = distFromPrevInMeters * 1000;
-						distFromPrevInMeters = UtilityBelt.round(distFromPrevInMeters, 2);
+						distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
 					}
 
 					else
@@ -678,11 +679,11 @@ public class DatabaseCreatorGowallaQuicker
 						// System.out.println("Computin/run/media/gunjan/BoX2/GowallaSpaceSpace/June16/g haversing for"
 						// + currentLat + " , " + currentLon + " --- " + prevLat + ","
 						// + prevLon);
-						distFromPrevInMeters = UtilityBelt.haversine(currentLat, currentLon, prevLat, prevLon);//
+						distFromPrevInMeters = StatsUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
 
 						// System.out.println("returned dist in km = " + distFromPrevInMeters);
 						distFromPrevInMeters = distFromPrevInMeters * 1000;
-						distFromPrevInMeters = UtilityBelt.round(distFromPrevInMeters, 2);
+						distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
 					}
 
 					else
@@ -872,11 +873,11 @@ public class DatabaseCreatorGowallaQuicker
 						// System.out.println("Computin/run/media/gunjan/BoX2/GowallaSpaceSpace/June16/g haversing for"
 						// + currentLat + " , " + currentLon + " --- " + prevLat + ","
 						// + prevLon);
-						distFromPrevInMeters = UtilityBelt.haversine(currentLat, currentLon, prevLat, prevLon);//
+						distFromPrevInMeters = StatsUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
 
 						// System.out.println("returned dist in km = " + distFromPrevInMeters);
 						distFromPrevInMeters = distFromPrevInMeters * 1000;
-						distFromPrevInMeters = UtilityBelt.round(distFromPrevInMeters, 2);
+						distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
 					}
 
 					else
@@ -1171,8 +1172,7 @@ public class DatabaseCreatorGowallaQuicker
 	public static ArrayList<String> identifyOnlyTargetUsers()
 	{
 		ArrayList<String> listOfUsersWhoLabelled = new ArrayList<String>();
-		int userIDs[] =
-		{ 62, 84 };// , 52, 68, 167, 179, 153, 85, 128, 10 };
+		int userIDs[] = { 62, 84 };// , 52, 68, 167, 179, 153, 85, 128, 10 };
 		for (int i : userIDs)
 		{
 			String userID = String.format("%03d", i);
@@ -1938,7 +1938,7 @@ public class DatabaseCreatorGowallaQuicker
 
 		long timeDiffInSecs = (nextTrajEntry.getTimestamp().getTime() - tsFirstEntryInPotentialStayPoint.getTime())
 				/ 1000;
-		double distDiffInKms = UtilityBelt.haversine(latFirstEntryInPotentialStayPoint,
+		double distDiffInKms = StatsUtils.haversine(latFirstEntryInPotentialStayPoint,
 				lonFirstEntryInPotentialStayPoint, latNextEntry, lonNextEntry);
 
 		if ((distDiffInKms * 1000) <= stayPointDistanceThresholdInMeters)
@@ -4064,9 +4064,8 @@ public class DatabaseCreatorGowallaQuicker
 	public static void listFilesForFolder(final File folder, String path, String userName)
 	{
 		// int count=0;
-		String categories[] =
-		{ "badImages", "Commuting", "Computer", "Eating", "Exercising", "Housework", "On the Phone", "Preparing Food",
-				"Shopping", "Socialising", "Watching TV" };
+		String categories[] = { "badImages", "Commuting", "Computer", "Eating", "Exercising", "Housework",
+				"On the Phone", "Preparing Food", "Shopping", "Socialising", "Watching TV" };
 		int countOfJPG = 0;// , countOfCategoryAssignments=0;;
 		int countOfActivityFilesFound = 0;
 		int countOfJPGFilesMentionedInAllActivityFiles = 0;

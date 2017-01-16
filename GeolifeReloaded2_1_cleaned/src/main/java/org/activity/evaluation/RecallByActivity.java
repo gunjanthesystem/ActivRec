@@ -10,9 +10,8 @@ import java.util.Map.Entry;
 public class RecallByActivity
 {
 	static String path = "/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global new without 99 1000/";
-	static final String[] activityNames =
-	{ "Others", "Commuting", "Computer", "Eating", "Exercising", "Housework", "On the Phone", "Preparing Food",
-			"Shopping", "Socialising", "Watching TV", "Unknown" };
+	static final String[] activityNames = { "Others", "Commuting", "Computer", "Eating", "Exercising", "Housework",
+			"On the Phone", "Preparing Food", "Shopping", "Socialising", "Watching TV", "Unknown" };
 
 	public static void main(String[] args)
 	{

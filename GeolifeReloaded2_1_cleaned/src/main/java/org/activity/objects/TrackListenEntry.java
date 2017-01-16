@@ -5,8 +5,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import org.activity.util.StatsUtils;
 import org.activity.util.StringUtils;
-import org.activity.util.UtilityBelt;
 
 /**
  * 
@@ -639,7 +639,7 @@ public class TrackListenEntry extends DataEntry implements Serializable, IDataEn
 	 */
 	public void addLatitude(String lat)
 	{
-		this.lat.add(UtilityBelt.round(lat, 6));
+		this.lat.add(StatsUtils.round(lat, 6));
 	}
 
 	/**
@@ -661,7 +661,7 @@ public class TrackListenEntry extends DataEntry implements Serializable, IDataEn
 
 	public void addLongitude(String lon)
 	{
-		this.lon.add(UtilityBelt.round(lon, 6));
+		this.lon.add(StatsUtils.round(lon, 6));
 	}
 
 	public void setLongitude(ArrayList<String> a)

@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 import org.apache.commons.math3.*;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
@@ -22,8 +22,7 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 public class TestStatsMore
 {
 	public static final int theKOriginal = 5;
-	public static final String[] timeCategories =
-	{ "All", "Morning", "Afternoon", "Evening" };
+	public static final String[] timeCategories = { "All", "Morning", "Afternoon", "Evening" };
 	public static String commonPath;// =Constant.commonPath;
 
 	public static void main(String args[])
@@ -70,7 +69,7 @@ public class TestStatsMore
 			// UtilityBelt.round(sd.evaluate(arrayFromArrayList(recallValsForEachRT)),4)+",");
 
 			System.out.print(// "mean at "+i+" is"+
-					UtilityBelt.round(mean(arrayFromArrayList(recallValsForEachRT)), 4) + ",");
+					StatsUtils.round(mean(arrayFromArrayList(recallValsForEachRT)), 4) + ",");
 			i += 50;
 		}
 	}

@@ -12,9 +12,9 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.Constant;
 import org.activity.util.TimelineUtils;
-import org.activity.util.UtilityBelt;
 
 /**
  * (Decided in meeting on Oct 13, 2014) </br>
@@ -175,7 +175,7 @@ public class RecommendationMasterBaseClosestTime
 		}
 		// ##############
 
-		this.startTimeDistanceSortedMap = (LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>) UtilityBelt
+		this.startTimeDistanceSortedMap = (LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>) ComparatorUtils
 				.sortByValueAscending5(startTimeDistanceUnsortedMap);
 
 		System.out.println("---------startTimeDistanceSortedMap.size()=" + startTimeDistanceSortedMap.size());
@@ -258,7 +258,7 @@ public class RecommendationMasterBaseClosestTime
 			}
 		}
 		System.out.println();
-		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) UtilityBelt
+		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
 				.sortByValueDesc(recommendedActivityNamesRankscorePairs); // Sorted in descending order of ranked score:
 																			// higher
 																			// ranked score means higher value of rank

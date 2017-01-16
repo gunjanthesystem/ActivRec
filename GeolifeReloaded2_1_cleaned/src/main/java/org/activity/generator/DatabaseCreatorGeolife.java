@@ -237,8 +237,7 @@ public class DatabaseCreatorGeolife
 	public static ArrayList<String> identifyOnlyTargetUsers()
 	{
 		ArrayList<String> listOfUsersWhoLabelled = new ArrayList<String>();
-		int userIDs[] =
-		{ 62, 84, 52, 68, 167, 179, 153, 85, 128, 10 };
+		int userIDs[] = { 62, 84, 52, 68, 167, 179, 153, 85, 128, 10 };
 		for (int i : userIDs)
 		{
 			String userID = String.format("%03d", i);
@@ -2308,9 +2307,8 @@ public class DatabaseCreatorGeolife
 	public static void listFilesForFolder(final File folder, String path, String userName)
 	{
 		// int count=0;
-		String categories[] =
-		{ "badImages", "Commuting", "Computer", "Eating", "Exercising", "Housework", "On the Phone", "Preparing Food",
-				"Shopping", "Socialising", "Watching TV" };
+		String categories[] = { "badImages", "Commuting", "Computer", "Eating", "Exercising", "Housework",
+				"On the Phone", "Preparing Food", "Shopping", "Socialising", "Watching TV" };
 		int countOfJPG = 0;// , countOfCategoryAssignments=0;;
 		int countOfActivityFilesFound = 0;
 		int countOfJPGFilesMentionedInAllActivityFiles = 0;

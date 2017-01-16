@@ -31,8 +31,7 @@ public class HilbertCurveUtils
 		BitVector chi;
 
 		// System.out.println("Inside getCompactHilbertCurveIndex");
-		CompactHilbertCurve chc = new CompactHilbertCurve(new int[]
-		{ precisionInBits, precisionInBits });
+		CompactHilbertCurve chc = new CompactHilbertCurve(new int[] { precisionInBits, precisionInBits });
 
 		List<Integer> bitsPerDimension = chc.getSpec().getBitsPerDimension();
 		// System.out.println("Bits per dimension: = " + bitsPerDimension.toString());
@@ -70,8 +69,7 @@ public class HilbertCurveUtils
 		System.out.println("Ajooba");
 		BitVector chi;
 
-		CompactHilbertCurve chc = new CompactHilbertCurve(new int[]
-		{ precisionInBits, precisionInBits });
+		CompactHilbertCurve chc = new CompactHilbertCurve(new int[] { precisionInBits, precisionInBits });
 
 		List<Integer> bitsPerDimension = chc.getSpec().getBitsPerDimension();
 		System.out.println("Bits per dimension: = " + bitsPerDimension.toString());

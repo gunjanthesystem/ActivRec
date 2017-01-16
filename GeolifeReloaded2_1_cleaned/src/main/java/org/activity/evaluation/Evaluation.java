@@ -21,10 +21,10 @@ import org.activity.util.Constant;
  */
 public class Evaluation
 {
-	public static final int theKOriginal = 5;
-	public static final String[] timeCategories =
-	{ "All", "Morning", "Afternoon", "Evening" };
 	public String commonPath;// =Constant.commonPath;
+
+	static final int theKOriginal = 5;
+	static final String[] timeCategories = { "All", "Morning", "Afternoon", "Evening" };
 
 	public Evaluation()// static void main(String args[])
 	{
@@ -229,13 +229,16 @@ public class Evaluation
 
 			for (String timeCategory : timeCategories)
 			{
-				for (int theK = theKOriginal; theK > 0; theK--)
+				if (Constant.EvalPrecisionRecallFMeasure)
 				{
-					writePrecisionRecallFMeasure("Algo", timeCategory, theK, arrayMeta, arrayTopK, arrayActual);
-					writePrecisionRecallFMeasure("BaselineOccurrence", timeCategory, theK, arrayMeta,
-							arrayBaselineOccurrence, arrayActual);
-					writePrecisionRecallFMeasure("BaselineDuration", timeCategory, theK, arrayMeta,
-							arrayBaselineDuration, arrayActual);
+					for (int theK = theKOriginal; theK > 0; theK--)
+					{
+						writePrecisionRecallFMeasure("Algo", timeCategory, theK, arrayMeta, arrayTopK, arrayActual);
+						writePrecisionRecallFMeasure("BaselineOccurrence", timeCategory, theK, arrayMeta,
+								arrayBaselineOccurrence, arrayActual);
+						writePrecisionRecallFMeasure("BaselineDuration", timeCategory, theK, arrayMeta,
+								arrayBaselineDuration, arrayActual);
+					}
 				}
 
 				writeReciprocalRank("Algo", timeCategory, arrayMeta, arrayTopK, arrayActual);
@@ -263,8 +266,8 @@ public class Evaluation
 			}
 			System.out.println("All test stats done");
 			// PopUps.showMessage("All test stats done");
-
 		}
+
 		catch (IOException e)
 		{
 			e.printStackTrace();
@@ -393,8 +396,7 @@ public class Evaluation
 							System.out.println("actual string =" + actual);
 						}
 						// int countOfOccurence = 0; // the number of times the actual item appears in the top K
-						// recommended list. NOTE: in the current case will be always be
-						// either 1 or 0.
+						// recommended list. NOTE: in the current case will be always be either 1 or 0.
 						int rank = -99;
 						for (int y = 1; y <= topKString.length - 1; y++)
 						{
@@ -780,7 +782,7 @@ public class Evaluation
 							{
 								double rrValueRead = Double.parseDouble(rrValuesForThisUser[i]);
 
-								if (rrValueRead >= 0) // negative P value for a given RT for given K means that we were
+								if (rrValueRead >= 0) // negative rr value for a given RT for given K means that we were
 														// unable to make K recommendation at that RT
 								{
 									countOfValidRRValues += 1;

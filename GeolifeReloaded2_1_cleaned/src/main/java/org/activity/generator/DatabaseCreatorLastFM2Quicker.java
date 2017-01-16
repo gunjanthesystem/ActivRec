@@ -247,8 +247,7 @@ public class DatabaseCreatorLastFM2Quicker extends DatabaseCreator
 	public static ArrayList<String> identifyOnlyTargetUsers()
 	{
 		ArrayList<String> listOfUsersWhoLabelled = new ArrayList<String>();
-		int userIDs[] =
-		{ 62, 84 };// , 52, 68, 167, 179, 153, 85, 128, 10 };
+		int userIDs[] = { 62, 84 };// , 52, 68, 167, 179, 153, 85, 128, 10 };
 		for (int i : userIDs)
 		{
 			String userID = String.format("%03d", i);

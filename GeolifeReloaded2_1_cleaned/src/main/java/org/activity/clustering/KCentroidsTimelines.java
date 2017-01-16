@@ -11,7 +11,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.Timeline;
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 
 /**
  * 
@@ -480,7 +480,7 @@ public class KCentroidsTimelines
 			res += clusters[i].getIntraClusterVariance(distancesMap);
 		}
 
-		return UtilityBelt.round(res / numOfClusters, 4);
+		return StatsUtils.round(res / numOfClusters, 4);
 	}
 
 	public double getAvgOfIntraClusterStandardDeviations()
@@ -490,7 +490,7 @@ public class KCentroidsTimelines
 		{
 			res += clusters[i].getIntraClusterStandardDeviation();
 		}
-		return UtilityBelt.round(res / numOfClusters, 4);
+		return StatsUtils.round(res / numOfClusters, 4);
 	}
 
 	public double getInterClusterVariance()
@@ -515,14 +515,14 @@ public class KCentroidsTimelines
 		System.out.println("Inter cluster variance =" + res + "/" + count);
 		res = res / count;
 
-		this.interClusterVariance = UtilityBelt.round(res, 4);
+		this.interClusterVariance = StatsUtils.round(res, 4);
 		return interClusterVariance;// UtilityBelt.round(res, 4);
 	}
 
 	public double getInterClusterStandardDeviation()
 	{
 		// return UtilityBelt.round(Math.sqrt(getInterClusterVariance()), 4);
-		return UtilityBelt.round(Math.sqrt(interClusterVariance), 4);
+		return StatsUtils.round(Math.sqrt(interClusterVariance), 4);
 	}
 	// public void traverseTimeline(LinkedHashMap<String, Timeline> allDayTimelines)
 	// {

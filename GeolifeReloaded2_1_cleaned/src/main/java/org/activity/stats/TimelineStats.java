@@ -32,12 +32,14 @@ import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.stats.entropy.SampleEntropyG;
 import org.activity.ui.PopUps;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.DescriptiveStatisticsG;
 import org.activity.util.HilbertCurveUtils;
 import org.activity.util.HjorthParameters;
+import org.activity.util.StatsUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
@@ -186,7 +188,7 @@ public class TimelineStats
 		}
 		case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
 		{
-			LinkedHashMap<String, Timeline> usersTimelines = UtilityBelt.dayTimelinesToTimelines(usersDayTimelines);
+			LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 			LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = UtilityBelt
 					.expungeInvalids(usersTimelines);
 
@@ -242,7 +244,7 @@ public class TimelineStats
 
 		case "NGramAnalysis":
 		{
-			LinkedHashMap<String, Timeline> userTimelines = UtilityBelt.dayTimelinesToTimelines(usersDayTimelines);
+			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
 			userTimelines = UtilityBelt.expungeInvalids(userTimelines);
 
@@ -255,7 +257,7 @@ public class TimelineStats
 
 		case "AlgorithmicAnalysis":
 		{
-			LinkedHashMap<String, Timeline> userTimelines = UtilityBelt.dayTimelinesToTimelines(usersDayTimelines);
+			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 			userTimelines = UtilityBelt.expungeInvalids(userTimelines);
 
 			performAlgorithmicAnalysis(userTimelines, 1, 20, (pathToWrite));
@@ -263,7 +265,7 @@ public class TimelineStats
 		}
 		case "AlgorithmicAnalysis2":
 		{
-			LinkedHashMap<String, Timeline> userTimelines = UtilityBelt.dayTimelinesToTimelines(usersDayTimelines);
+			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 			userTimelines = UtilityBelt.expungeInvalids(userTimelines);
 
 			performAlgorithmicAnalysis2(userTimelines, 1, 20, (pathToWrite));
@@ -271,7 +273,7 @@ public class TimelineStats
 		}
 		case "FeatureAnalysis":
 		{
-			LinkedHashMap<String, Timeline> userTimelines = UtilityBelt.dayTimelinesToTimelines(usersDayTimelines);
+			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
 			userTimelines = UtilityBelt.expungeInvalids(userTimelines);
 			writeAllFeaturesValues(userTimelines, pathToWrite);
@@ -326,7 +328,7 @@ public class TimelineStats
 				for (int m = mMin; m <= mMax; m += mStep)
 				{
 					double valsTS[] = UtilityBelt.getTimeSeriesVals(absfileNameToRead);
-					double sampleEntropy = SampleEntropyG.getSampleEntropyG(valsTS, m, r * UtilityBelt.getSD(valsTS));
+					double sampleEntropy = SampleEntropyG.getSampleEntropyG(valsTS, m, r * StatsUtils.getSD(valsTS));
 					if (Double.isInfinite(sampleEntropy) || Double.isNaN(sampleEntropy))
 					{
 						sampleEntropy = Double.NaN;// 12.33333;
@@ -430,7 +432,7 @@ public class TimelineStats
 						r = rOriginal;
 
 					double valsTS[] = UtilityBelt.getTimeSeriesVals(absfileNameToRead);
-					double sampleEntropy = SampleEntropyG.getSampleEntropyG(valsTS, m, r * UtilityBelt.getSD(valsTS));
+					double sampleEntropy = SampleEntropyG.getSampleEntropyG(valsTS, m, r * StatsUtils.getSD(valsTS));
 
 					if (Double.isInfinite(sampleEntropy) || Double.isNaN(sampleEntropy))
 					{
@@ -884,7 +886,7 @@ public class TimelineStats
 				for (Entry<Double, Double> muEntry : muEntries.entrySet())
 				{
 					double mu = muEntry.getKey();
-					double avgPairwiseEditDistanceOfSegments = UtilityBelt.round(muEntry.getValue(), 4);
+					double avgPairwiseEditDistanceOfSegments = StatsUtils.round(muEntry.getValue(), 4);
 					double upon;
 					if (mu == 0)
 					{
@@ -973,7 +975,7 @@ public class TimelineStats
 
 		if (beginIndices.size() != segments.size())
 		{
-			UtilityBelt.assertEquals(beginIndices.size(), segments.size());
+			ComparatorUtils.assertEquals(beginIndices.size(), segments.size());
 		}
 		// System.out.println("exiting getTrailSegments");
 
@@ -1058,8 +1060,7 @@ public class TimelineStats
 	{
 		// System.out.println("Inside getAvgPairwiseTwoLevelED");
 		if (segments.size() == 1) // only one segment
-			return new double[]
-			{ 0 };
+			return new double[] { 0 };
 
 		int count = 0;
 		// int numOfPairs = (int) (CombinatoricsUtils.factorial(segments.size()) / (CombinatoricsUtils.factorial(2) *
@@ -1878,7 +1879,7 @@ public class TimelineStats
 
 		for (Map.Entry<String, String> entry : ts.entrySet())
 		{
-			r.put(entry.getKey(), UtilityBelt.round(UtilityBelt.getShannonEntropy(entry.getValue()), 4));
+			r.put(entry.getKey(), StatsUtils.round(StatsUtils.getShannonEntropy(entry.getValue()), 4));
 		}
 		System.out.println("exiting getEntropy");
 		return r;
@@ -2770,7 +2771,7 @@ public class TimelineStats
 				}
 			}
 		}
-		Descriptive.getDescriptiveStatistics(durationsForAll.stream().mapToDouble(l -> l.doubleValue()).toArray(),
+		StatsUtils.getDescriptiveStatistics(durationsForAll.stream().mapToDouble(l -> l.doubleValue()).toArray(),
 				"Durations For All users", "DurationsForAllUsers");
 		System.out.println("Number of activity-objects with duration < 1 minutes: " + countLessOneMinute
 				+ ", % of total = " + (((double) countLessOneMinute / count) * 100));
@@ -2792,7 +2793,7 @@ public class TimelineStats
 
 		toWrite += "Num of users = " + usersDayTimelines.size();
 
-		LinkedHashMap<String, Timeline> usersTimelines = UtilityBelt.dayTimelinesToTimelines(usersDayTimelines);
+		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
 		StringBuffer s = new StringBuffer();
 		s.append("User, User, NumOfActivityObjects");
@@ -2813,7 +2814,7 @@ public class TimelineStats
 	public static void writeNumOfActivityObjectsInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
 	{
-		LinkedHashMap<String, Timeline> usersTimelines = UtilityBelt.dayTimelinesToTimelines(usersDayTimelines);
+		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
 		StringBuffer s = new StringBuffer();
 		s.append("User, User, NumOfActivityObjects");
@@ -2979,13 +2980,13 @@ public class TimelineStats
 				numOfDistinctActsPerDay.add(entryDay.getValue().countNumberOfValidDistinctActivities());
 			}
 
-			avgNumOfDistinctActsPerDay = UtilityBelt.averageOfListInteger(numOfDistinctActsPerDay);
+			avgNumOfDistinctActsPerDay = StatsUtils.averageOfListInteger(numOfDistinctActsPerDay);
 
 			s.append("\n" + entry.getKey() + "," + (Constant.getIndexOfUserID(Integer.valueOf(entry.getKey())) + 1)
 					+ "," + avgNumOfDistinctActsPerDay + ","
-					+ UtilityBelt.meanOfArrayListInt(numOfDistinctActsPerDay, 2) + ","
-					+ UtilityBelt.medianOfArrayListInt(numOfDistinctActsPerDay, 2) + ","
-					+ UtilityBelt.iqrOfArrayListInt(numOfDistinctActsPerDay, 2));
+					+ StatsUtils.meanOfArrayListInt(numOfDistinctActsPerDay, 2) + ","
+					+ StatsUtils.medianOfArrayListInt(numOfDistinctActsPerDay, 2) + ","
+					+ StatsUtils.iqrOfArrayListInt(numOfDistinctActsPerDay, 2));
 		}
 
 		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
@@ -3070,12 +3071,12 @@ public class TimelineStats
 				numOfTotalActsPerDay.add(entryDay.getValue().countNumberOfValidActivities());
 			}
 
-			avgNumOfTotalActsPerDay = UtilityBelt.averageOfListInteger(numOfTotalActsPerDay);
+			avgNumOfTotalActsPerDay = StatsUtils.averageOfListInteger(numOfTotalActsPerDay);
 
 			s.append("\n" + entry.getKey() + "," + (Constant.getIndexOfUserID(Integer.valueOf(entry.getKey())) + 1)
-					+ "," + avgNumOfTotalActsPerDay + "," + UtilityBelt.meanOfArrayListInt(numOfTotalActsPerDay, 2)
-					+ "," + UtilityBelt.medianOfArrayListInt(numOfTotalActsPerDay, 2) + ","
-					+ UtilityBelt.iqrOfArrayListInt(numOfTotalActsPerDay, 2));
+					+ "," + avgNumOfTotalActsPerDay + "," + StatsUtils.meanOfArrayListInt(numOfTotalActsPerDay, 2)
+					+ "," + StatsUtils.medianOfArrayListInt(numOfTotalActsPerDay, 2) + ","
+					+ StatsUtils.iqrOfArrayListInt(numOfTotalActsPerDay, 2));
 		}
 
 		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
