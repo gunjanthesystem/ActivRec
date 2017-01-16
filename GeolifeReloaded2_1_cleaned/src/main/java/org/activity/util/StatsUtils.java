@@ -52,6 +52,23 @@ public class StatsUtils
 		return newArray;
 	}
 
+	/**
+	 * Create org.apache.commons.math3.stat.descriptive.DescriptiveStatistics object from the ArrayList(Double)
+	 * 
+	 * @param valsReceived
+	 * @return
+	 */
+	public static DescriptiveStatistics getDescriptiveStatistics(ArrayList<Double> valsReceived)
+	{
+		double vals[] = new double[valsReceived.size()];
+
+		for (int i = 0; i < valsReceived.size(); i++)
+		{
+			vals[i] = valsReceived.get(i);
+		}
+		return new DescriptiveStatistics(vals);
+	}
+
 	public static double getSD(double[] vals)
 	{
 		DescriptiveStatistics ds = new DescriptiveStatistics(vals);

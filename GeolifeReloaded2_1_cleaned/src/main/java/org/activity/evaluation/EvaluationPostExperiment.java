@@ -18,6 +18,7 @@ import org.activity.util.Constant;
 import org.activity.util.StatsUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  * 
@@ -174,6 +175,10 @@ public class EvaluationPostExperiment
 						double allSum = 0, sumCurrTargetSame = 0, sumCurrTargetDiff = 0;
 						int countOfValidRRValues = 0, countOfCurrTargetSame = 0, countOfCurrentTargetDiff = 0;
 
+						ArrayList<Double> allrrValues = new ArrayList<Double>(),
+								rrValuesForCurrTargetSame = new ArrayList<Double>(),
+								rrValuesForCurrTargetDiff = new ArrayList<Double>();
+
 						if (currentRRLine.trim().length() == 0)
 						{
 							System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath
@@ -189,6 +194,7 @@ public class EvaluationPostExperiment
 								if (rrValueRead >= 0) // negative rr value for a given RT for given K means that we were
 														// unable to make K recommendation at that RT
 								{
+									allrrValues.add(rrValueRead);
 									countOfValidRRValues += 1;
 									allSum += rrValueRead;
 								}
@@ -197,6 +203,7 @@ public class EvaluationPostExperiment
 										|| ifCurrTargetSameValuesForThisUser[i].equals("1")
 										|| ifCurrTargetSameValuesForThisUser[i].equals("t"))
 								{
+									rrValuesForCurrTargetSame.add(rrValueRead);
 									countOfCurrTargetSame += 1;
 									sumCurrTargetSame += rrValueRead;
 								}
@@ -205,6 +212,7 @@ public class EvaluationPostExperiment
 										|| ifCurrTargetSameValuesForThisUser[i].equals("0")
 										|| ifCurrTargetSameValuesForThisUser[i].equals("f"))
 								{
+									rrValuesForCurrTargetDiff.add(rrValueRead);
 									countOfCurrentTargetDiff += 1;
 									sumCurrTargetDiff += rrValueRead;
 								}
@@ -233,6 +241,12 @@ public class EvaluationPostExperiment
 						currTargetDiffMRRValueForThisUser = StatsUtils
 								.round((double) sumCurrTargetDiff / countOfCurrentTargetDiff, 4);
 
+						DescriptiveStatistics dsAllrr = StatsUtils.getDescriptiveStatistics(allrrValues);
+						DescriptiveStatistics dsCurrentTargetSamerr = StatsUtils
+								.getDescriptiveStatistics(rrValuesForCurrTargetSame);
+						DescriptiveStatistics dsCurrentTargetDiffrr = StatsUtils
+								.getDescriptiveStatistics(rrValuesForCurrTargetDiff);
+
 						System.out.println("Calculating MRR: all = " + allSum + "/" + countOfValidRRValues);
 						System.out.println("Calculating MRR: curr target same = " + sumCurrTargetSame + "/"
 								+ countOfCurrTargetSame);
@@ -241,10 +255,21 @@ public class EvaluationPostExperiment
 
 						bw.write(currTargetSameMRRValueForThisUser + "," + currTargetDiffMRRValueForThisUser + ","
 								+ allMRRValueForThisUser + ",");
-						allTogetherForAnalysis
-								.write(currTargetSameMRRValueForThisUser + "," + currTargetDiffMRRValueForThisUser + ","
-										+ allMRRValueForThisUser + "," + countOfCurrTargetSame + ","
-										+ countOfCurrentTargetDiff + "," + countOfValidRRValues + "," + commonPath);
+
+						// allTogetherForAnalysis
+						// .write(currTargetSameMRRValueForThisUser + "," + currTargetDiffMRRValueForThisUser + ","
+						// + allMRRValueForThisUser + "," + countOfCurrTargetSame + ","
+						// + countOfCurrentTargetDiff + "," + countOfValidRRValues + "," + commonPath);
+
+						allTogetherForAnalysis.write(StatsUtils.round(dsCurrentTargetSamerr.getMean(), 4) + ","
+								+ StatsUtils.round(dsCurrentTargetDiffrr.getMean(), 4) + ","
+								+ StatsUtils.round(dsAllrr.getMean(), 4) + ","
+								+ StatsUtils.round(dsCurrentTargetSamerr.getN(), 4) + ","
+								+ StatsUtils.round(dsCurrentTargetDiffrr.getN(), 4) + ","
+								+ StatsUtils.round(dsAllrr.getN(), 4) + ","
+								+ StatsUtils.round(dsCurrentTargetSamerr.getStandardDeviation(), 4) + ","
+								+ StatsUtils.round(dsCurrentTargetDiffrr.getStandardDeviation(), 4) + ","
+								+ StatsUtils.round(dsAllrr.getStandardDeviation(), 4) + "," + commonPath);
 
 						break;
 					}
