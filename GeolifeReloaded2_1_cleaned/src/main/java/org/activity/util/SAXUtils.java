@@ -21,8 +21,7 @@ public class SAXUtils
 		 */
 		Timestamp a = new Timestamp(2014, 4, 4, 4, 4, 4, 0);
 
-		double vals[] =
-		{ 12, 14, 23.5, 22, 4 };
+		double vals[] = { 12, 14, 23.5, 22, 4 };
 		long stamps[] = new long[5];
 
 		System.out.println("Timeseries:");

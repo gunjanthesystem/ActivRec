@@ -30,8 +30,9 @@ import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
 import org.activity.util.CSVUtils;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.Constant;
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 import org.activity.util.weka.WekaUtilityBelt;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.ArrayUtils;
@@ -82,8 +83,7 @@ public class TimelineWEKAClusteringController
 																				// cluster, 2 for Third CLuster and 3
 																				// for Second Cluster
 
-	private final String attributeGroups[] =
-	{ "SampEn2", "SampEn3", "KGram" };
+	private final String attributeGroups[] = { "SampEn2", "SampEn3", "KGram" };
 
 	// final Pair<String, String> groundTruth1 = new Pair<String, String>("Clusters0Min",
 	// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsFeb8/Mod0/CountsForClusterLabelAccToMinMUHavMaxMRR.csv");
@@ -791,21 +791,21 @@ public class TimelineWEKAClusteringController
 		colNumUserIDKGram = getColumnNumberOfHeader("UserID", kGramAttRecords.get(0));
 		kGramAttRecords.remove(0);// removing header
 		// User1
-		TreeMap<String, String> actualClass = new TreeMap<String, String>(UtilityBelt.getUserIDComparator());
-		TreeMap<String, String> predictedClassAll = new TreeMap<String, String>(UtilityBelt.getUserIDComparator());
-		TreeMap<String, String> predictedClassSampEn2 = new TreeMap<String, String>(UtilityBelt.getUserIDComparator());
-		TreeMap<String, String> predictedClassSampEn3 = new TreeMap<String, String>(UtilityBelt.getUserIDComparator());
-		TreeMap<String, String> predictedClassKGram = new TreeMap<String, String>(UtilityBelt.getUserIDComparator());
+		TreeMap<String, String> actualClass = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassAll = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassSampEn2 = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassSampEn3 = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassKGram = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
 
 		// distribution <first cluster, thirdcluster, secondcluster>
 		TreeMap<String, Triple<Double, Double, Double>> predictedClassAllDist = new TreeMap<String, Triple<Double, Double, Double>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 		TreeMap<String, Triple<Double, Double, Double>> predictedClassSampEn2Dist = new TreeMap<String, Triple<Double, Double, Double>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 		TreeMap<String, Triple<Double, Double, Double>> predictedClassSampEn3Dist = new TreeMap<String, Triple<Double, Double, Double>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 		TreeMap<String, Triple<Double, Double, Double>> predictedClassKGramDist = new TreeMap<String, Triple<Double, Double, Double>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		System.out.println(">> Debug Marker: 679: " + colNumActualClassAll + "  " + colNumPredictedClassAll + "  "
 				+ colNumPredictedClassSampEn2 + "  " + colNumPredictedClassSampEn3 + "  " + colNumPredictedClassKGram
@@ -899,14 +899,14 @@ public class TimelineWEKAClusteringController
 		 * sampen2 sampen3 kgram for cluster2))
 		 */
 		TreeMap<String, Triple<Double, Double, Double>> meanEnsemble = new TreeMap<String, Triple<Double, Double, Double>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		/**
 		 * (UserID, (max of sampen2 sampen3 kgram for cluster1, max of sampen2 sampen3 kgram for cluster3, max of
 		 * sampen2 sampen3 kgram for cluster2))
 		 */
 		TreeMap<String, Triple<Double, Double, Double>> maxEnsemble = new TreeMap<String, Triple<Double, Double, Double>>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 
 		/**
 		 * (UserID, (max of sampen2 sampen3 kgram for cluster1, max of sampen2 sampen3 kgram for cluster3, max of
@@ -916,13 +916,13 @@ public class TimelineWEKAClusteringController
 		// Double>>(getUserIDComparator());
 
 		TreeMap<String, String> predictedClassMaxEnsemble = new TreeMap<String, String>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 		TreeMap<String, String> predictedClassMeanEnsemble = new TreeMap<String, String>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 		TreeMap<String, String> predictedClassMajorityVoting = new TreeMap<String, String>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 		TreeMap<String, String> predictedClassWeightedMajorityVoting = new TreeMap<String, String>(
-				UtilityBelt.getUserIDComparator());
+				ComparatorUtils.getUserIDComparator());
 		// TreeMap<String, String> predictedClassModeEnsemble = new TreeMap<String, String>(getUserIDComparator());
 
 		String fuseDistriFileToWrite = pathToWrite + "FusedDistributionFile.csv";
@@ -1432,8 +1432,7 @@ public class TimelineWEKAClusteringController
 		else
 		// (classLabel.length() <= 0) // do a random prediction
 		{
-			String s[] =
-			{ "FirstCluster__zz", "SecondCluster__zz", "ThirdCluster__zz" };
+			String s[] = { "FirstCluster__zz", "SecondCluster__zz", "ThirdCluster__zz" };
 
 			int randomNum = 0 + (int) (Math.random() * 2);
 			return s[randomNum];
@@ -1475,8 +1474,7 @@ public class TimelineWEKAClusteringController
 
 		if (classLabel.length() <= 0) // do a random prediction
 		{
-			String s[] =
-			{ "FirstCluster__zz", "SecondCluster__zz", "ThirdCluster__zz" };
+			String s[] = { "FirstCluster__zz", "SecondCluster__zz", "ThirdCluster__zz" };
 
 			int randomNum = 0 + (int) (Math.random() * 2);
 			return s[randomNum];
@@ -2126,7 +2124,7 @@ public class TimelineWEKAClusteringController
 			// END OF ALERT ALERT ALERT
 			// convert the indices with respect to the original data instances
 			// PopUps.showMessage("before adjustment Index of Selected Attributes =" + Utils.arrayToString(indices));
-			indices = UtilityBelt.addConstantToEach(indices, 2); // adding 2, (1:compensating the deletion of
+			indices = StatsUtils.addConstantToEach(indices, 2); // adding 2, (1:compensating the deletion of
 																	// instanceid, 1: to compensating that the selected
 																	// indices start from 0
 																	// while here we

@@ -16,6 +16,8 @@ import org.activity.objects.UserDayTimeline;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
+import org.activity.util.StatsUtils;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 import org.activity.util.weka.WekaUtilityBelt;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -79,7 +81,7 @@ public class TimelinesAttributesExtraction
 		// $$ addDoubleFeatureToFeatureVectors(getSequenceEntropyAfterExpungingInvalids(usersDayTimelines),
 		// "ShannonsEntropy");
 
-		LinkedHashMap<String, Timeline> usersTimelines = UtilityBelt.dayTimelinesToTimelines(usersDayTimelines);
+		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 		LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = UtilityBelt.expungeInvalids(usersTimelines);
 
 		sanityCheckDayTimelineToTimelineConversion(usersDayTimelines, usersTimelines);
@@ -704,7 +706,7 @@ public class TimelinesAttributesExtraction
 			double hjParam = UtilityBelt.getValByRowCol(
 					Constant.getCommonPath() + userIDN + featureName + "HjorthParams.csv", parameterIndex, 1, false);
 			// System.out.println(" putting " + userIDN + " , " + UtilityBelt.round(hjParam, 5));
-			res.put(userIDN, UtilityBelt.round(hjParam, 5));
+			res.put(userIDN, StatsUtils.round(hjParam, 5));
 		}
 
 		// System.out.println("Is res from getHjorthParametersAfterExpungingInvalids = " + res.isEmpty());

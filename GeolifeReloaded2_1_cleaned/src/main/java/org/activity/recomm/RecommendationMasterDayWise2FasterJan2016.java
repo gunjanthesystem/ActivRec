@@ -16,10 +16,11 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.Constant;
+import org.activity.util.StatsUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
-import org.activity.util.UtilityBelt;
 
 /* Modified version of RecommendationMasterDayWise2Faster. This uses daywise timelines*/
 public class RecommendationMasterDayWise2FasterJan2016
@@ -209,7 +210,7 @@ public class RecommendationMasterDayWise2FasterJan2016
 		// endPointIndexWithLeastDistanceForCandidateTimelines =
 		// getEndPointIndicesWithLeastDistanceInCandidateTimeline(candidateTimelines,activitiesGuidingRecomm);
 		// sort by edit distance ascending
-		editDistancesSortedMap = (LinkedHashMap<Date, Triple<Integer, String, Double>>) UtilityBelt
+		editDistancesSortedMap = (LinkedHashMap<Date, Triple<Integer, String, Double>>) ComparatorUtils
 				.sortTripleByThirdValueAscending6(editDistancesMap);
 
 		// this.nextActivityNamesFromCandsByEditDistance =
@@ -462,7 +463,7 @@ public class RecommendationMasterDayWise2FasterJan2016
 		}
 
 		System.out.println();
-		recommendedActivityNamesWithRankScores = (LinkedHashMap<String, Double>) UtilityBelt
+		recommendedActivityNamesWithRankScores = (LinkedHashMap<String, Double>) ComparatorUtils
 				.sortByValueDesc(recommendedActivityNamesWithRankScores); // Sorted in
 																			// descending
 																			// order of
@@ -855,7 +856,7 @@ public class RecommendationMasterDayWise2FasterJan2016
 		}
 		// ///////////////////
 
-		distanceScoresForEachSubsequence = (LinkedHashMap<Integer, Pair<String, Double>>) UtilityBelt
+		distanceScoresForEachSubsequence = (LinkedHashMap<Integer, Pair<String, Double>>) ComparatorUtils
 				.sortByValueAscendingIntStrDoub(distanceScoresForEachSubsequence);
 		// $$WritingToFile.writeEditDistancesOfAllEndPoints(activitiesGuidingRecomm,userDayTimeline,distanceScoresForEachSubsequence);
 
@@ -937,7 +938,7 @@ public class RecommendationMasterDayWise2FasterJan2016
 		System.out.println(
 				"distanceScoreForSubsequenceWithHighestSimilarity=" + distanceScoreForSubsequenceWithHighestSimilarity);
 
-		distanceScoreForSubsequenceWithHighestSimilarity = UtilityBelt
+		distanceScoreForSubsequenceWithHighestSimilarity = StatsUtils
 				.round(distanceScoreForSubsequenceWithHighestSimilarity, 4);
 
 		return new Triple(endPointIndexForSubsequenceWithHighestSimilarity,

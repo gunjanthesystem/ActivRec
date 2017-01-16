@@ -419,9 +419,8 @@ public abstract class DatabaseCreator
 	public static void listFilesForFolder(final File folder, String path, String userName)
 	{
 		// int count=0;
-		String categories[] =
-		{ "badImages", "Commuting", "Computer", "Eating", "Exercising", "Housework", "On the Phone", "Preparing Food",
-				"Shopping", "Socialising", "Watching TV" };
+		String categories[] = { "badImages", "Commuting", "Computer", "Eating", "Exercising", "Housework",
+				"On the Phone", "Preparing Food", "Shopping", "Socialising", "Watching TV" };
 		int countOfJPG = 0;// , countOfCategoryAssignments=0;;
 		int countOfActivityFilesFound = 0;
 		int countOfJPGFilesMentionedInAllActivityFiles = 0;

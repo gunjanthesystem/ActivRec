@@ -6,7 +6,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.util.Constant;
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 
 /**
  * Note: this has been modified for Geolife data set to account for the additional attributes from geolocation
@@ -203,8 +203,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 			}
 		}
 
-		dAct = UtilityBelt.round(dAct, 4);
-		dFeat = UtilityBelt.round(dFeat, 4);
+		dAct = StatsUtils.round(dAct, 4);
+		dFeat = StatsUtils.round(dFeat, 4);
 
 		if (Constant.verboseDistance)
 		{

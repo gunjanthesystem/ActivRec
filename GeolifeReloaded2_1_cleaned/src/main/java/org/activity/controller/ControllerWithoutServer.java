@@ -343,8 +343,7 @@ public class ControllerWithoutServer
 			// Constant.outputCoreResultsPath =
 			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 
-			String s[] =
-			{ "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+			String s[] = { "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 
 			System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 

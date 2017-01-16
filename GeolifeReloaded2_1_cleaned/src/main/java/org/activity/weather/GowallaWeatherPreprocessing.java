@@ -28,7 +28,7 @@ import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
 import org.activity.util.CSVUtils;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 
 /**
  * Preprocessing the Gowalla checkin data to generata data in format more suitable for fetching weather data
@@ -485,8 +485,8 @@ public class GowallaWeatherPreprocessing
 
 				String date = splittedLine[3].replaceAll("\"", "");
 
-				String lat = UtilityBelt.round(splittedLine[5], decimalPlacesToKeep);// .replaceAll("\"", ""));
-				String lon = UtilityBelt.round(splittedLine[6], decimalPlacesToKeep);
+				String lat = StatsUtils.round(splittedLine[5], decimalPlacesToKeep);// .replaceAll("\"", ""));
+				String lon = StatsUtils.round(splittedLine[6], decimalPlacesToKeep);
 
 				if (latLonDateSet.contains(lat + delimiter + lon + delimiter + date) == false)
 				{
@@ -566,8 +566,8 @@ public class GowallaWeatherPreprocessing
 				Instant instant = Instant.parse(timestampString);
 				long epochSeconds = instant.getEpochSecond();
 
-				String lat = UtilityBelt.round(splittedLine[5], decimalPlacesToKeep);// .replaceAll("\"", ""));
-				String lon = UtilityBelt.round(splittedLine[6], decimalPlacesToKeep);
+				String lat = StatsUtils.round(splittedLine[5], decimalPlacesToKeep);// .replaceAll("\"", ""));
+				String lon = StatsUtils.round(splittedLine[6], decimalPlacesToKeep);
 
 				if (latLonTSSet.contains(lat + delimiter + lon + delimiter + epochSeconds) == false)
 				{
@@ -714,8 +714,8 @@ public class GowallaWeatherPreprocessing
 						numOfActivityObjectsOverAllUsers += 1;
 						numOfActivityObjectForThisUser += 1;
 
-						String lat = UtilityBelt.round(aos.getStartLatitude(), numOfDecimalPlacesToKeep);
-						String lon = UtilityBelt.round(aos.getStartLongitude(), numOfDecimalPlacesToKeep);
+						String lat = StatsUtils.round(aos.getStartLatitude(), numOfDecimalPlacesToKeep);
+						String lon = StatsUtils.round(aos.getStartLongitude(), numOfDecimalPlacesToKeep);
 
 						if (dateOrTimestamp == true)
 						{
@@ -797,8 +797,8 @@ public class GowallaWeatherPreprocessing
 				// ts.toLocalDateTime().toLocalDate().toString();
 				// long epochSeconds = instant.getEpochSecond();
 
-				String lat = UtilityBelt.round(splittedLine[5], numOfDecimalPlacesToKeep);
-				String lon = UtilityBelt.round(splittedLine[6], numOfDecimalPlacesToKeep);
+				String lat = StatsUtils.round(splittedLine[5], numOfDecimalPlacesToKeep);
+				String lon = StatsUtils.round(splittedLine[6], numOfDecimalPlacesToKeep);
 
 				latLonTSSet.add(lat + delimiter + lon + delimiter + date);
 			}
@@ -847,8 +847,8 @@ public class GowallaWeatherPreprocessing
 				Instant instant = Instant.parse(timestampString);
 				long epochSeconds = instant.getEpochSecond();
 
-				String lat = UtilityBelt.round(splittedLine[5], numOfDecimalPlacesToKeep);
-				String lon = UtilityBelt.round(splittedLine[6], numOfDecimalPlacesToKeep);
+				String lat = StatsUtils.round(splittedLine[5], numOfDecimalPlacesToKeep);
+				String lon = StatsUtils.round(splittedLine[6], numOfDecimalPlacesToKeep);
 
 				latLonTSSet.add(lat + delimiter + lon + delimiter + epochSeconds);
 			}

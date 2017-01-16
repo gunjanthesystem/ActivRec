@@ -51,10 +51,8 @@ public class TestExperiments
 		KendallsCorrelation kt = new KendallsCorrelation();
 		SpearmansCorrelation sp = new SpearmansCorrelation();
 
-		double a1[] =
-		{ 1, 1, 2, 3, 2 };
-		double a2[] =
-		{ 3, 2, 1, 1, 2 };
+		double a1[] = { 1, 1, 2, 3, 2 };
+		double a2[] = { 3, 2, 1, 1, 2 };
 
 		System.out.println(kt.correlation(a1, a2));
 		System.out.println(sp.correlation(a1, a2));
@@ -151,8 +149,7 @@ public class TestExperiments
 		double median = stats.getPercentile(50);
 		System.out.println("median = " + new DescriptiveStatistics(arr).getPercentile(50));
 
-		double a[] =
-		{ 3610, 4563 };
+		double a[] = { 3610, 4563 };
 		System.out.println("median = " + getMedian(a));
 
 		return 0;
@@ -826,14 +823,14 @@ public class TestExperiments
 	{
 		Timestamp a = new Timestamp(2014, 4, 4, 4, 4, 4, 0);
 
-		double vals[] =
-		{ 62728.0, 63089.0, 63498.0, 63716.0, 63936.0, 65023.0, 64471.0, 65459.0, 65768.0, 36136.0, 36553.0, 36882.0 };// {
-																														// 12,
-																														// 14,
-																														// 23.5,
-																														// 22,
-																														// 4
-																														// };
+		double vals[] = { 62728.0, 63089.0, 63498.0, 63716.0, 63936.0, 65023.0, 64471.0, 65459.0, 65768.0, 36136.0,
+				36553.0, 36882.0 };// {
+									// 12,
+									// 14,
+									// 23.5,
+									// 22,
+									// 4
+									// };
 		long stamps[] = new long[12];
 
 		System.out.println("Timeseries:");

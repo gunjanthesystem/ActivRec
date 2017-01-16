@@ -8,8 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.activity.util.StatsUtils;
 import org.activity.util.StringUtils;
-import org.activity.util.UtilityBelt;
 
 /**
  * 
@@ -84,7 +84,7 @@ public class TrajectoryEntry implements Serializable
 			throw new Exception(
 					"Error in org.activity.util.TrajectoryEntry.getDistance(TrajectoryEntry, TrajectoryEntry): Trajectory entries are not single points but merged points");
 		}
-		res = UtilityBelt.haversine(t1.getLatitude().get(0), t1.getLongitude().get(0), t2.getLatitude().get(0),
+		res = StatsUtils.haversine(t1.getLatitude().get(0), t1.getLongitude().get(0), t2.getLatitude().get(0),
 				t2.getLongitude().get(0));
 		return res;
 	}
@@ -121,8 +121,8 @@ public class TrajectoryEntry implements Serializable
 		this.lon = new ArrayList<String>();
 		this.alt = new ArrayList<String>();
 		this.timestamps = new ArrayList<Timestamp>();
-		this.lat.add(UtilityBelt.round(lat, 6));
-		this.lon.add(UtilityBelt.round(lon, 6)); // note: 6 decimal places offers the precision upto .11m
+		this.lat.add(StatsUtils.round(lat, 6));
+		this.lon.add(StatsUtils.round(lon, 6)); // note: 6 decimal places offers the precision upto .11m
 													// ref:http://dpstyles.tumblr.com/post/95952859425/how-much-does-the-precision-of-a-latlong-change
 		// https://en.wikipedia.org/wiki/Decimal_degrees
 		this.alt.add(alt);
@@ -151,8 +151,8 @@ public class TrajectoryEntry implements Serializable
 
 		this.trajectoryID = new ArrayList<String>();
 
-		this.lat.add(UtilityBelt.round(lat, 6));
-		this.lon.add(UtilityBelt.round(lon, 6));
+		this.lat.add(StatsUtils.round(lat, 6));
+		this.lon.add(StatsUtils.round(lon, 6));
 		this.alt.add(alt);
 		this.timestamps.add(t);
 
@@ -599,7 +599,7 @@ public class TrajectoryEntry implements Serializable
 	 */
 	public void addLatitude(String lat)
 	{
-		this.lat.add(UtilityBelt.round(lat, 6));
+		this.lat.add(StatsUtils.round(lat, 6));
 	}
 
 	/**
@@ -621,7 +621,7 @@ public class TrajectoryEntry implements Serializable
 
 	public void addLongitude(String lon)
 	{
-		this.lon.add(UtilityBelt.round(lon, 6));
+		this.lon.add(StatsUtils.round(lon, 6));
 	}
 
 	public void setLongitude(ArrayList<String> a)
@@ -826,7 +826,7 @@ public class TrajectoryEntry implements Serializable
 
 		for (int i = 0; i < numOfLatsLons; i++)
 		{
-			res = res + UtilityBelt.haversine(String.valueOf(centreLat), String.valueOf(centreLon), lat.get(i),
+			res = res + StatsUtils.haversine(String.valueOf(centreLat), String.valueOf(centreLon), lat.get(i),
 					lon.get(i), false);
 		}
 

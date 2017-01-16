@@ -248,4 +248,9 @@ public class StringUtils
 		}
 		return s;
 	}
+
+	public static int countSubstring(String subStr, String str)
+	{
+		return (str.length() - str.replace(subStr, "").length()) / subStr.length();
+	}
 }

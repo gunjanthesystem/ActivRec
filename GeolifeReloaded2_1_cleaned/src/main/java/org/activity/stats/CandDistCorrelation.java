@@ -13,7 +13,7 @@ import java.util.TreeMap;
 import org.activity.io.WritingToFile;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 
 public class CandDistCorrelation
 {
@@ -117,12 +117,12 @@ public class CandDistCorrelation
 
 					if (correlationType.equals("pearson"))
 					{
-						correlationForPrevAndCurrentMUValues = UtilityBelt.getPearsonCorrelation(valsFromPreviousMU,
+						correlationForPrevAndCurrentMUValues = StatsUtils.getPearsonCorrelation(valsFromPreviousMU,
 								entryMULevel.getValue());
 					}
 					else if (correlationType.equals("kendalltau"))
 					{
-						correlationForPrevAndCurrentMUValues = UtilityBelt.getKendallTauCorrelation(valsFromPreviousMU,
+						correlationForPrevAndCurrentMUValues = StatsUtils.getKendallTauCorrelation(valsFromPreviousMU,
 								entryMULevel.getValue());
 					}
 
@@ -332,7 +332,7 @@ public class CandDistCorrelation
 						String[] splittedString = sCurrentLine.split(",");
 						// System.out.println(sCurrentLine + " " + splittedString[3]);
 						String RTdateTimeRead = splittedString[0] + "||" + splittedString[1];
-						double editDistance = UtilityBelt.round(Double.valueOf(splittedString[4]), 4);
+						double editDistance = StatsUtils.round(Double.valueOf(splittedString[4]), 4);
 
 						// System.out.println("Reading:" + userIDString + " " + matchingUnit + " " + RTdateTimeRead + "
 						// " + editDistance);

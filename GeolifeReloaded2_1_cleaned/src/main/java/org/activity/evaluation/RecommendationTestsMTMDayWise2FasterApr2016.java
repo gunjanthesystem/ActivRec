@@ -19,11 +19,11 @@ import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterDayWise2FasterJan2016;
 import org.activity.ui.PopUps;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
-import org.activity.util.UtilityBelt;
 
 /**
  * Executes the experiments for generating recommendations Works for daywise matching Taking the recommendation tests
@@ -43,10 +43,8 @@ public class RecommendationTestsMTMDayWise2FasterApr2016
 	 * the activities guiding recommendation are pruned out from set of candidate timelines
 	 */
 	String typeOfThresholds[];// = { "Global" };// Global"};//"Percent",
-	int globalThresholds[] =
-	{ 10000000 };// {50,100,150,200,250,300,350,400,450,500,550,600,650,700,1000};
-	int percentThresholds[] =
-	{ 100 };// {50,60,70,80,90,100};
+	int globalThresholds[] = { 10000000 };// {50,100,150,200,250,300,350,400,450,500,550,600,650,700,1000};
+	int percentThresholds[] = { 100 };// {50,60,70,80,90,100};
 
 	String caseType;// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
 
@@ -576,7 +574,7 @@ public class RecommendationTestsMTMDayWise2FasterApr2016
 								 */
 								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
 										.get("activityNameCountPairsOverAllTrainingDays");
-								UtilityBelt.assertNotNull(activityNameCountPairsOverAllTrainingDays);
+								ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
 								String activityNameCountPairsOverAllTrainingDaysWithoutCount = getActivityNameCountPairsOverAllTrainingDaysWithoutCount(
 										activityNameCountPairsOverAllTrainingDays);
 								baseLineOccurrence.write(activityNameCountPairsOverAllTrainingDaysWithoutCount + ",");
@@ -585,7 +583,7 @@ public class RecommendationTestsMTMDayWise2FasterApr2016
 								 */
 								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
 										.get("activityNameDurationPairsOverAllTrainingDays");
-								UtilityBelt.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
+								ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
 								String activityNameDurationPairsOverAllTrainingDaysWithoutDuration = getActivityNameDurationPairsOverAllTrainingDaysWithoutDuration(
 										activityNameDurationPairsOverAllTrainingDays);
 								baseLineDuration
@@ -917,8 +915,7 @@ public class RecommendationTestsMTMDayWise2FasterApr2016
 			this.thresholdsArray = globalThresholds;
 			break;
 		case "None":
-			this.thresholdsArray = new int[]
-			{ 10000000 };
+			this.thresholdsArray = new int[] { 10000000 };
 			break;
 		default:
 			System.err.println("Error: Unrecognised threshold type in setThresholdsArray()");

@@ -23,7 +23,9 @@ import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.Constant;
+import org.activity.util.StatsUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
@@ -420,7 +422,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		// getActivityNamesGuidingRecommwithTimestamps() +
 		// " size of current timeline="
 		// + currentTimeline.getActivityObjectsInTimeline().size());
-		editDistancesSortedMapFullCand = (LinkedHashMap<Integer, Pair<String, Double>>) UtilityBelt
+		editDistancesSortedMapFullCand = (LinkedHashMap<Integer, Pair<String, Double>>) ComparatorUtils
 				.sortByValueAscendingIntStrDoub(editDistancesMapUnsortedFullCand); // Now distanceScoresSorted
 		// contains the String Id for
 
@@ -766,7 +768,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		// getActivityNamesGuidingRecommwithTimestamps() +
 		// " size of current timeline="
 		// + currentTimeline.getActivityObjectsInTimeline().size());
-		editDistancesSortedMapFullCand = (LinkedHashMap<Integer, Pair<String, Double>>) UtilityBelt
+		editDistancesSortedMapFullCand = (LinkedHashMap<Integer, Pair<String, Double>>) ComparatorUtils
 				.sortByValueAscendingIntStrDoub(editDistancesMapUnsortedFullCand); // Now distanceScoresSorted
 		// contains the String Id for
 
@@ -1029,7 +1031,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			System.out.println("Warning: num of top next aos at max distance(>5) =" + numberOfNextAOsAtMaxDistance);
 		}
 
-		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) UtilityBelt
+		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
 				.sortByValueDesc(recommendedActivityNamesRankscorePairs); // Sorted in
 																			// descending
 																			// order of
@@ -1161,7 +1163,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		}
 		// // Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric
 		// value of rank)
-		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) UtilityBelt
+		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
 				.sortByValueDesc(recommendedActivityNamesRankscorePairs);
 		// ///////////IMPORTANT //////////////////////////////////////////////////////////
 		this.setRecommendedActivityNamesWithRankscores(recommendedActivityNamesRankscorePairs);
@@ -1428,7 +1430,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 			System.out.println("Warning: num of top next aos at max distance(>5) =" + numberOfNextAOsAtMaxDistance);
 		}
 
-		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) UtilityBelt
+		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
 				.sortByValueDesc(recommendedActivityNamesRankscorePairs); // Sorted in
 																			// descending
 																			// order of
@@ -1542,7 +1544,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 
 		// Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value
 		// of rank)
-		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) UtilityBelt
+		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
 				.sortByValueDesc(recommendedActivityNamesRankscorePairs);
 
 		// ///////////IMPORTANT //////////////////////////////////////////////////////////
@@ -1581,7 +1583,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 	{
 		if ((max - min) > 0)
 		{
-			return UtilityBelt.round(((val - min) / (max - min)), 4);
+			return StatsUtils.round(((val - min) / (max - min)), 4);
 		}
 		else
 		{
@@ -2543,7 +2545,7 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 				featureIndex++;
 			}
 
-			distanceAggregatedOverFeatures = UtilityBelt
+			distanceAggregatedOverFeatures = StatsUtils
 					.round(distanceAggregatedOverFeatures / Constant.getNumberOfFeatures(), 4);
 			aggregatedFeatureWiseDistances.put(candID, new Pair("", distanceAggregatedOverFeatures));
 		}

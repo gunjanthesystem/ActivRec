@@ -8,6 +8,7 @@ import org.activity.objects.Pair;
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.StatsUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -64,9 +65,8 @@ public class AlignmentBasedDistance
 
 	// index 0 is StartGeo Diff for user 062, index 1 is EndGeo for user 062, index 2 is StartGeo Diff for user 084,
 	// index 3 is EndGeo for user 084, and so on,
-	private final static double thirdQuartilesStartEndGeoDiffForGeolife[] =
-	{ 50.16, 39.15, 45.66, 46.7, 11.34, 11.42, 10.86, 10.91, 18.44, 18.27, 9.89, 9.81, 12.97, 12.89, 12.98, 13.01,
-			170.915, 263.39, 1581.13, 1581.0075 };
+	private final static double thirdQuartilesStartEndGeoDiffForGeolife[] = { 50.16, 39.15, 45.66, 46.7, 11.34, 11.42,
+			10.86, 10.91, 18.44, 18.27, 9.89, 9.81, 12.97, 12.89, 12.98, 13.01, 170.915, 263.39, 1581.13, 1581.0075 };
 
 	/*
 	 * 0...0, 1...2, 2....4 user start,end 0 --> 0,1 1 --> 2,3 2---> 4,5 3---> 6,7 4---> 8,9 9--> 18,19 for start geo
@@ -115,15 +115,15 @@ public class AlignmentBasedDistance
 		switch (Constant.getDatabaseName())
 		{
 		case "geolife1":
-			wtFullActivityObject = UtilityBelt.round(wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled
+			wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled
 					+ wtStartGeo + wtEndGeo + +wtAvgAltitude, 4);
 			break;
 		case "dcu_data_2":
-			wtFullActivityObject = UtilityBelt.round(wtActivityName + wtStartTime + wtDuration, 4);
+			wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration, 4);
 			break;
 
 		case "gowalla1":
-			wtFullActivityObject = UtilityBelt.round(wtActivityName + wtStartTime + wtLocation + wtLocPopularity, 4);
+			wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtLocation + wtLocPopularity, 4);
 			break;
 
 		default:
@@ -305,7 +305,7 @@ public class AlignmentBasedDistance
 			System.err.println("Error: Case similarity is negative");
 		}
 
-		return UtilityBelt.round(result, 4);
+		return StatsUtils.round(result, 4);
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class AlignmentBasedDistance
 			System.err.println("Error: Case similarity is negative");
 		}
 
-		return UtilityBelt.round(result, 4);
+		return StatsUtils.round(result, 4);
 	}
 
 	/**
@@ -493,7 +493,7 @@ public class AlignmentBasedDistance
 	{
 		double simComponentVal = 0;
 
-		double diffGeo = UtilityBelt.haversine(lat1, lon1, lat2, lon2);
+		double diffGeo = StatsUtils.haversine(lat1, lon1, lat2, lon2);
 
 		if (diffGeo <= tolerance)
 		{
@@ -763,8 +763,8 @@ public class AlignmentBasedDistance
 			sumLons += vals[i].getSecond();
 		}
 
-		double meanLats = UtilityBelt.round(sumLats / vals.length, 6);
-		double meanLons = UtilityBelt.round(sumLons / vals.length, 6);
+		double meanLats = StatsUtils.round(sumLats / vals.length, 6);
+		double meanLons = StatsUtils.round(sumLons / vals.length, 6);
 		return new Pair(meanLats, meanLons);
 	}
 
@@ -799,7 +799,7 @@ public class AlignmentBasedDistance
 																			// distance
 		Pair<Double, Double> centroid1 = getCentroidGeoCoordinates(vals1);
 
-		double distBetweenCentroids = UtilityBelt.haversine(centroid1.getFirst(), centroid1.getSecond(),
+		double distBetweenCentroids = StatsUtils.haversine(centroid1.getFirst(), centroid1.getSecond(),
 				centroid2.getFirst(), centroid2.getSecond());
 
 		if (Constant.verbose || Constant.verboseLevenstein)
@@ -829,14 +829,14 @@ public class AlignmentBasedDistance
 
 		for (int i = 1; i <= len1; i++)
 		{
-			dp[i][0] = dp[i - 1][0] + UtilityBelt.haversine(vals1[i - 1].getFirst(), vals1[i - 1].getSecond(),
+			dp[i][0] = dp[i - 1][0] + StatsUtils.haversine(vals1[i - 1].getFirst(), vals1[i - 1].getSecond(),
 					centroid2.getFirst(), centroid2.getSecond());
 			traceMatrix[i][0].append(traceMatrix[i - 1][0] + "_D(" + (i) + "-" + "0)");
 		}
 
 		for (int j = 1; j <= len2; j++)
 		{
-			dp[0][j] = dp[0][j - 1] + UtilityBelt.haversine(vals2[j - 1].getFirst(), vals2[j - 1].getSecond(),
+			dp[0][j] = dp[0][j - 1] + StatsUtils.haversine(vals2[j - 1].getFirst(), vals2[j - 1].getSecond(),
 					centroid2.getFirst(), centroid2.getSecond());// j * distBetweenCentroids;
 			traceMatrix[0][j].append(traceMatrix[0][j - 1] + "_I(0" + "-" + j + ")");
 		}
@@ -869,15 +869,15 @@ public class AlignmentBasedDistance
 					// + UtilityBelt.haversine(vals1[i].getFirst(), vals1[i].getSecond(), vals2[j].getFirst(),
 					// vals2[j].getSecond()) + "kms");
 
-					double distBetweenPoints = UtilityBelt.haversine(vals1[i].getFirst(), vals1[i].getSecond(),
+					double distBetweenPoints = StatsUtils.haversine(vals1[i].getFirst(), vals1[i].getSecond(),
 							vals2[j].getFirst(), vals2[j].getSecond());
 					if (Constant.verboseLevenstein)
 					{
 						System.out.println("Difference of vals = " + distBetweenPoints + "kms");
 					}
-					double distBetweenPoint1AndCentroid = UtilityBelt.haversine(vals1[i].getFirst(),
+					double distBetweenPoint1AndCentroid = StatsUtils.haversine(vals1[i].getFirst(),
 							vals1[i].getSecond(), centroid2.getFirst(), centroid2.getSecond());
-					double distBetweenPoint2AndCentroid = UtilityBelt.haversine(vals2[j].getFirst(),
+					double distBetweenPoint2AndCentroid = StatsUtils.haversine(vals2[j].getFirst(),
 							vals2[j].getSecond(), centroid2.getFirst(), centroid2.getSecond());
 
 					double replace = dp[i][j] + replaceWt * distBetweenPoints;

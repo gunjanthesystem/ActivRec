@@ -10,7 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.tools.JSONProcessingGowallaTryingNonStatic;
-import org.activity.util.UtilityBelt;
+import org.activity.util.ComparatorUtils;
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -173,7 +173,7 @@ public class CategoryHierarchyTreeUI extends Application
 				.mapToLong(Number::longValue).sum();
 
 		// PopUps.showMessage("totalNumOfCheckinsNotInAnyLevel= " + totalNumOfCheckinsNotInAnyLevel);
-		Map<Integer, Long> catIDInCheckinsButNotInAnyLevelSorted = (Map<Integer, Long>) UtilityBelt
+		Map<Integer, Long> catIDInCheckinsButNotInAnyLevelSorted = (Map<Integer, Long>) ComparatorUtils
 				.sortByValue(catIDInCheckinsButNotInAnyLevel, true);
 
 		ArrayList<Button> buttonsForCatIDsToAdd = new ArrayList<Button>();
@@ -247,7 +247,7 @@ public class CategoryHierarchyTreeUI extends Application
 				.mapToLong(Number::longValue).sum();
 
 		// $$PopUps.showMessage("totalNumOfCheckinsNotInAnyLevel= " + totalNumOfCheckinsNotInAnyLevel);
-		Map<Integer, Long> catIDInCheckinsButNotInAnyLevelSorted = (Map<Integer, Long>) UtilityBelt
+		Map<Integer, Long> catIDInCheckinsButNotInAnyLevelSorted = (Map<Integer, Long>) ComparatorUtils
 				.sortByValue(catIDInCheckinsButNotInAnyLevel, true);
 
 		listForCatIDsToAdd = new ListView<>();// <Button>();

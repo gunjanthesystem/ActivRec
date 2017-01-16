@@ -7,15 +7,8 @@ public class KMeansFromHJ
 	private static final int NUM_CLUSTERS = 2; // Total clusters.
 	private static final int TOTAL_DATA = 7; // Total data points.
 
-	private static final double SAMPLES[][] = new double[][]
-	{
-			{ 1.0, 1.0 },
-			{ 1.5, 2.0 },
-			{ 3.0, 4.0 },
-			{ 5.0, 7.0 },
-			{ 3.5, 5.0 },
-			{ 4.5, 5.0 },
-			{ 3.5, 4.5 } };
+	private static final double SAMPLES[][] = new double[][] { { 1.0, 1.0 }, { 1.5, 2.0 }, { 3.0, 4.0 }, { 5.0, 7.0 },
+			{ 3.5, 5.0 }, { 4.5, 5.0 }, { 3.5, 4.5 } };
 
 	private static ArrayList<Data> dataSet = new ArrayList<Data>();
 	private static ArrayList<Centroid> centroids = new ArrayList<Centroid>();

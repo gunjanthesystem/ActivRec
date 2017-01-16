@@ -1,6 +1,6 @@
 package org.activity.sanityChecks;
 
-import org.activity.util.UtilityBelt;
+import org.activity.util.StatsUtils;
 
 public class Testsplit
 {
@@ -13,7 +13,7 @@ public class Testsplit
 		// String[] splittedString = s.split(",");
 		// System.out.println(splittedString.length);
 
-		double num = UtilityBelt.haversine("-0.4536151886", "51.47269335", "-0.45792812", "51.47069346");
+		double num = StatsUtils.haversine("-0.4536151886", "51.47269335", "-0.45792812", "51.47069346");
 
 		System.out.println(num);
 		// 0.4536151886 , 51.4711990231 --- -0.45792812,51.47069346

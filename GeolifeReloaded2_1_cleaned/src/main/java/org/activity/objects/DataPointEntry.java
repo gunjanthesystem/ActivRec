@@ -8,8 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.activity.util.StatsUtils;
 import org.activity.util.StringUtils;
-import org.activity.util.UtilityBelt;
 
 /**
  * 
@@ -80,8 +80,8 @@ public class DataPointEntry implements Serializable
 		this.lon = new ArrayList<String>();
 		this.alt = new ArrayList<String>();
 
-		this.lat.add(UtilityBelt.round(lat, 6));
-		this.lon.add(UtilityBelt.round(lon, 6));
+		this.lat.add(StatsUtils.round(lat, 6));
+		this.lon.add(StatsUtils.round(lon, 6));
 		this.alt.add(alt);
 
 		this.timestamp = t;
@@ -106,8 +106,8 @@ public class DataPointEntry implements Serializable
 		this.alt = new ArrayList<String>();
 		this.trajectoryID = new ArrayList<String>();
 
-		this.lat.add(UtilityBelt.round(lat, 6));
-		this.lon.add(UtilityBelt.round(lon, 6));
+		this.lat.add(StatsUtils.round(lat, 6));
+		this.lon.add(StatsUtils.round(lon, 6));
 		this.alt.add(alt);
 
 		this.timestamp = t;
@@ -466,7 +466,7 @@ public class DataPointEntry implements Serializable
 	 */
 	public void addLatitude(String lat)
 	{
-		this.lat.add(UtilityBelt.round(lat, 6));
+		this.lat.add(StatsUtils.round(lat, 6));
 	}
 
 	/**
@@ -488,7 +488,7 @@ public class DataPointEntry implements Serializable
 
 	public void addLongitude(String lon)
 	{
-		this.lon.add(UtilityBelt.round(lon, 6));
+		this.lon.add(StatsUtils.round(lon, 6));
 	}
 
 	public void setLongitude(ArrayList<String> a)
