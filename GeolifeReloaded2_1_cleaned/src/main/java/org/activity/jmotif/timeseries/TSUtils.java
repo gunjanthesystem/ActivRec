@@ -18,11 +18,12 @@ import org.activity.jmotif.sax.alphabet.Alphabet;
  */
 public final class TSUtils
 {
-	
+
 	/** The latin alphabet, lower case letters a-z. */
-	static final char[] ALPHABET = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-			'u', 'v', 'w', 'x', 'y', 'z' };
-	
+	static final char[] ALPHABET =
+	{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
+			'x', 'y', 'z' };
+
 	/**
 	 * Constructor.
 	 */
@@ -30,9 +31,10 @@ public final class TSUtils
 	{
 		super();
 	}
-	
+
 	/**
-	 * Reads timeseries from a file. Assumes that file has a single double value on every line. Assigned timestamps are the line numbers.
+	 * Reads timeseries from a file. Assumes that file has a single double value on every line. Assigned timestamps are
+	 * the line numbers.
 	 * 
 	 * @param filename
 	 *            The file to read from.
@@ -46,7 +48,8 @@ public final class TSUtils
 	 * @throws TSException
 	 *             if error occurs.
 	 */
-	public static Timeseries readTS(String filename, int sizeLimit) throws NumberFormatException, IOException, TSException
+	public static Timeseries readTS(String filename, int sizeLimit)
+			throws NumberFormatException, IOException, TSException
 	{
 		BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
 		String line = null;
@@ -62,7 +65,7 @@ public final class TSUtils
 		br.close();
 		return new Timeseries(values, tstamps);
 	}
-	
+
 	/**
 	 * Finds the maximal value in timeseries.
 	 * 
@@ -87,7 +90,7 @@ public final class TSUtils
 		}
 		return max;
 	}
-	
+
 	/**
 	 * Finds the maximal value in timeseries.
 	 * 
@@ -111,7 +114,7 @@ public final class TSUtils
 		}
 		return max;
 	}
-	
+
 	/**
 	 * Finds the minimal value in timeseries.
 	 * 
@@ -136,7 +139,7 @@ public final class TSUtils
 		}
 		return min;
 	}
-	
+
 	/**
 	 * Finds the minimal value in timeseries.
 	 * 
@@ -160,7 +163,7 @@ public final class TSUtils
 		}
 		return min;
 	}
-	
+
 	/**
 	 * Computes the mean value of timeseries.
 	 * 
@@ -190,7 +193,7 @@ public final class TSUtils
 		}
 		return Double.NaN;
 	}
-	
+
 	/**
 	 * Computes the mean value of timeseries.
 	 * 
@@ -220,7 +223,7 @@ public final class TSUtils
 		}
 		return Double.NaN;
 	}
-	
+
 	/**
 	 * Compute the variance of timeseries.
 	 * 
@@ -255,7 +258,7 @@ public final class TSUtils
 		}
 		return Double.NaN;
 	}
-	
+
 	/**
 	 * Compute the variance of timeseries.
 	 * 
@@ -290,7 +293,7 @@ public final class TSUtils
 		}
 		return Double.NaN;
 	}
-	
+
 	/**
 	 * Computes the standard deviation of timeseries.
 	 * 
@@ -323,7 +326,7 @@ public final class TSUtils
 		}
 		return Double.NaN;
 	}
-	
+
 	/**
 	 * Computes the standard deviation of timeseries.
 	 * 
@@ -356,7 +359,7 @@ public final class TSUtils
 		}
 		return Double.NaN;
 	}
-	
+
 	/**
 	 * Z-Normalize timeseries to the mean zero and standard deviation of one.
 	 * 
@@ -369,11 +372,11 @@ public final class TSUtils
 	 */
 	public static Timeseries zNormalize(Timeseries series) throws TSException, CloneNotSupportedException
 	{
-		
+
 		// resulting series
 		//
 		Timeseries res = series.clone();
-		
+
 		// here I will extract doubles and normailize those, joining together later
 		//
 		double seriesValues[] = new double[series.size()];
@@ -384,7 +387,7 @@ public final class TSUtils
 			idx++;
 		}
 		double[] normalValues = zNormalize(seriesValues);
-		
+
 		// get things together
 		//
 		idx = 0;
@@ -395,7 +398,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Z-Normalize timeseries to the mean zero and standard deviation of one.
 	 * 
@@ -407,21 +410,21 @@ public final class TSUtils
 	 */
 	public static double[] zNormalize(double[] series) throws TSException
 	{
-		
+
 		// this is the resulting normalization
 		//
 		double[] res = new double[series.length];
-		
+
 		// get mean and sdev, NaN's will be handled
 		//
 		double mean = mean(series);
 		double sd = stDev(series);
-		
+
 		// check if we hit special case, where something got NaN
 		//
 		if (Double.isInfinite(mean) || Double.isNaN(mean) || Double.isInfinite(sd) || Double.isNaN(sd))
 		{
-			
+
 			// case[1] single value within the timeseries, normalize this value to 1.0 - magic number
 			//
 			int nanNum = countNaN(series);
@@ -439,7 +442,7 @@ public final class TSUtils
 					}
 				}
 			}
-			
+
 			// case[2] all values are NaN's
 			//
 			else if (series.length == nanNum)
@@ -450,13 +453,13 @@ public final class TSUtils
 				}
 			}
 		}
-		
+
 		// another special case, where SD happens to be close to a zero, i.e. they all are the same for
 		// example
 		//
 		else if (sd <= 0.001D)
 		{
-			
+
 			// here I assign another magic value - 0.001D which makes to middle band of the normal
 			// Alphabet
 			//
@@ -472,7 +475,7 @@ public final class TSUtils
 				}
 			}
 		}
-		
+
 		// normal case, everything seems to be fine
 		//
 		else
@@ -484,9 +487,9 @@ public final class TSUtils
 			}
 		}
 		return res;
-		
+
 	}
-	
+
 	/**
 	 * Z-Normalize timeseries to the mean zero and standard deviation of one.
 	 * 
@@ -502,16 +505,16 @@ public final class TSUtils
 	 */
 	public static double[] zNormalize(double[] series, double mean, double sd) throws TSException
 	{
-		
+
 		// this is the resulting normalization
 		//
 		double[] res = new double[series.length];
-		
+
 		// check if we hit special case, where something got NaN
 		//
 		if (Double.isInfinite(mean) || Double.isNaN(mean) || Double.isInfinite(sd) || Double.isNaN(sd))
 		{
-			
+
 			// case[1] single value within the timeseries, normalize this value to 1.0 - magic number
 			//
 			int nanNum = countNaN(series);
@@ -529,7 +532,7 @@ public final class TSUtils
 					}
 				}
 			}
-			
+
 			// case[2] all values are NaN's
 			//
 			else if (series.length == nanNum)
@@ -540,13 +543,13 @@ public final class TSUtils
 				}
 			}
 		}
-		
+
 		// another special case, where SD happens to be close to a zero, i.e. they all are the same for
 		// example
 		//
 		else if (sd <= 0.001D)
 		{
-			
+
 			// here I assign another magic value - 0.001D which makes to middle band of the normal
 			// Alphabet
 			//
@@ -562,7 +565,7 @@ public final class TSUtils
 				}
 			}
 		}
-		
+
 		// normal case, everything seems to be fine
 		//
 		else
@@ -574,12 +577,13 @@ public final class TSUtils
 			}
 		}
 		return res;
-		
+
 	}
-	
+
 	/**
-	 * Approximate the timeseries using PAA. If the timeseries has some NaN's they are handled as follows: 1) if all values of the piece are NaNs - the piece is approximated as
-	 * NaN, 2) if there are some (more or equal one) values happened to be in the piece - algorithm will handle it as usual - getting the mean.
+	 * Approximate the timeseries using PAA. If the timeseries has some NaN's they are handled as follows: 1) if all
+	 * values of the piece are NaNs - the piece is approximated as NaN, 2) if there are some (more or equal one) values
+	 * happened to be in the piece - algorithm will handle it as usual - getting the mean.
 	 * 
 	 * @param ts
 	 *            The timeseries to approximate.
@@ -642,7 +646,7 @@ public final class TSUtils
 			//
 			//
 			double[] newVals = MatrixFactory.colMeans(res);
-			
+
 			// work out timestamps
 			long start = tStamps[0];
 			long interval = tStamps[len - 1] - start;
@@ -655,10 +659,11 @@ public final class TSUtils
 			return new Timeseries(newVals, newTstamps);
 		}
 	}
-	
+
 	/**
-	 * Approximate the timeseries using PAA. If the timeseries has some NaN's they are handled as follows: 1) if all values of the piece are NaNs - the piece is approximated as
-	 * NaN, 2) if there are some (more or equal one) values happened to be in the piece - algorithm will handle it as usual - getting the mean.
+	 * Approximate the timeseries using PAA. If the timeseries has some NaN's they are handled as follows: 1) if all
+	 * values of the piece are NaNs - the piece is approximated as NaN, 2) if there are some (more or equal one) values
+	 * happened to be in the piece - algorithm will handle it as usual - getting the mean.
 	 * 
 	 * @param ts
 	 *            The timeseries to approximate.
@@ -701,15 +706,16 @@ public final class TSUtils
 				res = MatrixFactory.reshape(expandedSS, len, paaSize);
 			}
 			double[] newVals = MatrixFactory.colMeans(res);
-			
+
 			return newVals;
 		}
-		
+
 	}
-	
+
 	/**
-	 * Approximate the timeseries using PAA. If the timeseries has some NaN's they are handled as follows: 1) if all values of the piece are NaNs - the piece is approximated as
-	 * NaN, 2) if there are some (more or equal one) values happened to be in the piece - algorithm will handle it as usual - getting the mean.
+	 * Approximate the timeseries using PAA. If the timeseries has some NaN's they are handled as follows: 1) if all
+	 * values of the piece are NaNs - the piece is approximated as NaN, 2) if there are some (more or equal one) values
+	 * happened to be in the piece - algorithm will handle it as usual - getting the mean.
 	 * 
 	 * @param ts
 	 *            The timeseries to approximate.
@@ -759,9 +765,9 @@ public final class TSUtils
 				return paa;
 			}
 		}
-		
+
 	}
-	
+
 	public static double[] paaZeroNA(double[] ts, int paaSize)
 	{
 		for (int i = 0; i < ts.length; i++)
@@ -823,7 +829,7 @@ public final class TSUtils
 			}
 		}
 	}
-	
+
 	/**
 	 * Converts a timeseries into the string using alphabet cuts.
 	 * 
@@ -847,7 +853,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Converts the timeseries into string using given cuts intervals. Useful for not-normal distribution cuts.
 	 * 
@@ -866,7 +872,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Converts a timeseries into the string paying attention to NaN values.
 	 * 
@@ -885,7 +891,7 @@ public final class TSUtils
 		double[] cuts = alphabet.getCuts(alphabetSize);
 		return ts2StringWithNaNByCuts(series, cuts);
 	}
-	
+
 	/**
 	 * Converts a timeseries into the string paying attention to NaN values.
 	 * 
@@ -913,7 +919,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Get mapping of a number to char.
 	 * 
@@ -932,7 +938,7 @@ public final class TSUtils
 		}
 		return ALPHABET[count];
 	}
-	
+
 	/**
 	 * Converts index into char.
 	 * 
@@ -944,7 +950,7 @@ public final class TSUtils
 	{
 		return ALPHABET[idx];
 	}
-	
+
 	/**
 	 * Convert the timeseries into the index using SAX cuts.
 	 * 
@@ -968,7 +974,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Get mapping of number to cut index.
 	 * 
@@ -987,7 +993,7 @@ public final class TSUtils
 		}
 		return count;
 	}
-	
+
 	/**
 	 * Counts the number of NaNs' in the timeseries.
 	 * 
@@ -1007,7 +1013,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Counts the number of NaNs' in the timeseries.
 	 * 
@@ -1027,7 +1033,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Converts the vector into one-row matrix.
 	 * 
@@ -1044,7 +1050,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Extract subseries out of series.
 	 * 
@@ -1062,8 +1068,8 @@ public final class TSUtils
 	{
 		if (start + length > series.length)
 		{
-			throw new IndexOutOfBoundsException(
-					"Unable to extract subseries, series length: " + series.length + ", start: " + start + ", subseries length: " + length);
+			throw new IndexOutOfBoundsException("Unable to extract subseries, series length: " + series.length
+					+ ", start: " + start + ", subseries length: " + length);
 		}
 		double[] res = new double[length];
 		for (int i = 0; i < length; i++)
@@ -1072,7 +1078,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Extract subseries out of series.
 	 * 
@@ -1090,8 +1096,8 @@ public final class TSUtils
 	{
 		if (start + length > series.length)
 		{
-			throw new IndexOutOfBoundsException(
-					"Unable to extract subseries, series length: " + series.length + ", start: " + start + ", subseries length: " + length);
+			throw new IndexOutOfBoundsException("Unable to extract subseries, series length: " + series.length
+					+ ", start: " + start + ", subseries length: " + length);
 		}
 		double[] res = new double[length];
 		for (int i = 0; i < length; i++)
@@ -1100,7 +1106,7 @@ public final class TSUtils
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Implements Gaussian smoothing.
 	 * 
@@ -1114,11 +1120,11 @@ public final class TSUtils
 	 */
 	public static double[] gaussFilter(double[] series, double filterWidth) throws TSException
 	{
-		
+
 		double[] smoothedSignal = new double[series.length];
 		double sigma = filterWidth / 2D;
 		int maxShift = (int) Math.floor(4D * sigma); // Gaussian curve is reasonably > 0
-		
+
 		if (maxShift < 1)
 		{
 			throw new TSException("NOT smoothing: filter width too small - " + filterWidth);
@@ -1126,17 +1132,17 @@ public final class TSUtils
 		for (int i = 0; i < smoothedSignal.length; i++)
 		{
 			smoothedSignal[i] = series[i];
-			
+
 			if (maxShift < 1)
 			{
 				continue;
 			}
 			for (int j = 1; j <= maxShift; j++)
 			{
-				
+
 				double gaussFilter = Math.exp(-(j * j) / (2. * sigma * sigma));
 				double leftAmpl, rightAmpl;
-				
+
 				// go left
 				if ((i - j) >= 0)
 				{
@@ -1146,7 +1152,7 @@ public final class TSUtils
 				{
 					leftAmpl = series[i];
 				}
-				
+
 				// go right
 				if ((i + j) <= smoothedSignal.length - 1)
 				{
@@ -1156,24 +1162,24 @@ public final class TSUtils
 				{
 					rightAmpl = series[i];
 				}
-				
+
 				smoothedSignal[i] += gaussFilter * (leftAmpl + rightAmpl);
-				
+
 			}
-			
+
 			double normalizingCoef = Math.sqrt(2. * Math.PI) * sigma;
 			smoothedSignal[i] /= normalizingCoef;
-			
+
 		}
 		return smoothedSignal;
 	}
-	
+
 	public double gaussian(double x, double filterWidth)
 	{
 		double sigma = filterWidth / 2.;
 		return Math.exp(-(x * x) / (2. * sigma * sigma));
 	}
-	
+
 	public static String seriesToString(double[] series, NumberFormat df)
 	{
 		StringBuffer sb = new StringBuffer();
@@ -1185,5 +1191,5 @@ public final class TSUtils
 		sb.delete(sb.length() - 2, sb.length() - 1).append("]");
 		return sb.toString();
 	}
-	
+
 }

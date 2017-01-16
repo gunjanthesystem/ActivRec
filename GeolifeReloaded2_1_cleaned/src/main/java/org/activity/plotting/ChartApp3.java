@@ -13,12 +13,12 @@ import javafx.stage.Stage;
 
 public class ChartApp3 extends Application
 {
-	
+
 	public static void main(String[] args)
 	{
 		launch(args);
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage)
 	{
@@ -27,13 +27,13 @@ public class ChartApp3 extends Application
 		ScatterChart scatterChart = new ScatterChart(xAxis, yAxis);
 		scatterChart.setData(getChartData());
 		primaryStage.setTitle("ScatterChart");
-		
+
 		StackPane root = new StackPane();
 		root.getChildren().add(scatterChart);
 		primaryStage.setScene(new Scene(root, 400, 250));
 		primaryStage.show();
 	}
-	
+
 	private ObservableList<XYChart.Series<Integer, Double>> getChartData()
 	{
 		double javaValue = 17.56;
@@ -52,7 +52,7 @@ public class ChartApp3 extends Application
 			cpp.getData().add(new XYChart.Data(i, cppValue));
 			cppValue = cppValue + 4 * Math.random() - 2;
 		}
-		
+
 		answer.addAll(java, c, cpp);
 		return answer;
 	}

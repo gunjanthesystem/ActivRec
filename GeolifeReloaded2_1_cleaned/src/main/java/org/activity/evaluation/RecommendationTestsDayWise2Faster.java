@@ -35,13 +35,16 @@
 // {
 // public double percentageInTraining;// = 0.8;
 // // public String outputPath ="/run/media/gunjan/OS/Users/gunjan/Documents/LifeLog App/OUTPUT/";
-// public String commonPath;// =Constant.commonPath;//"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
+// public String commonPath;// =Constant.commonPath;//"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
+// Works/WorkingSet7July/";
 //
 // // public String typeOfThreshold = "Global";// "Percent"/"Global"
 // // public final double globalDistanceThresh=1000;
 // /*
-// * public final double percentDistanceThresh=100; /*threshold for choosing candidate timelines, those candidate timelines whose distance from the 'activity events guiding
-// * recommendations' is higher than the cost of replacing 'percentageDistanceThresh' % of Activity Events in the activities guiding recommendation are pruned out from set of
+// * public final double percentDistanceThresh=100; /*threshold for choosing candidate timelines, those candidate
+// timelines whose distance from the 'activity events guiding
+// * recommendations' is higher than the cost of replacing 'percentageDistanceThresh' % of Activity Events in the
+// activities guiding recommendation are pruned out from set of
 // * candidate timelines
 // */
 // String typeOfThresholds[]; // = { "Global" };// Global"};//"Percent",
@@ -55,8 +58,10 @@
 // public final int maxUser = 4;// CHANGE TO 4
 //
 // /*
-// * int userIDs[]={10,20,21,52,53,56,58,59,60,62,64,65,67,68,69,73,75,76,78, 80,81,82,84,85,86,87,88,89,91,92,96,97,98,100,101,102,104,105,106,
-// * 107,108,110,111,112,114,115,116,117,118,124,125,126,128,129,136,138, 139,141,144,147,153,154,161,163,167,170,174,175,179};
+// * int userIDs[]={10,20,21,52,53,56,58,59,60,62,64,65,67,68,69,73,75,76,78,
+// 80,81,82,84,85,86,87,88,89,91,92,96,97,98,100,101,102,104,105,106,
+// * 107,108,110,111,112,114,115,116,117,118,124,125,126,128,129,136,138,
+// 139,141,144,147,153,154,161,163,167,170,174,175,179};
 // */
 // // /**
 // // * Most active users
@@ -67,7 +72,8 @@
 //
 // int thresholdsArray[];
 //
-// public RecommendationTestsDayWise2Faster(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines)// /, String userAtRecomm)
+// public RecommendationTestsDayWise2Faster(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines)//
+// /, String userAtRecomm)
 // {
 // System.out.println("inside RecommendationTestsDayWise2Faster");
 // this.caseType = Constant.caseType;
@@ -89,7 +95,8 @@
 // // Constant.setCommonPath("/run/media/gunjan/HOME/gunjan/DCU Data Works Oct Space/Oct 29 exp HJ Distance/");
 // // $$Constant.setCommonPath("/run/media/gunjan/HOME/gunjan/Geolife Data Works/resultsJan14_2/");
 // // $$commonPath = Constant.getCommonPath();
-// commonPath = Constant.outputCoreResultsPath;// + Constant.DATABASE_NAME + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+// commonPath = Constant.outputCoreResultsPath;// + Constant.DATABASE_NAME + "_" +
+// LocalDateTime.now().getMonth().toString().substring(0, 3)
 //
 // try
 // {
@@ -128,7 +135,8 @@
 //
 // BufferedWriter bwCountTimeCategoryOfRecomm =
 // WritingToFile.getBufferedWriterForNewFile(commonPath + "CountTimeCategoryOfRecommPoitns.csv");
-// BufferedWriter bwNextActInvalid = WritingToFile.getBufferedWriterForNewFile(commonPath + "NextActivityIsInvalid.csv");
+// BufferedWriter bwNextActInvalid = WritingToFile.getBufferedWriterForNewFile(commonPath +
+// "NextActivityIsInvalid.csv");
 // BufferedWriter bwWriteNormalisationOfDistance =
 // WritingToFile.getBufferedWriterForNewFile(commonPath + "NormalisationDistances.csv"); // TODO
 // // NEW
@@ -192,7 +200,8 @@
 // BufferedWriter bwRecommTimesWithEditDistances =
 // new BufferedWriter(new FileWriter(recommTimesWithEditDistances.getAbsoluteFile(), true));
 // bwRecommTimesWithEditDistances.write("DateOfRecomm" + ",TimeOfRecomm,"
-// + "TargetActivity,EditDistanceOfCandidateTimeline,DateOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,CandidateTimeline,WeekDayOfRecomm,WeekDayOfCandidate");
+// +
+// "TargetActivity,EditDistanceOfCandidateTimeline,DateOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,CandidateTimeline,WeekDayOfRecomm,WeekDayOfCandidate");
 // bwRecommTimesWithEditDistances.newLine();
 //
 // userAllDatesTimeslines = userTimelines.get(Integer.toString(userId));// userId);
@@ -353,7 +362,8 @@
 // UserDayTimeline eachDayTimelineForUser = entry.getValue();
 // ArrayList<ActivityObject> activityObjectsInThatDay = eachDayTimelineForUser.getActivityObjectsInDay();
 //
-// for (int j = 0; j < activityObjectsInThatDay.size() - 1; j++) // will not make recommendation for days which have only one activity
+// for (int j = 0; j < activityObjectsInThatDay.size() - 1; j++) // will not make recommendation for days which have
+// only one activity
 // {
 // System.out.println("Iterating over potential recommendation times: current activityAtPotentialRecommTime="
 // + (activityObjectsInThatDay.get(j).getActivityName()));
@@ -399,12 +409,14 @@
 // {
 // System.out.println("User id" + userId + " Next activity event after " + startTimestamp + " is null");
 // System.out.println(
-// "Error in Sanity Check RT331: nextValidActivityAfteractivityRecommPoint1 is null, if it was such, we should have not reached this point of execution");
+// "Error in Sanity Check RT331: nextValidActivityAfteractivityRecommPoint1 is null, if it was such, we should have not
+// reached this point of execution");
 // }
 //
 // System.out.println("User id" + userId + " Next activity event after " + startTimestamp + " ="
 // + nextValidActivityAfteractivityRecommPoint1.getActivityName());
-// System.out.println("Recommendation point at this Activity Event are:- Start: " + startTimeString);// +" ,and Middle: "+middleTimeString);
+// System.out.println("Recommendation point at this Activity Event are:- Start: " + startTimeString);// +" ,and Middle:
+// "+middleTimeString);
 //
 // // ///////////
 // // Now we have those recommendation times which are valid for making recommendations
@@ -482,7 +494,8 @@
 // numberOfEveningRTs++;
 //
 // String actActualAtStart = nextValidActivityAfteractivityRecommPoint1.getActivityName();
-// String actRecommAtStartWithoutDistance = recommP1.getTopRecommendedActivityNamesWithoutDistanceString();// getTopFiveRecommendedActivities();
+// String actRecommAtStartWithoutDistance = recommP1.getTopRecommendedActivityNamesWithoutDistanceString();//
+// getTopFiveRecommendedActivities();
 // String actRecommAtStartWithDistance = recommP1.getNextActivityNamesByEditDist(); // its not just top five but top all
 //
 // String actAtRecommPoint = recommP1.getActivityObjectAtRecomm().getActivityName();
@@ -505,14 +518,16 @@
 // baseLineDuration.write(activityNameDurationPairsOverAllTrainingDaysWithoutDuration + ",");
 //
 // String[] splittedRecomm = rankedRecommAtStartWithoutScore.split(Pattern.quote("__"));
-// bwMaxNumOfDistinctRecommendations.write(dateToRecomm + "," + startTimestamp + "," + weekDay + // UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
+// bwMaxNumOfDistinctRecommendations.write(dateToRecomm + "," + startTimestamp + "," + weekDay + //
+// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
 // "," + (splittedRecomm.length - 1) + "," + recommP1.getNumberOfCandidateTimelinesBelowThreshold());
 // bwMaxNumOfDistinctRecommendations.newLine();
 //
 // bwRaw.write(userName + "," + dateToRecomm + "," + startTimestamp.getHours() + ":"
 // + startTimestamp.getMinutes() + ":" + startTimestamp.getSeconds() + "," + timeCategory + ","
 // + recommP1.getNumberOfValidActivitiesInActivitesGuidingRecommendation() + ","
-// + recommP1.getNumberOfActivitiesInActivitesGuidingRecommendation() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
+// + recommP1.getNumberOfActivitiesInActivitesGuidingRecommendation() + "," + weekDay//
+// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
 // + "," + actActualAtStart + "," + rankedRecommAtStartWithScore + "," + actAtRecommPoint + ","
 // + recommP1.getActivitiesGuidingRecomm());
 // bwRaw.newLine();
@@ -547,7 +562,8 @@
 // + startTimestamp.getMinutes() + ":" + startTimestamp.getSeconds() + "," + actActualAtStart + ","
 // + entryScore.getValue() + "," + dateOfCand + "," + diffStartTimeForEndPointsCand_n_GuidingInSecs
 // + "," + diffEndTimeForEndPointsCand_n_GuidingInSecs + ","
-// + dayTimelineTemp.getActivityObjectNamesInSequence() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
+// + dayTimelineTemp.getActivityObjectNamesInSequence() + "," + weekDay//
+// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
 // + "," + DateTimeUtils.getWeekDayFromWeekDayInt(entryScore.getKey().getDay()));
 // bwRecommTimesWithEditDistances.newLine();
 // }
@@ -633,7 +649,8 @@
 // return result;
 // }
 //
-// public String getActivityNameCountPairsOverAllTrainingDaysWithoutCount(LinkedHashMap<String, Long> nameCountPairsSorted)
+// public String getActivityNameCountPairsOverAllTrainingDaysWithoutCount(LinkedHashMap<String, Long>
+// nameCountPairsSorted)
 // {
 // String result = "";
 //
@@ -644,7 +661,8 @@
 // return result;
 // }
 //
-// public String getActivityNameDurationPairsOverAllTrainingDaysWithDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
+// public String getActivityNameDurationPairsOverAllTrainingDaysWithDuration(LinkedHashMap<String, Long>
+// nameDurationPairsSorted)
 // {
 // String result = "";
 //
@@ -655,7 +673,8 @@
 // return result;
 // }
 //
-// public String getActivityNameDurationPairsOverAllTrainingDaysWithoutDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
+// public String getActivityNameDurationPairsOverAllTrainingDaysWithoutDuration(LinkedHashMap<String, Long>
+// nameDurationPairsSorted)
 // {
 // String result = "";
 //

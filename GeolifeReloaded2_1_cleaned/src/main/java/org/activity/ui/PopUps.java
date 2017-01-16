@@ -27,7 +27,7 @@ public class PopUps
 		// frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
+
 	/**
 	 * Displays a popup pane with error message.
 	 * 
@@ -39,7 +39,7 @@ public class PopUps
 		JOptionPane.showMessageDialog(frame, msg, "Error Encountered", JOptionPane.ERROR_MESSAGE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
+
 	/**
 	 * Displays a popup pane with exception message
 	 * 
@@ -54,9 +54,9 @@ public class PopUps
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		String exceptionMsg = sw.toString(); // stack trace as a string
-		
+
 		exceptionMsg += ("\n Exception in " + methodName + "\n");
 		PopUps.showError(exceptionMsg);
 	}
-	
+
 }

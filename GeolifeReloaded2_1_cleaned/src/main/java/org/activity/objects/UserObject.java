@@ -13,7 +13,7 @@ public class UserObject
 {
 	String userID, userName, personalityTags, profession, ageCategory;
 	int userAge;
-	
+
 	/**
 	 * 
 	 * @param userID
@@ -23,7 +23,8 @@ public class UserObject
 	 * @param ageCategory
 	 * @param userAge
 	 */
-	public UserObject(String userID, String userName, String personalityTags, String profession, String ageCategory, int userAge)
+	public UserObject(String userID, String userName, String personalityTags, String profession, String ageCategory,
+			int userAge)
 	{
 		this.userID = userID;
 		this.userName = userName;
@@ -32,7 +33,7 @@ public class UserObject
 		this.ageCategory = ageCategory;
 		this.userAge = userAge;
 	}
-	
+
 	/**
 	 * Populate the values for all the attributes of User Dimension for a given userID
 	 * 
@@ -40,94 +41,94 @@ public class UserObject
 	 */
 	UserObject(String userID)
 	{
-		
+
 		try
 		{
 			ResultSet resultSet = ConnectDatabase.getSQLResultSet("*", "user_dimension", "User_ID = " + userID);
-			
+
 			// Check if resultSet is null: TO DO later, problem resultSet returned from executeQuery is never null
 			// /
-			
+
 			this.userID = userID;
 			this.userName = resultSet.getString("User_Name");
 			this.personalityTags = resultSet.getString("Personality_Tags");
 			this.profession = resultSet.getString("Profesion");
 			this.ageCategory = resultSet.getString("Age_Category");
-			
+
 			this.userAge = resultSet.getInt("User_Age");
-			
+
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
-	
+
 	public UserObject()
 	{
-		
+
 	}
-	
+
 	public void setUserID(String userID)
 	{
 		this.userID = userID;
 	}
-	
+
 	public void setUserName(String userName)
 	{
 		this.userName = userName;
 	}
-	
+
 	public void setPersonalityTags(String personalityTags)
 	{
 		this.personalityTags = personalityTags;
 	}
-	
+
 	public void setProfession(String profession)
 	{
 		this.profession = profession;
 	}
-	
+
 	public void setAgeCategory(String ageCategory)
 	{
 		this.ageCategory = ageCategory;
 	}
-	
+
 	public void setUserAge(int age)
 	{
 		this.userAge = age;
 	}
-	
+
 	public String getUserID()
 	{
 		return userID;
 	}
-	
+
 	public String getUserName()
 	{
 		return userName;
 	}
-	
+
 	public String getPersonalityTags()
 	{
 		return personalityTags;
 	}
-	
+
 	public String getProfession()
 	{
 		return profession;
 	}
-	
+
 	public String getAgeCategory()
 	{
 		return ageCategory;
 	}
-	
+
 	public int getUserAge()
 	{
 		return userAge;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
@@ -141,55 +142,41 @@ public class UserObject
 		result = prime * result + ((userName == null) ? 0 : userName.hashCode());
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
 		UserObject other = (UserObject) obj;
 		if (ageCategory == null)
 		{
-			if (other.ageCategory != null)
-				return false;
+			if (other.ageCategory != null) return false;
 		}
-		else if (!ageCategory.equals(other.ageCategory))
-			return false;
+		else if (!ageCategory.equals(other.ageCategory)) return false;
 		if (personalityTags == null)
 		{
-			if (other.personalityTags != null)
-				return false;
+			if (other.personalityTags != null) return false;
 		}
-		else if (!personalityTags.equals(other.personalityTags))
-			return false;
+		else if (!personalityTags.equals(other.personalityTags)) return false;
 		if (profession == null)
 		{
-			if (other.profession != null)
-				return false;
+			if (other.profession != null) return false;
 		}
-		else if (!profession.equals(other.profession))
-			return false;
-		if (userAge != other.userAge)
-			return false;
+		else if (!profession.equals(other.profession)) return false;
+		if (userAge != other.userAge) return false;
 		if (userID == null)
 		{
-			if (other.userID != null)
-				return false;
+			if (other.userID != null) return false;
 		}
-		else if (!userID.equals(other.userID))
-			return false;
+		else if (!userID.equals(other.userID)) return false;
 		if (userName == null)
 		{
-			if (other.userName != null)
-				return false;
+			if (other.userName != null) return false;
 		}
-		else if (!userName.equals(other.userName))
-			return false;
+		else if (!userName.equals(other.userName)) return false;
 		return true;
 	}
-	
+
 }

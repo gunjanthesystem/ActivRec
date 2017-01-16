@@ -5,14 +5,14 @@ import java.util.TimeZone;
 
 public class Test1
 {
-	
+
 	public static void main(String[] args)
 	{
 		System.out.println("running");
-		
+
 		timestampErrorDiagnosis();
 	}
-	
+
 	/**
 	 * To check the timestamp error which is leading to merge issue in Geolife data
 	 */
@@ -70,7 +70,7 @@ public class Test1
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void timestampDiagnosis2(String tsStringDate, String tsStringTime)
 	{
 		Timestamp ts = DatabaseCreatorGeolifeQuicker.getTimestampGeoData(tsStringDate, tsStringTime);
@@ -82,7 +82,7 @@ public class Test1
 		System.out.println("Timestamp generated (Timestamp.getTimezoneOffset()) = " + ts.getTimezoneOffset());
 		System.out.println("Timestamp generated (Timestamp.getTime()) = " + ts.getTime());
 		System.out.println("Converted to Instant = " + ts.toInstant().toString());
-		
+
 		System.out.println("================================ \n");// + ts.getTimezoneOffset());
 	}
 }
@@ -116,4 +116,3 @@ public class Test1
 // System.out.println("Timestamp generated (Timestamp.getTimezoneOffset()) = " + ts.getTimezoneOffset());
 // System.out.println("Timestamp generated (Timestamp.getTime()) = " + ts.getTime());
 // System.out.println("================================ \n");// + ts.getTimezoneOffset());
-

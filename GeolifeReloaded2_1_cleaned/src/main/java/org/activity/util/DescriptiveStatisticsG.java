@@ -10,16 +10,16 @@ public class DescriptiveStatisticsG extends DescriptiveStatistics
 	{
 		super(listToArray(valsD));
 	}
-	
+
 	public static double[] listToArray(ArrayList<Double> valsD)
 	{
 		double valsArr[] = new double[valsD.size()];
-		
+
 		for (int i = 0; i < valsD.size(); i++)
 		{
 			valsArr[i] = valsD.get(i);
 		}
-		
+
 		return valsArr;
 	}
 }

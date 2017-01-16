@@ -16,22 +16,22 @@ public class TestDummy2
 	public static void main(String args[])
 	{
 		// checkWritePerformance();
-		
+
 		String commonPath = "./";
-		
+
 		String currentPath = System.getProperty("user.dir") + "/";
 		String separator = File.separator;
 		System.out.println(currentPath + separator);
-		
+
 		WritingToFile.appendLineToFileAbsolute("test", currentPath + separator + "DeleteMe.txt");
-		
+
 		WritingToFile.appendLineToFileAbsolute("test", "DeleteMe2.txt");
 		// String str = " 112:Music^^ || 12600__2.1891152325934935%";
 		//
 		// String splitted[] = str.split("\\|\\|");
 		//
 		// System.out.println("splitted[0] = " + splitted[0]);
-		
+
 		// System.out.println(Double.NaN);
 		//
 		// System.out.println(("gunjan".equals("gunjan")));
@@ -46,7 +46,7 @@ public class TestDummy2
 		// int countOfSampleUsers = 0;
 		// System.out.println("startUserIndex=" + startUserIndex + " endUserIndex" + endUserIndex);
 		// }
-		
+
 		// byte c = 70;
 		// byte c1 = 84;
 		//
@@ -57,28 +57,28 @@ public class TestDummy2
 		// {
 		// System.out.println(Boolean.parseBoolean(s));
 		// }
-		
+
 	}
-	
+
 	public static void checkWritePerformance()
 	{
 		long maxIteration = 80000000;
 		long st1 = System.currentTimeMillis();
-		
+
 		String fileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Test/writePerformance.txt";
 		String msg = "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn";
 		try
 		{
 			BufferedWriter bwSimple = WritingToFile.getBufferedWriterForNewFile(fileName, 3072);
-			
+
 			for (int i = 0; i < maxIteration; i++)
 			{
 				bwSimple.write(msg + "\n");
 			}
-			
+
 			bwSimple.close();
 			long st2 = System.currentTimeMillis();
-			
+
 			System.out.println("file written with bwSimple in " + ((st2 - st1) * 1.0 / 1000) + " secs");
 		}
 		catch (Exception e)
@@ -89,5 +89,5 @@ public class TestDummy2
 		{
 		}
 	}
-	
+
 }

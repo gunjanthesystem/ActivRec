@@ -9,17 +9,18 @@ import com.google.uzaygezen.core.CompactHilbertCurve;
 
 public class TestGeoSFC
 {
-	
+
 	public static void main(String args[])
 	{
-		CompactHilbertCurve chc = new CompactHilbertCurve(new int[] { 2, 2 });
+		CompactHilbertCurve chc = new CompactHilbertCurve(new int[]
+		{ 2, 2 });
 		List<Integer> bitsPerDimension = chc.getSpec().getBitsPerDimension();
 		BitVector[] p = new BitVector[bitsPerDimension.size()];
 		for (int i = p.length; --i >= 0;)
 		{
 			p[i] = BitVectorFactories.OPTIMAL.apply(bitsPerDimension.get(i));
 		}
-		
+
 		p[0].copyFrom(0b10);
 		p[1].copyFrom(0b11);
 		BitVector chi = BitVectorFactories.OPTIMAL.apply(chc.getSpec().sumBitsPerDimension());

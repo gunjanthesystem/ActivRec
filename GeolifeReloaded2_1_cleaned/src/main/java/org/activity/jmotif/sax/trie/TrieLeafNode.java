@@ -9,71 +9,83 @@ import java.util.List;
  * @author Pavel Senin.
  *
  */
-public class TrieLeafNode extends TrieAbstractNode {
+public class TrieLeafNode extends TrieAbstractNode
+{
 
-  /** The occurrence locations. */
-  private ArrayList<Integer> occurrences;
+	/** The occurrence locations. */
+	private ArrayList<Integer> occurrences;
 
-  /**
-   * Constructor.
-   */
-  public TrieLeafNode() {
-    super();
-    initStorage();
-  }
+	/**
+	 * Constructor.
+	 */
+	public TrieLeafNode()
+	{
+		super();
+		initStorage();
+	}
 
-  /**
-   * Constructor.
-   *
-   * @param name The node label to set.
-   */
-  public TrieLeafNode(String name) {
-    super(name);
-    initStorage();
-  }
+	/**
+	 * Constructor.
+	 *
+	 * @param name
+	 *            The node label to set.
+	 */
+	public TrieLeafNode(String name)
+	{
+		super(name);
+		initStorage();
+	}
 
-  /**
-   * Internal data structures init.
-   */
-  private void initStorage() {
-    this.occurrences = new ArrayList<Integer>();
-  }
+	/**
+	 * Internal data structures init.
+	 */
+	private void initStorage()
+	{
+		this.occurrences = new ArrayList<Integer>();
+	}
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public TrieNodeType getType() {
-    return TrieNodeType.LEAF;
-  }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TrieNodeType getType()
+	{
+		return TrieNodeType.LEAF;
+	}
 
-  /**
-   * Get all occurrences associated with this leaf.
-   *
-   * @return Array of all occurrences associated with this leaf.
-   */
-  public List<Integer> getOccurences() {
-    return this.occurrences;
-  }
+	/**
+	 * Get all occurrences associated with this leaf.
+	 *
+	 * @return Array of all occurrences associated with this leaf.
+	 */
+	public List<Integer> getOccurences()
+	{
+		return this.occurrences;
+	}
 
-  /**
-   * Add new occurrence.
-   *
-   * @param pos Occurrence position.
-   */
-  public void addOccurrence(int pos) {
-    if (!this.occurrences.contains(Integer.valueOf(pos))) {
-      this.occurrences.add(pos);
-    }
-  }
+	/**
+	 * Add new occurrence.
+	 *
+	 * @param pos
+	 *            Occurrence position.
+	 */
+	public void addOccurrence(int pos)
+	{
+		if (!this.occurrences.contains(Integer.valueOf(pos)))
+		{
+			this.occurrences.add(pos);
+		}
+	}
 
-  /**
-   * Add multiple new occurrences.
-   *
-   * @param occurrences List of occurrences to add.
-   */
-  public void addOccurrences(List<Integer> occurrences) {
-    this.occurrences.addAll(occurrences);
-  }
+	/**
+	 * Add multiple new occurrences.
+	 *
+	 * @param occurrences
+	 *            List of occurrences to add.
+	 */
+	public void addOccurrences(List<Integer> occurrences)
+	{
+		this.occurrences.addAll(occurrences);
+	}
 
 }

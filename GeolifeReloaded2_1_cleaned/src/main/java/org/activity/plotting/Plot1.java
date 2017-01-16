@@ -19,14 +19,14 @@ public class Plot1 extends Application
 			Group root = new Group();
 			Scene scene = new Scene(root, 400, 400);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			
+
 			primaryStage.setTitle("Hello World");
-			
+
 			Button btn = new Button();
 			btn.setLayoutX(200);
 			btn.setLayoutY(200);
 			btn.setText("I am a Button");
-			
+
 			// btn.setOnAction(new EventHandler<ActionEvent>()
 			// {
 			// public void handle(ActionEvent event)
@@ -35,13 +35,13 @@ public class Plot1 extends Application
 			// }
 			// }
 			// );
-			
+
 			btn.setOnAction(event -> System.out.println("Button Pressed (lambda)"));
-			
+
 			root.getChildren().add(btn);
-			
+
 			primaryStage.setScene(scene);
-			
+
 			primaryStage.show();
 		}
 		catch (Exception e)
@@ -49,7 +49,7 @@ public class Plot1 extends Application
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(String[] args)
 	{
 		launch(args);

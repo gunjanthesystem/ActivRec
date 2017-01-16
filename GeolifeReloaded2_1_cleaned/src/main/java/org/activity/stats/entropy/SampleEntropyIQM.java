@@ -4,13 +4,13 @@ import java.util.Vector;
 
 public class SampleEntropyIQM
 {
-	
+
 	private int numbDataPoints = 0; // length of 1D data series
-	
+
 	public SampleEntropyIQM()
 	{
 	}
-	
+
 	/**
 	 * This method calculates the mean of a data series.
 	 * 
@@ -26,7 +26,7 @@ public class SampleEntropyIQM
 		}
 		return sum / data1D.size();
 	}
-	
+
 	/**
 	 * This method calculates the variance of a data series.
 	 * 
@@ -43,7 +43,7 @@ public class SampleEntropyIQM
 		}
 		return sum / (data1D.size() - 1); // 1/(n-1) is used by histo.getStandardDeviation() too
 	}
-	
+
 	/**
 	 * This method calculates the standard deviation of a data series.
 	 * 
@@ -55,7 +55,7 @@ public class SampleEntropyIQM
 		double variance = this.calcVariance(data1D);
 		return Math.sqrt(variance);
 	}
-	
+
 	/**
 	 * This method calculates new data series
 	 * 
@@ -83,7 +83,7 @@ public class SampleEntropyIQM
 		}
 		return newDataSeries; // size of newDataSeries = N_Series
 	}
-	
+
 	/**
 	 * This method calculates the number of correlations
 	 * 
@@ -97,7 +97,7 @@ public class SampleEntropyIQM
 	 */
 	private Vector<Integer> calcNumberOfCorrelations(Vector<Vector<Double>> newDataSeries, int m, double distR)
 	{
-		
+
 		int numSeries = newDataSeries.size();
 		Vector<Integer> numberOfCorrelations = new Vector<Integer>(numSeries);
 		for (int i = 0; i < numSeries; i++)
@@ -128,14 +128,14 @@ public class SampleEntropyIQM
 				}
 			}
 		}
-		
+
 		// for (int i = 0; i < numSeries; i++){ //initialize Vector
 		// System.out.println("numberOfCorrelations.get[i]: " +
 		// numberOfCorrelations.get(i));
 		// }
 		return numberOfCorrelations;
 	}
-	
+
 	/**
 	 * This method calculates correlations
 	 * 
@@ -150,16 +150,19 @@ public class SampleEntropyIQM
 	 */
 	private Vector<Double> calcCorrelations(Vector<Integer> numberOfCorrelations, int m, double d)
 	{
-		
+
 		Vector<Double> correlations = new Vector<Double>();
-		
+
 		for (int n = 0; n < numberOfCorrelations.size(); n++)
 		{
-			correlations.add((double) numberOfCorrelations.get(n) / (numbDataPoints - (m - 1) * d - 1)); // -1 because i=j was not allowed
+			correlations.add((double) numberOfCorrelations.get(n) / (numbDataPoints - (m - 1) * d - 1)); // -1 because
+																											// i=j was
+																											// not
+																											// allowed
 		}
 		return correlations;
 	}
-	
+
 	/**
 	 * This method calculates the sum of correlations
 	 * 
@@ -175,7 +178,7 @@ public class SampleEntropyIQM
 	private double calcSumOfCorrelation(Vector<Double> correlations, int m, int d)
 	{
 		double sumOfCorrelations = 0;
-		
+
 		for (int n = 0; n < correlations.size(); n++)
 		{
 			sumOfCorrelations = sumOfCorrelations + correlations.get(n);
@@ -183,16 +186,18 @@ public class SampleEntropyIQM
 		sumOfCorrelations = sumOfCorrelations / (numbDataPoints - (m - 1) * d);
 		return sumOfCorrelations;
 	}
-	
+
 	/**
 	 * This method calculates the sample entropy
 	 * 
 	 * @param data1D
 	 *            1D data vector
 	 * @param m
-	 *            number of new calculated time series (m = 2, Pincus et al.1994) m should not be greater than N/3 (N number of data points)!
+	 *            number of new calculated time series (m = 2, Pincus et al.1994) m should not be greater than N/3 (N
+	 *            number of data points)!
 	 * @param r
-	 *            maximal distance radius r (10%sd < r < 25%sd sd = standard deviation of time series, Pincus et al. 1994)
+	 *            maximal distance radius r (10%sd < r < 25%sd sd = standard deviation of time series, Pincus et al.
+	 *            1994)
 	 * @param d
 	 *            delay
 	 * @return Sample Entropy (single double value)
@@ -204,7 +209,7 @@ public class SampleEntropyIQM
 		numbDataPoints = data1D.size();
 		// System.out.println("inumbDataPoints = " + numbDataPoints);
 		// System.out.println("inumbDataPoints/3 = " + numbDataPoints / 3);
-		
+
 		if (m > (numbDataPoints / 3))
 		{
 			m = numbDataPoints / 3;
@@ -220,12 +225,12 @@ public class SampleEntropyIQM
 			System.err.println("delay too small, Sample entropy cannot be calulated");
 			return 999999999d;
 		}
-		
+
 		double sampleEntropy = 999999999999d;
 		double[] fmr = new double[2];
-		
+
 		double distR = this.calcStandardDeviation(data1D) * r;
-		
+
 		for (int mm = m; mm <= m + 1; mm++)
 		{ // two times
 			Vector<Vector<Double>> newDataSeries = this.calcNewSeries(data1D, mm, d);
@@ -234,10 +239,11 @@ public class SampleEntropyIQM
 			double sumOfCorrelations = this.calcSumOfCorrelation(correlations, mm, d);
 			fmr[mm - m] = sumOfCorrelations;
 		}
-		
+
 		// System.out.println("grrre");
-		// System.out.println("fmr[0] = " + fmr[0] + " fmr[1] = " + fmr[1] + "  fmr[0]/fmr[1] = " + fmr[0] / fmr[1]);
-		sampleEntropy = (Math.log(fmr[0] / fmr[1]));// d; //Gaussian noise can lead to log(0/x)=infinity or even log(0/0)=NaN for larger m
+		// System.out.println("fmr[0] = " + fmr[0] + " fmr[1] = " + fmr[1] + " fmr[0]/fmr[1] = " + fmr[0] / fmr[1]);
+		sampleEntropy = (Math.log(fmr[0] / fmr[1]));// d; //Gaussian noise can lead to log(0/x)=infinity or even
+													// log(0/0)=NaN for larger m
 		return sampleEntropy;
 	}
 }

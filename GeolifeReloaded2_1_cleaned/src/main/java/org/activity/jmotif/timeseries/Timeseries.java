@@ -8,21 +8,22 @@ import java.util.Vector;
 import net.seninp.util.StackTrace;
 
 /**
- * Implements time-series. It's important to know how it handles NaN values. If input data has NaN's or INFINITY's as entries it will be kept same, but if you specify particular
- * numeric value as NaN, (say a 0 for missing values) it'll be converted into Double.NaN internally and you have to convert it back to your number later.
+ * Implements time-series. It's important to know how it handles NaN values. If input data has NaN's or INFINITY's as
+ * entries it will be kept same, but if you specify particular numeric value as NaN, (say a 0 for missing values) it'll
+ * be converted into Double.NaN internally and you have to convert it back to your number later.
  * 
  * @author Pavel Senin.
  * 
  */
 public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializable
 {
-	
+
 	private static final String COMMA = ", ";
-	
+
 	private final Vector<TPoint> series = new Vector<TPoint>();
-	
+
 	private static final long serialVersionUID = 7526471155622776148L;
-	
+
 	/**
 	 * Constructor.
 	 * 
@@ -31,7 +32,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 	{
 		assert true;
 	}
-	
+
 	/**
 	 * Constructor.
 	 * 
@@ -56,7 +57,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 			throw new TSException("The lengths of the values and timestamps arrays are not equal!");
 		}
 	}
-	
+
 	/**
 	 * Constructor.
 	 * 
@@ -90,7 +91,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 			throw new TSException("The lengths of the values and timestamps arrays are not equal!");
 		}
 	}
-	
+
 	/**
 	 * Add the point at the end of the timeseries. No consistency check is conducted.
 	 * 
@@ -101,7 +102,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 	{
 		this.series.add(p);
 	}
-	
+
 	/**
 	 * Add the point to the timeseries, inserting it at the position specified by the timestamp.
 	 * 
@@ -128,7 +129,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		int pos2insert = findPositions(p);
 		this.series.insertElementAt(p, pos2insert);
 	}
-	
+
 	/**
 	 * Finds the position for the new point insertion.
 	 * 
@@ -163,7 +164,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Remove an element from the timeseries.
 	 * 
@@ -183,7 +184,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 			throw new TSException("Illegal position specified for removal: " + pos + ", series length: " + this.size());
 		}
 	}
-	
+
 	/**
 	 * Get the length of the timeseries.
 	 * 
@@ -193,7 +194,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 	{
 		return this.series.size();
 	}
-	
+
 	/**
 	 * Return the element at the position.
 	 * 
@@ -205,7 +206,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 	{
 		return this.series.get(i);
 	}
-	
+
 	/**
 	 * Return the array of values.
 	 * 
@@ -220,7 +221,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Return the one-row matrix of values.
 	 * 
@@ -235,7 +236,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Return the array of timestamps.
 	 * 
@@ -250,9 +251,10 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		}
 		return res;
 	}
-	
+
 	/**
-	 * Extract interval from timeseries. It is inclusive, i.e. subsection(0,5) will include 6 elements from ts[0] to ts[5].
+	 * Extract interval from timeseries. It is inclusive, i.e. subsection(0,5) will include 6 elements from ts[0] to
+	 * ts[5].
 	 * 
 	 * @param start
 	 *            the interval start.
@@ -269,24 +271,24 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 			int len = end - start + 1;
 			double[] val = new double[len];
 			long[] ts = new long[len];
-			
+
 			for (int i = start; i <= end; i++)
 			{
 				TPoint tp = this.series.get(i);
 				val[i - start] = tp.value();
 				ts[i - start] = tp.tstamp();
 			}
-			
+
 			return new Timeseries(val, ts);
-			
+
 		}
 		else
 		{
-			throw new TSException(
-					"Invalid interval specified: timeseries size " + this.series.size() + " interval [" + start + ", " + end + "]");
+			throw new TSException("Invalid interval specified: timeseries size " + this.series.size() + " interval ["
+					+ start + ", " + end + "]");
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -303,7 +305,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		}
 		return hash;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -330,7 +332,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		}
 		return false;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -339,7 +341,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 	{
 		return this.series.iterator();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -348,14 +350,14 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		int len = this.series.size();
 		double[] val = new double[len];
 		long[] ts = new long[len];
-		
+
 		for (int i = 0; i < len; i++)
 		{
 			TPoint tp = this.series.get(i);
 			val[i] = tp.value();
 			ts[i] = tp.tstamp();
 		}
-		
+
 		try
 		{
 			return new Timeseries(val, ts);
@@ -365,7 +367,7 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 			throw new CloneNotSupportedException("Exception thrown! " + StackTrace.toString(e));
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -378,5 +380,5 @@ public final class Timeseries implements Iterable<TPoint>, Cloneable, Serializab
 		}
 		return res.substring(0, res.length() - 2);
 	}
-	
+
 }

@@ -6,39 +6,45 @@ package org.activity.jmotif.sax.datastructures;
  * @author pavel Senin.
  * 
  */
-public class SAXDataEntry {
-  /** The substring. */
-  private final String Str;
-  /** The index pointer. */
-  private final Integer Idx;
+public class SAXDataEntry
+{
+	/** The substring. */
+	private final String Str;
+	/** The index pointer. */
+	private final Integer Idx;
 
-  /**
-   * Constructor.
-   * 
-   * @param s The substring value.
-   * @param i The index pointer.
-   */
-  public SAXDataEntry(String s, Integer i) {
-    this.Str = s;
-    this.Idx = i;
-  }
+	/**
+	 * Constructor.
+	 * 
+	 * @param s
+	 *            The substring value.
+	 * @param i
+	 *            The index pointer.
+	 */
+	public SAXDataEntry(String s, Integer i)
+	{
+		this.Str = s;
+		this.Idx = i;
+	}
 
-  /**
-   * Get the substring value.
-   * 
-   * @return The substring value.
-   */
-  public String getStr() {
-    return Str;
-  }
+	/**
+	 * Get the substring value.
+	 * 
+	 * @return The substring value.
+	 */
+	public String getStr()
+	{
+		return Str;
+	}
 
-  /**
-   * Get the index.
-   * 
-   * @return The index value.
-   */
-  public Integer getIdx() {
-    return Idx;
-  }
+	/**
+	 * Get the index.
+	 * 
+	 * @return The index value.
+	 */
+	public Integer getIdx()
+	{
+		return Idx;
+	}
 
 }

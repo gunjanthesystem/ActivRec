@@ -4,7 +4,7 @@ import org.activity.jmotif.sax.trie.VisitRegistry;
 
 public class LargeWindowAlgorithm implements SlidingWindowMarkerAlgorithm
 {
-	
+
 	@Override
 	public void markVisited(VisitRegistry registry, int startPosition, int intervalLength)
 	{
@@ -18,6 +18,6 @@ public class LargeWindowAlgorithm implements SlidingWindowMarkerAlgorithm
 		{
 			registry.markVisited(startPosition - i);
 		}
-		
+
 	}
 }

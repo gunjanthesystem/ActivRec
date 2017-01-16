@@ -99,7 +99,8 @@
 // // System.out.println("earlest time stamp="+earliestTimestamp);
 // // ArrayList<String> aggregatedSplittedTimeline =
 //
-// String aggregatedTimelineJSON = UtilityBelt.aggregateTimelines(timeLines, aggregateByString, aggregateMethodString);// //"MaxFrequency");//"ThresholdFrequency");//
+// String aggregatedTimelineJSON = UtilityBelt.aggregateTimelines(timeLines, aggregateByString,
+// aggregateMethodString);// //"MaxFrequency");//"ThresholdFrequency");//
 // System.out.println("QQQQQQQQ3 timeLines.size() =" + timeLines.size());
 //
 // // %%System.out.println(jsonArrayForDataTable.toString());
@@ -124,7 +125,8 @@
 // }
 // }
 //
-// if (request.getParameter("selectStringPost") != null && request.getParameter("aggregateBy") == null && request.getParameter("createActivityEventObjects") == null)
+// if (request.getParameter("selectStringPost") != null && request.getParameter("aggregateBy") == null &&
+// request.getParameter("createActivityEventObjects") == null)
 // {
 // String whereQueryString = request.getParameter("whereQueryStringPost");
 // // %%System.out.println("where query string in controller servlet="+whereQueryString);
@@ -136,17 +138,20 @@
 // try
 // {
 // // System.out.println(ConnectDatabase.getInnerJoinString());
-// // JSONArray jsonArrayForDataTable = ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString,whereQueryString,orderByString);
+// // JSONArray jsonArrayForDataTable =
+// ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString,whereQueryString,orderByString);
 // // System.out.println(jsonArrayForDataTable.toString());
 // // $$request.setAttribute("jsonStringForDataTable", jsonArrayForDataTable);
 //
 // // //////////////
-// JSONArray jsonArrayForDataTable = ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString, whereQueryString, orderByString);
+// JSONArray jsonArrayForDataTable = ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString, whereQueryString,
+// orderByString);
 // // System.out.println(jsonArrayForDataTable.toString());
 //
 // // ArrayList<ActivityObject> allActivityEvents= UtilityBelt.createActivityEventsFromJsonArray(jsonArrayForDataTable);
 //
-// // LinkedHashMap<String,LinkedHashMap<Date,UserDayTimeline>> userTimelines= UtilityBelt.createUserTimelinesFromActivityEvents(allActivityEvents);
+// // LinkedHashMap<String,LinkedHashMap<Date,UserDayTimeline>> userTimelines=
+// UtilityBelt.createUserTimelinesFromActivityEvents(allActivityEvents);
 //
 // // ////////////
 //
@@ -166,22 +171,29 @@
 // }
 //
 // /*
-// * if(request.getParameter("selectStringPost")!=null && request.getParameter("aggregateBy")==null && request.getParameter("reduciblePost")!= null) { System.out.println("reducible
-// post"); String whereQueryString = request.getParameter("whereQueryStringPost"); //%%System.out.println("where query string in controller servlet="+whereQueryString);
+// * if(request.getParameter("selectStringPost")!=null && request.getParameter("aggregateBy")==null &&
+// request.getParameter("reduciblePost")!= null) { System.out.println("reducible
+// post"); String whereQueryString = request.getParameter("whereQueryStringPost"); //%%System.out.println("where query
+// string in controller servlet="+whereQueryString);
 // *
-// * String selectAttributeString = request.getParameter("selectStringPost"); //%%System.out.println("select attribute string in controller servlet="+selectAttributeString);
+// * String selectAttributeString = request.getParameter("selectStringPost"); //%%System.out.println("select attribute
+// string in controller servlet="+selectAttributeString);
 // *
 // * try { //System.out.println(ConnectDatabase.getInnerJoinString()); JSONArray jsonArrayForDataTable =
-// ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString,whereQueryString); //%%System.out.println(jsonArrayForDataTable.toString());
-// //$$request.setAttribute("jsonStringForDataTable", jsonArrayForDataTable); String jsonArrayForDataTableString=jsonArrayForDataTable.toString();
+// ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString,whereQueryString);
+// //%%System.out.println(jsonArrayForDataTable.toString());
+// //$$request.setAttribute("jsonStringForDataTable", jsonArrayForDataTable); String
+// jsonArrayForDataTableString=jsonArrayForDataTable.toString();
 // *
-// * jsonArrayForDataTableString =UtilityBelt.reduceJSONString(selectAttributeString,jsonArrayForDataTableString); //jsonArrayForDataTableString =
+// * jsonArrayForDataTableString =UtilityBelt.reduceJSONString(selectAttributeString,jsonArrayForDataTableString);
+// //jsonArrayForDataTableString =
 // jsonArrayForDataTableString.replace('_',' ');
 // *
 // *
 // * response.setContentType("text/plain"); response.setContentLength(jsonArrayForDataTableString.getBytes().length);
 // *
-// * ServletOutputStream out=response.getOutputStream(); //PrintWriter out = response.getWriter(); out.print(jsonArrayForDataTableString); out.close();
+// * ServletOutputStream out=response.getOutputStream(); //PrintWriter out = response.getWriter();
+// out.print(jsonArrayForDataTableString); out.close();
 // *
 // * } catch(Exception e) { e.printStackTrace(); } }
 // */
@@ -240,12 +252,14 @@
 // try
 // {
 // System.out.println("inside create>>>>");
-// JSONArray jsonArray = ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString, whereQueryString, orderByString);
+// JSONArray jsonArray = ConnectDatabase.getJSONArrayOfDataTable(selectAttributeString, whereQueryString,
+// orderByString);
 // System.out.println(jsonArray.toString());
 //
 // ArrayList<ActivityObject> allActivityEvents = UtilityBelt.createActivityObjectsFromJsonArray(jsonArray);
 //
-// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines = TimelineUtils.createUserTimelinesFromActivityObjects(allActivityEvents);
+// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines =
+// TimelineUtils.createUserTimelinesFromActivityObjects(allActivityEvents);
 //
 // System.out.println("userTimelines.size()=" + userTimelines.size());
 //
@@ -253,7 +267,8 @@
 // // UtilityBelt.traverseActivityEvents(allActivityEvents); //Debugging Check: OK
 //
 // // for actual recommendation
-// // RecommendationMaster recommendationMaster=new RecommendationMaster(userTimelines,dateAtRecomm,timeAtRecomm,weekDayAtRecomm,userAtRecomm);
+// // RecommendationMaster recommendationMaster=new
+// RecommendationMaster(userTimelines,dateAtRecomm,timeAtRecomm,weekDayAtRecomm,userAtRecomm);
 //
 // // for testing
 // RecommendationTestsMU recommendationsTest = new RecommendationTestsMU(userTimelines);// ,userAtRecomm);
@@ -277,11 +292,13 @@
 // * if(request.getParameter("attributeControlAggregationPost")!=null) { String attributeControlNamePost="";
 // attributeControlNamePost=request.getParameter("attributeControlAggregationPost");
 // *
-// * if(!(attributeControlNamePost.isEmpty())) { String htmlString=AttributeControlObject.getHTMLStringAggregationControlObject(attributeControlNamePost.trim());
+// * if(!(attributeControlNamePost.isEmpty())) { String
+// htmlString=AttributeControlObject.getHTMLStringAggregationControlObject(attributeControlNamePost.trim());
 // *
 // * //$$request.setAttribute("htmlResponse", htmlString);
 // *
-// * response .setContentType ("text/html") ; PrintWriter out = response. getWriter () ; out.println (htmlString) ; out .close () ; } }
+// * response .setContentType ("text/html") ; PrintWriter out = response. getWriter () ; out.println (htmlString) ; out
+// .close () ; } }
 // */
 //
 // }

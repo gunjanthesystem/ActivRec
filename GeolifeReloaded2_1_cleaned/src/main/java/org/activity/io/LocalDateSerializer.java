@@ -15,13 +15,13 @@ import com.esotericsoftware.kryo.io.Output;
 
 public class LocalDateSerializer extends Serializer<Date>
 {
-	
+
 	@Override
 	public void write(Kryo kryo, Output output, Date date)
 	{
 		output.writeLong(date.getTime(), true);
 	}
-	
+
 	@Override
 	public Date read(Kryo kryo, Input input, Class<Date> dateClass)
 	{

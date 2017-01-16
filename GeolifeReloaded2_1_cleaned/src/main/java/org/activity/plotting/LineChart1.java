@@ -22,7 +22,7 @@ import javafx.stage.Stage;
  */
 public class LineChart1 extends Application
 {
-	
+
 	private void init(Stage primaryStage)
 	{
 		//
@@ -38,7 +38,7 @@ public class LineChart1 extends Application
 		// primaryStage.setScene(new Scene(root));
 		root.getChildren().add(createChart());
 	}
-	
+
 	protected LineChart<Number, Number> createChart()
 	{
 		final NumberAxis xAxis = new NumberAxis();
@@ -56,7 +56,7 @@ public class LineChart1 extends Application
 		series.getData().add(new XYChart.Data<Number, Number>(50d, 90d));
 		series.getData().add(new XYChart.Data<Number, Number>(70d, 30d));
 		series.getData().add(new XYChart.Data<Number, Number>(170d, 122d));
-		
+
 		XYChart.Series<Number, Number> series2 = new XYChart.Series<Number, Number>();
 		series2.setName("Data Series 2");
 		series2.getData().add(new XYChart.Data<Number, Number>(220d, 50d));
@@ -64,20 +64,20 @@ public class LineChart1 extends Application
 		series2.getData().add(new XYChart.Data<Number, Number>(220d, 90d));
 		series2.getData().add(new XYChart.Data<Number, Number>(170d, 30d));
 		series2.getData().add(new XYChart.Data<Number, Number>(170d, 122d));
-		
+
 		lc.getData().add(series);
 		lc.getData().add(series2);
 		lc.getData().add(series2);
 		return lc;
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
 		init(primaryStage);
 		primaryStage.show();
 	}
-	
+
 	public static void main(String[] args)
 	{
 		launch(args);

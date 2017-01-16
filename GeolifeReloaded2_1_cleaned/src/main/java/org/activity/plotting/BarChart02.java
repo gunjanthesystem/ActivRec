@@ -17,7 +17,7 @@ public class BarChart02 extends Application
 	final static String france = "France";
 	final static String italy = "Italy";
 	final static String usa = "USA";
-	
+
 	@Override
 	public void start(Stage stage)
 	{
@@ -28,13 +28,13 @@ public class BarChart02 extends Application
 		bc.setTitle("Country Summary");
 		xAxis.setLabel("Country");
 		yAxis.setLabel("Value");
-		
+
 		Scene scene = new Scene(bc, 800, 600);
-		
+
 		bc.setData(getChartData());
 		stage.setScene(scene);
 		stage.show();
-		
+
 		// PrinterJob job = PrinterJob.getPrinterJob();
 		// if (job != null) {
 		// if (job.printDialog(null)) {
@@ -42,11 +42,11 @@ public class BarChart02 extends Application
 		// }
 		// }
 	}
-	
+
 	private ObservableList<XYChart.Series<String, Number>> getChartData()
 	{
 		ObservableList<XYChart.Series<String, Number>> list = FXCollections.observableArrayList();
-		
+
 		XYChart.Series series1 = new XYChart.Series();
 		// series1.setName("2003");
 		series1.getData().add(new XYChart.Data(austria, 25601.34));
@@ -54,7 +54,7 @@ public class BarChart02 extends Application
 		series1.getData().add(new XYChart.Data(france, 10000));
 		series1.getData().add(new XYChart.Data(italy, 35407.15));
 		series1.getData().add(new XYChart.Data(usa, 12000));
-		
+
 		// XYChart.Series series2 = new XYChart.Series();
 		// series2.setName("2004");
 		// series2.getData().add(new XYChart.Data(austria, 57401.85));
@@ -70,15 +70,15 @@ public class BarChart02 extends Application
 		// series3.getData().add(new XYChart.Data(france, 18722.18));
 		// series3.getData().add(new XYChart.Data(italy, 17557.31));
 		// series3.getData().add(new XYChart.Data(usa, 92633.68));
-		
+
 		// list.addAll(series1, series2, series3);
-		
+
 		return list;
 	}
-	
+
 	public static void main(String[] args)
 	{
 		launch(args);
-		
+
 	}
 }

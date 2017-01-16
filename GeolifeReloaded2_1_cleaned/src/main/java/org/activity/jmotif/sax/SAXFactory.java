@@ -45,12 +45,12 @@ import weka.core.Instances;
  */
 public final class SAXFactory
 {
-	
+
 	public static final int DEFAULT_COLLECTION_SIZE = 50;
-	
+
 	private static Logger consoleLogger;
 	// disabled by gunjan private static final String LOGGING_LEVEL = "SEVERE";
-	
+
 	static
 	{
 		// disabled by Gunjan consoleLogger = HackystatLogger.getLogger("jmotif.debug.console", "jmotif");
@@ -65,7 +65,7 @@ public final class SAXFactory
 		// disabled by GunjanconsoleLogger.addHandler(handler);
 		// disabled by Gunjan HackystatLogger.setLoggingLevel(consoleLogger, LOGGING_LEVEL);
 	}
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -73,9 +73,10 @@ public final class SAXFactory
 	{
 		super();
 	}
-	
+
 	/**
-	 * Convert the timeseries into SAX string representation, normalizes each of the pieces before SAX conversion. NOSKIP means that ALL SAX words reported.
+	 * Convert the timeseries into SAX string representation, normalizes each of the pieces before SAX conversion.
+	 * NOSKIP means that ALL SAX words reported.
 	 * 
 	 * @param ts
 	 *            The timeseries given.
@@ -90,25 +91,25 @@ public final class SAXFactory
 	 *             If error occurs.
 	 * @throws CloneNotSupportedException
 	 */
-	
+
 	public static SAXFrequencyData ts2saxZnormByCutsNoSkip(Timeseries ts, int windowSize, int paaSize, double[] cuts)
 			throws TSException, CloneNotSupportedException
 	{
-		
+
 		// Initialize symbolic result data
 		SAXFrequencyData res = new SAXFrequencyData();
-		
+
 		// scan across the time series extract sub sequences, and converting
 		// them to strings
 		for (int i = 0; i < ts.size() - (windowSize - 1); i++)
 		{
-			
+
 			// fix the current subsection
 			Timeseries subSection = ts.subsection(i, i + windowSize - 1);
-			
+
 			// Z normalize it
 			subSection = TSUtils.zNormalize(subSection);
-			
+
 			// perform PAA conversion if needed
 			Timeseries paa;
 			try
@@ -119,18 +120,18 @@ public final class SAXFactory
 			{
 				throw new TSException("Unable to clone: " + StackTrace.toString(e));
 			}
-			
+
 			// Convert the PAA to a string.
 			char[] currentString = TSUtils.ts2StringWithNaNByCuts(paa, cuts);
-			
+
 			res.put(new String(currentString), i);
 		}
 		return res;
 	}
-	
+
 	/**
-	 * Convert the timeseries into SAX string representation, normalizes each of the pieces before SAX conversion. Not all SAX words reported, if the new SAX word is the same as
-	 * current it will not be reported.
+	 * Convert the timeseries into SAX string representation, normalizes each of the pieces before SAX conversion. Not
+	 * all SAX words reported, if the new SAX word is the same as current it will not be reported.
 	 * 
 	 * @param ts
 	 *            The timeseries given.
@@ -145,26 +146,26 @@ public final class SAXFactory
 	 *             If error occurs.
 	 * @throws CloneNotSupportedException
 	 */
-	
+
 	public static SAXFrequencyData ts2saxZnormByCuts(Timeseries ts, int windowSize, int paaSize, double[] cuts)
 			throws TSException, CloneNotSupportedException
 	{
-		
+
 		// Initialize symbolic result data
 		SAXFrequencyData res = new SAXFrequencyData();
 		String previousString = "";
-		
+
 		// scan across the time series extract sub sequences, and converting
 		// them to strings
 		for (int i = 0; i < ts.size() - (windowSize - 1); i++)
 		{
-			
+
 			// fix the current subsection
 			Timeseries subSection = ts.subsection(i, i + windowSize - 1);
-			
+
 			// Z normalize it
 			subSection = TSUtils.zNormalize(subSection);
-			
+
 			// perform PAA conversion if needed
 			Timeseries paa;
 			try
@@ -175,10 +176,10 @@ public final class SAXFactory
 			{
 				throw new TSException("Unable to clone: " + StackTrace.toString(e));
 			}
-			
+
 			// Convert the PAA to a string.
 			char[] currentString = TSUtils.ts2StringWithNaNByCuts(paa, cuts);
-			
+
 			// check if previous one was the same, if so, ignore that (don't
 			// know why though, but guess
 			// cause we didn't advance much on the timeseries itself)
@@ -191,9 +192,10 @@ public final class SAXFactory
 		}
 		return res;
 	}
-	
+
 	/**
-	 * Convert the timeseries into SAX string representation, normalizes each of the pieces before SAX conversion. NOSKIP means that ALL SAX words reported.
+	 * Convert the timeseries into SAX string representation, normalizes each of the pieces before SAX conversion.
+	 * NOSKIP means that ALL SAX words reported.
 	 * 
 	 * @param s
 	 *            The timeseries given.
@@ -219,10 +221,10 @@ public final class SAXFactory
 		Timeseries ts = new Timeseries(s, ticks);
 		return ts2saxZnormByCutsNoSkip(ts, windowSize, paaSize, cuts);
 	}
-	
+
 	/**
-	 * Convert the timeseries into SAX string representation, normalizes each of the pieces before SAX conversion. Not all SAX words reported, if the new SAX word is the same as
-	 * current it will not be reported.
+	 * Convert the timeseries into SAX string representation, normalizes each of the pieces before SAX conversion. Not
+	 * all SAX words reported, if the new SAX word is the same as current it will not be reported.
 	 * 
 	 * @param s
 	 *            The timeseries given.
@@ -248,7 +250,7 @@ public final class SAXFactory
 		Timeseries ts = new Timeseries(s, ticks);
 		return ts2saxZnormByCuts(ts, windowSize, paaSize, cuts);
 	}
-	
+
 	/**
 	 * Convert the timeseries into SAX string representation. It doesn't normalize anything.
 	 * 
@@ -264,25 +266,26 @@ public final class SAXFactory
 	 * @throws TSException
 	 *             If error occurs.
 	 */
-	
-	public static SAXFrequencyData ts2saxNoZnormByCuts(Timeseries ts, int windowSize, int paaSize, double[] cuts) throws TSException
+
+	public static SAXFrequencyData ts2saxNoZnormByCuts(Timeseries ts, int windowSize, int paaSize, double[] cuts)
+			throws TSException
 	{
-		
+
 		// Initialize symbolic result data
 		SAXFrequencyData res = new SAXFrequencyData();
 		String previousString = "";
-		
+
 		// scan across the time series extract sub sequences, and converting
 		// them to strings
 		for (int i = 0; i < ts.size() - (windowSize - 1); i++)
 		{
-			
+
 			// fix the current subsection
 			Timeseries subSection = ts.subsection(i, i + windowSize - 1);
-			
+
 			// Z normalize it
 			// subSection = TSUtils.normalize(subSection);
-			
+
 			// perform PAA conversion if needed
 			Timeseries paa;
 			try
@@ -293,10 +296,10 @@ public final class SAXFactory
 			{
 				throw new TSException("Unable to clone: " + StackTrace.toString(e));
 			}
-			
+
 			// Convert the PAA to a string.
 			char[] currentString = TSUtils.ts2StringWithNaNByCuts(paa, cuts);
-			
+
 			// check if previous one was the same, if so, ignore that (don't
 			// know why though, but guess
 			// cause we didn't advance much on the timeseries itself)
@@ -310,7 +313,7 @@ public final class SAXFactory
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Convert the timeseries into SAX string representation.
 	 * 
@@ -329,20 +332,20 @@ public final class SAXFactory
 	 *             If error occurs.
 	 * @throws CloneNotSupportedException
 	 */
-	
-	public static SAXFrequencyData ts2saxZNorm(Timeseries ts, int windowSize, int paaSize, Alphabet alphabet, int alphabetSize)
-			throws TSException, CloneNotSupportedException
+
+	public static SAXFrequencyData ts2saxZNorm(Timeseries ts, int windowSize, int paaSize, Alphabet alphabet,
+			int alphabetSize) throws TSException, CloneNotSupportedException
 	{
-		
+
 		if (alphabetSize > alphabet.getMaxSize())
 		{
 			throw new TSException("Unable to set the alphabet size greater than " + alphabet.getMaxSize());
 		}
-		
+
 		return ts2saxZnormByCuts(ts, windowSize, paaSize, alphabet.getCuts(alphabetSize));
-		
+
 	}
-	
+
 	/**
 	 * Convert the timeseries into SAX string representation.
 	 * 
@@ -360,20 +363,20 @@ public final class SAXFactory
 	 * @throws TSException
 	 *             If error occurs.
 	 */
-	
-	public static SAXFrequencyData ts2saxNoZnorm(Timeseries ts, int windowSize, int paaSize, Alphabet alphabet, int alphabetSize)
-			throws TSException
+
+	public static SAXFrequencyData ts2saxNoZnorm(Timeseries ts, int windowSize, int paaSize, Alphabet alphabet,
+			int alphabetSize) throws TSException
 	{
-		
+
 		if (alphabetSize > alphabet.getMaxSize())
 		{
 			throw new TSException("Unable to set the alphabet size greater than " + alphabet.getMaxSize());
 		}
-		
+
 		return ts2saxNoZnormByCuts(ts, windowSize, paaSize, alphabet.getCuts(alphabetSize));
-		
+
 	}
-	
+
 	/**
 	 * Convert the timeseries into SAX string representation.
 	 * 
@@ -393,12 +396,12 @@ public final class SAXFactory
 	public static String ts2string(Timeseries ts, int paaSize, Alphabet alphabet, int alphabetSize)
 			throws TSException, CloneNotSupportedException
 	{
-		
+
 		if (alphabetSize > alphabet.getMaxSize())
 		{
 			throw new TSException("Unable to set the alphabet size greater than " + alphabet.getMaxSize());
 		}
-		
+
 		int tsLength = ts.size();
 		if (tsLength == paaSize)
 		{
@@ -419,7 +422,7 @@ public final class SAXFactory
 			return new String(TSUtils.ts2String(PAA, alphabet, alphabetSize));
 		}
 	}
-	
+
 	/**
 	 * Build the SAX trie out of the series.
 	 * 
@@ -435,15 +438,16 @@ public final class SAXFactory
 	 * @throws TSException
 	 *             if error occurs.
 	 */
-	public static DiscordRecords ts2Discords(double[] tsData, int windowSize, int alphabetSize) throws TrieException, TSException
+	public static DiscordRecords ts2Discords(double[] tsData, int windowSize, int alphabetSize)
+			throws TrieException, TSException
 	{
-		
+
 		// make alphabet available
 		NormalAlphabet normalA = new NormalAlphabet();
-		
+
 		// get a trie instance
 		SAXTrie trie = new SAXTrie(tsData.length - windowSize, alphabetSize);
-		
+
 		// build the trie sliding over the series
 		//
 		int currPosition = 0;
@@ -457,15 +461,17 @@ public final class SAXFactory
 			// increment the position
 			currPosition++;
 		}
-		
+
 		// delegate the job to discords extraction engine
-		DiscordRecords discords = getDiscordsAlgorithm(tsData, windowSize, trie, DEFAULT_COLLECTION_SIZE, new LargeWindowAlgorithm());
-		
+		DiscordRecords discords = getDiscordsAlgorithm(tsData, windowSize, trie, DEFAULT_COLLECTION_SIZE,
+				new LargeWindowAlgorithm());
+
 		return discords;
 	}
-	
+
 	/**
-	 * Compute the distance between the two strings, this function use the numbers associated with ASCII codes, i.e. distance between a and b would be 1.
+	 * Compute the distance between the two strings, this function use the numbers associated with ASCII codes, i.e.
+	 * distance between a and b would be 1.
 	 * 
 	 * @param a
 	 *            The first string.
@@ -495,7 +501,7 @@ public final class SAXFactory
 			throw new TSException("Unable to compute SAX distance, string lengths are not equal");
 		}
 	}
-	
+
 	/**
 	 * Compute the distance between the two chars based on the ASCII symbol codes.
 	 * 
@@ -509,7 +515,7 @@ public final class SAXFactory
 	{
 		return Math.abs(Character.getNumericValue(a) - Character.getNumericValue(b));
 	}
-	
+
 	/**
 	 * This function implements SAX MINDIST function which uses alphabet based distance matrix.
 	 * 
@@ -553,35 +559,35 @@ public final class SAXFactory
 			throw new TSException("Data arrays lengths are not equal!");
 		}
 	}
-	
+
 	public MotifRecords series2Motifs(double[] series, int windowSize, int alphabetSize, int motifsNumToReport,
 			SlidingWindowMarkerAlgorithm markerAlgorithm) throws TrieException, TSException
 	{
 		// init the SAX structures
 		//
 		SAXTrie trie = new SAXTrie(series.length - windowSize, alphabetSize);
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("data size: ").append(series.length);
-		
+
 		double max = TSUtils.max(series);
 		sb.append("; max: ").append(max);
-		
+
 		double min = TSUtils.min(series);
 		sb.append("; min: ").append(min);
-		
+
 		double mean = TSUtils.mean(series);
 		sb.append("; mean: ").append(mean);
-		
+
 		int nans = TSUtils.countNaN(series);
 		sb.append("; NaNs: ").append(nans);
-		
+
 		consoleLogger.fine(sb.toString());
-		consoleLogger.fine(
-				"window size: " + windowSize + ", alphabet size: " + alphabetSize + ", SAX Trie size: " + (series.length - windowSize));
-		
+		consoleLogger.fine("window size: " + windowSize + ", alphabet size: " + alphabetSize + ", SAX Trie size: "
+				+ (series.length - windowSize));
+
 		Alphabet normalA = new NormalAlphabet();
-		
+
 		Date start = new Date();
 		// build the trie
 		//
@@ -598,16 +604,16 @@ public final class SAXFactory
 		}
 		Date end = new Date();
 		consoleLogger.fine("trie built in: " + timeToString(start.getTime(), end.getTime()));
-		
+
 		start = new Date();
 		MotifRecords motifs = getMotifs(trie, motifsNumToReport);
 		end = new Date();
-		
+
 		consoleLogger.fine("motifs retrieved in: " + timeToString(start.getTime(), end.getTime()));
-		
+
 		return motifs;
 	}
-	
+
 	/**
 	 * Build the SAX trie out of Instances reporting discords.
 	 * 
@@ -618,7 +624,8 @@ public final class SAXFactory
 	 * @param alphabetSize
 	 *            The SAX alphabet size.
 	 * @param dataAttributeName
-	 *            The WEKA attribute - essentially points on the instance attribute which bears the data value in this case.
+	 *            The WEKA attribute - essentially points on the instance attribute which bears the data value in this
+	 *            case.
 	 * @param discordsNumToReport
 	 *            how many discords to report.
 	 * @return Discords found within the series.
@@ -627,36 +634,36 @@ public final class SAXFactory
 	 * @throws TSException
 	 *             if error occurs.
 	 */
-	public static DiscordRecords instances2Discords(Instances tsData, String dataAttributeName, int windowSize, int alphabetSize,
-			int discordsNumToReport) throws TrieException, TSException
+	public static DiscordRecords instances2Discords(Instances tsData, String dataAttributeName, int windowSize,
+			int alphabetSize, int discordsNumToReport) throws TrieException, TSException
 	{
-		
+
 		// get the timestamps and data attributes
 		//
 		Attribute dataAttribute = tsData.attribute(dataAttributeName);
 		double[] series = toRealSeries(tsData, dataAttribute);
 		NormalAlphabet normalA = new NormalAlphabet();
 		SAXTrie trie = new SAXTrie(series.length - windowSize, alphabetSize);
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("data size: ").append(series.length);
-		
+
 		double max = TSUtils.max(series);
 		sb.append("; max: ").append(max);
-		
+
 		double min = TSUtils.min(series);
 		sb.append("; min: ").append(min);
-		
+
 		double mean = TSUtils.mean(series);
 		sb.append("; mean: ").append(mean);
-		
+
 		int nans = TSUtils.countNaN(series);
 		sb.append("; NaNs: ").append(nans);
-		
+
 		consoleLogger.fine(sb.toString());
-		consoleLogger.fine(
-				"window size: " + windowSize + ", alphabet size: " + alphabetSize + ", SAX Trie size: " + (series.length - windowSize));
-		
+		consoleLogger.fine("window size: " + windowSize + ", alphabet size: " + alphabetSize + ", SAX Trie size: "
+				+ (series.length - windowSize));
+
 		// build the trie
 		//
 		int currPosition = 0;
@@ -670,21 +677,21 @@ public final class SAXFactory
 			// increment the position
 			currPosition++;
 		}
-		
+
 		Date start = new Date();
 		int reportNum = DEFAULT_COLLECTION_SIZE;
 		if (discordsNumToReport > 0 && discordsNumToReport < 50)
 		{
 			reportNum = discordsNumToReport;
 		}
-		DiscordRecords discords =
-				getDiscordsAlgorithm(toRealSeries(tsData, dataAttribute), windowSize, trie, reportNum, new LargeWindowAlgorithm());
+		DiscordRecords discords = getDiscordsAlgorithm(toRealSeries(tsData, dataAttribute), windowSize, trie, reportNum,
+				new LargeWindowAlgorithm());
 		Date end = new Date();
 		consoleLogger.fine("discords search finished in : " + timeToString(start.getTime(), end.getTime()));
-		
+
 		return discords;
 	}
-	
+
 	/**
 	 * Build the SAX trie out of the series and reports discords.
 	 * 
@@ -702,34 +709,34 @@ public final class SAXFactory
 	 * @throws TSException
 	 *             if error occurs.
 	 */
-	public static DiscordRecords series2Discords(double[] series, int windowSize, int alphabetSize, int discordsNumToReport,
-			SlidingWindowMarkerAlgorithm markerAlgorithm) throws TrieException, TSException
+	public static DiscordRecords series2Discords(double[] series, int windowSize, int alphabetSize,
+			int discordsNumToReport, SlidingWindowMarkerAlgorithm markerAlgorithm) throws TrieException, TSException
 	{
-		
+
 		// get the timestamps and data attributes
 		//
 		NormalAlphabet normalA = new NormalAlphabet();
 		SAXTrie trie = new SAXTrie(series.length - windowSize, alphabetSize);
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("data size: ").append(series.length);
-		
+
 		double max = TSUtils.max(series);
 		sb.append("; max: ").append(max);
-		
+
 		double min = TSUtils.min(series);
 		sb.append("; min: ").append(min);
-		
+
 		double mean = TSUtils.mean(series);
 		sb.append("; mean: ").append(mean);
-		
+
 		int nans = TSUtils.countNaN(series);
 		sb.append("; NaNs: ").append(nans);
-		
+
 		consoleLogger.fine(sb.toString());
-		consoleLogger.fine(
-				"window size: " + windowSize + ", alphabet size: " + alphabetSize + ", SAX Trie size: " + (series.length - windowSize));
-		
+		consoleLogger.fine("window size: " + windowSize + ", alphabet size: " + alphabetSize + ", SAX Trie size: "
+				+ (series.length - windowSize));
+
 		// build the trie
 		//
 		int currPosition = 0;
@@ -743,7 +750,7 @@ public final class SAXFactory
 			// increment the position
 			currPosition++;
 		}
-		
+
 		Date start = new Date();
 		int reportNum = DEFAULT_COLLECTION_SIZE;
 		if (discordsNumToReport > 0 && discordsNumToReport < 50)
@@ -753,13 +760,14 @@ public final class SAXFactory
 		DiscordRecords discords = getDiscordsAlgorithm(series, windowSize, trie, reportNum, markerAlgorithm);
 		Date end = new Date();
 		consoleLogger.fine("discords search finished in : " + timeToString(start.getTime(), end.getTime()));
-		
+
 		return discords;
 	}
-	
+
 	/**
-	 * Builds two collections - collection of "discords" - the surprise or unique patterns and the collection of the motifs - most frequent patterns. This method leveraging the
-	 * Trie structure - so the sliding window size will be translated into the alphabet size by using PAA.
+	 * Builds two collections - collection of "discords" - the surprise or unique patterns and the collection of the
+	 * motifs - most frequent patterns. This method leveraging the Trie structure - so the sliding window size will be
+	 * translated into the alphabet size by using PAA.
 	 * 
 	 * @param series
 	 *            The data series.
@@ -778,36 +786,37 @@ public final class SAXFactory
 	 * @throws TSException
 	 *             if error occurs.
 	 */
-	public static DiscordsAndMotifs series2DiscordsAndMotifs(double[] series, int windowSize, int alphabetSize, int discordCollectionSize,
-			int motifsCollectionSize, SlidingWindowMarkerAlgorithm markerAlgorithm) throws TrieException, TSException
+	public static DiscordsAndMotifs series2DiscordsAndMotifs(double[] series, int windowSize, int alphabetSize,
+			int discordCollectionSize, int motifsCollectionSize, SlidingWindowMarkerAlgorithm markerAlgorithm)
+			throws TrieException, TSException
 	{
-		
+
 		// init the SAX structures
 		//
 		DiscordsAndMotifs res = new DiscordsAndMotifs(discordCollectionSize, motifsCollectionSize);
 		SAXTrie trie = new SAXTrie(series.length - windowSize, alphabetSize);
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("data size: ").append(series.length);
-		
+
 		double max = TSUtils.max(series);
 		sb.append("; max: ").append(max);
-		
+
 		double min = TSUtils.min(series);
 		sb.append("; min: ").append(min);
-		
+
 		double mean = TSUtils.mean(series);
 		sb.append("; mean: ").append(mean);
-		
+
 		int nans = TSUtils.countNaN(series);
 		sb.append("; NaNs: ").append(nans);
-		
+
 		consoleLogger.fine(sb.toString());
-		consoleLogger.fine(
-				"window size: " + windowSize + ", alphabet size: " + alphabetSize + ", SAX Trie size: " + (series.length - windowSize));
-		
+		consoleLogger.fine("window size: " + windowSize + ", alphabet size: " + alphabetSize + ", SAX Trie size: "
+				+ (series.length - windowSize));
+
 		Alphabet normalA = new NormalAlphabet();
-		
+
 		Date start = new Date();
 		// build the trie
 		//
@@ -824,29 +833,31 @@ public final class SAXFactory
 		}
 		Date end = new Date();
 		consoleLogger.fine("trie built in: " + timeToString(start.getTime(), end.getTime()));
-		
+
 		start = new Date();
 		MotifRecords motifs = getMotifs(trie, motifsCollectionSize);
 		end = new Date();
-		
+
 		consoleLogger.fine("motifs retrieved in: " + timeToString(start.getTime(), end.getTime()));
-		
+
 		start = new Date();
-		DiscordRecords discords = getDiscordsAlgorithm(series, windowSize, trie, discordCollectionSize, markerAlgorithm);
+		DiscordRecords discords = getDiscordsAlgorithm(series, windowSize, trie, discordCollectionSize,
+				markerAlgorithm);
 		end = new Date();
 		consoleLogger.fine("discords collected in: " + timeToString(start.getTime(), end.getTime()));
-		
+
 		res.addDiscords(discords);
 		res.addMotifs(motifs);
-		
+
 		return res;
 	}
-	
+
 	/**
 	 * The discords extraction method.
 	 * 
-	 * Here I need to keep a continuous stack of knowledge with information not only about distance, but about abandoning or conducting a full search for words. Thus, I will not be
-	 * doing the same expensive search on the rarest word all over again.
+	 * Here I need to keep a continuous stack of knowledge with information not only about distance, but about
+	 * abandoning or conducting a full search for words. Thus, I will not be doing the same expensive search on the
+	 * rarest word all over again.
 	 * 
 	 * @param series
 	 *            The series we work with.
@@ -860,19 +871,19 @@ public final class SAXFactory
 	 * @throws TSException
 	 * @throws TrieException
 	 */
-	private static DiscordRecords getDiscordsAlgorithm(double[] series, int windowSize, SAXTrie trie, int discordCollectionSize,
-			SlidingWindowMarkerAlgorithm marker) throws TSException, TrieException
+	private static DiscordRecords getDiscordsAlgorithm(double[] series, int windowSize, SAXTrie trie,
+			int discordCollectionSize, SlidingWindowMarkerAlgorithm marker) throws TSException, TrieException
 	{
-		
+
 		consoleLogger.fine("starting discords finding routines");
-		
+
 		// resulting discords collection
 		DiscordRecords discords = new DiscordRecords(discordCollectionSize);
-		
+
 		// visit registry. the idea is to mark as visited all the discord
 		// locations for all searches
 		VisitRegistry discordsVisitRegistry = new VisitRegistry(series.length - windowSize);
-		
+
 		// the collection of seen words and their best so far distances
 		// in the collection, in addition to pairs <word, distance> I store a
 		// semaphore
@@ -881,54 +892,55 @@ public final class SAXFactory
 		// abandoned at some point, so we do not know the final distance
 		//
 		TreeMap<String, DistanceEntry> knownWordsAndTheirCurrentDistances = new TreeMap<String, DistanceEntry>();
-		
+
 		// the words already in the discords collection, so we do not have to
 		// re-consider them
 		//
 		TreeSet<String> completeWords = new TreeSet<String>();
-		
+
 		// we conduct the search until the number of discords is less than
 		// desired
 		//
 		while (discords.getSize() < discordCollectionSize)
 		{
-			
+
 			consoleLogger.fine("currently known discords: " + discords.getSize() + " out of " + discordCollectionSize);
-			
+
 			Date start = new Date();
-			DiscordRecord bestDiscord = findBestDiscord(series, windowSize, trie, completeWords, knownWordsAndTheirCurrentDistances,
-					discordsVisitRegistry, marker);
+			DiscordRecord bestDiscord = findBestDiscord(series, windowSize, trie, completeWords,
+					knownWordsAndTheirCurrentDistances, discordsVisitRegistry, marker);
 			Date end = new Date();
-			
+
 			// if the discord is null we getting out of the search
 			if (bestDiscord.getDistance() == 0.0D || bestDiscord.getPosition() == -1)
 			{
-				consoleLogger.fine("breaking the outer search loop, discords found: " + discords.getSize() + " last seen discord: "
-						+ bestDiscord.toString());
+				consoleLogger.fine("breaking the outer search loop, discords found: " + discords.getSize()
+						+ " last seen discord: " + bestDiscord.toString());
 				break;
 			}
-			
-			consoleLogger.fine("new discord: " + bestDiscord.getPayload() + ", position " + bestDiscord.getPosition() + ", distance "
-					+ bestDiscord.getDistance() + ", elapsed time: " + timeToString(start.getTime(), end.getTime()));
-			
+
+			consoleLogger.fine("new discord: " + bestDiscord.getPayload() + ", position " + bestDiscord.getPosition()
+					+ ", distance " + bestDiscord.getDistance() + ", elapsed time: "
+					+ timeToString(start.getTime(), end.getTime()));
+
 			// collect the result
 			//
 			discords.add(bestDiscord);
-			
+
 			// and maintain data structures
 			//
 			marker.markVisited(discordsVisitRegistry, bestDiscord.getPosition(), windowSize);
 			completeWords.add(String.valueOf(bestDiscord.getPayload()));
 		}
-		
+
 		// done deal
 		//
 		return discords;
 	}
-	
+
 	/**
-	 * This method reports the best found discord. Note, that this discord is approximately the best. Due to the fuzzy-logic search with randomization and aggressive labeling of
-	 * the magic array locations.
+	 * This method reports the best found discord. Note, that this discord is approximately the best. Due to the
+	 * fuzzy-logic search with randomization and aggressive labeling of the magic array locations.
 	 * 
 	 * @param series
 	 *            The series we are looking for discord in.
@@ -939,7 +951,8 @@ public final class SAXFactory
 	 * @param foundDiscordsWords
 	 *            Already found discords.
 	 * @param knownWordsAndTheirDistances
-	 *            The best known distances for certain word. I use the early search abandoning optimization in oder to reduce complexity.
+	 *            The best known distances for certain word. I use the early search abandoning optimization in oder to
+	 *            reduce complexity.
 	 * @param visitedLocations
 	 *            The magic array.
 	 * @return The best discord instance.
@@ -948,11 +961,11 @@ public final class SAXFactory
 	 * @throws TrieException
 	 *             If error occurs.
 	 */
-	private static DiscordRecord findBestDiscord(double[] series, int windowSize, SAXTrie trie, TreeSet<String> foundDiscordsWords,
-			TreeMap<String, DistanceEntry> knownWordsAndTheirDistances, VisitRegistry visitedLocations, SlidingWindowMarkerAlgorithm marker)
-			throws TSException, TrieException
+	private static DiscordRecord findBestDiscord(double[] series, int windowSize, SAXTrie trie,
+			TreeSet<String> foundDiscordsWords, TreeMap<String, DistanceEntry> knownWordsAndTheirDistances,
+			VisitRegistry visitedLocations, SlidingWindowMarkerAlgorithm marker) throws TSException, TrieException
 	{
-		
+
 		// we extract all seen words from the trie
 		// and sort them by the frequency decrease
 		//
@@ -964,28 +977,28 @@ public final class SAXFactory
 		// .append(frequencies.get(i).getPosition()).append(" ; ");
 		// }
 		// consoleLogger.finer(sb.toString());
-		
+
 		// init variables
 		int bestSoFarPosition = -1;
 		double bestSoFarDistance = 0.0D;
 		String bestSoFarString = "";
-		
+
 		// we will iterate over words from rarest to frequent ones
 		//
 		int idx = 0;
 		int limit = frequencies.size();
 		while (idx < limit)
 		{
-			
+
 			SAXTrieHitEntry currentEntry = frequencies.get(idx);
 			String currentWord = String.valueOf(currentEntry.getStr());
 			int currentPosition = currentEntry.getPosition();
-			
+
 			// take care about this entry
 			cleanUpFrequencies(frequencies, currentWord, idx);
 			// and update the length
 			limit = frequencies.size();
-			
+
 			if (foundDiscordsWords.contains(currentWord) || visitedLocations.isVisited(currentPosition))
 			{
 				consoleLogger.finer("skipping the search for " + currentWord);
@@ -994,32 +1007,35 @@ public final class SAXFactory
 			}
 			else
 			{
-				consoleLogger.finer("conducting search for " + currentWord + " iteration " + idx + " from " + frequencies.size());
+				consoleLogger.finer(
+						"conducting search for " + currentWord + " iteration " + idx + " from " + frequencies.size());
 			}
-			
+
 			// so, lets search begin
 			//
 			double nearestNeighborDist = Double.MAX_VALUE;
 			boolean doRandomSearch = true;
-			
+
 			// get a copy of visited locations
 			VisitRegistry registry = new VisitRegistry(series.length - windowSize);
 			registry.transferVisited(visitedLocations);
 			// & mark visited current substring
 			double[] currentLocations = getSubSeries(series, currentPosition, currentPosition + windowSize);
 			marker.markVisited(registry, currentPosition, windowSize);
-			
+
 			// WE QRE GOING TO ITERATE OVER THE CURRENT WORD OCCURENCES HERE
 			//
 			DistanceEntry bestKnownDistance = knownWordsAndTheirDistances.get(String.valueOf(currentEntry.getStr()));
-			
+
 			if (null != bestKnownDistance && !(bestKnownDistance.isAbandoned()))
 			{
-				consoleLogger.finer("skipping iterations over " + currentWord + " retrieved result from known distances ");
+				consoleLogger
+						.finer("skipping iterations over " + currentWord + " retrieved result from known distances ");
 				nearestNeighborDist = bestKnownDistance.getDistance();
 				if (bestKnownDistance.getDistance() < bestSoFarDistance)
 				{
-					consoleLogger.finer("breaking the inner loop flow, bestKnownDistance is less than bestSoFarDistance ");
+					consoleLogger
+							.finer("breaking the inner loop flow, bestKnownDistance is less than bestSoFarDistance ");
 					doRandomSearch = false;
 					idx++;
 					continue;
@@ -1027,26 +1043,26 @@ public final class SAXFactory
 			}
 			else
 			{
-				
+
 				List<Integer> currentOccurences = trie.getOccurences(currentEntry.getStr());
 				consoleLogger.finer(currentWord + " has " + currentOccurences.size() + " occurrences, iterating...");
-				
+
 				for (Integer nextOccurrence : currentOccurences)
 				{
-					
+
 					// skip the location we standing at
 					if (Math.abs(nextOccurrence.intValue() - currentPosition) < windowSize)
 					{
 						continue;
 					}
-					
+
 					// mark current next visited
 					marker.markVisited(registry, nextOccurrence, windowSize);
-					
+
 					// get the piece of the timeseries
 					double[] occurrenceValues = getSubSeries(series, nextOccurrence, nextOccurrence + windowSize);
 					double dist = EuclideanDistance.distance(currentLocations, occurrenceValues);
-					
+
 					// keep track of best so far distance
 					if (dist < nearestNeighborDist)
 					{
@@ -1059,18 +1075,19 @@ public final class SAXFactory
 						}
 					}
 				}
-				
+
 			}
-			
+
 			if (!(Double.MAX_VALUE == nearestNeighborDist))
 			{
-				consoleLogger.finer("for " + currentWord + " occurrences, smallest nearest neighbor distance: " + nearestNeighborDist);
+				consoleLogger.finer("for " + currentWord + " occurrences, smallest nearest neighbor distance: "
+						+ nearestNeighborDist);
 			}
 			else
 			{
 				consoleLogger.finer("nothing changed after iterations...");
 			}
-			
+
 			boolean completeSearch = true;
 			// check if we must continue with random neighbors
 			if (doRandomSearch)
@@ -1078,66 +1095,72 @@ public final class SAXFactory
 				// it is heuristics here
 				//
 				int nextRandomVisitTarget = -1;
-				
+
 				int visitCounter = 0;
 				while ((nextRandomVisitTarget = registry.getNextRandomUnvisitedPosition()) != -1)
 				{
-					consoleLogger.finer(" random position pick step " + visitCounter + " visited: " + registry.getVisited().size()
-							+ ", unvisited: " + registry.getUnvisited().size() + "; nearest neighbor: " + nearestNeighborDist);
-					
+					consoleLogger.finer(" random position pick step " + visitCounter + " visited: "
+							+ registry.getVisited().size() + ", unvisited: " + registry.getUnvisited().size()
+							+ "; nearest neighbor: " + nearestNeighborDist);
+
 					// registry.markVisited(nextRandomVisitTarget);
 					marker.markVisited(registry, nextRandomVisitTarget, windowSize);
-					
-					double[] randomTargetValues = getSubSeries(series, nextRandomVisitTarget, nextRandomVisitTarget + windowSize);
+
+					double[] randomTargetValues = getSubSeries(series, nextRandomVisitTarget,
+							nextRandomVisitTarget + windowSize);
 					double randomTargetDistance = EuclideanDistance.distance(currentLocations, randomTargetValues);
-					
+
 					// early abandoning of the search, the current word is not
 					// discord, we seen better
 					if (randomTargetDistance < bestSoFarDistance)
 					{
 						nearestNeighborDist = randomTargetDistance;
-						consoleLogger.finer(" ** abandoning random visits loop, seen distance " + nearestNeighborDist + " at iteration "
-								+ visitCounter);
+						consoleLogger.finer(" ** abandoning random visits loop, seen distance " + nearestNeighborDist
+								+ " at iteration " + visitCounter);
 						completeSearch = false;
 						break;
 					}
-					
+
 					// keep track
 					if (randomTargetDistance < nearestNeighborDist)
 					{
 						nearestNeighborDist = randomTargetDistance;
 					}
-					
+
 					visitCounter = visitCounter + 1;
 				} // while inner loop
 				consoleLogger.finer("random visits loop finished, total positions considered: " + visitCounter);
-				
+
 			} // if break loop
-			
+
 			if (nearestNeighborDist > bestSoFarDistance)
 			{
 				bestSoFarDistance = nearestNeighborDist;
 				bestSoFarPosition = currentPosition;
 				bestSoFarString = String.valueOf(currentEntry.getStr());
 			}
-			if (knownWordsAndTheirDistances.containsKey(currentWord) && knownWordsAndTheirDistances.get(currentWord).isAbandoned())
+			if (knownWordsAndTheirDistances.containsKey(currentWord)
+					&& knownWordsAndTheirDistances.get(currentWord).isAbandoned())
 			{
-				knownWordsAndTheirDistances.put(String.valueOf(currentWord), new DistanceEntry(nearestNeighborDist, completeSearch));
+				knownWordsAndTheirDistances.put(String.valueOf(currentWord),
+						new DistanceEntry(nearestNeighborDist, completeSearch));
 			}
 			else
 			{
-				knownWordsAndTheirDistances.put(String.valueOf(currentWord), new DistanceEntry(nearestNeighborDist, completeSearch));
+				knownWordsAndTheirDistances.put(String.valueOf(currentWord),
+						new DistanceEntry(nearestNeighborDist, completeSearch));
 			}
-			consoleLogger
-					.finer(" . . iterated " + idx + " times, best distance:  " + bestSoFarDistance + " for a string " + bestSoFarString);
-			
+			consoleLogger.finer(" . . iterated " + idx + " times, best distance:  " + bestSoFarDistance
+					+ " for a string " + bestSoFarString);
+
 			idx++;
 		} // outer loop
-		
+
 		return new DiscordRecord(bestSoFarPosition, bestSoFarDistance, bestSoFarString);
 	}
-	
-	private static void cleanUpFrequencies(ArrayList<SAXTrieHitEntry> frequencies, String currentWord, int startPosition)
+
+	private static void cleanUpFrequencies(ArrayList<SAXTrieHitEntry> frequencies, String currentWord,
+			int startPosition)
 	{
 		int i = startPosition + 1;
 		while (i < frequencies.size())
@@ -1151,9 +1174,9 @@ public final class SAXFactory
 				i++;
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Get N top motifs from trie.
 	 * 
@@ -1167,26 +1190,26 @@ public final class SAXFactory
 	 */
 	private static MotifRecords getMotifs(SAXTrie trie, int maxMotifsNum) throws TrieException
 	{
-		
+
 		MotifRecords res = new MotifRecords(maxMotifsNum);
-		
+
 		ArrayList<SAXTrieHitEntry> frequencies = trie.getFrequencies();
-		
+
 		Collections.sort(frequencies);
-		
+
 		// all sorted - from one end we have unique words - those discords
 		// from the other end - we have motifs - the most frequent entries
 		//
 		// what I'll do here - is to populate non-trivial frequent entries into
 		// the resulting container
 		//
-		
+
 		// picking those non-trivial patterns this method job
 		// non-trivial here means the one which are not the same letters
 		//
-		
+
 		Set<SAXTrieHitEntry> seen = new TreeSet<SAXTrieHitEntry>();
-		
+
 		int counter = 0;
 		// iterating backward - collection is sorted
 		for (int i = frequencies.size() - 1; i >= 0; i--)
@@ -1213,7 +1236,7 @@ public final class SAXFactory
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Convert real-valued series into symbolic representation.
 	 * 
@@ -1240,7 +1263,7 @@ public final class SAXFactory
 		}
 		return saxVals;
 	}
-	
+
 	/**
 	 * Extracts sub-series from the WEKA-style series.
 	 * 
@@ -1264,7 +1287,7 @@ public final class SAXFactory
 		}
 		return vals;
 	}
-	
+
 	/**
 	 * Converts Instances into double array.
 	 * 
@@ -1283,7 +1306,7 @@ public final class SAXFactory
 		}
 		return vals;
 	}
-	
+
 	/**
 	 * Extracts sub-series from series.
 	 * 
@@ -1304,7 +1327,7 @@ public final class SAXFactory
 		}
 		return vals;
 	}
-	
+
 	/**
 	 * Brute force calculation of the distances.
 	 * 
@@ -1319,30 +1342,31 @@ public final class SAXFactory
 	 * @throws TSException
 	 *             if error occurs.
 	 */
-	public static void maxDistances(Instances tsData, String dataAttributeName, int[] controls, int window) throws TSException
+	public static void maxDistances(Instances tsData, String dataAttributeName, int[] controls, int window)
+			throws TSException
 	{
 		// get the timestamps and data attributes
 		//
 		Attribute dataAttribute = tsData.attribute(dataAttributeName);
-		
+
 		double[] distances = new double[controls.length];
 		int[] maxPos = new int[controls.length];
-		
+
 		for (int i = 0; i < controls.length; i++)
 		{
 			distances[i] = Double.MAX_VALUE;
 			maxPos[i] = -1;
 		}
-		
+
 		// [1.0] PREPROCESSING: in the sliding window loop build SAX string
 		// entries
 		//
 		int currPosition = 0;
 		while ((currPosition + window) < tsData.size())
 		{
-			
+
 			double[] vals = getSubSeries(tsData, dataAttribute, currPosition, currPosition + window);
-			
+
 			for (int i = 0; i < controls.length; i++)
 			{
 				if (Math.abs(controls[i] - currPosition) < window)
@@ -1362,12 +1386,12 @@ public final class SAXFactory
 			}
 			currPosition++;
 		}
-		
+
 		// for (int i = 0; i < controls.length; i++) {
 		// System.out.println(controls[i] + " - " + distances[i] + ", at " +
 		// maxPos[i]);
 		// }
-		
+
 		// for (int i = 0; i < controls.length; i++) {
 		// double[] is = getSubSeries(tsData, dataAttribute, controls[i],
 		// controls[i] + window);
@@ -1376,7 +1400,7 @@ public final class SAXFactory
 		// System.out.println(Arrays.toString(is) + "\n" + Arrays.toString(os));
 		// }
 	}
-	
+
 	// /**
 	// *
 	// * "We are given n, the length of the discords in advance, and we must
@@ -1486,11 +1510,11 @@ public final class SAXFactory
 	// } // i loop - outer
 	// return discords;
 	// }
-	
+
 	/**
 	 * 
-	 * "We are given n, the length of the discords in advance, and we must choose two parameters, the cardinality of the SAX alphabet size a, and the SAX word size w. We defer a
-	 * discussion of how to set these parameters until"
+	 * "We are given n, the length of the discords in advance, and we must choose two parameters, the cardinality of the
+	 * SAX alphabet size a, and the SAX word size w. We defer a discussion of how to set these parameters until"
 	 * 
 	 * 
 	 * @param tsData
@@ -1503,47 +1527,47 @@ public final class SAXFactory
 	 */
 	public static DiscordRecords getBruteForceDiscords(double[] tsData, int windowLength) throws TSException
 	{
-		
+
 		DiscordRecords discords = new DiscordRecords(100);
-		
+
 		// run the search loop
 		//
 		for (int i = 0; i < tsData.length - windowLength; i++)
 		{
-			
+
 			double[] seriesA = getSubSeries(tsData, i, i + windowLength);
 			Double nearestNeighborDist = Double.MAX_VALUE;
-			
+
 			// the inner loop
 			//
 			for (int j = 0; j < tsData.length - windowLength; j++)
 			{
-				
+
 				if (Math.abs(i - j) < windowLength)
 				{
 					continue;
 				}
-				
+
 				double[] seriesB = getSubSeries(tsData, j, j + windowLength);
 				double dist = EuclideanDistance.distance(seriesA, seriesB);
-				
+
 				if (dist < nearestNeighborDist)
 				{
 					nearestNeighborDist = dist;
 				}
-				
+
 			} // inner loop
-			
+
 			// if (nearestNeighborDist > bestSoFarDist) {
 			// bestSoFarDist = nearestNeighborDist;
 			// bestSoFarLoc = i;
 			discords.add(new DiscordRecord(i, nearestNeighborDist));
 			// }
 		}
-		
+
 		return discords;
 	}
-	
+
 	/**
 	 * Generic method to convert the milliseconds into the elapsed time string.
 	 * 
@@ -1556,34 +1580,34 @@ public final class SAXFactory
 	private static String timeToString(long start, long finish)
 	{
 		long diff = finish - start;
-		
+
 		long secondInMillis = 1000;
 		long minuteInMillis = secondInMillis * 60;
 		long hourInMillis = minuteInMillis * 60;
 		long dayInMillis = hourInMillis * 24;
 		long yearInMillis = dayInMillis * 365;
-		
+
 		@SuppressWarnings("unused")
 		long elapsedYears = diff / yearInMillis;
 		diff = diff % yearInMillis;
-		
+
 		@SuppressWarnings("unused")
 		long elapsedDays = diff / dayInMillis;
 		diff = diff % dayInMillis;
-		
+
 		@SuppressWarnings("unused")
 		long elapsedHours = diff / hourInMillis;
 		diff = diff % hourInMillis;
-		
+
 		long elapsedMinutes = diff / minuteInMillis;
 		diff = diff % minuteInMillis;
-		
+
 		long elapsedSeconds = diff / secondInMillis;
 		diff = diff % secondInMillis;
-		
+
 		long elapsedMilliseconds = diff % secondInMillis;
-		
+
 		return elapsedMinutes + "m " + elapsedSeconds + "s " + elapsedMilliseconds + "ms";
 	}
-	
+
 }

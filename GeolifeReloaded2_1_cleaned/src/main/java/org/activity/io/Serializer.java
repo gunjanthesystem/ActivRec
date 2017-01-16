@@ -27,11 +27,12 @@ import com.esotericsoftware.kryo.serializers.MapSerializer;
 
 public class Serializer
 {
-	
-	// static String commonPath="/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";//Constant.commonPath;
+
+	// static String commonPath="/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
+	// Works/WorkingSet7July/";//Constant.commonPath;
 	static final String fileName = Constant.getCommonPath() + "flatFile";
 	static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
-	
+
 	/**
 	 * Optimised java native serialization </br>
 	 * ref: http://java.dzone.com/articles/fast-java-file-serialization
@@ -46,26 +47,27 @@ public class Serializer
 		long dt = System.currentTimeMillis();
 		try
 		{
-			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see http://java.dzone.com/articles/fast-java-file-serialization
-			
+			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see
+																			// http://java.dzone.com/articles/fast-java-file-serialization
+
 			// FileOutputStream fos = new FileOutputStream(raf.getFD());
-			
+
 			fos = new FileOutputStream(raf.getFD());// fileName);
 			out = new ObjectOutputStream(fos);
 			out.writeObject(obj);
 			out.close();
 			raf.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully serialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		}
-		
+
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Java native deserialization </br>
 	 * ref: http://java.dzone.com/articles/fast-java-file-serialization
@@ -76,7 +78,7 @@ public class Serializer
 	public static Object deSerializeThis(String fileName)
 	{
 		Object obj = null;
-		
+
 		FileInputStream fis = null;
 		ObjectInputStream in = null;
 		System.out.println("Deserialising ..." + fileName);
@@ -90,10 +92,10 @@ public class Serializer
 			// System.out.println("FF:"+e2.User_Name);
 			in.close();
 			raf.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully deserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
-			
+
 		}
 		catch (Exception ex)
 		{
@@ -101,7 +103,7 @@ public class Serializer
 		}
 		return obj;
 	}
-	
+
 	/////////////////////////////////////////
 	public static void fstSerializeThis(Object obj, String fileName)
 	{
@@ -119,14 +121,14 @@ public class Serializer
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		}
-		
+
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	public static void fstSerializeThis2(Object obj, String fileName)
 	{
 		FileOutputStream fos = null;
@@ -139,7 +141,7 @@ public class Serializer
 			// // DON'T out.close() when using factory method;
 			// out.flush();
 			// stream.close();
-			
+
 			RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 			fos = new FileOutputStream(raf.getFD());
 			out = new FSTObjectOutput(fos, conf);
@@ -149,14 +151,14 @@ public class Serializer
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		}
-		
+
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
 	 * https://github.com/RuedigerMoeller/fast-serialization/wiki/Serialization#plain-objectoutputstream-replacement
 	 * 
@@ -171,24 +173,25 @@ public class Serializer
 		long dt = System.currentTimeMillis();
 		try
 		{
-			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see http://java.dzone.com/articles/fast-java-file-serialization
+			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see
+																			// http://java.dzone.com/articles/fast-java-file-serialization
 			fos = new FileOutputStream(raf.getFD());// fileName);
 			out = new FSTObjectOutput(fos);// FSTObjectInput
 			out.writeObject(obj, classOfObject.getClass());
 			out.flush();
 			raf.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		}
-		
+
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	public static void fstSerializeThis2(Object obj, String fileName, Class classOfObject)
 	{
 		FileOutputStream fos = null;
@@ -196,24 +199,25 @@ public class Serializer
 		long dt = System.currentTimeMillis();
 		try
 		{
-			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see http://java.dzone.com/articles/fast-java-file-serialization
+			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see
+																			// http://java.dzone.com/articles/fast-java-file-serialization
 			fos = new FileOutputStream(raf.getFD());// fileName);
 			out = new FSTObjectOutput(fos, conf);// FSTObjectInput
 			out.writeObject(obj, classOfObject.getClass());
 			out.flush();
 			raf.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		}
-		
+
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	public static void fstSerializeThisNoRandom(Object obj, String fileName, Class classOfObject)
 	{
 		FileOutputStream fos = null;
@@ -226,18 +230,18 @@ public class Serializer
 			out.writeObject(obj, classOfObject.getClass());
 			out.flush();
 			fos.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		}
-		
+
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	public static void fstSerializeThisJSON(Object obj, String fileName)
 	{
 		FileOutputStream fos = null;
@@ -246,12 +250,12 @@ public class Serializer
 		try
 		{
 			FSTConfiguration conf = FSTConfiguration.createJsonNoRefConfiguration();
-			
+
 			byte[] bytes = conf.asByteArray(obj);
-			
+
 			System.out.println(new String(bytes, "UTF-8"));
 			Object deser = conf.asObject(bytes);
-			
+
 			// RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 			// fos = new FileOutputStream(raf.getFD());
 			// out = new FSTObjectOutput(fos);
@@ -261,14 +265,14 @@ public class Serializer
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		}
-		
+
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	public static byte[] getJSONBytesfst(Object obj)
 	{
 		long dt = System.currentTimeMillis();
@@ -276,7 +280,7 @@ public class Serializer
 		try
 		{
 			FSTConfiguration conf = FSTConfiguration.createJsonNoRefConfiguration();
-			
+
 			bytes = conf.asByteArray(obj);
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully jsonised  in " + (lt - dt) / 1000 + " secs");
@@ -287,7 +291,7 @@ public class Serializer
 		}
 		return bytes;
 	}
-	
+
 	public static Object getObjectFromJSONBytesfst(byte[] bytes)
 	{
 		long dt = System.currentTimeMillis();
@@ -305,7 +309,7 @@ public class Serializer
 		}
 		return obj;
 	}
-	
+
 	public static Object fstDeSerializeThis(String fileName)
 	{
 		Object obj = null;
@@ -323,7 +327,7 @@ public class Serializer
 			raf.close();
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstdeserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
-			
+
 		}
 		catch (Exception ex)
 		{
@@ -331,7 +335,7 @@ public class Serializer
 		}
 		return obj;
 	}
-	
+
 	public static Object fstDeSerializeThis2(String fileName)
 	{
 		Object obj = null;
@@ -349,7 +353,7 @@ public class Serializer
 			raf.close();
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstdeserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
-			
+
 		}
 		catch (Exception ex)
 		{
@@ -357,11 +361,12 @@ public class Serializer
 		}
 		return obj;
 	}
-	
-	public static StayPointsAllDataContainer fstDeSerializeThis(String fileName, StayPointsAllDataContainer classOfObject)
+
+	public static StayPointsAllDataContainer fstDeSerializeThis(String fileName,
+			StayPointsAllDataContainer classOfObject)
 	{
 		StayPointsAllDataContainer obj = null;
-		
+
 		FileInputStream fis = null;
 		FSTObjectInput in = null;
 		System.out.println("Deserialising ..." + fileName);
@@ -371,19 +376,19 @@ public class Serializer
 			RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 			fis = new FileInputStream(raf.getFD());// PfileName);
 			in = new FSTObjectInput(fis);
-			
+
 			// obj = in.readObject();
-			
+
 			obj = (StayPointsAllDataContainer) in.readObject(StayPointsAllDataContainer.class);
 			// DON'T: in.close(); here prevents reuse and will result in an exception
 			// in.close();
 			raf.close();
-			
+
 			// stream.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstdeserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
-			
+
 		}
 		catch (Exception ex)
 		{
@@ -391,11 +396,12 @@ public class Serializer
 		}
 		return obj;
 	}
-	
-	public static StayPointsAllDataContainer fstDeSerializeThisNoRandom(String fileName, StayPointsAllDataContainer classOfObject)
+
+	public static StayPointsAllDataContainer fstDeSerializeThisNoRandom(String fileName,
+			StayPointsAllDataContainer classOfObject)
 	{
 		StayPointsAllDataContainer obj = null;
-		
+
 		FileInputStream fis = null;
 		FSTObjectInput in = null;
 		System.out.println("Deserialising ..." + fileName);
@@ -404,19 +410,19 @@ public class Serializer
 		{
 			fis = new FileInputStream(fileName);// PfileName);
 			in = new FSTObjectInput(fis);
-			
+
 			// obj = in.readObject();
-			
+
 			obj = (StayPointsAllDataContainer) in.readObject(StayPointsAllDataContainer.class);
 			// DON'T: in.close(); here prevents reuse and will result in an exception
 			// in.close();
 			fis.close();
-			
+
 			// stream.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstdeserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
-			
+
 		}
 		catch (Exception ex)
 		{
@@ -424,11 +430,12 @@ public class Serializer
 		}
 		return obj;
 	}
-	
-	public static StayPointsAllDataContainer fstDeSerializeThis2(String fileName, StayPointsAllDataContainer classOfObject)
+
+	public static StayPointsAllDataContainer fstDeSerializeThis2(String fileName,
+			StayPointsAllDataContainer classOfObject)
 	{
 		StayPointsAllDataContainer obj = null;
-		
+
 		FileInputStream fis = null;
 		FSTObjectInput in = null;
 		System.out.println("Deserialising ..." + fileName);
@@ -438,19 +445,19 @@ public class Serializer
 			RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 			fis = new FileInputStream(raf.getFD());// PfileName);
 			in = new FSTObjectInput(fis, conf);
-			
+
 			// obj = in.readObject();
-			
+
 			obj = (StayPointsAllDataContainer) in.readObject(StayPointsAllDataContainer.class);
 			// DON'T: in.close(); here prevents reuse and will result in an exception
 			// in.close();
 			raf.close();
-			
+
 			// stream.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully fstdeserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
-			
+
 		}
 		catch (Exception ex)
 		{
@@ -460,7 +467,7 @@ public class Serializer
 	}
 	/////////////////////////////////////////
 	///////////////
-	
+
 	/**
 	 * 
 	 * @param obj
@@ -472,29 +479,30 @@ public class Serializer
 		long dt = System.currentTimeMillis();
 		try
 		{
-			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see http://java.dzone.com/articles/fast-java-file-serialization
+			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see
+																			// http://java.dzone.com/articles/fast-java-file-serialization
 			fos = new FileOutputStream(raf.getFD());
 			Output kryoOutput = new Output(fos);
 			Kryo kryo = new Kryo();
 			kryo.addDefaultSerializer(java.sql.Timestamp.class, TimestampSerializer.class);
 			kryo.addDefaultSerializer(java.sql.Date.class, SqlDateSerializer.class);
-			
+
 			kryo.writeClassAndObject(kryoOutput, obj);
 			kryoOutput.close();
 			raf.close();
 			// out.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully kryo serialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
-			
+
 		}
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param obj
@@ -506,14 +514,15 @@ public class Serializer
 		long dt = System.currentTimeMillis();
 		try
 		{
-			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see http://java.dzone.com/articles/fast-java-file-serialization
+			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see
+																			// http://java.dzone.com/articles/fast-java-file-serialization
 			fos = new FileOutputStream(raf.getFD());
 			Output kryoOutput = new Output(fos);
 			Kryo kryo = new Kryo();
 			kryo.addDefaultSerializer(java.sql.Timestamp.class, TimestampSerializer.class);
 			////////////////
 			kryo.register(LinkedHashMap.class);
-			
+
 			MapSerializer serializer = new MapSerializer();
 			kryo.register(HashMap.class, serializer);
 			kryo.register(LinkedHashMap.class, serializer);
@@ -522,7 +531,7 @@ public class Serializer
 			serializer.setValueClass(LinkedHashMap.class, serializer);
 			serializer.setValuesCanBeNull(false);
 			//////////////////
-			
+
 			kryo.writeClassAndObject(kryoOutput, obj);
 			kryoOutput.close();
 			raf.close();
@@ -535,7 +544,7 @@ public class Serializer
 		long lt = System.currentTimeMillis();
 		System.out.println("Successfully kryo serialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 	}
-	
+
 	//// -----------
 	public void kryoSerializeThis2(Object test, String fileName) throws IOException
 	{
@@ -556,9 +565,9 @@ public class Serializer
 			}
 		}
 	}
-	
+
 	// ---------
-	
+
 	// //// -----------
 	// public void kryoDeSerializeThis2(String fileName) throws IOException
 	// {
@@ -578,11 +587,11 @@ public class Serializer
 	// }
 	// }
 	// }
-	
+
 	// ---------
-	
+
 	///////////////
-	
+
 	public static Object kryoDeSerializeThis(String fileName)
 	{
 		Object obj = null;
@@ -597,12 +606,12 @@ public class Serializer
 			Kryo kryo = new Kryo();
 			kryo.addDefaultSerializer(java.sql.Timestamp.class, TimestampSerializer.class);
 			kryo.addDefaultSerializer(java.sql.Date.class, SqlDateSerializer.class);
-			
+
 			obj = kryo.readClassAndObject(kryoInput);// , Object.class);
 			raf.close();
 			kryoInput.close();
 			// kryoInput.close();
-			
+
 			long lt = System.currentTimeMillis();
 			System.out.println("Successfully kryo deserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		}
@@ -610,10 +619,10 @@ public class Serializer
 		{
 			ex.printStackTrace();
 		}
-		
+
 		return obj;
 	}
-	
+
 	public static Object kryoDeSerializeThis(String fileName, Object expectedObject)
 	{
 		Object obj = null;
@@ -638,7 +647,7 @@ public class Serializer
 		System.out.println("Successfully kryo deserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		return obj;
 	}
-	
+
 	/**
 	 * 
 	 * @param absPath
@@ -647,28 +656,28 @@ public class Serializer
 	 * @param stepSize
 	 * @return
 	 */
-	public static LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> deserialiseAndConsolidateMaps(String absPath, int startIndex,
-			int endIndex, int stepSize)
+	public static LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> deserialiseAndConsolidateMaps(
+			String absPath, int startIndex, int endIndex, int stepSize)
 	{
-		LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataMergedContinuousWithDuration =
-				new LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>>();
+		LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataMergedContinuousWithDuration = new LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>>();
 		for (int i = startIndex; i <= endIndex; i += stepSize)
 		{
 			String pathToSerialisedData = absPath + i;
 			mapForAllDataMergedContinuousWithDuration
-					.putAll((LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>>) Serializer.deSerializeThis(pathToSerialisedData));
+					.putAll((LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>>) Serializer
+							.deSerializeThis(pathToSerialisedData));
 		}
-		
+
 		System.out.println("Consolidated map is of size: " + mapForAllDataMergedContinuousWithDuration.size());
 		return mapForAllDataMergedContinuousWithDuration;
 	}
-	
+
 	public static void main(String args[])
 	{
 		Constant.setCommonPath("/run/media/gunjan/HOME/gunjan/Geolife Data Works/");
 		String fileName = "flatFile";
 		ArrayList<FlatActivityLogEntry> listOfActivityEntries = getAllLogEntries(fileName);
-		
+
 		WritingToFile.writeArrayListFlatActivityLogEntry(listOfActivityEntries, "FlatActivityLogEntries",
 				"User_ID,Activity_ID,Date_ID,Time_ID,Location_ID,User_Name,Activity_Name,Start_Time,End_Time,Start_Date,End_Date,Duration,Start_Latitude,Start_Longitude,Start_Altitude,End_Latitude,End_Longitude,End_Altitude,Avg_Altitude");
 		// int count=0;
@@ -679,7 +688,7 @@ public class Serializer
 		// }
 		System.out.println("count of activity entries = " + listOfActivityEntries.size());
 	}
-	
+
 	/**
 	 * Serialises the given ArrayList of FlatActivityLog entries.
 	 * 
@@ -690,7 +699,7 @@ public class Serializer
 	{
 		// filename = "flatFile";
 		// FlatActivityLogEntry e1 = new FlatActivityLogEntry();
-		
+
 		// e1.setUser_Name("gunjan");
 		// save the object to file
 		fileName = Constant.getCommonPath() + fileName;
@@ -699,8 +708,9 @@ public class Serializer
 		long dt = System.currentTimeMillis();
 		try
 		{
-			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see http://java.dzone.com/articles/fast-java-file-serialization
-			
+			RandomAccessFile raf = new RandomAccessFile(fileName, "rw"); // for performance see
+																			// http://java.dzone.com/articles/fast-java-file-serialization
+
 			// FileOutputStream fos = new FileOutputStream(raf.getFD());
 			fos = new FileOutputStream(raf.getFD());// fileName);
 			fos = new FileOutputStream(fileName);
@@ -708,20 +718,20 @@ public class Serializer
 			out.writeObject(listOfLogEntries);
 			out.close();
 		}
-		
+
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
 		long lt = System.currentTimeMillis();
 		System.out.println("Serialisation takes " + (lt - dt) / 1000 + " secs");
-		
+
 	}
-	
+
 	public static ArrayList<FlatActivityLogEntry> getAllLogEntries(String fileName)
 	{
 		fileName = Constant.getCommonPath() + fileName;
-		
+
 		ArrayList<FlatActivityLogEntry> allActivityLogEntries = new ArrayList<FlatActivityLogEntry>();
 		FileInputStream fis = null;
 		ObjectInputStream in = null;

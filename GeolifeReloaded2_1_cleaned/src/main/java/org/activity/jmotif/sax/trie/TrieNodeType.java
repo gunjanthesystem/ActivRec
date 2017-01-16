@@ -6,9 +6,10 @@ package org.activity.jmotif.sax.trie;
  * @author Pavel Senin
  *
  */
-public enum TrieNodeType {
-  /** The inner node type. */
-  INNER,
-  /** The leaf node type. */
-  LEAF;
+public enum TrieNodeType
+{
+	/** The inner node type. */
+	INNER,
+	/** The leaf node type. */
+	LEAF;
 }

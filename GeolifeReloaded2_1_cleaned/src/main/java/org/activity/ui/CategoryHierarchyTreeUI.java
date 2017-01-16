@@ -44,50 +44,52 @@ public class CategoryHierarchyTreeUI extends Application
 	final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/";
 	PrintStream consoleLogStream;
 	TreeItem<String> rootNode;
-	
+
 	private final TreeView<String> treeView = new TreeView<>();
 	private final TextArea msgLogFld = new TextArea();
 	private ListView<String> listForCatIDsToAdd;// = new ListView();
-	
+
 	private final String serializedCatTreeFileNamePhrase = "RootOfCategoryTree25Nov2016.DMTreeNode";// "RootOfCategoryTree9Sep2016.DMTreeNode";
-	
+
 	private final String whichRootToUse = "updated";// "originalRaw";// "updated
-	
+
 	public static void main(String[] args)
 	{
 		System.setProperty("prism.allowhidpi", "true");
 		launch(args);
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage)
 	{
-		
+
 		try
 		{
 			// consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog2.txt");
 			// Select the root node
 			treeView.getSelectionModel().selectFirst();
-			
-			JSONProcessingGowallaTryingNonStatic preProcessGowalla = new JSONProcessingGowallaTryingNonStatic(commonPath);
-			
+
+			JSONProcessingGowallaTryingNonStatic preProcessGowalla = new JSONProcessingGowallaTryingNonStatic(
+					commonPath);
+
 			/////////
 			TreeMap<Integer, String> dict = preProcessGowalla.getCatIDNameDictionary();
 			Serializer.kryoSerializeThis(dict, commonPath + "CatIDNameDictionary.kryo");
 			/////////
 			// Serializer.serializeThis(preProcessGowalla, commonPath + "SerializedPreProcessGowalla24Aug.obj");
 			// JSONProcessingGowallaTryingNonStatic preProcessGowalla =
-			// (JSONProcessingGowallaTryingNonStatic) Serializer.deSerializeThis(commonPath + "SerializedPreProcessGowalla24Aug.obj");
-			
+			// (JSONProcessingGowallaTryingNonStatic) Serializer.deSerializeThis(commonPath +
+			///////// "SerializedPreProcessGowalla24Aug.obj");
+
 			// ~~~~~~` get deserialised tree.. (the one in which we have already manually added some nodes)
 			if (whichRootToUse.equals("updated"))
 			{
 				DefaultMutableTreeNode rootOfCategoryTreeTN = (DefaultMutableTreeNode) Serializer.deSerializeThis(
 						"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode");
 				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/RootOfCategoryTree9Sep2016.DMTreeNode");
-				
+
 				TreeItem<String> rootOfCategoryTree = UIUtilityBox.convertTreeNodesToTreeItems(rootOfCategoryTreeTN);
-				
+
 				treeView.setRoot(rootOfCategoryTree);
 			}
 			// ~~~~~~`
@@ -100,17 +102,17 @@ public class CategoryHierarchyTreeUI extends Application
 			// PopUps.showMessage("before second right pane");
 			HBox rightPane2 = getPaneForCatIDsNotInHierarchy2(preProcessGowalla.getCheckinCountResultsTogether(),
 					preProcessGowalla.getCatIDNameDictionary());
-			
+
 			ScrollPane sp2 = new ScrollPane();
 			sp2.setContent(rightPane2);
-			
+
 			HBox root = new HBox(treeView, rightPane, sp2);
 			root.setSpacing(20);
-			root.setStyle("-fx-padding: 10;" + "-fx-border-style: solid inside;" + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
-					+ "-fx-border-radius: 5;" + "-fx-border-color: blue;");
-			
+			root.setStyle("-fx-padding: 10;" + "-fx-border-style: solid inside;" + "-fx-border-width: 2;"
+					+ "-fx-border-insets: 5;" + "-fx-border-radius: 5;" + "-fx-border-color: blue;");
+
 			Scene scene = new Scene(root);// , 1600, 900);
-			
+
 			///////////
 			// size of the screen
 			Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
@@ -121,13 +123,13 @@ public class CategoryHierarchyTreeUI extends Application
 			primaryStage.setMinHeight(200);
 			primaryStage.setMinWidth(400);
 			primaryStage.setOpacity(0.5); // A half-translucent stage
-			
+
 			//////////
 			primaryStage.setTitle("Category Hierarchy");
 			primaryStage.setScene(scene);
 			// PopUps.showMessage("before staging");
 			primaryStage.show();
-			
+
 			System.out.println("The stage must be showing by now");
 		}
 		catch (Exception e)
@@ -139,67 +141,68 @@ public class CategoryHierarchyTreeUI extends Application
 			// consoleLogStream.close();
 		}
 	}
-	
+
 	public VBox getRightPane()
 	{
 		// TextField itemFld = new TextField();
-		
+
 		Button removeItemBtn = new Button("Remove Selected Item");
 		removeItemBtn.setOnAction(e -> this.removeItem());
-		
+
 		msgLogFld.setPrefRowCount(15);
 		msgLogFld.setPrefColumnCount(25);
-		
+
 		Button saveNewTreeBtn = new Button("Save this tree");
 		saveNewTreeBtn.setOnAction(e -> this.saveCurrentTree());
-		
-		VBox box = new VBox(new Label("Select an item to add to or remove."), saveNewTreeBtn, removeItemBtn, new Label("Message Log:"),
-				msgLogFld);
+
+		VBox box = new VBox(new Label("Select an item to add to or remove."), saveNewTreeBtn, removeItemBtn,
+				new Label("Message Log:"), msgLogFld);
 		box.setSpacing(10);
 		return box;
 	}
-	
+
 	public VBox getPaneForCatIDsNotInHierarchy(Map<String, TreeMap<Integer, Long>> catIDCountCheckinResultsMap,
 			TreeMap<Integer, String> catIDNameDictionary)
 	{
 		// UtilityBelt.sortByValue(map)
 		System.out.println("Inside getPaneForCatIDsNotInHierarchy");
 		// PopUps.showMessage("Inside getPaneForCatIDsNotInHierarchy");
-		TreeMap<Integer, Long> catIDInCheckinsButNotInAnyLevel = catIDCountCheckinResultsMap.get("noneLevelCheckinCountMap");// .keySet();
-		long totalNumOfCheckinsNotInAnyLevel = catIDInCheckinsButNotInAnyLevel.values().stream().mapToLong(Number::longValue).sum();
-		
+		TreeMap<Integer, Long> catIDInCheckinsButNotInAnyLevel = catIDCountCheckinResultsMap
+				.get("noneLevelCheckinCountMap");// .keySet();
+		long totalNumOfCheckinsNotInAnyLevel = catIDInCheckinsButNotInAnyLevel.values().stream()
+				.mapToLong(Number::longValue).sum();
+
 		// PopUps.showMessage("totalNumOfCheckinsNotInAnyLevel= " + totalNumOfCheckinsNotInAnyLevel);
-		Map<Integer, Long> catIDInCheckinsButNotInAnyLevelSorted =
-				(Map<Integer, Long>) UtilityBelt.sortByValue(catIDInCheckinsButNotInAnyLevel, true);
-		
+		Map<Integer, Long> catIDInCheckinsButNotInAnyLevelSorted = (Map<Integer, Long>) UtilityBelt
+				.sortByValue(catIDInCheckinsButNotInAnyLevel, true);
+
 		ArrayList<Button> buttonsForCatIDsToAdd = new ArrayList<Button>();
-		
+
 		int count = 0;
-		
+
 		// PopUps.showMessage("Here00");
 		for (Integer catid : catIDInCheckinsButNotInAnyLevelSorted.keySet())
 		{
 			// PopUps.showMessage("Here01");
 			count++;
-			
-			if (count > 300)
-				break;
-			
+
+			if (count > 300) break;
+
 			String catName = "not found";
 			catName = catIDNameDictionary.get(catid);
 			// PopUps.showMessage("Here02 catid=" + catid + " catname=" + catName);
 			System.out.println("before adding btn-" + count);
-			
+
 			long numOfCheckinsNotInAnyLevelForThisCatID = catIDInCheckinsButNotInAnyLevel.get(catid);
 			// PopUps.showMessage("numOfCheckinsNotInAnyLevelForThisCatID= " + numOfCheckinsNotInAnyLevelForThisCatID);
-			
-			double percentageOfTotalCheckinsNotInAnyLevel =
-					((double) numOfCheckinsNotInAnyLevelForThisCatID / (double) totalNumOfCheckinsNotInAnyLevel) * 100;
+
+			double percentageOfTotalCheckinsNotInAnyLevel = ((double) numOfCheckinsNotInAnyLevelForThisCatID
+					/ (double) totalNumOfCheckinsNotInAnyLevel) * 100;
 			// PopUps.showMessage("percentageOfTotalCheckinsNotInAnyLevel= " + percentageOfTotalCheckinsNotInAnyLevel);
-			
+
 			Button btn = new Button(catid + ":" + catName.trim() + " = " + numOfCheckinsNotInAnyLevelForThisCatID + "__"
 					+ (percentageOfTotalCheckinsNotInAnyLevel) + "%"); // NAL: not in any level
-			
+
 			btn.setOnAction(e -> this.newCatToAddSelected());
 			// PopUps.showMessage("Here04");
 			buttonsForCatIDsToAdd.add(btn);
@@ -209,20 +212,22 @@ public class CategoryHierarchyTreeUI extends Application
 		// Button btn = new Button("test");
 		// btn.setOnAction(e -> this.newCatToAddSelected());
 		// buttonsForCatIDsToAdd.add(btn);
-		
-		System.out.println("Num of buttons added, i.e., num of catid in checkins but not in any levels = " + buttonsForCatIDsToAdd.size());
-		
+
+		System.out.println("Num of buttons added, i.e., num of catid in checkins but not in any levels = "
+				+ buttonsForCatIDsToAdd.size());
+
 		VBox box = new VBox();
 		box.setSpacing(5);
-		
+
 		box.getChildren().addAll(buttonsForCatIDsToAdd);
 		// PopUps.showMessage("Here06");
-		// VBox box = new VBox(new Label("Select an item to add to or remove."), new HBox(new Label("Item:"), itemFld, addItemBtn),
+		// VBox box = new VBox(new Label("Select an item to add to or remove."), new HBox(new Label("Item:"), itemFld,
+		// addItemBtn),
 		// removeItemBtn, new Label("Message Log:"), msgLogFld);
 		System.out.println("Exiting getPaneForCatIDsNotInHierarchy");
 		return box;
 	}
-	
+
 	/**
 	 * ListView instead of buttons
 	 * 
@@ -236,45 +241,48 @@ public class CategoryHierarchyTreeUI extends Application
 		// UtilityBelt.sortByValue(map)
 		System.out.println("Inside getPaneForCatIDsNotInHierarchy2");
 		// PopUps.showMessage("Inside getPaneForCatIDsNotInHierarchy");
-		TreeMap<Integer, Long> catIDInCheckinsButNotInAnyLevel = catIDCountCheckinResultsMap.get("noneLevelCheckinCountMap");// .keySet();
-		long totalNumOfCheckinsNotInAnyLevel = catIDInCheckinsButNotInAnyLevel.values().stream().mapToLong(Number::longValue).sum();
-		
+		TreeMap<Integer, Long> catIDInCheckinsButNotInAnyLevel = catIDCountCheckinResultsMap
+				.get("noneLevelCheckinCountMap");// .keySet();
+		long totalNumOfCheckinsNotInAnyLevel = catIDInCheckinsButNotInAnyLevel.values().stream()
+				.mapToLong(Number::longValue).sum();
+
 		// $$PopUps.showMessage("totalNumOfCheckinsNotInAnyLevel= " + totalNumOfCheckinsNotInAnyLevel);
-		Map<Integer, Long> catIDInCheckinsButNotInAnyLevelSorted =
-				(Map<Integer, Long>) UtilityBelt.sortByValue(catIDInCheckinsButNotInAnyLevel, true);
-		
+		Map<Integer, Long> catIDInCheckinsButNotInAnyLevelSorted = (Map<Integer, Long>) UtilityBelt
+				.sortByValue(catIDInCheckinsButNotInAnyLevel, true);
+
 		listForCatIDsToAdd = new ListView<>();// <Button>();
 		listForCatIDsToAdd.setPrefSize(600, 970);
-		
+
 		listForCatIDsToAdd.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		
+
 		int count = 0;
-		
+
 		// PopUps.showMessage("Here00");
 		for (Integer catid : catIDInCheckinsButNotInAnyLevelSorted.keySet())
 		{
 			// PopUps.showMessage("Here01");
 			count++;
-			
+
 			// if (count > 300)
 			// break;
-			
+
 			String catName = "not found";
 			catName = catIDNameDictionary.get(catid);
 			// PopUps.showMessage("Here02 catid=" + catid + " catname=" + catName);
 			// System.out.println("before adding btn-" + count);
-			
+
 			long numOfCheckinsNotInAnyLevelForThisCatID = catIDInCheckinsButNotInAnyLevel.get(catid);
 			// PopUps.showMessage("numOfCheckinsNotInAnyLevelForThisCatID= " + numOfCheckinsNotInAnyLevelForThisCatID);
-			
-			double percentageOfTotalCheckinsNotInAnyLevel =
-					((double) numOfCheckinsNotInAnyLevelForThisCatID / (double) totalNumOfCheckinsNotInAnyLevel) * 100;
+
+			double percentageOfTotalCheckinsNotInAnyLevel = ((double) numOfCheckinsNotInAnyLevelForThisCatID
+					/ (double) totalNumOfCheckinsNotInAnyLevel) * 100;
 			// PopUps.showMessage("percentageOfTotalCheckinsNotInAnyLevel= " + percentageOfTotalCheckinsNotInAnyLevel);
-			
-			String labelForCatID = (count + "||" + catid + ":" + catName.trim() + " || " + numOfCheckinsNotInAnyLevelForThisCatID + "__"
-					+ (percentageOfTotalCheckinsNotInAnyLevel) + "%");
-			
-			// Button btn = new Button(catid + ":" + catName.trim() + " || " + numOfCheckinsNotInAnyLevelForThisCatID + "__"
+
+			String labelForCatID = (count + "||" + catid + ":" + catName.trim() + " || "
+					+ numOfCheckinsNotInAnyLevelForThisCatID + "__" + (percentageOfTotalCheckinsNotInAnyLevel) + "%");
+
+			// Button btn = new Button(catid + ":" + catName.trim() + " || " + numOfCheckinsNotInAnyLevelForThisCatID +
+			// "__"
 			// + (percentageOfTotalCheckinsNotInAnyLevel) + "%"); // NAL: not in any level
 			listForCatIDsToAdd.getItems().add(labelForCatID);
 			// btn.setOnAction(e -> this.newCatToAddSelected(e));
@@ -286,42 +294,44 @@ public class CategoryHierarchyTreeUI extends Application
 		// Button btn = new Button("test");
 		// btn.setOnAction(e -> this.newCatToAddSelected());
 		// buttonsForCatIDsToAdd.add(btn);
-		
-		// System.out.println("Num of buttons added, i.e., num of catid in checkins but not in any levels = " + buttonsForCatIDsToAdd.size());
+
+		// System.out.println("Num of buttons added, i.e., num of catid in checkins but not in any levels = " +
+		// buttonsForCatIDsToAdd.size());
 		Button choose = new Button("Add selected cat to selected node");
 		choose.setOnAction(e -> this.newCatToAddSelected());
-		
+
 		HBox box = new HBox();
 		box.setSpacing(5);
-		
+
 		box.getChildren().addAll(listForCatIDsToAdd, choose);
 		// PopUps.showMessage("Here06");
-		// VBox box = new VBox(new Label("Select an item to add to or remove."), new HBox(new Label("Item:"), itemFld, addItemBtn),
+		// VBox box = new VBox(new Label("Select an item to add to or remove."), new HBox(new Label("Item:"), itemFld,
+		// addItemBtn),
 		// removeItemBtn, new Label("Message Log:"), msgLogFld);
 		System.out.println("Exiting getPaneForCatIDsNotInHierarchy");
 		return box;
 	}
-	
+
 	public void newCatToAddSelected()
 	{
-		
+
 		// this.logMsg("newCatToAddSelected pressed");
 		String selectedCatItemLabelString = listForCatIDsToAdd.getSelectionModel().getSelectedItem();
-		
+
 		// String splittedString[] = selectedCatItemLabelString.split("\\|\\|");
 		// String selectedCatStringToUse = splittedString[1].replaceAll("\\*", "");
-		
+
 		String selectedCatStringToUse = getCatStringFromLabel(selectedCatItemLabelString);
 		// String selectedNode = t
 		this.logMsg("SelectedItem = " + selectedCatStringToUse);
-		
+
 		this.logMsg("Selected Tree Node = " + selectedCatStringToUse);
-		
+
 		this.addItem(selectedCatStringToUse);
 		// this.logMsg("SelectedItem = " + selectedCatStringToUse);
 		// return null;
 	}
-	
+
 	/**
 	 * 
 	 * @param label
@@ -332,7 +342,7 @@ public class CategoryHierarchyTreeUI extends Application
 		String splittedString[] = label.split("\\|\\|");
 		return splittedString[1].replaceAll("\\*", "");
 	}
-	
+
 	public void addItem(String value)
 	{
 		if (value == null || value.trim().equals(""))
@@ -340,14 +350,14 @@ public class CategoryHierarchyTreeUI extends Application
 			this.logMsg("Item cannot be empty.");
 			return;
 		}
-		
+
 		TreeItem<String> parent = treeView.getSelectionModel().getSelectedItem();
 		if (parent == null)
 		{
 			this.logMsg("Select a node to add this item to.");
 			return;
 		}
-		
+
 		// Check for duplicate
 		for (TreeItem<String> child : parent.getChildren())
 		{
@@ -357,7 +367,7 @@ public class CategoryHierarchyTreeUI extends Application
 				return;
 			}
 		}
-		
+
 		TreeItem<String> newItem = new TreeItem<String>(value);
 		parent.getChildren().add(newItem);
 		if (!parent.isExpanded())
@@ -365,7 +375,7 @@ public class CategoryHierarchyTreeUI extends Application
 			parent.setExpanded(true);
 		}
 	}
-	
+
 	public void removeItem()
 	{
 		TreeItem<String> item = treeView.getSelectionModel().getSelectedItem();
@@ -374,7 +384,7 @@ public class CategoryHierarchyTreeUI extends Application
 			this.logMsg("Select a node to remove.");
 			return;
 		}
-		
+
 		TreeItem<String> parent = item.getParent();
 		if (parent == null)
 		{
@@ -385,14 +395,14 @@ public class CategoryHierarchyTreeUI extends Application
 			parent.getChildren().remove(item);
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void disableAlreadyAddedInToAdd()
 	{
 		ObservableList<String> items = listForCatIDsToAdd.getItems();// .getChildrenUnmodifiable();
-		
+
 		for (String item : items)
 		{
 			if (UIUtilityBox.recursiveDfs(treeView.getRoot(), item))
@@ -401,40 +411,40 @@ public class CategoryHierarchyTreeUI extends Application
 			}
 		}
 	}
-	
+
 	private EventHandler<ActionEvent> saveCurrentTree()
 	{
 		this.logMsg("Should save the currently displayed tree");
-		
+
 		TreeItem<String> rootNoteT = treeView.getRoot();
 		this.logMsg("root node has " + treeView.getRoot().getChildren().size() + " children");
 		// this.logMsg("root node has " + rootNode.getChildren().size() + " children");
 		DefaultMutableTreeNode serializableRoot = UIUtilityBox.convertTreeItemsToTreeNodes(rootNoteT);
-		
+
 		String treeAsString = UIUtilityBox.treeToString(0, rootNoteT, new StringBuffer());
 		String serialisableTreeAsString = UIUtilityBox.treeToString(0, serializableRoot, new StringBuffer());
-		
+
 		WritingToFile.writeToNewFile(treeAsString, commonPath + "TreeOfTreeItemsAsString.txt");
 		WritingToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
-		
+
 		Serializer.serializeThis(serializableRoot, commonPath + serializedCatTreeFileNamePhrase);
-		
+
 		PopUps.showMessage("Save event handling finished");
 		return null;
 	}
-	
+
 	public void branchExpanded(TreeItem.TreeModificationEvent<String> e)
 	{
 		String nodeValue = e.getSource().getValue();
 		this.logMsg("Event: " + nodeValue + " expanded.");
 	}
-	
+
 	public void branchCollapsed(TreeItem.TreeModificationEvent<String> e)
 	{
 		String nodeValue = e.getSource().getValue();
 		this.logMsg("Event: " + nodeValue + " collapsed.");
 	}
-	
+
 	public void childrenModification(TreeItem.TreeModificationEvent<String> e)
 	{
 		if (e.wasAdded())
@@ -444,7 +454,7 @@ public class CategoryHierarchyTreeUI extends Application
 				this.logMsg("Event: " + item.getValue() + " has been added.");
 			}
 		}
-		
+
 		if (e.wasRemoved())
 		{
 			for (TreeItem<String> item : e.getRemovedChildren())
@@ -453,12 +463,12 @@ public class CategoryHierarchyTreeUI extends Application
 			}
 		}
 	}
-	
+
 	public void logMsg(String msg)
 	{
 		this.msgLogFld.appendText(msg + "\n");
 	}
-	
+
 	// @Override
 	// public void start(Stage primaryStage)
 	// {
@@ -477,7 +487,8 @@ public class CategoryHierarchyTreeUI extends Application
 	//
 	// ////////
 	// String catHierarchyFileNameToRead =
-	// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
+	// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another
+	// source/gowalla/gowalla_category_structure.json";
 	//
 	// Pair<TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>>, TreeItem<String>> pairedResult =
 	// JSONProcessingGowallaTryingNonStatic.getThreeLevelCategoryHierarchyTreeFromJSON(catHierarchyFileNameToRead);
@@ -489,7 +500,8 @@ public class CategoryHierarchyTreeUI extends Application
 	//
 	// HBox root = new HBox(treeView, rightPane);
 	// root.setSpacing(20);
-	// root.setStyle("-fx-padding: 10;" + "-fx-border-style: solid inside;" + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
+	// root.setStyle("-fx-padding: 10;" + "-fx-border-style: solid inside;" + "-fx-border-width: 2;" +
+	// "-fx-border-insets: 5;"
 	// + "-fx-border-radius: 5;" + "-fx-border-color: blue;");
 	//
 	// Scene scene = new Scene(root);// , 350, 150);
@@ -503,5 +515,5 @@ public class CategoryHierarchyTreeUI extends Application
 	// e.printStackTrace();
 	// }
 	// }
-	
+
 }

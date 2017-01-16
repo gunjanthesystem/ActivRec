@@ -2,7 +2,7 @@ package org.activity.plotting;
 
 public class ChartUtil
 {
-	
+
 	public static Integer calculateFloorPowerOfTen(Integer number)
 	{
 		Integer powerOfTen = 0;
@@ -20,17 +20,17 @@ public class ChartUtil
 		}
 		return result;
 	}
-	
+
 	public static Float calculateUpperbound(Float upperbound, Integer tickUnit)
 	{
 		float temp = upperbound / tickUnit;
 		return new Float(Math.ceil(new Float(temp).doubleValue()) * tickUnit);
 	}
-	
+
 	public static Float calculateLowerbound(Float upperbound, Integer tickUnit)
 	{
 		float temp = upperbound / tickUnit;
 		return new Float(Math.floor(new Float(temp).doubleValue()) * tickUnit);
 	}
-	
+
 }
