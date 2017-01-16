@@ -11,13 +11,13 @@ package org.activity.objects;
  */
 public class LeakyStringBuilder
 {
-	
+
 	private StringBuilder leakyStringBuilder;
 	private long leakThreshold;
-	
+
 	public LeakyStringBuilder(int leakThreshold)
 	{
 		// TODO Auto-generated constructor stub
 	}
-	
+
 }

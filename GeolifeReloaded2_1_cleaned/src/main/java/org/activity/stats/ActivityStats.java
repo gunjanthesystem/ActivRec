@@ -21,61 +21,63 @@ import org.activity.util.UtilityBelt;
 public class ActivityStats
 {
 	static String pathToWrite;
-	
+
 	/**
 	 * INCOMPLETE
 	 * 
 	 * @param usersDayTimelinesAll
 	 */
-	public static void getActivityStatsPerDay(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesAll)
+	public static void getActivityStatsPerDay(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesAll)
 	{
 		Constant.setCommonPath(Constant.outputCoreResultsPath);
-		
+
 		String directoryToWrite;
-		
+
 		directoryToWrite = Constant.outputCoreResultsPath + Constant.getDatabaseName()
-				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth() + "ActivityPerDayStats";
-		
+				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+				+ "ActivityPerDayStats";
+
 		new File(directoryToWrite).mkdir();
 		pathToWrite = directoryToWrite + "/";
 		Constant.setCommonPath(pathToWrite);
 		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
-		
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines =
-				new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+
+		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
 		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
-		
+
 	}
-	
+
 	/**
 	 * INCOMPLETE
 	 * 
 	 * @param usersDayTimelinesAll
 	 */
-	public static void writeDistinctActivities(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesAll)
+	public static void writeDistinctActivities(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesAll)
 	{
 		Constant.setCommonPath(Constant.outputCoreResultsPath);
-		
+
 		String directoryToWrite;
-		
+
 		directoryToWrite = Constant.outputCoreResultsPath + Constant.getDatabaseName()
-				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth() + "ActivityPerDayStats";
-		
+				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+				+ "ActivityPerDayStats";
+
 		new File(directoryToWrite).mkdir();
 		pathToWrite = directoryToWrite + "/";
 		Constant.setCommonPath(pathToWrite);
 		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
-		
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines =
-				new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+
+		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
 		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
-		
+
 	}
-	
+
 	public static void main(String[] args)
 	{
 		LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataMergedPlusDuration;
-		
+
 		Constant.setCommonPath("/run/media/gunjan/HOME/gunjan/Geolife Data Works/");
 		try
 		{
@@ -88,16 +90,18 @@ public class ActivityStats
 			// PrintStream loadLogStream= new PrintStream(loadLog);
 			// System.setOut(loadLogStream);
 			// System.setErr(loadLogStream);
-			
+
 			mapForAllDataMergedPlusDuration = (LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>>) (Serializer
 					.deSerializeThis(Constant.getCommonPath() + "mapForAllDataMergedPlusDuration.map"));
 			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"Everything","MergedContinuous",false);
 			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"Everything","MergedContinuousSandwiches",true);
 			//
-			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"Not Available","MergedContinuousSandwiches",true);
+			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"Not
+			// Available","MergedContinuousSandwiches",true);
 			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"Unknown","MergedContinuousSandwiches",true);
-			
-			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"Not Available","MergedContinuous",false);
+
+			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"Not
+			// Available","MergedContinuous",false);
 			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"Unknown","MergedContinuous",false);
 			//
 			// WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedPlusDuration,"ValidsOnly","MergedContinuous",false);
@@ -108,24 +112,24 @@ public class ActivityStats
 		{
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param mapForAllDataMergedPlusDuration
 	 */
-	public static void
-			getAllActivitiesGeoDistances(LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataMergedPlusDuration)
+	public static void getAllActivitiesGeoDistances(
+			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataMergedPlusDuration)
 	{
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entry : mapForAllDataMergedPlusDuration.entrySet())
 		{
 			String user = entry.getKey();
-			
+
 			ArrayList<TrajectoryEntry> listOfTrajectoryEntries = UtilityBelt.treeMapToArrayListGeo(entry.getValue());
-			
+
 			ArrayList<TrajectoryEntry> validTrajectoryEntries = new ArrayList<TrajectoryEntry>();
-			
+
 			// System.out.println("num of activity objects for user "+user+" are = "+listOfTrajectoryEntries.size());
 			for (TrajectoryEntry te : listOfTrajectoryEntries)
 			{
@@ -134,9 +138,10 @@ public class ActivityStats
 					validTrajectoryEntries.add(te);
 				}
 			}
-			
-			System.out.println("num of valid activity objects for user " + user + " are = " + validTrajectoryEntries.size());
-			
+
+			System.out.println(
+					"num of valid activity objects for user " + user + " are = " + validTrajectoryEntries.size());
+
 			for (int i = 0; i < validTrajectoryEntries.size(); i++)
 			{
 				for (int j = i + 1; j < validTrajectoryEntries.size(); j++)
@@ -144,27 +149,27 @@ public class ActivityStats
 					// System.out.println("i = "+i+" , j="+j);
 					String startGeoLat1 = validTrajectoryEntries.get(i).getStartLat();
 					String startGeoLon1 = validTrajectoryEntries.get(i).getStartLon();
-					
+
 					String startGeoLat2 = validTrajectoryEntries.get(j).getStartLat();
 					String startGeoLon2 = validTrajectoryEntries.get(j).getStartLon();
-					
+
 					double startDiff = UtilityBelt.haversine(startGeoLat1, startGeoLon1, startGeoLat2, startGeoLon2);
-					
+
 					WritingToFile.appendLineToFile(String.valueOf(UtilityBelt.round(startDiff, 2)), user + "startDiff");
-					
+
 					String endGeoLat1 = validTrajectoryEntries.get(i).getEndLat();
 					String endGeoLon1 = validTrajectoryEntries.get(i).getEndLon();
-					
+
 					String endGeoLat2 = validTrajectoryEntries.get(j).getEndLat();
 					String endGeoLon2 = validTrajectoryEntries.get(j).getEndLon();
-					
+
 					double endDiff = UtilityBelt.haversine(endGeoLat1, endGeoLon1, endGeoLat2, endGeoLon2);
-					
+
 					WritingToFile.appendLineToFile(String.valueOf(UtilityBelt.round(endDiff, 2)), user + "endDiff");
 					// validTrajectoryEntries.get(i),validTrajectoryEntries.get(j)
 				}
 			}
-			
+
 		}
 	}
 }

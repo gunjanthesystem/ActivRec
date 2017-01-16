@@ -12,47 +12,49 @@ import net.seninp.jmotif.sax.SAXProcessor;
 
 public class SAXUtils
 {
-	
+
 	public static void main(String[] args)
 	{
 		/*
-		 * To use: public static String ts2string(Timeseries ts, int paaSize, Alphabet alphabet, int alphabetSize) throws TSException, CloneNotSupportedException {
+		 * To use: public static String ts2string(Timeseries ts, int paaSize, Alphabet alphabet, int alphabetSize)
+		 * throws TSException, CloneNotSupportedException {
 		 */
 		Timestamp a = new Timestamp(2014, 4, 4, 4, 4, 4, 0);
-		
-		double vals[] = { 12, 14, 23.5, 22, 4 };
+
+		double vals[] =
+		{ 12, 14, 23.5, 22, 4 };
 		long stamps[] = new long[5];
-		
+
 		System.out.println("Timeseries:");
 		for (int i = 0; i < 5; i++)
 		{
 			stamps[i] = a.getTime() + i * 60 * 1000;
 		}
-		
+
 		for (int i = 0; i < 5; i++)
 		{
 			System.out.println(vals[i] + ":" + stamps[i]);
 		}
-		
+
 		System.out.println("///////////");
-		
+
 		try
 		{
 			// Timeseries ts = new Timeseries(vals, stamps);
 			//
 			// String resultant = SAXFactory.ts2string(ts, 5, new NormalAlphabet(), 10);
 			//
-			
+
 			System.out.println("String representation = " + getSAXString(vals, stamps, 5, 10));
 			System.out.println("String representation = " + getSAXStringNewVersion(vals, stamps, 5, 10));
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param vals
@@ -77,9 +79,10 @@ public class SAXUtils
 		}
 		return res;
 	}
-	
+
 	/**
-	 * Using the new SAX version available on github which does deprecated some previous classes like Timeseries and change some methods. (16 Nov 2016)
+	 * Using the new SAX version available on github which does deprecated some previous classes like Timeseries and
+	 * change some methods. (16 Nov 2016)
 	 * 
 	 * @param vals
 	 * @param stamps
@@ -92,28 +95,29 @@ public class SAXUtils
 	public static String getSAXStringNewVersion(double vals[], long stamps[], int numDataPoints, int alphabetSize)
 	{
 		// ### 3.1 Discretizing time-series *by chunking*:
-		
+
 		// instantiate classes
 		NormalAlphabet na = new NormalAlphabet();
 		SAXProcessor sp = new SAXProcessor();
-		
+
 		// read the input file
 		// double[] ts = TSProcessor.readFileColumn(dataFName, 0, 0);
-		
+
 		// perform the discretization
 		String strs = "";
 		try
 		{
-			// note: nThredhold: normalisation threshold for znorm = 0d, if std dev is below this val then all 0s are returned. Currently, my aim is to keep it consistent with the
+			// note: nThredhold: normalisation threshold for znorm = 0d, if std dev is below this val then all 0s are
+			// returned. Currently, my aim is to keep it consistent with the
 			// previous verion of the implementation.
 			strs = sp.ts2saxByChunking(vals, numDataPoints, na.getCuts(alphabetSize), 0d).getSAXString(",");
 		}
-		
+
 		catch (SAXException | TSException e)
 		{
 			e.printStackTrace();
 		}
-		
+
 		// print the output
 		// System.out.println(strs);
 		return strs;

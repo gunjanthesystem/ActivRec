@@ -20,33 +20,33 @@ public class EMClustering
 	{
 		ClusterEvaluation clusterEvaluation;
 		Instances dataInstances;
-		
+
 		String[] clusteringOptions;
 		String[] evaluationOptions;
 		EM EMClusterer;
 		double logLikelyhood;
-		
+
 		try
 		{
 			dataInstances = DataSource.read(inputAbsoluteFileName);
-			
+
 			System.out.println("\n--> Manual Clustering " + LocalDateTime.now().toString());
-			
+
 			EMClusterer = new EM();
-			
+
 			clusteringOptions = new String[2];
 			clusteringOptions[0] = "-V";
 			EMClusterer.buildClusterer(dataInstances);
-			
+
 			// EMClusterer.setOptions(clusteringOptions);
-			
+
 			clusterEvaluation = new ClusterEvaluation();
 			clusterEvaluation.setClusterer(EMClusterer);
 			clusterEvaluation.evaluateClusterer(new Instances(dataInstances));
 			WritingToFile.appendLineToFileAbsolute(clusterEvaluation.clusterResultsToString(), outputAbsoluteFileName);
-			
+
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();

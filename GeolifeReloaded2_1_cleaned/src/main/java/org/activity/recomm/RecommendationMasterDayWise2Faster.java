@@ -36,7 +36,8 @@
 // String userAtRecomm;
 // String userIDAtRecomm;
 //
-// ArrayList<ActivityObject> activitiesGuidingRecomm; // sequence of activity events happening one or before the recomm point on that day
+// ArrayList<ActivityObject> activitiesGuidingRecomm; // sequence of activity events happening one or before the recomm
+// point on that day
 // ActivityObject activityAtRecommPoint;
 // // Date dateOfMostSimilar
 //
@@ -46,7 +47,8 @@
 // LinkedHashMap<Date, String> topNames;
 //
 // /**
-// * (Cand TimelineID, (End point index of least distant subsequence, String containing the trace of edit operations performed, edit distance of least distant subsequence)) this
+// * (Cand TimelineID, (End point index of least distant subsequence, String containing the trace of edit operations
+// performed, edit distance of least distant subsequence)) this
 // * LinkedHashMap is sorted by the value of edit distance in ascending order (second component of the Pair (value))
 // *
 // */
@@ -70,8 +72,10 @@
 // public static String commonPath;// = Constant.commonPath;
 //
 // /*
-// * threshold for choosing candidate timelines, those candidate timelines whose distance from the 'activity events guiding recommendations' is higher than the cost of replacing
-// * 'percentageDistanceThresh' % of Activity Events in the activities guiding recommendation are pruned out from set of candidate timelines
+// * threshold for choosing candidate timelines, those candidate timelines whose distance from the 'activity events
+// guiding recommendations' is higher than the cost of replacing
+// * 'percentageDistanceThresh' % of Activity Events in the activities guiding recommendation are pruned out from set of
+// candidate timelines
 // */
 //
 // public RecommendationMasterDayWise2Faster(LinkedHashMap<Date, UserDayTimeline> trainingTimelines,
@@ -114,7 +118,8 @@
 // this.timeAtRecomm.getHours(), this.timeAtRecomm.getMinutes(), this.timeAtRecomm.getSeconds(), 0);
 // System.out.println("timestampPointAtRecomm = " + timestampPointAtRecomm);
 //
-// this.activitiesGuidingRecomm = userDayTimelineAtRecomm.getActivityObjectsStartingOnBeforeTime(timestampPointAtRecomm);
+// this.activitiesGuidingRecomm =
+// userDayTimelineAtRecomm.getActivityObjectsStartingOnBeforeTime(timestampPointAtRecomm);
 // System.out.println("Activity starting on or before the time to recommend (on recommendation day) are: \t");
 // for (int i = 0; i < activitiesGuidingRecomm.size(); i++)
 // {
@@ -133,7 +138,8 @@
 //
 // if (candidateTimelines.size() == 0)
 // {
-// System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm + " at time:"
+// System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm + " at
+// time:"
 // + timeAtRecomm + " because there are no candidate timelines");
 // // this.singleNextRecommendedActivity = null;
 // hasCandidateTimelines = false;
@@ -157,7 +163,8 @@
 // }
 // // ##############
 //
-// // /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry for such candidate timelines from the distance scores map
+// // /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry for such
+// candidate timelines from the distance scores map
 // if (typeOfThreshold.equalsIgnoreCase("Global"))
 // {
 // this.thresholdAsDistance = thresholdVal;
@@ -194,21 +201,26 @@
 //
 // // //////////////////////////////
 //
-// // endPointIndexWithLeastDistanceForCandidateTimelines = getEndPointIndicesWithLeastDistanceInCandidateTimeline(candidateTimelines,activitiesGuidingRecomm);
+// // endPointIndexWithLeastDistanceForCandidateTimelines =
+// getEndPointIndicesWithLeastDistanceInCandidateTimeline(candidateTimelines,activitiesGuidingRecomm);
 // editDistancesSortedMap =
-// (LinkedHashMap<Date, Triple<Integer, String, Double>>) UtilityBelt.sortTripleByThirdValueAscending6(editDistancesSortedMap);
+// (LinkedHashMap<Date, Triple<Integer, String, Double>>)
+// UtilityBelt.sortTripleByThirdValueAscending6(editDistancesSortedMap);
 //
 // this.topRecommendedActivities =
 // getTopNextRecommendedActivityNameEditDistance(activitiesGuidingRecomm, editDistancesSortedMap, trainingTimelines);
-// setTopNextRecommendedActivityNameEditDistanceArray(activitiesGuidingRecomm, editDistancesSortedMap, trainingTimelines);
+// setTopNextRecommendedActivityNameEditDistanceArray(activitiesGuidingRecomm, editDistancesSortedMap,
+// trainingTimelines);
 // // this.topRecommendedActivitiesWithDistance = =
-// // getTopNextRecommendedActivityNamesWithDistanceEditDistance(activitiesGuidingRecomm,editDistancesSortedMap,dayTimelinesForUser);
+// //
+// getTopNextRecommendedActivityNamesWithDistanceEditDistance(activitiesGuidingRecomm,editDistancesSortedMap,dayTimelinesForUser);
 //
 // // ########Sanity check
 // String sanity11[] = topRecommendedActivities.split(Pattern.quote("__"));
 // if (sanity11.length - 1 != editDistancesSortedMap.size())
 // {
-// System.err.println("Error at Sanity 11: num of topRecommendedActivities (without wtd ranking)(=" + (sanity11.length - 1)
+// System.err.println("Error at Sanity 11: num of topRecommendedActivities (without wtd ranking)(=" + (sanity11.length -
+// 1)
 // + " is not equal to the number of dates for which distance has been calculated:(=" + editDistancesSortedMap.size()
 // + ")");
 // }
@@ -221,7 +233,8 @@
 // createRankedTopRecommendation(this.topRecommendedActivities);
 // // System.out.println("Next recommended 5 activity is: "+this.topFiveRecommendedActivities);
 //
-// int indexOfRecommPointInDayTimeline = userDayTimelineAtRecomm.getIndexOfActivityObjectsAtTime(timestampPointAtRecomm);
+// int indexOfRecommPointInDayTimeline =
+// userDayTimelineAtRecomm.getIndexOfActivityObjectsAtTime(timestampPointAtRecomm);
 // if (indexOfRecommPointInDayTimeline + 1 > userDayTimelineAtRecomm.getActivityObjectsInDay().size() - 1)
 // {
 // System.err.println("Error in Recommendation Master: No activity event after recomm point");
@@ -244,7 +257,8 @@
 // System.out.println("removing recomm point activity");
 // }
 //
-// WritingToFile.writeDistanceScoresSortedMap(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm, this.editDistancesSortedMap,
+// WritingToFile.writeDistanceScoresSortedMap(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm,
+// this.editDistancesSortedMap,
 // this.candidateTimelines, this.topNames, this.activitiesGuidingRecomm);
 // System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
 // }
@@ -271,7 +285,8 @@
 // {
 // // if(hasCandidateTimelinesBelowThreshold==false)
 // // {
-// // System.err.println("Error: Sanity Check RM60 failed: trying to get number of candidate timelines below threshold while there is no candidate below threshold, u shouldnt
+// // System.err.println("Error: Sanity Check RM60 failed: trying to get number of candidate timelines below threshold
+// while there is no candidate below threshold, u shouldnt
 // // have called this function");
 // // }
 // return editDistancesSortedMap.size();
@@ -325,7 +340,8 @@
 //
 // int numberOfRecommendations = splitted1.length - 1;
 //
-// System.out.println("Debug inside createRankedTopRecommendation: topRecommendationsWithDistance=" + topRecommendationsWithDistance);
+// System.out.println("Debug inside createRankedTopRecommendation: topRecommendationsWithDistance=" +
+// topRecommendationsWithDistance);
 // System.out.println(
 // "Debug inside createRankedTopRecommendation: numberOfRecommendations=splitted1.length-1=" + numberOfRecommendations);
 // System.out.print("Debug inside createRankedTopRecommendation: the read recommendation are: ");
@@ -360,12 +376,14 @@
 //
 // else
 // {
-// recommendationRankscorePairs.put(recommActivityname, recommendationRankscorePairs.get(recommActivityname) + rankScore);
+// recommendationRankscorePairs.put(recommActivityname, recommendationRankscorePairs.get(recommActivityname) +
+// rankScore);
 // }
 // }
 //
 // System.out.println();
-// recommendationRankscorePairs = (LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendationRankscorePairs); // Sorted in descending order of ranked score: higher
+// recommendationRankscorePairs = (LinkedHashMap<String, Double>) UtilityBelt.sortByValue(recommendationRankscorePairs);
+// // Sorted in descending order of ranked score: higher
 // // ranked score
 // // means
 // // higher rank
@@ -390,7 +408,8 @@
 // topRankedString = getRankedRecommendationWithRankScores();
 // System.out.println("Debug inside createRankedTopRecommendation: topRankedString= " + topRankedString);
 // System.out.println(
-// "Debug inside createRankedTopRecommendation: topRankedStringWithoutScore= " + getRankedRecommendationWithoutRankScores());
+// "Debug inside createRankedTopRecommendation: topRankedStringWithoutScore= " +
+// getRankedRecommendationWithoutRankScores());
 //
 // return topRankedString;
 //
@@ -466,7 +485,8 @@
 //
 // // //
 //
-// // public int getEndPointIndexOfSubsequenceAsCodeWithHighestSimilarity(String activitySequenceAsCode, String activitiesGuidingAsStringCode)
+// // public int getEndPointIndexOfSubsequenceAsCodeWithHighestSimilarity(String activitySequenceAsCode, String
+// activitiesGuidingAsStringCode)
 //
 // // getTopFivWithDistanceeRecommendedActivities getTopNextRecommendedActivityNamesWithDistanceEditDistance
 //
@@ -492,9 +512,11 @@
 // Double distanceOfSimilarTimeline = distEntryOfCand.getValue().getThird();
 // Date dateOfSimilarTimeline = distEntryOfCand.getKey();
 //
-// topSimilarUserDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfSimilarTimeline);
+// topSimilarUserDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser,
+// dateOfSimilarTimeline);
 //
-// ActivityObject nextValidAO = topSimilarUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexOfCand);
+// ActivityObject nextValidAO =
+// topSimilarUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexOfCand);
 //
 // // topNextForThisCand.put(distEntryOfCand.getKey(), nextValidAO.getActivityName());
 //
@@ -508,7 +530,8 @@
 // return topNames;
 // }
 //
-// public LinkedHashMap<Date, String> setTopNextRecommendedActivityNameEditDistanceArray(ArrayList<ActivityObject> activitiesGuidingRecomm,
+// public LinkedHashMap<Date, String> setTopNextRecommendedActivityNameEditDistanceArray(ArrayList<ActivityObject>
+// activitiesGuidingRecomm,
 // LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScoresSorted,
 // LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser)
 // {
@@ -529,9 +552,11 @@
 // Double distanceOfSimilarTimeline = distEntryOfCand.getValue().getThird();
 // Date dateOfSimilarTimeline = distEntryOfCand.getKey();
 //
-// topSimilarUserDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfSimilarTimeline);
+// topSimilarUserDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser,
+// dateOfSimilarTimeline);
 //
-// ActivityObject nextValidAO = topSimilarUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexOfCand);
+// ActivityObject nextValidAO =
+// topSimilarUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexOfCand);
 //
 // // topNextForThisCand.put(distEntryOfCand.getKey(), nextValidAO.getActivityName());
 //
@@ -552,7 +577,8 @@
 // String unknownAsCode = StringCode.getStringCodeFromActivityName("Unknown");
 // String othersAsCode = StringCode.getStringCodeFromActivityName("Others");
 // String nextValidActivity = null;
-// for (int i = endPointIndexForSubsequenceWithHighestSimilarity + 1; i < topSimilarUserDayActivitiesAsStringCode.length(); i++)
+// for (int i = endPointIndexForSubsequenceWithHighestSimilarity + 1; i <
+// topSimilarUserDayActivitiesAsStringCode.length(); i++)
 // {
 // if (String.valueOf(topSimilarUserDayActivitiesAsStringCode.charAt(i)).equals(unknownAsCode)
 // || String.valueOf(topSimilarUserDayActivitiesAsStringCode.charAt(i)).equals(othersAsCode))
@@ -572,7 +598,8 @@
 // LinkedHashMap<Date, UserDayTimeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm)
 // {
 // // <Date of CandidateTimeline, Distance score for that timeline>
-// LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScores = new LinkedHashMap<Date, Triple<Integer, String, Double>>();
+// LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScores = new LinkedHashMap<Date, Triple<Integer, String,
+// Double>>();
 //
 // for (Map.Entry<Date, UserDayTimeline> entry : candidateTimelines.entrySet())
 // {
@@ -590,8 +617,10 @@
 // /**
 // * Get distance scores using modified edit distance.
 // *
-// * <end point index, edit operations trace, edit distance The distance score is the distance between the activities guiding recommendation and the least distant subcandidate
-// * (which has a valid activity after it) from the candidate timeline. (subcandidate is a subsequence from candidate timeline, from the start of the candidate timeline to any
+// * <end point index, edit operations trace, edit distance The distance score is the distance between the activities
+// guiding recommendation and the least distant subcandidate
+// * (which has a valid activity after it) from the candidate timeline. (subcandidate is a subsequence from candidate
+// timeline, from the start of the candidate timeline to any
 // * occurrence of the ActivityGuiding Recomm or current activity.
 // *
 // * @param userDayTimeline
@@ -619,15 +648,18 @@
 // getIndicesOfEndPointActivityInDayButNotLastValid(userDayTimelineAsStringCode, activityAtRecommPointAsStringCode);
 //
 // // ///
-// // $$WritingToFile.writeEndPoinIndexCheck24Oct(activityAtRecommPointAsStringCode,userDayTimelineAsStringCode,indicesOfEndPointActivityInDay1,indicesOfEndPointActivityInDay);
+// //
+// $$WritingToFile.writeEndPoinIndexCheck24Oct(activityAtRecommPointAsStringCode,userDayTimelineAsStringCode,indicesOfEndPointActivityInDay1,indicesOfEndPointActivityInDay);
 //
 // // $$ System.out.println("Debug oct 24 1pm: indicesOfEndPointActivityInDay1"+indicesOfEndPointActivityInDay1);
 // // $$System.out.println("Debug oct 24 1pm: indicesOfEndPointActivityInDay"+indicesOfEndPointActivityInDay);
-// // $$System.out.println("same="+indicesOfEndPointActivityInDay1.toString().equals(indicesOfEndPointActivityInDay.toString()));
+// //
+// $$System.out.println("same="+indicesOfEndPointActivityInDay1.toString().equals(indicesOfEndPointActivityInDay.toString()));
 // // //////
 //
 // /** index of end point, edit operations trace, edit distance **/
-// LinkedHashMap<Integer, Pair<String, Double>> distanceScoresForEachSubsequence = new LinkedHashMap<Integer, Pair<String, Double>>();
+// LinkedHashMap<Integer, Pair<String, Double>> distanceScoresForEachSubsequence = new LinkedHashMap<Integer,
+// Pair<String, Double>>();
 //
 // // getting distance scores for each subcandidate
 // for (int i = 0; i < indicesOfEndPointActivityInDay1.size(); i++)
@@ -638,26 +670,33 @@
 // userDayTimeline.getActivityObjectsInDayFromToIndex(0, indicesOfEndPointActivityInDay1.get(i) + 1),
 // activitiesGuidingRecomm);
 // /*
-// * public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
+// * public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
+// ArrayList<ActivityObject> activityObjects2Original,
 // * String userAtRecomm, String dateAtRecomm, String timeAtRecomm, Integer candidateTimelineId)
 // */
 // distanceScoresForEachSubsequence.put(indicesOfEndPointActivityInDay1.get(i), distance);
 //
-// // System.out.println("Distance between:\n activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
+// // System.out.println("Distance between:\n
+// activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
 // // "\n and subsequence of
-// // Cand:"+UtilityBelt.getActivityNamesFromArrayList(userDayTimeline.getActivityObjectsInDayFromToIndex(0,indicesOfEndPointActivityInDay1.get(i)+1)));
+// //
+// Cand:"+UtilityBelt.getActivityNamesFromArrayList(userDayTimeline.getActivityObjectsInDayFromToIndex(0,indicesOfEndPointActivityInDay1.get(i)+1)));
 //
 // }
 // // ///////////////////
 //
 // distanceScoresForEachSubsequence =
-// (LinkedHashMap<Integer, Pair<String, Double>>) UtilityBelt.sortByValueAscendingIntStrDoub(distanceScoresForEachSubsequence);
-// // $$WritingToFile.writeEditDistancesOfAllEndPoints(activitiesGuidingRecomm,userDayTimeline,distanceScoresForEachSubsequence);
+// (LinkedHashMap<Integer, Pair<String, Double>>)
+// UtilityBelt.sortByValueAscendingIntStrDoub(distanceScoresForEachSubsequence);
+// //
+// $$WritingToFile.writeEditDistancesOfAllEndPoints(activitiesGuidingRecomm,userDayTimeline,distanceScoresForEachSubsequence);
 //
-// for (Map.Entry<Integer, Pair<String, Double>> entry1 : distanceScoresForEachSubsequence.entrySet()) // we only consider the most similar timeline . i.e. the first entry in
+// for (Map.Entry<Integer, Pair<String, Double>> entry1 : distanceScoresForEachSubsequence.entrySet()) // we only
+// consider the most similar timeline . i.e. the first entry in
 // // this Map
 // {
-// System.out.println("End point= " + entry1.getKey() + " distance=" + entry1.getValue().getSecond());// +" trace="+distance.getFirst());
+// System.out.println("End point= " + entry1.getKey() + " distance=" + entry1.getValue().getSecond());// +"
+// trace="+distance.getFirst());
 // }
 //
 // if (distanceScoresForEachSubsequence.size() == 0)
@@ -670,7 +709,8 @@
 // String traceEditOperationsForSubsequenceWithHighestSimilarity = "";
 //
 // // finding the end point index with highest similarity WHICH HAS A VALID ACTIVITY AFTER IT
-// for (Map.Entry<Integer, Pair<String, Double>> entry1 : distanceScoresForEachSubsequence.entrySet()) // we only consider the most similar timeline . i.e. the first entry in
+// for (Map.Entry<Integer, Pair<String, Double>> entry1 : distanceScoresForEachSubsequence.entrySet()) // we only
+// consider the most similar timeline . i.e. the first entry in
 // // this Map
 // {
 // endPointIndexForSubsequenceWithHighestSimilarity = entry1.getKey().intValue();
@@ -710,24 +750,31 @@
 // System.out.println("activityAtRecommPointAsStringCode=" + activityAtRecommPointAsStringCode);
 // System.out.println("userDayTimelineAsStringCode=" + userDayTimelineAsStringCode);
 //
-// System.out.println("endPointIndexForSubsequenceWithHighestSimilarity=" + endPointIndexForSubsequenceWithHighestSimilarity);
-// System.out.println("distanceScoreForSubsequenceWithHighestSimilarity=" + distanceScoreForSubsequenceWithHighestSimilarity);
+// System.out.println("endPointIndexForSubsequenceWithHighestSimilarity=" +
+// endPointIndexForSubsequenceWithHighestSimilarity);
+// System.out.println("distanceScoreForSubsequenceWithHighestSimilarity=" +
+// distanceScoreForSubsequenceWithHighestSimilarity);
 //
-// distanceScoreForSubsequenceWithHighestSimilarity = UtilityBelt.round(distanceScoreForSubsequenceWithHighestSimilarity, 4);
+// distanceScoreForSubsequenceWithHighestSimilarity =
+// UtilityBelt.round(distanceScoreForSubsequenceWithHighestSimilarity, 4);
 //
-// return new Triple(endPointIndexForSubsequenceWithHighestSimilarity, traceEditOperationsForSubsequenceWithHighestSimilarity,
+// return new Triple(endPointIndexForSubsequenceWithHighestSimilarity,
+// traceEditOperationsForSubsequenceWithHighestSimilarity,
 // distanceScoreForSubsequenceWithHighestSimilarity);
 // }
 //
 // /**
-// * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current Activity). Also, this candidate timeline must contain the
-// * activityAtRecomm point at non-last position and there is atleast one valid activity after this activityAtRecomm point
+// * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current
+// Activity). Also, this candidate timeline must contain the
+// * activityAtRecomm point at non-last position and there is atleast one valid activity after this activityAtRecomm
+// point
 // *
 // * @param dayTimelinesForUser
 // * @param activitiesGuidingRecomm
 // * @return
 // */
-// public LinkedHashMap<Date, UserDayTimeline> getCandidateTimelines(LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser,
+// public LinkedHashMap<Date, UserDayTimeline> getCandidateTimelines(LinkedHashMap<Date, UserDayTimeline>
+// dayTimelinesForUser,
 // ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm)
 // {
 // LinkedHashMap<Date, UserDayTimeline> candidateTimelines = new LinkedHashMap<Date, UserDayTimeline>();
@@ -741,17 +788,20 @@
 // {
 // totalNumberOfProbableCands += 1;
 //
-// // Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for the day to be recommended (this should nt be the case because
+// // Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for the day to
+// be recommended (this should nt be the case because
 // // test and
 // // trainin set
 // // are diffferent)
 // // and there is atleast one valid activity after this activityAtRecomm point
-// if (entry.getValue().countContainsActivityButNotAsLast(this.activityAtRecommPoint) > 0)// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
+// if (entry.getValue().countContainsActivityButNotAsLast(this.activityAtRecommPoint) > 0)// &&
+// (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
 // {
 // if (entry.getKey().toString().equals(dateAtRecomm.toString()) == true)
 // {
 // System.err.println(
-// "Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
+// "Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and
+// test set correctly");
 // continue;
 // }
 //
@@ -775,7 +825,8 @@
 // public ArrayList<Integer> getIndicesOfEndPointActivityInDayButNotAsLast(String userDayActivitiesAsStringCode,
 // String codeOfEndPointActivity)
 // {
-// // System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast: userDayActivitiesAsStringCode="+userDayActivitiesAsStringCode+" and
+// // System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast:
+// userDayActivitiesAsStringCode="+userDayActivitiesAsStringCode+" and
 // // codeOfEndPointActivity="+codeOfEndPointActivity);
 // ArrayList<Integer> indicesOfEndPointActivityInDay = new ArrayList<Integer>();
 //
@@ -828,7 +879,8 @@
 // }
 //
 // ArrayList<Integer> endPoints = new ArrayList<Integer>();
-// for (int i = 0; i < indicesOfValids.size() - 1; i++) // skip the last valid because there is no valid activity to recommend after that.
+// for (int i = 0; i < indicesOfValids.size() - 1; i++) // skip the last valid because there is no valid activity to
+// recommend after that.
 // {
 // int indexOfValid = indicesOfValids.get(i);
 //

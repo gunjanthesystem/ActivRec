@@ -10,14 +10,14 @@ import org.activity.jmotif.timeseries.TSException;
  */
 public abstract class Alphabet
 {
-	
+
 	/**
 	 * get the max size of the alphabet.
 	 * 
 	 * @return maximum size of the alphabet.
 	 */
 	public abstract Integer getMaxSize();
-	
+
 	/**
 	 * Get cut intervals corresponding to the alphabet size.
 	 * 
@@ -28,7 +28,7 @@ public abstract class Alphabet
 	 *             if error occurs.
 	 */
 	public abstract double[] getCuts(Integer size) throws TSException;
-	
+
 	/**
 	 * Get the distance matrix for the alphabet size.
 	 * 
@@ -39,5 +39,5 @@ public abstract class Alphabet
 	 *             if error occurs.
 	 */
 	public abstract double[][] getDistanceMatrix(Integer size) throws TSException;
-	
+
 }

@@ -14,14 +14,14 @@ import com.esotericsoftware.kryo.io.Output;
  */
 public class TimestampSerializer extends Serializer<Timestamp>
 {
-	
+
 	@Override
 	public void write(Kryo kryo, Output output, Timestamp timestamp)
 	{
 		output.writeLong(timestamp.getTime(), true);
 		output.writeInt(timestamp.getNanos(), true);
 	}
-	
+
 	@Override
 	public Timestamp read(Kryo kryo, Input input, Class<Timestamp> timestampClass)
 	{

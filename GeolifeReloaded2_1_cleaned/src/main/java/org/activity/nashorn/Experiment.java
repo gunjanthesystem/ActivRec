@@ -6,7 +6,7 @@ import javax.script.ScriptException;
 
 public class Experiment
 {
-	
+
 	public static void main(String[] args)
 	{
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
@@ -20,5 +20,5 @@ public class Experiment
 			e.printStackTrace();
 		}
 	}
-	
+
 }

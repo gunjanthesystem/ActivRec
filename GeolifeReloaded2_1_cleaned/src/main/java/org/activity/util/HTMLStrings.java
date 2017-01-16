@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 public class HTMLStrings
 {
-	public static String getHTMLOptionValueVarchar(String attributeName /* varcharColumnName */, String dimensionName /* String dataTableName */) // like
-																																				// varcharColumnName
-																																				// = user_name
+	public static String getHTMLOptionValueVarchar(String attributeName /* varcharColumnName */,
+			String dimensionName /* String dataTableName */) // like
+																// varcharColumnName
+																// = user_name
 	{
 		String htmlString = "";
 		try
@@ -16,23 +17,25 @@ public class HTMLStrings
 			{
 				orderString = "ORDER BY FIELD(Week_Day, 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')";
 			}
-			ArrayList<String> column = ConnectDatabase.getSQLStringResultSingleColumn("SELECT DISTINCT(" + attributeName + ") from "
-					+ ConnectDatabase.getDatabaseName() + "." + dimensionName.toLowerCase() + "_table " + orderString);// +" ORDER BY "+varcharColumnName+";");//getColumnFromActivityLogDatabase(varcharColumnName);
+			ArrayList<String> column = ConnectDatabase.getSQLStringResultSingleColumn(
+					"SELECT DISTINCT(" + attributeName + ") from " + ConnectDatabase.getDatabaseName() + "."
+							+ dimensionName.toLowerCase() + "_table " + orderString);// +" ORDER BY
+																						// "+varcharColumnName+";");//getColumnFromActivityLogDatabase(varcharColumnName);
 			for (int i = 0; i < column.size(); i++)
 			{
 				htmlString = htmlString + "<option value=\"" + column.get(i) + "\">" + column.get(i) + "</option>";
 			}
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();
 			System.out.print("exception in getHTMLOptionValueVarchar");
 		}
-		
+
 		return htmlString;
 	}
-	
+
 	public static String getStringForTimeline(String jsonText)
 	{
 		String stringForTimeline = "";

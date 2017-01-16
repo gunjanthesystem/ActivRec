@@ -22,22 +22,22 @@ public class Clustering
 		String[] evaluationOptions;
 		DensityBasedClusterer densityBasedClusterer;
 		double logLikelyhood;
-		
+
 		try
 		{
 			dataInstances = DataSource.read(inputFileName);
-			
+
 			System.out.println("\n--> Manual Clustering " + LocalDateTime.now().toString());
-			
+
 			densityBasedClusterer = new EM();
 			densityBasedClusterer.buildClusterer(dataInstances);
-			
+
 			clusterEvaluation = new ClusterEvaluation();
 			clusterEvaluation.setClusterer(densityBasedClusterer);
 			clusterEvaluation.evaluateClusterer(new Instances(dataInstances));
 			System.out.println(clusterEvaluation.clusterResultsToString());
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();

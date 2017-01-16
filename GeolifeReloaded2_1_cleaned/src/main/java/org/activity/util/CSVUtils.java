@@ -29,56 +29,60 @@ import gnu.trove.set.hash.THashSet;
 
 public class CSVUtils
 {
-	
+
 	public static void main(String[] args)
 	{
 		// testSideConcat();
 		gowallaMain();
 	}
-	
+
 	public static void testSideConcat()
 	{
-		
+
 		ArrayList<String> fileNamesToConcat = new ArrayList<String>();
 		fileNamesToConcat.add("/home/gunjan/test/gunjan.csv");
 		fileNamesToConcat.add("/home/gunjan/test/manali.csv");
 		fileNamesToConcat.add("/home/gunjan/test/galadriel.csv");
-		
+
 		concatenateCSVFilesSideways(fileNamesToConcat, true, "/home/gunjan/test/concat.csv");
-		
+
 	}
-	
+
 	public static void gowallaMain()
 	{
 		String fileNameHeadString = "BO";// for baseline occurrence file, empty for algo file
 		// //curtain 1 start
-		// String processedCheckInFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/processedCheckIns.csv";
+		// String processedCheckInFileName =
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/processedCheckIns.csv";
 		// String noDupProcessedCheckinFileName =
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/NoDuplicateprocessedCheckIns.csv";
 		// String dupLinesCheckinFileName =
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/DupLinesFromProcessedCheckins.csv";
 		//
-		// // removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName, dupLinesCheckinFileName, 0);
-		// removeDuplicationRowsUsingCuckoo(processedCheckInFileName, noDupProcessedCheckinFileName, dupLinesCheckinFileName);
+		// // removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,
+		// dupLinesCheckinFileName, 0);
+		// removeDuplicationRowsUsingCuckoo(processedCheckInFileName, noDupProcessedCheckinFileName,
+		// dupLinesCheckinFileName);
 		// // UsingCuckoo
 		// //curtain 1 end
-		
+
 		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
-		
-		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
-		
+
+		String s[] =
+		{ "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+
 		ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
 		ArrayList<String> listOfAllMUsWithMaxMRRFiles = new ArrayList<String>();
 		ArrayList<String> listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
 		ArrayList<String> listOfAllCountsForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
 		ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
 		ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
-		
+
 		for (int i = 0; i < s.length; i++)
 		{
 			String pathToRead = commonPathToRead + s[i] + "/CLUSTERING2/";
-			
+
 			listOfAllMRRFiles.add(pathToRead + fileNameHeadString + "AllMRR.csv");
 			listOfAllMUsWithMaxMRRFiles.add(pathToRead + fileNameHeadString + "MUsWithMaxMRR.csv");
 			listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles
@@ -87,10 +91,10 @@ public class CSVUtils
 					.add(pathToRead + fileNameHeadString + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
 			listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles
 					.add(pathToRead + fileNameHeadString + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
-			listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles
-					.add(pathToRead + fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+			listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles.add(
+					pathToRead + fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
 		}
-		
+
 		concatenateCSVFilesSideways(listOfAllMRRFiles, true, pathToWrite + fileNameHeadString + "AllMRR.csv");
 		concatenateCSVFiles(listOfAllMUsWithMaxMRRFiles, true, pathToWrite + fileNameHeadString + "MUsWithMaxMRR.csv");
 		concatenateCSVFiles(listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles, true,
@@ -101,14 +105,14 @@ public class CSVUtils
 				pathToWrite + fileNameHeadString + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
 		concatenateCSVFiles(listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles, true,
 				pathToWrite + fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
-		
+
 		// concatenateCSVFiles(ArrayList<String>, boolean, String)
 	}
-	
+
 	public static void gowallaMainBaseline()
 	{
 	}
-	
+
 	/**
 	 * Removes duplicate rows from a given csv file.</br>
 	 * preserves order of unique rows</br>
@@ -120,31 +124,31 @@ public class CSVUtils
 	public static void removeDuplicationRows(String inputFileName, String outputFileName, String duplicateLinesFileName)
 	{
 		System.out.println("Entering removeDuplicationRows");
-		
+
 		HashSet<CharSequence> allUniqueEntries = new HashSet<CharSequence>();
 		BufferedReader br = null;
 		// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
 		BufferedWriter bwDup = WritingToFile.getBufferedWriterForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
-		
+
 		long t1 = System.currentTimeMillis();
 		int allLinesCount = 0, uniqueLinesCount = 0, duplicateLinesCount = 0;
 		try
 		{
 			br = new BufferedReader(new FileReader(inputFileName));
-			
+
 			CharSequence currentLineRead;
-			
+
 			while ((currentLineRead = br.readLine()) != null)
 			{
 				allLinesCount += 1;
-				
+
 				// if (allLinesCount > 2000000)
 				// {
 				// allLinesCount -= 1;
 				// break;
 				// }
-				
+
 				if (allUniqueEntries.contains(currentLineRead))
 				{
 					duplicateLinesCount++;
@@ -156,7 +160,7 @@ public class CSVUtils
 					allUniqueEntries.add(currentLineRead);
 					uniqueLines.append(currentLineRead + "\n");
 				}
-				
+
 				if (allLinesCount % 20000 == 0)
 				{
 					// truncate the set to save space
@@ -164,24 +168,24 @@ public class CSVUtils
 					// {
 					// allUniqueEntries.val
 					// }
-					
+
 					// System.out.println("read- " + allLinesCount);
 					// System.out.println("free memory: " + Runtime.getRuntime().freeMemory() + " bytes");
 					WritingToFile.appendLineToFileAbsolute(uniqueLines.toString(), outputFileName);
 					// bw.write(uniqueLines.toString());
 					uniqueLines.setLength(0);
 				}
-				
+
 				if (allLinesCount % 200000 == 0)
 				{
 					System.out.println("lines read: " + allLinesCount);
 				}
 			}
-			
+
 			WritingToFile.appendLineToFileAbsolute(uniqueLines.toString(), outputFileName);
 			// bw.write(uniqueLines.toString());
 			uniqueLines.setLength(0);
-			
+
 			br.close();
 			// bw.close();
 			bwDup.close();
@@ -193,11 +197,11 @@ public class CSVUtils
 		long t2 = System.currentTimeMillis();
 		System.out.println("Num of lines read = " + allLinesCount);
 		System.out.println("Num of unique lines = " + allUniqueEntries.size() + " = " + uniqueLinesCount);
-		
+
 		System.out.println("Num of duplicate lines = " + duplicateLinesCount);
-		
+
 		long sum = uniqueLinesCount + duplicateLinesCount;
-		
+
 		if (sum != allLinesCount)
 		{
 			System.out.println(" sum = " + sum + "allLinesCount = " + allLinesCount);
@@ -205,7 +209,7 @@ public class CSVUtils
 		System.out.println("time taken = " + (t2 - t1) / 1000 + " secs ");
 		System.out.println("Exiting removeDuplicationRows");
 	}
-	
+
 	/**
 	 * Removes duplicate rows from a given csv file.</br>
 	 * preserves order of unique rows</br>
@@ -214,34 +218,35 @@ public class CSVUtils
 	 * @param inputFileName
 	 * @param logPath
 	 */
-	public static void removeDuplicationRowsTrove(String inputFileName, String outputFileName, String duplicateLinesFileName)
+	public static void removeDuplicationRowsTrove(String inputFileName, String outputFileName,
+			String duplicateLinesFileName)
 	{
 		System.out.println("Entering removeDuplicationRows");
-		
+
 		THashSet<String> allUniqueEntries = new THashSet<String>();
 		BufferedReader br = null;
 		BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
 		BufferedWriter bwDup = WritingToFile.getBufferedWriterForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
-		
+
 		long t1 = System.currentTimeMillis();
 		int allLinesCount = 0, uniqueLinesCount = 0, duplicateLinesCount = 0;
 		try
 		{
 			br = new BufferedReader(new FileReader(inputFileName));
-			
+
 			String currentLineRead;
-			
+
 			while ((currentLineRead = br.readLine()) != null)
 			{
 				allLinesCount += 1;
-				
+
 				// if (allLinesCount > 2000000)
 				// {
 				// allLinesCount -= 1;
 				// break;
 				// }
-				
+
 				if (allUniqueEntries.contains(currentLineRead))
 				{
 					duplicateLinesCount++;
@@ -253,7 +258,7 @@ public class CSVUtils
 					allUniqueEntries.add(currentLineRead);
 					uniqueLines.append(currentLineRead + "\n");
 				}
-				
+
 				if (allLinesCount % 25000 == 0)
 				{
 					// truncate the set to save space
@@ -261,18 +266,18 @@ public class CSVUtils
 					// {
 					// allUniqueEntries.val
 					// }
-					
+
 					System.out.println("lines read: " + allLinesCount);
 					System.out.println("free memory: " + Runtime.getRuntime().freeMemory() + " bytes");
 					bw.write(uniqueLines.toString());
 					uniqueLines.setLength(0);
 				}
-				
+
 			}
-			
+
 			bw.write(uniqueLines.toString());
 			uniqueLines.setLength(0);
-			
+
 			br.close();
 			bw.close();
 		}
@@ -283,11 +288,11 @@ public class CSVUtils
 		long t2 = System.currentTimeMillis();
 		System.out.println("Num of lines read = " + allLinesCount);
 		System.out.println("Num of unique lines = " + allUniqueEntries.size() + " = " + uniqueLinesCount);
-		
+
 		System.out.println("Num of duplicate lines = " + duplicateLinesCount);
-		
+
 		long sum = uniqueLinesCount + duplicateLinesCount;
-		
+
 		if (sum != allLinesCount)
 		{
 			System.out.println(" sum = " + sum + "allLinesCount = " + allLinesCount);
@@ -295,7 +300,7 @@ public class CSVUtils
 		System.out.println("time taken = " + (t2 - t1) / 1000 + " secs ");
 		System.out.println("Exiting removeDuplicationRows");
 	}
-	
+
 	/**
 	 * Removes duplicate rows from a given csv file.</br>
 	 * preserves order of unique rows</br>
@@ -306,35 +311,35 @@ public class CSVUtils
 	 * @param duplicateLinesFileName
 	 * @param previcinity
 	 */
-	public static void removeDuplicationRowsInPreVicinity(String inputFileName, String outputFileName, String duplicateLinesFileName,
-			int previcinity)
+	public static void removeDuplicationRowsInPreVicinity(String inputFileName, String outputFileName,
+			String duplicateLinesFileName, int previcinity)
 	{
 		System.out.println("Entering removeDuplicationRows");
-		
+
 		ArrayList<String> allUniqueEntries = new ArrayList<String>();
 		BufferedReader br = null;
 		// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
 		BufferedWriter bwDup = WritingToFile.getBufferedWriterForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
-		
+
 		long t1 = System.currentTimeMillis();
 		int allLinesCount = 0, uniqueLinesCount = 0, duplicateLinesCount = 0;
 		try
 		{
 			br = new BufferedReader(new FileReader(inputFileName));
-			
+
 			String currentLineRead;
-			
+
 			while ((currentLineRead = br.readLine()) != null)
 			{
 				allLinesCount += 1;
-				
+
 				// if (allLinesCount > 2000000)
 				// {
 				// allLinesCount -= 1;
 				// break;
 				// }
-				
+
 				if (allUniqueEntries.contains(currentLineRead))
 				{
 					duplicateLinesCount++;
@@ -346,7 +351,7 @@ public class CSVUtils
 					allUniqueEntries.add(currentLineRead);
 					uniqueLines.append(currentLineRead + "\n");
 				}
-				
+
 				if (allLinesCount % 40000 == 0)
 				{
 					// truncate the set to save space
@@ -354,24 +359,24 @@ public class CSVUtils
 					// {
 					// allUniqueEntries.val
 					// }
-					
+
 					// System.out.println("read- " + allLinesCount);
 					// System.out.println("free memory: " + Runtime.getRuntime().freeMemory() + " bytes");
 					WritingToFile.appendLineToFileAbsolute(uniqueLines.toString(), outputFileName);
 					// bw.write(uniqueLines.toString());
 					uniqueLines.setLength(0);
 				}
-				
+
 				if (allLinesCount % 100000 == 0)
 				{
 					System.out.println("lines read: " + allLinesCount);
 				}
 			}
-			
+
 			WritingToFile.appendLineToFileAbsolute(uniqueLines.toString(), outputFileName);
 			// bw.write(uniqueLines.toString());
 			uniqueLines.setLength(0);
-			
+
 			br.close();
 			// bw.close();
 			bwDup.close();
@@ -383,11 +388,11 @@ public class CSVUtils
 		long t2 = System.currentTimeMillis();
 		System.out.println("Num of lines read = " + allLinesCount);
 		System.out.println("Num of unique lines = " + allUniqueEntries.size() + " = " + uniqueLinesCount);
-		
+
 		System.out.println("Num of duplicate lines = " + duplicateLinesCount);
-		
+
 		long sum = uniqueLinesCount + duplicateLinesCount;
-		
+
 		if (sum != allLinesCount)
 		{
 			System.out.println(" sum = " + sum + "allLinesCount = " + allLinesCount);
@@ -395,14 +400,15 @@ public class CSVUtils
 		System.out.println("time taken = " + (t2 - t1) / 1000 + " secs ");
 		System.out.println("Exiting removeDuplicationRows");
 	}
-	
+
 	/**
 	 * 
 	 * @param listOfAbsFileNames
 	 * @param hasColumnHeader
 	 *            to make sure columnHeadersAreNotRepeated
 	 */
-	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader, String absfileToWrite)
+	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
+			String absfileToWrite)
 	{
 		int countOfFiles = 0, countOfTotalLines = 0;
 		try
@@ -411,52 +417,54 @@ public class CSVUtils
 			{
 				countOfFiles += 1;
 				List<CSVRecord> csvRecords = CSVUtils.getCSVRecords(fileToRead);
-				
+
 				// System.out.println("read records from " + fileToRead + " are :");
-				
+
 				BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
 				CSVPrinter printer = new CSVPrinter(bw, CSVFormat.DEFAULT);
-				
+
 				int countOfLines = 0;
 				for (CSVRecord r : csvRecords)
 				{
 					countOfLines += 1;
-					
-					if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first files
+
+					if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for
+																					// non-first files
 					{
 						continue;
 					}
 					// System.out.println(r.toString());
 					printer.printRecord(r);
-					
+
 				}
 				System.out.println(countOfLines + " lines read for this user");
 				countOfTotalLines += countOfLines;
-				
+
 				printer.close();
 			}
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param listOfAbsFileNames
 	 * @param hasColumnHeader
 	 *            to make sure columnHeadersAreNotRepeated
 	 */
-	public static void concatenateCSVFilesSideways(ArrayList<String> listOfAbsFileNames, boolean hasRowHeader, String absfileToWrite)
+	public static void concatenateCSVFilesSideways(ArrayList<String> listOfAbsFileNames, boolean hasRowHeader,
+			String absfileToWrite)
 	{
 		// read each file
 		// store all lines in a list, size of list = num of rows
 		// read new file. add string from corresponding lines
 		int countOfFiles = 0, countOfTotalLines = 0;
-		
+
 		// if (hasRowHeader)
 		// {
 		// PopUps.showException(new Exception("row header not allowed"),
@@ -468,17 +476,17 @@ public class CSVUtils
 			for (String fileToRead : listOfAbsFileNames)
 			{
 				BufferedReader br = new BufferedReader(new FileReader(fileToRead));
-				
+
 				int lineIndex = 0;
 				String currentLine;
 				while ((currentLine = br.readLine()) != null)
 				{
 					String res = "";
-					
+
 					if (hasRowHeader)
 					{
 						String[] splitted = currentLine.split(",");
-						
+
 						StringBuilder trimmedCurrentLine = new StringBuilder();
 						for (int i = 1; i < splitted.length; i++)
 						{
@@ -486,7 +494,7 @@ public class CSVUtils
 						}
 						currentLine = trimmedCurrentLine.toString();
 					}
-					
+
 					if (finalLines.containsKey(lineIndex))
 					{
 						String prev = finalLines.get(lineIndex);
@@ -496,13 +504,13 @@ public class CSVUtils
 					{
 						res = currentLine;
 					}
-					
+
 					finalLines.put(lineIndex, res);
 					lineIndex += 1;
 				}
 				br.close();
 			}
-			
+
 			BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
 			for (Entry<Integer, String> l : finalLines.entrySet())
 			{
@@ -535,7 +543,8 @@ public class CSVUtils
 		// if (r.size() > maxNumOfColumns)
 		// maxNumOfColumns = r.size();
 		//
-		// // if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first files
+		// // if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first
+		// files
 		// // {
 		// // continue;
 		// // }
@@ -549,24 +558,24 @@ public class CSVUtils
 		// printer.close();
 		// }
 		// }
-		
+
 		catch (
-		
+
 		Exception e)
 		{
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param listOfAbsFileNames
 	 * @param hasColumnHeader
 	 *            to make sure columnHeadersAreNotRepeated
 	 */
-	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader, String absfileToWrite,
-			char delimiter)
+	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
+			String absfileToWrite, char delimiter)
 	{
 		int countOfFiles = 0, countOfTotalLines = 0;
 		try
@@ -575,39 +584,40 @@ public class CSVUtils
 			{
 				countOfFiles += 1;
 				List<CSVRecord> csvRecords = CSVUtils.getCSVRecords(fileToRead, delimiter);
-				
+
 				// System.out.println("read records from " + fileToRead + " are :");
-				
+
 				BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
 				CSVPrinter printer = new CSVPrinter(bw, CSVFormat.DEFAULT.withDelimiter(delimiter).withQuote(null));
-				
+
 				int countOfLines = 0;
 				for (CSVRecord r : csvRecords)
 				{
 					countOfLines += 1;
-					
-					if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first files
+
+					if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for
+																					// non-first files
 					{
 						continue;
 					}
 					// System.out.println(r.toString());
 					printer.printRecord(r);
-					
+
 				}
 				System.out.println(countOfLines + " lines read for this user");
 				countOfTotalLines += countOfLines;
-				
+
 				printer.close();
 			}
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param absFileToSplit
@@ -616,8 +626,8 @@ public class CSVUtils
 	 * @param columnNumForSplit
 	 * @return
 	 */
-	public static ArrayList<String> splitCSVFilesByColumnValueNoHeader(String absFileToSplit, char delimiter, int columnNumForSplit,
-			String pathToWrite)
+	public static ArrayList<String> splitCSVFilesByColumnValueNoHeader(String absFileToSplit, char delimiter,
+			int columnNumForSplit, String pathToWrite)
 	{
 		int countOfFiles = 0, countOfTotalLines = 0;
 		int splitID = 1;
@@ -627,24 +637,24 @@ public class CSVUtils
 		StringBuffer stringBuffer = new StringBuffer();
 		String currentVal = "", prevVal = "";
 		String headerLine = "";
-		
+
 		try
 		{
 			List<CSVRecord> csvRecords = CSVUtils.getCSVRecords(absFileToSplit, delimiter);
 			countOfTotalLines = csvRecords.size();
 			System.out.println("File to split has " + countOfTotalLines + " lines");
 			printer = new CSVPrinter(stringBuffer, CSVFormat.DEFAULT.withDelimiter(delimiter).withQuote(null));
-			
+
 			for (CSVRecord rec : csvRecords)
 			{
 				countOfLines += 1;
-				
+
 				// System.out.println(stringBuffer.toString());
 				currentVal = rec.get(columnNumForSplit);
 				// System.out.println(stringBuffer.toString());
-				
+
 				System.out.println(countOfLines + " " + "currentVal= " + currentVal + " " + "prevVal= " + prevVal);
-				
+
 				if ((prevVal.length() == 0 || currentVal.equals(prevVal)) && countOfLines != countOfTotalLines)
 				{
 					System.out.println("if-->");
@@ -661,10 +671,10 @@ public class CSVUtils
 					bw.write(stringBuffer.toString());
 					bw.close();
 					stringBuffer.setLength(0);
-					
+
 					splitID++;
 				}
-				
+
 				else
 				{
 					System.out.println("else-->");
@@ -679,7 +689,7 @@ public class CSVUtils
 				}
 				prevVal = currentVal;
 			}
-			
+
 			// // System.out.println("read records from " + fileToRead + " are :");
 			//
 			// // BufferedWriter bw = WritingToFile.getBufferedWriter(absfileToWrite);
@@ -690,7 +700,8 @@ public class CSVUtils
 			// {
 			// countOfLines += 1;
 			//
-			// if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first files
+			// if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first
+			// files
 			// {
 			// continue;
 			// }
@@ -702,17 +713,17 @@ public class CSVUtils
 			// countOfTotalLines += countOfLines;
 			//
 			// printer.close();
-			
+
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
+
 		return new ArrayList<String>();
 	}
-	
+
 	/**
 	 * 
 	 * @param absFileToSplit
@@ -732,7 +743,7 @@ public class CSVUtils
 		StringBuffer stringBuffer = new StringBuffer();
 		String currentVal = "", prevVal = "";
 		String headerLine = "";
-		
+
 		try
 		{
 			// List<CSVRecord> csvRecords = getCSVRecords(absFileToSplit, delimiter);
@@ -741,18 +752,18 @@ public class CSVUtils
 			BufferedReader br = new BufferedReader(new FileReader(absFileToSplit));// Constant.getCommonPath() +
 			String lineRead = "";
 			Pattern delimiterP = Pattern.compile(delimiter);
-			
+
 			while ((lineRead = br.readLine()) != null)
 			{
 				countOfLines += 1;
-				
+
 				String[] splittedString = delimiterP.split(lineRead);
 				// System.out.println(stringBuffer.toString());
 				currentVal = splittedString[columnNumForSplit];
 				// System.out.println(stringBuffer.toString());
-				
+
 				// System.out.println(countOfLines + " " + "currentVal= " + currentVal + " " + "prevVal= " + prevVal);
-				
+
 				if ((prevVal.length() == 0 || currentVal.equals(prevVal)) && countOfLines != countOfTotalLines)
 				{
 					// System.out.println("if-->");
@@ -770,10 +781,10 @@ public class CSVUtils
 					bw.write(stringBuffer.toString());
 					bw.close();
 					stringBuffer.setLength(0);
-					
+
 					splitID++;
 				}
-				
+
 				else
 				{
 					// System.out.println("else-->");
@@ -788,7 +799,7 @@ public class CSVUtils
 				}
 				prevVal = currentVal;
 			}
-			
+
 			// // System.out.println("read records from " + fileToRead + " are :");
 			//
 			// // BufferedWriter bw = WritingToFile.getBufferedWriter(absfileToWrite);
@@ -799,7 +810,8 @@ public class CSVUtils
 			// {
 			// countOfLines += 1;
 			//
-			// if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first files
+			// if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for non-first
+			// files
 			// {
 			// continue;
 			// }
@@ -811,17 +823,17 @@ public class CSVUtils
 			// countOfTotalLines += countOfLines;
 			//
 			// printer.close();
-			
+
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
+
 		return new ArrayList<String>();
 	}
-	
+
 	/**
 	 * reads the given csv file into a list of CSV record
 	 * 
@@ -841,7 +853,7 @@ public class CSVUtils
 		// try
 		{
 			row = getCSVRecords(absoluteFileName).get(rowNum - 1);
-			
+
 		}
 		// catch (FileNotFoundException e)
 		// {
@@ -851,11 +863,11 @@ public class CSVUtils
 		// {
 		// e.printStackTrace();
 		// }
-		
+
 		// System.out.println(list.size() + " records read from " + absoluteFileName);
 		return row;
 	}
-	
+
 	/**
 	 * reads the given csv file into a list of CSV record
 	 * 
@@ -869,9 +881,9 @@ public class CSVUtils
 		{
 			Reader in = new FileReader(absoluteFileName);
 			CSVParser parser = new CSVParser(in, CSVFormat.DEFAULT);
-			
+
 			list = parser.getRecords();
-			
+
 		}
 		catch (FileNotFoundException e)
 		{
@@ -881,11 +893,11 @@ public class CSVUtils
 		{
 			e.printStackTrace();
 		}
-		
+
 		System.out.println(list.size() + " records read from " + absoluteFileName);
 		return list;
 	}
-	
+
 	/**
 	 * reads the given csv file into a list of CSV record
 	 * 
@@ -898,12 +910,12 @@ public class CSVUtils
 		try
 		{
 			// CSVFormat csvFileFormat = CSVFormat.DEFAULT.withQuote(null).withDelimiter(delimiter);
-			
+
 			Reader in = new FileReader(absoluteFileName);
 			CSVParser parser = new CSVParser(in, CSVFormat.DEFAULT.withDelimiter(delimiter).withQuote(null));
-			
+
 			list = parser.getRecords();
-			
+
 		}
 		catch (FileNotFoundException e)
 		{
@@ -913,11 +925,11 @@ public class CSVUtils
 		{
 			e.printStackTrace();
 		}
-		
+
 		System.out.println(list.size() + " records read from " + absoluteFileName);
 		return list;
 	}
-	
+
 	/**
 	 * 
 	 * @param rowNum
@@ -927,22 +939,24 @@ public class CSVUtils
 	 * @param filenameToRead
 	 * @return
 	 */
-	public static String getCellValueFromCSVFile(int rowNum, int colNum, String filenameToRead)// , boolean hasColHeader, boolean hasRowHeader)
+	public static String getCellValueFromCSVFile(int rowNum, int colNum, String filenameToRead)// , boolean
+																								// hasColHeader, boolean
+																								// hasRowHeader)
 	{
 		String tval = "";
 		boolean found = false;
-		
+
 		List<CSVRecord> csvRecords = getCSVRecords(filenameToRead);
-		
+
 		for (int row = 0; row < csvRecords.size(); row++)
 		{
 			CSVRecord fetchedRow = csvRecords.get(row);
 			// System.out.print(" row: " + row + " = " + fetchedRow.toString());
-			
+
 			for (int col = 0; col < fetchedRow.size(); col++)
 			{
 				// System.out.print(" col: " + col + " = " + fetchedRow.get(col));
-				
+
 				if (row == (rowNum - 1) && col == (colNum - 1))
 				{
 					// System.out.println("Found in row " + (row + 1) + " col " + (col + 1));
@@ -951,13 +965,14 @@ public class CSVUtils
 			}
 			// System.out.println("\n");
 		}
-		
+
 		if (found == false)
 		{
-			// PopUps.showException(new Exception("Error in getCellValueFromCSVFile: rowNum=" + rowNum + " colNum=" + colNum
+			// PopUps.showException(new Exception("Error in getCellValueFromCSVFile: rowNum=" + rowNum + " colNum=" +
+			// colNum
 			// + " not found in file=" + filenameToRead), "ReadingFromFile.getCellValueFromCSVFile()");
 		}
-		
+
 		return tval;
 	}
 	// /**
@@ -971,7 +986,8 @@ public class CSVUtils
 	// * @param hasHeader
 	// * @return
 	// */
-	// public static List<String> twoColumnReaderString(String fileNameToRead, String delimiter, int columnIndex1, int columnIndex2, boolean hasHeader)
+	// public static List<String> twoColumnReaderString(String fileNameToRead, String delimiter, int columnIndex1, int
+	// columnIndex2, boolean hasHeader)
 	// {
 	//
 	// List<String> raw = new ArrayList<String>();
@@ -984,11 +1000,13 @@ public class CSVUtils
 	//
 	// if (hasHeader)
 	// {
-	// raw = br.lines().skip(1).map((String s) -> (s.split(Pattern.quote(delimiter))[columnIndex])).collect(Collectors.toList());
+	// raw = br.lines().skip(1).map((String s) ->
+	// (s.split(Pattern.quote(delimiter))[columnIndex])).collect(Collectors.toList());
 	// }
 	// else
 	// {
-	// raw = br.lines().map((String s) -> (s.split(Pattern.quote(delimiter))[columnIndex])).collect(Collectors.toList());
+	// raw = br.lines().map((String s) ->
+	// (s.split(Pattern.quote(delimiter))[columnIndex])).collect(Collectors.toList());
 	// }
 	// System.out.println("Size of raw =" + raw.size());
 	// }
@@ -999,7 +1017,7 @@ public class CSVUtils
 	// }
 	// return raw;
 	// }
-	
+
 	/**
 	 * Removes duplicate rows from a given csv file.</br>
 	 * preserves order of unique rows</br>
@@ -1010,38 +1028,40 @@ public class CSVUtils
 	 * @param inputFileName
 	 * @param logPath
 	 */
-	public static void removeDuplicationRowsUsingCuckoo(String inputFileName, String outputFileName, String duplicateLinesFileName)
+	public static void removeDuplicationRowsUsingCuckoo(String inputFileName, String outputFileName,
+			String duplicateLinesFileName)
 	{
 		System.out.println("Entering removeDuplicationRows");
-		
+
 		// create
-		CuckooFilter<CharSequence> allUniqueEntries = new CuckooFilter.Builder<>(Funnels.stringFunnel(Charset.defaultCharset()), 37000000)
-				.withFalsePositiveRate(0.0000000000001).build();// 0.0000000000001
-		
+		CuckooFilter<CharSequence> allUniqueEntries = new CuckooFilter.Builder<>(
+				Funnels.stringFunnel(Charset.defaultCharset()), 37000000).withFalsePositiveRate(0.0000000000001)
+						.build();// 0.0000000000001
+
 		// HashSet<String> allUniqueEntries = new HashSet<String>();
 		BufferedReader br = null;
 		BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
 		BufferedWriter bwDup = WritingToFile.getBufferedWriterForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
-		
+
 		long t1 = System.currentTimeMillis();
 		int allLinesCount = 0, uniqueLinesCount = 0, duplicateLinesCount = 0;
 		try
 		{
 			br = new BufferedReader(new FileReader(inputFileName));
-			
+
 			String currentLineRead;
-			
+
 			while ((currentLineRead = br.readLine()) != null)
 			{
 				allLinesCount += 1;
-				
+
 				// if (allLinesCount > 2000000)
 				// {
 				// allLinesCount -= 1;
 				// break;
 				// }
-				
+
 				if (allUniqueEntries.mightContain(currentLineRead) == false) // definitely does not contain
 				// if (allUniqueEntries.contains(currentLineRead))
 				// allUniqueEntries
@@ -1060,7 +1080,7 @@ public class CSVUtils
 					duplicateLinesCount++;
 					bwDup.append(currentLineRead.toString() + "\n");
 				}
-				
+
 				if (allLinesCount % 200000 == 0)
 				{
 					// truncate the set to save space
@@ -1068,18 +1088,18 @@ public class CSVUtils
 					// {
 					// allUniqueEntries.val
 					// }
-					
+
 					System.out.println("lines read: " + allLinesCount);
 					// System.out.println("free memory: " + Runtime.getRuntime().freeMemory() + " bytes");
 					bw.write(uniqueLines.toString());
 					uniqueLines.setLength(0);
 				}
-				
+
 			}
-			
+
 			bw.write(uniqueLines.toString());
 			uniqueLines.setLength(0);
-			
+
 			br.close();
 			bw.close();
 			bwDup.close();
@@ -1091,11 +1111,11 @@ public class CSVUtils
 		long t2 = System.currentTimeMillis();
 		System.out.println("Num of lines read = " + allLinesCount);
 		System.out.println("Num of unique lines = " + allUniqueEntries.getCount() + " = " + uniqueLinesCount);
-		
+
 		System.out.println("Num of duplicate lines = " + duplicateLinesCount);
-		
+
 		long sum = uniqueLinesCount + duplicateLinesCount;
-		
+
 		if (sum != allLinesCount)
 		{
 			System.out.println(" sum = " + sum + "allLinesCount = " + allLinesCount);
@@ -1116,13 +1136,14 @@ public class CSVUtils
 	 *            start from 1
 	 * @param endCol
 	 */
-	public static void writeMaxCellOverCSVFiles(String[] absCSVFileNamesToRead, String absFileNameToWrite, int beginRow, int endRow,
-			int beginCol, int endCol, String fileToReadForNullifyingZeros)
+	public static void writeMaxCellOverCSVFiles(String[] absCSVFileNamesToRead, String absFileNameToWrite, int beginRow,
+			int endRow, int beginCol, int endCol, String fileToReadForNullifyingZeros)
 	{
 		int numOfFiles = absCSVFileNamesToRead.length;
 		BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absFileNameToWrite);
-		BufferedWriter bwMU =
-				WritingToFile.getBufferedWriterForNewFile(absFileNameToWrite.substring(0, absFileNameToWrite.length() - 4) + "MU.csv");// stores the value of max mu
+		BufferedWriter bwMU = WritingToFile.getBufferedWriterForNewFile(
+				absFileNameToWrite.substring(0, absFileNameToWrite.length() - 4) + "MU.csv");// stores the value of max
+																								// mu
 		try
 		{
 			for (int row = beginRow; row <= endRow; row++)
@@ -1134,7 +1155,7 @@ public class CSVUtils
 					for (String fileToRead : absCSVFileNamesToRead)
 					{
 						String val = getCellValueFromCSVFile(row, col, fileToRead);
-						
+
 						if (val.length() == 0 || val == null)
 						{
 							valuesForThisCellPosition[fileReadCounter] = -999;
@@ -1147,28 +1168,30 @@ public class CSVUtils
 								+ valuesForThisCellPosition[fileReadCounter]);
 						fileReadCounter++;
 					}
-					
+
 					double maxOfCellsAtThisPosition = StatUtils.max(valuesForThisCellPosition);
 					String maxOfCellsAtThisPositionString = String.valueOf(maxOfCellsAtThisPosition);
-					
+
 					if (maxOfCellsAtThisPosition == 0)
 					{ // check if there were no RTs
 						// int numOfRTs = 0;
-						
-						String whetherThisCellPosIsValid = getCellValueFromCSVFile(row, col, fileToReadForNullifyingZeros);
-						
-						// numOfRTs = Integer.valueOf(ReadingFromFile.getCellValueFromCSVFile(row, col, fileToReadForNullifyingZeros));
-						
+
+						String whetherThisCellPosIsValid = getCellValueFromCSVFile(row, col,
+								fileToReadForNullifyingZeros);
+
+						// numOfRTs = Integer.valueOf(ReadingFromFile.getCellValueFromCSVFile(row, col,
+						// fileToReadForNullifyingZeros));
+
 						if (whetherThisCellPosIsValid.equals("0") || whetherThisCellPosIsValid.equals("")
 								|| whetherThisCellPosIsValid == null)// (numOfRTs == 0)
 						{
 							maxOfCellsAtThisPositionString = "NA";
 						}
 					}
-					
+
 					bw.write(maxOfCellsAtThisPositionString);
 					// bwMU.write(Arrays.toString(UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition)));
-					
+
 					// bwMU.write(Arrays.toString(UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition)));
 					// String.join("_", UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition));
 					if (maxOfCellsAtThisPositionString.equals("NA"))// (maxOfCellsAtThisPosition == 0)
@@ -1176,7 +1199,8 @@ public class CSVUtils
 						bwMU.write("NA");
 					}
 					else
-						bwMU.write(StringUtils.getArrayAsStringDelimited(UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition), "_"));
+						bwMU.write(StringUtils.getArrayAsStringDelimited(
+								UtilityBelt.findLargeNumberIndices(valuesForThisCellPosition), "_"));
 					if (col != endCol)
 					{
 						bw.write(",");
@@ -1197,7 +1221,8 @@ public class CSVUtils
 			PopUps.showException(e, "writeMaxCellOverCSVFiles");
 			e.printStackTrace();
 		}
-		
-		// BufferedReader brRR = new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
+
+		// BufferedReader brRR = new BufferedReader(new FileReader(commonPath + fileNamePhrase + timeCategory +
+		// "ReciprocalRank.csv"));
 	}
 }

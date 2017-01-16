@@ -10,7 +10,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 public class SampleEntropyG
 {
 	int m;
-	
+
 	/**
 	 * Correct Based on Costa's definition which is equivalent to Richman's definition
 	 * 
@@ -25,42 +25,42 @@ public class SampleEntropyG
 		// System.out.println("Inside getSampleEntropy ");
 		double sampEn = -9999, A = 0, B = 0;
 		int N = input.length;
-		
+
 		// System.out.println(" N = " + N);
 		// System.out.println(" m = " + m);
 		// System.out.println(" N-m+1 =" + (N - m + 1));
-		
+
 		double[][] mLengthVectors = getSegmentVectors(input, m);
 		// printSegmentVectors(mLengthVectors);
-		
+
 		double[][] mPlusOneLengthVectors = getSegmentVectors(input, m + 1);
 		// printSegmentVectors(mPlusOneLengthVectors);
-		
+
 		for (int i = 0; i < N - m; i++)
 		{
 			B += getNumOfCloseVectors(i, mLengthVectors, N - m, tolerance);
 			A += getNumOfCloseVectors(i, mPlusOneLengthVectors, N - m, tolerance);
 		}
-		
-		// System.out.println("\n\t\t A = " + A + "  B = " + B + "  A/B = " + A / B);
+
+		// System.out.println("\n\t\t A = " + A + " B = " + B + " A/B = " + A / B);
 		sampEn = -Math.log(A / B);
-		
+
 		// System.out.println("Sample entropy Gunjan = " + sampEn);
-		
+
 		if (sampEn == -0)
 		{
 			sampEn *= -1;
 		}
 		return sampEn;
 	}
-	
+
 	public static double getSD(double[] vals)
 	{
 		DescriptiveStatistics ds = new DescriptiveStatistics(vals);
 		double sd = ds.getStandardDeviation();
 		return ds.getStandardDeviation();
 	}
-	
+
 	public static double[] getTimeSeriesVals(String filePath)
 	{
 		List<Double> vals = ReadingFromFile.oneColumnReaderDouble(filePath, ",", 1, false);
@@ -68,7 +68,7 @@ public class SampleEntropyG
 		double[] vals3 = ArrayUtils.toPrimitive(vals2);
 		return vals3;
 	}
-	
+
 	/**
 	 * Tested OK
 	 * 
@@ -77,7 +77,8 @@ public class SampleEntropyG
 	 * @param tolerance
 	 * @return
 	 */
-	public static int getNumOfCloseVectors(int indexOfReferenceVector, double[][] segmentVectors, int NMinusM, double tolerance)
+	public static int getNumOfCloseVectors(int indexOfReferenceVector, double[][] segmentVectors, int NMinusM,
+			double tolerance)
 	{
 		int numOfCloseVectors = 0;
 		// System.out.println("Inside getNumOfCloseVectors: segmentVectors.length =" + segmentVectors.length);
@@ -104,7 +105,7 @@ public class SampleEntropyG
 		// System.out.println("Exiting getNumOfCloseVectors");
 		return numOfCloseVectors;
 	}
-	
+
 	/**
 	 * Tested OK
 	 * 
@@ -120,7 +121,7 @@ public class SampleEntropyG
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Tested OK
 	 * 
@@ -132,11 +133,11 @@ public class SampleEntropyG
 	{
 		int N = inputData.length;
 		double[][] mLengthVectors = new double[N - m + 1][m];
-		
+
 		for (int i = 0; i < (N - m + 1); i++)
 		{
 			int k = 0;
-			
+
 			for (int j = i; j < i + m; j++)
 			{
 				mLengthVectors[i][k] = inputData[j];
@@ -145,7 +146,7 @@ public class SampleEntropyG
 		}
 		return mLengthVectors;
 	}
-	
+
 	/**
 	 * Tested OK
 	 * 
@@ -154,10 +155,10 @@ public class SampleEntropyG
 	public static void printSegmentVectors(double[][] segmentVectors)
 	{
 		System.out.println("Printing " + segmentVectors[0].length + " length vectors:");
-		
+
 		int nRows = segmentVectors.length;
 		int nCols = segmentVectors[0].length;
-		
+
 		for (int i = 0; i < nRows; i++)
 		{
 			System.out.print((i + 1) + ") -->  ");
@@ -168,12 +169,14 @@ public class SampleEntropyG
 			System.out.println("");
 		}
 	}
-	
+
 	public SampleEntropyG()
 	{
-		// String timeSeriesFile = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/TimeSeries2/geolife1JUL6TimeSeriesAnalysis_UsersAbove10RTs/testy1.csv";
+		// String timeSeriesFile = "/run/media/gunjan/HOME/gunjan/Geolife Data
+		// Works/stats/TimeSeries2/geolife1JUL6TimeSeriesAnalysis_UsersAbove10RTs/testy1.csv";
 		//
-		// double[] input = getTimeSeriesVals(timeSeriesFile);// getTimeSeriesVals(timeSeriesFile);// getRandomSeries(400);// getNaiveSeries(20);
+		// double[] input = getTimeSeriesVals(timeSeriesFile);// getTimeSeriesVals(timeSeriesFile);//
+		// getRandomSeries(400);// getNaiveSeries(20);
 		// // // //getRandomSeries(400);// getNaiveSeries(397);getPureRegularSeries(400);
 		// int N = input.length;
 		// System.out.println("Input data: ");
@@ -211,7 +214,7 @@ public class SampleEntropyG
 		// int numOfCloseVectors4 = getNumOfCloseVectors(4, mLengthVectors, 3);
 		// System.out.println("num of close vectors = " + numOfCloseVectors4);
 	}
-	
+
 	// /**
 	// * Based on Richman's simplified definition WRONG WRONG WRONG
 	// *
@@ -261,7 +264,7 @@ public class SampleEntropyG
 	// }
 	// }
 	//
-	// System.out.println(" A = " + A + "  B = " + B + "  A/B = " + A / B);
+	// System.out.println(" A = " + A + " B = " + B + " A/B = " + A / B);
 	// sampEn = -Math.log(A / B);
 	//
 	// System.out.println("Alt Sample entropy = " + sampEn);

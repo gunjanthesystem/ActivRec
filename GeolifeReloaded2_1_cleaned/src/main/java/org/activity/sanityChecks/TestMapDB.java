@@ -8,24 +8,24 @@ import org.mapdb.DBMaker;
 
 public class TestMapDB
 {
-	
+
 	public static void main(String[] args)
 	{
 		long ct1 = System.currentTimeMillis();
 		DB db = DBMaker.memoryDB().make();
 		ConcurrentMap tmap1 = db.hashMap("testmap").make();
-		
+
 		for (int i = 0; i < 3000000; i++)
 		{
 			tmap1.put(i, "XiaYuLe");
 		}
-		
+
 		long ct4 = System.currentTimeMillis();
 		PopUps.showMessage("All data creation done in " + ((ct4 - ct1) / 1000) + " seconds since start");
-		
+
 		db.close();
 	}
-	
+
 	// public static String generateTestString(int rounds)
 	// {
 	// long dt = System.currentTimeMillis();

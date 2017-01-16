@@ -13,7 +13,8 @@ import java.util.TreeSet;
  * @author gunjan
  *
  */
-public abstract class DataEntry implements Serializable // why abstract class and not interface: because we dont want to make all fields public static final
+public abstract class DataEntry implements Serializable // why abstract class and not interface: because we dont want to
+														// make all fields public static final
 {
 	protected Timestamp timestamp;
 	protected long differenceWithNextInSeconds, durationInSeconds;
@@ -23,9 +24,9 @@ public abstract class DataEntry implements Serializable // why abstract class an
 	 * This may or may not be relvant dependent on whether the activities are broken over days
 	 */
 	protected int breakOverDaysCount;
-	
-	public DataEntry(Timestamp timestamp, long differenceWithNextInSeconds, long durationInSeconds, ArrayList<String> trajectoryID,
-			String extraComments, int breakOverDaysCount)
+
+	public DataEntry(Timestamp timestamp, long differenceWithNextInSeconds, long durationInSeconds,
+			ArrayList<String> trajectoryID, String extraComments, int breakOverDaysCount)
 	{
 		super();
 		this.timestamp = timestamp;
@@ -35,11 +36,11 @@ public abstract class DataEntry implements Serializable // why abstract class an
 		this.extraComments = extraComments;
 		this.breakOverDaysCount = breakOverDaysCount;
 	}
-	
+
 	public DataEntry()
 	{
 	}
-	
+
 	/**
 	 * Usually used for creating <i>Unknown</i> data entries
 	 * 
@@ -49,69 +50,70 @@ public abstract class DataEntry implements Serializable // why abstract class an
 	public DataEntry(Timestamp t, long durationInSeconds, String mod)
 	{
 	}
-	
+
 	// abstract public boolean isMergeableAllSame(DataEntry tleA, DataEntry tleB);
-	
+
 	abstract public String toString();
-	
+
 	abstract public String toStringWithTrajID();
-	
+
 	abstract public String toStringWithTrajIDWithTrajPurityCheck();
-	
+
 	abstract public String toStringWithTrajIDsInfo();
-	
+
 	/**
-	 * returned values are in sequence, "StartTimestamp,EndTimestamp,Mode,Latitude,Longitude,Altitude,DifferenceWithNextInSeconds,DurationInSeconds,BreakOverDaysCount"
+	 * returned values are in sequence,
+	 * "StartTimestamp,EndTimestamp,Mode,Latitude,Longitude,Altitude,DifferenceWithNextInSeconds,DurationInSeconds,BreakOverDaysCount"
 	 * 
 	 * @return
 	 */
 	abstract public String toStringWithoutHeaders();
-	
+
 	/**
 	 * Returns with comma as delimiter
 	 * 
 	 * @return
 	 */
 	abstract public String toStringWithoutHeadersWithTrajID();
-	
+
 	abstract public String toStringWithoutHeadersWithTrajID(String delimiter);
-	
+
 	/**
-	 * returns values are in
-	 * sequence,"timestamp, endt,mode,timedifferenceWithNextInSeconds,durationInSeconds,breakOverDaysCount,#distinctTrajIDs,#TrajIDs,trajID,,latitude,longitude,alt" Timestamps
-	 * strings changed to GMT string on April 7 2016
+	 * returns values are in sequence,"timestamp,
+	 * endt,mode,timedifferenceWithNextInSeconds,durationInSeconds,breakOverDaysCount,#distinctTrajIDs,#TrajIDs,trajID,,latitude,longitude,alt"
+	 * Timestamps strings changed to GMT string on April 7 2016
 	 * 
 	 * @return
 	 */
 	abstract public String toStringWithoutHeadersWithTrajIDPurityCheck();
-	
+
 	/**
 	 * returned values are in sequence, "Timestamp,Mode,Latitude,Longitude,Altitude"
 	 * 
 	 * @return
 	 */
 	abstract public String toStringEssentialsWithoutHeaders();
-	
+
 	public void setDurationInSeconds(long tInSecs)
 	{
 		this.durationInSeconds = tInSecs;
 	}
-	
+
 	public long getDurationInSeconds()
 	{
 		return this.durationInSeconds;
 	}
-	
+
 	public void setDifferenceWithNextInSeconds(long t)
 	{
 		this.differenceWithNextInSeconds = t;
 	}
-	
+
 	public long getDifferenceWithNextInSeconds()
 	{
 		return this.differenceWithNextInSeconds;
 	}
-	
+
 	/**
 	 * Returns the end timestamp computed using the duration in seconds
 	 * 
@@ -126,17 +128,17 @@ public abstract class DataEntry implements Serializable // why abstract class an
 		}
 		return ts;
 	}
-	
+
 	public void setExtraComments(String comments)
 	{
 		this.extraComments = comments;
 	}
-	
+
 	public String getExtraComments()
 	{
 		return this.extraComments;
 	}
-	
+
 	// public void setMode(String mod)
 	// {
 	// this.mode = mod;
@@ -146,7 +148,7 @@ public abstract class DataEntry implements Serializable // why abstract class an
 	// {
 	// return this.mode;
 	// }
-	
+
 	// /**
 	// *
 	// * @param lat
@@ -157,7 +159,8 @@ public abstract class DataEntry implements Serializable // why abstract class an
 	// }
 	//
 	// /**
-	// * clears previous latitude entries and adds the new ones. </br> <b>Used when merging Trajectory entries and not when reading raw files.</b>
+	// * clears previous latitude entries and adds the new ones. </br> <b>Used when merging Trajectory entries and not
+	// when reading raw files.</b>
 	// *
 	// * @param a
 	// */
@@ -209,12 +212,12 @@ public abstract class DataEntry implements Serializable // why abstract class an
 		this.trajectoryID.clear();
 		this.trajectoryID.addAll(a);
 	}
-	
+
 	public ArrayList<String> getTrajectoryID()
 	{
 		return this.trajectoryID;
 	}
-	
+
 	/**
 	 * This is useful for merged trajectories which have more than one trajectory entries
 	 * 
@@ -225,17 +228,18 @@ public abstract class DataEntry implements Serializable // why abstract class an
 		TreeSet<String> set = new TreeSet(this.trajectoryID);
 		return set.size();
 	}
-	
+
 	public int getNumberOfTrajectoryIDs()
 	{
 		return this.trajectoryID.size();
 	}
-	
+
 	/**
 	 * Returns a trajectory ID /** Returns distinct trajectory IDs separated by delimiter.
 	 * 
-	 * i.e., if there is only one distinct trajectory Id in the the arraylist of trajectory IDs, else returns the distinct trajIDs separated by delimiter. There is an arraylist of
-	 * trajectory ids in the first place to allow for multiple trajectory entries (with same or difference trajectory IDs) to be merged.
+	 * i.e., if there is only one distinct trajectory Id in the the arraylist of trajectory IDs, else returns the
+	 * distinct trajIDs separated by delimiter. There is an arraylist of trajectory ids in the first place to allow for
+	 * multiple trajectory entries (with same or difference trajectory IDs) to be merged.
 	 * 
 	 * @param delimiter
 	 * @return
@@ -243,23 +247,23 @@ public abstract class DataEntry implements Serializable // why abstract class an
 	public String getDistinctTrajectoryIDs(String delimiter)
 	{
 		String distinctTrajIds = "";
-		
+
 		Set<String> set = new LinkedHashSet<String>(this.trajectoryID);
-		
+
 		return String.join(delimiter, set);
-		
+
 	}
-	
+
 	public void setTimestamp(Timestamp t)
 	{
 		this.timestamp = t;
 	}
-	
+
 	public Timestamp getTimestamp()
 	{
 		return this.timestamp;
 	}
-	
+
 	// public String getStartLat()
 	// {
 	// if (lat.size() > 0)
@@ -330,12 +334,12 @@ public abstract class DataEntry implements Serializable // why abstract class an
 	{
 		this.breakOverDaysCount = c;
 	}
-	
+
 	public int getBreakOverDaysCount()
 	{
 		return this.breakOverDaysCount;
 	}
-	
+
 	// //////////Getters for counts
 	// public static long getCountNegativeAltitudes()
 	// {
@@ -396,7 +400,7 @@ public abstract class DataEntry implements Serializable // why abstract class an
 	// else
 	// return -777;
 	// }
-	
+
 	// public static String getAverage(ArrayList <String> marks)
 	// {
 	// String sum = new String(0);

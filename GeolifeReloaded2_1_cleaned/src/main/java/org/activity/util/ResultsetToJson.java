@@ -14,18 +14,18 @@ public class ResultsetToJson
 	{
 		JSONArray jsonArray = new JSONArray();
 		ResultSetMetaData metaData = resultSet.getMetaData();
-		
+
 		int numColumns = metaData.getColumnCount();
-		
+
 		while (resultSet.next())
 		{
-			
+
 			JSONObject jsonObject = new JSONObject();
-			
+
 			for (int i = 1; i < numColumns + 1; i++)
 			{
 				String column_name = metaData.getColumnName(i);
-				
+
 				if (metaData.getColumnType(i) == java.sql.Types.ARRAY)
 				{
 					jsonObject.put(column_name, resultSet.getArray(column_name));
@@ -83,10 +83,10 @@ public class ResultsetToJson
 					jsonObject.put(column_name, resultSet.getObject(column_name));
 				}
 			}
-			
+
 			jsonArray.put(jsonObject);
 		}
-		
+
 		return jsonArray;
 	}
 }

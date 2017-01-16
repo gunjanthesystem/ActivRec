@@ -24,7 +24,7 @@ public class PopUpsFX extends Application
 		launch(args);
 		PopUps.showMessage("test");
 	}
-	
+
 	/**
 	 * 
 	 * @param msg
@@ -37,7 +37,7 @@ public class PopUpsFX extends Application
 		alert.showAndWait();
 		alert.setHeight(150);
 		alert.setHeight(300);
-		
+
 		// JFrame frame = new JFrame();
 		// // frame.setSize(200, 150);
 		// // frame.getContentPane( ).setLayout(new BorderLayout( ));
@@ -46,7 +46,7 @@ public class PopUpsFX extends Application
 		// // frame.setVisible(true);
 		// frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
+
 	/**
 	 * 
 	 * @param msg
@@ -57,7 +57,7 @@ public class PopUpsFX extends Application
 		JOptionPane.showMessageDialog(frame, msg, "Error Encountered", JOptionPane.ERROR_MESSAGE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
+
 	/**
 	 * Displays a popup pane with exception message
 	 * 
@@ -71,15 +71,15 @@ public class PopUpsFX extends Application
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		String exceptionMsg = sw.toString(); // stack trace as a string
-		
+
 		exceptionMsg += ("\n Exception in " + methodName + "\n");
 		PopUpsFX.showError(exceptionMsg);
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
 		showMessage("Testing aler box");
 	}
-	
+
 }

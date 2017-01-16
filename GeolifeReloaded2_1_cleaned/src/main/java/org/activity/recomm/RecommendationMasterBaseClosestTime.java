@@ -18,14 +18,16 @@ import org.activity.util.UtilityBelt;
 
 /**
  * (Decided in meeting on Oct 13, 2014) </br>
- * The primary purpose of this class is to provide a simple recommender which will be used as a baseline to compare our proposed two-level recommender </br>
+ * The primary purpose of this class is to provide a simple recommender which will be used as a baseline to compare our
+ * proposed two-level recommender </br>
  * Algorithm in words:
  * <ol>
  * <li>For each RT, the candidate timelines are all timelines in the training.</li>
- * <li>To get the top recommended activity: from each candidate timeline, select candidate Activity Objects which is the valid Activity Object whose start time is nearest to
- * RT.</li>
+ * <li>To get the top recommended activity: from each candidate timeline, select candidate Activity Objects which is the
+ * valid Activity Object whose start time is nearest to RT.</li>
  * <li>Measure the similarity of each of the candidate activity object as 1- min( 1, |Stcand - RT|/60mins)</li>
- * <li>The recommended item is a list ranked by score, ScoreAO, scores of activity objects of same activity name are aggregated</li>
+ * <li>The recommended item is a list ranked by score, ScoreAO, scores of activity objects of same activity name are
+ * aggregated</li>
  * </ol>
  * Score (A<sub>O</sub>) = ∑ { 1- min( 1, |Stcand - RT|/60mins) } </br>
  * 
@@ -36,73 +38,75 @@ import org.activity.util.UtilityBelt;
 public class RecommendationMasterBaseClosestTime
 {
 	LinkedHashMap<Date, UserDayTimeline> trainingTimelines, testTimelines, candidateTimelines;
-	
+
 	UserDayTimeline userDayTimelineAtRecomm;
-	
+
 	Date dateAtRecomm;
 	Time timeAtRecomm;
 	String userAtRecomm;
 	String userIDAtRecomm;
 	Timestamp timestampPointAtRecomm;
-	
-	ArrayList<ActivityObject> activitiesGuidingRecomm; // sequence of activity events happening one or before the recomm point on that day
+
+	ArrayList<ActivityObject> activitiesGuidingRecomm; // sequence of activity events happening one or before the recomm
+														// point on that day
 	ActivityObject activityAtRecommPoint;
-	
+
 	/**
 	 * (Cand Date, Pair<Index of ST nearest AO, distance as diff of this ST with ST of CO)
 	 * 
-	 * distance is the difference of the start time of the Current Activity Object and the Activity Object from the candidate timelines whose start time is nearest to the start
-	 * time of current Activity Object. this LinkedHashMap is sorted by the value of distance in ascending order
+	 * distance is the difference of the start time of the Current Activity Object and the Activity Object from the
+	 * candidate timelines whose start time is nearest to the start time of current Activity Object. this LinkedHashMap
+	 * is sorted by the value of distance in ascending order
 	 * 
 	 */
 	private LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceSortedMap; //
-	
+
 	/** Recommended Activity names with their rank score */
 	private LinkedHashMap<String, Double> recommendedActivityNamesWithRankscores;
-	
+
 	private String rankedRecommendedActivityNameWithRankScores;
 	private String rankedRecommendedActivityNameWithoutRankScores;
-	
+
 	private boolean hasCandidateTimelines, errorExists, nextActivityJustAfterRecommPointIsInvalid;
-	
+
 	public static String commonPath;// = Constant.commonPath;
-	
+
 	public int totalNumberOfProbableCands;
 	public int numCandsRejectedDueToNoCurrentActivityAtNonLast;
 	public int numCandsRejectedDueToNoNextActivity;
-	
+
 	// /// Dummy
 	private double thresholdAsDistance = 99999999;
-	
+
 	public double getThresholdAsDistance()
 	{
 		return thresholdAsDistance;
 	}
-	
+
 	public boolean hasThresholdPruningNoEffect()
 	{
 		return true;
 	}
-	
+
 	public boolean hasCandidateTimelinesBelowThreshold()
 	{
 		return true;
 	}
-	
+
 	public int getNumberOfCandidateTimelinesBelowThreshold()
 	{
 		return this.candidateTimelines.size();
 	}
-	
+
 	// ///
 	public RecommendationMasterBaseClosestTime(LinkedHashMap<Date, UserDayTimeline> trainingTimelines,
-			LinkedHashMap<Date, UserDayTimeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm)// ,double trainingPercentage)
+			LinkedHashMap<Date, UserDayTimeline> testTimelines, String dateAtRecomm, String timeAtRecomm,
+			int userAtRecomm)// ,double trainingPercentage)
 	{
 		commonPath = Constant.getCommonPath();
 		hasCandidateTimelines = true;
-		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceUnsortedMap =
-				new LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>(); //
-		
+		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceUnsortedMap = new LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>(); //
+
 		String[] splittedDate = dateAtRecomm.split("/"); // dd/mm/yyyy
 		this.dateAtRecomm = new Date(Integer.parseInt(splittedDate[2]) - 1900, Integer.parseInt(splittedDate[1]) - 1,
 				Integer.parseInt(splittedDate[0]));
@@ -110,35 +114,37 @@ public class RecommendationMasterBaseClosestTime
 		this.timeAtRecomm = Time.valueOf(timeAtRecomm);
 		this.userAtRecomm = Integer.toString(userAtRecomm);
 		this.userIDAtRecomm = Integer.toString(userAtRecomm);
-		
+
 		System.out.println("\n^^^^^^^^^^^^^^^^Inside  RecommendationMasterBaseClosestTime");
 		System.out.println("	User at Recomm = " + this.userAtRecomm);
 		System.out.println("	Date at Recomm = " + this.dateAtRecomm);
 		System.out.println("	Time at Recomm = " + this.timeAtRecomm);
-		
+
 		userDayTimelineAtRecomm = TimelineUtils.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
-		
+
 		if (userDayTimelineAtRecomm == null)
 		{
 			System.err.println("Error: day timeline not found (in test timelines) for the recommendation day");
 		}
-		
+
 		System.out.println("The Activities on the recomm day are:");
 		userDayTimelineAtRecomm.printActivityObjectNamesWithTimestampsInSequence();
 		System.out.println();
-		
-		timestampPointAtRecomm = new Timestamp(this.dateAtRecomm.getYear(), this.dateAtRecomm.getMonth(), this.dateAtRecomm.getDate(),
-				this.timeAtRecomm.getHours(), this.timeAtRecomm.getMinutes(), this.timeAtRecomm.getSeconds(), 0);
+
+		timestampPointAtRecomm = new Timestamp(this.dateAtRecomm.getYear(), this.dateAtRecomm.getMonth(),
+				this.dateAtRecomm.getDate(), this.timeAtRecomm.getHours(), this.timeAtRecomm.getMinutes(),
+				this.timeAtRecomm.getSeconds(), 0);
 		System.out.println("timestampPointAtRecomm = " + timestampPointAtRecomm);
-		
-		this.activitiesGuidingRecomm = userDayTimelineAtRecomm.getActivityObjectsStartingOnBeforeTime(timestampPointAtRecomm);
+
+		this.activitiesGuidingRecomm = userDayTimelineAtRecomm
+				.getActivityObjectsStartingOnBeforeTime(timestampPointAtRecomm);
 		this.activityAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 		System.out.println("\nActivity at Recomm point =" + this.activityAtRecommPoint.getActivityName());
-		
+
 		// /////IMPORTANT
-		candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines, this.activitiesGuidingRecomm,
-				this.dateAtRecomm, this.activityAtRecommPoint);// trainingTimelines;
-		
+		candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines,
+				this.activitiesGuidingRecomm, this.dateAtRecomm, this.activityAtRecommPoint);// trainingTimelines;
+
 		totalNumberOfProbableCands = candidateTimelines.size();
 		numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
 		numCandsRejectedDueToNoNextActivity = 0;
@@ -148,8 +154,8 @@ public class RecommendationMasterBaseClosestTime
 		// $$traverseMapOfDayTimelines(candidateTimelines);
 		if (candidateTimelines.size() == 0)
 		{
-			System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm + " at time:"
-					+ timeAtRecomm + "  because there are no candidate timelines");
+			System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
+					+ " at time:" + timeAtRecomm + "  because there are no candidate timelines");
 			hasCandidateTimelines = false;
 			// $$this.topNextActivityObjects=null;
 			this.startTimeDistanceSortedMap = null;
@@ -160,7 +166,7 @@ public class RecommendationMasterBaseClosestTime
 			this.hasCandidateTimelines = true;
 		}
 		startTimeDistanceUnsortedMap = getDistancesforCandidateTimeline(candidateTimelines, activityAtRecommPoint);// activitiesGuidingRecomm);
-		
+
 		// ########Sanity check
 		if (startTimeDistanceUnsortedMap.size() != candidateTimelines.size())
 		{
@@ -168,29 +174,30 @@ public class RecommendationMasterBaseClosestTime
 			errorExists = true;
 		}
 		// ##############
-		
+
 		this.startTimeDistanceSortedMap = (LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>) UtilityBelt
 				.sortByValueAscending5(startTimeDistanceUnsortedMap);
-		
+
 		System.out.println("---------startTimeDistanceSortedMap.size()=" + startTimeDistanceSortedMap.size());
 		System.out.println(
 				">>>>>>>>>>>>>>startTimeDistanceSortedMap is:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n Date, Index of nearest, name of nearest, dist of nearest");
 		StringBuilder temp1 = new StringBuilder();
 		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : startTimeDistanceSortedMap.entrySet())
 		{
-			temp1.append("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__" + entry.getValue().getSecond().getActivityName()
-					+ "__" + entry.getValue().getThird() + "\n");
+			temp1.append("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__"
+					+ entry.getValue().getSecond().getActivityName() + "__" + entry.getValue().getThird() + "\n");
 		}
 		System.out.println(temp1.toString());
-		
+
 		createRankedTopRecommendedActivityNames(startTimeDistanceSortedMap);
-		
+
 		WritingToFile.writeStartTimeDistancesSorted(this.startTimeDistanceSortedMap);
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting RecommendationMasterBaseClosestTime");
 	}
-	
+
 	/**
-	 * Gets the start time distances of the (valid) Activity Object in each candidate timeline which is nearest to the start time of the current Activity Object
+	 * Gets the start time distances of the (valid) Activity Object in each candidate timeline which is nearest to the
+	 * start time of the current Activity Object
 	 * 
 	 * @param candidateTimelines
 	 * @param activityObjectAtRecommPoint
@@ -200,40 +207,41 @@ public class RecommendationMasterBaseClosestTime
 	public LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> getDistancesforCandidateTimeline(
 			LinkedHashMap<Date, UserDayTimeline> candidateTimelines, ActivityObject activityObjectAtRecommPoint)
 	{
-		// <Date of CandidateTimeline, <Index for the nearest Activity Object, Diff of Start time of nearest Activity Object with start time of current Activity Object>
-		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> distances =
-				new LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>();
-		
+		// <Date of CandidateTimeline, <Index for the nearest Activity Object, Diff of Start time of nearest Activity
+		// Object with start time of current Activity Object>
+		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> distances = new LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>();
+
 		for (Map.Entry<Date, UserDayTimeline> entry : candidateTimelines.entrySet())
 		{
 			/*
-			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of current Activity Object and the distance is diff of their
-			 * start times
+			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
+			 * current Activity Object and the distance is diff of their start times
 			 */
 			Triple<Integer, ActivityObject, Double> score = (entry.getValue()
-					.getTimeDiffValidActivityObjectWithStartTimeNearestTo(activityObjectAtRecommPoint.getStartTimestamp()));
+					.getTimeDiffValidActivityObjectWithStartTimeNearestTo(
+							activityObjectAtRecommPoint.getStartTimestamp()));
 			distances.put(entry.getKey(), score);
 			// System.out.println("now we put "+entry.getKey()+" and score="+score);
 		}
 		return distances;
 	}
-	
+
 	public LinkedHashMap<Date, UserDayTimeline> getCandidateTimeslines()
 	{
 		return this.candidateTimelines;
 	}
-	
+
 	/**
 	 * 
 	 * @param startTimeDistanceSortedMap
 	 */
 	// used
-	public void
-			createRankedTopRecommendedActivityNames(LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceSortedMap)
+	public void createRankedTopRecommendedActivityNames(
+			LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceSortedMap)
 	{
 		System.out.println("Debug inside createRankedTopRecommendedActivityNames:");
 		int numberOfTopNextActivityObjects = startTimeDistanceSortedMap.size();
-		
+
 		LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs = new LinkedHashMap<String, Double>(); // <ActivityName,RankScore>
 		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : startTimeDistanceSortedMap.entrySet())
 		{
@@ -250,22 +258,24 @@ public class RecommendationMasterBaseClosestTime
 			}
 		}
 		System.out.println();
-		recommendedActivityNamesRankscorePairs =
-				(LinkedHashMap<String, Double>) UtilityBelt.sortByValueDesc(recommendedActivityNamesRankscorePairs); // Sorted in descending order of ranked score: higher
-																													// ranked score means higher value of rank
-		
+		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) UtilityBelt
+				.sortByValueDesc(recommendedActivityNamesRankscorePairs); // Sorted in descending order of ranked score:
+																			// higher
+																			// ranked score means higher value of rank
+
 		// ///////////IMPORTANT //////////////////////////////////////////////////////////
 		this.setRecommendedActivityNamesWithRankscores(recommendedActivityNamesRankscorePairs);
 		this.setRankedRecommendedActivityNamesWithRankScores(recommendedActivityNamesRankscorePairs);
 		this.setRankedRecommendedActivityNamesWithoutRankScores(recommendedActivityNamesRankscorePairs);
-		
+
 		// /////////////////////////////////////////////////////////////////////
 		System.out.println("Debug inside createRankedTopRecommendedActivityObjects: topRankedActivityNamesWithScore=  "
 				+ getRankedRecommendedActivityNamesWithRankScores());
-		System.out.println("Debug inside createRankedTopRecommendedActivityObjects: topRankedActivityNamesWithoutScore=  "
-				+ getRankedRecommendedActivityNamesWithoutRankScores());
+		System.out
+				.println("Debug inside createRankedTopRecommendedActivityObjects: topRankedActivityNamesWithoutScore=  "
+						+ getRankedRecommendedActivityNamesWithoutRankScores());
 	}
-	
+
 	// /////////////////////////////////////////////////////////////////////
 	/**
 	 * set Map of <recommended Activity Name, rank score>
@@ -273,18 +283,19 @@ public class RecommendationMasterBaseClosestTime
 	 * @param recommendedActivityNamesRankscorePairs
 	 */
 	// used
-	public void setRecommendedActivityNamesWithRankscores(LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs)
+	public void setRecommendedActivityNamesWithRankscores(
+			LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs)
 	{
 		this.recommendedActivityNamesWithRankscores = recommendedActivityNamesRankscorePairs;
 	}
-	
+
 	public LinkedHashMap<String, Double> getRecommendedActivityNamesWithRankscores()
 	{
 		return this.recommendedActivityNamesWithRankscores;
 	}
-	
+
 	// /////////////////////////////////////////////////////////////////////
-	
+
 	// /////////////////////////////////////////////////////////////////////
 	/**
 	 * Set string as '__recommendedActivityName1:rankScore1__recommendedActivityName2:rankScore2'
@@ -292,26 +303,27 @@ public class RecommendationMasterBaseClosestTime
 	 * @param recommendedActivityNameRankscorePairs
 	 */
 	// used
-	public void setRankedRecommendedActivityNamesWithRankScores(LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
+	public void setRankedRecommendedActivityNamesWithRankScores(
+			LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
 	{
 		StringBuffer topRankedString = new StringBuffer();// String topRankedString= new String();
-		
+
 		for (Map.Entry<String, Double> entry : recommendedActivityNameRankscorePairs.entrySet())
 		{
 			topRankedString.append("__" + entry.getKey() + ":" + Evaluation.round(entry.getValue(), 4));// topRankedString+=
 																										// "__"+entry.getKey()+":"+TestStats.round(entry.getValue(),4);
 		}
-		
+
 		this.rankedRecommendedActivityNameWithRankScores = topRankedString.toString();
 	}
-	
+
 	public String getRankedRecommendedActivityNamesWithRankScores()
 	{
 		return this.rankedRecommendedActivityNameWithRankScores;
 	}
-	
+
 	// /////////////////////////////////////////////////////////////////////
-	
+
 	// /////////////////////////////////////////////////////////////////////
 	/**
 	 * Set string as '__recommendedActivityName1__recommendedActivityName2'
@@ -320,24 +332,28 @@ public class RecommendationMasterBaseClosestTime
 	 * @return
 	 */
 	// used
-	public void setRankedRecommendedActivityNamesWithoutRankScores(LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
+	public void setRankedRecommendedActivityNamesWithoutRankScores(
+			LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
 	{
-		StringBuffer rankedRecommendationWithoutRankScores = new StringBuffer();// String rankedRecommendationWithoutRankScores=new String();
+		StringBuffer rankedRecommendationWithoutRankScores = new StringBuffer();// String
+																				// rankedRecommendationWithoutRankScores=new
+																				// String();
 		for (Map.Entry<String, Double> entry : recommendedActivityNameRankscorePairs.entrySet())
 		{
-			rankedRecommendationWithoutRankScores.append("__" + entry.getKey());// rankedRecommendationWithoutRankScores+= "__"+entry.getKey();
+			rankedRecommendationWithoutRankScores.append("__" + entry.getKey());// rankedRecommendationWithoutRankScores+=
+																				// "__"+entry.getKey();
 		}
-		
+
 		this.rankedRecommendedActivityNameWithoutRankScores = rankedRecommendationWithoutRankScores.toString();
 	}
-	
+
 	public String getRankedRecommendedActivityNamesWithoutRankScores()
 	{
 		return this.rankedRecommendedActivityNameWithoutRankScores;
 	}
-	
+
 	// /////////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * Returns top next activity names as String
 	 * 
@@ -346,18 +362,19 @@ public class RecommendationMasterBaseClosestTime
 	public String getTopNextActivityNamesWithoutDistanceString()
 	{
 		StringBuffer result = new StringBuffer("");// String result="";
-		
-		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : this.startTimeDistanceSortedMap.entrySet())
+
+		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : this.startTimeDistanceSortedMap
+				.entrySet())
 		{
 			Triple<Integer, ActivityObject, Double> tripleAO = entry.getValue();
-			
+
 			result.append("__" + tripleAO.getSecond().getActivityName());// result=result+"__"+pairAE.getFirst().getActivityName();
-			
+
 		}
-		
+
 		return result.toString();
 	}
-	
+
 	/**
 	 * Returns top next activity names with distance as String
 	 * 
@@ -366,48 +383,51 @@ public class RecommendationMasterBaseClosestTime
 	public String getTopNextActivityNamesWithDistanceString()
 	{
 		StringBuffer result = new StringBuffer("");// String result="";
-		
-		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : this.startTimeDistanceSortedMap.entrySet())
+
+		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : this.startTimeDistanceSortedMap
+				.entrySet())
 		{
 			Triple<Integer, ActivityObject, Double> tripleAO = entry.getValue();
-			
+
 			result.append("__" + tripleAO.getSecond().getActivityName() + ":" + tripleAO.getThird().toString());// result=result+"__"+pairAE.getFirst().getActivityName();
 		}
 		return result.toString();
 	}
-	
+
 	public int getNumberOfValidActivitiesInActivitesGuidingRecommendation()
 	{
 		int count = 0;
 		for (ActivityObject ae : this.activitiesGuidingRecomm)
 		{
-			if (!((ae.getActivityName().equalsIgnoreCase("Others")) || (ae.getActivityName().equalsIgnoreCase("Unknown"))))
+			if (!((ae.getActivityName().equalsIgnoreCase("Others"))
+					|| (ae.getActivityName().equalsIgnoreCase("Unknown"))))
 			{
 				count++;
 			}
 		}
 		return count++;
 	}
-	
+
 	public int getNumberOfActivitiesInActivitesGuidingRecommendation()
 	{
 		return this.activitiesGuidingRecomm.size();
 	}
-	
+
 	public boolean isNextActivityJustAfterRecommPointIsInvalid()
 	{
 		nextActivityJustAfterRecommPointIsInvalid = false;
-		int indexOfRecommPointInDayTimeline = userDayTimelineAtRecomm.getIndexOfActivityObjectsAtTime(timestampPointAtRecomm);
+		int indexOfRecommPointInDayTimeline = userDayTimelineAtRecomm
+				.getIndexOfActivityObjectsAtTime(timestampPointAtRecomm);
 		if (indexOfRecommPointInDayTimeline + 1 > userDayTimelineAtRecomm.getActivityObjectsInDay().size() - 1)
 		{
-			System.err
-					.println("Error(Almost Warning) in isNextActivityJustAfterRecommPointIsInvalid: No activity event after recomm point");
+			System.err.println(
+					"Error(Almost Warning) in isNextActivityJustAfterRecommPointIsInvalid: No activity event after recomm point");
 		}
-		
+
 		else
 		{
-			ActivityObject activityJustAfterRecommPoint =
-					userDayTimelineAtRecomm.getActivityObjectAtPosition(indexOfRecommPointInDayTimeline + 1);
+			ActivityObject activityJustAfterRecommPoint = userDayTimelineAtRecomm
+					.getActivityObjectAtPosition(indexOfRecommPointInDayTimeline + 1);
 			if (activityJustAfterRecommPoint.getActivityName().equals("Unknown")
 					|| activityJustAfterRecommPoint.getActivityName().equals("Others"))
 			{
@@ -416,48 +436,51 @@ public class RecommendationMasterBaseClosestTime
 		}
 		return this.nextActivityJustAfterRecommPointIsInvalid;
 	}
-	
+
 	public LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> getStartDistancesSortedMap()
 	{
 		return this.startTimeDistanceSortedMap;
 	}
-	
+
 	public ActivityObject getActivityAtRecomm()
 	{
 		return this.activityAtRecommPoint;
 	}
-	
+
 	public String getActivitiesGuidingRecomm()
 	{
 		String res = "";
-		
+
 		for (ActivityObject ae : activitiesGuidingRecomm)
 		{
 			res += ">>" + ae.getActivityName();
 		}
 		return res;
 	}
-	
+
 	public void removeRecommPointActivityFromRankedRecomm()
 	{
 		String activityNameAtRecommPoint = activityAtRecommPoint.getActivityName();
 		this.recommendedActivityNamesWithRankscores.remove(activityNameAtRecommPoint);
 	}
-	
+
 	public boolean hasCandidateTimeslines()
 	{
 		return hasCandidateTimelines;
 	}
-	
+
 	// /**
-	// * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current Activity). Also, this candidate timeline must contain the
-	// * activityAtRecomm point at non-last position and there is atleast one valid activity after this activityAtRecomm point
+	// * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point
+	// (current Activity). Also, this candidate timeline must contain the
+	// * activityAtRecomm point at non-last position and there is atleast one valid activity after this activityAtRecomm
+	// point
 	// *
 	// * @param dayTimelinesForUser
 	// * @param activitiesGuidingRecomm
 	// * @return
 	// */
-	// public LinkedHashMap<Date, UserDayTimeline> getCandidateTimelines(LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser,
+	// public LinkedHashMap<Date, UserDayTimeline> getCandidateTimelines(LinkedHashMap<Date, UserDayTimeline>
+	// dayTimelinesForUser,
 	// ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm)
 	// {
 	// LinkedHashMap<Date, UserDayTimeline> candidateTimelines = new LinkedHashMap<Date, UserDayTimeline>();
@@ -471,16 +494,19 @@ public class RecommendationMasterBaseClosestTime
 	// {
 	// totalNumberOfProbableCands += 1;
 	//
-	// // Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for the day to be recommended (this should nt be the case because
+	// // Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for the day
+	// to be recommended (this should nt be the case because
 	// // test and trainin set
 	// // are diffferent)
 	// // and there is atleast one valid activity after this activityAtRecomm point
-	// if (entry.getValue().countContainsActivityButNotAsLast(this.activityAtRecommPoint) > 0)// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
+	// if (entry.getValue().countContainsActivityButNotAsLast(this.activityAtRecommPoint) > 0)// &&
+	// (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
 	// {
 	// if (entry.getKey().toString().equals(dateAtRecomm.toString()) == true)
 	// {
 	// System.err.println(
-	// "Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
+	// "Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training
+	// and test set correctly");
 	// continue;
 	// }
 	//
@@ -504,28 +530,32 @@ public class RecommendationMasterBaseClosestTime
 	/*
 	 * public String getTopFiveRecommendedActivities() { return this.topRecommendedActivities; }
 	 * 
-	 * public String getTopRecommendedActivitiesWithoutDistance() { String result=""; String topActivities=this.topRecommendedActivities; String[] splitted1=
-	 * topActivities.split("__");
+	 * public String getTopRecommendedActivitiesWithoutDistance() { String result=""; String
+	 * topActivities=this.topRecommendedActivities; String[] splitted1= topActivities.split("__");
 	 * 
-	 * for(int i=1;i<splitted1.length;i++) { String[] splitted2=splitted1[i].split(":"); result=result+"__"+splitted2[0]; }
+	 * for(int i=1;i<splitted1.length;i++) { String[] splitted2=splitted1[i].split(":");
+	 * result=result+"__"+splitted2[0]; }
 	 * 
 	 * return result; }
 	 */
 	// //
-	
-	// public int getEndPointIndexOfSubsequenceAsCodeWithHighestSimilarity(String activitySequenceAsCode, String activitiesGuidingAsStringCode)
-	
+
+	// public int getEndPointIndexOfSubsequenceAsCodeWithHighestSimilarity(String activitySequenceAsCode, String
+	// activitiesGuidingAsStringCode)
+
 	// getTopFivWithDistanceeRecommendedActivities getTopNextRecommendedActivityNamesWithDistanceEditDistance
-	
+
 	/*
-	 * public String getTopNextRecommendedActivityNames(ArrayList<ActivityObject> activitiesGuidingRecomm, LinkedHashMap<Date,Double>
-	 * distanceScoresSorted,LinkedHashMap<Date,UserDayTimeline> dayTimelinesForUser) {
+	 * public String getTopNextRecommendedActivityNames(ArrayList<ActivityObject> activitiesGuidingRecomm,
+	 * LinkedHashMap<Date,Double> distanceScoresSorted,LinkedHashMap<Date,UserDayTimeline> dayTimelinesForUser) {
 	 * 
 	 * }
 	 */
-	
+
 	/*
-	 * public void traverseMapOfKeyPair(LinkedHashMap<Date,Pair<Integer,Double>> map) { for (Map.Entry<Date, UserDayTimeline> entry : map.entrySet()) {
-	 * System.out.print("Date: "+entry.getKey()); entry.getValue().printActivityObjectNamesInSequence(); System.out.println(); } System.out.println("-----------"); }
+	 * public void traverseMapOfKeyPair(LinkedHashMap<Date,Pair<Integer,Double>> map) { for (Map.Entry<Date,
+	 * UserDayTimeline> entry : map.entrySet()) { System.out.print("Date: "+entry.getKey());
+	 * entry.getValue().printActivityObjectNamesInSequence(); System.out.println(); } System.out.println("-----------");
+	 * }
 	 */
 }

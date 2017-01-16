@@ -16,7 +16,7 @@ public class Descriptive
 {
 	public final static String commonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";
 	final static String outputPath = commonPath + "results/";
-	
+
 	public static void main(String[] args)
 	{
 		Constant.setCommonPath(commonPath);
@@ -24,29 +24,34 @@ public class Descriptive
 		// double[] rawSortedArray = raw.stream().sorted().mapToDouble(l -> l.doubleValue()).toArray();
 		//
 		//
-		// //getDescriptiveStatistics(rawSortedArray,"Time difference between Data Points (in seconds)","TimeDiffBetweenDataPoints.csv");
+		// //getDescriptiveStatistics(rawSortedArray,"Time difference between Data Points (in
+		// seconds)","TimeDiffBetweenDataPoints.csv");
 		// getFrequencyDistribution(rawSortedArray);
-		
+
 		//
 		// List<Long> raw= ReadingFromFile.oneColumnReader("UnknownMergedContinuousSandwiches.csv",",",3,true);
 		// double[] rawSortedArray = raw.stream().sorted().mapToDouble(l -> l.doubleValue()).toArray();
-		// getDescriptiveStatistics(rawSortedArray,"Duration of (sandwiched) Unknowns in secs","UnknownsSandwichedDurations.txt");
+		// getDescriptiveStatistics(rawSortedArray,"Duration of (sandwiched) Unknowns in
+		// secs","UnknownsSandwichedDurations.txt");
 		//
-		
+
 		// List<Long> raw= ReadingFromFile.oneColumnReader("UnknownMergedContinuous.csv",",",3,true);
 		// double[] rawSortedArray = raw.stream().sorted().mapToDouble(l -> l.doubleValue()).toArray();
 		// getDescriptiveStatistics(rawSortedArray,"Duration of (all) Unknowns in secs","UnknownsDurations.txt");
-		
+
 		// List<Long> raw= ReadingFromFile.oneColumnReader("Not_AvailableMergedContinuous.csv",",",3,true);
 		// double[] rawSortedArray = raw.stream().sorted().mapToDouble(l -> l.doubleValue()).toArray();
-		// getDescriptiveStatistics(rawSortedArray,"Duration of (all) NotAvailable in secs","NotAvailableDurations.txt");
-		
+		// getDescriptiveStatistics(rawSortedArray,"Duration of (all) NotAvailable in
+		// secs","NotAvailableDurations.txt");
+
 		// List<Long> raw= ReadingFromFile.oneColumnReader("Not_AvailableMergedContinuousSandwiches.csv",",",3,true);
 		// double[] rawSortedArray = raw.stream().sorted().mapToDouble(l -> l.doubleValue()).toArray();
-		// getDescriptiveStatistics(rawSortedArray,"Duration of (sandwiched) NotAvalaible in secs","NotAvailableSandwichedDurations.csv");
-		
-		String[] userIDs = { "062", "084", "052", "068", "167", "179", "153", "085", "128", "010" };
-		
+		// getDescriptiveStatistics(rawSortedArray,"Duration of (sandwiched) NotAvalaible in
+		// secs","NotAvailableSandwichedDurations.csv");
+
+		String[] userIDs =
+		{ "062", "084", "052", "068", "167", "179", "153", "085", "128", "010" };
+
 		// ArrayList
 		long rawStartAllCount = 0, rawEndAllCount = 0;
 		for (String user : userIDs)
@@ -61,32 +66,32 @@ public class Descriptive
 			WritingToFile.appendLineToFile(String.valueOf(dsStart.getPercentile(75)),
 					"ThirdQuartileStartEndGeoDiff.csv");
 			rawStartAllCount += raw.size();
-			
+
 			List<Double> raw2 = ReadingFromFile.oneColumnReaderDouble(Constant.getCommonPath() + user + "endDiff.csv",
 					",", 0, false);
 			double[] rawArray2 = raw2.stream().mapToDouble(l -> l.doubleValue()).toArray();
 			DescriptiveStatistics dsEnd = getDescriptiveStatistics(rawArray2, "Difference of EndGeo location in km",
 					user + "Stats_EndDiffStats.txt");
 			WritingToFile.appendLineToFile(String.valueOf(dsEnd.getPercentile(75)), "ThirdQuartileStartEndGeoDiff.csv");
-			
+
 			rawEndAllCount += raw2.size();
 		}
-		
+
 		System.out.println("rawStartAllCount = " + rawStartAllCount + ", rawEndAllCount = " + rawEndAllCount);
-		
+
 		// List<Long> raw= ReadingFromFile.oneColumnReader("ValidsOnlyMergedContinuous.csv",",",3,true);
 		// double[] rawSortedArray = raw.stream().sorted().mapToDouble(l -> l.doubleValue()).toArray();
 		// getDescriptiveStatistics(rawSortedArray,"Duration of Valids in secs","ValidsOnlyDurations.csv");
 		//
-		
+
 		// getFrequencyDistribution(rawSortedArray);
 	}
-	
+
 	public static void fun()
 	{
-		
+
 	}
-	
+
 	// /**
 	// *
 	// *
@@ -121,15 +126,15 @@ public class Descriptive
 	// return fd;
 	//
 	// }
-	
+
 	public static LinkedHashMap<String, Long> getFrequencyDistribution(double[] values)
 	{
 		Map<String, Long> fd = new TreeMap<String, Long>();
-		
+
 		for (double a : values)
 		{
 			String key = Double.toString(a);
-			
+
 			if (fd.containsKey(key))
 			{
 				fd.put(key, fd.get(key) + 1);
@@ -138,34 +143,34 @@ public class Descriptive
 			{
 				fd.put(key, (long) 1);
 			}
-			
+
 		}
-		
+
 		fd = UtilityBelt.sortByValueDesc(fd);
-		
+
 		WritingToFile.writeSimpleMapToFile(fd, commonPath + "TimeDifference_Frequency distribution.csv", "Value",
 				"Frequency Count");
-		
+
 		return (LinkedHashMap<String, Long>) fd;
-		
+
 	}
-	
+
 	public static DescriptiveStatistics getDescriptiveStatistics(double[] values, String nameForValue,
 			String fileNameToWrite)
 	{
-		
+
 		DescriptiveStatistics dstats = new DescriptiveStatistics(values);
 		NumberFormat nf = NumberFormat.getInstance();
 		nf.setMaximumIntegerDigits(30);
-		
-		StringBuffer message = new StringBuffer("-------------------------------\nDescriptive stats for "
-				+ nameForValue + "\n-------------------------------\n");
-		
+
+		StringBuffer message = new StringBuffer("-------------------------------\nDescriptive stats for " + nameForValue
+				+ "\n-------------------------------\n");
+
 		if (dstats.getN() != values.length)
 		{
 			System.err.println("Error in getDescriptiveStatistics:dstats.getN() != values.length ");
 		}
-		
+
 		String m1 = "Count = " + nf.format(dstats.getN()) + "\n" + "Maximum = " + nf.format(dstats.getMax()) + "\n"
 				+ "Minimum = " + nf.format(dstats.getMin()) + "\n" + "Arithmetic mean = " + nf.format(dstats.getMean())
 				+ "\n" + "Standard deviation = " + nf.format(dstats.getStandardDeviation()) + "\n" + "Q1 = "
@@ -173,7 +178,7 @@ public class Descriptive
 				+ "\n" + "Q3 = " + nf.format(dstats.getPercentile(75)) + "\n" + "Skewness = "
 				+ nf.format(dstats.getSkewness()) + "\n" + "Kurtosis = " + nf.format(dstats.getKurtosis()) + "\n"
 				+ "Sum = " + nf.format(dstats.getSum()) + "\n" + "-------------------------------\n";
-		
+
 		message.append(m1);
 		WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite); // TODO
 																													// check
@@ -182,8 +187,8 @@ public class Descriptive
 																													// works
 																													// corrcetly
 		// System.out.println(m1);
-		
+
 		return dstats;
 	}
-	
+
 }

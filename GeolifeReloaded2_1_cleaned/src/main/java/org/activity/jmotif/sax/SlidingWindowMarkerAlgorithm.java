@@ -4,7 +4,7 @@ import org.activity.jmotif.sax.trie.VisitRegistry;
 
 public interface SlidingWindowMarkerAlgorithm
 {
-	
+
 	/**
 	 * Marks visited locations (of the magic array).
 	 * 
@@ -16,5 +16,5 @@ public interface SlidingWindowMarkerAlgorithm
 	 *            The length of the interval to be labeled.
 	 */
 	void markVisited(VisitRegistry registry, int startPosition, int intervalLength);
-	
+
 }
