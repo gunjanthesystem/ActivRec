@@ -323,8 +323,8 @@ public class ControllerWithoutServer
 					Constant.getCommonPath() + "NumOfDaysPerUserCleaned.csv");
 			System.out.println("Num of users cleaned = " + usersCleanedDayTimelines.size());
 
-			///// again remove users with less than 50 days (there are the clean days)
-			System.out.println("\n--again remove users with less than 50 days (there are the clean days)");
+			///// again remove users with less than 50 days (these are the clean days)
+			System.out.println("\n--again remove users with less than 50 days (these are the clean days)");
 			usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 50,
 					Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan50DaysLog.csv");
 			// Writing user day timelines. big file ~ 17.3GB

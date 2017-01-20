@@ -238,9 +238,8 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 		// $$LOGGINGSystem.out.println(" Date at Recomm = " + this.dateAtRecomm);
 		// $$LOGGINGSystem.out.println(" Time at Recomm = " + this.timeAtRecomm);
 
-		this.trainingTimeline = new Timeline(trainingTimelines); // converting day timelines into continuous timelines
-																	// suitable to be used for matching unit
-																	// views
+		// converting day timelines into continuous timelines suitable to be used for matching unit views
+		this.trainingTimeline = new Timeline(trainingTimelines);
 		this.testTimeline = new Timeline(testTimelines);
 
 		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)

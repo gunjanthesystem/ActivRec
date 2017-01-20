@@ -346,7 +346,7 @@ public class DatabaseCreatorGowallaQuicker0
 				// workingLevelCatIDs = givenLevelOrAboveCatIDs.stream().reduce((t, u) -> t + "__" + u).get();
 				// }
 				// // String workingLevelCatIDs =
-				Pair<Boolean, String> isAcceptableDirectCatID = IsAcceptableDirectCatID(catIDDirect,
+				Pair<Boolean, String> isAcceptableDirectCatID = isAcceptableDirectCatID(catIDDirect,
 						rootOfCategoryTree);
 
 				if (isAcceptableDirectCatID.getFirst() == false)
@@ -412,7 +412,7 @@ public class DatabaseCreatorGowallaQuicker0
 	 * @param rootOfCategoryTree
 	 * @return pair which can be either of (true, "Acceptable"),(false, "NotInHierarchy"),(false, "LevelNotAcceptable")
 	 */
-	private static Pair<Boolean, String> IsAcceptableDirectCatID(Integer catIDToSearch,
+	private static Pair<Boolean, String> isAcceptableDirectCatID(Integer catIDToSearch,
 			DefaultMutableTreeNode rootOfCategoryTree)
 	{
 		ArrayList<DefaultMutableTreeNode> foundNodes = UIUtilityBox.recursiveDfsMulipleOccurences2OnlyCatID(

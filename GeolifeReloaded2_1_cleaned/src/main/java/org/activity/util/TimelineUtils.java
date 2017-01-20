@@ -55,7 +55,10 @@ public class TimelineUtils
 		TimeZone dft = TimeZone.getTimeZone("UTC");
 		TimeZone.setDefault(dft);
 
-		checkConvertTimewiseMapToDatewiseMap2(dft);
+		// $$ checkConvertTimewiseMapToDatewiseMap2(dft);
+
+		ArrayList<Integer> l = new ArrayList<Integer>();
+		System.out.println("max num of elemens in arraylist = " + Integer.MAX_VALUE);
 	}
 
 	/**
@@ -307,8 +310,8 @@ public class TimelineUtils
 
 	/**
 	 * 
-	 * <font color = green>Hidden time component in java.sql.Date prevented from causing duplicate date keys by
-	 * timestamp->LocalDate->sql.Date</font>
+	 * <font color = green>Issue Solved: Prevented hidden time component in java.sql.Date from causing duplicate date
+	 * keys by timestamp->LocalDate->sql.Date</font>
 	 * <p>
 	 * convert a timestamp wise map to date wise map
 	 * </p>
@@ -455,6 +458,67 @@ public class TimelineUtils
 			}
 
 		}
+
+	}
+
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 */
+	public static void countConsecutiveSimilarActivities2(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String commonPathToWrite)
+	{
+		LinkedHashMap<String, ArrayList<Integer>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
+		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecutives = new LinkedHashMap<>();
+
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userE : usersDayTimelines.entrySet())
+			{
+				String user = userE.getKey();
+
+				for (Entry<Date, UserDayTimeline> dateE : userE.getValue().entrySet())
+				{
+					String date = dateE.getKey().toString();
+
+					String prevActivityName = "";
+					Timestamp prevActivityStartTimestamp = null;
+					int numOfConsecutives = 0;
+					long timeDiff = 0;
+					for (ActivityObject aos : dateE.getValue().getActivityObjectsInDay())
+					{
+						String activityName = aos.getActivityName();
+						if (activityName.equals(prevActivityName))
+						{
+							numOfConsecutives += 1;
+							timeDiff += aos.getStartTimestamp().getTime() - prevActivityStartTimestamp.getTime();
+						}
+					}
+				}
+
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		//
+		// // <User__Date, time difference between then in secs>
+		// LinkedHashMap<String, Double> mapForConsecutive2s = new LinkedHashMap<>();
+		//
+		// // <User__Date, time difference between then in secs>
+		// LinkedHashMap<String, Double> mapForConsecutive3s = new LinkedHashMap<>();
+		//
+		// // <User__Date, time difference between then in secs>
+		// LinkedHashMap<String, Double> mapForConsecutive4s = new LinkedHashMap<>();
+		//
+		// // <User__Date, time difference between then in secs>
+		// LinkedHashMap<String, Double> mapForConsecutive5s = new LinkedHashMap<>();
+		//
+		// // <User__Date, time difference between then in secs>
+		// LinkedHashMap<String, Double> mapForConsecutive6OrMores = new LinkedHashMap<>();
+		//
 
 	}
 
@@ -616,7 +680,8 @@ public class TimelineUtils
 					// sanity check start
 					if (userIDInside.equals(userID) == false)
 					{
-						System.err.println("Sanity check failed in createUserTimelinesFromCheckinEntriesGowalla()");
+						System.err.println(
+								"Error: sanity check failed in createUserTimelinesFromCheckinEntriesGowalla()");
 					}
 					// sanity check end
 
@@ -2070,13 +2135,13 @@ public class TimelineUtils
 		{
 			String userID = usersTimelinesEntry.getKey();
 			LinkedHashMap<Date, UserDayTimeline> userDayTimelines = usersTimelinesEntry.getValue();
-	
+
 			userDayTimelines = cleanUserDayTimelines(userDayTimelines);
-	
+
 			Timeline timelineForUser = new Timeline(userDayTimelines); // converts the day time to continuous dayless
 																		// timeline
 			timelineForUser = UtilityBelt.expungeInvalids(timelineForUser); // expunges invalid activity objects
-	
+
 			cleanedERTimelines.put(userID, timelineForUser);
 		}
 		System.out.println("\t" + cleanedERTimelines.size() + " timelines created");
