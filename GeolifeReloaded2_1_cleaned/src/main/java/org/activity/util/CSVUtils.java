@@ -33,6 +33,7 @@ public class CSVUtils
 	public static void main(String[] args)
 	{
 		// testSideConcat();
+		// removeDuplicateRowsGowalla();
 		gowallaMain();
 	}
 
@@ -45,26 +46,31 @@ public class CSVUtils
 		fileNamesToConcat.add("/home/gunjan/test/galadriel.csv");
 
 		concatenateCSVFilesSideways(fileNamesToConcat, true, "/home/gunjan/test/concat.csv");
-
 	}
 
+	public static void removeDuplicateRowsGowalla()
+	{
+		// curtain 1 start
+		String processedCheckInFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/processedCheckIns.csv";
+		String noDupProcessedCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/NoDuplicateprocessedCheckIns.csv";
+		String dupLinesCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/DupLinesFromProcessedCheckins.csv";
+
+		// $$ check again to make sure this method is not doing anything more than the cuckoo method is doing
+		// removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,
+		// dupLinesCheckinFileName, 0);
+
+		removeDuplicationRowsUsingCuckoo(processedCheckInFileName, noDupProcessedCheckinFileName,
+				dupLinesCheckinFileName);
+		// UsingCuckoo
+		// curtain 1 end
+	}
+
+	/**
+	 * 
+	 */
 	public static void gowallaMain()
 	{
 		String fileNameHeadString = "BO";// for baseline occurrence file, empty for algo file
-		// //curtain 1 start
-		// String processedCheckInFileName =
-		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/processedCheckIns.csv";
-		// String noDupProcessedCheckinFileName =
-		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/NoDuplicateprocessedCheckIns.csv";
-		// String dupLinesCheckinFileName =
-		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/DupLinesFromProcessedCheckins.csv";
-		//
-		// // removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,
-		// dupLinesCheckinFileName, 0);
-		// removeDuplicationRowsUsingCuckoo(processedCheckInFileName, noDupProcessedCheckinFileName,
-		// dupLinesCheckinFileName);
-		// // UsingCuckoo
-		// //curtain 1 end
 
 		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
@@ -313,7 +319,7 @@ public class CSVUtils
 	public static void removeDuplicationRowsInPreVicinity(String inputFileName, String outputFileName,
 			String duplicateLinesFileName, int previcinity)
 	{
-		System.out.println("Entering removeDuplicationRows");
+		System.out.println("Entering removeDuplicationRowsInPreVicinity");
 
 		ArrayList<String> allUniqueEntries = new ArrayList<String>();
 		BufferedReader br = null;
@@ -397,7 +403,7 @@ public class CSVUtils
 			System.out.println(" sum = " + sum + "allLinesCount = " + allLinesCount);
 		}
 		System.out.println("time taken = " + (t2 - t1) / 1000 + " secs ");
-		System.out.println("Exiting removeDuplicationRows");
+		System.out.println("Exiting removeDuplicationRowsInPreVicinity");
 	}
 
 	/**
@@ -1030,7 +1036,7 @@ public class CSVUtils
 	public static void removeDuplicationRowsUsingCuckoo(String inputFileName, String outputFileName,
 			String duplicateLinesFileName)
 	{
-		System.out.println("Entering removeDuplicationRows");
+		System.out.println("Entering removeDuplicationRowsUsingCuckoo");
 
 		// create
 		CuckooFilter<CharSequence> allUniqueEntries = new CuckooFilter.Builder<>(
@@ -1120,7 +1126,7 @@ public class CSVUtils
 			System.out.println(" sum = " + sum + "allLinesCount = " + allLinesCount);
 		}
 		System.out.println("time taken = " + (t2 - t1) / 1000 + " secs ");
-		System.out.println("Exiting removeDuplicationRows");
+		System.out.println("Exiting removeDuplicationRowsUsingCuckoo");
 	}
 
 	/**
@@ -1239,5 +1245,87 @@ public class CSVUtils
 			res += s.get(i) + delimiter;
 		}
 		return res.substring(0, res.length() - delimiter.length());// a,b,c,d, // len = 8 (0,7)
+	}
+
+	// notes: ll threes csv files have same number of rows and columns
+	public static void CompareCSV(String[] args)
+	{
+		BufferedReader br1 = null, br2 = null, brMeta = null;
+
+		int rowCount = 0;
+		int columnCount = 0;
+
+		String fileName1 = "/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global 550/dataRankedRecommendationWithScores.csv";
+		String fileName2 = "/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global 500/dataRankedRecommendationWithScores.csv";
+		String fileNameMeta = "/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global 500/meta.csv";
+
+		System.out.println("File 1 is:" + fileName1);
+		System.out.println("File 2 is:" + fileName2 + "\n");
+
+		try
+		{
+			br1 = new BufferedReader(new FileReader(fileName1));
+			br2 = new BufferedReader(new FileReader(fileName2));
+			brMeta = new BufferedReader(new FileReader(fileNameMeta));
+
+			String currentLine1, currentLine2, currentLineMeta;
+
+			while ((currentLineMeta = brMeta.readLine()) != null)
+			{
+				rowCount++;
+
+				currentLine1 = br1.readLine();
+				currentLine2 = br2.readLine();
+
+				if (currentLine1.equals(currentLine2))
+				{
+					System.out.println("User " + rowCount + " is same");
+				}
+				else
+				{
+					System.out.println("User " + rowCount + " is different");
+
+					String columns1[] = currentLine1.split(Pattern.quote(","));
+					String columns2[] = currentLine2.split(Pattern.quote(","));
+					String columnsMeta[] = currentLineMeta.split(Pattern.quote(","));
+
+					System.out.println("count colums1=" + columns1.length + " count columns2=" + columns2.length
+							+ " count meta columns=" + columnsMeta.length);
+					for (int j = 0; j < columns2.length; j++)
+					{
+						if (columns1[j].equals(columns2[j]))
+						{
+
+						}
+						else
+						{
+							System.out.println("\tcolumns " + (j + 1) + " is different.");// Timestamp="+columnsMeta[j]);
+							System.out.println("\t\tfile 1 is:" + columns1[j]);
+							System.out.println("\t\tfile 2 is:" + columns2[j]);
+						}
+					}
+
+				}
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				if (br1 != null) br1.close();
+				if (br2 != null) br2.close();
+				if (brMeta != null) brMeta.close();
+			}
+			catch (IOException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+
 	}
 }

@@ -119,6 +119,9 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	// made class variable so that they are compiled only once to improve performance
 	static Pattern patternDoubleQuotes, patternApostropheS, patternND;
 
+	/**
+	 * To compile these patterns only once to improve performance
+	 */
 	public static void compileRegexPatterns()
 	{
 		patternDoubleQuotes = Pattern.compile("\"\"");
