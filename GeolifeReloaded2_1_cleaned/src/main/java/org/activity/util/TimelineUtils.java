@@ -1,5 +1,6 @@
 package org.activity.util;
 
+import java.io.BufferedWriter;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -16,6 +17,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
@@ -413,6 +415,7 @@ public class TimelineUtils
 	}
 
 	/**
+	 * INCOMPLETE
 	 * 
 	 * @param usersDayTimelines
 	 */
@@ -463,65 +466,237 @@ public class TimelineUtils
 
 	/**
 	 * 
-	 * @param usersDayTimelines
+	 * @param absPathToCatIDDictionary
+	 * @return Pair(catIDLengthConsecutives, catIDNameDictionary)
 	 */
-	public static void countConsecutiveSimilarActivities2(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String commonPathToWrite)
+	public static Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> getEmptyMapOfCatIDs(
+			String absPathToCatIDDictionary)
 	{
-		LinkedHashMap<String, ArrayList<Integer>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
+		System.out.println("Entering org.activity.util.TimelineUtils.getEmptyMapOfCatIDs(String)");
 		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecutives = new LinkedHashMap<>();
 
+		TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
+				.kryoDeSerializeThis(absPathToCatIDDictionary);
+		System.out.println("Num of catid in dictionary = " + catIDNameDictionary.size() + "\n");
+
+		for (Integer catID : catIDNameDictionary.keySet())
+		{
+			catIDLengthConsecutives.put(String.valueOf(catID), new ArrayList<Integer>());
+			System.out.print(catID + ",");
+		}
+
+		System.out.println("Exiting org.activity.util.TimelineUtils.getEmptyMapOfCatIDs(String)");
+		return new Pair(catIDLengthConsecutives, catIDNameDictionary);
+	}
+
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @return
+	 */
+	public static LinkedHashMap<String, ArrayList<Integer>> countConsecutiveSimilarActivities2(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String commonPathToWrite,
+			String absPathToCatIDDictionary)
+	{
+		// LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
+		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 = getEmptyMapOfCatIDs(
+				absPathToCatIDDictionary);
+		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecutives = r1.getFirst();
+		TreeMap<Integer, String> catIDNameDictionary = r1.getSecond();
+
+		StringBuilder sbEnumerateAllCats = new StringBuilder();// write all catid sequentially userwise
+		long aoCount = 0;
 		try
 		{
 			for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userE : usersDayTimelines.entrySet())
 			{
 				String user = userE.getKey();
+				String prevActivityName = "";// Timestamp prevActivityStartTimestamp = null;
+
+				int numOfConsecutives = 1;// long timeDiff = 0;
 
 				for (Entry<Date, UserDayTimeline> dateE : userE.getValue().entrySet())
 				{
 					String date = dateE.getKey().toString();
-
-					String prevActivityName = "";
-					Timestamp prevActivityStartTimestamp = null;
-					int numOfConsecutives = 0;
-					long timeDiff = 0;
 					for (ActivityObject aos : dateE.getValue().getActivityObjectsInDay())
 					{
 						String activityName = aos.getActivityName();
+
+						aoCount += 1;
+						// System.out.println("aoCount=" + aoCount + " activityName=" + activityName);
+
+						sbEnumerateAllCats.append(user + "," + date + "," + activityName + ","
+								+ catIDNameDictionary.get(Integer.valueOf(activityName)) + "\n");
+
 						if (activityName.equals(prevActivityName))
 						{
 							numOfConsecutives += 1;
-							timeDiff += aos.getStartTimestamp().getTime() - prevActivityStartTimestamp.getTime();
+							// timeDiff += aos.getStartTimestamp().getTime() - prevActivityStartTimestamp.getTime();
+							// System.out.println(" Current Prev act Same, numOfConsecutives =" + numOfConsecutives);
+							continue;
 						}
-					}
-				}
 
-			}
+						else // not equals then
+						{
+							ArrayList<Integer> consecVals = catIDLengthConsecutives.get(prevActivityName);
+							if (consecVals == null)
+							{
+								if (prevActivityName.length() > 0)
+								{
+									System.out.println(
+											"Error in org.activity.util.TimelineUtils.countConsecutiveSimilarActivities2(): consecVals = null, i,e., array list for activityName="
+													+ prevActivityName
+													+ " hasn't been initialised in catIDLengthConsecutives");
+								}
+								else
+								{
+									// encountered the first activity for that user.
+								}
+							}
+							else
+							{
+								consecVals.add(numOfConsecutives);
+								catIDLengthConsecutives.put(prevActivityName, consecVals);
+								// System.out.println(" Current Prev act diff, numOfConsecutives =" +
+								// numOfConsecutives);
+								// System.out.println(" (prev) activity name=" + prevActivityName + " consecVals="
+								// + catIDLengthConsecutives.get(prevActivityName).toString());
+								numOfConsecutives = 1;// resetting
+							}
+
+						}
+						prevActivityName = activityName;
+
+						if (aoCount % 20000 == 0)
+						{
+							WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+									commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv");
+							sbEnumerateAllCats.setLength(0);
+						}
+					} // end of loop over aos over this day for this user
+						// break;
+				} // end of loop over days
+					// break;
+			} // end of loop over user
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 
-		//
-		// // <User__Date, time difference between then in secs>
-		// LinkedHashMap<String, Double> mapForConsecutive2s = new LinkedHashMap<>();
-		//
-		// // <User__Date, time difference between then in secs>
-		// LinkedHashMap<String, Double> mapForConsecutive3s = new LinkedHashMap<>();
-		//
-		// // <User__Date, time difference between then in secs>
-		// LinkedHashMap<String, Double> mapForConsecutive4s = new LinkedHashMap<>();
-		//
-		// // <User__Date, time difference between then in secs>
-		// LinkedHashMap<String, Double> mapForConsecutive5s = new LinkedHashMap<>();
-		//
-		// // <User__Date, time difference between then in secs>
-		// LinkedHashMap<String, Double> mapForConsecutive6OrMores = new LinkedHashMap<>();
-		//
+		System.out.println("Num of aos read = " + aoCount);
+		writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
+				commonPathToWrite + "ConsecCountsEqualLength.csv");
+		WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+				commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv");
+		return catIDLengthConsecutives;
 
 	}
 
+	/**
+	 * 
+	 * @param map
+	 * @param catIDNameDictionary
+	 * @param absfileNameToUse
+	 */
+	public static void writeConsectiveCounts(LinkedHashMap<String, ArrayList<Integer>> map,
+			TreeMap<Integer, String> catIDNameDictionary, String absfileNameToUse)
+	{
+		int numOfCatIDsInMap = 0;
+		try
+		{
+			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absfileNameToUse);
+			for (Entry<String, ArrayList<Integer>> entry : map.entrySet())
+			{
+				String catID = entry.getKey();
+				ArrayList<Integer> consecCounts = entry.getValue();
+
+				if (consecCounts.size() != 0)
+				{
+					StringBuilder sb = new StringBuilder();
+					sb.append(catID + ":" + catIDNameDictionary.get(Integer.valueOf(catID)));
+
+					numOfCatIDsInMap += 1;
+
+					for (Integer t : consecCounts)
+					{
+						sb.append("," + t);
+					}
+
+					bw.write(sb.toString() + "\n");
+				}
+			}
+			bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.out.println("Num of catIDs in dictionary = " + catIDNameDictionary.size());
+		System.out.println("Num of catIDs in working dataset = " + numOfCatIDsInMap);
+	}
+
+	/**
+	 * Make each row of equal length (i.e., same num of columns by filling in with "NA"s. This is to facilitate reading
+	 * data in R.
+	 * 
+	 * @param map
+	 * @param catIDNameDictionary
+	 * @param absfileNameToUse
+	 */
+	public static void writeConsectiveCountsEqualLength(LinkedHashMap<String, ArrayList<Integer>> map,
+			TreeMap<Integer, String> catIDNameDictionary, String absfileNameToUse)
+	{
+		int maxNumOfVals = -1; // max consec counts over all cat ids
+
+		// find the max size
+		maxNumOfVals = (map.entrySet().stream().mapToInt(e -> e.getValue().size()).max()).getAsInt();
+		// maxNumOfVals += 1; // 1 additional column for header
+		// for (Entry<String, ArrayList<Integer>> e : map.entrySet())
+		// {
+		// // if(e.getValue().size()>maxSizeOfArrayList)
+		// }
+
+		int numOfCatIDsInMap = 0;
+		try
+		{
+			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absfileNameToUse);
+			for (Entry<String, ArrayList<Integer>> entry : map.entrySet())
+			{
+				String catID = entry.getKey();
+				ArrayList<Integer> consecCounts = entry.getValue();
+
+				if (consecCounts.size() != 0)
+				{
+					int numOfNAsToBeInserted = maxNumOfVals - consecCounts.size();
+					StringBuilder sb = new StringBuilder();
+					sb.append(catID + ":" + catIDNameDictionary.get(Integer.valueOf(catID)));
+
+					numOfCatIDsInMap += 1;
+
+					for (Integer t : consecCounts)
+					{
+						sb.append("," + t);
+					}
+
+					for (int i = 0; i < numOfNAsToBeInserted; i++)
+					{
+						sb.append(",NA");
+					}
+
+					bw.write(sb.toString() + "\n");
+				}
+			}
+			bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.out.println("Num of catIDs in dictionary = " + catIDNameDictionary.size());
+		System.out.println("Num of catIDs in working dataset = " + numOfCatIDsInMap);
+		System.out.println("maxNumOfVals = " + maxNumOfVals);
+	}
 	// LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>();
 	//
 	// // convert checkinentries to activity objects

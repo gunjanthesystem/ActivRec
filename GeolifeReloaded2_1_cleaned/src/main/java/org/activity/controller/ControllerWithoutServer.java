@@ -22,7 +22,6 @@ import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
-import org.activity.weather.GowallaWeatherPreprocessing;
 
 /**
  * This class is used for recommending without the web interface (no web server) Note: to run these experiments proper
@@ -64,7 +63,7 @@ public class ControllerWithoutServer
 						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
 						+ ".kryo";
 
-				commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/";//
+				commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
 				// run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//
 				/// "/run/media/gunjan/BoX2/GowallaSpaceSpace/GowallaDataWorksSep16/";
 				break;
@@ -351,10 +350,18 @@ public class ControllerWithoutServer
 			// $$TimelineWEKAClusteringController clustering = new
 			// TimelineWEKAClusteringController(usersCleanedDayTimelines, null);
 
-			// start of for gowalla weather data generation
-			GowallaWeatherPreprocessing.GowallaWeatherPreprocessingController(usersCleanedDayTimelines,
-					Constant.outputCoreResultsPath);
-			// end of for gowalla weather data generation
+			// // start of for gowalla weather data generation //commented out 22 Jan 2017
+			// GowallaWeatherPreprocessing.GowallaWeatherPreprocessingController(usersCleanedDayTimelines,
+			// Constant.outputCoreResultsPath);
+			// // end of for gowalla weather data generation //commented out 22 Jan 2017
+
+			// start of consective counts
+			LinkedHashMap<String, ArrayList<Integer>> consecutiveCounts = TimelineUtils
+					.countConsecutiveSimilarActivities2(usersCleanedDayTimelines,
+							"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/",
+							"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
+
+			// end of consecutive counts
 
 			// for (int i = 0; i < s.length; i++)
 			// {
