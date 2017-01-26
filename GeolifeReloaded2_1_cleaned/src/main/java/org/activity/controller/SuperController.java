@@ -11,8 +11,11 @@ public class SuperController
 		long at = System.currentTimeMillis();
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 
-		String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/CheckJavaSqlDuplicateDateIssue/";
-		String commonPathGowalla = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/";
+		String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
+		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
+		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/CheckJavaSqlDuplicateDateIssue/";
+		String commonPathGowalla = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
+		// $$/ home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";///
 		// home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov25/";
 		// "/run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//

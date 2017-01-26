@@ -2,6 +2,9 @@ package org.activity.sanityChecks;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.OptionalInt;
 
 import org.activity.io.WritingToFile;
 
@@ -13,7 +16,7 @@ import org.activity.io.WritingToFile;
  */
 public class TestDummy2
 {
-	public static void main(String args[])
+	public static void main1(String args[])
 	{
 		// checkWritePerformance();
 
@@ -58,6 +61,42 @@ public class TestDummy2
 		// System.out.println(Boolean.parseBoolean(s));
 		// }
 
+	}
+
+	public static void main(String args[])
+	{
+		streamExp1();
+	}
+
+	public static void streamExp1()
+	{
+		LinkedHashMap<String, ArrayList<Integer>> map = new LinkedHashMap<String, ArrayList<Integer>>();
+
+		ArrayList<Integer> a1 = new ArrayList<Integer>();
+		ArrayList<Integer> a2 = new ArrayList<Integer>();
+		ArrayList<Integer> a3 = new ArrayList<Integer>();
+		for (int i = 1; i <= 5; i++)
+		{
+			a1.add(i);
+		}
+
+		for (int i = 1; i <= 8; i++)
+		{
+			a2.add(i);
+		}
+
+		for (int i = 1; i <= 3; i++)
+		{
+			a3.add(i);
+		}
+
+		map.put("A1", a1);
+		map.put("A2", a2);
+		map.put("A3", a3);
+
+		OptionalInt max = map.entrySet().stream().mapToInt(e -> e.getValue().size()).max();
+
+		System.out.println("max = " + max.getAsInt());
 	}
 
 	public static void checkWritePerformance()

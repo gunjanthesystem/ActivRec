@@ -45,7 +45,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep1/";
 	static String catHierarchyFileNameToRead;
 
-	TreeMap<Integer, String> catIDNameDictionary;
+	TreeMap<Integer, String> catIDNameDictionary;// catID, catName
 	Map<String, TreeMap<Integer, Long>> checkinCountResultsTogether;
 	TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>> categoryHierarchyMap;
 	TreeItem<String> rootOfCategoryHierarchyTree;

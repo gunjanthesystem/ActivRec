@@ -168,7 +168,8 @@ public class WritingToFile
 				serialNum++;
 			}
 
-			mrrMap = (LinkedHashMap<Double, Double>) ComparatorUtils.sortByValueDesc(mrrMap);// sorted by descending vals
+			mrrMap = (LinkedHashMap<Double, Double>) ComparatorUtils.sortByValueDesc(mrrMap);// sorted by descending
+																								// vals
 
 			double maxMRR = Collections.max(mrrMap.values()); // for this col, i.e., for this user
 			List<Double> MUsHavingMaxMRR = new ArrayList<Double>(); // for this col, i.e., for this user
@@ -235,7 +236,8 @@ public class WritingToFile
 				count++;
 			}
 
-			mrrMap = (LinkedHashMap<String, Double>) ComparatorUtils.sortByValueDesc(mrrMap);// sorted by descending vals
+			mrrMap = (LinkedHashMap<String, Double>) ComparatorUtils.sortByValueDesc(mrrMap);// sorted by descending
+																								// vals
 
 			Pair<String, Double> maxMUMRR = new Pair<String, Double>("0", 0.0);
 			for (Entry<String, Double> entry : mrrMap.entrySet())
@@ -1150,6 +1152,34 @@ public class WritingToFile
 			bw.close();
 		}
 
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @param absfileNameToUse
+	 */
+	public static void writeLinkedHashMapOfArrayListInteger(LinkedHashMap<?, ArrayList<Integer>> map,
+			String absfileNameToUse)
+	{
+		try
+		{
+			BufferedWriter bw = getBufferedWriterForNewFile(absfileNameToUse);
+			for (Entry<?, ArrayList<Integer>> entry : map.entrySet())
+			{
+				String s = entry.getKey().toString();
+				for (Object t : entry.getValue())
+				{
+					s += "," + t.toString();
+				}
+				bw.write(s + "\n");
+			}
+			bw.close();
+		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
