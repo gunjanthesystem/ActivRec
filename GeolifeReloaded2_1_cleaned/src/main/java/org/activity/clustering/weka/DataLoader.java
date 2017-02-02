@@ -6,6 +6,8 @@ import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
 /**
+ * Loads a CSV file by converting it into arff file and if class index is absent then last attribute is set as class
+ * index
  * 
  * @author gunjan
  *

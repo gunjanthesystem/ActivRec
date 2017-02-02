@@ -41,6 +41,11 @@ public class TestDummy1
 
 	public static void main(String args[])
 	{
+		System.out.println(System.getProperty("user.dir"));
+	}
+
+	public static void main1(String args[])
+	{
 		// String rawPathToRead =
 		// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Research/datasets/last.fm
 		// dataset/lastfm-dataset/lastfm-dataset-1K/";

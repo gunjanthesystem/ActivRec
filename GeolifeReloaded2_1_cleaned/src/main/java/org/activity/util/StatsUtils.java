@@ -680,4 +680,55 @@ public class StatsUtils
 		return Math.log(a) / Math.log(2);
 	}
 
+	/**
+	 * Return a random in within the given range
+	 * 
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	public static int randomInRange(int min, int max)
+	{
+		return (min + (int) (Math.random() * ((max - min) + 1)));
+	}
+
+	/**
+	 * Return a random in within the given range with bias for a particular integer value
+	 * 
+	 * @param min
+	 * @param max
+	 * @param biasNumber
+	 * @return
+	 */
+	public static int randomInRangeWithBias(int min, int max, int biasNumber)
+	{
+		if (Math.random() < 0.35) // 35% bias approx
+		{
+			return biasNumber;
+		}
+		else
+			return (min + (int) (Math.random() * ((max - min) + 1)));
+	}
+
+	/**
+	 * Return a random in within the given range with bias for a particular integer value
+	 * 
+	 * 
+	 * @param min
+	 * @param max
+	 * @param biasNumber
+	 * @param biasInPercentage
+	 *            between 0 and 1
+	 * @return
+	 */
+	public static int randomInRangeWithBias(int min, int max, int biasNumber, double biasInPercentage)
+	{
+		if (Math.random() < biasInPercentage) // 35% bias approx
+		{
+			return biasNumber;
+		}
+		else
+			return (min + (int) (Math.random() * ((max - min) + 1)));
+	}
+
 }

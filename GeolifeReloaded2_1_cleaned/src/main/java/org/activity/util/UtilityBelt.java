@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.activity.generator.generateSyntheticData;
+import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
@@ -765,7 +765,7 @@ public class UtilityBelt
 			activityNamesForComparison.add(activityNames.get(intervalIndex + 1)); // add the activityName at that index
 																					// for the current timeline
 			activityCategoriesForComparison
-					.add(generateSyntheticData.getActivityCategory(activityNames.get(intervalIndex + 1))); // add the
+					.add(GenerateSyntheticData.getActivityCategory(activityNames.get(intervalIndex + 1))); // add the
 																											// activityName
 																											// at that
 																											// index for
@@ -875,7 +875,7 @@ public class UtilityBelt
 
 		for (int i = 0; i < activityNames.size(); i++)
 		{
-			activityCategories.add(generateSyntheticData.getActivityCategory(activityNames.get(i)));
+			activityCategories.add(GenerateSyntheticData.getActivityCategory(activityNames.get(i)));
 		}
 
 		if (activityCategories.size() != activityNames.size())

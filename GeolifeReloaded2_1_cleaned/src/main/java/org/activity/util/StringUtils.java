@@ -139,6 +139,11 @@ public class StringUtils
 		return res;
 	}
 
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 */
 	public static String toStringCompactWithoutCount(ArrayList<String> list)
 	{
 		String res = "", currentString = "", previousString = "";
@@ -186,6 +191,12 @@ public class StringUtils
 		return res;
 	}
 
+	/**
+	 * 
+	 * @param list
+	 * @param delimiter
+	 * @return
+	 */
 	public static String toStringCompactWithoutCount(ArrayList<String> list, String delimiter)
 	{
 		String res = "", currentString = "", previousString = "";
@@ -249,6 +260,12 @@ public class StringUtils
 		return s;
 	}
 
+	/**
+	 * 
+	 * @param subStr
+	 * @param str
+	 * @return
+	 */
 	public static int countSubstring(String subStr, String str)
 	{
 		return (str.length() - str.replace(subStr, "").length()) / subStr.length();

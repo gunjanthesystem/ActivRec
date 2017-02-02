@@ -6,6 +6,12 @@ import java.io.IOException;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 
+/**
+ * Converts csv to arff file and writes the arff file.
+ * 
+ * @author gunjan
+ *
+ */
 public class CSV2Arff
 {
 	String inputFileName, outputfileName;
@@ -48,12 +54,10 @@ public class CSV2Arff
 
 	public static void main(String args[])
 	{
-		String inputFileName = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/geolife1_JUN25/TimelineFeatureVectors.csv";// "/run/media/gunjan/HOME/gunjan/Geolife
-																																				// Data
-																																				// Works/stats/wekaResults/JUN25/TimelineFeatureVectors.csv";
-		String oututFileName = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/geolife1_JUN25/TimelineFeatureVectors.arff";// /run/media/gunjan/HOME/gunjan/Geolife
-																																				// Data
-																																				// Works/stats/wekaResults/JUN25/TimelineFeatureVectors.arff";
+		String inputFileName = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/geolife1_JUN25/TimelineFeatureVectors.csv";
+		// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/JUN25/TimelineFeatureVectors.csv";
+		String oututFileName = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/geolife1_JUN25/TimelineFeatureVectors.arff";
+		// /run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/JUN25/TimelineFeatureVectors.arff";
 		new CSV2Arff(inputFileName, oututFileName);
 	}
 
