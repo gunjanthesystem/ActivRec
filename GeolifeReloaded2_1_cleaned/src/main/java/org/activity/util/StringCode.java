@@ -53,6 +53,8 @@ public class StringCode
 	/**
 	 * Returns the activity-name corresponding to given String code of 1-character length
 	 * 
+	 * @deprecated used for dcu and geolife where num of uniques activities was <=10
+	 * 
 	 * @param code
 	 * @return
 	 */

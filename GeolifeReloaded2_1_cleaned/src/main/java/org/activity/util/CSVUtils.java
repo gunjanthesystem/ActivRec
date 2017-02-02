@@ -70,10 +70,11 @@ public class CSVUtils
 	 */
 	public static void gowallaMain()
 	{
-		String fileNameHeadString = "BO";// for baseline occurrence file, empty for algo file
+		String fileNameHeadString = "";// "BO";// for baseline occurrence file, empty for algo file
 
 		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
-		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
+		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Analysis2/";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
 
 		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 
