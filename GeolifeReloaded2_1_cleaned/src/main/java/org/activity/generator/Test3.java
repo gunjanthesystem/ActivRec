@@ -40,7 +40,7 @@ public class Test3
 		String subset1Filename = "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_spots_subset1.csv";
 
 		HashMap<Long, ArrayList<String>> subset1Map = org.activity.generator.DatabaseCreatorGowallaQuickerPreprocessor
-				.readSpotSubset(subset1Filename);
+				.readSpotSubset(subset1Filename, 3, 2);
 
 		System.out.println("traversing subset 1");
 		for (Entry<Long, ArrayList<String>> e : subset1Map.entrySet())
@@ -87,7 +87,7 @@ public class Test3
 		String subset1Filename = "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_spots_subset1.csv";
 
 		HashMap<Long, ArrayList<String>> subset1Map = org.activity.generator.DatabaseCreatorGowallaQuickerPreprocessor
-				.readSpotSubset(subset1Filename);
+				.readSpotSubset(subset1Filename, 3, 2);
 
 		System.out.println("traversing subset 1");
 		for (Entry<Long, ArrayList<String>> e : subset1Map.entrySet())

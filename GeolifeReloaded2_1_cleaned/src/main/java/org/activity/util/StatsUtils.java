@@ -12,11 +12,11 @@ import java.util.TreeMap;
 import org.activity.io.WritingToFile;
 import org.activity.stats.Descriptive;
 import org.activity.ui.PopUps;
-import org.apache.commons.math3.analysis.function.Asin;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.util.FastMath;
 
 public class StatsUtils
 {
@@ -233,11 +233,14 @@ public class StatsUtils
 	}
 
 	/**
-	 * Using non-native math libraries for faster computation. User jafama or apache common maths.</br>
-	 * TODO <font color = red>HAVE NOT FINISHED converting java math functions to new libraries. </font>This uses the
-	 * ‘haversine’ formula to calculate the great-circle distance between two points – that is, the shortest distance
-	 * over the earth’s surface – giving an ‘as-the-crow-flies’ distance between the points (ignoring any hills they fly
-	 * over, of course!).
+	 * 
+	 * This uses the ‘haversine’ formula to calculate the great-circle distance between two points – that is, the
+	 * shortest distance over the earth’s surface – giving an ‘as-the-crow-flies’ distance between the points (ignoring
+	 * any hills they fly over, of course!).</br>
+	 * uses FastMath from apache common maths as drop in replacement for java's standard Math.</br>
+	 * 
+	 * convert it to bigdecimal form source:http://rosettacode.org/wiki/Haversine_formula#Java ? Not converting to
+	 * BigDecimal for performance concerns,
 	 * 
 	 * @param lat1
 	 * @param lon1
@@ -245,7 +248,7 @@ public class StatsUtils
 	 * @param lon2
 	 * @return distance in Kilometers
 	 */
-	public static double haversineFasterIncomplete(String lat1s, String lon1s, String lat2s, String lon2s)
+	public static double haversineFastMath(String lat1s, String lon1s, String lat2s, String lon2s)
 	{
 
 		double lat1 = Double.parseDouble(lat1s);
@@ -255,7 +258,7 @@ public class StatsUtils
 		double lon2 = Double.parseDouble(lon2s);
 
 		// System.out.println("inside haversine = " + lat1 + "," + lon1 + "--" + lat2 + "," + lon2);
-		if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90 || Math.abs(lon1) > 180 || Math.abs(lon2) > 180)
+		if (FastMath.abs(lat1) > 90 || FastMath.abs(lat2) > 90 || FastMath.abs(lon1) > 180 || Math.abs(lon2) > 180)
 		{
 			new Exception("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + ","
 					+ lon1s + "  " + lat2s + "," + lon2s);
@@ -267,18 +270,28 @@ public class StatsUtils
 			return Constant.unknownDistanceTravelled;// System.exit(-1);
 		}
 
-		double dLat = Math.toRadians(lat2 - lat1);
-		double dLon = Math.toRadians(lon2 - lon1);
-		lat1 = Math.toRadians(lat1);
-		lat2 = Math.toRadians(lat2);
+		double dLat = FastMath.toRadians(lat2 - lat1);
+		double dLon = FastMath.toRadians(lon2 - lon1);
+		lat1 = FastMath.toRadians(lat1);
+		lat2 = FastMath.toRadians(lat2);
 
 		// System.out.println("inside haversine = " + dLat + "," + dLon + "--" + lat2 + "," + lon2);
 
-		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-				+ Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+		double a = FastMath.sin(dLat / 2) * FastMath.sin(dLat / 2)
+				+ FastMath.sin(dLon / 2) * FastMath.sin(dLon / 2) * FastMath.cos(lat1) * FastMath.cos(lat2);
 
-		// double c = 2 * Math.asin(Math.sqrt(a)); // TODO: #performanceEater
-		double c = 2 * new Asin().value(Math.sqrt(a));
+		// System.out.println("a = " + a);
+		// double sqrtVal = Math.sqrt(a);
+		//
+		// if (Double.isNaN(sqrtVal))
+		// {
+		// PopUps.showException(new Exception("NaN sqrt: for a = " + a + " for latitude and/or longitude outside range:
+		// provided " + lat1s
+		// + "," + lon1s + " " + lat2s + "," + lon2), "org.activity.util.UtilityBelt.haversine(String, String, String,
+		// String)");
+		// }
+
+		double c = 2 * FastMath.asin(FastMath.sqrt(a)); // TODO: #performanceEater
 		// System.out.println("c = " + c);
 
 		if (Constant.checkForDistanceTravelledAnomaly && (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
@@ -291,6 +304,75 @@ public class StatsUtils
 		return StatsUtils.round(radiusOfEarthInKMs * c, 4);
 	}
 
+	// /**
+	// * Using non-native math libraries for faster computation. User jafama or apache common maths.</br>
+	// * TODO <font color = red>HAVE NOT FINISHED converting java math functions to new libraries. </font>This uses the
+	// * ‘haversine’ formula to calculate the great-circle distance between two points – that is, the shortest distance
+	// * over the earth’s surface – giving an ‘as-the-crow-flies’ distance between the points (ignoring any hills they
+	// fly
+	// * over, of course!).
+	// *
+	// * @param lat1
+	// * @param lon1
+	// * @param lat2
+	// * @param lon2
+	// * @return distance in Kilometers
+	// */
+	// public static double haversineFasterIncomplete(String lat1s, String lon1s, String lat2s, String lon2s)
+	// {
+	//
+	// double lat1 = Double.parseDouble(lat1s);
+	// double lon1 = Double.parseDouble(lon1s);
+	//
+	// double lat2 = Double.parseDouble(lat2s);
+	// double lon2 = Double.parseDouble(lon2s);
+	//
+	// // System.out.println("inside haversine = " + lat1 + "," + lon1 + "--" + lat2 + "," + lon2);
+	// if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90 || Math.abs(lon1) > 180 || Math.abs(lon2) > 180)
+	// {
+	// new Exception("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + ","
+	// + lon1s + " " + lat2s + "," + lon2s);
+	// if (Constant.checkForHaversineAnomaly)
+	// {
+	// PopUps.showError("Possible Error in haversin: latitude and/or longitude outside range: provided "
+	// + lat1s + "," + lon1s + " " + lat2s + "," + lon2s);
+	// }
+	// return Constant.unknownDistanceTravelled;// System.exit(-1);
+	// }
+	//
+	// double dLat = Math.toRadians(lat2 - lat1);
+	// double dLon = Math.toRadians(lon2 - lon1);
+	// lat1 = Math.toRadians(lat1);
+	// lat2 = Math.toRadians(lat2);
+	//
+	// // System.out.println("inside haversine = " + dLat + "," + dLon + "--" + lat2 + "," + lon2);
+	//
+	// double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+	// + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+	//
+	// // double c = 2 * Math.asin(Math.sqrt(a)); // : #performanceEater
+	// double c = 2 * new Asin().value(Math.sqrt(a));
+	// // System.out.println("c = " + c);
+	//
+	// if (Constant.checkForDistanceTravelledAnomaly && (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
+	// {
+	// System.err.println("Probable Error: haversine():+ distance >200kms (=" + radiusOfEarthInKMs * c
+	// + " for latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + " " + lat2s
+	// + "," + lon2s);
+	// }
+	//
+	// return StatsUtils.round(radiusOfEarthInKMs * c, 4);
+	// }
+
+	/**
+	 * 
+	 * @param lat1s
+	 * @param lon1s
+	 * @param lat2s
+	 * @param lon2s
+	 * @param roundTheResult
+	 * @return
+	 */
 	public static double haversine(String lat1s, String lon1s, String lat2s, String lon2s, boolean roundTheResult)
 	{
 
@@ -344,7 +426,8 @@ public class StatsUtils
 	}
 
 	/**
-	 * @todo convert it to bigdecimal form source:http://rosettacode.org/wiki/Haversine_formula#Java
+	 * convert it to bigdecimal form source:http://rosettacode.org/wiki/Haversine_formula#Java
+	 * 
 	 * @param lat1
 	 * @param lon1
 	 * @param lat2
@@ -361,6 +444,27 @@ public class StatsUtils
 		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
 				+ Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
 		double c = 2 * Math.asin(Math.sqrt(a));
+		return radiusOfEarthInKMs * c;
+	}
+
+	/**
+	 * 
+	 * @param lat1
+	 * @param lon1
+	 * @param lat2
+	 * @param lon2
+	 * @return
+	 */
+	public static double haversineFastMath(double lat1, double lon1, double lat2, double lon2)
+	{
+		double dLat = FastMath.toRadians(lat2 - lat1);
+		double dLon = FastMath.toRadians(lon2 - lon1);
+		lat1 = FastMath.toRadians(lat1);
+		lat2 = FastMath.toRadians(lat2);
+
+		double a = FastMath.sin(dLat / 2) * FastMath.sin(dLat / 2)
+				+ FastMath.sin(dLon / 2) * FastMath.sin(dLon / 2) * FastMath.cos(lat1) * FastMath.cos(lat2);
+		double c = 2 * FastMath.asin(FastMath.sqrt(a));
 		return radiusOfEarthInKMs * c;
 	}
 
