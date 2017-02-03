@@ -138,13 +138,12 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	public static void main(String args[])
 	{
 		System.out.println("Running starts");
-		commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";
+		commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DataGeneration/";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June28_2/"; //last past on XPS
 		// June2_finalSameTraj/";// June2_2016_SameTraj/";
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/TrajectorySpace/May17_2016_newDataStruct/" //
 		// May17_2016_good2/";
-		System.out.println("CommonPath = " + commonPath);
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 12, 2016
 		// String userNames={""
 		// LinkedHashMap<String, String> userMap = new LinkedHashMap<String, String>();
 		// userMap.put("Stefan", "C:\\Users\\gunjan\\Documents\\Lifelog working dataset\\Data_Set_Stefan\\Data Set");
@@ -158,6 +157,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			PrintStream consoleLogStream = new PrintStream(
 					new File(commonPath + "consoleLogDatabaseCreatorGowalla.txt"), "US-ASCII");
 			System.out.println("Current DateTime: " + LocalDateTime.now());
+
 			///
 			// BufferedWriterzzz out = new BufferedWriter(new OutputStreamWriter(new
 			/// FileOutputStream(java.io.FileDescriptor.out), "ASCII"), 512);
@@ -165,8 +165,13 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			///
 
 			// System.setOut(new PrintStream(new FileOutputStream('/dev/stdout')));
-			System.setOut(new PrintStream(consoleLogStream));
+			// System.setOut(new PrintStream(consoleLogStream));
+			System.setOut(consoleLogStream);
 			System.setErr(consoleLogStream);
+
+			System.out.println("CommonPath = " + commonPath);
+			TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 12, 2016
+
 			// ConnectDatabaseV1.getTimestamp("B00000028_21I5H1_20140216_170559E.JPG,");
 			System.out.println("Default timezone = " + TimeZone.getDefault());
 			System.out.println("stayPointTimeThresholdInSecs =" + stayPointTimeThresholdInSecs
@@ -185,15 +190,17 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 			compileRegexPatterns();
 
-			HashMap<Long, ArrayList<String>> spots1 = readSpotSubset(spotsSubset1FileName);
+			HashMap<Long, ArrayList<String>> spots1 = readSpotSubset(spotsSubset1FileName, 3, 2);
 			System.out.println("spots1 size =" + spots1.size());
-			HashMap<Long, ArrayList<String>> spots2 = readSpotSubset(spotsSubset2FileName);
+			HashMap<Long, ArrayList<String>> spots2 = readSpotSubset(spotsSubset2FileName, 1, 2);
 			System.out.println("spots2 size =" + spots2.size());
 
 			// $$ preprocessCheckInWithDate(checkInFileName, spots1, spots2, commonPath + "checkInPreProcessingLog.txt",
 			// $$ commonPath + "processedCheckIns.csv");
-			preprocessCheckInWithDateCategoryOnlySpots1Faster(checkInFileName, spots1, spots2,
-					commonPath + "checkInPreProcessingLog.txt", commonPath + "processedCheckIns.csv");
+			// reversed because the original file was in descending order of timestamps, now its ascending order of ts
+			String checkInFileNameNoDups = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRawReversed.csv";
+			preprocessCheckInWithDateCategoryOnlySpots1Faster(checkInFileNameNoDups/* checkInFileName */, spots1,
+					spots2, commonPath + "checkInPreProcessingLog.txt", commonPath + "processedCheckIns.csv");
 			// $userIDsOriginal = identifyUsers();// identifyOnlyTargetUsers();//
 
 			// // start of curtain 1
@@ -992,9 +999,13 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			HashMap<Long, ArrayList<String>> spots1, HashMap<Long, ArrayList<String>> spots2, String logfile,
 			String preprocessedFile)
 	{
-		long countOfSpots1 = 0, countOfSpots2 = 0, countOfNotFound = 0;
+		long countOfSpots1 = 0, countOfSpots2 = 0, countOfNotFound = 0, countWithWrongGeoCoords = 0;
+		// countWithWrongGeoCoords: num of checkins in placees which have incorrect geocoordinates
+
 		// String dlimPatrn = Pattern.quote(",");
-		PopUps.showMessage("preprocessCheckInWithDateCategoryOnlySpots1 called");
+		// PopUps.showMessage
+		System.out.println(
+				"preprocessCheckInWithDateCategoryOnlySpots1Faster called with checkinfilename = " + checkinFileName);
 		try
 		{
 			int lineCount = 0;
@@ -1011,6 +1022,10 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 			String currentLineRead;
 			String prevLat = "", prevLon = "", prevUser = "", currUser = "";
+
+			boolean isCurrGeoCoordsValid = false;
+			boolean isPrevGeoCoordsValid = false;
+
 			Timestamp prevTime = null, currentTime = null;
 			String currentDate = "";
 			String currentLat = "", currentLon = "";
@@ -1029,7 +1044,9 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				spotCatID = "NA";
 				spotCatName = "NA";
 
-				boolean found = false;
+				boolean foundInSpots1 = false;
+				boolean foundInSpots2 = false;
+
 				lineCount++;
 				if (lineCount == 1)
 				{
@@ -1057,25 +1074,19 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 				if (vals1 != null)
 				{
-					found = true;
-					// sequenceOfSpotsFound.append("1");
+					foundInSpots1 = true; // sequenceOfSpotsFound.append("1");
 					countOfSpots1++;
-
 					// System.out.println("found in spots1");
 
 					currentLat = vals1.get(2);
 					currentLon = vals1.get(1);
-
 					// spotCatID = getSpotCatID(vals1);
 					// spotCatName = getSpotCatName(vals1);
-
 					Pair<String, String> spotCatIDName = getSpotCatIDCatName(vals1);
-
 					spotCatID = spotCatIDName.getFirst();
 					spotCatName = spotCatIDName.getSecond();
 				}
 
-				/////
 				if (vals2 != null)
 				{
 					if (vals1 != null)
@@ -1084,78 +1095,92 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 					}
 
 					// System.out.println("found in spots2");
-					found = true;
+					foundInSpots2 = true;
 					// sequenceOfSpotsFound.append("2");
-
 					countOfSpots2++;
 
 					currentLat = vals2.get(0);
 					currentLon = vals2.get(1);
 				}
-				if (!found)
+
+				if (!foundInSpots1 && !foundInSpots2)
 				{
 					countOfNotFound++;
 
-					currentLat = "-777";
-					currentLon = "-777";
+					currentLat = "-777"; // not found in either spots
+					currentLon = "-777"; // not found in either spots
 				}
-
-				////
-
-				if (found)
+				else// (foundInSpots1 || foundInSpots2) //found in either of spots
 				{
-					if (prevUser.equals(currUser))// prevLat.length() > 0 && prevLon.length() > 0 &&
+					if (Math.abs(Double.valueOf(currentLat)) > 90 || Math.abs(Double.valueOf(currentLon)) > 180)
 					{
-						// System.out.println("Computin/run/media/gunjan/BoX2/GowallaSpaceSpace/June16/g haversing for"
-						// + currentLat + " , " + currentLon + " --- " + prevLat + ","
-						// + prevLon);
-						distFromPrevInMeters = StatsUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
+						// System.out
+						// .println("Invalid geo coordinate becauce. lat =" + currentLat + " long=" + currentLat);
+						isCurrGeoCoordsValid = false;
+						countWithWrongGeoCoords += 1;
+					}
+					else
+					{
+						isCurrGeoCoordsValid = true;
+					}
 
-						// System.out.println("returned dist in km = " + distFromPrevInMeters);
-						distFromPrevInMeters = distFromPrevInMeters * 1000;
-						distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
+					if (prevUser.equals(currUser))
+					{
+						if (isPrevGeoCoordsValid && isCurrGeoCoordsValid)
+						{
+							distFromPrevInMeters = StatsUtils.haversineFastMath(currentLat, currentLon, prevLat,
+									prevLon);//
+							distFromPrevInMeters *= 1000;
+							distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
+						}
+						// - removed as data has been reversed so that now it is in ascending order of timestamp
+						durationFromPrevInSeconds = (currentTime.getTime() - prevTime.getTime()) / 1000;
 					}
 
 					else
 					{
-						distFromPrevInMeters = 0;
-						// System.out.println("prevlat=" + prevLat + " prevLon=" + prevLon);
+						distFromPrevInMeters = -99;// 0;
+						durationFromPrevInSeconds = -99;// 0;
 					}
 
-					if (prevTime != null && prevUser.equals(currUser))
+					if (isCurrGeoCoordsValid)
 					{
-						durationFromPrevInSeconds = -(currentTime.getTime() - prevTime.getTime()) / 1000;
+						prevLat = currentLat;
+						prevLon = currentLon;
+						isPrevGeoCoordsValid = true;
 					}
-
 					else
 					{
-						durationFromPrevInSeconds = 0;
-						// System.out.println("prevlat=" + prevLat + " prevLon=" + prevLon);
+						isPrevGeoCoordsValid = false;
+					}
+
+					if (foundInSpots1) // ONLY WRITE IF FOUND IN SPOTS SUBSET 1
+					{
+						String towrite = currentLineRead + "," + currentDate + "," + currentLat + "," + currentLon + ","
+								+ spotCatID + "," + spotCatName + "," + distFromPrevInMeters + ","
+								+ durationFromPrevInSeconds + "\n";
+						String towrite2 = splittedString[0] + "," + currentDate + "," + spotCatID + "," + spotCatName
+								+ "," + distFromPrevInMeters + "," + durationFromPrevInSeconds + "\n";
+
+						toWriteInBatch.append(towrite);
+						toWriteInBatch2.append(towrite2);
 					}
 				}
 
-				if (Double.valueOf(currentLat) > -777 && Double.valueOf(currentLon) > -777) // when not found in spots 1
-																							// or spots 2
-				{
-					prevLat = currentLat;
-					prevLon = currentLon;
-				}
+				// if (isCurrGeoCoordsValid)
+				// {
+				// isPrevGeoCoordsValid = true;
+				// }
+				// else
+				// {
+				// isPrevGeoCoordsValid = false;
+				// }
+				//
+				// prevLat = currentLat;
+				// prevLon = currentLon;
 
 				prevTime = currentTime;
 				prevUser = currUser;
-
-				// bw.write("UserID,
-				// PlaceID,TS,Date,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
-				// bw2.write("UserID,Date,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
-
-				String towrite = currentLineRead + "," + currentDate + "," + currentLat + "," + currentLon + ","
-						+ spotCatID + "," + spotCatName + "," + distFromPrevInMeters + "," + durationFromPrevInSeconds
-						+ "\n";
-				String towrite2 = splittedString[0] + "," + currentDate + "," + spotCatID + "," + spotCatName + ","
-						+ distFromPrevInMeters + "," + durationFromPrevInSeconds + "\n";
-
-				toWriteInBatch.append(towrite);
-				toWriteInBatch2.append(towrite2);
 
 				if (lineCount % 70870 == 0)// 48260 == 0) // 24130 find divisors of 36001960 using
 											// http://www.javascripter.net/math/calculators/divisorscalculator.htm
@@ -1168,9 +1193,23 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				// $$bw.write(towrite);
 			}
 
-			System.out.println("Count of spots1 = " + countOfSpots1);
-			System.out.println("Count of spots2 = " + countOfSpots2);
-			System.out.println("Count of not found = " + countOfNotFound);
+			// should also write leftover, which will happen if not using exact divisors
+			// write any leftovers
+			if (toWriteInBatch.length() > 0)
+			{
+				System.out.println("Writing leftovers ... ");
+				bw.write(toWriteInBatch.toString());
+				toWriteInBatch.setLength(0);
+				bw2.write(toWriteInBatch2.toString());
+				toWriteInBatch2.setLength(0);
+			}
+
+			System.out.println("Num of checkins lines read = " + lineCount);
+			System.out.println("Count of checkins in spots1 = " + countOfSpots1);
+			System.out.println("Count of checkins in spots2 = " + countOfSpots2);
+			System.out.println("Count of checkins in neither of spots = " + countOfNotFound);
+			System.out.println("Count of checkins with wrongGeoCoords = " + countWithWrongGeoCoords);
+
 			br.close();
 			bw.close();
 			bw2.close();
@@ -1318,15 +1357,18 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	 * 
 	 * @param fileName
 	 *            comma delimited values
+	 * @param latIndex
+	 * @param longIndex
 	 * @return map with each lines
 	 */
-	public static HashMap<Long, ArrayList<String>> readSpotSubset(String fileName)
+	public static HashMap<Long, ArrayList<String>> readSpotSubset(String fileName, int latIndex, int longIndex)
 	{
 		// String dlimPatrn = Pattern.quote(","); // removed for performance
 		HashMap<Long, ArrayList<String>> map1 = new HashMap<Long, ArrayList<String>>();
 		StringBuffer listOfDuplicateEntries = new StringBuffer();
 
 		long t1 = System.currentTimeMillis();
+		int countOfSpotsWithWrongGeoCoords = 0;
 		try
 		{
 			// DB db = DBMaker.fileDB("fileSpotSubset1.db").make();
@@ -1359,7 +1401,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				}
 				else if (lineCount % 100000 == 0)
 				{
-					System.out.println("Lines read = " + lineCount);
+					// System.out.println("Lines read = " + lineCount);
 				}
 
 				String[] splittedString = currentLine.split(",");// dlimPatrn);//StringUtils.split(currentLine,",");//
@@ -1389,6 +1431,14 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				if (key < 0)
 				{
 					System.err.println("Error: location ID empty " + splittedString[0]);
+				}
+
+				if (Math.abs(Double.valueOf(splittedString[longIndex])) > 180
+						|| Math.abs(Double.valueOf(splittedString[latIndex])) > 90)
+				{
+					System.err.println("Error: Lat/Long out of range: for lineRead\n\t" + currentLine);
+					countOfSpotsWithWrongGeoCoords++;
+					// PopUps.showError("Error: Lat/Long out of range: for lineRead\n" + currentLine);
 				}
 
 				if (map1.containsKey(key)) // if duplicate then safely ignore, else generate error
@@ -1422,6 +1472,8 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			}
 			// List<CSVRecord> csvRecords = ReadingFromFile.getCSVRecords(fileName);
 			System.out.println("Duplicate entries in " + fileName + " are:" + listOfDuplicateEntries.toString());
+			System.out
+					.println("countOfSpotsWithWrongGeoCoords in " + fileName + " = " + countOfSpotsWithWrongGeoCoords);
 
 			br.close();
 			// db.close();
@@ -1431,7 +1483,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 		{
 			e.printStackTrace();
 		}
-		System.out.println("returned map if of size: " + map1.size());
+		System.out.println("returned map is of size: " + map1.size());
 		System.out.println("readSpotSubset " + fileName + " took :" + (System.currentTimeMillis() - t1) + " ms");
 		return map1;
 	}

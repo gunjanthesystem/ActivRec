@@ -21,7 +21,7 @@ version = '1.0'
 
 jar {
 	 manifest {
-        attributes 'Implementation-Title': 'GowallaWeather',
+        attributes 'Implementation-Title': 'build.gradle'//'GowallaWeather',
                    'Implementation-Version': version
     }
 }

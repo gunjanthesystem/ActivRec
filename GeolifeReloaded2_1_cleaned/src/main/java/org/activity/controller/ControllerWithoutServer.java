@@ -63,7 +63,8 @@ public class ControllerWithoutServer
 						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
 						+ ".kryo";
 
-				commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
+				commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/ConsecutiveAnalysis/";
+				// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
 				// run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//
 				/// "/run/media/gunjan/BoX2/GowallaSpaceSpace/GowallaDataWorksSep16/";
 				break;
@@ -191,7 +192,8 @@ public class ControllerWithoutServer
 
 				if (Constant.getDatabaseName().equals("gowalla1"))
 				{
-					String folderPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/DatabaseCreation/";
+					String folderPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
+					// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/DatabaseCreation/";
 					LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData = (LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>) Serializer
 							.kryoDeSerializeThis(folderPath + "mapForAllCheckinData.kryo");
 					// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllCheckinData.kryo");
@@ -358,7 +360,8 @@ public class ControllerWithoutServer
 			// start of consective counts
 			LinkedHashMap<String, ArrayList<Integer>> consecutiveCounts = TimelineUtils
 					.countConsecutiveSimilarActivities2(usersCleanedDayTimelines,
-							"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/",
+							/* $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/" */
+							"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/ConsecutiveAnalysis/",
 							"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
 
 			// end of consecutive counts

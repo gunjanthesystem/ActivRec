@@ -34,7 +34,8 @@ public class CSVUtils
 	{
 		// testSideConcat();
 		// removeDuplicateRowsGowalla();
-		gowallaMain();
+		removeDuplicateRowsFromRawGowalla();
+		// gowallaMain();//
 	}
 
 	public static void testSideConcat()
@@ -61,6 +62,22 @@ public class CSVUtils
 
 		removeDuplicationRowsUsingCuckoo(processedCheckInFileName, noDupProcessedCheckinFileName,
 				dupLinesCheckinFileName);
+		// UsingCuckoo
+		// curtain 1 end
+	}
+
+	public static void removeDuplicateRowsFromRawGowalla()
+	{
+		// curtain 1 start
+		String checkInFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_checkins.csv";
+		String noDupCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
+		String dupLinesCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/DupLines_gowalla_checkinsRaw.csv";
+
+		// $$ check again to make sure this method is not doing anything more than the cuckoo method is doing
+		// removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,
+		// dupLinesCheckinFileName, 0);
+
+		removeDuplicationRowsUsingCuckoo(checkInFileName, noDupCheckinFileName, dupLinesCheckinFileName);
 		// UsingCuckoo
 		// curtain 1 end
 	}
