@@ -340,6 +340,8 @@ public class DatabaseCreatorGowallaQuicker0
 				String latitude = new String(splittedLine[5]);
 				String longitude = new String(splittedLine[6]);
 				Integer catIDDirect = Integer.valueOf(splittedLine[7]);// .replaceAll("\"", ""));
+				Double distFromNextInM = Double.valueOf(splittedLine[9]);
+				Long durationFromNextInM = Long.valueOf(splittedLine[10]);
 				// String catName = splittedLine[8].replaceAll("\"", "");
 				// Set<String> givenLevelOrAboveCatIDs =
 				// UIUtilityBox.getGivenLevelOrAboveCatID(splittedLine[7], rootOfCategoryTree, workingLevelForCat);
@@ -373,7 +375,8 @@ public class DatabaseCreatorGowallaQuicker0
 				String workingLevelCatIDs = catIDWorkingLevelCatIDsDict.get(catIDDirect);
 
 				CheckinEntry cobj = new CheckinEntry(userID, locationID, ts, latitude, longitude, catIDDirect,
-						workingLevelCatIDs);
+						workingLevelCatIDs, distFromNextInM, durationFromNextInM);
+
 				countOfCheckinEntryObjects++;
 
 				TreeMap<Timestamp, CheckinEntry> mapForThisUser;

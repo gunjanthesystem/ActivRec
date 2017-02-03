@@ -35,6 +35,9 @@ public class CheckinEntry extends DataEntry implements Serializable
 	private String startLongitude;
 	private int activityID;
 
+	private double distanceInMetersFromNext;
+	private long durationInSecsFromNext;
+
 	/**
 	 * <p>
 	 * // note: 6 decimal places offers the precision upto .11m //
@@ -62,6 +65,35 @@ public class CheckinEntry extends DataEntry implements Serializable
 
 		this.activityID = catID;
 		this.setWorkingLevelCatIDs(workingLevelCatIDs);
+	}
+
+	/**
+	 * 
+	 * @param userID
+	 * @param locationID
+	 * @param ts
+	 * @param latitude
+	 * @param longitude
+	 * @param catID
+	 * @param workingLevelCatIDs
+	 * @param distanceInMetersFromNext
+	 * @param durationInSecsFromNext
+	 */
+	public CheckinEntry(String userID, Integer locationID, Timestamp ts, String latitude, String longitude,
+			Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext)
+	{
+		this.userID = userID;
+		this.locationID = locationID;
+		this.timestamp = ts;
+
+		this.startLatitude = StatsUtils.round(latitude, 6);
+		this.startLongitude = StatsUtils.round(longitude, 6);
+
+		this.activityID = catID;
+		this.setWorkingLevelCatIDs(workingLevelCatIDs);
+
+		this.distanceInMetersFromNext = distanceInMetersFromNext;
+		this.durationInSecsFromNext = durationInSecsFromNext;
 	}
 
 	public CheckinEntry(Timestamp timestamp, long differenceWithNextInSeconds, long durationInSeconds,
@@ -171,16 +203,41 @@ public class CheckinEntry extends DataEntry implements Serializable
 		return null;
 	}
 
+	public double getDistanceInMetersFromNext()
+	{
+		return distanceInMetersFromNext;
+	}
+
+	public void setDistanceInMetersFromNext(double distanceInMetersFromNext)
+	{
+		this.distanceInMetersFromNext = distanceInMetersFromNext;
+	}
+
+	public long getDurationInSecsFromNext()
+	{
+		return durationInSecsFromNext;
+	}
+
+	public void setDurationInSecsFromNext(long durationInSecsFromNext)
+	{
+		this.durationInSecsFromNext = durationInSecsFromNext;
+	}
+
 	@Override
 	public int hashCode()
 	{
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1;
 		result = prime * result + activityID;
+		long temp;
+		temp = Double.doubleToLongBits(distanceInMetersFromNext);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (int) (durationInSecsFromNext ^ (durationInSecsFromNext >>> 32));
 		result = prime * result + locationID;
 		result = prime * result + ((startLatitude == null) ? 0 : startLatitude.hashCode());
 		result = prime * result + ((startLongitude == null) ? 0 : startLongitude.hashCode());
 		result = prime * result + ((userID == null) ? 0 : userID.hashCode());
+		result = prime * result + ((workingLevelCatIDs == null) ? 0 : workingLevelCatIDs.hashCode());
 		return result;
 	}
 
@@ -188,10 +245,14 @@ public class CheckinEntry extends DataEntry implements Serializable
 	public boolean equals(Object obj)
 	{
 		if (this == obj) return true;
-		if (!super.equals(obj)) return false;
+		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		CheckinEntry other = (CheckinEntry) obj;
 		if (activityID != other.activityID) return false;
+		if (Double.doubleToLongBits(distanceInMetersFromNext) != Double
+				.doubleToLongBits(other.distanceInMetersFromNext))
+			return false;
+		if (durationInSecsFromNext != other.durationInSecsFromNext) return false;
 		if (locationID != other.locationID) return false;
 		if (startLatitude == null)
 		{
@@ -208,6 +269,11 @@ public class CheckinEntry extends DataEntry implements Serializable
 			if (other.userID != null) return false;
 		}
 		else if (!userID.equals(other.userID)) return false;
+		if (workingLevelCatIDs == null)
+		{
+			if (other.workingLevelCatIDs != null) return false;
+		}
+		else if (!workingLevelCatIDs.equals(other.workingLevelCatIDs)) return false;
 		return true;
 	}
 
