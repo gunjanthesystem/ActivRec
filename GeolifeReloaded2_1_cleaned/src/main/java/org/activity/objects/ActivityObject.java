@@ -56,6 +56,8 @@ public class ActivityObject implements Serializable
 	 */
 	String userID;
 	int photos_count, checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count;// spot_categories;
+	double distanceInMFromNext;
+	long durationInSecondsFromNext;
 
 	/**
 	 * Constructor for Gowalla activity object
@@ -109,6 +111,84 @@ public class ActivityObject implements Serializable
 
 	}
 
+	/**
+	 * 
+	 * @param activityID
+	 * @param locationID
+	 * @param activityName
+	 * @param locationName
+	 * @param startTimestamp
+	 * @param startLatitude
+	 * @param startLongitude
+	 * @param startAltitude
+	 * @param userID
+	 * @param photos_count
+	 * @param checkins_count
+	 * @param users_count
+	 * @param radius_meters
+	 * @param highlights_count
+	 * @param items_count
+	 * @param max_items_count
+	 * @param workingLevelCatIDs
+	 * @param distanceInMFromNext
+	 * @param durationInSecsFromNext
+	 */
+	public ActivityObject(int activityID, int locationID, String activityName, String locationName,
+			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
+			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
+			long durationInSecsFromNext)
+	{
+
+		// this.activityID = activityID;
+
+		String splittedwlci[] = workingLevelCatIDs.split("__");
+		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
+															// considering one working level cat id
+
+		this.locationID = locationID;
+		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
+		this.locationName = locationName;
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = startTimestamp;
+		this.startLatitude = startLatitude;
+		this.startLongitude = startLongitude;
+		this.startAltitude = startAltitude;
+		this.userID = userID;
+		this.photos_count = photos_count;
+		this.checkins_count = checkins_count;
+		this.users_count = users_count;
+		this.radius_meters = radius_meters;
+		this.highlights_count = highlights_count;
+		this.items_count = items_count;
+		this.max_items_count = max_items_count;
+		this.workingLevelCatIDs = workingLevelCatIDs;
+
+		this.distanceInMFromNext = distanceInMFromNext;
+		this.durationInSecondsFromNext = durationInSecsFromNext;
+
+	}
+
+	public double getDistanceInMFromNext()
+	{
+		return distanceInMFromNext;
+	}
+
+	public void setDistanceInMFromNext(double distanceInMFromNext)
+	{
+		this.distanceInMFromNext = distanceInMFromNext;
+	}
+
+	public long getDurationInSecondsFromNext()
+	{
+		return durationInSecondsFromNext;
+	}
+
+	public void setDurationInSecondsFromNext(long durationInSecondsFromNext)
+	{
+		this.durationInSecondsFromNext = durationInSecondsFromNext;
+	}
+
 	public String toStringAll()
 	{
 		return "ActivityObject [dimensions=" + dimensions + ", dimensionIDNameValues=" + dimensionIDNameValues
@@ -126,13 +206,14 @@ public class ActivityObject implements Serializable
 
 	public String toStringAllGowalla()
 	{
-		return "activityID=" + activityID + "__ locationID=" + locationID + "__ activityName=" + activityName
-				+ "__ locationName=" + locationName + "__ workingLevelCatIDs=" + workingLevelCatIDs
-				+ "__ startTimestamp=" + startTimestamp + "__ startLatitude=" + startLatitude + "__ startLongitude="
+		return "activityID=" + activityID + "__locationID=" + locationID + "__activityName=" + activityName
+				+ "__ locationName=" + locationName + "__workingLevelCatIDs=" + workingLevelCatIDs
+				+ "__ startTimestamp=" + startTimestamp + "__startLatitude=" + startLatitude + "__startLongitude="
 				+ startLongitude + "__ startAltitude=" + startAltitude + "__ userID=" + userID + "__ photos_count="
 				+ photos_count + "__ checkins_count=" + checkins_count + "__ users_count=" + users_count
 				+ "__ radius_meters=" + radius_meters + "__ highlights_count=" + highlights_count + "__ items_count="
-				+ items_count + "__ max_items_count=" + max_items_count;
+				+ items_count + "__ max_items_count=" + max_items_count + "__ distNext=" + distanceInMFromNext
+				+ "__durationNext=" + durationInSecondsFromNext;
 	}
 
 	public String toString()

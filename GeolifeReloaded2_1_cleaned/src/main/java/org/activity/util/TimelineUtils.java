@@ -504,6 +504,9 @@ public class TimelineUtils
 		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecutives = r1.getFirst();
 		TreeMap<Integer, String> catIDNameDictionary = r1.getSecond();
 
+		StringBuilder sbAllDistanceInM = new StringBuilder();
+		StringBuilder sbAllDurationFromNext = new StringBuilder();
+
 		StringBuilder sbEnumerateAllCats = new StringBuilder();// write all catid sequentially userwise
 		long aoCount = 0;
 		try
@@ -515,12 +518,17 @@ public class TimelineUtils
 
 				int numOfConsecutives = 1;// long timeDiff = 0;
 
+				StringBuilder distanceFromNextSeq = new StringBuilder();
+				StringBuilder durationFromNextSeq = new StringBuilder();
+
 				for (Entry<Date, UserDayTimeline> dateE : userE.getValue().entrySet())
 				{
 					String date = dateE.getKey().toString();
 					for (ActivityObject aos : dateE.getValue().getActivityObjectsInDay())
 					{
 						String activityName = aos.getActivityName();
+						double distNext = aos.getDistanceInMFromNext();
+						long durationNext = aos.getDurationInSecondsFromNext();
 
 						aoCount += 1;
 						// System.out.println("aoCount=" + aoCount + " activityName=" + activityName);
@@ -531,6 +539,8 @@ public class TimelineUtils
 						if (activityName.equals(prevActivityName))
 						{
 							numOfConsecutives += 1;
+							distanceFromNextSeq.append(String.valueOf(distNext));
+							durationFromNextSeq.append(String.valueOf(durationNext));
 							// timeDiff += aos.getStartTimestamp().getTime() - prevActivityStartTimestamp.getTime();
 							// System.out.println(" Current Prev act Same, numOfConsecutives =" + numOfConsecutives);
 							continue;
@@ -557,6 +567,13 @@ public class TimelineUtils
 							{
 								consecVals.add(numOfConsecutives);
 								catIDLengthConsecutives.put(prevActivityName, consecVals);
+
+								if (numOfConsecutives > 1)
+								{
+									sbAllDistanceInM.append(distanceFromNextSeq.toString());
+									sbAllDurationFromNext.append(durationFromNextSeq.toString());
+								}
+
 								// System.out.println(" Current Prev act diff, numOfConsecutives =" +
 								// numOfConsecutives);
 								// System.out.println(" (prev) activity name=" + prevActivityName + " consecVals="
@@ -851,6 +868,8 @@ public class TimelineUtils
 					String startLongitude = e.getStartLongitude();
 					String startAltitude = "";//
 					String userIDInside = e.getUserID();
+					double distaneInMFromNext = e.getDistanceInMetersFromNext();
+					long durationInSecFromNext = e.getDurationInSecsFromNext();
 
 					// sanity check start
 					if (userIDInside.equals(userID) == false)
@@ -872,7 +891,7 @@ public class TimelineUtils
 					ActivityObject ao = new ActivityObject(activityID, locationID, activityName, locationName,
 							startTimestamp, startLatitude, startLongitude, startAltitude, userID, photos_count,
 							checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count,
-							e.getWorkingLevelCatIDs());
+							e.getWorkingLevelCatIDs(), distaneInMFromNext, durationInSecFromNext);
 					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
 				}
