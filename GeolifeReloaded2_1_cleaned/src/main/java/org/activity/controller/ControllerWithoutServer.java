@@ -329,8 +329,9 @@ public class ControllerWithoutServer
 			usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 50,
 					Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan50DaysLog.csv");
 			// Writing user day timelines. big file ~ 17.3GB
-			WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines, "usersCleanedDayTimelinesReduced3",
-					false, false, false, "GowallaUserDayTimelinesCleanedReduced3.csv");// users
+			// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines,
+			// "usersCleanedDayTimelinesReduced3",
+			// false, false, false, "GowallaUserDayTimelinesCleanedReduced3.csv");// users
 
 			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfActsCleanedReduced3.csv");// us
