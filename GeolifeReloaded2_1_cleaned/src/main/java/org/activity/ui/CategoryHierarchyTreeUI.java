@@ -41,7 +41,9 @@ import javafx.util.Callback;
  */
 public class CategoryHierarchyTreeUI extends Application
 {
-	final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/";
+	final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/UI/";
+	// $$ "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";//
+	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/";
 	PrintStream consoleLogStream;
 	TreeItem<String> rootNode;
 
@@ -62,6 +64,8 @@ public class CategoryHierarchyTreeUI extends Application
 	@Override
 	public void start(Stage primaryStage)
 	{
+		String checkinFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
 
 		try
 		{
@@ -70,7 +74,7 @@ public class CategoryHierarchyTreeUI extends Application
 			treeView.getSelectionModel().selectFirst();
 
 			JSONProcessingGowallaTryingNonStatic preProcessGowalla = new JSONProcessingGowallaTryingNonStatic(
-					commonPath);
+					commonPath, checkinFileNameToRead);
 
 			/////////
 			TreeMap<Integer, String> dict = preProcessGowalla.getCatIDNameDictionary();

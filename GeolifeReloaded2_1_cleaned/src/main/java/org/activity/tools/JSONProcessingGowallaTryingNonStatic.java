@@ -7,12 +7,10 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +24,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.UtilityBelt;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,8 +41,11 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep1/";
-	static String catHierarchyFileNameToRead;
+	String commonPath;// = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/";//
+						// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep1/";
+	static final String catHierarchyFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
+
+	// static String catHierarchyFileNameToRead;
 
 	TreeMap<Integer, String> catIDNameDictionary;// catID, catName
 	Map<String, TreeMap<Integer, Long>> checkinCountResultsTogether;
@@ -93,6 +95,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	}
 
 	/**
+	 * Append the given catID and name to the CatIDNameDictionary
 	 * 
 	 * @param catID
 	 * @param catName
@@ -119,6 +122,10 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		return checkinCountResultsTogether;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>> getCategoryHierarchyMap()
 	{
 		return categoryHierarchyMap;
@@ -140,23 +147,28 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 
 	public JSONProcessingGowallaTryingNonStatic()
 	{
-		new JSONProcessingGowallaTryingNonStatic(commonPath);
+		String checkinFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
+		new JSONProcessingGowallaTryingNonStatic(commonPath, checkinFileNameToRead);
 	}
 
 	/**
 	 * 
 	 * @param commonPathToWrite
 	 */
-	public JSONProcessingGowallaTryingNonStatic(String commonPathToWrite)
+	public JSONProcessingGowallaTryingNonStatic(String commonPathToWrite, String checkinFileNameToRead)
 	{
 		this.commonPath = commonPathToWrite;
 		// $$PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-		catHierarchyFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
+		// catHierarchyFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another
+		// source/gowalla/gowalla_category_structure.json";
 		// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another
 		// source/gowalla/gowalla_category_structure.json";
-		String checkinFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
+		// String checkinFileNameToRead
+		// ="/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Aug22_2016/gw2CheckinsSpots1TargetUsersDatesOnly.csv";///
 		// gw2CheckinsSpots1Slim1TargetUsersDatesOnly.csv";
 		String checkinFileNameToWrite = commonPath + "gw2CheckinsSpots1TargetUsersDatesOnlyWithLevels.csv";
@@ -921,11 +933,11 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 			Set<Integer> l3Keys = level3Map.keySet();
 
 			System.out.println("Intersection of l1Keys and l2Keys = "
-					+ Arrays.toString(getIntersection(l1Keys, l2Keys).toArray()));
+					+ Arrays.toString(UtilityBelt.getIntersection(l1Keys, l2Keys).toArray()));
 			System.out.println(
-					"Intersection of l2Keys and l3Keys =" + Arrays.toString(getIntersection(l2Keys, l3Keys).toArray()));
+					"Intersection of l2Keys and l3Keys =" + Arrays.toString(UtilityBelt.getIntersection(l2Keys, l3Keys).toArray()));
 			System.out.println(
-					"Intersection of l1Keys and l3Keys =" + Arrays.toString(getIntersection(l1Keys, l3Keys).toArray()));
+					"Intersection of l1Keys and l3Keys =" + Arrays.toString(UtilityBelt.getIntersection(l1Keys, l3Keys).toArray()));
 			// Arrays.toString(children.toArray()
 			System.out.println("Total num of catIDs = " + (level1Map.size() + level2Map.size() + level3Map.size()));
 
@@ -1289,7 +1301,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 			System.out.println("All IDs = " + Arrays.toString(listOfAllIDs.toArray()));
 
 			// listOfAllIDs.removeAll(allUniqueIDs);
-			Set<Integer> duplicateIDs = findDuplicates(listOfAllIDs);
+			Set<Integer> duplicateIDs = UtilityBelt.findDuplicates(listOfAllIDs);
 			System.out.println("Total num of duplicate cat id in categoryHierarchyMap = " + duplicateIDs.size());
 
 			System.out.println("Duplicate IDs  = " + Arrays.toString(duplicateIDs.toArray()));
@@ -1477,7 +1489,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 			System.out.println("All IDs = " + Arrays.toString(listOfAllIDs.toArray()));
 
 			// listOfAllIDs.removeAll(allUniqueIDs);
-			Set<Integer> duplicateIDs = findDuplicates(listOfAllIDs);
+			Set<Integer> duplicateIDs = UtilityBelt.findDuplicates(listOfAllIDs);
 			System.out.println("Total num of duplicate cat id in categoryHierarchyMap = " + duplicateIDs.size());
 
 			System.out.println("Duplicate IDs  = " + Arrays.toString(duplicateIDs.toArray()));
@@ -1658,15 +1670,6 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	// return null;// categoryHierarchyMapLevel1;
 	// }
 
-	public static Set<Integer> getIntersection(Set<Integer> s1, Set<Integer> s2)
-	{
-		Set<Integer> intersection = new HashSet<Integer>(s1);
-		intersection.retainAll(s2);
-
-		return intersection;
-	}
-	// public static
-
 	/**
 	 * To get the (day) difference between consecutive days of data for each user. Note: the input here is daywise data.
 	 */
@@ -1777,178 +1780,4 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		}
 
 	}
-
-	/**
-	 * 
-	 * @param list
-	 * @return
-	 */
-	public static <T> Set<T> findDuplicates(Collection<T> list)
-	{
-
-		Set<T> duplicates = new LinkedHashSet<T>();
-		Set<T> uniques = new HashSet<T>();
-
-		for (T t : list)
-		{
-			if (!uniques.add(t))
-			{
-				duplicates.add(t);
-			}
-		}
-
-		return duplicates;
-	}
-	// public static void writeCatLevelInfo()
-	// {
-	// TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-	//
-	// Triple catLevelMaps = getCategoryMapsFromJSON();
-	// LinkedHashMap<Integer, String> level1Map = (LinkedHashMap<Integer, String>) catLevelMaps.getFirst();
-	// LinkedHashMap<Integer, String> level2Map = (LinkedHashMap<Integer, String>) catLevelMaps.getSecond();
-	// LinkedHashMap<Integer, String> level3Map = (LinkedHashMap<Integer, String>) catLevelMaps.getThird();
-	//
-	// TreeMap<Integer, Long> level1CkeckinCountMap = new TreeMap<Integer, Long>();// )
-	// TreeMap<Integer, Long> level2CkeckinCountMap = new TreeMap<Integer, Long>();
-	// TreeMap<Integer, Long> level3CkeckinCountMap = new TreeMap<Integer, Long>();
-	// TreeMap<Integer, Long> noneLevelCkeckinCountMap = new TreeMap<Integer, Long>();
-	//
-	// String fileNameToRead =
-	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June30/gw2CheckinsSpots1Slim1TargetUsersDatesOnly.csv";
-	// String fileNameToWrite =
-	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June30/gw2CheckinsSpots1Slim1TargetUsersDatesOnlyWithLevelsV2_2.csv";
-	//
-	// String fileNameToWriteCatLevelDistro =
-	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June30/gw2CheckinsSpots1Slim1TargetUsersDatesOnlyCatLevelDistro";
-	//
-	// int countOfLines = 0;
-	// StringBuffer sbuf = new StringBuffer();
-	// String lineRead;
-	//
-	// int l1Count = 0, l2Count = 0, l3Count = 0, notFoundInAnyLevel = 0;
-	// ArrayList<Integer> catIDsNotFoundInAnyLevel = new ArrayList<Integer>();
-	// // int lengthOfReadTokens = -1;
-	// try
-	// {
-	// BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-	// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileNameToWrite);
-	//
-	// while ((lineRead = br.readLine()) != null)
-	// {
-	// countOfLines += 1;
-	// int isLevel1 = 0, isLevel2 = 0, isLevel3 = 0;
-	// int foundInLevels = 0;
-	//
-	// String[] splittedLine = lineRead.split(",");
-	//
-	// if (countOfLines == 1)
-	// {
-	// sbuf.append(splittedLine[1] + "," + splittedLine[2] + "," + splittedLine[3] + "," + splittedLine[4] + ","
-	// + splittedLine[5] + ",IsLevel1,IsLevel2,IsLevel3\n");
-	// continue;
-	// }
-	// // System.out.println("splittedLine[3] =" + splittedLine[3]);
-	// // System.out.println("splittedLine[1] =" + splittedLine[1]);
-	// Integer catID = Integer.valueOf(splittedLine[3].replaceAll("\"", ""));
-	//
-	// if (level1Map.containsKey(catID))
-	// {
-	// isLevel1 = 1;
-	// foundInLevels++;
-	// l1Count++;
-	// level1CkeckinCountMap.put(catID, level1CkeckinCountMap.getOrDefault(catID, new Long(0)) + 1);
-	// }
-	// if (level2Map.containsKey(catID))
-	// {
-	// isLevel2 = 1;
-	// foundInLevels++;
-	// l2Count++;
-	// level2CkeckinCountMap.put(catID, level2CkeckinCountMap.getOrDefault(catID, new Long(0)) + 1);
-	// }
-	//
-	// if (level3Map.containsKey(catID))
-	// {
-	// isLevel3 = 1;
-	// foundInLevels++;
-	// l3Count++;
-	// level3CkeckinCountMap.put(catID, level3CkeckinCountMap.getOrDefault(catID, new Long(0)) + 1);
-	// }
-	//
-	// if (foundInLevels == 0)
-	// {
-	// catIDsNotFoundInAnyLevel.add(catID);
-	// notFoundInAnyLevel++;
-	// noneLevelCkeckinCountMap.put(catID, noneLevelCkeckinCountMap.getOrDefault(catID, new Long(0)) + 1);
-	// }
-	//
-	// if (foundInLevels > 1 && catID != 201)
-	// {
-	// System.err.println("Error: catID " + catID + " found in multiple levels " + isLevel1 + "," + isLevel3 + "," +
-	// isLevel3);
-	// }
-	//
-	// sbuf.append(splittedLine[1] + "," + splittedLine[2] + "," + splittedLine[3] + "," + splittedLine[4] + "," +
-	// splittedLine[5]
-	// + "," + isLevel1 + "," + isLevel2 + "," + isLevel3 + "\n");
-	//
-	// // if (countOfLines % 4000 == 0)
-	// // {
-	// bw.write(sbuf.toString());
-	// sbuf.setLength(0);
-	// // }
-	// }
-	//
-	// bw.close();
-	// br.close();
-	//
-	// System.out.println("Num of checkins read: " + (countOfLines - 1));
-	// System.out.println("Num of level1 in checkins: " + l1Count);
-	// System.out.println("Num of level2 in checkins: " + l2Count);
-	// System.out.println("Num of level3 in checkins: " + l3Count);
-	// System.out.println("Num of checkins with catID in no levelMap: " + notFoundInAnyLevel);
-	//
-	// WritingToFile.appendLineToFileAbsolute(StringUtils.join(catIDsNotFoundInAnyLevel.toArray(), ","),
-	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June30/CatsInNoMaps.csv");
-	//
-	// writeCheckInDistributionOverCatIDs(level1CkeckinCountMap, level2CkeckinCountMap, level3CkeckinCountMap,
-	// noneLevelCkeckinCountMap, fileNameToWriteCatLevelDistro);
-	// // catIDsNotFoundInAnyLevel
-	// // bw.write(sbuf.toString());
-	// // sbuf.setLength(0);
-	//
-	// }
-	// catch (Exception e)
-	// {
-	// e.printStackTrace();
-	// }
-	//
-	// }
-	//
-	//
-	// bw.close();
-	// br.close();
-	//
-	// System.out.println("Num of checkins read: " + (countOfLines - 1));
-	// System.out.println("Num of level1 in checkins: " + l1Count);
-	// System.out.println("Num of level2 in checkins: " + l2Count);
-	// System.out.println("Num of level3 in checkins: " + l3Count);
-	// System.out.println("Num of checkins with catID in no levelMap: " + notFoundInAnyLevel);
-	//
-	// WritingToFile.appendLineToFileAbsolute(StringUtils.join(catIDsNotFoundInAnyLevel.toArray(), ","),
-	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June30/CatsInNoMaps.csv");
-	//
-	// writeCheckInDistributionOverCatIDs(level1CkeckinCountMap, level2CkeckinCountMap, level3CkeckinCountMap,
-	// noneLevelCkeckinCountMap, fileNameToWriteCatLevelDistro);
-	// // catIDsNotFoundInAnyLevel
-	// // bw.write(sbuf.toString());
-	// // sbuf.setLength(0);
-	//
-	// }
-	// catch (Exception e)
-	// {
-	// e.printStackTrace();
-	// }
-	//
-	// }
-	//
 }

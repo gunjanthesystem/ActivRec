@@ -210,8 +210,12 @@ public class UIUtilityBox
 		{
 			// stringToTree(Files.readAllLines(treeAsStringFile));
 			final String commonPath = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9/";
+
+			String checkinFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
+
 			JSONProcessingGowallaTryingNonStatic preProcessGowalla = new JSONProcessingGowallaTryingNonStatic(
-					commonPath);
+					commonPath, checkinFileNameToRead);
 
 			TreeItem<String> rootOfTree = preProcessGowalla.getRootOfCategoryHierarchyTree();
 			DefaultMutableTreeNode rootOfSerializableTree = convertTreeItemsToTreeNodes(rootOfTree);
@@ -233,9 +237,12 @@ public class UIUtilityBox
 		try
 		{
 			// stringToTree(Files.readAllLines(treeAsStringFile));
+			String checkinFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
+
 			final String commonPath = "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/";
 			JSONProcessingGowallaTryingNonStatic preProcessGowalla = new JSONProcessingGowallaTryingNonStatic(
-					commonPath);
+					commonPath, checkinFileNameToRead);
 
 			TreeMap<Integer, String> dict = preProcessGowalla.getCatIDNameDictionary();
 
