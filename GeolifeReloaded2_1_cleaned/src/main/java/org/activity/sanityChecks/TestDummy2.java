@@ -68,6 +68,27 @@ public class TestDummy2
 		streamExp1();
 	}
 
+	public static void streamExp1Spartanized()
+	{
+		LinkedHashMap<String, ArrayList<Integer>> map = new LinkedHashMap<String, ArrayList<Integer>>();
+
+		ArrayList<Integer> a1 = new ArrayList<Integer>(), a2 = new ArrayList<Integer>(), a3 = new ArrayList<Integer>();
+		for (int ¢ = 1; ¢ <= 5; ++¢)
+			a1.add(¢);
+
+		for (int ¢ = 1; ¢ <= 8; ++¢)
+			a2.add(¢);
+
+		for (int ¢ = 1; ¢ <= 3; ++¢)
+			a3.add(¢);
+
+		map.put("A1", a1);
+		map.put("A2", a2);
+		map.put("A3", a3);
+
+		System.out.println("max = " + map.entrySet().stream().mapToInt(λ -> λ.getValue().size()).max().getAsInt());
+	}
+
 	public static void streamExp1()
 	{
 		LinkedHashMap<String, ArrayList<Integer>> map = new LinkedHashMap<String, ArrayList<Integer>>();
