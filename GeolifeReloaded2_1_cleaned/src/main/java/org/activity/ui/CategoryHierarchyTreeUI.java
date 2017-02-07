@@ -9,7 +9,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
-import org.activity.tools.JSONProcessingGowallaTryingNonStatic;
+import org.activity.tools.JSONProcessingGowallaCatHierachy;
 import org.activity.util.ComparatorUtils;
 
 import javafx.application.Application;
@@ -73,7 +73,7 @@ public class CategoryHierarchyTreeUI extends Application
 			// Select the root node
 			treeView.getSelectionModel().selectFirst();
 
-			JSONProcessingGowallaTryingNonStatic preProcessGowalla = new JSONProcessingGowallaTryingNonStatic(
+			JSONProcessingGowallaCatHierachy preProcessGowalla = new JSONProcessingGowallaCatHierachy(
 					commonPath, checkinFileNameToRead);
 
 			/////////
