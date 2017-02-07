@@ -33,11 +33,21 @@ import javafx.scene.control.TreeItem;
 
 /**
  * CURRENTLY USED 6 sep, 2016. 26 AUG 9PM
+ * <p>
+ * Processing the cat id hierarchy provided in the json format to obtain the following:
+ * <ul>
+ * <li>Get three separate catid name maps for each of the three level from the provided json hierarchy file</li>
+ * <li>Get cat id map as hierarchy tree from the provided json hierarchy file</li>
+ * <li>Count occurrence of each level's cats in the checkins file and find cat id which are in checkins but notin any of
+ * the cat levels</li>
+ * <li>Create the cat id name dictionary</li>
+ * </ul>
+ * (formerly named as: JSONProcessingGowallaTryingNonStatic)
  * 
  * @author gunjan
  *
  */
-public class JSONProcessingGowallaTryingNonStatic implements Serializable
+public class JSONProcessingGowallaCatHierachy implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -45,9 +55,13 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 						// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep1/";
 	static final String catHierarchyFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
 
-	// static String catHierarchyFileNameToRead;
+	/**
+	 * CatID name map which contains catid in each of the three levels in the provided json hierarhcy file as well as
+	 * those catid which are present in checkins but not in any of the provided json hierarhcy level (note that some of
+	 * these non level catid will be later manually added to the hierarchy tree in CategoryHierarchyTreeUI())
+	 */
+	TreeMap<Integer, String> catIDNameDictionary;
 
-	TreeMap<Integer, String> catIDNameDictionary;// catID, catName
 	Map<String, TreeMap<Integer, Long>> checkinCountResultsTogether;
 	TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>> categoryHierarchyMap;
 	TreeItem<String> rootOfCategoryHierarchyTree;
@@ -60,7 +74,9 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	/**
 	 * 
 	 * @param catIDNames3Levels
+	 *            cat id names maps for each of the three levels as a triple
 	 * @param catIDNamesInNoLevel
+	 *            cat id names maps for catds not in any level
 	 */
 	public void setCatIDNameDictionary(
 			Triple<LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>> catIDNames3Levels,
@@ -79,6 +95,10 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		catIDNameDictionary.putAll(catIDNamesInNoLevel);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public TreeMap<Integer, String> getCatIDNameDictionary()
 	{
 		return catIDNameDictionary;
@@ -142,21 +162,29 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 		// getCategoryMapsFromJSON2();
 		// writeCatLevelInfo3();// getCategoryMapsFromJSON2());
 		// writeDiffFromNextDay();
-		new JSONProcessingGowallaTryingNonStatic();
+		new JSONProcessingGowallaCatHierachy();
 	}
 
-	public JSONProcessingGowallaTryingNonStatic()
+	public JSONProcessingGowallaCatHierachy()
 	{
 		String checkinFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
-		new JSONProcessingGowallaTryingNonStatic(commonPath, checkinFileNameToRead);
+		new JSONProcessingGowallaCatHierachy(commonPath, checkinFileNameToRead);
 	}
 
 	/**
+	 * Get three separate catid name maps for each of the three level from the provided json hierarchy file
+	 * <p>
+	 * Get cat id map as hierarchy tree from the provided json hierarchy file
+	 * <p>
+	 * Count occurrence of each level's cats in the checkins file and find cat id which are in checkins but notin any of
+	 * the cat levels
+	 * <p>
+	 * Create the cat id name dictionary
 	 * 
 	 * @param commonPathToWrite
 	 */
-	public JSONProcessingGowallaTryingNonStatic(String commonPathToWrite, String checkinFileNameToRead)
+	public JSONProcessingGowallaCatHierachy(String commonPathToWrite, String checkinFileNameToRead)
 	{
 		this.commonPath = commonPathToWrite;
 		// $$PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
@@ -178,13 +206,16 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 
 		try
 		{
+			/** Get three separate catid name maps for each of the three level from the provided json hierarchy file **/
 			Triple<LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>, LinkedHashMap<Integer, String>> catIDNamesFor3Levels = getCatIDNamesForEachLevelFromJSON(
 					catHierarchyFileNameToRead);
 
 			LinkedHashMap<Integer, String> level1CatIDNames = catIDNamesFor3Levels.getFirst();
 			LinkedHashMap<Integer, String> level2CatIDNames = catIDNamesFor3Levels.getSecond();
 			LinkedHashMap<Integer, String> level3CatIDNames = catIDNamesFor3Levels.getThird();
+			//////////////////////////////////////
 
+			/** Get cat id map as hierarchy tree from the provided json hierarchy file **/
 			// TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>> catHierarchyMap =
 			// getThreeLevelCategoryHierarchyFromJSON(catHierarchyFileNameToRead);
 			Pair<TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>>, TreeItem<String>> hierarchyProcessingResult = getThreeLevelCategoryHierarchyTreeFromJSON(
@@ -192,7 +223,12 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 
 			categoryHierarchyMap = hierarchyProcessingResult.getFirst();
 			rootOfCategoryHierarchyTree = hierarchyProcessingResult.getSecond();
+			//////////////////////////////////////
 
+			/**
+			 * Count occurrence of each level's cats in the checkins file and find cat id which are in checkins but not
+			 * in any of the cat levels
+			 **/
 			Pair<Map<String, TreeMap<Integer, Long>>, TreeMap<Integer, String>> preProcessingResult = getCountsFromCheckinData(
 					level1CatIDNames, level2CatIDNames, level3CatIDNames, categoryHierarchyMap, checkinFileNameToRead,
 					checkinFileNameToWrite);
@@ -200,7 +236,9 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 			checkinCountResultsTogether = preProcessingResult.getFirst();
 
 			TreeMap<Integer, String> noneLevelCatIDNames = preProcessingResult.getSecond();
+			//////////////////////////////////////
 
+			/** create the cat id name dictionary **/
 			setCatIDNameDictionary(catIDNamesFor3Levels, noneLevelCatIDNames);
 
 			writeCheckInDistributionOverCatIDs(checkinCountResultsTogether.get("level1CheckinCountMap"),
@@ -208,6 +246,7 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 					checkinCountResultsTogether.get("level3CheckinCountMap"),
 					checkinCountResultsTogether.get("noneLevelCheckinCountMap"),
 					checkinCountResultsTogether.get("level1OverallDistribution"), fileNameToWriteCatLevelDistro);
+
 			System.out.print("catIDNameDictionary.size:" + catIDNameDictionary.size() + "\n");
 			System.out.println(toStringCatIDNameDictionary());
 			System.out.println("Exiting JSONProcessingGowallaTryingNonStatic()");
@@ -223,12 +262,236 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 	}
 
 	/**
+	 * TODO Iterate through the checkin data and generate count maps for level1, level2, level3 and nonelevel catids.
+	 * <p>
+	 * Second version of getCountsFromCheckinData()
+	 * 
+	 * @param level1Map
+	 *            cat id names map for level 1 cat ids
+	 * @param level2Map
+	 *            cat id names map for level w cat ids
+	 * @param level3Map
+	 *            cat id names map for level 3 cat ids
+	 * @param catHierarchyMap
+	 *            cat id as three level tree as map of maps of sets
+	 * @param checkinFileNameToRead
+	 * @param checkinFileNameToWrite
+	 * @return A pair where the first element is:</br>
+	 *         - a map of map where the inner maps contains key as cat id at particular level and values as num of
+	 *         checkins for that catid. the innermaps are "level1CheckinCountMap, level2CheckinCountMap,
+	 *         level3CheckinCountMap, noneLevelCheckinCountMap, level1OverallDistribution" </br>
+	 *         - noneLevelCheckinCountMap is a map with key as cat ids which are in checkins but not in any of the
+	 *         levels of hierarchy by Gowalla, and value as the number of times each of those catids occur in checkins
+	 *         </br>
+	 *         and the second element is:</br>
+	 *         - a map of (catid,name**) for categories not in any of the levels, to be added to catid,name dictionary
+	 *         (note: ** added to these cat names to mark them as ones not in category hierarchy.)
+	 */
+	public static Pair<Map<String, TreeMap<Integer, Long>>, TreeMap<Integer, String>> getCountsFromCheckinData2(
+			LinkedHashMap<Integer, String> level1Map, LinkedHashMap<Integer, String> level2Map,
+			LinkedHashMap<Integer, String> level3Map,
+			TreeMap<Integer, TreeMap<Integer, TreeSet<Integer>>> catHierarchyMap, String checkinFileNameToRead,
+			String checkinFileNameToWrite)// earlier called writeCatLevelInfo3()
+	{
+
+		////////////////////////////////
+		// key: checkin cat id in level 1, value: num of checkins
+		TreeMap<Integer, Long> level1CheckinCountMap = new TreeMap<Integer, Long>();
+		// key: checkin cat id in level 2, value: num of checkins
+		TreeMap<Integer, Long> level2CheckinCountMap = new TreeMap<Integer, Long>();
+		// key: checkin cat id in level 3, value: num of checkins
+		TreeMap<Integer, Long> level3CheckinCountMap = new TreeMap<Integer, Long>();
+		// key: checkin cat id in none of the levels, value: num of checkins
+		TreeMap<Integer, Long> noneLevelCheckinCountMap = new TreeMap<Integer, Long>();
+		// key: checkin cat id in none of the levels, value: name. used for updating dictionary
+		TreeMap<Integer, String> noneLevelCatIDNameMap = new TreeMap<Integer, String>();
+		// ** added at the end of cat name which was not in any of the levels
+		////////////////////////////////
+
+		////////////////////////////////
+		TreeMap<Integer, Long> level1OverallDistribution = new TreeMap<Integer, Long>();
+		TreeMap<Integer, Long> level2OverallDistribution = new TreeMap<Integer, Long>();
+		TreeMap<Integer, Long> level3OverallDistribution = new TreeMap<Integer, Long>();
+		////////////////////////////////
+
+		int countOfLines = 0;
+		String lineRead;
+
+		int l1Count = 0, l2Count = 0, l3Count = 0, notFoundInAnyLevelCount = 0;
+		int foundInFlatMap = 0;
+		ArrayList<Integer> notFoundInFlatMap = new ArrayList<Integer>();
+		ArrayList<Integer> catIDsNotFoundInAnyLevel = new ArrayList<Integer>();
+		// int lengthOfReadTokens = -1;
+		try
+		{
+			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
+			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(checkinFileNameToWrite);
+
+			while ((lineRead = br.readLine()) != null)
+			{
+				countOfLines += 1;
+				int isLevel1 = 0, isLevel2 = 0, isLevel3 = 0;
+				// int countFoundInLevels = 0;
+
+				ArrayList<Integer> level1IDs, level2IDs, level3IDs; // IDs of current, parent and grandparent.//
+																	// allowing for multiple parents and grandparents.
+
+				String[] splittedLine = lineRead.split(",");
+
+				if (countOfLines == 1) // skip the first
+				{
+					continue;
+				}
+
+				Integer catID = Integer.valueOf(splittedLine[7].replaceAll("\"", ""));
+
+				if (level1Map.containsKey(catID))
+				{
+					isLevel1 = 1;
+					// countFoundInLevels++;
+					l1Count++;
+					level1CheckinCountMap.put(catID, level1CheckinCountMap.getOrDefault(catID, new Long(0)) + 1);
+				}
+				else if (level2Map.containsKey(catID))
+				{
+					isLevel2 = 1;
+					// countFoundInLevels++;
+					l2Count++;
+					level2CheckinCountMap.put(catID, level2CheckinCountMap.getOrDefault(catID, new Long(0)) + 1);
+				}
+
+				else if (level3Map.containsKey(catID))
+				{
+					isLevel3 = 1;
+					// countFoundInLevels++;
+					l3Count++;
+					level3CheckinCountMap.put(catID, level3CheckinCountMap.getOrDefault(catID, new Long(0)) + 1);
+				}
+
+				if ((isLevel1 + isLevel2 + isLevel3) == 0) // does not belong in any of the levels
+				{
+					catIDsNotFoundInAnyLevel.add(catID);
+					notFoundInAnyLevelCount++;
+					noneLevelCheckinCountMap.put(catID, noneLevelCheckinCountMap.getOrDefault(catID, new Long(0)) + 1);
+					String catName = String.valueOf(splittedLine[8].replaceAll("\"", ""));
+					noneLevelCatIDNameMap.put(catID, catName + "**");
+				}
+
+				if ((isLevel1 + isLevel2 + isLevel3) > 1)// && catID != 201)
+				{
+					System.err.println("Warning: catID " + catID + " found in multiple levels , level1Found=" + isLevel1
+							+ ",level2Found=" + isLevel2 + ",level3Found=" + isLevel3);
+				}
+
+				boolean isInCategoryHierarchy = false;
+
+				// if (foundInLevels > 0)
+				// {
+				// // then search it in the category hierarchy tree
+				// if()
+				// }
+				// for (Integer level1KeyID : catHierarchyMap.keySet())
+				// {
+				// if (isInCategoryHierarchy == true)
+				// {
+				// // break;
+				// }
+				// if (catID == level1KeyID) // is level 1 ID
+				// {
+				// long count = 0;
+				// if (level1OverallDistribution.get(level1KeyID) != null)
+				// {
+				// count = level1OverallDistribution.get(level1KeyID);
+				// }
+				// level1OverallDistribution.put(level1KeyID, count + 1);
+				// isInCategoryHierarchy = true;
+				// foundInFlatMap++;
+				// break;
+				// }
+				// for (Integer childID : catHierarchyMap.get(level1KeyID)) // is child of level1 id
+				// {
+				// if (catID == childID)
+				// {
+				// long count = 0;
+				// if (level1OverallDistribution.get(level1KeyID) != null)
+				// {
+				// count = level1OverallDistribution.get(level1KeyID);
+				// }
+				// level1OverallDistribution.put(level1KeyID, count + 1);
+				//
+				// isInCategoryHierarchy = true;
+				// foundInFlatMap++;
+				// break;
+				// }
+				// }
+				// }
+
+				if (!isInCategoryHierarchy)
+				{
+					notFoundInFlatMap.add(catID);
+				}
+
+			}
+
+			System.out.println("-----------------------------------------");
+			System.out.println("Num of lines read = " + countOfLines);
+
+			System.out.println("Num of level 1 catids in checkins = " + level1CheckinCountMap.size());
+			System.out.println("Num of level 2 catids in checkins = " + level2CheckinCountMap.size());
+			System.out.println("Num of level 3 catids in checkins = " + level3CheckinCountMap.size());
+			System.out.println("Num of catids not in any levels in checkins = " + noneLevelCheckinCountMap.size());
+
+			System.out.println("Num of checkins at level 1 = " + l1Count);
+			System.out.println("Num of checkins at level 2 = " + l2Count);
+			System.out.println("Num of checkins at level 3 = " + l3Count);
+			System.out.println("Num of checkins not found in any levels (i.e., not in category hierarchy) = "
+					+ notFoundInAnyLevelCount);
+
+			// System.out.println("Num of checkins found at one of the levels = " + foundInFlatMap);
+			// System.out.println("Num of checkins not found in hierarchy map = " + notFoundInFlatMap.size());
+			System.out.println("-----------------------------------------");
+
+			br.close();
+			bw.close();
+		} // end
+			// of
+			// try
+		catch (
+
+		Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		// writeCheckInDistributionOverCatIDs(level1CheckinCountMap, level2CheckinCountMap, level3CheckinCountMap,
+		// noneLevelCheckinCountMap,
+		// level1OverallDistribution, fileNameToWriteCatLevelDistro); //removed from here to make methods more
+		// functional, less sideeffects.
+
+		Map<String, TreeMap<Integer, Long>> countResultsTogether = new LinkedHashMap<>();
+
+		countResultsTogether.put("level1CheckinCountMap", level1CheckinCountMap);
+		countResultsTogether.put("level2CheckinCountMap", level2CheckinCountMap);
+		countResultsTogether.put("level3CheckinCountMap", level3CheckinCountMap);
+		countResultsTogether.put("noneLevelCheckinCountMap", noneLevelCheckinCountMap);
+		countResultsTogether.put("level1OverallDistribution", level1OverallDistribution);
+
+		return new Pair<Map<String, TreeMap<Integer, Long>>, TreeMap<Integer, String>>(countResultsTogether,
+				noneLevelCatIDNameMap);
+		// return noneLevelCheckinCountMap;
+	}
+
+	/**
 	 * Iterate through the checkin data and generate count maps for level1, level2, level3 and nonelevel catids.
 	 * 
 	 * @param level1Map
+	 *            cat id names map for level 1 cat ids
 	 * @param level2Map
+	 *            cat id names map for level w cat ids
 	 * @param level3Map
+	 *            cat id names map for level 3 cat ids
 	 * @param catHierarchyMap
+	 *            cat id as three level tree as map of maps of sets
 	 * @param checkinFileNameToRead
 	 * @param checkinFileNameToWrite
 	 * @return A pair where the first element is:</br>
@@ -934,10 +1197,10 @@ public class JSONProcessingGowallaTryingNonStatic implements Serializable
 
 			System.out.println("Intersection of l1Keys and l2Keys = "
 					+ Arrays.toString(UtilityBelt.getIntersection(l1Keys, l2Keys).toArray()));
-			System.out.println(
-					"Intersection of l2Keys and l3Keys =" + Arrays.toString(UtilityBelt.getIntersection(l2Keys, l3Keys).toArray()));
-			System.out.println(
-					"Intersection of l1Keys and l3Keys =" + Arrays.toString(UtilityBelt.getIntersection(l1Keys, l3Keys).toArray()));
+			System.out.println("Intersection of l2Keys and l3Keys ="
+					+ Arrays.toString(UtilityBelt.getIntersection(l2Keys, l3Keys).toArray()));
+			System.out.println("Intersection of l1Keys and l3Keys ="
+					+ Arrays.toString(UtilityBelt.getIntersection(l1Keys, l3Keys).toArray()));
 			// Arrays.toString(children.toArray()
 			System.out.println("Total num of catIDs = " + (level1Map.size() + level2Map.size() + level3Map.size()));
 

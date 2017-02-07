@@ -79,6 +79,7 @@ public class DatabaseCreatorGowallaQuicker0
 	public static final String categoryHierarchyTreeFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode";
 	static String nameForMapToBeSerialised = "mapForGowallaData25Nov2016.map";// "mapForGowallaData9Sep2016.map";
 
+	static final String catIDNameDictionaryFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/UI/CatIDNameDictionary.kryo";
 	// $$public static final int continuityThresholdInSeconds = 5 * 60; // changed from 30 min in DCU dataset...., if
 	// two timestamps are separated by less than equal to this value
 	// and
@@ -130,8 +131,9 @@ public class DatabaseCreatorGowallaQuicker0
 			DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
 					.deSerializeThis(categoryHierarchyTreeFileName);
 			//
-			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer.kryoDeSerializeThis(
-					"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
+			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
+					.kryoDeSerializeThis(catIDNameDictionaryFileName);
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
 			// commonPath + "CatIDNameDictionary.kryo");
 
 			int workingCatLevel = Constant.gowallaWorkingCatLevel;
