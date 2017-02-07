@@ -5,8 +5,10 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
@@ -63,7 +65,8 @@ public class ControllerWithoutServer
 						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
 						+ ".kryo";
 
-				commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/ConsecutiveAnalysis/";
+				commonPath = Constant.outputCoreResultsPath;
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/";
 				// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
 				// run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//
 				/// "/run/media/gunjan/BoX2/GowallaSpaceSpace/GowallaDataWorksSep16/";
@@ -192,17 +195,17 @@ public class ControllerWithoutServer
 
 				if (Constant.getDatabaseName().equals("gowalla1"))
 				{
-					String folderPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
+					String gowallaDataFolder = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 					// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/DatabaseCreation/";
 					LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData = (LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>) Serializer
-							.kryoDeSerializeThis(folderPath + "mapForAllCheckinData.kryo");
+							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllCheckinData.kryo");
 					// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllCheckinData.kryo");
 					LinkedHashMap<String, UserGowalla> mapForAllUserData = (LinkedHashMap<String, UserGowalla>) Serializer
-							.kryoDeSerializeThis(folderPath + "mapForAllUserData.kryo");
+							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllUserData.kryo");
 					// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllUserData.kryo");
 
 					LinkedHashMap<String, LocationGowalla> mapForAllLocationData = (LinkedHashMap<String, LocationGowalla>) Serializer
-							.kryoDeSerializeThis(folderPath + "mapForAllLocationData.kryo");
+							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
 					// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
 
 					usersDayTimelinesOriginal = TimelineUtils
@@ -328,10 +331,21 @@ public class ControllerWithoutServer
 			System.out.println("\n--again remove users with less than 50 days (these are the clean days)");
 			usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 50,
 					Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan50DaysLog.csv");
+
 			// Writing user day timelines. big file ~ 17.3GB
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 			// "usersCleanedDayTimelinesReduced3",
 			// false, false, false, "GowallaUserDayTimelinesCleanedReduced3.csv");// users
+
+			// write a subset of timelines
+			Map<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelinesSampled = usersCleanedDayTimelines
+					.entrySet().stream().limit(2).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+
+			WritingToFile.writeUsersDayTimelinesSameFile(
+					new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>(usersCleanedDayTimelinesSampled),
+					"usersCleanedDayTimelinesReduced3First2UsersOnly", false, false, false,
+					"GowallaUserDayTimelinesCleanedReduced3First2UsersOnly.csv");// users
+			////////
 
 			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfActsCleanedReduced3.csv");// us
@@ -358,11 +372,14 @@ public class ControllerWithoutServer
 			// // end of for gowalla weather data generation //commented out 22 Jan 2017
 
 			// start of consective counts
-			LinkedHashMap<String, ArrayList<Integer>> consecutiveCounts = TimelineUtils
-					.countConsecutiveSimilarActivities2(usersCleanedDayTimelines,
-							/* $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/" */
-							"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/ConsecutiveAnalysis/",
-							"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
+
+			// //good curtain 7 Feb 2017 start
+			// LinkedHashMap<String, ArrayList<Integer>> consecutiveCounts = TimelineUtils
+			// .countConsecutiveSimilarActivities2(usersCleanedDayTimelines,
+			// /* $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/" */
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/ConsecutiveAnalysis/",
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
+			// //good curtain 7 Feb 2017 end
 
 			// end of consecutive counts
 

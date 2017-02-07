@@ -206,14 +206,17 @@ public class ActivityObject implements Serializable
 
 	public String toStringAllGowalla()
 	{
-		return "activityID=" + activityID + "__locationID=" + locationID + "__activityName=" + activityName
-				+ "__ locationName=" + locationName + "__workingLevelCatIDs=" + workingLevelCatIDs
-				+ "__ startTimestamp=" + startTimestamp + "__startLatitude=" + startLatitude + "__startLongitude="
-				+ startLongitude + "__ startAltitude=" + startAltitude + "__ userID=" + userID + "__ photos_count="
-				+ photos_count + "__ checkins_count=" + checkins_count + "__ users_count=" + users_count
-				+ "__ radius_meters=" + radius_meters + "__ highlights_count=" + highlights_count + "__ items_count="
-				+ items_count + "__ max_items_count=" + max_items_count + "__ distNext=" + distanceInMFromNext
-				+ "__durationNext=" + durationInSecondsFromNext;
+		return "activityID=" + activityID + "__locationID="
+				+ locationID /*
+								 * + "__activityName=" + activityName + "__ locationName=" + locationName
+								 */ + "__workLvlCat=" + workingLevelCatIDs + "__startTS=" + startTimestamp + "__startLat="
+				+ startLatitude + "__startLon=" + startLongitude /*
+																	 * + "__ startAlt=" + startAltitude
+																	 */ + "__userID=" + userID + "__photos_count="
+				+ photos_count + "__cins_count=" + checkins_count + "__users_count=" + users_count + "__radius_m="
+				+ radius_meters + "__highlts_count=" + highlights_count + "__items_count=" + items_count
+				+ "__max_items_count=" + max_items_count + "__distNext=" + distanceInMFromNext + "__durNext="
+				+ durationInSecondsFromNext;
 	}
 
 	public String toString()
