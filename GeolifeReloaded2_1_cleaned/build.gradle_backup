@@ -79,7 +79,7 @@ dependencies
 	
 	
 	//for shadow jar- http://imperceptiblethoughts.com/shadow/#running_the_shadow_jar
-    //compile 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+    classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
 	//compile 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
 	
 	//compile name: 'spmf'
@@ -94,22 +94,11 @@ dependencies
 }
 
 
-// buildscript {
-//     repositories {
-//         jcenter()
-//     }
-//     dependencies {
-//         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-//     }
-// }
+apply plugin: 'com.github.johnrengelman.shadow'
 
-// apply plugin: 'com.github.johnrengelman.shadow'
-
-//  to run 
-mainClassName = 'org.activity.controller.SuperController'
 
 //////////////
-jar { //shadowJar
+shadowJar {
 	 manifest {
         attributes	 'Implementation-Title': 'SuperController',
 					     'Main-Class': 'org.activity.controller.SuperController',
@@ -117,11 +106,13 @@ jar { //shadowJar
     }
 }
 /////////////
-
+//  to run 
+mainClassName = 'org.activity.controller.SuperController'
 
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
+
   main = 'org.activity.controller.SuperController'
-  jvmArgs = [  '-Xmx11g', '-XX:-UseGCOverheadLimit']
+
   // arguments to pass to the application
 }
