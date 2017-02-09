@@ -76,7 +76,8 @@ public class DatabaseCreatorGowallaQuicker0
 
 	public static final String userLocationFileName = rawPathToRead + "gowalla_spots_subset1.csv";
 
-	public static final String categoryHierarchyTreeFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode";
+	public static final String categoryHierarchyTreeFileName = "./dataToRead/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode";
+	// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode";
 	static String nameForMapToBeSerialised = "mapForGowallaData25Nov2016.map";// "mapForGowallaData9Sep2016.map";
 
 	static final String catIDNameDictionaryFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/UI/CatIDNameDictionary.kryo";

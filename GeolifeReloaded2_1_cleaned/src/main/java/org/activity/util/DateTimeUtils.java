@@ -213,6 +213,12 @@ public class DateTimeUtils
 		return new Date(timestamp.getTime());
 	}
 
+	/**
+	 * 
+	 * @param timestamp
+	 * @param tz
+	 * @return
+	 */
 	public static LocalDate getLocalDate(Timestamp timestamp, TimeZone tz)
 	{
 		TimeZone.setDefault(tz);

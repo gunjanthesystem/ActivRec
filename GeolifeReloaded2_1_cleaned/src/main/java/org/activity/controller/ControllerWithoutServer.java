@@ -195,7 +195,8 @@ public class ControllerWithoutServer
 
 				if (Constant.getDatabaseName().equals("gowalla1"))
 				{
-					String gowallaDataFolder = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
+					String gowallaDataFolder = "./dataToRead/Feb2/DatabaseCreated/";
+					// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 					// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/DatabaseCreation/";
 					LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData = (LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>) Serializer
 							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllCheckinData.kryo");
