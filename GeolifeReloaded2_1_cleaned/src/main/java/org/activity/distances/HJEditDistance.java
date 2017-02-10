@@ -6,6 +6,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.util.Constant;
+import org.activity.util.RegexUtils;
 import org.activity.util.StatsUtils;
 
 /**
@@ -153,7 +154,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 		Pair<String, Double> levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1,
 				stringCodeForActivityObjects2, 1, 1, 2);
 
-		String[] splitted = levenshteinDistance.getFirst().split("_"); // "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
+		String[] splitted = RegexUtils.patternUnderScore.split(levenshteinDistance.getFirst());
+		// $$ levenshteinDistance.getFirst().split("_");
+		// "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
 
 		if (Constant.verboseDistance)
 		{
@@ -164,14 +167,16 @@ public class HJEditDistance extends AlignmentBasedDistance
 		for (int i = 1; i < splitted.length; i++)
 		{
 			String op = splitted[i]; // D(1-0)
-			String[] splitOps = op.split("\\("); // D and 1-0)
+			String[] splitOps = RegexUtils.patternOpeningRoundBrace.split(op);// $$op.split("\\("); // D and 1-0)
 
 			// System.out.println(splitted[i]); //D(1-0)
 
 			String operation = splitOps[0]; // D
 
-			String splitCo[] = splitOps[1].split("-"); // 1 and 0)
-			String splitCoAgain[] = splitCo[1].split("\\)"); // 0 and nothing
+			String splitCo[] = RegexUtils.patternHyphen.split(splitOps[1]);
+			// $$splitOps[1].split("-"); // 1 and 0)
+			String splitCoAgain[] = RegexUtils.patternClosingRoundBrace.split(splitCo[1]);
+			// $$splitCo[1].split("\\)"); // 0 and nothing
 
 			int coordOfAO1 = Integer.parseInt(splitCo[0]) - 1;// 1 minus 1
 

@@ -224,7 +224,7 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18 };
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12 };// , 14, 16, 18 };
 	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
 	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 
@@ -244,7 +244,7 @@ public final class Constant
 															// OTMDSAMEditDistance
 
 	/****** Evaluation Constants Start ***********/
-	public static final boolean EvalPrecisionRecallFMeasure = false;
+	public static final boolean EvalPrecisionRecallFMeasure = false;// true;// false;
 	/****** Evaluation Constants End ***********/
 
 	static TimeZone timeZoneForExperiments = null;

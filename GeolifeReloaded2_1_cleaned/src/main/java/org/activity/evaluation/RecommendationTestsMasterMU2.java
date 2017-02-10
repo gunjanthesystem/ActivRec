@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
@@ -28,6 +27,7 @@ import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.RegexUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -132,8 +132,8 @@ public class RecommendationTestsMasterMU2
 				pruningHasSaturated = true;
 				try
 				{
-					for (int matchingUnitIterator = 0; matchingUnitIterator < matchingUnitArray.length; matchingUnitIterator++)// double
-																																// matchingUnitInHoursc)
+					for (int matchingUnitIterator = 0; matchingUnitIterator < matchingUnitArray.length; matchingUnitIterator++)
+					// double matchingUnitInHoursc)
 					{
 						long ctmu1 = System.currentTimeMillis();
 						userIdNumOfRTsMap = new TreeMap<Integer, Integer>();
@@ -154,10 +154,8 @@ public class RecommendationTestsMasterMU2
 						// else
 						// Constant.setWriteNumActsmatchingUnit(false);
 						// }
-						// commonPath = Constant.outputCoreResultsPath;
-						commonPath = Constant.outputCoreResultsPath;// + Constant.DATABASE_NAME + "_" +
-																	// LocalDateTime.now().getMonth().toString().substring(0,
-																	// 3)
+						commonPath = Constant.outputCoreResultsPath;
+						// + Constant.DATABASE_NAME + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
 						// + LocalDateTime.now().getDayOfMonth();
 
 						// Creating the directory for that matching unit
@@ -168,7 +166,7 @@ public class RecommendationTestsMasterMU2
 							System.exit(-135);
 						}
 
-						commonPath = commonPath + "/MatchingUnit" + matchingUnit + "/";
+						commonPath = commonPath + "MatchingUnit" + matchingUnit + "/";
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath()); // commonPath=Constant.getCommonPath();
 
@@ -366,9 +364,8 @@ public class RecommendationTestsMasterMU2
 							// change per matching unit
 
 							// note: the maps of maps here contains a map for baselines count and another map for
-							// baseline
-							// duration: they will be used later to write prediction results for baseline count and
-							// baseline duration
+							// baseline duration: they will be used later to write prediction results for baseline count
+							// and baseline duration
 							LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines = WritingToFile
 									.writeBasicActivityStatsAndGetBaselineMaps(userName, userAllDatesTimeslines,
 											userTrainingTimelines, userTestTimelines);
@@ -529,19 +526,9 @@ public class RecommendationTestsMasterMU2
 
 									RecommendationMasterMU recommP1 = new RecommendationMasterMU(userTrainingTimelines,
 											userTestTimelines, dateToRecomm, endTimeString, userId, thresholdValue,
-											typeOfThreshold, matchingUnit, caseType, this.lookPastType, false);// LAST
-																												// PARAM
-																												// TRUE
-																												// IS
-																												// DUMMY
-																												// FOR
-																												// CALLING
-																												// PERFORMANCE
-																												// CONSTRUCTOR,
-																												// REMOVE
-																												// IT
-																												// FOR
-																												// EXPERIMENTS
+											typeOfThreshold, matchingUnit, caseType, this.lookPastType, false);
+									// LAST PARAM TRUE IS DUMMY FOR CALLING PERFORMANCE CONSTRUCTOR, REMOVE IT FOR
+									// EXPERIMENTS
 									// ,fullCandOrSubCand);
 
 									LinkedHashMap<Integer, TimelineWithNext> candidateTimelines = recommP1
@@ -560,13 +547,8 @@ public class RecommendationTestsMasterMU2
 										{
 											Timeline candtt1 = candTimelineTemp.getValue(); // ArrayList<ActivityObject>
 																							// aa1=candtt1.getActivityObjectsInTimeline();
-											int sizez1 = candtt1.countNumberOfValidActivities() - 1; // excluding the
-																										// current
-																										// activity at
-																										// the end of
-																										// the
-																										// candidate
-																										// timeline
+											int sizez1 = candtt1.countNumberOfValidActivities() - 1;
+											// excluding the current activity at the end of the candidate timeline
 											// System.out.println("Number of activity Objects in this timeline (except
 											// the end current activity) is: "+sizez1);
 											// numActsInEachCandbw.write
@@ -671,10 +653,8 @@ public class RecommendationTestsMasterMU2
 										numberOfAfternoonRTs++;
 									else if (timeCategory.equalsIgnoreCase("Evening")) numberOfEveningRTs++;
 
-									String actActualDone = nextValidActivityObjectAfterRecommPoint1.getActivityName(); // target
-																														// activity
-																														// for
-																														// recommendation
+									/** target activity for recommendation **/
+									String actActualDone = nextValidActivityObjectAfterRecommPoint1.getActivityName();
 
 									// String topNextActivityForRecommAtStartWithoutDistance =
 									// recommP1.getTopNextActivityNamesWithoutDistanceString();
@@ -752,8 +732,9 @@ public class RecommendationTestsMasterMU2
 									 * ***
 									 */
 
-									String[] splittedRecomm = rankedRecommAtStartWithoutScore
-											.split(Pattern.quote("__"));
+									String[] splittedRecomm = RegexUtils.patternDoubleUnderScore
+											.split(rankedRecommAtStartWithoutScore);
+									// $$ rankedRecommAtStartWithoutScore.split(Pattern.quote("__"));
 									bwMaxNumOfDistinctRecommendations
 											.write(dateToRecomm + "," + endTimeStamp + "," + weekDay + // UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
 													"," + (splittedRecomm.length - 1) + ","
@@ -828,7 +809,7 @@ public class RecommendationTestsMasterMU2
 										} // end of loop over editDistancesSortedMapFullCand
 										bwRecommTimesWithEditDistances.write(rtsWithEditDistancesMsg + "\n");
 									}
-									System.out.println("// end of for loop over all activity objects in test date");
+									System.out.println("end of for loop over all activity objects in test date");
 								} // end of for loop over all activity objects in test date
 								bwRaw.write(bwRawToWriteForThisUserDate.toString());
 								metaBufferWriter.write(metaToWriteForThisUserDate.toString());
@@ -927,12 +908,12 @@ public class RecommendationTestsMasterMU2
 						long recommTestsEndtime = System.currentTimeMillis();
 
 						System.out.println("Time taken for executing Recommendation Tests for this matching unit ="
+								+ (recommTestsEndtime - ctmu1) / 1000 + "seconds");
+						System.out.println("Time since Recommendation Tests started ="
 								+ (recommTestsEndtime - recommTestsStarttime) / 1000 + "seconds");
-
 						consoleLogStream.close();
-
 					} // end of loop over matching unit
-				}
+				} // end of loop pver recommendation tests for this threshold value
 
 				catch (IOException e)
 				{
