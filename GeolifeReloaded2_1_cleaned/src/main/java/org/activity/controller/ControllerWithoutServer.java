@@ -1,15 +1,19 @@
 package org.activity.controller;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.activity.evaluation.RecommendationTestsMasterMU2;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -22,6 +26,7 @@ import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
+import org.activity.util.PerformanceAnalytics;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -209,6 +214,8 @@ public class ControllerWithoutServer
 							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
 					// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
 
+					System.out.println("before creating timelines\n" + PerformanceAnalytics.getHeapInformation());
+
 					usersDayTimelinesOriginal = TimelineUtils
 							.createUserTimelinesFromCheckinEntriesGowalla(mapForAllCheckinData, mapForAllLocationData);
 				}
@@ -359,7 +366,7 @@ public class ControllerWithoutServer
 			// Constant.outputCoreResultsPath =
 			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 
-			String s[] = { "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+			String s[] = { "1", "101", "201", "301", "401", "501" };// , "601", "701", "801", "901" };
 
 			System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
@@ -393,36 +400,44 @@ public class ControllerWithoutServer
 			// System.out.println("startUserIndex=" + startUserIndex + " endUserIndex" + endUserIndex);
 			// }
 
-			// //important curtain 1 start
-			// for (int i = 0; i < s.length; i++)
-			// {
-			// int startUserIndex = Integer.valueOf(s[i]) - 1;// 100
-			// int endUserIndex = startUserIndex + 199;// 140; // 199
-			// Constant.outputCoreResultsPath = Constant.outputCoreResultsPath + s[i] + "/";
-			// int indexOfSampleUsers = 0;
-			// /// sample users
-			// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> sampledUsers = new LinkedHashMap<>();
-			//
-			// for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
-			// {
-			// // countOfSampleUsers += 1;
-			// if (indexOfSampleUsers < startUserIndex)
-			// {
-			// indexOfSampleUsers += 1;
-			// continue;
-			// }
-			// if (indexOfSampleUsers > endUserIndex)
-			// {
-			// indexOfSampleUsers += 1;
-			// break;
-			// }
-			// sampledUsers.put(userEntry.getKey(), userEntry.getValue());
-			// System.out.println("putting in user= " + userEntry.getKey());
-			// indexOfSampleUsers += 1;
-			// }
-			// RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
-			// }
-			// //important curtain 1 end
+			String commonBasePath = Constant.getCommonPath();
+			// important curtain 1 start
+			for (int i = 0; i < s.length; i++)
+			{
+				// important so as to wipe the previously assigned user ids
+				Constant.initialise(commonPath, Constant.getDatabaseName());
+
+				int startUserIndex = Integer.valueOf(s[i]) - 1;// 100
+				int endUserIndex = startUserIndex + 99;// 199;// 140; // 199
+				Constant.outputCoreResultsPath = commonBasePath + s[i] + "/";
+				Files.createDirectories(Paths.get(Constant.outputCoreResultsPath)); // added on 9th Feb 2017
+				int indexOfSampleUsers = 0;
+				/// sample users
+				LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> sampledUsers = new LinkedHashMap<>();
+
+				for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines
+						.entrySet())
+				{
+					// countOfSampleUsers += 1;
+					if (indexOfSampleUsers < startUserIndex)
+					{
+						indexOfSampleUsers += 1;
+						continue;
+					}
+					if (indexOfSampleUsers > endUserIndex)
+					{
+						indexOfSampleUsers += 1;
+						break;
+					}
+					sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+					// $$System.out.println("putting in user= " + userEntry.getKey());
+					indexOfSampleUsers += 1;
+				}
+				System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
+				System.out.println(" -- Users = " + sampledUsers.keySet().toString());
+				RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+			}
+			// important curtain 1 end
 			// $$$
 			// String, LinkedHashMap<Date, UserDayTimeline>
 			//////////// for Gowalla end

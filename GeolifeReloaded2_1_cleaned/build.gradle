@@ -14,8 +14,6 @@ apply plugin: 'application'
 //apply plugin: 'fatJar'
 
 
-
-
 ///////////////////////////////////////////////////
 sourceCompatibility = 1.8
 version = '1.0'
@@ -122,6 +120,7 @@ jar { //shadowJar
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = 'org.activity.controller.SuperController'
-  jvmArgs = [  '-Xmx11g', '-XX:-UseGCOverheadLimit']
+  jvmArgs = ['-Xmx11g']
+  //, '-XX:-UseGCOverheadLimit
   // arguments to pass to the application
 }

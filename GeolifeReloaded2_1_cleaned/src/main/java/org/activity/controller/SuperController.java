@@ -2,6 +2,7 @@ package org.activity.controller;
 
 import org.activity.ui.PopUps;
 import org.activity.util.Constant;
+import org.activity.util.PerformanceAnalytics;
 
 public class SuperController
 {
@@ -11,7 +12,8 @@ public class SuperController
 		long at = System.currentTimeMillis();
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 
-		String commonPath = "./dataWritten/";
+		System.out.println(PerformanceAnalytics.getHeapInformation());
+		String commonPath = "./dataWritten/RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";

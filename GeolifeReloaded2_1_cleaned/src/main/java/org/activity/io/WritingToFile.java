@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -261,6 +263,21 @@ public class WritingToFile
 	}
 
 	public static void main(String args[])
+	{
+		try
+		{
+			// Path path = Paths.get("./dataWritten/RecommUnmergedNCount/101/MatchingUnit0.0/");
+			Files.createDirectories(Paths.get("./dataWritten/RecommUnmergedNCount/101/MatchingUnit0.0/"));
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+
+		}
+	}
+
+	public static void main1(String args[])
 	{
 		// List<Double> vals = new ArrayList<Double>();
 		// vals.add(12.2);
@@ -754,9 +771,10 @@ public class WritingToFile
 	 */
 	public static void appendLineToFileAbsolute(String msg, String fullPathfileNameToUse)
 	{
+		String fileName = null;
 		try
 		{
-			String fileName = fullPathfileNameToUse;
+			fileName = fullPathfileNameToUse;
 			// PopUps.showMessage("Inside appendLineToFileAbsolute() for filename " + fileName);
 			File file = new File(fileName);
 
@@ -774,6 +792,7 @@ public class WritingToFile
 
 		catch (Exception e)
 		{
+			System.err.println("Exception generated for fileName = " + fileName);
 			e.printStackTrace();
 		}
 	}
@@ -3129,10 +3148,8 @@ public class WritingToFile
 		}
 
 		writeSimpleLinkedHashMapToFileAppend(activityNameDurationPairsOverAllDayTimelines,
-				"ActivityNameDurationPairsOver" + fileNamePhrase + ".csv", "Activity", "Duration");
-		// TODO check if it
-		// indeed should be
-		// an append
+				commonPath + "ActivityNameDurationPairsOver" + fileNamePhrase + ".csv", "Activity", "Duration");
+		// TODO check if it indeed should be an append
 
 		return activityNameDurationPairsOverAllDayTimelines;
 
@@ -3277,8 +3294,10 @@ public class WritingToFile
 		}
 
 		writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
-				"ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count"); // TODO check if it indeed
-																								// should be an append
+				commonPath + "ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count"); // TODO check
+																											// if it
+																											// indeed
+		// should be an append
 
 		if (Constant.verbose) System.out.println("Exiting writeActivityCountsInGivenDayTimelines");
 
@@ -3395,8 +3414,9 @@ public class WritingToFile
 		}
 
 		writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
-				"ActivityOccPerTimelines" + fileNamePhrase + ".csv", "Activity", "Count");// TODO check if it indeed
-																							// should be an append
+				commonPath + "ActivityOccPerTimelines" + fileNamePhrase + ".csv", "Activity", "Count");// TODO check if
+																										// it indeed
+		// should be an append
 
 		return activityNameCountPairsOverAllDayTimelines;
 
@@ -3794,11 +3814,11 @@ public class WritingToFile
 	 * Write a LinkedHashMap to file modified for append
 	 * 
 	 * @param map
-	 * @param fileName
+	 * @param absFileNameToWrite
 	 * @param headerKey
 	 * @param headerValue
 	 */
-	public static void writeSimpleLinkedHashMapToFileAppend(LinkedHashMap<String, ?> map, String fileName,
+	public static void writeSimpleLinkedHashMapToFileAppend(LinkedHashMap<String, ?> map, String absFileNameToWrite,
 			String headerKey, String headerValue)
 	{
 		// commonPath = Constant.getCommonPath();//
@@ -3812,7 +3832,7 @@ public class WritingToFile
 
 		try
 		{
-			File fileToWrite = new File(fileName);
+			File fileToWrite = new File(absFileNameToWrite);
 			// fileToWrite.delete();
 			// fileToWrite.createNewFile();
 

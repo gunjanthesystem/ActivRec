@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.RegexUtils;
 import org.activity.util.StatsUtils;
 import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
@@ -87,7 +88,9 @@ public class ActivityObject implements Serializable
 
 		// this.activityID = activityID;
 
-		String splittedwlci[] = workingLevelCatIDs.split("__");
+		String splittedwlci[] = RegexUtils.patternDoubleUnderScore.split(workingLevelCatIDs);
+		// $$ workingLevelCatIDs.split("__");
+
 		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
 															// considering one working level cat id
 

@@ -1,5 +1,6 @@
 package org.activity.ui;
 
+import java.awt.HeadlessException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -19,13 +20,21 @@ public class PopUps
 	 */
 	public static void showMessage(String msg)
 	{
-		JFrame frame = new JFrame();
-		// frame.setSize(200, 150);
-		// frame.getContentPane( ).setLayout(new BorderLayout( ));
-		JOptionPane.showMessageDialog(frame, msg);
-		// frame.getContentPane( ).add(p, BorderLayout.SOUTH);
-		// frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		try
+		{
+			JFrame frame = new JFrame();
+			// frame.setSize(200, 150);
+			// frame.getContentPane( ).setLayout(new BorderLayout( ));
+			JOptionPane.showMessageDialog(frame, msg);
+			// frame.getContentPane( ).add(p, BorderLayout.SOUTH);
+			// frame.setVisible(true);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
+
+		catch (HeadlessException e)
+		{
+			System.out.println("\n Headless: hence printing msg instead of PopUp.\n" + msg);
+		}
 	}
 
 	/**
@@ -35,9 +44,16 @@ public class PopUps
 	 */
 	public static void showError(String msg)
 	{
-		JFrame frame = new JFrame();
-		JOptionPane.showMessageDialog(frame, msg, "Error Encountered", JOptionPane.ERROR_MESSAGE);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		try
+		{
+			JFrame frame = new JFrame();
+			JOptionPane.showMessageDialog(frame, msg, "Error Encountered", JOptionPane.ERROR_MESSAGE);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
+		catch (HeadlessException e)
+		{
+			System.err.println("\n Headless: hence printing error msg instead of PopUp.\n" + msg);
+		}
 	}
 
 	/**

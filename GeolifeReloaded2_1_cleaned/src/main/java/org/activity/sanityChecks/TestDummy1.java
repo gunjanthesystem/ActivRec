@@ -2,6 +2,9 @@ package org.activity.sanityChecks;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import org.activity.util.RegexUtils;
 
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.IntArraySerializer;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers.StringSerializer;
@@ -41,7 +44,73 @@ public class TestDummy1
 
 	public static void main(String args[])
 	{
-		System.out.println(System.getProperty("user.dir"));
+		// System.out.println(System.getProperty("user.dir"));
+		// stringSplitPerformance();
+
+	}
+
+	public static void stringSplitPerformance()
+	{
+		String s1 = "gunjan,manali,neha";
+		String[] splitted1 = null, splitted2 = null, splitted3 = null;
+		long timeTaken1 = -1, timeTaken2 = -1, timeTaken3 = -1;
+		int numOfIterations = 1000000;
+		String delimiter = ",";
+		/////////////////////////////////////////
+		long begin = System.nanoTime();
+		for (int i = 0; i < numOfIterations; i++)
+		{
+			splitted1 = s1.split(Pattern.quote(delimiter));
+		}
+		long end = System.nanoTime();
+		timeTaken1 = end - begin;
+		System.out.println(" time taken for split pattern quote = " + timeTaken1 + "ns");
+		/////////////////////////////////////////
+		begin = System.nanoTime();
+		for (int i = 0; i < numOfIterations; i++)
+		{
+			Pattern doubleUnderScorePattern = RegexUtils.patternComma;// Pattern.compile(delimiter);
+			splitted2 = doubleUnderScorePattern.split(s1);
+		}
+		end = System.nanoTime();
+		timeTaken2 = end - begin;
+		System.out.println(" time taken for pattern compile = " + timeTaken2 + "ns");
+		/////////////////////////////////////////
+		begin = System.nanoTime();
+		Pattern doubleUnderScorePattern = RegexUtils.patternComma;
+		for (int i = 0; i < numOfIterations; i++)
+		{
+			splitted3 = doubleUnderScorePattern.split(s1);
+		}
+		end = System.nanoTime();
+		timeTaken3 = end - begin;
+		System.out.println(" time taken for pattern precompiled = " + timeTaken3 + "ns");
+		/////////////////////////////////////////
+
+		double times = (timeTaken1 * 1.0 / timeTaken2);
+		System.out.println("timeTaken1/timeTaken2 = " + times);
+
+		times = (timeTaken1 * 1.0 / timeTaken3);
+		System.out.println("timeTaken1/timeTaken3 = " + times);
+		// System.out.println(Arrays.stream(splitted1).forEach(e -> System.out.println(e.toString())));
+		/////////////////////////////////////////
+
+		System.out.println("Splitted 1 = ");
+		for (String s : splitted1)
+		{
+			System.out.println(s);
+		}
+		System.out.println("Splitted 2 = ");
+		for (String s : splitted2)
+		{
+			System.out.println(s);
+		}
+
+		System.out.println("Splitted 3 = ");
+		for (String s : splitted3)
+		{
+			System.out.println(s);
+		}
 	}
 
 	public static void main1(String args[])

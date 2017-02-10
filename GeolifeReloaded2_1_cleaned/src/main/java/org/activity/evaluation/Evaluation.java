@@ -9,9 +9,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
+import org.activity.io.WritingToFile;
 import org.activity.util.Constant;
+import org.activity.util.RegexUtils;
 
 /**
  * (note: In earlier version (before 14 April 2015, this class was name as TestStats.java)
@@ -25,6 +26,16 @@ public class Evaluation
 
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All", "Morning", "Afternoon", "Evening" };
+	// static String literalUnderscore, literalColon;
+
+	// /**
+	// * Set regexes to be use, so that they are compiled to regex only use and can be reused to improve performance
+	// */
+	// public void setRegexesToBeUsed()
+	// {
+	// literalUnderscore = Pattern.quote("_");
+	// literalColon = Pattern.quote(":");
+	// }
 
 	public Evaluation()// static void main(String args[])
 	{
@@ -96,7 +107,8 @@ public class Evaluation
 			{
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println(metaCurrentLine);
-				String[] tokensInCurrentMetaLine = metaCurrentLine.split(",");
+				String[] tokensInCurrentMetaLine = RegexUtils.patternComma.split(metaCurrentLine);// $$
+																									// metaCurrentLine.split(",");
 				// System.out.println("number of tokens in this meta line=" + tokensInCurrentMetaLine.length);
 				consoleLogBuilder.append("meta line num:" + (countOfLinesMeta + 1) + "#tokensInLine:"
 						+ tokensInCurrentMetaLine.length + "\n");
@@ -114,7 +126,8 @@ public class Evaluation
 			{
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println("topKCurrentLine is" + topKCurrentLine);
-				String[] tokensInCurrentTopKLine = topKCurrentLine.split(",");
+				String[] tokensInCurrentTopKLine = RegexUtils.patternComma.split(topKCurrentLine);// $$
+																									// topKCurrentLine.split(",");
 				// System.out.println("number of tokens in this topK line=" + tokensInCurrentTopKLine.length);
 				consoleLogBuilder.append("topk line num:" + (countOfLinesTopK + 1) + "#tokensInLine:"
 						+ tokensInCurrentTopKLine.length + "\n");
@@ -132,7 +145,8 @@ public class Evaluation
 			{
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println("baseLineOccurrenceCurrentLine is" + baseLineOccurrenceCurrentLine);
-				String[] tokensInCurrentBaseLineOccurrenceLine = baseLineOccurrenceCurrentLine.split(",");
+				String[] tokensInCurrentBaseLineOccurrenceLine = RegexUtils.patternComma
+						.split(baseLineOccurrenceCurrentLine);// $$baseLineOccurrenceCurrentLine.split(",");
 				// System.out.println("number of tokens in this baselineOccurrence line=" +
 				// tokensInCurrentBaseLineOccurrenceLine.length);
 				consoleLogBuilder.append("baselineOccurrence line num:" + (countOfLinesBaselineOccurrence + 1)
@@ -152,7 +166,8 @@ public class Evaluation
 			{
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println("baseLineDurationCurrentLine is" + baseLineDurationCurrentLine);
-				String[] tokensInCurrentBaseLineDurationLine = baseLineDurationCurrentLine.split(",");
+				String[] tokensInCurrentBaseLineDurationLine = RegexUtils.patternComma
+						.split(baseLineDurationCurrentLine);// $$baseLineDurationCurrentLine.split(",");
 				// System.out.println("number of tokens in this baseLineDuration line=" +
 				// tokensInCurrentBaseLineDurationLine.length);
 				consoleLogBuilder.append("baseLineDuration line num:" + (countOfLinesBaselineDuration + 1)
@@ -172,7 +187,7 @@ public class Evaluation
 			{
 				ArrayList<String> currentLineArray = new ArrayList<String>();
 				// System.out.println(actualCurrentLine);
-				String[] tokensInCurrentActualLine = actualCurrentLine.split(",");
+				String[] tokensInCurrentActualLine = RegexUtils.patternComma.split(actualCurrentLine);// $$actualCurrentLine.split(",");
 				// System.out.println("number of token in this actual line=" + tokensInCurrentActualLine.length);
 				consoleLogBuilder.append("actual line num:" + (countOfLinesActual + 1) + "#tokensInLine:"
 						+ tokensInCurrentActualLine.length + "\n");
@@ -189,9 +204,8 @@ public class Evaluation
 			while ((actualCurrentLine = brCurrentTargetSame.readLine()) != null)
 			{
 				ArrayList<Boolean> currentLineArray = new ArrayList<Boolean>(); // System.out.println(actualCurrentLine);
-				String[] tokensInCurrentTargetSameLine = actualCurrentLine.split(","); // System.out.println("number of
-																						// token in this actual line=" +
-																						// tokensInCurrentActualLine.length);
+				String[] tokensInCurrentTargetSameLine = RegexUtils.patternComma.split(actualCurrentLine);// $$actualCurrentLine.split(",");
+				// System.out.println("number of token in this actual line=" + tokensInCurrentActualLine.length);
 				consoleLogBuilder.append("current target same line num:" + (countOfLinesCurrentTargetSame + 1)
 						+ "#tokensInLine:" + tokensInCurrentTargetSameLine.length + "\n");
 
@@ -250,18 +264,20 @@ public class Evaluation
 				writeMeanReciprocalRank("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
 				writeMeanReciprocalRank("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
 
-				// writeAvgPrecisionsForAllKs("Algo", timeCategory, countOfLinesTopK); // average over data points
-				writeAvgRecallsForAllKs("Algo", timeCategory, countOfLinesTopK);
-				// writeAvgFMeasuresForAllKs("Algo", timeCategory, countOfLinesTopK);
+				if (Constant.EvalPrecisionRecallFMeasure)
+				{
+					// writeAvgPrecisionsForAllKs("Algo", timeCategory, countOfLinesTopK); // average over data points
+					writeAvgRecallsForAllKs("Algo", timeCategory, countOfLinesTopK);
+					// writeAvgFMeasuresForAllKs("Algo", timeCategory, countOfLinesTopK);
 
-				// writeAvgPrecisionsForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
-				writeAvgRecallsForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
-				// writeAvgFMeasuresForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
+					// writeAvgPrecisionsForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
+					writeAvgRecallsForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
+					// writeAvgFMeasuresForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
 
-				// writeAvgPrecisionsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-				writeAvgRecallsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-				// writeAvgFMeasuresForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-
+					// writeAvgPrecisionsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+					writeAvgRecallsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+					// writeAvgFMeasuresForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+				}
 				break;// only 'All' time category
 			}
 			System.out.println("All test stats done");
@@ -311,50 +327,24 @@ public class Evaluation
 		try
 		{
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine;
-			/*
-			 * brMeta = new BufferedReader(new FileReader("/home/gunjan/meta.csv")); brTopK = new BufferedReader(new
-			 * FileReader("/home/gunjan/dataRecommTop5.csv")); brActual = new BufferedReader(new
-			 * FileReader("/home/gunjan/dataActual.csv"));
-			 */
-			File fileRR = new File(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
-
-			// File fileNumberOfRecommendationTimes = new File(commonPath + fileNamePhrase + timeCategory +
-			// "NumOfRecommendationTimes.csv");
-			// File fileAccuracy = new File("/home/gunjan/accuracy.csv");
-
-			fileRR.delete();
-			// fileAccuracy.delete();
-
-			if (!fileRR.exists())
-			{
-				fileRR.createNewFile();
-			}
-			// fileNumberOfRecommendationTimes.createNewFile();
-			/*
-			 * if (!fileAccuracy.exists()) { fileAccuracy.createNewFile(); }
-			 */
-
-			bwRR = new BufferedWriter(new FileWriter(fileRR.getAbsoluteFile()));
-			// bwNumberOfRecommendationTimes = new BufferedWriter(new
-			// FileWriter(fileNumberOfRecommendationTimes.getAbsoluteFile()));
-
-			// bwAccuracy = new BufferedWriter(new FileWriter(fileAccuracy.getAbsoluteFile()));
+			// File fileRR = new File(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
+			// fileRR.delete();
+			// if (!fileRR.exists())
+			// {
+			// fileRR.createNewFile();
+			// }
+			// bwRR = new BufferedWriter(new FileWriter(fileRR.getAbsoluteFile()));
+			bwRR = WritingToFile
+					.getBufferedWriterForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
 
 			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
 					+ "   size of actual array=" + arrayActual.size());
 
-			// bwNumberOfRecommendationTimes.write("," + timeCategory);
-			// bwNumberOfRecommendationTimes.newLine();
-
 			for (int i = 0; i < arrayMeta.size(); i++) // iterating over users (or rows)
 			{
 				ArrayList<String> currentLineArray = arrayMeta.get(i);
-				System.out.println("Calculating RR for user:" + i);
-
+				// $$System.out.println("Calculating RR for user:" + i);
 				double RR = -99;
-
-				// bwNumberOfRecommendationTimes.write(ConnectDatabase.getUserName(i) + ",");
-				// int theK = 0;
 				int countOfRecommendationTimesConsidered = 0; // =count of meta entries considered
 
 				for (int j = 0; j < currentLineArray.size(); j++) // iterating over recommendation times (or columns)
@@ -367,36 +357,16 @@ public class Evaluation
 
 						String actual = arrayActual.get(i).get(j);
 
-						String[] topKString = arrayTopK.get(i).get(j).split("__"); // topK is of the form string:
-																					// __a__b__c__d__e is of length 6...
-																					// value at index 0 is empty.
-
-						// theK = theKOriginal;
-						// System.out.println();
-
-						// if (topKStrings.length - 1 < theK) // for this RT we are not able to make K recommendations
-						// as less than K recommendations are present.
-						// {
-						// System.err.println("Warning: For " + currentLineArray.get(j) + ", Only top " +
-						// (topKStrings.length - 1) +
-						// " recommendation present while the asked for K is " + theK
-						// + "\nDecreasing asked for K to " + (topKStrings.length - 1));
-						// // +"\nWriting -999 values");
-						// theK = topKStrings.length - 1;
-						// // $topKPrecisionVal=-9999;
-						// // $topKRecallVal=-9999;
-						// // $topKFVal=-9999;
-						// }
-						// theK=topKStrings.length-1;
-						// $else
-						// ${
+						String[] topKString = RegexUtils.patternDoubleUnderScore.split(arrayTopK.get(i).get(j));
+						// $$ arrayTopK.get(i).get(j).split("__");
+						// topK is of the form string: __a__b__c__d__e is of length 6...
+						// value at index 0 is empty.
 						if (Constant.verbose)
 						{
 							System.out.println("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j));
 							System.out.println("actual string =" + actual);
 						}
-						// int countOfOccurence = 0; // the number of times the actual item appears in the top K
-						// recommended list. NOTE: in the current case will be always be either 1 or 0.
+
 						int rank = -99;
 						for (int y = 1; y <= topKString.length - 1; y++)
 						{
@@ -407,16 +377,6 @@ public class Evaluation
 							}
 						}
 
-						// if (countOfOccurence > 1)
-						// {
-						// System.err.println("Error: in writePrecisionRecallFMeasure(): the actual string appears
-						// multiple times in topK, which should not be the case as per our
-						// current algorithm.");
-						// }
-						// if (countOfOccurence > 0)
-						// {
-						// countOfOccurence = 1;
-						// }
 						if (rank != -99)
 						{
 							RR = round((double) 1 / rank, 4);
@@ -425,20 +385,14 @@ public class Evaluation
 						{
 							RR = 0; // assuming the rank is at infinity
 						}
-
 						bwRR.write(RR + ",");
-
 						if (Constant.verbose)
 						{
 							System.out.println("RR = " + RR);
 						}
-
 					}
 				} // end of current line array
-
 				bwRR.write("\n");
-				// bwNumberOfRecommendationTimes.write(countOfRecommendationTimesConsidered + "\n");
-				// bwAccuracy.write("\n");
 			}
 
 		}
@@ -451,9 +405,6 @@ public class Evaluation
 			try
 			{
 				bwRR.close();
-				// bwNumberOfRecommendationTimes.close();
-				// bwAccuracy.close();
-
 			}
 			catch (IOException ex)
 			{
@@ -572,9 +523,10 @@ public class Evaluation
 
 						String actual = arrayActual.get(i).get(j);
 
-						String[] topKStrings = arrayTopK.get(i).get(j).split("__"); // topK is of the form string:
-																					// __a__b__c__d__e is of length 6...
-																					// value at index 0 is empty.
+						String[] topKStrings = RegexUtils.patternDoubleUnderScore.split(arrayTopK.get(i).get(j));
+						// arrayTopK.get(i).get(j).split("__");
+						// topK is of the form string: __a__b__c__d__e is of length 6...
+						// value at index 0 is empty.
 
 						theK = theKOriginal;
 						// System.out.println();
@@ -752,11 +704,11 @@ public class Evaluation
 				{
 					if (lineNumber == user)
 					{
-						String[] rrValuesForThisUser = currentLine.split(","); // get avg of all these rr values
-																				// concern: splitting on empty lines
-																				// gives an array of length1, also
-																				// splitting on one values line gives an
-																				// array of length 1
+						String[] rrValuesForThisUser = RegexUtils.patternComma.split(currentLine);
+						// currentLine.split(",");
+						// get avg of all these rr values
+						// concern: splitting on empty lines gives an array of length1, also splitting on one values
+						// line gives an array of length 1
 						if (Constant.verboseEvaluationMetricsToConsole)
 						{
 							System.out.println("current rrValues line read=" + currentLine + " trimmed length="
@@ -870,14 +822,11 @@ public class Evaluation
 					{
 						if (lineNumber == user)
 						{
-							String[] pValuesForThisUserForThisK = currentLine.split(","); // get avg of all these
-																							// precision values concern:
-																							// splitting on empty lines
-																							// gives an array
-																							// of length1, also
-																							// splitting on one values
-																							// line gives an array of
-																							// length 1
+							String[] pValuesForThisUserForThisK = RegexUtils.patternComma.split(currentLine);
+							// currentLine.split(",");
+							// get avg of all these precision values
+							// concern: splitting on empty lines gives an array of length1, also splitting on one values
+							// line gives an array of length 1
 							System.out.println("the current pValues line read=" + currentLine + " trimmed length="
 									+ currentLine.trim().length());
 							System.out.println("The number of p values for user(" + user + ") = "
@@ -1018,7 +967,8 @@ public class Evaluation
 					{
 						if (lineNumber == user)
 						{
-							String[] rValuesForThisUserForThisK = currentLine.split(",");
+							String[] rValuesForThisUserForThisK = RegexUtils.patternComma.split(currentLine);
+							// currentLine.split(",");
 							// double[] pValuesForThisUserForThisK = new double[tokensInCurrentLine.length];
 
 							double avgRValueForThisUserForThisK = 0;
@@ -1124,8 +1074,8 @@ public class Evaluation
 					{
 						if (lineNumber == user)
 						{
-							String[] fValuesForThisUserForThisK = currentLine.split(","); // this is 1 in case of empty
-																							// string
+							String[] fValuesForThisUserForThisK = RegexUtils.patternComma.split(currentLine);
+							// currentLine.split(","); // this is 1 in case of empty string
 							// double[] pValuesForThisUserForThisK = new double[tokensInCurrentLine.length];
 
 							double avgFValueForThisUserForThisK = 0;
@@ -1185,6 +1135,51 @@ public class Evaluation
 		}
 	}
 
+	/**
+	 * changed on 9 Feb to use percompiled regex patterns to improve string split performance correctness verified
+	 * 
+	 * @param metaString
+	 * @return
+	 */
+	public static int getHourFromMetaString(String metaString) // example metaString: 1_10/4/2014_18:39:3
+	{
+		String[] splitted1 = RegexUtils.patternUnderScore.split(metaString);
+		// metaString.split(literalUnderscore);//// Pattern.quote("_"));
+		String[] splitted2 = RegexUtils.patternColon.split(splitted1[2]);
+		// splitted1[2].split(literalColon);// // Pattern.quote(":"));
+		return Integer.valueOf(splitted2[0]);
+	}
+
+	public static String getTimeCategoryOfTheDay(int hour)
+	{
+		String timeCategory = null;
+
+		if (hour >= 0 && hour < 12)
+		{
+			timeCategory = timeCategories[1];
+		}
+
+		else if (hour >= 12 && hour < 16)
+		{
+			timeCategory = timeCategories[2];
+		}
+
+		else if (hour >= 16 && hour <= 23)
+		{
+			timeCategory = timeCategories[3];
+		}
+
+		return timeCategory;
+	}
+
+	public static double round(double value, int places)
+	{
+		if (places < 0) throw new IllegalArgumentException();
+
+		BigDecimal bd = new BigDecimal(value);
+		bd = bd.setScale(places, RoundingMode.HALF_UP);
+		return bd.doubleValue();
+	}
 	/*
 	 * public static void writeAvgRecallForAllKs() { //BufferedReader br= null;
 	 * 
@@ -1253,44 +1248,4 @@ public class Evaluation
 	 * 
 	 * catch (IOException e) { e.printStackTrace(); } }
 	 */
-
-	public static int getHourFromMetaString(String metaString) // example metaString: 1_10/4/2014_18:39:3
-	{
-		String[] splitted1 = metaString.split(Pattern.quote("_"));
-		String[] splitted2 = splitted1[2].split(Pattern.quote(":"));
-
-		return Integer.valueOf(splitted2[0]);
-	}
-
-	public static String getTimeCategoryOfTheDay(int hour)
-	{
-		String timeCategory = null;
-
-		if (hour >= 0 && hour < 12)
-		{
-			timeCategory = timeCategories[1];
-		}
-
-		else if (hour >= 12 && hour < 16)
-		{
-			timeCategory = timeCategories[2];
-		}
-
-		else if (hour >= 16 && hour <= 23)
-		{
-			timeCategory = timeCategories[3];
-		}
-
-		return timeCategory;
-	}
-
-	public static double round(double value, int places)
-	{
-		if (places < 0) throw new IllegalArgumentException();
-
-		BigDecimal bd = new BigDecimal(value);
-		bd = bd.setScale(places, RoundingMode.HALF_UP);
-		return bd.doubleValue();
-	}
-
 }
