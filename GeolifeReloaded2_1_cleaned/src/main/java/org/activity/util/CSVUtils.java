@@ -34,7 +34,17 @@ public class CSVUtils
 	{
 		// testSideConcat();
 		// removeDuplicateRowsGowalla();
-		removeDuplicateRowsFromRawGowalla();
+		// $$removeDuplicateRowsFromRawGowalla();
+		removeDuplicationRowsUsingCuckoo(
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/sbAllDistanceInM.csv",
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/NoDupsbAllDistanceInM.csv",
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/AllDupssbAllDistanceInM.csv");
+
+		removeDuplicationRows(
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/sbAllDistanceInM.csv",
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SNoDupsbAllDistanceInM.csv",
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SAllDupssbAllDistanceInM.csv");
+
 		// gowallaMain();//
 	}
 
