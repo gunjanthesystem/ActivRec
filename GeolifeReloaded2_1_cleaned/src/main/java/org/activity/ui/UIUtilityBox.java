@@ -13,16 +13,21 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.tools.JSONProcessingGowallaCatHierachy;
+import org.activity.util.RegexUtils;
 
 import javafx.scene.control.TreeItem;
 
+/**
+ * 
+ * @author gunjan
+ *
+ */
 public class UIUtilityBox
 {
 
 	public static void main(String args[])
 	{
 		// Path treeAsStringFile = Paths.get("/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep6/TreeAsString.txt");
-
 		try
 		{
 			checkNodesAtGivenDepth(1);
@@ -47,10 +52,13 @@ public class UIUtilityBox
 		}
 	}
 
+	/**
+	 * 
+	 * @param depth
+	 */
 	public static void checkNodesAtGivenDepth(int depth)
 	{
 		// int depth = 3;
-
 		String categoryHierarchyTreeFileName = org.activity.generator.DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName;
 		DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
 				.deSerializeThis(categoryHierarchyTreeFileName);
@@ -84,7 +92,7 @@ public class UIUtilityBox
 		{
 			if (s.contains("depth" + givenDepth) == true)
 			{
-				String[] splittedLine = s.split(":");
+				String[] splittedLine = RegexUtils.patternColon.split(s);// s.split(":");
 				res.add(splittedLine[1].trim());// [2] is cat name
 			}
 		}
@@ -110,7 +118,7 @@ public class UIUtilityBox
 		WritingToFile.writeToNewFile(serialisableTreeAsStringNoTabs, commonPath + "TreeOfTreeNodesAsStringNoTabs.txt");
 
 		// recursiveDfs(rootOfCategoryTree, "195:Terrain Park", 0);
-		recursiveDfsMulipleOccurences(rootOfCategoryTree, "912:Snow Cones");
+		recursiveDfsMultipleOccurences(rootOfCategoryTree, "912:Snow Cones");
 		ArrayList<DefaultMutableTreeNode> foundNodes = recursiveDfsMulipleOccurences2(rootOfCategoryTree,
 				"912:Snow Cones", new ArrayList<DefaultMutableTreeNode>());
 
@@ -323,7 +331,15 @@ public class UIUtilityBox
 		return false;
 	}
 
-	public static boolean recursiveDfsMulipleOccurences(DefaultMutableTreeNode node, String valueToSearch)
+	/**
+	 * Use depth-first-search recursively to find if the valueToSearch is present in the tree with node as root. If
+	 * value is found, print the level and path at which the goal node is found.
+	 * 
+	 * @param node
+	 * @param valueToSearch
+	 * @return
+	 */
+	public static boolean recursiveDfsMultipleOccurences(DefaultMutableTreeNode node, String valueToSearch)
 	{
 		if (node.toString().equals(valueToSearch))// isGoal(node))
 		{
@@ -337,12 +353,19 @@ public class UIUtilityBox
 			for (int i = 0; i < node.getChildCount(); i++)
 			{
 				DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
-				recursiveDfsMulipleOccurences(childNode, valueToSearch);
+				recursiveDfsMultipleOccurences(childNode, valueToSearch);
 			}
 		}
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param node
+	 * @param valueToSearch
+	 * @param foundNodes
+	 * @return
+	 */
 	public static ArrayList<DefaultMutableTreeNode> recursiveDfsMulipleOccurences2(DefaultMutableTreeNode node,
 			String valueToSearch, ArrayList<DefaultMutableTreeNode> foundNodes)
 	{
@@ -366,6 +389,7 @@ public class UIUtilityBox
 	}
 
 	/**
+	 * Use depth-first-search recursively to find if the valueToSearch is present in the tree with node as root.
 	 * 
 	 * @param node
 	 * @param valueToSearch
@@ -375,7 +399,8 @@ public class UIUtilityBox
 	public static ArrayList<DefaultMutableTreeNode> recursiveDfsMulipleOccurences2OnlyCatID(DefaultMutableTreeNode node,
 			String valueToSearch, ArrayList<DefaultMutableTreeNode> foundNodes)
 	{
-		String splitted[] = node.toString().split(":");
+		String splitted[] = RegexUtils.patternColon.split(node.toString());
+		// node.toString().split(":");
 
 		if (splitted[0].equals(valueToSearch))// isGoal(node))
 		{

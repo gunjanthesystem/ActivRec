@@ -122,17 +122,20 @@ public class TestDummy2
 
 		System.out.println("max = " + max.getAsInt());
 
+		long count = map.entrySet().stream().mapToInt(e -> e.getValue().size()).sum();
+
+		System.out.println("count = " + count);
+
 		map.entrySet().stream().map(e -> (e.getKey() + ":" + e.getValue())).forEach(System.out::println);
 
+		System.out.println("-------------");
 		Map<String, ArrayList<Integer>> map2 = map.entrySet().stream().limit(2)
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-
-		System.out.println("-------------");
 		map2.entrySet().stream().map(e -> (e.getKey() + ":" + e.getValue())).forEach(System.out::println);
 
+		System.out.println("-------------");
 		// LinkedHashMap<String, ArrayList<Integer>> map3 = (LinkedHashMap<String, ArrayList<Integer>>) map2;
 		LinkedHashMap<String, ArrayList<Integer>> map3 = new LinkedHashMap<String, ArrayList<Integer>>(map2);
-		System.out.println("-------------");
 		map3.entrySet().stream().map(e -> (e.getKey() + ":" + e.getValue())).forEach(System.out::println);
 	}
 
