@@ -211,7 +211,7 @@ public final class Constant
 			"motorcycle", "run", "subway", "taxi", "train", "walk" };
 
 	static final String[] gowallaActivityNames = null;
-	public static final int gowallaWorkingCatLevel = 2;
+	public static final int gowallaWorkingCatLevel = 2; // -1 indicates original working cat
 
 	// static final String[] GeolifeActivityNames = { "Not Available", "Unknown", /* "airplane", */"bike", /* "boat",
 	// */"bus", "car", /* "motorcycle", */

@@ -29,6 +29,9 @@ import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
 import org.activity.util.Constant;
+import org.activity.util.RegexUtils;
+import org.activity.util.TimelineUtils;
+import org.joda.time.LocalDateTime;
 
 /**
  * Reads
@@ -57,7 +60,8 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb14/DatabaseCreated/";
+	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 	// commented out on 2 feb 2017
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Dec1/DatabaseCreation/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";
@@ -105,7 +109,7 @@ public class DatabaseCreatorGowallaQuicker0
 
 	public static void main(String args[])
 	{
-		System.out.println("Running starts");
+		System.out.println("Running starts:  " + LocalDateTime.now());
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 12, 2016
 
 		try
@@ -146,6 +150,14 @@ public class DatabaseCreatorGowallaQuicker0
 					checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict);
 
 			mapForAllCheckinData = checkinResult.getFirst();
+
+			long numOfCheckins = mapForAllCheckinData.entrySet().stream().mapToLong(e -> e.getValue().size()).sum();
+			System.out.println("num of checkins = " + numOfCheckins); // 6276222
+			PopUps.showMessage("num of checkins = " + numOfCheckins);
+			//////
+			countConsecutiveSimilarActivities2(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName);
+
+			/////
 
 			userIDsInCheckinData = mapForAllCheckinData.keySet();
 			locationIDsInCheckinData = checkinResult.getSecond();
@@ -229,6 +241,205 @@ public class DatabaseCreatorGowallaQuicker0
 	}
 
 	/**
+	 * Similar to org.activity.util.TimelineUtils.countConsecutiveSimilarActivities2() but modified to work with
+	 * checkins instead of timelines
+	 * 
+	 * @param mapForAllCheckinData
+	 * @param commonPathToWrite
+	 * @param absPathToCatIDDictionary
+	 * @return
+	 */
+	private static LinkedHashMap<String, ArrayList<Integer>> countConsecutiveSimilarActivities2(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData, String commonPathToWrite,
+			String absPathToCatIDDictionary)
+	{
+		// LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
+		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 = TimelineUtils
+				.getEmptyMapOfCatIDs(absPathToCatIDDictionary);
+
+		// <catid, [1,1,2,4,1,1,1,6]>
+		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecutives = r1.getFirst();
+
+		System.out.println("catIDLengthConsecutives.size = " + catIDLengthConsecutives.size());
+
+		// /* Uncomment to view the category ids in the map */
+		// catIDLengthConsecutives.entrySet().stream()
+		// .forEach(e -> System.out.print(" " + e.getKey().toString() + "-" + e.getValue()));
+
+		// <catid,catname>
+		TreeMap<Integer, String> catIDNameDictionary = r1.getSecond();
+
+		// <userIDt, [1,1,2,4,1,1,1,6]>
+		LinkedHashMap<String, ArrayList<Integer>> userLengthConsecutives = new LinkedHashMap<>();
+
+		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
+		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
+		// StringBuilder sbAllDurationFromNext = new StringBuilder();
+		WritingToFile.appendLineToFileAbsolute("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
+				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
+
+		StringBuilder sbEnumerateAllCats = new StringBuilder();// write all catid sequentially userwise
+
+		long checkinsCount = 0;
+		try
+		{
+			for (Entry<String, TreeMap<Timestamp, CheckinEntry>> userE : mapForAllCheckinData.entrySet())
+			{
+				String user = userE.getKey();
+
+				ArrayList<Integer> userLengthConsecutivesValues = new ArrayList<Integer>();
+
+				String prevActivityID = "";// Timestamp prevActivityStartTimestamp = null;
+
+				int numOfConsecutives = 1;// long timeDiff = 0;
+
+				StringBuilder distanceDurationFromNextSeq = new StringBuilder(); // only write >1 consecs
+				// StringBuilder durationFromNextSeq = new StringBuilder();// only write >1 consecs
+
+				for (Entry<Timestamp, CheckinEntry> dateE : userE.getValue().entrySet())
+				{
+					// for (ActivityObject aos : dateE.getValue().getActivityObjectsInDay())
+					// {
+					checkinsCount += 1;
+					CheckinEntry ce = dateE.getValue();
+					String activityID = String.valueOf(ce.getActivityID());// aos.getActivityName();
+					double distNext = ce.getDistanceInMetersFromNext();
+					long durationNext = ce.getDurationInSecsFromNext();
+					String ts = ce.getTimestamp().toString();
+					String actCatName = catIDNameDictionary.get(Integer.valueOf(activityID));
+
+					// System.out.println("aoCount=" + aoCount + " activityName=" + activityName);
+
+					sbEnumerateAllCats.append(user + "," + ts + "," + activityID + "," + actCatName + "\n");
+					// $$System.out.println("\nReading: " + user + "," + ts + "," + activityName + "," +
+					// actCatName);
+
+					if (activityID.equals(prevActivityID))
+					{
+						// $$ System.out.println(" act name:" + activityName + " = prevActName = " +
+						// prevActivityName
+						// $$ + " \n Hence append");
+						numOfConsecutives += 1;
+						distanceDurationFromNextSeq.append(user + "," + ts + "," + activityID + "," + actCatName + ","
+								+ String.valueOf(distNext) + "," + String.valueOf(durationNext) + "\n");
+						// durationFromNextSeq.append(user + "," + ts + "," + activityName + "," + actCatName + ","
+						// + String.valueOf(durationNext) + "\n");
+						// timeDiff += aos.getStartTimestamp().getTime() - prevActivityStartTimestamp.getTime();
+						// System.out.println(" Current Prev act Same, numOfConsecutives =" + numOfConsecutives);
+						continue;
+					}
+
+					else // not equals then
+					{
+						// $$System.out.println(" act name:" + activityName + " != prevActName = " +
+						// prevActivityName);
+						ArrayList<Integer> consecVals = catIDLengthConsecutives.get(prevActivityID);
+						if (consecVals == null)
+						{
+							if (prevActivityID.length() > 0)
+							{
+								System.out.println(
+										"Error in org.activity.generator.DatabaseCreatorGowallaQuicker0.countConsecutiveSimilarActivities2(): consecVals = null, i,e., array list for activityName="
+												+ prevActivityID
+												+ " hasn't been initialised in catIDLengthConsecutives");
+							}
+							else
+							{
+								// encountered the first activity for that user.
+								// System.out.println(" first activity for this user.");
+							}
+						}
+						else
+						{
+							// $$System.out.println(" currently numOfConsecutives= " + numOfConsecutives);
+							consecVals.add(numOfConsecutives);
+							catIDLengthConsecutives.put(prevActivityID, consecVals);
+							userLengthConsecutivesValues.add(numOfConsecutives);
+
+							if (numOfConsecutives > 1)
+							{
+								sbAllDistanceInMDurationInSec.append(distanceDurationFromNextSeq.toString());
+								// sbAllDurationFromNext.append(durationFromNextSeq.toString());// + "\n");
+								// $$System.out.println("appending to dista, duration");
+							}
+							// else
+							// {
+							distanceDurationFromNextSeq.setLength(0);
+							// durationFromNextSeq.setLength(0);
+							// }
+
+							// System.out.println(" Current Prev act diff, numOfConsecutives =" +
+							// numOfConsecutives);
+							// System.out.println(" (prev) activity name=" + prevActivityName + " consecVals="
+							// + catIDLengthConsecutives.get(prevActivityName).toString());
+							numOfConsecutives = 1;// resetting
+						}
+
+					}
+					prevActivityID = activityID;
+
+					if (checkinsCount % 20000 == 0)
+					{
+						WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+								commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
+						sbEnumerateAllCats.setLength(0);
+
+						/////////////////
+						WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+								commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
+						sbAllDistanceInMDurationInSec.setLength(0);
+
+						// WritingToFile.appendLineToFileAbsolute(sbAllDurationFromNext.toString(),
+						// commonPathToWrite + "sbAllDurationFromNext.csv");
+						// sbAllDurationFromNext.setLength(0);
+						/////////////////
+
+					}
+					// } // end of loop over aos over this day for this user
+					// break;
+				} // end of loop over days
+					// break;
+				userLengthConsecutives.put(user, userLengthConsecutivesValues);
+			} // end of loop over users
+
+			// write remaining in buffer
+			if (sbEnumerateAllCats.length() != 0)
+			{
+				WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+						commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
+				sbEnumerateAllCats.setLength(0);
+
+				/////////////////
+				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+						commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
+				sbAllDistanceInMDurationInSec.setLength(0);
+
+				// WritingToFile.appendLineToFileAbsolute(sbAllDurationFromNext.toString(),
+				// commonPathToWrite + "sbAllDurationFromNext.csv");
+				// sbAllDurationFromNext.setLength(0);
+				/////////////////
+
+			}
+
+			System.out.println("Num of aos read = " + checkinsCount);
+			TimelineUtils.writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
+					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
+			TimelineUtils.writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
+					commonPathToWrite + "UserwiseConsecCountsEqualLength.csv", false, false);
+
+			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+			// commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return catIDLengthConsecutives;
+	}
+
+	////////
+
+	/**
 	 * 
 	 * @param catIDNameDictionary
 	 * @param workingCatLevel
@@ -283,8 +494,12 @@ public class DatabaseCreatorGowallaQuicker0
 	 * <p>
 	 * Read the checkin file and create checkin entry objects
 	 * </p>
+	 * <font color = yellow>#CheckinsReadFromData = #checkinNotInHierarchy + #checkinsLevelNotAcceptable +
+	 * #checkinsCreated + #checkinsDuplicateTimestampUser</font>
 	 * <p>
-	 * 
+	 * <font color = orange>Note: Gowalla checkin data read: there exists 281 instances where same user checkins at
+	 * different locations for the same timestamp. Currently, i am only considering the most recent location for that
+	 * timestamp.</font>
 	 * </p>
 	 * 
 	 * @param checkindatafilename2
@@ -302,6 +517,7 @@ public class DatabaseCreatorGowallaQuicker0
 					DefaultMutableTreeNode rootOfCategoryTree, TreeMap<Integer, String> catIDWorkingLevelCatIDsDict)
 	{
 		int countOfCheckinEntryObjects = 0;
+		int numOfDuplicateTimestamps = 0;
 		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> result = new LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>();
 
 		Set<String> locationIDsInCheckinData = new HashSet<String>();
@@ -334,7 +550,8 @@ public class DatabaseCreatorGowallaQuicker0
 					System.out.println(" #lines read = " + countOfLines);
 				}
 
-				String splittedLine[] = lineRead.split(",");
+				String splittedLine[] = RegexUtils.patternComma.split(lineRead);
+				// lineRead.split(",");
 
 				String userID = splittedLine[1];// .replaceAll("\"", ""));
 				Integer locationID = Integer.valueOf(splittedLine[2]);// .replaceAll("\"", ""));
@@ -380,7 +597,7 @@ public class DatabaseCreatorGowallaQuicker0
 				CheckinEntry cobj = new CheckinEntry(userID, locationID, ts, latitude, longitude, catIDDirect,
 						workingLevelCatIDs, distFromNextInM, durationFromNextInM);
 
-				countOfCheckinEntryObjects++;
+				countOfCheckinEntryObjects += 1;
 
 				TreeMap<Timestamp, CheckinEntry> mapForThisUser;
 
@@ -389,6 +606,13 @@ public class DatabaseCreatorGowallaQuicker0
 				if (mapForThisUser == null) // else create new map for this userid
 				{
 					mapForThisUser = new TreeMap<Timestamp, CheckinEntry>();
+				}
+
+				if (mapForThisUser.containsKey(ts))
+				{
+					System.err.println("Error: duplicate ts: map for this user (userID=" + userID
+							+ ") already contains ts =" + ts.toString());
+					numOfDuplicateTimestamps += 1;
 				}
 
 				mapForThisUser.put(ts, cobj);
@@ -400,7 +624,12 @@ public class DatabaseCreatorGowallaQuicker0
 
 			System.out.println("num of lines NotInHierarchy = " + countOfRejectedCheckinNotInHierarchy);
 			System.out.println("num of lines LevelNotAcceptable = " + countOfRejectedCHeckinBelowLevel2);
-			System.out.println("num of CheckinEntry objects created = " + countOfCheckinEntryObjects);
+			System.out.println(
+					"num of CheckinEntry objects created = countOfCheckinEntryObjects =" + countOfCheckinEntryObjects);
+			System.out.println("num of duplicate timestamps = " + numOfDuplicateTimestamps);
+			System.out.println("actual num of CheckinEntry objects created returned ="
+					+ result.entrySet().stream().mapToLong(e -> e.getValue().size()).sum());
+			// numOfDuplicateTimestamps
 		}
 		catch (Exception e)
 		{
@@ -427,13 +656,15 @@ public class DatabaseCreatorGowallaQuicker0
 	{
 		ArrayList<DefaultMutableTreeNode> foundNodes = UIUtilityBox.recursiveDfsMulipleOccurences2OnlyCatID(
 				rootOfCategoryTree, catIDToSearch.toString(), new ArrayList<DefaultMutableTreeNode>());
+		// TODO Performance: this can be performance optimised by creating a list once by traversing the hierarchy
+		// instead of
+		// recursively traversing it for every call.
 
 		// System.out.println("num of matching nodes found = " + foundNodes2.size());
 		boolean isLevelAcceptable = false;
 
 		if (foundNodes.size() > 0) // is it there in hierarchy tree
 		{
-
 			for (DefaultMutableTreeNode foundnode : foundNodes)
 			{
 				if (foundnode.getLevel() >= 2) // atleast level 2

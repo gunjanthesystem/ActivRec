@@ -483,10 +483,10 @@ public class TimelineUtils
 		for (Integer catID : catIDNameDictionary.keySet())
 		{
 			catIDLengthConsecutives.put(String.valueOf(catID), new ArrayList<Integer>());
-			System.out.print(catID + ",");
+			// System.out.print(catID + ",");
 		}
 
-		System.out.println("Exiting org.activity.util.TimelineUtils.getEmptyMapOfCatIDs(String)");
+		System.out.println("\nExiting org.activity.util.TimelineUtils.getEmptyMapOfCatIDs(String)");
 		return new Pair(catIDLengthConsecutives, catIDNameDictionary);
 	}
 
@@ -513,8 +513,11 @@ public class TimelineUtils
 		// <userIDt, [1,1,2,4,1,1,1,6]>
 		LinkedHashMap<String, ArrayList<Integer>> userLengthConsecutives = new LinkedHashMap<>();
 
-		StringBuilder sbAllDistanceInM = new StringBuilder();
-		StringBuilder sbAllDurationFromNext = new StringBuilder();
+		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
+		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
+		// StringBuilder sbAllDurationFromNext = new StringBuilder();
+		WritingToFile.appendLineToFileAbsolute("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
+				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
 
 		StringBuilder sbEnumerateAllCats = new StringBuilder();// write all catid sequentially userwise
 
@@ -531,8 +534,8 @@ public class TimelineUtils
 
 				int numOfConsecutives = 1;// long timeDiff = 0;
 
-				StringBuilder distanceFromNextSeq = new StringBuilder(); // only write >1 consecs
-				StringBuilder durationFromNextSeq = new StringBuilder();// only write >1 consecs
+				StringBuilder distanceDurationFromNextSeq = new StringBuilder(); // only write >1 consecs
+				// StringBuilder durationFromNextSeq = new StringBuilder();// only write >1 consecs
 
 				for (Entry<Date, UserDayTimeline> dateE : userE.getValue().entrySet())
 				{
@@ -559,10 +562,10 @@ public class TimelineUtils
 							// prevActivityName
 							// $$ + " \n Hence append");
 							numOfConsecutives += 1;
-							distanceFromNextSeq.append(user + "," + ts + "," + activityName + "," + actCatName + ","
-									+ String.valueOf(distNext) + "\n");
-							durationFromNextSeq.append(user + "," + ts + "," + activityName + "," + actCatName + ","
-									+ String.valueOf(durationNext) + "\n");
+							distanceDurationFromNextSeq.append(user + "," + ts + "," + activityName + "," + actCatName
+									+ "," + String.valueOf(distNext) + "," + String.valueOf(durationNext) + "\n");
+							// durationFromNextSeq.append(user + "," + ts + "," + activityName + "," + actCatName + ","
+							// + String.valueOf(durationNext) + "\n");
 							// timeDiff += aos.getStartTimestamp().getTime() - prevActivityStartTimestamp.getTime();
 							// System.out.println(" Current Prev act Same, numOfConsecutives =" + numOfConsecutives);
 							continue;
@@ -597,14 +600,14 @@ public class TimelineUtils
 
 								if (numOfConsecutives > 1)
 								{
-									sbAllDistanceInM.append(distanceFromNextSeq.toString());// + "\n");
-									sbAllDurationFromNext.append(durationFromNextSeq.toString());// + "\n");
+									sbAllDistanceInMDurationInSec.append(distanceDurationFromNextSeq.toString());
+									// sbAllDurationFromNext.append(durationFromNextSeq.toString());// + "\n");
 									// $$System.out.println("appending to dista, duration");
 								}
 								// else
 								// {
-								distanceFromNextSeq.setLength(0);
-								durationFromNextSeq.setLength(0);
+								distanceDurationFromNextSeq.setLength(0);
+								// durationFromNextSeq.setLength(0);
 								// }
 
 								// System.out.println(" Current Prev act diff, numOfConsecutives =" +
@@ -624,13 +627,13 @@ public class TimelineUtils
 							sbEnumerateAllCats.setLength(0);
 
 							/////////////////
-							WritingToFile.appendLineToFileAbsolute(sbAllDistanceInM.toString(),
-									commonPathToWrite + "sbAllDistanceInM.csv");
-							sbAllDistanceInM.setLength(0);
+							WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+									commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
+							sbAllDistanceInMDurationInSec.setLength(0);
 
-							WritingToFile.appendLineToFileAbsolute(sbAllDurationFromNext.toString(),
-									commonPathToWrite + "sbAllDurationFromNext.csv");
-							sbAllDurationFromNext.setLength(0);
+							// WritingToFile.appendLineToFileAbsolute(sbAllDurationFromNext.toString(),
+							// commonPathToWrite + "sbAllDurationFromNext.csv");
+							// sbAllDurationFromNext.setLength(0);
 							/////////////////
 
 						}
@@ -649,31 +652,31 @@ public class TimelineUtils
 				sbEnumerateAllCats.setLength(0);
 
 				/////////////////
-				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInM.toString(),
-						commonPathToWrite + "sbAllDistanceInM.csv");
-				sbAllDistanceInM.setLength(0);
+				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+						commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
+				sbAllDistanceInMDurationInSec.setLength(0);
 
-				WritingToFile.appendLineToFileAbsolute(sbAllDurationFromNext.toString(),
-						commonPathToWrite + "sbAllDurationFromNext.csv");
-				sbAllDurationFromNext.setLength(0);
+				// WritingToFile.appendLineToFileAbsolute(sbAllDurationFromNext.toString(),
+				// commonPathToWrite + "sbAllDurationFromNext.csv");
+				// sbAllDurationFromNext.setLength(0);
 				/////////////////
 
 			}
+
+			System.out.println("Num of aos read = " + aoCount);
+			writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
+					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
+			writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
+					commonPathToWrite + "UserwiseConsecCountsEqualLength.csv", false, false);
+
+			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+			// commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv"); // probably not needed
 
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-
-		System.out.println("Num of aos read = " + aoCount);
-		writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
-				commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-		writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
-				commonPathToWrite + "UserwiseConsecCountsEqualLength.csv", false, false);
-
-		WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
-				commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv");
 		return catIDLengthConsecutives;
 
 	}
