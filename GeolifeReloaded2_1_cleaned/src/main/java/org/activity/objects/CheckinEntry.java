@@ -33,6 +33,9 @@ public class CheckinEntry extends DataEntry implements Serializable
 	private int locationID;
 	private String startLatitude;
 	private String startLongitude;
+	/**
+	 * Category ID (direct)
+	 */
 	private int activityID;
 
 	private double distanceInMetersFromNext;
