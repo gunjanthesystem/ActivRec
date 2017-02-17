@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -88,12 +89,16 @@ public class DatabaseCreatorGowallaQuicker0
 	// $$public static final int continuityThresholdInSeconds = 5 * 60; // changed from 30 min in DCU dataset...., if
 	// two timestamps are separated by less than equal to this value
 	// and
-	public static final int continuityThresholdInSeconds = Integer.MAX_VALUE;// * 60; // changed from 30 min in DCU
-																				// dataset...., if two timestamps are
-																				// separated by less than equal
-																				// to this value and have same mode
-																				// name, then they are assumed to be
-																				// continuos
+
+	public static final int gowallaContinuityThresholdInSecs = 10 * 60;
+	public static final int continuityThresholdInSeconds = gowallaContinuityThresholdInSecs;// = Integer.MAX_VALUE;// *
+																							// 60; // changed from 30
+																							// min in DCU
+	// dataset...., if two timestamps are
+	// separated by less than equal
+	// to this value and have same mode
+	// name, then they are assumed to be
+	// continuos
 	public static final int assumeContinuesBeforeNextInSecs = 2 * 60; // changed from 30 min in DCU dataset we assume
 																		// that
 	// if two activities have a start time gap of more than 'assumeContinuesBeforeNextInSecs' seconds ,
@@ -155,7 +160,12 @@ public class DatabaseCreatorGowallaQuicker0
 			System.out.println("num of checkins = " + numOfCheckins); // 6276222
 			PopUps.showMessage("num of checkins = " + numOfCheckins);
 			//////
-			countConsecutiveSimilarActivities2(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName);
+			// countConsecutiveSimilarActivities2(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName);
+			Function<CheckinEntry, String> consecCompareDirectCatID = ce -> String.valueOf(ce.getActivityID());
+			Function<CheckinEntry, String> consecCompareLocationID = ce -> String.valueOf(ce.getLocationID());
+
+			countConsecutiveSimilarActivities3(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName,
+					consecCompareLocationID);// consecCompareDirectCatID);
 
 			/////
 
@@ -239,6 +249,190 @@ public class DatabaseCreatorGowallaQuicker0
 		PopUps.showMessage("End of data creation");
 		System.exit(0);
 	}
+
+	/**
+	 * Fork of
+	 * org.activity.generator.DatabaseCreatorGowallaQuicker0.countConsecutiveSimilarActivities2(LinkedHashMap<String,
+	 * TreeMap<Timestamp, CheckinEntry>>, String, String). Adds control for choosing which attribute to use for
+	 * considering consecutives to be considered same
+	 * 
+	 * @param mapForAllCheckinData
+	 * @param commonPathToWrite
+	 * @param absPathToCatIDDictionary
+	 * @return
+	 */
+	private static LinkedHashMap<String, ArrayList<Integer>> countConsecutiveSimilarActivities3(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData, String commonPathToWrite,
+			String absPathToCatIDDictionary, Function<CheckinEntry, String> lambdaForConsecSameAttribute)
+	{
+		// LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
+		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 = TimelineUtils
+				.getEmptyMapOfCatIDs(absPathToCatIDDictionary);
+
+		// <catid,catname>
+		TreeMap<Integer, String> catIDNameDictionary = r1.getSecond();
+
+		// <catid, [1,1,2,4,1,1,1,6]>
+		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecs = r1.getFirst();
+		System.out.println("catIDLengthConsecutives.size = " + catIDLengthConsecs.size());
+
+		// <placeid, [1,1,2,4,1,1,1,6]>
+		LinkedHashMap<String, ArrayList<Integer>> comparedAttribLengthConsecs = new LinkedHashMap<>();
+
+		// <userID, [1,1,2,4,1,1,1,6]>
+		LinkedHashMap<String, ArrayList<Integer>> userLengthConsecs = new LinkedHashMap<>();
+
+		StringBuilder sbEnumerateAllCheckins = new StringBuilder();// write all checkins sequentially userwise
+		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
+		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
+		// StringBuilder sbAllDurationFromNext = new StringBuilder();
+		WritingToFile.appendLineToFileAbsolute("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
+				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
+
+		long checkinsCount = 0;
+		// /* Uncomment to view the category ids in the map */
+		// catIDLengthConsecs.entrySet().stream().forEach(e -> System.out.print(" " + e.getKey().toString() + "-" +
+		// e.getValue()));
+
+		try
+		{
+			for (Entry<String, TreeMap<Timestamp, CheckinEntry>> userE : mapForAllCheckinData.entrySet())
+			{
+				String user = userE.getKey();
+
+				// can initiate here, since entries for each user is together, can't do same for cat and compared attrib
+				ArrayList<Integer> userLengthConsecsVals = new ArrayList<Integer>();
+
+				String prevValOfComparisonAttribute = "", prevActivityID = "";// activityID or placeID
+
+				int numOfConsecutives = 1;
+
+				StringBuilder distanceDurationFromNextSeq = new StringBuilder(); // only writes >1 consecs
+
+				for (Entry<Timestamp, CheckinEntry> dateE : userE.getValue().entrySet())
+				{
+					CheckinEntry ce = dateE.getValue();
+					checkinsCount += 1;
+					String currValOfComparisonAttribute = lambdaForConsecSameAttribute.apply(ce);
+					String activityID = String.valueOf(ce.getActivityID());
+					double distNext = ce.getDistanceInMetersFromNext();
+					long durationNext = ce.getDurationInSecsFromNext();
+					String ts = ce.getTimestamp().toString();
+					String actCatName = catIDNameDictionary.get(Integer.valueOf(activityID));
+
+					sbEnumerateAllCheckins.append(user + "," + ts + "," + currValOfComparisonAttribute + ","
+							+ activityID + "," + actCatName + "," + distNext + "," + durationNext + "\n");
+
+					// if curr is same as prev for compared attrib,
+					// keep on accumulating the consecutives & append entry for writing to file
+					if (currValOfComparisonAttribute.equals(prevValOfComparisonAttribute))
+					{
+						// $$ System.out.println(" act name:" + activityName + " = prevActName = " + prevActivityName
+						// $$ + " \n Hence append");
+						numOfConsecutives += 1;
+						distanceDurationFromNextSeq.append(user + "," + ts + "," + currValOfComparisonAttribute + ","
+								+ activityID + "," + actCatName + "," + String.valueOf(distNext) + ","
+								+ String.valueOf(durationNext) + "\n");
+						continue;
+					}
+					// if current val is not equal to prev value, write the prev accumulated consecutives
+					else
+					{
+						if (prevValOfComparisonAttribute.length() == 0)
+						{
+							// skip the first entry for this user.
+						}
+						else
+						{
+							// $$System.out.println(" act name:" + activityName + " != prevActName = " +
+							// prevActivityName);
+							// consec vals for this cat id. note: preassigned empty arraylist for each catid beforehand
+							ArrayList<Integer> consecValsCat = catIDLengthConsecs.get(prevActivityID);
+
+							// consec vals for this compared attibute (say place id)
+							// ArrayList<Integer> consecValsCompAttrib;
+							// if (comparedAttribLengthConsecs.containsKey(prevValOfComparisonAttribute))
+							// {
+							// consecValsCompAttrib = comparedAttribLengthConsecs.get(prevValOfComparisonAttribute);
+							// }
+							//
+							// else
+							// {
+							// consecValsCompAttrib = new ArrayList<>();
+							// }
+							ArrayList<Integer> consecValsCompAttrib = comparedAttribLengthConsecs
+									.get(prevValOfComparisonAttribute);
+
+							if (consecValsCompAttrib == null)
+							{
+								consecValsCompAttrib = new ArrayList<>();
+							}
+
+							// $$System.out.println(" currently numOfConsecutives= " + numOfConsecutives);
+							consecValsCat.add(numOfConsecutives); // append this consec value
+							consecValsCompAttrib.add(numOfConsecutives); // append this consec value
+							userLengthConsecsVals.add(numOfConsecutives); // append this consec value
+
+							catIDLengthConsecs.put(prevActivityID, consecValsCat);
+							comparedAttribLengthConsecs.put(prevValOfComparisonAttribute, consecValsCompAttrib);
+
+							if (numOfConsecutives > 1)
+							{
+								sbAllDistanceInMDurationInSec.append(distanceDurationFromNextSeq.toString());
+								// $$System.out.println("appending to dista, duration");
+							}
+							distanceDurationFromNextSeq.setLength(0); // resetting
+							numOfConsecutives = 1;// resetting
+						}
+					}
+					prevValOfComparisonAttribute = currValOfComparisonAttribute;
+					prevActivityID = activityID; // not for comparison but for consecValsCat
+
+					if (checkinsCount % 20000 == 0)
+					{
+						WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+								commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
+						sbEnumerateAllCheckins.setLength(0);
+
+						WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+								commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
+						sbAllDistanceInMDurationInSec.setLength(0);
+					}
+				} // end of loop over days
+				userLengthConsecs.put(user, userLengthConsecsVals);
+			} // end of loop over users
+
+			// write remaining in buffer
+			if (sbEnumerateAllCheckins.length() != 0)
+			{
+				WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+						commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
+				sbEnumerateAllCheckins.setLength(0);
+
+				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+						commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
+				sbAllDistanceInMDurationInSec.setLength(0);
+			}
+
+			System.out.println("Num of checkins read = " + checkinsCount);
+			TimelineUtils.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
+					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
+			TimelineUtils.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
+					commonPathToWrite + "ComparedAtributewiseConsecCounts.csv", false, false);
+			TimelineUtils.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
+					commonPathToWrite + "UserwiseConsecCounts.csv", false, false);
+
+			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+			// commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return catIDLengthConsecs;
+	}
+
+	////////
 
 	/**
 	 * Similar to org.activity.util.TimelineUtils.countConsecutiveSimilarActivities2() but modified to work with

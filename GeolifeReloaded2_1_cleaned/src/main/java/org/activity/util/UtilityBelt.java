@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.ActivityObject;
+import org.activity.objects.CheckinEntry;
 import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.objects.UserDayTimeline;
@@ -363,6 +364,30 @@ public class UtilityBelt
 		return arrayList;
 	}
 
+	public static ArrayList<CheckinEntry> treeMapToArrayListCheckinEntry(TreeMap<Timestamp, CheckinEntry> treeMap)
+	{
+		ArrayList<CheckinEntry> arrayList = new ArrayList<CheckinEntry>();
+
+		for (Map.Entry<Timestamp, CheckinEntry> entry : treeMap.entrySet())
+		{
+			arrayList.add(entry.getValue());
+		}
+
+		// if (treeMap.size() == arrayList.size())
+		// {
+		// System.out.println("TreeMap converted to arraylist succesfully");
+		// }
+
+		if (treeMap.size() != arrayList.size())
+		{
+			String msg = "Error in TreeMap conversion to arraylist";
+			PopUps.showException(new Exception(msg),
+					"org.activity.util.UtilityBelt.treeMapToArrayListCheckinEntry(TreeMap<Timestamp, CheckinEntry>)");
+			// PopUps.showError(msg);
+		}
+		return arrayList;
+	}
+
 	public static ArrayList<?> treeMapToArrayList(TreeMap<Timestamp, ?> treeMap)
 	{
 		ArrayList arrayList = new ArrayList();
@@ -499,8 +524,6 @@ public class UtilityBelt
 		return countOfL2Ops;
 	}
 
-	
-
 	// public static TreeMap<Integer, Long> sortByValue2(TreeMap<Integer, Long> map, boolean isStable)
 	// {
 	// List<Map.Entry<Integer, Long>> list = new LinkedList<>(map.entrySet());
@@ -549,8 +572,6 @@ public class UtilityBelt
 	// return null;
 	// // return val;
 	// }
-
-	
 
 	/*
 	 * static Map sortByValueAscending(Map map)
@@ -617,8 +638,6 @@ public class UtilityBelt
 		}
 		return 0;
 	}
-
-	
 
 	/*
 	 * $$21Oct public static HashMap<String, ArrayList<String>> getSplittedTimelines(HashMap<String,
@@ -779,9 +798,10 @@ public class UtilityBelt
 			count++;
 		} // all activity names for comparison collected
 
-		boolean sameName = ComparatorUtils.areAllStringsInListSame(activityNamesForComparison);// all activity names at that interval
-																				// index for all the splittedtimelines
-																				// are same
+		boolean sameName = ComparatorUtils.areAllStringsInListSame(activityNamesForComparison);// all activity names at
+																								// that interval
+		// index for all the splittedtimelines
+		// are same
 
 		boolean sameCategory = true; // all activity names at that interval index for all the splittedtimelines are of
 										// same category
@@ -1707,7 +1727,7 @@ public class UtilityBelt
 	{
 		Set<Integer> intersection = new HashSet<Integer>(s1);
 		intersection.retainAll(s2);
-	
+
 		return intersection;
 	}
 	// public static
@@ -1722,7 +1742,7 @@ public class UtilityBelt
 	{
 		Set<T> duplicates = new LinkedHashSet<T>();
 		Set<T> uniques = new HashSet<T>();
-	
+
 		for (T t : list)
 		{
 			if (!uniques.add(t))
@@ -1730,7 +1750,7 @@ public class UtilityBelt
 				duplicates.add(t);
 			}
 		}
-	
+
 		return duplicates;
 	}
 	// public static void writeCatLevelInfo()

@@ -2,13 +2,17 @@ package org.activity.sanityChecks;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.activity.io.WritingToFile;
+import org.activity.objects.CheckinEntry;
 
 /**
  * Just to check/run some random snippets of code NOT IMPORTANT
@@ -67,28 +71,55 @@ public class TestDummy2
 
 	public static void main(String args[])
 	{
-		streamExp1();
+		steamFunctionParameter(2);
+		// streamExp1();
 	}
 
-	public static void streamExp1Spartanized()
+	/**
+	 * 
+	 * @param choice
+	 */
+	public static void steamFunctionParameter(int choice)
 	{
-		LinkedHashMap<String, ArrayList<Integer>> map = new LinkedHashMap<String, ArrayList<Integer>>();
+		try
+		{
+			Function<CheckinEntry, String> funVariable = ce -> String.valueOf(ce.getActivityID());// new Function<>();
 
-		ArrayList<Integer> a1 = new ArrayList<Integer>(), a2 = new ArrayList<Integer>(), a3 = new ArrayList<Integer>();
-		for (int ¢ = 1; ¢ <= 5; ++¢)
-			a1.add(¢);
+			if (choice == 1)
+			{
+				funVariable = ce -> String.valueOf(ce.getActivityID());
+			}
+			else if (choice == 2)
+			{
+				funVariable = ce -> String.valueOf(ce.getTimestamp());
+			}
 
-		for (int ¢ = 1; ¢ <= 8; ++¢)
-			a2.add(¢);
+			for (int i = 0; i < 10; i++)
+			{
 
-		for (int ¢ = 1; ¢ <= 3; ++¢)
-			a3.add(¢);
+				CheckinEntry ce = new CheckinEntry("1", i, Timestamp.valueOf(LocalDateTime.now()), "1.1", "3.3", 15,
+						"5");
+				System.out.println(funVariable.apply(ce));
+				System.out.println(funVariable.toString());
+				// compares the choice variable for each of the 100 times, even though value of choice is known before
+				// the loop evn starts.
+				// Can we store the function to be called in a variable and assign it before the for loop.
+				// if (choice == 1)
+				// {
+				// System.out.println(ce.getActivityID());
+				// }
+				// else if (choice == 2)
+				// {
+				// System.out.println(ce.getTimestamp());
+				// }
+			}
 
-		map.put("A1", a1);
-		map.put("A2", a2);
-		map.put("A3", a3);
+		}
 
-		System.out.println("max = " + map.entrySet().stream().mapToInt(λ -> λ.getValue().size()).max().getAsInt());
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public static void streamExp1()
@@ -167,6 +198,27 @@ public class TestDummy2
 		finally
 		{
 		}
+	}
+
+	public static void streamExp1Spartanized()
+	{
+		LinkedHashMap<String, ArrayList<Integer>> map = new LinkedHashMap<String, ArrayList<Integer>>();
+
+		ArrayList<Integer> a1 = new ArrayList<Integer>(), a2 = new ArrayList<Integer>(), a3 = new ArrayList<Integer>();
+		for (int ¢ = 1; ¢ <= 5; ++¢)
+			a1.add(¢);
+
+		for (int ¢ = 1; ¢ <= 8; ++¢)
+			a2.add(¢);
+
+		for (int ¢ = 1; ¢ <= 3; ++¢)
+			a3.add(¢);
+
+		map.put("A1", a1);
+		map.put("A2", a2);
+		map.put("A3", a3);
+
+		System.out.println("max = " + map.entrySet().stream().mapToInt(λ -> λ.getValue().size()).max().getAsInt());
 	}
 
 }
