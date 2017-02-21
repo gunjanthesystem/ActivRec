@@ -3,6 +3,7 @@ package org.activity.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,12 +31,12 @@ public class UIUtilityBox
 		// Path treeAsStringFile = Paths.get("/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep6/TreeAsString.txt");
 		try
 		{
-			checkNodesAtGivenDepth(1);
+			// $$checkNodesAtGivenDepth(1);
 			// checkNodesAtGivenDepth(2);
 			// checkNodesAtGivenDepth(3);
 			// $$checkConversionOfTreeItemToTreeNode();
 			// checkTreeSearch();
-			// checkTreeSearch_1();
+			checkTreeSearch_1();
 			// Set<String> s = new HashSet<>();
 			// s.add("gunjan");
 			// s.add("supertramp");
@@ -105,9 +106,12 @@ public class UIUtilityBox
 	 */
 	public static void checkTreeSearch_1()
 	{
-		final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/TreeSanity/";// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15CatTree/";
-		DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer.deSerializeThis(
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode");
+		final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb20/TreeSanity/";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/TreeSanity/";//
+		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15CatTree/";
+		DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
+				.deSerializeThis("./dataToRead/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode");//
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode");
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/RootOfCategoryTree9Sep2016.DMTreeNode");
 
 		String serialisableTreeAsString = treeToString(0, rootOfCategoryTree, new StringBuffer());
@@ -118,7 +122,7 @@ public class UIUtilityBox
 		WritingToFile.writeToNewFile(serialisableTreeAsStringNoTabs, commonPath + "TreeOfTreeNodesAsStringNoTabs.txt");
 
 		// recursiveDfs(rootOfCategoryTree, "195:Terrain Park", 0);
-		recursiveDfsMultipleOccurences(rootOfCategoryTree, "912:Snow Cones");
+		// $$recursiveDfsMultipleOccurences(rootOfCategoryTree, "912:Snow Cones");
 		ArrayList<DefaultMutableTreeNode> foundNodes = recursiveDfsMulipleOccurences2(rootOfCategoryTree,
 				"912:Snow Cones", new ArrayList<DefaultMutableTreeNode>());
 
@@ -147,13 +151,37 @@ public class UIUtilityBox
 		}
 
 		System.out.println("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		int workingLevel = 2;
+		int workingLevel = 1;
 		Set<String> givenLevelOrAboveCatIDs = getGivenLevelOrAboveCatID(catIDToSearch, rootOfCategoryTree,
 				workingLevel);
 		for (String catID : givenLevelOrAboveCatIDs)
 		{
 			System.out.println("level " + workingLevel + " or above catid = " + catID);
 		}
+	}
+
+	/**
+	 * Return a map containing (catid, list of nodes from hierarchy tree which contains that cat id)
+	 * <p>
+	 * created to improve performance by reducing redundant computations
+	 * <p>
+	 * if a catid exists in cat id name dictionary but does not exists in hierrchy tree then the list if of size o.
+	 * 
+	 * @return
+	 */
+	public static LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> getCatIDsFoundNodesMap(
+			DefaultMutableTreeNode rootOfCategoryTree, TreeMap<Integer, String> catIDNameDictionary)
+	{
+		LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIdFoundNodesMap = new LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>>();
+
+		for (Integer catIDToSearch : catIDNameDictionary.keySet())
+		{
+			ArrayList<DefaultMutableTreeNode> foundNodes = recursiveDfsMulipleOccurences2OnlyCatID(rootOfCategoryTree,
+					String.valueOf(catIDToSearch), new ArrayList<DefaultMutableTreeNode>());
+
+			catIdFoundNodesMap.put(String.valueOf(catIDToSearch), foundNodes);
+		}
+		return catIdFoundNodesMap;
 	}
 
 	/**
@@ -177,17 +205,24 @@ public class UIUtilityBox
 		{
 			if (foundnode.getLevel() <= level)
 			{
-				String splitted[] = foundnode.toString().split(":");
+				String splitted[] = RegexUtils.patternColon.split(foundnode.toString());// foundnode.toString().split(":");
 				givenLevelOrAboveCatIDs.add(splitted[0]);
 			}
 
 			else
 			{
+				// if node was found in hierarchy but at a level higher than desired level, then go to lower levels.
 				while (foundnode.getLevel() > level && foundnode != null)
 				{
-					foundnode = (DefaultMutableTreeNode) foundnode.getParent();
+					// foundnode = (DefaultMutableTreeNode) foundnode.getParent(); // will it only work for 3 levels.
+					DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) foundnode.getParent();
+					while (parentNode.getLevel() > level)
+					{
+						parentNode = (DefaultMutableTreeNode) parentNode.getParent();
+					}
+					foundnode = parentNode;
 				}
-				String splitted[] = foundnode.toString().split(":");
+				String splitted[] = RegexUtils.patternColon.split(foundnode.toString());// foundnode.toString().split(":");
 				givenLevelOrAboveCatIDs.add(splitted[0]);
 			}
 			// System.out.println("Foundnode = " + foundnode.toString());
@@ -198,13 +233,13 @@ public class UIUtilityBox
 		{
 			if (foundNodes2.size() == 0)
 			{
-				// System.err.println("Warning:" + catIDToSearh + " has not given level " + level
-				// + " or above node because it was not in category hierarhcy tree");
+				System.err.println("Warning:" + catIDToSearh + " has not given level " + level
+						+ " or above node because it was not in category hierarhcy tree");
 			}
 			else
 			{
 				System.err.println("Error:" + catIDToSearh + " has not given level " + level
-						+ " or above node because it is in category hierarhcy tree");
+						+ " or above node though it is in category hierarhcy tree");
 			}
 		}
 		return givenLevelOrAboveCatIDs;

@@ -156,8 +156,28 @@ public class DatabaseCreatorGowallaQuicker0
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = getWorkingLevelCatIDsForAllCatIDs(
 					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
 
+			// sanity check to verify if no cat id as empty working lvel cat ids
+			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length > 0");
+			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() > 0)
+					.forEach(e -> System.out.println(e.getKey() + "-" + e.getValue()));
+
+			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length = 0");
+			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() == 0)
+					.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue()));
+
+			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length > 3");
+			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() > 3)
+					.forEach(e -> System.out.println(e.getKey() + "-" + e.getValue()));
+
+			////
+			// used in create checkin entries to determine if a cat id is acceptable
+			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap = UIUtilityBox
+					.getCatIDsFoundNodesMap(rootOfCategoryTree, catIDNameDictionary);
+
+			////
 			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> checkinResult = createCheckinEntries(
-					checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict);
+					checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict,
+					catIDsFoundNodesMap, workingCatLevel);
 
 			mapForAllCheckinData = checkinResult.getFirst();
 
@@ -658,6 +678,9 @@ public class DatabaseCreatorGowallaQuicker0
 	////////
 
 	/**
+	 * Return a a map containing working level cat ids for for each cat id in the given cat id name dictionary and given
+	 * working level cat id and writes MapForgetWorkingLevelCatIDsForAllCatIDs.csv containing working level cats for
+	 * cats and num of not found in hierarchy tree, num of cat having multiple working level cat ids
 	 * 
 	 * @param catIDNameDictionary
 	 * @param workingCatLevel
@@ -726,13 +749,16 @@ public class DatabaseCreatorGowallaQuicker0
 	 * @param workingLevelForCat
 	 * @param rootOfCategoryTree
 	 * @param catIDWorkingLevelCatIDsDict
+	 * @param catIDsFoundNodesMap
+	 *            (cat id, list of nodes in hierarchy tree at which this cat id is found)
 	 * @return
 	 */
 
 	private static Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>>
 
 			createCheckinEntries(String checkinFileNameToRead, String commonPath,
-					DefaultMutableTreeNode rootOfCategoryTree, TreeMap<Integer, String> catIDWorkingLevelCatIDsDict)
+					DefaultMutableTreeNode rootOfCategoryTree, TreeMap<Integer, String> catIDWorkingLevelCatIDsDict,
+					LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap, int workingCatLevel)
 	{
 		int countOfCheckinEntryObjects = 0;
 		int numOfDuplicateTimestamps = 0;
@@ -790,8 +816,17 @@ public class DatabaseCreatorGowallaQuicker0
 				// workingLevelCatIDs = givenLevelOrAboveCatIDs.stream().reduce((t, u) -> t + "__" + u).get();
 				// }
 				// // String workingLevelCatIDs =
-				Pair<Boolean, String> isAcceptableDirectCatID = isAcceptableDirectCatID(catIDDirect,
-						rootOfCategoryTree);
+
+				// Pair<Boolean, String> isAcceptableDirectCatID = isAcceptableDirectCatID(catIDDirect,
+				// rootOfCategoryTree);
+
+				// a direct catid is acceptable only if it is present in cat hierarchy tree at one of more nodes and
+				// atleast one of those nodes have direct level >= workingLevel (2).. in other words, ignore catid at
+				// level 1
+				Pair<Boolean, String> isAcceptableDirectCatID = isAcceptableDirectCatIDFaster(catIDDirect,
+						catIDsFoundNodesMap, workingCatLevel);
+
+				// catIDWorkingLevelCatIDsDict
 
 				if (isAcceptableDirectCatID.getFirst() == false)
 				{
@@ -860,6 +895,49 @@ public class DatabaseCreatorGowallaQuicker0
 		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>>(result,
 				locationIDsInCheckinData);
 
+	}
+
+	/**
+	 * Checks if the category id is present in hierarchy tree and at a level >=workingLevelCatID (=2) (i.e.,more than
+	 * level 1).
+	 * 
+	 * @param catIDDirect
+	 * @param rootOfCategoryTree
+	 * @param catIDWorkingLevelCatIDsDict
+	 * @return pair which can be either of (true, "Acceptable"),(false, "NotInHierarchy"),(false, "LevelNotAcceptable")
+	 */
+	private static Pair<Boolean, String> isAcceptableDirectCatIDFaster(Integer catIDToSearch,
+			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIdFoundNodesMap, int workingLevelCatID)
+	{
+		// get nodes containing this catID
+		ArrayList<DefaultMutableTreeNode> foundNodes = catIdFoundNodesMap.get(String.valueOf(catIDToSearch));
+		// UIUtilityBox.recursiveDfsMulipleOccurences2OnlyCatID(
+		// rootOfCategoryTree, catIDToSearch.toString(), new ArrayList<DefaultMutableTreeNode>());
+
+		// System.out.println("num of matching nodes found = " + foundNodes2.size());
+		// boolean isLevelAcceptable = false;
+
+		if (foundNodes.size() > 0) // is it there in hierarchy tree
+		{
+			// check if any of these nodes containing catID are at level >=2.
+			for (DefaultMutableTreeNode foundnode : foundNodes)
+			{
+				if (foundnode.getLevel() >= workingLevelCatID) // atleast level 2
+				{
+					// isLevelAcceptable = true;
+					return new Pair<Boolean, String>(true, "Acceptable");
+				}
+				// System.out.println("Foundnode = " + foundnode.toString());
+				// System.out.println("Foundnode depth = " + foundnode.getLevel());
+				// System.out.println("Foundnode path = " + Arrays.toString(foundnode.getPath()));
+			}
+		}
+		else
+		{
+			return new Pair<Boolean, String>(false, "NotInHierarchy");
+		}
+
+		return new Pair<Boolean, String>(false, "LevelNotAcceptable");
 	}
 
 	/**
