@@ -30,16 +30,23 @@ public class CheckinEntry extends DataEntry implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 	private String userID, workingLevelCatIDs; // note: working level catid can be multiple "36_60"
-	private int locationID;
-	private String startLatitude;
-	private String startLongitude;
+	// private int locationID;
+	// private String startLatitude;
+	// private String startLongitude;
+
+	ArrayList<String> locationIDs; // needed for merged checkin entries
+	ArrayList<String> startLats, startLons; // needed for merged checkin entries
 	/**
 	 * Category ID (direct)
 	 */
 	private int activityID;
 
-	private double distanceInMetersFromNext;
-	private long durationInSecsFromNext;
+	private double distanceInMetersFromPrev;
+	private long durationInSecsFromPrev;
+
+	// private int numOfCheckins; // num of checkins this checkin is composed of, this is relevant when multiple
+	// checkins
+	// // are merged to form one checkin
 
 	/**
 	 * <p>
@@ -60,17 +67,22 @@ public class CheckinEntry extends DataEntry implements Serializable
 			Integer catID, String workingLevelCatIDs)
 	{
 		this.userID = userID;
-		this.locationID = locationID;
+		this.locationIDs = new ArrayList<String>();
+		this.locationIDs.add(String.valueOf(locationID));
 		this.timestamp = ts;
 
-		this.startLatitude = StatsUtils.round(latitude, 6);
-		this.startLongitude = StatsUtils.round(longitude, 6);
+		this.startLats = new ArrayList<String>();
+		this.startLons = new ArrayList<String>();
+
+		this.startLats.add(StatsUtils.round(latitude, 6));
+		this.startLons.add(StatsUtils.round(longitude, 6));
 
 		this.activityID = catID;
 		this.setWorkingLevelCatIDs(workingLevelCatIDs);
 	}
 
 	/**
+	 * <font color = green>Most useful constructor</font>
 	 * 
 	 * @param userID
 	 * @param locationID
@@ -86,19 +98,64 @@ public class CheckinEntry extends DataEntry implements Serializable
 			Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext)
 	{
 		this.userID = userID;
-		this.locationID = locationID;
+		this.locationIDs = new ArrayList<String>();
+		this.locationIDs.add(String.valueOf(locationID));
 		this.timestamp = ts;
 
-		this.startLatitude = StatsUtils.round(latitude, 6);
-		this.startLongitude = StatsUtils.round(longitude, 6);
+		this.startLats = new ArrayList<String>();
+		this.startLons = new ArrayList<String>();
+
+		this.startLats.add(StatsUtils.round(latitude, 6));
+		this.startLons.add(StatsUtils.round(longitude, 6));
 
 		this.activityID = catID;
 		this.setWorkingLevelCatIDs(workingLevelCatIDs);
 
-		this.distanceInMetersFromNext = distanceInMetersFromNext;
-		this.durationInSecsFromNext = durationInSecsFromNext;
+		this.distanceInMetersFromPrev = distanceInMetersFromNext;
+		this.durationInSecsFromPrev = durationInSecsFromNext;
 	}
 
+	/**
+	 * <font color = green>Most useful constructor</font>
+	 *
+	 * @param userID
+	 * @param locationID
+	 * @param ts
+	 * @param latitude
+	 * @param longitude
+	 * @param catID
+	 * @param workingLevelCatIDs
+	 * @param distanceInMetersFromNext
+	 * @param durationInSecsFromNext
+	 */
+	public CheckinEntry(String userID, ArrayList<String> locationIDs, Timestamp ts, ArrayList<String> latitudes,
+			ArrayList<String> longitudes, Integer catID, String workingLevelCatIDs, double distanceInMetersFromPrev,
+			long durationInSecsFromPrev)
+	{
+		this.userID = userID;
+		this.locationIDs = locationIDs;
+		this.timestamp = ts;
+
+		this.startLats = latitudes;
+		this.startLons = longitudes;
+
+		this.activityID = catID;
+		this.setWorkingLevelCatIDs(workingLevelCatIDs);
+
+		this.distanceInMetersFromPrev = distanceInMetersFromPrev;
+		this.durationInSecsFromPrev = durationInSecsFromPrev;
+	}
+
+	/**
+	 * <font color = orange>currently not called</font>
+	 * 
+	 * @param timestamp
+	 * @param differenceWithNextInSeconds
+	 * @param durationInSeconds
+	 * @param trajectoryID
+	 * @param extraComments
+	 * @param breakOverDaysCount
+	 */
 	public CheckinEntry(Timestamp timestamp, long differenceWithNextInSeconds, long durationInSeconds,
 			ArrayList<String> trajectoryID, String extraComments, int breakOverDaysCount)
 	{
@@ -124,19 +181,31 @@ public class CheckinEntry extends DataEntry implements Serializable
 		return userID;
 	}
 
-	public int getLocationID()
+	/**
+	 * 
+	 * @return the first location id
+	 */
+	public String getLocationID()
 	{
-		return locationID;
+		return this.locationIDs.get(0);// return this.lo;
 	}
 
+	/**
+	 * 
+	 * @return first lat
+	 */
 	public String getStartLatitude()
 	{
-		return startLatitude;
+		return this.startLats.get(0);
 	}
 
+	/**
+	 * 
+	 * @return first lon
+	 */
 	public String getStartLongitude()
 	{
-		return startLongitude;
+		return this.startLons.get(0);
 	}
 
 	public int getActivityID()
@@ -147,7 +216,10 @@ public class CheckinEntry extends DataEntry implements Serializable
 	@Override
 	public String toString()
 	{
-		return null;
+		return "CheckinEntry [userID=" + userID + ", workingLevelCatIDs=" + workingLevelCatIDs + ", locationIDs="
+				+ locationIDs + ", startLats=" + startLats + ", startLons=" + startLons + ", activityID=" + activityID
+				+ ", distanceInMetersFromPrev=" + distanceInMetersFromPrev + ", durationInSecsFromPrev="
+				+ durationInSecsFromPrev + "]";
 	}
 
 	@Override
@@ -174,8 +246,18 @@ public class CheckinEntry extends DataEntry implements Serializable
 	@Override
 	public String toStringWithoutHeaders()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return this.userID + "," + this.timestamp + "," + this.activityID + "," + this.distanceInMetersFromPrev + ","
+				+ this.durationInSecsFromPrev;
+	}
+
+	/**
+	 * returns correspnding header for toStringWithoutHeaders()
+	 * 
+	 * @return "userID,timestamp,activityID,distanceInMetersFromPrev,durationInSecsFromPrev"
+	 */
+	public static String getHeaderToWrite()
+	{
+		return "userID,timestamp,activityID,distanceInMetersFromPrev,durationInSecsFromPrev";
 	}
 
 	@Override
@@ -206,78 +288,24 @@ public class CheckinEntry extends DataEntry implements Serializable
 		return null;
 	}
 
-	public double getDistanceInMetersFromNext()
+	public double getDistanceInMetersFromPrev()
 	{
-		return distanceInMetersFromNext;
+		return distanceInMetersFromPrev;
 	}
 
-	public void setDistanceInMetersFromNext(double distanceInMetersFromNext)
+	public void setDistanceInMetersFromPrev(double distanceInMetersFromNext)
 	{
-		this.distanceInMetersFromNext = distanceInMetersFromNext;
+		this.distanceInMetersFromPrev = distanceInMetersFromNext;
 	}
 
-	public long getDurationInSecsFromNext()
+	public long getDurationInSecsFromPrev()
 	{
-		return durationInSecsFromNext;
+		return durationInSecsFromPrev;
 	}
 
-	public void setDurationInSecsFromNext(long durationInSecsFromNext)
+	public void setDurationInSecsFromPrev(long durationInSecsFromNext)
 	{
-		this.durationInSecsFromNext = durationInSecsFromNext;
-	}
-
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + activityID;
-		long temp;
-		temp = Double.doubleToLongBits(distanceInMetersFromNext);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + (int) (durationInSecsFromNext ^ (durationInSecsFromNext >>> 32));
-		result = prime * result + locationID;
-		result = prime * result + ((startLatitude == null) ? 0 : startLatitude.hashCode());
-		result = prime * result + ((startLongitude == null) ? 0 : startLongitude.hashCode());
-		result = prime * result + ((userID == null) ? 0 : userID.hashCode());
-		result = prime * result + ((workingLevelCatIDs == null) ? 0 : workingLevelCatIDs.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
-		CheckinEntry other = (CheckinEntry) obj;
-		if (activityID != other.activityID) return false;
-		if (Double.doubleToLongBits(distanceInMetersFromNext) != Double
-				.doubleToLongBits(other.distanceInMetersFromNext))
-			return false;
-		if (durationInSecsFromNext != other.durationInSecsFromNext) return false;
-		if (locationID != other.locationID) return false;
-		if (startLatitude == null)
-		{
-			if (other.startLatitude != null) return false;
-		}
-		else if (!startLatitude.equals(other.startLatitude)) return false;
-		if (startLongitude == null)
-		{
-			if (other.startLongitude != null) return false;
-		}
-		else if (!startLongitude.equals(other.startLongitude)) return false;
-		if (userID == null)
-		{
-			if (other.userID != null) return false;
-		}
-		else if (!userID.equals(other.userID)) return false;
-		if (workingLevelCatIDs == null)
-		{
-			if (other.workingLevelCatIDs != null) return false;
-		}
-		else if (!workingLevelCatIDs.equals(other.workingLevelCatIDs)) return false;
-		return true;
+		this.durationInSecsFromPrev = durationInSecsFromNext;
 	}
 
 	public String getWorkingLevelCatIDs()
@@ -288,6 +316,36 @@ public class CheckinEntry extends DataEntry implements Serializable
 	public void setWorkingLevelCatIDs(String workingLevelCatIDs)
 	{
 		this.workingLevelCatIDs = workingLevelCatIDs;
+	}
+
+	public ArrayList<String> getLocationIDs()
+	{
+		return locationIDs;
+	}
+
+	public void setLocationIDs(ArrayList<String> locationIDs)
+	{
+		this.locationIDs = locationIDs;
+	}
+
+	public ArrayList<String> getStartLats()
+	{
+		return startLats;
+	}
+
+	public void setStartLats(ArrayList<String> startLats)
+	{
+		this.startLats = startLats;
+	}
+
+	public ArrayList<String> getStartLons()
+	{
+		return startLons;
+	}
+
+	public void setStartLons(ArrayList<String> startLons)
+	{
+		this.startLons = startLons;
 	}
 
 }

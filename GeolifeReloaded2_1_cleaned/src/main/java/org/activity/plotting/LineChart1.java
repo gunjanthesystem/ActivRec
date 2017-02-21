@@ -67,7 +67,7 @@ public class LineChart1 extends Application
 
 		lc.getData().add(series);
 		lc.getData().add(series2);
-		lc.getData().add(series2);
+		// lc.getData().add(series2);
 		return lc;
 	}
 
