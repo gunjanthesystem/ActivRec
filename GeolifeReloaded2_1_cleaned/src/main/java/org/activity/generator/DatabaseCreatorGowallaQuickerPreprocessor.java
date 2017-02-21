@@ -986,8 +986,6 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	 * To generate data with category information (note: category information is only available for data point for spots
 	 * 1 places.)
 	 * 
-	 * ALERT: currently it is also generating data for non spots 1 data point with catID and cat Name as 'NA'. -99
-	 * values.
 	 * 
 	 * @param checkinFileName
 	 * @param spots1
@@ -1155,6 +1153,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 					}
 
 					if (foundInSpots1) // ONLY WRITE IF FOUND IN SPOTS SUBSET 1
+					// && isCurrGeoCoordsValid and is valid geocoordinates
 					{
 						String towrite = currentLineRead + "," + currentDate + "," + currentLat + "," + currentLon + ","
 								+ spotCatID + "," + spotCatName + "," + distFromPrevInMeters + ","
@@ -2595,7 +2594,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemap2(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -5711,7 +5710,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemap2(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)

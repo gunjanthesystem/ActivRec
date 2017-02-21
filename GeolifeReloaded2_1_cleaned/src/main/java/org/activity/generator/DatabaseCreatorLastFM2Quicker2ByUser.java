@@ -511,7 +511,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 
 			WritingToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
 
-			WritingToFile.writeLinkedHashMapOfTreemapDE(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WritingToFile.writeLinkedHashMapOfTreemapDataEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -1322,7 +1322,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 
 			WritingToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
 
-			WritingToFile.writeLinkedHashMapOfTreemapDE(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WritingToFile.writeLinkedHashMapOfTreemapDataEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -4592,7 +4592,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemap2(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)

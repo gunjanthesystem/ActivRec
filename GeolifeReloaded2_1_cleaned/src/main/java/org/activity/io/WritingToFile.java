@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.activity.loader.GeolifeDataLoader;
 import org.activity.objects.ActivityObject;
+import org.activity.objects.CheckinEntry;
 import org.activity.objects.DataEntry;
 import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.Pair;
@@ -1345,8 +1346,53 @@ public class WritingToFile
 		}
 	}
 
-	public static void writeLinkedHashMapOfTreemap2(LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapOfMap,
-			String fileNameToUse, String headerLine)
+	/**
+	 * 
+	 * @param mapOfMap
+	 * @param absfileNameToUse
+	 * @param headerLine
+	 */
+	public static void writeLinkedHashMapOfTreemapCheckinEntry(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapOfMap, String absfileNameToUse)
+	{
+		try
+		{
+			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absfileNameToUse);
+			StringBuilder sbToWrite = new StringBuilder();
+			sbToWrite.append(CheckinEntry.getHeaderToWrite() + "\n");
+
+			int count = 0;
+			for (Entry<String, TreeMap<Timestamp, CheckinEntry>> entryForUser : mapOfMap.entrySet())
+			{
+				TreeMap<Timestamp, CheckinEntry> mapForEachUser = entryForUser.getValue();
+				for (Map.Entry<Timestamp, CheckinEntry> entryInside : mapForEachUser.entrySet())
+				{
+					count += 1;
+					sbToWrite.append(entryInside.getValue().toStringWithoutHeaders() + "\n");
+
+					if (count % 25000 == 0) // write in chunks
+					{
+						bw.write(sbToWrite.toString());
+						sbToWrite.setLength(0);
+					}
+				}
+			}
+
+			// write the remaining
+			bw.write(sbToWrite.toString());
+			sbToWrite.setLength(0);
+			bw.close();
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static void writeLinkedHashMapOfTreemapTrajEntry(
+			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapOfMap, String fileNameToUse,
+			String headerLine)
 	{
 		commonPath = Constant.getCommonPath();//
 		try
@@ -1388,8 +1434,8 @@ public class WritingToFile
 		}
 	}
 
-	public static void writeLinkedHashMapOfTreemapDE(LinkedHashMap<String, TreeMap<Timestamp, DataEntry>> mapOfMap,
-			String fileNameToUse, String headerLine)
+	public static void writeLinkedHashMapOfTreemapDataEntry(
+			LinkedHashMap<String, TreeMap<Timestamp, DataEntry>> mapOfMap, String fileNameToUse, String headerLine)
 	{
 		commonPath = Constant.getCommonPath();//
 		try

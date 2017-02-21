@@ -1,7 +1,17 @@
 package org.activity.util;
 
-/**
- * Contains some utilities method which could be reused.
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
+import org.activity.objects.CheckinEntry;
+import org.activity.ui.PopUps;
+
+/***
+ * Contains some utilities method which could be reused.**
  * 
  * @since 16 Feb 2016 12:21am
  * @author gunjan
@@ -9,31 +19,149 @@ package org.activity.util;
  */
 public class DatageneratorUtils
 {
+	// static int assumeContinuousThresholdInSeconds = 60 * 10;
+	// static int assumeContinuousThresholdInMeters = 600;
+
+	public static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mergeContinuousGowallaWithoutBOD4(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllData, String pathToWrite,
+			int assumeContinuousThresholdInSeconds, int assumeContinuousThresholdInMeters)
+	{
+		String commonPath = pathToWrite;
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForDataMerged = new LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>();
+
+		System.out.println("mergeContinuousGowallaWithoutBOD4 called with assumeContinuousThresholdInSeconds = "
+				+ assumeContinuousThresholdInSeconds + " and assumeContinuousThresholdInMeters = "
+				+ assumeContinuousThresholdInMeters);
+		// StringBuilder sbMergerCaseLogs = new StringBuilder();
+		// BufferedWriter bwMergerCaseLogs = WritingToFile
+		// .getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
+
+		/*
+		 * Note: using TreeMap is IMPORTANT here, because TreeMap will automatically sort by the timestamp, so we do not
+		 * need to be concerned about whether we add the activities in correct order or not, if the timestamps are
+		 * right, it will be stored correctly
+		 */
+		System.out.println("Merging continuous without BOD");
+		try
+		{
+			// sbMergerCaseLogs.append("User,Case,ActName,CurrentTS, NextTS,Comment\n");
+			for (Map.Entry<String, TreeMap<Timestamp, CheckinEntry>> entryForUser : mapForAllData.entrySet())
+			{
+				String userID = entryForUser.getKey();
+				System.out.println("\nUser =" + userID);
+
+				int numOfTrajCaseA = 0, numOfTrajCaseB = 0, numOfTrajCaseC = 0, numOfLastTrajEntries = 0;
+				int countOfContinuousMerged = 1;
+
+				TreeMap<Timestamp, CheckinEntry> continuousMergedForThisUser = new TreeMap<Timestamp, CheckinEntry>();
+
+				CheckinEntry previousCheckinEntry = null; // should be null before starting for each user
+				ArrayList<CheckinEntry> checkinsToMerge = new ArrayList<CheckinEntry>(); // accumulated checkins to
+																							// merge into one
+
+				int countOfCheckins = 0;
+				for (Entry<Timestamp, CheckinEntry> checkinEntries : entryForUser.getValue().entrySet())
+				{
+					countOfCheckins += 1;
+
+					if (countOfCheckins == 1)
+					{
+						previousCheckinEntry = checkinEntries.getValue();
+						checkinsToMerge.add(previousCheckinEntry);
+						continue;
+					}
+					else
+					{
+						CheckinEntry currentCheckinEntry = checkinEntries.getValue();
+
+						// should this be merged with previous checkin
+						if (currentCheckinEntry.getDurationInSecsFromPrev() <= assumeContinuousThresholdInSeconds
+								&& currentCheckinEntry
+										.getDistanceInMetersFromPrev() <= assumeContinuousThresholdInMeters
+								&& (currentCheckinEntry.getActivityID() == previousCheckinEntry.getActivityID()))
+						{
+							// merge
+							checkinsToMerge.add(currentCheckinEntry);
+						}
+						else
+						{
+							CheckinEntry mergedCheckinEntry = mergeCheckins(checkinsToMerge);
+							continuousMergedForThisUser.put(mergedCheckinEntry.getTimestamp(), mergedCheckinEntry);
+							checkinsToMerge.clear();
+						}
+						previousCheckinEntry = currentCheckinEntry;
+					}
+				} // end of loop over checkins for this user
+				mapForDataMerged.put(userID, continuousMergedForThisUser);
+			} // end of loop over checkins for all users
+		}
+		catch (Exception e)
+		{
+			PopUps.showException(e, "mergeContinuousGowallaWithoutBOD4()");
+		}
+		return mapForDataMerged;
+	}
+
+	private static CheckinEntry mergeCheckins(ArrayList<CheckinEntry> checkinsToMerge)
+	{
+
+		if (checkinsToMerge.size() == 1)
+		{
+			return checkinsToMerge.get(0);
+		}
+
+		// CheckinEntry(String userID, Integer locationID, Timestamp ts, String latitude, String longitude,
+		// Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext)
+
+		String userID = checkinsToMerge.get(0).getUserID();
+		Timestamp ts = checkinsToMerge.get(0).getTimestamp();
+		Integer catID = checkinsToMerge.get(0).getActivityID();
+		String workingLevelCatIDs = checkinsToMerge.get(0).getWorkingLevelCatIDs();
+		double distanceInMFromPrev = checkinsToMerge.get(0).getDistanceInMetersFromPrev();
+		long durationInSecsFromPrev = checkinsToMerge.get(0).getDurationInSecsFromPrev();
+
+		ArrayList<String> locationIDs = new ArrayList<>();
+		ArrayList<String> lats = new ArrayList<>();
+		ArrayList<String> lons = new ArrayList<>();
+
+		for (CheckinEntry ce : checkinsToMerge)
+		{
+			locationIDs.addAll(ce.getLocationIDs());
+			lats.addAll(ce.getStartLats());
+			lons.addAll(ce.getStartLons());
+		}
+
+		CheckinEntry mergedCheckin = new CheckinEntry(userID, locationIDs, ts, lats, lons, catID, workingLevelCatIDs,
+				distanceInMFromPrev, durationInSecsFromPrev);
+
+		return mergedCheckin;
+	}
 
 	/**
 	 * Merges continuous activities with same activity names and start timestamp difference of less than
 	 * 'continuityThresholdInSeconds'. without break over days
-	 * 
+	 *
 	 * Duration assigned is difference between the start-timestamp of this activity and start-timestamp of the next
 	 * (different) activity. difference between the start-timestamp of this activity and start-timestamp of the next
 	 * (different) activity BUT ONLY IF this difference is less than P2 minutes, otherwise the duration is P2 minutes.
-	 * 
+	 *
 	 * Adds 'Unknown' and writes the unknown inserted to a file "Unknown_Wholes_Inserted.csv" with columns
 	 * "User,Timestamp,DurationInSecs"
-	 * 
+	 *
 	 * Nuances of merging consecutive activities and calculation the duration of activities.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param mapForAllData
 	 *            is LinkedHashMap of the form <username, <timestamp,TrajectoryEntry>>
 	 * @return <UserName, <Timestamp,TrajectoryEntry>>
 	 */
-	// public static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mergeContinuousWithoutBOD2(
+	// public static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mergeContinuousWithoutBOD3(
 	// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllData, String pathToWrite)
 	// {
 	// String commonPath = pathToWrite;
-	// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllDataMergedPlusDuration = new
-	// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>();
+	// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForDataMerged = new LinkedHashMap<String,
+	// TreeMap<Timestamp, CheckinEntry>>();
+	//
 	// /*
 	// * Note: using TreeMap is IMPORTANT here, because TreeMap will automatically sort by the timestamp, so we do not
 	// * need to be concerned about whether we add the activities in correct order or not, if the timestamps are
@@ -46,22 +174,21 @@ public class DatageneratorUtils
 	// for (Map.Entry<String, TreeMap<Timestamp, CheckinEntry>> entryForUser : mapForAllData.entrySet())
 	// {
 	// String userID = entryForUser.getKey();
-	// BufferedWriter bwMergerCaseLogs = WritingToFile
-	// .getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
-	// bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
-	//
 	// System.out.println("\nUser =" + userID);
 	//
-	// int numOfTrajCaseA = 0, numOfTrajCaseB = 0, numOfTrajCaseC = 0, numOfLastTrajEntries = 0;
+	// BufferedWriter bwMergerCaseLogs = WritingToFile
+	// .getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
+	// bwMergerCaseLogs.write("Case,ActName,CurrentTS, NextTS,Comment\n");
 	//
+	// int numOfTrajCaseA = 0, numOfTrajCaseB = 0, numOfTrajCaseC = 0, numOfLastTrajEntries = 0;
 	// int countOfContinuousMerged = 1;
 	//
-	// TreeMap<Timestamp, CheckinEntry> mapContinuousMerged = new TreeMap<Timestamp, CheckinEntry>();
+	// TreeMap<Timestamp, CheckinEntry> continuousMergedForThisUser = new TreeMap<Timestamp, CheckinEntry>();
 	//
 	// long durationInSeconds = 0;
 	//
 	// ArrayList<String> newLati = new ArrayList<String>(), newLongi = new ArrayList<String>(),
-	// newAlti = new ArrayList<String>();
+	// newPlaceID = new ArrayList<String>();
 	//
 	// long timeDiffWithNextInSeconds = 0; // do not delete. // not directly relevant
 	// Timestamp startTimestamp;
@@ -74,26 +201,22 @@ public class DatageneratorUtils
 	// // $$System.out.println("----END OF Unmerged Activity data--"+userName+"--");
 	// for (int i = 0; i < entriesForCurrentUser.size(); i++)
 	// {
-	// // startTimestamp = getTimestampFromDataEntry(dataForCurrentUser.get(i));
-	// // ##
 	// // $$System.out.println("\nReading: "+dataForCurrentUser.get(i).toString());
 	// CheckinEntry ce = entriesForCurrentUser.get(i);
 	//
 	// Timestamp currentTimestamp = ce.getTimestamp();
 	// String currentActName = String.valueOf(ce.getActivityID());// .getMode();
 	//
-	// ArrayList<String> currentLat = trajEntriesForCurrentUser.get(i).getLatitude();
-	// ArrayList<String> currentLon = trajEntriesForCurrentUser.get(i).getLongitude();
-	// ArrayList<String> currentAlt = trajEntriesForCurrentUser.get(i).getAltitude();
-	// ArrayList<String> currentTrajID = trajEntriesForCurrentUser.get(i).getTrajectoryID();
+	// ArrayList<String> currentLat = ce.getStartLats();// .getLatitude();
+	// ArrayList<String> currentLon = ce.getStartLons();// trajEntriesForCurrentUser.get(i).getLongitude();
+	// ArrayList<String> currentPlaceID = ce.getLocationIDs();// trajEntriesForCurrentUser.get(i).getTrajectoryID();
 	//
 	// newLati.addAll(currentLat);
 	// newLongi.addAll(currentLon);
-	// newAlti.addAll(currentAlt);
-	// newTrajID.addAll(currentTrajID);
+	// newPlaceID.addAll(currentPlaceID);
 	// // startTimestamp=currentTimestamp;
 	//
-	// if (i < trajEntriesForCurrentUser.size() - 1) // is not the last element of arraylist
+	// if (i < ce.size() - 1) // is not the last element of arraylist
 	// {
 	// // check if the next element should be merged with this one if they are continuous and have same
 	// // activity name
@@ -112,18 +235,6 @@ public class DatageneratorUtils
 	// timeDiffWithNextInSeconds = trajEntriesForCurrentUser.get(i)
 	// .getDifferenceWithNextInSeconds()
 	// + trajEntriesForCurrentUser.get(i + 1).getDifferenceWithNextInSeconds(); // TODO
-	// // CHECK
-	// // IF
-	// // NOT
-	// // NEEDED
-	//
-	// // newLati.addAll(currentLat);
-	// // newLongi.addAll(currentLon);
-	// // newAlti.addAll(currentAlt);
-	//
-	// // newLati.addAll(nextLat);
-	// // newLongi.addAll(nextLon);
-	// // newAlti.addAll(nextAlt);
 	//
 	// countOfContinuousMerged++;
 	// // ##bwMergerCaseLogs.write("CaseA: Continuous merged for mode=" + currentModeName + "
@@ -189,7 +300,7 @@ public class DatageneratorUtils
 	//
 	// TrajectoryEntry te = new TrajectoryEntry(startOfNewUnknown,
 	// durationForNewUnknownActivity, "Unknown");// ,bodCount);
-	// mapContinuousMerged.put(startOfNewUnknown, te);
+	// continuousMergedForThisUser.put(startOfNewUnknown, te);
 	// unknownsInsertedWholes.put(startOfNewUnknown, te);
 	// // $$System.out.println("Added Trajectory Entry: "+te.toString());
 	// }
@@ -207,7 +318,7 @@ public class DatageneratorUtils
 	// te.setDurationInSeconds(durationInSeconds);
 	// // te.setDifferenceWithNextInSeconds(timeDiffWithNextInSeconds);
 	//
-	// mapContinuousMerged.put(startTimestamp, te);
+	// continuousMergedForThisUser.put(startTimestamp, te);
 	// // $$System.out.println("Added Trajectory Entry: "+te.toString());
 	//
 	// // durationInSeconds =0;
@@ -235,7 +346,7 @@ public class DatageneratorUtils
 	// te.setTimestamp(startTimestamp);
 	// te.setDurationInSeconds(durationInSeconds + timeDurationForLastSingletonTrajectoryEntry);
 	//
-	// mapContinuousMerged.put(startTimestamp, te);
+	// continuousMergedForThisUser.put(startTimestamp, te);
 	//
 	// // $$System.out.println("Added Trajectory Entry: "+te.toString());
 	//
@@ -255,7 +366,7 @@ public class DatageneratorUtils
 	// newTrajID.clear();
 	// } // end of for loop over trajectory entries for current user.
 	//
-	// mapForAllDataMergedPlusDuration.put(entryForUser.getKey(), mapContinuousMerged);
+	// mapForAllDataMerged.put(entryForUser.getKey(), continuousMergedForThisUser);
 	// mapForAllUnknownsWholes.put(entryForUser.getKey(), unknownsInsertedWholes);
 	//
 	// bwMergerCaseLogs.write("User:" + userID + ",numOfTrajCaseA = " + numOfTrajCaseA + ",numOfTrajCaseB = "
@@ -274,6 +385,6 @@ public class DatageneratorUtils
 	// {
 	// PopUps.showException(e, "mergeContinuousTrajectoriesAssignDurationWithoutBOD2()");
 	// }
-	// return mapForAllDataMergedPlusDuration;
+	// return mapForAllDataMerged;
 	// }
 }

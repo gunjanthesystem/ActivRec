@@ -835,4 +835,21 @@ public class StatsUtils
 			return (min + (int) (Math.random() * ((max - min) + 1)));
 	}
 
+	/**
+	 * 
+	 * @param currentLat
+	 * @param currentLon
+	 * @return
+	 */
+	public static boolean isValidGeoCoordinate(String currentLat, String currentLon)
+	{
+		if (Math.abs(Double.valueOf(currentLat)) > 90 || Math.abs(Double.valueOf(currentLon)) > 180)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
 }

@@ -942,8 +942,8 @@ public class TimelineUtils
 
 				for (CheckinEntry e : dateEntry.getValue())// over checkins
 				{
-					int activityID = e.getActivityID();
-					int locationID = e.getLocationID();
+					int activityID = Integer.valueOf(e.getActivityID());
+					int locationID = Integer.valueOf(e.getLocationID());
 
 					String activityName = String.valueOf(e.getActivityID());// "";// TODO
 					String locationName = "";//
@@ -952,8 +952,8 @@ public class TimelineUtils
 					String startLongitude = e.getStartLongitude();
 					String startAltitude = "";//
 					String userIDInside = e.getUserID();
-					double distaneInMFromNext = e.getDistanceInMetersFromNext();
-					long durationInSecFromNext = e.getDurationInSecsFromNext();
+					double distaneInMFromNext = e.getDistanceInMetersFromPrev();
+					long durationInSecFromNext = e.getDurationInSecsFromPrev();
 
 					// sanity check start
 					if (userIDInside.equals(userID) == false)

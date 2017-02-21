@@ -30,7 +30,9 @@ import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
 import org.activity.util.Constant;
+import org.activity.util.DatageneratorUtils;
 import org.activity.util.RegexUtils;
+import org.activity.util.StatsUtils;
 import org.activity.util.TimelineUtils;
 import org.joda.time.LocalDateTime;
 
@@ -61,7 +63,7 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb14/DatabaseCreated/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb20/DatabaseCreated/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 	// commented out on 2 feb 2017
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Dec1/DatabaseCreation/";
@@ -90,23 +92,28 @@ public class DatabaseCreatorGowallaQuicker0
 	// two timestamps are separated by less than equal to this value
 	// and
 
-	public static final int gowallaContinuityThresholdInSecs = 10 * 60;
-	public static final int continuityThresholdInSeconds = gowallaContinuityThresholdInSecs;// = Integer.MAX_VALUE;// *
-																							// 60; // changed from 30
-																							// min in DCU
+	static final int gowallaContinuityThresholdInSecs = 10 * 60;
+	public static final int continuityThresholdInSeconds = gowallaContinuityThresholdInSecs;// = Integer.MAX_VALUE;//
+	public static final int continuityThresholdInMeters = 600;// = Integer.MAX_VALUE;//
+
+	// *
+	// 60; // changed from 30
+	// min in DCU
 	// dataset...., if two timestamps are
 	// separated by less than equal
 	// to this value and have same mode
 	// name, then they are assumed to be
 	// continuos
-	public static final int assumeContinuesBeforeNextInSecs = 2 * 60; // changed from 30 min in DCU dataset we assume
-																		// that
+	// public static final int assumeContinuesBeforeNextInSecs = 600; // changed from 30 min in DCU dataset we assume
+	// public static final int assumeContinuesBeforeNextInMeters = 600; // that
+
 	// if two activities have a start time gap of more than 'assumeContinuesBeforeNextInSecs' seconds ,
 	// then the first activity continues for 'assumeContinuesBeforeNextInSecs' seconds before the next activity starts.
-	public static final int thresholdForMergingNotAvailables = 5 * 60;
-	public static final int thresholdForMergingSandwiches = 10 * 60;
 
-	public static final int timeDurationForLastSingletonTrajectoryEntry = 2 * 60;
+	// public static final int thresholdForMergingNotAvailables = 5 * 60;
+	// public static final int thresholdForMergingSandwiches = 10 * 60;
+	//
+	// public static final int timeDurationForLastSingletonTrajectoryEntry = 2 * 60;
 
 	// public static final int sandwichFillerDurationInSecs = 10 * 60;
 
@@ -132,9 +139,7 @@ public class DatabaseCreatorGowallaQuicker0
 			// ConnectDatabaseV1.getTimestamp("B00000028_21I5H1_20140216_170559E.JPG,");
 			System.out.println("Default timezone = " + TimeZone.getDefault());
 			System.out.println("\ncontinuityThresholdInSeconds=" + continuityThresholdInSeconds
-					+ "\nassumeContinuesBeforeNextInSecs" + assumeContinuesBeforeNextInSecs
-					+ "\thresholdForMergingSandwiches = " + thresholdForMergingSandwiches
-					+ "\ntimeDurationForLastSingletonTrajectoryEntry" + timeDurationForLastSingletonTrajectoryEntry);
+					+ " continuityThresholdInMeters" + continuityThresholdInMeters);
 
 			//// start of curtian1
 			// get root of the category hierarchy tree
@@ -158,16 +163,27 @@ public class DatabaseCreatorGowallaQuicker0
 
 			long numOfCheckins = mapForAllCheckinData.entrySet().stream().mapToLong(e -> e.getValue().size()).sum();
 			System.out.println("num of checkins = " + numOfCheckins); // 6276222
-			PopUps.showMessage("num of checkins = " + numOfCheckins);
-			//////
+			// PopUps.showMessage("num of checkins = " + numOfCheckins);
+
+			////// consecutive same analysis
 			// countConsecutiveSimilarActivities2(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName);
-			Function<CheckinEntry, String> consecCompareDirectCatID = ce -> String.valueOf(ce.getActivityID());
-			Function<CheckinEntry, String> consecCompareLocationID = ce -> String.valueOf(ce.getLocationID());
-
-			countConsecutiveSimilarActivities3(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName,
-					consecCompareLocationID);// consecCompareDirectCatID);
-
+			// $$Function<CheckinEntry, String> consecCompareDirectCatID = ce -> String.valueOf(ce.getActivityID());
+			// $$Function<CheckinEntry, String> consecCompareLocationID = ce -> String.valueOf(ce.getLocationID());
+			// $$countConsecutiveSimilarActivities3(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName,
+			// $$ consecCompareLocationID);// consecCompareDirectCatID);
 			/////
+
+			WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
+					commonPath + "mapForAllCheckinDataBeforeMerged.csv");
+			/////
+			// merge
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged = DatageneratorUtils
+					.mergeContinuousGowallaWithoutBOD4(mapForAllCheckinData, commonPath, continuityThresholdInSeconds,
+							continuityThresholdInMeters);
+			// mapForAllCheckinData
+			///
+			WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinDataMerged,
+					commonPath + "mapForAllCheckinDataAfterMerged.csv");
 
 			userIDsInCheckinData = mapForAllCheckinData.keySet();
 			locationIDsInCheckinData = checkinResult.getSecond();
@@ -289,7 +305,7 @@ public class DatabaseCreatorGowallaQuicker0
 		WritingToFile.appendLineToFileAbsolute("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
 				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
 
-		long checkinsCount = 0;
+		long checkinsCount = 0, checkinsWithInvalidGeocoords = 0;
 		// /* Uncomment to view the category ids in the map */
 		// catIDLengthConsecs.entrySet().stream().forEach(e -> System.out.print(" " + e.getKey().toString() + "-" +
 		// e.getValue()));
@@ -313,10 +329,16 @@ public class DatabaseCreatorGowallaQuicker0
 				{
 					CheckinEntry ce = dateE.getValue();
 					checkinsCount += 1;
+
+					if (!StatsUtils.isValidGeoCoordinate(ce.getStartLatitude(), ce.getStartLongitude()))
+					{
+						checkinsWithInvalidGeocoords += 1;
+					}
+
 					String currValOfComparisonAttribute = lambdaForConsecSameAttribute.apply(ce);
 					String activityID = String.valueOf(ce.getActivityID());
-					double distNext = ce.getDistanceInMetersFromNext();
-					long durationNext = ce.getDurationInSecsFromNext();
+					double distNext = ce.getDistanceInMetersFromPrev();
+					long durationNext = ce.getDurationInSecsFromPrev();
 					String ts = ce.getTimestamp().toString();
 					String actCatName = catIDNameDictionary.get(Integer.valueOf(activityID));
 
@@ -415,6 +437,8 @@ public class DatabaseCreatorGowallaQuicker0
 			}
 
 			System.out.println("Num of checkins read = " + checkinsCount);
+			System.out.println("checkinsWithInvalidGeocoords read = " + checkinsWithInvalidGeocoords);
+
 			TimelineUtils.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
 			TimelineUtils.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
@@ -497,8 +521,8 @@ public class DatabaseCreatorGowallaQuicker0
 					checkinsCount += 1;
 					CheckinEntry ce = dateE.getValue();
 					String activityID = String.valueOf(ce.getActivityID());// aos.getActivityName();
-					double distNext = ce.getDistanceInMetersFromNext();
-					long durationNext = ce.getDurationInSecsFromNext();
+					double distNext = ce.getDistanceInMetersFromPrev();
+					long durationNext = ce.getDurationInSecsFromPrev();
 					String ts = ce.getTimestamp().toString();
 					String actCatName = catIDNameDictionary.get(Integer.valueOf(activityID));
 

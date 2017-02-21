@@ -640,7 +640,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemap2(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -3570,7 +3570,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemap2(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
