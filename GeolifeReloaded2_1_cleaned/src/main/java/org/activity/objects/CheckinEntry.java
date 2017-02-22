@@ -246,8 +246,8 @@ public class CheckinEntry extends DataEntry implements Serializable
 	@Override
 	public String toStringWithoutHeaders()
 	{
-		return this.userID + "," + this.timestamp + "," + this.activityID + "," + this.distanceInMetersFromPrev + ","
-				+ this.durationInSecsFromPrev;
+		return this.userID + "," + this.timestamp + "," + this.activityID + "," + this.getLocationIDs('_') + ","
+				+ this.distanceInMetersFromPrev + "," + this.durationInSecsFromPrev;
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class CheckinEntry extends DataEntry implements Serializable
 	 */
 	public static String getHeaderToWrite()
 	{
-		return "userID,timestamp,activityID,distanceInMetersFromPrev,durationInSecsFromPrev";
+		return "userID,timestamp,activityID,placeID,distanceInMetersFromPrev,durationInSecsFromPrev";
 	}
 
 	@Override
@@ -323,6 +323,13 @@ public class CheckinEntry extends DataEntry implements Serializable
 		return locationIDs;
 	}
 
+	public String getLocationIDs(char delimiter)
+	{
+		StringBuilder sb = new StringBuilder();
+		locationIDs.stream().forEach(e -> sb.append(e + delimiter));
+		return sb.toString();
+	}
+
 	public void setLocationIDs(ArrayList<String> locationIDs)
 	{
 		this.locationIDs = locationIDs;
@@ -346,6 +353,64 @@ public class CheckinEntry extends DataEntry implements Serializable
 	public void setStartLons(ArrayList<String> startLons)
 	{
 		this.startLons = startLons;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + activityID;
+		long temp;
+		temp = Double.doubleToLongBits(distanceInMetersFromPrev);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (int) (durationInSecsFromPrev ^ (durationInSecsFromPrev >>> 32));
+		result = prime * result + ((locationIDs == null) ? 0 : locationIDs.hashCode());
+		result = prime * result + ((startLats == null) ? 0 : startLats.hashCode());
+		result = prime * result + ((startLons == null) ? 0 : startLons.hashCode());
+		result = prime * result + ((userID == null) ? 0 : userID.hashCode());
+		result = prime * result + ((workingLevelCatIDs == null) ? 0 : workingLevelCatIDs.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		CheckinEntry other = (CheckinEntry) obj;
+		if (activityID != other.activityID) return false;
+		if (Double.doubleToLongBits(distanceInMetersFromPrev) != Double
+				.doubleToLongBits(other.distanceInMetersFromPrev))
+			return false;
+		if (durationInSecsFromPrev != other.durationInSecsFromPrev) return false;
+		if (locationIDs == null)
+		{
+			if (other.locationIDs != null) return false;
+		}
+		else if (!locationIDs.equals(other.locationIDs)) return false;
+		if (startLats == null)
+		{
+			if (other.startLats != null) return false;
+		}
+		else if (!startLats.equals(other.startLats)) return false;
+		if (startLons == null)
+		{
+			if (other.startLons != null) return false;
+		}
+		else if (!startLons.equals(other.startLons)) return false;
+		if (userID == null)
+		{
+			if (other.userID != null) return false;
+		}
+		else if (!userID.equals(other.userID)) return false;
+		if (workingLevelCatIDs == null)
+		{
+			if (other.workingLevelCatIDs != null) return false;
+		}
+		else if (!workingLevelCatIDs.equals(other.workingLevelCatIDs)) return false;
+		return true;
 	}
 
 }

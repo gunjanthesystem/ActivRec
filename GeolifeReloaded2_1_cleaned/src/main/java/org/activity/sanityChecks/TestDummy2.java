@@ -5,7 +5,9 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.function.Function;
@@ -71,7 +73,11 @@ public class TestDummy2
 
 	public static void main(String args[])
 	{
-		steamFunctionParameter(2);
+
+		List<String> list = Arrays.asList(new String[] { "gunjan", "manali", "sukany" });
+		System.out.println(list.toString());
+		list.stream().forEach(e -> System.out.print(e.toString() + "_"));
+		// steamFunctionParameter(2);
 		// streamExp1();
 	}
 

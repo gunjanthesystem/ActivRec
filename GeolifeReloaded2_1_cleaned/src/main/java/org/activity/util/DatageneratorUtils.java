@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.activity.objects.CheckinEntry;
-import org.activity.ui.PopUps;
 
 /***
  * Contains some utilities method which could be reused.**
@@ -22,6 +21,25 @@ public class DatageneratorUtils
 	// static int assumeContinuousThresholdInSeconds = 60 * 10;
 	// static int assumeContinuousThresholdInMeters = 600;
 
+	/**
+	 * Merge checkins based on the given thresholds
+	 * <p>
+	 * <font color = orange>Note: distanceFromPrev and durationFromPrev for the merged checkin is considered to be the
+	 * corresponding values for the first checkin.
+	 * <p>
+	 * This results in following: if a checkin which is a merger of 3 checkins is followed by a single unmerged checkin.
+	 * Then the distanceFromPrev and durationFromPrev for the merged checkin is the corresponding values for the first
+	 * merged checkin while distanceFromPrev and durationFromPrev for the following unmerged checkin is the values
+	 * corresponding to the distance and difference of this unmerged checking from the last (3rd) of the merged checkin.
+	 * </font>
+	 * 
+	 * 
+	 * @param mapForAllData
+	 * @param pathToWrite
+	 * @param assumeContinuousThresholdInSeconds
+	 * @param assumeContinuousThresholdInMeters
+	 * @return
+	 */
 	public static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mergeContinuousGowallaWithoutBOD4(
 			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllData, String pathToWrite,
 			int assumeContinuousThresholdInSeconds, int assumeContinuousThresholdInMeters)
@@ -48,9 +66,10 @@ public class DatageneratorUtils
 			for (Map.Entry<String, TreeMap<Timestamp, CheckinEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				System.out.println("\nUser =" + userID);
+				// $$System.out.println("\nUser =" + userID);
 
-				int numOfTrajCaseA = 0, numOfTrajCaseB = 0, numOfTrajCaseC = 0, numOfLastTrajEntries = 0;
+				// int numOfTrajCaseA = 0, numOfTrajCaseB = 0, numOfTrajCaseC = 0, numOfLastTrajEntries = 0;
+				// int numOfPlaceIDMerger
 				int countOfContinuousMerged = 1;
 
 				TreeMap<Timestamp, CheckinEntry> continuousMergedForThisUser = new TreeMap<Timestamp, CheckinEntry>();
@@ -63,16 +82,21 @@ public class DatageneratorUtils
 				for (Entry<Timestamp, CheckinEntry> checkinEntries : entryForUser.getValue().entrySet())
 				{
 					countOfCheckins += 1;
+					CheckinEntry currentCheckinEntry = checkinEntries.getValue();
+					// $$System.out.println(
+					// $$ "Reading checkin " + countOfCheckins + " " + currentCheckinEntry.toStringWithoutHeaders());
 
 					if (countOfCheckins == 1)
 					{
 						previousCheckinEntry = checkinEntries.getValue();
 						checkinsToMerge.add(previousCheckinEntry);
+						// $$System.out.println(
+						// $$ "first checkin: continuing, checkinsToMerge.size() = " + checkinsToMerge.size());
 						continue;
 					}
 					else
 					{
-						CheckinEntry currentCheckinEntry = checkinEntries.getValue();
+						// CheckinEntry currentCheckinEntry = checkinEntries.getValue();
 
 						// should this be merged with previous checkin
 						if (currentCheckinEntry.getDurationInSecsFromPrev() <= assumeContinuousThresholdInSeconds
@@ -82,12 +106,21 @@ public class DatageneratorUtils
 						{
 							// merge
 							checkinsToMerge.add(currentCheckinEntry);
+							// $$System.out.println("add to merge, checkinsToMerge.size() = " + checkinsToMerge.size());
 						}
 						else
 						{
+							// $$System.out.println("not same, checkinsToMerge.size() = " + checkinsToMerge.size());
+							// $$System.out.println("merge previous ones and add curr to merge = " +
+							// checkinsToMerge.size());
+
+							// merge the previously accumulated checkins, put in result map
 							CheckinEntry mergedCheckinEntry = mergeCheckins(checkinsToMerge);
 							continuousMergedForThisUser.put(mergedCheckinEntry.getTimestamp(), mergedCheckinEntry);
 							checkinsToMerge.clear();
+							// add current checkin to merge
+							checkinsToMerge.add(currentCheckinEntry);
+							// $$System.out.println("checkinsToMerge.size() = " + checkinsToMerge.size());
 						}
 						previousCheckinEntry = currentCheckinEntry;
 					}
@@ -97,11 +130,26 @@ public class DatageneratorUtils
 		}
 		catch (Exception e)
 		{
-			PopUps.showException(e, "mergeContinuousGowallaWithoutBOD4()");
+			System.err.println("Exception in mergeContinuousGowallaWithoutBOD4");
+			e.printStackTrace();
+			// PopUps.showException(e, "mergeContinuousGowallaWithoutBOD4()");
 		}
 		return mapForDataMerged;
 	}
 
+	/**
+	 * <font color = orange>Note: distanceFromPrev and durationFromPrev for the merged checkin is considered to be the
+	 * corresponding values for the first checkin.
+	 * <p>
+	 * This results in following: if a checkin which is a merger of 3 checkins is followed by a single unmerged checkin.
+	 * Then the distanceFromPrev and durationFromPrev for the merged checkin is the corresponding values for the first
+	 * merged checkin while distanceFromPrev and durationFromPrev for the following unmerged checkin is the values
+	 * corresponding to the distance and difference of this unmerged checking from the last (3rd) of the merged checkin.
+	 * </font>
+	 * 
+	 * @param checkinsToMerge
+	 * @return
+	 */
 	private static CheckinEntry mergeCheckins(ArrayList<CheckinEntry> checkinsToMerge)
 	{
 
