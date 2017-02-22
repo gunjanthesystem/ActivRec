@@ -65,14 +65,20 @@ public class PopUps
 	 */
 	public static void showException(Exception e, String methodName)
 	{
-		// String exceptionMsg =ExceptionUtils.getStackTrace(throwable)// e.getMessage();
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		String exceptionMsg = sw.toString(); // stack trace as a string
-
 		exceptionMsg += ("\n Exception in " + methodName + "\n");
-		PopUps.showError(exceptionMsg);
+		try
+		{
+			// String exceptionMsg =ExceptionUtils.getStackTrace(throwable)// e.getMessage();
+			PopUps.showError(exceptionMsg);
+		}
+		catch (HeadlessException ex)
+		{
+			System.err.println("\n Headless: hence printing exeception msg instead of PopUp.\n" + exceptionMsg);
+		}
 	}
 
 }

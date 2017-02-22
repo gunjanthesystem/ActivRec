@@ -1370,7 +1370,7 @@ public class WritingToFile
 					count += 1;
 					sbToWrite.append(entryInside.getValue().toStringWithoutHeaders() + "\n");
 
-					if (count % 25000 == 0) // write in chunks
+					if (count % 50000 == 0) // write in chunks
 					{
 						bw.write(sbToWrite.toString());
 						sbToWrite.setLength(0);

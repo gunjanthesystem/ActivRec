@@ -193,17 +193,16 @@ public class DatabaseCreatorGowallaQuicker0
 			// $$ consecCompareLocationID);// consecCompareDirectCatID);
 			/////
 
-			WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
-					commonPath + "mapForAllCheckinDataBeforeMerged.csv");
+			// $$WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
+			// $$ commonPath + "mapForAllCheckinDataBeforeMerged.csv");
 			/////
 			// merge
-			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged = DatageneratorUtils
-					.mergeContinuousGowallaWithoutBOD4(mapForAllCheckinData, commonPath, continuityThresholdInSeconds,
-							continuityThresholdInMeters);
-			// mapForAllCheckinData
-			///
-			WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinDataMerged,
-					commonPath + "mapForAllCheckinDataAfterMerged.csv");
+			// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged
+			mapForAllCheckinData = DatageneratorUtils.mergeContinuousGowallaWithoutBOD4(mapForAllCheckinData,
+					commonPath, continuityThresholdInSeconds, continuityThresholdInMeters);
+			// $$WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
+			// $$ commonPath + "mapForAllCheckinDataAfterMerged.csv");
+			//
 
 			userIDsInCheckinData = mapForAllCheckinData.keySet();
 			locationIDsInCheckinData = checkinResult.getSecond();
