@@ -15,7 +15,7 @@ public class LocationGowalla extends LocationObject implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 
-	String locationID;
+	Integer locationID;
 	int photos_count, checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count;// spot_categories;
 
 	public LocationGowalla()
@@ -51,7 +51,7 @@ public class LocationGowalla extends LocationObject implements Serializable
 	 * @param max_items_count
 	 */
 	public LocationGowalla(String lat, String lon, String locName, String locCat, String city, String county,
-			String country, String continent, String locationID, int photos_count, int checkins_count, int users_count,
+			String country, String continent, Integer locationID, int photos_count, int checkins_count, int users_count,
 			int radius_meters, int highlights_count, int items_count, int max_items_count)
 	{
 		super(lat, lon, locName, locCat, city, county, country, continent);
@@ -66,7 +66,7 @@ public class LocationGowalla extends LocationObject implements Serializable
 		this.max_items_count = max_items_count;
 	}
 
-	public String getLocationID()
+	public Integer getLocationID()
 	{
 		return locationID;
 	}
@@ -104,6 +104,15 @@ public class LocationGowalla extends LocationObject implements Serializable
 	public int getMax_items_count()
 	{
 		return max_items_count;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "LocationGowalla [locationID=" + locationID + ", photos_count=" + photos_count + ", checkins_count="
+				+ checkins_count + ", users_count=" + users_count + ", radius_meters=" + radius_meters
+				+ ", highlights_count=" + highlights_count + ", items_count=" + items_count + ", max_items_count="
+				+ max_items_count + "]";
 	}
 
 	@Override

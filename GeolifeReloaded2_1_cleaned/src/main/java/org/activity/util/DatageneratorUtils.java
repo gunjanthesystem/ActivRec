@@ -168,7 +168,7 @@ public class DatageneratorUtils
 		double distanceInMFromPrev = checkinsToMerge.get(0).getDistanceInMetersFromPrev();
 		long durationInSecsFromPrev = checkinsToMerge.get(0).getDurationInSecsFromPrev();
 
-		ArrayList<String> locationIDs = new ArrayList<>();
+		ArrayList<Integer> locationIDs = new ArrayList<>();
 		ArrayList<String> lats = new ArrayList<>();
 		ArrayList<String> lons = new ArrayList<>();
 

@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.activity.util.Constant;
@@ -33,7 +35,8 @@ public class ActivityObject implements Serializable
 	HashMap<String, String> dimensionIDNameValues; // (User_ID, 2) //this was to keep activity object generic but not
 													// entirely successfull IMHO
 
-	int activityID, locationID;
+	int activityID;
+	LinkedHashSet<Integer> locationIDs; // an activity object can have multiple location ids if it is a merged
 	String activityName, locationName, workingLevelCatIDs;// workingLevelCatIDs are "__" separated catID for the given
 															// working level in hierarhcy
 
@@ -47,6 +50,8 @@ public class ActivityObject implements Serializable
 	 * Not available in DCU_dataset. Available in Geolife dataset
 	 */
 	String startLatitude, endLatitude, startLongitude, endLongitude, startAltitude, endAltitude, avgAltitude;
+
+	ArrayList<String> lats, lons; // multiple lats, lons if it is a merged
 	/**
 	 * Not available in DCU_dataset. Available in Geolife dataset
 	 */
@@ -94,7 +99,8 @@ public class ActivityObject implements Serializable
 		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
 															// considering one working level cat id
 
-		this.locationID = locationID;
+		this.locationIDs = new LinkedHashSet<Integer>();
+		locationIDs.add(locationID);
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
 		this.startTimestamp = startTimestamp;
@@ -149,7 +155,70 @@ public class ActivityObject implements Serializable
 		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
 															// considering one working level cat id
 
-		this.locationID = locationID;
+		this.locationIDs = new LinkedHashSet<Integer>();
+		locationIDs.add(locationID);
+
+		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
+		this.locationName = locationName;
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = startTimestamp;
+		this.startLatitude = startLatitude;
+		this.startLongitude = startLongitude;
+		this.startAltitude = startAltitude;
+		this.userID = userID;
+		this.photos_count = photos_count;
+		this.checkins_count = checkins_count;
+		this.users_count = users_count;
+		this.radius_meters = radius_meters;
+		this.highlights_count = highlights_count;
+		this.items_count = items_count;
+		this.max_items_count = max_items_count;
+		this.workingLevelCatIDs = workingLevelCatIDs;
+
+		this.distanceInMFromNext = distanceInMFromNext;
+		this.durationInSecondsFromNext = durationInSecsFromNext;
+
+	}
+
+	/**
+	 * 
+	 * @param activityID
+	 * @param locationIDs
+	 *            list of locations id. this will >1 in case of mergers. note: we store the location id in the activity
+	 *            object as Set and not as List
+	 * @param activityName
+	 * @param locationName
+	 * @param startTimestamp
+	 * @param startLatitude
+	 * @param startLongitude
+	 * @param startAltitude
+	 * @param userID
+	 * @param photos_count
+	 * @param checkins_count
+	 * @param users_count
+	 * @param radius_meters
+	 * @param highlights_count
+	 * @param items_count
+	 * @param max_items_count
+	 * @param workingLevelCatIDs
+	 * @param distanceInMFromNext
+	 * @param durationInSecsFromNext
+	 */
+	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
+			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
+			long durationInSecsFromNext)
+	{
+
+		// this.activityID = activityID;
+
+		String splittedwlci[] = workingLevelCatIDs.split("__");
+		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
+															// considering one working level cat id
+
+		this.locationIDs = new LinkedHashSet<Integer>(locationIDs);
+
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
 		this.startTimestamp = startTimestamp;
@@ -195,29 +264,29 @@ public class ActivityObject implements Serializable
 	public String toStringAll()
 	{
 		return "ActivityObject [dimensions=" + dimensions + ", dimensionIDNameValues=" + dimensionIDNameValues
-				+ ", activityID=" + activityID + ", locationID=" + locationID + ", activityName=" + activityName
-				+ ", locationName=" + locationName + ", workingLevelCatIDs=" + workingLevelCatIDs + ", startTimestamp="
-				+ startTimestamp + ", endTimestamp=" + endTimestamp + ", durationInSeconds=" + durationInSeconds
-				+ ", startLatitude=" + startLatitude + ", endLatitude=" + endLatitude + ", startLongitude="
-				+ startLongitude + ", endLongitude=" + endLongitude + ", startAltitude=" + startAltitude
-				+ ", endAltitude=" + endAltitude + ", avgAltitude=" + avgAltitude + ", distanceTravelled="
-				+ distanceTravelled + ", userID=" + userID + ", photos_count=" + photos_count + ", checkins_count="
-				+ checkins_count + ", users_count=" + users_count + ", radius_meters=" + radius_meters
-				+ ", highlights_count=" + highlights_count + ", items_count=" + items_count + ", max_items_count="
-				+ max_items_count + "]";
+				+ ", activityID=" + activityID + ", locationID=" + this.getLocationIDs('-') + ", activityName="
+				+ activityName + ", locationName=" + locationName + ", workingLevelCatIDs=" + workingLevelCatIDs
+				+ ", startTimestamp=" + startTimestamp + ", endTimestamp=" + endTimestamp + ", durationInSeconds="
+				+ durationInSeconds + ", startLatitude=" + startLatitude + ", endLatitude=" + endLatitude
+				+ ", startLongitude=" + startLongitude + ", endLongitude=" + endLongitude + ", startAltitude="
+				+ startAltitude + ", endAltitude=" + endAltitude + ", avgAltitude=" + avgAltitude
+				+ ", distanceTravelled=" + distanceTravelled + ", userID=" + userID + ", photos_count=" + photos_count
+				+ ", checkins_count=" + checkins_count + ", users_count=" + users_count + ", radius_meters="
+				+ radius_meters + ", highlights_count=" + highlights_count + ", items_count=" + items_count
+				+ ", max_items_count=" + max_items_count + "]";
 	}
 
 	public String toStringAllGowalla()
 	{
 		return "activityID=" + activityID + "__locationID="
-				+ locationID /*
-								 * + "__activityName=" + activityName + "__ locationName=" + locationName
-								 */ + "__workLvlCat=" + workingLevelCatIDs + "__startTS=" + startTimestamp + "__startLat="
-				+ startLatitude + "__startLon=" + startLongitude /*
-																	 * + "__ startAlt=" + startAltitude
-																	 */ + "__userID=" + userID + "__photos_count="
-				+ photos_count + "__cins_count=" + checkins_count + "__users_count=" + users_count + "__radius_m="
-				+ radius_meters + "__highlts_count=" + highlights_count + "__items_count=" + items_count
+				+ this.getLocationIDs('-') /*
+											 * + "__activityName=" + activityName + "__ locationName=" + locationName
+											 */ + "__workLvlCat=" + workingLevelCatIDs + "__startTS=" + startTimestamp
+				+ "__startLat=" + startLatitude + "__startLon=" + startLongitude /*
+																					 * + "__ startAlt=" + startAltitude
+																					 */ + "__userID=" + userID
+				+ "__photos_count=" + photos_count + "__cins_count=" + checkins_count + "__users_count=" + users_count
+				+ "__radius_m=" + radius_meters + "__highlts_count=" + highlights_count + "__items_count=" + items_count
 				+ "__max_items_count=" + max_items_count + "__distNext=" + distanceInMFromNext + "__durNext="
 				+ durationInSecondsFromNext;
 	}
@@ -529,9 +598,16 @@ public class ActivityObject implements Serializable
 	 * 
 	 * @return
 	 */
-	public int getLocationID()
+	public HashSet<Integer> getLocationIDs()
 	{
-		return locationID;
+		return locationIDs;
+	}
+
+	public String getLocationIDs(char delimiter)
+	{
+		StringBuilder sb = new StringBuilder();
+		locationIDs.stream().forEach(e -> sb.append(e + delimiter));
+		return sb.toString();
 	}
 
 	/**
@@ -542,7 +618,9 @@ public class ActivityObject implements Serializable
 		dimensions = new ArrayList<Dimension>();
 		dimensionIDNameValues = new HashMap<String, String>();
 		activityName = "empty";
-		activityID = locationID = -99;
+		activityID = -99;
+		this.locationIDs = new LinkedHashSet<Integer>();
+
 	}
 
 	// String thisConstructorIsForTest
@@ -686,10 +764,10 @@ public class ActivityObject implements Serializable
 		return this.durationInSeconds;
 	}
 
-	public String getLocationName()
-	{
-		return this.locationName;
-	}
+	// public String getLocationName()
+	// {
+	// return this.locationName;
+	// }
 
 	public String getDimensionIDValue(String dimensionIDName)
 	{
@@ -832,6 +910,11 @@ public class ActivityObject implements Serializable
 		this.photos_count = photos_count;
 	}
 
+	/**
+	 * this is actually the avg checkins count if this is an activity object created of merged multiple checkins
+	 * 
+	 * @return
+	 */
 	public int getCheckins_count()
 	{
 		return checkins_count;
