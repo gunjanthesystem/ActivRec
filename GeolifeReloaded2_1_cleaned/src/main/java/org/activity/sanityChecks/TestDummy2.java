@@ -81,6 +81,11 @@ public class TestDummy2
 		// streamExp1();
 	}
 
+	public static void sets()
+	{
+
+	}
+
 	/**
 	 * 
 	 * @param choice

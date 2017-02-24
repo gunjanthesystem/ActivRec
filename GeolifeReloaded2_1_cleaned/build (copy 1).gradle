@@ -103,45 +103,6 @@ dependencies
 
 // apply plugin: 'com.github.johnrengelman.shadow'
 
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-//ref: https://github.com/danthegoodman/gradle-capsule-plugin
-//ref:https://plugins.gradle.org/plugin/us.kirchmeier.capsule
-buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "us.kirchmeier:gradle-capsule-plugin:1.0.2"
-  }
-}
-
-apply plugin: "us.kirchmeier.capsule"
-
-task fatCapsule(type: FatCapsule) {
-  applicationClass 'org.activity.controller.SuperController'
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //  to run 
 mainClassName = 'org.activity.controller.SuperController'
 
@@ -155,16 +116,6 @@ jar { //shadowJar
 }
 /////////////
 
-task fatJar(type: Jar) {
-	manifest {
-        attributes 'Implementation-Title': 'SuperController',
-        	'Implementation-Version': version,
-        	'Main-Class': 'org.activity.controller.SuperController'
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
 
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath

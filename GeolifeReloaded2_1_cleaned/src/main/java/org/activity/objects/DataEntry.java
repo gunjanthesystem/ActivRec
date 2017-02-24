@@ -259,6 +259,10 @@ public abstract class DataEntry implements Serializable // why abstract class an
 		this.timestamp = t;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Timestamp getTimestamp()
 	{
 		return this.timestamp;

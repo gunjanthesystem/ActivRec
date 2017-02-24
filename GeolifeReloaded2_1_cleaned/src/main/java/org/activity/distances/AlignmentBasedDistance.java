@@ -370,7 +370,7 @@ public class AlignmentBasedDistance
 	 * <p>
 	 * TODO To make it generic, store the feature names in a data structure at the start of experiments.) NOT GENERIC
 	 * 
-	 * this is exactly same as HJEditDistance.getFeatureLevelDistance()
+	 * this is a fork of HJEditDistance.getFeatureLevelDistance()
 	 * 
 	 * @param ao1
 	 * @param ao2
@@ -385,20 +385,28 @@ public class AlignmentBasedDistance
 		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
 		{
 			if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(),
-					startTimeToleranceInSeconds) == false)
+					startTimeToleranceInSeconds) == false) // if not same within 60mins then add wt to dfeat
 			{
 				dfeat += wtStartTime;
 			}
 
-			if (ao1.getLocationID() != ao2.getLocationID())
+			// System.out.println("@@ ao1.getLocationIDs() = " + ao1.getLocationIDs());
+			// System.out.println("@@ ao2.getLocationIDs() = " + ao2.getLocationIDs());
+			// System.out.println("@@ UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size() = "
+			// + UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size());
+
+			if (UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size() == 0)
+			// ao1.getLocationIDs() != ao2.getLocationIDs()) // if no matching locationIDs then add wt to dfeat
 			{
 				dfeat += wtLocation;
 			}
 
 			double c1 = ao1.getCheckins_count();
 			double c2 = ao2.getCheckins_count();
-			double popularityDistance = 1 - (Math.abs(c1 - c2) / Math.max(c1, c2));
+			double popularityDistance = (Math.abs(c1 - c2) / Math.max(c1, c2));
+			/// 1 - (Math.abs(c1 - c2) / Math.max(c1, c2));
 
+			// add more weight if they are more different, popDistance should be higher if they are more different
 			dfeat += popularityDistance * this.wtLocPopularity;
 		}
 

@@ -34,7 +34,7 @@ public class CheckinEntry extends DataEntry implements Serializable
 	// private String startLatitude;
 	// private String startLongitude;
 
-	ArrayList<String> locationIDs; // needed for merged checkin entries
+	ArrayList<Integer> locationIDs; // needed for merged checkin entries
 	ArrayList<String> startLats, startLons; // needed for merged checkin entries
 	/**
 	 * Category ID (direct)
@@ -67,8 +67,8 @@ public class CheckinEntry extends DataEntry implements Serializable
 			Integer catID, String workingLevelCatIDs)
 	{
 		this.userID = userID;
-		this.locationIDs = new ArrayList<String>();
-		this.locationIDs.add(String.valueOf(locationID));
+		this.locationIDs = new ArrayList<Integer>();
+		this.locationIDs.add((locationID));
 		this.timestamp = ts;
 
 		this.startLats = new ArrayList<String>();
@@ -98,8 +98,8 @@ public class CheckinEntry extends DataEntry implements Serializable
 			Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext)
 	{
 		this.userID = userID;
-		this.locationIDs = new ArrayList<String>();
-		this.locationIDs.add(String.valueOf(locationID));
+		this.locationIDs = new ArrayList<Integer>();
+		this.locationIDs.add((locationID));
 		this.timestamp = ts;
 
 		this.startLats = new ArrayList<String>();
@@ -128,7 +128,7 @@ public class CheckinEntry extends DataEntry implements Serializable
 	 * @param distanceInMetersFromNext
 	 * @param durationInSecsFromNext
 	 */
-	public CheckinEntry(String userID, ArrayList<String> locationIDs, Timestamp ts, ArrayList<String> latitudes,
+	public CheckinEntry(String userID, ArrayList<Integer> locationIDs, Timestamp ts, ArrayList<String> latitudes,
 			ArrayList<String> longitudes, Integer catID, String workingLevelCatIDs, double distanceInMetersFromPrev,
 			long durationInSecsFromPrev)
 	{
@@ -181,14 +181,14 @@ public class CheckinEntry extends DataEntry implements Serializable
 		return userID;
 	}
 
-	/**
-	 * 
-	 * @return the first location id
-	 */
-	public String getLocationID()
-	{
-		return this.locationIDs.get(0);// return this.lo;
-	}
+	// /**
+	// *
+	// * @return the first location id
+	// */
+	// public String getLocationID()
+	// {
+	// return this.locationIDs.get(0);// return this.lo;
+	// }
 
 	/**
 	 * 
@@ -318,7 +318,7 @@ public class CheckinEntry extends DataEntry implements Serializable
 		this.workingLevelCatIDs = workingLevelCatIDs;
 	}
 
-	public ArrayList<String> getLocationIDs()
+	public ArrayList<Integer> getLocationIDs()
 	{
 		return locationIDs;
 	}
@@ -326,11 +326,11 @@ public class CheckinEntry extends DataEntry implements Serializable
 	public String getLocationIDs(char delimiter)
 	{
 		StringBuilder sb = new StringBuilder();
-		locationIDs.stream().forEach(e -> sb.append(e + delimiter));
+		locationIDs.stream().forEach(e -> sb.append(String.valueOf(e) + delimiter));
 		return sb.toString();
 	}
 
-	public void setLocationIDs(ArrayList<String> locationIDs)
+	public void setLocationIDs(ArrayList<Integer> locationIDs)
 	{
 		this.locationIDs = locationIDs;
 	}

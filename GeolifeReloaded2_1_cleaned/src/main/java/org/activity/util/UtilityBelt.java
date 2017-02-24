@@ -1723,11 +1723,16 @@ public class UtilityBelt
 		PopUps.showError(msg);
 	}
 
+	/**
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
 	public static Set<Integer> getIntersection(Set<Integer> s1, Set<Integer> s2)
 	{
 		Set<Integer> intersection = new HashSet<Integer>(s1);
 		intersection.retainAll(s2);
-
 		return intersection;
 	}
 	// public static

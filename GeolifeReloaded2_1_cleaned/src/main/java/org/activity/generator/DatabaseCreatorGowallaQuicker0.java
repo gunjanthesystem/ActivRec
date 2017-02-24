@@ -51,7 +51,7 @@ public class DatabaseCreatorGowallaQuicker0
 	static LinkedHashMap<String, ArrayList<LabelEntry>> mapForLabelEntries;
 	static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData;
 	static LinkedHashMap<String, UserGowalla> mapForAllUserData;
-	static LinkedHashMap<String, LocationGowalla> mapForAllLocationData;
+	static LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData;
 
 	static Set<String> userIDsInCheckinData, locationIDsInCheckinData;
 	// static LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataTimeDifference;
@@ -63,7 +63,7 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb20/DatabaseCreated/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb23/DatabaseCreatedNoMerge/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 	// commented out on 2 feb 2017
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Dec1/DatabaseCreation/";
@@ -96,6 +96,7 @@ public class DatabaseCreatorGowallaQuicker0
 	public static final int continuityThresholdInSeconds = gowallaContinuityThresholdInSecs;// = Integer.MAX_VALUE;//
 	public static final int continuityThresholdInMeters = 600;// = Integer.MAX_VALUE;//
 
+	static final boolean merge = false;
 	// *
 	// 60; // changed from 30
 	// min in DCU
@@ -175,11 +176,11 @@ public class DatabaseCreatorGowallaQuicker0
 					.getCatIDsFoundNodesMap(rootOfCategoryTree, catIDNameDictionary);
 
 			////
-			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> checkinResult = createCheckinEntries(
+			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> unmergedCheckinResult = createCheckinEntries(
 					checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict,
 					catIDsFoundNodesMap, workingCatLevel);
 
-			mapForAllCheckinData = checkinResult.getFirst();
+			mapForAllCheckinData = unmergedCheckinResult.getFirst();
 
 			long numOfCheckins = mapForAllCheckinData.entrySet().stream().mapToLong(e -> e.getValue().size()).sum();
 			System.out.println("num of checkins = " + numOfCheckins); // 6276222
@@ -193,19 +194,26 @@ public class DatabaseCreatorGowallaQuicker0
 			// $$ consecCompareLocationID);// consecCompareDirectCatID);
 			/////
 
-			// $$WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
-			// $$ commonPath + "mapForAllCheckinDataBeforeMerged.csv");
-			/////
-			// merge
-			// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged
-			mapForAllCheckinData = DatageneratorUtils.mergeContinuousGowallaWithoutBOD4(mapForAllCheckinData,
-					commonPath, continuityThresholdInSeconds, continuityThresholdInMeters);
-			// $$WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
-			// $$ commonPath + "mapForAllCheckinDataAfterMerged.csv");
-			//
+			if (merge)
+			{
+				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
+						commonPath + "mapForAllCheckinDataBeforeMerged.csv");
+				/////
+				// merge
+				// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged
+				mapForAllCheckinData = DatageneratorUtils.mergeContinuousGowallaWithoutBOD4(mapForAllCheckinData,
+						commonPath, continuityThresholdInSeconds, continuityThresholdInMeters);
+				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
+						commonPath + "mapForAllCheckinDataAfterMerged.csv");
+			}
+			else
+			{
+				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
+						commonPath + "mapForAllCheckinNoMerging.csv");
+			}
 
 			userIDsInCheckinData = mapForAllCheckinData.keySet();
-			locationIDsInCheckinData = checkinResult.getSecond();
+			locationIDsInCheckinData = unmergedCheckinResult.getSecond();
 			//
 			System.out.println("userIDsInCheckinData.size()=" + userIDsInCheckinData.size());
 			System.out.println("locationIDsInCheckinData.size()=" + locationIDsInCheckinData.size());
@@ -1068,11 +1076,11 @@ public class DatabaseCreatorGowallaQuicker0
 	 * @param commonPath
 	 * @return
 	 */
-	private static LinkedHashMap<String, LocationGowalla> createLocationGowalla0(String locationFileNameToRead,
+	private static LinkedHashMap<Integer, LocationGowalla> createLocationGowalla0(String locationFileNameToRead,
 			Set<String> locationIDsInCheckinData, String commonPath)
 	{
-
-		LinkedHashMap<String, LocationGowalla> result = new LinkedHashMap<>();
+		// locationid
+		LinkedHashMap<Integer, LocationGowalla> result = new LinkedHashMap<>();
 		int countOfLines = 0;
 		String lineRead;
 
@@ -1084,22 +1092,21 @@ public class DatabaseCreatorGowallaQuicker0
 			while ((lineRead = br.readLine()) != null)
 			{
 				countOfLines += 1;
-
 				if (countOfLines == 1)
 				{
 					continue; // skip the header line
 				}
-
 				if (countOfLines % 200000 == 0)
 				{
 					System.out.println(" #lines read = " + countOfLines);
 				}
 
-				String splittedLine[] = lineRead.split(",");
+				String splittedLine[] = RegexUtils.patternComma.split(lineRead);// lineRead.split(",");
 
-				String locID = splittedLine[0];
+				Integer locID = Integer.valueOf(splittedLine[0]);
 
-				if (locationIDsInCheckinData.contains(locID)) // only if this userid is in ur checkin data
+				// only if this userid is in ur checkin data
+				if (locationIDsInCheckinData.contains(String.valueOf(locID)))
 				{
 					Pair<String, String> spotCatIDName = DatabaseCreatorGowallaQuickerPreprocessor.getSpotCatIDName(
 							splittedLine[splittedLine.length - 2] + "," + splittedLine[splittedLine.length - 1]);
@@ -1113,16 +1120,15 @@ public class DatabaseCreatorGowallaQuicker0
 							Integer.valueOf(splittedLine[10]));
 
 					// (String lat, String lon, String locName, String locCat, String city, String county, String
-					// country,
-					// String continent, String locationID, int photos_count, int checkins_count, int users_count, int
-					// radius_meters,
-					// int highlights_count, int items_count, int max_items_count)
+					// country, String continent, String locationID, int photos_count, int checkins_count, int
+					// users_count, int radius_meters, int highlights_count, int items_count, int max_items_count)
 					result.put(locID, cobj);
 				}
 			}
 
 			System.out.println("num of location objects = " + result.size());
 			System.out.println("num of lines read = " + countOfLines);
+			br.close();
 		}
 		catch (Exception e)
 		{
@@ -1152,11 +1158,11 @@ public class DatabaseCreatorGowallaQuicker0
 	 * @param rootOfCategoryTree
 	 * @return
 	 */
-	private static LinkedHashMap<String, LocationGowalla> createLocationGowalla(String locationFileNameToRead,
+	private static LinkedHashMap<Integer, LocationGowalla> createLocationGowalla(String locationFileNameToRead,
 			Set<String> locationIDsInCheckinData, String commonPath)
 	{
 
-		LinkedHashMap<String, LocationGowalla> result = new LinkedHashMap<String, LocationGowalla>();
+		LinkedHashMap<Integer, LocationGowalla> result = new LinkedHashMap<>();
 		int countOfLines = 0;
 		String lineRead;
 
@@ -1170,7 +1176,7 @@ public class DatabaseCreatorGowallaQuicker0
 
 			for (Entry<String, ArrayList<String>> locEntry : spots1.entrySet())
 			{
-				String locID = locEntry.getKey();
+				Integer locID = Integer.valueOf(locEntry.getKey());
 
 				ArrayList<String> rest = locEntry.getValue();
 
@@ -1185,7 +1191,7 @@ public class DatabaseCreatorGowallaQuicker0
 						Integer.valueOf(rest.get(5)), Integer.valueOf(rest.get(6)), Integer.valueOf(rest.get(7)),
 						Integer.valueOf(rest.get(8)), Integer.valueOf(rest.get(9)));
 
-				result.put(String.valueOf(locID), cobj);
+				result.put(locID, cobj);
 
 				// String lat, String lon, String locName, String locCat, String city, String county, String country,
 				// String continent, int locationID, int photos_count, int checkins_count, int users_count, int

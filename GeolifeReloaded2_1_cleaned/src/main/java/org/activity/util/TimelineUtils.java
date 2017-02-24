@@ -375,7 +375,7 @@ public class TimelineUtils
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> createUserTimelinesFromCheckinEntriesGowalla(
 			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> checkinEntries,
-			LinkedHashMap<String, LocationGowalla> locationObjects)
+			LinkedHashMap<Integer, LocationGowalla> locationObjects)
 	{
 		long ct1 = System.currentTimeMillis();
 
@@ -917,11 +917,19 @@ public class TimelineUtils
 	 */
 	private static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> convertCheckinEntriesToActivityObjectsGowalla(
 			LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise,
-			LinkedHashMap<String, LocationGowalla> locationObjects)
+			LinkedHashMap<Integer, LocationGowalla> locationObjects)
 	{
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>();
 		System.out.println("starting convertCheckinEntriesToActivityObjectsGowalla");
+		System.out.println("Num of locationObjects received = " + locationObjects.size() + " with keys as follows");
 
+		// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
+		StringBuilder locInfo = new StringBuilder();
+		locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
+		WritingToFile.writeToNewFile(locInfo.toString(), Constant.outputCoreResultsPath + "LocationMap.csv");
+		// System.out.println("Num of locationObjects received = " + locationObjects.size());
+
+		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0;
 		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
 
 		// convert checkinentries to activity objects
@@ -943,17 +951,19 @@ public class TimelineUtils
 				for (CheckinEntry e : dateEntry.getValue())// over checkins
 				{
 					int activityID = Integer.valueOf(e.getActivityID());
-					int locationID = Integer.valueOf(e.getLocationID());
-
 					String activityName = String.valueOf(e.getActivityID());// "";// TODO
-					String locationName = "";//
-					Timestamp startTimestamp = e.getTimestamp();
-					String startLatitude = e.getStartLatitude();
-					String startLongitude = e.getStartLongitude();
+
+					Timestamp startTimestamp = e.getTimestamp(); // timestamp of first cin with its a merged one
+					String startLatitude = e.getStartLatitude(); // of first cin if its a merged one
+					String startLongitude = e.getStartLongitude();// of first cin if its a merged one
 					String startAltitude = "";//
 					String userIDInside = e.getUserID();
-					double distaneInMFromNext = e.getDistanceInMetersFromPrev();
-					long durationInSecFromNext = e.getDurationInSecsFromPrev();
+					double distaneInMFromPrev = e.getDistanceInMetersFromPrev();// of first cin if its a merged one
+					long durationInSecFromPrev = e.getDurationInSecsFromPrev();// of first cin if its a merged one
+
+					// int locationID = Integer.valueOf(e.getLocationID());
+					ArrayList<Integer> locIDs = e.getLocationIDs();// e.getLocationIDs());
+					String locationName = "";//
 
 					// sanity check start
 					if (userIDInside.equals(userID) == false)
@@ -963,19 +973,60 @@ public class TimelineUtils
 					}
 					// sanity check end
 
-					LocationGowalla loc = locationObjects.get(String.valueOf(locationID));
-					int photos_count = loc.getPhotos_count();
-					int checkins_count = loc.getCheckins_count();
-					int users_count = loc.getUsers_count();
-					int radius_meters = loc.getRadius_meters();
-					int highlights_count = loc.getHighlights_count();
-					int items_count = loc.getItems_count();
-					int max_items_count = loc.getMax_items_count();
+					int numOfLocIDs = locIDs.size();
+					int photos_count = 0, checkins_count = 0, users_count = 0, radius_meters = 0, highlights_count = 0,
+							items_count = 0, max_items_count = 0;
+					// we need to compute the average of these atributes in case there are more than one place id for a
+					// (merged) checkin entry
+					for (Integer locationID : locIDs)
+					{
+						LocationGowalla loc = locationObjects.get((locationID));
 
-					ActivityObject ao = new ActivityObject(activityID, locationID, activityName, locationName,
+						if (loc == null)
+						{
+							System.err.println(
+									"Error in convertCheckinEntriesToActivityObjectsGowalla: No LocationGowalla object found for locationID="
+											+ String.valueOf(locationID));
+						}
+
+						photos_count += loc.getPhotos_count();
+						checkins_count += loc.getCheckins_count();
+						users_count += loc.getUsers_count();
+						radius_meters += loc.getRadius_meters();
+						highlights_count = loc.getHighlights_count();
+						items_count += loc.getItems_count();
+						max_items_count += loc.getMax_items_count();
+					}
+
+					if (numOfLocIDs > 1)
+					{
+						numOfCInsWithMultipleLocIDs += 1;
+						photos_count = photos_count / numOfLocIDs;
+						checkins_count = checkins_count / numOfLocIDs;
+						users_count = users_count / numOfLocIDs;
+						radius_meters = radius_meters / numOfLocIDs;
+						highlights_count = highlights_count / numOfLocIDs;
+						items_count = items_count / numOfLocIDs;
+						max_items_count = max_items_count / numOfLocIDs;
+					}
+
+					if (new HashSet<Integer>(locIDs).size() > 1) // if more than 1 distinct locations
+					{
+						numOfCInsWithMultipleDistinctLocIDs += 1;
+					}
+					// LocationGowalla loc = locationObjects.get(String.valueOf(locationID));
+					// int photos_count = loc.getPhotos_count();
+					// int checkins_count = loc.getCheckins_count();
+					// int users_count = loc.getUsers_count();
+					// int radius_meters = loc.getRadius_meters();
+					// int highlights_count = loc.getHighlights_count();
+					// int items_count = loc.getItems_count();
+					// int max_items_count = loc.getMax_items_count();
+
+					ActivityObject ao = new ActivityObject(activityID, locIDs, activityName, locationName,
 							startTimestamp, startLatitude, startLongitude, startAltitude, userID, photos_count,
 							checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count,
-							e.getWorkingLevelCatIDs(), distaneInMFromNext, durationInSecFromNext);
+							e.getWorkingLevelCatIDs(), distaneInMFromPrev, durationInSecFromPrev);
 					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
 				}
@@ -983,8 +1034,12 @@ public class TimelineUtils
 			}
 			activityObjectsDatewise.put(userID, dayWiseForThisUser);
 		}
+		System.out.println(" numOfCInsWithMultipleLocIDs = " + numOfCInsWithMultipleLocIDs);
+		System.out.println(" numOfCInsWithMultipleDistinctLocIDs = " + numOfCInsWithMultipleDistinctLocIDs);
+
 		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
 		return activityObjectsDatewise;
+
 	}
 
 	// DISABLED BECAUSE AFTER THE OCT 2016 CRASH, I COULD NOT FIND BACK THE CLASS CheckinActivityObject
