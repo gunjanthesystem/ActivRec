@@ -926,8 +926,10 @@ public class TimelineUtils
 		// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
 		StringBuilder locInfo = new StringBuilder();
 		locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
-		WritingToFile.writeToNewFile(locInfo.toString(), Constant.outputCoreResultsPath + "LocationMap.csv");
-		// System.out.println("Num of locationObjects received = " + locationObjects.size());
+		if (Constant.WriteLocationMap)
+		{
+			WritingToFile.writeToNewFile(locInfo.toString(), Constant.outputCoreResultsPath + "LocationMap.csv");
+		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
 
 		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0;
 		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
@@ -2473,7 +2475,7 @@ public class TimelineUtils
 
 			Timeline timelineForUser = new Timeline(userDayTimelines); // converts the day time to continuous dayless
 																		// timeline
-			timelineForUser = UtilityBelt.expungeInvalids(timelineForUser); // expunges invalid activity objects
+			timelineForUser = TimelineUtils.expungeInvalids(timelineForUser); // expunges invalid activity objects
 
 			cleanedERTimelines.put(userID, timelineForUser);
 		}
@@ -2505,5 +2507,157 @@ public class TimelineUtils
 		}
 		return timelines;
 	}
+
+	/**
+	 * Checks whether the given list Activity Objects are in chronological sequence.
+	 * 
+	 * @param listToCheck
+	 * @return
+	 */
+	public static boolean isChronological(ArrayList<ActivityObject> listToCheck)
+	{
+		boolean chronologyPreserved = true;
+
+		for (int i = 0; i < listToCheck.size() - 1; i++)
+		{
+			// one activity object's starttimestamp is after the next activity object's starttimestamp, implying the
+			// breaking of chronoligcal order
+			if (listToCheck.get(i).getStartTimestamp().after(listToCheck.get(i + 1).getStartTimestamp()))
+			{
+				chronologyPreserved = false;
+			}
+		}
+		return chronologyPreserved;
+	}
+
+	public static boolean isNoValidActivityAfterIt(int activityObjectIndex, Timeline givenTimeline)
+	{
+		boolean isNoValidAfter = true;
+
+		ArrayList<ActivityObject> objectsInGivenTimeline = givenTimeline.getActivityObjectsInTimeline();
+
+		System.out.println("inside isNoValidActivityAfterIt");
+		System.out.println("activityIndexAfterWhichToCheck=" + activityObjectIndex);
+
+		givenTimeline.printActivityObjectNamesInSequence();
+		System.out.println("Number of activities in timeline=" + objectsInGivenTimeline.size());
+
+		if (activityObjectIndex == objectsInGivenTimeline.size() - 1)
+		{
+			return true;
+		}
+
+		for (int i = activityObjectIndex + 1; i < objectsInGivenTimeline.size(); i++)
+		{
+			if (UtilityBelt.isValidActivityName(objectsInGivenTimeline.get(i).getActivityName()))
+			// if((objectsInGivenTimeline.get(i).getActivityName().equalsIgnoreCase("Unknown") ||
+			// objectsInGivenTimeline.get(i).getActivityName().equalsIgnoreCase("Others"))
+			// ==false)
+			{
+				System.out.println("Activity making it false=" + objectsInGivenTimeline.get(i).getActivityName());
+				isNoValidAfter = false;
+				break;
+			}
+		}
+
+		System.out.println("No valid after is:" + isNoValidAfter);
+		return isNoValidAfter;
+	}
+
+	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> expungeUserDayTimelinesByUser(
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines,
+			ArrayList<String> userIDsToExpunge)
+	{
+		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> reducedTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		System.out.println("number of users before reducing users timeline = " + usersTimelines.size());
+		System.out.println("Users to remove = " + userIDsToExpunge.toString());
+
+		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
+		{
+			String userID = usersTimelinesEntry.getKey();
+			System.out.println("Reading " + userID);
+			if (userIDsToExpunge.contains(userID))
+			{
+				System.out.println("removing");
+				continue;
+			}
+			else
+			{
+				System.out.println("keeping");
+				reducedTimelines.put(userID, usersTimelinesEntry.getValue());
+			}
+		}
+
+		System.out.println("number of users in reduced users timeline = " + reducedTimelines.size());
+		return reducedTimelines;
+	}
+
+	public static LinkedHashMap<String, Timeline> expungeInvalids(LinkedHashMap<String, Timeline> usersTimelines)
+	{
+		LinkedHashMap<String, Timeline> expungedTimelines = new LinkedHashMap<String, Timeline>();
+
+		for (Map.Entry<String, Timeline> entry : usersTimelines.entrySet())
+		{
+			expungedTimelines.put(entry.getKey(), TimelineUtils.expungeInvalids(entry.getValue()));
+		}
+		return expungedTimelines;
+	}
+
+	/**
+	 * Removes the invalid activity objects from the given Timeline. Invalid Activity Objects are Activity Objects with
+	 * Activity Name as 'Others' or 'Unknown'
+	 * 
+	 * @param timelineToPrune
+	 * @return the Timeline without all its invalid activity objects
+	 */
+	public static Timeline expungeInvalids(Timeline timelineToPrune)
+	{
+		if (timelineToPrune == null)
+		{
+			System.err.println("Error inside UtulityBelt.expungeInvalids: timelineToPrune is null");
+		}
+
+		ArrayList<ActivityObject> arrayToPrune = timelineToPrune.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject> arrPruned = new ArrayList<ActivityObject>();
+
+		Integer timelineID = timelineToPrune.getTimelineID();
+
+		for (int i = 0; i < arrayToPrune.size(); i++)
+		{
+			if (arrayToPrune.get(i).isInvalidActivityName()) // if the first element is unknown, prune it
+			{
+				continue;
+			}
+			else
+				arrPruned.add(arrayToPrune.get(i));
+		}
+		return (new Timeline(timelineID, arrPruned));
+	}
+
+	// private void compareTimelines(String serialisedTimelines1, String serialisedTimelines2)
+	// {
+	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal1 =
+	// (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer.deSerializeThis(serialisedTimelines1);
+	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal2 =
+	// (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer.deSerializeThis(serialisedTimelines2);
+	//
+	// StringBuffer s = new StringBuffer("Comparing " + serialisedTimelines1 + " and " + serialisedTimelines2 + "\n");
+	//
+	// if (usersDayTimelinesOriginal1.size() == usersDayTimelinesOriginal2.size())
+	// {
+	// s.append("Num of users: same " + usersDayTimelinesOriginal1.size() + " = " + usersDayTimelinesOriginal2.size());
+	//
+	// for
+	// }
+	// else
+	// {
+	// s.append("Num of users: different " + usersDayTimelinesOriginal1.size() + " = " +
+	// usersDayTimelinesOriginal2.size());
+	// }
+	//
+	//
+	// WritingToFile.appendLineToFileAbsolute(s.toString(), Constant.getCommonPath() + "ComparingTimelines.txt");// ,
+	// fullPathfileNameToUse);
+	// }
 
 }

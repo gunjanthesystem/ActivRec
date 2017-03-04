@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.activity.util.Constant;
 import org.activity.util.StringCode;
+import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -77,7 +78,7 @@ public class Timeline
 			 */
 		}
 
-		if (!isChronological(activityObjects))
+		if (!TimelineUtils.isChronological(activityObjects))
 		{
 			System.err
 					.println("Error: in Timeline(ArrayList<ActivityObject> activityObjects), CHRONOLOGY NOT PRESERVED");
@@ -148,10 +149,13 @@ public class Timeline
 			timelineID = countTimelinesCreatedUntilNow;// new UID().toString();
 		}
 
-		if (!isChronological(activityObjects))
+		if (Constant.checkIfTimelineCreatedIsChronological)
 		{
-			System.err.println(
-					"Error: in Timeline(LinkedHashMap<Date,UserDayTimeline> dayTimelines), CHRONOLOGY NOT PRESERVED");
+			if (!TimelineUtils.isChronological(activityObjects))
+			{
+				System.err.println(
+						"Error: in Timeline(LinkedHashMap<Date,UserDayTimeline> dayTimelines), CHRONOLOGY NOT PRESERVED");
+			}
 		}
 		long lt = System.currentTimeMillis();
 
@@ -198,7 +202,7 @@ public class Timeline
 			this.timelineID = timelineID;// new UID().toString();
 		}
 
-		if (!isChronological(activityObjects))
+		if (!TimelineUtils.isChronological(activityObjects))
 		{
 			System.err.println(
 					"Error: in Timeline(LinkedHashMap<Date,UserDayTimeline> dayTimelines), CHRONOLOGY NOT PRESERVED");
@@ -212,40 +216,6 @@ public class Timeline
 	public Integer getTimelineID()
 	{
 		return this.timelineID;
-	}
-
-	/**
-	 * Checks whether the Activity Objects in this Timeline are in chronological sequence.
-	 * 
-	 * @param listToCheck
-	 * @return
-	 */
-	public boolean isChronological(ArrayList<ActivityObject> listToCheck)
-	{
-		boolean chronologyPreserved = true;
-
-		for (int i = 0; i < listToCheck.size() - 1; i++)
-		{
-			if (listToCheck.get(i).getStartTimestamp().after(listToCheck.get(i + 1).getStartTimestamp())) // one
-																											// activity
-																											// object's
-																											// starttimestamp
-																											// is after
-																											// the next
-																											// activity
-																											// object's
-																											// starttimestamp,
-																											// implying
-																											// the
-																											// breaking
-																											// of
-																											// chronoligcal
-																											// order
-			{
-				chronologyPreserved = false;
-			}
-		}
-		return chronologyPreserved;
 	}
 
 	/**
@@ -392,40 +362,6 @@ public class Timeline
 		 */
 		// $$System.out.println(nextValidActivityObject.getActivityName());
 		return nextValidActivityObject;
-	}
-
-	public static boolean isNoValidActivityAfterIt(int activityObjectIndex, Timeline givenTimeline)
-	{
-		boolean isNoValidAfter = true;
-
-		ArrayList<ActivityObject> objectsInGivenTimeline = givenTimeline.getActivityObjectsInTimeline();
-
-		System.out.println("inside isNoValidActivityAfterIt");
-		System.out.println("activityIndexAfterWhichToCheck=" + activityObjectIndex);
-
-		givenTimeline.printActivityObjectNamesInSequence();
-		System.out.println("Number of activities in timeline=" + objectsInGivenTimeline.size());
-
-		if (activityObjectIndex == objectsInGivenTimeline.size() - 1)
-		{
-			return true;
-		}
-
-		for (int i = activityObjectIndex + 1; i < objectsInGivenTimeline.size(); i++)
-		{
-			if (UtilityBelt.isValidActivityName(objectsInGivenTimeline.get(i).getActivityName()))
-			// if((objectsInGivenTimeline.get(i).getActivityName().equalsIgnoreCase("Unknown") ||
-			// objectsInGivenTimeline.get(i).getActivityName().equalsIgnoreCase("Others"))
-			// ==false)
-			{
-				System.out.println("Activity making it false=" + objectsInGivenTimeline.get(i).getActivityName());
-				isNoValidAfter = false;
-				break;
-			}
-		}
-
-		System.out.println("No valid after is:" + isNoValidAfter);
-		return isNoValidAfter;
 	}
 
 	public boolean containsOnlySingleActivity()

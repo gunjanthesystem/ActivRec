@@ -62,13 +62,10 @@ public class ReadingFromFile
 	{
 
 		List<String> raw = new ArrayList<String>();
-		String line = "";
+		BufferedReader br = null;
 		try
 		{
-			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-
-			int count;
-
+			br = new BufferedReader(new FileReader(fileNameToRead));
 			if (hasHeader)
 			{
 				raw = br.lines().skip(1).map((String s) -> (s.split(Pattern.quote(delimiter))[columnIndex]))
@@ -80,6 +77,7 @@ public class ReadingFromFile
 						.collect(Collectors.toList());
 			}
 			System.out.println("Size of raw =" + raw.size());
+			br.close();
 		}
 
 		catch (IOException e)
@@ -106,9 +104,10 @@ public class ReadingFromFile
 
 		List<Long> raw = new ArrayList<Long>();
 		String line = "";
+		BufferedReader br;
 		try
 		{
-			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
+			br = new BufferedReader(new FileReader(fileNameToRead));
 
 			int count;
 
@@ -124,6 +123,7 @@ public class ReadingFromFile
 						.collect(Collectors.toList());
 			}
 			System.out.println("Size of raw =" + raw.size());
+			br.close();
 		}
 
 		catch (IOException e)
@@ -150,9 +150,10 @@ public class ReadingFromFile
 
 		List<Double> raw = new ArrayList<Double>();
 		String line = "";
+		BufferedReader br;
 		try
 		{
-			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));// Constant.getCommonPath() +
+			br = new BufferedReader(new FileReader(fileNameToRead));// Constant.getCommonPath() +
 
 			int count;
 
@@ -168,10 +169,12 @@ public class ReadingFromFile
 						.collect(Collectors.toList());
 			}
 			System.out.println("Size of raw =" + raw.size());
+			br.close();
 		}
 
 		catch (IOException e)
 		{
+			System.err.println("Exception reading file: " + fileNameToRead);
 			e.printStackTrace();
 		}
 		return raw;
@@ -196,9 +199,10 @@ public class ReadingFromFile
 		List<String> raw = new ArrayList<String>();
 		String line = "";
 		String dlimPatrn = Pattern.quote(delimiter);
+		BufferedReader br;
 		try
 		{
-			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
+			br = new BufferedReader(new FileReader(fileNameToRead));
 
 			int count;
 
@@ -215,6 +219,7 @@ public class ReadingFromFile
 						.collect(Collectors.toList());
 			}
 			// System.out.println("Size of raw =" + raw.size());
+			br.close();
 		}
 
 		catch (IOException e)

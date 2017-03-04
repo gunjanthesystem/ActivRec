@@ -188,11 +188,11 @@ public class RecommendationTestsMasterMU2
 						BufferedWriter topNextActWithDist = WritingToFile
 								.getBufferedWriterForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
 
-						BufferedWriter rtsInvalidWriter = WritingToFile.getBufferedWriterForNewFile(
+						BufferedWriter rtsRejInvalidWriter = WritingToFile.getBufferedWriterForNewFile(
 								commonPath + "recommPointsInvalidBecuzNoValidActivityAfterThis.csv");
-						BufferedWriter rtsWithNoCands = WritingToFile
+						BufferedWriter rtsRejWithNoCands = WritingToFile
 								.getBufferedWriterForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
-						BufferedWriter rtsWithNoDWButMUCandsCands = WritingToFile
+						BufferedWriter rtsRejWithNoDWButMUCandsCands = WritingToFile
 								.getBufferedWriterForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
 
 						BufferedWriter rankedRecommWithScore = WritingToFile
@@ -233,12 +233,12 @@ public class RecommendationTestsMasterMU2
 						// FileWriter singleRecommWriter = new FileWriter(file4.getAbsoluteFile(),true);
 						// BufferedWriter bufferWriter4 = new BufferedWriter(singleRecommWriter);
 
-						rtsInvalidWriter.write(
+						rtsRejInvalidWriter.write(
 								"User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity\n");
-						rtsWithNoCands
+						rtsRejWithNoCands
 								.write("User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity,TotalNumOfPossibleCands,"
 										+ "NumCandsRejectedDueToNoCurrentActivityAtNonLast,NumCandsRejectedDueToNoNextActivity\n");
-						rtsWithNoDWButMUCandsCands
+						rtsRejWithNoDWButMUCandsCands
 								.write("User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity,TotalNumOfPossibleCands,"
 										+ "NumCandsRejectedDueToNoCurrentActivityAtNonLast,NumCandsRejectedDueToNoNextActivity\n");
 
@@ -273,9 +273,8 @@ public class RecommendationTestsMasterMU2
 								.write("User, DateOfRecomm, TimeOfRecom, NumOfValidsAOsAfterRTInDay\n");
 
 						WritingToFile.writeDistanceScoresSortedMapHeader(); // writes EditDistancePerRtPerCand.csv
-						WritingToFile.writeEditSimilarityCalculationsHeader(); // writes the edit similarity
-																				// calculations for this recommendation
-																				// master
+						// writes the edit similarity calculations for this recommendation master
+						WritingToFile.writeEditSimilarityCalculationsHeader();
 
 						System.out.println(Constant.getAllGlobalConstants());
 						System.out.println(Constant.getCommonPath());
@@ -299,27 +298,44 @@ public class RecommendationTestsMasterMU2
 							{
 								userName = ConnectDatabase.getUserName(userId);// ConnectDatabase.getUserNameFromDatabase(userId);
 							}
+							// can change for diff matching units
+							// ~ BufferedWriter bwMaxNumOfDistinctRecommendations = WritingToFile
+							// ~ .getBufferedWriterForNewFile(
+							// ~ commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
+							// ~ bwMaxNumOfDistinctRecommendations.write("DateOfRecomm" + ",TimeOfRecomm"
+							// ~ + ",Week_Day,MaxNumOfDistictRecommendation,NumOfCandidateTimelines(after applying
+							// ~ Threshold)\n");
 
-							BufferedWriter bwMaxNumOfDistinctRecommendations = WritingToFile
-									.getBufferedWriterForNewFile(
-											commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
-							bwMaxNumOfDistinctRecommendations.write("DateOfRecomm" + ",TimeOfRecomm"
+							// replacing iterative write with StringBuilder for better performance
+							StringBuilder sbMaxNumOfDistinctRecommendations = new StringBuilder();
+							sbMaxNumOfDistinctRecommendations.append("DateOfRecomm" + ",TimeOfRecomm"
 									+ ",Week_Day,MaxNumOfDistictRecommendation,NumOfCandidateTimelines(after applying Threshold)\n");
-							// bwMaxNumOfDistinctRecommendations.newLine();
 
-							BufferedWriter bwNumOfCandTimelinesBelowThreshold = WritingToFile
-									.getBufferedWriterForNewFile(
-											commonPath + userName + "numberOfCandidateTimelinesBelow" + typeOfThreshold
-													+ thresholdValue + ".csv");
-							bwNumOfCandTimelinesBelowThreshold.write("DateOfRecomm" + ",TimeOfRecomm"
+							// should be same over diff matching units
+							// BufferedWriter bwNumOfCandTimelinesBelowThreshold = WritingToFile
+							// .getBufferedWriterForNewFile(
+							// commonPath + userName + "numberOfCandidateTimelinesBelow" + typeOfThreshold
+							// + thresholdValue + ".csv");
+							// bwNumOfCandTimelinesBelowThreshold.write("DateOfRecomm" + ",TimeOfRecomm"
+							// + ",Week_Day,ThresholdAsDistance,NumOfCandidateTimelinesBelowThreshold,\n");
+
+							// replacing iterative write with StringBuilder for better performance
+							StringBuilder sbNumOfCandTimelinesBelowThreshold = new StringBuilder();
+							sbNumOfCandTimelinesBelowThreshold.append("DateOfRecomm" + ",TimeOfRecomm"
 									+ ",Week_Day,ThresholdAsDistance,NumOfCandidateTimelinesBelowThreshold,\n");
-							// bwNumOfCandTimelinesBelowThreshold.newLine();
 
-							BufferedWriter bwRecommTimesWithEditDistances = WritingToFile.getBufferedWriterForNewFile(
-									commonPath + userName + "RecommTimesWithEditDistance.csv");
-							bwRecommTimesWithEditDistances.write("DateOfRecomm" + ",TimeOfRecomm,"
+							// BufferedWriter bwRecommTimesWithEditDistances =
+							// WritingToFile.getBufferedWriterForNewFile(
+							// commonPath + userName + "RecommTimesWithEditDistance.csv");
+							// bwRecommTimesWithEditDistances.write("DateOfRecomm" + ",TimeOfRecomm,"
+							// +
+							// "CandidateTimelineID,TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,EndIndexOf(Sub)Cand,CandidateTimeline,WeekDayOfRecomm\n");
+
+							// replacing iterative write with StringBuilder for better performance
+							StringBuilder sbRecommTimesWithEditDistances = new StringBuilder();
+							sbRecommTimesWithEditDistances.append("DateOfRecomm" + ",TimeOfRecomm,"
 									+ "CandidateTimelineID,TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,EndIndexOf(Sub)Cand,CandidateTimeline,WeekDayOfRecomm\n");
-							// bwRecommTimesWithEditDistances.newLine();
+
 							// get timelines for this user
 							userAllDatesTimeslines = usersTimelines.get(Integer.toString(userId));// userId);
 
@@ -335,7 +351,8 @@ public class RecommendationTestsMasterMU2
 							userAllDatesTimeslines = TimelineUtils.cleanUserDayTimelines(userAllDatesTimeslines,
 									commonPath + "InsideRecommTestCleanUserDayTimelines", String.valueOf(userId));
 							// ////////////////////////////////////////////////////////////////////////////////
-							if (matchingUnitIterator == 0) // write the given day timelines only once
+							if (matchingUnitIterator == 0 && Constant.WriteTimelines) // write the given day timelines
+																						// only once
 							{
 								WritingToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", true,
 										true, true);
@@ -366,9 +383,19 @@ public class RecommendationTestsMasterMU2
 							// note: the maps of maps here contains a map for baselines count and another map for
 							// baseline duration: they will be used later to write prediction results for baseline count
 							// and baseline duration
-							LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines = WritingToFile
-									.writeBasicActivityStatsAndGetBaselineMaps(userName, userAllDatesTimeslines,
-											userTrainingTimelines, userTestTimelines);
+							LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines = null;
+							if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
+							{
+								mapsForCountDurationBaselines = WritingToFile.writeBasicActivityStatsAndGetBaselineMaps(
+										userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
+							}
+							else if (matchingUnitIterator == 0) // do this only for one matching unit as it does not
+							// change per matching unit
+							{
+								mapsForCountDurationBaselines = WritingToFile.writeBasicActivityStatsAndGetBaselineMaps(
+										userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
+							}
+
 							/*
 							 * ********** ************************************************
 							 * ********************************
@@ -473,8 +500,8 @@ public class RecommendationTestsMasterMU2
 										// see j's loop
 										// {System.out.println("This was the last activity of the day:" + dateToRecomm +
 										// " for user:" + userId); }
-										rtsInvalidWriter.write(userId + "," + dateToRecomm + "," + indexOfAOInDay + ","
-												+ endTimeStamp + "," + weekDay + "," + timeCategory
+										rtsRejInvalidWriter.write(userId + "," + dateToRecomm + "," + indexOfAOInDay
+												+ "," + endTimeStamp + "," + weekDay + "," + timeCategory
 												+ activityNameInThatDay + "\n");// rtsInvalidWriter.newLine();
 										continue;
 									}
@@ -570,15 +597,20 @@ public class RecommendationTestsMasterMU2
 
 									if (recommP1.hasCandidateTimeslines() == false)
 									{
-										rtsWithNoCands.write(userId + "," + dateToRecomm + "," + indexOfAOInDay + ","
+										rtsRejWithNoCands.write(userId + "," + dateToRecomm + "," + indexOfAOInDay + ","
 												+ endTimeStamp + "," + weekDay + "," + timeCategory + ","
 												+ recommP1.getActivityObjectAtRecomm().getActivityName() + ",\n");
 										// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
 										// rtsWithNoCands.newLine();
 										System.out.println(
 												"Cannot make recommendation at this point as there are no candidate timelines");
-										bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp + ","
-												+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
+										// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp +
+										// ","
+										// + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");//
+										// bwNumOfCandTimelinesBelowThreshold.newLine();
+										sbNumOfCandTimelinesBelowThreshold.append(dateToRecomm + "," + endTimeStamp
+												+ "," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
+
 										continue;
 									}
 
@@ -591,7 +623,7 @@ public class RecommendationTestsMasterMU2
 
 									if (hasDayWiseCandidateTimelines == false)
 									{
-										rtsWithNoDWButMUCandsCands
+										rtsRejWithNoDWButMUCandsCands
 												.write(userId + "," + dateToRecomm + "," + indexOfAOInDay + ","
 														+ endTimeStamp + "," + weekDay + "," + timeCategory + ","
 														+ recommP1.getActivityObjectAtRecomm().getActivityName()
@@ -599,8 +631,11 @@ public class RecommendationTestsMasterMU2
 										System.out.println(
 												"Cannot make recommendation at this point as there are no daywise candidate timelines, even though there are mu candidate timelines");
 
-										bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp + ","
-												+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
+										// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp +
+										// ","
+										// + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
+										sbNumOfCandTimelinesBelowThreshold.append(dateToRecomm + "," + endTimeStamp
+												+ "," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
 										continue;
 									}
 									///////////////////////////////////////////////////////////////////////
@@ -612,11 +647,15 @@ public class RecommendationTestsMasterMU2
 										{
 											System.out.println("Alert: blacklisted RT: " + userId + " " + endTimeStamp
 													+ " will not be used and will be logged in rtsWithNoCands");
-											rtsWithNoCands.write(userId + "," + dateToRecomm + "," + indexOfAOInDay
+											rtsRejWithNoCands.write(userId + "," + dateToRecomm + "," + indexOfAOInDay
 													+ "," + endTimeStamp + "," + weekDay + "," + timeCategory + ","
 													+ recommP1.getActivityObjectAtRecomm().getActivityName() + ",\n");// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
 											// rtsWithNoCands.newLine();
-											bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp
+											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
+											// endTimeStamp
+											// + "," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
+
+											sbNumOfCandTimelinesBelowThreshold.append(dateToRecomm + "," + endTimeStamp
 													+ "," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
 											continue;
 										}
@@ -625,14 +664,22 @@ public class RecommendationTestsMasterMU2
 
 									if (recommP1.hasCandidateTimelinesBelowThreshold() == false)
 									{
-										bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp + ","
-												+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
+										// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp +
+										// ","
+										// + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");//
+
+										sbNumOfCandTimelinesBelowThreshold.append(dateToRecomm + "," + endTimeStamp
+												+ "," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
 										System.out.println(
 												"Cannot make recommendation at this point as there are no candidate timelines BELOW THRESHOLD");
 										continue;
 									}
 
-									bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp + ","
+									// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," + endTimeStamp + ","
+									// + weekDay + "," + thresholdAsDistance + ","
+									// + recommP1.getNumberOfCandidateTimelinesBelowThreshold() + "\n");
+
+									sbNumOfCandTimelinesBelowThreshold.append(dateToRecomm + "," + endTimeStamp + ","
 											+ weekDay + "," + thresholdAsDistance + ","
 											+ recommP1.getNumberOfCandidateTimelinesBelowThreshold() + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
 
@@ -679,14 +726,14 @@ public class RecommendationTestsMasterMU2
 									dataActualToWriteForThisUserDate.append(actActualDone + ",");
 
 									// top5BufferWriter.write
-									if (Constant.writeTopNextActivitiesWithoutDistance)
+									if (Constant.WriteTopNextActivitiesWithoutDistance)
 									{
 										topNextActsWithoutDistToWriteForThisUserDate
 												.append(recommP1.getTopNextActivityNamesWithoutDistanceString() + ",");
 									}
 
 									// topRecommWithDistance.write
-									if (Constant.writeTopNextActivitiesWithDistance)
+									if (Constant.WriteTopNextActivitiesWithDistance)
 									{
 										topNextActsWithDistToWriteForThisUserDate
 												.append(recommP1.getTopNextActivityNamesWithDistanceString() + ",");
@@ -709,24 +756,30 @@ public class RecommendationTestsMasterMU2
 									 * *********************************************************************************
 									 * ***
 									 */
-									LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-											.get("activityNameCountPairsOverAllTrainingDays");
-									ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
-									// baseLineOccurrence
-									baseLineOccurrenceToWriteForThisUserDate
-											.append(getActivityNameCountPairsWithoutCount(
-													activityNameCountPairsOverAllTrainingDays) + ",");
+									if (Constant.DoBaselineOccurrence)
+									{
+										LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+												.get("activityNameCountPairsOverAllTrainingDays");
+										ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
+										// baseLineOccurrence
+										baseLineOccurrenceToWriteForThisUserDate
+												.append(getActivityNameCountPairsWithoutCount(
+														activityNameCountPairsOverAllTrainingDays) + ",");
+									}
 									/*
 									 * *********************************************************************************
 									 * ***
 									 */
-									LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-											.get("activityNameDurationPairsOverAllTrainingDays");
-									ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
-									// baseLineDuration
-									baseLineDurationToWriteForThisUserDate
-											.append(getActivityNameDurationPairsWithoutDuration(
-													activityNameDurationPairsOverAllTrainingDays) + ",");
+									if (Constant.DoBaselineDuration)
+									{
+										LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+												.get("activityNameDurationPairsOverAllTrainingDays");
+										ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
+										// baseLineDuration
+										baseLineDurationToWriteForThisUserDate
+												.append(getActivityNameDurationPairsWithoutDuration(
+														activityNameDurationPairsOverAllTrainingDays) + ",");
+									}
 									/*
 									 * *********************************************************************************
 									 * ***
@@ -735,10 +788,16 @@ public class RecommendationTestsMasterMU2
 									String[] splittedRecomm = RegexUtils.patternDoubleUnderScore
 											.split(rankedRecommAtStartWithoutScore);
 									// $$ rankedRecommAtStartWithoutScore.split(Pattern.quote("__"));
-									bwMaxNumOfDistinctRecommendations
-											.write(dateToRecomm + "," + endTimeStamp + "," + weekDay + // UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
+									// bwMaxNumOfDistinctRecommendations
+									// .write(dateToRecomm + "," + endTimeStamp + "," + weekDay + //
+									// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
+									// "," + (splittedRecomm.length - 1) + ","
+									// + recommP1.getNumberOfCandidateTimelinesBelowThreshold() + "\n");
+
+									sbMaxNumOfDistinctRecommendations
+											.append(dateToRecomm + "," + endTimeStamp + "," + weekDay + // UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
 													"," + (splittedRecomm.length - 1) + ","
-													+ recommP1.getNumberOfCandidateTimelinesBelowThreshold() + "\n");// bwMaxNumOfDistinctRecommendations.newLine();
+													+ recommP1.getNumberOfCandidateTimelinesBelowThreshold() + "\n");
 
 									// bwRaw.write
 									bwRawToWriteForThisUserDate.append(userName + "," + dateToRecomm + ","
@@ -807,7 +866,9 @@ public class RecommendationTestsMasterMU2
 											// +"," +UtilityBelt.getWeekDayFromWeekDayInt(entryScore.getKey().getDay())
 											// bwRecommTimesWithEditDistances.newLine();
 										} // end of loop over editDistancesSortedMapFullCand
-										bwRecommTimesWithEditDistances.write(rtsWithEditDistancesMsg + "\n");
+											// bwRecommTimesWithEditDistances.write(rtsWithEditDistancesMsg + "\n");
+										sbRecommTimesWithEditDistances.append(rtsWithEditDistancesMsg + "\n");
+
 									}
 									System.out.println("end of for loop over all activity objects in test date");
 								} // end of for loop over all activity objects in test date
@@ -815,13 +876,13 @@ public class RecommendationTestsMasterMU2
 								metaBufferWriter.write(metaToWriteForThisUserDate.toString());
 								actualBufferWriter.write(dataActualToWriteForThisUserDate.toString());
 
-								if (Constant.writeTopNextActivitiesWithoutDistance)
+								if (Constant.WriteTopNextActivitiesWithoutDistance)
 								{
 									topNextActWithoutDist
 											.write(topNextActsWithoutDistToWriteForThisUserDate.toString());
 								}
 
-								if (Constant.writeTopNextActivitiesWithDistance)
+								if (Constant.WriteTopNextActivitiesWithDistance)
 								{
 									topNextActWithDist.write(topNextActsWithDistToWriteForThisUserDate.toString());
 								}
@@ -829,8 +890,16 @@ public class RecommendationTestsMasterMU2
 								rankedRecommWithScore.write(rankedRecommWithScoreToWriteForThisUserDate.toString());
 								rankedRecommWithoutScore
 										.write(rankedRecommWithoutScoreToWriteForThisUserDate.toString());
-								baseLineOccurrence.write(baseLineOccurrenceToWriteForThisUserDate.toString());
-								baseLineDuration.write(baseLineDurationToWriteForThisUserDate.toString());
+
+								if (Constant.DoBaselineOccurrence)
+								{
+									baseLineOccurrence.write(baseLineOccurrenceToWriteForThisUserDate.toString());
+								}
+								if (Constant.DoBaselineDuration)
+								{
+									baseLineDuration.write(baseLineDurationToWriteForThisUserDate.toString());
+								}
+
 								metaIfCurrentTargetSameWriter
 										.write(metaIfCurrentTargetSameToWriteForThisUserDate.toString());
 								System.out.println("/end of for loop over all test dates");
@@ -858,9 +927,24 @@ public class RecommendationTestsMasterMU2
 							baseLineOccurrence.newLine();
 							baseLineDuration.newLine();
 
-							bwMaxNumOfDistinctRecommendations.close();
-							bwRecommTimesWithEditDistances.close();
-							bwNumOfCandTimelinesBelowThreshold.close();
+							WritingToFile.writeToNewFile(sbMaxNumOfDistinctRecommendations.toString(),
+									commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
+							// bwMaxNumOfDistinctRecommendations.close();
+
+							WritingToFile.writeToNewFile(sbRecommTimesWithEditDistances.toString(),
+									commonPath + userName + "RecommTimesWithEditDistance.csv");
+							// bwRecommTimesWithEditDistances.close();
+
+							if (matchingUnitIterator == 0)
+							{// write it only for one mu since it will remain same over
+								// mus and is only for stat purpose
+								WritingToFile.writeToNewFile(sbNumOfCandTimelinesBelowThreshold.toString(),
+										commonPath + userName + "numberOfCandidateTimelinesBelow" + typeOfThreshold
+												+ thresholdValue + ".csv");
+							}
+
+							// bwNumOfCandTimelinesBelowThreshold.close();
+
 							System.out.println("//end of for over userID");
 						} // end of for over userID
 						numActsInEachCandbw.close();
@@ -870,9 +954,9 @@ public class RecommendationTestsMasterMU2
 						topNextActWithoutDist.close();
 						topNextActWithDist.close();
 
-						rtsInvalidWriter.close();
-						rtsWithNoCands.close();
-						rtsWithNoDWButMUCandsCands.close();
+						rtsRejInvalidWriter.close();
+						rtsRejWithNoCands.close();
+						rtsRejWithNoDWButMUCandsCands.close();
 						rankedRecommWithScore.close();
 						rankedRecommWithoutScore.close();
 
@@ -930,6 +1014,7 @@ public class RecommendationTestsMasterMU2
 		}
 		// PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
 		System.out.println("**********Exiting Recommendation Tests**********");
+
 	}
 
 	/**

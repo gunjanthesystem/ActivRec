@@ -64,6 +64,20 @@ public class DateTimeUtils
 	}
 
 	/**
+	 * 
+	 * @param ts1
+	 * @param ts2
+	 * @return
+	 */
+	public static long getTimeDiffInSeconds(Timestamp ts1, Timestamp ts2)
+	{
+		long time1 = ts1.getHours() * 60 * 60 + ts1.getMinutes() * 60 + ts1.getSeconds();
+		long time2 = ts2.getHours() * 60 * 60 + ts2.getMinutes() * 60 + ts2.getSeconds();
+
+		return Math.abs(time1 - time2);
+	}
+
+	/**
 	 * Returns the time in the day (as seconds past midnight) for the given timestamp.
 	 * 
 	 * @param ts1

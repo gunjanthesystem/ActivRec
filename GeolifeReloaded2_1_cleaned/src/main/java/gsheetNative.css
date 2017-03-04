@@ -1,0 +1,25 @@
+
+.root{
+    -fx-font-size: 18pt;
+}
+
+.menu{
+  -fx-border-width: 2pt;
+  -fx-padding:5pt;
+}
+
+.button{
+    -fx-padding:10pt;
+    -fx-alignment: center;
+    -fx-margin: 20pt
+}
+.vbox{
+    -fx-alignment: right;
+    -fx-spacing: 20pt;
+}
+
+.chart-line-symbol {
+    -fx-background-radius: 15px;
+ }
+
+

@@ -244,11 +244,20 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 
 		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 		{
-			this.trainingTimeline = UtilityBelt.expungeInvalids(trainingTimeline);
-			this.testTimeline = UtilityBelt.expungeInvalids(testTimeline);
+			if (Constant.hasInvalidActivityNames == true)
+			{
+				this.trainingTimeline = TimelineUtils.expungeInvalids(trainingTimeline);
+				this.testTimeline = TimelineUtils.expungeInvalids(testTimeline);
 
-			System.out.println(
-					"Expunging invalids before recommendation process: expunging from test and training timelines");
+				System.out.println(
+						"Expunging invalids before recommendation process: expunging from test and training timelines");
+			}
+			else
+			{
+				System.out.println(
+						"Data is assumed to have no invalid act names to be expunged from test and training timelines");
+
+			}
 		}
 
 		// //////////////////
@@ -597,8 +606,8 @@ public class RecommendationMasterMU// implements IRecommenderMaster
 
 		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 		{
-			this.trainingTimeline = UtilityBelt.expungeInvalids(trainingTimeline);
-			this.testTimeline = UtilityBelt.expungeInvalids(testTimeline);
+			this.trainingTimeline = TimelineUtils.expungeInvalids(trainingTimeline);
+			this.testTimeline = TimelineUtils.expungeInvalids(testTimeline);
 
 			System.out.println(
 					"Expunging invalids before recommendation process: expunging from test and training timelines");

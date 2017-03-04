@@ -128,9 +128,11 @@ public class RecommendationMasterBaseClosestTime
 		}
 
 		System.out.println("The Activities on the recomm day are:");
-		userDayTimelineAtRecomm.printActivityObjectNamesWithTimestampsInSequence();
-		System.out.println();
-
+		if (Constant.verbose)
+		{
+			userDayTimelineAtRecomm.printActivityObjectNamesWithTimestampsInSequence();
+			System.out.println();
+		}
 		timestampPointAtRecomm = new Timestamp(this.dateAtRecomm.getYear(), this.dateAtRecomm.getMonth(),
 				this.dateAtRecomm.getDate(), this.timeAtRecomm.getHours(), this.timeAtRecomm.getMinutes(),
 				this.timeAtRecomm.getSeconds(), 0);
@@ -179,15 +181,18 @@ public class RecommendationMasterBaseClosestTime
 				.sortByValueAscending5(startTimeDistanceUnsortedMap);
 
 		System.out.println("---------startTimeDistanceSortedMap.size()=" + startTimeDistanceSortedMap.size());
-		System.out.println(
-				">>>>>>>>>>>>>>startTimeDistanceSortedMap is:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n Date, Index of nearest, name of nearest, dist of nearest");
-		StringBuilder temp1 = new StringBuilder();
-		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : startTimeDistanceSortedMap.entrySet())
+		if (Constant.verbose)
 		{
-			temp1.append("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__"
-					+ entry.getValue().getSecond().getActivityName() + "__" + entry.getValue().getThird() + "\n");
+			System.out.println(
+					">>>>>>>>>>>>>>startTimeDistanceSortedMap is:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n Date, Index of nearest, name of nearest, dist of nearest");
+			StringBuilder temp1 = new StringBuilder();
+			for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : startTimeDistanceSortedMap.entrySet())
+			{
+				temp1.append("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__"
+						+ entry.getValue().getSecond().getActivityName() + "__" + entry.getValue().getThird() + "\n");
+			}
+			System.out.println(temp1.toString());
 		}
-		System.out.println(temp1.toString());
 
 		createRankedTopRecommendedActivityNames(startTimeDistanceSortedMap);
 

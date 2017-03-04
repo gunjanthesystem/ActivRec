@@ -11,7 +11,6 @@ import org.activity.objects.Timeline;
 import org.activity.objects.UserDayTimeline;
 import org.activity.util.Constant;
 import org.activity.util.TimelineUtils;
-import org.activity.util.UtilityBelt;
 
 public class ExperimentDistances
 {
@@ -51,7 +50,7 @@ public class ExperimentDistances
 
 			if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 			{
-				timeline = UtilityBelt.expungeInvalids(timeline);
+				timeline = TimelineUtils.expungeInvalids(timeline);
 			}
 
 			arrayOfTimelines.add(timeline); // converts the day time to continuous dayless timeline

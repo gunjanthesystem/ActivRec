@@ -22,7 +22,6 @@ import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
-import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
@@ -83,44 +82,7 @@ public class UtilityBelt
 		return ((new BigDecimal(Double.toString(ldouble))).toPlainString());
 	}
 
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> expungeUserDayTimelinesByUser(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines,
-			ArrayList<String> userIDsToExpunge)
-	{
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> reducedTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
-		System.out.println("number of users before reducing users timeline = " + usersTimelines.size());
-		System.out.println("Users to remove = " + userIDsToExpunge.toString());
-
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
-		{
-			String userID = usersTimelinesEntry.getKey();
-			System.out.println("Reading " + userID);
-			if (userIDsToExpunge.contains(userID))
-			{
-				System.out.println("removing");
-				continue;
-			}
-			else
-			{
-				System.out.println("keeping");
-				reducedTimelines.put(userID, usersTimelinesEntry.getValue());
-			}
-		}
-
-		System.out.println("number of users in reduced users timeline = " + reducedTimelines.size());
-		return reducedTimelines;
-	}
-
-	public static LinkedHashMap<String, Timeline> expungeInvalids(LinkedHashMap<String, Timeline> usersTimelines)
-	{
-		LinkedHashMap<String, Timeline> expungedTimelines = new LinkedHashMap<String, Timeline>();
-
-		for (Map.Entry<String, Timeline> entry : usersTimelines.entrySet())
-		{
-			expungedTimelines.put(entry.getKey(), UtilityBelt.expungeInvalids(entry.getValue()));
-		}
-		return expungedTimelines;
-	}
+	
 
 	// public static LinkedHashMap<String, Timeline> dayTimelinesToRearrangedTimelines(LinkedHashMap<String,
 	// LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
@@ -481,37 +443,6 @@ public class UtilityBelt
 	// }
 	//
 	//
-
-	/**
-	 * Removes the invalid activity objects from the given Timeline. Invalid Activity Objects are Activity Objects with
-	 * Activity Name as 'Others' or 'Unknown'
-	 * 
-	 * @param timelineToPrune
-	 * @return the Timeline without all its invalid activity objects
-	 */
-	public static Timeline expungeInvalids(Timeline timelineToPrune)
-	{
-		if (timelineToPrune == null)
-		{
-			System.err.println("Error inside UtulityBelt.expungeInvalids: timelineToPrune is null");
-		}
-
-		ArrayList<ActivityObject> arrayToPrune = timelineToPrune.getActivityObjectsInTimeline();
-		ArrayList<ActivityObject> arrPruned = new ArrayList<ActivityObject>();
-
-		Integer timelineID = timelineToPrune.getTimelineID();
-
-		for (int i = 0; i < arrayToPrune.size(); i++)
-		{
-			if (arrayToPrune.get(i).isInvalidActivityName()) // if the first element is unknown, prune it
-			{
-				continue;
-			}
-			else
-				arrPruned.add(arrayToPrune.get(i));
-		}
-		return (new Timeline(timelineID, arrPruned));
-	}
 
 	public static int getCountOfLevel2Ops(String editOpsTrace)
 	{

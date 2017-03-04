@@ -189,7 +189,7 @@ public class TimelineStats
 		case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
 		{
 			LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-			LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = UtilityBelt
+			LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineUtils
 					.expungeInvalids(usersTimelines);
 
 			applyKCentroidsTimelinesTwoLevel(usersTimelinesInvalidsExpunged);
@@ -246,7 +246,7 @@ public class TimelineStats
 		{
 			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
-			userTimelines = UtilityBelt.expungeInvalids(userTimelines);
+			userTimelines = TimelineUtils.expungeInvalids(userTimelines);
 
 			WritingToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
 					pathToWrite + "UserNumOfActivityObjects.csv", "UserID", "NumOfActivityObjects");
@@ -258,7 +258,7 @@ public class TimelineStats
 		case "AlgorithmicAnalysis":
 		{
 			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-			userTimelines = UtilityBelt.expungeInvalids(userTimelines);
+			userTimelines = TimelineUtils.expungeInvalids(userTimelines);
 
 			performAlgorithmicAnalysis(userTimelines, 1, 20, (pathToWrite));
 			break;
@@ -266,7 +266,7 @@ public class TimelineStats
 		case "AlgorithmicAnalysis2":
 		{
 			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-			userTimelines = UtilityBelt.expungeInvalids(userTimelines);
+			userTimelines = TimelineUtils.expungeInvalids(userTimelines);
 
 			performAlgorithmicAnalysis2(userTimelines, 1, 20, (pathToWrite));
 			break;
@@ -275,7 +275,7 @@ public class TimelineStats
 		{
 			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
-			userTimelines = UtilityBelt.expungeInvalids(userTimelines);
+			userTimelines = TimelineUtils.expungeInvalids(userTimelines);
 			writeAllFeaturesValues(userTimelines, pathToWrite);
 			break;
 		}
@@ -784,7 +784,7 @@ public class TimelineStats
 		LinkedHashMap<String, Timeline> allTimelines = new LinkedHashMap<String, Timeline>();
 		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
 		{
-			Timeline newTimeline = UtilityBelt.expungeInvalids(new Timeline(entry.getValue()));
+			Timeline newTimeline = TimelineUtils.expungeInvalids(new Timeline(entry.getValue()));
 			allTimelines.put(entry.getKey(), newTimeline);
 		}
 

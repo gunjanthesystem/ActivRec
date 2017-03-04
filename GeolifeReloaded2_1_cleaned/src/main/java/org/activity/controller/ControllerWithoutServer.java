@@ -200,7 +200,8 @@ public class ControllerWithoutServer
 
 				if (Constant.getDatabaseName().equals("gowalla1"))
 				{
-					String gowallaDataFolder = "./dataToRead/Feb23/DatabaseCreatedMerged/";// Feb2/DatabaseCreated/";
+					String gowallaDataFolder = "./dataToRead/Feb23/DatabaseCreatedMerged/";// DatabaseCreatedMerged/";//
+																							// Feb2/DatabaseCreated/";
 					System.out.println("gowallaDataFolder = " + gowallaDataFolder);
 					// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 					// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/DatabaseCreation/";
@@ -367,7 +368,7 @@ public class ControllerWithoutServer
 			// Constant.outputCoreResultsPath =
 			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
 
-			String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+			String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };// , "1001" };
 
 			System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
@@ -439,6 +440,12 @@ public class ControllerWithoutServer
 				System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
 				System.out.println(" -- Users = " + sampledUsers.keySet().toString());
 				RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+				// $$RecommendationTestsBaseClosestTime recommendationsTest = new RecommendationTestsBaseClosestTime(
+				// $$ sampledUsers);
+
+				// $$RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new
+				// RecommendationTestsDayWise2FasterJan2016(
+				// $$ sampledUsers);
 			}
 			// // important curtain 1 end 10 Feb 2017
 			// $$$
@@ -448,13 +455,12 @@ public class ControllerWithoutServer
 			// WritingToFile.writeUsersDayTimelines(usersDayTimelinesOriginal, "usersDayTimelinesOriginal", true, true,
 			// true);// users
 			// $$ WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			// true, true, true,
-			// $$ "AllInSameFileApr21UncorrrectedTZ.csv");// users
+			// true, true, true, "AllInSameFileApr21UncorrrectedTZ.csv");// users
 
 			// //Start of disabled on 15 Sep 2016 _1
 			// String serialisedTimelines1 = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
 			// String serialisedTimelines2 = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesJUN18.lmap";
-			// // CompareTimelines(serialisedTimelines1, serialisedTimelines2);
+			// TimelineUtilities.CompareTimelines(serialisedTimelines1, serialisedTimelines2);
 			// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedRearrangedDayTimelines =
 			// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
 			// usersCleanedRearrangedDayTimelines = TimelineUtilities.cleanDayTimelines(usersDayTimelinesOriginal);
@@ -621,9 +627,7 @@ public class ControllerWithoutServer
 
 			/** Clustering timelines using weka and after feature extraction **/
 			// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedRearrangedDayTimelines = new
-			// LinkedHashMap<String,
-			// LinkedHashMap<Date,
-			// UserDayTimeline>>();
+			// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
 			// usersCleanedRearrangedDayTimelines = UtilityBelt.cleanDayTimelines(usersDayTimelinesOriginal);
 			// usersCleanedRearrangedDayTimelines =
 			// UtilityBelt.rearrangeDayTimelinesOrderForDataset(usersCleanedRearrangedDayTimelines);
@@ -671,29 +675,4 @@ public class ControllerWithoutServer
 
 	}
 
-	// private void CompareTimelines(String serialisedTimelines1, String serialisedTimelines2)
-	// {
-	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal1 =
-	// (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer.deSerializeThis(serialisedTimelines1);
-	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal2 =
-	// (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer.deSerializeThis(serialisedTimelines2);
-	//
-	// StringBuffer s = new StringBuffer("Comparing " + serialisedTimelines1 + " and " + serialisedTimelines2 + "\n");
-	//
-	// if (usersDayTimelinesOriginal1.size() == usersDayTimelinesOriginal2.size())
-	// {
-	// s.append("Num of users: same " + usersDayTimelinesOriginal1.size() + " = " + usersDayTimelinesOriginal2.size());
-	//
-	// for
-	// }
-	// else
-	// {
-	// s.append("Num of users: different " + usersDayTimelinesOriginal1.size() + " = " +
-	// usersDayTimelinesOriginal2.size());
-	// }
-	//
-	//
-	// WritingToFile.appendLineToFileAbsolute(s.toString(), Constant.getCommonPath() + "ComparingTimelines.txt");// ,
-	// fullPathfileNameToUse);
-	// }
 }

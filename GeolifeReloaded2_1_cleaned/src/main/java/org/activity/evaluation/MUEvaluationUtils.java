@@ -1,5 +1,6 @@
 package org.activity.evaluation;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -73,8 +74,9 @@ public class MUEvaluationUtils
 
 	public static void main(String args[])
 	{
-		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
-		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+		String commonPathToRead = "./dataWritten/Target/";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901", "1001" };
 		try
 		{
 			for (int i = 0; i < s.length; i++)
@@ -82,12 +84,19 @@ public class MUEvaluationUtils
 				String pathToRead = commonPathToRead + s[i] + "/";
 				String clustersRangeSchemeTitle = "CLUSTERING2";
 				String pathToWrite = pathToRead + clustersRangeSchemeTitle;
+
+				WritingToFile.deleteNonEmptyDirectory(Paths.get(pathToWrite));
 				Files.createDirectories(Paths.get(pathToWrite));
 				pathToWrite += "/";
 
 				gowallaEvals(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2);
 				gowallaEvalsBaselineOccurrence(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2);
 			}
+		}
+		catch (FileAlreadyExistsException e)
+		{
+			System.err.println("Exception : FileAlreadyExistsException thrown");
+			e.printStackTrace();
 		}
 		catch (Exception e)
 		{
