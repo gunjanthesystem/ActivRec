@@ -18,7 +18,6 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterBaseClosestTime;
-import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.Constant;
@@ -49,9 +48,13 @@ public class RecommendationTestsBaseClosestTime
 	int userIDs[];
 	int thresholdsArray[];
 
-	public RecommendationTestsBaseClosestTime(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines)// /,
-																														// String
-																														// userAtRecomm)
+	/**
+	 * TODO: make this faster, less writes, use stringbuilder for write
+	 * 
+	 * @param userTimelines
+	 */
+	public RecommendationTestsBaseClosestTime(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines)
+	// /,// String userAtRecomm)
 	{
 		// if userid is not set in constant class, in case of gowalla
 		if (userIDs == null || userIDs.length == 0)
@@ -305,8 +308,8 @@ public class RecommendationTestsBaseClosestTime
 						// userAllDatesTimeslines=UtilityBelt.removeWeekdaysTimelines(userAllDatesTimeslines);
 						// ////////////////////////////////////////////////////////////////////////////////
 
-						WritingToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", false, false,
-								false);
+						// $$WritingToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", false, false,
+						// $$ false);
 
 						// Splitting the set of timelines into training set and test set.
 						int numberOfValidDays = 0;
@@ -653,15 +656,20 @@ public class RecommendationTestsBaseClosestTime
 											.getEndTimestamp().getTime()
 											- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
 
-									bwRecommTimesWithEditDistances.write(dateToRecomm + "," + endTimestamp.getHours()
-											+ ":" + endTimestamp.getMinutes() + ":" + endTimestamp.getSeconds() + ","
-											+ actActualAtStart + "," + entryDistance.getValue() + "," + dateOfCand + ","
-											+ diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
-											+ diffEndTimeForEndPointsCand_n_GuidingInSecs + ","
-											+ dayTimelineTemp.getActivityObjectNamesInSequence() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
-											+ ","
-											+ DateTimeUtils.getWeekDayFromWeekDayInt(entryDistance.getKey().getDay()));
-									bwRecommTimesWithEditDistances.newLine();
+									if (Constant.WriteRecommendationTimesWithEditDistance)
+									{
+										bwRecommTimesWithEditDistances.write(dateToRecomm + ","
+												+ endTimestamp.getHours() + ":" + endTimestamp.getMinutes() + ":"
+												+ endTimestamp.getSeconds() + "," + actActualAtStart + ","
+												+ entryDistance.getValue() + "," + dateOfCand + ","
+												+ diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
+												+ diffEndTimeForEndPointsCand_n_GuidingInSecs + ","
+												+ dayTimelineTemp.getActivityObjectNamesInSequence() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
+												+ "," + DateTimeUtils
+														.getWeekDayFromWeekDayInt(entryDistance.getKey().getDay()));
+										bwRecommTimesWithEditDistances.newLine();
+									}
+
 								}
 							}
 						} // end of for loop over all test dates
@@ -739,7 +747,7 @@ public class RecommendationTestsBaseClosestTime
 		}
 		System.out.println("ALL TESTS DONE");
 
-		PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
+		// PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
 
 	}
 

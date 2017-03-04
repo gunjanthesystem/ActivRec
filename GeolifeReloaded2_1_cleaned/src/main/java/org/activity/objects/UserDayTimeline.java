@@ -624,9 +624,13 @@ public class UserDayTimeline implements Serializable
 			}
 		}
 
-		System.out.println("In the daytimeline (User = " + this.userID + ", Date=" + this.dateID + "). "
-				+ "The index of Activity Object with ST nearest to current_ST(=" + t + "is: "
-				+ indexOfActivityObjectNearestST + " with time diff of " + leastDistantSTVal);
+		if (Constant.verbose)
+		{
+			System.out.println("In the daytimeline (User = " + this.userID + ", Date=" + this.dateID + "). "
+					+ "The index of Activity Object with ST nearest to current_ST(=" + t + "is: "
+					+ indexOfActivityObjectNearestST + " with time diff of " + leastDistantSTVal);
+		}
+
 		return new Triple(indexOfActivityObjectNearestST, this.ActivityObjectsInDay.get(indexOfActivityObjectNearestST),
 				(double) leastDistantSTVal);
 	}

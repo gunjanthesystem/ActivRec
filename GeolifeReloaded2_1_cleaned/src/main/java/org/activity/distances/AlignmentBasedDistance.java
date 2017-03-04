@@ -384,11 +384,40 @@ public class AlignmentBasedDistance
 		// experiments do not show any visible difference in results { dfeat+=costReplaceStartTime; }
 		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
 		{
-			if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(),
-					startTimeToleranceInSeconds) == false) // if not same within 60mins then add wt to dfeat
+			// $$ curtain on 2 Mar 2017 start
+			// if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(),
+			// startTimeToleranceInSeconds) == false) // if not same within 60mins then add wt to dfeat
+			// {
+			// dfeat += wtStartTime;
+			// }
+			// $$ curtain on 2 Mar 2017 end
+
+			// $$ added on 2nd march 2017 start
+			// long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
+			// ao2.getStartTimestamp());
+			//
+			// if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
+			// {
+			// double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
+			// dfeat += (timeDistance * wtStartTime);
+			// }
+			// else // absTimeDiffInSeconds > startTimeToleranceInSeconds
+			// {
+			// dfeat += (1.0 * wtStartTime);
+			// }
+			// $$ added on 2nd march 2017 end
+
+			// added on 3rd march 2017 start
+			// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
+			long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
+					ao2.getStartTimestamp());
+
+			if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
 			{
-				dfeat += wtStartTime;
+				double timeDistance = absTimeDiffInSeconds / 10800;
+				dfeat += (timeDistance * wtStartTime);
 			}
+			// added on 3rd march 2017 end
 
 			// System.out.println("@@ ao1.getLocationIDs() = " + ao1.getLocationIDs());
 			// System.out.println("@@ ao2.getLocationIDs() = " + ao2.getLocationIDs());

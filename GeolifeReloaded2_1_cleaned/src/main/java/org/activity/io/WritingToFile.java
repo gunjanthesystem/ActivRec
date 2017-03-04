@@ -3,14 +3,18 @@ package org.activity.io;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -4027,6 +4031,20 @@ public class WritingToFile
 			bw.close();
 		}
 		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static void deleteNonEmptyDirectory(Path absRootPath)
+	{
+		try
+		{
+			Files.walk(absRootPath, FileVisitOption.FOLLOW_LINKS).sorted(Comparator.reverseOrder()).map(Path::toFile)
+					.peek(f -> System.out.println("Deleting :" + f.toString())).forEach(File::delete);
+		}
+
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}

@@ -35,17 +35,17 @@ public class CSVUtils
 		// testSideConcat();
 		// removeDuplicateRowsGowalla();
 		// $$removeDuplicateRowsFromRawGowalla();
-		removeDuplicationRowsUsingCuckoo(
-				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/sbAllDistanceInM.csv",
-				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/NoDupsbAllDistanceInM.csv",
-				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/AllDupssbAllDistanceInM.csv");
+		// //$$removeDuplicationRowsUsingCuckoo(
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/sbAllDistanceInM.csv",
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/NoDupsbAllDistanceInM.csv",
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/AllDupssbAllDistanceInM.csv");
 
-		removeDuplicationRows(
-				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/sbAllDistanceInM.csv",
-				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SNoDupsbAllDistanceInM.csv",
-				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SAllDupssbAllDistanceInM.csv");
+		// $$removeDuplicationRows(
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/sbAllDistanceInM.csv",
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SNoDupsbAllDistanceInM.csv",
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SAllDupssbAllDistanceInM.csv");
 
-		// gowallaMain();//
+		gowallaMain();//
 	}
 
 	public static void testSideConcat()
@@ -99,8 +99,10 @@ public class CSVUtils
 	{
 		String fileNameHeadString = "";// "BO";// for baseline occurrence file, empty for algo file
 
-		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
-		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Analysis2/";
+		String commonPathToRead = "./dataWritten/Target/";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+		String pathToWrite = "./dataWritten/";
+		// + "///home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Analysis2/";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
 
 		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };

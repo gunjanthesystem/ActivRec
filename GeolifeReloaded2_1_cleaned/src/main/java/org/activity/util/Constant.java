@@ -87,8 +87,17 @@ public final class Constant
 	public static String outputCoreResultsPath = "";
 
 	// ////************* PARAMETERS TO BE SET ********************//////
+	public static final boolean hasInvalidActivityNames = false;
+
 	public static final boolean checkForDistanceTravelledAnomaly = false;
 	public static final boolean checkForHaversineAnomaly = true; // false;
+	public static final boolean checkArrayOfFeatures = false;
+	/**
+	 * Can be disabled for better performance for subsequent runs if previous run of experiments shows that timelines
+	 * created had no chronological anomaly
+	 */
+	public static final boolean checkIfTimelineCreatedIsChronological = false;
+
 	/**
 	 * Percentage/100 for training test split of dataset
 	 */
@@ -135,7 +144,6 @@ public final class Constant
 	public static final boolean verboseNormalisation = false;// false;
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;
-	public static final boolean checkArrayOfFeatures = false;
 	public static final boolean verboseOTMDSAM = false;
 	public static final boolean verboseDistance = false;
 	public static final boolean verboseRankScoreCalcToConsole = false;
@@ -164,11 +172,13 @@ public final class Constant
 	 */
 	public static final boolean WriteRecommendationTimesWithEditDistance = false;
 
+	public static final boolean WriteTimelines = false;
+	public static final boolean WriteLocationMap = false;
 	/**
 	 * to save writing non essential redudant stuffs
 	 */
-	public static final boolean writeTopNextActivitiesWithoutDistance = false;
-	public static final boolean writeTopNextActivitiesWithDistance = false;
+	public static final boolean WriteTopNextActivitiesWithoutDistance = false;
+	public static final boolean WriteTopNextActivitiesWithDistance = false;
 	/**
 	 * Expunge the invalid Activity Objects even before the recommendation process starts
 	 */
@@ -181,7 +191,7 @@ public final class Constant
 														// RTs in MU have to be blacklisted as they did not had any cand
 														// timeline in daywise
 
-	public static final boolean doBaselineDuration = false, doBaselineOccurrence = true;
+	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = true;
 
 	// Clustering0
 	public static final int cluster1Min = 0, cluster1Max = 1, cluster2Min = 2, cluster2Max = 5, cluster3Min = 6,

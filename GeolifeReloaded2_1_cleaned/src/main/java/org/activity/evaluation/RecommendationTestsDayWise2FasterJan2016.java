@@ -276,8 +276,8 @@ public class RecommendationTestsDayWise2FasterJan2016
 						// ////////////////////////////////////////////////////////////////////////////////
 
 						boolean hasGeoCoordinates = Constant.hasGeoCoordinates(Constant.getDatabaseName());
-						WritingToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", hasGeoCoordinates,
-								hasGeoCoordinates, hasGeoCoordinates);
+						// $$ WritingToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All",
+						// hasGeoCoordinates, hasGeoCoordinates, hasGeoCoordinates);
 
 						/* ********** Splitting the set of timelines into training set and test set.**************** */
 						List<LinkedHashMap<Date, UserDayTimeline>> trainTestTimelines = splitTestTrainingTimelines(
@@ -634,41 +634,44 @@ public class RecommendationTestsDayWise2FasterJan2016
 								LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScoresForRecomm = recommP1
 										.getDistanceScoresSorted();
 
-								for (Map.Entry<Date, Triple<Integer, String, Double>> entryScore : distanceScoresForRecomm
-										.entrySet())
+								if (Constant.WriteRecommendationTimesWithEditDistance)
 								{
-									int dayOfCand = entryScore.getKey().getDate();
-									int monthOfCand = entryScore.getKey().getMonth() + 1;
-									int yearOfCand = entryScore.getKey().getYear() + 1900;
-									String dateOfCand = dayOfCand + "-" + monthOfCand + "-" + yearOfCand;
+									for (Map.Entry<Date, Triple<Integer, String, Double>> entryScore : distanceScoresForRecomm
+											.entrySet())
+									{
+										int dayOfCand = entryScore.getKey().getDate();
+										int monthOfCand = entryScore.getKey().getMonth() + 1;
+										int yearOfCand = entryScore.getKey().getYear() + 1900;
+										String dateOfCand = dayOfCand + "-" + monthOfCand + "-" + yearOfCand;
 
-									UserDayTimeline dayTimelineTemp = TimelineUtils.getUserDayTimelineByDateFromMap(
-											userTrainingTimelines, entryScore.getKey());
+										UserDayTimeline dayTimelineTemp = TimelineUtils.getUserDayTimelineByDateFromMap(
+												userTrainingTimelines, entryScore.getKey());
 
-									Integer endPointIndexWithLeastDistanceForThisCandidate = entryScore.getValue()
-											.getFirst(); // UtilityBelt.getIntegerByDateFromMap(recommP1.getEndPointIndexWithLeastDistanceForCandidateTimelines(),
-															// entryScore.getKey());
-									ActivityObject endPointActivityInCandidate = dayTimelineTemp
-											.getActivityObjectAtPosition(
-													endPointIndexWithLeastDistanceForThisCandidate);
-									long diffStartTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint
-											.getStartTimestamp().getTime()
-											- endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
-									long diffEndTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint
-											.getEndTimestamp().getTime()
-											- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
+										Integer endPointIndexWithLeastDistanceForThisCandidate = entryScore.getValue()
+												.getFirst(); // UtilityBelt.getIntegerByDateFromMap(recommP1.getEndPointIndexWithLeastDistanceForCandidateTimelines(),
+																// entryScore.getKey());
+										ActivityObject endPointActivityInCandidate = dayTimelineTemp
+												.getActivityObjectAtPosition(
+														endPointIndexWithLeastDistanceForThisCandidate);
+										long diffStartTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint
+												.getStartTimestamp().getTime()
+												- endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
+										long diffEndTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint
+												.getEndTimestamp().getTime()
+												- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
 
-									bwRecommTimesWithEditDistances.write(dateToRecomm + "," + endTimeStamp.getHours()
-											+ ":" + endTimeStamp.getMinutes() + ":" + endTimeStamp.getSeconds() + ","
-											+ actActualDone + "," + entryScore.getValue() + "," + dateOfCand + ","
-											+ diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
-											+ diffEndTimeForEndPointsCand_n_GuidingInSecs + ","
-											+ dayTimelineTemp.getActivityObjectNamesInSequence() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
-											+ ","
-											+ DateTimeUtils.getWeekDayFromWeekDayInt(entryScore.getKey().getDay()));
-									bwRecommTimesWithEditDistances.newLine();
+										bwRecommTimesWithEditDistances.write(dateToRecomm + ","
+												+ endTimeStamp.getHours() + ":" + endTimeStamp.getMinutes() + ":"
+												+ endTimeStamp.getSeconds() + "," + actActualDone + ","
+												+ entryScore.getValue() + "," + dateOfCand + ","
+												+ diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
+												+ diffEndTimeForEndPointsCand_n_GuidingInSecs + ","
+												+ dayTimelineTemp.getActivityObjectNamesInSequence() + "," + weekDay// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
+												+ ","
+												+ DateTimeUtils.getWeekDayFromWeekDayInt(entryScore.getKey().getDay()));
+										bwRecommTimesWithEditDistances.newLine();
+									}
 								}
-
 								System.out.println("// end of for loop over all activity objects in test date");
 							} // end of for loop over all activity objects in test date
 							System.out.println("/end of for loop over all test dates");

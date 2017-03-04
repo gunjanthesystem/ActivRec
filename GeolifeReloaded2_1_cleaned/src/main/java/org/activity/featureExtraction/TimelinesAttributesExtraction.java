@@ -82,7 +82,7 @@ public class TimelinesAttributesExtraction
 		// "ShannonsEntropy");
 
 		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-		LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = UtilityBelt.expungeInvalids(usersTimelines);
+		LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineUtils.expungeInvalids(usersTimelines);
 
 		sanityCheckDayTimelineToTimelineConversion(usersDayTimelines, usersTimelines);
 
