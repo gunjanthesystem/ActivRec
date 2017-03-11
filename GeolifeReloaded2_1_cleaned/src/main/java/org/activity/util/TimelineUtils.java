@@ -2419,28 +2419,28 @@ public class TimelineUtils
 		int numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
 		int numCandsRejectedDueToNoNextActivity = 0;
 
-		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelinesForUser.entrySet())
+		for (Map.Entry<Date, UserDayTimeline> dayTimelineEntry : dayTimelinesForUser.entrySet())
 		{
 			totalNumberOfProbableCands += 1;
-
+			Date dayOfTimeline = dayTimelineEntry.getKey();
+			UserDayTimeline dayTimeline = dayTimelineEntry.getValue();//
 			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for
-			// the day to be recommended (this should nt
-			// be the case because test and training set are diffferent)
+			// the day to be recommended (this should nt be the case because test and training set are diffferent)
 			// and there is atleast one valid activity after this activityAtRecomm point
-			if (entry.getValue().countContainsActivityButNotAsLast(activityAtRecommPoint) > 0)// &&
-																								// (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
+			if (dayTimeline.countContainsActivityButNotAsLast(activityAtRecommPoint) > 0)
+			// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
 			{
-				if (entry.getKey().toString().equals(dateAtRecomm.toString()) == true)
+				if (dayOfTimeline.toString().equals(dateAtRecomm.toString()) == true)
 				{
 					System.err.println(
 							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
 					continue;
 				}
 
-				if (entry.getValue().containsOnlySingleActivity() == false && entry.getValue()
+				if (dayTimeline.containsOnlySingleActivity() == false && dayTimeline
 						.hasAValidActivityAfterFirstOccurrenceOfThisActivity(activityAtRecommPoint) == true)
 				{
-					candidateTimelines.put(entry.getKey(), entry.getValue());
+					candidateTimelines.put(dayOfTimeline, dayTimeline);
 					count++;
 				}
 				else

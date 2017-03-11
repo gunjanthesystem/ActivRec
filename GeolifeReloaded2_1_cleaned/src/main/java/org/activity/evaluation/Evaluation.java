@@ -52,7 +52,7 @@ public class Evaluation
 		/**
 		 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation times
 		 * and a cell contains the meta information (userid_dateOfRt_timeOfRt) for the corresponding user for
-		 * correspnding recommendation time
+		 * corresponding recommendation time
 		 */
 		ArrayList<ArrayList<String>> arrayMeta = new ArrayList<ArrayList<String>>();
 		/**
@@ -68,6 +68,11 @@ public class Evaluation
 		 */
 		ArrayList<ArrayList<String>> arrayActual = new ArrayList<ArrayList<String>>();
 
+		/**
+		 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation times
+		 * and a cell boolean value representing whether the current and target activity names were same for this
+		 * recommendation time
+		 */
 		ArrayList<ArrayList<Boolean>> arrayCurrentTargetSame = new ArrayList<ArrayList<Boolean>>();
 
 		/**
@@ -77,6 +82,7 @@ public class Evaluation
 		 * user, the top K items in this case are same across all RTs)
 		 */
 		ArrayList<ArrayList<String>> arrayBaselineOccurrence = new ArrayList<ArrayList<String>>();
+
 		/**
 		 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation times
 		 * and a cell contains the topK recommended items for the corresponding user for corresponding recommendation
@@ -248,21 +254,36 @@ public class Evaluation
 					for (int theK = theKOriginal; theK > 0; theK--)
 					{
 						writePrecisionRecallFMeasure("Algo", timeCategory, theK, arrayMeta, arrayTopK, arrayActual);
-						writePrecisionRecallFMeasure("BaselineOccurrence", timeCategory, theK, arrayMeta,
-								arrayBaselineOccurrence, arrayActual);
-						writePrecisionRecallFMeasure("BaselineDuration", timeCategory, theK, arrayMeta,
-								arrayBaselineDuration, arrayActual);
+						if (Constant.DoBaselineOccurrence)
+						{
+							writePrecisionRecallFMeasure("BaselineOccurrence", timeCategory, theK, arrayMeta,
+									arrayBaselineOccurrence, arrayActual);
+						}
+						if (Constant.DoBaselineDuration)
+						{
+							writePrecisionRecallFMeasure("BaselineDuration", timeCategory, theK, arrayMeta,
+									arrayBaselineDuration, arrayActual);
+						}
 					}
 				}
 
 				writeReciprocalRank("Algo", timeCategory, arrayMeta, arrayTopK, arrayActual);
-				writeReciprocalRank("BaselineOccurrence", timeCategory, arrayMeta, arrayBaselineOccurrence,
-						arrayActual);
-				writeReciprocalRank("BaselineDuration", timeCategory, arrayMeta, arrayBaselineDuration, arrayActual);
-
 				writeMeanReciprocalRank("Algo", timeCategory, countOfLinesTopK); // average over data points
-				writeMeanReciprocalRank("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
-				writeMeanReciprocalRank("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+
+				if (Constant.DoBaselineOccurrence)
+				{
+					writeReciprocalRank("BaselineOccurrence", timeCategory, arrayMeta, arrayBaselineOccurrence,
+							arrayActual);
+					writeMeanReciprocalRank("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
+
+				}
+
+				if (Constant.DoBaselineDuration)
+				{
+					writeReciprocalRank("BaselineDuration", timeCategory, arrayMeta, arrayBaselineDuration,
+							arrayActual);
+					writeMeanReciprocalRank("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+				}
 
 				if (Constant.EvalPrecisionRecallFMeasure)
 				{
@@ -270,13 +291,18 @@ public class Evaluation
 					writeAvgRecallsForAllKs("Algo", timeCategory, countOfLinesTopK);
 					// writeAvgFMeasuresForAllKs("Algo", timeCategory, countOfLinesTopK);
 
-					// writeAvgPrecisionsForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
-					writeAvgRecallsForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
-					// writeAvgFMeasuresForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
-
-					// writeAvgPrecisionsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-					writeAvgRecallsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-					// writeAvgFMeasuresForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+					if (Constant.DoBaselineOccurrence)
+					{
+						// writeAvgPrecisionsForAllKs("BaselineOccurrence",timeCategory,countOfLinesBaselineOccurrence);
+						writeAvgRecallsForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
+						// writeAvgFMeasuresForAllKs("BaselineOccurrence",timeCategory,countOfLinesBaselineOccurrence);
+					}
+					if (Constant.DoBaselineDuration)
+					{
+						// writeAvgPrecisionsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+						writeAvgRecallsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+						// writeAvgFMeasuresForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
+					}
 				}
 				break;// only 'All' time category
 			}

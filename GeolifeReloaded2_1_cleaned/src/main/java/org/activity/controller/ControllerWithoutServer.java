@@ -13,7 +13,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.activity.evaluation.RecommendationTestsMasterMU2;
+import org.activity.evaluation.RecommendationTestsDayWise2FasterJan2016;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -439,13 +439,14 @@ public class ControllerWithoutServer
 				}
 				System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
 				System.out.println(" -- Users = " + sampledUsers.keySet().toString());
-				RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+
+				// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+				// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
 				// $$RecommendationTestsBaseClosestTime recommendationsTest = new RecommendationTestsBaseClosestTime(
 				// $$ sampledUsers);
 
-				// $$RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new
-				// RecommendationTestsDayWise2FasterJan2016(
-				// $$ sampledUsers);
+				RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new RecommendationTestsDayWise2FasterJan2016(
+						sampledUsers);
 			}
 			// // important curtain 1 end 10 Feb 2017
 			// $$$

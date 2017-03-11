@@ -50,6 +50,8 @@ public class DatageneratorUtils
 		System.out.println("mergeContinuousGowallaWithoutBOD4 called with assumeContinuousThresholdInSeconds = "
 				+ assumeContinuousThresholdInSeconds + " and assumeContinuousThresholdInMeters = "
 				+ assumeContinuousThresholdInMeters);
+
+		long numOfConsecActNameSame = 0, numOfConsecActNameSameMerged = 0;
 		// StringBuilder sbMergerCaseLogs = new StringBuilder();
 		// BufferedWriter bwMergerCaseLogs = WritingToFile
 		// .getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
@@ -96,6 +98,11 @@ public class DatageneratorUtils
 					}
 					else
 					{
+						if (currentCheckinEntry.getActivityID() == previousCheckinEntry.getActivityID())
+						{
+							numOfConsecActNameSame += 1;
+						}
+
 						// CheckinEntry currentCheckinEntry = checkinEntries.getValue();
 
 						// should this be merged with previous checkin
@@ -105,6 +112,7 @@ public class DatageneratorUtils
 								&& (currentCheckinEntry.getActivityID() == previousCheckinEntry.getActivityID()))
 						{
 							// merge
+							numOfConsecActNameSameMerged += 1;
 							checkinsToMerge.add(currentCheckinEntry);
 							// $$System.out.println("add to merge, checkinsToMerge.size() = " + checkinsToMerge.size());
 						}
@@ -134,6 +142,9 @@ public class DatageneratorUtils
 			e.printStackTrace();
 			// PopUps.showException(e, "mergeContinuousGowallaWithoutBOD4()");
 		}
+		System.out.println("numOfConsecActNameSame = " + numOfConsecActNameSame + " " + "numOfConsecActNameSameMerged ="
+				+ numOfConsecActNameSameMerged + " percentage of consecs merged = "
+				+ (numOfConsecActNameSameMerged * 100.0 / numOfConsecActNameSame * 1.0));
 		return mapForDataMerged;
 	}
 
