@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -14,6 +15,8 @@ import java.util.stream.Collectors;
 
 import org.activity.io.WritingToFile;
 import org.activity.objects.CheckinEntry;
+import org.activity.ui.PopUps;
+import org.activity.util.RegexUtils;
 
 /**
  * Just to check/run some random snippets of code NOT IMPORTANT
@@ -72,13 +75,73 @@ public class TestDummy2
 
 	public static void main(String args[])
 	{
-		testDirectoryDeletion();
+		// checkStackTrace();
+		// testDirectoryDeletion();
 		// List<String> list = Arrays.asList(new String[] { "gunjan", "manali", "sukany" });
 		// System.out.println(list.toString());
 		// list.stream().forEach(e -> System.out.print(e.toString() + "_"));
 
 		// steamFunctionParameter(2);
 		// streamExp1();
+		// checkString1();
+
+		checkRegexUtils();
+		// List<Integer> range = IntStream.rangeClosed(1, 10).boxed().collect(Collectors.toList());
+		// range.forEach(System.out::println);
+	}
+
+	public static void checkRegexUtils()
+	{
+		String s = "__a__b__c__d__e";
+		String[] topKString = RegexUtils.patternDoubleUnderScore.split(s);
+		String[] topKString2 = s.split("__");
+
+		System.out.println(Arrays.asList(topKString) + "\n" + Arrays.asList(topKString2));
+
+		// $$ s.get(i).get(j).split("__");
+		// topK is of the form string: __a__b__c__d__e is of length 6...
+
+	}
+
+	public static void checkString1()
+	{
+		String codeUn = "A";
+		String codeO = "B";
+		String userDayActivitiesAsStringCode = "DAHBAUQWEDAA";
+		// get indices of valid activity ActivityNames
+		ArrayList<Integer> indicesOfValids = new ArrayList<Integer>();
+
+		for (int i = 0; i < userDayActivitiesAsStringCode.length(); i++)
+		{
+			String codeToCheck = userDayActivitiesAsStringCode.substring(i, i + 1); // only one character
+			// here the codeToCheck is only of length 1, hence, using endsWith or equals below shouldn't make difference
+			if (codeToCheck.endsWith(codeUn) || codeToCheck.equals(codeO))
+			{
+				continue;
+			}
+			else
+				indicesOfValids.add(i);
+		}
+		indicesOfValids.stream().forEach(System.out::println);
+	}
+
+	public static void checkString1Spartanized()
+	{
+		String codeUn = "A";
+		String codeO = "B";
+		String userDayActivitiesAsStringCode = "DAHBAUQWEDAA";
+		// get indices of valid activity ActivityNames
+		ArrayList<Integer> indicesOfValids = new ArrayList<Integer>();
+
+		for (int i = 0; i < userDayActivitiesAsStringCode.length(); ++i)
+		{
+			String codeToCheck = userDayActivitiesAsStringCode.substring(i, i + 1);
+			if (!codeToCheck.endsWith(codeUn) && !codeToCheck.equals(codeO))
+			{
+				indicesOfValids.add(i);
+			}
+		}
+		indicesOfValids.stream().forEach(System.out::println);
 	}
 
 	public static void testDirectoryDeletion()
@@ -89,6 +152,33 @@ public class TestDummy2
 	public static void sets()
 	{
 
+	}
+
+	public static void checkStackTrace()
+	{
+		checkStackTrace1();
+	}
+
+	public static void checkStackTrace1()
+	{
+		checkStackTrace2();
+	}
+
+	public static void checkStackTrace2()
+	{
+		checkStackTrace3();
+	}
+
+	public static void checkStackTrace3()
+	{
+		System.out.println(PopUps.getCurrentStackTracedErrorMsg("XYZ error occurred"));
+		// StackTraceElement[] stacktraceElements = Thread.currentThread().getStackTrace();
+		//
+		// Arrays.stream(stacktraceElements).forEach(e -> System.out.println(e.toString()));
+		//
+		// // System.out.println(Thread.currentThread().getStackTrace());
+		// System.out.println("--------------");
+		// System.out.println(ExceptionUtils.getFullStackTrace(throwable));
 	}
 
 	/**

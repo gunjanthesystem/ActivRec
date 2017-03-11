@@ -210,7 +210,7 @@ public class AlignmentBasedDistance
 
 	/**
 	 * Return the Edit Distance of given sequence of Activity Objects with an empty sequence of Activity Objects, thus
-	 * this is the maximal eidt distance possible for the given sequence. (in current case of implementation.)
+	 * this is the maximal edit distance possible for the given sequence. (in current case of implementation.)
 	 * 
 	 * 
 	 * @param activityObjects1
@@ -392,31 +392,31 @@ public class AlignmentBasedDistance
 			// }
 			// $$ curtain on 2 Mar 2017 end
 
-			// $$ added on 2nd march 2017 start
-			// long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
-			// ao2.getStartTimestamp());
-			//
-			// if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
-			// {
-			// double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
-			// dfeat += (timeDistance * wtStartTime);
-			// }
-			// else // absTimeDiffInSeconds > startTimeToleranceInSeconds
-			// {
-			// dfeat += (1.0 * wtStartTime);
-			// }
-			// $$ added on 2nd march 2017 end
-
-			// added on 3rd march 2017 start
-			// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
+			// $$ added on 2nd march 2017 start: nearerScaledTimeDistance
 			long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
 					ao2.getStartTimestamp());
 
-			if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
+			if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
 			{
-				double timeDistance = absTimeDiffInSeconds / 10800;
+				double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
 				dfeat += (timeDistance * wtStartTime);
 			}
+			else // absTimeDiffInSeconds > startTimeToleranceInSeconds
+			{
+				dfeat += (1.0 * wtStartTime);
+			}
+			// $$ added on 2nd march 2017 end
+
+			// added on 3rd march 2017 start: furtherScaledTimeDistance
+			// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
+			// long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
+			// ao2.getStartTimestamp());
+			//
+			// if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
+			// {
+			// double timeDistance = absTimeDiffInSeconds / 10800;
+			// dfeat += (timeDistance * wtStartTime);
+			// }
 			// added on 3rd march 2017 end
 
 			// System.out.println("@@ ao1.getLocationIDs() = " + ao1.getLocationIDs());

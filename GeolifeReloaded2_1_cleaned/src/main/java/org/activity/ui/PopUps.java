@@ -3,6 +3,7 @@ package org.activity.ui;
 import java.awt.HeadlessException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -79,6 +80,13 @@ public class PopUps
 		{
 			System.err.println("\n Headless: hence printing exeception msg instead of PopUp.\n" + exceptionMsg);
 		}
+	}
+
+	public static String getCurrentStackTracedErrorMsg(String errorMsg)
+	{
+		StringBuilder sb = new StringBuilder("Error:" + errorMsg + "\n" + "--------- current stack -------\n");
+		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
+		return sb.append("--------- ------- ----- -------").toString();
 	}
 
 }

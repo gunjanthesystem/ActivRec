@@ -124,7 +124,7 @@ buildscript {
 apply plugin: "us.kirchmeier.capsule"
 
 task fatCapsule(type: FatCapsule) {
-  applicationClass 'org.activity.controller.SuperController'
+  applicationClass 'org.activity.util.CSVUtils'
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -143,13 +143,13 @@ task fatCapsule(type: FatCapsule) {
 
 
 //  to run 
-mainClassName = 'org.activity.controller.SuperController'
+mainClassName = 'org.activity.util.CSVUtils'
 
 //////////////
 jar { //shadowJar
 	 manifest {
         attributes	 'Implementation-Title': 'SuperController',
-					     'Main-Class': 'org.activity.controller.SuperController',
+					     'Main-Class': 'org.activity.util.CSVUtils',
 					     'Implementation-Version': version
     }
 }
@@ -159,7 +159,7 @@ task fatJar(type: Jar) {
 	manifest {
         attributes 'Implementation-Title': 'SuperController',
         	'Implementation-Version': version,
-        	'Main-Class': 'org.activity.controller.SuperController'
+        	'Main-Class': 'org.activity.util.CSVUtils'
     }
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -168,7 +168,7 @@ task fatJar(type: Jar) {
 
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
-  main = 'org.activity.controller.SuperController'
+  main = 'org.activity.util.CSVUtils'
   jvmArgs = ['-Xmx11g']
   //, '-XX:-UseGCOverheadLimit
   // arguments to pass to the application

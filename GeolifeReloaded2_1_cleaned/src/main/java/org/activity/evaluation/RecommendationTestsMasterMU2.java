@@ -21,7 +21,7 @@ import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterDayWise2FasterJan2016;
-import org.activity.recomm.RecommendationMasterMU;
+import org.activity.recomm.RecommendationMasterMUMar2017;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
@@ -389,6 +389,7 @@ public class RecommendationTestsMasterMU2
 								mapsForCountDurationBaselines = WritingToFile.writeBasicActivityStatsAndGetBaselineMaps(
 										userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
 							}
+
 							else if (matchingUnitIterator == 0) // do this only for one matching unit as it does not
 							// change per matching unit
 							{
@@ -551,9 +552,10 @@ public class RecommendationTestsMasterMU2
 									// $$ thresholdValue, typeOfThreshold, matchingUnit, caseType, this.lookPastType);//
 									// ,fullCandOrSubCand);
 
-									RecommendationMasterMU recommP1 = new RecommendationMasterMU(userTrainingTimelines,
-											userTestTimelines, dateToRecomm, endTimeString, userId, thresholdValue,
-											typeOfThreshold, matchingUnit, caseType, this.lookPastType, false);
+									RecommendationMasterMUMar2017 recommP1 = new RecommendationMasterMUMar2017(
+											userTrainingTimelines, userTestTimelines, dateToRecomm, endTimeString,
+											userId, thresholdValue, typeOfThreshold, matchingUnit, caseType,
+											this.lookPastType, false);
 									// LAST PARAM TRUE IS DUMMY FOR CALLING PERFORMANCE CONSTRUCTOR, REMOVE IT FOR
 									// EXPERIMENTS
 									// ,fullCandOrSubCand);

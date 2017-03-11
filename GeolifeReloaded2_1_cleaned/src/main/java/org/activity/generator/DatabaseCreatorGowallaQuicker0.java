@@ -63,7 +63,8 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb23/DatabaseCreatedNoMerge/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar9/DatabaseCreatedMerged/";
+	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb23/DatabaseCreatedNoMerge/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 	// commented out on 2 feb 2017
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Dec1/DatabaseCreation/";
@@ -96,7 +97,7 @@ public class DatabaseCreatorGowallaQuicker0
 	public static final int continuityThresholdInSeconds = gowallaContinuityThresholdInSecs;// = Integer.MAX_VALUE;//
 	public static final int continuityThresholdInMeters = 600;// = Integer.MAX_VALUE;//
 
-	static final boolean merge = false;
+	static final boolean merge = true;// false;
 	// *
 	// 60; // changed from 30
 	// min in DCU

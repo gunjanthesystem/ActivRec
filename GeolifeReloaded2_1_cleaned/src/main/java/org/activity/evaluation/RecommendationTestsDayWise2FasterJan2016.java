@@ -18,7 +18,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
-import org.activity.recomm.RecommendationMasterDayWise2FasterJan2016;
+import org.activity.recomm.RecommendationMasterDayWise2FasterMar2017;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
@@ -446,7 +446,12 @@ public class RecommendationTestsDayWise2FasterJan2016
 								// $$ thresholdValue, typeOfThreshold, matchingUnit, caseType, this.lookPastType);//
 								// ,fullCandOrSubCand);
 
-								RecommendationMasterDayWise2FasterJan2016 recommP1 = new RecommendationMasterDayWise2FasterJan2016(
+								// $$RecommendationMasterDayWise2FasterJan2016 recommP1 = new
+								// RecommendationMasterDayWise2FasterJan2016(
+								// $$ userTrainingTimelines, userTestTimelines, dateToRecomm, endTimeString, userId,
+								// $$ thresholdValue, typeOfThreshold);// , caseType);
+
+								RecommendationMasterDayWise2FasterMar2017 recommP1 = new RecommendationMasterDayWise2FasterMar2017(
 										userTrainingTimelines, userTestTimelines, dateToRecomm, endTimeString, userId,
 										thresholdValue, typeOfThreshold);// , caseType);
 

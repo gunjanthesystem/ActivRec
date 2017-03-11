@@ -9,10 +9,12 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.RegexUtils;
 import org.activity.util.StatsUtils;
 import org.activity.util.weka.WekaUtilityBelt;
 import org.activity.util.weka.WekaUtilityBelt.ClustersRangeScheme;
@@ -74,9 +76,9 @@ public class MUEvaluationUtils
 
 	public static void main(String args[])
 	{
-		String commonPathToRead = "./dataWritten/Target/";
+		String commonPathToRead = "./DD/Target/";// "./dataWritten/Target/";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
-		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901", "1001" };
+		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };// , "1001" };
 		try
 		{
 			for (int i = 0; i < s.length; i++)
@@ -147,9 +149,13 @@ public class MUEvaluationUtils
 				"User, MUsWithMaxMRR,MaxMRR, MinMUHavingMaxMRR, ClusterLabelAccToMinMUHavMaxMRR,ClusterLabelAccToMajorityMUsHavMaxMRR\n",
 				MUsWithMaxMRRFileName);
 
-		for (Entry<String, Pair<List<Double>, Double>> entryForUser : usersMaxMUMRRMap.entrySet()) // iterating over
-																									// users
+		LinkedHashMap<String, String> listOfRRsForBestMinMUForEachUser = new LinkedHashMap<>();
+
+		int userIter = -1;
+		// iterating over users
+		for (Entry<String, Pair<List<Double>, Double>> entryForUser : usersMaxMUMRRMap.entrySet())
 		{
+			userIter += 1;
 			String user = entryForUser.getKey();
 			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
 			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString)
@@ -178,6 +184,29 @@ public class MUEvaluationUtils
 			countsForClusterLabelAccToMajorityMUsHavMaxMRR = incrementCount(user, clusterLabelAccToMajorityMUsHavMaxMRR,
 					countsForClusterLabelAccToMajorityMUsHavMaxMRR);
 
+			///////////
+			// fetch the file for this user for its best MU
+			String fileNameRRBestMU = commonPathToRead + "MatchingUnit" + minMUHavingMaxMRR.intValue()// Integer.valueOf(minMUHavingMaxMRR.toString())
+					+ ".0/AlgoAllReciprocalRank.csv";
+			// read the line corresponding to the user.
+			String rrLine = "";
+			try (Stream<String> lines = Files.lines(Paths.get(fileNameRRBestMU)))
+			{
+
+				rrLine = lines.skip(userIter).findFirst().get();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			listOfRRsForBestMinMUForEachUser.put(user, rrLine);
+			WritingToFile.appendLineToFileAbsolute(user + "||" + minMUHavingMaxMRR + "||" + rrLine + "\n",
+					rootPathToWriteResults + "rrValsForBestMU.csv");
+
+			StringBuilder sbrr = new StringBuilder();
+			Stream.of(RegexUtils.patternComma.split(rrLine)).forEach(e -> sbrr.append(e + "\n"));
+			WritingToFile.appendLineToFileAbsolute(sbrr.toString(), rootPathToWriteResults + "rrValsForBestMUCol.csv");
+			///////////
 		} // end of iteration over users. }
 
 		////
@@ -190,6 +219,7 @@ public class MUEvaluationUtils
 				rootPathToWriteResults + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
 		writeModeDistribution(countsForClusterLabelAccToMajorityMUsHavMaxMRR,
 				rootPathToWriteResults + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+
 	}
 
 	public static void gowallaEvalsBaselineOccurrence(String commonPathToRead, String rootPathToWriteResults,
@@ -234,10 +264,12 @@ public class MUEvaluationUtils
 		WritingToFile.appendLineToFileAbsolute(
 				"User, MUsWithMaxMRR,MaxMRR, MinMUHavingMaxMRR, ClusterLabelAccToMinMUHavMaxMRR,ClusterLabelAccToMajorityMUsHavMaxMRR\n",
 				MUsWithMaxMRRFileName);
-
+		int userIter = -1;
 		for (Entry<String, Pair<List<Double>, Double>> entryForUser : usersMaxMUMRRMap.entrySet()) // iterating over
 																									// users
 		{
+			userIter += 1;
+
 			String user = entryForUser.getKey();
 			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
 			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString)
@@ -265,6 +297,33 @@ public class MUEvaluationUtils
 					countsForClusterLabelAccToMinMUHavMaxMRR);
 			countsForClusterLabelAccToMajorityMUsHavMaxMRR = incrementCount(user, clusterLabelAccToMajorityMUsHavMaxMRR,
 					countsForClusterLabelAccToMajorityMUsHavMaxMRR);
+			//
+			///////////
+			// fetch the file for this user for its best MU
+			String fileNameRRBestMU = commonPathToRead + "MatchingUnit" + minMUHavingMaxMRR.intValue()// Integer.valueOf(minMUHavingMaxMRR.toString())
+					+ ".0/BaselineOccurrenceAllReciprocalRank.csv";
+			// String fileNameRRBestMU = commonPathToRead + "MatchingUnit"
+			// + (new DecimalFormat("#.0").format(minMUHavingMaxMRR) + "/BaselineOccurrenceAllReciprocalRank.csv");
+
+			// read the line corresponding to the user.
+			String rrLine = "";
+			try (Stream<String> lines = Files.lines(Paths.get(fileNameRRBestMU)))
+			{
+				rrLine = lines.skip(userIter).findFirst().get();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			// listOfRRsForBestMinMUForEachUser.put(user, rrLine);
+			WritingToFile.appendLineToFileAbsolute(user + "||" + minMUHavingMaxMRR + "||" + rrLine + "\n",
+					rootPathToWriteResults + "BOrrValsForBestMU.csv");
+
+			StringBuilder sbrr = new StringBuilder();
+			Stream.of(RegexUtils.patternComma.split(rrLine)).forEach(e -> sbrr.append(e + "\n"));
+			WritingToFile.appendLineToFileAbsolute(sbrr.toString(),
+					rootPathToWriteResults + "BOrrValsForBestMUCol.csv");
+			///////////
 
 		} // end of iteration over users. }
 

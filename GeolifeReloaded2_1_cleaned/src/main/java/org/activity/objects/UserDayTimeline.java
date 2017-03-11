@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.activity.util.Constant;
-import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
 
 public class UserDayTimeline implements Serializable
@@ -415,21 +414,24 @@ public class UserDayTimeline implements Serializable
 		return newList;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getActivityObjectsAsStringCode()
 	{
 		StringBuffer stringCodeForDay = new StringBuffer();// changed from String to StringBuffer on Sep 20 2016
 
-		for (int i = 0; i < ActivityObjectsInDay.size(); i++)
+		for (ActivityObject ao : ActivityObjectsInDay)// int i = 0; i < ActivityObjectsInDay.size(); i++)
 		{
-			String activityName = ActivityObjectsInDay.get(i).getActivityName();
-
-			// int activityID= generateSyntheticData.getActivityid(activityName);
-
-			stringCodeForDay.append(StringCode.getStringCodeFromActivityName(activityName)); // Character.toString
-																								// ((char)(activityID+65));
-																								// //getting the ascii
-																								// code
-			// for (activity id+65)
+			// commented out on 10 Mar 2017 start. not applicable for >107 acts
+			// String activityName = ActivityObjectsInDay.get(i).getActivityName();
+			// // int activityID= generateSyntheticData.getActivityid(activityName);
+			// stringCodeForDay.append(StringCode.getStringCodeFromActivityName(activityName));
+			// // Character.toString ((char)(activityID+65));//getting the ascii code
+			// // for (activity id+65)
+			// commented out on 10 Mar 2017 end
+			stringCodeForDay.append(ao.getStringCode());
 		}
 
 		return stringCodeForDay.toString();

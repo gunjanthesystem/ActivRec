@@ -62,6 +62,10 @@ public class StringCode
 	{
 		String name = null;
 
+		String msg = "Alert!: you are using org.activity.util.StringCode.getActivityNameFromStringCode(String)! ";
+		PopUps.showMessage(PopUps.getCurrentStackTracedErrorMsg(msg));
+		System.err.println(msg);
+
 		char[] charCode = code.toCharArray();
 		if (charCode.length > 1)
 		{
@@ -92,6 +96,16 @@ public class StringCode
 	 */
 	public static String getStringCodeFromActivityName(String activityName)
 	{
+		// if(activityName.equals(Constant.INVALID_ACTIVITY1))
+		// {
+		// return
+		// }
+
+		String msg = "Alert!: you are using org.activity.util.StringCode.getStringCodeFromActivityName(String)! ";
+		PopUps.showMessage(PopUps.getCurrentStackTracedErrorMsg(msg));
+		System.err.println(msg);
+		// PopUps.getCurrentStackTracedErrorMsg(msg);
+
 		if (activityName.length() == 1)
 		{
 			return activityName;

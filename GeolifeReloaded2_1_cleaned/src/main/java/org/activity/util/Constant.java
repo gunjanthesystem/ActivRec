@@ -88,6 +88,7 @@ public final class Constant
 
 	// ////************* PARAMETERS TO BE SET ********************//////
 	public static final boolean hasInvalidActivityNames = false;
+	public static final boolean removeCurrentActivityNameFromRecommendations = false;// true;
 
 	public static final boolean checkForDistanceTravelledAnomaly = false;
 	public static final boolean checkForHaversineAnomaly = true; // false;
@@ -258,6 +259,8 @@ public final class Constant
 	/****** Evaluation Constants End ***********/
 
 	static TimeZone timeZoneForExperiments = null;
+
+	public static final int RoundingPrecision = 4;
 
 	public static void setDefaultTimeZone(String timeZoneString)
 	{

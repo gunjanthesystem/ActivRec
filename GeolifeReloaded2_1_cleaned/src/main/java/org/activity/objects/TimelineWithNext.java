@@ -182,9 +182,8 @@ public class TimelineWithNext extends Timeline
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
 
 		// System.out.println("Current timeline="+currentTimeline.getActivityObjectNamesInSequence());
-		if (currentTimeline.getActivityObjectsInTimeline().size() != (matchingUnitInCounts + 1)) // note: this is
-																									// matching unit in
-																									// counts reduced
+		if (currentTimeline.getActivityObjectsInTimeline().size() != (matchingUnitInCounts + 1))
+		// note: this is matching unit in counts reduced
 		{
 			System.err.println("Error: the current timeline does have #activity objs = adjusted matching unit");
 		}

@@ -97,51 +97,62 @@ public class CSVUtils
 	 */
 	public static void gowallaMain()
 	{
-		String fileNameHeadString = "";// "BO";// for baseline occurrence file, empty for algo file
-
-		String commonPathToRead = "./dataWritten/Target/";
-		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
-		String pathToWrite = "./dataWritten/";
-		// + "///home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Analysis2/";
-		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
-
-		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
-
-		ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
-		ArrayList<String> listOfAllMUsWithMaxMRRFiles = new ArrayList<String>();
-		ArrayList<String> listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
-		ArrayList<String> listOfAllCountsForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
-		ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
-		ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
-
-		for (int i = 0; i < s.length; i++)
+		String[] fileNameHeadStrings = { "", "BO" };
+		for (String fileNameHeadString : fileNameHeadStrings)
 		{
-			String pathToRead = commonPathToRead + s[i] + "/CLUSTERING2/";
+			// String fileNameHeadString = "";// "BO";// for baseline occurrence file, empty for algo file
 
-			listOfAllMRRFiles.add(pathToRead + fileNameHeadString + "AllMRR.csv");
-			listOfAllMUsWithMaxMRRFiles.add(pathToRead + fileNameHeadString + "MUsWithMaxMRR.csv");
-			listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles
-					.add(pathToRead + fileNameHeadString + "CountsForClusterLabelAccToMinMUHavMaxMRR.csv");
-			listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles
-					.add(pathToRead + fileNameHeadString + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
-			listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles
-					.add(pathToRead + fileNameHeadString + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
-			listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles.add(
-					pathToRead + fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+			String commonPathToRead = "./DD/Target/";
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+			String pathToWrite = "./DD/Target/";
+			// + "///home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Analysis2/";
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
+
+			String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+
+			ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
+			ArrayList<String> listOfAllMUsWithMaxMRRFiles = new ArrayList<String>();
+			ArrayList<String> listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
+			ArrayList<String> listOfAllCountsForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
+			ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
+			ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
+
+			ArrayList<String> listOfrrCOlFiles = new ArrayList<String>();
+			// ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
+
+			for (int i = 0; i < s.length; i++)
+			{
+				String pathToRead = commonPathToRead + s[i] + "/CLUSTERING2/";
+
+				listOfAllMRRFiles.add(pathToRead + fileNameHeadString + "AllMRR.csv");
+				listOfrrCOlFiles.add(pathToRead + fileNameHeadString + "rrValsForBestMUCol.csv");
+				listOfAllMUsWithMaxMRRFiles.add(pathToRead + fileNameHeadString + "MUsWithMaxMRR.csv");
+				listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles
+						.add(pathToRead + fileNameHeadString + "CountsForClusterLabelAccToMinMUHavMaxMRR.csv");
+				listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles
+						.add(pathToRead + fileNameHeadString + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+				listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles.add(
+						pathToRead + fileNameHeadString + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
+				listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles.add(pathToRead
+						+ fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+			}
+
+			concatenateCSVFilesSideways(listOfAllMRRFiles, true, pathToWrite + fileNameHeadString + "AllMRR.csv");
+			concatenateCSVFiles(listOfAllMUsWithMaxMRRFiles, true,
+					pathToWrite + fileNameHeadString + "MUsWithMaxMRR.csv");
+			concatenateCSVFiles(listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles, true,
+					pathToWrite + fileNameHeadString + "CountsForClusterLabelAccToMinMUHavMaxMRR.csv");
+			concatenateCSVFiles(listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles, true,
+					pathToWrite + fileNameHeadString + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+			concatenateCSVFiles(listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles, true,
+					pathToWrite + fileNameHeadString + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
+			concatenateCSVFiles(listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles, true,
+					pathToWrite + fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
+
+			concatenateCSVFiles(listOfrrCOlFiles, true, pathToWrite + fileNameHeadString + "ListOfrrColFiles.csv");
+
+			// concatenateCSVFiles(ArrayList<String>, boolean, String)
 		}
-
-		concatenateCSVFilesSideways(listOfAllMRRFiles, true, pathToWrite + fileNameHeadString + "AllMRR.csv");
-		concatenateCSVFiles(listOfAllMUsWithMaxMRRFiles, true, pathToWrite + fileNameHeadString + "MUsWithMaxMRR.csv");
-		concatenateCSVFiles(listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles, true,
-				pathToWrite + fileNameHeadString + "CountsForClusterLabelAccToMinMUHavMaxMRR.csv");
-		concatenateCSVFiles(listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles, true,
-				pathToWrite + fileNameHeadString + "CountsForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
-		concatenateCSVFiles(listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles, true,
-				pathToWrite + fileNameHeadString + "ModeDistributionForClusterLabelAccToMinMUHavMaxMRR.csv");
-		concatenateCSVFiles(listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles, true,
-				pathToWrite + fileNameHeadString + "ModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRR.csv");
-
-		// concatenateCSVFiles(ArrayList<String>, boolean, String)
 	}
 
 	public static void gowallaMainBaseline()

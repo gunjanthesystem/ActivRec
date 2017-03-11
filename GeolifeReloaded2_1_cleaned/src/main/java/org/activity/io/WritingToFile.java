@@ -2382,29 +2382,29 @@ public class WritingToFile
 			LinkedHashMap<Date, UserDayTimeline> candidateTimelines, LinkedHashMap<Date, String> topNames,
 			ArrayList<ActivityObject> currentTimeline)
 	{
-		commonPath = Constant.getCommonPath();//
 		try
 		{
-			String fileName = commonPath + "EditDistancePerRtPerCand.csv";
-
-			FileWriter fw = new FileWriter(new File(fileName).getAbsoluteFile(), true);
-			BufferedWriter bw = new BufferedWriter(fw);
+			// String fileName = commonPath + "EditDistancePerRtPerCand.csv";
+			// FileWriter fw = new FileWriter(new File(fileName).getAbsoluteFile(), true);
+			// BufferedWriter bw = new BufferedWriter(fw);
+			StringBuilder toWrite = new StringBuilder();
 
 			for (Map.Entry<Date, Triple<Integer, String, Double>> entry : getDistanceScoresSorted.entrySet())
 			{
 				int countOfL1Ops = UtilityBelt.getCountOfLevel1Ops(entry.getValue().getSecond());
 				int countOfL2Ops = UtilityBelt.getCountOfLevel2Ops(entry.getValue().getSecond());
 
-				bw.write(userAtRecomm + "," + dateAtRecomm.toString() + "," + timeAtRecomm.toString() + ","
+				toWrite.append(userAtRecomm + "," + dateAtRecomm.toString() + "," + timeAtRecomm.toString() + ","
 						+ entry.getKey().toString() + "," + entry.getValue().getFirst() + ","
 						+ entry.getValue().getSecond() + "," + entry.getValue().getThird() + "," + countOfL1Ops + ","
 						+ countOfL2Ops + "," + topNames.get(entry.getKey()) + ","
 						+ candidateTimelines.get(entry.getKey()).getActivityObjectNamesInSequenceWithFeatures() + ","
-						+ "," + getStringActivityObjArray(currentTimeline));
-				bw.newLine();
+						+ "," + getStringActivityObjArray(currentTimeline) + "\n");
+				// bw.newLine();
 			}
-			bw.close();
-
+			WritingToFile.appendLineToFileAbsolute(toWrite.toString(),
+					Constant.getCommonPath() + "EditDistancePerRtPerCand.csv");
+			// bw.close();
 		}
 		catch (Exception e)
 		{
@@ -2527,11 +2527,8 @@ public class WritingToFile
 
 				String topNextAOName = "null";
 
-				for (Triple<ActivityObject, Double, Integer> t : topNextActivityObjects) // topNextActivityObjects
-																							// should be converted to
-																							// hashmap for faster
-																							// access.
-				{
+				for (Triple<ActivityObject, Double, Integer> t : topNextActivityObjects)
+				{// topNextActivityObjects should be converted to hashmap for faster access.
 					if (t.getThird() == candTimelineID)
 					{
 						topNextAOName = t.getFirst().getActivityName();
@@ -2564,10 +2561,8 @@ public class WritingToFile
 					userString = userAtRecomm;
 					dateString = dateAtRecomm.toString();
 					timeString = timeAtRecomm.toString();
-					currentTimelineString = getStringActivityObjArray(currentTimeline); // current timeline is same
-																						// throughout an execution of
-																						// this method.
-
+					currentTimelineString = getStringActivityObjArray(currentTimeline);
+					// current timeline is same throughout an execution of this method.
 					writefull = false;
 				}
 
@@ -3344,9 +3339,8 @@ public class WritingToFile
 		}
 
 		writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
-				commonPath + "ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count"); // TODO check
-																											// if it
-																											// indeed
+				commonPath + "ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count");
+		// TODO check if it indeed
 		// should be an append
 
 		if (Constant.verbose) System.out.println("Exiting writeActivityCountsInGivenDayTimelines");

@@ -713,7 +713,7 @@ public class ActivityObject implements Serializable
 	}
 
 	/**
-	 * Returns the 1-character string code from the ActivityID and hence is guaranteed to be unique for at least 107
+	 * Returns the 1-character string code from the ActivityID and hence is guaranteed to be unique for at least 400
 	 * activities.
 	 * 
 	 * @since 30 Nov 2016
@@ -730,7 +730,7 @@ public class ActivityObject implements Serializable
 
 	/**
 	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID
-	 * and hence is guaranteed to be unique for at least 107 activities.
+	 * and hence is guaranteed to be unique for at least 400 activities.
 	 * 
 	 * @param ActivityObjects
 	 * @return
