@@ -1,6 +1,6 @@
 package org.activity.sanityChecks;
 
-import org.activity.util.StatsUtils;
+import org.activity.stats.StatsUtils;
 
 public class Testsplit
 {

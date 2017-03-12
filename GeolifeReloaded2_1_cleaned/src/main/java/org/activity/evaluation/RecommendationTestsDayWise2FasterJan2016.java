@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
@@ -22,7 +24,6 @@ import org.activity.recomm.RecommendationMasterDayWise2FasterMar2017;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
 
@@ -462,7 +463,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 										+ " candidate timelines");
 								System.out.println("\tIterating over candidate timelines:");
 
-								if (Constant.WriteNumActsPerRTPerCand) // this information is redudant (TODO: check
+								if (VerbosityConstants.WriteNumActsPerRTPerCand) // this information is redudant (TODO: check
 																		// redundant with which file)
 								{
 									for (Map.Entry<Date, UserDayTimeline> entryAjooba : candidateTimelines.entrySet())
@@ -639,7 +640,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 								LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScoresForRecomm = recommP1
 										.getDistanceScoresSorted();
 
-								if (Constant.WriteRecommendationTimesWithEditDistance)
+								if (VerbosityConstants.WriteRecommendationTimesWithEditDistance)
 								{
 									for (Map.Entry<Date, Triple<Integer, String, Double>> entryScore : distanceScoresForRecomm
 											.entrySet())

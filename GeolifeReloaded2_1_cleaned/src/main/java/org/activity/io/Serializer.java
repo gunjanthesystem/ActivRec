@@ -12,10 +12,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
+import org.activity.constants.Constant;
 import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.StayPointsAllDataContainer;
 import org.activity.objects.TrajectoryEntry;
-import org.activity.util.Constant;
 import org.nustaq.serialization.FSTConfiguration;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;

@@ -10,10 +10,10 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.io.WritingToFile;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 
 public class CandDistCorrelation
 {
@@ -287,7 +287,7 @@ public class CandDistCorrelation
 
 			if (Constant.getDatabaseName().equals("dcu_data_2"))
 			{
-				userIDString = Constant.userNamesDCUData[uIterator];
+				userIDString = DomainConstants.userNamesDCUData[uIterator];
 			}
 			else
 				userIDString = Integer.toString(userID);

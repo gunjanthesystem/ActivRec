@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 //import java.rmi.server.UID;
 import java.util.ArrayList;
 
-import org.activity.util.Constant;
+import org.activity.constants.VerbosityConstants;
 
 /**
  * Timeline is a chronological sequence of Activity Objects with the next Activity Object to be considered after this
@@ -127,7 +127,7 @@ public class TimelineWithNext extends Timeline
 		int matchingUnitInCounts = (int) matchingUnitInCountsD;
 		System.out.println("------Inside getCurrentTimelineFromLongerTimelineMUCount");
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println("longer timeline=" + longerTimeline.getActivityObjectNamesWithTimestampsInSequence());// getActivityObjectNamesInSequence());
 		}

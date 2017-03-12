@@ -2,9 +2,9 @@ package org.activity.clustering;
 
 import java.util.ArrayList;
 
+import org.activity.constants.Constant;
 import org.activity.distances.FeatureWiseEditDistance;
 import org.activity.objects.Timeline;
-import org.activity.util.Constant;
 
 public class DistancesMatrix
 {

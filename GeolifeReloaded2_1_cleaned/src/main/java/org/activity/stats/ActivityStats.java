@@ -10,12 +10,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.activity.constants.Constant;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.objects.UserDayTimeline;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 

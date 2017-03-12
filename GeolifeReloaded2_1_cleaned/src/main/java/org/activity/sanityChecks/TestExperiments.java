@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.Pair;
+import org.activity.stats.HjorthParameters;
 import org.activity.stats.entropy.EntropyUtilityBelt;
 import org.activity.stats.entropy.MultiscaleEntropy;
 import org.activity.stats.entropy.SampleEntropyG;
 import org.activity.stats.entropy.SampleEntropyIQM;
 import org.activity.ui.PopUps;
-import org.activity.util.Constant;
-import org.activity.util.HjorthParameters;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -65,7 +65,7 @@ public class TestExperiments
 		// Constant.verboseLevenstein = true;
 		// new AlignmentBasedDistance().getMySimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
 		// // new AlignmentBasedDistance().getWeightedLevenshteinDistance("AAB", "AAS", 1, 1, 2);
-		Constant.verboseLevenstein = true;
+		VerbosityConstants.verboseLevenstein = true;
 
 		System.out.println(
 				new AlignmentBasedDistance().getMySimpleLevenshteinDistance("gunjankumar", "manaligaur", 1, 1, 2));

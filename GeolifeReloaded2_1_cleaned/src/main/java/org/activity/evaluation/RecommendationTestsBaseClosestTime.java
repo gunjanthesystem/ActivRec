@@ -13,6 +13,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
@@ -20,7 +22,6 @@ import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterBaseClosestTime;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
 
@@ -656,7 +657,7 @@ public class RecommendationTestsBaseClosestTime
 											.getEndTimestamp().getTime()
 											- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
 
-									if (Constant.WriteRecommendationTimesWithEditDistance)
+									if (VerbosityConstants.WriteRecommendationTimesWithEditDistance)
 									{
 										bwRecommTimesWithEditDistances.write(dateToRecomm + ","
 												+ endTimestamp.getHours() + ":" + endTimestamp.getMinutes() + ":"

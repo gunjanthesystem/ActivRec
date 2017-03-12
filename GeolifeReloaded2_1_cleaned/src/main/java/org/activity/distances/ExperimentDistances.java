@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.constants.Constant;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserDayTimeline;
-import org.activity.util.Constant;
 import org.activity.util.TimelineUtils;
 
 public class ExperimentDistances

@@ -9,8 +9,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import org.activity.io.WritingToFile;
+import org.activity.stats.StatsUtils;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.StatsUtils;
 
 /**
  * Computes the time and geo difference between consecutive checkins

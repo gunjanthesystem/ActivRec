@@ -23,17 +23,16 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import org.activity.constants.Constant;
 import org.activity.featureExtraction.TimelinesAttributesExtraction;
+import org.activity.io.CSVUtils;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
-import org.activity.util.CSVUtils;
 import org.activity.util.ComparatorUtils;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
-import org.activity.util.weka.WekaUtilityBelt;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;

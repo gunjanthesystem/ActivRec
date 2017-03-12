@@ -10,8 +10,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
-import org.activity.util.Constant;
 import org.activity.util.RegexUtils;
 
 /**
@@ -387,7 +388,7 @@ public class Evaluation
 						// $$ arrayTopK.get(i).get(j).split("__");
 						// topK is of the form string: __a__b__c__d__e is of length 6...
 						// value at index 0 is empty.
-						if (Constant.verbose)
+						if (VerbosityConstants.verbose)
 						{
 							System.out.println("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j));
 							System.out.println("actual string =" + actual);
@@ -412,7 +413,7 @@ public class Evaluation
 							RR = 0; // assuming the rank is at infinity
 						}
 						bwRR.write(RR + ",");
-						if (Constant.verbose)
+						if (VerbosityConstants.verbose)
 						{
 							System.out.println("RR = " + RR);
 						}
@@ -573,7 +574,7 @@ public class Evaluation
 						// theK=topKStrings.length-1;
 						// $else
 						// ${
-						if (Constant.verbose)
+						if (VerbosityConstants.verbose)
 						{
 							consoleLogBuilder
 									.append("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j) + "\n");
@@ -621,7 +622,7 @@ public class Evaluation
 						bwTopKRecall.write(topKRecallVal + ",");
 						bwTopKF.write(topKFVal + ",");
 						// bwAccuracy.write(accuracy+",");
-						if (Constant.verboseEvaluationMetricsToConsole)
+						if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 						{
 							consoleLogBuilder.append("count-of-occurence-used=" + countOfOccurence + "         "
 									+ "k-used=" + theK + " k-Original=" + theKOriginal + "\n");// +
@@ -718,7 +719,7 @@ public class Evaluation
 						new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
 				String currentLine;
 
-				if (Constant.verboseEvaluationMetricsToConsole)
+				if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 				{
 					System.out.println("Calculating MRR for user:" + user);
 					System.out.println(
@@ -735,7 +736,7 @@ public class Evaluation
 						// get avg of all these rr values
 						// concern: splitting on empty lines gives an array of length1, also splitting on one values
 						// line gives an array of length 1
-						if (Constant.verboseEvaluationMetricsToConsole)
+						if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 						{
 							System.out.println("current rrValues line read=" + currentLine + " trimmed length="
 									+ currentLine.trim().length());
@@ -913,7 +914,7 @@ public class Evaluation
 								countOfValidPValues = 1;
 							avgPValueForThisUserForThisK = round((double) sum / countOfValidPValues, 4);
 
-							if (Constant.verboseEvaluationMetricsToConsole)
+							if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 							{
 								System.out.println(
 										"Calculating avg precision (K=" + K + "):" + sum + "/" + countOfValidPValues);
@@ -1025,7 +1026,7 @@ public class Evaluation
 							if (countOfValidRValues == 0) // to avoid divide by zero exception
 								countOfValidRValues = 1;
 							avgRValueForThisUserForThisK = round((double) sum / countOfValidRValues, 4);
-							if (Constant.verboseEvaluationMetricsToConsole)
+							if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 							{
 								System.out.println(
 										"Calculating avg recall (K=" + K + "):" + sum + "/" + countOfValidRValues);
@@ -1135,7 +1136,7 @@ public class Evaluation
 							if (countOfValidFValues == 0) // to avoid divide by zero exception
 								countOfValidFValues = 1;
 							avgFValueForThisUserForThisK = round((double) sum / countOfValidFValues, 4);
-							if (Constant.verboseEvaluationMetricsToConsole)
+							if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 							{
 								System.out.println(
 										"Calculating avg FMeasure (K=" + K + "):" + sum + "/" + countOfValidFValues);

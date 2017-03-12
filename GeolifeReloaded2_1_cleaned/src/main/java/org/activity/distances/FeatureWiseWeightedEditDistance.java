@@ -6,9 +6,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
-import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.StringCode;
 
@@ -178,7 +179,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseWeightedEditDistanceRawValsWithTrace(
 			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original)
 	{
-		if (Constant.verboseDistance)
+		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("Debug note: calc feature-wise editDist between " + activityObjects1Original.size()
 					+ " & " + activityObjects2Original.size() + " objs");
@@ -220,7 +221,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 					activityObjects2, "AvgAltitude"));
 		}
 
-		if (Constant.verboseSAX) traverse(mapOfDistances);
+		if (VerbosityConstants.verboseSAX) traverse(mapOfDistances);
 
 		return mapOfDistances;
 	}

@@ -1,7 +1,7 @@
 package org.activity.controller;
 
+import org.activity.constants.Constant;
 import org.activity.ui.PopUps;
-import org.activity.util.Constant;
 import org.activity.util.PerformanceAnalytics;
 
 public class SuperController

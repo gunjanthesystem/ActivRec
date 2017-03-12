@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.activity.util.StatsUtils;
+import org.activity.stats.StatsUtils;
 import org.activity.util.StringUtils;
 
 /**

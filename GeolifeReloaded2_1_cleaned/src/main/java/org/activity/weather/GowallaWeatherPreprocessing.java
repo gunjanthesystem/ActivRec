@@ -21,14 +21,14 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.UserDayTimeline;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
-import org.activity.util.CSVUtils;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.StatsUtils;
 
 /**
  * Preprocessing the Gowalla checkin data to generata data in format more suitable for fetching weather data

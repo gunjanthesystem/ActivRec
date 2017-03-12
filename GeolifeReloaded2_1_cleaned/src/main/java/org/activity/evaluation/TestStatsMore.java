@@ -11,10 +11,10 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import org.activity.constants.Constant;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 import org.apache.commons.math3.*;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;

@@ -2,10 +2,9 @@ package org.activity.stats;
 
 import java.util.List;
 
+import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class Descriptive

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.activity.constants.Constant;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
 import org.activity.evaluation.Evaluation;
@@ -17,11 +18,10 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
-import org.activity.util.Constant;
 import org.activity.util.RegexUtils;
-import org.activity.util.StatsUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
 

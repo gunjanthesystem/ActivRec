@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activity.util.Constant;
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
+import org.activity.stats.StatsUtils;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.StatsUtils;
 import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
 
@@ -446,7 +447,7 @@ public class CopyOfActivityObject implements Serializable
 	{
 		String code = new String();
 
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForActivityObjects");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForActivityObjects");
 
 		for (int i = 0; i < ActivityObjects.size(); i++)
 		{
@@ -456,10 +457,10 @@ public class CopyOfActivityObject implements Serializable
 			code += ActivityObjects.get(i).getStringCode(); // Character.toString ((char)(activityID+65)); //getting the
 															// ascii code for (activity id+65)
 
-			if (Constant.verboseSAX) System.out.print(ActivityObjects.get(i).getActivityName() + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(ActivityObjects.get(i).getActivityName() + " ");
 		}
 
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("Code: " + code);
 		}

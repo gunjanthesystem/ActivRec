@@ -2,10 +2,10 @@ package org.activity.util;
 
 import java.sql.Timestamp;
 
-import org.activity.jmotif.sax.SAXFactory;
-import org.activity.jmotif.sax.alphabet.NormalAlphabet;
-import org.activity.jmotif.timeseries.TSException;
-import org.activity.jmotif.timeseries.Timeseries;
+import org.jmotif.sax.SAXFactory;
+import org.jmotif.sax.alphabet.NormalAlphabet;
+import org.jmotif.timeseries.TSException;
+import org.jmotif.timeseries.Timeseries;
 
 import net.seninp.jmotif.sax.SAXException;
 import net.seninp.jmotif.sax.SAXProcessor;

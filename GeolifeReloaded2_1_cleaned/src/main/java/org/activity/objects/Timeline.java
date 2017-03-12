@@ -9,7 +9,8 @@ import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.activity.util.Constant;
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
@@ -159,7 +160,7 @@ public class Timeline
 		}
 		long lt = System.currentTimeMillis();
 
-		if (Constant.verboseTimelineCleaning) System.out.println(
+		if (VerbosityConstants.verboseTimelineCleaning) System.out.println(
 				"Creating timelines for " + dayTimelines.size() + " daytimelines  takes " + (lt - dt) / 1000 + " secs");
 	}
 
@@ -209,7 +210,7 @@ public class Timeline
 		}
 		long lt = System.currentTimeMillis();
 
-		if (Constant.verboseTimelineCleaning) System.out.println(
+		if (VerbosityConstants.verboseTimelineCleaning) System.out.println(
 				"Creating timelines for " + dayTimelines.size() + " daytimelines  takes " + (lt - dt) / 1000 + " secs");
 	}
 
@@ -342,7 +343,7 @@ public class Timeline
 		if (nextValidActivityObject.getActivityName()
 				.equals(activityObjectsInTimeline.get(indexOfActivityObject).getActivityName()))
 		{
-			if (Constant.verbose)
+			if (VerbosityConstants.verbose)
 			{
 				System.err
 						.println("\n\t Warning: Next Valid activity has same name as current activity (for timelineID:"
@@ -759,7 +760,7 @@ public class Timeline
 		}
 
 		// ////// for testing correctness
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.print("\t Inside getActivityObjectsBetweenTime: activity objects inside " + startTimestampC
 					+ " and " + endTimestampC + " are: ");

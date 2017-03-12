@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
@@ -926,7 +928,7 @@ public class TimelineUtils
 		// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
 		StringBuilder locInfo = new StringBuilder();
 		locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
-		if (Constant.WriteLocationMap)
+		if (VerbosityConstants.WriteLocationMap)
 		{
 			WritingToFile.writeToNewFile(locInfo.toString(), Constant.outputCoreResultsPath + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
@@ -1219,7 +1221,7 @@ public class TimelineUtils
 
 		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
-			if (Constant.verboseTimelineCleaning)
+			if (VerbosityConstants.verboseTimelineCleaning)
 			{
 				System.out.println("for user: " + usersTimelinesEntry.getKey() + "\n");
 			}
@@ -1240,7 +1242,7 @@ public class TimelineUtils
 		}
 		System.out.println("\ttotal num of users after cleaning = " + cleanedUserDayTimelines.size());
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("exiting cleanDayTimelines() ");
 		}
@@ -1516,7 +1518,7 @@ public class TimelineUtils
 	public static LinkedHashMap<Date, UserDayTimeline> removeWeekendDayTimelines(
 			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines)
 	{
-		boolean verbose = Constant.verboseTimelineCleaning;
+		boolean verbose = VerbosityConstants.verboseTimelineCleaning;
 		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
 		ArrayList<Date> datesToRemove = new ArrayList<Date>();
 		if (verbose) System.out.print("Weekends to remove:");// + entry.getKey());
@@ -1535,7 +1537,7 @@ public class TimelineUtils
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("Num of days removed for removeWeekendDayTimelines =" + datesToRemove.size());
 		}
@@ -1583,7 +1585,7 @@ public class TimelineUtils
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("Num of days removed for removeWeekendDayTimelines =" + datesToRemove.size());
 		}
@@ -1597,7 +1599,7 @@ public class TimelineUtils
 	public static LinkedHashMap<Date, UserDayTimeline> removeWeekdaysDayTimelines(
 			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines)
 	{
-		boolean verbose = Constant.verboseTimelineCleaning;
+		boolean verbose = VerbosityConstants.verboseTimelineCleaning;
 		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
 		ArrayList<Date> datesToRemove = new ArrayList<Date>();
 
@@ -1636,7 +1638,7 @@ public class TimelineUtils
 		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
 		ArrayList<Date> datesToRemove = new ArrayList<Date>();
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 			System.out.print("Invalid days to remove for no valid activities in the day:");
 
 		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
@@ -1644,11 +1646,11 @@ public class TimelineUtils
 			if (entry.getValue().containsAtLeastOneValidActivity() == false)
 			{
 				datesToRemove.add(entry.getKey());
-				if (Constant.verboseTimelineCleaning) System.out.print("," + entry.getKey());
+				if (VerbosityConstants.verboseTimelineCleaning) System.out.print("," + entry.getKey());
 			}
 		}
 
-		if (Constant.verboseTimelineCleaning) System.out.println("");
+		if (VerbosityConstants.verboseTimelineCleaning) System.out.println("");
 
 		/**
 		 * @TODO check and change if the two loops in this method can be replace with one
@@ -1660,7 +1662,7 @@ public class TimelineUtils
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("Num of days removed for removeDayTimelinesWithNoValidAct =" + datesToRemove.size());
 		}
@@ -1717,7 +1719,7 @@ public class TimelineUtils
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("Num of days removed for removeDayTimelinesWithNoValidAct =" + datesToRemove.size());
 		}
@@ -1741,7 +1743,7 @@ public class TimelineUtils
 	public static LinkedHashMap<Date, UserDayTimeline> removeDayTimelinesWithOneOrLessDistinctValidAct(
 			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines)
 	{
-		boolean verbose = Constant.verboseTimelineCleaning;
+		boolean verbose = VerbosityConstants.verboseTimelineCleaning;
 		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
 		ArrayList<Date> datesToRemove = new ArrayList<Date>();
 		if (verbose) System.out.print("Invalid days to remove for TimelinesWithLessThanOneDistinctValidAct:");// +
@@ -1761,7 +1763,7 @@ public class TimelineUtils
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println(
 					"Num of days removed for removeDayTimelinesWithOneOrLessDistinctValidAct =" + datesToRemove.size());
@@ -1817,7 +1819,7 @@ public class TimelineUtils
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println(
 					"Num of days removed for removeDayTimelinesWithOneOrLessDistinctValidAct =" + datesToRemove.size());
@@ -1841,7 +1843,7 @@ public class TimelineUtils
 	public static LinkedHashMap<Date, UserDayTimeline> removeDayTimelinesLessDistinctValidAct(
 			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines, int lowerLimit)
 	{
-		boolean verbose = Constant.verboseTimelineCleaning;
+		boolean verbose = VerbosityConstants.verboseTimelineCleaning;
 		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
 		ArrayList<Date> datesToRemove = new ArrayList<Date>();
 
@@ -1863,7 +1865,7 @@ public class TimelineUtils
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
-		if (Constant.verboseTimelineCleaning)
+		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("Num of days removed for removeDayTimelinesLessDistinctValidAct (lowerlimit ="
 					+ lowerLimit + ") =" + datesToRemove.size());

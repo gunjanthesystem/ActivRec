@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.CheckinEntry;
@@ -27,12 +29,11 @@ import org.activity.objects.LabelEntry;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.UserGowalla;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
-import org.activity.util.Constant;
 import org.activity.util.DatageneratorUtils;
 import org.activity.util.RegexUtils;
-import org.activity.util.StatsUtils;
 import org.activity.util.TimelineUtils;
 import org.joda.time.LocalDateTime;
 
@@ -153,7 +154,7 @@ public class DatabaseCreatorGowallaQuicker0
 			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
 			// commonPath + "CatIDNameDictionary.kryo");
 
-			int workingCatLevel = Constant.gowallaWorkingCatLevel;
+			int workingCatLevel = DomainConstants.gowallaWorkingCatLevel;
 
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = getWorkingLevelCatIDsForAllCatIDs(
 					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);

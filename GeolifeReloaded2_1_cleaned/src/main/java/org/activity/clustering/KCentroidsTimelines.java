@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.activity.constants.Constant;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Timeline;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 
 /**
  * 

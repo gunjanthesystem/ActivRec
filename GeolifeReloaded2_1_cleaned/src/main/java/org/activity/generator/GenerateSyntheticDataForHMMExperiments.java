@@ -2,10 +2,10 @@ package org.activity.generator;
 
 import java.util.Random;
 
+import org.activity.io.CSV2Arff;
 import org.activity.io.WritingToFile;
-import org.activity.util.StatsUtils;
+import org.activity.stats.StatsUtils;
 import org.activity.util.StringCode;
-import org.activity.util.weka.CSV2Arff;
 
 public class GenerateSyntheticDataForHMMExperiments
 {

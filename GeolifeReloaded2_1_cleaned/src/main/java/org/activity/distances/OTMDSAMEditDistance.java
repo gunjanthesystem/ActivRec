@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
-import org.activity.util.Constant;
 
 /**
  * 
@@ -34,7 +34,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
 			String timeAtRecomm, Integer candidateTimelineId)
 	{
-		if (Constant.verboseOTMDSAM)
+		if (VerbosityConstants.verboseOTMDSAM)
 		{
 			System.out.println("-------------Inside getOTMDSAMEditDistanceWithTrace");
 			System.out.println("Debug note: calc editDist between " + activityObjects1Original.size() + " & "
@@ -60,12 +60,12 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 															// thus only three elements
 		}
 
-		if (Constant.verboseOTMDSAM)
+		if (VerbosityConstants.verboseOTMDSAM)
 		{
 			printAllMappedEditOperations(allEditOperations);
 		}
 
-		if (Constant.verboseOTMDSAM) System.out.println("-------------Exiting getOTMDSAMEditDistanceWithTrace");
+		if (VerbosityConstants.verboseOTMDSAM) System.out.println("-------------Exiting getOTMDSAMEditDistanceWithTrace");
 		// return calculateOTMDSAMDistance((ArrayList<Pair<Integer, String>>) allEditOperations.get(0),
 		// (ArrayList<Pair<Integer, String>>) allEditOperations.get(1),
 		// (ArrayList<Triple<Integer, Integer, String>>) allEditOperations.get(2));
@@ -84,7 +84,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	@SuppressWarnings("rawtypes")
 	public ArrayList getAllEditOperations(LinkedHashMap<String, Pair<String, Double>> pairs)
 	{
-		if (Constant.verboseOTMDSAM) System.out.println("Inside getAllEditOperations");
+		if (VerbosityConstants.verboseOTMDSAM) System.out.println("Inside getAllEditOperations");
 
 		// Obtain the list of insertion, deletions and replacements operations for minimum edit distance for all
 		// features.
@@ -100,7 +100,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 		for (Map.Entry<String, Pair<String, Double>> entry : pairs.entrySet())
 		{
 			String featureName = entry.getKey();
-			if (Constant.verboseOTMDSAM)
+			if (VerbosityConstants.verboseOTMDSAM)
 			{
 				System.out.println("\tFeature: " + entry.getKey());
 				System.out.println("\tLevenshtein distance: " + entry.getValue().getSecond());
@@ -181,7 +181,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 		all.add(deletions);
 		all.add(replacements);
 
-		if (Constant.verboseOTMDSAM)
+		if (VerbosityConstants.verboseOTMDSAM)
 		{
 			// printAllMappedEditOperations(all);
 			System.out.println("exiting getAllEditOperations");

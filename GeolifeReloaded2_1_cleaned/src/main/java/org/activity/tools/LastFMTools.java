@@ -2,7 +2,7 @@ package org.activity.tools;
 
 import java.util.ArrayList;
 
-import org.activity.util.CSVUtils;
+import org.activity.io.CSVUtils;
 
 public class LastFMTools
 {

@@ -11,13 +11,13 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.activity.clustering.weka.WekaUtilityBelt;
+import org.activity.clustering.weka.WekaUtilityBelt.ClustersRangeScheme;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
+import org.activity.stats.StatsUtils;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.RegexUtils;
-import org.activity.util.StatsUtils;
-import org.activity.util.weka.WekaUtilityBelt;
-import org.activity.util.weka.WekaUtilityBelt.ClustersRangeScheme;
 
 /**
  * Addresses the task such as finding the best MUs and MRR in case of MU experiments. Hence useful for ground truth
