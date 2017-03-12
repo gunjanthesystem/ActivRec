@@ -22,6 +22,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.DataEntry;
 import org.activity.objects.LabelEntry;
@@ -29,7 +30,6 @@ import org.activity.objects.Pair;
 import org.activity.objects.TrackListenEntry;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
-import org.activity.util.Constant;
 import org.activity.util.UtilityBelt;
 import org.activity.io.WritingToFile;
 

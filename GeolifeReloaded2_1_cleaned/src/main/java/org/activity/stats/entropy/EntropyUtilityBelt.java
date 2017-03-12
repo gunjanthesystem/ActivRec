@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.activity.util.StatsUtils;
+import org.activity.stats.StatsUtils;
 
 /**
  * Contains an assortment of methods useful for different kinds of entropies

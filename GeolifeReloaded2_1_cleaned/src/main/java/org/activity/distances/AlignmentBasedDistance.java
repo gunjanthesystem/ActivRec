@@ -3,12 +3,13 @@ package org.activity.distances;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
-import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.StatsUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -234,7 +235,7 @@ public class AlignmentBasedDistance
 	public final double getCaseBasedV1SimilarityGeolifeData(ActivityObject activityObject1,
 			ActivityObject activityObject2, int userID)
 	{
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Inside getCaseBasedV1Similarity \n ActivityObject1:" + activityObject1.getActivityName()
 					+ "__" + activityObject1.getStartTimestamp() + "__" + activityObject1.getDurationInSeconds() + "__"
@@ -321,7 +322,7 @@ public class AlignmentBasedDistance
 	public final double getCaseBasedV1SimilarityDCUData(ActivityObject activityObject1, ActivityObject activityObject2,
 			int userID)
 	{
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Inside getCaseBasedV1Similarity \n ActivityObject1:" + activityObject1.getActivityName()
 					+ "__" + activityObject1.getStartTimestamp() + "__" + activityObject1.getDurationInSeconds()
@@ -506,7 +507,7 @@ public class AlignmentBasedDistance
 		{
 			simComponentVal = 1;
 		}
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println(componentName + "Similarity=" + simComponentVal + " for vals " + val1 + ", " + val2);
 		}
@@ -567,7 +568,7 @@ public class AlignmentBasedDistance
 			}
 		}
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
 					componentName + "Similarity=" + simComponentVal + " for geo locations apart by " + diffGeo);
@@ -839,7 +840,7 @@ public class AlignmentBasedDistance
 		double distBetweenCentroids = StatsUtils.haversine(centroid1.getFirst(), centroid1.getSecond(),
 				centroid2.getFirst(), centroid2.getSecond());
 
-		if (Constant.verbose || Constant.verboseLevenstein)
+		if (VerbosityConstants.verbose || VerbosityConstants.verboseLevenstein)
 		{
 			System.out.println("inside getWeightedLevenshteinDistanceRawValsForGeoCoordinates  for word1=" + word1
 					+ "  word2=" + word2 + " with insertWt=" + insertWt + " with deleteWt=" + deleteWt
@@ -885,7 +886,7 @@ public class AlignmentBasedDistance
 			for (int j = 0; j < len2; j++)
 			{
 				char c2 = word2.charAt(j);
-				if (Constant.verboseLevenstein)
+				if (VerbosityConstants.verboseLevenstein)
 				{
 					System.out.println("\nComparing " + c1 + " and " + c2);
 				} // if last two chars equal
@@ -894,7 +895,7 @@ public class AlignmentBasedDistance
 					// update dp value for +1 length
 					dp[i + 1][j + 1] = dp[i][j];
 					traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_N(" + (i + 1) + "-" + (j + 1) + ")");
-					if (Constant.verboseLevenstein)
+					if (VerbosityConstants.verboseLevenstein)
 					{
 						System.out.println("Equal" + " Trace " + traceMatrix[i + 1][j + 1]);// "_N(" + (i + 1) + "-" +
 																							// (j + 1) + ")");
@@ -908,7 +909,7 @@ public class AlignmentBasedDistance
 
 					double distBetweenPoints = StatsUtils.haversine(vals1[i].getFirst(), vals1[i].getSecond(),
 							vals2[j].getFirst(), vals2[j].getSecond());
-					if (Constant.verboseLevenstein)
+					if (VerbosityConstants.verboseLevenstein)
 					{
 						System.out.println("Difference of vals = " + distBetweenPoints + "kms");
 					}
@@ -924,7 +925,7 @@ public class AlignmentBasedDistance
 					double insert = dp[i + 1][j] + insertWt * distBetweenPoint2AndCentroid;// insertion --previous
 																							// column, i.e, cell on left
 
-					if (Constant.verboseLevenstein)
+					if (VerbosityConstants.verboseLevenstein)
 					{
 						System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
 					} // int min = replace > insert ? insert : replace;
@@ -936,7 +937,7 @@ public class AlignmentBasedDistance
 					{
 						traceMatrix[i + 1][j + 1].append(traceMatrix[i][j + 1] + "_D(" + (i + 1) + "-" + (j + 1) + ")");
 						min = delete;
-						if (Constant.verboseLevenstein)
+						if (VerbosityConstants.verboseLevenstein)
 						{
 							System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);// "
 																													// Trace
@@ -963,7 +964,7 @@ public class AlignmentBasedDistance
 					{
 						traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j] + "_I(" + (i + 1) + "-" + (j + 1) + ")");
 						min = insert;
-						if (Constant.verboseLevenstein)
+						if (VerbosityConstants.verboseLevenstein)
 						{
 							System.out.println("Insert is min:" + insert + " Trace " + traceMatrix[i + 1][j + 1]);// "
 																													// Trace
@@ -989,7 +990,7 @@ public class AlignmentBasedDistance
 					{
 						traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_S(" + (i + 1) + "-" + (j + 1) + ")");
 						min = replace;
-						if (Constant.verboseLevenstein)
+						if (VerbosityConstants.verboseLevenstein)
 						{
 							System.out.println("replace is min:" + replace + " Trace " + traceMatrix[i + 1][j + 1]);// "
 																													// Trace
@@ -1022,7 +1023,7 @@ public class AlignmentBasedDistance
 			}
 		}
 
-		if (Constant.verboseLevenstein)
+		if (VerbosityConstants.verboseLevenstein)
 		// iterate though, and check last char
 		{
 			System.out.println("  Trace Matrix: ");
@@ -1099,7 +1100,7 @@ public class AlignmentBasedDistance
 											// edit
 											// distance
 
-		if (Constant.verbose || Constant.verboseLevenstein)
+		if (VerbosityConstants.verbose || VerbosityConstants.verboseLevenstein)
 		{
 			System.out.println("inside getSimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2
 					+ " with insertWt=" + insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt
@@ -1143,7 +1144,7 @@ public class AlignmentBasedDistance
 			for (int j = 0; j < len2; j++)
 			{
 				char c2 = word2.charAt(j);
-				if (Constant.verboseLevenstein)
+				if (VerbosityConstants.verboseLevenstein)
 				{
 					System.out.println("\nComparing " + c1 + " and " + c2);
 				}
@@ -1153,7 +1154,7 @@ public class AlignmentBasedDistance
 					// update dp value for +1 length
 					dp[i + 1][j + 1] = dp[i][j];
 					traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_N(" + (i + 1) + "-" + (j + 1) + ")");
-					if (Constant.verboseLevenstein)
+					if (VerbosityConstants.verboseLevenstein)
 					{
 						System.out.println("Equal" + " Trace " + traceMatrix[i + 1][j + 1]);// "_N(" + (i + 1) + "-" +
 																							// (j + 1) + ")");
@@ -1167,7 +1168,7 @@ public class AlignmentBasedDistance
 																							// i.e, cell above
 					double insert = dp[i + 1][j] + insertWt * Math.abs(vals2[j] - median2);// insertion --previous
 																							// column, i.e, cell on left
-					if (Constant.verboseLevenstein)
+					if (VerbosityConstants.verboseLevenstein)
 					{
 						System.out.println("Difference of vals = " + Math.abs(vals1[i] - vals2[j]));//
 						System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
@@ -1180,7 +1181,7 @@ public class AlignmentBasedDistance
 					{
 						traceMatrix[i + 1][j + 1].append(traceMatrix[i][j + 1] + "_D(" + (i + 1) + "-" + (j + 1) + ")");
 						min = delete;
-						if (Constant.verboseLevenstein)
+						if (VerbosityConstants.verboseLevenstein)
 						{
 							System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);// "
 																													// Trace
@@ -1207,7 +1208,7 @@ public class AlignmentBasedDistance
 					{
 						traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j] + "_I(" + (i + 1) + "-" + (j + 1) + ")");
 						min = insert;
-						if (Constant.verboseLevenstein)
+						if (VerbosityConstants.verboseLevenstein)
 						{
 							System.out.println("Insert is min:" + insert + " Trace " + traceMatrix[i + 1][j + 1]);// "
 																													// Trace
@@ -1233,7 +1234,7 @@ public class AlignmentBasedDistance
 					{
 						traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_S(" + (i + 1) + "-" + (j + 1) + ")");
 						min = replace;
-						if (Constant.verboseLevenstein)
+						if (VerbosityConstants.verboseLevenstein)
 						{
 							System.out.println("replace is min:" + replace + " Trace " + traceMatrix[i + 1][j + 1]);// "
 																													// Trace
@@ -1266,7 +1267,7 @@ public class AlignmentBasedDistance
 			}
 		}
 
-		if (Constant.verboseLevenstein)
+		if (VerbosityConstants.verboseLevenstein)
 		// iterate though, and check last char
 		{
 			System.out.println("  Trace Matrix: ");
@@ -1465,7 +1466,7 @@ public class AlignmentBasedDistance
 	public Pair<String, Double> getMySimpleLevenshteinDistance(String word1, String word2, int insertWt, int deleteWt,
 			int replaceWt)
 	{
-		if (Constant.verboseLevenstein)// Constant.verbose ||
+		if (VerbosityConstants.verboseLevenstein)// Constant.verbose ||
 		{
 			System.out.println("inside getMySimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2
 					+ " with insertWt=" + insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt);
@@ -1563,7 +1564,7 @@ public class AlignmentBasedDistance
 			}
 		}
 
-		if (Constant.verboseLevenstein)
+		if (VerbosityConstants.verboseLevenstein)
 		// iterate though, and check last char
 		{
 			System.out.println("  Trace Matrix: ");
@@ -1613,7 +1614,7 @@ public class AlignmentBasedDistance
 	public static double getMySimpleLevenshteinDistanceWithoutTrace(String word1, String word2, int insertWt,
 			int deleteWt, int replaceWt)
 	{
-		if (Constant.verbose || Constant.verboseLevenstein)
+		if (VerbosityConstants.verbose || VerbosityConstants.verboseLevenstein)
 		{
 			System.out.println("inside getMySimpleLevenshteinDistanceWithoutTrace  for word1=" + word1 + "  word2="
 					+ word2 + " with insertWt=" + insertWt + " with deleteWt=" + deleteWt + " with replaceWt="
@@ -1714,7 +1715,7 @@ public class AlignmentBasedDistance
 			}
 		}
 
-		if (Constant.verboseLevenstein)
+		if (VerbosityConstants.verboseLevenstein)
 		// iterate though, and check last char
 		{
 			// System.out.println(" Trace Matrix: ");

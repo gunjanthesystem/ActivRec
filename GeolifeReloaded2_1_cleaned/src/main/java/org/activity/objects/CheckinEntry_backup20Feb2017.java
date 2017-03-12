@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import org.activity.util.StatsUtils;
+import org.activity.stats.StatsUtils;
 
 /**
  * For storing checkin entries for Gowalla dataset

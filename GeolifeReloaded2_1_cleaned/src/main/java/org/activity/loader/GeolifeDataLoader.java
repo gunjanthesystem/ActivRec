@@ -15,14 +15,14 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.activity.constants.Constant;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.TrajectoryEntry;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 

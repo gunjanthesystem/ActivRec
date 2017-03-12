@@ -2,12 +2,21 @@ package org.activity.util;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author gunjan
+ *
+ */
 public class HTMLStrings
 {
+	/**
+	 * 
+	 * @param attributeName
+	 * @param dimensionName
+	 * @return
+	 */
 	public static String getHTMLOptionValueVarchar(String attributeName /* varcharColumnName */,
-			String dimensionName /* String dataTableName */) // like
-																// varcharColumnName
-																// = user_name
+			String dimensionName /* String dataTableName */) // like varcharColumnName = user_name
 	{
 		String htmlString = "";
 		try

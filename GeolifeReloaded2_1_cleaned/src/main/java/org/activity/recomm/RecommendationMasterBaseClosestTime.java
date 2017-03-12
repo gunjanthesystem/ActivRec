@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.evaluation.Evaluation;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.util.ComparatorUtils;
-import org.activity.util.Constant;
 import org.activity.util.TimelineUtils;
 
 /**
@@ -128,7 +129,7 @@ public class RecommendationMasterBaseClosestTime
 		}
 
 		System.out.println("The Activities on the recomm day are:");
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			userDayTimelineAtRecomm.printActivityObjectNamesWithTimestampsInSequence();
 			System.out.println();
@@ -181,7 +182,7 @@ public class RecommendationMasterBaseClosestTime
 				.sortByValueAscending5(startTimeDistanceUnsortedMap);
 
 		System.out.println("---------startTimeDistanceSortedMap.size()=" + startTimeDistanceSortedMap.size());
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
 					">>>>>>>>>>>>>>startTimeDistanceSortedMap is:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n Date, Index of nearest, name of nearest, dist of nearest");

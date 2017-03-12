@@ -10,6 +10,7 @@ import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.activity.constants.Constant;
 import org.activity.objects.FlatActivityLogEntry;
 import org.json.JSONArray;
 

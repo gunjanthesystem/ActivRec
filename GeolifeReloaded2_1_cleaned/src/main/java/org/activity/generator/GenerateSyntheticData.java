@@ -3,12 +3,12 @@ package org.activity.generator;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import org.activity.constants.Constant;
 import org.activity.io.Serializer;
 import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.LocationObject;
+import org.activity.stats.StatsUtils;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 
 /**
  * The was used in intial phase of the project to generate synthetic timelines

@@ -12,12 +12,12 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import org.activity.constants.Constant;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.StayPointsAllDataContainer;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
-import org.activity.util.Constant;
 import org.activity.util.UtilityBelt;
 
 /**

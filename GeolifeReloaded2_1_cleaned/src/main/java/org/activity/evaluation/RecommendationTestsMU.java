@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
@@ -25,10 +27,8 @@ import org.activity.recomm.RecommendationMasterMU;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
-import org.activity.util.UtilityBelt;
 
 /**
  * Executes the experiments for generating recommendations
@@ -157,7 +157,7 @@ public class RecommendationTestsMU
 						// + LocalDateTime.now().getDayOfMonth();
 
 						// Creating the directory for that matching unit
-						boolean dir = UtilityBelt
+						boolean dir = WritingToFile
 								.createDirectory(commonPath + "/MatchingUnit" + String.valueOf(matchingUnit));
 						if (!dir)
 						{
@@ -516,7 +516,7 @@ public class RecommendationTestsMU
 													+ " candidate timelines for matching unit " + matchingUnit);
 									System.out.println("\tIterating over candidate timelines:");
 
-									if (Constant.WriteNumActsPerRTPerCand)
+									if (VerbosityConstants.WriteNumActsPerRTPerCand)
 									{
 										StringBuilder tmpWriter = new StringBuilder();
 										for (Map.Entry<Integer, TimelineWithNext> entryAjooba : candidateTimelines
@@ -711,7 +711,7 @@ public class RecommendationTestsMU
 									LinkedHashMap<Integer, Pair<String, Double>> editDistancesSortedMapFullCand = recommP1
 											.getEditDistancesSortedMapFullCand();
 
-									if (Constant.WriteRecommendationTimesWithEditDistance)
+									if (VerbosityConstants.WriteRecommendationTimesWithEditDistance)
 									{
 										StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
 

@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
+import org.activity.io.CSVUtils;
 import org.activity.io.WritingToFile;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
-import org.activity.util.CSVUtils;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -125,7 +126,7 @@ public class EvaluationPostExperiment
 
 				String currentRRLine, currentIfCurrTargetSameLine;
 
-				if (Constant.verboseEvaluationMetricsToConsole)
+				if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 				{
 					System.out.println("Calculating MRRCTD for user:" + user);
 					System.out.println(
@@ -158,7 +159,7 @@ public class EvaluationPostExperiment
 											+ ifCurrTargetSameValuesForThisUser.length + ")");
 						}
 
-						if (Constant.verboseEvaluationMetricsToConsole)
+						if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 						{
 							System.out.println("current rrValues line read=" + currentRRLine + " trimmed length="
 									+ currentRRLine.trim().length());

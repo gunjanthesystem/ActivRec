@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.activity.objects.Pair;
-import org.activity.util.weka.WekaUtilityBelt;
 
 /**
  * Splits the set of users into training and test set based on the class label (based on best matching-unit) assigned to

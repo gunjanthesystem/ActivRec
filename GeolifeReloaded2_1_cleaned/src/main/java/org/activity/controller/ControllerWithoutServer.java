@@ -13,6 +13,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.activity.constants.Constant;
 import org.activity.evaluation.RecommendationTestsDayWise2FasterJan2016;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
@@ -25,7 +26,6 @@ import org.activity.objects.UserDayTimeline;
 import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.Constant;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
@@ -38,10 +38,6 @@ import org.activity.util.UtilityBelt;
  */
 public class ControllerWithoutServer
 {
-	// **** Parameters to set **** DO NOT CHANGE ****//
-	// static final boolean toSerializeJSONArray = true, toDeSerializeJSONArray = true, toCreateTimelines = true,
-	// toSerializeTimelines = true, toDeSerializeTimelines = true;
-
 	public ControllerWithoutServer()
 	{
 		try
@@ -61,14 +57,16 @@ public class ControllerWithoutServer
 				pathForLatestSerialisedJSONArray = "" + currentDateTime.getMonth().toString().substring(0, 3)
 						+ currentDateTime.getDayOfMonth() + "obj";
 
-				pathToLatestSerialisedTimelines = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelinesNOV30.kryo";
+				pathToLatestSerialisedTimelines = null;
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelinesNOV30.kryo";
 				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines.kryo";
 				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";//
 				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";
 
-				pathForLatestSerialisedTimelines = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines"
-						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
-						+ ".kryo";
+				pathForLatestSerialisedTimelines = null;
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines"
+				// + currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+				// + ".kryo";
 
 				commonPath = Constant.outputCoreResultsPath;
 				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/";

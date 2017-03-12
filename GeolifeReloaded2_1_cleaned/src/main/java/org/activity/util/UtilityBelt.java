@@ -1,7 +1,6 @@
 package org.activity.util;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -18,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.activity.constants.Constant;
 import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.ActivityObject;
@@ -56,14 +56,6 @@ public class UtilityBelt
 		Double[] vals2 = vals.toArray(new Double[vals.size()]);
 		double[] vals3 = ArrayUtils.toPrimitive(vals2);
 		return vals3;
-	}
-
-	public static double getValByRowCol(String filePath, int rowIndex, int colIndex, boolean hasColHeader)
-	{
-		List<Double> vals = ReadingFromFile.oneColumnReaderDouble(filePath, ",", colIndex, hasColHeader);
-		Double[] vals2 = vals.toArray(new Double[vals.size()]);
-		double[] vals3 = ArrayUtils.toPrimitive(vals2);
-		return vals3[rowIndex];
 	}
 
 	/**
@@ -170,27 +162,6 @@ public class UtilityBelt
 	//
 	// }
 
-	public static boolean isDirectoryEmpty(String path)
-	{
-		boolean isEmpty = false;
-
-		File file = new File(path);
-
-		if (file.isDirectory())
-		{
-			if (file.list().length == 0)
-			{
-				isEmpty = true;
-			}
-		}
-		else
-		{
-			System.err.println("Error in isDirectoryEmpty: " + path + " is not a directory");
-		}
-
-		return isEmpty;
-	}
-
 	/**
 	 * 
 	 * @param array
@@ -212,44 +183,6 @@ public class UtilityBelt
 		for (int i = 0; i < array.size(); i++)
 		{
 			result[i] = array.get(i).doubleValue();
-		}
-		return result;
-	}
-
-	/**
-	 * Creates a directory if it does not already exist
-	 * 
-	 * @param pathname
-	 * @return
-	 */
-	public static boolean createDirectory(String pathname)
-	{
-		boolean result = false;
-
-		File directory = new File(pathname);
-
-		// if the directory does not exist, create it
-		if (!directory.exists())
-		{
-			System.out.println("creating directory: " + directory);
-			try
-			{
-				directory.mkdir();
-				result = true;
-			}
-			catch (SecurityException se)
-			{
-				System.err.println("Error: cannot create  directory " + directory);
-				se.printStackTrace();
-			}
-			if (result)
-			{
-				System.out.println(pathname + " directory created");
-			}
-		}
-		else
-		{
-			System.out.println("Cannot create  directory " + directory + " as it already exists");
 		}
 		return result;
 	}

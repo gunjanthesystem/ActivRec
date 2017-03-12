@@ -1,6 +1,6 @@
 package org.activity.clustering.weka;
 
-import org.activity.util.weka.CSV2Arff;
+import org.activity.io.CSV2Arff;
 
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;

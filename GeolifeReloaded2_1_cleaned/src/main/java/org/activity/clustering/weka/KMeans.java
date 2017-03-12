@@ -3,7 +3,6 @@ package org.activity.clustering.weka;
 import java.time.LocalDateTime;
 
 import org.activity.io.WritingToFile;
-import org.activity.util.weka.WekaUtilityBelt;
 
 import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.SimpleKMeans;

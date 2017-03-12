@@ -7,19 +7,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activity.clustering.weka.WekaUtilityBelt;
+import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
+import org.activity.stats.StatsUtils;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
-import org.activity.util.weka.WekaUtilityBelt;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
@@ -640,7 +640,7 @@ public class TimelinesAttributesExtraction
 			String userIDN = entry.getKey();
 			// System.out.println(" m =" + m);
 
-			double sampen = UtilityBelt.getValByRowCol(Constant.getCommonPath() + userIDN + featureName + "SampEn.csv",
+			double sampen = ReadingFromFile.getValByRowCol(Constant.getCommonPath() + userIDN + featureName + "SampEn.csv",
 					m - 1, 1, false);
 
 			// System.out.println(" putting " + userIDN + " , " + sampen);
@@ -673,7 +673,7 @@ public class TimelinesAttributesExtraction
 		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey();
-			double sampen = UtilityBelt.getValByRowCol(Constant.getCommonPath() + userIDN + aggName + "SampEn.csv",
+			double sampen = ReadingFromFile.getValByRowCol(Constant.getCommonPath() + userIDN + aggName + "SampEn.csv",
 					m - 1, 1, false);
 			res.put(userIDN, sampen);
 		}
@@ -703,7 +703,7 @@ public class TimelinesAttributesExtraction
 			String userIDN = entry.getKey();
 			// System.out.println(" parameterIndex =" + parameterIndex);
 
-			double hjParam = UtilityBelt.getValByRowCol(
+			double hjParam = ReadingFromFile.getValByRowCol(
 					Constant.getCommonPath() + userIDN + featureName + "HjorthParams.csv", parameterIndex, 1, false);
 			// System.out.println(" putting " + userIDN + " , " + UtilityBelt.round(hjParam, 5));
 			res.put(userIDN, StatsUtils.round(hjParam, 5));

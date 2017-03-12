@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.FeatureWiseEditDistance;
 import org.activity.distances.FeatureWiseWeightedEditDistance;
@@ -22,10 +24,9 @@ import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
@@ -446,7 +447,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 		System.out.println("---------editDistancesSortedMapFullCand.size()=" + editDistancesSortedMapFullCand.size());
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -743,7 +744,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		topRankedActivityNamesWithScore = getRankedRecommendedActivityNamesWithRankScores();
 		topRankedActivityNamesWithoutScore = getRankedRecommendedActivityNamesWithoutRankScores();
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
 					"Debug inside createRankedTopRecommendedActivityObjects: topRankedActivityNamesWithScore=  "
@@ -860,7 +861,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		topRankedActivityNamesWithScore = getRankedRecommendedActivityNamesWithRankScores();
 		topRankedActivityNamesWithoutScore = getRankedRecommendedActivityNamesWithoutRankScores();
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
 					"Debug inside createRankedTopRecommendedActivityObjects: topRankedActivityNamesWithScore=  "
@@ -1078,7 +1079,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 			double normEditDistanceVal = minMaxNorm(editDistanceVal, maxEditDistanceVal, minEditDistanceVal);
 
-			if (Constant.WriteNormalisation)
+			if (VerbosityConstants.WriteNormalisation)
 			{
 				editDistances.append("_" + editDistanceVal);
 				normalisedEditDistances.append("_" + normEditDistanceVal);
@@ -1135,7 +1136,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		topRankedActivityNamesWithScore = getRankedRecommendedActivityNamesWithRankScores();
 		topRankedActivityNamesWithoutScore = getRankedRecommendedActivityNamesWithoutRankScores();
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
 					"Debug inside createRankedTopRecommendedActivityObjects: topRankedActivityNamesWithScore=  "
@@ -1145,7 +1146,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 							+ topRankedActivityNamesWithoutScore);
 		}
 
-		if (Constant.WriteNormalisation)
+		if (VerbosityConstants.WriteNormalisation)
 		{
 			String toWrite = userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + editDistances + ","
 					+ normalisedEditDistances + "\n";
@@ -1219,7 +1220,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 			}
 		}
 
-		if (Constant.verboseRankScoreCalcToConsole)
+		if (VerbosityConstants.verboseRankScoreCalcToConsole)
 		{
 			System.out.println(rankScoreCalc.toString());
 		}
@@ -1240,7 +1241,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		topRankedActivityNamesWithScore = getRankedRecommendedActivityNamesWithRankScores();
 		topRankedActivityNamesWithoutScore = getRankedRecommendedActivityNamesWithoutRankScores();
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
 					"Debug inside createRankedTopRecommendedActivityObjects: topRankedActivityNamesWithScore=  "
@@ -1316,7 +1317,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 		this.rankedRecommendedActivityNameWithRankScores = topRankedString.toString();
 
-		if (Constant.verboseRankScoreCalcToConsole)
+		if (VerbosityConstants.verboseRankScoreCalcToConsole)
 		{
 			System.out.println(msg.toString() + "\n");
 		}
@@ -1989,7 +1990,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		LinkedHashMap<Integer, Pair<String, Double>> aggregatedNormalisedCandEditDistances = aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(
 				normalisedCandEditDistances);
 
-		if (Constant.verboseNormalisation)
+		if (VerbosityConstants.verboseNormalisation)
 		{
 			traverseLLP(normalisedCandEditDistances, " Normalised Feature wise Edit Distances");
 			traverseLP(aggregatedNormalisedCandEditDistances, "Aggregated Normalised  Feature wise Edit Distances");
@@ -2034,7 +2035,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		LinkedHashMap<Integer, Pair<String, Double>> aggregatedNormalisedCandEditDistances = aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(
 				normalisedCandEditDistances);
 
-		if (Constant.verboseNormalisation)
+		if (VerbosityConstants.verboseNormalisation)
 		{
 			traverseLLP(normalisedCandEditDistances, " Normalised Weighted Edit Distances");
 			traverseLP(aggregatedNormalisedCandEditDistances, "Aggregated Normalised Weighted Edit Distances");
@@ -2116,7 +2117,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 			{
 				String featureName = distEntry.getKey();
 				double distanceValue = distEntry.getValue().getSecond();
-				if (Constant.verboseNormalisation)
+				if (VerbosityConstants.verboseNormalisation)
 					System.out.println("reading:" + featureName + "  distance:" + distanceValue);
 
 				if (distanceValue > maxs[featureIndex])
@@ -2147,7 +2148,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 			}
 		}
 		System.out.print("Before normalisation:\n");
-		if (Constant.verboseNormalisation)
+		if (VerbosityConstants.verboseNormalisation)
 		{
 			for (Map.Entry<Integer, LinkedHashMap<String, Pair<String, Double>>> entry : setOfFeatureWiseDistances
 					.entrySet()) // iterating over cands
@@ -2267,7 +2268,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 			// Integer candTimelineID = distEntry.getKey();
 			Double editDistanceVal = distEntry.getValue().getSecond();
 
-			if (Constant.WriteNormalisation)
+			if (VerbosityConstants.WriteNormalisation)
 			{
 				editDistances.append("_" + editDistanceVal);
 				editDistancesList.add(editDistanceVal);
@@ -2298,7 +2299,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		{
 			Double normalisedEditDistanceVal = Double.valueOf(minMaxNorm(distEntry.getValue().getSecond(), max, min));
 
-			if (Constant.WriteNormalisation)
+			if (VerbosityConstants.WriteNormalisation)
 			{
 				normalisedEditDistances.append("_" + normalisedEditDistanceVal);
 				normalisedEditDistancesList.add(normalisedEditDistanceVal);
@@ -2307,7 +2308,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 					new Pair<String, Double>(distEntry.getValue().getFirst(), normalisedEditDistanceVal));
 		}
 
-		if (Constant.WriteNormalisation && !Constant.WriteNormalisationsSeparateLines)
+		if (VerbosityConstants.WriteNormalisation && !VerbosityConstants.WriteNormalisationsSeparateLines)
 		{
 			Collections.sort(normalisedEditDistancesList);
 			Collections.sort(editDistancesList);
@@ -2316,7 +2317,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 			WritingToFile.appendLineToFileAbsolute(toWrite, Constant.getCommonPath() + "NormalisationDistances.csv");
 		}
 
-		if (Constant.WriteNormalisationsSeparateLines)
+		if (VerbosityConstants.WriteNormalisationsSeparateLines)
 		{
 			Collections.sort(normalisedEditDistancesList);
 			Collections.sort(editDistancesList);

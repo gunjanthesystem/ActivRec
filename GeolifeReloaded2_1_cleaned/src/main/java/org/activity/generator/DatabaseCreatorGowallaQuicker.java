@@ -26,13 +26,13 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.activity.constants.Constant;
 import org.activity.io.WritingToFile;
 import org.activity.objects.LabelEntry;
 import org.activity.objects.Pair;
 import org.activity.objects.TrajectoryEntry;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
-import org.activity.util.Constant;
-import org.activity.util.StatsUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 import org.json.JSONObject;

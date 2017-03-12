@@ -12,11 +12,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.activity.constants.Constant;
 import org.activity.io.WritingToFile;
 import org.activity.objects.DataEntry;
 import org.activity.objects.Pair;
 import org.activity.objects.TrackListenEntry;
-import org.activity.util.Constant;
 import org.activity.util.UtilityBelt;
 
 public abstract class DatabaseCreator

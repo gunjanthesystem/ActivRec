@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
-import org.activity.util.Constant;
 
 /**
  * 
@@ -65,12 +65,12 @@ public class OTMDSAM2 extends AlignmentBasedDistance
 		ArrayList<Pair<Integer, String>> insertions = new ArrayList<Pair<Integer, String>>();
 		ArrayList<Pair<Integer, String>> deletions = new ArrayList<Pair<Integer, String>>();
 		ArrayList<Triple<Integer, Integer, String>> replacements = new ArrayList<Triple<Integer, Integer, String>>();
-		if (Constant.verboseOTMDSAM) System.out.println("Inside getAllEditOperations");
+		if (VerbosityConstants.verboseOTMDSAM) System.out.println("Inside getAllEditOperations");
 
 		for (Map.Entry<String, Pair<String, Double>> entry : pairs.entrySet())
 		{
 			String featureName = entry.getKey();
-			if (Constant.verboseOTMDSAM)
+			if (VerbosityConstants.verboseOTMDSAM)
 			{
 				System.out.println("\tFeature: " + entry.getKey());
 				System.out.println("\tLevenshtein distance: " + entry.getValue().getSecond());
@@ -113,7 +113,7 @@ public class OTMDSAM2 extends AlignmentBasedDistance
 			}
 		}
 
-		if (Constant.verboseOTMDSAM)
+		if (VerbosityConstants.verboseOTMDSAM)
 		{
 			printAllEditOperations(insertions, deletions, replacements);
 		}
@@ -123,7 +123,7 @@ public class OTMDSAM2 extends AlignmentBasedDistance
 		all.add(deletions);
 		all.add(replacements);
 
-		if (Constant.verboseOTMDSAM) System.out.println("exiting getAllEditOperations");
+		if (VerbosityConstants.verboseOTMDSAM) System.out.println("exiting getAllEditOperations");
 
 		return all;
 	}

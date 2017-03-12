@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.activity.ui.PopUps;
-import org.activity.util.CSVUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class ReadingFromFile
 {
@@ -297,5 +297,13 @@ public class ReadingFromFile
 		}
 
 		return res;
+	}
+
+	public static double getValByRowCol(String filePath, int rowIndex, int colIndex, boolean hasColHeader)
+	{
+		List<Double> vals = oneColumnReaderDouble(filePath, ",", colIndex, hasColHeader);
+		Double[] vals2 = vals.toArray(new Double[vals.size()]);
+		double[] vals3 = ArrayUtils.toPrimitive(vals2);
+		return vals3[rowIndex];
 	}
 }

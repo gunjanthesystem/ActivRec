@@ -2,12 +2,12 @@ package org.activity.distances;
 
 import java.util.ArrayList;
 
+import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
-import org.activity.util.Constant;
+import org.activity.stats.StatsUtils;
 import org.activity.util.RegexUtils;
-import org.activity.util.StatsUtils;
 
 /**
  * Note: this has been modified for Geolife data set to account for the additional attributes from geolocation
@@ -138,7 +138,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
 			String timeAtRecomm, long candidateTimelineId)
 	{
-		if (Constant.verboseDistance)
+		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("calc HJeditDist between " + activityObjects1Original.size() + " & "
 					+ activityObjects2Original.size() + " objs");
@@ -158,7 +158,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// $$ levenshteinDistance.getFirst().split("_");
 		// "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
 
-		if (Constant.verboseDistance)
+		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("Trace =" + levenshteinDistance.getFirst() + "  simpleLevenshteinDistance112="
 					+ levenshteinDistance.getSecond());
@@ -211,14 +211,14 @@ public class HJEditDistance extends AlignmentBasedDistance
 		dAct = StatsUtils.round(dAct, 4);
 		dFeat = StatsUtils.round(dFeat, 4);
 
-		if (Constant.verboseDistance)
+		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("HJ dist=" + dAct + " + " + dFeat);
 		}
 
 		distanceTotal = dAct + dFeat;
 
-		if (Constant.WriteEditSimilarityCalculations)
+		if (VerbosityConstants.WriteEditSimilarityCalculations)
 		{
 			// System.out.println("passing Activity Objects of sizes: " + activityObjects1.size() + " " +
 			// activityObjects2.size());

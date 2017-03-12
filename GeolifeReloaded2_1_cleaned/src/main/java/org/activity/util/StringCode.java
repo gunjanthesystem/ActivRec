@@ -2,7 +2,11 @@ package org.activity.util;
 
 import java.util.ArrayList;
 
+import org.activity.constants.Constant;
+import org.activity.constants.SaxConstants;
+import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
+import org.activity.stats.HilbertCurveUtils;
 import org.activity.ui.PopUps;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -177,7 +181,7 @@ public class StringCode
 	 */
 	public static String getStringCodeForStartTime(ArrayList<ActivityObject> actObjs)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForStartTime");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForStartTime");
 
 		String resultant = new String();
 
@@ -190,12 +194,12 @@ public class StringCode
 																								// minutes
 			stamps[i] = actObjs.get(i).getStartTimestamp().getTime();
 
-			if (Constant.verboseSAX) System.out.print(vals[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals[i] + " ");
 		}
 
 		try
 		{
-			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXStartTimeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXStartTimeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
 																												// SAXFactory.ts2string(ts,
 																												// actObjs.size(),
 																												// new
@@ -213,7 +217,7 @@ public class StringCode
 			System.err.println("Error in getStringCodeForStartTime(): no resultant SAX ");
 		}
 
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + resultant);
 		}
@@ -228,7 +232,7 @@ public class StringCode
 	public static String[] getStringCodesForStartTime(ArrayList<ActivityObject> actObjs1,
 			ArrayList<ActivityObject> actObjs2)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForStartTime");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForStartTime");
 
 		String finalResultant[] = new String[2];
 
@@ -239,9 +243,9 @@ public class StringCode
 			vals1[i] = DateTimeUtils.getTimeInDayInSeconds(actObjs1.get(i).getStartTimestamp()); // should i convert it
 																									// to minutes
 			stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals1[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals1[i] + " ");
 		}
-		if (Constant.verboseSAX) System.out.println();
+		if (VerbosityConstants.verboseSAX) System.out.println();
 
 		double vals2[] = new double[actObjs2.size()];
 		long stamps2[] = new long[actObjs2.size()];
@@ -250,7 +254,7 @@ public class StringCode
 			vals2[i] = DateTimeUtils.getTimeInDayInSeconds(actObjs2.get(i).getStartTimestamp()); // should i convert it
 																									// to minutes
 			stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals2[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals2[i] + " ");
 		}
 
 		double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -258,7 +262,7 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXStartTimeAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, SaxConstants.SAXStartTimeAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -273,7 +277,7 @@ public class StringCode
 			System.err.println("Error in getStringCodeForStartTime(): no resultant SAX ");
 		}
 
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + finalResultant[0] + " &  " + finalResultant[1]);
 		}
@@ -282,7 +286,7 @@ public class StringCode
 
 	public static String getStringCodeForDuration(ArrayList<ActivityObject> actObjs)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForDuration");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDuration");
 
 		String resultant = new String();
 
@@ -294,12 +298,12 @@ public class StringCode
 			vals[i] = actObjs.get(i).getDurationInSeconds(); // should i convert it to minutes
 			stamps[i] = actObjs.get(i).getStartTimestamp().getTime();
 
-			if (Constant.verboseSAX) System.out.print(vals[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals[i] + " ");
 		}
 
 		try
 		{
-			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXDurationAlphabsetSize);// SAXFactory.ts2string(ts,
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXDurationAlphabsetSize);// SAXFactory.ts2string(ts,
 																												// actObjs.size(),
 																												// new
 			// NormalAlphabet(), 10);
@@ -315,7 +319,7 @@ public class StringCode
 		{
 			System.err.println("Error in getStringCodeForDuration(): no resultant SAX ");
 		}
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + resultant);
 		}
@@ -332,7 +336,7 @@ public class StringCode
 	public static String[] getStringCodesForDuration(ArrayList<ActivityObject> actObjs1,
 			ArrayList<ActivityObject> actObjs2)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForDuration");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDuration");
 
 		String finalResultant[] = new String[2];
 
@@ -344,9 +348,9 @@ public class StringCode
 			vals1[i] = actObjs1.get(i).getDurationInSeconds(); // should i convert it to minutes
 			stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
 
-			if (Constant.verboseSAX) System.out.print(vals1[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals1[i] + " ");
 		}
-		if (Constant.verboseSAX) System.out.println();
+		if (VerbosityConstants.verboseSAX) System.out.println();
 
 		double vals2[] = new double[actObjs2.size()];
 		long stamps2[] = new long[actObjs2.size()];
@@ -354,7 +358,7 @@ public class StringCode
 		{
 			vals2[i] = actObjs2.get(i).getDurationInSeconds(); // should i convert it to minutes
 			stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals2[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals2[i] + " ");
 		}
 
 		double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -363,7 +367,7 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, Constant.SAXDurationAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, SaxConstants.SAXDurationAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -378,7 +382,7 @@ public class StringCode
 			System.err.println("Error in getStringCodeForDuration(): no resultant SAX ");
 		}
 
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + finalResultant[0] + " &  " + finalResultant[1]);
 		}
@@ -387,7 +391,7 @@ public class StringCode
 
 	public static String getStringCodeForDistanceTravelled(ArrayList<ActivityObject> actObjs)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForDistanceTravelled");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDistanceTravelled");
 		String resultant = new String();
 
 		double vals[] = new double[actObjs.size()];
@@ -397,12 +401,12 @@ public class StringCode
 		{
 			vals[i] = actObjs.get(i).getDistanceTravelled();
 			stamps[i] = actObjs.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals[i] + " ");
 		}
 
 		try
 		{
-			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
 																														// actObjs.size(),
 			// new
 			// NormalAlphabet(), 10);
@@ -418,7 +422,7 @@ public class StringCode
 		{
 			System.err.println("Error in getStringCodeForDistanceTravelled(): no resultant SAX ");
 		}
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + resultant);
 		}
@@ -435,7 +439,7 @@ public class StringCode
 	public static String[] getStringCodesForDistanceTravelled(ArrayList<ActivityObject> actObjs1,
 			ArrayList<ActivityObject> actObjs2)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForDistanceTravelled");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDistanceTravelled");
 		String finalResultant[] = new String[2];
 
 		double vals1[] = new double[actObjs1.size()];
@@ -445,10 +449,10 @@ public class StringCode
 		{
 			vals1[i] = actObjs1.get(i).getDistanceTravelled();
 			stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals1[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals1[i] + " ");
 		}
 
-		if (Constant.verboseSAX) System.out.println();
+		if (VerbosityConstants.verboseSAX) System.out.println();
 
 		double vals2[] = new double[actObjs2.size()];
 		long stamps2[] = new long[actObjs2.size()];
@@ -456,7 +460,7 @@ public class StringCode
 		{
 			vals2[i] = actObjs2.get(i).getDistanceTravelled();
 			stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals2[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals2[i] + " ");
 		}
 
 		double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -466,7 +470,7 @@ public class StringCode
 		try
 		{
 			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
-					Constant.SAXDistanceTravelledAlphabsetSize);
+					SaxConstants.SAXDistanceTravelledAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -481,7 +485,7 @@ public class StringCode
 			System.err.println("Error in getStringCodesForDistanceTravelled(): no resultant SAX ");
 		}
 
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + finalResultant[0] + " &  " + finalResultant[1]);
 		}
@@ -490,7 +494,7 @@ public class StringCode
 
 	public static String getStringCodeForAvgAltitudes(ArrayList<ActivityObject> actObjs)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForAvgAltitudes");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForAvgAltitudes");
 		String resultant = new String();
 
 		double vals[] = new double[actObjs.size()];
@@ -500,12 +504,12 @@ public class StringCode
 		{
 			vals[i] = Double.parseDouble(actObjs.get(i).getAvgAltitude());
 			stamps[i] = actObjs.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals[i] + " ");
 		}
 
 		try
 		{
-			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), Constant.SAXAvgAltitudeAlphabsetSize);// SAXFactory.ts2string(ts,
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXAvgAltitudeAlphabsetSize);// SAXFactory.ts2string(ts,
 																													// actObjs.size(),
 																													// new
 			// NormalAlphabet(), 10);
@@ -521,7 +525,7 @@ public class StringCode
 		{
 			System.err.println("Error in getStringCodeForAvgAltitude(): no resultant SAX ");
 		}
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + resultant);
 		}
@@ -538,7 +542,7 @@ public class StringCode
 	public static String[] getStringCodesForAvgAltitudes(ArrayList<ActivityObject> actObjs1,
 			ArrayList<ActivityObject> actObjs2)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodeForAvgAltitudes");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForAvgAltitudes");
 
 		String finalResultant[] = new String[2];
 
@@ -549,10 +553,10 @@ public class StringCode
 		{
 			vals1[i] = Double.parseDouble(actObjs1.get(i).getAvgAltitude());
 			stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals1[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals1[i] + " ");
 		}
 
-		if (Constant.verboseSAX) System.out.println();
+		if (VerbosityConstants.verboseSAX) System.out.println();
 
 		double vals2[] = new double[actObjs2.size()];
 		long stamps2[] = new long[actObjs2.size()];
@@ -560,7 +564,7 @@ public class StringCode
 		{
 			vals2[i] = Double.parseDouble(actObjs2.get(i).getAvgAltitude());
 			stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
-			if (Constant.verboseSAX) System.out.print(vals2[i] + " ");
+			if (VerbosityConstants.verboseSAX) System.out.print(vals2[i] + " ");
 		}
 
 		double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -570,7 +574,7 @@ public class StringCode
 		try
 		{
 			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
-					Constant.SAXAvgAltitudeAlphabsetSize);
+					SaxConstants.SAXAvgAltitudeAlphabsetSize);
 
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
@@ -586,7 +590,7 @@ public class StringCode
 			System.err.println("Error in getStringCodesForAvgAltitudes(): no resultant SAX ");
 		}
 
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + finalResultant[0] + " &  " + finalResultant[1]);
 		}
@@ -605,7 +609,7 @@ public class StringCode
 	public static String[] getStringCodesForStartGeoCoordinates(ArrayList<ActivityObject> actObjs1,
 			ArrayList<ActivityObject> actObjs2)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodesForGeoCoordinates");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodesForGeoCoordinates");
 
 		String finalResultant[] = new String[2];
 
@@ -624,16 +628,16 @@ public class StringCode
 
 				vals1[i] = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
 				stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
-				if (Constant.verboseHilbert)
+				if (VerbosityConstants.verboseHilbert)
 				{
 					System.out.println("lat:" + latitude1 + " lon:" + longitude1 + "->latL:" + latitude1AsLong
 							+ ", lonL:" + longitude1AsLong + "  HSFC ind:" + vals1[i]);
 				}
 
-				if (Constant.verboseSAX && !Constant.verboseHilbert) System.out.print(vals1[i] + " ");
+				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert) System.out.print(vals1[i] + " ");
 			}
 
-			if (Constant.verboseSAX) System.out.println();
+			if (VerbosityConstants.verboseSAX) System.out.println();
 
 			double vals2[] = new double[actObjs2.size()];
 			long stamps2[] = new long[actObjs2.size()];
@@ -648,13 +652,13 @@ public class StringCode
 
 				vals2[i] = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude2AsLong, longitude2AsLong);
 				stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
-				if (Constant.verboseHilbert)
+				if (VerbosityConstants.verboseHilbert)
 				{
 					System.out.println("lat:" + latitude2 + " lon:" + longitude2 + "->latL:" + latitude2AsLong
 							+ ", lonL:" + longitude2AsLong + "  HSFC ind:" + vals2[i]);
 				}
 
-				if (Constant.verboseSAX && !Constant.verboseHilbert) System.out.print(vals2[i] + " ");
+				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert) System.out.print(vals2[i] + " ");
 			}
 
 			double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -662,7 +666,7 @@ public class StringCode
 
 			String resultant;
 			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
-					Constant.SAXAvgAltitudeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
+					SaxConstants.SAXAvgAltitudeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
 
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
@@ -683,7 +687,7 @@ public class StringCode
 			System.err.println("Error in getStringCodesForGeoCoordinates(): no resultant SAX ");
 		}
 
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + finalResultant[0] + " &  " + finalResultant[1]);
 		}
@@ -702,7 +706,7 @@ public class StringCode
 	public static String[] getStringCodesForEndGeoCoordinates(ArrayList<ActivityObject> actObjs1,
 			ArrayList<ActivityObject> actObjs2)
 	{
-		if (Constant.verboseSAX) System.out.println("Inside getStringCodesForGeoCoordinates");
+		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodesForGeoCoordinates");
 
 		String finalResultant[] = new String[2];
 
@@ -721,16 +725,16 @@ public class StringCode
 
 				vals1[i] = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
 				stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
-				if (Constant.verboseHilbert)
+				if (VerbosityConstants.verboseHilbert)
 				{
 					System.out.println("lat:" + latitude1 + " lon:" + longitude1 + "->latL:" + latitude1AsLong
 							+ ", lonL:" + longitude1AsLong + "  HSFC ind:" + vals1[i]);
 				}
 
-				if (Constant.verboseSAX && !Constant.verboseHilbert) System.out.print(vals1[i] + " ");
+				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert) System.out.print(vals1[i] + " ");
 			}
 
-			if (Constant.verboseSAX) System.out.println();
+			if (VerbosityConstants.verboseSAX) System.out.println();
 
 			double vals2[] = new double[actObjs2.size()];
 			long stamps2[] = new long[actObjs2.size()];
@@ -745,13 +749,13 @@ public class StringCode
 
 				vals2[i] = HilbertCurveUtils.getCompactHilbertCurveIndex(latitude2AsLong, longitude2AsLong);
 				stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
-				if (Constant.verboseHilbert)
+				if (VerbosityConstants.verboseHilbert)
 				{
 					System.out.println("lat:" + latitude2 + " lon:" + longitude2 + "->latL:" + latitude2AsLong
 							+ ", lonL:" + longitude2AsLong + "  HSFC ind:" + vals2[i]);
 				}
 
-				if (Constant.verboseSAX && !Constant.verboseHilbert) System.out.print(vals2[i] + " ");
+				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert) System.out.print(vals2[i] + " ");
 			}
 
 			double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -759,7 +763,7 @@ public class StringCode
 
 			String resultant;
 			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
-					Constant.SAXAvgAltitudeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
+					SaxConstants.SAXAvgAltitudeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
 
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
@@ -780,7 +784,7 @@ public class StringCode
 			System.err.println("Error in getStringCodesForGeoCoordinates(): no resultant SAX ");
 		}
 
-		if (Constant.verboseSAX)
+		if (VerbosityConstants.verboseSAX)
 		{
 			System.out.println("SAX: " + finalResultant[0] + " &  " + finalResultant[1]);
 		}

@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.activity.util.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.util.UtilityBelt;
 
 public class UserDayTimeline implements Serializable
@@ -162,7 +162,7 @@ public class UserDayTimeline implements Serializable
 			timestamp = nextValidAOAfterAOAtThisTime.getEndTimestamp(); // update timestamp
 		}
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Debug: num of valid after timestamp " + timestampOriginal + " is: " + numOfValids);
 		}
@@ -182,7 +182,7 @@ public class UserDayTimeline implements Serializable
 
 		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectsAtTime(timestamp);
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out
 					.print("inside:getNextValidActivityAfterActivityAtThisTime(): Index of activity event at this timestamp is:"
@@ -219,7 +219,7 @@ public class UserDayTimeline implements Serializable
 				// + ")Activity Name=" +
 				// ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName());
 			}
-			if (Constant.verbose)
+			if (VerbosityConstants.verbose)
 			{
 				System.out.println(nextValidActivityObject.getActivityName());
 			}
@@ -283,7 +283,7 @@ public class UserDayTimeline implements Serializable
 
 		ArrayList<ActivityObject> eventsInDay = theDayTimeline.getActivityObjectsInDay();
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println("inside isNoValidActivityAfterItInTheDay");
 			System.out.println("activityIndexAfterWhichToCheck=" + ActivityObjectIndex);
@@ -300,7 +300,7 @@ public class UserDayTimeline implements Serializable
 		{
 			if (UtilityBelt.isValidActivityName(eventsInDay.get(i).getActivityName()))
 			{
-				if (Constant.verbose)
+				if (VerbosityConstants.verbose)
 				{
 					System.out.println("Activity making it false=" + eventsInDay.get(i).getActivityName());
 				}
@@ -309,7 +309,7 @@ public class UserDayTimeline implements Serializable
 			}
 		}
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println("No valid after is:" + isNoValidAfter);
 		}
@@ -626,7 +626,7 @@ public class UserDayTimeline implements Serializable
 			}
 		}
 
-		if (Constant.verbose)
+		if (VerbosityConstants.verbose)
 		{
 			System.out.println("In the daytimeline (User = " + this.userID + ", Date=" + this.dateID + "). "
 					+ "The index of Activity Object with ST nearest to current_ST(=" + t + "is: "

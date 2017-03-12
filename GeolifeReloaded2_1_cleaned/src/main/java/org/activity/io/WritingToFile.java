@@ -23,6 +23,9 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.activity.clustering.weka.WekaUtilityBelt;
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.loader.GeolifeDataLoader;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
@@ -36,10 +39,8 @@ import org.activity.objects.Triple;
 import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
-import org.activity.util.Constant;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.UtilityBelt;
-import org.activity.util.weka.WekaUtilityBelt;
 import org.apache.commons.math3.complex.Complex;
 
 /**
@@ -2171,7 +2172,7 @@ public class WritingToFile
 			StringBuilder activityObjects1String = new StringBuilder();
 			StringBuilder activityObjects2String = new StringBuilder();
 
-			if (Constant.WriteActivityObjectsInEditSimilarityCalculations)
+			if (VerbosityConstants.WriteActivityObjectsInEditSimilarityCalculations)
 			{
 				for (int i = 0; i < ActivityObjects1.size(); i++)
 				{
@@ -2556,7 +2557,7 @@ public class WritingToFile
 				 * "UserAtRecomm,DateAtRecomm,TimeAtRecomm, Candidate ID, End point index of cand, Edit operations trace of cand, Edit Distance of Candidate, #Level_1_EditOps, #ObjectsInSameOrder"
 				 * + ",NextActivityForRecomm,CandidateTimeline,CurrentTimeline"
 				 */
-				if (writefull || Constant.WriteRedundant)
+				if (writefull || VerbosityConstants.WriteRedundant)
 				{
 					userString = userAtRecomm;
 					dateString = dateAtRecomm.toString();
@@ -3105,7 +3106,7 @@ public class WritingToFile
 			// System.out.println("\nUser ="+entryForUser.getKey());
 			String fileName = commonPath + userName + "ActivityDuration" + fileNamePhrase + ".csv";
 
-			if (Constant.verbose)
+			if (VerbosityConstants.verbose)
 			{
 				System.out.println("writing " + userName + "ActivityDuration" + fileNamePhrase + ".csv");
 			}
@@ -3216,7 +3217,7 @@ public class WritingToFile
 	{
 		commonPath = Constant.getCommonPath();//
 
-		if (Constant.verbose) System.out.println("Inside writeActivityCountsInGivenDayTimelines");
+		if (VerbosityConstants.verbose) System.out.println("Inside writeActivityCountsInGivenDayTimelines");
 
 		/* <Activity Name, count over all days> */
 		LinkedHashMap<String, Long> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Long>(); // count
@@ -3231,7 +3232,7 @@ public class WritingToFile
 			// System.out.println("\nUser ="+entryForUser.getKey());
 			String fileName = commonPath + userName + "ActivityCounts" + fileNamePhrase + ".csv";
 
-			if (Constant.verbose)
+			if (VerbosityConstants.verbose)
 			{
 				System.out.println("writing " + userName + "ActivityCounts" + fileNamePhrase + ".csv");
 			}
@@ -3343,7 +3344,7 @@ public class WritingToFile
 		// TODO check if it indeed
 		// should be an append
 
-		if (Constant.verbose) System.out.println("Exiting writeActivityCountsInGivenDayTimelines");
+		if (VerbosityConstants.verbose) System.out.println("Exiting writeActivityCountsInGivenDayTimelines");
 
 		return activityNameCountPairsOverAllDayTimelines;
 
@@ -3371,7 +3372,7 @@ public class WritingToFile
 			// System.out.println("\nUser ="+entryForUser.getKey());
 			String fileName = commonPath + userName + "ActivityOccPerTimelines" + fileNamePhrase + ".csv";
 
-			if (Constant.verbose)
+			if (VerbosityConstants.verbose)
 			{
 				System.out.println("writing " + userName + "ActivityOccPerTimelines" + fileNamePhrase + ".csv");
 			}
@@ -4108,6 +4109,65 @@ public class WritingToFile
 	// e.printStackTrace();
 	// }
 	// }
+
+	/**
+	 * Creates a directory if it does not already exist
+	 * 
+	 * @param pathname
+	 * @return
+	 */
+	public static boolean createDirectory(String pathname)
+	{
+		boolean result = false;
+	
+		File directory = new File(pathname);
+	
+		// if the directory does not exist, create it
+		if (!directory.exists())
+		{
+			System.out.println("creating directory: " + directory);
+			try
+			{
+				directory.mkdir();
+				result = true;
+			}
+			catch (SecurityException se)
+			{
+				System.err.println("Error: cannot create  directory " + directory);
+				se.printStackTrace();
+			}
+			if (result)
+			{
+				System.out.println(pathname + " directory created");
+			}
+		}
+		else
+		{
+			System.out.println("Cannot create  directory " + directory + " as it already exists");
+		}
+		return result;
+	}
+
+	public static boolean isDirectoryEmpty(String path)
+	{
+		boolean isEmpty = false;
+	
+		File file = new File(path);
+	
+		if (file.isDirectory())
+		{
+			if (file.list().length == 0)
+			{
+				isEmpty = true;
+			}
+		}
+		else
+		{
+			System.err.println("Error in isDirectoryEmpty: " + path + " is not a directory");
+		}
+	
+		return isEmpty;
+	}
 
 	// public static void writeSimpleLinkedHashMapToFileAppendDouble(LinkedHashMap<String, Double> map, String fileName,
 	// String headerKey,
