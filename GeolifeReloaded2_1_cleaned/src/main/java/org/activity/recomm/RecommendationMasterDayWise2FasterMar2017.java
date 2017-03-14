@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
 import org.activity.evaluation.Evaluation;
@@ -32,7 +33,7 @@ import org.activity.util.TimelineUtils;
  *
  */
 /* Modified version of RecommendationMasterDayWise2Faster. This uses daywise timelines */
-public class RecommendationMasterDayWise2FasterMar2017
+public class RecommendationMasterDayWise2FasterMar2017 implements RecommendationMasterI
 {
 	private LinkedHashMap<Date, UserDayTimeline> trainingTimelines;
 	private LinkedHashMap<Date, UserDayTimeline> testTimelines;
@@ -91,7 +92,7 @@ public class RecommendationMasterDayWise2FasterMar2017
 
 	public RecommendationMasterDayWise2FasterMar2017(LinkedHashMap<Date, UserDayTimeline> trainingTimelines,
 			LinkedHashMap<Date, UserDayTimeline> testTimelines, String dateAtRecomm, String timeAtRecomm,
-			int userAtRecomm, double thresholdVal, String typeOfThreshold)
+			int userAtRecomm, double thresholdVal, Enums.TypeOfThreshold typeOfThreshold)
 	{
 		System.out.println("\n----------------Starting RecommendationMasterDayWise2FasterDec ");
 		commonPath = Constant.getCommonPath();
@@ -176,11 +177,11 @@ public class RecommendationMasterDayWise2FasterMar2017
 		// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry for
 		// such candidate timelines from the
 		// distance scores map
-		if (typeOfThreshold.equalsIgnoreCase("Global"))
+		if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))// IgnoreCase("Global"))
 		{
 			this.thresholdAsDistance = thresholdVal;
 		}
-		else if (typeOfThreshold.equalsIgnoreCase("Percent"))
+		else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// "Percent"))
 		{
 			double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
 			this.thresholdAsDistance = maxEditDistance * (thresholdVal / 100);

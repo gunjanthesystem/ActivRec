@@ -61,7 +61,7 @@ public class SuperController2
 
 		/** For N Gram Analysis **/
 		Constant.setDatabaseName("dcu_data_2");//
-		Constant.caseType = "none";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
+		Constant.caseType = null;// "none";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
 		Constant.rankScoring = "none";
 		Constant.outputCoreResultsPath = "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link to Geolife Data Works/stats/NGramAnalysis/";// /run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/Geolife/SimpleV3/";
 		new ControllerWithoutServer();

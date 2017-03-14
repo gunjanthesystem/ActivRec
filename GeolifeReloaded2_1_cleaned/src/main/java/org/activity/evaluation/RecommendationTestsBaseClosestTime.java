@@ -409,7 +409,7 @@ public class RecommendationTestsBaseClosestTime
 						WritingToFile.writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(userName,
 								userTestTimelines, "Test");
 
-						int numberOfWeekendsInTraining = WritingToFile
+						int numberOfWeekendsInTraining = TimelineUtils
 								.getNumberOfWeekendsInGivenDayTimelines(userTrainingTimelines);
 						int numberOfWeekdaysInTraining = userTrainingTimelines.size() - numberOfWeekendsInTraining;
 
@@ -460,7 +460,7 @@ public class RecommendationTestsBaseClosestTime
 
 								Timestamp endTimestamp = activityObjectsInThatDay.get(j).getEndTimestamp();// getStartTimestamp();
 
-								String timeCategory = Evaluation.getTimeCategoryOfTheDay(endTimestamp.getHours());
+								String timeCategory = DateTimeUtils.getTimeCategoryOfTheDay(endTimestamp.getHours());
 
 								if (UserDayTimeline.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
 								{

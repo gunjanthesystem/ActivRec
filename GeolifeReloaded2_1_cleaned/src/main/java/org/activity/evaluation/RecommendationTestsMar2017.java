@@ -1,13 +1,11 @@
 package org.activity.evaluation;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,15 +13,22 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums;
+import org.activity.constants.Enums.CaseType;
+import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
+import org.activity.objects.TimelineI;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.UserDayTimeline;
-import org.activity.recomm.RecommendationMasterMU;
+import org.activity.recomm.RecommendationMasterBaseClosestTimeMar2017;
+import org.activity.recomm.RecommendationMasterDayWise2FasterMar2017;
+import org.activity.recomm.RecommendationMasterI;
+import org.activity.recomm.RecommendationMasterMUMar2017;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
@@ -31,13 +36,17 @@ import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
 
 /**
+ * Fork of org.activity.evaluation.RecommendationTestsMU. Trying to make the same class work for MU and daywise
+ * approach. (For a cleaner and more maintenable code). cohesion and separation of concern.
+ * <p>
  * Executes the experiments for generating recommendations
  * 
  * @author gunjan
  *
  */
-public class RecommendationTestsMU
+public class RecommendationTestsMar2017
 {
+	// String typeOfMatching; //"Daywise","
 	double percentageInTraining;// = 0.8;
 	// String fullCandOrSubCand="fullCand";
 	/**
@@ -45,12 +54,12 @@ public class RecommendationTestsMU
 	 * guiding recommendations' is higher than the cost of replacing 'percentageDistanceThresh' % of Activity Objects in
 	 * the activities guiding recommendation are pruned out from set of candidate timelines
 	 */
-	String typeOfThresholds[];// = { "Global" };// Global"};//"Percent",
+	Enums.TypeOfThreshold typeOfThresholds[];// = { "Global" };// Global"};//"Percent",
 	int globalThresholds[] = { 10000000 };// {50,100,150,200,250,300,350,400,450,500,550,600,650,700,1000};
 	int percentThresholds[] = { 100 };// {50,60,70,80,90,100};
 
-	String caseType;// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
-	String lookPastType;// = "Count";// "Hrs"
+	CaseType caseType;// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
+	LookPastType lookPastType;// = "Count";// "Hrs" "Daywise"
 
 	int userIDs[];// = { 62, 84, 52, 68, 167, 179, 153, 85, 128, 10 };
 
@@ -64,6 +73,8 @@ public class RecommendationTestsMU
 
 	public boolean pruningHasSaturated;
 
+	private boolean writeDayTimelinesOnce = true;;
+
 	int thresholdsArray[];
 
 	/**
@@ -71,34 +82,29 @@ public class RecommendationTestsMU
 	 */
 	// LinkedHashMap<String, ArrayList<Double>> allUsersMRRForAllMUs;
 
-	public RecommendationTestsMU(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+	/**
+	 * 
+	 * @param usersTimelines
+	 */
+	public RecommendationTestsMar2017(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines,
+			Enums.LookPastType lookPastType)
 	{
-		System.out.println("\n\n **********Entering Recommendation Tests**********");
-		// PopUps.showMessage("**********Entering Recommendation Tests**********\n with output path = " +
-		// Constant.outputCoreResultsPath);
-
+		System.out.println("\n\n **********Entering RecommendationTestsMar2017**********");
 		long recommTestsStarttime = System.currentTimeMillis();
+
+		this.lookPastType = lookPastType;// Constant.lookPastType;
 
 		this.percentageInTraining = Constant.percentageInTraining;
 		this.caseType = Constant.caseType;
-		this.lookPastType = Constant.lookPastType;
 		this.typeOfThresholds = Constant.typeOfThresholds;
 		this.userIDs = Constant.getUserIDs();
 
 		if (userIDs == null || userIDs.length == 0) // if userid is not set in constant class, in case of gowalla
 		{
-			userIDs = new int[usersTimelines.size()];
-			// System.out.println("usersTimelines.size() = " + usersTimelines.size());
-			System.out.println("UserIDs not set, hence extracting user ids from usersTimelines keyset");
-			int count = 0;
-			for (String userS : usersTimelines.keySet())
-			{
-				userIDs[count++] = Integer.valueOf(userS);
-			}
+			userIDs = usersTimelines.keySet().stream().mapToInt(userID -> Integer.valueOf(userID)).toArray();
+			System.out.println("UserIDs not set in Constant, hence extracted" + userIDs.length
+					+ " user ids from usersTimelines keyset");
 		}
-
-		System.out.println("User ids = " + Arrays.toString(userIDs));
-		// allUsersMRRForAllMUs = new LinkedHashMap<String, ArrayList<Double>>();
 
 		// Rts not used in daywise matching owing to unavailability of cand timelines for them
 		List<String> blackListedRTs = null;
@@ -109,78 +115,58 @@ public class RecommendationTestsMU
 
 		// check if directory is empty to prevent overwriting of results
 		// if (UtilityBelt.isDirectoryEmpty(Constant.outputCoreResultsPath) == false)
-		// {
-		// System.err.println("Warning with exit: results' directory not empty");
-		// System.exit(-1);
-		// }
+		// { System.err.println("Warning with exit: results' directory not empty");
+		// System.exit(-1);}
+
 		setMatchingUnitArray(lookPastType);
 
-		for (String typeOfThreshold : typeOfThresholds)
+		for (Enums.TypeOfThreshold typeOfThreshold : typeOfThresholds)
 		{
 			setThresholdsArray(typeOfThreshold);
-
 			for (int thresholdValue : thresholdsArray)
 			{
 				System.out.println("Executing RecommendationTests for threshold value: " + thresholdValue);
-				Constant.setTypeOfTimelineMatching("N-count"); // N-count, N-hours
-				ArrayList<String> userNames = new ArrayList<String>();
+				// ArrayList<String> userNames = new ArrayList<String>();
 				LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines = null;
 				pruningHasSaturated = true;
 				try
 				{
-					for (int matchingUnitIterator = 0; matchingUnitIterator < matchingUnitArray.length; matchingUnitIterator++)// double
-																																// matchingUnitInHoursc)
+					for (double matchingUnit : matchingUnitArray)
 					{
 						long ctmu1 = System.currentTimeMillis();
 						userIdNumOfRTsMap = new TreeMap<Integer, Integer>();
-						double matchingUnit = matchingUnitArray[matchingUnitIterator];
+
 						Constant.setCurrentMatchingUnit(matchingUnit); // used for sanity checks
 						System.out.println("Executing RecommendationTests for matching unit: " + matchingUnit);
 
-						// if (matchingUnitIterator % 8 == 0) // to control the verbosity of console output
-						// {
-						// Constant.setVerbose(true);
-						// Constant.setWriteNumActsmatchingUnit(true);
-						// }
-						// else
-						// {
-						// Constant.setVerbose(false);
-						// if (matchingUnitIterator % 8 == 0)
-						// Constant.setWriteNumActsmatchingUnit(true);
-						// else
-						// Constant.setWriteNumActsmatchingUnit(false);
-						// }
-						// commonPath = Constant.outputCoreResultsPath;
-						commonPath = Constant.outputCoreResultsPath;// + Constant.DATABASE_NAME + "_" +
-																	// LocalDateTime.now().getMonth().toString().substring(0,
-																	// 3)
-						// + LocalDateTime.now().getDayOfMonth();
-
-						// Creating the directory for that matching unit
-						boolean dir = WritingToFile
-								.createDirectory(commonPath + "/MatchingUnit" + String.valueOf(matchingUnit));
-						if (!dir)
+						// matching unit is only relevant if it is not daywise
+						if (this.lookPastType.equals(Enums.LookPastType.NCount)
+								|| this.lookPastType.equals(Enums.LookPastType.NHours))
 						{
-							System.exit(-135);
+							String dirToCreate = Constant.outputCoreResultsPath + "/MatchingUnit"
+									+ String.valueOf(matchingUnit);
+							WritingToFile.createDirectory(dirToCreate);// Creating the directory for that matching unit
+							commonPath = dirToCreate + "/";
+						}
+						else // daywise
+						{
+							commonPath = Constant.outputCoreResultsPath;
 						}
 
-						commonPath = commonPath + "/" + "MatchingUnit" + matchingUnit + "/";
 						Constant.setCommonPath(commonPath);
-						System.out.println("Common path=" + Constant.getCommonPath()); // commonPath=Constant.getCommonPath();
-
-						new File(commonPath + "EditSimilarityCalculations.csv").delete();
+						System.out.println("Common path=" + Constant.getCommonPath());
 
 						PrintStream consoleLogStream = WritingToFile
 								.redirectConsoleOutput(commonPath + "consoleLog.txt");
 
 						BufferedWriter metaBufferWriter = WritingToFile
-								.getBufferedWriterForNewFile(commonPath + "meta.csv");// new BufferedWriter(metaWriter);
+								.getBufferedWriterForNewFile(commonPath + "meta.csv");
 						BufferedWriter actualBufferWriter = WritingToFile
-								.getBufferedWriterForNewFile(commonPath + "dataActual.csv");// new
-																							// BufferedWriter(actualWriter);
-						BufferedWriter top5BufferWriter = WritingToFile
+								.getBufferedWriterForNewFile(commonPath + "dataActual.csv");
+
+						BufferedWriter topNextActsWithoutDistance = WritingToFile
 								.getBufferedWriterForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
-						BufferedWriter topRecommWithDistance = WritingToFile
+						BufferedWriter topNextActsWithDistance = WritingToFile
 								.getBufferedWriterForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
 						BufferedWriter rtsInvalidWriter = WritingToFile.getBufferedWriterForNewFile(
 								commonPath + "recommPointsInvalidBecuzNoValidActivityAfterThis.csv");
@@ -199,7 +185,9 @@ public class RecommendationTestsMU
 								.getBufferedWriterForNewFile(commonPath + "dataBaseLineOccurrence.csv");
 						BufferedWriter baseLineDuration = WritingToFile
 								.getBufferedWriterForNewFile(commonPath + "dataBaseLineDuration.csv");
+
 						BufferedWriter bwRaw = WritingToFile.getBufferedWriterForNewFile(commonPath + "Raw.csv");
+
 						BufferedWriter bwNumOfWeekendsInTraining = WritingToFile
 								.getBufferedWriterForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
 						BufferedWriter bwNumOfWeekendsInAll = WritingToFile
@@ -210,13 +198,6 @@ public class RecommendationTestsMU
 								.getBufferedWriterForNewFile(commonPath + "NextActivityIsInvalid.csv");
 						BufferedWriter bwWriteNormalisationOfDistance = WritingToFile
 								.getBufferedWriterForNewFile(commonPath + "NormalisationDistances.csv");
-						// BufferedWriter bwCountInActivitiesGuidingRecomm= new BufferedWriter(new
-						// FileWriter(fileCountInActivitiesGuidingRecomm.getAbsoluteFile(),true));
-						// fileCountTimeCategoryOfRecomm
-						// BufferedWriter bwNumOfWeekdaysInTraining = new BufferedWriter(new
-						// FileWriter(fileNumOfWeekdaysInTraining.getAbsoluteFile(),true));
-						// FileWriter singleRecommWriter = new FileWriter(file4.getAbsoluteFile(),true);
-						// BufferedWriter bufferWriter4 = new BufferedWriter(singleRecommWriter);
 
 						rtsInvalidWriter.write(
 								"User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity\n");
@@ -229,18 +210,14 @@ public class RecommendationTestsMU
 								+ "NumOfCandidateTimelinesBelowThresh," + "WeekDayOfRecomm,Target(ActualActivity),"
 								+ "RecommendedActivities," + "NumOfDistinctRecomms,"
 								+ "PearsonCorrOfCandSimsAndEndCaseSims," + "AvgRestSimilarity,"
-								+ "StdDevRestSimilarity," + "AvgEndSimilarity," + "StdDevEndSimilarity");// LastActivityOnRecommDay");//,ActivitiesOnRecommDayUntiRecomm");
-						bwRaw.newLine();
+								+ "StdDevRestSimilarity," + "AvgEndSimilarity," + "StdDevEndSimilarity\n");// LastActivityOnRecommDay");//,ActivitiesOnRecommDayUntiRecomm");
 
 						bwCountTimeCategoryOfRecomm
-								.write("User,Num_of_Mornings,Num_of_Afternoons,Number_of_Evenings,TotalRTs");
-						bwCountTimeCategoryOfRecomm.newLine();
+								.write("User,Num_of_Mornings,Num_of_Afternoons,Number_of_Evenings,TotalRTs\n");
 
-						bwNumOfWeekendsInTraining.write("User,NumOfWeekends,NumOfWeekdays");
-						bwNumOfWeekendsInTraining.newLine();
+						bwNumOfWeekendsInTraining.write("User,NumOfWeekends,NumOfWeekdays\n");
 
-						bwNextActInvalid.write("User,Timestamp_of_Recomm");
-						bwNextActInvalid.newLine();
+						bwNextActInvalid.write("User,Timestamp_of_Recomm\n");
 
 						// bwCountInActivitiesGuidingRecomm.write("User,RecommendationTime,TimeCategory,NumberOfValidActivities_in_Current_Timeline,NumberOfActivities_in_Current_Timeline");
 						// bwCountInActivitiesGuidingRecomm.newLine();
@@ -248,17 +225,21 @@ public class RecommendationTestsMU
 						BufferedWriter numActsInEachCandbw = WritingToFile.getBufferedWriterForNewFile(
 								commonPath + "NumActsmatchingUnit" + String.valueOf(matchingUnit) + ".csv");
 						numActsInEachCandbw.write(
-								"NumberOfActivityObjectInCandidateTimeline,TimelineID,UserId, DateAtRT, TimeAtRT, ActivitytObjectsInCandidateTimeline");
-						numActsInEachCandbw.newLine();
+								"NumberOfActivityObjectInCandidateTimeline,TimelineID,UserId, DateAtRT, TimeAtRT, ActivitytObjectsInCandidateTimeline\n");
 
 						bwWriteNormalisationOfDistance
-								.write("User, DateOfRecomm, TimeOfRecom, EditDistance,NormalisedEditDistance");
-						bwWriteNormalisationOfDistance.newLine();
+								.write("User, DateOfRecomm, TimeOfRecom, EditDistance,NormalisedEditDistance\n");
 
-						WritingToFile.writeDistanceScoresSortedMapHeader(); // writes EditDistancePerRtPerCand.csv
-						WritingToFile.writeEditSimilarityCalculationsHeader(); // writes the edit similarity
-																				// calculations for this recommendation
-																				// master
+						// writes the edit similarity calculations for this recommendation master
+						// WritingToFile.writeEditSimilarityCalculationsHeader();
+						WritingToFile.writeToNewFile(
+								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandidateTimelineID,EditDistance,ActLevelDistance,FeatLevelDistance,Trace, ActivityObjects1,ActivityObjects2\n",
+								commonPath + "EditSimilarityCalculations.csv");
+						// writes EditDistancePerRtPerCand.csv// WritingToFile.writeDistanceScoresSortedMapHeader();
+						WritingToFile.writeToNewFile(
+								"UserAtRecomm,DateAtRecomm,TimeAtRecomm, Candidate ID, End point index of cand, Edit operations trace of cand, Edit Distance of Candidate, #Level_1_EditOps, #ObjectsInSameOrder"
+										+ ",NextActivityForRecomm,CandidateTimeline,CurrentTimeline\n",
+								commonPath + "EditDistancePerRtPerCand.csv");
 
 						System.out.println(Constant.getAllGlobalConstants());
 						System.out.println(Constant.getCommonPath());
@@ -266,19 +247,18 @@ public class RecommendationTestsMU
 						/** Can be used to select users above 10 RTs **/
 						LinkedHashMap<Integer, Integer> numOfValidRTs = new LinkedHashMap<Integer, Integer>();
 
+						// LinkedHashMap<Integer, LinkedHashMap<Timestamp, Integer>> rtsWithMoreThan4ValidsAfter = new
+						// LinkedHashMap<>();
+						StringBuilder sbNumOfValidsAfterAnRT = new StringBuilder();
 						// int userCount = 0;
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
-						{
-							// int numberOfValidRTs = 0;
-							// userCount += 1;
-
+						{ // int numberOfValidRTs = 0;// userCount += 1;
 							System.out.println("\nUser id=" + userId);
 							String userName = "";
 							if (Constant.getDatabaseName().equals("gowalla1"))
 							{
 								userName = String.valueOf(userId);
 							}
-
 							else
 							{
 								userName = ConnectDatabase.getUserName(userId);// ConnectDatabase.getUserNameFromDatabase(userId);
@@ -288,41 +268,37 @@ public class RecommendationTestsMU
 									.getBufferedWriterForNewFile(
 											commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
 							bwMaxNumOfDistinctRecommendations.write("DateOfRecomm" + ",TimeOfRecomm"
-									+ ",Week_Day,MaxNumOfDistictRecommendation,NumOfCandidateTimelines(after applying Threshold)");
-							bwMaxNumOfDistinctRecommendations.newLine();
+									+ ",Week_Day,MaxNumOfDistictRecommendation,NumOfCandidateTimelines(after applying Threshold)\n");
 
 							BufferedWriter bwNumOfCandTimelinesBelowThreshold = WritingToFile
 									.getBufferedWriterForNewFile(
 											commonPath + userName + "numberOfCandidateTimelinesBelow" + typeOfThreshold
 													+ thresholdValue + ".csv");
 							bwNumOfCandTimelinesBelowThreshold.write("DateOfRecomm" + ",TimeOfRecomm"
-									+ ",Week_Day,ThresholdAsDistance,NumOfCandidateTimelinesBelowThreshold,");
-							bwNumOfCandTimelinesBelowThreshold.newLine();
+									+ ",Week_Day,ThresholdAsDistance,NumOfCandidateTimelinesBelowThreshold,\n");
 
 							BufferedWriter bwRecommTimesWithEditDistances = WritingToFile.getBufferedWriterForNewFile(
 									commonPath + userName + "RecommTimesWithEditDistance.csv");
 							bwRecommTimesWithEditDistances.write("DateOfRecomm" + ",TimeOfRecomm,"
-									+ "CandidateTimelineID,TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,EndIndexOf(Sub)Cand,CandidateTimeline,WeekDayOfRecomm");
-							bwRecommTimesWithEditDistances.newLine();
+									+ "CandidateTimelineID,TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,EndIndexOf(Sub)Cand,CandidateTimeline,WeekDayOfRecomm\n");
 
 							userAllDatesTimeslines = usersTimelines.get(Integer.toString(userId));// userId);
 
 							if (userAllDatesTimeslines == null)
 							{
-								System.err.println(
-										"userAllDatesTimeslines = " + userAllDatesTimeslines + " user " + userId);
+								System.err.println("Error: userAllDatesTimeslines = " + userAllDatesTimeslines
+										+ " user " + userId);
 							}
 
-							// //////////////////REMOVING SELECTED TIMELINES FROM
-							// DATASET///////////////////////////////////////////////////////
-							// userAllDatesTimeslines = TimelineUtilities.cleanUserDayTimelines(userAllDatesTimeslines);
+							// //////////////////REMOVING SELECTED TIMELINES FROM DATASET////////////////////
 							userAllDatesTimeslines = TimelineUtils.cleanUserDayTimelines(userAllDatesTimeslines,
 									commonPath + "InsideRecommTestCleanUserDayTimelines", String.valueOf(userId));
 							// ////////////////////////////////////////////////////////////////////////////////
-							if (matchingUnitIterator == 0) // write the given day timelines only once
-							{
+							if (this.writeDayTimelinesOnce)
+							{// if (matchingUnitIterator == 0) // write the given day timelines only once
 								WritingToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", true,
 										true, true);
+								this.writeDayTimelinesOnce = false;
 							}
 
 							// Splitting the set of timelines into training set and test set.
@@ -335,47 +311,32 @@ public class RecommendationTestsMU
 							{
 								System.out.println(
 										"Warning: Skipping this user " + userId + " as it has 0 training days");
-								WritingToFile.appendLineToFile("User " + userId + ",", "UserWithNoTrainingDay");
+								WritingToFile.appendLineToFileAbsolute("User " + userId + ",",
+										commonPath + "UserWithNoTrainingDay.csv");
 								numOfValidRTs.put(userId, 0);
 								continue;
 							}
-
-							/*
-							 * ********** ************************************************
-							 * ********************************
-							 */
+							// ////////////////////////////////////////
 							// if (matchingUnitIterator == 0) // do this only for one matching unit as it does not
 							// change per matching unit
-
 							LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines = WritingToFile
 									.writeBasicActivityStatsAndGetBaselineMaps(userName, userAllDatesTimeslines,
 											userTrainingTimelines, userTestTimelines);
 							// note: the maps of maps here contains a map for baselines count and another map for
-							// baseline
-							// duration: they will be used later to
-							// write prediction results for baseline count and baseline duration
-
-							/*
-							 * ********** ************************************************
-							 * ********************************
-							 */
+							// baseline duration: they will be used later to write prediction results for baseline count
+							// and baseline duration
 
 							int numberOfWeekendsInTraining = TimelineUtils
 									.getNumberOfWeekendsInGivenDayTimelines(userTrainingTimelines);
 							int numberOfWeekdaysInTraining = userTrainingTimelines.size() - numberOfWeekendsInTraining;
-
-							bwNumOfWeekendsInTraining.write(
-									userName + "," + numberOfWeekendsInTraining + "," + numberOfWeekdaysInTraining);
-							bwNumOfWeekendsInTraining.newLine();
+							bwNumOfWeekendsInTraining.write(userName + "," + numberOfWeekendsInTraining + ","
+									+ numberOfWeekdaysInTraining + "\n");
 
 							int numberOfWeekendsInAll = TimelineUtils
 									.getNumberOfWeekendsInGivenDayTimelines(userAllDatesTimeslines);
 							int numberOfWeekdaysInAll = userAllDatesTimeslines.size() - numberOfWeekendsInAll;
-
 							bwNumOfWeekendsInAll
-									.write(userName + "," + numberOfWeekendsInAll + "," + numberOfWeekdaysInAll);
-							bwNumOfWeekendsInAll.newLine();
-							// ////////////////////////////////////////
+									.write(userName + "," + numberOfWeekendsInAll + "," + numberOfWeekdaysInAll + "\n");
 							// }
 							// ////////////////////////////////////////
 
@@ -384,25 +345,24 @@ public class RecommendationTestsMU
 							// generate date and times for recommendation
 							for (Map.Entry<Date, UserDayTimeline> entry : userTestTimelines.entrySet())
 							{
-								int date = entry.getKey().getDate();
-								int month = entry.getKey().getMonth() + 1;
-								int year = entry.getKey().getYear() + 1900;
+								Date testDate = entry.getKey();
+								UserDayTimeline eachDayTimelineForUser = entry.getValue();
+
+								int date = testDate.getDate();
+								int month = testDate.getMonth() + 1;
+								int year = testDate.getYear() + 1900;
 
 								String dateToRecomm = date + "/" + month + "/" + year;
-								System.out.println("For userid=" + userId + " entry.getKey()=" + entry.getKey()
+								System.out.println("For userid=" + userId + " entry.getKey()=" + testDate
 										+ "  dateToRecomm=" + dateToRecomm);
 
-								String weekDay = DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay());
+								String weekDay = DateTimeUtils.getWeekDayFromWeekDayInt(testDate.getDay());
 
-								UserDayTimeline eachDayTimelineForUser = entry.getValue();
 								ArrayList<ActivityObject> activityObjectsInThatDay = eachDayTimelineForUser
 										.getActivityObjectsInDay();
 
-								for (int j = 0; j < activityObjectsInThatDay.size() - 1; j++) // will not make
-																								// recommendation for
-																								// days which have only
-																								// one
-																								// activity
+								// will not make recommendation for days which have only one activity
+								for (int j = 0; j < activityObjectsInThatDay.size() - 1; j++)
 								{
 									ActivityObject activityObjectInThatDay = activityObjectsInThatDay.get(j);
 									String activityNameInThatDay = activityObjectInThatDay.getActivityName();
@@ -411,45 +371,41 @@ public class RecommendationTestsMU
 											"Iterating over potential recommendation times: current activityAtPotentialRecommTime="
 													+ activityNameInThatDay);// (activityObjectsInThatDay.get(j).getActivityName()));
 
-									if (activityNameInThatDay.equals(Constant.INVALID_ACTIVITY1))// (activityObjectsInThatDay.get(j).getActivityName().equals(Constant.INVALID_ACTIVITY1))//
-																									// ("Unknown"))
-									{
+									if (activityNameInThatDay.equals(Constant.INVALID_ACTIVITY1))
+									{// ("Unknown"))
 										System.out.println("Skipping because " + Constant.INVALID_ACTIVITY1);
 										continue;
 									}
-									if (activityNameInThatDay.equals(Constant.INVALID_ACTIVITY2))// ("Others"/"Not
-																									// Available"))
-									{
+									if (activityNameInThatDay.equals(Constant.INVALID_ACTIVITY2))
+									{// ("Others"/"Not// Available"))
 										System.out.println("Skipping because " + Constant.INVALID_ACTIVITY2);
 										continue;
 									}
 
-									Timestamp endTimeStamp = activityObjectInThatDay.getEndTimestamp();// getStartTimestamp();
-
-									String timeCategory = DateTimeUtils.getTimeCategoryOfTheDay(endTimeStamp.getHours());
-
-									if (UserDayTimeline.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
-									{ // this will rarely happen because we are already not including the last activity
-										// of day as RT (see j's loop). So this
-										// will happen only if j is a not last ao in day timeline and has only invalid
-										// aos after it.
-										System.out.println(
-												"Skipping this recommendation point because there are no valid activity Objects after this in the day");
-										// if (j == activityObjectsInThatDay.size() - 1) // this should never happen,
-										// see j's loop
-										// {System.out.println("This was the last activity of the day:" + dateToRecomm +
-										// " for user:" + userId); }
-										rtsInvalidWriter
-												.write(userId + "," + dateToRecomm + "," + j + "," + endTimeStamp + ","
-														+ weekDay + "," + timeCategory + activityNameInThatDay);
-										rtsInvalidWriter.newLine();
-										continue;
-									}
 									// Recommendation is made at the end time of the activity object in consideration
-									// (activityObjectInThatDay)
+									Timestamp endTimeStamp = activityObjectInThatDay.getEndTimestamp();// getStartTimestamp();
 									String endTimeString = endTimeStamp.getHours() + ":" + endTimeStamp.getMinutes()
 											+ ":" + endTimeStamp.getSeconds();
 
+									String timeCategory = DateTimeUtils
+											.getTimeCategoryOfTheDay(endTimeStamp.getHours());
+
+									if (UserDayTimeline.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
+									{ // this will rarely happen because we are already not including the last activity
+										// of day as RT (see j's loop). So this will happen only if j is a not last ao
+										// in day timeline and has only invalid aos after it.
+										System.out.println(
+												"Skipping this recommendation point because there are no valid activity Objects after this in the day");
+										// if (j == activityObjectsInThatDay.size() - 1) // this should never happen,
+										// see j's loop {System.out.println("This was the last activity of the day:" +
+										// dateToRecomm +" for user:" + userId); }
+										rtsInvalidWriter
+												.write(userId + "," + dateToRecomm + "," + j + "," + endTimeStamp + ","
+														+ weekDay + "," + timeCategory + activityNameInThatDay + "\n");
+										continue;
+									}
+
+									// Target Activity, actual next activity
 									ActivityObject nextValidActivityObjectAfterRecommPoint1 = eachDayTimelineForUser
 											.getNextValidActivityAfterActivityAtThisTime(
 													new Timestamp(year - 1900, month - 1, date, endTimeStamp.getHours(),
@@ -467,49 +423,55 @@ public class RecommendationTestsMU
 												"Error in Sanity Check RT407: nextValidActivityAfteractivityRecommPoint1 is null, if it was such, we should have not reached this point of execution");
 									}
 
-									System.out.println(
-											"User id" + userId + " Next activity Object after " + endTimeStamp + " ="
-													+ nextValidActivityObjectAfterRecommPoint1.getActivityName());
+									System.out.println("User id" + userId + " Next activity Object after recomm time:"
+											+ endTimeStamp + " ="
+											+ nextValidActivityObjectAfterRecommPoint1.getActivityName());
 
-									System.out.println("Recommendation point at this Activity Object are:- End time: "
-											+ endTimeString);// +" ,and Middle: "+middleTimeString);
-
+									if (VerbosityConstants.WriteNumOfValidsAfterAnRT)
+									{
+										int numOfValidsAOsAfterThisRT = eachDayTimelineForUser
+												.getNumOfValidActivityObjectAfterThisTime(endTimeStamp);
+										sbNumOfValidsAfterAnRT.append(userId + "," + dateToRecomm + "," + endTimeStamp
+												+ "," + numOfValidsAOsAfterThisRT + "\n");
+										// if (numOfValidsAOsAfterThisRT >= 4) { WritingToFile.appendLineToFileAbsolute(
+										// userId + "," + dateToRecomm + "," + endTimeStamp + ","
+										// + numOfValidsAOsAfterThisRT + "\n", commonPath +
+										// "numOfValidsAfterRTsGEQ4.csv"); }
+									}
 									// ///////////
 									// Now we have those recommendation times which are valid for making recommendations
 									// ///////////////////Start//////////////////////////////////
-									// String
-									// actRecommAtStart=recommP1.getSingleNextRecommendedActivity();RecommendationMaster
-									// recommP1=new
-									// RecommendationMaster(/*userTimelines,*/userTrainingTimelines,userTestTimelines,dateToRecomm,startTimeString,
-									// userId);
-
-									// create interface for recommendermaster
+									// Manali
 									// /IMPORTANT
-									// $$RecommendationMasterMU recommP1 = new
-									// RecommendationMasterMU(userTrainingTimelines, userTestTimelines, dateToRecomm,
-									// endTimeString, userId,
-									// $$ thresholdValue, typeOfThreshold, matchingUnit, caseType, this.lookPastType);//
-									// ,fullCandOrSubCand);
+									RecommendationMasterI recommP1 = null;
+									switch (this.lookPastType)
+									{
+									case NCount:
+										recommP1 = new RecommendationMasterMUMar2017(userTrainingTimelines,
+												userTestTimelines, dateToRecomm, endTimeString, userId, thresholdValue,
+												typeOfThreshold, matchingUnit, caseType, this.lookPastType, false);
+										break;
+									case NHours:
+										recommP1 = new RecommendationMasterMUMar2017(userTrainingTimelines,
+												userTestTimelines, dateToRecomm, endTimeString, userId, thresholdValue,
+												typeOfThreshold, matchingUnit, caseType, this.lookPastType, false);
+										break;
+									case Daywise:
+										recommP1 = new RecommendationMasterDayWise2FasterMar2017(userTrainingTimelines,
+												userTestTimelines, dateToRecomm, endTimeString, userId, thresholdValue,
+												typeOfThreshold);// , caseType);
+										break;
+									case ClosestTime:
+										recommP1 = new RecommendationMasterBaseClosestTimeMar2017(userTrainingTimelines,
+												userTestTimelines, dateToRecomm, endTimeString, userId);
+										break;
 
-									RecommendationMasterMU recommP1 = new RecommendationMasterMU(userTrainingTimelines,
-											userTestTimelines, dateToRecomm, endTimeString, userId, thresholdValue,
-											typeOfThreshold, matchingUnit, caseType, this.lookPastType, false);// LAST
-																												// PARAM
-																												// TRUE
-																												// IS
-																												// DUMMY
-																												// FOR
-																												// CALLING
-																												// PERFORMANCE
-																												// CONSTRUCTOR,
-																												// REMOVE
-																												// IT
-																												// FOR
-																												// EXPERIMENTS
-									// ,fullCandOrSubCand);
-
-									LinkedHashMap<Integer, TimelineWithNext> candidateTimelines = recommP1
+									}
+									// LAST PARAM TRUE IS DUMMY FOR CALLING PERFORMANCE CONSTRUCTOR,
+									LinkedHashMap<Integer, TimelineI> candidateTimelines = recommP1
 											.getCandidateTimeslines();
+									// LinkedHashMap<Integer, TimelineWithNext> candidateTimelines = recommP1
+									// .getCandidateTimeslines();
 
 									System.out.println(
 											"Back to RecommendationTests: received " + candidateTimelines.size()
@@ -648,8 +610,9 @@ public class RecommendationTestsMU
 									metaBufferWriter.write(userId + "_" + dateToRecomm + "_" + endTimeString + ",");
 									actualBufferWriter.write(actActualDone + ",");
 
-									top5BufferWriter.write(topNextActivityForRecommAtStartWithoutDistance + ",");
-									topRecommWithDistance.write(topNextActivityForRecommAtStartWithDistance + ",");
+									topNextActsWithoutDistance
+											.write(topNextActivityForRecommAtStartWithoutDistance + ",");
+									topNextActsWithDistance.write(topNextActivityForRecommAtStartWithDistance + ",");
 
 									rankedRecommWithScore.write(rankedRecommAtStartWithScore + ",");
 									rankedRecommWithoutScore.write(rankedRecommAtStartWithoutScore + ",");
@@ -774,8 +737,8 @@ public class RecommendationTestsMU
 							// userTrainingTimelines,userTestTimelines,dateAtRecomm,timeAtRecomm,userAtRecomm);
 							metaBufferWriter.newLine();
 							actualBufferWriter.newLine();
-							top5BufferWriter.newLine();
-							topRecommWithDistance.newLine();
+							topNextActsWithoutDistance.newLine();
+							topNextActsWithDistance.newLine();
 							rankedRecommWithScore.newLine();
 							rankedRecommWithoutScore.newLine();
 
@@ -791,8 +754,8 @@ public class RecommendationTestsMU
 
 						metaBufferWriter.close();
 						actualBufferWriter.close();
-						top5BufferWriter.close();
-						topRecommWithDistance.close();
+						topNextActsWithoutDistance.close();
+						topNextActsWithDistance.close();
 
 						rtsInvalidWriter.close();
 						rtsWithNoCands.close();
@@ -981,21 +944,27 @@ public class RecommendationTestsMU
 	 * 
 	 * @param lookPastType
 	 */
-	public void setMatchingUnitArray(String lookPastType)
+	public void setMatchingUnitArray(Enums.LookPastType lookPastType)
 	{
-		if (lookPastType.equals("Count"))
+		if (lookPastType.equals(Enums.LookPastType.NCount))// "Count"))
 		{
 			this.matchingUnitArray = Constant.matchingUnitAsPastCount;// matchingUnitAsPastCount; //
 																		// PopUps.showMessage(matchingUnitArray.toString());
 		}
-		else if (lookPastType.equals("Hrs"))
+		else if (lookPastType.equals(Enums.LookPastType.NHours))// "Hrs"))
 		{
 			this.matchingUnitArray = Constant.matchingUnitHrsArray;// matchingUnitHrsArray; //
 																	// PopUps.showMessage(matchingUnitArray.toString());
 		}
+		else if (lookPastType.equals(Enums.LookPastType.Daywise))// "Hrs"))
+		{
+			this.matchingUnitArray = new double[] { -9999 };
+		}
+		// else if
 		else
 		{
-			System.err.println("Error: unknown look past type in in setMatchingUnitArray() RecommendationTests()");
+			System.err.println(
+					"Error: unknown look past type in in setMatchingUnitArray() RecommendationTests():" + lookPastType);
 			System.exit(-1);
 		}
 	}
@@ -1005,21 +974,21 @@ public class RecommendationTestsMU
 	 * 
 	 * @param typeOfThreshold
 	 */
-	public void setThresholdsArray(String typeOfThreshold)
+	public void setThresholdsArray(Enums.TypeOfThreshold typeOfThreshold)
 	{
 		switch (typeOfThreshold)
 		{
-		case "Percent":
+		case Percent:// "Percent":
 			this.thresholdsArray = percentThresholds;
 			break;
-		case "Global":
+		case Global:// "Global":
 			this.thresholdsArray = globalThresholds;
 			break;
-		case "None":
-			this.thresholdsArray = new int[] { 10000000 };
-			break;
+		// case "None":
+		// this.thresholdsArray = new int[] { 10000000 };
+		// break;
 		default:
-			System.err.println("Error: Unrecognised threshold type in setThresholdsArray()");
+			System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
 		}
 	}
 }

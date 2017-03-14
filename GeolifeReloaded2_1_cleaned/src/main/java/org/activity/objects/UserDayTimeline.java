@@ -9,7 +9,7 @@ import java.util.HashSet;
 import org.activity.constants.VerbosityConstants;
 import org.activity.util.UtilityBelt;
 
-public class UserDayTimeline implements Serializable
+public class UserDayTimeline implements Serializable, TimelineI
 {
 	private static final long serialVersionUID = 2L;
 	private ArrayList<ActivityObject> ActivityObjectsInDay;
@@ -50,10 +50,8 @@ public class UserDayTimeline implements Serializable
 			if (isSameDay(ActivityObjectsInDay) == true)
 			{
 				this.dateID = ActivityObjectsInDay.get(0).getDimensionIDValue("Date_ID");
-
 				this.dayName = ActivityObjectsInDay.get(0).getDimensionAttributeValue("Date_Dimension", "Week_Day")
 						.toString();
-
 				this.userID = ActivityObjectsInDay.get(0).getDimensionIDValue("User_ID");
 			}
 		}
@@ -119,28 +117,30 @@ public class UserDayTimeline implements Serializable
 	public int countNumberOfValidDistinctActivities()
 	{
 		HashSet<String> set = new HashSet<String>();
-		for (int i = 0; i < ActivityObjectsInDay.size(); i++)
+		for (ActivityObject ao : ActivityObjectsInDay)// int i = 0; i < ActivityObjectsInDay.size(); i++)
 		{
-			if (UtilityBelt.isValidActivityName(ActivityObjectsInDay.get(i).getActivityName()))
+			if (UtilityBelt.isValidActivityName(ao.getActivityName()))
 			{
-				set.add(ActivityObjectsInDay.get(i).getActivityName().trim());
+				set.add(ao.getActivityName());// .trim());
 			}
 		}
-
 		return set.size();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public int countNumberOfValidActivities()
 	{
 		int count = 0;
-		for (int i = 0; i < ActivityObjectsInDay.size(); i++)
+		for (ActivityObject ao : ActivityObjectsInDay)// int i = 0; i < ActivityObjectsInDay.size(); i++)
 		{
-			if (UtilityBelt.isValidActivityName(ActivityObjectsInDay.get(i).getActivityName()))
+			if (UtilityBelt.isValidActivityName(ao.getActivityName()))
 			{
 				count += 1;
 			}
 		}
-
 		return count;
 	}
 
@@ -231,6 +231,11 @@ public class UserDayTimeline implements Serializable
 		return nextValidActivityObject;
 	}
 
+	/**
+	 * 
+	 * @param indexOfActivityObjectGiven
+	 * @return
+	 */
 	public ActivityObject getNextValidActivityAfterActivityAtThisPosition(int indexOfActivityObjectGiven)
 	{
 		ActivityObject nextValidActivityObject = null;
@@ -316,6 +321,10 @@ public class UserDayTimeline implements Serializable
 		return isNoValidAfter;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean containsOnlySingleActivity()
 	{
 		if (ActivityObjectsInDay.size() <= 1)
@@ -801,10 +810,13 @@ public class UserDayTimeline implements Serializable
 		return this.ActivityObjectsInDay.get(n);
 	}
 
-	public boolean isSameDay(ArrayList<ActivityObject> ActivityObjectsInDay) // checks whether all activity events in
-																				// the day timeline are of the same day
-																				// or
-																				// not
+	/**
+	 * Checks whether all activity events in the day timeline are of the same day or not
+	 * 
+	 * @param ActivityObjectsInDay
+	 * @return
+	 */
+	public boolean isSameDay(ArrayList<ActivityObject> ActivityObjectsInDay)
 	{
 		boolean sane = true;
 
@@ -824,10 +836,8 @@ public class UserDayTimeline implements Serializable
 
 		if (!sane)
 		{
-			System.err.println("Error: Day Timeline  contains ActivityObjects from more than one day"); /*
-																										 * with
-																										 * Date_ID:"+ dateID+"
-																										 */
+			System.err.println("Error: Day Timeline  contains ActivityObjects from more than one day");
+			/* with Date_ID:"+ dateID+" */
 			// System.exit(3);
 		}
 		return sane;

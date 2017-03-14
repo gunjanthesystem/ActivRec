@@ -40,15 +40,15 @@ public final class Constant
 	static String DATABASE_NAME = "";// ;"geolife1";// default database name,
 										// dcu_data_2";// "geolife1";// "start_base_2";databaseName
 	public static String rankScoring = "";// "sum";// default product"; // "sum"
-	public static String caseType = "";// CaseBasedV1";// default " CaseBasedV1 " or SimpleV3
+	public static Enums.CaseType caseType = null;// String caseType CaseBasedV1";// default " CaseBasedV1 " or SimpleV3
 
 	public static String howManyUsers = "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
 	static double currentMatchingUnit = -99; // stores the current matching unit at all times, used for some
 												// sanity checks
-	/**
-	 * This variable is not used for anything currently but just to write to console the type of matching
-	 */
-	static String typeOfTimelineMatching;// = "Daywise"; // N-count, N-hours
+	// Redudant since we have lookPastType/**
+	// * This variable is not used for anything currently but just to write to console the type of matching
+	// */
+	// static String typeOfTimelineMatching;// = "Daywise"; // N-count, N-hours
 	/**
 	 * ALPHA value for sum-based rank scoring
 	 */
@@ -97,7 +97,8 @@ public final class Constant
 	 * whether there threshold should be applied on candidate timelines based on edit distance
 	 */
 	public static final boolean candidateThresholding = false; //
-	public static final String[] typeOfThresholds = { "Global" };// Global"};//"Percent", "None"
+	public static final Enums.TypeOfThreshold[] typeOfThresholds = { Enums.TypeOfThreshold.Global };
+	// String[] typeOfThresholds = { "Global" };// Global"};//"Percent", "None"
 
 	/**
 	 * Determines if thresholding is used to eliminate candidate timelines beyond the threshold distance
@@ -139,7 +140,9 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = true;
 
-	public static final String lookPastType = "Count";// "Count";// "Hrs"
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;
+	// "Count";// "Count";// "Hrs"// "Daywise"
+
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
@@ -350,39 +353,40 @@ public final class Constant
 		// if(dname.trim().equals("HJEditDistance")
 	}
 
-	/**
-	 * Set the type of timeline matching. The currently supported types of timeline matching are: Daywise, N-count and
-	 * N-hours
-	 * 
-	 * @param name
-	 */
-	public static void setTypeOfTimelineMatching(String name)
-	{
-		name = name.trim();
+	// /**
+	// * Set the type of timeline matching. The currently supported types of timeline matching are: Daywise, N-count and
+	// * N-hours
+	// *
+	// * @param name
+	// */
+	// public static void setTypeOfTimelineMatching(String name)
+	// {
+	// name = name.trim();
+	//
+	// if (name != "Daywise" && name != "N-count" && name != "N-hours")
+	// {
+	// String msg = "Error in org.activity.util.Constant.setTypeOfTimelineMatching(String): unknown type of time line
+	// matching:"
+	// + name;
+	// PopUps.showError(msg);
+	// System.err.println(msg);
+	//
+	// }
+	// else
+	// {
+	// typeOfTimelineMatching = name;
+	// }
+	// }
 
-		if (name != "Daywise" && name != "N-count" && name != "N-hours")
-		{
-			String msg = "Error in org.activity.util.Constant.setTypeOfTimelineMatching(String): unknown type of time line matching:"
-					+ name;
-			PopUps.showError(msg);
-			System.err.println(msg);
-
-		}
-		else
-		{
-			typeOfTimelineMatching = name;
-		}
-	}
-
-	/**
-	 * Returns the type of timeline matching
-	 * 
-	 * @return
-	 */
-	public static String getTypeOfTimelineMatching()
-	{
-		return typeOfTimelineMatching;
-	}
+	// /**
+	// * Returns the type of timeline matching
+	// *
+	// * @return
+	// */
+	// public static String getTypeOfTimelineMatching()
+	// {
+	// return typeOfTimelineMatching;
+	// }
 
 	public static String getDistanceUsed()
 	{
@@ -767,7 +771,7 @@ public final class Constant
 		s.append("\nINVALID ACTIVITY 1:" + INVALID_ACTIVITY1);
 		s.append("\nINVALID ACTIVITY 2:" + INVALID_ACTIVITY2);
 		s.append("\nCommon path:" + commonPath);
-		s.append("\nType of timeline matching:" + typeOfTimelineMatching);
+		// s.append("\nType of timeline matching:" + typeOfTimelineMatching);
 		s.append("\nLook past type:" + lookPastType);
 		s.append("\nactivityNames:" + Arrays.toString(activityNames));
 		s.append("\nUsing Tolernace:" + useTolerance);
@@ -823,9 +827,9 @@ public final class Constant
 		// System.err.println("rankScoring name is empty");
 		// allSet = false;
 		// }
-		if (caseType.length() == 0)
+		if (caseType == null)// .length() == 0)
 		{
-			System.err.println("caseType name is empty");
+			System.err.println("caseType name is null");
 			allSet = false;
 		}
 		if (ALPHA < 0 && rankScoring.equals("sum"))

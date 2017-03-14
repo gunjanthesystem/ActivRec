@@ -428,19 +428,9 @@ public class ActivityObject implements Serializable
 		this.endTimestamp = DateTimeUtils.getTimestamp(endTimeString, endDateString);// in iiWAS ver, dateString is used
 																						// here instead of endDateString
 
-		this.durationInSeconds = (this.endTimestamp.getTime() - this.startTimestamp.getTime()) / 1000 + 1; // +1 because
-																											// 1 seconds
-																											// was
-																											// decremented
-																											// while
-																											// loading
-																											// data for
-																											// resolving
-																											// consecutive
-																											// activities
-																											// primarliy
-																											// for
-																											// visualisation
+		this.durationInSeconds = (this.endTimestamp.getTime() - this.startTimestamp.getTime()) / 1000 + 1;
+		// +1 because 1 seconds
+		// was decremented while loading data for resolving consecutive activities primarliy for visualisation
 
 		if (this.durationInSeconds < 0)
 		{
@@ -452,10 +442,7 @@ public class ActivityObject implements Serializable
 
 		// System.out.println("Exiting ActivityObject contructor-----------");
 		// System.out.println("Activity Event Create: number of dimensions"+dimensions.size()); // Debug Info: count the
-		// occurence of this in output to see if the number of
-		// activity events
-		// generated
-		// is correct:
+		// occurence of this in output to see if the number of activity events generated is correct:
 		// checked(on 27 June 1pm) 887 for Tessa and Yakub
 	}
 
@@ -775,11 +762,16 @@ public class ActivityObject implements Serializable
 		return this.dimensionIDNameValues.get(dimensionIDName);
 	}
 
-	public Object getDimensionAttributeValue(String dimensionName, String dimensionAttributeName) // (User_Dimension,
-																									// User_Name)
+	/**
+	 * // (User_Dimension, // User_Name)
+	 * 
+	 * @param dimensionName
+	 * @param dimensionAttributeName
+	 * @return
+	 */
+	public Object getDimensionAttributeValue(String dimensionName, String dimensionAttributeName)
 	{
 		Object dimensionAttributeValue = new Object();
-
 		Dimension dimensionToFetch = null;
 
 		for (int i = 0; i < dimensions.size(); i++)

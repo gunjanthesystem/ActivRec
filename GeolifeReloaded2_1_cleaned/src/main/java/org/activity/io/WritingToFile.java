@@ -2069,23 +2069,6 @@ public class WritingToFile
 		}
 	}
 
-	public static int getNumberOfWeekendsInGivenDayTimelines(LinkedHashMap<Date, UserDayTimeline> userTimelines)
-	{
-		int numberOfWeekends = 0;
-
-		for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
-		{
-			int weekDayInt = entry.getKey().getDay();
-
-			if (weekDayInt == 0 || weekDayInt == 6)
-			{
-				numberOfWeekends++;
-			}
-		}
-
-		return numberOfWeekends;
-	}
-
 	public static void writeEditSimilarityCalculation(ArrayList<ActivityObject> ActivityObjects1,
 			ArrayList<ActivityObject> ActivityObjects2, double editDistance)
 	{

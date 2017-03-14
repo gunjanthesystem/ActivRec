@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.FeatureWiseEditDistance;
@@ -48,7 +49,7 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
  * @since 28 October, 2014
  * @author gunjan
  */
-public class RecommendationMasterMUMar2017// implements IRecommenderMaster
+public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IRecommenderMaster
 {
 	// LinkedHashMap<String,LinkedHashMap<Date,UserDayTimeline>> userTimelines; // LinkedHashMap<Date,UserDayTimeline>
 	// dayTimelinesForUser;
@@ -111,14 +112,14 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	// private int fullCandOrSubCand; //0 means full cand .... 1 means subcand
 	private boolean thresholdPruningNoEffect;
 
-	public final String lookPastType;
+	public final Enums.LookPastType lookPastType;// String
 	// public int totalNumberOfProbableCands; // public int
 	// numCandsRejectedDueToNoCurrentActivityAtNonLast; // public int
 	// numCandsRejectedDueToNoNextActivity;
 	// candidateTimelinesStatus; //1 for has candidate timelines, -1 for no candidate timelines because no past timeline
 	// with current act, -2 for no candodate timelines because
 
-	String caseType; // 'SimpleV3' for no case case, 'CaseBasedV1' for first cased based implementation
+	Enums.CaseType caseType; // String 'SimpleV3' for no case case, 'CaseBasedV1' for first cased based implementation
 
 	// public static String commonPath ;//= Constant.commonPath;
 
@@ -198,9 +199,8 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public RecommendationMasterMUMar2017(LinkedHashMap<Date, UserDayTimeline> trainingTimelines,
 			LinkedHashMap<Date, UserDayTimeline> testTimelines, String dateAtRecomm, String timeAtRecomm,
-			int userAtRecomm, double thresholdVal, String typeOfThreshold, double matchingUnitInCountsOrHours,
-			String caseType, String lookPastType, boolean dummy // counts or hours
-	)
+			int userAtRecomm, double thresholdVal, Enums.TypeOfThreshold typeOfThreshold,
+			double matchingUnitInCountsOrHours, Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy)
 	{
 		String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 		/// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifePerformance/Test/Performance.csv";//
@@ -260,15 +260,15 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		}
 
 		// //////////////////
-		if (lookPastType.equalsIgnoreCase("Count"))
+		if (lookPastType.equals(Enums.LookPastType.NCount))// .equalsIgnoreCase("Count"))
 		{
-			this.currentTimeline = TimelineWithNext.getCurrentTimelineFromLongerTimelineMUCount(testTimeline,
+			this.currentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(testTimeline,
 					this.dateAtRecomm, this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours);
 		}
 
-		else if (lookPastType.equalsIgnoreCase("Hrs"))
+		else if (lookPastType.equals(Enums.LookPastType.NHours))// .equalsIgnoreCase("Hrs"))
 		{
-			this.currentTimeline = TimelineWithNext.getCurrentTimelineFromLongerTimelineMUHours(testTimeline,
+			this.currentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUHours(testTimeline,
 					this.dateAtRecomm, this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours);
 		}
 		else
@@ -307,7 +307,8 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		// All check OK
 		// //////////////////////////
 		long recommMasterT1 = System.currentTimeMillis();
-		this.candidateTimelines = getCandidateTimelinesMU(trainingTimeline, matchingUnitInCountsOrHours, lookPastType);// ,this.dateAtRecomm);//,this.activitiesGuidingRecomm
+		this.candidateTimelines = extractCandidateTimelinesMU(trainingTimeline, matchingUnitInCountsOrHours,
+				lookPastType);// ,this.dateAtRecomm);//,this.activitiesGuidingRecomm
 		long recommMasterT2 = System.currentTimeMillis();
 		long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
 		// ///////////////////////////
@@ -373,11 +374,11 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 		// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry for
 		// such candidate timelines from the
 		// distance scores map
-		if (typeOfThreshold.equalsIgnoreCase("Global"))
+		if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
 		{
 			this.thresholdAsDistance = thresholdVal;
 		}
-		else if (typeOfThreshold.equalsIgnoreCase("Percent"))
+		else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
 		{
 			double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
 			this.thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
@@ -1534,7 +1535,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, Pair<String, Double>> getHJEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm)
 	{
 		// <CandidateTimeline ID, Edit distance>
@@ -1548,7 +1549,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 			switch (caseType)
 			{
-			case "CaseBasedV1":
+			case CaseBasedV1:// "CaseBasedV1":
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
@@ -1567,7 +1568,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 				}
 				break;
 
-			case "SimpleV3":
+			case SimpleV3:// "SimpleV3":
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
@@ -1621,7 +1622,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, LinkedHashMap<String, Pair<String, Double>>> getFeatureWiseEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm)
 	{
 		// <CandidateTimeline ID, Edit distance>
@@ -1634,7 +1635,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 			switch (caseType)
 			{
-			case "CaseBasedV1":
+			case CaseBasedV1:// "CaseBasedV1":
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
@@ -1660,7 +1661,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 				}
 				break;
 
-			case "SimpleV3":
+			case SimpleV3:// "SimpleV3":
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
@@ -1715,7 +1716,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, Pair<String, Double>> getOTMDSAMEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm)
 	{
 		// <CandidateTimeline ID, Edit distance>
@@ -1729,7 +1730,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 			switch (caseType)
 			{
-			case "CaseBasedV1":
+			case CaseBasedV1:// "CaseBasedV1":
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
@@ -1748,7 +1749,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 				}
 				break;
 
-			case "SimpleV3":
+			case SimpleV3:// "SimpleV3":
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
@@ -1794,7 +1795,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, LinkedHashMap<String, Pair<String, Double>>> getFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm)
 	{
 		// <CandidateTimeline ID, Edit distance>
@@ -1807,7 +1808,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 			switch (caseType)
 			{
-			case "CaseBasedV1":
+			case CaseBasedV1:// "CaseBasedV1":
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
@@ -1833,7 +1834,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 				}
 				break;
 
-			case "SimpleV3":
+			case SimpleV3:// "SimpleV3":
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
@@ -1890,7 +1891,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, Pair<String, Double>> getNormalisedDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, String distanceUsed)
 	{
 
@@ -1955,7 +1956,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, Pair<String, Double>> getNormalisedHJEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm)
 	{
 		LinkedHashMap<Integer, Pair<String, Double>> candEditDistances = getHJEditDistancesForCandidateTimelinesFullCand(
@@ -1979,7 +1980,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, Pair<String, Double>> getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm)
 	{
 		LinkedHashMap<Integer, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise = getFeatureWiseEditDistancesForCandidateTimelinesFullCand(
@@ -2000,7 +2001,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 	public LinkedHashMap<Integer, Pair<String, Double>> getNormalisedOTMDSAMEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm)
 	{
 		LinkedHashMap<Integer, Pair<String, Double>> candEditDistances = getOTMDSAMEditDistancesForCandidateTimelinesFullCand(
@@ -2024,7 +2025,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, Pair<String, Double>> getNormalisedFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, String userAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm)
 	{
 		LinkedHashMap<Integer, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise = getFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
@@ -2363,7 +2364,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 */
 	public LinkedHashMap<Integer, Double> getCaseSimilarityEndPointActivityObjectCand(
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String caseType, int userID, String dateAtRecomm,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, int userID, String dateAtRecomm,
 			String timeAtRecomm)
 	{
 		// <CandidateTimeline ID, Edit distance>
@@ -2376,7 +2377,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 			// EditSimilarity editSimilarity = new EditSimilarity();
 			Double endPointEditDistanceForThisCandidate = new Double(-9999);
-			if (caseType.equals("CaseBasedV1")) // CaseBasedV1
+			if (caseType.equals(Enums.CaseType.CaseBasedV1))// "CaseBasedV1")) // CaseBasedV1
 			{
 				ActivityObject endPointActivityObjectCandidate = (activityObjectsInCand
 						.get(activityObjectsInCand.size() - 1)); // only the end point activity
@@ -2403,7 +2404,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 
 			}
 
-			else if (caseType.equals("SimpleV3"))
+			else if (caseType.equals(Enums.CaseType.SimpleV3))// "SimpleV3"))
 			{
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistance(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
@@ -2459,22 +2460,22 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 * @param lookPastType
 	 * @return
 	 */
-	public LinkedHashMap<Integer, TimelineWithNext> getCandidateTimelinesMU(Timeline trainingTimeline,
-			double matchingUnit, String lookPastType)
+	public LinkedHashMap<Integer, TimelineWithNext> extractCandidateTimelinesMU(Timeline trainingTimeline,
+			double matchingUnit, Enums.LookPastType lookPastType)
 	{
-		if (lookPastType.equalsIgnoreCase("Count"))
+		if (lookPastType.equals(Enums.LookPastType.NCount))// IgnoreCase("Count"))
 		{
 			if (matchingUnit % 1 != 0)
 			{
 				System.out.println("Warning: matching unit" + matchingUnit
 						+ " is not integer while the lookPastType is Count. We will use the integer value.");
 			}
-			return getCandidateTimelinesMUCount(trainingTimeline, new Double(matchingUnit).intValue());
+			return extractCandidateTimelinesMUCount(trainingTimeline, new Double(matchingUnit).intValue());
 		}
 
-		else if (lookPastType.equalsIgnoreCase("Hrs"))
+		else if (lookPastType.equals(Enums.LookPastType.NHours))// .equalsIgnoreCase("Hrs"))
 		{
-			return getCandidateTimelinesMUHours(trainingTimeline, matchingUnit);
+			return extractCandidateTimelinesMUHours(trainingTimeline, matchingUnit);
 		}
 		else
 		{
@@ -2493,11 +2494,8 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 * @param dayTimelinesForUser
 	 * @return
 	 */
-	public LinkedHashMap<Integer, TimelineWithNext> getCandidateTimelinesMUCount(Timeline trainingTimeline,
-			int matchingUnitInCounts)// ,
-										// /*ArrayList<ActivityObject>
-										// activitiesGuidingRecomm,*/
-										// //Date//dateAtRecomm)
+	public LinkedHashMap<Integer, TimelineWithNext> extractCandidateTimelinesMUCount(Timeline trainingTimeline,
+			int matchingUnitInCounts)// ArrayList<ActivityObject>// activitiesGuidingRecomm,*/// //Date//dateAtRecomm)
 	{
 		int count = 0;
 		// int matchingUnitInCounts = (int) this.matchingUnitInCountsOrHours;
@@ -2526,10 +2524,7 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 			{
 				// Timestamp newCandEndTimestamp= new
 				// Timestamp(ae.getStartTimestamp().getTime()+ae.getDurationInSeconds()*1000-1000); //decreasing 1
-				// second
-				// (because this is convention followed
-				// in
-				// data generation)
+				// second (because this is convention followed in data generation)
 				int newCandEndIndex = i;
 				// NOTE: going back matchingUnitCounts FROM THE index.
 				int newCandStartIndex = (newCandEndIndex - matchingUnitInCounts) >= 0
@@ -2567,11 +2562,8 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 	 * @param dayTimelinesForUser
 	 * @return
 	 */
-	public LinkedHashMap<Integer, TimelineWithNext> getCandidateTimelinesMUHours(Timeline trainingTimeline,
-			double matchingUnitInHours)// ,
-										// /*ArrayList<ActivityObject>
-										// activitiesGuidingRecomm,*/
-										// //Date//dateAtRecomm)
+	public LinkedHashMap<Integer, TimelineWithNext> extractCandidateTimelinesMUHours(Timeline trainingTimeline,
+			double matchingUnitInHours)// ArrayList<ActivityObject> activitiesGuidingRecomm,Date//dateAtRecomm)
 	{
 		int count = 0;
 		LinkedHashMap<Integer, TimelineWithNext> candidateTimelines = new LinkedHashMap<Integer, TimelineWithNext>();
@@ -2593,14 +2585,8 @@ public class RecommendationMasterMUMar2017// implements IRecommenderMaster
 			if (ae.getActivityName().equals(this.activityNameAtRecommPoint)) // same name as current activity
 			{
 				Timestamp newCandEndTimestamp = new Timestamp(
-						ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000); // decreasing 1
-																										// second
-																										// (because
-																										// this is
-																										// convention
-																										// followed
-																										// in data
-																										// generation)
+						ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
+				// decreasing 1 second (because this is convention followed in data generation)
 
 				// NOTE: going back matchingUnitHours FROM THE START TIMESTAMP and not the end timestamp.
 
