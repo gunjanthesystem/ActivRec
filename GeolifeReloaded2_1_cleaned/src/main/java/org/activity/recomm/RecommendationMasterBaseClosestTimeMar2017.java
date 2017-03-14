@@ -37,7 +37,7 @@ import org.activity.util.TimelineUtils;
  * @author gunjan
  *
  */
-public class RecommendationMasterBaseClosestTimeMar2017
+public class RecommendationMasterBaseClosestTimeMar2017 implements RecommendationMasterI
 {
 	LinkedHashMap<Date, UserDayTimeline> trainingTimelines, testTimelines, candidateTimelines;
 

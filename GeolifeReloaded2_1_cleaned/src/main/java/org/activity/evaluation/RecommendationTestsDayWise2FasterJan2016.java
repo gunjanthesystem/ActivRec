@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
@@ -45,11 +46,11 @@ public class RecommendationTestsDayWise2FasterJan2016
 	 * guiding recommendations' is higher than the cost of replacing 'percentageDistanceThresh' % of Activity Objects in
 	 * the activities guiding recommendation are pruned out from set of candidate timelines
 	 */
-	String typeOfThresholds[];// = { "Global" };// Global"};//"Percent",
+	Enums.TypeOfThreshold typeOfThresholds[];// = { "Global" };// Global"};//"Percent",
 	int globalThresholds[] = { 10000000 };// {50,100,150,200,250,300,350,400,450,500,550,600,650,700,1000};
 	int percentThresholds[] = { 100 };// {50,60,70,80,90,100};
 
-	String caseType;// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
+	Enums.CaseType caseType;// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
 
 	int userIDs[];// = { 62, 84, 52, 68, 167, 179, 153, 85, 128, 10 };
 	TreeMap<Integer, Integer> userIdNumOfRTsMap;
@@ -95,7 +96,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 		}
 		System.out.println("User ids = " + Arrays.toString(userIDs));
 
-		for (String typeOfThreshold : typeOfThresholds)
+		for (Enums.TypeOfThreshold typeOfThreshold : typeOfThresholds)
 		{
 			setThresholdsArray(typeOfThreshold);
 
@@ -307,7 +308,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 						 * ********** ************************************************ ********************************
 						 */
 
-						int numberOfWeekendsInTraining = WritingToFile
+						int numberOfWeekendsInTraining = TimelineUtils
 								.getNumberOfWeekendsInGivenDayTimelines(userTrainingTimelines);
 						int numberOfWeekdaysInTraining = userTrainingTimelines.size() - numberOfWeekendsInTraining;
 
@@ -315,7 +316,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 								.write(userName + "," + numberOfWeekendsInTraining + "," + numberOfWeekdaysInTraining);
 						bwNumOfWeekendsInTraining.newLine();
 
-						int numberOfWeekendsInAll = WritingToFile
+						int numberOfWeekendsInAll = TimelineUtils
 								.getNumberOfWeekendsInGivenDayTimelines(userAllDatesTimeslines);
 						int numberOfWeekdaysInAll = userAllDatesTimeslines.size() - numberOfWeekendsInAll;
 
@@ -368,7 +369,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 
 								Timestamp endTimeStamp = activityObjectInThatDay.getEndTimestamp();// getStartTimestamp();
 
-								String timeCategory = Evaluation.getTimeCategoryOfTheDay(endTimeStamp.getHours());
+								String timeCategory = DateTimeUtils.getTimeCategoryOfTheDay(endTimeStamp.getHours());
 
 								if (UserDayTimeline.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
 								{ // this will rarely happen because we are already not including the last activity of
@@ -463,8 +464,9 @@ public class RecommendationTestsDayWise2FasterJan2016
 										+ " candidate timelines");
 								System.out.println("\tIterating over candidate timelines:");
 
-								if (VerbosityConstants.WriteNumActsPerRTPerCand) // this information is redudant (TODO: check
-																		// redundant with which file)
+								if (VerbosityConstants.WriteNumActsPerRTPerCand) // this information is redudant (TODO:
+																					// check
+								// redundant with which file)
 								{
 									for (Map.Entry<Date, UserDayTimeline> entryAjooba : candidateTimelines.entrySet())
 									{
@@ -916,19 +918,19 @@ public class RecommendationTestsDayWise2FasterJan2016
 	 * 
 	 * @param typeOfThreshold
 	 */
-	public void setThresholdsArray(String typeOfThreshold)
+	public void setThresholdsArray(Enums.TypeOfThreshold typeOfThreshold)
 	{
 		switch (typeOfThreshold)
 		{
-		case "Percent":
+		case Percent:// "Percent":
 			this.thresholdsArray = percentThresholds;
 			break;
-		case "Global":
+		case Global:// "Global":
 			this.thresholdsArray = globalThresholds;
 			break;
-		case "None":
-			this.thresholdsArray = new int[] { 10000000 };
-			break;
+		// case "None":
+		// this.thresholdsArray = new int[] { 10000000 };
+		// break;
 		default:
 			System.err.println("Error: Unrecognised threshold type in setThresholdsArray()");
 		}

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
+import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 
 /**
@@ -26,7 +27,7 @@ public class Evaluation
 	public String commonPath;// =Constant.commonPath;
 
 	static final int theKOriginal = 5;
-	static final String[] timeCategories = { "All", "Morning", "Afternoon", "Evening" };
+	public static final String[] timeCategories = { "All", "Morning", "Afternoon", "Evening" };
 	// static String literalUnderscore, literalColon;
 
 	// /**
@@ -377,7 +378,7 @@ public class Evaluation
 				for (int j = 0; j < currentLineArray.size(); j++) // iterating over recommendation times (or columns)
 				{
 					int hourOfTheDay = getHourFromMetaString(currentLineArray.get(j));
-					if (getTimeCategoryOfTheDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
+					if (DateTimeUtils.getTimeCategoryOfTheDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
 							|| timeCategory.equals("All"))
 					{
 						countOfRecommendationTimesConsidered++;
@@ -543,7 +544,7 @@ public class Evaluation
 				for (int j = 0; j < currentLineArray.size(); j++) // iterating over recommendation times (or columns)
 				{
 					int hourOfTheDay = getHourFromMetaString(currentLineArray.get(j));
-					if (getTimeCategoryOfTheDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
+					if (DateTimeUtils.getTimeCategoryOfTheDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
 							|| timeCategory.equals("All"))
 					{
 						countOfRecommendationTimesConsidered++;
@@ -1175,28 +1176,6 @@ public class Evaluation
 		String[] splitted2 = RegexUtils.patternColon.split(splitted1[2]);
 		// splitted1[2].split(literalColon);// // Pattern.quote(":"));
 		return Integer.valueOf(splitted2[0]);
-	}
-
-	public static String getTimeCategoryOfTheDay(int hour)
-	{
-		String timeCategory = null;
-
-		if (hour >= 0 && hour < 12)
-		{
-			timeCategory = timeCategories[1];
-		}
-
-		else if (hour >= 12 && hour < 16)
-		{
-			timeCategory = timeCategories[2];
-		}
-
-		else if (hour >= 16 && hour <= 23)
-		{
-			timeCategory = timeCategories[3];
-		}
-
-		return timeCategory;
 	}
 
 	public static double round(double value, int places)

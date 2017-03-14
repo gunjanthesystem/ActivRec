@@ -10,6 +10,8 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import org.activity.evaluation.Evaluation;
+
 /**
  * 
  * Contains date time utility methods.
@@ -470,6 +472,28 @@ public class DateTimeUtils
 			e.printStackTrace();
 		}
 		return timeStamp;
+	}
+
+	public static String getTimeCategoryOfTheDay(int hour)
+	{
+		String timeCategory = null;
+	
+		if (hour >= 0 && hour < 12)
+		{
+			timeCategory = Evaluation.timeCategories[1];
+		}
+	
+		else if (hour >= 12 && hour < 16)
+		{
+			timeCategory = Evaluation.timeCategories[2];
+		}
+	
+		else if (hour >= 16 && hour <= 23)
+		{
+			timeCategory = Evaluation.timeCategories[3];
+		}
+	
+		return timeCategory;
 	}
 
 }

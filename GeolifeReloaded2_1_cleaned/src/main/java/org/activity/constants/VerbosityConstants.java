@@ -47,6 +47,8 @@ public class VerbosityConstants
 	public static final boolean WriteRecommendationTimesWithEditDistance = false;
 	public static final boolean WriteTimelines = false;
 	public static final boolean WriteLocationMap = false;
+	public static final boolean WriteNumOfValidsAfterAnRT = false;
+
 	/**
 	 * to save writing non essential redudant stuffs
 	 */

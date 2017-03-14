@@ -286,19 +286,24 @@ public class ReadingFromFile
 							+ databaseName),
 					"org.activity.util.ReadingFromFile.getBlackListedRTs(String)");
 		}
-
 		else
 		{
 			String fileName = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Jan27Daywise/recommPointsWithNoCandidates.csv";
 			res = twoColumnReaderString(fileName, ",", 0, 3, true);
-
 			System.out.println("The blacklisted RTs are: ");
 			res.stream().forEach(System.out::println);
 		}
-
 		return res;
 	}
 
+	/**
+	 * 
+	 * @param filePath
+	 * @param rowIndex
+	 * @param colIndex
+	 * @param hasColHeader
+	 * @return
+	 */
 	public static double getValByRowCol(String filePath, int rowIndex, int colIndex, boolean hasColHeader)
 	{
 		List<Double> vals = oneColumnReaderDouble(filePath, ",", colIndex, hasColHeader);

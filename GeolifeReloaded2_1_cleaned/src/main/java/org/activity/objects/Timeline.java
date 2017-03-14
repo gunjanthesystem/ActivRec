@@ -21,7 +21,7 @@ import org.activity.util.UtilityBelt;
  * @author gunjan
  *
  */
-public class Timeline
+public class Timeline implements TimelineI
 {
 	Integer timelineID;
 	ArrayList<ActivityObject> activityObjectsInTimeline;
@@ -57,7 +57,6 @@ public class Timeline
 	 */
 	public Timeline(ArrayList<ActivityObject> activityObjects)
 	{
-
 		/*
 		 * if(activityObjects.size() ==0 ) {
 		 * System.err.println("Error in creating Timeline: Empty Activity Objects provided"); System.exit(5); }
