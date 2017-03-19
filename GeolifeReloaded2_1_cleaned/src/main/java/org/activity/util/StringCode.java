@@ -200,9 +200,9 @@ public class StringCode
 		try
 		{
 			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXStartTimeAlphabsetSize);// Constant.SAXStartTimeAlphabetSize);//
-																												// SAXFactory.ts2string(ts,
-																												// actObjs.size(),
-																												// new
+			// SAXFactory.ts2string(ts,
+			// actObjs.size(),
+			// new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
 		}
@@ -262,7 +262,8 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, SaxConstants.SAXStartTimeAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
+					SaxConstants.SAXStartTimeAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -304,8 +305,8 @@ public class StringCode
 		try
 		{
 			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXDurationAlphabsetSize);// SAXFactory.ts2string(ts,
-																												// actObjs.size(),
-																												// new
+																													// actObjs.size(),
+																													// new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
 		}
@@ -367,7 +368,8 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, SaxConstants.SAXDurationAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
+					SaxConstants.SAXDurationAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -406,8 +408,9 @@ public class StringCode
 
 		try
 		{
-			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
-																														// actObjs.size(),
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(),
+					SaxConstants.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
+			// actObjs.size(),
 			// new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
@@ -510,8 +513,8 @@ public class StringCode
 		try
 		{
 			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXAvgAltitudeAlphabsetSize);// SAXFactory.ts2string(ts,
-																													// actObjs.size(),
-																													// new
+																														// actObjs.size(),
+																														// new
 			// NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
 		}
@@ -634,7 +637,8 @@ public class StringCode
 							+ ", lonL:" + longitude1AsLong + "  HSFC ind:" + vals1[i]);
 				}
 
-				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert) System.out.print(vals1[i] + " ");
+				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert)
+					System.out.print(vals1[i] + " ");
 			}
 
 			if (VerbosityConstants.verboseSAX) System.out.println();
@@ -658,7 +662,8 @@ public class StringCode
 							+ ", lonL:" + longitude2AsLong + "  HSFC ind:" + vals2[i]);
 				}
 
-				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert) System.out.print(vals2[i] + " ");
+				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert)
+					System.out.print(vals2[i] + " ");
 			}
 
 			double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -731,7 +736,8 @@ public class StringCode
 							+ ", lonL:" + longitude1AsLong + "  HSFC ind:" + vals1[i]);
 				}
 
-				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert) System.out.print(vals1[i] + " ");
+				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert)
+					System.out.print(vals1[i] + " ");
 			}
 
 			if (VerbosityConstants.verboseSAX) System.out.println();
@@ -755,7 +761,8 @@ public class StringCode
 							+ ", lonL:" + longitude2AsLong + "  HSFC ind:" + vals2[i]);
 				}
 
-				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert) System.out.print(vals2[i] + " ");
+				if (VerbosityConstants.verboseSAX && !VerbosityConstants.verboseHilbert)
+					System.out.print(vals2[i] + " ");
 			}
 
 			double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -789,6 +796,30 @@ public class StringCode
 			System.out.println("SAX: " + finalResultant[0] + " &  " + finalResultant[1]);
 		}
 		return finalResultant;
+	}
+
+	/**
+	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID
+	 * and hence is guaranteed to be unique for at least 400 activities.
+	 * 
+	 * @param activityObjects
+	 * @return
+	 */
+	public static String getStringCodeForActivityObjects(ArrayList<ActivityObject> activityObjects)
+	{
+		StringBuilder code = new StringBuilder();
+
+		activityObjects.stream().forEach(ao -> code.append(ao.getStringCode()));
+		String codeS = code.toString();
+
+		if (VerbosityConstants.verbose || VerbosityConstants.verboseSAX)
+		{
+			System.out.println("Inside getStringCodeForActivityObjects:\n Act Names:\n");
+			activityObjects.stream().forEach(ao -> System.out.print(ao.getActivityName() + " "));
+			System.out.println("Code: " + codeS);
+		}
+
+		return codeS;
 	}
 
 	// public static String getStringCodeForStartLatitudes(ArrayList<ActivityObject> actObjs)

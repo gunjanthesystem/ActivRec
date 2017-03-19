@@ -9,15 +9,15 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.activity.constants.Constant;
-import org.activity.constants.VerbosityConstants;
 import org.activity.stats.StatsUtils;
+import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
 
 /**
- * Trying to make it better and suitable for Gowalla dataset oon 15 Sep 2016
+ * Trying to make it better and suitable for Gowalla dataset on 15 Sep 2016
  * <p>
  * (thought on 9 sept 2016: to reduce size of object, remove method which can converted to static functional methods),
  * but perhaps do not affect the size of per object
@@ -31,15 +31,26 @@ public class ActivityObject implements Serializable
 {
 	private static final long serialVersionUID = 5056824311499867608L;
 
-	ArrayList<Dimension> dimensions;// this was to keep activity object generic but not entirely successfull IMHO
+	/**
+	 * this was to keep activity object generic but not entirely successfull IMHO
+	 */
+	ArrayList<Dimension> dimensions;//
 
-	HashMap<String, String> dimensionIDNameValues; // (User_ID, 2) //this was to keep activity object generic but not
-													// entirely successfull IMHO
+	/**
+	 * (User_ID, 2) //this was to keep activity object generic but not entirely successfull IMHO
+	 */
+	HashMap<String, String> dimensionIDNameValues; //
 
 	int activityID;
-	LinkedHashSet<Integer> locationIDs; // an activity object can have multiple location ids if it is a merged
-	String activityName, locationName, workingLevelCatIDs;// workingLevelCatIDs are "__" separated catID for the given
-															// working level in hierarhcy
+	/**
+	 * an activity object can have multiple location ids if it is a merged
+	 */
+	LinkedHashSet<Integer> locationIDs;
+	String activityName, locationName;
+	/**
+	 * workingLevelCatIDs are "__" separated catID for the given working level in hierarhcy
+	 */
+	String workingLevelCatIDs;//
 
 	private Timestamp startTimestamp, endTimestamp;
 
@@ -598,18 +609,18 @@ public class ActivityObject implements Serializable
 		return sb.toString();
 	}
 
-	/**
-	 * Create empty Activity Object
-	 */
-	public ActivityObject()
-	{
-		dimensions = new ArrayList<Dimension>();
-		dimensionIDNameValues = new HashMap<String, String>();
-		activityName = "empty";
-		activityID = -99;
-		this.locationIDs = new LinkedHashSet<Integer>();
-
-	}
+	// /**
+	// * Create empty Activity Object
+	// */
+	// public ActivityObject()
+	// {
+	// dimensions = new ArrayList<Dimension>();
+	// dimensionIDNameValues = new HashMap<String, String>();
+	// activityName = "empty";
+	// activityID = -99;
+	// this.locationIDs = new LinkedHashSet<Integer>();
+	//
+	// }
 
 	// String thisConstructorIsForTest
 	/**
@@ -635,49 +646,45 @@ public class ActivityObject implements Serializable
 	 */
 	public boolean isInvalidActivityName()
 	{
-		boolean invalid = false;
-
-		if (UtilityBelt.isValidActivityName(this.activityName) == false)// (this.activityName.trim().equals("Unknown")||this.activityName.trim().equals("Not
-																		// Available"))//equals("Others"))
-		{
-			invalid = true;
-		}
-
-		return invalid;
+		return !UtilityBelt.isValidActivityName(this.activityName);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public ArrayList<Dimension> getDimensions()
 	{
 		return dimensions;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Timestamp getMiddleTimestamp()
 	{
-		Timestamp middleTimestamp = null;
-
-		middleTimestamp = new Timestamp(
-				startTimestamp.getTime() + ((endTimestamp.getTime() - startTimestamp.getTime()) / 2));
-
-		return middleTimestamp;
-
+		return new Timestamp(startTimestamp.getTime() + (endTimestamp.getTime() - startTimestamp.getTime()) / 2);
 	}
 
-	public boolean equals(ActivityObject aeToCompare)
-	{
-		boolean equal = true;
-
-		if (this.activityName != aeToCompare.activityName) return false;
-
-		// else if()
-
-		return equal;
-	}
+	// public boolean equals(ActivityObject aeToCompare)
+	// {
+	// boolean $ = true;
+	//
+	// if (this.activityName != aeToCompare.activityName) return false;
+	// return $;
+	// }
 
 	// public String getWorkingLevelCatIDs()
 	// {
 	// return workingLevelCatIDs;
 	// }
 
+	/**
+	 * Set working level cat id. This is relevant when there exists hierarchy of category IDs.
+	 * 
+	 * @param workingLevelCatIDs
+	 */
 	public void setWorkingLevelCatIDs(String workingLevelCatIDs)
 	{
 		this.workingLevelCatIDs = workingLevelCatIDs;
@@ -709,42 +716,7 @@ public class ActivityObject implements Serializable
 	 */
 	public char getStringCode()
 	{
-		/*
-		 * String code = new String(); String activityName= this.activityName; int activityID=
-		 * generateSyntheticData.getActivityid(activityName); code= Character.toString ((char)(activityID+65));
-		 */
 		return StringCode.getCharCodeFromActivityID(this.activityID);
-	}
-
-	/**
-	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID
-	 * and hence is guaranteed to be unique for at least 400 activities.
-	 * 
-	 * @param ActivityObjects
-	 * @return
-	 */
-	public static String getStringCodeForActivityObjects(ArrayList<ActivityObject> ActivityObjects)
-	{
-		StringBuilder code = new StringBuilder();
-
-		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForActivityObjects");
-
-		for (int i = 0; i < ActivityObjects.size(); i++)
-		{
-			// String activityName= ActivityObjects.get(i).getActivityName();
-			// int activityID= generateSyntheticData.getActivityid(activityName);
-
-			code.append(ActivityObjects.get(i).getStringCode()); // Character.toString ((char)(activityID+65));
-																	// //getting the ascii code for (activity id+65)
-
-			if (VerbosityConstants.verboseSAX) System.out.print(ActivityObjects.get(i).getActivityName() + " ");
-		}
-
-		if (VerbosityConstants.verboseSAX)
-		{
-			System.out.println("Code: " + code.toString());
-		}
-		return code.toString();
 	}
 
 	public long getDurationInSeconds()
@@ -785,10 +757,10 @@ public class ActivityObject implements Serializable
 
 		if (dimensionToFetch == null)
 		{
-			System.err.println("Erros in getDimensionAttributeValue() for dimension name = " + dimensionName
-					+ ", dimension attribute name = " + dimensionAttributeName
-					+ "\n No such dimension found for this activity event.");
-
+			System.err.println(
+					PopUps.getCurrentStackTracedErrorMsg("Error in getDimensionAttributeValue() for dimension name = "
+							+ dimensionName + ", dimension attribute name = " + dimensionAttributeName
+							+ "\n No such dimension found for this activity event."));
 			System.exit(2); // Check later if it is wise or unwise to exit in such case
 		}
 
@@ -800,6 +772,21 @@ public class ActivityObject implements Serializable
 		return dimensionAttributeValue;
 	}
 
+	/**
+	 * 
+	 */
+	public void traverseActivityObject()
+	{
+		System.out.println("\n---Traversing Activity Event:--");
+		System.out.print("----Dimensions ID are: ");
+		traverseDimensionIDNameValues();
+		System.out.println("----Dimension attributes are: ");
+		dimensions.stream().forEach(d -> d.traverseDimensionAttributeNameValuepairs());
+	}
+
+	/**
+	 * 
+	 */
 	public void traverseDimensionIDNameValues()
 	{
 		for (Map.Entry<String, String> entry : this.dimensionIDNameValues.entrySet())
@@ -809,41 +796,12 @@ public class ActivityObject implements Serializable
 		System.out.println("");
 	}
 
-	// TODO
-	public String writeDimensionIDNameValues()
-	{
-		StringBuffer s = new StringBuffer();
-
-		for (Map.Entry<String, String> entry : this.dimensionIDNameValues.entrySet())
-		{
-			// s.append
-			// System.out.print(" " + entry.getKey() + " getDimensionAttributeValue: " + entry.getValue() + " ");
-		}
-		System.out.println("");
-		return null;
-	}
-
-	public void traverseActivityObject()
-	{
-		System.out.println("\n---Traversing Activity Event:--");
-		System.out.print("----Dimensions ID are: ");
-		traverseDimensionIDNameValues();
-
-		System.out.println("----Dimension attributes are: ");
-
-		for (int i = 0; i < dimensions.size(); i++)
-		{
-			Dimension dimension = dimensions.get(i);
-			dimension.traverseDimensionAttributeNameValuepairs();
-		}
-	}
-
-	// TODO
-	public static String writeActivityObject()
-	{
-		return null;
-	}
-
+	/**
+	 * 
+	 * @param name
+	 * @param start
+	 * @param end
+	 */
 	public ActivityObject(String name, Timestamp start, Timestamp end)
 	{
 		// userName=user;
@@ -1024,162 +982,162 @@ public class ActivityObject implements Serializable
 		return ((this.startTimestamp.getTime() <= endInterval.getTime())
 				&& (this.endTimestamp.getTime() >= startInterval.getTime()));
 	} // courtesy:http://goo.gl/pnR3p1
-
-	/*
-	 * /** UNTESTED
-	 * 
-	 * @param startInterval
-	 * 
-	 * @param endInterval
-	 * 
-	 * @return
-	 */
-	// $$30Sep UNTESTED
-	// TODO CHECK WHTHER THIS METHOD IS CORRECT LOGICALLY AS WELL AS FOR THIS USE CASE
-	/*
-	 * public long intersectingIntervalInSeconds(Timestamp startInterval, Timestamp endInterval)
-	 * 
-	 * { return ( (endInterval.getTime()-this.startTimestamp.getTime()) + (this.endTimestamp.getTime() -
-	 * startInterval.getTime()) )/1000; }
-	 */
-	/*
-	 * $$30Sep /**` Computes the intersection of the activity event on time axis with a given time interval.
-	 * 
-	 * @param startInterval
-	 * 
-	 * @param endInterval
-	 * 
-	 * @return
-	 */
-	/*
-	 * $$30Seppublic long intersectingIntervalInSeconds(Timestamp startInterval, Timestamp endInterval) { long
-	 * intersectionInSeconds=0;
-	 * 
-	 * /* If Activity Event: AAAAAAAAAAA or AAAAAAAA and interval to check: iiiiiiiiiii iiiiiiiiiiiiiii
-	 */
-	/*
-	 * if(this.startTimestamp.before(startInterval) && this.endTimestamp.before(endInterval) &&
-	 * this.endTimestamp.after(startInterval) )
-	 */
-	/*
-	 * $$30Sep if( (this.startTimestamp.getTime()<=startInterval.getTime()) && this.endTimestamp.before(endInterval) &&
-	 * this.endTimestamp.after(startInterval) ) { intersectionInSeconds= (this.endTimestamp.getTime() -
-	 * startInterval.getTime()) / 1000;
-	 * 
-	 * //added on Sep 30, 2014 if(( (endInterval.getTime() -startInterval.getTime()) / 1000)==0) {
-	 * intersectionInSeconds=1; // to include an activity whose start time and end time are equal (it can happen as we
-	 * are substrating 1second from duration.) } //////// }
-	 * 
-	 * /* If Activity Event:
-	 * >>Unknown>>Others>>Computer>>Others>>Computer>>Others>>Computer>>Others>>Computer>>Others>>Computer>>Others>>
-	 * Eating>>Others>>Socialising>>Others>>Commuting >>Others>>Socialising >>Others>>Socialising
-	 * >>Others>>Socialising>>Others>>Socialising>>Others AAAAAAAAAAA or AAAAAAAAA and interval to check: iiiiiiiiiii
-	 * iiiiiiiiiiiii
-	 */
-	/*
-	 * else if(this.startTimestamp.after(startInterval) && this.startTimestamp.before(endInterval) &&
-	 * this.endTimestamp.after(endInterval) )
-	 */
-	/*
-	 * $$30Sepelse if(this.startTimestamp.after(startInterval) && this.startTimestamp.before(endInterval) &&
-	 * (this.endTimestamp.getTime()>=endInterval.getTime()) ) { intersectionInSeconds=
-	 * (endInterval.getTime()-this.startTimestamp.getTime()) / 1000;
-	 * 
-	 * //added on Sep 30, 2014 if(( (endInterval.getTime() -startInterval.getTime()) / 1000)==0) {
-	 * intersectionInSeconds=1; // to include an activity whose start time and end time are equal (it can happen as we
-	 * are substrating 1second from duration.) } //////////// }
-	 * 
-	 * 
-	 * /* If Activity Event: AAAAAA and interval to check: iiiiiiiiiii
-	 */
-	/*
-	 * $$30Sepelse if(this.startTimestamp.after(startInterval) /*$$30Sep && this.startTimestamp.before(endInterval) &&
-	 * this.endTimestamp.before(endInterval) && this.endTimestamp.after(startInterval) ) { intersectionInSeconds=
-	 * (this.endTimestamp.getTime() -this.startTimestamp.getTime()) / 1000;
-	 * 
-	 * //added on Sep 30, 2014 if(( (endInterval.getTime() -startInterval.getTime()) / 1000)==0) {
-	 * intersectionInSeconds=1; // to include an activity whose start time and end time are equal (it can happen as we
-	 * are substrating 1second from duration.) } //////////// }
-	 * 
-	 * ////////// Addition on 29 September, 2014 : This refactoring should not affect the results of previous result
-	 * /*Not sure if we need this If Activity Event: AAAAAAAA or AAAAAAAAAAA and interval to check iiii iiiiiiiiiii *
-	 */
-	/*
-	 * $$30Sepelse if(this.startTimestamp.getTime()<= startInterval.getTime() && this.endTimestamp.getTime() >=
-	 * endInterval.getTime() ) {
-	 * System.out.println("Inside intersectingIntervalInSeconds: case of concern about 29 sep refactoring");
-	 * System.out.println("endInterval.getTime()="+endInterval.getTime()+"  startInterval.getTime()"+startInterval.
-	 * getTime()); intersectionInSeconds= (endInterval.getTime() -startInterval.getTime()) / 1000;
-	 * 
-	 * //added on Sep 30, 2014 if(( (endInterval.getTime() -startInterval.getTime()) / 1000)==0) {
-	 * intersectionInSeconds=1; // to include an activity whose start time and end time are equal (it can happen as we
-	 * are substrating 1second from duration.) } //////////// }
-	 * 
-	 * 
-	 * return intersectionInSeconds; }
-	 */
-	// /older IIWAS
-	// /**`
-	// * Computes the inersection of the activity event on time axis with a given time interval.
-	// *
-	// * @param startInterval
-	// * @param endInterval
-	// * @return
-	// */
-	// public long intersectingIntervalInSeconds(Timestamp startInterval, Timestamp endInterval)
-	// {
-	// long intersectionInSeconds=0;
-	//
-	// /*
-	// * If Activity Event: AAAAAAAAAAA
-	// * and interval to check: iiiiiiiiiii
-	// */
-	// /*if(this.startTimestamp.before(startInterval)
-	// && this.endTimestamp.before(endInterval)
-	// && this.endTimestamp.after(startInterval)
-	// )
-	// */
-	// if( (this.startTimestamp.getTime()<=startInterval.getTime())
-	// && this.endTimestamp.before(endInterval)
-	// && this.endTimestamp.after(startInterval)
-	// )
-	// {
-	// intersectionInSeconds= (this.endTimestamp.getTime() - startInterval.getTime()) / 1000;
-	// }
-	//
-	// /*
-	// * If Activity Event: AAAAAAAAAAA
-	// * and interval to check: iiiiiiiiiii
-	// */
-	// /*else if(this.startTimestamp.after(startInterval)
-	// && this.startTimestamp.before(endInterval)
-	// && this.endTimestamp.after(endInterval)
-	// )*/
-	// else if(this.startTimestamp.after(startInterval)
-	// && this.startTimestamp.before(endInterval)
-	// && (this.endTimestamp.getTime()>=endInterval.getTime())
-	// )
-	// {
-	// intersectionInSeconds= (endInterval.getTime()-this.startTimestamp.getTime()) / 1000;
-	// }
-	//
-	//
-	// /*
-	// * If Activity Event: AAAAAA
-	// * and interval to check: iiiiiiiiiii
-	// */
-	// else if(this.startTimestamp.after(startInterval)
-	// && this.startTimestamp.before(endInterval)
-	// && this.endTimestamp.before(endInterval)
-	// && this.endTimestamp.after(startInterval)
-	// )
-	// {
-	// intersectionInSeconds= (this.endTimestamp.getTime() -this.startTimestamp.getTime()) / 1000;
-	// }
-	//
-	// return intersectionInSeconds;
-	// }
-
-	// /
-
 }
+
+//////////////////////////////////// DEACTIVATED CODE BELOW//////
+/*
+ * /** UNTESTED
+ * 
+ * @param startInterval
+ * 
+ * @param endInterval
+ * 
+ * @return
+ */
+// $$30Sep UNTESTED
+// CHECK WHTHER THIS METHOD IS CORRECT LOGICALLY AS WELL AS FOR THIS USE CASE
+/*
+ * public long intersectingIntervalInSeconds(Timestamp startInterval, Timestamp endInterval)
+ * 
+ * { return ( (endInterval.getTime()-this.startTimestamp.getTime()) + (this.endTimestamp.getTime() -
+ * startInterval.getTime()) )/1000; }
+ */
+/*
+ * $$30Sep /**` Computes the intersection of the activity event on time axis with a given time interval.
+ * 
+ * @param startInterval
+ * 
+ * @param endInterval
+ * 
+ * @return
+ */
+/*
+ * $$30Seppublic long intersectingIntervalInSeconds(Timestamp startInterval, Timestamp endInterval) { long
+ * intersectionInSeconds=0;
+ * 
+ * /* If Activity Event: AAAAAAAAAAA or AAAAAAAA and interval to check: iiiiiiiiiii iiiiiiiiiiiiiii
+ */
+/*
+ * if(this.startTimestamp.before(startInterval) && this.endTimestamp.before(endInterval) &&
+ * this.endTimestamp.after(startInterval) )
+ */
+/*
+ * $$30Sep if( (this.startTimestamp.getTime()<=startInterval.getTime()) && this.endTimestamp.before(endInterval) &&
+ * this.endTimestamp.after(startInterval) ) { intersectionInSeconds= (this.endTimestamp.getTime() -
+ * startInterval.getTime()) / 1000;
+ * 
+ * //added on Sep 30, 2014 if(( (endInterval.getTime() -startInterval.getTime()) / 1000)==0) { intersectionInSeconds=1;
+ * // to include an activity whose start time and end time are equal (it can happen as we are substrating 1second from
+ * duration.) } //////// }
+ * 
+ * /* If Activity Event:
+ * >>Unknown>>Others>>Computer>>Others>>Computer>>Others>>Computer>>Others>>Computer>>Others>>Computer>>Others>>
+ * Eating>>Others>>Socialising>>Others>>Commuting >>Others>>Socialising >>Others>>Socialising
+ * >>Others>>Socialising>>Others>>Socialising>>Others AAAAAAAAAAA or AAAAAAAAA and interval to check: iiiiiiiiiii
+ * iiiiiiiiiiiii
+ */
+/*
+ * else if(this.startTimestamp.after(startInterval) && this.startTimestamp.before(endInterval) &&
+ * this.endTimestamp.after(endInterval) )
+ */
+/*
+ * $$30Sepelse if(this.startTimestamp.after(startInterval) && this.startTimestamp.before(endInterval) &&
+ * (this.endTimestamp.getTime()>=endInterval.getTime()) ) { intersectionInSeconds=
+ * (endInterval.getTime()-this.startTimestamp.getTime()) / 1000;
+ * 
+ * //added on Sep 30, 2014 if(( (endInterval.getTime() -startInterval.getTime()) / 1000)==0) { intersectionInSeconds=1;
+ * // to include an activity whose start time and end time are equal (it can happen as we are substrating 1second from
+ * duration.) } //////////// }
+ * 
+ * 
+ * /* If Activity Event: AAAAAA and interval to check: iiiiiiiiiii
+ */
+/*
+ * $$30Sepelse if(this.startTimestamp.after(startInterval) /*$$30Sep && this.startTimestamp.before(endInterval) &&
+ * this.endTimestamp.before(endInterval) && this.endTimestamp.after(startInterval) ) { intersectionInSeconds=
+ * (this.endTimestamp.getTime() -this.startTimestamp.getTime()) / 1000;
+ * 
+ * //added on Sep 30, 2014 if(( (endInterval.getTime() -startInterval.getTime()) / 1000)==0) { intersectionInSeconds=1;
+ * // to include an activity whose start time and end time are equal (it can happen as we are substrating 1second from
+ * duration.) } //////////// }
+ * 
+ * ////////// Addition on 29 September, 2014 : This refactoring should not affect the results of previous result /*Not
+ * sure if we need this If Activity Event: AAAAAAAA or AAAAAAAAAAA and interval to check iiii iiiiiiiiiii *
+ */
+/*
+ * $$30Sepelse if(this.startTimestamp.getTime()<= startInterval.getTime() && this.endTimestamp.getTime() >=
+ * endInterval.getTime() ) {
+ * System.out.println("Inside intersectingIntervalInSeconds: case of concern about 29 sep refactoring");
+ * System.out.println("endInterval.getTime()="+endInterval.getTime()+"  startInterval.getTime()"+startInterval.
+ * getTime()); intersectionInSeconds= (endInterval.getTime() -startInterval.getTime()) / 1000;
+ * 
+ * //added on Sep 30, 2014 if(( (endInterval.getTime() -startInterval.getTime()) / 1000)==0) { intersectionInSeconds=1;
+ * // to include an activity whose start time and end time are equal (it can happen as we are substrating 1second from
+ * duration.) } //////////// }
+ * 
+ * 
+ * return intersectionInSeconds; }
+ */
+// /older IIWAS
+// /**`
+// * Computes the inersection of the activity event on time axis with a given time interval.
+// *
+// * @param startInterval
+// * @param endInterval
+// * @return
+// */
+// public long intersectingIntervalInSeconds(Timestamp startInterval, Timestamp endInterval)
+// {
+// long intersectionInSeconds=0;
+//
+// /*
+// * If Activity Event: AAAAAAAAAAA
+// * and interval to check: iiiiiiiiiii
+// */
+// /*if(this.startTimestamp.before(startInterval)
+// && this.endTimestamp.before(endInterval)
+// && this.endTimestamp.after(startInterval)
+// )
+// */
+// if( (this.startTimestamp.getTime()<=startInterval.getTime())
+// && this.endTimestamp.before(endInterval)
+// && this.endTimestamp.after(startInterval)
+// )
+// {
+// intersectionInSeconds= (this.endTimestamp.getTime() - startInterval.getTime()) / 1000;
+// }
+//
+// /*
+// * If Activity Event: AAAAAAAAAAA
+// * and interval to check: iiiiiiiiiii
+// */
+// /*else if(this.startTimestamp.after(startInterval)
+// && this.startTimestamp.before(endInterval)
+// && this.endTimestamp.after(endInterval)
+// )*/
+// else if(this.startTimestamp.after(startInterval)
+// && this.startTimestamp.before(endInterval)
+// && (this.endTimestamp.getTime()>=endInterval.getTime())
+// )
+// {
+// intersectionInSeconds= (endInterval.getTime()-this.startTimestamp.getTime()) / 1000;
+// }
+//
+//
+// /*
+// * If Activity Event: AAAAAA
+// * and interval to check: iiiiiiiiiii
+// */
+// else if(this.startTimestamp.after(startInterval)
+// && this.startTimestamp.before(endInterval)
+// && this.endTimestamp.before(endInterval)
+// && this.endTimestamp.after(startInterval)
+// )
+// {
+// intersectionInSeconds= (this.endTimestamp.getTime() -this.startTimestamp.getTime()) / 1000;
+// }
+//
+// return intersectionInSeconds;
+// }
+
+// /

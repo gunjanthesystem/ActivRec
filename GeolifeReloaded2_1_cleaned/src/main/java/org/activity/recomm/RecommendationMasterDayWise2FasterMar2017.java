@@ -828,7 +828,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 
 		String activityAtRecommPointAsStringCode = String
 				.valueOf(activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1).getStringCode());
-		String activitiesGuidingAsStringCode = ActivityObject.getStringCodeForActivityObjects(activitiesGuidingRecomm);
+		String activitiesGuidingAsStringCode = StringCode.getStringCodeForActivityObjects(activitiesGuidingRecomm);
 		String userDayTimelineAsStringCode = userDayTimeline.getActivityObjectsAsStringCode();
 
 		// IMPORTANAT CHANGE on 24 OCt

@@ -14,7 +14,6 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
-import org.activity.objects.UserDayTimeline;
 import org.activity.stats.StatsUtils;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
@@ -64,7 +63,7 @@ public class TimelinesAttributesExtraction
 	 *            (Absolute path to file containing ground truth, column in which ground truth is there, has column
 	 *            headers or not)
 	 */
-	public TimelinesAttributesExtraction(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines,
+	public TimelinesAttributesExtraction(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
 			String pathToWrite, Triple<String, Integer, Boolean> groundTruthToRead)
 	{
 		// PopUps.showMessage("Num of user timelnes recieved inTimelinesFeatureExtraction= " +
@@ -543,8 +542,15 @@ public class TimelinesAttributesExtraction
 
 	}
 
+	/**
+	 * Checks is they have same num of user ,i.e, keys
+	 * 
+	 * @param usersDayTimelines
+	 * @param usersTimelines
+	 * @return
+	 */
 	public boolean sanityCheckDayTimelineToTimelineConversion(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
 			LinkedHashMap<String, Timeline> usersTimelines)
 	{
 		boolean sane = true;
@@ -556,7 +562,7 @@ public class TimelinesAttributesExtraction
 					"Error in sanityCheckDayTimelineTimelineMatching: (usersDayTimelines.size() !=usersTimelines.size())");
 		}
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 
 		}
@@ -571,7 +577,7 @@ public class TimelinesAttributesExtraction
 	 * @param usersDayTimelines
 	 */
 	public void initialiseTimelineAttributeVectors(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		System.out.println("Inside initialiseTimelineAttributeVectors ");
 		timelineAttributeVectors = new LinkedHashMap<String, ArrayList<String>>();
@@ -580,7 +586,7 @@ public class TimelinesAttributesExtraction
 
 		int instanceID = 1;
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			timelineAttributeVectors.put(entry.getKey(), new ArrayList<String>());
 			userIDInstanceID.put(entry.getKey(), instanceID);
@@ -610,7 +616,7 @@ public class TimelinesAttributesExtraction
 	 * @return
 	 */
 	public LinkedHashMap<String, Double> getSequenceEntropyAfterExpungingInvalids(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineStats
 				.transformToSequenceDayWise(usersDayTimelines);// , false);
@@ -629,19 +635,19 @@ public class TimelinesAttributesExtraction
 	 * @return
 	 */
 	public LinkedHashMap<String, Double> getFeatureSampleEntropyAfterExpungingInvalids(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String featureName, int m)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String featureName, int m)
 	{
 		// TimelineStats.performTimeSeriesAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelines));//
 		// LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userLevelSampEn =
 		// TimelineStats.performSampleEntropyVsMAnalysis2(usersDayTimelines);
 		LinkedHashMap<String, Double> res = new LinkedHashMap<String, Double>();
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey();
 			// System.out.println(" m =" + m);
 
-			double sampen = ReadingFromFile.getValByRowCol(Constant.getCommonPath() + userIDN + featureName + "SampEn.csv",
-					m - 1, 1, false);
+			double sampen = ReadingFromFile
+					.getValByRowCol(Constant.getCommonPath() + userIDN + featureName + "SampEn.csv", m - 1, 1, false);
 
 			// System.out.println(" putting " + userIDN + " , " + sampen);
 			res.put(userIDN, sampen);
@@ -664,13 +670,13 @@ public class TimelinesAttributesExtraction
 	 * @return
 	 */
 	public LinkedHashMap<String, Double> getAggSampleEntropyAfterExpungingInvalids(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String aggName, int m)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String aggName, int m)
 	{
 		// TimelineStats.performTimeSeriesAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelines));//
 		// LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userLevelSampEn =
 		// TimelineStats.performSampleEntropyVsMAnalysis2(usersDayTimelines);
 		LinkedHashMap<String, Double> res = new LinkedHashMap<String, Double>();
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey();
 			double sampen = ReadingFromFile.getValByRowCol(Constant.getCommonPath() + userIDN + aggName + "SampEn.csv",
@@ -692,13 +698,13 @@ public class TimelinesAttributesExtraction
 	 * @return hjorth parameter rounded to 5 decimal places
 	 */
 	public LinkedHashMap<String, Double> getHjorthParametersAfterExpungingInvalids(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String featureName,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String featureName,
 			int parameterIndex)
 	{
 		LinkedHashMap<String, Double> res = new LinkedHashMap<String, Double>();
 
 		System.out.println(" inside getHjorthParametersAfterExpungingInvalids");
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey();
 			// System.out.println(" parameterIndex =" + parameterIndex);

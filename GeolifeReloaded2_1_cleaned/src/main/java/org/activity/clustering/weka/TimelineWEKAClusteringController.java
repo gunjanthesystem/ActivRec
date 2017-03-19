@@ -28,8 +28,8 @@ import org.activity.featureExtraction.TimelinesAttributesExtraction;
 import org.activity.io.CSVUtils;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
+import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
-import org.activity.objects.UserDayTimeline;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -150,8 +150,7 @@ public class TimelineWEKAClusteringController
 	 * @param usersDayTimelinesAll
 	 * @param trainingTestUsers
 	 */
-	public TimelineWEKAClusteringController(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesAll,
+	public TimelineWEKAClusteringController(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll,
 			Pair<ArrayList<String>, ArrayList<String>> trainingTestUsers)
 	{
 		String nameOfFeatureFile = "";
@@ -187,10 +186,8 @@ public class TimelineWEKAClusteringController
 				String groundTruthLabel = gtEntry.getFirst();
 				String groundTruthFileName = gtEntry.getSecond();
 
-				String directoryToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/WekaCLustering/"// "/run/media/gunjan/HOME/gunjan/Geolife
-																																// Data
-																																// Works/stats/wekaResults/"//
-																																// TimelinesClustering/"
+				String directoryToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/WekaCLustering/"
+						// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/"// TimelinesClustering/"
 						+ Constant.getDatabaseName() + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
 						+ LocalDateTime.now().getDayOfMonth() + "_" + Constant.howManyUsers + "_" + groundTruthLabel;
 				new File(directoryToWrite).mkdir();
@@ -792,9 +789,12 @@ public class TimelineWEKAClusteringController
 		// User1
 		TreeMap<String, String> actualClass = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
 		TreeMap<String, String> predictedClassAll = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassSampEn2 = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassSampEn3 = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassKGram = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassSampEn2 = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassSampEn3 = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassKGram = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
 
 		// distribution <first cluster, thirdcluster, secondcluster>
 		TreeMap<String, Triple<Double, Double, Double>> predictedClassAllDist = new TreeMap<String, Triple<Double, Double, Double>>(
@@ -2124,10 +2124,10 @@ public class TimelineWEKAClusteringController
 			// convert the indices with respect to the original data instances
 			// PopUps.showMessage("before adjustment Index of Selected Attributes =" + Utils.arrayToString(indices));
 			indices = StatsUtils.addConstantToEach(indices, 2); // adding 2, (1:compensating the deletion of
-																	// instanceid, 1: to compensating that the selected
-																	// indices start from 0
-																	// while here we
-																	// need them to begin at 1)
+																// instanceid, 1: to compensating that the selected
+																// indices start from 0
+																// while here we
+																// need them to begin at 1)
 
 			String selectedAttributesAsString = (Utils.arrayToString(indices));
 			// PopUps.showMessage("Adjusted Index of Selected Attributes =" + selectedAttributesAsString);

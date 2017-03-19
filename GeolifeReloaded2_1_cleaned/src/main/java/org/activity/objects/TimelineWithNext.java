@@ -12,18 +12,29 @@ import java.util.ArrayList;
  */
 public class TimelineWithNext extends Timeline
 {
-	ActivityObject nextActivityObject; // currently the nextActivityObject is set to be always a valid ActivityObject
-	int immediateNextActivityIsInvalid = -1; // -1 means 'not determined yet', '0' means 'was not invalid', '1' means
-												// 'was invalid'
+	private static final long serialVersionUID = 1L;
+	/**
+	 * currently the nextActivityObject is set to be always a valid ActivityObject
+	 */
+	ActivityObject nextActivityObject; //
+	/**
+	 * -1 means 'not determined yet', '0' means 'was not invalid', '1' means 'was invalid'
+	 */
+	int immediateNextActivityIsInvalid = -1; //
 
 	/**
 	 * Create Timeline from given Activity Objects and the given next Activity Object to be considered
 	 * 
+	 * 
 	 * @param activityObjects
+	 * @param nextActivityObject
+	 * @param shouldBelongToSingleDay
+	 * @param shouldBelongToSingleUser
 	 */
-	public TimelineWithNext(ArrayList<ActivityObject> activityObjects, ActivityObject nextActivityObject)
+	public TimelineWithNext(ArrayList<ActivityObject> activityObjects, ActivityObject nextActivityObject,
+			boolean shouldBelongToSingleDay, boolean shouldBelongToSingleUser)
 	{
-		super(activityObjects);
+		super(activityObjects, shouldBelongToSingleDay, shouldBelongToSingleUser);
 		this.nextActivityObject = nextActivityObject;
 	}
 

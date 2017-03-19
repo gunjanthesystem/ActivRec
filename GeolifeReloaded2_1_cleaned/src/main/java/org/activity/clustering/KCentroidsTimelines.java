@@ -154,38 +154,9 @@ public class KCentroidsTimelines
 		}
 
 		this.numOfUpdates = (countOfIte - 1);
-		System.out.println("----After clustering (updating centroids) for -----" + (countOfIte - 1) + " iterations"); // num
-																														// of
-																														// times
-																														// centroids
-																														// are
-																														// updated,
-																														// if
-																														// (countOfIte
-																														// -
-																														// 1)
-																														// =
-																														// 2
-																														// ,
-																														// this
-																														// means
-																														// 2
-																														// times
-																														// the
-																														// centroid
-																														// were
-																														// updated
-																														// with
-																														// change
-																														// and
-																														// third
-																														// time
-																														// there
-																														// was
-																														// no
-																														// change
-																														// in
-																														// centroids
+		System.out.println("----After clustering (updating centroids) for -----" + (countOfIte - 1) + " iterations");
+		// num of times centroids are updated, if (countOfIte - 1) = 2 , this means
+		// 2 times the centroid were updated with change and third time there was no change in centroids
 		printClustersUserwise();
 
 		if (writeResultToFile) writeResultToFile("KCentroid" + numOfClusters + "ClustersResults");
@@ -199,17 +170,18 @@ public class KCentroidsTimelines
 		return numOfUpdates;
 	}
 
-	@SuppressWarnings("unused")
+	/**
+	 * 
+	 * @param sequenceOfSymbols
+	 */
 	public void setDataPoints(LinkedHashMap<String, Timeline> sequenceOfSymbols)
 	{
 		dataPoints = new ArrayList<DataPoint>();
-
 		int minimumLength = Integer.MAX_VALUE;
 		// int maximumLength = Integer.MIN_VALUE;
 
 		for (Map.Entry<String, Timeline> dataEntry : sequenceOfSymbols.entrySet())
 		{
-
 			Timeline val = dataEntry.getValue();
 			if (trimDataPointsToMinimalHead || trimDataPointsToMinimalTail)
 			{
@@ -217,7 +189,6 @@ public class KCentroidsTimelines
 				{
 					minimumLength = val.size();
 				}
-
 				// if (val.length() < maximumLength)
 				// {
 				// maximumLength = val.length();
@@ -239,13 +210,14 @@ public class KCentroidsTimelines
 
 				if (trimDataPointsToMinimalHead)
 				{
-					val = new Timeline(val.getActivityObjectsInTimelineFromToIndex(0, minimumLength));
+					val = new Timeline(val.getActivityObjectsInTimelineFromToIndex(0, minimumLength), false, true);
 				}
 
 				else if (trimDataPointsToMinimalTail)
 				{
 					val = new Timeline(
-							val.getActivityObjectsInTimelineFromToIndex(val.size() - minimumLength, val.size()));
+							val.getActivityObjectsInTimelineFromToIndex(val.size() - minimumLength, val.size()), false,
+							true);
 				}
 				DataPoint d = new DataPoint(dataEntry.getKey(), val);
 				dataPoints.add(d);
@@ -255,6 +227,10 @@ public class KCentroidsTimelines
 
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public int randomlySeedClusters()
 	{
 		System.out.println("--------Start of random Seeding");

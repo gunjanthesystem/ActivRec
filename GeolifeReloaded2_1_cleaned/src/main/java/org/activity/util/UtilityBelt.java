@@ -16,14 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
+import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
-import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
@@ -74,8 +75,6 @@ public class UtilityBelt
 		return ((new BigDecimal(Double.toString(ldouble))).toPlainString());
 	}
 
-	
-
 	// public static LinkedHashMap<String, Timeline> dayTimelinesToRearrangedTimelines(LinkedHashMap<String,
 	// LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
 	// {
@@ -125,17 +124,16 @@ public class UtilityBelt
 	// return userTimelines;
 	// }
 
-	public static ArrayList<String> getListOfUsers(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+	public static ArrayList<String> getListOfUsers(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
 	{
-		ArrayList<String> users = new ArrayList<String>();
+		return (ArrayList<String>) usersTimelines.entrySet().stream().map(e -> e.getKey()).collect(Collectors.toList());
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
-		{
-			users.add(usersTimelinesEntry.getKey());
-		}
-
-		return users;
+		// ArrayList<String> users = new ArrayList<String>();
+		// for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
+		// {
+		// users.add(usersTimelinesEntry.getKey());
+		// }
+		// return users;
 
 	}
 
@@ -1452,12 +1450,12 @@ public class UtilityBelt
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> reformatUserIDs(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> map)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reformatUserIDs(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> map)
 	{
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> rearranged = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearranged = new LinkedHashMap<>();
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : map.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : map.entrySet())
 		{
 			int newUserID = UtilityBelt.getIndexOfUserID(Integer.valueOf(entry.getKey())) + 1;
 			rearranged.put(String.valueOf(newUserID), entry.getValue());

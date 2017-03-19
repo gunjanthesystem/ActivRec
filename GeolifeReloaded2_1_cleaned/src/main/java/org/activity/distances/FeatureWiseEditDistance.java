@@ -102,8 +102,8 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 		if (Constant.considerAllFeaturesForFeatureWiseEditDistance
 				|| Constant.considerActivityNameInFeatureWiseEditDistance)
 		{
-			String stringCodeForActivityNames1 = ActivityObject.getStringCodeForActivityObjects(activityObjects1);
-			String stringCodeForActivityNames2 = ActivityObject.getStringCodeForActivityObjects(activityObjects2);
+			String stringCodeForActivityNames1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
+			String stringCodeForActivityNames2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
 			Pair<String, Double> levenshteinActivityName = getMySimpleLevenshteinDistance(stringCodeForActivityNames1,
 					stringCodeForActivityNames2, 1, 1, 2);
 			mapOfDistances.put("ActivityName", levenshteinActivityName);

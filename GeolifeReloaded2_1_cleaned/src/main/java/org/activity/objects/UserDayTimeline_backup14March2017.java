@@ -6,19 +6,25 @@
 // import java.util.ArrayList;
 // import java.util.HashSet;
 //
-// import org.activity.util.StringCode;
+// import org.activity.constants.VerbosityConstants;
 // import org.activity.util.UtilityBelt;
 //
-// public class UserDayTimeline_backup17Sep2016 implements Serializable
+// public class UserDayTimeline_backup14March2017 implements Serializable, TimelineI
 // {
 // private static final long serialVersionUID = 2L;
 // private ArrayList<ActivityObject> ActivityObjectsInDay;
 // private String dateID, userID;
 //
 // private String dayName; // sunday, monday, etc..
-// private Date date;
 //
-// public UserDayTimeline_backup17Sep2016()
+// /**
+// * java.sql.Date -> java.lang.LocalDate -> java.sql.Date has been done while creating timelines to remove the time
+// * component of sql date
+// */
+// private Date date; // changed from java.sql.date to LocalDate on 18 Sep 2016 since sql.date takes time into account
+// // as well.
+//
+// public UserDayTimeline_backup14March2017()
 // {
 //
 // }
@@ -28,7 +34,7 @@
 // * @param ActivityObjects
 // * @param date
 // */
-// public UserDayTimeline_backup17Sep2016(ArrayList<ActivityObject> ActivityObjects, Date date)
+// public UserDayTimeline_backup14March2017(ArrayList<ActivityObject> ActivityObjects, Date date)
 // {
 // this.date = date;
 // if (ActivityObjects.size() == 0)
@@ -44,10 +50,8 @@
 // if (isSameDay(ActivityObjectsInDay) == true)
 // {
 // this.dateID = ActivityObjectsInDay.get(0).getDimensionIDValue("Date_ID");
-//
 // this.dayName = ActivityObjectsInDay.get(0).getDimensionAttributeValue("Date_Dimension", "Week_Day")
 // .toString();
-//
 // this.userID = ActivityObjectsInDay.get(0).getDimensionIDValue("User_ID");
 // }
 // }
@@ -60,8 +64,9 @@
 // * @param dayName
 // * @param date
 // */
-// public UserDayTimeline_backup17Sep2016(ArrayList<ActivityObject> activityObjectsInDay, String dateID, String userID,
-// String dayName, Date date)
+// public UserDayTimeline_backup14March2017(ArrayList<ActivityObject> activityObjectsInDay, String dateID, String
+// userID, String dayName,
+// Date date)
 // {
 // ActivityObjectsInDay = activityObjectsInDay;
 // this.dateID = dateID;
@@ -105,58 +110,86 @@
 // return dateID;
 // }
 //
+// /**
+// * Num of activities with distinct activity names
+// *
+// * @return
+// */
 // public int countNumberOfValidDistinctActivities()
 // {
 // HashSet<String> set = new HashSet<String>();
-// for (int i = 0; i < ActivityObjectsInDay.size(); i++)
+// for (ActivityObject ao : ActivityObjectsInDay)// int i = 0; i < ActivityObjectsInDay.size(); i++)
 // {
-// if (UtilityBelt.isValidActivityName(ActivityObjectsInDay.get(i).getActivityName()))
+// if (UtilityBelt.isValidActivityName(ao.getActivityName()))
 // {
-// set.add(ActivityObjectsInDay.get(i).getActivityName().trim());
+// set.add(ao.getActivityName());// .trim());
 // }
 // }
-//
 // return set.size();
 // }
 //
+// /**
+// *
+// * @return
+// */
 // public int countNumberOfValidActivities()
 // {
 // int count = 0;
-// for (int i = 0; i < ActivityObjectsInDay.size(); i++)
+// for (ActivityObject ao : ActivityObjectsInDay)// int i = 0; i < ActivityObjectsInDay.size(); i++)
 // {
-// if (UtilityBelt.isValidActivityName(ActivityObjectsInDay.get(i).getActivityName()))
+// if (UtilityBelt.isValidActivityName(ao.getActivityName()))
 // {
 // count += 1;
 // }
 // }
-//
 // return count;
 // }
 //
-// public int getNumOfValidActivityObjectAfterThisTime(Timestamp timestamp)
+// /**
+// *
+// * @param timestamp
+// * @return
+// */
+// public int getNumOfValidActivityObjectAfterThisTime(Timestamp timestampOriginal)
 // {
 // int numOfValids = 0;
-//
-// while (getNextValidActivityAfterActivityAtThisTime(timestamp) != null)
+// Timestamp timestamp = timestampOriginal;
+// // while ((currentLine = br.readLine()) != null)
+// ActivityObject nextValidAOAfterAOAtThisTime;
+// while ((nextValidAOAfterAOAtThisTime = getNextValidActivityAfterActivityAtThisTime(timestamp)) != null)
+// // while (getNextValidActivityAfterActivityAtThisTime(timestamp) != null)
 // {
 // numOfValids += 1;
-// timestamp = getNextValidActivityAfterActivityAtThisTime(timestamp).getEndTimestamp();
+// timestamp = nextValidAOAfterAOAtThisTime.getEndTimestamp(); // update timestamp
 // }
 //
-// System.out.println("Debug: num of valid after timestamp " + timestamp + " is: " + numOfValids);
+// if (VerbosityConstants.verbose)
+// {
+// System.out.println("Debug: num of valid after timestamp " + timestampOriginal + " is: " + numOfValids);
+// }
 // return numOfValids;
 //
 // }
 //
+// /**
+// *
+// * @param timestamp
+// * @return
+// */
 // public ActivityObject getNextValidActivityAfterActivityAtThisTime(Timestamp timestamp)
 // {
 // // System.out.println("To find next activity event at :"+timestamp);
 // ActivityObject nextValidActivityObject = null;
 //
 // int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectsAtTime(timestamp);
+//
+// if (VerbosityConstants.verbose)
+// {
 // System.out
 // .print("inside:getNextValidActivityAfterActivityAtThisTime(): Index of activity event at this timestamp is:"
-// + indexOfActivityObjectAtGivenTimestamp + " \nNext valid activity after" + timestamp + " is ");
+// + indexOfActivityObjectAtGivenTimestamp + " \nNext valid activity after" + timestamp
+// + " is ");
+// }
 // if (indexOfActivityObjectAtGivenTimestamp == this.ActivityObjectsInDay.size() - 1)
 // {
 // // there are no next activities
@@ -178,17 +211,32 @@
 // if (nextValidActivityObject.getActivityName()
 // .equals(ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName()))
 // {
-// System.err.println("\nWarning: Next Valid activity has same name as current activity (for timestamp:"
-// + timestamp + " userID:" + userID + ")Activity Name="
+// System.err.println("\nWarning: Next Valid AO has same name as given AO (ts:" + timestamp + " userID:"
+// + userID + ") given Act ="
 // + ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName());
+// // System.err.println(
+// // "\nWarning: Next Valid activity has same name as current activity (for timestamp:" + timestamp + "
+// // userID:" + userID
+// // + ")Activity Name=" +
+// // ActivityObjectsInDay.get(indexOfActivityObjectAtGivenTimestamp).getActivityName());
 // }
-//
+// if (VerbosityConstants.verbose)
+// {
 // System.out.println(nextValidActivityObject.getActivityName());
 // }
+// }
+// else
+// {
 // System.out.println("Warning: next valid activity after timestamp: " + timestamp + " is null");
+// }
 // return nextValidActivityObject;
 // }
 //
+// /**
+// *
+// * @param indexOfActivityObjectGiven
+// * @return
+// */
 // public ActivityObject getNextValidActivityAfterActivityAtThisPosition(int indexOfActivityObjectGiven)
 // {
 // ActivityObject nextValidActivityObject = null;
@@ -229,18 +277,26 @@
 // return nextValidActivityObject;
 // }
 //
-// public static boolean isNoValidActivityAfterItInTheDay(int ActivityObjectIndex,
-// UserDayTimeline_backup17Sep2016 theDayTimeline)
+// /**
+// *
+// * @param ActivityObjectIndex
+// * @param theDayTimeline
+// * @return
+// */
+// public static boolean isNoValidActivityAfterItInTheDay(int ActivityObjectIndex, UserDayTimeline_backup14March2017
+// theDayTimeline)
 // {
 // boolean isNoValidAfter = true;
 //
 // ArrayList<ActivityObject> eventsInDay = theDayTimeline.getActivityObjectsInDay();
 //
+// if (VerbosityConstants.verbose)
+// {
 // System.out.println("inside isNoValidActivityAfterItInTheDay");
-// System.out.println("activityIndexAfterWhichToChecl=" + ActivityObjectIndex);
-//
+// System.out.println("activityIndexAfterWhichToCheck=" + ActivityObjectIndex);
 // theDayTimeline.printActivityObjectNamesInSequence();
 // System.out.println("Number of activities in day=" + eventsInDay.size());
+// }
 //
 // if (ActivityObjectIndex == eventsInDay.size() - 1)
 // {
@@ -251,16 +307,26 @@
 // {
 // if (UtilityBelt.isValidActivityName(eventsInDay.get(i).getActivityName()))
 // {
+// if (VerbosityConstants.verbose)
+// {
 // System.out.println("Activity making it false=" + eventsInDay.get(i).getActivityName());
+// }
 // isNoValidAfter = false;
 // break;
 // }
 // }
 //
+// if (VerbosityConstants.verbose)
+// {
 // System.out.println("No valid after is:" + isNoValidAfter);
+// }
 // return isNoValidAfter;
 // }
 //
+// /**
+// *
+// * @return
+// */
 // public boolean containsOnlySingleActivity()
 // {
 // if (ActivityObjectsInDay.size() <= 1)
@@ -359,23 +425,27 @@
 // return newList;
 // }
 //
+// /**
+// *
+// * @return
+// */
 // public String getActivityObjectsAsStringCode()
 // {
-// String stringCodeForDay = new String();
+// StringBuffer stringCodeForDay = new StringBuffer();// changed from String to StringBuffer on Sep 20 2016
 //
-// for (int i = 0; i < ActivityObjectsInDay.size(); i++)
+// for (ActivityObject ao : ActivityObjectsInDay)// int i = 0; i < ActivityObjectsInDay.size(); i++)
 // {
-// String activityName = ActivityObjectsInDay.get(i).getActivityName();
-//
-// // int activityID= generateSyntheticData.getActivityid(activityName);
-//
-// stringCodeForDay += StringCode.getStringCodeFromActivityName(activityName); // Character.toString
-// // ((char)(activityID+65));
-// // //getting the ascii code
-// // for (activity id+65)
+// // commented out on 10 Mar 2017 start. not applicable for >107 acts
+// // String activityName = ActivityObjectsInDay.get(i).getActivityName();
+// // // int activityID= generateSyntheticData.getActivityid(activityName);
+// // stringCodeForDay.append(StringCode.getStringCodeFromActivityName(activityName));
+// // // Character.toString ((char)(activityID+65));//getting the ascii code
+// // // for (activity id+65)
+// // commented out on 10 Mar 2017 end
+// stringCodeForDay.append(ao.getStringCode());
 // }
 //
-// return stringCodeForDay;
+// return stringCodeForDay.toString();
 // }
 //
 // public int countContainsActivity(ActivityObject activityToCheck)
@@ -428,6 +498,11 @@
 // return containsCount;
 // }
 //
+// /**
+// *
+// * @param activityToCheck
+// * @return
+// */
 // public boolean hasAValidActivityAfterFirstOccurrenceOfThisActivity(ActivityObject activityToCheck)
 // {
 // boolean hasValidAfter = false;
@@ -436,13 +511,11 @@
 //
 // try
 // {
-//
 // if (indexOfFirstOccurrence < 0)
 // {
 // Exception errorException = new Exception(
 // "Error in hasAValidActivityAfterFirstOccurrenceOfThisActivity: No Occurrence of the given activity in the given
 // daytimeline, throwing exception");
-//
 // }
 //
 // if (indexOfFirstOccurrence < this.ActivityObjectsInDay.size() - 1) // not the last activity of the day
@@ -468,6 +541,11 @@
 // return hasValidAfter;
 // }
 //
+// /**
+// *
+// * @param activityToCheck
+// * @return
+// */
 // public int getIndexOfFirstOccurrenceOfThisActivity(ActivityObject activityToCheck)
 // {
 // String activityName = activityToCheck.getActivityName();
@@ -525,10 +603,15 @@
 // *
 // *
 // * @param t
-// * @return a Pair with first value as the index of the found Activity Object in the timeline and the second value is
-// * the absolute difference of the start time in day of this Activity Object and the start time of current
-// * Activity Object
+// *
+// * @return a Triple (indexOfActivityObject with nearest start time to given timestamp, that activity object, abs
+// * time difference in secs between the st of this ao and st of current ao t)
 // */
+//
+// // *a Pair with first value as the index of the found Activity Object
+// // *in the timeline and the second value is the absolute difference of the start time in day of this
+// // * Activity Object and the start time of current Activity Object
+// // */
 // public Triple<Integer, ActivityObject, Double> getTimeDiffValidActivityObjectWithStartTimeNearestTo(Timestamp t)
 // {
 // /** Seconds in that day before the timestamp t which is start timestamp of the current activity object **/
@@ -555,9 +638,13 @@
 // }
 // }
 //
+// if (VerbosityConstants.verbose)
+// {
 // System.out.println("In the daytimeline (User = " + this.userID + ", Date=" + this.dateID + "). "
 // + "The index of Activity Object with ST nearest to current_ST(=" + t + "is: "
 // + indexOfActivityObjectNearestST + " with time diff of " + leastDistantSTVal);
+// }
+//
 // return new Triple(indexOfActivityObjectNearestST, this.ActivityObjectsInDay.get(indexOfActivityObjectNearestST),
 // (double) leastDistantSTVal);
 // }
@@ -727,10 +814,13 @@
 // return this.ActivityObjectsInDay.get(n);
 // }
 //
-// public boolean isSameDay(ArrayList<ActivityObject> ActivityObjectsInDay) // checks whether all activity events in
-// // the day timeline are of the same day
-// // or
-// // not
+// /**
+// * Checks whether all activity events in the day timeline are of the same day or not
+// *
+// * @param ActivityObjectsInDay
+// * @return
+// */
+// public boolean isSameDay(ArrayList<ActivityObject> ActivityObjectsInDay)
 // {
 // boolean sane = true;
 //
@@ -750,10 +840,8 @@
 //
 // if (!sane)
 // {
-// System.err.println("Error: Day Timeline contains ActivityObjects from more than one day"); /*
-// * with
-// * Date_ID:"+ dateID+"
-// */
+// System.err.println("Error: Day Timeline contains ActivityObjects from more than one day");
+// /* with Date_ID:"+ dateID+" */
 // // System.exit(3);
 // }
 // return sane;

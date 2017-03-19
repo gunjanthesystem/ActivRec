@@ -11,12 +11,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
@@ -29,7 +31,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
-import org.activity.objects.UserDayTimeline;
+import org.activity.ui.PopUps;
 import org.json.JSONArray;
 
 /**
@@ -44,11 +46,7 @@ public class TimelineUtils
 	 */
 	public static int countNumberOfDistinctActivities(ArrayList<ActivityObject> ActivityObjects)
 	{
-		HashSet<String> set = new HashSet<String>();
-		for (int i = 0; i < ActivityObjects.size(); i++)
-		{
-			set.add(ActivityObjects.get(i).getActivityName().trim());
-		}
+		Set<String> set = ActivityObjects.stream().map(ao -> ao.getActivityName().trim()).collect(Collectors.toSet());
 		return set.size();
 	}
 	// public TimelineUtilities()
@@ -377,7 +375,7 @@ public class TimelineUtils
 	 * @param allActivityEvents
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> createUserTimelinesFromCheckinEntriesGowalla(
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createUserTimelinesFromCheckinEntriesGowalla(
 			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> checkinEntries,
 			LinkedHashMap<Integer, LocationGowalla> locationObjects)
 	{
@@ -390,12 +388,12 @@ public class TimelineUtils
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = convertCheckinEntriesToActivityObjectsGowalla(
 				checkinEntriesDatewise, locationObjects);
 
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userDaytimelines = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines = new LinkedHashMap<>();
 
 		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject>>> userEntry : activityObjectsDatewise.entrySet())
 		{
 			String userID = userEntry.getKey();
-			LinkedHashMap<Date, UserDayTimeline> dayTimelines = new LinkedHashMap<>();
+			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>();
 
 			for (Entry<Date, ArrayList<ActivityObject>> dateEntry : userEntry.getValue().entrySet())
 
@@ -404,7 +402,7 @@ public class TimelineUtils
 				ArrayList<ActivityObject> activityObjectsInDay = dateEntry.getValue();
 				String dateID = date.toString();
 				String dayName = DateTimeUtils.getWeekDayFromWeekDayInt(date.getDay());// DateTimeUtils.getWeekDayFromWeekDayInt(date.getDayOfWeek().getValue());
-				dayTimelines.put(date, new UserDayTimeline(activityObjectsInDay, dateID, userID, dayName, date));
+				dayTimelines.put(date, new Timeline(activityObjectsInDay, true, true));
 			}
 
 			userDaytimelines.put(userID, dayTimelines);
@@ -421,10 +419,11 @@ public class TimelineUtils
 	/**
 	 * INCOMPLETE
 	 * 
+	 * @deprecated INCOMPLETE
 	 * @param usersDayTimelines
 	 */
 	public static void countConsecutiveSimilarActivities(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		// <User__Date, time difference between then in secs>
 		LinkedHashMap<String, Double> mapForConsecutive2s = new LinkedHashMap<>();
@@ -441,11 +440,11 @@ public class TimelineUtils
 		// <User__Date, time difference between then in secs>
 		LinkedHashMap<String, Double> mapForConsecutive6OrMores = new LinkedHashMap<>();
 
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userE : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userE : usersDayTimelines.entrySet())
 		{
 			String user = userE.getKey();
 
-			for (Entry<Date, UserDayTimeline> dateE : userE.getValue().entrySet())
+			for (Entry<Date, Timeline> dateE : userE.getValue().entrySet())
 			{
 				String date = dateE.getKey().toString();
 
@@ -453,7 +452,7 @@ public class TimelineUtils
 				Timestamp prevActivityStartTimestamp = null;
 				int numOfConsecutives = 0;
 				long timeDiff = 0;
-				for (ActivityObject aos : dateE.getValue().getActivityObjectsInDay())
+				for (ActivityObject aos : dateE.getValue().getActivityObjectsInTimeline())
 				{
 					String activityName = aos.getActivityName();
 					if (activityName.equals(prevActivityName))
@@ -463,9 +462,7 @@ public class TimelineUtils
 					}
 				}
 			}
-
 		}
-
 	}
 
 	/**
@@ -503,7 +500,7 @@ public class TimelineUtils
 	 * @return
 	 */
 	public static LinkedHashMap<String, ArrayList<Integer>> countConsecutiveSimilarActivities2(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String commonPathToWrite,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String commonPathToWrite,
 			String absPathToCatIDDictionary)
 	{
 		// LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
@@ -528,7 +525,7 @@ public class TimelineUtils
 		long aoCount = 0;
 		try
 		{
-			for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userE : usersDayTimelines.entrySet())
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userE : usersDayTimelines.entrySet())
 			{
 				String user = userE.getKey();
 
@@ -541,10 +538,10 @@ public class TimelineUtils
 				StringBuilder distanceDurationFromNextSeq = new StringBuilder(); // only write >1 consecs
 				// StringBuilder durationFromNextSeq = new StringBuilder();// only write >1 consecs
 
-				for (Entry<Date, UserDayTimeline> dateE : userE.getValue().entrySet())
+				for (Entry<Date, Timeline> dateE : userE.getValue().entrySet())
 				{
 					String date = dateE.getKey().toString();
-					for (ActivityObject aos : dateE.getValue().getActivityObjectsInDay())
+					for (ActivityObject aos : dateE.getValue().getActivityObjectsInTimeline())
 					{
 						aoCount += 1;
 
@@ -1048,89 +1045,23 @@ public class TimelineUtils
 
 	}
 
-	// DISABLED BECAUSE AFTER THE OCT 2016 CRASH, I COULD NOT FIND BACK THE CLASS CheckinActivityObject
-	// /**
-	// *
-	// * @param allActivityObjects
-	// * @return
-	// */
-	// public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>
-	// createUserTimelinesFromCheckinActivityObjects(
-	// LinkedHashMap<String, TreeMap<Timestamp, CheckinActivityObject>> allActivityObjects)
-	// {
-	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines =
-	// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
-	// // userid, usertimeline
-	// LinkedHashMap<String, ArrayList<CheckinActivityObject>> perUserActivityEvents =
-	// new LinkedHashMap<String, ArrayList<CheckinActivityObject>>();
-	//
-	// System.out.println("inside createUserTimelinesFromCheckinActivityObjects");
-	//
-	// for (Entry<String, TreeMap<Timestamp, CheckinActivityObject>> perUserActObjEntry : allActivityObjects.entrySet())
-	// // Iterate over Users
-	// {
-	// String userID = perUserActObjEntry.getKey();
-	//
-	// System.out.println("for user:" + userID + " number of activity-objects =" +
-	// perUserActObjEntry.getValue().size());
-	//
-	// LinkedHashMap<Date, ArrayList<CheckinActivityObject>> perDateActObjsForThisUser =
-	// new LinkedHashMap<Date, ArrayList<CheckinActivityObject>>();
-	//
-	// TreeMap<Timestamp, CheckinActivityObject> actObjsForThisUserByTS = perUserActObjEntry.getValue();
-	//
-	// for (Entry<Timestamp, CheckinActivityObject> perTSActObjEntry : actObjsForThisUserByTS.entrySet()) // Iterate
-	// over Users
-	// {
-	// Date date = new Date(perTSActObjEntry.getKey().getTime());// (Date)
-	// actObjsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension", "Date"); // start date
-	//
-	// if (!(perDateActObjsForThisUser.containsKey(date)))
-	// {
-	// perDateActObjsForThisUser.put(date, new ArrayList<CheckinActivityObject>());
-	// }
-	//
-	// perDateActObjsForThisUser.get(date).add(perTSActObjEntry.getValue());
-	// }
-	//
-	// // perDateActivityEventsForThisUser has been created now.
-	//
-	// LinkedHashMap<Date, UserDayTimeline> dayTimelines = new LinkedHashMap<Date, UserDayTimeline>();
-	//
-	// for (Map.Entry<Date, ArrayList<CheckinActivityObject>> perDateActivityEventsForThisUserEntry :
-	// perDateActObjsForThisUser
-	// .entrySet())
-	// {
-	// Date date = perDateActivityEventsForThisUserEntry.getKey();
-	//
-	// /// TODO dayTimelines.put(date, new UserDayTimeline(perDateActivityEventsForThisUserEntry.getValue(), date));
-	//
-	// }
-	//
-	// userTimelines.put(userID, dayTimelines);
-	//
-	// }
-	//
-	// System.out.println("exiting createUserTimelinesFromActivityEvents");
-	// return userTimelines;
-	// }
-
 	/**
 	 * Creates user day timelines from the given list of Activity Objects.
 	 * 
 	 * Activity events ---> day timelines (later, not here)---> user timelines
 	 * 
+	 * @deprecated needs to be checked again
 	 * @param allActivityEvents
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> createUserTimelinesFromActivityObjects(
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createUserTimelinesFromActivityObjects(
 			ArrayList<ActivityObject> allActivityEvents)
 	{
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userTimelines = new LinkedHashMap<>();
 		// userid, usertimeline
-		LinkedHashMap<String, ArrayList<ActivityObject>> perUserActivityEvents = new LinkedHashMap<String, ArrayList<ActivityObject>>();
+		LinkedHashMap<String, ArrayList<ActivityObject>> perUserActivityEvents = new LinkedHashMap<>();
 
-		System.out.println("inside createUserTimelinesFromActivityEvents");
+		System.out.println("inside createUserTimelinesFromActivityObjects");
 
 		for (int i = 0; i < allActivityEvents.size(); i++)
 		{
@@ -1138,16 +1069,12 @@ public class TimelineUtils
 			// System.out.println(allActivityEvents.size());
 			// System.out.println(allActivityEvents.get(i));
 			// System.out.println(allActivityEvents.get(i).getDimensionIDValue("User_ID"));
-
 			String userID = allActivityEvents.get(i).getDimensionIDValue("User_ID");
-
 			if (!(perUserActivityEvents.containsKey(userID)))
 			{
 				perUserActivityEvents.put(userID, new ArrayList<ActivityObject>());
 			}
-
 			perUserActivityEvents.get(userID).add(allActivityEvents.get(i));
-
 			/*
 			 * if(!(userTimelines.containsKey(userID)) ) { userTimelines.put(userID, new HashMap<Date,UserDayTimeline>
 			 * ()); }
@@ -1157,16 +1084,12 @@ public class TimelineUtils
 
 		// perUserActivityEventCreated
 
-		for (Map.Entry<String, ArrayList<ActivityObject>> perUserActivityEventsEntry : perUserActivityEvents.entrySet()) // Iterate
-																															// over
-																															// Users
+		// Iterate over Users
+		for (Map.Entry<String, ArrayList<ActivityObject>> perUserActivityEventsEntry : perUserActivityEvents.entrySet())
 		{
-
 			System.out.println("for user:" + perUserActivityEventsEntry.getKey() + " number of activity-objects ="
 					+ perUserActivityEventsEntry.getValue().size());
-
 			String userID = perUserActivityEventsEntry.getKey();
-
 			ArrayList<ActivityObject> activityEventsForThisUser = perUserActivityEventsEntry.getValue();
 
 			LinkedHashMap<Date, ArrayList<ActivityObject>> perDateActivityEventsForThisUser = new LinkedHashMap<Date, ArrayList<ActivityObject>>();
@@ -1175,33 +1098,25 @@ public class TimelineUtils
 			{
 				Date date = (Date) activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension",
 						"Date"); // start date
-
 				if (!(perDateActivityEventsForThisUser.containsKey(date)))
 				{
 					perDateActivityEventsForThisUser.put(date, new ArrayList<ActivityObject>());
 				}
-
 				perDateActivityEventsForThisUser.get(date).add(activityEventsForThisUser.get(i));
 			}
 
 			// perDateActivityEventsForThisUser has been created now.
 
-			LinkedHashMap<Date, UserDayTimeline> dayTimelines = new LinkedHashMap<Date, UserDayTimeline>();
+			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<Date, Timeline>();
 
 			for (Map.Entry<Date, ArrayList<ActivityObject>> perDateActivityEventsForThisUserEntry : perDateActivityEventsForThisUser
 					.entrySet())
 			{
 				Date date = perDateActivityEventsForThisUserEntry.getKey();
-
-				// $$ dayTimelines.put(date, new UserDayTimeline(perDateActivityEventsForThisUserEntry.getValue(),
-				// date));
-
+				dayTimelines.put(date, new Timeline(perDateActivityEventsForThisUserEntry.getValue(), true, true));
 			}
-
 			userTimelines.put(userID, dayTimelines);
-
 		}
-
 		System.out.println("exiting createUserTimelinesFromActivityEvents");
 		return userTimelines;
 	}
@@ -1214,40 +1129,32 @@ public class TimelineUtils
 	 * @param usersTimelines
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> cleanDayTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> cleanDayTimelines(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
 	{
 		System.out.println("Inside cleanDayTimelines(): total num of users before cleaning = " + usersTimelines.size());
 		long ct = System.currentTimeMillis();
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> cleanedUserDayTimelines = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> cleanedUserDayTimelines = new LinkedHashMap<>();
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
-			if (VerbosityConstants.verboseTimelineCleaning)
-			{
-				System.out.println("for user: " + usersTimelinesEntry.getKey() + "\n");
-			}
 
-			// LinkedHashMap<Date, UserDayTimeline> cleanedDayTimelines =
-			// TimelineUtilities.cleanUserDayTimelines(usersTimelinesEntry.getValue());
-
-			LinkedHashMap<Date, UserDayTimeline> cleanedDayTimelines = TimelineUtils.cleanUserDayTimelines(
+			LinkedHashMap<Date, Timeline> cleanedDayTimelines = TimelineUtils.cleanUserDayTimelines(
 					usersTimelinesEntry.getValue(), Constant.getCommonPath() + "LogCleanedDayTimelines_",
 					usersTimelinesEntry.getKey());
+
+			if (VerbosityConstants.verboseTimelineCleaning)
+			{
+				System.out.println("for user: " + usersTimelinesEntry.getKey() + "#cleanedDayTimeline = "
+						+ cleanedDayTimelines.size() + "\n");
+			}
 
 			if (cleanedDayTimelines.size() > 0)
 			{
 				cleanedUserDayTimelines.put(usersTimelinesEntry.getKey(), cleanedDayTimelines);
 			}
-
-			// System.out.println();
 		}
 		System.out.println("\ttotal num of users after cleaning = " + cleanedUserDayTimelines.size());
-
-		if (VerbosityConstants.verboseTimelineCleaning)
-		{
-			System.out.println("exiting cleanDayTimelines() ");
-		}
 
 		long ct2 = System.currentTimeMillis();
 		System.out.println("Exiting cleanDayTimelines(): total num of users after cleaning = "
@@ -1263,8 +1170,7 @@ public class TimelineUtils
 	 * @param userDayTimelines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> cleanUserDayTimelines(
-			LinkedHashMap<Date, UserDayTimeline> userDayTimelines)
+	public static LinkedHashMap<Date, Timeline> cleanUserDayTimelines(LinkedHashMap<Date, Timeline> userDayTimelines)
 	{
 		userDayTimelines = TimelineUtils.removeDayTimelinesWithNoValidAct(userDayTimelines);
 		userDayTimelines = TimelineUtils.removeDayTimelinesWithOneOrLessDistinctValidAct(userDayTimelines);
@@ -1288,8 +1194,8 @@ public class TimelineUtils
 	 * @param user
 	 * @return
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> cleanUserDayTimelines(
-			LinkedHashMap<Date, UserDayTimeline> userDayTimelines, String logFileNamePhrase, String user)
+	public static LinkedHashMap<Date, Timeline> cleanUserDayTimelines(LinkedHashMap<Date, Timeline> userDayTimelines,
+			String logFileNamePhrase, String user)
 	{
 		String removeDayTimelinesWithNoValidActLog = logFileNamePhrase + "RemoveDayTimelinesWithNoValidAct.csv";
 
@@ -1308,21 +1214,21 @@ public class TimelineUtils
 	 * 
 	 * @param userAllDatesTimeslines
 	 * @param percentageInTraining
-	 * @return
+	 * @return List, first element is training timelines (daywise) and second element is test timelines(daywise)
 	 */
-	public static List<LinkedHashMap<Date, UserDayTimeline>> splitTestTrainingTimelines(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines, double percentageInTraining)
+	public static List<LinkedHashMap<Date, Timeline>> splitTestTrainingTimelines(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines, double percentageInTraining)
 	{
-		ArrayList<LinkedHashMap<Date, UserDayTimeline>> trainTestTimelines = new ArrayList<LinkedHashMap<Date, UserDayTimeline>>();
+		ArrayList<LinkedHashMap<Date, Timeline>> trainTestTimelines = new ArrayList<>();
 
 		int numberOfValidDays = 0;
 
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().containsAtLeastOneValidActivity() == false)
 			{ // if the day timelines contains no valid activity, then don't consider it for training or test
-				System.err.println(
-						"Error in splitTestTrainingTimelines: 45: userAllDatesTimeslines contains a day timeline with no valid activity, but we already tried to remove it");
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+						"Error in splitTestTrainingTimelines: 45: userAllDatesTimeslines contains a day timeline with no valid activity, but we already tried to remove it"));
 				continue;
 			}
 			numberOfValidDays++;
@@ -1338,11 +1244,11 @@ public class TimelineUtils
 			numberOfDaysForTraining = numberOfValidDays - numberOfDaysForTest;
 		}
 
-		LinkedHashMap<Date, UserDayTimeline> userTrainingTimelines = new LinkedHashMap<Date, UserDayTimeline>();
-		LinkedHashMap<Date, UserDayTimeline> userTestTimelines = new LinkedHashMap<Date, UserDayTimeline>();
+		LinkedHashMap<Date, Timeline> userTrainingTimelines = new LinkedHashMap<>();
+		LinkedHashMap<Date, Timeline> userTestTimelines = new LinkedHashMap<>();
 
 		int count = 1;
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().containsAtLeastOneValidActivity() == false) // not essential anymore
 			{ // if the day timelines contains no valid activity, then don't consider it for training or test
@@ -1368,31 +1274,33 @@ public class TimelineUtils
 
 		if (trainTestTimelines.size() > 2)
 		{
-			System.err.println(
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
 					"Error in splitTestTrainingTimelines: there are more than two (train+test) timelines in returned result, there are "
-							+ trainTestTimelines.size() + " timelines.");
+							+ trainTestTimelines.size() + " timelines."));
 			System.exit(-43);
 		}
 
 		return trainTestTimelines;
 	}
 
-	public static void traverseUserTimelines(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines)
+	/**
+	 * @deprecated
+	 * @param userTimelines
+	 */
+	public static void traverseUserTimelines(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userTimelines)
 	{
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : userTimelines.entrySet()) // Iterate
-																											// over
-																											// Users
+		// Iterate over Users
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> userEntry : userTimelines.entrySet())
 		{
 			System.out.println("User ID =" + userEntry.getKey());
-
 			System.out.println("Number of day timelines for this user=" + userEntry.getValue().size());
 
-			for (Map.Entry<Date, UserDayTimeline> dayTimelineEntry : userEntry.getValue().entrySet())
+			for (Map.Entry<Date, Timeline> dayTimelineEntry : userEntry.getValue().entrySet())
 			{
 				System.out.println("Date: " + dayTimelineEntry.getKey());
 				// dayTimelineEntry.getValue().printActivityEventNamesInSequence();
 				// 21Oct dayTimelineEntry.getValue().printActivityEventNamesWithTimestampsInSequence();
-				System.out.println();
+				// System.out.println();
 			}
 		}
 
@@ -1473,7 +1381,7 @@ public class TimelineUtils
 	 * @param jsonArray
 	 * @return
 	 */
-	public static HashMap<String, ArrayList<ActivityObject>> createTimelinesFromJsonArray(JSONArray jsonArray)
+	public static HashMap<String, ArrayList<ActivityObject>> createActivityObjectsFromJsonArray(JSONArray jsonArray)
 	{
 
 		HashMap<String, ArrayList<ActivityObject>> timeLines = new HashMap<String, ArrayList<ActivityObject>>();
@@ -1517,35 +1425,42 @@ public class TimelineUtils
 		return timeLines;
 	}
 
-	public static LinkedHashMap<Date, UserDayTimeline> removeWeekendDayTimelines(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines)
+	// MANALI
+	/**
+	 * 
+	 * @param userAllDatesTimeslines
+	 * @return
+	 */
+	public static LinkedHashMap<Date, Timeline> removeWeekendDayTimelines(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
-		boolean verbose = VerbosityConstants.verboseTimelineCleaning;
-		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
-		ArrayList<Date> datesToRemove = new ArrayList<Date>();
-		if (verbose) System.out.print("Weekends to remove:");// + entry.getKey());
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
+		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<>(); // changed from ArrayList to LinkedHashSet on 17
+																	// Mar 2017
+
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getKey().getDay() == 0 || entry.getKey().getDay() == 6)
 			{
 				datesToRemove.add(entry.getKey());
-				if (verbose) System.out.print("," + entry.getKey());
 			}
 		}
-		if (verbose) System.out.println("");
+
 		for (Date dateToRemove : datesToRemove)
 		{
-			// System.out.print(datesToRemove.toString()+",");
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
+			System.out.print("Weekends to remove:");
+			datesToRemove.stream().forEach(d -> System.out.println("," + d.toString()));
 			System.out.println("Num of days removed for removeWeekendDayTimelines =" + datesToRemove.size());
 		}
+
 		// System.out.println("Count of weekends removed ="+datesToRemove.size()); //THERE IS SOME BUG, THE ARRAY HAS
 		// DUPLICATE ENTRIES, UNCOMMENT TO SEE, HOWEVER IT DOES NOT
-		// AFFECT OUR PURPORSE
+		// AFFECT OUR PURPORSE // probably this has been resolved by using set but not verified
 		return datesTimelinesPruned;
 	}
 
@@ -1559,31 +1474,24 @@ public class TimelineUtils
 	 * @param user
 	 * @return
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> removeWeekendDayTimelines(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines, String logFileName, String user)
+	public static LinkedHashMap<Date, Timeline> removeWeekendDayTimelines(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines, String logFileName, String user)
 	{
-		// boolean verbose = Constant.verboseTimelineCleaning;
-		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
-		ArrayList<Date> datesToRemove = new ArrayList<Date>();
-		StringBuffer log = new StringBuffer();
+		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
+		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
+		StringBuilder log = new StringBuilder();
 
-		// if (verbose)
-		// System.out.print("Weekends to remove:");// + entry.getKey());
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getKey().getDay() == 0 || entry.getKey().getDay() == 6)
 			{
 				datesToRemove.add(entry.getKey());
 				log.append(user + "," + entry.getKey() + "," + (entry.getKey().getDay()) + "\n");
-				// if (verbose)
-				// System.out.print("," + entry.getKey());
 			}
 		}
-		// if (verbose)
-		// System.out.println("");
+
 		for (Date dateToRemove : datesToRemove)
 		{
-			// System.out.print(datesToRemove.toString()+",");
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
@@ -1593,37 +1501,41 @@ public class TimelineUtils
 		}
 		// System.out.println("Count of weekends removed ="+datesToRemove.size()); //THERE IS SOME BUG, THE ARRAY HAS
 		// DUPLICATE ENTRIES, UNCOMMENT TO SEE, HOWEVER IT DOES NOT
-		// AFFECT OUR PURPORSE
+		// AFFECT OUR PURPORSE // probably this has been resolved by using set but not verified
 		WritingToFile.appendLineToFileAbsolute(log.toString(), logFileName);
 		return datesTimelinesPruned;
 	}
 
-	public static LinkedHashMap<Date, UserDayTimeline> removeWeekdaysDayTimelines(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines)
+	/**
+	 * 
+	 * @param userAllDatesTimeslines
+	 * @return
+	 */
+	public static LinkedHashMap<Date, Timeline> removeWeekdaysDayTimelines(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
-		boolean verbose = VerbosityConstants.verboseTimelineCleaning;
-		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
-		ArrayList<Date> datesToRemove = new ArrayList<Date>();
+		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
+		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
 
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (!(entry.getKey().getDay() == 0 || entry.getKey().getDay() == 6))
 			{
 				datesToRemove.add(entry.getKey());
-				if (verbose) System.out.println("Weekdays to remove=" + entry.getKey());
 			}
 		}
 
-		// System.out.println("Weekend dates to remove");
 		for (Date dateToRemove : datesToRemove)
 		{
-			// System.out.print(datesToRemove.toString()+",");
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
-		// System.out.println("Count of weekends removed ="+datesToRemove.size()); //THERE IS SOME BUG, THE ARRAY HAS
-		// DUPLICATE ENTRIES, UNCOMMENT TO SEE, HOWEVER IT DOES NOT
-		// AFFECT OUR PURPORSE
+		if (VerbosityConstants.verboseTimelineCleaning)
+		{
+			System.out.println("Weekdays to remove=");
+			datesToRemove.stream().forEach(d -> System.out.println("," + d.toString()));
+		}
+
 		return datesTimelinesPruned;
 	}
 
@@ -1633,47 +1545,34 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> removeDayTimelinesWithNoValidAct(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines)
+	public static LinkedHashMap<Date, Timeline> removeDayTimelinesWithNoValidAct(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
-		// boolean verbose = Constant.verbose2;
-		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
-		ArrayList<Date> datesToRemove = new ArrayList<Date>();
+		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
+		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
 
-		if (VerbosityConstants.verboseTimelineCleaning)
-			System.out.print("Invalid days to remove for no valid activities in the day:");
-
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().containsAtLeastOneValidActivity() == false)
 			{
 				datesToRemove.add(entry.getKey());
-				if (VerbosityConstants.verboseTimelineCleaning) System.out.print("," + entry.getKey());
 			}
 		}
 
-		if (VerbosityConstants.verboseTimelineCleaning) System.out.println("");
-
-		/**
-		 * @TODO check and change if the two loops in this method can be replace with one
-		 */
-
 		for (Date dateToRemove : datesToRemove)
 		{
-			// System.out.print(datesToRemove.toString()+",");
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
+			System.out.print("Invalid days to remove for no valid activities in the day:");
+			datesToRemove.stream().forEach(d -> System.out.println("," + d.toString()));
 			System.out.println("Num of days removed for removeDayTimelinesWithNoValidAct =" + datesToRemove.size());
 		}
+
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
-		// ="+datesToRemove.size());//THERE IS SOME BUG, THE ARRAY HAS
-		// DUPLICATE
-		// ENTRIES,
-		// UNCOMMENT TO SEE,
-		// HOWEVER IT DOES NOT AFFECT OUR PURPORSE
+		// ="+datesToRemove.size());
 		return datesTimelinesPruned;
 	}
 
@@ -1686,34 +1585,21 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> removeDayTimelinesWithNoValidAct(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines, String logFileName, String user)
+	public static LinkedHashMap<Date, Timeline> removeDayTimelinesWithNoValidAct(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines, String logFileName, String user)
 	{
-		// boolean verbose = Constant.verbose2;
-		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
-		ArrayList<Date> datesToRemove = new ArrayList<Date>();
+		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
+		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
 
-		StringBuffer log = new StringBuffer();
-		// StringBuffer log = new StringBuffer("User,DateToRemoveWithNoValidAct\n");
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		StringBuilder log = new StringBuilder("User,DateToRemove\n");
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().containsAtLeastOneValidActivity() == false)
 			{
 				datesToRemove.add(entry.getKey());
-
 				log.append(user + "," + entry.getKey() + "\n");
-				// if (Constant.verboseTimelineCleaning)
-				// System.out.print("," + entry.getKey());
 			}
 		}
-
-		// log.append("\n");
-		// if (Constant.verboseTimelineCleaning)
-		// System.out.println("");
-
-		/**
-		 * @TODO check and change if the two loops in this method can be replace with one
-		 */
 
 		for (Date dateToRemove : datesToRemove)
 		{
@@ -1727,10 +1613,6 @@ public class TimelineUtils
 		}
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
 		// ="+datesToRemove.size());//THERE IS SOME BUG, THE ARRAY HAS
-		// DUPLICATE
-		// ENTRIES,
-		// UNCOMMENT TO SEE,
-		// HOWEVER IT DOES NOT AFFECT OUR PURPORSE
 
 		WritingToFile.appendLineToFileAbsolute(log.toString(), logFileName);
 		return datesTimelinesPruned;
@@ -1742,40 +1624,35 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return HashMap of day timelines <Date, UserDayTimeline>
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> removeDayTimelinesWithOneOrLessDistinctValidAct(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines)
+	public static LinkedHashMap<Date, Timeline> removeDayTimelinesWithOneOrLessDistinctValidAct(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
-		boolean verbose = VerbosityConstants.verboseTimelineCleaning;
-		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
-		ArrayList<Date> datesToRemove = new ArrayList<Date>();
-		if (verbose) System.out.print("Invalid days to remove for TimelinesWithLessThanOneDistinctValidAct:");// +
-																												// entry.getKey());
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		// boolean verbose = VerbosityConstants.verboseTimelineCleaning;
+		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
+		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
+
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().countNumberOfValidDistinctActivities() <= 1)
 			{
 				datesToRemove.add(entry.getKey());
-				if (verbose) System.out.print("," + entry.getKey());
 			}
 		}
-		if (verbose) System.out.println("");
+
 		for (Date dateToRemove : datesToRemove)
 		{
-			// System.out.print(datesToRemove.toString()+",");
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
+			System.out.print("Invalid days to remove for TimelinesWithLessThanOneDistinctValidAct:");
+			datesToRemove.stream().forEach(d -> System.out.print("," + d.toString()));
 			System.out.println(
 					"Num of days removed for removeDayTimelinesWithOneOrLessDistinctValidAct =" + datesToRemove.size());
 		}
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
-		// ="+datesToRemove.size());//THERE IS SOME BUG, THE ARRAY HAS
-		// DUPLICATE
-		// ENTRIES,
-		// UNCOMMENT TO SEE,
-		// HOWEVER IT DOES NOT AFFECT OUR PURPORSE
+		// ="+datesToRemove.size());
 		return datesTimelinesPruned;
 	}
 
@@ -1790,34 +1667,26 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return HashMap of day timelines <Date, UserDayTimeline>
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> removeDayTimelinesWithOneOrLessDistinctValidAct(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines, String logFileName, String user)
+	public static LinkedHashMap<Date, Timeline> removeDayTimelinesWithOneOrLessDistinctValidAct(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines, String logFileName, String user)
 	{
-		// boolean verbose = Constant.verboseTimelineCleaning;
-		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
-		ArrayList<Date> datesToRemove = new ArrayList<Date>();
+		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
+		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
 
-		StringBuffer log = new StringBuffer();
-		// if (verbose)
-		// System.out.print("Invalid days to remove for TimelinesWithLessThanOneDistinctValidAct:");// +
-		// entry.getKey());
+		StringBuilder log = new StringBuilder("User,date\n");
 
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().countNumberOfValidDistinctActivities() <= 1)
 			{
 				datesToRemove.add(entry.getKey());
 				log.append(user + "," + entry.getKey() + "," + entry.getValue().countNumberOfValidDistinctActivities()
 						+ "\n");
-				// if (verbose)
-				// System.out.print("," + entry.getKey());
 			}
 		}
-		// if (verbose)
-		// System.out.println("");
+
 		for (Date dateToRemove : datesToRemove)
 		{
-			// System.out.print(datesToRemove.toString()+",");
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
@@ -1827,11 +1696,7 @@ public class TimelineUtils
 					"Num of days removed for removeDayTimelinesWithOneOrLessDistinctValidAct =" + datesToRemove.size());
 		}
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
-		// ="+datesToRemove.size());//THERE IS SOME BUG, THE ARRAY HAS
-		// DUPLICATE
-		// ENTRIES,
-		// UNCOMMENT TO SEE,
-		// HOWEVER IT DOES NOT AFFECT OUR PURPORSE
+		// ="+datesToRemove.size());
 		WritingToFile.appendLineToFileAbsolute(log.toString(), logFileName);
 		return datesTimelinesPruned;
 	}
@@ -1842,42 +1707,34 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return HashMap of day timelines <Date, UserDayTimeline>
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> removeDayTimelinesLessDistinctValidAct(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines, int lowerLimit)
+	public static LinkedHashMap<Date, Timeline> removeDayTimelinesLessDistinctValidAct(
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines, int lowerLimit)
 	{
-		boolean verbose = VerbosityConstants.verboseTimelineCleaning;
-		LinkedHashMap<Date, UserDayTimeline> datesTimelinesPruned = userAllDatesTimeslines;
-		ArrayList<Date> datesToRemove = new ArrayList<Date>();
+		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
+		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
 
-		if (verbose) System.out.print("Invalid days to remove for removeDayTimelinesLessDistinctValidAct:");// +
-																											// entry.getKey());
-
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().countNumberOfValidDistinctActivities() < lowerLimit)
 			{
 				datesToRemove.add(entry.getKey());
-				if (verbose) System.out.print("," + entry.getKey());
 			}
 		}
-		if (verbose) System.out.println("");
+
 		for (Date dateToRemove : datesToRemove)
 		{
-			// System.out.print(datesToRemove.toString()+",");
 			datesTimelinesPruned.remove(dateToRemove);
 		}
 
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
-			System.out.println("Num of days removed for removeDayTimelinesLessDistinctValidAct (lowerlimit ="
+			System.out.print("Invalid days to remove for removeDayTimelinesLessDistinctValidAct:");
+			datesToRemove.stream().forEach(d -> System.out.print("," + d.toString()));
+			System.out.println("\nNum of days removed for removeDayTimelinesLessDistinctValidAct (lowerlimit ="
 					+ lowerLimit + ") =" + datesToRemove.size());
 		}
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
-		// ="+datesToRemove.size());//THERE IS SOME BUG, THE ARRAY HAS
-		// DUPLICATE
-		// ENTRIES,
-		// UNCOMMENT TO SEE,
-		// HOWEVER IT DOES NOT AFFECT OUR PURPORSE
+		// ="+datesToRemove.size());
 		return datesTimelinesPruned;
 	}
 
@@ -1901,15 +1758,14 @@ public class TimelineUtils
 	 * @param orderKeys
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> rearrangeDayTimelinesByGivenOrder(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> map, int[] orderKeys)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearrangeDayTimelinesByGivenOrder(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> map, int[] orderKeys)
 	{
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> rearranged = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearranged = new LinkedHashMap<>();
 
 		for (int key : orderKeys)
 		{
 			String keyString = Integer.toString(key);
-
 			if (map.containsKey(keyString) == false)
 			{
 				continue;
@@ -1919,7 +1775,6 @@ public class TimelineUtils
 				rearranged.put(keyString, map.get(keyString));
 			}
 		}
-
 		return rearranged;
 	}
 
@@ -1961,12 +1816,12 @@ public class TimelineUtils
 	 */
 	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines = new LinkedHashMap<String,
 	// LinkedHashMap<Date, UserDayTimeline>>();
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> rearrangeDayTimelinesOrderForDataset(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userMaps)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearrangeDayTimelinesOrderForDataset(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userMaps)
 	{
 		System.out.println("rearrangeDayTimelinesOrderForDataset received: " + userMaps.size() + " users");
 		long ct1 = System.currentTimeMillis();
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> rearranged = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearranged = new LinkedHashMap<>();
 		rearranged = rearrangeDayTimelinesByGivenOrder(userMaps, Constant.getUserIDs());
 		long ct2 = System.currentTimeMillis();
 		System.out.println("rearrangeDayTimelinesOrderForDataset returned: " + rearranged.size() + " users"
@@ -1984,19 +1839,19 @@ public class TimelineUtils
 	 * @return
 	 */
 	public static Pair<Boolean, String> hasDuplicateDates(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal)
 	{
 		boolean hasDuplicateDates = false;
 		String usersWithDuplicateDates = new String();
 
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersDayTimelinesOriginal.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
 		{
 			String user = userEntry.getKey();
 
 			ArrayList<String> dateAsStringList = new ArrayList<>();
 			Set<String> dateAsStringSet = new HashSet();
 
-			for (Entry<Date, UserDayTimeline> dateEntry : userEntry.getValue().entrySet())
+			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
 			{
 				dateAsStringList.add(dateEntry.getKey().toString());
 				dateAsStringSet.add(dateEntry.getKey().toString());
@@ -2009,7 +1864,7 @@ public class TimelineUtils
 			}
 		}
 
-		return new Pair(hasDuplicateDates, usersWithDuplicateDates);
+		return new Pair<Boolean, String>(hasDuplicateDates, usersWithDuplicateDates);
 	}
 
 	/**
@@ -2019,26 +1874,25 @@ public class TimelineUtils
 	 * @param lowerLimit
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> removeDayTimelinesWithLessAct(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal, int lowerLimit,
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> removeDayTimelinesWithLessAct(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, int lowerLimit,
 			String fileNameForLog)
 	{
 		System.out.println("Inside removeDayTimelinesWithLessValidAct");
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> result = new LinkedHashMap<>();
-		StringBuffer log = new StringBuffer();
-		StringBuffer datesRemoved = new StringBuffer();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> result = new LinkedHashMap<>();
+		StringBuilder log = new StringBuilder();
+		StringBuilder datesRemoved = new StringBuilder();
 		log.append("User, #days(daytimelines) removed\n");
 
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersDayTimelinesOriginal.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
 		{
 			String user = userEntry.getKey();
-
-			LinkedHashMap<Date, UserDayTimeline> toKeepTimelines = new LinkedHashMap<>();
+			LinkedHashMap<Date, Timeline> toKeepTimelines = new LinkedHashMap<>();
 
 			int countOfDatesRemovedForThisUser = 0;
-			for (Entry<Date, UserDayTimeline> dateEntry : userEntry.getValue().entrySet())
+			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
 			{
-				if (dateEntry.getValue().getActivityObjectsInDay().size() >= lowerLimit)
+				if (dateEntry.getValue().getActivityObjectsInTimeline().size() >= lowerLimit)
 				{
 					toKeepTimelines.put(dateEntry.getKey(), dateEntry.getValue());
 				}
@@ -2076,16 +1930,16 @@ public class TimelineUtils
 	 * @param fileNameForLog
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> removeUsersWithLessDays(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal, int lowerLimit,
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> removeUsersWithLessDays(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, int lowerLimit,
 			String fileNameForLog)
 	{
 		System.out.println("Inside removeUsersWithLessDays");
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> result = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> result = new LinkedHashMap<>();
 		StringBuffer log = new StringBuffer();
 		log.append("UsersRemoved, NumOfDays\n");
 
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersDayTimelinesOriginal.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
 		{
 			String user = userEntry.getKey();
 			if (userEntry.getValue().size() >= lowerLimit)
@@ -2368,10 +2222,10 @@ public class TimelineUtils
 	 * @param dateA
 	 * @return
 	 */
-	public static UserDayTimeline getUserDayTimelineByDateFromMap(
-			LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser, Date dateA)
+	public static Timeline getUserDayTimelineByDateFromMap(LinkedHashMap<Date, Timeline> dayTimelinesForUser,
+			Date dateA)
 	{
-		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelinesForUser.entrySet())
+		for (Map.Entry<Date, Timeline> entry : dayTimelinesForUser.entrySet())
 		{
 			// System.out.println("Date ="+entry.getKey());
 			// if(entry.getKey().toString().equals((new Date(2014-1900,4-1,10)).toString()))
@@ -2385,10 +2239,14 @@ public class TimelineUtils
 		return null;
 	}
 
-	public static void traverseMapOfDayTimelines(LinkedHashMap<Date, UserDayTimeline> map)
+	/**
+	 * 
+	 * @param map
+	 */
+	public static void traverseMapOfDayTimelines(LinkedHashMap<Date, Timeline> map)
 	{
 		System.out.println("traversing map of day timelines");
-		for (Map.Entry<Date, UserDayTimeline> entry : map.entrySet())
+		for (Map.Entry<Date, Timeline> entry : map.entrySet())
 		{
 			System.out.print("Date: " + entry.getKey());
 			entry.getValue().printActivityObjectNamesInSequence();
@@ -2412,48 +2270,66 @@ public class TimelineUtils
 	 * @param activityAtRecommPoint
 	 * @return
 	 */
-	public static LinkedHashMap<Date, UserDayTimeline> extractDaywiseCandidateTimelines(
-			LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser, ArrayList<ActivityObject> activitiesGuidingRecomm,
+	public static LinkedHashMap<Date, Timeline> extractDaywiseCandidateTimelines(
+			LinkedHashMap<Date, Timeline> dayTimelinesForUser, ArrayList<ActivityObject> activitiesGuidingRecomm,
 			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
 	{
-		LinkedHashMap<Date, UserDayTimeline> candidateTimelines = new LinkedHashMap<Date, UserDayTimeline>();
+		LinkedHashMap<Date, Timeline> candidateTimelines = new LinkedHashMap<>();
 		int count = 0;
 
 		int totalNumberOfProbableCands = 0;
 		int numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
 		int numCandsRejectedDueToNoNextActivity = 0;
 
-		for (Map.Entry<Date, UserDayTimeline> dayTimelineEntry : dayTimelinesForUser.entrySet())
+		for (Map.Entry<Date, Timeline> dayTimelineEntry : dayTimelinesForUser.entrySet())
 		{
 			totalNumberOfProbableCands += 1;
 			Date dayOfTimeline = dayTimelineEntry.getKey();
-			UserDayTimeline dayTimeline = dayTimelineEntry.getValue();//
+			Timeline dayTimeline = dayTimelineEntry.getValue();//
+
 			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for
 			// the day to be recommended (this should nt be the case because test and training set are diffferent)
 			// and there is atleast one valid activity after this activityAtRecomm point
-			if (dayTimeline.countContainsActivityButNotAsLast(activityAtRecommPoint) > 0)
+			if (dayTimeline.countContainsActivityNameButNotAsLast(activityAtRecommPoint.getActivityName()) > 0)
 			// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
 			{
 				if (dayOfTimeline.toString().equals(dateAtRecomm.toString()) == true)
 				{
-					System.err.println(
-							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
+					System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly"));
 					continue;
 				}
 
-				if (dayTimeline.containsOnlySingleActivity() == false && dayTimeline
-						.hasAValidActivityAfterFirstOccurrenceOfThisActivity(activityAtRecommPoint) == true)
+				if (dayTimeline.getActivityObjectsInTimeline().size() > 1 && dayTimeline
+						.hasAValidActAfterFirstOccurOfThisActName(activityAtRecommPoint.getActivityName()))
+				// if (dayTimeline.containsOnlySingleActivity() == false && dayTimeline
+				// .hasAValidActivityAfterFirstOccurrenceOfThisActivity(activityAtRecommPoint) == true)
 				{
 					candidateTimelines.put(dayOfTimeline, dayTimeline);
 					count++;
 				}
 				else
+				{
 					numCandsRejectedDueToNoNextActivity += 1;
+				}
 			}
 			else
+			{
 				numCandsRejectedDueToNoCurrentActivityAtNonLast += 1;
+			}
 		}
-		if (count == 0) System.err.println("No candidate timelines found");
+
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Inside extractDaywiseCandidateTimelines: #cand timelines = " + count
+					+ " numCandsRejectedDueToNoNextActivity =" + numCandsRejectedDueToNoNextActivity
+					+ "  numCandsRejectedDueToNoCurrentActivityAtNonLast"
+					+ numCandsRejectedDueToNoCurrentActivityAtNonLast);
+		}
+		if (count == 0)
+		{
+			System.err.println("Warning: No candidate timelines found");
+		}
 		return candidateTimelines;
 	}
 
@@ -2466,19 +2342,21 @@ public class TimelineUtils
 	 * @return
 	 */
 	public static LinkedHashMap<String, Timeline> dayTimelinesToCleanedExpungedRearrangedTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
 	{
-		LinkedHashMap<String, Timeline> cleanedERTimelines = new LinkedHashMap<String, Timeline>();
+		LinkedHashMap<String, Timeline> cleanedERTimelines = new LinkedHashMap<>();
 		System.out.println("inside dayTimelinesToCleanedExpungedRearrangedTimelines()");
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
+
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
 			String userID = usersTimelinesEntry.getKey();
-			LinkedHashMap<Date, UserDayTimeline> userDayTimelines = usersTimelinesEntry.getValue();
+			LinkedHashMap<Date, Timeline> userDayTimelines = usersTimelinesEntry.getValue();
 
 			userDayTimelines = cleanUserDayTimelines(userDayTimelines);
 
-			Timeline timelineForUser = new Timeline(userDayTimelines); // converts the day time to continuous dayless
-																		// timeline
+			// converts the day time to continuous dayless //// new Timeline(userDayTimelines);
+			Timeline timelineForUser = dayTimelinesToATimeline(userDayTimelines, false, true);
+
 			timelineForUser = TimelineUtils.expungeInvalids(timelineForUser); // expunges invalid activity objects
 
 			cleanedERTimelines.put(userID, timelineForUser);
@@ -2489,29 +2367,31 @@ public class TimelineUtils
 		return cleanedERTimelines;
 	}
 
+	////
 	/**
 	 * 
 	 * @param usersTimelines
 	 * @return LinkedHashMap<User ID as String, Timeline of the user with user id as integer as timeline id>
 	 */
 	public static LinkedHashMap<String, Timeline> dayTimelinesToTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
 	{
-		LinkedHashMap<String, Timeline> timelines = new LinkedHashMap<String, Timeline>();
+		LinkedHashMap<String, Timeline> timelines = new LinkedHashMap<>();
 		if (usersTimelines.size() == 0 || usersTimelines == null)
 		{
-			new Exception(
-					"Error in org.activity.util.UtilityBelt.dayTimelinesToTimelines(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>): userTimeline.size = "
-							+ usersTimelines.size()).printStackTrace();
-			;
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in dayTimelinesToTimelines(): userTimeline.size = " + usersTimelines.size()));
 		}
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersTimelines.entrySet())
 		{
-			timelines.put(entry.getKey(), new Timeline(entry.getValue(), Integer.valueOf(entry.getKey())));
+			Timeline timelinesOfAllDatesCombined = dayTimelinesToATimeline(entry.getValue(), false, true);
+			timelines.put(entry.getKey(), timelinesOfAllDatesCombined);
+			// timelines.put(entry.getKey(), new Timeline(entry.getValue(), Integer.valueOf(entry.getKey())));
 		}
 		return timelines;
 	}
 
+	////
 	/**
 	 * Checks whether the given list Activity Objects are in chronological sequence.
 	 * 
@@ -2534,10 +2414,15 @@ public class TimelineUtils
 		return chronologyPreserved;
 	}
 
+	/**
+	 * 
+	 * @param activityObjectIndex
+	 * @param givenTimeline
+	 * @return
+	 */
 	public static boolean isNoValidActivityAfterIt(int activityObjectIndex, Timeline givenTimeline)
 	{
 		boolean isNoValidAfter = true;
-
 		ArrayList<ActivityObject> objectsInGivenTimeline = givenTimeline.getActivityObjectsInTimeline();
 
 		System.out.println("inside isNoValidActivityAfterIt");
@@ -2554,9 +2439,6 @@ public class TimelineUtils
 		for (int i = activityObjectIndex + 1; i < objectsInGivenTimeline.size(); i++)
 		{
 			if (UtilityBelt.isValidActivityName(objectsInGivenTimeline.get(i).getActivityName()))
-			// if((objectsInGivenTimeline.get(i).getActivityName().equalsIgnoreCase("Unknown") ||
-			// objectsInGivenTimeline.get(i).getActivityName().equalsIgnoreCase("Others"))
-			// ==false)
 			{
 				System.out.println("Activity making it false=" + objectsInGivenTimeline.get(i).getActivityName());
 				isNoValidAfter = false;
@@ -2568,15 +2450,20 @@ public class TimelineUtils
 		return isNoValidAfter;
 	}
 
-	public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> expungeUserDayTimelinesByUser(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines,
-			ArrayList<String> userIDsToExpunge)
+	/**
+	 * 
+	 * @param usersTimelines
+	 * @param userIDsToExpunge
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> expungeUserDayTimelinesByUser(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines, ArrayList<String> userIDsToExpunge)
 	{
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> reducedTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reducedTimelines = new LinkedHashMap<>();
 		System.out.println("number of users before reducing users timeline = " + usersTimelines.size());
 		System.out.println("Users to remove = " + userIDsToExpunge.toString());
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
 			String userID = usersTimelinesEntry.getKey();
 			System.out.println("Reading " + userID);
@@ -2591,14 +2478,18 @@ public class TimelineUtils
 				reducedTimelines.put(userID, usersTimelinesEntry.getValue());
 			}
 		}
-
 		System.out.println("number of users in reduced users timeline = " + reducedTimelines.size());
 		return reducedTimelines;
 	}
 
+	/**
+	 * 
+	 * @param usersTimelines
+	 * @return
+	 */
 	public static LinkedHashMap<String, Timeline> expungeInvalids(LinkedHashMap<String, Timeline> usersTimelines)
 	{
-		LinkedHashMap<String, Timeline> expungedTimelines = new LinkedHashMap<String, Timeline>();
+		LinkedHashMap<String, Timeline> expungedTimelines = new LinkedHashMap<>();
 
 		for (Map.Entry<String, Timeline> entry : usersTimelines.entrySet())
 		{
@@ -2618,40 +2509,31 @@ public class TimelineUtils
 	{
 		if (timelineToPrune == null)
 		{
-			System.err.println("Error inside UtulityBelt.expungeInvalids: timelineToPrune is null");
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error inside UtulityBelt.expungeInvalids: timelineToPrune is null"));
 		}
 
 		ArrayList<ActivityObject> arrayToPrune = timelineToPrune.getActivityObjectsInTimeline();
-		ArrayList<ActivityObject> arrPruned = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject> arrPruned = (ArrayList<ActivityObject>) arrayToPrune.stream()
+				.filter(ao -> ao.isInvalidActivityName() == false).collect(Collectors.toList());
 
-		Integer timelineID = timelineToPrune.getTimelineID();
-
-		for (int i = 0; i < arrayToPrune.size(); i++)
-		{
-			if (arrayToPrune.get(i).isInvalidActivityName()) // if the first element is unknown, prune it
-			{
-				continue;
-			}
-			else
-				arrPruned.add(arrayToPrune.get(i));
-		}
-		return (new Timeline(timelineID, arrPruned));
+		Timeline prunedTimeline = new Timeline(arrPruned, timelineToPrune.isShouldBelongToSingleDay(),
+				timelineToPrune.isShouldBelongToSingleUser());
+		prunedTimeline.setTimelineID(timelineToPrune.getTimelineID());
+		return prunedTimeline;
 	}
 
-	public static int getNumberOfWeekendsInGivenDayTimelines(LinkedHashMap<Date, UserDayTimeline> userTimelines)
+	public static int getNumberOfWeekendsInGivenDayTimelines(LinkedHashMap<Date, Timeline> userTimelines)
 	{
 		int numberOfWeekends = 0;
-	
-		for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+		for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 		{
 			int weekDayInt = entry.getKey().getDay();
-	
 			if (weekDayInt == 0 || weekDayInt == 6)
 			{
 				numberOfWeekends++;
 			}
 		}
-	
 		return numberOfWeekends;
 	}
 
@@ -2672,19 +2554,19 @@ public class TimelineUtils
 	{
 		int matchingUnitInCounts = (int) matchingUnitInCountsD;
 		System.out.println("------Inside getCurrentTimelineFromLongerTimelineMUCount");
-	
+
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("longer timeline=" + longerTimeline.getActivityObjectNamesWithTimestampsInSequence());// getActivityObjectNamesInSequence());
 		}
-	
+
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
 				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
 				0);
 		// long currentEndTime=currentEndTimestamp.getTime();
-	
+
 		int indexOfCurrentEnd = longerTimeline.getIndexOfActivityObjectsAtTime(currentEndTimestamp);
-	
+
 		if (indexOfCurrentEnd - matchingUnitInCounts < 0)
 		{
 			System.out.println(
@@ -2693,27 +2575,27 @@ public class TimelineUtils
 							+ (indexOfCurrentEnd - matchingUnitInCounts));
 			matchingUnitInCounts = indexOfCurrentEnd;
 		}
-	
+
 		// this is a safe cast in this case
 		// long matchingUnitInMilliSeconds= (long)(matchingUnitInHours*60*60*1000);//multiply(new
 		// BigDecimal(60*60*1000))).longValue();
 		// Timestamp currentStartTimestamp = new Timestamp(currentEndTime- matchingUnitInMilliSeconds);
-	
+
 		int indexOfCurrentStart = indexOfCurrentEnd - matchingUnitInCounts;
-	
+
 		System.out.println("Start index of current timeline=" + indexOfCurrentStart);
 		System.out.println("End index of current timeline=" + indexOfCurrentEnd);
-	
+
 		// identify the recommendation point in longer timeline
-	
+
 		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
 				.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
-	
+
 		ActivityObject nextValidActivityObject = longerTimeline
 				.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 		ActivityObject nextActivityObject = longerTimeline
 				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
-	
+
 		int isInvalid = -99;
 		if (nextActivityObject.isInvalidActivityName())
 		{
@@ -2721,11 +2603,11 @@ public class TimelineUtils
 		}
 		else
 			isInvalid = -1;
-	
+
 		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
-				nextValidActivityObject);
+				nextValidActivityObject, false, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
-	
+
 		// System.out.println("Current timeline="+currentTimeline.getActivityObjectNamesInSequence());
 		if (currentTimeline.getActivityObjectsInTimeline().size() != (matchingUnitInCounts + 1))
 		// note: this is matching unit in counts reduced
@@ -2754,30 +2636,30 @@ public class TimelineUtils
 			Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInHours)
 	{
 		System.out.println("------- Inside getCurrentTimelineFromLongerTimelineMUHours");
-	
+
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
 				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
 				0);
 		long currentEndTime = currentEndTimestamp.getTime();
-	
+
 		// this is a safe cast in this case
 		long matchingUnitInMilliSeconds = (long) (matchingUnitInHours * 60 * 60 * 1000);// multiply(new
 																						// BigDecimal(60*60*1000))).longValue();
-	
+
 		Timestamp currentStartTimestamp = new Timestamp(currentEndTime - matchingUnitInMilliSeconds);
-	
+
 		System.out.println("Starttime of current timeline=" + currentStartTimestamp);
 		System.out.println("Endtime of current timeline=" + currentEndTimestamp);
-	
+
 		// identify the recommendation point in longer timeline
-	
+
 		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
 				.getActivityObjectsBetweenTime(currentStartTimestamp, currentEndTimestamp);
-	
+
 		ActivityObject nextValidActivityObject = longerTimeline
 				.getNextValidActivityAfterActivityAtThisTime(currentEndTimestamp);
 		ActivityObject nextActivityObject = longerTimeline.getNextActivityAfterActivityAtThisTime(currentEndTimestamp);
-	
+
 		int isInvalid = -99;
 		if (nextActivityObject.isInvalidActivityName())
 		{
@@ -2785,38 +2667,204 @@ public class TimelineUtils
 		}
 		else
 			isInvalid = -1;
-	
+
 		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
-				nextValidActivityObject);
+				nextValidActivityObject, false, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
 		System.out.println("------- Exiting getCurrentTimelineFromLongerTimelineMUHours");
 		return currentTimeline;
 	}
 
-	// private void compareTimelines(String serialisedTimelines1, String serialisedTimelines2)
-	// {
-	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal1 =
-	// (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer.deSerializeThis(serialisedTimelines1);
-	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal2 =
-	// (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer.deSerializeThis(serialisedTimelines2);
-	//
-	// StringBuffer s = new StringBuffer("Comparing " + serialisedTimelines1 + " and " + serialisedTimelines2 + "\n");
-	//
-	// if (usersDayTimelinesOriginal1.size() == usersDayTimelinesOriginal2.size())
-	// {
-	// s.append("Num of users: same " + usersDayTimelinesOriginal1.size() + " = " + usersDayTimelinesOriginal2.size());
-	//
-	// for
-	// }
-	// else
-	// {
-	// s.append("Num of users: different " + usersDayTimelinesOriginal1.size() + " = " +
-	// usersDayTimelinesOriginal2.size());
-	// }
-	//
-	//
-	// WritingToFile.appendLineToFileAbsolute(s.toString(), Constant.getCommonPath() + "ComparingTimelines.txt");// ,
-	// fullPathfileNameToUse);
-	// }
+	/**
+	 * Checks whether all the ActivityObjects in the Timeline are of the same day or not. Compared the start timestamps
+	 * of activity objects
+	 * 
+	 * @return
+	 */
+	public static boolean isSameDay(ArrayList<ActivityObject> activityObjectsInDay)
+	{
+		if (activityObjectsInDay.size() == 0)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in isSameDay activityObjectsInDay.size()= " + activityObjectsInDay.size()));
+		}
+		Timestamp firstTimestamp = activityObjectsInDay.get(0).getStartTimestamp();
+		if (activityObjectsInDay.stream().skip(1)
+				.anyMatch(ao -> DateTimeUtils.isSameDate(firstTimestamp, ao.getStartTimestamp()) == false))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
+	 * Creates a Timeline consisting of the Activity Objects from the given LinkedHashMap of UserDay Timelines thus
+	 * essentially converts mulitple day timelines into a single continuous single timeline
+	 * 
+	 * @param dayTimelines
+	 *            LinkedHashMap of UserDayTimelines
+	 * 
+	 * @param shouldBelongToSingleDay
+	 *            should the Timeline to be returned belong to a single day
+	 * @param shouldBelongToSingleUser
+	 *            should the Timeline to be returned belong to a single user
+	 */
+	public static Timeline dayTimelinesToATimeline(LinkedHashMap<Date, Timeline> dayTimelines,
+			boolean shouldBelongToSingleDay, boolean shouldBelongToSingleUser)
+	{
+		long dt = System.currentTimeMillis();
+		Timeline concatenatedTimeline = null;
+
+		ArrayList<ActivityObject> allActivityObjects = new ArrayList<>();
+
+		for (Map.Entry<Date, Timeline> entry : dayTimelines.entrySet())
+		{
+			allActivityObjects.addAll(entry.getValue().getActivityObjectsInTimeline());
+		}
+
+		if (allActivityObjects.size() == 0)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in 'dayTimelinesToATimeline' creating Timeline: Empty Activity Objects provided"));
+			System.exit(-1);
+		}
+
+		else
+		{
+			concatenatedTimeline = new Timeline(allActivityObjects, shouldBelongToSingleDay, shouldBelongToSingleUser);
+			if (VerbosityConstants.verbose)
+			{
+				System.out.println("Creating timelines for " + dayTimelines.size() + " daytimelines  takes "
+						+ (System.currentTimeMillis() - dt) / 1000 + " secs");
+			}
+		}
+		return concatenatedTimeline;
+	}
 
 }
+
+/////////////// UNUSED CODE
+
+// DISABLED BECAUSE AFTER THE OCT 2016 CRASH, I COULD NOT FIND BACK THE CLASS CheckinActivityObject
+// /**
+// *
+// * @param allActivityObjects
+// * @return
+// */
+// public static LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>
+// createUserTimelinesFromCheckinActivityObjects(
+// LinkedHashMap<String, TreeMap<Timestamp, CheckinActivityObject>> allActivityObjects)
+// {
+// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines =
+// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+// // userid, usertimeline
+// LinkedHashMap<String, ArrayList<CheckinActivityObject>> perUserActivityEvents =
+// new LinkedHashMap<String, ArrayList<CheckinActivityObject>>();
+//
+// System.out.println("inside createUserTimelinesFromCheckinActivityObjects");
+//
+// for (Entry<String, TreeMap<Timestamp, CheckinActivityObject>> perUserActObjEntry : allActivityObjects.entrySet())
+// // Iterate over Users
+// {
+// String userID = perUserActObjEntry.getKey();
+//
+// System.out.println("for user:" + userID + " number of activity-objects =" +
+// perUserActObjEntry.getValue().size());
+//
+// LinkedHashMap<Date, ArrayList<CheckinActivityObject>> perDateActObjsForThisUser =
+// new LinkedHashMap<Date, ArrayList<CheckinActivityObject>>();
+//
+// TreeMap<Timestamp, CheckinActivityObject> actObjsForThisUserByTS = perUserActObjEntry.getValue();
+//
+// for (Entry<Timestamp, CheckinActivityObject> perTSActObjEntry : actObjsForThisUserByTS.entrySet()) // Iterate
+// over Users
+// {
+// Date date = new Date(perTSActObjEntry.getKey().getTime());// (Date)
+// actObjsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension", "Date"); // start date
+//
+// if (!(perDateActObjsForThisUser.containsKey(date)))
+// {
+// perDateActObjsForThisUser.put(date, new ArrayList<CheckinActivityObject>());
+// }
+//
+// perDateActObjsForThisUser.get(date).add(perTSActObjEntry.getValue());
+// }
+//
+// // perDateActivityEventsForThisUser has been created now.
+//
+// LinkedHashMap<Date, UserDayTimeline> dayTimelines = new LinkedHashMap<Date, UserDayTimeline>();
+//
+// for (Map.Entry<Date, ArrayList<CheckinActivityObject>> perDateActivityEventsForThisUserEntry :
+// perDateActObjsForThisUser
+// .entrySet())
+// {
+// Date date = perDateActivityEventsForThisUserEntry.getKey();
+//
+// /// todo dayTimelines.put(date, new UserDayTimeline(perDateActivityEventsForThisUserEntry.getValue(), date));
+//
+// }
+//
+// userTimelines.put(userID, dayTimelines);
+//
+// }
+//
+// System.out.println("exiting createUserTimelinesFromActivityEvents");
+// return userTimelines;
+// }
+
+/// **
+// *
+// * @param usersTimelines
+// * @return LinkedHashMap<User ID as String, Timeline of the user with user id as integer as timeline id>
+// */
+// public static LinkedHashMap<String, Timeline> dayTimelinesToTimelines(
+// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+// {
+// LinkedHashMap<String, Timeline> timelines = new LinkedHashMap<String, Timeline>();
+//
+// if (usersTimelines.size() == 0 || usersTimelines == null)
+// {
+// System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+// "Error in org.activity.util.UtilityBelt.dayTimelinesToTimelines(LinkedHashMap<String, LinkedHashMap<Date,
+/// UserDayTimeline>>): userTimeline.size = "
+// + usersTimelines.size()));
+// }
+//
+// for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersTimelines.entrySet())
+// {
+//
+// timelines.put(entry.getKey(), new Timeline(entry.getValue(), Integer.valueOf(entry.getKey())));
+//
+// timelines.put(entry.getKey(), new Timeline(entry.getValue(), Integer.valueOf(entry.getKey())));
+// }
+// return timelines;
+// }
+
+// private void compareTimelines(String serialisedTimelines1, String serialisedTimelines2)
+// {
+// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal1 =
+// (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer.deSerializeThis(serialisedTimelines1);
+// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal2 =
+// (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer.deSerializeThis(serialisedTimelines2);
+//
+// StringBuffer s = new StringBuffer("Comparing " + serialisedTimelines1 + " and " + serialisedTimelines2 + "\n");
+//
+// if (usersDayTimelinesOriginal1.size() == usersDayTimelinesOriginal2.size())
+// {
+// s.append("Num of users: same " + usersDayTimelinesOriginal1.size() + " = " + usersDayTimelinesOriginal2.size());
+//
+// for
+// }
+// else
+// {
+// s.append("Num of users: different " + usersDayTimelinesOriginal1.size() + " = " +
+// usersDayTimelinesOriginal2.size());
+// }
+//
+//
+// WritingToFile.appendLineToFileAbsolute(s.toString(), Constant.getCommonPath() + "ComparingTimelines.txt");// ,
+// fullPathfileNameToUse);
+// }
