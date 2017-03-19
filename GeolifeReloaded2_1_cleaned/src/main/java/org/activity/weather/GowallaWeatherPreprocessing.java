@@ -25,7 +25,7 @@ import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
-import org.activity.objects.UserDayTimeline;
+import org.activity.objects.Timeline;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -60,8 +60,7 @@ public class GowallaWeatherPreprocessing
 	static LocalDateTime currentDateTime;
 
 	public static void GowallaWeatherPreprocessingController(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelines,
-			String commonPathToWrite)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String commonPathToWrite)
 	{
 		writeLatLongRoundedDateSetFromTimelines(usersCleanedDayTimelines,
 				commonPathToWrite + "LatLongRoundedDateSet.txt", decimalPlacesToKeepForLatLon, false);
@@ -689,8 +688,8 @@ public class GowallaWeatherPreprocessing
 	 * 
 	 */
 	public static void writeLatLongRoundedDateSetFromTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelines,
-			String fileNameToWrite, int numOfDecimalPlacesToKeep, boolean dateOrTimestamp)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String fileNameToWrite,
+			int numOfDecimalPlacesToKeep, boolean dateOrTimestamp)
 	{
 		LinkedHashSet<String> latLongDate = new LinkedHashSet<String>();
 		LinkedHashMap<String, Integer> userNumOfActs = new LinkedHashMap<String, Integer>();
@@ -699,17 +698,17 @@ public class GowallaWeatherPreprocessing
 
 		try
 		{
-			for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
 				numOfUsers += 1;
 				int numOfActivityObjectForThisUser = 0;
 
-				for (Entry<Date, UserDayTimeline> dateEntryForThisUser : userEntry.getValue().entrySet())
+				for (Entry<Date, Timeline> dateEntryForThisUser : userEntry.getValue().entrySet())
 				{
 					Date date = dateEntryForThisUser.getKey();
-					UserDayTimeline timeline = dateEntryForThisUser.getValue();
+					Timeline timeline = dateEntryForThisUser.getValue();
 
-					for (ActivityObject aos : timeline.getActivityObjectsInDay())
+					for (ActivityObject aos : timeline.getActivityObjectsInTimeline())
 					{
 						numOfActivityObjectsOverAllUsers += 1;
 						numOfActivityObjectForThisUser += 1;

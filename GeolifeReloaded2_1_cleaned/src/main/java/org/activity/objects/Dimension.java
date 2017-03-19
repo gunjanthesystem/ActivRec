@@ -26,9 +26,10 @@ public class Dimension implements Serializable
 	 * populate the values for all the attributes of Dimension for a given dimensionID name and value
 	 * 
 	 * @param dimensionName
-	 *            // can get this from meta table, like User_Dimension
+	 *            can get this from meta table, like User_Dimension
+	 * @param dimensionPrimaryKeyValue
 	 * @param dimensionID
-	 *            // value of User_ID
+	 *            value of User_ID
 	 */
 	Dimension(String dimensionName, String dimensionPrimaryKeyValue)
 	{
@@ -63,15 +64,13 @@ public class Dimension implements Serializable
 				// attributeNameValuePairs.put(dimensionAttributes.get(i).get(0),new String()); // (User_Id, 2)
 				// LOGG< System.out.println("Writing "+i+"th Attribute");
 
-				ArrayList<String> dimensionAttributeInfo = dimensionAttributeInfos.get(i); // example (User_Name,
-																							// String, h2)
+				ArrayList<String> dimensionAttributeInfo = dimensionAttributeInfos.get(i);
+				// example (User_Name, String, h2)
 
 				// LOGG
 				// System.out.println("this attribute information is of size="+dimensionAttributeInfo.size());
 				// System.out.println("this attribute information is ="+dimensionAttributeInfo.toString());
-
 				attributeNameDatatypePairs.put(dimensionAttributeInfo.get(0), dimensionAttributeInfo.get(1)); // (User_ID,String)
-
 				attributeNameHierarchyPairs.put(dimensionAttributeInfo.get(0), dimensionAttributeInfo.get(2));
 			}
 

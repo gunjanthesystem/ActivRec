@@ -1,17 +1,17 @@
 package org.activity.objects;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LongSummaryStatistics;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
-import org.activity.util.StringCode;
+import org.activity.ui.PopUps;
+import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -21,9 +21,15 @@ import org.activity.util.UtilityBelt;
  * @author gunjan
  *
  */
-public class Timeline implements TimelineI
+public class Timeline implements Serializable
 {
-	Integer timelineID;
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * If shouldBelongToSingleDay, the timelineID is date, otherwise it is timeline count.
+	 */
+	String timelineID;
+	boolean shouldBelongToSingleUser, shouldBelongToSingleDay;
 	ArrayList<ActivityObject> activityObjectsInTimeline;
 
 	/**
@@ -32,190 +38,52 @@ public class Timeline implements TimelineI
 	static int countTimelinesCreatedUntilNow = 0;
 
 	/**
-	 * Create an empty timeline
-	 */
-	public Timeline()
-	{
-	}
-
-	/**
-	 * Create a Timeline with give ID and list of ActivityObjects
-	 * 
-	 * @param id
-	 * @param arrOs
-	 */
-	public Timeline(Integer id, ArrayList<ActivityObject> arrOs)
-	{
-		this.timelineID = id;
-		this.activityObjectsInTimeline = arrOs;
-	}
-
-	/**
 	 * Create Timeline from given Activity Objects
 	 * 
+	 * 
 	 * @param activityObjects
+	 * @param shouldBelongToSingleDay
+	 *            it also checks if all ao belong to same day
+	 * @param shouldBelongToSingleUser
+	 *            <font color = orange>currently, not checking if the ao's belong to same user</font>
 	 */
-	public Timeline(ArrayList<ActivityObject> activityObjects)
+	public Timeline(ArrayList<ActivityObject> activityObjects, boolean shouldBelongToSingleDay,
+			boolean shouldBelongToSingleUser)
 	{
-		/*
-		 * if(activityObjects.size() ==0 ) {
-		 * System.err.println("Error in creating Timeline: Empty Activity Objects provided"); System.exit(5); }
-		 * 
-		 * else
-		 */
-		{
-			countTimelinesCreatedUntilNow += 1;
-			this.activityObjectsInTimeline = activityObjects;
-			timelineID = countTimelinesCreatedUntilNow;// new UID().toString();
-			/*
-			 * if(isSameDay(activityObjectsInTimeline) == true) {
-			 * this.dateID=activityObjectsInTimeline.get(0).getDimensionIDValue("Date_ID");
-			 * 
-			 * this.dayName=activityObjectsInTimeline.get(0).getDimensionAttributeValue("Date_Dimension",
-			 * "Week_Day").toString();
-			 * 
-			 * this.userID=activityObjectsInTimeline.get(0).getDimensionIDValue("User_ID"); }
-			 */
-		}
-
-		if (!TimelineUtils.isChronological(activityObjects))
-		{
-			System.err
-					.println("Error: in Timeline(ArrayList<ActivityObject> activityObjects), CHRONOLOGY NOT PRESERVED");
-		}
-
-	}
-
-	/**
-	 * Create Timeline from a given UserDayTimeline
-	 * 
-	 * @param dayTimeline
-	 */
-	public Timeline(UserDayTimeline dayTimeline)
-	{
-		ArrayList<ActivityObject> activityObjects = dayTimeline.getActivityObjectsInDay();
-
 		if (activityObjects.size() == 0)
 		{
-			System.err.println("Error in creating Timeline: Empty Activity Objects provided");
+			System.err.println(PopUps
+					.getCurrentStackTracedErrorMsg("Error in creating Timeline: Empty Activity Objects provided"));
 			System.exit(5);
 		}
+		if (Constant.checkIfTimelineCreatedIsChronological && !TimelineUtils.isChronological(activityObjects))
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error: in Timeline(ArrayList<ActivityObject> activityObjects), CHRONOLOGY NOT PRESERVED"));
+		}
+		if (shouldBelongToSingleDay && !TimelineUtils.isSameDay(activityObjects))
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error: in Timeline(ArrayList<ActivityObject> activityObjects), shouldBelongToSingleDay= "
+							+ shouldBelongToSingleDay + " but TimelineUtils.isSameDay(activityObjects)="
+							+ TimelineUtils.isSameDay(activityObjects)));
+		}
 
+		this.shouldBelongToSingleDay = shouldBelongToSingleDay;
+		this.shouldBelongToSingleUser = shouldBelongToSingleUser;
+
+		this.activityObjectsInTimeline = activityObjects;
+
+		countTimelinesCreatedUntilNow += 1;
+
+		if (shouldBelongToSingleDay)
+		{
+			timelineID = String.valueOf(DateTimeUtils.getDate(activityObjects.get(0).getStartTimestamp()));
+		}
 		else
 		{
-			countTimelinesCreatedUntilNow += 1;
-			this.activityObjectsInTimeline = activityObjects;
-			timelineID = countTimelinesCreatedUntilNow;// new UID().toString();
-			/*
-			 * if(isSameDay(activityObjectsInTimeline) == true) {
-			 * this.dateID=activityObjectsInTimeline.get(0).getDimensionIDValue("Date_ID");
-			 * 
-			 * this.dayName=activityObjectsInTimeline.get(0).getDimensionAttributeValue("Date_Dimension",
-			 * "Week_Day").toString();
-			 * 
-			 * this.userID=activityObjectsInTimeline.get(0).getDimensionIDValue("User_ID"); }
-			 */
+			timelineID = String.valueOf(countTimelinesCreatedUntilNow);
 		}
-	}
-
-	/**
-	 * Creates a Timeline consisting of the Activity Objects from the given LinkedHashMap of UserDayTimelines thus
-	 * essentially converts mulitple day timelines into a single continuous single timeline
-	 * 
-	 * @param dayTimelines
-	 *            LinkedHashMap of UserDayTimelines
-	 */
-	public Timeline(LinkedHashMap<Date, UserDayTimeline> dayTimelines)
-	{
-		long dt = System.currentTimeMillis();
-		ArrayList<ActivityObject> activityObjects = new ArrayList<ActivityObject>();
-
-		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelines.entrySet())
-		{
-			UserDayTimeline dayTimelineEntry = entry.getValue();
-			activityObjects.addAll(dayTimelineEntry.getActivityObjectsInDay());
-		}
-
-		if (activityObjects.size() == 0)
-		{
-			System.err.println("Error in creating Timeline: Empty Activity Objects provided");
-			System.exit(5);
-		}
-
-		else
-		{
-			countTimelinesCreatedUntilNow += 1;
-			this.activityObjectsInTimeline = activityObjects;
-			timelineID = countTimelinesCreatedUntilNow;// new UID().toString();
-		}
-
-		if (Constant.checkIfTimelineCreatedIsChronological)
-		{
-			if (!TimelineUtils.isChronological(activityObjects))
-			{
-				System.err.println(
-						"Error: in Timeline(LinkedHashMap<Date,UserDayTimeline> dayTimelines), CHRONOLOGY NOT PRESERVED");
-			}
-		}
-		long lt = System.currentTimeMillis();
-
-		if (VerbosityConstants.verboseTimelineCleaning) System.out.println(
-				"Creating timelines for " + dayTimelines.size() + " daytimelines  takes " + (lt - dt) / 1000 + " secs");
-	}
-
-	/**
-	 * Creates a Timeline consisting of the Activity Objects from the given LinkedHashMap of UserDayTimelines thus
-	 * essentially converts mulitple day timelines into a single continuous single timeline with given ID for the
-	 * timeline
-	 * 
-	 * @param dayTimelines
-	 * @param timelineID
-	 *            this can be the user id to whom the timeline belongs or any another identifier relevant for the need.
-	 */
-	public Timeline(LinkedHashMap<Date, UserDayTimeline> dayTimelines, int timelineID)
-	{
-		long dt = System.currentTimeMillis();
-		ArrayList<ActivityObject> activityObjects = new ArrayList<ActivityObject>();
-
-		if (dayTimelines.size() == 0 || dayTimelines == null)
-		{
-			new Exception("Error creating new Timeline: num of day timelines " + dayTimelines.size());
-		}
-
-		for (Map.Entry<Date, UserDayTimeline> entry : dayTimelines.entrySet())
-		{
-			UserDayTimeline dayTimelineEntry = entry.getValue();
-			activityObjects.addAll(dayTimelineEntry.getActivityObjectsInDay());
-		}
-
-		// if (activityObjects.size() == 0) commented out on April 19 2016 begin
-		// {
-		// System.err.println("Error in creating Timeline: Empty Activity Objects provided");
-		// new Exception("Error in creating Timeline: Empty Activity Objects provided").printStackTrace();
-		// System.exit(5);
-		// }
-
-		// else commented out on April 19 2016 end
-		{
-			countTimelinesCreatedUntilNow += 1;
-			this.activityObjectsInTimeline = activityObjects;
-			this.timelineID = timelineID;// new UID().toString();
-		}
-
-		if (!TimelineUtils.isChronological(activityObjects))
-		{
-			System.err.println(
-					"Error: in Timeline(LinkedHashMap<Date,UserDayTimeline> dayTimelines), CHRONOLOGY NOT PRESERVED");
-		}
-		long lt = System.currentTimeMillis();
-
-		if (VerbosityConstants.verboseTimelineCleaning) System.out.println(
-				"Creating timelines for " + dayTimelines.size() + " daytimelines  takes " + (lt - dt) / 1000 + " secs");
-	}
-
-	public Integer getTimelineID()
-	{
-		return this.timelineID;
 	}
 
 	/**
@@ -227,14 +95,12 @@ public class Timeline implements TimelineI
 	{
 		HashSet<String> set = new HashSet<String>();
 
-		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
+		for (ActivityObject ao : activityObjectsInTimeline)
 		{
-			if (UtilityBelt.isValidActivityName(activityObjectsInTimeline.get(i).getActivityName()))
-			// ((activityObjectsInTimeline.get(i).getActivityName().equalsIgnoreCase("Unknown") ||
-			// activityObjectsInTimeline.get(i).getActivityName().equalsIgnoreCase("Others"))
-			// ==false)
+			String actName = ao.getActivityName();
+			if (UtilityBelt.isValidActivityName(actName))
 			{
-				set.add(activityObjectsInTimeline.get(i).getActivityName().trim());
+				set.add(actName.trim());
 			}
 		}
 		return set.size();
@@ -248,50 +114,22 @@ public class Timeline implements TimelineI
 	public int countNumberOfValidActivities()
 	{
 		int count = 0;
-
-		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
+		for (ActivityObject ao : activityObjectsInTimeline)
 		{
-			if (UtilityBelt.isValidActivityName(activityObjectsInTimeline.get(i).getActivityName()))
-			// ((activityObjectsInTimeline.get(i).getActivityName().equalsIgnoreCase("Unknown") ||
-			// activityObjectsInTimeline.get(i).getActivityName().equalsIgnoreCase("Others"))
-			// ==false)
+			String actName = ao.getActivityName();
+			if (UtilityBelt.isValidActivityName(actName))
 			{
 				count++;
 			}
 		}
-
 		return count;
 	}
 
 	public ActivityObject getNextValidActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
 		// System.out.println("To find next activity object at :"+timestamp);
-		ActivityObject nextValidActivityObject = null;
 		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectsAtTime(timestamp);
 		return getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp);
-	}
-
-	/**
-	 * Returns a list of distinct dates in the timeline
-	 * 
-	 * @return list of distinct dates in the times
-	 */
-	public ArrayList<Date> getAllDistinctDates()
-	{
-		ArrayList<Date> allDistinctDates = new ArrayList<Date>();
-
-		System.out.println("Inside getAllDistinctDays");
-
-		if (this.activityObjectsInTimeline.size() > 0)
-		{
-			Date date = (Date) activityObjectsInTimeline.get(0).getDimensionAttributeValue("Date_Dimension", "Date");
-			if (!allDistinctDates.contains(date))
-			{
-				allDistinctDates.add(date);
-			}
-		}
-
-		return allDistinctDates;
 	}
 
 	/**
@@ -302,13 +140,8 @@ public class Timeline implements TimelineI
 	 */
 	public ActivityObject getNextValidActivityAfterActivityAtThisPosition(int indexOfActivityObject)
 	{
-		// System.out.println("To find next activity object at :"+timestamp);
 		ActivityObject nextValidActivityObject = null;
 		int indexOfNextValidActivityObject = -99;
-
-		// $$System.out.print("\t getNextValidActivityAfterActivityAtThisPosition(): Index of activity object to look
-		// after is " + indexOfActivityObject +
-		// " \n\t Next valid activity is ");
 
 		if (indexOfActivityObject == this.activityObjectsInTimeline.size() - 1)// there are no next activities
 		{
@@ -318,10 +151,7 @@ public class Timeline implements TimelineI
 
 		for (int i = indexOfActivityObject + 1; i < activityObjectsInTimeline.size(); i++)
 		{
-			if (UtilityBelt.isValidActivityName(activityObjectsInTimeline.get(i).getActivityName())) // if((activityObjectsInTimeline.get(i).getActivityName().equalsIgnoreCase("Unknown")
-																										// ||
-																										// activityObjectsInTimeline.get(i).getActivityName().equalsIgnoreCase("Others"))
-																										// ==false)
+			if (UtilityBelt.isValidActivityName(activityObjectsInTimeline.get(i).getActivityName()))
 			{
 				nextValidActivityObject = activityObjectsInTimeline.get(i);
 				indexOfNextValidActivityObject = i;
@@ -336,13 +166,21 @@ public class Timeline implements TimelineI
 
 		if (nextValidActivityObject == null)
 		{
+			System.err.println("Warning: No next valid activity after this index in the given timeline");
+			System.err.println("\tThe timeline is:" + this.getActivityObjectNamesInSequence());
+			System.err.println("\tEnd index index is:" + indexOfActivityObject);
 			return nextValidActivityObject;
 		}
 
-		if (nextValidActivityObject.getActivityName()
-				.equals(activityObjectsInTimeline.get(indexOfActivityObject).getActivityName()))
+		if (VerbosityConstants.verbose)
 		{
-			if (VerbosityConstants.verbose)
+			System.out.println("To find next activity object after index :" + indexOfActivityObject);
+			System.out
+					.print("\t getNextValidActivityAfterActivityAtThisPosition(): Index of activity object to look after is "
+							+ indexOfActivityObject);
+			System.err.println("\t The timeline is:" + this.getActivityObjectNamesInSequence());
+			if (nextValidActivityObject.getActivityName()
+					.equals(activityObjectsInTimeline.get(indexOfActivityObject).getActivityName()))
 			{
 				System.err
 						.println("\n\t Warning: Next Valid activity has same name as current activity (for timelineID:"
@@ -353,25 +191,10 @@ public class Timeline implements TimelineI
 				System.err.println("\t End point index was:" + indexOfActivityObject);
 				System.err.println("\t Next valid activity object found at index:" + indexOfNextValidActivityObject);
 			}
+			System.out.println("\t Next valid activity is " + nextValidActivityObject.getActivityName());
 		}
-		/*
-		 * if(nextValidActivityObject==null) WHY DEAD CODE {
-		 * System.err.println("Warning: No next valid activity after this index in the given timeline");
-		 * System.err.println("\tThe timeline is:"+this.getActivityObjectNamesInSequence());
-		 * System.err.println("\tEnd index index is:"+indexOfActivityObject); }
-		 */
-		// $$System.out.println(nextValidActivityObject.getActivityName());
-		return nextValidActivityObject;
-	}
 
-	public boolean containsOnlySingleActivity()
-	{
-		if (activityObjectsInTimeline.size() <= 1)
-		{
-			return true;
-		}
-		else
-			return false;
+		return nextValidActivityObject;
 	}
 
 	/**
@@ -381,49 +204,33 @@ public class Timeline implements TimelineI
 	 */
 	public boolean containsAtLeastOneValidActivity()
 	{
-		boolean containsValid = false;
-		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
-		{
-			String actName = activityObjectsInTimeline.get(i).getActivityName();
-
-			if (UtilityBelt.isValidActivityName(actName))
-			// if( (actName.equalsIgnoreCase("Unknown")||actName.equalsIgnoreCase("Others")) == false)
-			{
-				containsValid = true;
-			}
-		}
-		return containsValid;
+		return activityObjectsInTimeline.stream().anyMatch(ao -> UtilityBelt.isValidActivityName(ao.getActivityName()));
 	}
 
 	public void printActivityObjectNamesInSequence()
 	{
-		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
-		{
-			System.out.print(" >>" + activityObjectsInTimeline.get(i).getActivityName());
-		}
-	}
-
-	public String[] getActivityObjectNamesInSequenceStringArray()
-	{
-		String[] res = new String[activityObjectsInTimeline.size()];
-
-		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
-		{
-			res[i] = activityObjectsInTimeline.get(i).getActivityName();
-		}
-		return res;
+		System.out.println(getActivityObjectNamesInSequence());
 	}
 
 	public String getActivityObjectNamesInSequence()
 	{
-		StringBuilder res = new StringBuilder("");
-
-		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
-		{
-			res.append(">" + activityObjectsInTimeline.get(i).getActivityName());
-		}
-		return res.toString();
+		StringBuilder sb = new StringBuilder();
+		activityObjectsInTimeline.stream().forEach(ao -> sb.append(" >>" + ao.getActivityName()));
+		return sb.toString();
 	}
+
+	///////////////
+	public String getActivityObjectNamesInSequenceWithFeatures()
+	{
+		String res = "";
+		for (ActivityObject ao : activityObjectsInTimeline)
+		{
+			res += (" >>" + ao.getActivityName() + "--" + ao.getStartTimestamp() + "--" + ao.getDurationInSeconds());
+		}
+		return res;
+	}
+
+	///////////////
 
 	public void printActivityObjectNamesWithTimestampsInSequence()
 	{
@@ -444,9 +251,6 @@ public class Timeline implements TimelineI
 			res.append(">>" + activityObjectsInTimeline.get(i).getActivityName() + "--"
 					+ activityObjectsInTimeline.get(i).getStartTimestamp() + "--"
 					+ activityObjectsInTimeline.get(i).getEndTimestamp());
-			// System.out.print(" >>"+activityObjectsInTimeline.get(i).getActivityName()+"--"
-			// +activityObjectsInTimeline.get(i).getStartTimestamp()+"--"
-			// +activityObjectsInTimeline.get(i).getEndTimestamp());
 		}
 		return res.toString();
 	}
@@ -461,9 +265,6 @@ public class Timeline implements TimelineI
 			res.append(" >>" + activityObjectsInTimeline.get(i).getActivityName() + "--"
 					+ activityObjectsInTimeline.get(i).getStartTimestamp() + "--"
 					+ activityObjectsInTimeline.get(i).getEndTimestamp());
-			// System.out.print(" >>"+activityObjectsInTimeline.get(i).getActivityName()+"--"
-			// +activityObjectsInTimeline.get(i).getStartTimestamp()+"--"
-			// +activityObjectsInTimeline.get(i).getEndTimestamp());
 		}
 		return res.toString();
 	}
@@ -490,16 +291,16 @@ public class Timeline implements TimelineI
 	 * 
 	 * @param from
 	 * @param to
+	 *            <font color = orange>exclusive</font>
 	 * @return ArrayList of Activity Objects in the timeline from the 'from' index until before the 'to' index
 	 */
 	public ArrayList<ActivityObject> getActivityObjectsInTimelineFromToIndex(int from, int to) // to is exclusive
 	{
 		if (to > this.activityObjectsInTimeline.size())
 		{
-			System.err.println(
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
 					"Error in getActivityObjectsInTimelineFromToIndex: 'to' index out of bounds. Num of Activity Objects in Timeline="
-							+ this.activityObjectsInTimeline.size() + " while 'to' index is=" + to);
-			// "");
+							+ this.activityObjectsInTimeline.size() + " while 'to' index is=" + to));
 			return null;
 		}
 
@@ -513,220 +314,182 @@ public class Timeline implements TimelineI
 
 	/**
 	 * Returns a string whose characters in sequence are the codes for the activity names of the timeline.
+	 * <p>
+	 * <font color= green>Capable of handling atleast 400 different kinds of activity names<font>
 	 * 
 	 * @return
 	 */
 	public String getActivityObjectsAsStringCode()
 	{
-		StringBuilder stringCodeForTimeline = new StringBuilder();// changed from String to StringBuilder on 20 Sep 2016
+		StringBuilder stringCodeForTimeline = new StringBuilder();
 
-		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
-		{
-			String activityName = activityObjectsInTimeline.get(i).getActivityName();
-
-			// int activityID= generateSyntheticData.getActivityid(activityName);
-
-			stringCodeForTimeline.append(StringCode.getStringCodeFromActivityName(activityName)); // Character.toString
-																									// ((char)(activityID+65));
-																									// //getting the
-																									// ascii code for
-																									// (activity id+65)
-		}
+		activityObjectsInTimeline.stream().forEach(ao -> stringCodeForTimeline.append(ao.getStringCode()));
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{
-			System.err.println(
-					"Error in getActivityObjectsAsStringCode(): stringCodeOfTimeline.length()!= timelineForUser.getActivityObjectsInTimeline().size()");
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getActivityObjectsAsStringCode(): stringCodeOfTimeline.length()!= timelineForUser.getActivityObjectsInTimeline().size()"));
 		}
-
 		return stringCodeForTimeline.toString();
 	}
 
 	/**
 	 * 
+	 * @param activityToCheck
 	 * @return
 	 */
-	public ArrayList<Integer> getActivityObjectsAsSequenceOfNumericCodes()
+	public long countContainsActivityName(String activityNameToCheck)
 	{
-		ArrayList<Integer> numericCodes = new ArrayList<Integer>();
-		String stringCodeForTimeline = new String();
-
-		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
-		{
-			String activityName = activityObjectsInTimeline.get(i).getActivityName();
-
-			// int activityID= generateSyntheticData.getActivityid(activityName);
-
-			stringCodeForTimeline += StringCode.getStringCodeFromActivityName(activityName); // Character.toString
-																								// ((char)(activityID+65));
-																								// //getting the ascii
-																								// code for (activity
-																								// id+65)
-		}
-
-		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
-		{
-			System.err.println(
-					"Error in getActivityObjectsAsStringCode(): stringCodeOfTimeline.length()!= timelineForUser.getActivityObjectsInTimeline().size()");
-		}
-
-		return numericCodes;
+		return activityObjectsInTimeline.stream().filter(ao -> ao.getActivityName().equals(activityNameToCheck))
+				.count();
 	}
 
-	public int countContainsActivity(ActivityObject activityToCheck)
+	/**
+	 * 
+	 * @param activityNameToCheck
+	 * @return num of non-last activity objects with the same act name as activityNameToCheck
+	 */
+	public int countContainsActivityNameButNotAsLast(String activityNameToCheck)
 	{
-		String activityName = activityToCheck.getActivityName();
 		int containsCount = 0;
-
-		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
-		{
-			if (this.activityObjectsInTimeline.get(i).getActivityName().equals(activityName))
-			{
-				containsCount++;
-			}
-		}
-
-		return containsCount;
-	}
-
-	public int countContainsActivityButNotAsLast(ActivityObject activityToCheck)
-	{
-		String activityName = activityToCheck.getActivityName();
-		int containsCount = 0;
-
 		for (int i = 0; i < this.activityObjectsInTimeline.size() - 1; i++)
 		{
-			if (this.activityObjectsInTimeline.get(i).getActivityName().equals(activityName))
+			if (this.activityObjectsInTimeline.get(i).getActivityName().equals(activityNameToCheck))
 			{
 				containsCount++;
 			}
 		}
-
 		return containsCount;
 	}
 
-	public boolean hasAValidActivityAfterFirstOccurrenceOfThisActivity(ActivityObject activityToCheck)
+	/**
+	 * TODO: Make sure the new change ,i.e. running until <size() is compatible with implemention of both Daywise and
+	 * start time approach.
+	 * 
+	 * @param actNameToCheck
+	 * @return
+	 */
+	public boolean hasAValidActAfterFirstOccurOfThisActName(String actNameToCheck)// ActivityObject activityToCheck)
 	{
 		boolean hasValidAfter = false;
 
-		int indexOfFirstOccurrence = getIndexOfFirstOccurrenceOfThisActivity(activityToCheck);
+		int indexOfFirstOccurrence = getIndexOfFirstOccurOfThisActName(actNameToCheck);
 
-		try
+		if (indexOfFirstOccurrence < 0)
 		{
-
-			if (indexOfFirstOccurrence < 0)
-			{
-				Exception errorException = new Exception(
-						"Error in hasAValidActivityAfterFirstOccurrenceOfThisActivity: No Occurrence of the given activity in the given timeline, throwing exception");
-
-			}
-
-			if (indexOfFirstOccurrence < this.activityObjectsInTimeline.size() - 1) // not the last activity of the
-																					// timeline
-			{
-				for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size() - 1; i++)
-				{
-					if (UtilityBelt.isValidActivityName(activityObjectsInTimeline.get(i).getActivityName()))
-					// if((activityObjectsInTimeline.get(i).getActivityName().equalsIgnoreCase("Unknown") ||
-					// activityObjectsInTimeline.get(i).getActivityName().equalsIgnoreCase("Others"))
-					// ==false)
-					{
-						hasValidAfter = true;
-						break;
-					}
-				}
-			}
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in hasAValidActAfterFirstOccurOfThisActName: No Occurrence of the given activity in the given timeline, throwing exception"));
 		}
 
-		catch (Exception e)
+		// not the last activity of the timeline
+		if (indexOfFirstOccurrence < this.activityObjectsInTimeline.size() - 1)
 		{
-			e.printStackTrace();
+			for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size()/* - 1 */; i++)
+			{
+				if (UtilityBelt.isValidActivityName(activityObjectsInTimeline.get(i).getActivityName()))
+				{
+					hasValidAfter = true;
+					break;
+				}
+			}
 		}
 		return hasValidAfter;
 	}
 
-	public int getIndexOfFirstOccurrenceOfThisActivity(ActivityObject activityToCheck)
+	/**
+	 * 
+	 * @param activityNameToCheck
+	 * @return
+	 */
+	public boolean hasActivityName(String activityNameToCheck)
 	{
-		String activityName = activityToCheck.getActivityName();
+		return this.activityObjectsInTimeline.stream().anyMatch(ao -> ao.getActivityName().equals(activityNameToCheck));
+	}
+
+	/**
+	 * TODO: Make sure the new change ,i.e. running until <size() is compatible with implemention of both Daywise and
+	 * start time approach.
+	 * 
+	 * @param actNameToCheck
+	 * @return
+	 */
+	public int getIndexOfFirstOccurOfThisActName(String actNameToCheck)
+	{
 		int indexOfFirstOccurrence = -99;
 
-		for (int i = 0; i < this.activityObjectsInTimeline.size() - 1; i++)
+		for (int i = 0; i < this.activityObjectsInTimeline.size()/* - 1 */; i++)
 		{
-			if (this.activityObjectsInTimeline.get(i).getActivityName().equals(activityName))
+			if (this.activityObjectsInTimeline.get(i).getActivityName().equals(actNameToCheck))
 			{
 				indexOfFirstOccurrence = i;
 				break;
 			}
 		}
-
 		return indexOfFirstOccurrence;
 	}
 
-	public Timestamp getStartTimestampOfFirstOccurrenceOfThisActivity(ActivityObject activityToCheck)
+	/**
+	 * 
+	 * @param activityNameToCheck
+	 * @return
+	 */
+	public Timestamp getStartTimestampOfFirstOccurOfThisActName(String activityNameToCheck)
 	{
-		String activityName = activityToCheck.getActivityName();
 		Timestamp timestampOfFirstOccurrence = null;
 
-		for (int i = 0; i < this.activityObjectsInTimeline.size() - 1; i++)
+		for (ActivityObject ao : this.activityObjectsInTimeline)
 		{
-			if (this.activityObjectsInTimeline.get(i).getActivityName().equals(activityName))
+			if (ao.getActivityName().equals(activityNameToCheck))
 			{
-				timestampOfFirstOccurrence = this.activityObjectsInTimeline.get(i).getStartTimestamp();
+				timestampOfFirstOccurrence = ao.getStartTimestamp();
 				break;
 			}
 		}
 		return timestampOfFirstOccurrence;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public static int getCountTimelinesCreatedUntilNow()
 	{
 		return countTimelinesCreatedUntilNow;
 	}
 
+	/**
+	 * 
+	 * @param timestamp
+	 * @return nextActivityAfterActivityAtThisTime, null otherwise
+	 */
 	public ActivityObject getNextActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
 		// System.out.println("To find next activity object at :"+timestamp);
-
 		ActivityObject ae = activityObjectsInTimeline.get(getIndexOfActivityObjectsAtTime(timestamp) + 1);
-		if (ae != null)
-			return ae;
-		else
-			return new ActivityObject(); // returning empty activity object
+		if (ae == null)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getNextActivityAfterActivityAtThisTime. No next activity after ts = " + timestamp));
+		}
+		return ae;
 	}
 
+	/**
+	 * 
+	 * @param index
+	 * @return
+	 */
 	public ActivityObject getNextActivityAfterActivityAtThisPosition(int index)
 	{
+		ActivityObject ae = null;
 		// System.out.println("To find next activity object at :"+timestamp);
 		if (index + 1 > activityObjectsInTimeline.size() - 1)
 		{
-			System.err.println("Error in getNextActivityAfterActivityAtThisPosition: array index out of bounds");
-			return new ActivityObject();
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getNextActivityAfterActivityAtThisPosition: array index out of bounds"));
 		}
-
-		ActivityObject ae = activityObjectsInTimeline.get(index + 1);
-		if (ae != null)
-			return ae;
-		else
-			return new ActivityObject(); // returning empty activity object
-	}
-
-	public ActivityObject getActivityObjectAtTime2(Timestamp t)
-	{
-		ArrayList<ActivityObject> aos = getActivityObjectsBetweenTime(t, t);
-
-		if (aos.size() > 1)
-		{
-			System.err.println("Error in getActivityObjectAtTime(), aos.size()>1");
-			return null;
-		}
-
-		if (aos.size() == 0 || aos == null)
-		{
-			System.err.println("Error in getActivityObjectAtTime(), aos.size()=" + aos.size());
-			return null;
-		}
-		else
-			return aos.get(0);
+		ae = activityObjectsInTimeline.get(index + 1);
+		return ae;
 	}
 
 	/**
@@ -739,140 +502,104 @@ public class Timeline implements TimelineI
 	 * @param verbose
 	 * @return
 	 */
-	public ArrayList<ActivityObject> getActivityObjectsBetweenTime(Timestamp startTimestampC, Timestamp endTimestampC)
+	public ArrayList<ActivityObject> getActivityObjectsBetweenTime(Timestamp st, Timestamp et)
 	{
-		ArrayList<ActivityObject> activityObjectsIn = new ArrayList<ActivityObject>();
-
-		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
-		{
-			/*
-			 * $$30Seplong intersectionOfActivityObjectAndIntervalInSeconds=
-			 * activityObjectsInTimeline.get(i).intersectingIntervalInSeconds(startTimestampC, endTimestampC);
-			 * if(intersectionOfActivityObjectAndIntervalInSeconds >0) {
-			 * activityObjectsIn.add(activityObjectsInTimeline.get(i)); } $$30Sep
-			 */
-			// 30Sep addition
-			if (activityObjectsInTimeline.get(i).doesOverlap(startTimestampC, endTimestampC))
-			{
-				activityObjectsIn.add(activityObjectsInTimeline.get(i));
-			}
-		}
+		ArrayList<ActivityObject> activityObjectsIn = (ArrayList<ActivityObject>) activityObjectsInTimeline.stream()
+				.filter(ao -> ao.doesOverlap(st, et)).collect(Collectors.toList());
 
 		// ////// for testing correctness
 		if (VerbosityConstants.verbose)
 		{
-			System.out.print("\t Inside getActivityObjectsBetweenTime: activity objects inside " + startTimestampC
-					+ " and " + endTimestampC + " are: ");
-			for (int i = 0; i < activityObjectsIn.size(); i++)
-			{
-				System.out.print(">>" + activityObjectsIn.get(i).getActivityName());
-			}
-
+			System.out.print(
+					"\t Inside getActivityObjectsBetweenTime: activity objects inside " + st + " and " + et + " are: ");
+			activityObjectsIn.stream().forEach(ao -> System.out.print(">>" + ao.getActivityName()));
 			System.out.println();
 		}
 		// /////////////////////////////////
 		return activityObjectsIn;
 	}
 
-	public int getIndexOfActivityObjectsAtTime(Timestamp timestampC)
+	/**
+	 * 
+	 * @param ts
+	 * @return
+	 */
+	public int getIndexOfActivityObjectsAtTime(Timestamp ts)
 	{
-		int index = -99;
-		int count = 0;
+		ArrayList<Integer> res = new ArrayList<>();
 		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
 		{
-			// System.out.println(" >> timestamp to check ="+timestampC+" startTimestamp for
-			// this="+activityObjectsInTimeline.get(i).getStartTimestamp()+" end time stamp for
-			// this="+activityObjectsInTimeline.get(i).getEndTimestamp());
-			if (activityObjectsInTimeline.get(i).getStartTimestamp().getTime() <= timestampC.getTime()
-					&& activityObjectsInTimeline.get(i).getEndTimestamp().getTime() >= timestampC.getTime()) // end
-																												// point
-																												// exclusive
-			{ // NOTICE : DO I NEED TO MAKE IT EXCLUSIVE OF EITHER BEGIN TIME OR END?
-				// System.out.println("Qualifies");
-				index = i;
-				count++;
-				break;
+			ActivityObject ao = activityObjectsInTimeline.get(i);
+			if (ao.getStartTimestamp().getTime() <= ts.getTime() && ao.getEndTimestamp().getTime() >= ts.getTime())
+			{
+				res.add(i);
 			}
 		}
 
-		if (count > 1)
+		if (res.size() == 0)
 		{
 			System.err.println(
-					"Error in  getIndexOfActivityObjectsAtTime(): more than one activites identified at a given point of time for a user.");
+					PopUps.getCurrentStackTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
+			return -99;
 		}
 
-		// System.out.println("Intersect: The activity objects inside "+timestampC+ " has "+startTimestamp+" are ");
-
-		if (index == -99)
+		if (res.size() > 1)
 		{
-			System.err.println(
-					"Error in  getIndexOfActivityObjectsAtTime(): No Activity object at this timestamp:" + timestampC);
-			new Exception(
-					"Error in  getIndexOfActivityObjectsAtTime(): No Activity object at this timestamp:" + timestampC);
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
+			return -99;
 		}
-		return index;
+		else
+			return res.get(0);
 	}
 
-	public ActivityObject getActivityObjectAtTime(Timestamp timestampC)
+	/**
+	 * Returns activity object at given timestamp.
+	 * <p>
+	 * (ao.getStartTimestamp().getTime() <= timestampC.getTime() && ao.getEndTimestamp().getTime() >=
+	 * timestampC.getTime())
+	 * 
+	 * @param ts
+	 * @return
+	 */
+	public ActivityObject getActivityObjectAtTime(Timestamp ts)
 	{
-		ActivityObject ao = null;
-		int count = 0;
+		ArrayList<ActivityObject> res = new ArrayList<>();
 
-		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
+		for (ActivityObject ao : activityObjectsInTimeline)
 		{
-			// System.out.println(" >> timestamp to check ="+timestampC+" startTimestamp for
-			// this="+activityObjectsInTimeline.get(i).getStartTimestamp()+" end time stamp for
-			// this="+activityObjectsInTimeline.get(i).getEndTimestamp());
-			if (activityObjectsInTimeline.get(i).getStartTimestamp().getTime() <= timestampC.getTime()
-					&& activityObjectsInTimeline.get(i).getEndTimestamp().getTime() >= timestampC.getTime()) // end
-																												// point
-																												// exclusive
-			{ // NOTICE : DO I NEED TO MAKE IT EXCLUSIVE OF EITHER BEGIN TIME OR END?
-				// System.out.println("Qualifies");
-				ao = activityObjectsInTimeline.get(i);
-				count++;
-				break;
+			if (ao.getStartTimestamp().getTime() <= ts.getTime() && ao.getEndTimestamp().getTime() >= ts.getTime())
+			{
+				res.add(ao);
 			}
 		}
 
-		if (count > 1)
+		if (res.size() == 0)
 		{
 			System.err.println(
-					"Error in  getIndexOfActivityObjectsAtTime(): more than one activites identified at a given point of time for a user.");
+					PopUps.getCurrentStackTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
+			return null;
 		}
 
-		// System.out.println("Intersect: The activity objects inside "+timestampC+ " has "+startTimestamp+" are ");
-
-		if (ao == null)
+		if (res.size() > 1)
 		{
-			System.err.println(
-					"Error in  getIndexOfActivityObjectsAtTime(): No Activity object at this timestamp:" + timestampC);
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
+			return null;
 		}
-		return ao;
+		else
+			return res.get(0);
 	}
 
 	/**
 	 * 
-	 * @param startTimestampC
+	 * @param startTimestamp
 	 * @return
 	 */
-	public ArrayList<ActivityObject> getActivityObjectsStartingOnBeforeTime(Timestamp startTimestampC)
+	public ArrayList<ActivityObject> getActivityObjectsStartingOnBeforeTime(Timestamp startTimestamp)
 	{
-		ArrayList<ActivityObject> activityObjectsIn = new ArrayList<ActivityObject>();
-
-		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
-		{
-			if (activityObjectsInTimeline.get(i).startsOnOrBefore(startTimestampC))
-			{
-				activityObjectsIn.add(activityObjectsInTimeline.get(i));
-			}
-		}
-
-		/*
-		 * System.out.println("Intersect: The activity objects inside "+startTimestampC+ " and "+endTimestampC+" are ");
-		 * for(int i=0;i<activityObjectsIn.size();i++) { System.out.print(activityObjectsIn.get(i).getActivityName()); }
-		 */
-		return activityObjectsIn;
+		return (ArrayList<ActivityObject>) activityObjectsInTimeline.stream()
+				.filter(ao -> ao.startsOnOrBefore(startTimestamp)).collect(Collectors.toList());
 	}
 
 	/**
@@ -887,50 +614,89 @@ public class Timeline implements TimelineI
 	}
 
 	/**
-	 * Checks whether all the ActivityObjects in the Timeline are of the same day or not.
 	 * 
 	 * @return
 	 */
-	public boolean isSameDay()// ArrayList<ActivityObject> activityObjectsInDay) // checks whether all activity objects
-								// in the timeline are of the same day or not
-	{
-		boolean sane = true;
-
-		if (this.activityObjectsInTimeline.size() > 0)
-		{
-			Date date = (Date) activityObjectsInTimeline.get(0).getDimensionAttributeValue("Date_Dimension", "Date");
-
-			for (int i = 1; i < activityObjectsInTimeline.size(); i++)
-			{
-				if (date.equals((Date) activityObjectsInTimeline.get(i).getDimensionAttributeValue("Date_Dimension",
-						"Date")) == false)
-				{
-					sane = false;
-				}
-			}
-		}
-
-		if (!sane)
-		{
-			System.err.println(
-					"Timeline  contains ActivityObjects from more than one day"); /* with Date_ID:"+ dateID+" */
-			// System.exit(3);
-		}
-		return sane;
-	}
-
 	public LongSummaryStatistics getDurationStats()
 	{
-		// int min = -9999;
-		LongSummaryStatistics summary = null;
+		return this.getActivityObjectsInTimeline().stream()
+				.collect(Collectors.summarizingLong(ao -> ao.getDurationInSeconds()));
+	}
 
-		ArrayList<ActivityObject> allAOs = new ArrayList<ActivityObject>();
-		allAOs = this.getActivityObjectsInTimeline();
+	/**
+	 * 
+	 * @return
+	 */
+	public String getStartDayName()
+	{
+		Date startDate = DateTimeUtils.getDate(this.activityObjectsInTimeline.get(0).getStartTimestamp());
+		return DateTimeUtils.getWeekDayFromWeekDayInt(startDate.getDay());
+	}
 
-		summary = allAOs.stream().collect(Collectors.summarizingLong(ao -> ao.getDurationInSeconds()));// .map(ao ->
-																										// ao.getDurationInSeconds()).
+	/**
+	 * @deprecated be careful, as in current setup we are not replying on it and timeline id for daywise timeline is the
+	 *             date as string while otherwise it is the count,i.e, serial number of the timeline as String
+	 * @return
+	 */
+	public String getTimelineID()
+	{
+		return this.timelineID;
+	}
 
-		return summary;
+	public void setTimelineID(String tid)
+	{
+		this.timelineID = tid;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isShouldBelongToSingleUser()
+	{
+		return shouldBelongToSingleUser;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isShouldBelongToSingleDay()
+	{
+		return shouldBelongToSingleDay;
+	}
+
+	/**
+	 * Returns the act objs in the day while also checking if this timeline is a single day timeline.
+	 * 
+	 * @return list of activity objects
+	 */
+	public ArrayList<ActivityObject> getActivityObjectsInDay()
+	{
+		if (!this.shouldBelongToSingleDay)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in Timeline.getActivityObjectsInDay(). shouldBelongToSingleDay= "
+							+ shouldBelongToSingleDay));
+		}
+		return this.activityObjectsInTimeline;
+	}
+
+	/**
+	 * 
+	 * @return the userID of first activity object in the timeline while also checking if this timeline is a single user
+	 *         timeline
+	 */
+	public String getUserID()
+	{
+		if (!this.shouldBelongToSingleUser)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in Timeline.getActivityObjectsInDay(). shouldBelongToSingleUser= "
+							+ shouldBelongToSingleUser));
+		}
+		return this.activityObjectsInTimeline.get(0).userID;
 
 	}
+
 }

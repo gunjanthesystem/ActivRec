@@ -408,6 +408,11 @@ public final class Constant
 		return commonPath;
 	}
 
+	public static String cleanedDayTimelines()
+	{
+		return commonPath;
+	}
+
 	public static String getInvalidActivity1()
 	{
 		return INVALID_ACTIVITY1;

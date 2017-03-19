@@ -8,6 +8,7 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.stats.StatsUtils;
 import org.activity.util.RegexUtils;
+import org.activity.util.StringCode;
 
 /**
  * Note: this has been modified for Geolife data set to account for the additional attributes from geolocation
@@ -148,8 +149,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 		ArrayList<ActivityObject> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
 
 		double dAct = 0, dFeat = 0, distanceTotal = 0;
-		String stringCodeForActivityObjects1 = ActivityObject.getStringCodeForActivityObjects(activityObjects1);
-		String stringCodeForActivityObjects2 = ActivityObject.getStringCodeForActivityObjects(activityObjects2);
+		String stringCodeForActivityObjects1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
+		String stringCodeForActivityObjects2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
 
 		Pair<String, Double> levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1,
 				stringCodeForActivityObjects2, 1, 1, 2);

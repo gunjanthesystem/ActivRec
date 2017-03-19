@@ -32,11 +32,11 @@ import org.activity.objects.CheckinEntry;
 import org.activity.objects.DataEntry;
 import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.Pair;
+import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.TrackListenEntry;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.objects.Triple;
-import org.activity.objects.UserDayTimeline;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
@@ -2236,8 +2236,8 @@ public class WritingToFile
 	}
 
 	public static void writeEditDistancesOfAllEndPoints(ArrayList<ActivityObject> activitiesGuidingRecomm,
-			UserDayTimeline userDayTimeline,
-			LinkedHashMap<Integer, Pair<String, Double>> distanceScoresForEachSubsequence)// String trace)
+			Timeline userDayTimeline, LinkedHashMap<Integer, Pair<String, Double>> distanceScoresForEachSubsequence)// String
+																													// trace)
 	{
 		commonPath = Constant.getCommonPath();//
 		try
@@ -2363,7 +2363,7 @@ public class WritingToFile
 	 */
 	public static void writeDistanceScoresSortedMap(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<Date, Triple<Integer, String, Double>> getDistanceScoresSorted,
-			LinkedHashMap<Date, UserDayTimeline> candidateTimelines, LinkedHashMap<Date, String> topNames,
+			LinkedHashMap<Date, Timeline> candidateTimelines, LinkedHashMap<Date, String> topNames,
 			ArrayList<ActivityObject> currentTimeline)
 	{
 		try
@@ -2636,7 +2636,7 @@ public class WritingToFile
 	}
 
 	public static void writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, UserDayTimeline> userTimelines, String timelinesPhrase)
+			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase)
 	{
 		commonPath = Constant.getCommonPath();//
 		StringBuilder toWrite = new StringBuilder();
@@ -2655,7 +2655,7 @@ public class WritingToFile
 
 			bw.write("Date, Num_of_Distict_Valid_Activities\n");// bw.newLine();
 
-			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 				int numOfDistinctValidActivities = entry.getValue().countNumberOfValidDistinctActivities();
 				toWrite.append(entry.getKey() + "," + numOfDistinctValidActivities + "\n");
@@ -2681,9 +2681,9 @@ public class WritingToFile
 	 * @param writeDistanceTravelled
 	 * @param writeAvgAltitude
 	 */
-	public static void writeUsersDayTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String timelinesPhrase,
-			boolean writeStartEndGeocoordinates, boolean writeDistanceTravelled, boolean writeAvgAltitude)
+	public static void writeUsersDayTimelines(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
+			String timelinesPhrase, boolean writeStartEndGeocoordinates, boolean writeDistanceTravelled,
+			boolean writeAvgAltitude)
 	{
 		// System.out.println("Common path=" + commonPath);
 		commonPath = Constant.getCommonPath();//
@@ -2691,7 +2691,7 @@ public class WritingToFile
 		System.out.println("Common path=" + commonPath);
 		try
 		{
-			for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 			{
 				writeGivenDayTimelines(entry.getKey(), entry.getValue(), timelinesPhrase, writeStartEndGeocoordinates,
 						writeDistanceTravelled, writeAvgAltitude);
@@ -2716,7 +2716,7 @@ public class WritingToFile
 	 * @param writeAvgAltitude
 	 */
 	public static void writeUsersDayTimelinesSameFile(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String timelinesPhrase,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
 			boolean writeStartEndGeocoordinates, boolean writeDistanceTravelled, boolean writeAvgAltitude,
 			String fileName)
 	{
@@ -2727,7 +2727,7 @@ public class WritingToFile
 		System.out.println("Common path=" + commonPath);
 		try
 		{
-			for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 			{
 				writeGivenDayTimelinesSameFile2(entry.getKey(), entry.getValue(), timelinesPhrase,
 						writeStartEndGeocoordinates, writeDistanceTravelled, writeAvgAltitude, fileName);
@@ -2743,7 +2743,7 @@ public class WritingToFile
 	}
 
 	public static void writeNumOfActsPerUsersDayTimelinesSameFile(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String timelinesPhrase,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
 			String fileName)
 	{
 		// System.out.println("Common path=" + commonPath);
@@ -2753,7 +2753,7 @@ public class WritingToFile
 		System.out.println("Common path=" + commonPath);
 		try
 		{
-			for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 			{
 				writeNumOfActsInGivenDayTimelinesSameFile(entry.getKey(), entry.getValue(), timelinesPhrase, fileName);
 			}
@@ -2768,7 +2768,7 @@ public class WritingToFile
 	}
 
 	public static void writeNumOfDaysPerUsersDayTimelinesSameFile(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String absFileName)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String absFileName)
 	{
 		// System.out.println("Common path=" + commonPath);
 		commonPath = Constant.getCommonPath();//
@@ -2779,7 +2779,7 @@ public class WritingToFile
 		msg.append("User,#Days\n");
 		try
 		{
-			for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 			{
 				msg.append(entry.getKey() + "," + entry.getValue().size() + "\n");
 			}
@@ -2805,7 +2805,7 @@ public class WritingToFile
 	 * @param writeDistanceTravelled
 	 * @param writeAvgAltitude
 	 */
-	public static void writeGivenDayTimelines(String userName, LinkedHashMap<Date, UserDayTimeline> userTimelines,
+	public static void writeGivenDayTimelines(String userName, LinkedHashMap<Date, Timeline> userTimelines,
 			String timelinesPhrase, boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled,
 			boolean writeAvgAltitude)
 	{
@@ -2829,7 +2829,7 @@ public class WritingToFile
 			toWrite.append("Date, DayTimeline\n");
 			// bw.newLine();
 
-			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 
 				// bw.write
@@ -2897,10 +2897,9 @@ public class WritingToFile
 	 * @param writeDistanceTravelled
 	 * @param writeAvgAltitude
 	 */
-	public static void writeGivenDayTimelinesSameFile(String userName,
-			LinkedHashMap<Date, UserDayTimeline> userTimelines, String timelinesPhrase,
-			boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled, boolean writeAvgAltitude,
-			String fileName)
+	public static void writeGivenDayTimelinesSameFile(String userName, LinkedHashMap<Date, Timeline> userTimelines,
+			String timelinesPhrase, boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled,
+			boolean writeAvgAltitude, String fileName)
 	{
 		commonPath = Constant.getCommonPath();//
 		try
@@ -2919,7 +2918,7 @@ public class WritingToFile
 			// bw.newLine();
 
 			String toWrite = "";
-			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 
 				toWrite += (userName + "," + entry.getKey() + ",");
@@ -2980,17 +2979,16 @@ public class WritingToFile
 	 * @param writeDistanceTravelled
 	 * @param writeAvgAltitude
 	 */
-	public static void writeGivenDayTimelinesSameFile2(String userName,
-			LinkedHashMap<Date, UserDayTimeline> userTimelines, String timelinesPhrase,
-			boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled, boolean writeAvgAltitude,
-			String fileName)
+	public static void writeGivenDayTimelinesSameFile2(String userName, LinkedHashMap<Date, Timeline> userTimelines,
+			String timelinesPhrase, boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled,
+			boolean writeAvgAltitude, String fileName)
 	{
 		commonPath = Constant.getCommonPath();//
 		try
 		{
 			fileName = commonPath + fileName;
 			StringBuffer toWrite = new StringBuffer();
-			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 				toWrite.append(userName + "," + entry.getKey() + ",");
 				ArrayList<ActivityObject> ActivityObjects = entry.getValue().getActivityObjectsInDay();
@@ -3044,14 +3042,14 @@ public class WritingToFile
 	}
 
 	public static void writeNumOfActsInGivenDayTimelinesSameFile(String userName,
-			LinkedHashMap<Date, UserDayTimeline> userTimelines, String timelinesPhrase, String fileName)
+			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase, String fileName)
 	{
 		commonPath = Constant.getCommonPath();//
 		try
 		{
 			fileName = commonPath + fileName;
 			StringBuffer toWrite = new StringBuffer();
-			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 				toWrite.append(
 						userName + "," + entry.getKey() + "," + entry.getValue().getActivityObjectsInDay().size());
@@ -3076,7 +3074,7 @@ public class WritingToFile
 	 * @return duration of activities over all days of given timelines
 	 */
 	public static LinkedHashMap<String, Long> writeActivityDurationInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, UserDayTimeline> userTimelines, String fileNamePhrase)
+			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
 	{
 		commonPath = Constant.getCommonPath();//
 		String[] activityNames = Constant.getActivityNames();// activityNames;
@@ -3113,7 +3111,7 @@ public class WritingToFile
 			toWrite.append("\n");
 			// bw.newLine();
 
-			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 				// System.out.println("Date =" + entry.getKey());
 				// bw.write(entry.getKey().toString());
@@ -3196,7 +3194,7 @@ public class WritingToFile
 	 * @return count of activities over all days of given timelines
 	 */
 	public static LinkedHashMap<String, Long> writeActivityCountsInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, UserDayTimeline> userTimelines, String fileNamePhrase)
+			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
 	{
 		commonPath = Constant.getCommonPath();//
 
@@ -3239,7 +3237,7 @@ public class WritingToFile
 			// bw.newLine();
 			bwString.append("\n");
 
-			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 				// System.out.println("Date =" + entry.getKey());
 				// bw.write(entry.getKey().toString());
@@ -3287,7 +3285,7 @@ public class WritingToFile
 						if (val == null)
 						{
 							new Exception(
-									"Exception in org.activity.io.WritingToFile.writeActivityCountsInGivenDayTimelines(String, LinkedHashMap<Date, UserDayTimeline>, String) : actName = "
+									"Exception in org.activity.io.WritingToFile.writeActivityCountsInGivenDayTimelines(String, LinkedHashMap<Date, Timeline>, String) : actName = "
 											+ actName + " has null val");// System.out.println("actName = " + actName);
 						}
 
@@ -3344,7 +3342,7 @@ public class WritingToFile
 	 * @return count of activities over all days of given timelines
 	 */
 	public static LinkedHashMap<String, Double> writeActivityOccPercentageOfTimelines(String userName,
-			LinkedHashMap<Date, UserDayTimeline> userTimelines, String fileNamePhrase)
+			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
 	{
 		commonPath = Constant.getCommonPath();//
 		LinkedHashMap<String, Double> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Double>();
@@ -3389,7 +3387,7 @@ public class WritingToFile
 				}
 			}
 
-			for (Map.Entry<Date, UserDayTimeline> entry : userTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 				// System.out.println("Date =" + entry.getKey());
 				// bw.write(entry.getKey().toString());
@@ -3397,12 +3395,10 @@ public class WritingToFile
 
 				ArrayList<ActivityObject> activitiesInDay = entry.getValue().getActivityObjectsInDay();
 
-				for (String activityName : activityNames) // written beforehand to maintain the same order of activity
-															// names
+				// written beforehand to maintain the same order of activity names
+				for (String activityName : activityNames)
 				{
 					if (UtilityBelt.isValidActivityName(activityName))
-					// if((activityName.equalsIgnoreCase("Not
-					// Available")||activityName.equalsIgnoreCase("Unknown"))==false)
 					{
 						if (entry.getValue().hasActivityName(activityName) == true)
 						{
@@ -3900,14 +3896,13 @@ public class WritingToFile
 	 *         timelines>, similarly for count of baseline duration
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<String, ?>> writeBasicActivityStatsAndGetBaselineMaps(
-			String userName, LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines,
-			LinkedHashMap<Date, UserDayTimeline> userTrainingTimelines,
-			LinkedHashMap<Date, UserDayTimeline> userTestTimelines)
+			String userName, LinkedHashMap<Date, Timeline> userAllDatesTimeslines,
+			LinkedHashMap<Date, Timeline> userTrainingTimelines, LinkedHashMap<Date, Timeline> userTestTimelines)
 	{
 		String commonPath = Constant.getCommonPath();
 
 		String timelinesSets[] = { "AllTimelines", "TrainingTimelines", "TestTimelines" };
-		LinkedHashMap<Date, UserDayTimeline> timelinesCursor = null;
+		LinkedHashMap<Date, Timeline> timelinesCursor = null;
 
 		// the thing to return, contains two hashmaps used for count and duration baselines
 		LinkedHashMap<String, LinkedHashMap<String, ?>> resultsToReturn = new LinkedHashMap<String, LinkedHashMap<String, ?>>();
@@ -4102,9 +4097,9 @@ public class WritingToFile
 	public static boolean createDirectory(String pathname)
 	{
 		boolean result = false;
-	
+
 		File directory = new File(pathname);
-	
+
 		// if the directory does not exist, create it
 		if (!directory.exists())
 		{
@@ -4134,9 +4129,9 @@ public class WritingToFile
 	public static boolean isDirectoryEmpty(String path)
 	{
 		boolean isEmpty = false;
-	
+
 		File file = new File(path);
-	
+
 		if (file.isDirectory())
 		{
 			if (file.list().length == 0)
@@ -4148,7 +4143,7 @@ public class WritingToFile
 		{
 			System.err.println("Error in isDirectoryEmpty: " + path + " is not a directory");
 		}
-	
+
 		return isEmpty;
 	}
 

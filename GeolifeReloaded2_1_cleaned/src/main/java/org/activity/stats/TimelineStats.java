@@ -30,7 +30,6 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
-import org.activity.objects.UserDayTimeline;
 import org.activity.stats.entropy.SampleEntropyG;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -98,7 +97,7 @@ public class TimelineStats
 	 */
 	@SuppressWarnings("unused")
 	public static void timelineStatsController(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesAll)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
 		Constant.setCommonPath(Constant.outputCoreResultsPath);
 		// PopUps.showMessage("Inside timelineStats controller");
@@ -145,7 +144,7 @@ public class TimelineStats
 		writeAvgNumOfDistinctActsPerDayInTimelines(usersDayTimelinesAll, "AvgNumOfDistinctActsInUncleanedTimelines");
 		writeAvgNumOfTotalActsPerDayInTimelines(usersDayTimelinesAll, "AvgNumOfTotalActsInUncleanedTimelines");
 		// //////////////////
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>();
 		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
 		usersDayTimelines = TimelineUtils.rearrangeDayTimelinesOrderForDataset(usersDayTimelines);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
 		WritingToFile.writeUsersDayTimelines(usersDayTimelines, "users", true, true, true);// users
@@ -290,7 +289,7 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 */
 	public static void performSampleEntropyVsMAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
@@ -304,7 +303,7 @@ public class TimelineStats
 		String[] featureNames = Constant.getFeatureNames();
 
 		LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>> userLevelSampEn = new LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>>();
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
 
@@ -385,13 +384,13 @@ public class TimelineStats
 
 	/**
 	 * Must be preceeded by org.activity.stats.TimelineStats.performTimeSeriesAnalysis(LinkedHashMap<String,
-	 * LinkedHashMap<Date, UserDayTimeline>>)
+	 * LinkedHashMap<Date, Timeline>>)
 	 * 
 	 * @param usersDayTimelines
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> performSampleEntropyVsMAnalysis2(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
@@ -405,7 +404,7 @@ public class TimelineStats
 		String[] featureNames = Constant.getFeatureNames();
 
 		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userLevelSampEn = new LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>>();
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
 
@@ -563,7 +562,7 @@ public class TimelineStats
 	}
 
 	public static LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>> performTimeSeriesCorrelationAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
@@ -573,7 +572,7 @@ public class TimelineStats
 
 		LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>> featSeriesCorr = new LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>>();
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
 			LinkedHashMap<Pair<String, String>, Double> featSeriesCorrUserLevel = new LinkedHashMap<Pair<String, String>, Double>();
@@ -636,8 +635,7 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 *            already cleaned and rearranged
 	 */
-	public static void performTimeSeriesAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+	public static void performTimeSeriesAnalysis(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines); relocated to when calling this method
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries =
@@ -732,7 +730,7 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 */
 	public static void performTimeSeriesEntropyAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries = transformToEqualIntervalTimeSeriesDayWise(
 				usersDayTimelines, intervalInSecs);
@@ -774,13 +772,20 @@ public class TimelineStats
 
 	}
 
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @return
+	 */
 	private static LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> applyActivityRegularityAnalysisTwoLevel(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		LinkedHashMap<String, Timeline> allTimelines = new LinkedHashMap<String, Timeline>();
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
-			Timeline newTimeline = TimelineUtils.expungeInvalids(new Timeline(entry.getValue()));
+			Timeline allDatesTimelineCombined = TimelineUtils.dayTimelinesToATimeline(entry.getValue(), false, true);
+			Timeline newTimeline = TimelineUtils.expungeInvalids(allDatesTimelineCombined);
+			// new Timeline(entry.getValue()));
 			allTimelines.put(entry.getKey(), newTimeline);
 		}
 
@@ -1913,21 +1918,21 @@ public class TimelineStats
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> transformToEqualIntervalTimeSeriesDayWise(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> allUsersDayTimelines, int intervalSizeInSeconds)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersDayTimelines, int intervalSizeInSeconds)
 	{
 		System.out.println("inside transformToEqualIntervalTimeSeriesDayWise");
 		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries = new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>();
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : allUsersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : allUsersDayTimelines.entrySet())
 		{
 			String userID = entry.getKey();
-			LinkedHashMap<Date, UserDayTimeline> dayTimelines = entry.getValue();
+			LinkedHashMap<Date, Timeline> dayTimelines = entry.getValue();
 
 			LinkedHashMap<Timestamp, ActivityObject> dataPoints = new LinkedHashMap<Timestamp, ActivityObject>();
 
-			for (Map.Entry<Date, UserDayTimeline> entryForDay : dayTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entryForDay : dayTimelines.entrySet())
 			{
-				UserDayTimeline dayTimeline = entryForDay.getValue();
+				Timeline dayTimeline = entryForDay.getValue();
 
 				Timestamp cursorTimestamp = dayTimeline.getActivityObjectAtPosition(0).getStartTimestamp();
 				Timestamp endTimestamp = dayTimeline
@@ -1967,23 +1972,23 @@ public class TimelineStats
 	 */
 	// StartTimestamp, Activity Object
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> transformToSequenceDayWise(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> allUsersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersDayTimelines)
 	{
 		System.out.println("inside transformToSequenceDayWise");
 		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceOfAOs = new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>();
 
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : allUsersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : allUsersDayTimelines.entrySet())
 		{
 			String userID = entry.getKey();
-			LinkedHashMap<Date, UserDayTimeline> dayTimelines = entry.getValue();
+			LinkedHashMap<Date, Timeline> dayTimelines = entry.getValue();
 
 			LinkedHashMap<Timestamp, ActivityObject> dataPoints = new LinkedHashMap<Timestamp, ActivityObject>();
 
 			int countOfAOs = 0;
 
-			for (Map.Entry<Date, UserDayTimeline> entryForDay : dayTimelines.entrySet())
+			for (Map.Entry<Date, Timeline> entryForDay : dayTimelines.entrySet())
 			{
-				UserDayTimeline dayTimeline = entryForDay.getValue();
+				Timeline dayTimeline = entryForDay.getValue();
 				for (int i = 0; i < dayTimeline.getActivityObjectsInDay().size(); i++)
 				{
 					ActivityObject ao = dayTimeline.getActivityObjectAtPosition(i);
@@ -2782,8 +2787,8 @@ public class TimelineStats
 	 * 
 	 * @param usersDayTimelines
 	 */
-	public static void writePreliminaryStats(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+	public static void writePreliminaryStats(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
+			String fileNamePhrase)
 	{
 		String toWrite = "";
 
@@ -2808,7 +2813,7 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 */
 	public static void writeNumOfActivityObjectsInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
 		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
@@ -2830,10 +2835,10 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 * @param fileNamePhrase
 	 */
-	public static void writeActivityStats(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines,
+	public static void writeActivityStats(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
 			String fileNamePhrase)
 	{
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userName = entry.getKey();
 			WritingToFile.writeActivityCountsInGivenDayTimelines(userName, entry.getValue(), "AllTimelines");
@@ -2847,15 +2852,15 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 */
 	public static void writeNumOfValidActivityObjectsInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
 		StringBuffer s = new StringBuffer();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append("User, User, NumOfValidActivityObjects");
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			int numOfTotalValidActs = 0;
-			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
+			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
 			{
 				numOfTotalValidActs += entryDay.getValue().countNumberOfValidActivities();
 			}
@@ -2871,16 +2876,16 @@ public class TimelineStats
 	 * 
 	 * @param usersDayTimelines
 	 */
-	public static void writeNumOfDaysInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+	public static void writeNumOfDaysInTimelines(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
+			String fileNamePhrase)
 	{
 		StringBuffer s = new StringBuffer();
 		s.append("User, User, NumOfDays, NumOfWeekDays,NumOfWeekends,%OfWeekdays");
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			int numOfWeekends = 0, numOfWeekDays = 0;
 
-			for (Entry<Date, UserDayTimeline> entryDate : entry.getValue().entrySet())
+			for (Entry<Date, Timeline> entryDate : entry.getValue().entrySet())
 			{
 				if (entryDate.getKey().getDay() == 0 || entryDate.getKey().getDay() == 6)
 				{
@@ -2902,13 +2907,13 @@ public class TimelineStats
 	}
 
 	public static void writeStatsNumOfDistinctActsPerDayInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
 		StringBuffer s = new StringBuffer();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append(
 				"User, User, MeanNumOfDistinctActsPerDay, MedianNumOfDistinctActsPerDay, IQRNumOfDistinctActsPerDay, MaxNumOfDistinctActsPerDay, MinNumOfDistinctActsPerDay,SumNumOfDistinctActsPerDay,TotalNumOfDistinctActsOverAllTimelines");
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			double avgNumOfDistinctActsPerDay = 0;
 			// long totalNumOfDistinctActsOverAllTimelines = 0;
@@ -2916,7 +2921,7 @@ public class TimelineStats
 			double[] numOfDistinctActsPerDayArray;
 			ArrayList<ActivityObject> allActObjs = new ArrayList<ActivityObject>();
 
-			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
+			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
 			{
 				allActObjs.addAll(entryDay.getValue().getActivityObjectsInDay());
 				numOfDistinctActsPerDay.add((double) entryDay.getValue().countNumberOfValidDistinctActivities());
@@ -2935,15 +2940,15 @@ public class TimelineStats
 	}
 
 	public static void writeAllNumOfDistinctActsPerDayInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
 		StringBuffer s = new StringBuffer();
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 
 			String numOfDistinctActsPerDay = new String();
 
-			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
+			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
 			{
 				numOfDistinctActsPerDay += (entryDay.getValue().countNumberOfValidDistinctActivities() + ",");
 			}
@@ -2960,18 +2965,18 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 */
 	public static void writeAvgNumOfDistinctActsPerDayInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
 		StringBuffer s = new StringBuffer();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append("User, User, AvgNumOfDistinctActsPerDay,Mean,Median, IQR");
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			double avgNumOfDistinctActsPerDay = 0;
 
 			ArrayList<Integer> numOfDistinctActsPerDay = new ArrayList<Integer>();// size= num of days
 
-			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
+			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
 			{
 				numOfDistinctActsPerDay.add(entryDay.getValue().countNumberOfValidDistinctActivities());
 			}
@@ -2979,9 +2984,8 @@ public class TimelineStats
 			avgNumOfDistinctActsPerDay = StatsUtils.averageOfListInteger(numOfDistinctActsPerDay);
 
 			s.append("\n" + entry.getKey() + "," + (Constant.getIndexOfUserID(Integer.valueOf(entry.getKey())) + 1)
-					+ "," + avgNumOfDistinctActsPerDay + ","
-					+ StatsUtils.meanOfArrayListInt(numOfDistinctActsPerDay, 2) + ","
-					+ StatsUtils.medianOfArrayListInt(numOfDistinctActsPerDay, 2) + ","
+					+ "," + avgNumOfDistinctActsPerDay + "," + StatsUtils.meanOfArrayListInt(numOfDistinctActsPerDay, 2)
+					+ "," + StatsUtils.medianOfArrayListInt(numOfDistinctActsPerDay, 2) + ","
 					+ StatsUtils.iqrOfArrayListInt(numOfDistinctActsPerDay, 2));
 		}
 
@@ -2994,13 +2998,13 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 */
 	public static void writeStatsNumOfTotalActsPerDayInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
 		StringBuffer s = new StringBuffer();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append(
 				"User, User, MeanNumOfTotalActsPerDay, MedianNumOfTotalActsPerDay, IQRNumOfTotalActsPerDay, MaxNumOfTotalActsPerDay, MinNumOfTotalActsPerDay,SumNumOfTotalActsPerDay,TotalNumOfActsOverAllTimelines");
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			double avgNumOfTotalActsPerDay = 0;
 			long totalNumOfActsOverAllTimelines = 0;
@@ -3008,7 +3012,7 @@ public class TimelineStats
 			ArrayList<Double> numOfTotalActsPerDay = new ArrayList<Double>();// size= num of days
 			double[] numOfTotalActsPerDayArray;
 
-			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
+			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
 			{
 				totalNumOfActsOverAllTimelines += entryDay.getValue().countNumberOfValidActivities();
 				numOfTotalActsPerDay.add((double) entryDay.getValue().countNumberOfValidActivities());
@@ -3028,14 +3032,14 @@ public class TimelineStats
 	//
 
 	public static void writeAllNumOfTotalActsPerDayInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
 		StringBuffer s = new StringBuffer();
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String numOfTotalActsPerDay = new String();
 
-			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
+			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
 			{
 				numOfTotalActsPerDay += (entryDay.getValue().countNumberOfValidActivities() + ",");
 			}
@@ -3051,18 +3055,18 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 */
 	public static void writeAvgNumOfTotalActsPerDayInTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines, String fileNamePhrase)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
 		StringBuffer s = new StringBuffer();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append("User,User, AvgNumOfTotalActsPerDay,Mean,Median,IQR");
-		for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			double avgNumOfTotalActsPerDay = 0;
 
 			ArrayList<Integer> numOfTotalActsPerDay = new ArrayList<Integer>();// size= num of days
 
-			for (Entry<Date, UserDayTimeline> entryDay : entry.getValue().entrySet())
+			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
 			{
 				numOfTotalActsPerDay.add(entryDay.getValue().countNumberOfValidActivities());
 			}
@@ -3070,8 +3074,8 @@ public class TimelineStats
 			avgNumOfTotalActsPerDay = StatsUtils.averageOfListInteger(numOfTotalActsPerDay);
 
 			s.append("\n" + entry.getKey() + "," + (Constant.getIndexOfUserID(Integer.valueOf(entry.getKey())) + 1)
-					+ "," + avgNumOfTotalActsPerDay + "," + StatsUtils.meanOfArrayListInt(numOfTotalActsPerDay, 2)
-					+ "," + StatsUtils.medianOfArrayListInt(numOfTotalActsPerDay, 2) + ","
+					+ "," + avgNumOfTotalActsPerDay + "," + StatsUtils.meanOfArrayListInt(numOfTotalActsPerDay, 2) + ","
+					+ StatsUtils.medianOfArrayListInt(numOfTotalActsPerDay, 2) + ","
 					+ StatsUtils.iqrOfArrayListInt(numOfTotalActsPerDay, 2));
 		}
 
@@ -3196,13 +3200,13 @@ public class TimelineStats
 
 	/**
 	 * Must be preceeded by org.activity.stats.TimelineStats.performTimeSeriesAnalysis(LinkedHashMap<String,
-	 * LinkedHashMap<Date, UserDayTimeline>>)
+	 * LinkedHashMap<Date, Timeline>>)
 	 * 
 	 * @param usersDayTimelines
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>> performHjorthParameterAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
@@ -3210,7 +3214,7 @@ public class TimelineStats
 		String[] featureNames = Constant.getFeatureNames();
 
 		LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>> userLevelHjorthParams = new LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>>();
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> entry : usersDayTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
 

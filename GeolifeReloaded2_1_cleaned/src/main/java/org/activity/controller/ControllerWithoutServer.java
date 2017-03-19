@@ -23,7 +23,7 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
-import org.activity.objects.UserDayTimeline;
+import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
@@ -88,7 +88,7 @@ public class ControllerWithoutServer
 			// System.out.println("ajooba");1
 			// //System.out.println(jsonArray.toString());
 			//
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal = null;
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = null;
 			// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
 			if (Constant.toCreateTimelines)
 			{
@@ -108,12 +108,12 @@ public class ControllerWithoutServer
 			{
 				if (Constant.getDatabaseName().equals("gowalla1"))
 				{
-					usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer
+					usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 							.kryoDeSerializeThis(pathToLatestSerialisedTimelines);
 				}
 				else
 				{
-					usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer
+					usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 							.deSerializeThis(pathToLatestSerialisedTimelines);
 				}
 				System.out.println("deserialised userTimelines.size()=" + usersDayTimelinesOriginal.size());
@@ -142,7 +142,7 @@ public class ControllerWithoutServer
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
 			//////////// false, false, false, "GowallaUserDayTimelines.csv");
 
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelines = reduceAndCleanTimelines(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = reduceAndCleanTimelines(
 					Constant.getDatabaseName(), usersDayTimelinesOriginal, true);
 
 			// int countOfSampleUsers = 0;
@@ -200,10 +200,9 @@ public class ControllerWithoutServer
 				int indexOfSampleUsers = 0;
 
 				/// sample users
-				LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> sampledUsers = new LinkedHashMap<>();
+				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsers = new LinkedHashMap<>();
 
-				for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> userEntry : usersCleanedDayTimelines
-						.entrySet())
+				for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 				{
 					// countOfSampleUsers += 1;
 					if (indexOfSampleUsers < startUserIndex)
@@ -480,8 +479,8 @@ public class ControllerWithoutServer
 	 * @param writeToFile
 	 * @return
 	 */
-	private LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> reduceAndCleanTimelines(String databaseName,
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal, boolean writeToFile)
+	private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceAndCleanTimelines(String databaseName,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile)
 	{
 		if (databaseName.equals("gowalla1") == false)
 		{
@@ -492,7 +491,7 @@ public class ControllerWithoutServer
 		///// clean timelines
 		System.out.println(
 				"\n-- Removes day timelines with no valid activity, with <=1 distinct valid activity, and the weekend day timelines.");
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelines = TimelineUtils
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = TimelineUtils
 				.cleanDayTimelines(usersDayTimelinesOriginal);
 		if (writeToFile)
 		{// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines, "usersCleanedDayTimelines", false,
@@ -519,11 +518,11 @@ public class ControllerWithoutServer
 			// "usersCleanedDayTimelinesReduced3",false, false, false, "GowallaUserDayTimelinesCleanedReduced3.csv");//
 
 			// write a subset of timelines
-			Map<String, LinkedHashMap<Date, UserDayTimeline>> usersCleanedDayTimelinesSampled = usersCleanedDayTimelines
+			Map<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelinesSampled = usersCleanedDayTimelines
 					.entrySet().stream().limit(2).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 
 			WritingToFile.writeUsersDayTimelinesSameFile(
-					new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>(usersCleanedDayTimelinesSampled),
+					new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>(usersCleanedDayTimelinesSampled),
 					"usersCleanedDayTimelinesReduced3First2UsersOnly", false, false, false,
 					"GowallaUserDayTimelinesCleanedReduced3First2UsersOnly.csv");// users
 
@@ -546,8 +545,8 @@ public class ControllerWithoutServer
 	 * @param writeToFile
 	 * @return
 	 */
-	private LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> reduceGowallaTimelines(String databaseName,
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal, boolean writeToFile)
+	private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelines(String databaseName,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile)
 	{
 		if (databaseName.equals("gowalla1") == false)
 		{
@@ -732,11 +731,11 @@ public class ControllerWithoutServer
 	 * @param gowallaDataFolder
 	 * @return
 	 */
-	public LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> createTimelines(String databaseName,
+	public LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createTimelines(String databaseName,
 			SerializableJSONArray jsonArrayD, String gowallaDataFolder)
 	{
 		long dt = System.currentTimeMillis();
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal = null;
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = null;
 
 		if (databaseName.equals("gowalla1"))
 		{

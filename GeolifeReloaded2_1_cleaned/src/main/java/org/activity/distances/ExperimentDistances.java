@@ -9,13 +9,12 @@ import java.util.Map;
 import org.activity.constants.Constant;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
-import org.activity.objects.UserDayTimeline;
 import org.activity.util.TimelineUtils;
 
 public class ExperimentDistances
 {
 
-	public ExperimentDistances(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines)
+	public ExperimentDistances(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
 	{
 		System.out.println("Entering ExperimentDistances");
 
@@ -34,19 +33,20 @@ public class ExperimentDistances
 	}
 
 	public static ArrayList<Timeline> getArrayListOfTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines, int numOfTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines, int numOfTimelines)
 	{
 		ArrayList<Timeline> arrayOfTimelines = new ArrayList<Timeline>();
 		int count = 0;
-		for (Map.Entry<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelinesEntry : usersTimelines.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
 			if (++count > numOfTimelines) break;
 			String userID = usersTimelinesEntry.getKey();
-			LinkedHashMap<Date, UserDayTimeline> userDayTimelines = usersTimelinesEntry.getValue();
+			LinkedHashMap<Date, Timeline> userDayTimelines = usersTimelinesEntry.getValue();
 			// System.out.println("\nUser ID: " + userID);
 			userDayTimelines = TimelineUtils.cleanUserDayTimelines(userDayTimelines);
 
-			Timeline timeline = new Timeline(userDayTimelines);
+			Timeline timeline = TimelineUtils.dayTimelinesToATimeline(userDayTimelines, false, true);
+			// new Timeline(userDayTimelines);
 
 			if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 			{

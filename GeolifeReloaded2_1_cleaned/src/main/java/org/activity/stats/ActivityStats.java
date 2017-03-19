@@ -13,8 +13,8 @@ import java.util.TreeMap;
 import org.activity.constants.Constant;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
+import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
-import org.activity.objects.UserDayTimeline;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -27,8 +27,7 @@ public class ActivityStats
 	 * 
 	 * @param usersDayTimelinesAll
 	 */
-	public static void getActivityStatsPerDay(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesAll)
+	public static void getActivityStatsPerDay(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
 		Constant.setCommonPath(Constant.outputCoreResultsPath);
 
@@ -43,7 +42,7 @@ public class ActivityStats
 		Constant.setCommonPath(pathToWrite);
 		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
 		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
 
 	}
@@ -54,7 +53,7 @@ public class ActivityStats
 	 * @param usersDayTimelinesAll
 	 */
 	public static void writeDistinctActivities(
-			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesAll)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
 		Constant.setCommonPath(Constant.outputCoreResultsPath);
 
@@ -69,7 +68,7 @@ public class ActivityStats
 		Constant.setCommonPath(pathToWrite);
 		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 
-		LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelines = new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
 		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
 
 	}

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
+import org.activity.util.StringCode;
 
 /**
  * Note: this has been modified for Geolife data set to account for the additional attributes from geolocation
@@ -730,8 +731,8 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 		activityObjects1 = pruneFirstUnknown(activityObjects1);
 		activityObjects2 = pruneFirstUnknown(activityObjects2);
 
-		String stringCodeForActivityObjects1 = ActivityObject.getStringCodeForActivityObjects(activityObjects1);
-		String stringCodeForActivityObjects2 = ActivityObject.getStringCodeForActivityObjects(activityObjects2);
+		String stringCodeForActivityObjects1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
+		String stringCodeForActivityObjects2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
 
 		// double levenshteinDistance =StringUtils.getLevenshteinDistance(stringCodeForActivityObjects1,
 		// stringCodeForActivityObjects2);
