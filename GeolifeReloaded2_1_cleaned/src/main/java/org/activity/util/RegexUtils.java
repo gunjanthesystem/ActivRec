@@ -14,7 +14,7 @@ public class RegexUtils
 	public static final Pattern patternUnderScore = Pattern.compile("_");
 	public static final Pattern patternDoubleUnderScore = Pattern.compile("__");
 	public static final Pattern patternColon = Pattern.compile(":");
-	public static final Pattern patternFromSlash = Pattern.compile("/");
+	public static final Pattern patternForwardSlash = Pattern.compile("/");
 	public static final Pattern patternComma = Pattern.compile(",");// Pattern.compile(",");
 	public static final Pattern patternOpeningRoundBrace = Pattern.compile("\\(");
 	public static final Pattern patternClosingRoundBrace = Pattern.compile("\\)");

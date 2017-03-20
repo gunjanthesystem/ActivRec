@@ -32,7 +32,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	@SuppressWarnings("unchecked")
 	public Pair<String, Double> getOTMDSAMEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
 			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
-			String timeAtRecomm, Integer candidateTimelineId)
+			String timeAtRecomm, String candidateTimelineId)
 	{
 		if (VerbosityConstants.verboseOTMDSAM)
 		{
@@ -65,7 +65,8 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 			printAllMappedEditOperations(allEditOperations);
 		}
 
-		if (VerbosityConstants.verboseOTMDSAM) System.out.println("-------------Exiting getOTMDSAMEditDistanceWithTrace");
+		if (VerbosityConstants.verboseOTMDSAM)
+			System.out.println("-------------Exiting getOTMDSAMEditDistanceWithTrace");
 		// return calculateOTMDSAMDistance((ArrayList<Pair<Integer, String>>) allEditOperations.get(0),
 		// (ArrayList<Pair<Integer, String>>) allEditOperations.get(1),
 		// (ArrayList<Triple<Integer, Integer, String>>) allEditOperations.get(2));
@@ -227,7 +228,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	 */
 	public final Pair<String, Double> getOTMDSAMEditDistanceWithoutEndCurrentActivity(
 			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, Integer candidateTimelineId)
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		ArrayList<ActivityObject> activityObjects1 = new ArrayList<ActivityObject>();
 		activityObjects1.addAll(activityObjects1Original);
@@ -257,7 +258,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	 */
 	public final Pair<String, Double> getOTMDSAMEditDistanceInvalidsExpunged(ArrayList<ActivityObject> activityObjects1,
 			ArrayList<ActivityObject> activityObjects2, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			Integer candidateTimelineId)
+			String candidateTimelineId)
 	{
 		return getOTMDSAMEditDistanceWithTrace(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2),
 				userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);//
@@ -275,7 +276,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	 */
 	public final Pair<String, Double> getOTMDSAMEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
 			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2, String userAtRecomm,
-			String dateAtRecomm, String timeAtRecomm, Integer candidateTimelineId)
+			String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		return getOTMDSAMEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1),
 				expungeInvalids(activityObjects2), userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);

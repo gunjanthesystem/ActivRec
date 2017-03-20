@@ -560,10 +560,10 @@ public class RecommendationTestsDayWise2FasterJan2016
 																													// activity
 
 								String rankedRecommAtStartWithScore = recommP1
-										.getRankedRecommendationWithRankScoresAsString();// //getRankedRecommendedActivityNamesWithRankScores();
+										.getRankedRecommendedActivityNamesWithRankScores();// //getRankedRecommendedActivityNamesWithRankScores();
 								// // rankedRecommAtStartWithScore
 								String rankedRecommAtStartWithoutScore = recommP1
-										.getRankedRecommendationWithoutRankScoresAsString();// getRankedRecommendedActivityNamesWithoutRankScores();
+										.getRankedRecommendedActivityNamesWithoutRankScores();// getRankedRecommendedActivityNamesWithoutRankScores();
 
 								System.out.println("** Ranked Recommended at Start=" + rankedRecommAtStartWithoutScore
 										+ ", while actual was=" + actActualDone);

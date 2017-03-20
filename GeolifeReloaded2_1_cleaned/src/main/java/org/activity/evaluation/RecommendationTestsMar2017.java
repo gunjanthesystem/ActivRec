@@ -22,9 +22,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
-import org.activity.objects.TimelineI;
 import org.activity.objects.TimelineWithNext;
-import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterBaseClosestTimeMar2017;
 import org.activity.recomm.RecommendationMasterDayWise2FasterMar2017;
 import org.activity.recomm.RecommendationMasterI;
@@ -86,7 +84,7 @@ public class RecommendationTestsMar2017
 	 * 
 	 * @param usersTimelines
 	 */
-	public RecommendationTestsMar2017(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersTimelines,
+	public RecommendationTestsMar2017(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines,
 			Enums.LookPastType lookPastType)
 	{
 		System.out.println("\n\n **********Entering RecommendationTestsMar2017**********");
@@ -127,7 +125,7 @@ public class RecommendationTestsMar2017
 			{
 				System.out.println("Executing RecommendationTests for threshold value: " + thresholdValue);
 				// ArrayList<String> userNames = new ArrayList<String>();
-				LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines = null;
+				LinkedHashMap<Date, Timeline> userAllDatesTimeslines = null;
 				pruningHasSaturated = true;
 				try
 				{
@@ -302,10 +300,10 @@ public class RecommendationTestsMar2017
 							}
 
 							// Splitting the set of timelines into training set and test set.
-							List<LinkedHashMap<Date, UserDayTimeline>> trainTestTimelines = splitTestTrainingTimelines(
-									userAllDatesTimeslines, percentageInTraining);
-							LinkedHashMap<Date, UserDayTimeline> userTrainingTimelines = trainTestTimelines.get(0);
-							LinkedHashMap<Date, UserDayTimeline> userTestTimelines = trainTestTimelines.get(1);
+							List<LinkedHashMap<Date, Timeline>> trainTestTimelines = TimelineUtils
+									.splitTestTrainingTimelines(userAllDatesTimeslines, percentageInTraining);
+							LinkedHashMap<Date, Timeline> userTrainingTimelines = trainTestTimelines.get(0);
+							LinkedHashMap<Date, Timeline> userTestTimelines = trainTestTimelines.get(1);
 
 							if (userTrainingTimelines.size() == 0)
 							{
@@ -343,10 +341,10 @@ public class RecommendationTestsMar2017
 							int numberOfMorningRTs = 0, numberOfAfternoonRTs = 0, numberOfEveningRTs = 0;
 							// Generating Recommendation Timestamps
 							// generate date and times for recommendation
-							for (Map.Entry<Date, UserDayTimeline> entry : userTestTimelines.entrySet())
+							for (Map.Entry<Date, Timeline> entry : userTestTimelines.entrySet())
 							{
 								Date testDate = entry.getKey();
-								UserDayTimeline eachDayTimelineForUser = entry.getValue();
+								Timeline eachDayTimelineForUser = entry.getValue();
 
 								int date = testDate.getDate();
 								int month = testDate.getMonth() + 1;
@@ -390,7 +388,7 @@ public class RecommendationTestsMar2017
 									String timeCategory = DateTimeUtils
 											.getTimeCategoryOfTheDay(endTimeStamp.getHours());
 
-									if (UserDayTimeline.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
+									if (TimelineUtils.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
 									{ // this will rarely happen because we are already not including the last activity
 										// of day as RT (see j's loop). So this will happen only if j is a not last ao
 										// in day timeline and has only invalid aos after it.
@@ -427,10 +425,11 @@ public class RecommendationTestsMar2017
 											+ endTimeStamp + " ="
 											+ nextValidActivityObjectAfterRecommPoint1.getActivityName());
 
-									if (VerbosityConstants.WriteNumOfValidsAfterAnRT)
+									if (VerbosityConstants.WriteNumOfValidsAfterAnRTInSameDay)
 									{
 										int numOfValidsAOsAfterThisRT = eachDayTimelineForUser
-												.getNumOfValidActivityObjectAfterThisTime(endTimeStamp);
+												.getNumOfValidActivityObjectsAfterThisTimeInSameDay(endTimeStamp);
+										// .getNumOfValidActivityObjectAfterThisTime(endTimeStamp);
 										sbNumOfValidsAfterAnRT.append(userId + "," + dateToRecomm + "," + endTimeStamp
 												+ "," + numOfValidsAOsAfterThisRT + "\n");
 										// if (numOfValidsAOsAfterThisRT >= 4) { WritingToFile.appendLineToFileAbsolute(
@@ -460,6 +459,7 @@ public class RecommendationTestsMar2017
 										recommP1 = new RecommendationMasterDayWise2FasterMar2017(userTrainingTimelines,
 												userTestTimelines, dateToRecomm, endTimeString, userId, thresholdValue,
 												typeOfThreshold);// , caseType);
+
 										break;
 									case ClosestTime:
 										recommP1 = new RecommendationMasterBaseClosestTimeMar2017(userTrainingTimelines,
@@ -468,7 +468,7 @@ public class RecommendationTestsMar2017
 
 									}
 									// LAST PARAM TRUE IS DUMMY FOR CALLING PERFORMANCE CONSTRUCTOR,
-									LinkedHashMap<Integer, TimelineI> candidateTimelines = recommP1
+									LinkedHashMap<String, TimelineWithNext> candidateTimelines = recommP1
 											.getCandidateTimeslines();
 									// LinkedHashMap<Integer, TimelineWithNext> candidateTimelines = recommP1
 									// .getCandidateTimeslines();
@@ -481,18 +481,13 @@ public class RecommendationTestsMar2017
 									if (VerbosityConstants.WriteNumActsPerRTPerCand)
 									{
 										StringBuilder tmpWriter = new StringBuilder();
-										for (Map.Entry<Integer, TimelineWithNext> entryAjooba : candidateTimelines
+										for (Map.Entry<String, TimelineWithNext> entryAjooba : candidateTimelines
 												.entrySet())
 										{
 											Timeline candtt1 = entryAjooba.getValue(); // ArrayList<ActivityObject>
 																						// aa1=candtt1.getActivityObjectsInTimeline();
-											int sizez1 = candtt1.countNumberOfValidActivities() - 1; // excluding the
-																										// current
-																										// activity at
-																										// the end of
-																										// the
-																										// candidate
-																										// timeline
+											int sizez1 = candtt1.countNumberOfValidActivities() - 1;
+											// excluding the current activity at the end of the candidate timeline
 											// System.out.println("Number of activity Objects in this timeline (except
 											// the end current activity) is: "+sizez1);
 											// numActsInEachCandbw.write
@@ -586,10 +581,8 @@ public class RecommendationTestsMar2017
 										numberOfAfternoonRTs++;
 									else if (timeCategory.equalsIgnoreCase("Evening")) numberOfEveningRTs++;
 
-									String actActualDone = nextValidActivityObjectAfterRecommPoint1.getActivityName(); // target
-																														// activity
-																														// for
-																														// recommendation
+									// target activity for recommendation
+									String actActualDone = nextValidActivityObjectAfterRecommPoint1.getActivityName();
 
 									String topNextActivityForRecommAtStartWithoutDistance = recommP1
 											.getTopNextActivityNamesWithoutDistanceString();
@@ -671,17 +664,17 @@ public class RecommendationTestsMar2017
 
 									ActivityObject activityAtRecommPoint = recommP1.getActivityObjectAtRecomm();
 
-									LinkedHashMap<Integer, Pair<String, Double>> editDistancesSortedMapFullCand = recommP1
+									LinkedHashMap<String, Pair<String, Double>> editDistancesSortedMapFullCand = recommP1
 											.getEditDistancesSortedMapFullCand();
 
 									if (VerbosityConstants.WriteRecommendationTimesWithEditDistance)
 									{
 										StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
 
-										for (Map.Entry<Integer, Pair<String, Double>> entryDistance : editDistancesSortedMapFullCand
+										for (Map.Entry<String, Pair<String, Double>> entryDistance : editDistancesSortedMapFullCand
 												.entrySet())
 										{
-											Integer candidateTimelineID = entryDistance.getKey();
+											String candidateTimelineID = entryDistance.getKey();
 
 											TimelineWithNext candidateTimeline = recommP1.getCandidateTimeslines()
 													.get(candidateTimelineID);
@@ -814,80 +807,6 @@ public class RecommendationTestsMar2017
 		}
 		// PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
 		System.out.println("**********Exiting Recommendation Tests**********");
-	}
-
-	/**
-	 * Splits the given timelines into training and test list of timelines.
-	 * 
-	 * @param userAllDatesTimeslines
-	 * @param percentageInTraining
-	 * @return
-	 */
-	public static List<LinkedHashMap<Date, UserDayTimeline>> splitTestTrainingTimelines(
-			LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines, double percentageInTraining)
-	{
-		ArrayList<LinkedHashMap<Date, UserDayTimeline>> trainTestTimelines = new ArrayList<LinkedHashMap<Date, UserDayTimeline>>();
-
-		int numberOfValidDays = 0;
-
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
-		{
-			if (entry.getValue().containsAtLeastOneValidActivity() == false)
-			{ // if the day timelines contains no valid activity, then don't consider it for training or test
-				System.err.println(
-						"Error in splitTestTrainingTimelines: 45: userAllDatesTimeslines contains a day timeline with no valid activity, but we already tried to remove it");
-				continue;
-			}
-			numberOfValidDays++;
-		}
-		// int numberOfDays = userAllDatesTimeslines.size();
-		int numberOfDaysForTraining = (int) Math.round(numberOfValidDays * percentageInTraining);// floor
-
-		int numberOfDaysForTest = numberOfValidDays - numberOfDaysForTraining;
-
-		if (numberOfDaysForTest < 1)
-		{
-			numberOfDaysForTest = 1;
-			numberOfDaysForTraining = numberOfValidDays - numberOfDaysForTest;
-		}
-
-		LinkedHashMap<Date, UserDayTimeline> userTrainingTimelines = new LinkedHashMap<Date, UserDayTimeline>();
-		LinkedHashMap<Date, UserDayTimeline> userTestTimelines = new LinkedHashMap<Date, UserDayTimeline>();
-
-		int count = 1;
-		for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
-		{
-			if (entry.getValue().containsAtLeastOneValidActivity() == false) // not essential anymore
-			{ // if the day timelines contains no valid activity, then don't consider it for training or test
-				continue;
-			}
-			if (count <= numberOfDaysForTraining)
-			{
-				userTrainingTimelines.put(entry.getKey(), entry.getValue());
-				count++;
-			}
-			else
-			{
-				userTestTimelines.put(entry.getKey(), entry.getValue());
-				count++;
-			}
-		}
-
-		trainTestTimelines.add(userTrainingTimelines);
-		trainTestTimelines.add(userTestTimelines);
-
-		System.out.println("Number of Training days = " + trainTestTimelines.get(0).size());
-		System.out.println("Number of Test days = " + trainTestTimelines.get(1).size());
-
-		if (trainTestTimelines.size() > 2)
-		{
-			System.err.println(
-					"Error in splitTestTrainingTimelines: there are more than two (train+test) timelines in returned result, there are "
-							+ trainTestTimelines.size() + " timelines.");
-			System.exit(-43);
-		}
-
-		return trainTestTimelines;
 	}
 
 	public String getActivityNameCountPairsOverAllTrainingDaysWithCount(

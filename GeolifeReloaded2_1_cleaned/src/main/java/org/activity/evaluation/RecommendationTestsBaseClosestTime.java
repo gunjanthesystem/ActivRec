@@ -17,8 +17,8 @@ import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
+import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
-import org.activity.objects.UserDayTimeline;
 import org.activity.recomm.RecommendationMasterBaseClosestTime;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
@@ -54,7 +54,7 @@ public class RecommendationTestsBaseClosestTime
 	 * 
 	 * @param userTimelines
 	 */
-	public RecommendationTestsBaseClosestTime(LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines)
+	public RecommendationTestsBaseClosestTime(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userTimelines)
 	// /,// String userAtRecomm)
 	{
 		// if userid is not set in constant class, in case of gowalla
@@ -100,7 +100,7 @@ public class RecommendationTestsBaseClosestTime
 				// /////////////////////////////////////////////////////////////////////Core
 
 				ArrayList<String> userNames = new ArrayList<String>();
-				LinkedHashMap<Date, UserDayTimeline> userAllDatesTimeslines = null;
+				LinkedHashMap<Date, Timeline> userAllDatesTimeslines = null;
 				pruningHasSaturated = true;
 				try
 				{
@@ -315,7 +315,7 @@ public class RecommendationTestsBaseClosestTime
 						// Splitting the set of timelines into training set and test set.
 						int numberOfValidDays = 0;
 
-						for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+						for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 						{
 							if (entry.getValue().containsAtLeastOneValidActivity() == false)
 							{ // if the day timelines contains no valid activity, then don't consider it for training or
@@ -336,11 +336,11 @@ public class RecommendationTestsBaseClosestTime
 							numberOfDaysForTraining = numberOfValidDays - numberOfDaysForTest;
 						}
 
-						LinkedHashMap<Date, UserDayTimeline> userTrainingTimelines = new LinkedHashMap<Date, UserDayTimeline>();
-						LinkedHashMap<Date, UserDayTimeline> userTestTimelines = new LinkedHashMap<Date, UserDayTimeline>();
+						LinkedHashMap<Date, Timeline> userTrainingTimelines = new LinkedHashMap<>();
+						LinkedHashMap<Date, Timeline> userTestTimelines = new LinkedHashMap<>();
 
 						int count = 1;
-						for (Map.Entry<Date, UserDayTimeline> entry : userAllDatesTimeslines.entrySet())
+						for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 						{
 							if (entry.getValue().containsAtLeastOneValidActivity() == false)
 							{ // if the day timelines contains no valid activity, then don't consider it for training or
@@ -421,7 +421,7 @@ public class RecommendationTestsBaseClosestTime
 						int numberOfMorningRTs = 0, numberOfAfternoonRTs = 0, numberOfEveningRTs = 0;
 						// Generating Recommendation Timestamps
 						// generate date and times for recommendation
-						for (Map.Entry<Date, UserDayTimeline> entry : userTestTimelines.entrySet())
+						for (Map.Entry<Date, Timeline> entry : userTestTimelines.entrySet())
 						{
 							int date = entry.getKey().getDate();
 							int month = entry.getKey().getMonth() + 1;
@@ -433,7 +433,7 @@ public class RecommendationTestsBaseClosestTime
 
 							String weekDay = DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay());
 
-							UserDayTimeline eachDayTimelineForUser = entry.getValue();
+							Timeline eachDayTimelineForUser = entry.getValue();
 							ArrayList<ActivityObject> activityObjectsInThatDay = eachDayTimelineForUser
 									.getActivityObjectsInDay();
 
@@ -462,7 +462,7 @@ public class RecommendationTestsBaseClosestTime
 
 								String timeCategory = DateTimeUtils.getTimeCategoryOfTheDay(endTimestamp.getHours());
 
-								if (UserDayTimeline.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
+								if (DateTimeUtils.isNoValidActivityAfterItInTheDay(j, eachDayTimelineForUser))
 								{
 									System.out.println(
 											"Skipping this recommendation point because there are no valid activity events after this in the day");
@@ -642,7 +642,7 @@ public class RecommendationTestsBaseClosestTime
 									int yearOfCand = entryDistance.getKey().getYear() + 1900;
 									String dateOfCand = dayOfCand + "-" + monthOfCand + "-" + yearOfCand;
 
-									UserDayTimeline dayTimelineTemp = TimelineUtils.getUserDayTimelineByDateFromMap(
+									Timeline dayTimelineTemp = TimelineUtils.getUserDayTimelineByDateFromMap(
 											userTrainingTimelines, entryDistance.getKey());
 									// Integer endPointIndexWithLeastDistanceForThisCandidate =
 									// UtilityBelt.getIntegerByDateFromMap(recommP1.getEndPointIndexWithLeastDistanceForCandidateTimelines(),

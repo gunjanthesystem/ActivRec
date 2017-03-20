@@ -617,20 +617,17 @@ public class AlignmentBasedDistance
 		{
 			System.err.println("Error inside pruneFirstUnknown: arrayToPrune is null");
 		}
-
-		ArrayList<ActivityObject> arrPruned = new ArrayList<ActivityObject>();
-
-		for (int i = 0; i < arrayToPrune.size(); i++)
+		ArrayList<ActivityObject> arrPruned = arrayToPrune;// new ArrayList<ActivityObject>();
+		// if the first element is unknown, prune it
+		if (arrPruned.get(0).getActivityName().equalsIgnoreCase("Unknown"))
 		{
-			if ((i == 0) && arrayToPrune.get(i).getActivityName().equalsIgnoreCase("Unknown")) // if the first element
-																								// is unknown, prune it
-			{
-				continue;
-			}
-			else
-				arrPruned.add(arrayToPrune.get(i));
+			arrPruned.remove(0);
 		}
-
+		// for (int i = 0; i < arrayToPrune.size(); i++)
+		// { if ((i == 0) && arrayToPrune.get(i).getActivityName().equalsIgnoreCase("Unknown"))
+		// {continue;}
+		// else arrPruned.add(arrayToPrune.get(i));
+		// }
 		return arrPruned;
 	}
 
