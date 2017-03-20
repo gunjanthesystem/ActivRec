@@ -3,6 +3,7 @@ package org.activity.sanityChecks;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import org.activity.io.WritingToFile;
 import org.activity.objects.CheckinEntry;
 import org.activity.ui.PopUps;
+import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 
 /**
@@ -85,9 +87,46 @@ public class TestDummy2
 		// streamExp1();
 		// checkString1();
 
-		checkRegexUtils();
+		// checkRegexUtils();
+
+		Timestamp t1 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
+		Timestamp t2 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
+
+		checkSQLDate0(t1, t2);
+		// checkSQLDate(t1, t2);
+
+		t1 = new Timestamp(2000, 12, 1, 5, 10, 10, 10);
+		t2 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
+
+		checkSQLDate0(t1, t2);
+		// checkSQLDate(t1, t2);
+
 		// List<Integer> range = IntStream.rangeClosed(1, 10).boxed().collect(Collectors.toList());
 		// range.forEach(System.out::println);
+	}
+
+	// public static void checkSQLDate(Timestamp t1, Timestamp t2)
+	// {
+	// System.out.println("---------getDateSafely------");
+	// Date d1 = DateTimeUtils.getDateSafely(t1);
+	// Date d2 = DateTimeUtils.getDateSafely(t2);
+	//
+	// System.out.println("t1=" + t1 + "\nt2=" + t2 + "\nd1=" + d1 + "\nd2=" + d2);
+	//
+	// System.out.println("d1 == d2:" + (d1 == d2));
+	// System.out.println("d1.equals(d2):" + d1.equals(d2));
+	// }
+
+	public static void checkSQLDate0(Timestamp t1, Timestamp t2)
+	{
+		System.out.println("-------getDate--------");
+		Date d1 = DateTimeUtils.getDate(t1);
+		Date d2 = DateTimeUtils.getDate(t2);
+
+		System.out.println("t1=" + t1 + "\nt2=" + t2 + "\nd1=" + d1 + "\nd2=" + d2);
+
+		System.out.println("d1 == d2:" + (d1 == d2));
+		System.out.println("d1.equals(d2):" + d1.equals(d2));
 	}
 
 	public static void checkRegexUtils()

@@ -1,6 +1,7 @@
 package org.activity.objects;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -823,6 +824,15 @@ public class ActivityObject implements Serializable
 	public Timestamp getEndTimestamp()
 	{
 		return endTimestamp;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Date getEndDate()
+	{
+		return DateTimeUtils.getDate(endTimestamp);
 	}
 
 	// /////////////////////////// To be removed later after refactoring

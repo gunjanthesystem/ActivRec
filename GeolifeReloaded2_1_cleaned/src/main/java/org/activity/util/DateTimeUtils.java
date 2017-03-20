@@ -224,10 +224,26 @@ public class DateTimeUtils
 		return (year + "-" + month + "-" + timestamp.getDate());
 	}
 
+	/**
+	 * 
+	 * @param timestamp
+	 * @return
+	 */
 	public static Date getDate(Timestamp timestamp)
 	{
 		return new Date(timestamp.getTime());
 	}
+
+	// /**
+	// * INCORRECT
+	// * @param timestamp
+	// * @return
+	// */
+	// public static Date getDateSafely(Timestamp t)
+	// {
+	// Timestamp ts = new Timestamp(t.getYear(), t.getMonth(), t.getDay(), 0, 0, 0, 0);
+	// return new Date(ts.getTime());
+	// }
 
 	/**
 	 * 

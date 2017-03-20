@@ -156,8 +156,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 				stringCodeForActivityObjects2, 1, 1, 2);
 
 		String[] splitted = RegexUtils.patternUnderScore.split(levenshteinDistance.getFirst());
-		// $$ levenshteinDistance.getFirst().split("_");
-		// "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
+		// $$ levenshteinDistance.getFirst().split("_");// "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
 
 		if (VerbosityConstants.verboseDistance)
 		{

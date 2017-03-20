@@ -854,4 +854,27 @@ public class StatsUtils
 			return true;
 		}
 	}
+
+	/**
+	 * Returns min max norm if max - min >0 else return 0 (as distance) ...leading to 1 as similarity (rounded off to 4
+	 * decimal places)
+	 * 
+	 * @param val
+	 * @param max
+	 * @param min
+	 * @return
+	 */
+	public static double minMaxNorm(double val, double max, double min)
+	{
+		if ((max - min) > 0)
+		{
+			return round(((val - min) / (max - min)), 4);
+		}
+		else
+		{
+			System.err.println("Warning: Alert!! minMaxNorm: max - min <=0 =" + (max - min));
+			return 0;
+		}
+	
+	}
 }

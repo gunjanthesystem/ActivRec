@@ -28,52 +28,6 @@ public class ComparatorUtils
 {
 
 	/**
-	 * source: http://codereview.stackexchange.com/questions/37201/finding-all-indices-of-largest-value-in-an-array
-	 * 
-	 * @param numbers
-	 * @return
-	 */
-	public static int[] findLargeNumberIndices(double[] numbers)
-	{
-
-		// create an array of at least 8 members.
-		// We may need to make this bigger during processing in case
-		// there's more than 8 values with the same large value
-		int[] indices = new int[Math.max(numbers.length / 16, 8)];
-		// how many large values do we have?
-		int count = 0;
-		// what is the largest value we have?
-		double largeNumber = Double.NEGATIVE_INFINITY;
-		for (int i = 0; i < numbers.length; i++)
-		{
-			if (numbers[i] > largeNumber)
-			{
-				// we have a new large number value... reset our history....
-				largeNumber = numbers[i];
-				// setting count to zero is enough to 'clear' our previous references.
-				count = 0;
-				// we know there's space for at least index 0. No need to check.
-				// note how we post-increment - this is a 'pattern'.
-				indices[count++] = i;
-			}
-			else if (numbers[i] == largeNumber)
-			{
-				// we have another large value.
-				if (count == indices.length)
-				{
-					// need to make more space for indices... increase array by 25%
-					// count >>> 2 is the same as count / 4 ....
-					indices = Arrays.copyOf(indices, count + (count >>> 2));
-				}
-				// again, use the post-increment
-				indices[count++] = i;
-			}
-		}
-		// return the number of values that are valid only.
-		return Arrays.copyOf(indices, count);
-	}
-
-	/**
 	 * Used for sanity checks and validations
 	 * 
 	 * @param a
@@ -317,6 +271,42 @@ public class ComparatorUtils
 	 * 
 	 * It is an unstable sort (forced by shuffle) to randomly break ties
 	 * 
+	 * note: In case the Value 'V' is a Pair<String,Double>, the comparison is done on the second component (Double)
+	 * 
+	 * @param map
+	 * @return
+	 */
+	public static LinkedHashMap<String, Pair<String, Double>> sortByValueAscendingStrStrDoub(
+			LinkedHashMap<String, Pair<String, Double>> map)
+	{
+		List<Map.Entry<String, Pair<String, Double>>> list = new LinkedList<>(map.entrySet());
+		if (Constant.breakTiesWithShuffle)
+		{
+			Collections.shuffle(list);
+		}
+		Collections.sort(list, new Comparator<Map.Entry<String, Pair<String, Double>>>()
+			{
+				@Override
+				public int compare(Map.Entry<String, Pair<String, Double>> o1,
+						Map.Entry<String, Pair<String, Double>> o2)
+				{
+					return (o1.getValue()).compareTo(o2.getValue());
+				}
+			});
+
+		LinkedHashMap<String, Pair<String, Double>> result = new LinkedHashMap<>();
+		for (Map.Entry<String, Pair<String, Double>> entry : list)
+		{
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
+
+	/**
+	 * Sorts a map in increasing order of value
+	 * 
+	 * It is an unstable sort (forced by shuffle) to randomly break ties
+	 * 
 	 * note: In case the Value 'V' is a Pair<Integer,Double>, the comparison is done on the second component (Double)
 	 * 
 	 * @param map
@@ -503,77 +493,6 @@ public class ComparatorUtils
 		return lastTimestamp;
 	}
 
-	// TODO this method needs refactoring (30 Sep changes: intersectingIntervalInSeconds replaced by doesOverlap
-	// 21Oct public static String getActivityNameForInterval(Timestamp earliestTimestamp, Timestamp lastTimestamp, int
-	// intervalIndex, int timeUnitInSeconds,
-	// ArrayList<ActivityObject>
-	// activityEvents)
-	// {
-	// //$$30Sep
-	// System.err.println("ERROR: This method needs refactoring");
-	// PopUps.showMessage("ERROR: This method needs refactoring");
-	// //
-	//
-	//
-	// String activityNameToAssign= "not found";
-	//
-	// Timestamp startInterval = getIncrementedTimestamp(earliestTimestamp,(intervalIndex * timeUnitInSeconds));
-	// Timestamp endInterval = getIncrementedTimestamp(earliestTimestamp,((intervalIndex+1) * timeUnitInSeconds));
-	// if(endInterval.getTime()> lastTimestamp.getTime())
-	// endInterval=lastTimestamp;
-	//
-	// //$$System.out.print("startinterval:"+startInterval+"endinterval:"+endInterval);
-	//
-	// for(ActivityObject activityEvent: activityEvents)
-	// {
-	// if(activityEvent.fullyContainsInterval(startInterval,endInterval)) // the interval falls inside only one activity
-	// event
-	// {
-	// activityNameToAssign = activityEvent.getActivityName();
-	// //$$System.out.print("**contains**");
-	// }
-	// }
-	//
-	// if(activityNameToAssign.equals("not found")) // the interval falls inside multiple activity events
-	// {
-	// long longestDuration=0; //in seconds
-	// for(ActivityObject activityEvent: activityEvents)
-	// {
-	// if(activityEvent.intersectingIntervalInSeconds(startInterval,endInterval)> longestDuration) // the interval falls
-	// inside only one activity event
-	// {
-	// longestDuration = activityEvent.intersectingIntervalInSeconds(startInterval,endInterval);
-	// activityNameToAssign = activityEvent.getActivityName();
-	// }
-	// }
-	// if(longestDuration>0)
-	// {
-	//
-	// //$$System.out.print("**intersects**");
-	// }
-	// }
-	//
-	// if(activityNameToAssign.equals("not found"))
-	// {
-	// if(startInterval.getMinutes()==59 && endInterval.getHours() ==0 && endInterval.getMinutes()==0)
-	// {
-	// // all is well because this is the last minute of the day
-	// //according to our current data. we have left an interval of a minute before the next day starts
-	// }
-	// else
-	// {
-	// System.out.println("Error inside getActivityNameForInterval(): No activity name found for given timeinterval
-	// "+startInterval+":"+endInterval+" assigning 'Others'");
-	// //System.exit(0);
-	//
-	// }
-	// activityNameToAssign="Others";
-	// }
-	//
-	// //System.out.print(activityNameToAssign+"-"+"\n");
-	// return activityNameToAssign;
-	// }
-	//
 	public static Timestamp getEarliestOfAllTimestamp(HashMap<String, ArrayList<ActivityObject>> timelinesToAggregate)
 	{
 
@@ -677,6 +596,51 @@ public class ComparatorUtils
 	}
 
 	/**
+	 * source: http://codereview.stackexchange.com/questions/37201/finding-all-indices-of-largest-value-in-an-array
+	 * 
+	 * @param numbers
+	 * @return
+	 */
+	public static int[] findLargeNumberIndices(double[] numbers)
+	{
+		// create an array of at least 8 members.
+		// We may need to make this bigger during processing in case
+		// there's more than 8 values with the same large value
+		int[] indices = new int[Math.max(numbers.length / 16, 8)];
+		// how many large values do we have?
+		int count = 0;
+		// what is the largest value we have?
+		double largeNumber = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < numbers.length; i++)
+		{
+			if (numbers[i] > largeNumber)
+			{
+				// we have a new large number value... reset our history....
+				largeNumber = numbers[i];
+				// setting count to zero is enough to 'clear' our previous references.
+				count = 0;
+				// we know there's space for at least index 0. No need to check.
+				// note how we post-increment - this is a 'pattern'.
+				indices[count++] = i;
+			}
+			else if (numbers[i] == largeNumber)
+			{
+				// we have another large value.
+				if (count == indices.length)
+				{
+					// need to make more space for indices... increase array by 25%
+					// count >>> 2 is the same as count / 4 ....
+					indices = Arrays.copyOf(indices, count + (count >>> 2));
+				}
+				// again, use the post-increment
+				indices[count++] = i;
+			}
+		}
+		// return the number of values that are valid only.
+		return Arrays.copyOf(indices, count);
+	}
+
+	/**
 	 * Find duplicates in the given list. Source:
 	 * https://stackoverflow.com/questions/7414667/identify-duplicates-in-a-list
 	 * 
@@ -700,6 +664,80 @@ public class ComparatorUtils
 
 		return duplicates;
 	}
+
+	/////////////////
+	// TODO this method needs refactoring (30 Sep changes: intersectingIntervalInSeconds replaced by doesOverlap
+	// 21Oct public static String getActivityNameForInterval(Timestamp earliestTimestamp, Timestamp lastTimestamp, int
+	// intervalIndex, int timeUnitInSeconds,
+	// ArrayList<ActivityObject>
+	// activityEvents)
+	// {
+	// //$$30Sep
+	// System.err.println("ERROR: This method needs refactoring");
+	// PopUps.showMessage("ERROR: This method needs refactoring");
+	// //
+	//
+	//
+	// String activityNameToAssign= "not found";
+	//
+	// Timestamp startInterval = getIncrementedTimestamp(earliestTimestamp,(intervalIndex * timeUnitInSeconds));
+	// Timestamp endInterval = getIncrementedTimestamp(earliestTimestamp,((intervalIndex+1) * timeUnitInSeconds));
+	// if(endInterval.getTime()> lastTimestamp.getTime())
+	// endInterval=lastTimestamp;
+	//
+	// //$$System.out.print("startinterval:"+startInterval+"endinterval:"+endInterval);
+	//
+	// for(ActivityObject activityEvent: activityEvents)
+	// {
+	// if(activityEvent.fullyContainsInterval(startInterval,endInterval)) // the interval falls inside only one activity
+	// event
+	// {
+	// activityNameToAssign = activityEvent.getActivityName();
+	// //$$System.out.print("**contains**");
+	// }
+	// }
+	//
+	// if(activityNameToAssign.equals("not found")) // the interval falls inside multiple activity events
+	// {
+	// long longestDuration=0; //in seconds
+	// for(ActivityObject activityEvent: activityEvents)
+	// {
+	// if(activityEvent.intersectingIntervalInSeconds(startInterval,endInterval)> longestDuration) // the interval falls
+	// inside only one activity event
+	// {
+	// longestDuration = activityEvent.intersectingIntervalInSeconds(startInterval,endInterval);
+	// activityNameToAssign = activityEvent.getActivityName();
+	// }
+	// }
+	// if(longestDuration>0)
+	// {
+	//
+	// //$$System.out.print("**intersects**");
+	// }
+	// }
+	//
+	// if(activityNameToAssign.equals("not found"))
+	// {
+	// if(startInterval.getMinutes()==59 && endInterval.getHours() ==0 && endInterval.getMinutes()==0)
+	// {
+	// // all is well because this is the last minute of the day
+	// //according to our current data. we have left an interval of a minute before the next day starts
+	// }
+	// else
+	// {
+	// System.out.println("Error inside getActivityNameForInterval(): No activity name found for given timeinterval
+	// "+startInterval+":"+endInterval+" assigning 'Others'");
+	// //System.exit(0);
+	//
+	// }
+	// activityNameToAssign="Others";
+	// }
+	//
+	// //System.out.print(activityNameToAssign+"-"+"\n");
+	// return activityNameToAssign;
+	// }
+	//
+
 	/*
 	 * /** Fetches the current timeline from the given longer timeline from the recommendation point back until the
 	 * matching unit length.

@@ -17,8 +17,8 @@ import org.activity.evaluation.Evaluation;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
+import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
-import org.activity.objects.UserDayTimeline;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -35,11 +35,11 @@ import org.activity.util.TimelineUtils;
 /* Modified version of RecommendationMasterDayWise2Faster. This uses daywise timelines */
 public class RecommendationMasterDayWise2FasterMar2017 implements RecommendationMasterI
 {
-	private LinkedHashMap<Date, UserDayTimeline> trainingTimelines;
-	private LinkedHashMap<Date, UserDayTimeline> testTimelines;
-	private LinkedHashMap<Date, UserDayTimeline> candidateTimelines;
+	private LinkedHashMap<Date, Timeline> trainingTimelines;
+	private LinkedHashMap<Date, Timeline> testTimelines;
+	private LinkedHashMap<Date, Timeline> candidateTimelines;
 
-	private UserDayTimeline currentDayTimeline;// userDayTimelineAtRecomm
+	private Timeline currentDayTimeline;// userDayTimelineAtRecomm
 
 	private Date dateAtRecomm;
 	private Time timeAtRecomm;
@@ -90,9 +90,19 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	 * the activities guiding recommendation are pruned out from set of candidate timelines
 	 */
 
-	public RecommendationMasterDayWise2FasterMar2017(LinkedHashMap<Date, UserDayTimeline> trainingTimelines,
-			LinkedHashMap<Date, UserDayTimeline> testTimelines, String dateAtRecomm, String timeAtRecomm,
-			int userAtRecomm, double thresholdVal, Enums.TypeOfThreshold typeOfThreshold)
+	/**
+	 * 
+	 * @param trainingTimelines
+	 * @param testTimelines
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param userAtRecomm
+	 * @param thresholdVal
+	 * @param typeOfThreshold
+	 */
+	public RecommendationMasterDayWise2FasterMar2017(LinkedHashMap<Date, Timeline> trainingTimelines,
+			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
+			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold)
 	{
 		System.out.println("\n----------------Starting RecommendationMasterDayWise2FasterDec ");
 		commonPath = Constant.getCommonPath();
@@ -101,7 +111,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		hasCandidateTimelines = true;
 		nextActivityJustAfterRecommPointIsInvalid = false;
 		// dateAtRecomm.split("/"); //
-		String[] splittedDate = RegexUtils.patternFromSlash.split(dateAtRecomm);// dd/mm/yyyy
+		String[] splittedDate = RegexUtils.patternForwardSlash.split(dateAtRecomm);// dd/mm/yyyy
 		this.dateAtRecomm = new Date(Integer.parseInt(splittedDate[2]) - 1900, Integer.parseInt(splittedDate[1]) - 1,
 				Integer.parseInt(splittedDate[0]));
 		String[] splittedTime = RegexUtils.patternColon.split(timeAtRecomm);// timeAtRecomm.split(":"); // hh:mm:ss
@@ -131,7 +141,8 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		System.out.println("timestampPointAtRecomm = " + timestampPointAtRecomm);
 
 		this.activitiesGuidingRecomm = currentDayTimeline
-				.getActivityObjectsStartingOnBeforeTime(timestampPointAtRecomm);
+				.getActivityObjectsStartingOnBeforeTimeSameDay(timestampPointAtRecomm);
+
 		System.out.println("Activity starting on or before the time to recommend (on recommendation day) are: \t");
 		activitiesGuidingRecomm.stream().forEach(e -> System.out.print(e.getActivityName() + " "));
 
@@ -391,26 +402,24 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		return this.activityAtRecommPoint;
 	}
 
-	public String getActivitiesGuidingRecomm()
+	public String getActivityNamesGuidingRecomm()
 	{
-		String res = "";
-
+		StringBuilder res = new StringBuilder();
 		for (ActivityObject ae : activitiesGuidingRecomm)
 		{
-			res += ">>" + ae.getActivityName();
+			res.append(">>" + ae.getActivityName());
 		}
-		return res;
+		return res.toString();
 	}
 
 	public String getActivityNamesGuidingRecommwithTimestamps()
 	{
-		String res = "";
-
+		StringBuilder res = new StringBuilder();
 		for (ActivityObject ae : activitiesGuidingRecomm)
 		{
-			res += "  " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp();
+			res.append("  " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp());
 		}
-		return res;
+		return res.toString();
 	}
 
 	/**
@@ -535,7 +544,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		return topRankedString.toString();
 	}
 
-	public String getRankedRecommendationWithRankScoresAsString()
+	public String getRankedRecommendedActivityNamesWithRankScores()
 	{
 		return this.rankedRecommendationWithRankScores;
 	}
@@ -552,7 +561,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		return rankedRecommendationWithoutRankScores.toString();
 	}
 
-	public String getRankedRecommendationWithoutRankScoresAsString()
+	public String getRankedRecommendedActivityNamesWithoutRankScores()
 	{
 		return this.rankedRecommendationWithoutRankScores;
 	}
@@ -577,10 +586,10 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	 * @param activityAtRecommPoint
 	 * @return
 	 */
-	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, UserDayTimeline> trainingTimelines,
+	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
 			ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm, ActivityObject activityAtRecommPoint)
 	{
-		LinkedHashMap<Date, UserDayTimeline> candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(
+		LinkedHashMap<Date, Timeline> candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(
 				trainingTimelines, activitiesGuidingRecomm, dateAtRecomm, activityAtRecommPoint);
 		if (candidateTimelines.size() > 0)
 			return true;
@@ -636,11 +645,11 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	 */
 	public String getNextActivityNamesFromCandsByEditDistances(ArrayList<ActivityObject> activitiesGuidingRecomm,
 			LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScoresSorted,
-			LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser)
+			LinkedHashMap<Date, Timeline> dayTimelinesForUser)
 	{
 		String nextActivityNames = new String();
 		// LinkedHashMap<Date,String> topNextForThisCand= new LinkedHashMap<Date,String>();
-		UserDayTimeline candUserDayTimeline = null;
+		Timeline candUserDayTimeline = null;
 		System.out.println("\n-----------------Inside getNextRecommendedActivityNamesEditDistance");
 		int nextCount = 0;
 
@@ -685,7 +694,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	public Pair<String, LinkedHashMap<Date, String>> getNextActivityNamesFromCandsByEditDistance(
 			ArrayList<ActivityObject> activitiesGuidingRecomm,
 			LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScoresSorted,
-			LinkedHashMap<Date, UserDayTimeline> dayTimelinesForUser)
+			LinkedHashMap<Date, Timeline> dayTimelinesForUser)
 	{
 		LinkedHashMap<Date, String> nextActivityNamesFromCandsByEditDistMap = new LinkedHashMap<Date, String>();
 		String nextActivityNamesFromCandsByEditDistString = new String();
@@ -693,7 +702,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		// this.nextActivityNamesFromCandsByEditDist = new LinkedHashMap<Date, String>();
 		// LinkedHashMap<Date,String> topNextForThisCand= new LinkedHashMap<Date,String>();
 
-		UserDayTimeline candUserDayTimeline = null;
+		Timeline candUserDayTimeline = null;
 		System.out.println("\n-----------------Inside getNextActivityNamesFromCandsByEditDistance");
 		int nextActCount = 0;
 
@@ -782,7 +791,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	 *         operations performed, edit distance of least distant subsequence))
 	 */
 	public LinkedHashMap<Date, Triple<Integer, String, Double>> getEditDistancesForCandidateTimelines(
-			LinkedHashMap<Date, UserDayTimeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<Date, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
 			String userAtRecomm, String dateAtRecomm, String timeAtRecomm)
 	{
 		// <Date of CandidateTimeline, (End point index of least distant subsequence, String containing the trace of
@@ -790,9 +799,9 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		// least distant subsequence)>
 		LinkedHashMap<Date, Triple<Integer, String, Double>> distancesRes = new LinkedHashMap<>();
 
-		for (Map.Entry<Date, UserDayTimeline> candidate : candidateTimelines.entrySet())
+		for (Map.Entry<Date, Timeline> candidate : candidateTimelines.entrySet())
 		{
-			UserDayTimeline candidateTimeline = candidate.getValue();
+			Timeline candidateTimeline = candidate.getValue();
 			// similarityScores.put(entry.getKey(), getSimilarityScore(entry.getValue(),activitiesGuidingRecomm));
 			// (Activity Events in Candidate Day, activity events on or before recomm on recomm day)
 			Long candTimelineID = candidate.getKey().getTime();// used as dummy, not exactly useful right now
@@ -818,7 +827,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	 * @param activitiesGuidingRecomm
 	 * @return
 	 */
-	public Triple<Integer, String, Double> getDistanceScoreModifiedEdit(UserDayTimeline userDayTimeline,
+	public Triple<Integer, String, Double> getDistanceScoreModifiedEdit(Timeline userDayTimeline,
 			ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
 			String timeAtRecomm, Long candidateID)
 	{
@@ -863,13 +872,10 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 			HJEditDistance editSimilarity = new HJEditDistance();
 
 			Pair<String, Double> distance = editSimilarity.getHJEditDistanceWithTrace(
-					userDayTimeline.getActivityObjectsInDayFromToIndex(0, indicesOfEndPointActivityInDay1.get(i) + 1),
+					userDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
+							indicesOfEndPointActivityInDay1.get(i) + 1),
 					activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateID);
-			/*
-			 * public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject>
-			 * activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String
-			 * dateAtRecomm, String timeAtRecomm, Integer candidateTimelineId)
-			 */
+
 			distanceScoresForEachSubsequence.put(indicesOfEndPointActivityInDay1.get(i), distance);
 
 			// System.out.println("Distance between:\n
@@ -1040,7 +1046,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	 * 
 	 * @return LinkedHashMap<Date, UserDayTimeline>
 	 */
-	public LinkedHashMap<Date, UserDayTimeline> getCandidateTimeslines()
+	public LinkedHashMap<Date, Timeline> getCandidateTimeslines()
 	{
 		return this.candidateTimelines;
 	}

@@ -603,6 +603,20 @@ public class Timeline implements Serializable
 	}
 
 	/**
+	 * 
+	 * @param startTimestamp
+	 * @return
+	 */
+	public ArrayList<ActivityObject> getActivityObjectsStartingOnBeforeTimeSameDay(Timestamp startTimestamp)
+	{
+		Date dateGiven = DateTimeUtils.getDate(startTimestamp);
+
+		return (ArrayList<ActivityObject>) activityObjectsInTimeline.stream()
+				.filter(ao -> ao.startsOnOrBefore(startTimestamp)).filter(ao -> ao.getEndDate().equals(dateGiven))
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * n takes values from 0 ...
 	 * 
 	 * @param n
@@ -697,6 +711,101 @@ public class Timeline implements Serializable
 		}
 		return this.activityObjectsInTimeline.get(0).userID;
 
+	}
+
+	/**
+	 *
+	 * @param timestamp
+	 * @return
+	 */
+	public int getNumOfValidActivityObjectsAfterThisTimeInSameDay(Timestamp timestampOriginal)
+	{
+		int numOfValids = 0;
+		Timestamp timestamp = timestampOriginal;
+		ActivityObject nextValidAOAfterAOAtThisTime;
+		// MANALI
+
+		Date dateOfGivenTimestamp = DateTimeUtils.getDate(timestampOriginal);
+
+		while ((nextValidAOAfterAOAtThisTime = getNextValidActivityAfterActivityAtThisTime(timestamp)) != null)
+		{
+			Date dateOfNextValidAO = DateTimeUtils.getDate(nextValidAOAfterAOAtThisTime.getEndTimestamp());
+			if (!dateOfNextValidAO.equals(dateOfGivenTimestamp))
+			{
+				break;
+			}
+
+			numOfValids += 1;
+			timestamp = nextValidAOAfterAOAtThisTime.getEndTimestamp(); // update timestamp
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Debug: num of valid after timestamp " + timestampOriginal + " is: " + numOfValids);
+		}
+		return numOfValids;
+
+	}
+
+	////
+	/**
+	 * Finds the valid Activity Object in this day timeline whose start time in the day is nearest to the start time of
+	 * current Activity Object
+	 *
+	 *
+	 * @param t
+	 *
+	 * @return a Triple (indexOfActivityObject with nearest start time to given timestamp, that activity object, abs
+	 *         time difference in secs between the st of this ao and st of current ao t)
+	 */
+	public Triple<Integer, ActivityObject, Double> getTimeDiffValidAOInDayWithStartTimeNearestTo(Timestamp t)
+	{
+		if (!this.isShouldBelongToSingleDay())
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in Timeline.getTimeDiffValidAOInDayWithStartTimeNearestTo: isShouldBelongToSingleDay ="
+							+ this.isShouldBelongToSingleDay()
+							+ " while this method should only be called for day timeline "));
+			System.exit(-1);
+		}
+
+		/** Seconds in that day before the timestamp t which is start timestamp of the current activity object **/
+		long secsCO_ST_InDay = t.getHours() * 60 * 60 + t.getMinutes() * 60 + t.getSeconds();
+
+		int indexOfActivityObjectNearestST = Integer.MIN_VALUE;
+		long leastDistantSTVal = Long.MAX_VALUE;
+
+		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
+		{
+			if (activityObjectsInTimeline.get(i).isInvalidActivityName())
+			{
+				continue;
+			}
+
+			Timestamp aoST = activityObjectsInTimeline.get(i).getStartTimestamp();
+
+			/** Seconds in that day before the Activity Object's start timestamp **/
+			long secsAO_ST_InDay = aoST.getHours() * 60 * 60 + aoST.getMinutes() * 60 + aoST.getSeconds();
+
+			long absDiffSecs = Math.abs(secsAO_ST_InDay - secsCO_ST_InDay);
+
+			if (absDiffSecs < leastDistantSTVal)
+			{
+				leastDistantSTVal = absDiffSecs;
+				indexOfActivityObjectNearestST = i;
+			}
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("In the daytimeline (User = " + activityObjectsInTimeline.get(0).getUserID() + ", Date="
+					+ activityObjectsInTimeline.get(0).getEndDate() + "). "
+					+ "The index of Activity Object with ST nearest to current_ST(=" + t + "is: "
+					+ indexOfActivityObjectNearestST + " with time diff of " + leastDistantSTVal);
+		}
+
+		return new Triple(indexOfActivityObjectNearestST,
+				this.activityObjectsInTimeline.get(indexOfActivityObjectNearestST), (double) leastDistantSTVal);
 	}
 
 }

@@ -809,14 +809,17 @@ public class StringCode
 	{
 		StringBuilder code = new StringBuilder();
 
-		activityObjects.stream().forEach(ao -> code.append(ao.getStringCode()));
+		for (ActivityObject ao : activityObjects)
+		{
+			code.append(ao.getStringCode());
+		}
+		// activityObjects.stream().forEach(ao -> code.append(ao.getStringCode()));
 		String codeS = code.toString();
 
 		if (VerbosityConstants.verbose || VerbosityConstants.verboseSAX)
 		{
-			System.out.println("Inside getStringCodeForActivityObjects:\n Act Names:\n");
 			activityObjects.stream().forEach(ao -> System.out.print(ao.getActivityName() + " "));
-			System.out.println("Code: " + codeS);
+			System.out.println("Inside getStringCodeForActivityObjects:\n Act Names:\nCode: " + codeS);
 		}
 
 		return codeS;
