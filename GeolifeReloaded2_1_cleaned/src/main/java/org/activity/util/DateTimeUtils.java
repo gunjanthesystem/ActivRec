@@ -234,6 +234,20 @@ public class DateTimeUtils
 		return new Date(timestamp.getTime());
 	}
 
+	/**
+	 * <font color = green>Okay. java.sql.Date with no hidden time</font>
+	 * 
+	 * @param dateString
+	 * @param separator
+	 * @return
+	 */
+	public static Date getDateFromDDMMYYYY(String dateString, Pattern separator)
+	{
+		String[] splittedDate = separator.split(dateString);// dd/mm/yyyy
+		return new Date(Integer.parseInt(splittedDate[2]) - 1900, Integer.parseInt(splittedDate[1]) - 1,
+				Integer.parseInt(splittedDate[0]));
+	}
+
 	// /**
 	// * INCORRECT
 	// * @param timestamp

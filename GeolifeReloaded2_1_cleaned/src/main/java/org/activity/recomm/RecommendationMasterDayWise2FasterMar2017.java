@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
+import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
 import org.activity.evaluation.Evaluation;
@@ -24,6 +25,7 @@ import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
@@ -39,9 +41,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 {
 	private LinkedHashMap<Date, Timeline> trainingTimelines;
 	private LinkedHashMap<Date, Timeline> testTimelines;
-	private LinkedHashMap<Date, Timeline> candidateTimelines;
-
-	private Timeline currentDayTimeline;// userDayTimelineAtRecomm
+	private LinkedHashMap<Date, Timeline> candidateTimelines; // these are day timelines.includes all aos for given date
 
 	private Date dateAtRecomm;
 	private Time timeAtRecomm;
@@ -51,23 +51,23 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	/**
 	 * Current Timeline
 	 */
+	private Timeline currentDayTimeline;
 	private ArrayList<ActivityObject> activitiesGuidingRecomm; // (activitiesGuidingRecomm) sequence of activity events
 																// happening one or before the recomm point on that day
-	private ActivityObject activityAtRecommPoint;
-	// Date dateOfMostSimilar
-
-	// private String singleNextRecommendedActivity;
-	private String nextActivityNamesFromCandsByEditDistString;
-
-	private LinkedHashMap<Date, String> nextActivityNamesFromCandsByEditDistMap;
+	private ActivityObject activityAtRecommPoint;// current Activity Object
+	private String activityNameAtRecommPoint;// current Activity Name
 
 	/**
-	 * (Cand TimelineID, (End point index of least distant subsequence, String containing the trace of edit operations
-	 * performed, edit distance of least distant subsequence)) this LinkedHashMap is sorted by the value of edit
-	 * distance in ascending order (second component of the Pair (value))
+	 * {Cand TimelineID, Triple{End point index of least distant subsequence, String containing the trace of edit
+	 * operations performed, edit distance of least distant subsequence}} this LinkedHashMap is sorted by the value of
+	 * edit distance in ascending order (second component of the Pair (value))
 	 * 
 	 */
 	private LinkedHashMap<Date, Triple<Integer, String, Double>> editDistancesSortedMap;
+
+	private String nextActivityNamesFromCandsByEditDistString;
+
+	private LinkedHashMap<Date, String> nextActivityNamesFromCandsByEditDistMap;
 
 	private LinkedHashMap<String, Double> recommendedActivityNamesWithRankScores;
 	private String rankedRecommendationWithRankScores;
@@ -83,8 +83,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	// public int totalNumberOfProbableCands;
 	// public int numCandsRejectedDueToNoCurrentActivityAtNonLast;
 	// public int numCandsRejectedDueToNoNextActivity;
-
-	private static String commonPath;// = Constant.commonPath;
+	// private static String commonPath;// = Constant.commonPath;
 
 	/*
 	 * threshold for choosing candidate timelines, those candidate timelines whose distance from the 'activity events
@@ -106,36 +105,35 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
 			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold)
 	{
-		System.out.println("\n----------------Starting RecommendationMasterDayWise2FasterDec ");
-		commonPath = Constant.getCommonPath();
+		System.out.println("\n----------------Starting RecommendationMasterDayWise2FasterMar2017 ");
+		// commonPath = Constant.getCommonPath();
 		// LinkedHashMap<Date, Pair<Integer, Double>> editDistancesMapUnsorted;
 
 		hasCandidateTimelines = true;
 		nextActivityJustAfterRecommPointIsInvalid = false;
-		// dateAtRecomm.split("/"); //
-		String[] splittedDate = RegexUtils.patternForwardSlash.split(dateAtRecomm);// dd/mm/yyyy
-		this.dateAtRecomm = new Date(Integer.parseInt(splittedDate[2]) - 1900, Integer.parseInt(splittedDate[1]) - 1,
-				Integer.parseInt(splittedDate[0]));
-		String[] splittedTime = RegexUtils.patternColon.split(timeAtRecomm);// timeAtRecomm.split(":"); // hh:mm:ss
+
+		// dd/mm/yyyy // okay java.sql.Date with no hidden time
+		this.dateAtRecomm = DateTimeUtils.getDateFromDDMMYYYY(dateAtRecomm, RegexUtils.patternForwardSlash);
 		this.timeAtRecomm = Time.valueOf(timeAtRecomm);
 		this.userAtRecomm = Integer.toString(userAtRecomm);
 		this.userIDAtRecomm = Integer.toString(userAtRecomm);
-
-		System.out.println("\n^^^^^^^^^^^^^^^^Inside RecommendationMasterDayWise2Faster");
 		System.out.println("	User at Recomm = " + this.userAtRecomm + "\n	Date at Recomm = " + this.dateAtRecomm
 				+ "\n	Time at Recomm = " + this.timeAtRecomm);
 
 		// $$21Oct
-		currentDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
+		this.currentDayTimeline = TimelineUtils.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
 
 		if (currentDayTimeline == null)
 		{
 			System.err.println("Error: current day timeline not found (in test timelines) for the recommendation day");
 		}
 
-		System.out.println("The Activities on the recomm day are:");
-		currentDayTimeline.printActivityObjectNamesWithTimestampsInSequence();
-		System.out.println();
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("The Activities on the recomm day are:");
+			currentDayTimeline.printActivityObjectNamesWithTimestampsInSequence();
+			System.out.println();
+		}
 
 		Timestamp timestampPointAtRecomm = new Timestamp(this.dateAtRecomm.getYear(), this.dateAtRecomm.getMonth(),
 				this.dateAtRecomm.getDate(), this.timeAtRecomm.getHours(), this.timeAtRecomm.getMinutes(),
@@ -309,12 +307,6 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
 	}
-
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 
