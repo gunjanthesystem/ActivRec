@@ -5,7 +5,9 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -387,6 +389,11 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		return this.editDistancesSortedMap;
 	}
 
+	public Set getCandidateTimelineIDs()
+	{
+		return this.editDistancesSortedMap.keySet();
+	}
+
 	/**
 	 * TODO: CHECK if this method is conceptually correct
 	 * 
@@ -576,27 +583,6 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		return hasCandidateTimelines;
 	}
 
-	/**
-	 * Useful for mu breaking of timelines to find if a particular rt will have recommendation for daywise approach so
-	 * that they can be compared
-	 * 
-	 * @param trainingTimelines
-	 * @param activitiesGuidingRecomm
-	 * @param dateAtRecomm
-	 * @param activityAtRecommPoint
-	 * @return
-	 */
-	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm, ActivityObject activityAtRecommPoint)
-	{
-		LinkedHashMap<Date, Timeline> candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(
-				trainingTimelines, activitiesGuidingRecomm, dateAtRecomm, activityAtRecommPoint);
-		if (candidateTimelines.size() > 0)
-			return true;
-		else
-			return false;
-	}
-
 	/*
 	 * public String getSingleNextRecommendedActivity() { return this.singleNextRecommendedActivity; }
 	 */
@@ -607,8 +593,11 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	}
 
 	// getTopNextActivityNamesWithoutDistanceString
-	public String getTopRecommendedActivityNamesWithoutDistanceString()// old name
-																		// getTopRecommendedActivitiesWithoutDistance()
+	/**
+	 * TODO: check
+	 */
+	public String getTopNextActivityNamesWithoutDistanceString()// old name
+																// getTopRecommendedActivitiesWithoutDistance()
 	{
 		String result = "";
 		String topActivities = this.nextActivityNamesFromCandsByEditDistString;
@@ -747,7 +736,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	 * @param endPointIndexForSubsequenceWithHighestSimilarity
 	 * @return
 	 */
-	public static String getNextValidActivityNameAsCode(String topSimilarUserDayActivitiesAsStringCode,
+	public String getNextValidActivityNameAsCode(String topSimilarUserDayActivitiesAsStringCode,
 			int endPointIndexForSubsequenceWithHighestSimilarity)
 	{
 		String unknownAsCode = "", othersAsCode = "";
@@ -1043,12 +1032,44 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	}
 
 	/**
+	 * removed raw type so that it is compatible with the interface
 	 * 
 	 * @return LinkedHashMap<Date, UserDayTimeline>
 	 */
 	public LinkedHashMap<Date, Timeline> getCandidateTimeslines()
 	{
 		return this.candidateTimelines;
+	}
+
+	public Timeline getCandidateTimesline(String timelineID)
+	{
+		List<Timeline> foundTimelines = this.candidateTimelines.entrySet().stream()
+				.filter(e -> e.getValue().toString().equals(timelineID)).map(e -> e.getValue())
+				.collect(Collectors.toList());
+		if (foundTimelines.size() != 1)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getCandidateTimesline(String timelineID): foundTimelines.size()=" + foundTimelines.size()
+							+ " while expected 1"));
+		}
+
+		return foundTimelines.get(0);
+	}
+
+	public ArrayList<Timeline> getOnlyCandidateTimeslines()
+	{
+		return (ArrayList<Timeline>) this.candidateTimelines.entrySet().stream().map(e -> e.getValue())
+				.collect(Collectors.toList());
+	}
+
+	public int getNumOfCandidateTimelines()
+	{
+		return this.candidateTimelines.size();
+	}
+
+	public double getAvgEndSimilarity()
+	{
+		return Double.NaN;
 	}
 
 }

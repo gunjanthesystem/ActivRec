@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
+import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.ui.PopUps;
@@ -1772,5 +1774,49 @@ public class UtilityBelt
 	//
 	// }
 	//
+
+	/**
+	 * 
+	 * @param map
+	 * @param name
+	 */
+	public static void traverseStringStringPair(LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> map,
+			String name)
+	{
+		System.out.println("-----------Traversing " + name);
+	
+		// iterating over cands
+		for (Map.Entry<String, LinkedHashMap<String, Pair<String, Double>>> entry : map.entrySet())
+		{
+			System.out.print("Cand=" + entry.getKey());
+			LinkedHashMap<String, Pair<String, Double>> featureWiseDistances = entry.getValue();
+	
+			for (Map.Entry<String, Pair<String, Double>> distEntry : featureWiseDistances.entrySet())
+			// iterating over distance for each feature
+			{
+				System.out.print("Feature names=" + distEntry.getKey());
+				System.out.print("val =" + distEntry.getValue().getSecond());
+			}
+			System.out.println();
+		}
+		System.out.println("-----------");
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @param name
+	 */
+	public static void traverseStringPair(LinkedHashMap<String, Pair<String, Double>> map, String name)
+	{
+		System.out.println("-----------Traversing " + name);
+		// iterating over distance for each feature
+		for (Map.Entry<String, Pair<String, Double>> distEntry : map.entrySet())
+		{
+			System.out.print("Cand =" + distEntry.getKey());
+			System.out.print("val =" + distEntry.getValue().getSecond());
+		}
+		System.out.println("\n-----------");
+	}
 
 }

@@ -2339,6 +2339,90 @@ public class TimelineUtils
 	}
 
 	/**
+	 * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current
+	 * Activity). Also, this candidate timeline must contain the activityAtRecomm point at non-last position and there
+	 * is atleast one valid activity after this activityAtRecomm point
+	 * 
+	 * <p>
+	 * converted to a static method on Dec 5 2016
+	 * <p>
+	 * 
+	 * @param dayTimelinesForUser
+	 * @param activitiesGuidingRecomm
+	 * @param dateAtRecomm
+	 * @param activityAtRecommPoint
+	 * @return
+	 */
+	public static LinkedHashMap<Date, Timeline> extractDaywiseCandidateTimelines2(
+			LinkedHashMap<Date, Timeline> dayTimelinesForUser, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
+	{
+		LinkedHashMap<Date, Timeline> candidateTimelines = new LinkedHashMap<>();
+		int count = 0;
+		int totalNumberOfProbableCands = 0;
+		int numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
+		int numCandsRejectedDueToNoNextActivity = 0;
+
+		for (Map.Entry<Date, Timeline> dayTimelineEntry : dayTimelinesForUser.entrySet())
+		{
+			totalNumberOfProbableCands += 1;
+			Date dayOfTimeline = dayTimelineEntry.getKey();
+			Timeline dayTimeline = dayTimelineEntry.getValue();//
+
+			if (!dayTimeline.isShouldBelongToSingleDay())
+			{
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+						"Error in extractDaywiseCandidateTimelines: dayTimeline.isShouldBelongToSingleDay()="
+								+ dayTimeline.isShouldBelongToSingleDay()));
+			}
+
+			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for
+			// the day to be recommended (this should nt be the case because test and training set are diffferent)
+			// and there is atleast one valid activity after this activityAtRecomm point
+			if (dayTimeline.countContainsActivityNameButNotAsLast(activityAtRecommPoint.getActivityName()) > 0)
+			// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
+			{
+				if (dayOfTimeline.toString().equals(dateAtRecomm.toString()) == true)
+				{
+					System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly"));
+					continue;
+				}
+
+				if (dayTimeline.getActivityObjectsInTimeline().size() > 1 && dayTimeline
+						.hasAValidActAfterFirstOccurOfThisActName(activityAtRecommPoint.getActivityName()))
+				// if (dayTimeline.containsOnlySingleActivity() == false && dayTimeline
+				// .hasAValidActivityAfterFirstOccurrenceOfThisActivity(activityAtRecommPoint) == true)
+				{
+					candidateTimelines.put(dayOfTimeline, dayTimeline);
+					count++;
+				}
+				else
+				{
+					numCandsRejectedDueToNoNextActivity += 1;
+				}
+			}
+			else
+			{
+				numCandsRejectedDueToNoCurrentActivityAtNonLast += 1;
+			}
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Inside extractDaywiseCandidateTimelines: #cand timelines = " + count
+					+ " numCandsRejectedDueToNoNextActivity =" + numCandsRejectedDueToNoNextActivity
+					+ "  numCandsRejectedDueToNoCurrentActivityAtNonLast"
+					+ numCandsRejectedDueToNoCurrentActivityAtNonLast);
+		}
+		if (count == 0)
+		{
+			System.err.println("Warning: No candidate timelines found");
+		}
+		return candidateTimelines;
+	}
+
+	/**
 	 * Cleaned , expunge all invalid activity objects and rearrange according to user id order in Constant.userID for
 	 * the current dataset </br>
 	 * <font color="red">NOT NEED ANYMORE AS IT HAS BEEN BROKEN DOWN INTO SMALLER SINGLE PURPOSE FUNCTIONS</font>
@@ -2796,6 +2880,54 @@ public class TimelineUtils
 			}
 		}
 		return concatenatedTimeline;
+	}
+
+	public static void traverseMapOfTimelines(LinkedHashMap<String, Timeline> map)
+	{
+		System.out.println("traversing map of day timelines");
+	
+		for (Map.Entry<String, Timeline> entry : map.entrySet())
+		{
+			System.out.print("ID: " + entry.getKey());
+			entry.getValue().printActivityObjectNamesInSequence();
+			System.out.println();
+		}
+		System.out.println("-----------");
+	}
+
+	public static void traverseMapOfTimelinesWithNext(LinkedHashMap<Integer, TimelineWithNext> map)
+	{
+		System.out.println("traversing map of timelines");
+	
+		for (Map.Entry<Integer, TimelineWithNext> entry : map.entrySet())
+		{
+			System.out.print("ID: " + entry.getKey());
+			entry.getValue().printActivityObjectNamesInSequence();
+			System.out.println("\t ** Next Activity Object (name=): "
+					+ entry.getValue().getNextActivityObject().getActivityName());
+		}
+		System.out.println("-----------");
+	}
+
+	/**
+	 * Useful for mu breaking of timelines to find if a particular rt will have recommendation for daywise approach so
+	 * that they can be compared
+	 * 
+	 * @param trainingTimelines
+	 * @param activitiesGuidingRecomm
+	 * @param dateAtRecomm
+	 * @param activityAtRecommPoint
+	 * @return
+	 */
+	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm, ActivityObject activityAtRecommPoint)
+	{
+		LinkedHashMap<Date, Timeline> candidateTimelines = extractDaywiseCandidateTimelines(
+				trainingTimelines, activitiesGuidingRecomm, dateAtRecomm, activityAtRecommPoint);
+		if (candidateTimelines.size() > 0)
+			return true;
+		else
+			return false;
 	}
 
 }

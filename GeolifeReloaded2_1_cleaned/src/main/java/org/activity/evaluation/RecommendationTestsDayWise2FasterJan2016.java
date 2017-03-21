@@ -552,7 +552,7 @@ public class RecommendationTestsDayWise2FasterJan2016
 																													// for
 																													// recommendation
 								String topNextActivityForRecommAtStartWithoutDistance = recommP1
-										.getTopRecommendedActivityNamesWithoutDistanceString();
+										.getTopNextActivityNamesWithoutDistanceString();
 								String topNextActivityForRecommAtStartWithDistance = recommP1
 										.getNextActivityNamesByEditDist();// getTopNextActivityNamesWithDistanceString();
 
