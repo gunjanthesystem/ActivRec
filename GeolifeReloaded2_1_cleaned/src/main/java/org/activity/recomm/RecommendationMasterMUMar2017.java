@@ -29,6 +29,7 @@ import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
@@ -52,8 +53,6 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
  */
 public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IRecommenderMaster
 {
-	// LinkedHashMap<String,LinkedHashMap<Date,UserDayTimeline>> userTimelines; // LinkedHashMap<Date,UserDayTimeline>
-	// dayTimelinesForUser;
 	private double matchingUnitInCountsOrHours;
 
 	private Timeline trainingTimeline;
@@ -61,8 +60,6 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	private LinkedHashMap<String, TimelineWithNext> candidateTimelines;
 	// here key is the TimelineID, which is already a class variable of Value,
 	// So we could have used ArrayList but we used LinkedHashMap purely for search performance reasons
-
-	private TimelineWithNext currentTimeline; // =current timelines
 
 	private Date dateAtRecomm;
 	private Time timeAtRecomm;
@@ -72,21 +69,22 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	/**
 	 * Current Timeline sequence of activity objects happening from the recomm point back until the matching unit
 	 */
+	private TimelineWithNext currentTimeline; // =current timelines
 	private ArrayList<ActivityObject> activitiesGuidingRecomm; // Current Timeline ,
 	private ActivityObject activityAtRecommPoint; // current Activity Object
 	private String activityNameAtRecommPoint;// current Activity Name
 
 	/**
-	 * List of of top next activity objects with their edit distances and the timeline id of the candidate producing
-	 * them. Triple <Next Activity Object,edit distance, TimelineID>
-	 */
-	private ArrayList<Triple<ActivityObject, Double, String>> topNextActivityObjects;
-
-	/**
-	 * (Cand TimelineID, Pair<Trace,Edit distance>) this LinkedHashMap is sorted by the value of edit distance in
+	 * {Cand TimelineID, Pair{Trace,Edit distance}} this LinkedHashMap is sorted by the value of edit distance in
 	 * ascending order
 	 */
 	private LinkedHashMap<String, Pair<String, Double>> editDistancesSortedMapFullCand; // for full candidate scenario
+
+	/**
+	 * List of of top next activity objects with their edit distances and the timeline id of the candidate producing
+	 * them. Triple <Next Activity Object,edit distance, TimelineID>
+	 */
+	private ArrayList<Triple<ActivityObject, Double, String>> nextActivityObjectsFromCands;// topNextActivityObjects
 
 	/**
 	 * This is only relevant when case type is 'CaseBasedV1' (Cand TimeineId, Edit distance of the end point activity
@@ -100,7 +98,6 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	 * Recommended Activity names with their rank score
 	 */
 	private LinkedHashMap<String, Double> recommendedActivityNamesWithRankscores;
-
 	private String rankedRecommendedActivityNameWithRankScores;
 	private String rankedRecommendedActivityNameWithoutRankScores;
 
@@ -142,11 +139,10 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	 * 
 	 * @return
 	 */
-	public int initialiseDistancesUsed()
+	public final int initialiseDistancesUsed(String dname)
 	{
 		alignmentBasedDistance = new AlignmentBasedDistance(); // used for case based similarity
-		String dname = Constant.getDistanceUsed(); // used for distance of candidate timelines from the current timeline
-
+		//
 		switch (dname)
 		{
 		case "HJEditDistance":
@@ -205,36 +201,28 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 		long recommMasterT0 = System.currentTimeMillis();
 
-		initialiseDistancesUsed();
+		initialiseDistancesUsed(Constant.getDistanceUsed());
 
 		this.lookPastType = lookPastType;
 		this.caseType = caseType;
 		this.matchingUnitInCountsOrHours = matchingUnitInCountsOrHours;
 
 		errorExists = false;
-		LinkedHashMap<String, Pair<String, Double>> editDistancesMapUnsortedFullCand = null;
 
 		this.hasCandidateTimelines = true;
 		this.nextActivityJustAfterRecommPointIsInvalid = false;
 
-		// dd/mm/yyyy
-		String[] splittedDate = RegexUtils.patternForwardSlash.split(dateAtRecomm);// dateAtRecomm.split("/");
-		this.dateAtRecomm = new Date(Integer.parseInt(splittedDate[2]) - 1900, Integer.parseInt(splittedDate[1]) - 1,
-				Integer.parseInt(splittedDate[0])); // okay java.sql.Date with no hidden time
-		String[] splittedTime = timeAtRecomm.split(":"); // hh:mm:ss
+		// dd/mm/yyyy // okay java.sql.Date with no hidden time
+		this.dateAtRecomm = DateTimeUtils.getDateFromDDMMYYYY(dateAtRecomm, RegexUtils.patternForwardSlash);
 		this.timeAtRecomm = Time.valueOf(timeAtRecomm);
 		this.userAtRecomm = Integer.toString(userAtRecomm);
 		this.userIDAtRecomm = Integer.toString(userAtRecomm);
-
-		// $$LOGGINGSystem.out.println(" User at Recomm = " + this.userAtRecomm); //// LOGGING
-		// $$LOGGINGSystem.out.println(" Date at Recomm = " + this.dateAtRecomm);
-		// $$LOGGINGSystem.out.println(" Time at Recomm = " + this.timeAtRecomm);
+		System.out.println("	User at Recomm = " + this.userAtRecomm + "\n	Date at Recomm = " + this.dateAtRecomm
+				+ "\n	Time at Recomm = " + this.timeAtRecomm);
 
 		// converting day timelines into continuous timelines suitable to be used for matching unit views
 		this.trainingTimeline = TimelineUtils.dayTimelinesToATimeline(trainingTimelines, false, true);
-		// new Timeline(trainingTimelines);
 		this.testTimeline = TimelineUtils.dayTimelinesToATimeline(testTimelines, false, true);
-		// new Timeline(testTimelines);
 
 		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 		{
@@ -242,7 +230,6 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 			{
 				this.trainingTimeline = TimelineUtils.expungeInvalids(trainingTimeline);
 				this.testTimeline = TimelineUtils.expungeInvalids(testTimeline);
-
 				System.out.println(
 						"Expunging invalids before recommendation process: expunging from test and training timelines");
 			}
@@ -250,7 +237,6 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 			{
 				System.out.println(
 						"Data is assumed to have no invalid act names to be expunged from test and training timelines");
-
 			}
 		}
 
@@ -260,7 +246,6 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 			this.currentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(testTimeline,
 					this.dateAtRecomm, this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours);
 		}
-
 		else if (lookPastType.equals(Enums.LookPastType.NHours))// .equalsIgnoreCase("Hrs"))
 		{
 			this.currentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUHours(testTimeline,
@@ -281,20 +266,16 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 
 		this.activitiesGuidingRecomm = currentTimeline.getActivityObjectsInTimeline(); // CURRENT TIMELINE
 		// $$LOGGINGSystem.out.println("Current timeline: " +
-		// currentTimeline.getActivityObjectNamesWithTimestampsInSequence() + "="
-		// $$LOGGING+ this.activitiesGuidingRecomm.size());
+		// currentTimeline.getActivityObjectNamesWithTimestampsInSequence() + "=" this.activitiesGuidingRecomm.size());
 		// $$LOGGINGSystem.out.print("Activities in the current timeline (as activities guiding recomm) are: \t");
 		// $$LOGGINGfor (int i = 0; i < activitiesGuidingRecomm.size(); i++)
-		// $$LOGGING{
-		// $$LOGGING System.out.print(activitiesGuidingRecomm.get(i).getActivityName() + " ");
-		// $$LOGGING}
-
+		// $$LOGGING{System.out.print(activitiesGuidingRecomm.get(i).getActivityName() + " ");}
 		// $$LOGGINGSystem.out.println("\nDebug note192: getActivityNamesGuidingRecommwithTimestamps() " +
-		// getActivityNamesGuidingRecommwithTimestamps()
-		// $$LOGGING + "\n size of current timeline=" + currentTimeline.getActivityObjectsInTimeline().size());
+		// getActivityNamesGuidingRecommwithTimestamps() + "\n size of current timeline=" +
+		// currentTimeline.getActivityObjectsInTimeline().size());
 
-		this.activityAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1); // current
-																										// ActivityObject
+		// current ActivityObject
+		this.activityAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 		this.activityNameAtRecommPoint = this.activityAtRecommPoint.getActivityName();
 
 		// $$LOGGINGSystem.out.println("\nActivity at Recomm point (Current Activity) =" + activityNameAtRecommPoint);//
@@ -319,7 +300,7 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 			// this.singleNextRecommendedActivity = null;
 			this.hasCandidateTimelines = false;
 			// this.topNextActivities =null;
-			this.topNextActivityObjects = null;
+			this.nextActivityObjectsFromCands = null;
 			this.thresholdPruningNoEffect = true;
 			return;
 		}
@@ -336,9 +317,9 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		// after thresholding (correct), here
 		// normalisation is before thresholding which should be changed
 		long recommMasterT3 = System.currentTimeMillis();
-		editDistancesMapUnsortedFullCand = getNormalisedDistancesForCandidateTimelinesFullCand(candidateTimelines,
-				activitiesGuidingRecomm, caseType, this.userIDAtRecomm, this.dateAtRecomm.toString(),
-				this.timeAtRecomm.toString(), Constant.getDistanceUsed());
+		LinkedHashMap<String, Pair<String, Double>> editDistancesMapUnsortedFullCand = getNormalisedDistancesForCandidateTimelinesFullCand(
+				candidateTimelines, activitiesGuidingRecomm, caseType, this.userIDAtRecomm,
+				this.dateAtRecomm.toString(), this.timeAtRecomm.toString(), Constant.getDistanceUsed());
 		long recommMasterT4 = System.currentTimeMillis();
 		long timeTakenToComputeNormEditDistances = recommMasterT4 - recommMasterT3;
 		/*
@@ -440,7 +421,8 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 					this.timeAtRecomm.toString());// getDistanceScoresforCandidateTimelines(candidateTimelines,activitiesGuidingRecomm);
 		}
 
-		this.topNextActivityObjects = fetchNextActivityObjects(editDistancesSortedMapFullCand, candidateTimelines);
+		this.nextActivityObjectsFromCands = fetchNextActivityObjects(editDistancesSortedMapFullCand,
+				candidateTimelines);
 
 		System.out.println("---------editDistancesSortedMapFullCand.size()=" + editDistancesSortedMapFullCand.size());
 
@@ -457,7 +439,7 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		// " size of current timeline="
 		// + currentTimeline.getActivityObjectsInTimeline().size());
 		// ########Sanity check
-		if (this.topNextActivityObjects.size() == editDistancesSortedMapFullCand.size()
+		if (this.nextActivityObjectsFromCands.size() == editDistancesSortedMapFullCand.size()
 				&& editDistancesSortedMapFullCand.size() == this.candidateTimelines.size())
 		{
 			// System.out.println("Sanity Check 349 Passed");
@@ -478,14 +460,14 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 			// this.similarityOfEndPointActivityObjectCand);
 
 			// rankScore= (1d-(editDistanceValExceptEnd/maxEditDistanceValExceptEnd))* simEndPointActivityObject;
-			createRankedTopRecommendedActivityNamesCaseBasedV1_3(this.topNextActivityObjects,
+			createRankedTopRecommendedActivityNamesCaseBasedV1_3(this.nextActivityObjectsFromCands,
 					this.similarityOfEndPointActivityObjectCand);
 		}
 
 		else
 		{
 			// createRankedTopRecommendedActivityNames
-			createRankedTopRecommendedActivityNamesSimpleV3_3(this.topNextActivityObjects);
+			createRankedTopRecommendedActivityNamesSimpleV3_3(this.nextActivityObjectsFromCands);
 		}
 
 		// System.out.println("Next recommended 5 activity is: "+this.topNextRecommendedActivities);
@@ -532,8 +514,6 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		// + timeTakenToFetchCandidateTimelines + "," + timeTakenToComputeNormEditDistances + "\n";
 		// WritingToFile.appendLineToFileAbsolute(performanceString, performanceFileName);
 		// end of curtain for performance string writing
-
-		// System.out.pri
 		//////////////
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
@@ -1324,9 +1304,9 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	public String getTopNextActivityNamesWithoutDistanceString()
 	{
 		StringBuilder result = new StringBuilder("");// String result="";
-		for (int i = 0; i < this.topNextActivityObjects.size(); i++)
+		for (int i = 0; i < this.nextActivityObjectsFromCands.size(); i++)
 		{
-			Triple<ActivityObject, Double, String> pairAE = this.topNextActivityObjects.get(i);
+			Triple<ActivityObject, Double, String> pairAE = this.nextActivityObjectsFromCands.get(i);
 			result.append("__" + pairAE.getFirst().getActivityName());// result=result+"__"+pairAE.getFirst().getActivityName();
 		}
 		return result.toString();
@@ -1341,9 +1321,9 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	{
 		StringBuilder result = new StringBuilder(""); // String result="";
 
-		for (int i = 0; i < this.topNextActivityObjects.size(); i++)
+		for (int i = 0; i < this.nextActivityObjectsFromCands.size(); i++)
 		{
-			Triple<ActivityObject, Double, String> pairAE = this.topNextActivityObjects.get(i);
+			Triple<ActivityObject, Double, String> pairAE = this.nextActivityObjectsFromCands.get(i);
 
 			result.append("__" + pairAE.getFirst().getActivityName() + ":" + pairAE.getSecond().toString());
 			// result=result+"__"+pairAE.getFirst().getActivityName()+":"+pairAE.getSecond().toString();
@@ -1411,7 +1391,7 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	 */
 	public ArrayList<Triple<ActivityObject, Double, String>> getTopNextActivityObjects()
 	{
-		return this.topNextActivityObjects;
+		return this.nextActivityObjectsFromCands;
 	}
 
 	// ////////
@@ -2605,12 +2585,12 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	public int traverseTopNextActivities()
 	{
 		System.out.println();
-		if (this.topNextActivityObjects.size() > 0)
+		if (this.nextActivityObjectsFromCands.size() > 0)
 		{
-			for (int i = 0; i < this.topNextActivityObjects.size(); i++)
+			for (int i = 0; i < this.nextActivityObjectsFromCands.size(); i++)
 			{
-				ActivityObject ae = this.topNextActivityObjects.get(i).getFirst();
-				Double dist = this.topNextActivityObjects.get(i).getSecond();
+				ActivityObject ae = this.nextActivityObjectsFromCands.get(i).getFirst();
+				Double dist = this.nextActivityObjectsFromCands.get(i).getSecond();
 				System.out.print(" >>" + ae.getActivityName() + ":" + dist);
 			}
 		}

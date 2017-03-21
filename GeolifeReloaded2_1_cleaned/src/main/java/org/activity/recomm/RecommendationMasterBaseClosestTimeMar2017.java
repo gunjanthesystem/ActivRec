@@ -19,6 +19,8 @@ import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.DateTimeUtils;
+import org.activity.util.RegexUtils;
 import org.activity.util.TimelineUtils;
 
 /**
@@ -104,22 +106,19 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm)
 	// ,double // trainingPercentage)
 	{
+		System.out.println("\n^^^^^^^^^^^^^^^^Inside  RecommendationMasterBaseClosestTime");
 		commonPath = Constant.getCommonPath();
 		hasCandidateTimelines = true;
 		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceUnsortedMap = new LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>(); //
 
-		String[] splittedDate = dateAtRecomm.split("/"); // dd/mm/yyyy
-		this.dateAtRecomm = new Date(Integer.parseInt(splittedDate[2]) - 1900, Integer.parseInt(splittedDate[1]) - 1,
-				Integer.parseInt(splittedDate[0]));
-		String[] splittedTime = timeAtRecomm.split(":"); // hh:mm:ss
+		// dd/mm/yyyy // okay java.sql.Date with no hidden time
+		this.dateAtRecomm = DateTimeUtils.getDateFromDDMMYYYY(dateAtRecomm, RegexUtils.patternForwardSlash);
 		this.timeAtRecomm = Time.valueOf(timeAtRecomm);
 		this.userAtRecomm = Integer.toString(userAtRecomm);
 		this.userIDAtRecomm = Integer.toString(userAtRecomm);
 
-		System.out.println("\n^^^^^^^^^^^^^^^^Inside  RecommendationMasterBaseClosestTime");
-		System.out.println("	User at Recomm = " + this.userAtRecomm);
-		System.out.println("	Date at Recomm = " + this.dateAtRecomm);
-		System.out.println("	Time at Recomm = " + this.timeAtRecomm);
+		System.out.println("	User at Recomm = " + this.userAtRecomm + "\n	Date at Recomm = " + this.dateAtRecomm
+				+ "\n	Time at Recomm = " + this.timeAtRecomm);
 
 		userDayTimelineAtRecomm = TimelineUtils.getUserDayTimelineByDateFromMap(testTimelines, this.dateAtRecomm);
 
