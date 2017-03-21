@@ -1,4 +1,4 @@
-package org.activity.util;
+package org.activity.generator;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;

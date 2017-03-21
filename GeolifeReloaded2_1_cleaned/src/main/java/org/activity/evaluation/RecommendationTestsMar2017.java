@@ -22,7 +22,6 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
-import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterBaseClosestTimeMar2017;
 import org.activity.recomm.RecommendationMasterDayWise2FasterMar2017;
 import org.activity.recomm.RecommendationMasterI;
@@ -40,9 +39,10 @@ import org.activity.util.TimelineUtils;
  * Executes the experiments for generating recommendations
  * 
  * @author gunjan
+ * @param <K>
  *
  */
-public class RecommendationTestsMar2017
+public class RecommendationTestsMar2017<K>
 {
 	// String typeOfMatching; //"Daywise","
 	double percentageInTraining;// = 0.8;
@@ -82,9 +82,10 @@ public class RecommendationTestsMar2017
 
 	/**
 	 * 
+	 * @param <V>
 	 * @param usersTimelines
 	 */
-	public RecommendationTestsMar2017(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines,
+	public <V> RecommendationTestsMar2017(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines,
 			Enums.LookPastType lookPastType)
 	{
 		System.out.println("\n\n **********Entering RecommendationTestsMar2017**********");
@@ -468,24 +469,27 @@ public class RecommendationTestsMar2017
 
 									}
 									// LAST PARAM TRUE IS DUMMY FOR CALLING PERFORMANCE CONSTRUCTOR,
-									LinkedHashMap<String, TimelineWithNext> candidateTimelines = recommP1
-											.getCandidateTimeslines();
+									// <String, TimelineWithNext>
+									// Disabled on 21 March 2017
+									// LinkedHashMap<String, Timeline> candidateTimelines = recommP1
+									// .getCandidateTimeslines();
 									// LinkedHashMap<Integer, TimelineWithNext> candidateTimelines = recommP1
 									// .getCandidateTimeslines();
 
-									System.out.println(
-											"Back to RecommendationTests: received " + candidateTimelines.size()
-													+ " candidate timelines for matching unit " + matchingUnit);
+									System.out.println("Back to RecommendationTests: received "
+											+ recommP1.getNumOfCandidateTimelines()// candidateTimelines.size()
+											+ " candidate timelines for matching unit " + matchingUnit);
 									System.out.println("\tIterating over candidate timelines:");
 
 									if (VerbosityConstants.WriteNumActsPerRTPerCand)
 									{
 										StringBuilder tmpWriter = new StringBuilder();
-										for (Map.Entry<String, TimelineWithNext> entryAjooba : candidateTimelines
-												.entrySet())
+
+										// <String, TimelineWithNext>
+										for (Timeline candtt1 : recommP1.getOnlyCandidateTimeslines())// candidateTimelines.entrySet())
 										{
-											Timeline candtt1 = entryAjooba.getValue(); // ArrayList<ActivityObject>
-																						// aa1=candtt1.getActivityObjectsInTimeline();
+											// Timeline candtt1 = entryAjooba.getValue(); // ArrayList<ActivityObject>
+											// aa1=candtt1.getActivityObjectsInTimeline();
 											int sizez1 = candtt1.countNumberOfValidActivities() - 1;
 											// excluding the current activity at the end of the candidate timeline
 											// System.out.println("Number of activity Objects in this timeline (except
@@ -563,11 +567,13 @@ public class RecommendationTestsMar2017
 											+ recommP1.getNumberOfCandidateTimelinesBelowThreshold());
 									bwNumOfCandTimelinesBelowThreshold.newLine();
 
-									if (recommP1.getTopNextActivityObjects() == null)
-									{
-										System.err.println(
-												"Error in Sanity Check RT500:recommP1.getTopNextActivityObjects()==null, but there are candidate timelines ");
-									}
+									// TODO: enable again later
+									// Diabled on 21 March 2017 if (recommP1.getTopNextActivityObjects() == null)
+									// {
+									// System.err.println(
+									// "Error in Sanity Check RT500:recommP1.getTopNextActivityObjects()==null, but
+									// there are candidate timelines ");
+									// }
 
 									if (recommP1.isNextActivityJustAfterRecommPointIsInvalid())
 									{
@@ -655,63 +661,22 @@ public class RecommendationTestsMar2017
 											+ "," + recommP1.getNumberOfCandidateTimelinesBelowThreshold() + ","
 											+ weekDay + ","// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
 											+ actActualDone + "," + rankedRecommAtStartWithScore + ","
-											+ recommP1.getNumberOfDistinctRecommendations() + ","
-											+ recommP1.getRestAndEndSimilaritiesCorrelation() + ","
-											+ recommP1.getAvgRestSimilarity() + "," + recommP1.getSDRestSimilarity()
-											+ "," + recommP1.getAvgEndSimilarity() + ","
-											+ recommP1.getSDEndSimilarity());// +","+recommP1.getActivitiesGuidingRecomm());
+											+ recommP1.getNumberOfDistinctRecommendations());
+									// curtain on 21 Mar 2017 start
+									// + ","
+									// + recommP1.getRestAndEndSimilaritiesCorrelation() + ","
+									// + recommP1.getAvgRestSimilarity() + "," + recommP1.getSDRestSimilarity()
+									// + "," + recommP1.getAvgEndSimilarity() + ","
+									// + recommP1.getSDEndSimilarity());// +","+recommP1.getActivitiesGuidingRecomm());
+									// curtain on 21 Mar 2017 end
 									bwRaw.newLine();
 
 									ActivityObject activityAtRecommPoint = recommP1.getActivityObjectAtRecomm();
 
-									LinkedHashMap<String, Pair<String, Double>> editDistancesSortedMapFullCand = recommP1
-											.getEditDistancesSortedMapFullCand();
-
 									if (VerbosityConstants.WriteRecommendationTimesWithEditDistance)
 									{
-										StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
-
-										for (Map.Entry<String, Pair<String, Double>> entryDistance : editDistancesSortedMapFullCand
-												.entrySet())
-										{
-											String candidateTimelineID = entryDistance.getKey();
-
-											TimelineWithNext candidateTimeline = recommP1.getCandidateTimeslines()
-													.get(candidateTimelineID);
-
-											int endPointIndexThisCandidate = candidateTimeline
-													.getActivityObjectsInTimeline().size() - 1;
-											ActivityObject endPointActivityInCandidate = candidateTimeline
-													.getActivityObjectsInTimeline().get(endPointIndexThisCandidate);
-
-											// difference in start time of end point activity of candidate and start
-											// time of current activity
-											long diffStartTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint
-													.getStartTimestamp().getTime()
-													- endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
-											// difference in end time of end point activity of candidate and end time of
-											// current activity
-											long diffEndTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint
-													.getEndTimestamp().getTime()
-													- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
-
-											// ("DateOfRecomm"+",TimeOfRecomm,"+"TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,CandidateTimeline,WeekDayOfRecomm");
-											// bwRecommTimesWithEditDistances.write
-											rtsWithEditDistancesMsg.append(dateToRecomm + "," + endTimeStamp.getHours()
-													+ ":" + endTimeStamp.getMinutes() + ":" + endTimeStamp.getSeconds()
-													+ "," + candidateTimelineID + "," + actActualDone + ","
-													+ entryDistance.getValue().getSecond() + ","
-													// +dateOfCand+","
-													+ diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
-													+ diffEndTimeForEndPointsCand_n_GuidingInSecs + ","
-													+ endPointIndexThisCandidate + ","
-													+ candidateTimeline.getActivityObjectNamesInSequence() + ","
-													+ weekDay + "\n");
-											// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
-											// +"," +UtilityBelt.getWeekDayFromWeekDayInt(entryScore.getKey().getDay())
-											// bwRecommTimesWithEditDistances.newLine();
-										}
-										bwRecommTimesWithEditDistances.write(rtsWithEditDistancesMsg + "\n");
+										bwRecommTimesWithEditDistances.write(getRTsWithDistancesToWrite(dateToRecomm,
+												weekDay, endTimeStamp, recommP1, actActualDone, activityAtRecommPoint));
 									}
 									System.out.println("// end of for loop over all activity objects in test date");
 								} // end of for loop over all activity objects in test date
@@ -807,6 +772,59 @@ public class RecommendationTestsMar2017
 		}
 		// PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
 		System.out.println("**********Exiting Recommendation Tests**********");
+	}
+
+	/**
+	 * 
+	 * @param dateToRecomm
+	 * @param weekDay
+	 * @param endTimeStamp
+	 * @param recommP1
+	 * @param actActualDone
+	 * @param activityAtRecommPoint
+	 * @return
+	 */
+	private String getRTsWithDistancesToWrite(String dateToRecomm, String weekDay, Timestamp endTimeStamp,
+			RecommendationMasterI recommP1, String actActualDone, ActivityObject activityAtRecommPoint)
+	{
+		StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
+
+		for (Map.Entry<String, Pair<String, Double>> entryDistance : recommP1.getEditDistancesSortedMapFullCand()
+				.entrySet())
+		{
+			String candidateTimelineID = entryDistance.getKey();
+
+			Timeline candidateTimeline = recommP1.getCandidateTimesline(candidateTimelineID);
+			// recommP1.getCandidateTimeslines() .get(candidateTimelineID);
+
+			int endPointIndexThisCandidate = candidateTimeline.getActivityObjectsInTimeline().size() - 1;
+			ActivityObject endPointActivityInCandidate = candidateTimeline.getActivityObjectsInTimeline()
+					.get(endPointIndexThisCandidate);
+
+			// difference in start time of end point activity of candidate and start
+			// time of current activity
+			long diffStartTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint.getStartTimestamp().getTime()
+					- endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
+			// difference in end time of end point activity of candidate and end time of
+			// current activity
+			long diffEndTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint.getEndTimestamp().getTime()
+					- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
+
+			// ("DateOfRecomm"+",TimeOfRecomm,"+"TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,CandidateTimeline,WeekDayOfRecomm");
+			// bwRecommTimesWithEditDistances.write
+			rtsWithEditDistancesMsg.append(dateToRecomm + "," + endTimeStamp.getHours() + ":"
+					+ endTimeStamp.getMinutes() + ":" + endTimeStamp.getSeconds() + "," + candidateTimelineID + ","
+					+ actActualDone + "," + entryDistance.getValue().getSecond() + ","
+					// +dateOfCand+","
+					+ diffStartTimeForEndPointsCand_n_GuidingInSecs + "," + diffEndTimeForEndPointsCand_n_GuidingInSecs
+					+ "," + endPointIndexThisCandidate + "," + candidateTimeline.getActivityObjectNamesInSequence()
+					+ "," + weekDay + "\n");
+			// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
+			// +"," +UtilityBelt.getWeekDayFromWeekDayInt(entryScore.getKey().getDay())
+			// bwRecommTimesWithEditDistances.newLine();
+		}
+
+		return rtsWithEditDistancesMsg.toString();// +"\n"
 	}
 
 	public String getActivityNameCountPairsOverAllTrainingDaysWithCount(

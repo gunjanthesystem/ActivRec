@@ -21,12 +21,8 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 	public CombinedLevelsEditDistance()
 	{
 		super();
-		System.out.println("Error: Using CombinedLevelEditDistance, we are not supposed to use this");// this error
-																										// message is
-																										// dependent on
-																										// our current
-																										// experimental
-																										// setup
+		System.out.println("Error: Using CombinedLevelEditDistance, we are not supposed to use this");
+		// this error message is dependent on our current experimental setup
 	}
 
 	// //////////////

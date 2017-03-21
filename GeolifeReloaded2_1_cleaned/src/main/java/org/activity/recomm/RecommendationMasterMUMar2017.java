@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
@@ -28,7 +30,6 @@ import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.RegexUtils;
-import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
@@ -1413,29 +1414,6 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		return this.topNextActivityObjects;
 	}
 
-	public static String getNextValidActivityNameAsCode(String topSimilarUserDayActivitiesAsStringCode,
-			int endPointIndexForSubsequenceWithHighestSimilarity)
-	{
-		String unknownAsCode = StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY1);// ("Unknown");
-		String othersAsCode = StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY2);// ("Others");
-		String nextValidActivity = null;
-
-		for (int i = endPointIndexForSubsequenceWithHighestSimilarity + 1; i < topSimilarUserDayActivitiesAsStringCode
-				.length(); i++)
-		{
-			if (String.valueOf(topSimilarUserDayActivitiesAsStringCode.charAt(i)).equals(unknownAsCode)
-					|| String.valueOf(topSimilarUserDayActivitiesAsStringCode.charAt(i)).equals(othersAsCode))
-			{
-				continue;
-			}
-			else
-			{
-				nextValidActivity = String.valueOf(topSimilarUserDayActivitiesAsStringCode.charAt(i));
-			}
-		}
-		return nextValidActivity;
-	}
-
 	// ////////
 	/*
 	 * Added: Oct 5, 2014: for IMPORTANT POINT: THE CANDIDATE TIMELINE IS THE DIRECT CANDIDATE TIMELINE AND NOT THE
@@ -1894,8 +1872,10 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 
 		if (VerbosityConstants.verboseNormalisation)
 		{
-			traverseLLP(normalisedCandEditDistances, " Normalised Feature wise Edit Distances");
-			traverseLP(aggregatedNormalisedCandEditDistances, "Aggregated Normalised  Feature wise Edit Distances");
+			UtilityBelt.traverseStringStringPair(normalisedCandEditDistances,
+					" Normalised Feature wise Edit Distances");
+			UtilityBelt.traverseStringPair(aggregatedNormalisedCandEditDistances,
+					"Aggregated Normalised  Feature wise Edit Distances");
 		}
 		return aggregatedNormalisedCandEditDistances;
 	}
@@ -1949,49 +1929,11 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 
 		if (VerbosityConstants.verboseNormalisation)
 		{
-			traverseLLP(normalisedCandEditDistances, " Normalised Weighted Edit Distances");
-			traverseLP(aggregatedNormalisedCandEditDistances, "Aggregated Normalised Weighted Edit Distances");
+			UtilityBelt.traverseStringStringPair(normalisedCandEditDistances, " Normalised Weighted Edit Distances");
+			UtilityBelt.traverseStringPair(aggregatedNormalisedCandEditDistances,
+					"Aggregated Normalised Weighted Edit Distances");
 		}
 		return aggregatedNormalisedCandEditDistances;
-	}
-
-	public void traverseLLP(LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> map, String name)
-	{
-		System.out.println("-----------Traversing " + name);
-
-		for (Map.Entry<String, LinkedHashMap<String, Pair<String, Double>>> entry : map.entrySet()) // iterating over
-																									// cands
-		{
-			System.out.print("Cand=" + entry.getKey());
-			LinkedHashMap<String, Pair<String, Double>> featureWiseDistances = entry.getValue();
-
-			for (Map.Entry<String, Pair<String, Double>> distEntry : featureWiseDistances.entrySet()) // iterating over
-																										// distance for
-																										// each feature
-			{
-				System.out.print("Feature names=" + distEntry.getKey());
-				System.out.print("val =" + distEntry.getValue().getSecond());
-			}
-			System.out.println();
-		}
-		System.out.println("-----------");
-
-	}
-
-	public void traverseLP(LinkedHashMap<String, Pair<String, Double>> map, String name)
-	{
-		System.out.println("-----------Traversing " + name);
-
-		for (Map.Entry<String, Pair<String, Double>> distEntry : map.entrySet()) // iterating over distance for each
-																					// feature
-		{
-			System.out.print("Cand =" + distEntry.getKey());
-			System.out.print("val =" + distEntry.getValue().getSecond());
-		}
-		System.out.println();
-
-		System.out.println("-----------");
-
 	}
 
 	/**
@@ -2018,8 +1960,7 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 
 		for (Map.Entry<String, LinkedHashMap<String, Pair<String, Double>>> entry : setOfFeatureWiseDistances
 				.entrySet()) // iterating over cands
-		{
-			String candID = entry.getKey();
+		{// String candID = entry.getKey();
 			LinkedHashMap<String, Pair<String, Double>> featureWiseDistances = entry.getValue();
 
 			int featureIndex = 0;
@@ -2580,33 +2521,24 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		return this.candidateTimelines;
 	}
 
-	public void traverseMapOfTimelines(LinkedHashMap<String, Timeline> map)
+	public Timeline getCandidateTimesline(String timelineID)
 	{
-		System.out.println("traversing map of day timelines");
-
-		for (Map.Entry<String, Timeline> entry : map.entrySet())
-		{
-			System.out.print("ID: " + entry.getKey());
-			entry.getValue().printActivityObjectNamesInSequence();
-			System.out.println();
-		}
-		System.out.println("-----------");
+		return this.candidateTimelines.get(timelineID);
 	}
 
-	public void traverseMapOfTimelinesWithNext(LinkedHashMap<Integer, TimelineWithNext> map)
+	public ArrayList<Timeline> getOnlyCandidateTimeslines()
 	{
-		System.out.println("traversing map of timelines");
-
-		for (Map.Entry<Integer, TimelineWithNext> entry : map.entrySet())
-		{
-			System.out.print("ID: " + entry.getKey());
-			entry.getValue().printActivityObjectNamesInSequence();
-			System.out.println("\t ** Next Activity Object (name=): "
-					+ entry.getValue().getNextActivityObject().getActivityName());
-		}
-		System.out.println("-----------");
+		return (ArrayList<Timeline>) this.candidateTimelines.entrySet().stream().map(e -> (Timeline) e.getValue())
+				.collect(Collectors.toList());
 	}
 
+	public int getNumOfCandidateTimelines()
+	{
+		return this.candidateTimelines.size();
+	}
+
+	/**
+	 */
 	public long getSumOfActivityObjects(LinkedHashMap<Integer, TimelineWithNext> map)
 	{
 		long count = 0;
@@ -2752,6 +2684,11 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		return this.editDistancesSortedMapFullCand;
 	}
 
+	public Set getCandidateTimelineIDs()
+	{
+		return this.editDistancesSortedMapFullCand.keySet();
+	}
+
 	public boolean hasError()
 	{
 		return this.errorExists;
@@ -2762,6 +2699,54 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		this.errorExists = exists;
 	}
 }
+
+/////////////////////////////////////////////////
+/// **
+// *
+// * @param map
+// * @return
+// */
+// public long getSumOfActivityObjects(LinkedHashMap<Integer, TimelineWithNext> map)
+// {
+// long count = 0;
+//
+// for (Map.Entry<Integer, TimelineWithNext> entry : map.entrySet())
+// {
+// int a = entry.getValue().countNumberOfValidActivities();
+// int b = entry.getValue().size();
+//
+// if (a != b)
+// {
+// PopUps.showError(
+// "Error in getSumOfActivityObjects a should be equal to be since we removed invalid aos beforehand but a = "
+// + a + " and b=" + b);
+// }
+// count += a;
+// }
+// return count;
+// }
+// public static String getNextValidActivityNameAsCode(String topSimilarUserDayActivitiesAsStringCode,
+// int endPointIndexForSubsequenceWithHighestSimilarity)
+// {
+// String unknownAsCode = StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY1);// ("Unknown");
+// String othersAsCode = StringCode.getStringCodeFromActivityName(Constant.INVALID_ACTIVITY2);// ("Others");
+// String nextValidActivity = null;
+//
+// for (int i = endPointIndexForSubsequenceWithHighestSimilarity + 1; i < topSimilarUserDayActivitiesAsStringCode
+// .length(); i++)
+// {
+// if (String.valueOf(topSimilarUserDayActivitiesAsStringCode.charAt(i)).equals(unknownAsCode)
+// || String.valueOf(topSimilarUserDayActivitiesAsStringCode.charAt(i)).equals(othersAsCode))
+// {
+// continue;
+// }
+// else
+// {
+// nextValidActivity = String.valueOf(topSimilarUserDayActivitiesAsStringCode.charAt(i));
+// }
+// }
+// return nextValidActivity;
+// }
 
 // End of curtain 9 march 2017: commented out because the other constructor is essentially doing the same thing but
 // with fewer logging for performance reasons

@@ -5,7 +5,10 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
@@ -14,6 +17,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
+import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.TimelineUtils;
 
@@ -232,6 +236,36 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 	public LinkedHashMap<Date, Timeline> getCandidateTimeslines()
 	{
 		return this.candidateTimelines;
+	}
+
+	public Set getCandidateTimelineIDs()
+	{
+		return this.startTimeDistanceSortedMap.keySet();
+	}
+
+	public Timeline getCandidateTimesline(String timelineID)
+	{
+		List<Timeline> foundTimelines = this.candidateTimelines.entrySet().stream()
+				.filter(e -> e.getValue().toString().equals(timelineID)).map(e -> e.getValue())
+				.collect(Collectors.toList());
+		if (foundTimelines.size() != 1)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getCandidateTimesline(String timelineID): foundTimelines.size()=" + foundTimelines.size()
+							+ " while expected 1"));
+		}
+		return foundTimelines.get(0);
+	}
+
+	public ArrayList<Timeline> getOnlyCandidateTimeslines()
+	{
+		return (ArrayList<Timeline>) this.candidateTimelines.entrySet().stream().map(e -> e.getValue())
+				.collect(Collectors.toList());
+	}
+
+	public int getNumOfCandidateTimelines()
+	{
+		return this.candidateTimelines.size();
 	}
 
 	/**
@@ -500,6 +534,21 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 	public int getNumberOfCandidateTimelinesBelowThreshold()
 	{
 		return this.candidateTimelines.size();
+	}
+
+	/**
+	 * TODO: CHECK if this method is conceptually correct
+	 * 
+	 * @return
+	 */
+	public int getNumberOfDistinctRecommendations()
+	{
+		return recommendedActivityNamesWithRankscores.size();
+	}
+
+	public double getAvgEndSimilarity()
+	{
+		return Double.NaN;
 	}
 
 	// /**

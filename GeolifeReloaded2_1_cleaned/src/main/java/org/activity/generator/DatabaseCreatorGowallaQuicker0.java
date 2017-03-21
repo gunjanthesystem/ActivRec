@@ -32,7 +32,6 @@ import org.activity.objects.UserGowalla;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
-import org.activity.util.DatageneratorUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.TimelineUtils;
 import org.joda.time.LocalDateTime;
