@@ -38,7 +38,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithoutEndCurrentActivity(
 			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, Long candidateTimelineId)
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		ArrayList<ActivityObject> activityObjects1 = new ArrayList<ActivityObject>();
 		activityObjects1.addAll(activityObjects1Original);
@@ -90,7 +90,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 */
 	public final Pair<String, Double> getHJEditDistanceInvalidsExpunged(ArrayList<ActivityObject> activityObjects1,
 			ArrayList<ActivityObject> activityObjects2, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			Long candidateTimelineId)
+			String candidateTimelineId)
 	{
 		return getHJEditDistanceWithTrace(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2),
 				userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);// similarity;
@@ -107,7 +107,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
 			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2, String userAtRecomm,
-			String dateAtRecomm, String timeAtRecomm, Long candidateTimelineId)
+			String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		return getHJEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1),
 				expungeInvalids(activityObjects2), userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);// similarity;
@@ -137,7 +137,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
 			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
-			String timeAtRecomm, long candidateTimelineId)
+			String timeAtRecomm, String candidateTimelineId)
 	{
 		if (VerbosityConstants.verboseDistance)
 		{

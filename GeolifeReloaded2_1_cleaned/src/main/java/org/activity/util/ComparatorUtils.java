@@ -279,6 +279,11 @@ public class ComparatorUtils
 	public static LinkedHashMap<String, Pair<String, Double>> sortByValueAscendingStrStrDoub(
 			LinkedHashMap<String, Pair<String, Double>> map)
 	{
+		if (map.size() == 0)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: map.size = " + map.size()));
+		}
+
 		List<Map.Entry<String, Pair<String, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
 		{

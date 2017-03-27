@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -333,6 +332,11 @@ public class UtilityBelt
 		return res;
 	}
 
+	/**
+	 * 
+	 * @param editOpsTrace
+	 * @return
+	 */
 	public static int getCountOfLevel1Ops(String editOpsTrace)
 	{
 		int countOfL1Ops = 0;
@@ -344,6 +348,11 @@ public class UtilityBelt
 		return countOfL1Ops;
 	}
 
+	/**
+	 * 
+	 * @param editOpsTrace
+	 * @return
+	 */
 	public static int getCountOfLevelInsertions(String editOpsTrace)
 	{
 		int countOfL1Ops = 0;
@@ -1784,13 +1793,13 @@ public class UtilityBelt
 			String name)
 	{
 		System.out.println("-----------Traversing " + name);
-	
+
 		// iterating over cands
 		for (Map.Entry<String, LinkedHashMap<String, Pair<String, Double>>> entry : map.entrySet())
 		{
 			System.out.print("Cand=" + entry.getKey());
 			LinkedHashMap<String, Pair<String, Double>> featureWiseDistances = entry.getValue();
-	
+
 			for (Map.Entry<String, Pair<String, Double>> distEntry : featureWiseDistances.entrySet())
 			// iterating over distance for each feature
 			{

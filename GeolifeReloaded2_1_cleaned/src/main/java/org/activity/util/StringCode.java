@@ -176,6 +176,40 @@ public class StringCode
 
 	/**
 	 * 
+	 * @param invalidActivityName
+	 * @return<font color= red> 'A' for invalid act 1, 'B' for invalid act 2</font>
+	 */
+	public static char getCharCodeFromInvalidActivityName(String invalidActivityName)
+	{
+		// uncode char from 127 to 159 are non printable, hence do not use them
+		char code = '\u0000';// null character new String();
+		try
+		{
+			if (invalidActivityName.equals(Constant.INVALID_ACTIVITY1))
+			{
+				return (char) 65;// A
+			}
+
+			else if (invalidActivityName.equals(Constant.INVALID_ACTIVITY1))
+			{
+				return (char) 66;// B
+			}
+			else
+			{
+				System.out.println(
+						PopUps.getCurrentStackTracedErrorMsg("Unknown invalid act name: = " + invalidActivityName));
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return code;
+
+	}
+
+	/**
+	 * 
 	 * @param actObjs
 	 * @return
 	 */

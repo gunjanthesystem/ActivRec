@@ -2137,7 +2137,7 @@ public class WritingToFile
 
 	public static void writeEditSimilarityCalculations(ArrayList<ActivityObject> ActivityObjects1,
 			ArrayList<ActivityObject> ActivityObjects2, double editDistance, String trace, double dAct, double dFeat,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, Long candidateTimelineId)
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		commonPath = Constant.getCommonPath();//
 		try
@@ -2237,28 +2237,22 @@ public class WritingToFile
 
 	public static void writeEditDistancesOfAllEndPoints(ArrayList<ActivityObject> activitiesGuidingRecomm,
 			Timeline userDayTimeline, LinkedHashMap<Integer, Pair<String, Double>> distanceScoresForEachSubsequence)// String
-																													// trace)
 	{
-		commonPath = Constant.getCommonPath();//
 		try
 		{
-			String fileName = commonPath + "EditDistancesForAllEndPoints.csv";
-
-			FileWriter fw = new FileWriter(new File(fileName).getAbsoluteFile(), true);
-			BufferedWriter bw = new BufferedWriter(fw);
-
+			StringBuilder sbToWrite = new StringBuilder();
 			counterEditAllEndPoints++;
 			for (Map.Entry<Integer, Pair<String, Double>> entry : distanceScoresForEachSubsequence.entrySet())
 			{
 
-				bw.write(counterEditAllEndPoints + "," + userDayTimeline.getUserID() + ","
+				sbToWrite.append(counterEditAllEndPoints + "," + userDayTimeline.getUserID() + ","
 						+ ActivityObject.getArrayListOfActivityObjectsAsString(activitiesGuidingRecomm) + ","
 						+ userDayTimeline.getActivityObjectNamesInSequenceWithFeatures() + "," + entry.getKey() + ","
-						+ entry.getValue().getSecond());
-				bw.newLine();
+						+ entry.getValue().getSecond() + "\n");
 			}
-			bw.close();
-
+			sbToWrite.append("\n");
+			WritingToFile.appendLineToFileAbsolute(sbToWrite.toString(),
+					Constant.getCommonPath() + "EditDistancesForAllEndPoints.csv");
 		}
 		catch (Exception e)
 		{
@@ -2572,6 +2566,95 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * Writes the file EditDistancePerRtPerCand.csv
+	 * 
+	 * @param userAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param editDistancesSorted
+	 * @param candidateTimelines
+	 * @param nextActObjs
+	 * @param currentTimeline
+	 * @param writeCandidateTimeline
+	 * @param writeEditOperations
+	 */
+	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
+			LinkedHashMap<String, Pair<String, Double>> editDistancesSorted,
+			LinkedHashMap<String, Timeline> candidateTimelines,
+			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs, ArrayList<ActivityObject> currentTimeline,
+			boolean writeCandidateTimeline, boolean writeEditOperations)
+	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
+	// Enums.CaseType caseType)
+	{
+		commonPath = Constant.getCommonPath();
+		try
+		{
+			StringBuilder sbToWrite = new StringBuilder();
+			boolean writefull = true;
+
+			for (Map.Entry<String, Pair<String, Double>> entry : editDistancesSorted.entrySet())
+			{
+				String candTimelineID = entry.getKey();
+				String editOps = entry.getValue().getFirst();
+				double editDist = entry.getValue().getSecond();
+
+				int countOfL1Ops = UtilityBelt.getCountOfLevel1Ops(editOps);// entry.getValue().getFirst());
+				int countOfL2Ops = UtilityBelt.getCountOfLevel2Ops(editOps);// entry.getValue().getFirst());
+
+				String nextAOName = nextActObjs.get(candTimelineID).getFirst().getActivityName();// "null";
+
+				String candidateTimelineAsString = " ";
+				String editOperationsString = " ";
+
+				if (writeCandidateTimeline)
+				{
+					candidateTimelineAsString = candidateTimelines.get(candTimelineID)
+							.getActivityObjectNamesWithTimestampsInSequence();
+				}
+
+				if (writeEditOperations)
+				{
+					editOperationsString = editOps;
+				}
+
+				String userString = "'", dateString = "'", timeString = "'", currentTimelineString = "";
+
+				/*
+				 * "UserAtRecomm,DateAtRecomm,TimeAtRecomm, Candidate ID, End point index of cand, Edit operations trace of cand, Edit Distance of Candidate, #Level_1_EditOps, #ObjectsInSameOrder"
+				 * + ",NextActivityForRecomm,CandidateTimeline,CurrentTimeline"
+				 */
+				if (writefull || VerbosityConstants.WriteRedundant)
+				{
+					userString = userAtRecomm;
+					dateString = dateAtRecomm.toString();
+					timeString = timeAtRecomm.toString();
+					currentTimelineString = getStringActivityObjArray(currentTimeline);
+					// current timeline is same throughout an execution of this method.
+					writefull = false;
+				}
+
+				sbToWrite.append(userString + "," + dateString + "," + timeString + "," + candTimelineID + "," + " "
+						+ "," + editOperationsString + "," + editDist + "," + countOfL1Ops + "," + countOfL2Ops + ","
+						+ nextAOName + "," + candidateTimelineAsString + "," + currentTimelineString + "\n");
+				// else // no need to write same repeating things everytime
+				// { bw.write("',','," + candTimelineID + "," + " " + "," + editOperationsString + "," + editDist + ","
+				// + countOfL1Ops + "," + countOfL2Ops + "," + topNextAOName + "," + candidateTimelineAsString + "," +
+				// ",'"); }
+			}
+			WritingToFile.appendLineToFileAbsolute(sbToWrite.toString(), commonPath + "EditDistancePerRtPerCand.csv");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
 	public static String getStringActivityObjArray(ArrayList<ActivityObject> array)
 	{
 		String s = "";
