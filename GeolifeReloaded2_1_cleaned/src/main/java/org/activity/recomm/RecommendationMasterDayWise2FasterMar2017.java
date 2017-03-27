@@ -37,7 +37,7 @@ import org.activity.util.TimelineUtils;
  *
  */
 /* Modified version of RecommendationMasterDayWise2Faster. This uses daywise timelines */
-public class RecommendationMasterDayWise2FasterMar2017 implements RecommendationMasterI
+public class RecommendationMasterDayWise2FasterMar2017 // implements RecommendationMasterI
 {
 	private LinkedHashMap<Date, Timeline> trainingTimelines;
 	private LinkedHashMap<Date, Timeline> testTimelines;
@@ -786,7 +786,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 			// (Activity Events in Candidate Day, activity events on or before recomm on recomm day)
 			Long candTimelineID = candidate.getKey().getTime();// used as dummy, not exactly useful right now
 			Triple<Integer, String, Double> score = getDistanceScoreModifiedEdit(candidateTimeline,
-					activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candTimelineID);
+					activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candTimelineID.toString());
 
 			distancesRes.put(candidate.getKey(), score);
 			// System.out.println("now we put "+entry.getKey()+" and score="+score);
@@ -809,7 +809,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	 */
 	public Triple<Integer, String, Double> getDistanceScoreModifiedEdit(Timeline userDayTimeline,
 			ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
-			String timeAtRecomm, Long candidateID)
+			String timeAtRecomm, String candidateID)
 	{
 		System.out.println("Inside getDistanceScoreModifiedEdit");
 		// find the end points in the userDayTimeline

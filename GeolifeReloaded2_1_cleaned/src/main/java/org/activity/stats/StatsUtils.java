@@ -123,7 +123,7 @@ public class StatsUtils
 	 * @param arr2
 	 * @return
 	 */
-	public static double getPearsonCorrelation(ArrayList<Double> arr1, ArrayList<Double> arr2)
+	public static double getPearsonCorrelation2(ArrayList<Double> arr1, ArrayList<Double> arr2)
 	{
 		PearsonsCorrelation pc = new PearsonsCorrelation();
 		return (pc.correlation(UtilityBelt.toPrimitive(arr1), UtilityBelt.toPrimitive(arr2)));

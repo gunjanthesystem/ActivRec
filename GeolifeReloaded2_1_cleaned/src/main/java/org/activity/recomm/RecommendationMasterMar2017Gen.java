@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
@@ -53,7 +54,7 @@ import org.activity.util.UtilityBelt;
  * @since 22 March, 2017
  * @author gunjan
  */
-public class RecommendationMasterMar2017Gen// implements RecommendationMasterI// IRecommenderMaster
+public class RecommendationMasterMar2017Gen implements RecommendationMasterI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
 
@@ -81,14 +82,16 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 	 * {Cand TimelineID, Pair{Trace,Edit distance}} this LinkedHashMap is sorted by the value of edit distance in
 	 * ascending order://formerly: editDistancesSortedMapFullCand
 	 */
-	private LinkedHashMap<String, Pair<String, Double>> editDistancesSortedMap;
+	private LinkedHashMap<String, Pair<String, Double>> distancesSortedMap;
 
 	/**
 	 * Relevant for daywise approach: the edit distance is computed for least distance subsequence in case current
 	 * activity name occurs at multiple times in a day timeline {Cand TimelineID, End point index of least distant
 	 * subsequence}
 	 */
-	private LinkedHashMap<String, Integer> endIndexOfLeastDistSubseqOfCands;
+	private LinkedHashMap<String, Integer> endPointIndicesConsideredInCands;
+
+	// private LinkedHashMap<String, ActivityObject> endPointActivityObjectsInCands;
 
 	/*
 	 * List of of top next activity objects with their edit distances and the timeline id of the candidate producing
@@ -149,6 +152,11 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 	FeatureWiseEditDistance featureWiseEditDistance = null;
 	FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance = null;
 	OTMDSAMEditDistance OTMDSAMEditDistance = null;
+
+	/**
+	 * Score (A<sub>O</sub>) = ∑ { 1- min( 1, |Stcand - RT|/60mins) }
+	 **/
+	private static final double timeInSecsForRankScoreNormalisation = 60 * 60; // 60 mins
 
 	/**
 	 * 
@@ -285,9 +293,13 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		// after thresholding (correct), here
 		// normalisation is before thresholding which should be changed
 		long recommMasterT3 = System.currentTimeMillis();
-		LinkedHashMap<String, Pair<String, Double>> editDistancesMapUnsorted = getNormalisedDistancesForCandidateTimelines(
+		Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes = getNormalisedDistancesForCandidateTimelines(
 				candidateTimelines, activitiesGuidingRecomm, caseType, this.userIDAtRecomm, this.dateAtRecomm,
 				this.timeAtRecomm, Constant.getDistanceUsed(), this.lookPastType);
+
+		LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted = normalisedDistFromCandsRes.getFirst();
+		this.endPointIndicesConsideredInCands = normalisedDistFromCandsRes.getSecond();
+
 		long recommMasterT4 = System.currentTimeMillis();
 		long timeTakenToComputeNormEditDistances = recommMasterT4 - recommMasterT3;
 
@@ -295,10 +307,10 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		// getActivityNamesGuidingRecommwithTimestamps() +" size of current timeline=" +
 		// currentTimeline.getActivityObjectsInTimeline().size());
 		// ########Sanity check
-		if (editDistancesMapUnsorted.size() != candidateTimelines.size())
+		if (distancesMapUnsorted.size() != candidateTimelines.size())
 		{
 			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
-					"Error editDistancesMapUnsorted.size() (" + editDistancesMapUnsorted.size()
+					"Error editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
 							+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")"));
 			errorExists = true;
 		}
@@ -306,34 +318,36 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 
 		// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry for
 		// such candidate timelines from the distance scores map
-		if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
+		if (!this.lookPastType.equals(Enums.LookPastType.ClosestTime))// no pruning for baseline closest ST
 		{
-			this.thresholdAsDistance = thresholdVal;
-		}
-		else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
-		{
-			double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
-			this.thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
-		}
-		else
-		{
-			System.err.println("Error: type of threshold unknown in recommendation master");
-			errorExists = true;
-			System.exit(-2);
-		}
+			if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
+			{
+				this.thresholdAsDistance = thresholdVal;
+			}
+			else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
+			{
+				double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
+				this.thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
+			}
+			else
+			{
+				System.err.println("Error: type of threshold unknown in recommendation master");
+				errorExists = true;
+				System.exit(-2);
+			}
 
-		int countCandBeforeThresholdPruning = editDistancesMapUnsorted.size();// distanceScoresSorted.size();
-		editDistancesMapUnsorted = TimelineUtils.removeAboveThreshold4SSD(editDistancesMapUnsorted,
-				thresholdAsDistance);//
-		int countCandAfterThresholdPruning = editDistancesMapUnsorted.size();
-		this.thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
-		if (!thresholdPruningNoEffect)
-		{
-			PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
+			int countCandBeforeThresholdPruning = distancesMapUnsorted.size();// distanceScoresSorted.size();
+			distancesMapUnsorted = TimelineUtils.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
+			int countCandAfterThresholdPruning = distancesMapUnsorted.size();
+			this.thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
+			if (!thresholdPruningNoEffect)
+			{
+				PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
+			}
 		}
 		// ////////////////////////////////
 
-		if (editDistancesMapUnsorted.size() == 0)
+		if (distancesMapUnsorted.size() == 0)
 		{
 			System.out.println("Warning: No candidate timelines below threshold distance");
 			hasCandidateTimelinesBelowThreshold = false;
@@ -345,9 +359,9 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		}
 
 		// Is this sorting necessary?
-		editDistancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
-				.sortByValueAscendingStrStrDoub(editDistancesMapUnsorted);
-		System.out.println("---------editDistancesSortedMap.size()=" + editDistancesSortedMap.size());
+		distancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
+				.sortByValueAscendingStrStrDoub(distancesMapUnsorted);
+		System.out.println("---------editDistancesSortedMap.size()=" + distancesSortedMap.size());
 
 		if (caseType.equals(Enums.CaseType.CaseBasedV1))
 		{
@@ -357,11 +371,11 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 					this.timeAtRecomm.toString(), alignmentBasedDistance);// getDistanceScoresforCandidateTimelines(candidateTimelines,activitiesGuidingRecomm);
 		}
 
-		this.nextActivityObjectsFromCands = fetchNextActivityObjects(editDistancesSortedMap, candidateTimelines,
-				this.lookPastType, endIndexOfLeastDistSubseqOfCands);
+		this.nextActivityObjectsFromCands = fetchNextActivityObjects(distancesSortedMap, candidateTimelines,
+				this.lookPastType, endPointIndicesConsideredInCands);
 
-		if (this.nextActivityObjectsFromCands.size() != editDistancesSortedMap.size()
-				|| editDistancesSortedMap.size() != this.candidateTimelines.size())
+		if (this.nextActivityObjectsFromCands.size() != distancesSortedMap.size()
+				|| distancesSortedMap.size() != this.candidateTimelines.size())
 		{
 			System.err.println(
 					"Error at Sanity 349 (RecommenderMaster: this.topNextActivityObjects.size() == editDistancesSortedMapFullCand.size() && editDistancesSortedMapFullCand.size()== this.candidateTimelines.size()  not satisfied");
@@ -370,10 +384,11 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 
 		if (VerbosityConstants.verbose)
 		{
-			StringBuilder sbToWrite1 = new StringBuilder(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-					+ "\n\n The candidate timelines  in increasing order of distance are:\n");
-			editDistancesSortedMap.entrySet().stream().forEach(
-					e -> sbToWrite1.append("candID:" + e.getKey() + " editDist:" + e.getValue().getSecond() + "\n acts:"
+			StringBuilder sbToWrite1 = new StringBuilder(
+					">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" + "\n lookPastType:" + lookPastType
+							+ "\n The candidate timelines  in increasing order of distance are:\n");
+			distancesSortedMap.entrySet().stream().forEach(
+					e -> sbToWrite1.append("candID:" + e.getKey() + " dist:" + e.getValue().getSecond() + "\n acts:"
 							+ candidateTimelines.get(e.getKey()).getActivityObjectNamesInSequence() + "\n"));
 			sbToWrite1.append("Top next activities are:\n");// +this.topNextRecommendedActivities);
 			nextActivityObjectsFromCands.entrySet().stream().forEach(e -> sbToWrite1
@@ -388,14 +403,17 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		if (VerbosityConstants.WriteEditDistancePerRtPerCand)
 		{
 			WritingToFile.writeEditDistancesPerRtPerCand(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm,
-					this.editDistancesSortedMap, this.candidateTimelines, this.nextActivityObjectsFromCands,
-					this.activitiesGuidingRecomm, VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
-					VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand);
+					this.distancesSortedMap, this.candidateTimelines, this.nextActivityObjectsFromCands,
+					this.activitiesGuidingRecomm, activityAtRecommPoint,
+					VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
+					VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand,
+					this.endPointIndicesConsideredInCands);
 		}
 
 		//////// Create ranked recommended act names
 		this.recommendedActivityNamesWithRankscores = createRankedTopRecommendedActivityNames(
-				this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand);
+				this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand,
+				this.lookPastType, this.distancesSortedMap);
 
 		this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityNamesWithRankScoresString(
 				this.recommendedActivityNamesWithRankscores);
@@ -429,7 +447,8 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 			 */
 			if (currentTimeline.getImmediateNextActivityInvalid() == 0) // not invalid
 			{
-				removeRecommPointActivityFromRankedRecomm();
+				this.recommendedActivityNamesWithRankscores = removeRecommPointActivityFromRankedRecomm(
+						recommendedActivityNamesWithRankscores, activityNameAtRecommPoint);
 				System.out.println("removing recomm point activity (Current Activity) from list of recommendation");
 			}
 		}
@@ -461,22 +480,40 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 	 * @param caseType
 	 * @param similarityOfEndPointActObjCands
 	 *            used for CaseBasedV1_3 approach
+	 * @param distancesSortedMap
+	 *            used for closest time approach in which case it is {candid, Pair{act name of act obj of cloeset, abs
+	 *            diff of st}}
 	 * @return
 	 */
 	private static LinkedHashMap<String, Double> createRankedTopRecommendedActivityNames(
 			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsFromCands, CaseType caseType,
-			LinkedHashMap<String, Double> similarityOfEndPointActObjCands)
+			LinkedHashMap<String, Double> similarityOfEndPointActObjCands, LookPastType lookPastType,
+			LinkedHashMap<String, Pair<String, Double>> distancesSortedMap)
 	{
 
-		switch (caseType)
+		if (lookPastType.equals(Enums.LookPastType.ClosestTime))
 		{
-		case SimpleV3:
-			return createRankedTopRecommendedActivityNamesSimpleV3_3(nextActivityObjectsFromCands);
-		case CaseBasedV1:
-			return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
-					similarityOfEndPointActObjCands);
-		default:
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error:unrecognised case type = " + caseType));
+			return createRankedTopRecommendedActivityNamesClosestTime(distancesSortedMap);
+		}
+		else if ((lookPastType.equals(Enums.LookPastType.Daywise)) || (lookPastType.equals(Enums.LookPastType.NHours))
+				|| (lookPastType.equals(Enums.LookPastType.NCount)))
+		{
+			switch (caseType)
+			{
+			case SimpleV3:
+				return createRankedTopRecommendedActivityNamesSimpleV3_3(nextActivityObjectsFromCands);
+			case CaseBasedV1:
+				return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
+						similarityOfEndPointActObjCands);
+			default:
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error:unrecognised case type = " + caseType));
+				return null;
+			}
+		}
+		else
+		{
+			System.err.println(
+					PopUps.getCurrentStackTracedErrorMsg("Error:unrecognised lookpast type = " + lookPastType));
 			return null;
 		}
 
@@ -492,9 +529,21 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 	 * @param timeAtRecomm
 	 * @param distanceUsed
 	 * @param lookPastType
-	 * @return
+	 * @return {CandID,Trace,EditDist} for MU and Daywise, {CandID,ActName of act obj with closest st,avs time diff in
+	 *         secs} for closest st time.... Pair{{},{candID,indexOfEndPointConsideredInCand}}
+	 *         <p>
+	 *         The second element of the result pair is:
+	 *         <p>
+	 *         - for SeqNCount and SeqNHours approach, tne end point index considered in the candidate is the last
+	 *         activity object in that cand
+	 *         <p>
+	 *         - for Daywise approach: {Date of CandidateTimeline as string, End point index of least distant
+	 *         subsequence}}
+	 *         <p>
+	 *         - for ClosesetTime approach: {Date of CandidateTimeline as string, End point index of least distant
+	 *         subsequence}}
 	 */
-	private LinkedHashMap<String, Pair<String, Double>> getNormalisedDistancesForCandidateTimelines(
+	private Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getNormalisedDistancesForCandidateTimelines(
 			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
 			CaseType caseType, String userIDAtRecomm, Date dateAtRecomm, Time timeAtRecomm, String distanceUsed,
 			LookPastType lookPastType)
@@ -504,7 +553,8 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 
 		// {CandID, EndIndexOfLeastDistantSubsequene} //this is relevant for daywise as curr act can occur multiple
 		// times in same cand
-		// LinkedHashMap<String,Integer>
+		LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;
+
 		if (lookPastType.equals(Enums.LookPastType.Daywise))
 		{
 			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes = TimelineUtils
@@ -517,6 +567,8 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 			normalisedDistanceForCandTimelines = normalisedDistancesOverTheSet(candEditDistances, userIDAtRecomm,
 					dateAtRecomm.toString(), timeAtRecomm.toString());
 
+			endIndexSubseqConsideredInCand = editDistancesRes.getSecond();
+
 		}
 		else if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		{
@@ -524,7 +576,27 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
 					distanceUsed, this.hjEditDistance, this.featureWiseEditDistance,
 					this.featureWiseWeightedEditDistance, this.OTMDSAMEditDistance);
+
+			// for SeqNCount and SeqNHours approach, tne end point index considered in the candidate is the last
+			// activity object in that cand
+			endIndexSubseqConsideredInCand = (LinkedHashMap<String, Integer>) candidateTimelines.entrySet().stream()
+					.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1));
 		}
+		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))
+		{
+			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes = TimelineUtils
+					.getClosestTimeDistancesForDaywiseCandidateTimelines(candidateTimelines, activitiesGuidingRecomm,
+							userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+							Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
+							distanceUsed);
+
+			LinkedHashMap<String, Pair<String, Double>> candEditDistances = editDistancesRes.getFirst();
+			normalisedDistanceForCandTimelines = normalisedDistancesOverTheSet(candEditDistances, userIDAtRecomm,
+					dateAtRecomm.toString(), timeAtRecomm.toString());
+
+			endIndexSubseqConsideredInCand = editDistancesRes.getSecond();
+		}
+
 		else
 		{
 			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: Unrecognised lookPastType "));
@@ -537,7 +609,8 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 					"Error: normalisedDistanceForCandTimelines.size=" + normalisedDistanceForCandTimelines.size()));
 		}
 
-		return normalisedDistanceForCandTimelines;
+		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(
+				normalisedDistanceForCandTimelines, endIndexSubseqConsideredInCand);
 	}
 
 	/**
@@ -622,7 +695,7 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 	 * @param userIDAtRecomm
 	 * @param matchingUnitInCountsOrHours
 	 * @param activityAtRecommPoint
-	 * @return
+	 * @return {candID,candTimeline}
 	 */
 	private static LinkedHashMap<String, Timeline> extractCandidateTimelines(
 			LinkedHashMap<Date, Timeline> trainingTimelineOrig, LookPastType lookPastType2, Date dateAtRecomm,
@@ -684,19 +757,9 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		return candidateTimelines;
 	}
 
-	public int getNumberOfDistinctRecommendations()
-	{
-		return recommendedActivityNamesWithRankscores.size();
-	}
-
 	public Date getDateAtRecomm()
 	{
 		return dateAtRecomm;
-	}
-
-	public ActivityObject getActivityObjectAtRecomm()
-	{
-		return this.activityAtRecommPoint;
 	}
 
 	public ArrayList<ActivityObject> getActivitiesGuidingRecomm()
@@ -710,16 +773,6 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		for (ActivityObject ae : activitiesGuidingRecomm)
 		{
 			res.append(">>" + ae.getActivityName());
-		}
-		return res.toString();
-	}
-
-	public String getActivityNamesGuidingRecommwithTimestamps()
-	{
-		StringBuilder res = new StringBuilder();
-		for (ActivityObject ae : activitiesGuidingRecomm)
-		{
-			res.append("  " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp());
 		}
 		return res.toString();
 	}
@@ -962,6 +1015,46 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 					PopUps.getCurrentStackTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
 							+ recommendedActivityNamesRankscorePairs.size());
 		}
+
+		return recommendedActivityNamesRankscorePairs;
+	}
+
+	/**
+	 * // used
+	 * <p>
+	 * Score (A<sub>O</sub>) = ∑ { 1- min( 1, |Stcand - RT|/60mins) }
+	 * 
+	 * @param closestActObjsWithSTDiffInSecs
+	 * @return {nextActObj,rankScore}
+	 */
+	public static LinkedHashMap<String, Double> createRankedTopRecommendedActivityNamesClosestTime(
+			LinkedHashMap<String, Pair<String, Double>> closestActObjsWithSTDiffInSecs)
+	// LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceSortedMap)
+	{
+		System.out.println("Debug inside createRankedTopRecommendedActivityNamesClosestTime:");
+
+		LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs = new LinkedHashMap<>(); // <ActivityName,RankScore>
+
+		for (Map.Entry<String, Pair<String, Double>> entry : closestActObjsWithSTDiffInSecs.entrySet())
+		{
+			String nextActivityName = entry.getValue().getFirst();
+			Double rankScore = 1d - Math.min(1, (entry.getValue().getSecond()) / timeInSecsForRankScoreNormalisation);
+			// 60 * 60);
+
+			if (recommendedActivityNamesRankscorePairs.containsKey(nextActivityName) == false)
+			{
+				recommendedActivityNamesRankscorePairs.put(nextActivityName, rankScore);
+			}
+			else
+			{
+				recommendedActivityNamesRankscorePairs.put(nextActivityName,
+						recommendedActivityNamesRankscorePairs.get(nextActivityName) + rankScore);
+			}
+		}
+
+		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
+				.sortByValueDesc(recommendedActivityNamesRankscorePairs);
+		// Sorted in descending order of ranked score: higher ranked score means higher value of rank
 
 		return recommendedActivityNamesRankscorePairs;
 	}
@@ -1298,11 +1391,6 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		return topRankedString.toString();
 	}
 
-	public String getRankedRecommendedActivityNamesWithRankScores()
-	{
-		return this.rankedRecommendedActNamesWithRankScoresStr;
-	}
-
 	// /////////////////////////////////////////////////////////////////////
 
 	// /////////////////////////////////////////////////////////////////////
@@ -1323,60 +1411,7 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		return rankedRecommendationWithoutRankScores.toString();
 	}
 
-	public String getRankedRecommendedActivityNamesWithoutRankScores()
-	{
-		return this.rankedRecommendedActNamesWithoutRankScoresStr;
-	}
-
 	// /////////////////////////////////////////////////////////////////////
-
-	public void removeRecommPointActivityFromRankedRecomm()
-	{
-		// String activityNameAtRecommPoint = activityAtRecommPoint.getActivityName();
-		this.recommendedActivityNamesWithRankscores.remove(activityNameAtRecommPoint);
-	}
-
-	public boolean hasCandidateTimeslines()
-	{
-		return hasCandidateTimelines;
-	}
-
-	/**
-	 * Returns top next activity names as String
-	 * 
-	 * @return
-	 */
-	// public String getTopNextActivityNamesWithoutDistanceString()
-	// {
-	// StringBuilder result = new StringBuilder("");// String result="";
-	// for (int i = 0; i < this.nextActivityObjectsFromCands.size(); i++)
-	// {
-	// Triple<ActivityObject, Double, String> pairAE = this.nextActivityObjectsFromCands.get(i);
-	// result.append("__" + pairAE.getFirst().getActivityName());//
-	// result=result+"__"+pairAE.getFirst().getActivityName();
-	// }
-	// return result.toString();
-	// }
-
-	/**
-	 * Returns top next activity names with distance as String
-	 * 
-	 * @return
-	 */
-	// public String getTopNextActivityNamesWithDistanceString()
-	// {
-	// StringBuilder result = new StringBuilder(""); // String result="";
-	//
-	// for (int i = 0; i < this.nextActivityObjectsFromCands.size(); i++)
-	// {
-	// Triple<ActivityObject, Double, String> pairAE = this.nextActivityObjectsFromCands.get(i);
-	//
-	// result.append("__" + pairAE.getFirst().getActivityName() + ":" + pairAE.getSecond().toString());
-	// // result=result+"__"+pairAE.getFirst().getActivityName()+":"+pairAE.getSecond().toString();
-	// }
-	// return result.toString();
-	//
-	// }
 
 	/*
 	 * public String getSingleNextRecommendedActivity() { return this.singleNextRecommendedActivity; }
@@ -1554,6 +1589,8 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
 		case NHours:
 			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		case ClosestTime:
+			return null;
 		default:
 			System.err
 					.println(PopUps.getCurrentStackTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
@@ -2441,20 +2478,14 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 
 	// /
 
-	public String getStringCodeOfActivityObjects(ArrayList<ActivityObject> activityObjects)
+	public static String getStringCodeOfActivityObjects(ArrayList<ActivityObject> activityObjects)
 	{
-		String code = new String();
-
-		for (int i = 0; i < activityObjects.size(); i++)
+		StringBuilder code = new StringBuilder();
+		for (ActivityObject ao : activityObjects)
 		{
-			// String activityName= activityObjects.get(i).getActivityName();
-			// int activityID= generateSyntheticData.getActivityid(activityName);
-
-			code += activityObjects.get(i).getStringCode(); // Character.toString ((char)(activityID+65)); //getting the
-															// ascii code for (activity id+65)
+			code.append(ao.getStringCode());
 		}
-
-		return code;
+		return code.toString();
 	}
 
 	/**
@@ -2636,7 +2667,20 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		return candidateTimelines;
 	}
 
-	public ArrayList<Integer> getIndicesOfEndPointActivityInDayButNotAsLast(String userDayActivitiesAsStringCode,
+	public static LinkedHashMap<String, Double> removeRecommPointActivityFromRankedRecomm(
+			LinkedHashMap<String, Double> recommendedActivityNamesWithRankscores, String activityNameAtRecommPoint)
+	{
+		// String activityNameAtRecommPoint = activityAtRecommPoint.getActivityName();
+		System.out.println("removeRecommPointActivityFromRankedRecomm called");
+		Double d = recommendedActivityNamesWithRankscores.remove(activityNameAtRecommPoint);
+		if (d == null)
+		{
+			System.out.println("Note: removeRecommPointActivityFromRankedRecomm: curr act not in recommendation");
+		}
+		return recommendedActivityNamesWithRankscores;
+	}
+
+	public static ArrayList<Integer> getIndicesOfEndPointActivityInDayButNotAsLast(String userDayActivitiesAsStringCode,
 			String codeOfEndPointActivity)
 	{
 		// System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast:
@@ -2658,7 +2702,7 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		return indicesOfEndPointActivityInDay;
 	}
 
-	public ArrayList<Integer> getIndicesOfEndPointActivityInTimeline(String userActivitiesAsStringCode,
+	public static ArrayList<Integer> getIndicesOfEndPointActivityInTimeline(String userActivitiesAsStringCode,
 			String codeOfEndPointActivity)
 	{
 		// System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast:
@@ -2676,39 +2720,13 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		return indicesOfEndPointActivityInTimeline;
 	}
 
-	// /**
-	// * Returns a Map of candidate timelines
-	// *
-	// * @return
-	// */
-	// public LinkedHashMap<String, TimelineWithNext> getCandidateTimeslines()
-	// {
-	// return this.candidateTimelines;
-	// }
-
-	public Timeline getCandidateTimesline(String timelineID)
-	{
-		return this.candidateTimelines.get(timelineID);
-	}
-
-	public ArrayList<Timeline> getOnlyCandidateTimeslines()
-	{
-		return (ArrayList<Timeline>) this.candidateTimelines.entrySet().stream().map(e -> (Timeline) e.getValue())
-				.collect(Collectors.toList());
-	}
-
-	public int getNumOfCandidateTimelines()
-	{
-		return this.candidateTimelines.size();
-	}
-
 	/**
 	 */
-	public long getSumOfActivityObjects(LinkedHashMap<Integer, TimelineWithNext> map)
+	public static long getSumOfActivityObjects(LinkedHashMap<Integer, Timeline> map)
 	{
 		long count = 0;
 
-		for (Map.Entry<Integer, TimelineWithNext> entry : map.entrySet())
+		for (Map.Entry<Integer, Timeline> entry : map.entrySet())
 		{
 			int a = entry.getValue().countNumberOfValidActivities();
 			int b = entry.getValue().size();
@@ -2724,67 +2742,27 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		return count;
 	}
 
-	/**
-	 * Traverse candidate timelines with edit distance and print them.
-	 * 
-	 * @param editDistancesSortedMapFullCand
-	 * @return
-	 */
-	// public int traverseCandidateTimelineWithEditDistance()// LinkedHashMap<Integer, Pair<String, Double>>
-	// // editDistancesSortedMapFullCand)
-	// {
-	// if (editDistancesSortedMapFullCand.size() > 0)
-	// {
-	// for (Map.Entry<String, Pair<String, Double>> entry : editDistancesSortedMapFullCand.entrySet())
-	// {
-	// String timelineID = entry.getKey();
-	// Double editDistance = entry.getValue().getSecond();
-	//
-	// System.out.println("\n\tCand timeline ID: " + timelineID);
-	// System.out.print("\tEdit dist: " + editDistance);
-	//
-	// Timeline candidateTimeline = this.candidateTimelines.get(timelineID);
-	//
-	// ArrayList<ActivityObject> activityObjectsInCand = candidateTimeline.getActivityObjectsInTimeline();
-	// System.out.println("\nact objs:");
-	// for (int i = 0; i < activityObjectsInCand.size(); i++)
-	// {
-	// System.out.print(">>" + activityObjectsInCand.get(i).getActivityName());
-	//
-	// }
-	// }
-	// }
-	// else
-	// {
-	// System.out.println(
-	// "Warning in traverseCandidateTimelineWithEditDistance(): editDistancesSortedMapFullCand is empty.");
-	// }
-	// return 0;
-	// }
+	public boolean hasError()
+	{
+		return this.errorExists;
+	}
 
-	// /**
-	// * Traverse top next activity objects' names with the edit distance of the candidate timeline which produced them
-	// *
-	// * @return
-	// */
-	// public int traverseTopNextActivities()
-	// {
-	// System.out.println();
-	// if (this.nextActivityObjectsFromCands.size() > 0)
-	// {
-	// for (int i = 0; i < this.nextActivityObjectsFromCands.size(); i++)
-	// {
-	// ActivityObject ae = this.nextActivityObjectsFromCands.get(i).getFirst();
-	// Double dist = this.nextActivityObjectsFromCands.get(i).getSecond();
-	// System.out.print(" >>" + ae.getActivityName() + ":" + dist);
-	// }
-	// }
-	// else
-	// {
-	// System.out.println("Warning in traverseTopNextActivities(): there are no top next activity objects.");
-	// }
-	// return 0;
-	// }
+	public void setErrorExists(boolean exists)
+	{
+		this.errorExists = exists;
+	}
+
+	/// Start of Methods for interface
+
+	public int getNumOfCandidateTimelines()
+	{
+		return this.candidateTimelines.size();
+	}
+
+	public int getNumberOfActivitiesInActivitesGuidingRecommendation()
+	{
+		return this.activitiesGuidingRecomm.size();
+	}
 
 	public int getNumberOfValidActivitiesInActivitesGuidingRecommendation()
 	{
@@ -2792,8 +2770,6 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		for (ActivityObject ae : this.activitiesGuidingRecomm)
 		{
 			if (UtilityBelt.isValidActivityName(ae.getActivityName()))
-			// (!( (ae.getActivityName().equalsIgnoreCase("Others")) ||
-			// (ae.getActivityName().equalsIgnoreCase("Unknown")) ))
 			{
 				count++;
 			}
@@ -2801,9 +2777,54 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		return count++;
 	}
 
-	public int getNumberOfActivitiesInActivitesGuidingRecommendation()
+	public Timeline getCandidateTimeline(String timelineID)
 	{
-		return this.activitiesGuidingRecomm.size();
+		return this.candidateTimelines.get(timelineID);
+	}
+
+	public ArrayList<Timeline> getOnlyCandidateTimeslines()
+	{
+		return (ArrayList<Timeline>) this.candidateTimelines.entrySet().stream().map(e -> (Timeline) e.getValue())
+				.collect(Collectors.toList());
+	}
+
+	public Set<String> getCandidateTimelineIDs()
+	{
+		return this.candidateTimelines.keySet();
+	}
+
+	public boolean hasCandidateTimeslines()
+	{
+		return hasCandidateTimelines;
+	}
+
+	public boolean hasCandidateTimelinesBelowThreshold()
+	{
+		return hasCandidateTimelinesBelowThreshold;
+	}
+
+	public boolean hasThresholdPruningNoEffect()
+	{
+		return thresholdPruningNoEffect;
+	}
+
+	public boolean isNextActivityJustAfterRecommPointIsInvalid()
+	{
+		return this.nextActivityJustAfterRecommPointIsInvalid;
+	}
+
+	public ActivityObject getActivityObjectAtRecomm()
+	{
+		return this.activityAtRecommPoint;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public double getThresholdAsDistance()
+	{
+		return thresholdAsDistance;
 	}
 
 	public int getNumberOfCandidateTimelinesBelowThreshold() // satisfying threshold
@@ -2817,47 +2838,72 @@ public class RecommendationMasterMar2017Gen// implements RecommendationMasterI//
 		/*
 		 * Assuming that threshold has already been applied
 		 */
-		return this.editDistancesSortedMap.size();
+		return this.distancesSortedMap.size();
 	}
 
 	/**
+	 * Returns next activity names as String
 	 * 
 	 * @return
 	 */
-	public double getThresholdAsDistance()
-	{
-		return thresholdAsDistance;
+	public String getNextActivityNamesWithoutDistanceString()
+	{// LinkedHashMap<String, Pair<ActivityObject, Double>>
+		StringBuilder result = new StringBuilder("");
+		nextActivityObjectsFromCands.entrySet().stream()
+				.forEach(e -> result.append("__" + e.getValue().getFirst().getActivityName()));
+		return result.toString();
 	}
 
-	public boolean isNextActivityJustAfterRecommPointIsInvalid()
-	{
-		return this.nextActivityJustAfterRecommPointIsInvalid;
+	/**
+	 * Returns next activity names with distance as String
+	 * 
+	 * @return
+	 */
+	public String getNextActivityNamesWithDistanceString()
+	{// LinkedHashMap<String, Pair<ActivityObject, Double>>
+		StringBuilder result = new StringBuilder("");
+		nextActivityObjectsFromCands.entrySet().stream().forEach(e -> result
+				.append("__" + e.getValue().getFirst().getActivityName() + ":" + e.getValue().getSecond().toString()));
+		return result.toString();
 	}
 
-	public boolean hasThresholdPruningNoEffect()
+	public String getActivityNamesGuidingRecommwithTimestamps()
 	{
-		return thresholdPruningNoEffect;
+		StringBuilder res = new StringBuilder();
+		for (ActivityObject ae : activitiesGuidingRecomm)
+		{
+			res.append("  " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp());
+		}
+		return res.toString();
 	}
 
-	public boolean hasCandidateTimelinesBelowThreshold()
+	public String getRankedRecommendedActivityNamesWithoutRankScores()
 	{
-		return hasCandidateTimelinesBelowThreshold;
+		return this.rankedRecommendedActNamesWithoutRankScoresStr;
 	}
 
-	public LinkedHashMap<String, Pair<String, Double>> getEditDistancesSortedMap()// getDistanceScoresSorted()
+	public String getRankedRecommendedActivityNamesWithRankScores()
 	{
-		return this.editDistancesSortedMap;
+		return this.rankedRecommendedActNamesWithRankScoresStr;
 	}
 
-	public boolean hasError()
+	public int getNumberOfDistinctRecommendations()
 	{
-		return this.errorExists;
+		return recommendedActivityNamesWithRankscores.size();
 	}
 
-	public void setErrorExists(boolean exists)
+	public LinkedHashMap<String, Pair<String, Double>> getDistancesSortedMap()
 	{
-		this.errorExists = exists;
+		return this.distancesSortedMap;
 	}
+
+	public LinkedHashMap<String, Integer> getEndPointIndicesConsideredInCands()
+	{
+		return endPointIndicesConsideredInCands;
+	}
+
+	/// end of methods for interface
+
 }
 
 /////////////////////////////////////////////////

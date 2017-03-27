@@ -1042,7 +1042,7 @@ public class TimelineStats
 			{
 				HJEditDistance hjDist = new HJEditDistance();
 				Pair<String, Double> dist = hjDist.getHJEditDistanceWithTrace(segments.get(i), segments.get(j), "", "",
-						"", new Long(1));
+						"", "1");// new Long(1)
 				sumOfDistances += (dist.getSecond());// , 1, 1, 2);
 				count++;
 			}
@@ -1075,9 +1075,9 @@ public class TimelineStats
 			{
 				HJEditDistance hjDist = new HJEditDistance();
 				Pair<String, Double> dist = hjDist.getHJEditDistanceWithTrace(segments.get(i), segments.get(j), "", "",
-						"", new Long(1));// new Pair("a", new Double(2));// ALERT
-											// ALERT ALTER ALERT
-											// ALERT
+						"", "1");// new Pair("a", new Double(2));// ALERT
+									// ALERT ALTER ALERT
+									// ALERT
 				distances.add(dist.getSecond());// , 1, 1, 2);
 				count++;
 			}

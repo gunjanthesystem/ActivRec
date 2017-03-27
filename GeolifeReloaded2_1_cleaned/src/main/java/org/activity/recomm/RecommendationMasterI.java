@@ -1,9 +1,11 @@
 package org.activity.recomm;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.activity.objects.ActivityObject;
+import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 
 public interface RecommendationMasterI
@@ -14,11 +16,11 @@ public interface RecommendationMasterI
 
 	public int getNumberOfValidActivitiesInActivitesGuidingRecommendation();
 
-	public Timeline getCandidateTimesline(String timelineID);
+	public Timeline getCandidateTimeline(String timelineID);
 
 	public ArrayList<Timeline> getOnlyCandidateTimeslines();
 
-	public Set getCandidateTimelineIDs();
+	public Set<String> getCandidateTimelineIDs();
 
 	public boolean hasCandidateTimeslines();
 
@@ -30,13 +32,7 @@ public interface RecommendationMasterI
 
 	public ActivityObject getActivityObjectAtRecomm();
 
-	public double getThresholdAsDistance();
-
 	public int getNumberOfCandidateTimelinesBelowThreshold();
-
-	public String getTopNextActivityNamesWithDistanceString();
-
-	public String getTopNextActivityNamesWithoutDistanceString();
 
 	public String getActivityNamesGuidingRecommwithTimestamps();
 
@@ -46,12 +42,23 @@ public interface RecommendationMasterI
 
 	public int getNumberOfDistinctRecommendations();
 
-	/**
-	 * not implemented in daywise and baseline st. yet. relevant for case-based approach
-	 * 
-	 * @return
-	 */
-	public double getAvgEndSimilarity();
+	// Specific for distance based approaches: could be later taken out into a separate interface
+	public double getThresholdAsDistance();
+
+	public String getNextActivityNamesWithDistanceString();
+
+	public String getNextActivityNamesWithoutDistanceString();
+
+	public LinkedHashMap<String, Pair<String, Double>> getDistancesSortedMap();
+
+	public LinkedHashMap<String, Integer> getEndPointIndicesConsideredInCands();
+
+	// /**
+	// * not implemented in daywise and baseline st. yet. relevant for case-based approach
+	// *
+	// * @return
+	// */
+	// public double getAvgEndSimilarity();
 
 	//
 	// public String getRankedRecommendationWithRankScores();

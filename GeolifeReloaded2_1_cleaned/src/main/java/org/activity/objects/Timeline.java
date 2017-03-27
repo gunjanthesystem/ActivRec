@@ -807,7 +807,7 @@ public class Timeline implements Serializable
 					+ indexOfActivityObjectNearestST + " with time diff of " + leastDistantSTVal);
 		}
 
-		return new Triple(indexOfActivityObjectNearestST,
+		return new Triple<Integer, ActivityObject, Double>(indexOfActivityObjectNearestST,
 				this.activityObjectsInTimeline.get(indexOfActivityObjectNearestST), (double) leastDistantSTVal);
 	}
 

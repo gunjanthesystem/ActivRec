@@ -3199,6 +3199,57 @@ public class TimelineUtils
 
 		return endPoints;
 	}
+
+	/**
+	 * Gets the start time distances of the (valid) Activity Object in each candidate timeline which is nearest to the
+	 * start time of the current Activity Object
+	 * 
+	 * @param candidateTimelines
+	 * @param activitiesGuidingRecomm
+	 * @param userIDAtRecomm
+	 * @param string
+	 * @param string2
+	 * @param hasinvalidactivitynames
+	 * @param iNVALID_ACTIVITY1
+	 * @param iNVALID_ACTIVITY2
+	 * @param distanceUsed
+	 * @return {candID, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
+	 */
+	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getClosestTimeDistancesForDaywiseCandidateTimelines(
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasinvalidactivitynames,
+			String iNVALID_ACTIVITY1, String iNVALID_ACTIVITY2, String distanceUsed)
+	{
+
+		// timelineID, <Index for the nearest Activity Object, Diff of Start time of nearest Activity
+		// Object with start time of current Activity Object>
+		LinkedHashMap<String, Pair<String, Double>> distances = new LinkedHashMap<>();
+
+		/**
+		 * {Date of CandidateTimeline as string, End point index of least distant subsequence}}
+		 */
+		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
+
+		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+
+		for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
+		{
+			/*
+			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
+			 * current Activity Object and the distance is diff of their start times
+			 */
+			Triple<Integer, ActivityObject, Double> score = (entry.getValue()
+					.getTimeDiffValidAOInDayWithStartTimeNearestTo(activityObjectAtRecommPoint.getStartTimestamp()));
+
+			distances.put(entry.getKey(),
+					new Pair<String, Double>(score.getSecond().getActivityName(), score.getThird()));
+
+			indicesOfActObjsWithNearestST.put(entry.getKey(), score.getFirst());
+			// System.out.println("now we put "+entry.getKey()+" and score="+score);
+		}
+		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distances,
+				indicesOfActObjsWithNearestST);
+	}
 }
 /////////////// UNUSED CODE
 

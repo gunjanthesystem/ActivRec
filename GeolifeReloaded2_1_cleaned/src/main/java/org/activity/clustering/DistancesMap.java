@@ -73,7 +73,7 @@ public class DistancesMap
 		case "HJDistance":
 			Pair<String, Double> dist = (new HJEditDistance()).getHJEditDistanceWithTrace(
 					A.toTimeline().getActivityObjectsInTimeline(), B.toTimeline().getActivityObjectsInTimeline(), "",
-					"", "", 0);
+					"", "", "0");// 0);
 			// .(A.getDataValue().toString(), B.getDataValue().toString(), 1, 1, 2);
 			return dist.getSecond();
 
