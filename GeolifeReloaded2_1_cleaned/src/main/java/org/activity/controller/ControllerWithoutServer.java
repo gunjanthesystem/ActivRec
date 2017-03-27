@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
-import org.activity.evaluation.RecommendationTestsDayWise2FasterJan2016;
+import org.activity.evaluation.RecommendationTestsMar2017Gen;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -226,9 +226,12 @@ public class ControllerWithoutServer
 				// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
 				// $$RecommendationTestsBaseClosestTime recommendationsTest = new RecommendationTestsBaseClosestTime(
 				// $$ sampledUsers);
-
-				RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new RecommendationTestsDayWise2FasterJan2016(
-						sampledUsers);
+				RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
+						Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
+						Constant.percentageInTraining);
+				// RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new
+				// RecommendationTestsDayWise2FasterJan2016(
+				// sampledUsers);
 			}
 			// // important curtain 1 end 10 Feb 2017
 			// $$$

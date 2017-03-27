@@ -43,7 +43,7 @@ import org.activity.util.TimelineUtils;
  * @author gunjan
  *
  */
-public class RecommendationMasterBaseClosestTimeMar2017 implements RecommendationMasterI
+public class RecommendationMasterBaseClosestTimeMar2017 // implements RecommendationMasterI
 {
 	LinkedHashMap<Date, Timeline> trainingTimelines, testTimelines, candidateTimelines;
 
@@ -143,8 +143,8 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 		System.out.println("\nActivity at Recomm point =" + this.activityAtRecommPoint.getActivityName());
 
 		// /////IMPORTANT
-		candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines,
-				this.activitiesGuidingRecomm, this.dateAtRecomm, this.activityAtRecommPoint);// trainingTimelines;
+		candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines, this.dateAtRecomm,
+				this.activityAtRecommPoint);// trainingTimelines;
 
 		totalNumberOfProbableCands = candidateTimelines.size();
 		numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
@@ -241,7 +241,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 		return this.startTimeDistanceSortedMap.keySet();
 	}
 
-	public Timeline getCandidateTimesline(String timelineID)
+	public Timeline getCandidateTimeline(String timelineID)
 	{
 		List<Timeline> foundTimelines = this.candidateTimelines.entrySet().stream()
 				.filter(e -> e.getValue().toString().equals(timelineID)).map(e -> e.getValue())
@@ -395,7 +395,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 	 * 
 	 * @return
 	 */
-	public String getTopNextActivityNamesWithoutDistanceString()
+	public String getNextActivityNamesWithoutDistanceString()
 	{
 		StringBuffer result = new StringBuffer("");// String result="";
 
@@ -416,7 +416,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 	 * 
 	 * @return
 	 */
-	public String getTopNextActivityNamesWithDistanceString()
+	public String getNextActivityNamesWithDistanceString()
 	{
 		StringBuffer result = new StringBuffer("");// String result="";
 

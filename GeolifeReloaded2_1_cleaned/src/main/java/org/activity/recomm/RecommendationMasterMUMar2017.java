@@ -51,7 +51,7 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
  * @since 28 October, 2014
  * @author gunjan
  */
-public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IRecommenderMaster
+public class RecommendationMasterMUMar2017// implements RecommendationMasterI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
 
@@ -1299,7 +1299,7 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	 * 
 	 * @return
 	 */
-	public String getTopNextActivityNamesWithoutDistanceString()
+	public String getNextActivityNamesWithoutDistanceString()
 	{
 		StringBuilder result = new StringBuilder("");// String result="";
 		for (int i = 0; i < this.nextActivityObjectsFromCands.size(); i++)
@@ -1315,7 +1315,7 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 	 * 
 	 * @return
 	 */
-	public String getTopNextActivityNamesWithDistanceString()
+	public String getNextActivityNamesWithDistanceString()
 	{
 		StringBuilder result = new StringBuilder(""); // String result="";
 
@@ -1438,14 +1438,14 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 				{
 					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithoutEndCurrentActivity(
 							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, new Long(candidateTimelineId));
+							dateAtRecomm, timeAtRecomm, (candidateTimelineId));
 				}
 				else
 				{
 					editDistanceForThisCandidate = hjEditDistance
 							.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
 									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
-									userAtRecomm, dateAtRecomm, timeAtRecomm, new Long(candidateTimelineId));
+									userAtRecomm, dateAtRecomm, timeAtRecomm, (candidateTimelineId));
 				}
 				break;
 
@@ -1456,13 +1456,13 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 				{
 					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
 							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, new Long(candidateTimelineId));
+							dateAtRecomm, timeAtRecomm, (candidateTimelineId));
 				}
 				else
 				{
 					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceInvalidsExpunged(
 							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, new Long(candidateTimelineId));
+							dateAtRecomm, timeAtRecomm, (candidateTimelineId));
 				}
 				break;
 
@@ -2499,7 +2499,7 @@ public class RecommendationMasterMUMar2017 implements RecommendationMasterI// IR
 		return this.candidateTimelines;
 	}
 
-	public Timeline getCandidateTimesline(String timelineID)
+	public Timeline getCandidateTimeline(String timelineID)
 	{
 		return this.candidateTimelines.get(timelineID);
 	}

@@ -1,9 +1,9 @@
 package org.activity.controller;
 
 import org.activity.constants.Constant;
-import org.activity.constants.Enums;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
+import org.activity.util.Searcher;
 
 public class SuperController
 {
@@ -81,7 +81,7 @@ public class SuperController
 		// $$ CURRENT END
 
 		Constant.setDatabaseName("gowalla1");// "");// ("dcu_data_2");// "geolife1";//gowalla1
-		Constant.caseType = Enums.CaseType.SimpleV3;/// "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
+		// Constant.caseType = Enums.CaseType.SimpleV3;/// "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
 		Constant.outputCoreResultsPath = commonPathGowalla;// commonPathGeolife;// commonPathDCU + "SimpleV3/";//
 															// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
@@ -282,6 +282,9 @@ public class SuperController
 		// new ControllerWithoutServer();
 
 		// ///////////////////////
+
+		Searcher.search(Constant.outputCoreResultsPath, "consoleLog", "rror");
+		Searcher.search(Constant.outputCoreResultsPath, "consoleLog", "xception");
 
 		long bt = System.currentTimeMillis();
 		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");

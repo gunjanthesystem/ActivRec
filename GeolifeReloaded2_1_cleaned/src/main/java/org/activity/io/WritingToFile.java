@@ -2574,16 +2574,19 @@ public class WritingToFile
 	 * @param timeAtRecomm
 	 * @param editDistancesSorted
 	 * @param candidateTimelines
+	 * @param currentActivityObject
 	 * @param nextActObjs
 	 * @param currentTimeline
 	 * @param writeCandidateTimeline
 	 * @param writeEditOperations
+	 * @param endPointIndicesInCands
 	 */
 	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<String, Pair<String, Double>> editDistancesSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines,
 			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs, ArrayList<ActivityObject> currentTimeline,
-			boolean writeCandidateTimeline, boolean writeEditOperations)
+			ActivityObject currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
+			LinkedHashMap<String, Integer> endPointIndicesInCands)
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
 	// Enums.CaseType caseType)
 	{
@@ -2634,9 +2637,30 @@ public class WritingToFile
 					writefull = false;
 				}
 
-				sbToWrite.append(userString + "," + dateString + "," + timeString + "," + candTimelineID + "," + " "
-						+ "," + editOperationsString + "," + editDist + "," + countOfL1Ops + "," + countOfL2Ops + ","
-						+ nextAOName + "," + candidateTimelineAsString + "," + currentTimelineString + "\n");
+				///
+				Integer endPointIndexInCand = endPointIndicesInCands.get(candTimelineID);
+				ActivityObject endPointActivityInCandidate = candidateTimelines.get(candTimelineID)
+						.getActivityObjectAtPosition(endPointIndexInCand);
+				// difference in start time of end point activity of candidate and start
+				// time of current activity
+				long diffStartTimeForEndPointsCand_n_GuidingInSecs = (currentActivityObject.getStartTimestamp()
+						.getTime() - endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
+				// difference in end time of end point activity of candidate and end time of
+				// current activity
+				long diffEndTimeForEndPointsCand_n_GuidingInSecs = (currentActivityObject.getEndTimestamp().getTime()
+						- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
+				///
+
+				sbToWrite.append(userString + "," + dateString + "," + timeString + "," + candTimelineID + ","
+						+ endPointIndexInCand + "," + editOperationsString + "," + editDist + "," + countOfL1Ops + ","
+						+ countOfL2Ops + "," + nextAOName + "," + diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
+						+ diffEndTimeForEndPointsCand_n_GuidingInSecs + "," + candidateTimelineAsString + ","
+						+ currentTimelineString + "\n");
+
+				// sbToWrite.append(userString + "," + dateString + "," + timeString + "," + candTimelineID + "," + " "
+				// + "," + editOperationsString + "," + editDist + "," + countOfL1Ops + "," + countOfL2Ops + ","
+				// + nextAOName + "," + candidateTimelineAsString + "," + currentTimelineString + "\n");
+
 				// else // no need to write same repeating things everytime
 				// { bw.write("',','," + candTimelineID + "," + " " + "," + editOperationsString + "," + editDist + ","
 				// + countOfL1Ops + "," + countOfL2Ops + "," + topNextAOName + "," + candidateTimelineAsString + "," +

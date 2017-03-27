@@ -40,7 +40,9 @@ public final class Constant
 	static String DATABASE_NAME = "";// ;"geolife1";// default database name,
 										// dcu_data_2";// "geolife1";// "start_base_2";databaseName
 	public static String rankScoring = "";// "sum";// default product"; // "sum"
-	public static Enums.CaseType caseType = null;// String caseType CaseBasedV1";// default " CaseBasedV1 " or SimpleV3
+	public static final Enums.CaseType caseType = Enums.CaseType.SimpleV3;// null;// String caseType CaseBasedV1";//
+																			// default "
+	// CaseBasedV1 " or SimpleV3
 
 	public static String howManyUsers = "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
 	static double currentMatchingUnit = -99; // stores the current matching unit at all times, used for some
@@ -140,7 +142,7 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = true;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;// Enums.LookPastType.NCount;
 	// "Count";// "Count";// "Hrs"// "Daywise"
 
 	/**
