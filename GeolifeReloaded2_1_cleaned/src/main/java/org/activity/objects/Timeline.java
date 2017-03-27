@@ -128,12 +128,14 @@ public class Timeline implements Serializable
 	public ActivityObject getNextValidActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
 		// System.out.println("To find next activity object at :"+timestamp);
-		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectsAtTime(timestamp);
+		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectAtTime(timestamp);
 		return getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp);
 	}
 
 	/**
 	 * Returns the next valid Activity Object in the Timeline after the given index.
+	 * <p>
+	 * 
 	 * 
 	 * @param indexOfActivityObject
 	 * @return
@@ -290,6 +292,7 @@ public class Timeline implements Serializable
 	/**
 	 * 
 	 * @param from
+	 *            starting from 0
 	 * @param to
 	 *            <font color = orange>exclusive</font>
 	 * @return ArrayList of Activity Objects in the timeline from the 'from' index until before the 'to' index
@@ -465,7 +468,7 @@ public class Timeline implements Serializable
 	public ActivityObject getNextActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
 		// System.out.println("To find next activity object at :"+timestamp);
-		ActivityObject ae = activityObjectsInTimeline.get(getIndexOfActivityObjectsAtTime(timestamp) + 1);
+		ActivityObject ae = activityObjectsInTimeline.get(getIndexOfActivityObjectAtTime(timestamp) + 1);
 		if (ae == null)
 		{
 			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
@@ -524,7 +527,7 @@ public class Timeline implements Serializable
 	 * @param ts
 	 * @return
 	 */
-	public int getIndexOfActivityObjectsAtTime(Timestamp ts)
+	public int getIndexOfActivityObjectAtTime(Timestamp ts)
 	{
 		ArrayList<Integer> res = new ArrayList<>();
 		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)

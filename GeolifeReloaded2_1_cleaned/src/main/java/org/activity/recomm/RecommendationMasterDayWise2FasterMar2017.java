@@ -55,12 +55,11 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	private ArrayList<ActivityObject> activitiesGuidingRecomm; // (activitiesGuidingRecomm) sequence of activity events
 																// happening one or before the recomm point on that day
 	private ActivityObject activityAtRecommPoint;// current Activity Object
-	private String activityNameAtRecommPoint;// current Activity Name
 
 	/**
-	 * {Cand TimelineID, Triple{End point index of least distant subsequence, String containing the trace of edit
-	 * operations performed, edit distance of least distant subsequence}} this LinkedHashMap is sorted by the value of
-	 * edit distance in ascending order (second component of the Pair (value))
+	 * {Cand TimelineID, Triple{End point index of least distant subsequence, trace of edit operations performed, edit
+	 * distance of least distant subsequence}} this LinkedHashMap is sorted by the value of edit distance in ascending
+	 * order (second component of the Pair (value))
 	 * 
 	 */
 	private LinkedHashMap<Date, Triple<Integer, String, Double>> editDistancesSortedMap;
@@ -70,8 +69,8 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 	private LinkedHashMap<Date, String> nextActivityNamesFromCandsByEditDistMap;
 
 	private LinkedHashMap<String, Double> recommendedActivityNamesWithRankScores;
-	private String rankedRecommendationWithRankScores;
-	private String rankedRecommendationWithoutRankScores;
+	private String rankedRecommendedActNamesWithRankScores;
+	private String rankedRecommendedActNamesWithoutRankScores;
 
 	private boolean hasCandidateTimelines, hasCandidateTimelinesBelowThreshold;
 
@@ -142,19 +141,20 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 
 		this.activitiesGuidingRecomm = currentDayTimeline
 				.getActivityObjectsStartingOnBeforeTimeSameDay(timestampPointAtRecomm);
-
-		System.out.println("Activity starting on or before the time to recommend (on recommendation day) are: \t");
-		activitiesGuidingRecomm.stream().forEach(e -> System.out.print(e.getActivityName() + " "));
-
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Activity starting on or before the time to recommend (on recommendation day) are: \t");
+			activitiesGuidingRecomm.stream().forEach(e -> System.out.print(e.getActivityName() + " "));
+		}
 		this.activityAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 		System.out.println("\nActivity at Recomm point =" + this.activityAtRecommPoint.getActivityName());
 
 		// All check OK
-		this.candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines,
-				this.activitiesGuidingRecomm, this.dateAtRecomm, this.activityAtRecommPoint);
+		this.candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines, this.dateAtRecomm,
+				this.activityAtRecommPoint);
 
 		System.out.println("Number of candidate timelines =" + candidateTimelines.size());
-		System.out.println("the candidate timelines are as follows:");
+		// $$System.out.println("the candidate timelines are as follows:");
 		// $$traverseMapOfDayTimelines(candidateTimelines);
 
 		if (candidateTimelines.size() == 0)
@@ -263,16 +263,15 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 		{
 			Triple<String, String, LinkedHashMap<String, Double>> recommRes = createRankedTopRecommendation(
 					this.nextActivityNamesFromCandsByEditDistString);
-			this.rankedRecommendationWithRankScores = recommRes.getFirst();
-			this.rankedRecommendationWithoutRankScores = recommRes.getSecond();
+			this.rankedRecommendedActNamesWithRankScores = recommRes.getFirst();
+			this.rankedRecommendedActNamesWithoutRankScores = recommRes.getSecond();
 			this.recommendedActivityNamesWithRankScores = recommRes.getThird();
 		}
 
 		// this.rankedRecommendationWithRankScores
 		// System.out.println("Next recommended 5 activity is: "+this.topFiveRecommendedActivities);
 
-		int indexOfRecommPointInDayTimeline = currentDayTimeline
-				.getIndexOfActivityObjectsAtTime(timestampPointAtRecomm);
+		int indexOfRecommPointInDayTimeline = currentDayTimeline.getIndexOfActivityObjectAtTime(timestampPointAtRecomm);
 
 		if (indexOfRecommPointInDayTimeline + 1 > currentDayTimeline.getActivityObjectsInDay().size() - 1)
 		{
@@ -545,7 +544,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 
 	public String getRankedRecommendedActivityNamesWithRankScores()
 	{
-		return this.rankedRecommendationWithRankScores;
+		return this.rankedRecommendedActNamesWithRankScores;
 	}
 
 	public String convertRankedRecommendationWithoutRankScoresAsString(
@@ -562,7 +561,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 
 	public String getRankedRecommendedActivityNamesWithoutRankScores()
 	{
-		return this.rankedRecommendationWithoutRankScores;
+		return this.rankedRecommendedActNamesWithoutRankScores;
 	}
 
 	public LinkedHashMap<String, Double> getRecommendationRankscorePairs()
@@ -1000,7 +999,7 @@ public class RecommendationMasterDayWise2FasterMar2017 implements Recommendation
 					indicesOfValids.add(i);
 			}
 		}
-		// all indices are valid acts
+		else// all indices are valid acts
 		{
 			indicesOfValids = (ArrayList<Integer>) IntStream.rangeClosed(0, userDayActivitiesAsStringCode.length() - 1)
 					.boxed().collect(Collectors.toList());

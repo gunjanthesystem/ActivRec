@@ -89,4 +89,11 @@ public class PopUps
 		return sb.append("--------- ------- ----- -------").toString();
 	}
 
+	public static String getCurrentStackTracedWarningMsg(String errorMsg)
+	{
+		StringBuilder sb = new StringBuilder("Warning:" + errorMsg + "\n" + "--------- current stack -------\n");
+		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
+		return sb.append("--------- ------- ----- -------").toString();
+	}
+
 }

@@ -47,6 +47,16 @@ public class TestDummy1
 		// System.out.println(System.getProperty("user.dir"));
 		// stringSplitPerformance();
 
+		String s = "manali";
+
+		fun1(s);
+		System.out.println(s);
+
+	}
+
+	static void fun1(String s)
+	{
+		s = "gunjan";
 	}
 
 	public static void stringSplitPerformance()

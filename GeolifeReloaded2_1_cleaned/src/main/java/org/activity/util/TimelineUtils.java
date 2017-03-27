@@ -19,9 +19,11 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
+import org.activity.distances.HJEditDistance;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
@@ -31,6 +33,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.json.JSONArray;
 
@@ -2144,7 +2147,7 @@ public class TimelineUtils
 	public static LinkedHashMap<Integer, Pair<String, Double>> removeAboveThreshold4FullCandISD(
 			LinkedHashMap<Integer, Pair<String, Double>> distanceScoresSortedFullCand, double threshold)
 	{
-		LinkedHashMap<Integer, Pair<String, Double>> pruned = new LinkedHashMap<Integer, Pair<String, Double>>();
+		LinkedHashMap<Integer, Pair<String, Double>> pruned = new LinkedHashMap<>();
 
 		int numberOfTimelinesRemoved = 0;
 
@@ -2170,6 +2173,22 @@ public class TimelineUtils
 		}
 
 		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		return pruned;
+	}
+
+	/**
+	 * 
+	 * @param distanceScoresSortedFullCand
+	 * @param threshold
+	 * @return
+	 */
+	public static LinkedHashMap<String, Pair<String, Double>> removeAboveThreshold4SSD(
+			LinkedHashMap<String, Pair<String, Double>> distanceScoresSortedFullCand, double threshold)
+	{
+		LinkedHashMap<String, Pair<String, Double>> pruned = (LinkedHashMap<String, Pair<String, Double>>) distanceScoresSortedFullCand
+				.entrySet().stream().filter(e -> e.getValue().getSecond() <= threshold)
+				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+		System.out.println("Number of timelines removed=" + (distanceScoresSortedFullCand.size() - pruned.size()));
 		return pruned;
 	}
 
@@ -2263,98 +2282,14 @@ public class TimelineUtils
 	 * converted to a static method on Dec 5 2016
 	 * <p>
 	 * 
+	 * 
 	 * @param dayTimelinesForUser
-	 * @param activitiesGuidingRecomm
 	 * @param dateAtRecomm
 	 * @param activityAtRecommPoint
 	 * @return
 	 */
 	public static LinkedHashMap<Date, Timeline> extractDaywiseCandidateTimelines(
-			LinkedHashMap<Date, Timeline> dayTimelinesForUser, ArrayList<ActivityObject> activitiesGuidingRecomm,
-			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
-	{
-		LinkedHashMap<Date, Timeline> candidateTimelines = new LinkedHashMap<>();
-		int count = 0;
-		int totalNumberOfProbableCands = 0;
-		int numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
-		int numCandsRejectedDueToNoNextActivity = 0;
-
-		for (Map.Entry<Date, Timeline> dayTimelineEntry : dayTimelinesForUser.entrySet())
-		{
-			totalNumberOfProbableCands += 1;
-			Date dayOfTimeline = dayTimelineEntry.getKey();
-			Timeline dayTimeline = dayTimelineEntry.getValue();//
-
-			if (!dayTimeline.isShouldBelongToSingleDay())
-			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
-						"Error in extractDaywiseCandidateTimelines: dayTimeline.isShouldBelongToSingleDay()="
-								+ dayTimeline.isShouldBelongToSingleDay()));
-			}
-
-			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for
-			// the day to be recommended (this should nt be the case because test and training set are diffferent)
-			// and there is atleast one valid activity after this activityAtRecomm point
-			if (dayTimeline.countContainsActivityNameButNotAsLast(activityAtRecommPoint.getActivityName()) > 0)
-			// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
-			{
-				if (dayOfTimeline.toString().equals(dateAtRecomm.toString()) == true)
-				{
-					System.err.println(PopUps.getCurrentStackTracedErrorMsg(
-							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly"));
-					continue;
-				}
-
-				if (dayTimeline.getActivityObjectsInTimeline().size() > 1 && dayTimeline
-						.hasAValidActAfterFirstOccurOfThisActName(activityAtRecommPoint.getActivityName()))
-				// if (dayTimeline.containsOnlySingleActivity() == false && dayTimeline
-				// .hasAValidActivityAfterFirstOccurrenceOfThisActivity(activityAtRecommPoint) == true)
-				{
-					candidateTimelines.put(dayOfTimeline, dayTimeline);
-					count++;
-				}
-				else
-				{
-					numCandsRejectedDueToNoNextActivity += 1;
-				}
-			}
-			else
-			{
-				numCandsRejectedDueToNoCurrentActivityAtNonLast += 1;
-			}
-		}
-
-		if (VerbosityConstants.verbose)
-		{
-			System.out.println("Inside extractDaywiseCandidateTimelines: #cand timelines = " + count
-					+ " numCandsRejectedDueToNoNextActivity =" + numCandsRejectedDueToNoNextActivity
-					+ "  numCandsRejectedDueToNoCurrentActivityAtNonLast"
-					+ numCandsRejectedDueToNoCurrentActivityAtNonLast);
-		}
-		if (count == 0)
-		{
-			System.err.println("Warning: No candidate timelines found");
-		}
-		return candidateTimelines;
-	}
-
-	/**
-	 * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current
-	 * Activity). Also, this candidate timeline must contain the activityAtRecomm point at non-last position and there
-	 * is atleast one valid activity after this activityAtRecomm point
-	 * 
-	 * <p>
-	 * converted to a static method on Dec 5 2016
-	 * <p>
-	 * 
-	 * @param dayTimelinesForUser
-	 * @param activitiesGuidingRecomm
-	 * @param dateAtRecomm
-	 * @param activityAtRecommPoint
-	 * @return
-	 */
-	public static LinkedHashMap<Date, Timeline> extractDaywiseCandidateTimelines2(
-			LinkedHashMap<Date, Timeline> dayTimelinesForUser, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<Date, Timeline> dayTimelinesForUser, // ArrayList<ActivityObject> activitiesGuidingRecomm,
 			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
 	{
 		LinkedHashMap<Date, Timeline> candidateTimelines = new LinkedHashMap<>();
@@ -2638,6 +2573,17 @@ public class TimelineUtils
 	}
 
 	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @return
+	 */
+	public static LinkedHashMap<Date, Timeline> expungeInvalidsDT(LinkedHashMap<Date, Timeline> usersDayTimelines)
+	{
+		return (LinkedHashMap<Date, Timeline>) usersDayTimelines.entrySet().stream()
+				.collect(Collectors.toMap(e -> e.getKey(), e -> TimelineUtils.expungeInvalids(e.getValue())));
+	}
+
+	/**
 	 * Removes the invalid activity objects from the given Timeline. Invalid Activity Objects are Activity Objects with
 	 * Activity Name as 'Others' or 'Unknown'
 	 * 
@@ -2700,7 +2646,7 @@ public class TimelineUtils
 				0);
 		// long currentEndTime=currentEndTimestamp.getTime();
 
-		int indexOfCurrentEnd = longerTimeline.getIndexOfActivityObjectsAtTime(currentEndTimestamp);
+		int indexOfCurrentEnd = longerTimeline.getIndexOfActivityObjectAtTime(currentEndTimestamp);
 
 		if (indexOfCurrentEnd - matchingUnitInCounts < 0)
 		{
@@ -2735,14 +2681,7 @@ public class TimelineUtils
 		ActivityObject nextActivityObject = longerTimeline
 				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 
-		int isInvalid = -99;
-		if (nextActivityObject.isInvalidActivityName())
-		{
-			isInvalid = 1;
-		}
-		else
-			isInvalid = -1;
-
+		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
 		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
 				nextValidActivityObject, false, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
@@ -2798,18 +2737,80 @@ public class TimelineUtils
 				.getNextValidActivityAfterActivityAtThisTime(currentEndTimestamp);
 		ActivityObject nextActivityObject = longerTimeline.getNextActivityAfterActivityAtThisTime(currentEndTimestamp);
 
-		int isInvalid = -99;
-		if (nextActivityObject.isInvalidActivityName())
-		{
-			isInvalid = 1;
-		}
-		else
-			isInvalid = -1;
-
+		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
 		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
 				nextValidActivityObject, false, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
 		System.out.println("------- Exiting getCurrentTimelineFromLongerTimelineMUHours");
+		return currentTimeline;
+	}
+
+	/**
+	 * Fetches the current timeline from the given longer timeline from the recommendation point back until the matching
+	 * unit count Activity Objects.
+	 * 
+	 * @param longerTimeline
+	 *            the timelines (test timeline) from which the current timeline is to be extracted
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param userIDAtRecomm
+	 * @param matchingUnitInCounts
+	 * @return
+	 */
+	public static TimelineWithNext getCurrentTimelineFromLongerTimelineDaywise(
+			LinkedHashMap<Date, Timeline> testDayTimelines, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm)
+	{
+		System.out.println("------Inside getCurrentTimelineFromLongerTimelineDaywise");
+
+		///////////////////////////////////////////////////////////////////
+		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
+				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
+				0);
+		Timestamp currentEndTimestamp2 = new Timestamp(timeAtRecomm.getTime());
+		// TODO: check if timestamps are actually equally, if yes, prefer the cleaner method
+		System.out.println("Debug sanity check Note: currentEndTimestamp2.equals(currentEndTimestamp) ="
+				+ currentEndTimestamp2.equals(currentEndTimestamp));
+		System.out.println("Debug sanity check Note: currentEndTimestamp2 =" + currentEndTimestamp2
+				+ "currentEndTimestamp = " + currentEndTimestamp);
+		///////////////////////////////////////////////////////////////////
+		Timeline currentDayTimeline = testDayTimelines.get(dateAtRecomm);
+		Date dateOfFetchedDayTimeline = currentDayTimeline.getActivityObjectsInTimeline().get(0).getEndDate();
+		System.out.println("Debug sanity check Note: dateOfFetchedDayTimeline = " + dateOfFetchedDayTimeline
+				+ " dateAtRecomm = " + dateAtRecomm + "equals = " + dateAtRecomm.equals(dateOfFetchedDayTimeline));
+		if (currentDayTimeline == null || !(currentDayTimeline.size() > 0))
+		{
+			System.err.println(PopUps
+					.getCurrentStackTracedErrorMsg("Error: currentDayTimeline.size() =" + currentDayTimeline.size()));
+		}
+		///////////////////////////////////////////////////////////////////
+
+		int indexOfCurrentEnd = currentDayTimeline.getIndexOfActivityObjectAtTime(currentEndTimestamp);
+
+		// identify the recommendation point in longer timeline
+		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = currentDayTimeline
+				.getActivityObjectsInTimelineFromToIndex(0, indexOfCurrentEnd + 1);
+
+		ActivityObject nextValidActivityObject = currentDayTimeline
+				.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
+		ActivityObject nextActivityObject = currentDayTimeline
+				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
+
+		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
+
+		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
+				nextValidActivityObject, true, true);
+		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
+
+		// if (VerbosityConstants.verbose)
+		// System.out.println("Current timeline=" + currentTimeline.getActivityObjectNamesInSequence());
+
+		if (!(currentTimeline.size() > 0))
+		{
+			System.err.println(
+					PopUps.getCurrentStackTracedErrorMsg("Error: currentTimeline.size() =" + currentTimeline.size()));
+		}
+
+		System.out.println("------Exiting getCurrentTimelineFromLongerTimelineDaywise");
 		return currentTimeline;
 	}
 
@@ -2885,7 +2886,7 @@ public class TimelineUtils
 	public static void traverseMapOfTimelines(LinkedHashMap<String, Timeline> map)
 	{
 		System.out.println("traversing map of day timelines");
-	
+
 		for (Map.Entry<String, Timeline> entry : map.entrySet())
 		{
 			System.out.print("ID: " + entry.getKey());
@@ -2898,7 +2899,7 @@ public class TimelineUtils
 	public static void traverseMapOfTimelinesWithNext(LinkedHashMap<Integer, TimelineWithNext> map)
 	{
 		System.out.println("traversing map of timelines");
-	
+
 		for (Map.Entry<Integer, TimelineWithNext> entry : map.entrySet())
 		{
 			System.out.print("ID: " + entry.getKey());
@@ -2922,16 +2923,283 @@ public class TimelineUtils
 	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
 			ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm, ActivityObject activityAtRecommPoint)
 	{
-		LinkedHashMap<Date, Timeline> candidateTimelines = extractDaywiseCandidateTimelines(
-				trainingTimelines, activitiesGuidingRecomm, dateAtRecomm, activityAtRecommPoint);
+		LinkedHashMap<Date, Timeline> candidateTimelines = extractDaywiseCandidateTimelines(trainingTimelines,
+				dateAtRecomm, activityAtRecommPoint);
 		if (candidateTimelines.size() > 0)
 			return true;
 		else
 			return false;
 	}
 
-}
+	/**
+	 * 
+	 * @param candidateTimelines2
+	 * @param activitiesGuidingRecomm2
+	 * @param userIDAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param hasInvalidActivityNames
+	 * @param invalidActName1
+	 * @param invalidActName2
+	 * @param distanceUsed
+	 * @return
+	 */
+	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getEditDistancesForDaywiseCandidateTimelines(
+			LinkedHashMap<String, Timeline> candidateTimelines2, ArrayList<ActivityObject> activitiesGuidingRecomm2,
+			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasInvalidActivityNames,
+			String invalidActName1, String invalidActName2, String distanceUsed)
+	{
+		// <Date of CandidateTimeline, (End point index of least distant subsequence, String containing the trace of
+		// edit operations performed, edit distance of
+		// least distant subsequence)>
+		/**
+		 * {Date of CandidateTimeline as string, Pair {trace of edit operations performed, edit distance of least
+		 * distant subsequence}}
+		 */
+		LinkedHashMap<String, Pair<String, Double>> distancesRes = new LinkedHashMap<>();
 
+		/**
+		 * {Date of CandidateTimeline as string, End point index of least distant subsequence}}
+		 */
+		LinkedHashMap<String, Integer> endIndicesOfLeastDistantSubcand = new LinkedHashMap<>();
+
+		for (Map.Entry<String, Timeline> candidate : candidateTimelines2.entrySet())
+		{
+			Timeline candidateTimeline = candidate.getValue();
+			// similarityScores.put(entry.getKey(), getSimilarityScore(entry.getValue(),activitiesGuidingRecomm));
+			// (Activity Events in Candidate Day, activity events on or before recomm on recomm day)
+			// Long candTimelineID = candidate.getKey().getTime();// used as dummy, not exactly useful right now
+			Triple<Integer, String, Double> distance = getEditDistanceLeastDistantSubcand(candidateTimeline,
+					activitiesGuidingRecomm2, userIDAtRecomm, dateAtRecomm, timeAtRecomm, candidate.getKey(),
+					hasInvalidActivityNames, invalidActName1, invalidActName2, distanceUsed);
+
+			distancesRes.put(candidate.getKey(), new Pair<String, Double>(distance.getSecond(), distance.getThird()));
+			endIndicesOfLeastDistantSubcand.put(candidate.getKey(), distance.getFirst());
+			// System.out.println("now we put "+entry.getKey()+" and score="+score);
+		}
+
+		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distancesRes,
+				endIndicesOfLeastDistantSubcand);
+	}
+
+	/**
+	 * Get distance scores using modified edit distance.
+	 * 
+	 * <end point index, edit operations trace, edit distance> The distance score is the distance between the activities
+	 * guiding recommendation and the least distant subcandidate (which has a valid activity after it) from the
+	 * candidate timeline. (subcandidate is a subsequence from candidate timeline, from the start of the candidate
+	 * timeline to any occurrence of the ActivityGuiding Recomm or current activity).
+	 * 
+	 * 
+	 * @param candidateDayTimeline
+	 *            currently a day timeline. It should not be TimelineWithNext, because instead of timeline 'with next'
+	 *            here the subsequence must have a valid act after it or else not considered. This valid act after the
+	 *            subsequence essentially served as "the next" activity to recommend.
+	 * @param activitiesGuidingRecomm
+	 * @param userAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param candidateID
+	 * @param hasInvalidActivityNames
+	 * @param invalidActName1
+	 * @param invalidActName2
+	 * @param distanceUsed
+	 * @return Triple{EndIndexOfLestDistantSubCand,TraceOfEditOperation,EditDistance}
+	 */
+	public static Triple<Integer, String, Double> getEditDistanceLeastDistantSubcand(Timeline candidateDayTimeline,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
+			String timeAtRecomm, String candidateID, boolean hasInvalidActivityNames, String invalidActName1,
+			String invalidActName2, String distanceUsed)
+	{
+		System.out.println("Inside getEditDistancesLeastDistantSubcands");
+
+		// find the end points in the userDayTimeline
+		char activityAtRecommPointAsStringCode = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1)
+				.getStringCode();
+		String activitiesGuidingAsStringCode = StringCode.getStringCodeForActivityObjects(activitiesGuidingRecomm);
+		String userDayTimelineAsStringCode = candidateDayTimeline.getActivityObjectsAsStringCode();
+
+		ArrayList<Integer> indicesOfEndPointActivityInDayButNotLastValid = getIndicesOfEndPointActivityInDayButNotLastValid(
+				userDayTimelineAsStringCode, activityAtRecommPointAsStringCode, hasInvalidActivityNames,
+				StringCode.getCharCodeFromInvalidActivityName(invalidActName1),
+				StringCode.getCharCodeFromInvalidActivityName(invalidActName2));
+
+		// $$WritingToFile.writeEndPoinIndexCheck24Oct(activityAtRecommPointAsStringCode,userDayTimelineAsStringCode,indicesOfEndPointActivityInDay1,indicesOfEndPointActivityInDay);
+
+		/** index of end point, edit operations trace, edit distance **/
+		LinkedHashMap<Integer, Pair<String, Double>> distanceScoresForEachSubsequence = new LinkedHashMap<>();
+
+		// getting distance scores for each subcandidate
+		switch (distanceUsed)
+		{
+		case "HJEditDistance":
+		{
+			HJEditDistance editSimilarity = new HJEditDistance();
+			for (Integer indexOfEndPointWithValidAfterIt : indicesOfEndPointActivityInDayButNotLastValid)
+			{
+				Pair<String, Double> distance = editSimilarity.getHJEditDistanceWithTrace(
+						candidateDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
+								indexOfEndPointWithValidAfterIt + 1),
+						activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateID);
+				distanceScoresForEachSubsequence.put(indexOfEndPointWithValidAfterIt, distance);
+				// System.out.println("Distance between:\n
+				// activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
+				// "\n and subsequence of
+				// Cand:"+UtilityBelt.getActivityNamesFromArrayList(userDayTimeline.getActivityObjectsInDayFromToIndex(0,indicesOfEndPointActivityInDay1.get(i)+1)));
+			}
+			break;
+		}
+		default:
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error unknown distance:" + distanceUsed));
+			System.exit(-1);
+		}
+
+		// sort by each subcand by edit distance
+		distanceScoresForEachSubsequence = (LinkedHashMap<Integer, Pair<String, Double>>) ComparatorUtils
+				.sortByValueAscendingIntStrDoub(distanceScoresForEachSubsequence);
+
+		if (distanceScoresForEachSubsequence.size() == 0)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error no subsequence to be considered for distance,distanceScoresForEachSubsequence.size() = "
+							+ distanceScoresForEachSubsequence.size()));
+		}
+
+		// we only consider the most similar subsequence . i.e. the first entry in this Map
+		List<Entry<Integer, Pair<String, Double>>> subseqWithLeastEditDist = distanceScoresForEachSubsequence.entrySet()
+				.stream().limit(1).collect(Collectors.toList());
+
+		int endPointIndexForSubsequenceWithHighestSimilarity = subseqWithLeastEditDist.get(0).getKey();// -1;
+		String traceEditOperationsForSubsequenceWithHighestSimilarity = subseqWithLeastEditDist.get(0).getValue()
+				.getFirst();
+		double distanceScoreForSubsequenceWithHighestSimilarity = subseqWithLeastEditDist.get(0).getValue().getSecond();// -9999;
+		distanceScoreForSubsequenceWithHighestSimilarity = StatsUtils
+				.round(distanceScoreForSubsequenceWithHighestSimilarity, Constant.RoundingPrecision);
+
+		// finding the end point index with highest similarity WHICH HAS A VALID ACTIVITY AFTER IT
+		// removed some legacy code from here since we have already checked if there exists valid act after every of the
+		// considered index of subcand. the legacy code can be found:
+		// org.activity.recomm.RecommendationMasterDayWise2FasterMar2017.getDistanceScoreModifiedEdit()
+
+		// /////
+
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("---Debug: getEditDistancesLeastDistantSubcand---- \nactivitiesGuidingAsStringCode="
+					+ activitiesGuidingAsStringCode + "\nactivityAtRecommPointAsStringCode="
+					+ activityAtRecommPointAsStringCode + "\nuserDayTimelineAsStringCode="
+					+ userDayTimelineAsStringCode);
+			for (Map.Entry<Integer, Pair<String, Double>> entry1 : distanceScoresForEachSubsequence.entrySet())
+			{
+				System.out.println("End point= " + entry1.getKey() + " distance=" + entry1.getValue().getSecond()
+						+ "trace=" + entry1.getValue().getFirst());
+			}
+			System.out.println("endPointIndexForSubsequenceWithHighestSimilarity="
+					+ endPointIndexForSubsequenceWithHighestSimilarity);
+			System.out.println("distanceScoreForSubsequenceWithHighestSimilarity="
+					+ distanceScoreForSubsequenceWithHighestSimilarity);
+		}
+		if (VerbosityConstants.WriteEditDistancesOfAllEndPoints)
+		{
+			WritingToFile.writeEditDistancesOfAllEndPoints(activitiesGuidingRecomm, candidateDayTimeline,
+					distanceScoresForEachSubsequence);
+
+		}
+
+		// Triple{EndIndexOfLestDistantSubCand,TraceOfEditOperation,EditDistance}
+		return new Triple<Integer, String, Double>(endPointIndexForSubsequenceWithHighestSimilarity,
+				traceEditOperationsForSubsequenceWithHighestSimilarity,
+				distanceScoreForSubsequenceWithHighestSimilarity);
+	}
+
+	/**
+	 * 
+	 * @param userDayActivitiesAsStringCode
+	 * @param codeOfEndPointActivity
+	 * @return
+	 */
+	public static ArrayList<Integer> getIndicesOfSubstringInStringButNotAsLast(String userDayActivitiesAsStringCode,
+			String codeOfEndPointActivity)
+	{
+		// System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast:
+		// userDayActivitiesAsStringCode="+userDayActivitiesAsStringCode+" and
+		// codeOfEndPointActivity="+codeOfEndPointActivity);
+		ArrayList<Integer> indicesOfEndPointActivityInDay = new ArrayList<>();
+
+		int index = userDayActivitiesAsStringCode.indexOf(codeOfEndPointActivity); // get index of first occurrence
+
+		while (index >= 0)
+		{
+			// System.out.println(index);
+			if (index != (userDayActivitiesAsStringCode.length() - 1)) // not last index
+			{
+				indicesOfEndPointActivityInDay.add(index);
+			}
+			index = userDayActivitiesAsStringCode.indexOf(codeOfEndPointActivity, index + 1);
+		}
+		return indicesOfEndPointActivityInDay;
+	}
+
+	/**
+	 * Indices of current activity occurrence with atleast one valid activity after it.
+	 * 
+	 * @param userDayActivitiesAsStringCode
+	 *            each activity is represented by single char in this string
+	 * @param codeOfEndPointActivity
+	 * @param hasInvalidActivityNames
+	 * @param codeOfInvalidAct1
+	 * @param codeOfInvalidAct2
+	 * @return
+	 */
+	public static ArrayList<Integer> getIndicesOfEndPointActivityInDayButNotLastValid(
+			String userDayActivitiesAsStringCode, char codeOfEndPointActivity, boolean hasInvalidActivityNames,
+			char codeOfInvalidAct1, char codeOfInvalidAct2)
+	{
+		System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotLastValid: userDayActivitiesAsStringCode="
+				+ userDayActivitiesAsStringCode + "  and codeOfEndPointActivity=" + codeOfEndPointActivity);
+
+		// get indices of valid activity ActivityNames
+		ArrayList<Integer> indicesOfValids = new ArrayList<>();
+
+		if (hasInvalidActivityNames)
+		{
+			for (int i = 0; i < userDayActivitiesAsStringCode.length(); i++)
+			{
+				char charToCheck = userDayActivitiesAsStringCode.charAt(i);
+				// userDayActivitiesAsStringCode.substring(i, i + 1); // only one character
+				// here codeToCheck is of length 1, hence, using endsWith or equals below shouldn't make difference
+				// sanity checked in org.activity.sanityChecks.TestDummy2.checkString1()
+				// if (codeToCheck.equals((codeUn) || codeToCheck.equals(codeO))
+				if (charToCheck != codeOfInvalidAct1 && charToCheck != codeOfInvalidAct2)
+				{
+					indicesOfValids.add(i);
+				}
+			}
+		}
+		else// all indices are valid acts
+		{
+			indicesOfValids = (ArrayList<Integer>) IntStream.rangeClosed(0, userDayActivitiesAsStringCode.length() - 1)
+					.boxed().collect(Collectors.toList());
+		}
+
+		ArrayList<Integer> endPoints = new ArrayList<>();
+
+		for (int indexOfValid = 0; indexOfValid < indicesOfValids.size() - 1; indexOfValid++)
+		{ // skip the last valid because there is no valid activity to recommend after that.
+			// if (userDayActivitiesAsStringCode.substring(indexOfValid, indexOfValid +
+			// 1).equals(codeOfEndPointActivity))
+			if (userDayActivitiesAsStringCode.charAt(indexOfValid) == codeOfEndPointActivity)
+			{
+				endPoints.add(indexOfValid);
+			}
+		}
+
+		System.out.println("indices of valids=" + indicesOfValids);
+		System.out.println("end points considered" + endPoints);
+
+		return endPoints;
+	}
+}
 /////////////// UNUSED CODE
 
 // DISABLED BECAUSE AFTER THE OCT 2016 CRASH, I COULD NOT FIND BACK THE CLASS CheckinActivityObject

@@ -18,6 +18,7 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.util.FastMath;
 
 public class StatsUtils
@@ -92,6 +93,13 @@ public class StatsUtils
 		return ds.getStandardDeviation();
 	}
 
+	public static double getStandardDeviation(ArrayList<Double> array)
+	{
+		return (new StandardDeviation().evaluate(UtilityBelt.toPrimitive(array)));
+		// PearsonsCorrelation pc = new PearsonsCorrelation();
+		// , 0, normEditSimilarity.size()));// pc.correlation(UtilityBelt.toPrimitive(normEditSimilarity),
+	}
+
 	public static double iqrOfArrayListInt(ArrayList<Integer> arr, int roundOffToPlaces)
 	{
 		if (arr.size() == 0) return 0;
@@ -104,6 +112,21 @@ public class StatsUtils
 		}
 
 		return StatsUtils.round(StatUtils.percentile(vals, 75) - StatUtils.percentile(vals, 25), roundOffToPlaces);
+	}
+
+	/**
+	 * Used for case-based approach
+	 * <p>
+	 * the correlation between the rest and end similarites of candidate timelines with current timelines
+	 * 
+	 * @param arr1
+	 * @param arr2
+	 * @return
+	 */
+	public static double getPearsonCorrelation(ArrayList<Double> arr1, ArrayList<Double> arr2)
+	{
+		PearsonsCorrelation pc = new PearsonsCorrelation();
+		return (pc.correlation(UtilityBelt.toPrimitive(arr1), UtilityBelt.toPrimitive(arr2)));
 	}
 
 	/*
@@ -875,6 +898,6 @@ public class StatsUtils
 			System.err.println("Warning: Alert!! minMaxNorm: max - min <=0 =" + (max - min));
 			return 0;
 		}
-	
+
 	}
 }

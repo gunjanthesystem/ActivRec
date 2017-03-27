@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.evaluation.Evaluation;
 import org.activity.io.WritingToFile;
@@ -61,7 +60,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 	ActivityObject activityAtRecommPoint;
 
 	/**
-	 * (Cand Date, Pair<Index of ST nearest AO, distance as diff of this ST with ST of CO)
+	 * {Cand Date, Pair{Index of ST nearest AO, distance as diff of this ST with ST of CO}}
 	 * 
 	 * distance is the difference of the start time of the Current Activity Object and the Activity Object from the
 	 * candidate timelines whose start time is nearest to the start time of current Activity Object. this LinkedHashMap
@@ -73,12 +72,12 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 	/** Recommended Activity names with their rank score */
 	private LinkedHashMap<String, Double> recommendedActivityNamesWithRankscores;
 
-	private String rankedRecommendedActivityNameWithRankScores;
-	private String rankedRecommendedActivityNameWithoutRankScores;
+	private String rankedRecommendedActNamesWithRankScores;
+	private String rankedRecommendedActNamesWithoutRankScores;
 
 	private boolean hasCandidateTimelines, errorExists, nextActivityJustAfterRecommPointIsInvalid;
 
-	public static String commonPath;// = Constant.commonPath;
+	// public static String commonPath;// = Constant.commonPath;
 
 	public int totalNumberOfProbableCands;
 	public int numCandsRejectedDueToNoCurrentActivityAtNonLast;
@@ -107,9 +106,8 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 	// ,double // trainingPercentage)
 	{
 		System.out.println("\n^^^^^^^^^^^^^^^^Inside  RecommendationMasterBaseClosestTime");
-		commonPath = Constant.getCommonPath();
+		// commonPath = Constant.getCommonPath();
 		hasCandidateTimelines = true;
-		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceUnsortedMap = new LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>(); //
 
 		// dd/mm/yyyy // okay java.sql.Date with no hidden time
 		this.dateAtRecomm = DateTimeUtils.getDateFromDDMMYYYY(dateAtRecomm, RegexUtils.patternForwardSlash);
@@ -168,7 +166,8 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 		{
 			this.hasCandidateTimelines = true;
 		}
-		startTimeDistanceUnsortedMap = getDistancesforCandidateTimeline(candidateTimelines, activityAtRecommPoint);
+		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceUnsortedMap = getDistancesforCandidateTimeline(
+				candidateTimelines, activityAtRecommPoint);
 		// activitiesGuidingRecomm);
 
 		// ########Sanity check
@@ -352,12 +351,12 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 																										// "__"+entry.getKey()+":"+TestStats.round(entry.getValue(),4);
 		}
 
-		this.rankedRecommendedActivityNameWithRankScores = topRankedString.toString();
+		this.rankedRecommendedActNamesWithRankScores = topRankedString.toString();
 	}
 
 	public String getRankedRecommendedActivityNamesWithRankScores()
 	{
-		return this.rankedRecommendedActivityNameWithRankScores;
+		return this.rankedRecommendedActNamesWithRankScores;
 	}
 
 	// /////////////////////////////////////////////////////////////////////
@@ -381,12 +380,12 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 			// rankedRecommendationWithoutRankScores+= "__"+entry.getKey();
 		}
 
-		this.rankedRecommendedActivityNameWithoutRankScores = rankedRecommendationWithoutRankScores.toString();
+		this.rankedRecommendedActNamesWithoutRankScores = rankedRecommendationWithoutRankScores.toString();
 	}
 
 	public String getRankedRecommendedActivityNamesWithoutRankScores()
 	{
-		return this.rankedRecommendedActivityNameWithoutRankScores;
+		return this.rankedRecommendedActNamesWithoutRankScores;
 	}
 
 	// /////////////////////////////////////////////////////////////////////
@@ -454,7 +453,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 implements Recommendatio
 	{
 		nextActivityJustAfterRecommPointIsInvalid = false;
 		int indexOfRecommPointInDayTimeline = userDayTimelineAtRecomm
-				.getIndexOfActivityObjectsAtTime(timestampPointAtRecomm);
+				.getIndexOfActivityObjectAtTime(timestampPointAtRecomm);
 		if (indexOfRecommPointInDayTimeline + 1 > userDayTimelineAtRecomm.getActivityObjectsInDay().size() - 1)
 		{
 			System.err.println(

@@ -37,6 +37,7 @@ public class VerbosityConstants
 	public static final boolean WriteEditSimilarityCalculations = false;// false;
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;
 	public static final boolean WriteNormalisation = false;// false;
+	public static final boolean WriteEditDistancesOfAllEndPoints = false;
 	/**
 	 * Write each cand of each RT in separate line
 	 */
