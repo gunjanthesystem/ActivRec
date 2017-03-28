@@ -696,7 +696,7 @@ public class TimelineUtils
 		int numOfCatIDsInMap = 0;
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absfileNameToUse);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
 			for (Entry<String, ArrayList<Integer>> entry : map.entrySet())
 			{
 				String catID = entry.getKey();
@@ -754,7 +754,7 @@ public class TimelineUtils
 		int numOfCatIDsInMap = 0;
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absfileNameToUse);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
 			for (Entry<String, ArrayList<Integer>> entry : map.entrySet())
 			{
 				String catID = entry.getKey();
@@ -2051,7 +2051,10 @@ public class TimelineUtils
 			}
 		}
 
-		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Number of timelines removeAboveThreshold2=" + numberOfTimelinesRemoved);
+		}
 		return pruned;
 	}
 
@@ -2090,8 +2093,10 @@ public class TimelineUtils
 				numberOfTimelinesRemoved += 1;
 			}
 		}
-
-		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Number of timelines removeAboveThreshold3=" + numberOfTimelinesRemoved);
+		}
 		return pruned;
 	}
 
@@ -2185,9 +2190,9 @@ public class TimelineUtils
 	public static LinkedHashMap<String, Pair<String, Double>> removeAboveThreshold4SSD(
 			LinkedHashMap<String, Pair<String, Double>> distanceScoresSortedFullCand, double threshold)
 	{
-		LinkedHashMap<String, Pair<String, Double>> pruned = (LinkedHashMap<String, Pair<String, Double>>) distanceScoresSortedFullCand
-				.entrySet().stream().filter(e -> e.getValue().getSecond() <= threshold)
-				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+		LinkedHashMap<String, Pair<String, Double>> pruned = distanceScoresSortedFullCand.entrySet().stream()
+				.filter(e -> e.getValue().getSecond() <= threshold).collect(Collectors.toMap(e -> e.getKey(),
+						e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Pair<String, Double>>::new));
 		System.out.println("Number of timelines removed=" + (distanceScoresSortedFullCand.size() - pruned.size()));
 		return pruned;
 	}
@@ -2476,31 +2481,44 @@ public class TimelineUtils
 
 	/**
 	 * 
-	 * @param activityObjectIndex
-	 * @param givenTimeline
+	 * @param givenActivityObjectIndex
+	 * @param givenTimelineToCheckIn
 	 * @return
 	 */
-	public static boolean isNoValidActivityAfterItInTheDay(int activityObjectIndex, Timeline givenTimeline)
+	public static boolean isNoValidActivityAfterItInTheDay(int givenActivityObjectIndex,
+			Timeline givenTimelineToCheckIn)
 	{
 		boolean isNoValidAfter = true;
-		ArrayList<ActivityObject> objectsInGivenTimeline = givenTimeline.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
 
-		Date dateOfAOAtIndex = DateTimeUtils
-				.getDate(givenTimeline.getActivityObjectAtPosition(activityObjectIndex).getEndTimestamp());
+		// Date dateOfAOAtGivenIndex = DateTimeUtils.getDate(
+		// givenTimelineToCheckIn.getActivityObjectAtPosition(givenActivityObjectIndex).getEndTimestamp());
 
-		if (activityObjectIndex == objectsInGivenTimeline.size() - 1)
+		LocalDate dateOfAOAtGivenIndex = givenTimelineToCheckIn.getActivityObjectAtPosition(givenActivityObjectIndex)
+				.getEndTimestamp().toLocalDateTime().toLocalDate();
+
+		if (givenActivityObjectIndex == aosInGivenTimelineToCheckIn.size() - 1)
 		{
 			return true;
 		}
 
 		int i = -1;
-		for (i = activityObjectIndex + 1; i < objectsInGivenTimeline.size(); i++)
+		for (i = givenActivityObjectIndex + 1; i < aosInGivenTimelineToCheckIn.size(); i++)
 		{
-			Date dateOfThisAO = DateTimeUtils.getDate(objectsInGivenTimeline.get(i).getEndTimestamp());
-			if (dateOfThisAO.equals(dateOfAOAtIndex)) // only look at aos in same day
+			// System.out.println("for index " + i);
+			LocalDate dateOfThisAO = aosInGivenTimelineToCheckIn.get(i).getEndTimestamp().toLocalDateTime()
+					.toLocalDate();
+
+			// System.out.println("dateOfAOAtGivenIndex = " + dateOfAOAtGivenIndex + " dateOfThisAO = " + dateOfThisAO);
+			// System.out
+			// .println("dateOfThisAO.equals(dateOfAOAtGivenIndex = " + dateOfThisAO.equals(dateOfAOAtGivenIndex));
+
+			if (dateOfThisAO.equals(dateOfAOAtGivenIndex)) // only look at aos in same day
 			{
-				if (UtilityBelt.isValidActivityName(objectsInGivenTimeline.get(i).getActivityName()))
+				// System.out.println("found same date");
+				if (UtilityBelt.isValidActivityName(aosInGivenTimelineToCheckIn.get(i).getActivityName()))
 				{
+					// System.out.println("found valid act");
 					isNoValidAfter = false;
 					break;
 				}
@@ -2513,12 +2531,13 @@ public class TimelineUtils
 
 		if (VerbosityConstants.verbose)
 		{
-			System.out.println(
-					"inside isNoValidActivityAfterItInTheDay\nactivityIndexAfterWhichToCheck=" + activityObjectIndex);
-			givenTimeline.printActivityObjectNamesInSequence();
-			System.out.println("Number of activities in timeline=" + objectsInGivenTimeline.size());
-			System.out.println("AO making it false=" + objectsInGivenTimeline.get(i).getActivityName());
-			System.out.println("No valid after is:" + isNoValidAfter);
+			System.out.println("-------\n\tinside isNoValidActivityAfterItInTheDay\n\tactivityIndexAfterWhichToCheck="
+					+ givenActivityObjectIndex);
+			givenTimelineToCheckIn.printActivityObjectNamesInSequence();
+			System.out.println("\tNumber of activities in timeline=" + aosInGivenTimelineToCheckIn.size());
+			if (!isNoValidAfter)
+				System.out.println("\tAO making it false=" + aosInGivenTimelineToCheckIn.get(i).getActivityName());
+			System.out.println("\tNo valid after is:" + isNoValidAfter + "\n-------");
 		}
 
 		return isNoValidAfter;
@@ -2579,8 +2598,8 @@ public class TimelineUtils
 	 */
 	public static LinkedHashMap<Date, Timeline> expungeInvalidsDT(LinkedHashMap<Date, Timeline> usersDayTimelines)
 	{
-		return (LinkedHashMap<Date, Timeline>) usersDayTimelines.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> TimelineUtils.expungeInvalids(e.getValue())));
+		return usersDayTimelines.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(),
+				e -> TimelineUtils.expungeInvalids(e.getValue()), (v1, v2) -> v1, LinkedHashMap<Date, Timeline>::new));
 	}
 
 	/**
@@ -2766,17 +2785,21 @@ public class TimelineUtils
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
 				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
 				0);
-		Timestamp currentEndTimestamp2 = new Timestamp(timeAtRecomm.getTime());
-		// TODO: check if timestamps are actually equally, if yes, prefer the cleaner method
-		System.out.println("Debug sanity check Note: currentEndTimestamp2.equals(currentEndTimestamp) ="
-				+ currentEndTimestamp2.equals(currentEndTimestamp));
-		System.out.println("Debug sanity check Note: currentEndTimestamp2 =" + currentEndTimestamp2
-				+ "currentEndTimestamp = " + currentEndTimestamp);
+		// Timestamp currentEndTimestamp2 = new Timestamp(timeAtRecomm.getTime()); INCORRECT 1970 year
+		// check if timestamps are actually equally, if yes, prefer the cleaner method INCORRECT 1970 year
+		// System.out.println("Debug sanity check Note: currentEndTimestamp2.equals(currentEndTimestamp) ="
+		// + currentEndTimestamp.equals(currentEndTimestamp));
+		// System.out.println("Debug sanity check Note: currentEndTimestamp2 =" + currentEndTimestamp
+		// + "currentEndTimestamp = " + currentEndTimestamp);
 		///////////////////////////////////////////////////////////////////
 		Timeline currentDayTimeline = testDayTimelines.get(dateAtRecomm);
-		Date dateOfFetchedDayTimeline = currentDayTimeline.getActivityObjectsInTimeline().get(0).getEndDate();
-		System.out.println("Debug sanity check Note: dateOfFetchedDayTimeline = " + dateOfFetchedDayTimeline
-				+ " dateAtRecomm = " + dateAtRecomm + "equals = " + dateAtRecomm.equals(dateOfFetchedDayTimeline));
+
+		if (VerbosityConstants.verbose)
+		{
+			LocalDate dateOfFetchedDayTimeline = currentDayTimeline.getActivityObjectsInTimeline().get(0).getEndDate();
+			System.out.println("Debug sanity check Note: dateOfFetchedDayTimeline = " + dateOfFetchedDayTimeline
+					+ " dateAtRecomm = " + dateAtRecomm + "equals = " + dateAtRecomm.equals(dateOfFetchedDayTimeline));
+		}
 		if (currentDayTimeline == null || !(currentDayTimeline.size() > 0))
 		{
 			System.err.println(PopUps
@@ -2942,12 +2965,13 @@ public class TimelineUtils
 	 * @param invalidActName1
 	 * @param invalidActName2
 	 * @param distanceUsed
+	 * @param HJEditDistance
 	 * @return
 	 */
 	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getEditDistancesForDaywiseCandidateTimelines(
 			LinkedHashMap<String, Timeline> candidateTimelines2, ArrayList<ActivityObject> activitiesGuidingRecomm2,
 			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasInvalidActivityNames,
-			String invalidActName1, String invalidActName2, String distanceUsed)
+			String invalidActName1, String invalidActName2, String distanceUsed, HJEditDistance hjEditDistance)
 	{
 		// <Date of CandidateTimeline, (End point index of least distant subsequence, String containing the trace of
 		// edit operations performed, edit distance of
@@ -2971,7 +2995,7 @@ public class TimelineUtils
 			// Long candTimelineID = candidate.getKey().getTime();// used as dummy, not exactly useful right now
 			Triple<Integer, String, Double> distance = getEditDistanceLeastDistantSubcand(candidateTimeline,
 					activitiesGuidingRecomm2, userIDAtRecomm, dateAtRecomm, timeAtRecomm, candidate.getKey(),
-					hasInvalidActivityNames, invalidActName1, invalidActName2, distanceUsed);
+					hasInvalidActivityNames, invalidActName1, invalidActName2, distanceUsed, hjEditDistance);
 
 			distancesRes.put(candidate.getKey(), new Pair<String, Double>(distance.getSecond(), distance.getThird()));
 			endIndicesOfLeastDistantSubcand.put(candidate.getKey(), distance.getFirst());
@@ -3004,14 +3028,14 @@ public class TimelineUtils
 	 * @param invalidActName1
 	 * @param invalidActName2
 	 * @param distanceUsed
+	 * @param HJEditDistance
 	 * @return Triple{EndIndexOfLestDistantSubCand,TraceOfEditOperation,EditDistance}
 	 */
 	public static Triple<Integer, String, Double> getEditDistanceLeastDistantSubcand(Timeline candidateDayTimeline,
 			ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
 			String timeAtRecomm, String candidateID, boolean hasInvalidActivityNames, String invalidActName1,
-			String invalidActName2, String distanceUsed)
+			String invalidActName2, String distanceUsed, HJEditDistance hjEditDistance)
 	{
-		System.out.println("Inside getEditDistancesLeastDistantSubcands");
 
 		// find the end points in the userDayTimeline
 		char activityAtRecommPointAsStringCode = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1)
@@ -3021,8 +3045,11 @@ public class TimelineUtils
 
 		ArrayList<Integer> indicesOfEndPointActivityInDayButNotLastValid = getIndicesOfEndPointActivityInDayButNotLastValid(
 				userDayTimelineAsStringCode, activityAtRecommPointAsStringCode, hasInvalidActivityNames,
-				StringCode.getCharCodeFromInvalidActivityName(invalidActName1),
-				StringCode.getCharCodeFromInvalidActivityName(invalidActName2));
+				Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2);
+
+		// System.out.println(
+		// "Inside getEditDistancesLeastDistantSubcands: indicesOfEndPointActivityInDayButNotLastValid.size() ="
+		// + indicesOfEndPointActivityInDayButNotLastValid.size());
 
 		// $$WritingToFile.writeEndPoinIndexCheck24Oct(activityAtRecommPointAsStringCode,userDayTimelineAsStringCode,indicesOfEndPointActivityInDay1,indicesOfEndPointActivityInDay);
 
@@ -3034,13 +3061,16 @@ public class TimelineUtils
 		{
 		case "HJEditDistance":
 		{
-			HJEditDistance editSimilarity = new HJEditDistance();
+			// HJEditDistance editSimilarity = new HJEditDistance();
 			for (Integer indexOfEndPointWithValidAfterIt : indicesOfEndPointActivityInDayButNotLastValid)
 			{
-				Pair<String, Double> distance = editSimilarity.getHJEditDistanceWithTrace(
+				// long t1 = System.currentTimeMillis();
+				Pair<String, Double> distance = hjEditDistance.getHJEditDistanceWithTrace(
 						candidateDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
 								indexOfEndPointWithValidAfterIt + 1),
 						activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateID);
+				// System.out.println(
+				// "getHJEditDistanceWithTrace computed in: " + (System.currentTimeMillis() - t1) + " ms");
 				distanceScoresForEachSubsequence.put(indexOfEndPointWithValidAfterIt, distance);
 				// System.out.println("Distance between:\n
 				// activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
@@ -3147,22 +3177,22 @@ public class TimelineUtils
 	 *            each activity is represented by single char in this string
 	 * @param codeOfEndPointActivity
 	 * @param hasInvalidActivityNames
-	 * @param codeOfInvalidAct1
-	 * @param codeOfInvalidAct2
+	 * @param invalidAct1
+	 * @param invalidAct2
 	 * @return
 	 */
 	public static ArrayList<Integer> getIndicesOfEndPointActivityInDayButNotLastValid(
 			String userDayActivitiesAsStringCode, char codeOfEndPointActivity, boolean hasInvalidActivityNames,
-			char codeOfInvalidAct1, char codeOfInvalidAct2)
+			String invalidAct1, String invalidAct2)
 	{
-		System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotLastValid: userDayActivitiesAsStringCode="
-				+ userDayActivitiesAsStringCode + "  and codeOfEndPointActivity=" + codeOfEndPointActivity);
 
 		// get indices of valid activity ActivityNames
 		ArrayList<Integer> indicesOfValids = new ArrayList<>();
 
 		if (hasInvalidActivityNames)
 		{
+			char codeOfInvalidAct1 = StringCode.getCharCodeFromInvalidActivityName(invalidAct1);
+			char codeOfInvalidAct2 = StringCode.getCharCodeFromInvalidActivityName(invalidAct2);
 			for (int i = 0; i < userDayActivitiesAsStringCode.length(); i++)
 			{
 				char charToCheck = userDayActivitiesAsStringCode.charAt(i);
@@ -3194,8 +3224,14 @@ public class TimelineUtils
 			}
 		}
 
-		System.out.println("indices of valids=" + indicesOfValids);
-		System.out.println("end points considered" + endPoints);
+		if (VerbosityConstants.verbose)
+		{
+			System.out
+					.println("\nDebug getIndicesOfEndPointActivityInDayButNotLastValid: userDayActivitiesAsStringCode="
+							+ userDayActivitiesAsStringCode + "  and codeOfEndPointActivity=" + codeOfEndPointActivity);
+			System.out.println("indices of valids=" + indicesOfValids);
+			System.out.println("end points considered" + endPoints);
+		}
 
 		return endPoints;
 	}

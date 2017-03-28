@@ -88,17 +88,21 @@ public class TestDummy2
 		// checkString1();
 
 		// checkRegexUtils();
-
-		Timestamp t1 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
-		Timestamp t2 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
-
-		checkSQLDate0(t1, t2);
-		// checkSQLDate(t1, t2);
-
-		t1 = new Timestamp(2000, 12, 1, 5, 10, 10, 10);
-		t2 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
-
-		checkSQLDate0(t1, t2);
+		StringBuilder sb = new StringBuilder("Manali");
+		sb.append(" is ").append(" a good ").append(" girl.");
+		sb.append(" Really? ");
+		System.out.println(sb.toString());
+		//
+		// Timestamp t1 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
+		// Timestamp t2 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
+		//
+		// checkSQLDate0(t1, t2);
+		// // checkSQLDate(t1, t2);
+		//
+		// t1 = new Timestamp(2000, 12, 1, 5, 10, 10, 10);
+		// t2 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
+		//
+		// checkSQLDate0(t1, t2);
 		// checkSQLDate(t1, t2);
 
 		// List<Integer> range = IntStream.rangeClosed(1, 10).boxed().collect(Collectors.toList());

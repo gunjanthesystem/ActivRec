@@ -895,7 +895,7 @@ public class StatsUtils
 		}
 		else
 		{
-			System.err.println("Warning: Alert!! minMaxNorm: max - min <=0 =" + (max - min));
+			System.err.println(("Warning: Alert!! minMaxNorm: max - min <=0 =" + (max - min)));
 			return 0;
 		}
 

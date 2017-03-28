@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.activity.clustering.weka.WekaUtilityBelt;
 import org.activity.constants.Constant;
+import org.activity.constants.Enums;
 import org.activity.constants.VerbosityConstants;
 import org.activity.loader.GeolifeDataLoader;
 import org.activity.objects.ActivityObject;
@@ -82,15 +83,25 @@ public class WritingToFile
 		{
 			WritingToFile.appendLineToFileAbsolute("MUs/Users\n", absFileNameToWrite);
 
-			if (Constant.lookPastType.equals("Count"))
+			if (Constant.lookPastType.equals(Enums.LookPastType.NCount))
 			{
 				matchingUnitArray = Constant.matchingUnitAsPastCount;// matchingUnitAsPastCount; //
 																		// PopUps.showMessage(matchingUnitArray.toString());
 			}
-			else if (Constant.lookPastType.equals("Hrs"))
+			else if (Constant.lookPastType.equals(Enums.LookPastType.NHours))
 			{
 				matchingUnitArray = Constant.matchingUnitHrsArray;// matchingUnitHrsArray; //
 																	// PopUps.showMessage(matchingUnitArray.toString());
+			}
+
+			else if (Constant.lookPastType.equals(Enums.LookPastType.Daywise))
+			{
+				matchingUnitArray = Constant.matchingDummy;
+			}
+
+			else if (Constant.lookPastType.equals(Enums.LookPastType.ClosestTime))
+			{
+				matchingUnitArray = Constant.matchingDummy;
 			}
 			else
 			{
@@ -100,8 +111,15 @@ public class WritingToFile
 
 			for (double mu : matchingUnitArray)
 			{
-				String fileName = rootPath + "MatchingUnit" + mu + "/" + whichAlgo + "AllMeanReciprocalRank.csv";
-
+				String fileName = "";
+				if (mu == -1)
+				{
+					fileName = rootPath + whichAlgo + "AllMeanReciprocalRank.csv";
+				}
+				else
+				{
+					fileName = rootPath + "MatchingUnit" + mu + "/" + whichAlgo + "AllMeanReciprocalRank.csv";
+				}
 				List<Double> mrrVals = ReadingFromFile.oneColumnReaderDouble(fileName, ",", 1, true);
 				numberOfUsers = mrrVals.size(); // note we need to do this only once, but no harm done if done multiple
 												// times, overwriting the same value.
@@ -372,7 +390,7 @@ public class WritingToFile
 	 *            absolute path for the file
 	 * @return BufferedWriter for given file
 	 */
-	public static BufferedWriter getBufferedWriterForNewFile(String fullPath)
+	public static BufferedWriter getBWForNewFile(String fullPath)
 	{
 		BufferedWriter bw = null;
 		// System.out.println("fullpath =" + fullPath);
@@ -1193,7 +1211,7 @@ public class WritingToFile
 	{
 		try
 		{
-			BufferedWriter bw = getBufferedWriterForNewFile(absfileNameToUse);
+			BufferedWriter bw = getBWForNewFile(absfileNameToUse);
 			for (Entry<?, ArrayList<Integer>> entry : map.entrySet())
 			{
 				String s = entry.getKey().toString();
@@ -1362,7 +1380,7 @@ public class WritingToFile
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absfileNameToUse);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
 			StringBuilder sbToWrite = new StringBuilder();
 			sbToWrite.append(CheckinEntry.getHeaderToWrite() + "\n");
 
@@ -4096,7 +4114,7 @@ public class WritingToFile
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fullPath);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(fullPath);
 			bw.append("User,TimestampOfRT,NumOfValidsAfterIt");
 			bw.newLine();
 

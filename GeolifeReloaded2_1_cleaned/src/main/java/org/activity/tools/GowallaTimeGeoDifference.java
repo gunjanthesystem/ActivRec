@@ -27,7 +27,7 @@ public class GowallaTimeGeoDifference
 		{
 			int lineCount = 0;
 			BufferedReader br = new BufferedReader(new FileReader(checkinFileName));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(processedFileName);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(processedFileName);
 			// BufferedWriter bw2 = WritingToFile.getBufferedWriterForNewFile(processedFile + "slim");
 
 			bw.write("UserID, PlaceID,TS,Date,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");

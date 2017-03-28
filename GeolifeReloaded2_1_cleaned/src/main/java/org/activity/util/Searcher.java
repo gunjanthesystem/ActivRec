@@ -18,8 +18,9 @@ public class Searcher
 	 * @param fileNamePatternToSearch
 	 * @param contentToMatch
 	 */
-	public static void search(String rootPathToSearch, String fileNamePatternToSearch, String contentToMatch)
+	public static String search(String rootPathToSearch, String fileNamePatternToSearch, String contentToMatch)
 	{
+		StringBuilder res = new StringBuilder();
 		// String rootPathToSearch = args[0];// "./";
 		// String fileNamePatternToSearch = args[1];// "";
 		// String contentToMatch = args[2];// "repo";
@@ -53,34 +54,33 @@ public class Searcher
 				}
 			}
 
-			System.out.println("--- Root folder: " + Paths.get(rootPathToSearch).toAbsolutePath().toString());
-			System.out.println("--- fileNamePatternToSearch: " + fileNamePatternToSearch);
-			System.out.println("       num of file matching fileNamePatternToSearch = " + pathsOfFoundFiles.size()
+			res.append("\n--- Root folder: " + Paths.get(rootPathToSearch).toAbsolutePath().toString());
+			res.append("\n--- fileNamePatternToSearch: " + fileNamePatternToSearch);
+			res.append("\n       num of file matching fileNamePatternToSearch = " + pathsOfFoundFiles.size()
 					+ " regular files.");
 
-			System.out.println("--- content in file to search: " + contentToMatch);
-			System.out.println("       num of Resultant files = " + pathOfResultantFiles.size());
-			System.out.println("       num of Unreadable files = " + pathOfUnreadableFiles.size());
-			System.out.println("\n-------\n--- Resultant files:");
-			pathOfResultantFiles.forEach(System.out::println);
+			res.append("\n--- content in file to search: " + contentToMatch);
+			res.append("\n       num of Resultant files = " + pathOfResultantFiles.size());
+			res.append("\n       num of Unreadable files = " + pathOfUnreadableFiles.size());
+			res.append("\n-------\n--- Resultant files:\n");
+
+			pathOfResultantFiles.forEach(e -> res.append("\n").append(e.toString()));// System.out::println);
 
 			if (pathOfUnreadableFiles.size() > 0)
 			{
-				System.out.println("\n\n--- Unreadable files:");
-				pathOfUnreadableFiles.forEach(System.out::println);
+				res.append("\n\n--- Unreadable files:");
+				pathOfUnreadableFiles.forEach(e -> res.append("\n").append(e.toString()));// System.out::println);
 			}
 			// pathsOfFoundFiles.stream().filter(path -> Files.lines(path).anyMatch(line ->
 			// line.contains(contentToMatch)))
 			// .forEach(System.out::println);
-
 			allPaths.close();
-
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-
+		return res.toString();
 	}
 
 }

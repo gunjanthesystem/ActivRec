@@ -56,7 +56,7 @@ public class JSONProcessingAOTM
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileNameToWrite);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
 			String lineRead;
 			StringBuffer jsonStringBuf = new StringBuffer();
 			StringBuffer toWriteMsg = new StringBuffer();
@@ -180,7 +180,7 @@ public class JSONProcessingAOTM
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileNameToWrite);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -286,7 +286,7 @@ public class JSONProcessingAOTM
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileNameToWrite);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{

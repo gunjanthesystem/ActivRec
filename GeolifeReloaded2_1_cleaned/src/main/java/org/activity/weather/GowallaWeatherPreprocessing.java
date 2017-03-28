@@ -734,7 +734,7 @@ public class GowallaWeatherPreprocessing
 			System.out.println("size of latLongDate = " + latLongDate.size());
 			System.out.println("num of aos over all users = " + numOfActivityObjectsOverAllUsers);
 
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileNameToWrite);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
 
 			// StringBuilder sb = new StringBuilder();
 			for (String st : latLongDate)

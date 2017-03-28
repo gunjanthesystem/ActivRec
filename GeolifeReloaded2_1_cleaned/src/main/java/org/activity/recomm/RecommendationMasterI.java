@@ -1,5 +1,6 @@
 package org.activity.recomm;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -32,6 +33,8 @@ public interface RecommendationMasterI
 
 	public ActivityObject getActivityObjectAtRecomm();
 
+	public ArrayList<ActivityObject> getActivitiesGuidingRecomm();
+
 	public int getNumberOfCandidateTimelinesBelowThreshold();
 
 	public String getActivityNamesGuidingRecommwithTimestamps();
@@ -52,6 +55,8 @@ public interface RecommendationMasterI
 	public LinkedHashMap<String, Pair<String, Double>> getDistancesSortedMap();
 
 	public LinkedHashMap<String, Integer> getEndPointIndicesConsideredInCands();
+
+	public Date getDateAtRecomm();
 
 	// /**
 	// * not implemented in daywise and baseline st. yet. relevant for case-based approach

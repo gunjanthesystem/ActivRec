@@ -362,8 +362,7 @@ public class Evaluation
 			// fileRR.createNewFile();
 			// }
 			// bwRR = new BufferedWriter(new FileWriter(fileRR.getAbsoluteFile()));
-			bwRR = WritingToFile
-					.getBufferedWriterForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
+			bwRR = WritingToFile.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
 
 			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
 					+ "   size of actual array=" + arrayActual.size());
@@ -775,7 +774,10 @@ public class Evaluation
 							countOfValidRRValues = 1;
 						MRRValueForThisUser = round((double) sum / countOfValidRRValues, 4);
 
-						System.out.println("Calculating MRR:" + sum + "/" + countOfValidRRValues);
+						if (VerbosityConstants.verboseEvaluationMetricsToConsole)
+						{
+							System.out.println("Calculating MRR:" + sum + "/" + countOfValidRRValues);
+						}
 						bw.write(MRRValueForThisUser + ",");
 
 						break;

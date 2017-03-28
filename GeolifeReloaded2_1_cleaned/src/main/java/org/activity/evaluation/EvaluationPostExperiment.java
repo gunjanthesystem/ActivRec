@@ -655,7 +655,7 @@ public class EvaluationPostExperiment
 		{
 			LinkedHashMap<Integer, Integer> mapOfUserOptimalMU = getObservedOptimalMUForUserNum();
 			BufferedWriter MRRAtOptimalMUForRTsFile = WritingToFile
-					.getBufferedWriterForNewFile(commonPath + "RRAtOptimalMUForRTsFile.csv");
+					.getBWForNewFile(commonPath + "RRAtOptimalMUForRTsFile.csv");
 
 			for (int user = 1; user <= 18; user++)
 			{
@@ -717,9 +717,9 @@ public class EvaluationPostExperiment
 
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(
+			BufferedWriter bw = WritingToFile.getBWForNewFile(
 					commonPath + fileNamePhrase + timeCategory + "PerActivityMeanReciprocalRank.csv");
-			BufferedWriter bwDistri = WritingToFile.getBufferedWriterForNewFile(commonPath + "NumOfRTsPerAct.csv");
+			BufferedWriter bwDistri = WritingToFile.getBWForNewFile(commonPath + "NumOfRTsPerAct.csv");
 			BufferedReader brRR = new BufferedReader(
 					new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
 			BufferedReader brDataActual = new BufferedReader(new FileReader(commonPath + "dataActual.csv"));

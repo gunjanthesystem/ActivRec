@@ -59,7 +59,7 @@ public abstract class DatabaseCreator
 		try
 		{
 			BufferedWriter bwAllUsers = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
+					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
 			{
@@ -73,7 +73,7 @@ public abstract class DatabaseCreator
 				{
 					String userName = entryForUser.getKey();
 					// System.out.println("\nUser =" + entryForUser.getKey());
-					BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(
+					BufferedWriter bw = WritingToFile.getBWForNewFile(
 							Constant.getCommonPath() + userName + filenameEndPhrase + ".csv");
 
 					TreeMap<Timestamp, String> mapForEachUser = new TreeMap<Timestamp, String>();
@@ -126,7 +126,7 @@ public abstract class DatabaseCreator
 		try
 		{
 			BufferedWriter bwAllUsers = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
+					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
 			{
@@ -140,7 +140,7 @@ public abstract class DatabaseCreator
 				{
 					String userName = entryForUser.getKey();
 					// System.out.println("\nUser =" + entryForUser.getKey());
-					BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(
+					BufferedWriter bw = WritingToFile.getBWForNewFile(
 							Constant.getCommonPath() + userName + filenameEndPhrase + ".csv");
 
 					TreeMap<Timestamp, String> mapForEachUser = new TreeMap<Timestamp, String>();
@@ -604,7 +604,7 @@ public abstract class DatabaseCreator
 		try
 		{
 			BufferedWriter bwAllUsers = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
+					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
 			{
@@ -618,7 +618,7 @@ public abstract class DatabaseCreator
 				{
 					String userName = entryForUser.getKey();
 					// System.out.println("\nUser =" + entryForUser.getKey());
-					BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(
+					BufferedWriter bw = WritingToFile.getBWForNewFile(
 							Constant.getCommonPath() + userName + filenameEndPhrase + ".csv");
 
 					TreeMap<Timestamp, String> mapForEachUser = new TreeMap<Timestamp, String>();
@@ -662,7 +662,7 @@ public abstract class DatabaseCreator
 		try
 		{
 			BufferedWriter bwAllUsers = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
+					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
 			{
@@ -720,7 +720,7 @@ public abstract class DatabaseCreator
 		try
 		{
 			BufferedWriter bw = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + splitID + filenameEndPhrase + ".csv");
+					.getBWForNewFile(Constant.getCommonPath() + splitID + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
 			{
@@ -756,7 +756,7 @@ public abstract class DatabaseCreator
 		try
 		{
 			BufferedWriter bwAllUsers = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
+					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
 			{
@@ -814,7 +814,7 @@ public abstract class DatabaseCreator
 		try
 		{
 			BufferedWriter bw = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + splitID + filenameEndPhrase + ".csv");
+					.getBWForNewFile(Constant.getCommonPath() + splitID + filenameEndPhrase + ".csv");
 			try
 			{
 				if (printHeaders)
