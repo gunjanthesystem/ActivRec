@@ -429,8 +429,8 @@ public class DatabaseCreatorGowallaQuicker
 		{
 			int lineCount = 0;
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(preprocessedFile);
-			BufferedWriter bw2 = WritingToFile.getBufferedWriterForNewFile(preprocessedFile + "slim");
+			BufferedWriter bw = WritingToFile.getBWForNewFile(preprocessedFile);
+			BufferedWriter bw2 = WritingToFile.getBWForNewFile(preprocessedFile + "slim");
 			bw.write("UserID,PlaceID,TS,Lat,Lon,SpotT,DistInM,DurationInSecs\n");
 			bw2.write("UserID,PlaceID,SpotT,DistInM,DurationInSecs\n");
 			StringBuffer toWriteInBatch = new StringBuffer();
@@ -593,8 +593,8 @@ public class DatabaseCreatorGowallaQuicker
 		{
 			int lineCount = 0;
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(preprocessedFile);
-			BufferedWriter bw2 = WritingToFile.getBufferedWriterForNewFile(preprocessedFile + "slim");
+			BufferedWriter bw = WritingToFile.getBWForNewFile(preprocessedFile);
+			BufferedWriter bw2 = WritingToFile.getBWForNewFile(preprocessedFile + "slim");
 			bw.write("UserID, PlaceID,TS,Date,Lat,Lon,SpotT,DistInM,DurationInSecs\n");
 			bw2.write("UserID,PlaceID,Date,SpotT,DistInM,DurationInSecs\n");
 			StringBuffer toWriteInBatch = new StringBuffer();
@@ -764,8 +764,8 @@ public class DatabaseCreatorGowallaQuicker
 		{
 			int lineCount = 0;
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(preprocessedFile);
-			BufferedWriter bw2 = WritingToFile.getBufferedWriterForNewFile(preprocessedFile + "slim");
+			BufferedWriter bw = WritingToFile.getBWForNewFile(preprocessedFile);
+			BufferedWriter bw2 = WritingToFile.getBWForNewFile(preprocessedFile + "slim");
 
 			bw.write("UserID, PlaceID,TS,Date,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
 			bw2.write("UserID,Date,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
@@ -1984,7 +1984,7 @@ public class DatabaseCreatorGowallaQuicker
 			{
 				String userID = entryForUser.getKey();
 				BufferedWriter bwMergerCaseLogs = WritingToFile
-						.getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
+						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);
@@ -4483,7 +4483,7 @@ public class DatabaseCreatorGowallaQuicker
 	public static void checkConsecutiveSameActivityNameTrajSensitive(
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, String absfilename)
 	{
-		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBufferedWriterForNewFile(absfilename);
+		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBWForNewFile(absfilename);
 		String toWrite = "User,TrajID,TimestampWhichIsSimilarToPrev,Mode\n";
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : data.entrySet())
 		{
@@ -4550,7 +4550,7 @@ public class DatabaseCreatorGowallaQuicker
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, int sandwichFillerDurationInSecs,
 			String absfilename)
 	{
-		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBufferedWriterForNewFile(absfilename);
+		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBWForNewFile(absfilename);
 		String toWrite = "User,TrajID,StartTime,Mode,Duration,SanwichIndexIndex\n";
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : data.entrySet())
 		{
@@ -4804,7 +4804,7 @@ public class DatabaseCreatorGowallaQuicker
 				// System.out.println("\nUser =" + entryForUser.getKey());
 				String fileName = Constant.getCommonPath() + userName + filenameEndPhrase + ".csv";
 
-				BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileName);
+				BufferedWriter bw = WritingToFile.getBWForNewFile(fileName);
 
 				// TreeMap<Timestamp, String> mapForEachUser = new TreeMap<Timestamp, String>();
 
@@ -4877,7 +4877,7 @@ public class DatabaseCreatorGowallaQuicker
 				// System.out.println("\nUser =" + entryForUser.getKey());
 				String fileName = Constant.getCommonPath() + userName + filenameEndPhrase + ".csv";
 
-				BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileName);
+				BufferedWriter bw = WritingToFile.getBWForNewFile(fileName);
 
 				// TreeMap<Timestamp, String> mapForEachUser = new TreeMap<Timestamp, String>();
 
@@ -5109,9 +5109,9 @@ public class DatabaseCreatorGowallaQuicker
 		try
 		{
 			BufferedWriter userNumOfTrajs = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + "UserNumOfTrajs.csv");
+					.getBWForNewFile(Constant.getCommonPath() + "UserNumOfTrajs.csv");
 			BufferedWriter userTrajsNumOfEntries = WritingToFile
-					.getBufferedWriterForNewFile(Constant.getCommonPath() + "UserTrajsNumOfEntries.csv");
+					.getBWForNewFile(Constant.getCommonPath() + "UserTrajsNumOfEntries.csv");
 
 			userNumOfTrajs.write("user, #TrajIDs\n");
 			userTrajsNumOfEntries.write("user, TrajID,#TrajEntries\n");
@@ -5279,7 +5279,7 @@ public class DatabaseCreatorGowallaQuicker
 			{
 				String userID = entryForUser.getKey();
 				BufferedWriter bwMergerCaseLogs = WritingToFile
-						.getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
+						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("TrajId,Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);
@@ -5540,7 +5540,7 @@ public class DatabaseCreatorGowallaQuicker
 			{
 				String userID = entryForUser.getKey();
 				BufferedWriter bwMergerCaseLogs = WritingToFile
-						.getBufferedWriterForNewFile(commonPath + userID + "MergerCleanNotAvailableCasesLog.csv");
+						.getBWForNewFile(commonPath + userID + "MergerCleanNotAvailableCasesLog.csv");
 				bwMergerCaseLogs
 						.write("TrajId,Case,CurrentMode,NextMode,NextDurationInSecs,CurrentTS, NextTS,Comment\n");
 
@@ -5804,7 +5804,7 @@ public class DatabaseCreatorGowallaQuicker
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile.getBufferedWriterForNewFile(
+				BufferedWriter bwMergerCaseLogs = WritingToFile.getBWForNewFile(
 						commonPath + userID + activityNameToMerge + "MergerSandwichesLog.csv");
 				bwMergerCaseLogs.write(
 						"TrajId,CurrentMode,NextMode,NextToNextMode,CurrentTS, NextTS,NextToNextTS,DurationOfNext,TimestampDifferenceForDuration\n");

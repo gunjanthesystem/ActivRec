@@ -178,7 +178,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(checkinFileNameToWrite);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(checkinFileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -523,7 +523,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileNameToWrite);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -622,12 +622,12 @@ public class JSONProcessingGowalla2backup24Aug8pm
 	{
 		try
 		{
-			BufferedWriter bwL1 = WritingToFile.getBufferedWriterForNewFile(absFileNameToUse + "L1.csv");
-			BufferedWriter bwL2 = WritingToFile.getBufferedWriterForNewFile(absFileNameToUse + "L2.csv");
-			BufferedWriter bwL3 = WritingToFile.getBufferedWriterForNewFile(absFileNameToUse + "L3.csv");
-			BufferedWriter bwNone = WritingToFile.getBufferedWriterForNewFile(absFileNameToUse + "None.csv");
+			BufferedWriter bwL1 = WritingToFile.getBWForNewFile(absFileNameToUse + "L1.csv");
+			BufferedWriter bwL2 = WritingToFile.getBWForNewFile(absFileNameToUse + "L2.csv");
+			BufferedWriter bwL3 = WritingToFile.getBWForNewFile(absFileNameToUse + "L3.csv");
+			BufferedWriter bwNone = WritingToFile.getBWForNewFile(absFileNameToUse + "None.csv");
 			BufferedWriter overallLevel1 = WritingToFile
-					.getBufferedWriterForNewFile(absFileNameToUse + "OverallLevel1.csv");
+					.getBWForNewFile(absFileNameToUse + "OverallLevel1.csv");
 
 			ArrayList<BufferedWriter> allBWToWrite = new ArrayList<BufferedWriter>();
 			allBWToWrite.add(bwL1);
@@ -1573,7 +1573,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileNameToWrite);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{

@@ -348,7 +348,7 @@ public class DatabaseCreatorGeolife
 			{
 				String userID = entryForUser.getKey();
 				BufferedWriter bwMergerCaseLogs = WritingToFile
-						.getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
+						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);
@@ -2976,7 +2976,7 @@ public class DatabaseCreatorGeolife
 			{
 				String userID = entryForUser.getKey();
 				BufferedWriter bwMergerCaseLogs = WritingToFile
-						.getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
+						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);

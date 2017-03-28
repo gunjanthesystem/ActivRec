@@ -852,8 +852,9 @@ public class StringCode
 
 		if (VerbosityConstants.verbose || VerbosityConstants.verboseSAX)
 		{
+			System.out.print("\tInside getStringCodeForActivityObjects:\n Act Names:");
 			activityObjects.stream().forEach(ao -> System.out.print(ao.getActivityName() + " "));
-			System.out.println("Inside getStringCodeForActivityObjects:\n Act Names:\nCode: " + codeS);
+			System.out.println("\tCode: " + codeS);
 		}
 
 		return codeS;

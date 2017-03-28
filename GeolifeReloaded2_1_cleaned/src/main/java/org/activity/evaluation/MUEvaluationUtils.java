@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 import org.activity.clustering.weka.WekaUtilityBelt;
 import org.activity.clustering.weka.WekaUtilityBelt.ClustersRangeScheme;
+import org.activity.constants.Constant;
+import org.activity.constants.Enums;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
 import org.activity.stats.StatsUtils;
@@ -186,8 +188,17 @@ public class MUEvaluationUtils
 
 			///////////
 			// fetch the file for this user for its best MU
-			String fileNameRRBestMU = commonPathToRead + "MatchingUnit" + minMUHavingMaxMRR.intValue()// Integer.valueOf(minMUHavingMaxMRR.toString())
-					+ ".0/AlgoAllReciprocalRank.csv";
+			String fileNameRRBestMU = "";
+			if ((Constant.lookPastType.equals(Enums.LookPastType.ClosestTime))
+					|| (Constant.lookPastType.equals(Enums.LookPastType.Daywise)))
+			{
+				fileNameRRBestMU = commonPathToRead + "AlgoAllReciprocalRank.csv";
+			}
+			else
+			{
+				fileNameRRBestMU = commonPathToRead + "MatchingUnit" + minMUHavingMaxMRR.intValue()// Integer.valueOf(minMUHavingMaxMRR.toString())
+						+ ".0/AlgoAllReciprocalRank.csv";
+			}
 			// read the line corresponding to the user.
 			String rrLine = "";
 			try (Stream<String> lines = Files.lines(Paths.get(fileNameRRBestMU)))
@@ -300,8 +311,18 @@ public class MUEvaluationUtils
 			//
 			///////////
 			// fetch the file for this user for its best MU
-			String fileNameRRBestMU = commonPathToRead + "MatchingUnit" + minMUHavingMaxMRR.intValue()// Integer.valueOf(minMUHavingMaxMRR.toString())
-					+ ".0/BaselineOccurrenceAllReciprocalRank.csv";
+			String fileNameRRBestMU = "";
+			if ((Constant.lookPastType.equals(Enums.LookPastType.ClosestTime))
+					|| (Constant.lookPastType.equals(Enums.LookPastType.Daywise)))
+			{
+				fileNameRRBestMU = commonPathToRead + "BaselineOccurrenceAllReciprocalRank.csv";
+			}
+			else
+			{
+				fileNameRRBestMU = commonPathToRead + "MatchingUnit" + minMUHavingMaxMRR.intValue()// Integer.valueOf(minMUHavingMaxMRR.toString())
+						+ ".0/BaselineOccurrenceAllReciprocalRank.csv";
+			}
+
 			// String fileNameRRBestMU = commonPathToRead + "MatchingUnit"
 			// + (new DecimalFormat("#.0").format(minMUHavingMaxMRR) + "/BaselineOccurrenceAllReciprocalRank.csv");
 

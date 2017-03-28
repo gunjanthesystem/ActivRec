@@ -99,6 +99,7 @@ public class CSVUtils
 	public static void gowallaMain()
 	{
 		String[] fileNameHeadStrings = { "", "BO" };
+
 		for (String fileNameHeadString : fileNameHeadStrings)
 		{
 			// String fileNameHeadString = "";// "BO";// for baseline occurrence file, empty for algo file
@@ -156,10 +157,6 @@ public class CSVUtils
 		}
 	}
 
-	public static void gowallaMainBaseline()
-	{
-	}
-
 	/**
 	 * Removes duplicate rows from a given csv file.</br>
 	 * preserves order of unique rows</br>
@@ -175,7 +172,7 @@ public class CSVUtils
 		HashSet<CharSequence> allUniqueEntries = new HashSet<CharSequence>();
 		BufferedReader br = null;
 		// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
-		BufferedWriter bwDup = WritingToFile.getBufferedWriterForNewFile(duplicateLinesFileName);
+		BufferedWriter bwDup = WritingToFile.getBWForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
 
 		long t1 = System.currentTimeMillis();
@@ -272,8 +269,8 @@ public class CSVUtils
 
 		THashSet<String> allUniqueEntries = new THashSet<String>();
 		BufferedReader br = null;
-		BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
-		BufferedWriter bwDup = WritingToFile.getBufferedWriterForNewFile(duplicateLinesFileName);
+		BufferedWriter bw = WritingToFile.getBWForNewFile(outputFileName);
+		BufferedWriter bwDup = WritingToFile.getBWForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
 
 		long t1 = System.currentTimeMillis();
@@ -366,7 +363,7 @@ public class CSVUtils
 		ArrayList<String> allUniqueEntries = new ArrayList<String>();
 		BufferedReader br = null;
 		// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
-		BufferedWriter bwDup = WritingToFile.getBufferedWriterForNewFile(duplicateLinesFileName);
+		BufferedWriter bwDup = WritingToFile.getBWForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
 
 		long t1 = System.currentTimeMillis();
@@ -711,7 +708,7 @@ public class CSVUtils
 				else if (countOfLines == countOfTotalLines)
 				{
 					System.out.println("else-->");
-					bw = WritingToFile.getBufferedWriterForNewFile(pathToWrite + "Split" + splitID + ".csv");
+					bw = WritingToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
 					// System.out.println(" jjj ");
 					// System.out.println(" kkk" + stringBuffer.toString());
 					printer.printRecord(rec);
@@ -725,7 +722,7 @@ public class CSVUtils
 				else
 				{
 					System.out.println("else-->");
-					bw = WritingToFile.getBufferedWriterForNewFile(pathToWrite + "Split" + splitID + ".csv");
+					bw = WritingToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
 					// System.out.println(" jjj ");
 					// System.out.println(" kkk" + stringBuffer.toString());
 					bw.write(stringBuffer.toString());
@@ -821,7 +818,7 @@ public class CSVUtils
 				else if (countOfLines == countOfTotalLines)
 				{
 					// System.out.println("else-->");
-					bw = WritingToFile.getBufferedWriterForNewFile(pathToWrite + "Split" + splitID + ".csv");
+					bw = WritingToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
 					// System.out.println(" jjj ");
 					// System.out.println(" kkk" + stringBuffer.toString());
 					stringBuffer.append(lineRead + "\n");
@@ -835,7 +832,7 @@ public class CSVUtils
 				else
 				{
 					// System.out.println("else-->");
-					bw = WritingToFile.getBufferedWriterForNewFile(pathToWrite + "Split" + splitID + ".csv");
+					bw = WritingToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
 					// System.out.println(" jjj ");
 					// System.out.println(" kkk" + stringBuffer.toString());
 					bw.write(stringBuffer.toString());
@@ -1087,8 +1084,8 @@ public class CSVUtils
 
 		// HashSet<String> allUniqueEntries = new HashSet<String>();
 		BufferedReader br = null;
-		BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
-		BufferedWriter bwDup = WritingToFile.getBufferedWriterForNewFile(duplicateLinesFileName);
+		BufferedWriter bw = WritingToFile.getBWForNewFile(outputFileName);
+		BufferedWriter bwDup = WritingToFile.getBWForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
 
 		long t1 = System.currentTimeMillis();
@@ -1187,10 +1184,14 @@ public class CSVUtils
 			int endRow, int beginCol, int endCol, String fileToReadForNullifyingZeros)
 	{
 		int numOfFiles = absCSVFileNamesToRead.length;
-		BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absFileNameToWrite);
-		BufferedWriter bwMU = WritingToFile.getBufferedWriterForNewFile(
-				absFileNameToWrite.substring(0, absFileNameToWrite.length() - 4) + "MU.csv");// stores the value of max
-																								// mu
+		BufferedWriter bw = WritingToFile.getBWForNewFile(absFileNameToWrite);
+		BufferedWriter bwMU = WritingToFile
+				.getBWForNewFile(absFileNameToWrite.substring(0, absFileNameToWrite.length() - 4) + "MU.csv");// stores
+																												// the
+																												// value
+																												// of
+																												// max
+																												// mu
 		try
 		{
 			for (int row = beginRow; row <= endRow; row++)

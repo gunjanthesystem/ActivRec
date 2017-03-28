@@ -176,9 +176,9 @@ public class Timeline implements Serializable
 
 		if (VerbosityConstants.verbose)
 		{
-			System.out.println("To find next activity object after index :" + indexOfActivityObject);
-			System.out
-					.print("\t getNextValidActivityAfterActivityAtThisPosition(): Index of activity object to look after is "
+			// System.out.println("To find next activity object after index :" + indexOfActivityObject);
+			System.out.println(
+					"\t Inside getNextValidActivityAfterActivityAtThisPosition(): Index of activity object to look after is "
 							+ indexOfActivityObject);
 			System.err.println("\t The timeline is:" + this.getActivityObjectNamesInSequence());
 			if (nextValidActivityObject.getActivityName()
@@ -189,8 +189,7 @@ public class Timeline implements Serializable
 								+ timelineID + ") Activity Name="
 								+ activityObjectsInTimeline.get(indexOfActivityObject).getActivityName());
 				// System.err.println("\t The timeline is:"+this.getActivityObjectNamesInSequence());
-
-				System.err.println("\t End point index was:" + indexOfActivityObject);
+				// System.err.println("\t End point index was:" + indexOfActivityObject);
 				System.err.println("\t Next valid activity object found at index:" + indexOfNextValidActivityObject);
 			}
 			System.out.println("\t Next valid activity is " + nextValidActivityObject.getActivityName());
@@ -387,7 +386,12 @@ public class Timeline implements Serializable
 		// not the last activity of the timeline
 		if (indexOfFirstOccurrence < this.activityObjectsInTimeline.size() - 1)
 		{
-			for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size()/* - 1 */; i++)
+			// changed the loop upper limit in Mar 2017: changed back again for compatibility with prev results for
+			// comparison. TODO
+			// new: for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size(); i++)
+			// old: for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size() - 1; i++)
+			// only affect is slight reduction in num of RTs
+			for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size() - 1; i++)
 			{
 				if (UtilityBelt.isValidActivityName(activityObjectsInTimeline.get(i).getActivityName()))
 				{

@@ -150,7 +150,7 @@ public class TrajectoryStats
 		try
 		{
 			BufferedWriter bw = WritingToFile
-					.getBufferedWriterForNewFile(commonPath + fileNamePharse + "TrajectoryEntriesByTrajID.csv");
+					.getBWForNewFile(commonPath + fileNamePharse + "TrajectoryEntriesByTrajID.csv");
 			bw.write("User,TrajID, #TrajecEntries,#DistinctModes,TrajectoryEntriesAsMode\n");
 			for (Entry<String, LinkedHashMap<String, ArrayList<TrajectoryEntry>>> e : trajectoryEntriesByTrajID
 					.entrySet())
@@ -186,7 +186,7 @@ public class TrajectoryStats
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(
+			BufferedWriter bw = WritingToFile.getBWForNewFile(
 					commonPath + fileNamePharse + "TrajectoryEntriesByTrajIDWithTimestamps.csv");
 			bw.write("User,TrajID, #TrajecEntries,#DistinctModes,TrajectoryEntriesAsMode\n");
 			for (Entry<String, LinkedHashMap<String, ArrayList<TrajectoryEntry>>> e : trajectoryEntriesByTrajID
@@ -223,7 +223,7 @@ public class TrajectoryStats
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(
+			BufferedWriter bw = WritingToFile.getBWForNewFile(
 					commonPath + fileNamePharse + "NumOfTrajectoryEntriesForEachTrajID.csv");
 			// bw.write("User,TrajID, #TrajecEntries,TrajectoryEntriesAsMode\n");
 			for (Entry<String, LinkedHashMap<String, ArrayList<TrajectoryEntry>>> e : trajectoryEntriesByTrajID
@@ -272,7 +272,7 @@ public class TrajectoryStats
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(
+			BufferedWriter bw = WritingToFile.getBWForNewFile(
 					commonPath + fileNamePharse + "NumOfDistinctModesInTrajectoryEntriesForEachTrajID.csv");
 			// bw.write("User,TrajID, #TrajecEntries,TrajectoryEntriesAsMode\n");
 			for (Entry<String, LinkedHashMap<String, ArrayList<TrajectoryEntry>>> e : trajectoryEntriesByTrajID
@@ -325,7 +325,7 @@ public class TrajectoryStats
 		try
 		{
 			BufferedWriter bw = WritingToFile
-					.getBufferedWriterForNewFile(commonPath + fileNamePharse + "NumOfDistinctTrajecsForEachUser.csv");
+					.getBWForNewFile(commonPath + fileNamePharse + "NumOfDistinctTrajecsForEachUser.csv");
 			bw.write("User,#TrajectoriesWithDistinctSequenceOfModes\n");
 			for (Entry<String, LinkedHashMap<String, ArrayList<TrajectoryEntry>>> e : trajectoryEntriesByTrajID
 					.entrySet())
@@ -350,7 +350,7 @@ public class TrajectoryStats
 		try
 		{
 			BufferedWriter bw = WritingToFile
-					.getBufferedWriterForNewFile(commonPath + fileNamePharse + "NumOfTrajIDsForEachUser.csv");
+					.getBWForNewFile(commonPath + fileNamePharse + "NumOfTrajIDsForEachUser.csv");
 			bw.write("User,#TrajIDs\n");
 			for (Entry<String, LinkedHashMap<String, ArrayList<TrajectoryEntry>>> e : trajectoryEntriesByTrajID
 					.entrySet())
@@ -416,7 +416,7 @@ public class TrajectoryStats
 		try
 		{
 			BufferedWriter bw = WritingToFile
-					.getBufferedWriterForNewFile(commonPath + fileNamePharse + "TrajIDsSpanningMultipleDays.csv");
+					.getBWForNewFile(commonPath + fileNamePharse + "TrajIDsSpanningMultipleDays.csv");
 			bw.write("User,TrajID,numOfDaysSpans\n");
 			for (Entry<String, LinkedHashMap<String, ArrayList<TrajectoryEntry>>> e : trajectoryEntriesByTrajID
 					.entrySet())
@@ -453,7 +453,7 @@ public class TrajectoryStats
 		try
 		{
 			BufferedWriter bw = WritingToFile
-					.getBufferedWriterForNewFile(commonPath + fileNamePharse + "NumOfWeekendTrajIDsForEachUser.csv");
+					.getBWForNewFile(commonPath + fileNamePharse + "NumOfWeekendTrajIDsForEachUser.csv");
 			bw.write("User,#WeekendStartTrajIDs,#WeekdayStartTrajIDs, #TrajIDs,#TrajIDsSpaningMultipleDays\n");
 			for (Entry<String, LinkedHashMap<String, ArrayList<TrajectoryEntry>>> e : trajectoryEntriesByTrajID
 					.entrySet())

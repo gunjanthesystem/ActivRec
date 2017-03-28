@@ -3957,7 +3957,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 	public static void checkConsecutiveSameActivityNameTrajSensitive(
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, String absfilename)
 	{
-		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBufferedWriterForNewFile(absfilename);
+		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBWForNewFile(absfilename);
 		String toWrite = "User,TrajID,TimestampWhichIsSimilarToPrev,Mode\n";
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : data.entrySet())
 		{
@@ -4024,7 +4024,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, int sandwichFillerDurationInSecs,
 			String absfilename)
 	{
-		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBufferedWriterForNewFile(absfilename);
+		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBWForNewFile(absfilename);
 		String toWrite = "User,TrajID,StartTime,Mode,Duration,SanwichIndexIndex\n";
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : data.entrySet())
 		{
@@ -4369,7 +4369,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			{
 				String userID = entryForUser.getKey();
 				BufferedWriter bwMergerCaseLogs = WritingToFile
-						.getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
+						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("TrajId,Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);
@@ -4630,7 +4630,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			{
 				String userID = entryForUser.getKey();
 				BufferedWriter bwMergerCaseLogs = WritingToFile
-						.getBufferedWriterForNewFile(commonPath + userID + "MergerCleanNotAvailableCasesLog.csv");
+						.getBWForNewFile(commonPath + userID + "MergerCleanNotAvailableCasesLog.csv");
 				bwMergerCaseLogs
 						.write("TrajId,Case,CurrentMode,NextMode,NextDurationInSecs,CurrentTS, NextTS,Comment\n");
 
@@ -4894,7 +4894,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile.getBufferedWriterForNewFile(
+				BufferedWriter bwMergerCaseLogs = WritingToFile.getBWForNewFile(
 						commonPath + userID + activityNameToMerge + "MergerSandwichesLog.csv");
 				bwMergerCaseLogs.write(
 						"TrajId,CurrentMode,NextMode,NextToNextMode,CurrentTS, NextTS,NextToNextTS,DurationOfNext,TimestampDifferenceForDuration\n");

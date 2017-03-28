@@ -181,7 +181,8 @@ public class ControllerWithoutServer
 			// int countOfSampleUsers = 0;
 			// System.out.println("startUserIndex=" + startUserIndex + " endUserIndex" + endUserIndex);
 			// }
-			String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+			String groupsOf100UsersLabels[] = { /* "1", "101", */"201", "301", "401", "501", "601", "701", "801",
+					"901" };
 			// ,// "1001" };
 			System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
@@ -229,6 +230,7 @@ public class ControllerWithoutServer
 				RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
 						Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
 						Constant.percentageInTraining);
+
 				// RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new
 				// RecommendationTestsDayWise2FasterJan2016(
 				// sampledUsers);
@@ -485,7 +487,7 @@ public class ControllerWithoutServer
 	private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceAndCleanTimelines(String databaseName,
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile)
 	{
-		if (databaseName.equals("gowalla1") == false)
+		if (databaseName.equals("gowalla1"))
 		{
 			usersDayTimelinesOriginal = reduceGowallaTimelines(Constant.getDatabaseName(), usersDayTimelinesOriginal,
 					true);
@@ -507,7 +509,7 @@ public class ControllerWithoutServer
 		System.out.println("Num of users cleaned = " + usersCleanedDayTimelines.size());
 		///
 
-		if (databaseName.equals("gowalla1") == false)
+		if (databaseName.equals("gowalla1"))
 		{
 			///// again remove users with less than 50 days (these are the clean days)
 			System.out.println("\n--again remove users with less than 50 days (these are the clean days)");
@@ -551,6 +553,8 @@ public class ControllerWithoutServer
 	private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelines(String databaseName,
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile)
 	{
+		System.out.println("Inside reduceGowallaTimelines");
+
 		if (databaseName.equals("gowalla1") == false)
 		{
 			String msg = PopUps.getCurrentStackTracedErrorMsg(

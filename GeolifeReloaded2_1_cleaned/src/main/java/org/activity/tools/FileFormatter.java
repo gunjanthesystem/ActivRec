@@ -25,7 +25,7 @@ public class FileFormatter
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(absFileNameToRead));// Constant.getCommonPath() +
-			BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(absFileNameToWrite);
+			BufferedWriter bw = WritingToFile.getBWForNewFile(absFileNameToWrite);
 			String lineRead = "";
 			int countOfLines = 0;
 			while ((lineRead = br.readLine()) != null)

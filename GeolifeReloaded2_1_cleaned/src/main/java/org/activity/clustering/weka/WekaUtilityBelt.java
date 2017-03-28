@@ -176,8 +176,11 @@ public class WekaUtilityBelt
 		else if (MUVal >= 5 && MUVal <= ClusteringConstants.cluster3Max)
 			clusterLabel = "ThirdCluster";
 		else
-			PopUps.showError("Error in getClusterLabelClustering2 " + MUVal + " not falling inside any cluster");
-
+		{
+			clusterLabel = "NoCluster";
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getClusterLabelClustering2 " + MUVal + " not falling inside any cluster"));
+		}
 		return clusterLabel;
 	}
 

@@ -142,7 +142,8 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = true;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;// Enums.LookPastType.NCount;
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.ClosestTime;// NCount;//
+																							// Enums.LookPastType.NCount;
 	// "Count";// "Count";// "Hrs"// "Daywise"
 
 	/**
@@ -154,6 +155,8 @@ public final class Constant
 
 	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 			17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
+
+	public static final double matchingDummy[] = { -1 };
 	// public static final double matchingUnitHrsArray[] = { 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
 
 	public static String distanceUsed = "HJEditDistance"; // "FeatureWiseEditDistance",FeatureWiseEditDistance,

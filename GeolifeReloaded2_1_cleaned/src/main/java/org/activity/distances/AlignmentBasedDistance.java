@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
+import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.stats.StatsUtils;
@@ -1180,24 +1181,25 @@ public class AlignmentBasedDistance
 						min = delete;
 						if (VerbosityConstants.verboseLevenstein)
 						{
-							System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);// "
-																													// Trace
-																													// added=
-																													// "
-																													// +
-																													// "_D("
-																													// +
-																													// (i
-																													// +
-																													// 1)
-																													// +
-																													// "-"
-																													// +
-																													// (j
-																													// +
-																													// 1)
-																													// +
-																													// ")");
+							System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);
+							// "
+							// Trace
+							// added=
+							// "
+							// +
+							// "_D("
+							// +
+							// (i
+							// +
+							// 1)
+							// +
+							// "-"
+							// +
+							// (j
+							// +
+							// 1)
+							// +
+							// ")");
 						}
 					}
 
@@ -1207,24 +1209,25 @@ public class AlignmentBasedDistance
 						min = insert;
 						if (VerbosityConstants.verboseLevenstein)
 						{
-							System.out.println("Insert is min:" + insert + " Trace " + traceMatrix[i + 1][j + 1]);// "
-																													// Trace
-																													// added=
-																													// "
-																													// +
-																													// "_I("
-																													// +
-																													// (i
-																													// +
-																													// 1)
-																													// +
-																													// "-"
-																													// +
-																													// (j
-																													// +
-																													// 1)
-																													// +
-																													// ")");
+							System.out.println("Insert is min:" + insert + " Trace " + traceMatrix[i + 1][j + 1]);
+							// "
+							// Trace
+							// added=
+							// "
+							// +
+							// "_I("
+							// +
+							// (i
+							// +
+							// 1)
+							// +
+							// "-"
+							// +
+							// (j
+							// +
+							// 1)
+							// +
+							// ")");
 						}
 					}
 					else if (isMinimum(replace, delete, insert, replace))
@@ -1233,24 +1236,25 @@ public class AlignmentBasedDistance
 						min = replace;
 						if (VerbosityConstants.verboseLevenstein)
 						{
-							System.out.println("replace is min:" + replace + " Trace " + traceMatrix[i + 1][j + 1]);// "
-																													// Trace
-																													// added=
-																													// "
-																													// +
-																													// "_S("
-																													// +
-																													// (i
-																													// +
-																													// 1)
-																													// +
-																													// "-"
-																													// +
-																													// (j
-																													// +
-																													// 1)
-																													// +
-																													// ")");
+							System.out.println("replace is min:" + replace + " Trace " + traceMatrix[i + 1][j + 1]);
+							// "
+							// Trace
+							// added=
+							// "
+							// +
+							// "_S("
+							// +
+							// (i
+							// +
+							// 1)
+							// +
+							// "-"
+							// +
+							// (j
+							// +
+							// 1)
+							// +
+							// ")");
 						}
 					}
 
@@ -1459,10 +1463,11 @@ public class AlignmentBasedDistance
 	 * @param deleteWt
 	 * @param replaceWt
 	 * @return Levenshtein distance with trace of operations
-	 */
-	public Pair<String, Double> getMySimpleLevenshteinDistance(String word1, String word2, int insertWt, int deleteWt,
-			int replaceWt)
+	 */ // Correct: renamed from getMySimpleLevenshteinDistance() on 27 March 2017
+	public Pair<String, Double> getMySimpleLevenshteinDistanceSlower1(String word1, String word2, int insertWt,
+			int deleteWt, int replaceWt)
 	{
+		long performanceTime1 = System.currentTimeMillis();
 		if (VerbosityConstants.verboseLevenstein)// Constant.verbose ||
 		{
 			System.out.println("inside getMySimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2
@@ -1587,9 +1592,194 @@ public class AlignmentBasedDistance
 			System.out.println("Resultant Trace = " + traceMatrix[len1][len2].toString());
 			System.out.println(" -------- ");
 		}
+		long performanceTime2 = System.currentTimeMillis();
+
+		WritingToFile.appendLineToFileAbsolute(
+				Integer.toString(word1.length()) + "," + Integer.toString(word2.length()) + ","
+						+ Long.toString(performanceTime2 - performanceTime1) + "\n",
+				Constant.getCommonPath() + "MySimpleLevenshteinDistanceTimeTakenInms.csv");
 
 		return new Pair<String, Double>(traceMatrix[len1][len2].toString(), new Double(dist[len1][len2]));
 	}
+
+	///// start of faster
+	/**
+	 * Fork of org.activity.distances.AlignmentBasedDistance.getMySimpleLevenshteinDistance(String, String, int, int,
+	 * int) for faster performance by optimising string concatenation. ref:
+	 * http://stackoverflow.com/questions/10078912/best-practices-performance-mixing-stringbuilder-append-with-string-concat
+	 * <p>
+	 * Computes Levenshtein distance between the given strings.</br>
+	 * 
+	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br>
+	 * Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
+	 * Weight of replacement = replaceWt * abs(diff(replaceVal - original))
+	 * 
+	 * right to left: insertion? top to down: deletion
+	 * 
+	 * @param word1
+	 * @param word2
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @return Levenshtein distance with trace of operations
+	 */
+	public Pair<String, Double> getMySimpleLevenshteinDistance(String word1, String word2, int insertWt, int deleteWt,
+			int replaceWt)
+	{
+		// long performanceTime1 = System.currentTimeMillis();
+		if (VerbosityConstants.verboseLevenstein)// Constant.verbose ||
+		{
+			System.out.println("inside getMySimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2
+					+ " with insertWt=" + insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt);
+		}
+		int len1 = word1.length();
+		int len2 = word2.length();
+
+		// len1+1, len2+1, because finally return dp[len1][len2]
+		int[][] dist = new int[len1 + 1][len2 + 1];
+
+		StringBuilder[][] traceMatrix = new StringBuilder[len1 + 1][len2 + 1];
+
+		for (int i = 0; i <= len1; i++)
+		{
+			for (int j = 0; j <= len2; j++)
+			{
+				traceMatrix[i][j] = new StringBuilder();
+			}
+		}
+
+		dist[0][0] = 0;
+
+		for (int i = 1; i <= len1; i++)
+		{
+			dist[i][0] = i;
+			// traceMatrix[i][0].append(traceMatrix[i - 1][0] + "_D(" + (i) + "-" + "0)");
+			traceMatrix[i][0].append(traceMatrix[i - 1][0].toString()).append("_D(").append(Integer.toString(i))
+					.append("-0)");
+		}
+
+		for (int j = 1; j <= len2; j++)
+		{
+			dist[0][j] = j;
+			// traceMatrix[0][j].append(traceMatrix[0][j - 1] + "_I(0" + "-" + j + ")");
+			traceMatrix[0][j].append(traceMatrix[0][j - 1].toString()).append("_I(0-").append(Integer.toString(j))
+					.append(")");
+		}
+
+		// iterate though, and check last char
+		for (int i = 0; i < len1; i++)
+		{
+			char c1 = word1.charAt(i);
+			for (int j = 0; j < len2; j++)
+			{
+				char c2 = word2.charAt(j);
+
+				// System.out.println("\nComparing " + c1 + " and " + c2);
+				// if last two chars equal
+				if (c1 == c2)
+				{
+					// update dp value for +1 length
+					dist[i + 1][j + 1] = dist[i][j];
+					// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_N(" + (i + 1) + "-" + (j + 1) + ")");
+					traceMatrix[i + 1][j + 1].append(traceMatrix[i][j].toString()).append("_N(")
+							.append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1)).append(")");
+
+					// System.out.println("Equal" + " Trace " + traceMatrix[i + 1][j + 1]);// "_N(" + (i + 1) + "-" + (j
+					// + 1) + ")");
+				}
+				else
+				{
+					int replace = dist[i][j] + replaceWt;// 2; //diagonally previous, see slides from STANFORD NLP on
+															// min edit distance
+					int delete = dist[i][j + 1] + deleteWt;// 1;//deletion --previous row, i.e, cell above
+					int insert = dist[i + 1][j] + insertWt;// 1;// insertion --previous column, i.e, cell on left
+
+					// System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
+					// int min = replace > insert ? insert : replace;
+					// min = delete > min ? min : delete;
+					//
+					int min = -9999;
+
+					if (isMinimum(delete, delete, insert, replace))
+					{
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j + 1] + "_D(" + (i + 1) + "-" + (j + 1) +
+						// ")");
+						traceMatrix[i + 1][j + 1].append(traceMatrix[i][j + 1].toString()).append("_D(")
+								.append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
+								.append(")");
+						min = delete;
+						// System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_D(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+
+					else if (isMinimum(insert, delete, insert, replace))
+					{
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j] + "_I(" + (i + 1) + "-" + (j + 1) +
+						// ")");
+						traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j].toString()).append("_I(")
+								.append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
+								.append(")");
+						min = insert;
+						// System.out.println("Insert is min:" + insert + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_I(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+					else if (isMinimum(replace, delete, insert, replace))
+					{
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_S(" + (i + 1) + "-" + (j + 1) + ")");
+						traceMatrix[i + 1][j + 1].append(traceMatrix[i][j].toString()).append("_S(")
+								.append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
+								.append(")");
+
+						min = replace;
+						// System.out.println("replace is min:" + replace + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_S(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+
+					if (min == -9999)
+					{
+						System.out.println("Error in minDistance");
+					}
+
+					dist[i + 1][j + 1] = min;
+				}
+			}
+		}
+
+		if (VerbosityConstants.verboseLevenstein)
+		// iterate though, and check last char
+		{
+			System.out.println("  Trace Matrix: ");
+			for (int i = 0; i <= len1; i++)
+			{
+				for (int j = 0; j <= len2; j++)
+				{
+					System.out.print(traceMatrix[i][j] + "||");
+				}
+				System.out.println();
+			}
+			System.out.println("  Distance Matrix: ");
+			for (int i = 0; i <= len1; i++)
+			{
+				for (int j = 0; j <= len2; j++)
+				{
+					System.out.print(dist[i][j] + "||");
+				}
+				System.out.println();
+			}
+
+			System.out.println("Resultant Distance = " + new Double(dist[len1][len2]));
+			System.out.println("Resultant Trace = " + traceMatrix[len1][len2].toString());
+			System.out.println(" -------- ");
+		}
+
+		// long performanceTime2 = System.currentTimeMillis();
+		// WritingToFile.appendLineToFileAbsolute(
+		// Integer.toString(word1.length()) + "," + Integer.toString(word2.length()) + ","
+		// + Long.toString(performanceTime2 - performanceTime1) + "\n",
+		// Constant.getCommonPath() + "MySimpleLevenshteinDistanceTimeTakenInms.csv");
+		return new Pair<String, Double>(traceMatrix[len1][len2].toString(), new Double(dist[len1][len2]));
+	}
+	///// end of faster
 
 	/**
 	 * Computes Levenshtein distance between the given strings.</br>

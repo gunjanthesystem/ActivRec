@@ -1,6 +1,7 @@
 package org.activity.controller;
 
 import org.activity.constants.Constant;
+import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.Searcher;
@@ -283,8 +284,11 @@ public class SuperController
 
 		// ///////////////////////
 
-		Searcher.search(Constant.outputCoreResultsPath, "consoleLog", "rror");
-		Searcher.search(Constant.outputCoreResultsPath, "consoleLog", "xception");
+		String errors = Searcher.search(Constant.outputCoreResultsPath, "consoleLog", "rror");
+		String exceptions = Searcher.search(Constant.outputCoreResultsPath, "consoleLog", "xception");
+
+		WritingToFile.writeToNewFile(errors + "\n" + exceptions,
+				Constant.outputCoreResultsPath + "ErrorsExceptions.txt");
 
 		long bt = System.currentTimeMillis();
 		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");
