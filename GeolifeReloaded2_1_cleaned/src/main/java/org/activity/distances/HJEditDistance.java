@@ -2,11 +2,13 @@ package org.activity.distances;
 
 import java.util.ArrayList;
 
+import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.stats.StatsUtils;
+import org.activity.util.ProcessUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
 
@@ -152,8 +154,20 @@ public class HJEditDistance extends AlignmentBasedDistance
 		String stringCodeForActivityObjects1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
 		String stringCodeForActivityObjects2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
 
-		Pair<String, Double> levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1,
-				stringCodeForActivityObjects2, 1, 1, 2);
+		Pair<String, Double> levenshteinDistance = null;
+		long t1 = System.nanoTime();
+		if (!Constant.useJarForMySimpleLevenshteinDistance)
+		{
+			levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1,
+					stringCodeForActivityObjects2, 1, 1, 2);
+			System.out.println("getMySimpleLevenshteinDistance took " + (System.nanoTime() - t1) + " ns");
+		}
+		else
+		{
+			levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
+					stringCodeForActivityObjects2, Integer.toString(1), Integer.toString(1), Integer.toString(2));
+			System.out.println("getMySimpleLevenshteinProcesse took " + (System.nanoTime() - t1) + " ns");
+		}
 
 		String[] splitted = RegexUtils.patternUnderScore.split(levenshteinDistance.getFirst());
 		// $$ levenshteinDistance.getFirst().split("_");// "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";

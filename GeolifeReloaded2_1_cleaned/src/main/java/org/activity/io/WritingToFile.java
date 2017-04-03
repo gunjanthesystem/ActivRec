@@ -4017,8 +4017,8 @@ public class WritingToFile
 	 * @param userTrainingTimelines
 	 * @param userTestTimelines
 	 * @return linkedhashmap contain two maps for training timelines, one for baseline count and other for baseline
-	 *         duration. Here, map for baseline count contains <ActivityNames,count over all days in training
-	 *         timelines>, similarly for count of baseline duration
+	 *         duration. Here, map for baseline count contains {ActivityNames,count over all days in training
+	 *         timelines}, similarly for count of baseline duration
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<String, ?>> writeBasicActivityStatsAndGetBaselineMaps(
 			String userName, LinkedHashMap<Date, Timeline> userAllDatesTimeslines,
@@ -4088,11 +4088,11 @@ public class WritingToFile
 						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet);
 
 				writeSimpleLinkedHashMapToFileAppend(actCountRes1,
-						Constant.getCommonPath() + "ActivityCounts" + timelinesSet + ".csv", "dummy", "dummy");
+						commonPath + "ActivityCounts" + timelinesSet + ".csv", "dummy", "dummy");
 				writeSimpleLinkedHashMapToFileAppend(actDurationRes1,
-						Constant.getCommonPath() + "ActivityDurations" + timelinesSet + ".csv", "dummy", "dummy");
+						commonPath + "ActivityDurations" + timelinesSet + ".csv", "dummy", "dummy");
 				writeSimpleLinkedHashMapToFileAppend(actOccPercentageRes1,
-						Constant.getCommonPath() + "ActivityPerOccur" + timelinesSet + ".csv", "dummy", "dummy");
+						commonPath + "ActivityPerOccur" + timelinesSet + ".csv", "dummy", "dummy");
 				// writeSimpleLinkedHashMapToFileAppend(LinkedHashMap<String, ?> map, String fileName, String headerKey,
 				// String headerValue)
 				// writeSimpleLinkedHashMapToFile(LinkedHashMap<String, ?> map, String absFileName, String headerKey,

@@ -343,7 +343,7 @@ public class UtilityBelt
 
 		countOfL1Ops += StringUtils.countSubstring("_I(", editOpsTrace);
 		countOfL1Ops += StringUtils.countSubstring("_D(", editOpsTrace);
-		countOfL1Ops += StringUtils.countSubstring("_Sao(", editOpsTrace);
+		// countOfL1Ops += StringUtils.countSubstring("_Sao(", editOpsTrace);
 
 		return countOfL1Ops;
 	}
@@ -390,10 +390,10 @@ public class UtilityBelt
 	{
 		int countOfL2Ops = 0;
 
-		countOfL2Ops += StringUtils.countSubstring("_Sst(", editOpsTrace);
-		countOfL2Ops += StringUtils.countSubstring("_Sd(", editOpsTrace);
-		countOfL2Ops += StringUtils.countSubstring("_Sstd(", editOpsTrace);
-
+		countOfL2Ops += StringUtils.countSubstring("_N(", editOpsTrace);
+		// countOfL2Ops += StringUtils.countSubstring("_Sst(", editOpsTrace);
+		// countOfL2Ops += StringUtils.countSubstring("_Sd(", editOpsTrace);
+		// countOfL2Ops += StringUtils.countSubstring("_Sstd(", editOpsTrace);
 		return countOfL2Ops;
 	}
 

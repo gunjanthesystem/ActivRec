@@ -42,7 +42,7 @@ public class TestDummy1
 		System.out.println("var 3 = " + var3);
 	}
 
-	public static void main(String args[])
+	public static void main0(String args[])
 	{
 		// System.out.println(System.getProperty("user.dir"));
 		// stringSplitPerformance();

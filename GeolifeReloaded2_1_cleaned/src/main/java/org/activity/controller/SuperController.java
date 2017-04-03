@@ -284,11 +284,10 @@ public class SuperController
 
 		// ///////////////////////
 
-		String errors = Searcher.search(Constant.outputCoreResultsPath, "consoleLog", "rror");
-		String exceptions = Searcher.search(Constant.outputCoreResultsPath, "consoleLog", "xception");
+		String errors = Searcher.search(commonPath, "consoleLog", "rror");
+		String exceptions = Searcher.search(commonPath, "consoleLog", "xception");
 
-		WritingToFile.writeToNewFile(errors + "\n" + exceptions,
-				Constant.outputCoreResultsPath + "ErrorsExceptions.txt");
+		WritingToFile.writeToNewFile(errors + "\n" + exceptions, commonPath + "ErrorsExceptions.txt");
 
 		long bt = System.currentTimeMillis();
 		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");

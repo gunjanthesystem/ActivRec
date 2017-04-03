@@ -35,7 +35,9 @@ public class DomainConstants
 	public static final int gowallaWorkingCatLevel = 2; // -1 indicates original working cat
 	static int[] gowallaUserIDs = null;
 	public static String[] featureNames = { "ActivityName", "StartTime", "Duration", "DistanceTravelled",
-	"StartGeoCoordinates", "EndGeoCoordinates", "AvgAltitude" };
+			"StartGeoCoordinates", "EndGeoCoordinates", "AvgAltitude" };
+
+	public final static int numOfCatLevels = 3;
 
 	public DomainConstants()
 	{

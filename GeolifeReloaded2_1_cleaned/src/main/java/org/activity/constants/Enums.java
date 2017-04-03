@@ -40,4 +40,8 @@ public class Enums
 	}
 	// typeOfThresholds[];// = { "Global" };// Global"};//"Percent"
 
+	public enum EditDistanceTimeDistanceType
+	{
+		BinaryThreshold, NearerScaled, FurtherScaled;
+	}
 }

@@ -1,6 +1,12 @@
 package org.activity.util;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.activity.io.WritingToFile;
+import org.activity.objects.Pair;
 
 /**
  * Contains an assortment of utility methods for string manipulation
@@ -35,55 +41,271 @@ public class StringUtils
 
 	public static void main(String[] args)
 	{
-		ArrayList<String> list = new ArrayList<String>();
+		stringConcatPerformance();
+	}
 
-		list.add("G");
-		list.add("G");
-		list.add("G");
-		list.add("U");
-		list.add("U");
-		list.add("U");
-		list.add("U");
-		list.add("U");
-		list.add("N");
-		list.add("N");
-		list.add("J");
-		list.add("J");
-		list.add("J");
-		for (int i = 0; i < 1000000; i++)
+	public static void stringConcatPerformance()
+	{
+		ArrayList<String> list0 = new ArrayList<String>();
+		ArrayList<String> testList = new ArrayList<String>();
+
+		// list.add("G");
+		// list.add("G");
+		// list.add("G");
+		// list.add("U");
+		// list.add("U");
+		// list.add("U");
+		// list.add("U");
+		// list.add("U");
+		// list.add("N");
+		// list.add("N");
+		// list.add("J");
+		// list.add("J");
+		// list.add("J");
+
+		for (int i = 0; i < 1000; i++)
 		{
-			list.add("wonderful ");
+			list0.add("wonderfuli");// "wonderful ");
 		}
 
+		String longString = fCat(list0.toArray(new String[list0.size()]));
+		System.out.println("longString.length()=" + longString.length());
+
+		System.out.println("\n1: getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+
+		for (int i = 0; i < 10000; i++)
 		{
-			long t1 = System.nanoTime();
-			String res1 = fastStringConcat(list);
-			long t2 = System.nanoTime();
-			System.out.println("timetaken = " + (t2 - t1) + " ns");
-			System.out.println("res1.length = " + res1.length());
+			testList.add(longString);// "wonderfuli");// "wonderful ");
 		}
 
-		{
-			long t1 = System.nanoTime();
-			String res1 = stringConcat1(list);
-			long t2 = System.nanoTime();
-			System.out.println("timetaken = " + (t2 - t1) + " ns");
-			System.out.println("res1.length = " + res1.length());
-		}
+		// System.out.println("\n2: getHeapInfo\n" + PerformanceAnalytics.getHeapPercentageFree());
 
-		{
-			long t1 = System.nanoTime();
-			String res1 = stringConcat2(list);
-			long t2 = System.nanoTime();
-			System.out.println("timetaken = " + (t2 - t1) + " ns");
-			System.out.println("res1.length = " + res1.length());
-		}
+		Pair<String, Long> res1 = PerformanceAnalytics.timeThisFunctionInns(e -> fastStringConcat(e), testList,
+				"fastStringConcat(ArrayList<String> arrayOfStrings)\n");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
+		// System.out.println("\n3: getHeapInfo\n" + PerformanceAnalytics.getHeapPercentageFree());
+
+		res1 = PerformanceAnalytics.timeThisFunctionInns(e -> fastStringConcatIter(e), testList,
+				"fastStringConcatIter(ArrayList<String> arrayOfStrings)\n");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
+		System.out.println("\n4: getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+
+		res1 = PerformanceAnalytics.timeThisFunctionInns(e -> fCat(e), testList.toArray(new String[testList.size()]),
+				"fCat(String... stringsToConcat)\n");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
+		System.out.println("\n4: getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+
+		StringBuilder sb = new StringBuilder();
+
+		Pair<StringBuilder, Long> res2 = PerformanceAnalytics.timeThisFunctionInns((e, f) -> fastStringConcat(e, f), sb,
+				testList.toArray(new String[testList.size()]),
+				"fastStringConcat(StringBuilder res, String... stringsToConcat)\n");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
+		System.out.println("\n4: getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+
+		res2 = PerformanceAnalytics.timeThisFunctionInns((e, f) -> fCatLeaner1(e, f), sb,
+				testList.toArray(new String[testList.size()]),
+				"fCatLeaner1(StringBuilder givenSB, String... stringsToConcat)\n");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
+		System.out.println("\n3: getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+
+		res2 = PerformanceAnalytics.timeThisFunctionInns((e, f) -> fCat(e, f), sb,
+				testList.toArray(new String[testList.size()]),
+				"fCatLeaner2(StringBuilder givenSB, String... stringsToConcat)\n");
+		System.out.println("timetaken = " + res1.getSecond());
+		System.out.println("res1.length = " + res1.getFirst().length());
+
+		System.out.println("\n3: getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+
+		res1 = PerformanceAnalytics.timeThisFunctionInns(e -> fastStringConcatFor(e),
+				testList.toArray(new String[testList.size()]), "fastStringConcatFor(String... stringsToConcat)\n");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
+		// System.out.println("\n3: getHeapInfo\n" + PerformanceAnalytics.getHeapPercentageFree());
+
+		// res1 = PerformanceAnalytics.timeThisFunctionInns(e -> fastStringConcat(e), "fastStringConcatArray var args",
+		// "G", "G", "G", "U", "U", "U", "U", "U", "N", "N", "J", "J", "J");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
+		res1 = PerformanceAnalytics.timeThisFunctionInns(e -> writeToFile(e), testList, "writeToFile");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
+		// System.out.println("\n3: getHeapInfo\n" + PerformanceAnalytics.getHeapPercentageFree());
+
+		// res1 = PerformanceAnalytics.timeThisFunctionInns(e -> stringConcat2(e), list, "stringConcat2");
+		// System.out.println("timetaken = " + res1.getSecond());
+		// System.out.println("res1.length = " + res1.getFirst().length());
+
 	}
 
 	public static String fastStringConcat(ArrayList<String> arrayOfStrings)
 	{
 		StringBuilder res = new StringBuilder();
 		arrayOfStrings.stream().forEach(s -> res.append(s));
+		return res.toString();
+	}
+
+	public static String fastStringConcatIter(ArrayList<String> arrayOfStrings)
+	{
+		StringBuilder res = new StringBuilder();
+		for (String s : arrayOfStrings)
+		{
+			res.append(s);
+		}
+		return res.toString();
+	}
+
+	/**
+	 * <font color = green>Very Fast string concatenation found.</font>
+	 * <p>
+	 * previously names as fastStringConcat
+	 * 
+	 * @param stringsToConcat
+	 * @return
+	 */
+	public static String fCat(String... stringsToConcat)
+	{
+		StringBuilder res = new StringBuilder();
+		for (String s : stringsToConcat)
+		{
+			res.append(s);
+		}
+		System.out.println(
+				"\nInside fCat(String... stringsToConcat): getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+
+		return res.toString();
+	}
+
+	/**
+	 * Appends given strings to the given StringBuilder
+	 * <p>
+	 * <font color = green>Very Fast string concatenation found.</font>
+	 * <p>
+	 * previously names as fastStringConcat
+	 * <p>
+	 * fCatV1
+	 * 
+	 * @param res
+	 * @param stringsToConcat
+	 * @return res appended with stringsToConcat
+	 */
+	public static StringBuilder fastStringConcat(StringBuilder res, String... stringsToConcat)
+	{
+		for (String s : stringsToConcat)
+		{
+			res.append(s);
+		}
+
+		System.out.println("\nInside fCat(StringBuilder res, String... stringsToConcat): getHeapInfo\n"
+				+ PerformanceAnalytics.getHeapInformation());
+		return res;
+	}
+	//
+	// /**
+	// * Appends given strings to the given StringBuilder with newline.
+	// * <p>
+	// * <font color = green>Very Fast string concatenation found.</font>
+	// * <p>
+	// * previously names as fastStringConcat
+	// *
+	// * @param res
+	// * @param stringsToConcat
+	// * @return res appended with stringsToConcat
+	// */
+	// public static StringBuilder fCatln(StringBuilder res, String... stringsToConcat)
+	// {
+	// for (String s : stringsToConcat)
+	// {
+	// res.append(s);
+	// }
+	// res.append("\n");
+	// return res;
+	// }
+
+	/**
+	 * Appends given strings to the given StringBuilder
+	 * <p>
+	 * <font color = green>Very Fast string concatenation found.</font>
+	 * <p>
+	 * previously names as fastStringConcat
+	 * 
+	 * @param res
+	 * @param stringsToConcat
+	 * @return res appended with stringsToConcat
+	 */
+	public static StringBuilder fCatLeaner1(StringBuilder givenSB, String... stringsToConcat)
+	{
+		int expectedSize = givenSB.length();
+		expectedSize += Arrays.stream(stringsToConcat).parallel().mapToLong(String::length).sum();
+
+		StringBuilder result = new StringBuilder(expectedSize + 100);
+		result.append(givenSB);
+		givenSB = null;
+		for (String s : stringsToConcat)
+		{
+			result.append(s);
+			// res.append(s);
+		}
+		System.out.println("\nInsidefCatLeaner1: getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+		return result;
+	}
+
+	/**
+	 * Fastest for long string until 30 Mar 2017 but takes larger heap space.
+	 * <p>
+	 * previously called: fCatLeaner2
+	 * 
+	 * @param givenSB
+	 * @param stringsToConcat
+	 * @return
+	 */
+	public static StringBuilder fCat(StringBuilder givenSB, String... stringsToConcat)
+	{
+		int expectedSize = givenSB.length();
+		for (String s : stringsToConcat)
+		{
+			expectedSize += s.length();
+		}
+
+		StringBuilder result = new StringBuilder(expectedSize + 100);
+
+		result.append(givenSB);
+		givenSB = null;
+
+		for (String s : stringsToConcat)
+		{
+			result.append(s);
+		}
+		// System.out.println("\nInsidefCatLeaner2: getHeapInfo\n" + PerformanceAnalytics.getHeapInformation());
+
+		return result;
+	}
+
+	public static String fastStringConcatFor(String... stringsToConcat)
+	{
+		StringBuilder res = new StringBuilder();
+
+		for (int i = 0; i < stringsToConcat.length; i++)
+		{
+			res.append(stringsToConcat[i]);
+		}
+		// for (String s : stringsToConcat)
+		// {
+		// res.append(s);
+		// }
 		return res.toString();
 	}
 
@@ -103,6 +325,24 @@ public class StringUtils
 			res += s;
 		}
 		return res;
+	}
+
+	public static String writeToFile(ArrayList<String> arrayOfStrings)
+	{
+		try
+		{
+			BufferedWriter bw = WritingToFile.getBWForNewFile("dummyTest.csv");
+			for (String s : arrayOfStrings)
+			{
+				bw.write(s);
+			}
+			bw.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return "dummy";
 	}
 
 	/**

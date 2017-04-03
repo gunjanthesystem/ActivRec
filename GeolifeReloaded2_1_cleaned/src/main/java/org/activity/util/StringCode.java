@@ -105,9 +105,10 @@ public class StringCode
 		// return
 		// }
 
-		String msg = "Alert!: you are using org.activity.util.StringCode.getStringCodeFromActivityName(String)! ";
+		String msg = "Error!: you are using org.activity.util.StringCode.getStringCodeFromActivityName(String)! ";
 		PopUps.showMessage(PopUps.getCurrentStackTracedErrorMsg(msg));
-		System.err.println(msg);
+		System.err.println(PopUps.getCurrentStackTracedErrorMsg(msg));
+		// System.err.println(msg);
 		// PopUps.getCurrentStackTracedErrorMsg(msg);
 
 		if (activityName.length() == 1)
@@ -159,7 +160,6 @@ public class StringCode
 	 */
 	public static char getCharCodeFromActivityID(int activityID)
 	{
-
 		// uncode char from 127 to 159 are non printable, hence do not use them
 		char code = '\u0000';// null character new String();
 		try
@@ -171,7 +171,6 @@ public class StringCode
 			e.printStackTrace();
 		}
 		return code;
-
 	}
 
 	/**
