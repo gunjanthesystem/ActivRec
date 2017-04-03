@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -63,7 +64,7 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar9/DatabaseCreatedMerged/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar30/DatabaseCreatedMerged/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb23/DatabaseCreatedNoMerge/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 	// commented out on 2 feb 2017
@@ -158,10 +159,18 @@ public class DatabaseCreatorGowallaQuicker0
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = getWorkingLevelCatIDsForAllCatIDs(
 					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
 
+			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = getLevelWiseCatIDsForAllCatIDs(catIDNameDictionary,
+					rootOfCategoryTree, DomainConstants.numOfCatLevels);
+
 			// sanity check to verify if no cat id as empty working lvel cat ids
 			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length > 0");
 			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() > 0)
 					.forEach(e -> System.out.println(e.getKey() + "-" + e.getValue()));
+
+			System.out.println("num of catIDWorkingLevelCatIDsDict with val length > 1="
+					+ catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() > 1).count());
+
+			// .forEach(e -> System.out.println(e.getKey() + "--" + e.getValue()));
 
 			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length = 0");
 			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() == 0)
@@ -171,6 +180,10 @@ public class DatabaseCreatorGowallaQuicker0
 			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() > 3)
 					.forEach(e -> System.out.println(e.getKey() + "-" + e.getValue()));
 
+			System.out.println("Sanity Check: printing all catIDLevelWiseCatIDsDict");
+			catIDLevelWiseCatIDsDict.entrySet().stream()
+					.forEach(e -> System.out.println(e.getKey() + "-" + Arrays.toString(e.getValue())));
+
 			////
 			// used in create checkin entries to determine if a cat id is acceptable
 			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap = UIUtilityBox
@@ -179,7 +192,7 @@ public class DatabaseCreatorGowallaQuicker0
 			////
 			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> unmergedCheckinResult = createCheckinEntries(
 					checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict,
-					catIDsFoundNodesMap, workingCatLevel);
+					catIDsFoundNodesMap, workingCatLevel, catIDLevelWiseCatIDsDict);
 
 			mapForAllCheckinData = unmergedCheckinResult.getFirst();
 
@@ -194,7 +207,7 @@ public class DatabaseCreatorGowallaQuicker0
 			// $$countConsecutiveSimilarActivities3(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName,
 			// $$ consecCompareLocationID);// consecCompareDirectCatID);
 			/////
-
+			System.out.println("merge = " + merge);
 			if (merge)
 			{
 				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
@@ -728,13 +741,69 @@ public class DatabaseCreatorGowallaQuicker0
 			sb.append(cat.getKey() + "," + workingLevelCatIDs + "\n");
 		}
 		//
-		WritingToFile.writeToNewFile(sb.toString(), commonPath + "MapForgetWorkingLevelCatIDsForAllCatIDs.csv");
+		WritingToFile.writeToNewFile(sb.toString(), commonPath + "MapWorkingLevelCatIDsForAllCatIDs.csv");
 
 		String s = "numOfCatsWithMultipleWorkingLevelCats = " + numOfCatsWithMultipleWorkingLevelCats
 				+ "\nnumOfCatsNotInHierarchyTree = " + numOfCatsNotInHierarchyTree + "\nnumOfCatsInHierarchyTree = "
 				+ numOfCatsInHierarchyTree;
 
-		WritingToFile.appendLineToFileAbsolute(s, commonPath + "MapForgetWorkingLevelCatIDsForAllCatIDs.csv");
+		WritingToFile.appendLineToFileAbsolute(s, commonPath + "MapWorkingLevelCatIDsForAllCatIDs.csv");
+
+		return res;
+	}
+
+	/**
+	 * Return a a map containing working level cat ids for for each cat id in the given cat id name dictionary and given
+	 * working level cat id and writes MapForgetWorkingLevelCatIDsForAllCatIDs.csv containing working level cats for
+	 * cats and num of not found in hierarchy tree, num of cat having multiple working level cat ids
+	 * 
+	 * @param catIDNameDictionary
+	 * @param rootOfCategoryTree
+	 *            new root, root with newly manually added catids
+	 * @param numOfLevels
+	 * @return <catid, catid__catid__catid>
+	 */
+	private static TreeMap<Integer, String[]> getLevelWiseCatIDsForAllCatIDs(
+			TreeMap<Integer, String> catIDNameDictionary, DefaultMutableTreeNode rootOfCategoryTree, int numOfLevels)
+	{
+		TreeMap<Integer, String[]> res = new TreeMap<>();
+		StringBuilder sb = new StringBuilder();
+		int numOfCatsWithMultipleWorkingLevelCats = 0, numOfCatsNotInHierarchyTree = 0, numOfCatsInHierarchyTree = 0;
+
+		for (Entry<Integer, String> cat : catIDNameDictionary.entrySet())
+		{
+			String[] levelWiseCatIDsForThisCatID = new String[numOfLevels];
+
+			for (int level = 1; level <= numOfLevels; level++)
+			{
+				Set<String> givenLevelOrAboveCatIDs = UIUtilityBox.getGivenLevelCatIDs(String.valueOf(cat.getKey()),
+						rootOfCategoryTree, level);
+
+				if (givenLevelOrAboveCatIDs.size() > 0)
+				{
+					levelWiseCatIDsForThisCatID[level - 1] = givenLevelOrAboveCatIDs.stream()
+							.reduce((t, u) -> t + "__" + u).get();
+					numOfCatsInHierarchyTree += 1;
+
+					if (givenLevelOrAboveCatIDs.size() > 1)
+					{
+						numOfCatsWithMultipleWorkingLevelCats += 1;
+					}
+				}
+				else
+				{
+					numOfCatsNotInHierarchyTree += 1;
+				}
+			}
+			res.put(cat.getKey(), levelWiseCatIDsForThisCatID);
+			sb.append(cat.getKey() + "," + Arrays.toString(levelWiseCatIDsForThisCatID) + "\n");
+		}
+		//
+		WritingToFile.writeToNewFile(sb.toString(), commonPath + "MapLevelWiseCatIDsForAllCatIDs.csv");
+		String s = "numOfCatsWithMultipleWorkingLevelCats = " + numOfCatsWithMultipleWorkingLevelCats
+				+ "\nnumOfCatsNotInHierarchyTree = " + numOfCatsNotInHierarchyTree + "\nnumOfCatsInHierarchyTree = "
+				+ numOfCatsInHierarchyTree;
+		WritingToFile.appendLineToFileAbsolute(s, commonPath + "MapLevelWiseCatIDsForAllCatIDs.csv");
 
 		return res;
 	}
@@ -761,12 +830,10 @@ public class DatabaseCreatorGowallaQuicker0
 	 *            (cat id, list of nodes in hierarchy tree at which this cat id is found)
 	 * @return
 	 */
-
-	private static Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>>
-
-			createCheckinEntries(String checkinFileNameToRead, String commonPath,
-					DefaultMutableTreeNode rootOfCategoryTree, TreeMap<Integer, String> catIDWorkingLevelCatIDsDict,
-					LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap, int workingCatLevel)
+	private static Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> createCheckinEntries(
+			String checkinFileNameToRead, String commonPath, DefaultMutableTreeNode rootOfCategoryTree,
+			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict,
+			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap, int workingCatLevel)
 	{
 		int countOfCheckinEntryObjects = 0;
 		int numOfDuplicateTimestamps = 0;
@@ -891,6 +958,166 @@ public class DatabaseCreatorGowallaQuicker0
 			System.out.println("actual num of CheckinEntry objects created returned ="
 					+ result.entrySet().stream().mapToLong(e -> e.getValue().size()).sum());
 			// numOfDuplicateTimestamps
+
+			br.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
+
+		System.out.println("----Exiting createCheckinEntries----------------");
+		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>>(result,
+				locationIDsInCheckinData);
+
+	}
+
+	/**
+	 * <p>
+	 * Read the checkin file and create checkin entry objects
+	 * </p>
+	 * <font color = yellow>#CheckinsReadFromData = #checkinNotInHierarchy + #checkinsLevelNotAcceptable +
+	 * #checkinsCreated + #checkinsDuplicateTimestampUser</font>
+	 * <p>
+	 * <font color = orange>Note: Gowalla checkin data read: there exists 281 instances where same user checkins at
+	 * different locations for the same timestamp. Currently, i am only considering the most recent location for that
+	 * timestamp.</font>
+	 * </p>
+	 * 
+	 * @param checkindatafilename2
+	 * @param commonPath2
+	 * @param rootOfCategoryTree
+	 * @param workingLevelForCat
+	 * @param rootOfCategoryTree
+	 * @param catIDWorkingLevelCatIDsDict
+	 * @param catIDLevelWiseCatIDsDict
+	 * 
+	 * @param catIDsFoundNodesMap
+	 *            (cat id, list of nodes in hierarchy tree at which this cat id is found)
+	 * @return
+	 */
+	private static Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> createCheckinEntries(
+			String checkinFileNameToRead, String commonPath, DefaultMutableTreeNode rootOfCategoryTree,
+			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict,
+			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap, int workingCatLevel,
+			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict)
+	{
+		int countOfCheckinEntryObjects = 0;
+		int numOfDuplicateTimestamps = 0;
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> result = new LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>();
+
+		Set<String> locationIDsInCheckinData = new HashSet<String>();
+
+		int countOfLines = 0;
+
+		String lineRead;
+
+		ArrayList<Integer> notFoundInFlatMap = new ArrayList<Integer>();
+		ArrayList<Integer> catIDsNotFoundInAnyLevel = new ArrayList<Integer>();
+
+		StringBuffer logRejectedCheckins = new StringBuffer();
+		long countOfRejectedCheckinNotInHierarchy = 0, countOfRejectedCHeckinBelowLevel2 = 0,
+				countOfCinWithMultipleWorkingLevelCatIDs = 0;
+		System.out.println("----Inside createCheckinEntries----------------");
+		try
+		{
+			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
+			while ((lineRead = br.readLine()) != null)
+			{
+				countOfLines += 1;
+				if (countOfLines == 1)
+				{
+					continue; // skip the header line
+				}
+
+				if (countOfLines % 200000 == 0)
+				{
+					System.out.println(" #lines read = " + countOfLines);
+				}
+
+				String splittedLine[] = RegexUtils.patternComma.split(lineRead);
+				// lineRead.split(",");
+
+				String userID = splittedLine[1];// .replaceAll("\"", ""));
+				Integer locationID = Integer.valueOf(splittedLine[2]);// .replaceAll("\"", ""));
+				locationIDsInCheckinData.add(locationID.toString());
+				Timestamp ts = Timestamp.from(Instant.parse(splittedLine[3].replaceAll("\"", "")));
+				String latitude = new String(splittedLine[5]);
+				String longitude = new String(splittedLine[6]);
+				Integer catIDDirect = Integer.valueOf(splittedLine[7]);// .replaceAll("\"", ""));
+				Double distFromNextInM = Double.valueOf(splittedLine[9]);
+				Long durationFromNextInM = Long.valueOf(splittedLine[10]);
+
+				// a direct catid is acceptable only if it is present in cat hierarchy tree at one of more nodes and
+				// atleast one of those nodes have direct level >= workingLevel (2).. in other words, ignore catid at
+				// level 1
+				Pair<Boolean, String> isAcceptableDirectCatID = isAcceptableDirectCatIDFaster(catIDDirect,
+						catIDsFoundNodesMap, workingCatLevel);
+
+				if (isAcceptableDirectCatID.getFirst() == false)
+				{
+					String reason = isAcceptableDirectCatID.getSecond();
+					// maintaining a log of rejected checkins with the reason for rejection
+					logRejectedCheckins.append(countOfLines + "-" + reason + "\n");
+					if (reason.equals("NotInHierarchy"))
+					{
+						countOfRejectedCheckinNotInHierarchy += 1;
+					}
+					else if (reason.equals("LevelNotAcceptable"))
+					{
+						countOfRejectedCHeckinBelowLevel2 += 1;
+					}
+					// int countOfRejectedCheckinNotInHierarchy = 0, countOfRejectedCHeckinBelowLevel2 = 0;
+					continue;
+				}
+				String workingLevelCatIDs = catIDWorkingLevelCatIDsDict.get(catIDDirect);
+				if (RegexUtils.patternDoubleUnderScore.split(workingLevelCatIDs).length > 1)
+				{
+					countOfCinWithMultipleWorkingLevelCatIDs += 1;
+				}
+				CheckinEntry cobj = new CheckinEntry(userID, locationID, ts, latitude, longitude, catIDDirect,
+						workingLevelCatIDs, distFromNextInM, durationFromNextInM,
+						catIDLevelWiseCatIDsDict.get(catIDDirect));
+
+				countOfCheckinEntryObjects += 1;
+
+				TreeMap<Timestamp, CheckinEntry> mapForThisUser;
+
+				mapForThisUser = result.get(userID); // if userid already in map
+
+				if (mapForThisUser == null) // else create new map for this userid
+				{
+					mapForThisUser = new TreeMap<Timestamp, CheckinEntry>();
+				}
+
+				if (mapForThisUser.containsKey(ts))
+				{
+					System.err.println("Error: duplicate ts: map for this user (userID=" + userID
+							+ ") already contains ts =" + ts.toString());
+					numOfDuplicateTimestamps += 1;
+				}
+
+				mapForThisUser.put(ts, cobj);
+				result.put(userID, mapForThisUser);
+			}
+
+			System.out.println("num of users = " + result.size());
+			System.out.println("num of lines read = " + countOfLines);
+
+			System.out.println("num of lines NotInHierarchy = " + countOfRejectedCheckinNotInHierarchy);
+			System.out.println("num of lines LevelNotAcceptable = " + countOfRejectedCHeckinBelowLevel2);
+			System.out.println(
+					"num of CheckinEntry objects created = countOfCheckinEntryObjects =" + countOfCheckinEntryObjects);
+			System.out.println("num of duplicate timestamps = " + numOfDuplicateTimestamps);
+			System.out.println("actual num of CheckinEntry objects created returned ="
+					+ result.entrySet().stream().mapToLong(e -> e.getValue().size()).sum());
+
+			System.out.println("countOfCinWithMultipleWorkingLevelCatIDs =" + countOfCinWithMultipleWorkingLevelCatIDs);
+			// numOfDuplicateTimestamps
+
+			br.close();
 		}
 		catch (Exception e)
 		{

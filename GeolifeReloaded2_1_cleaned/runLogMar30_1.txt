@@ -1,0 +1,10 @@
+:compileJava UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:runApp
+Running starts:  2017-03-30T02:03:56.579
+:runApp FAILED
+
+BUILD FAILED
+
+Total time: 1 mins 37.121 secs

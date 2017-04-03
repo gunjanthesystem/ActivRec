@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.activity.constants.VerbosityConstants;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.tools.JSONProcessingGowallaCatHierachy;
@@ -245,6 +246,144 @@ public class UIUtilityBox
 		return givenLevelOrAboveCatIDs;
 	}
 
+	/**
+	 * Note:. not expecting more than three levels
+	 * <p>
+	 * Checkec all correct
+	 * 
+	 * @param catIDToSearh
+	 * @param rootOfCategoryTree
+	 * @param level
+	 * @return
+	 * @since Mar 30, 2017
+	 */
+	public static Set<String> getGivenLevelCatIDs(String catIDToSearh, DefaultMutableTreeNode rootOfCategoryTree,
+			int level) // suppose given level is 3
+	{
+		// System.out.println("Inside getGivenLevelCatIDs: catIDToSearh " + catIDToSearh + " level=" + level);
+
+		ArrayList<DefaultMutableTreeNode> foundNodes2 = recursiveDfsMulipleOccurences2OnlyCatID(rootOfCategoryTree,
+				catIDToSearh, new ArrayList<DefaultMutableTreeNode>());
+		// System.out.println("foundNodes2.size()= " + foundNodes2.size());
+
+		Set<String> givenCatIDs = new HashSet<>();
+
+		for (DefaultMutableTreeNode foundnode : foundNodes2)
+		{
+			int levelOfFoundNode = foundnode.getLevel();
+			// System.out.println("levelOfFoundNode = " + levelOfFoundNode);
+			if (foundnode != null)
+			{
+				if (levelOfFoundNode == level) // if found at level 3
+				{
+					// System.out.println("inside levelOfFoundNode == level");
+					givenCatIDs.add(RegexUtils.patternColon.split(foundnode.toString())[0]);
+				}
+
+				else if (levelOfFoundNode < level) // if found at level 2,1
+				{
+					int numOfChildren = foundnode.getChildCount();
+					// System.out.println("inside levelOfFoundNode< level , numOfChildren=" + numOfChildren);
+					if (numOfChildren > 0)
+					{
+						for (int childIndex = 0; childIndex < numOfChildren; childIndex++)
+						{
+							DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) foundnode
+									.getChildAt(childIndex);
+							int levelOfChild = childNode.getLevel();
+							// System.out.println("levelOfChild = " + levelOfChild);
+
+							if (levelOfChild == level)
+							{
+								// System.out.println("inside levelOfChild == level");
+								givenCatIDs.add(RegexUtils.patternColon.split(childNode.toString())[0]);
+							}
+							else if (levelOfChild < level)
+							{
+								int numOfGrandChildren = childNode.getChildCount();
+								// System.out.println(
+								// "inside levelOfChild< level , numOfGrandChildren=" + numOfGrandChildren);
+								if (numOfGrandChildren > 0)
+								{
+									for (int grandChildIndex = 0; grandChildIndex < numOfGrandChildren; grandChildIndex++)
+									{
+										DefaultMutableTreeNode grandChildNode = (DefaultMutableTreeNode) childNode
+												.getChildAt(grandChildIndex);
+										int levelOfGrandChild = grandChildNode.getLevel();
+										// System.out.println("levelOfGrandChild = " + levelOfGrandChild);
+
+										if (levelOfGrandChild == level)
+										{
+											// System.out.println("inside levelOfGrandChild == level");
+											givenCatIDs
+													.add(RegexUtils.patternColon.split(grandChildNode.toString())[0]);
+										}
+										else
+										{
+
+											System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+													"Error: levelOfGrandChild= " + levelOfGrandChild
+															+ " Not expected more than three levels. foundnode.getLevel() = "
+															+ foundnode.getLevel() + ", while level to look for is: "
+															+ level + " cat to look for: " + catIDToSearh));
+										}
+									}
+								}
+							}
+							else
+							{
+								System.err.println("Error: should not have reached this");
+								// System.out.println("childNode.getLevel() = " + level
+								// + " Not expected more than three levels.\nchildNode.getLevel() = "
+								// + childNode.getLevel() + " foundnode.getLevel() = " + foundnode.getLevel()
+								// + ", while level to look for is: " + level + " cat to look for: "
+								// + catIDToSearh);
+								// System.err.println(
+								// PopUps.getCurrentStackTracedErrorMsg("Error: childNode.getLevel() = " + level
+								// + " Not expected more than three levels.\nchildNode.getLevel() = "
+								// + childNode.getLevel() + " foundnode.getLevel() = "
+								// + foundnode.getLevel() + ", while level to look for is: " + level
+								// + " cat to look for: " + catIDToSearh));
+							}
+						}
+					}
+				}
+				else
+				{ // if node was found in hierarchy but at a level higher than desired level, then go to lower levels.
+					// System.out.println("Inside else represeting levelOfFoundNode > level");
+					while (foundnode.getLevel() > level)
+					{
+						foundnode = (DefaultMutableTreeNode) foundnode.getParent();
+					}
+					// System.out
+					// .println("relevant parentnode = " + RegexUtils.patternColon.split(foundnode.toString())[0]);
+					givenCatIDs.add(RegexUtils.patternColon.split(foundnode.toString())[0]);
+				}
+
+			}
+		}
+		if (givenCatIDs.size() == 0)
+		{
+			if (foundNodes2.size() == 0)
+			{
+				System.err.println("Warning:" + catIDToSearh + " has not given level " + level
+						+ " because it was not in category hierarhcy tree");
+			}
+			else
+			{
+				System.err.println("Warning: Alert!" + catIDToSearh + " has not given level " + level
+						+ " though it is in category hierarhcy tree");
+			}
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Inside getGivenLevelCatIDs: for catid:" + catIDToSearh + " at level" + level
+					+ " the givenCatIDs are: " + givenCatIDs.toString());
+		}
+		return givenCatIDs;
+	}
+
 	public static void checkConversionOfTreeItemToTreeNode()
 	{
 		// Path treeAsStringFile = Paths.get("/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep6/TreeAsString.txt");
@@ -429,7 +568,7 @@ public class UIUtilityBox
 	 * @param node
 	 * @param valueToSearch
 	 * @param foundNodes
-	 * @return
+	 * @return ArrayList of matching nodes
 	 */
 	public static ArrayList<DefaultMutableTreeNode> recursiveDfsMulipleOccurences2OnlyCatID(DefaultMutableTreeNode node,
 			String valueToSearch, ArrayList<DefaultMutableTreeNode> foundNodes)

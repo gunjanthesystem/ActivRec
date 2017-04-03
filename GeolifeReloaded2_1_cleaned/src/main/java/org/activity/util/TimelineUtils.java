@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.HJEditDistance;
 import org.activity.io.Serializer;
@@ -934,7 +935,9 @@ public class TimelineUtils
 			WritingToFile.writeToNewFile(locInfo.toString(), Constant.outputCoreResultsPath + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
 
-		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0;
+		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0,
+				numOfCInsWithMultipleWorkingLevelCatIDs = 0, numOfCIns = 0;
+		HashMap<String, String> actsOfCinsWithMultipleWorkLevelCatIDs = new HashMap<>();
 		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
 
 		// convert checkinentries to activity objects
@@ -953,23 +956,29 @@ public class TimelineUtils
 				// "--* user:" + userID + " date:" + date.toString() + " has " + dateEntry.getValue().size() + "
 				// checkinentries");
 
-				for (CheckinEntry e : dateEntry.getValue())// over checkins
+				for (CheckinEntry cin : dateEntry.getValue())// over checkins
 				{
-					int activityID = Integer.valueOf(e.getActivityID());
-					String activityName = String.valueOf(e.getActivityID());// "";// TODO
+					numOfCIns += 1;
+					int activityID = Integer.valueOf(cin.getActivityID());
+					String activityName = String.valueOf(cin.getActivityID());// "";
 
-					Timestamp startTimestamp = e.getTimestamp(); // timestamp of first cin with its a merged one
-					String startLatitude = e.getStartLatitude(); // of first cin if its a merged one
-					String startLongitude = e.getStartLongitude();// of first cin if its a merged one
+					Timestamp startTimestamp = cin.getTimestamp(); // timestamp of first cin with its a merged one
+					String startLatitude = cin.getStartLatitude(); // of first cin if its a merged one
+					String startLongitude = cin.getStartLongitude();// of first cin if its a merged one
 					String startAltitude = "";//
-					String userIDInside = e.getUserID();
-					double distaneInMFromPrev = e.getDistanceInMetersFromPrev();// of first cin if its a merged one
-					long durationInSecFromPrev = e.getDurationInSecsFromPrev();// of first cin if its a merged one
+					String userIDInside = cin.getUserID();
+					double distaneInMFromPrev = cin.getDistanceInMetersFromPrev();// of first cin if its a merged one
+					long durationInSecFromPrev = cin.getDurationInSecsFromPrev();// of first cin if its a merged one
 
+					String[] levelWiseCatIDs = cin.getLevelWiseCatIDs();
 					// int locationID = Integer.valueOf(e.getLocationID());
-					ArrayList<Integer> locIDs = e.getLocationIDs();// e.getLocationIDs());
+					ArrayList<Integer> locIDs = cin.getLocationIDs();// e.getLocationIDs());
 					String locationName = "";//
-
+					if (RegexUtils.patternDoubleUnderScore.split(cin.getWorkingLevelCatIDs()).length > 1)
+					{
+						numOfCInsWithMultipleWorkingLevelCatIDs += 1;
+						actsOfCinsWithMultipleWorkLevelCatIDs.put(activityName, cin.getWorkingLevelCatIDs());
+					}
 					// sanity check start
 					if (userIDInside.equals(userID) == false)
 					{
@@ -1031,7 +1040,7 @@ public class TimelineUtils
 					ActivityObject ao = new ActivityObject(activityID, locIDs, activityName, locationName,
 							startTimestamp, startLatitude, startLongitude, startAltitude, userID, photos_count,
 							checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count,
-							e.getWorkingLevelCatIDs(), distaneInMFromPrev, durationInSecFromPrev);
+							cin.getWorkingLevelCatIDs(), distaneInMFromPrev, durationInSecFromPrev, levelWiseCatIDs);
 					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
 				}
@@ -1039,9 +1048,16 @@ public class TimelineUtils
 			}
 			activityObjectsDatewise.put(userID, dayWiseForThisUser);
 		}
+		System.out.println(" numOfCIns = " + numOfCIns);
 		System.out.println(" numOfCInsWithMultipleLocIDs = " + numOfCInsWithMultipleLocIDs);
 		System.out.println(" numOfCInsWithMultipleDistinctLocIDs = " + numOfCInsWithMultipleDistinctLocIDs);
+		System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfCInsWithMultipleWorkingLevelCatIDs
+				+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
 
+		WritingToFile.writeToNewFile(
+				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
+						.collect(Collectors.joining("\n")),
+				Constant.outputCoreResultsPath + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
 		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
 		return activityObjectsDatewise;
 

@@ -53,6 +53,11 @@ public class ActivityObject implements Serializable
 	 */
 	String workingLevelCatIDs;//
 
+	/**
+	 * [0] level 1 catids, [1] level 2 catid
+	 */
+	private String[] levelWiseCatIDs;
+
 	private Timestamp startTimestamp, endTimestamp;
 
 	/**
@@ -251,6 +256,70 @@ public class ActivityObject implements Serializable
 
 		this.distanceInMFromNext = distanceInMFromNext;
 		this.durationInSecondsFromNext = durationInSecsFromNext;
+
+	}
+
+	/**
+	 * 
+	 * @param activityID
+	 * @param locationIDs
+	 *            list of locations id. this will >1 in case of mergers. note: we store the location id in the activity
+	 *            object as Set and not as List
+	 * @param activityName
+	 * @param locationName
+	 * @param startTimestamp
+	 * @param startLatitude
+	 * @param startLongitude
+	 * @param startAltitude
+	 * @param userID
+	 * @param photos_count
+	 * @param checkins_count
+	 * @param users_count
+	 * @param radius_meters
+	 * @param highlights_count
+	 * @param items_count
+	 * @param max_items_count
+	 * @param workingLevelCatIDs
+	 * @param distanceInMFromNext
+	 * @param durationInSecsFromNext
+	 * @param levelWiseCatIDs
+	 */
+	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
+			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
+			long durationInSecsFromNext, String[] levelWiseCatIDs)
+	{
+
+		// this.activityID = activityID;
+
+		String splittedwlci[] = workingLevelCatIDs.split("__");
+		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
+															// considering one working level cat id
+
+		this.locationIDs = new LinkedHashSet<Integer>(locationIDs);
+
+		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
+		this.locationName = locationName;
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = startTimestamp;
+		this.startLatitude = startLatitude;
+		this.startLongitude = startLongitude;
+		this.startAltitude = startAltitude;
+		this.userID = userID;
+		this.photos_count = photos_count;
+		this.checkins_count = checkins_count;
+		this.users_count = users_count;
+		this.radius_meters = radius_meters;
+		this.highlights_count = highlights_count;
+		this.items_count = items_count;
+		this.max_items_count = max_items_count;
+		this.workingLevelCatIDs = workingLevelCatIDs;
+
+		this.distanceInMFromNext = distanceInMFromNext;
+		this.durationInSecondsFromNext = durationInSecsFromNext;
+
+		this.levelWiseCatIDs = levelWiseCatIDs;
 
 	}
 
@@ -610,6 +679,15 @@ public class ActivityObject implements Serializable
 		return sb.toString();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public String[] getLevelWiseCatIDs()
+	{
+		return levelWiseCatIDs;
+	}
+
 	// /**
 	// * Create empty Activity Object
 	// */
@@ -909,6 +987,11 @@ public class ActivityObject implements Serializable
 	public int getHighlights_count()
 	{
 		return highlights_count;
+	}
+
+	public String getWorkingLevelCatIDs()
+	{
+		return workingLevelCatIDs;
 	}
 
 	public void setHighlights_count(int highlights_count)

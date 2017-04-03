@@ -15,6 +15,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
+import org.activity.constants.Enums.TypeOfThreshold;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.FeatureWiseEditDistance;
@@ -27,11 +28,13 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
+import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
+import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -317,33 +320,14 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		// ##############
 
 		// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry for
-		// such candidate timelines from the distance scores map
-		if (!this.lookPastType.equals(Enums.LookPastType.ClosestTime))// no pruning for baseline closest ST
+		// such candidate timelines from the distance scores map. // no pruning for baseline closest ST
+		if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == false)
 		{
-			if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
-			{
-				this.thresholdAsDistance = thresholdVal;
-			}
-			else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
-			{
-				double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
-				this.thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
-			}
-			else
-			{
-				System.err.println("Error: type of threshold unknown in recommendation master");
-				errorExists = true;
-				System.exit(-2);
-			}
-
-			int countCandBeforeThresholdPruning = distancesMapUnsorted.size();// distanceScoresSorted.size();
-			distancesMapUnsorted = TimelineUtils.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
-			int countCandAfterThresholdPruning = distancesMapUnsorted.size();
-			this.thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
-			if (!thresholdPruningNoEffect)
-			{
-				PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
-			}
+			Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
+					distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm);
+			distancesMapUnsorted = prunedRes.getFirst();
+			this.thresholdAsDistance = prunedRes.getSecond();
+			this.thresholdPruningNoEffect = prunedRes.getThird();
 		}
 		// ////////////////////////////////
 
@@ -479,6 +463,54 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		//////////////
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
+	}
+
+	/**
+	 * 
+	 * @param distancesMapUnsorted
+	 * @param typeOfThreshold
+	 * @param thresholdVal
+	 * @param activitiesGuidingRecomm
+	 * @return Triple{prunedDistancesMap,thresholdAsDistance,thresholdPruningNoEffect}
+	 */
+	private static Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> pruneAboveThreshold(
+			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted, TypeOfThreshold typeOfThreshold,
+			double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm)
+	{
+		double thresholdAsDistance = -1;
+		if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
+		{
+			thresholdAsDistance = thresholdVal;
+		}
+		else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
+		{
+			double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
+			thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
+		}
+		else
+		{
+			System.err.println(
+					PopUps.getCurrentStackTracedErrorMsg("Error: type of threshold unknown in recommendation master"));
+			// errorExists = true;
+			System.exit(-2);
+		}
+
+		int countCandBeforeThresholdPruning = distancesMapUnsorted.size();// distanceScoresSorted.size();
+		distancesMapUnsorted = TimelineUtils.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
+		int countCandAfterThresholdPruning = distancesMapUnsorted.size();
+
+		boolean thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
+		if (!thresholdPruningNoEffect)
+		{
+			System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
+			PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
+			if (!Constant.useThreshold)
+			{
+				System.err.println("Error: threshold pruning is happening.");// +msg);
+			}
+		}
+		return new Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean>(distancesMapUnsorted,
+				thresholdAsDistance, thresholdPruningNoEffect);
 	}
 
 	/**
@@ -783,9 +815,11 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 	public String getActivityNamesGuidingRecomm()
 	{
 		StringBuilder res = new StringBuilder();
+
 		for (ActivityObject ae : activitiesGuidingRecomm)
 		{
-			res.append(">>" + ae.getActivityName());
+			res = StringUtils.fCat(res, ">>", ae.getActivityName());
+			// res.append(">>" + ae.getActivityName());
 		}
 		return res.toString();
 	}
@@ -2773,12 +2807,12 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		return this.candidateTimelines.size();
 	}
 
-	public int getNumberOfActivitiesInActivitesGuidingRecommendation()
+	public int getNumOfActsInActsGuidingRecomm()
 	{
 		return this.activitiesGuidingRecomm.size();
 	}
 
-	public int getNumberOfValidActivitiesInActivitesGuidingRecommendation()
+	public int getNumOfValidActsInActsGuidingRecomm()
 	{
 		int count = 0;
 		for (ActivityObject ae : this.activitiesGuidingRecomm)
@@ -2841,7 +2875,7 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		return thresholdAsDistance;
 	}
 
-	public int getNumberOfCandidateTimelinesBelowThreshold() // satisfying threshold
+	public int getNumOfCandTimelinesBelowThresh() // satisfying threshold
 	{
 		// if(hasCandidateTimelinesBelowThreshold==false)
 		// {
@@ -2860,7 +2894,7 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 	 * 
 	 * @return
 	 */
-	public String getNextActivityNamesWithoutDistanceString()
+	public String getNextActNamesWithoutDistString()
 	{// LinkedHashMap<String, Pair<ActivityObject, Double>>
 		StringBuilder result = new StringBuilder("");
 		nextActivityObjectsFromCands.entrySet().stream()
@@ -2873,7 +2907,7 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 	 * 
 	 * @return
 	 */
-	public String getNextActivityNamesWithDistanceString()
+	public String getNextActNamesWithDistString()
 	{// LinkedHashMap<String, Pair<ActivityObject, Double>>
 		StringBuilder result = new StringBuilder("");
 		nextActivityObjectsFromCands.entrySet().stream().forEach(e -> result
@@ -2886,22 +2920,24 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		StringBuilder res = new StringBuilder();
 		for (ActivityObject ae : activitiesGuidingRecomm)
 		{
-			res.append("  " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp());
+			res = StringUtils.fCat(res, "  ", ae.getActivityName(), "__", ae.getStartTimestamp().toString(), "_to_",
+					ae.getEndTimestamp().toString());
+			// res.append(" " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp());
 		}
 		return res.toString();
 	}
 
-	public String getRankedRecommendedActivityNamesWithoutRankScores()
+	public String getRankedRecommendedActNamesWithoutRankScores()
 	{
 		return this.rankedRecommendedActNamesWithoutRankScoresStr;
 	}
 
-	public String getRankedRecommendedActivityNamesWithRankScores()
+	public String getRankedRecommendedActNamesWithRankScores()
 	{
 		return this.rankedRecommendedActNamesWithRankScoresStr;
 	}
 
-	public int getNumberOfDistinctRecommendations()
+	public int getNumOfDistinctRecommendations()
 	{
 		return recommendedActivityNamesWithRankscores.size();
 	}
@@ -2916,7 +2952,7 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		return endPointIndicesConsideredInCands;
 	}
 
-	public ArrayList<ActivityObject> getActivitiesGuidingRecomm()
+	public ArrayList<ActivityObject> getActsGuidingRecomm()
 	{
 		return activitiesGuidingRecomm;
 	}

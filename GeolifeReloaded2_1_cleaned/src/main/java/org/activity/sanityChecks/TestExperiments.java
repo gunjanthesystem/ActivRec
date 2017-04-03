@@ -59,7 +59,7 @@ public class TestExperiments
 
 	}
 
-	public static void checkEditDistance()
+	public static void checkEditDistance2()
 	{
 		// Constant.setDatabaseName("dcu_data_2");
 		// Constant.verboseLevenstein = true;
@@ -67,10 +67,43 @@ public class TestExperiments
 		// // new AlignmentBasedDistance().getWeightedLevenshteinDistance("AAB", "AAS", 1, 1, 2);
 		VerbosityConstants.verboseLevenstein = true;
 
-		System.out.println(
-				new AlignmentBasedDistance().getMySimpleLevenshteinDistance("gunjankumar", "manaligaur", 1, 1, 2));
-		System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace("gunjankumar",
-				"manaligaur", 1, 1, 2));
+		System.out.println(new AlignmentBasedDistance().getMySimpleLevenshteinDistance("gunjankumarmanaligaurgunjan",
+				"manaligaurgunjanmanaligaurgunjan", 1, 1, 2));
+		// System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace("gunjankumar",
+		// "manaligaur", 1, 1, 2));
+		// new AlignmentBasedDistance().getSimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
+	}
+
+	public static void checkEditDistance1()
+	{
+		// Constant.setDatabaseName("dcu_data_2");
+		// Constant.verboseLevenstein = true;
+		// new AlignmentBasedDistance().getMySimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
+		// // new AlignmentBasedDistance().getWeightedLevenshteinDistance("AAB", "AAS", 1, 1, 2);
+		VerbosityConstants.verboseLevenstein = true;
+
+		System.out.println(new AlignmentBasedDistance().getMySimpleLevenshteinDistanceSlower2(
+				"gunjankumarmanaligaurgunjan", "manaligaurgunjanmanaligaurgunjan", 1, 1, 2));
+		// System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace("gunjankumar",
+		// "manaligaur", 1, 1, 2));
+		// new AlignmentBasedDistance().getSimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
+	}
+
+	public static void checkEditDistance0()
+	{
+		// Constant.setDatabaseName("dcu_data_2");
+		// Constant.verboseLevenstein = true;
+		// new AlignmentBasedDistance().getMySimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
+		// // new AlignmentBasedDistance().getWeightedLevenshteinDistance("AAB", "AAS", 1, 1, 2);
+		VerbosityConstants.verboseLevenstein = true;
+
+		System.out.println(new AlignmentBasedDistance().getMySimpleLevenshteinDistanceSlower1(
+				"gunjankumarmanaligaurgunjan", "manaligaurgunjanmanaligaurgunjan", 1, 1, 2));
+		// System.out.println(new AlignmentBasedDistance().getMySimpleLevenshteinDistanceSlower1("ape", "aces", 1, 1,
+		// 2));
+
+		// System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace("gunjankumar",
+		// "manaligaur", 1, 1, 2));
 		// new AlignmentBasedDistance().getSimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
 	}
 
@@ -452,6 +485,24 @@ public class TestExperiments
 	}
 
 	public static void main(String[] args)
+	{
+		long t1 = System.nanoTime();
+
+		checkEditDistance0();
+		long t2 = System.nanoTime();
+
+		checkEditDistance1();
+		long t3 = System.nanoTime();
+
+		checkEditDistance2();
+		long t4 = System.nanoTime();
+
+		System.out.println("checkEditDistance0=" + (t2 - t1));
+		System.out.println("checkEditDistance1=" + (t3 - t2));
+		System.out.println("checkEditDistance2=" + (t4 - t3));
+	}
+
+	public static void main0(String[] args)
 	{
 		try
 		{

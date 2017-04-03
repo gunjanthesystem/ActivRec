@@ -149,8 +149,10 @@ public class DatageneratorUtils
 	}
 
 	/**
-	 * <font color = orange>Note: distanceFromPrev and durationFromPrev for the merged checkin is considered to be the
-	 * corresponding values for the first checkin.
+	 * <font color = orange>Assuming merged checking have same activityID(catID)
+	 * <p>
+	 * Note: distanceFromPrev and durationFromPrev for the merged checkin is considered to be the corresponding values
+	 * for the first checkin.
 	 * <p>
 	 * This results in following: if a checkin which is a merger of 3 checkins is followed by a single unmerged checkin.
 	 * Then the distanceFromPrev and durationFromPrev for the merged checkin is the corresponding values for the first
@@ -178,6 +180,7 @@ public class DatageneratorUtils
 		String workingLevelCatIDs = checkinsToMerge.get(0).getWorkingLevelCatIDs();
 		double distanceInMFromPrev = checkinsToMerge.get(0).getDistanceInMetersFromPrev();
 		long durationInSecsFromPrev = checkinsToMerge.get(0).getDurationInSecsFromPrev();
+		String[] levelWiseCatIDs = checkinsToMerge.get(0).getLevelWiseCatIDs();
 
 		ArrayList<Integer> locationIDs = new ArrayList<>();
 		ArrayList<String> lats = new ArrayList<>();
@@ -191,7 +194,7 @@ public class DatageneratorUtils
 		}
 
 		CheckinEntry mergedCheckin = new CheckinEntry(userID, locationIDs, ts, lats, lons, catID, workingLevelCatIDs,
-				distanceInMFromPrev, durationInSecsFromPrev);
+				distanceInMFromPrev, durationInSecsFromPrev, levelWiseCatIDs);
 
 		return mergedCheckin;
 	}

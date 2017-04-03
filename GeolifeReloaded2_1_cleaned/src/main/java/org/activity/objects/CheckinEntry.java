@@ -41,6 +41,11 @@ public class CheckinEntry extends DataEntry implements Serializable
 	 */
 	private int activityID;
 
+	/**
+	 * [0] level 1 catids, [1] level 2 catid
+	 */
+	private String[] levelWiseCatIDs;
+
 	private double distanceInMetersFromPrev;
 	private long durationInSecsFromPrev;
 
@@ -117,7 +122,46 @@ public class CheckinEntry extends DataEntry implements Serializable
 
 	/**
 	 * <font color = green>Most useful constructor</font>
-	 *
+	 * 
+	 * @param userID
+	 * @param locationID
+	 * @param ts
+	 * @param latitude
+	 * @param longitude
+	 * @param catID
+	 * @param workingLevelCatIDs
+	 * @param distanceInMetersFromNext
+	 * @param durationInSecsFromNext
+	 */
+	public CheckinEntry(String userID, Integer locationID, Timestamp ts, String latitude, String longitude,
+			Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext,
+			String[] levelWiseCatIDs)
+	{
+		this.userID = userID;
+		this.locationIDs = new ArrayList<Integer>();
+		this.locationIDs.add((locationID));
+		this.timestamp = ts;
+
+		this.startLats = new ArrayList<String>();
+		this.startLons = new ArrayList<String>();
+
+		this.startLats.add(StatsUtils.round(latitude, 6));
+		this.startLons.add(StatsUtils.round(longitude, 6));
+
+		this.activityID = catID;
+		this.setWorkingLevelCatIDs(workingLevelCatIDs);
+
+		this.distanceInMetersFromPrev = distanceInMetersFromNext;
+		this.durationInSecsFromPrev = durationInSecsFromNext;
+
+		this.levelWiseCatIDs = levelWiseCatIDs;
+	}
+
+	/**
+	 * <font color = green>Most useful constructor</font>
+	 * <p>
+	 * Used to created merged checkin entry
+	 * 
 	 * @param userID
 	 * @param locationID
 	 * @param ts
@@ -144,6 +188,39 @@ public class CheckinEntry extends DataEntry implements Serializable
 
 		this.distanceInMetersFromPrev = distanceInMetersFromPrev;
 		this.durationInSecsFromPrev = durationInSecsFromPrev;
+	}
+
+	/**
+	 * <font color = green>Most useful constructor</font> Used to created merged checkin entry
+	 * 
+	 * @param userID
+	 * @param locationID
+	 * @param ts
+	 * @param latitude
+	 * @param longitude
+	 * @param catID
+	 * @param workingLevelCatIDs
+	 * @param distanceInMetersFromNext
+	 * @param durationInSecsFromNext
+	 */
+	public CheckinEntry(String userID, ArrayList<Integer> locationIDs, Timestamp ts, ArrayList<String> latitudes,
+			ArrayList<String> longitudes, Integer catID, String workingLevelCatIDs, double distanceInMetersFromPrev,
+			long durationInSecsFromPrev, String[] levelWiseCatIDs)
+	{
+		this.userID = userID;
+		this.locationIDs = locationIDs;
+		this.timestamp = ts;
+
+		this.startLats = latitudes;
+		this.startLons = longitudes;
+
+		this.activityID = catID;
+		this.setWorkingLevelCatIDs(workingLevelCatIDs);
+
+		this.distanceInMetersFromPrev = distanceInMetersFromPrev;
+		this.durationInSecsFromPrev = durationInSecsFromPrev;
+
+		this.levelWiseCatIDs = levelWiseCatIDs;
 	}
 
 	/**
@@ -179,6 +256,16 @@ public class CheckinEntry extends DataEntry implements Serializable
 	public String getUserID()
 	{
 		return userID;
+	}
+
+	/**
+	 * [0] level 1 catids, [1] level 2 catid
+	 * 
+	 * @return
+	 */
+	public String[] getLevelWiseCatIDs()
+	{
+		return levelWiseCatIDs;
 	}
 
 	// /**

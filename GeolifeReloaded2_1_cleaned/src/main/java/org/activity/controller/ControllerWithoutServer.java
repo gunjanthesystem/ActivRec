@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,6 +29,7 @@ import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.PerformanceAnalytics;
+import org.activity.util.RegexUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -92,7 +94,7 @@ public class ControllerWithoutServer
 			// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
 			if (Constant.toCreateTimelines)
 			{
-				String gowallaDataFolder = "./dataToRead/Feb23/DatabaseCreatedMerged/";
+				String gowallaDataFolder = "./dataToRead/Mar30/DatabaseCreatedMerged/";// Feb23
 				usersDayTimelinesOriginal = createTimelines(Constant.getDatabaseName(), jsonArrayD, gowallaDataFolder);
 			}
 			// //to improve repeat execution performance...serialising
@@ -145,6 +147,33 @@ public class ControllerWithoutServer
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = reduceAndCleanTimelines(
 					Constant.getDatabaseName(), usersDayTimelinesOriginal, true);
 
+			/////////// start of temp
+			long numOfActWithMultipleWorkingLevelCatID = 0, numOfAOs = 0;
+			HashSet<String> multipleWorkingLevelCatIds = new HashSet<>();
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+				{
+					for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+					{
+						numOfAOs += 1;
+						if (RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs()).length > 1)
+						{
+							multipleWorkingLevelCatIds.add(ao.getWorkingLevelCatIDs());
+							numOfActWithMultipleWorkingLevelCatID += 1;
+						}
+					}
+				}
+			}
+			System.out.println("num of AOs = " + numOfAOs);
+			System.out.println("numOfActWithMultipleWorkingLevelCatID = " + numOfActWithMultipleWorkingLevelCatID);
+			System.out.println("% ActWithMultipleWorkingLevelCatID = "
+					+ ((numOfActWithMultipleWorkingLevelCatID / numOfAOs) * 100));
+			WritingToFile.writeToNewFile(
+					multipleWorkingLevelCatIds.stream().map(s -> s.toString()).collect(Collectors.joining("\n")),
+					Constant.outputCoreResultsPath + "SetmultipleWorkingLevelCatIds.csv");
+			System.exit(0);
+			/////////// end of temp
 			// int countOfSampleUsers = 0;
 			// $$$
 			// Constant.outputCoreResultsPath =
@@ -181,8 +210,7 @@ public class ControllerWithoutServer
 			// int countOfSampleUsers = 0;
 			// System.out.println("startUserIndex=" + startUserIndex + " endUserIndex" + endUserIndex);
 			// }
-			String groupsOf100UsersLabels[] = { /* "1", "101", */"201", "301", "401", "501", "601", "701", "801",
-					"901" };
+			String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 			// ,// "1001" };
 			System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
@@ -765,6 +793,7 @@ public class ControllerWithoutServer
 
 			usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromCheckinEntriesGowalla(mapForAllCheckinData,
 					mapForAllLocationData);
+
 		}
 		else
 		{

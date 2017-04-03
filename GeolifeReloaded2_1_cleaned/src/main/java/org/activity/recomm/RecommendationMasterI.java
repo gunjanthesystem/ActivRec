@@ -13,9 +13,9 @@ public interface RecommendationMasterI
 {
 	public int getNumOfCandidateTimelines();
 
-	public int getNumberOfActivitiesInActivitesGuidingRecommendation();
+	public int getNumOfActsInActsGuidingRecomm();
 
-	public int getNumberOfValidActivitiesInActivitesGuidingRecommendation();
+	public int getNumOfValidActsInActsGuidingRecomm();
 
 	public Timeline getCandidateTimeline(String timelineID);
 
@@ -33,24 +33,26 @@ public interface RecommendationMasterI
 
 	public ActivityObject getActivityObjectAtRecomm();
 
-	public ArrayList<ActivityObject> getActivitiesGuidingRecomm();
+	public ArrayList<ActivityObject> getActsGuidingRecomm();
 
-	public int getNumberOfCandidateTimelinesBelowThreshold();
+	public int getNumOfCandTimelinesBelowThresh();
 
 	public String getActivityNamesGuidingRecommwithTimestamps();
 
-	public String getRankedRecommendedActivityNamesWithoutRankScores();
+	public String getActivityNamesGuidingRecomm();
 
-	public String getRankedRecommendedActivityNamesWithRankScores();
+	public String getRankedRecommendedActNamesWithoutRankScores();
 
-	public int getNumberOfDistinctRecommendations();
+	public String getRankedRecommendedActNamesWithRankScores();
+
+	public int getNumOfDistinctRecommendations();
 
 	// Specific for distance based approaches: could be later taken out into a separate interface
 	public double getThresholdAsDistance();
 
-	public String getNextActivityNamesWithDistanceString();
+	public String getNextActNamesWithDistString();
 
-	public String getNextActivityNamesWithoutDistanceString();
+	public String getNextActNamesWithoutDistString();
 
 	public LinkedHashMap<String, Pair<String, Double>> getDistancesSortedMap();
 
