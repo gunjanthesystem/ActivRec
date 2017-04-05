@@ -345,7 +345,6 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		// Is this sorting necessary?
 		distancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
 				.sortByValueAscendingStrStrDoub(distancesMapUnsorted);
-		System.out.println("---------editDistancesSortedMap.size()=" + distancesSortedMap.size());
 
 		if (caseType.equals(Enums.CaseType.CaseBasedV1))
 		{
@@ -375,6 +374,8 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 
 		if (VerbosityConstants.verbose)
 		{
+			System.out.println("---------editDistancesSortedMap.size()=" + distancesSortedMap.size());
+
 			StringBuilder sbToWrite1 = new StringBuilder(
 					">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" + "\n lookPastType:" + lookPastType
 							+ "\n The candidate timelines  in increasing order of distance are:\n");
@@ -427,6 +428,8 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 					"Debug: rankedRecommendedActNamesWithRankScoresStr= " + rankedRecommendedActNamesWithRankScoresStr);
 			System.out.println("Debug: rankedRecommendedActNamesWithoutRankScoresStr= "
 					+ rankedRecommendedActNamesWithoutRankScoresStr);
+			System.out.println("Constant.removeCurrentActivityNameFromRecommendations = "
+					+ Constant.removeCurrentActivityNameFromRecommendations);
 		}
 		////////
 
@@ -443,8 +446,6 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 				System.out.println("removing recomm point activity (Current Activity) from list of recommendation");
 			}
 		}
-		System.out.println("Constant.removeCurrentActivityNameFromRecommendations = "
-				+ Constant.removeCurrentActivityNameFromRecommendations);
 
 		// System.out.println("Debug note192_2: current timeline " +
 		// currentTimeline.getActivityObjectNamesInSequence());
@@ -684,11 +685,11 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 			if (Constant.hasInvalidActivityNames)
 			{
 				testTimelinesDaywise = TimelineUtils.expungeInvalidsDT(testTimelinesOrig);
-				System.out.println("Expunging invalids before recommendation process: expunging test timelines");
+				// $$System.out.println("Expunging invalids before recommendation process: expunging test timelines");
 			}
 			else
 			{
-				System.out.println("Data assumed to have no invalid act names to be expunged from test timelines");
+				// $$System.out.println("Data assumed to have no invalid act names to be expunged from test timelines");
 			}
 		}
 

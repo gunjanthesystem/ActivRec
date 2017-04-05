@@ -29,11 +29,12 @@ public class VerbosityConstants
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv
 	 * and EditDistancePerRtPerCand.csv have some similar information and have corresponding records.
 	 */
-	public static final boolean WriteEditDistancePerRtPerCand = true;// false;// false;// false; //
+	public static final boolean WriteEditDistancePerRtPerCand = false;// true;// false;// false;// false; //
 	public static final boolean WriteCandInEditDistancePerRtPerCand = false;// false;// false;// false;
 	public static boolean WriteNumActsPerRTPerCand = false;// false; // this information is redundant as well
 	public static final boolean WriteRedundant = false;
-	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = true;// false;// false;// false;
+	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;// true;// false;// false;//
+																						// false;
 	public static final boolean WriteEditSimilarityCalculations = false;// false;// false;
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
@@ -55,9 +56,5 @@ public class VerbosityConstants
 	 */
 	public static final boolean WriteTopNextActivitiesWithoutDistance = false;
 	public static final boolean WriteTopNextActivitiesWithDistance = false;
-
-	public VerbosityConstants()
-	{
-	}
 
 }

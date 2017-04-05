@@ -41,7 +41,171 @@ public class StringUtils
 
 	public static void main(String[] args)
 	{
-		stringConcatPerformance();
+		analysePerformance3dArray();
+	}
+
+	public static void analysePerformance3dArray()
+	{
+		// stringConcatPerformance();
+		// charArrayExperiments();
+		long t1 = System.nanoTime();
+		create3DCharArray(500 + 500, false);
+		long t2 = System.nanoTime();
+
+		System.out.println("time elapsed = " + (t2 - t1) + " ns\n\n");
+		long t3 = System.nanoTime();
+		create3DCharArrayOptimalSize(500, 500, false);
+		long t4 = System.nanoTime();
+		// System.out.println(PerformanceAnalytics.getHeapInformation());
+		System.out.println("time elapsed = " + (t4 - t3) + " ns\n\n");
+
+	}
+
+	public static void create3DCharArray(int oneSizeForThreeDimensions, boolean verbose)
+	{
+		System.out.println("inside create3DCharArray");
+
+		int capacity = oneSizeForThreeDimensions;
+		char[][][] traceArray = new char[capacity][capacity][capacity];
+
+		for (int i = 0; i < capacity; ++i)
+			for (int j = 0; j < capacity; ++j)
+				for (int k = 0; k < capacity; ++k)
+					traceArray[i][j][k] = 'a';
+
+		if (verbose)
+		{
+			StringBuilder sb = new StringBuilder("---\n");
+			for (int i = 0; i < capacity; ++i)
+			{
+				sb.append("|");
+				for (int j = 0; j < capacity; ++j)
+				{
+					for (int k = 0; k < capacity; ++k)
+						sb.append(traceArray[i][j][k]);
+					sb.append("|");
+				}
+				sb.append("\n");
+			}
+			System.out.println("sb=\n" + sb);
+		}
+		System.out.println(PerformanceAnalytics.getHeapInformation());
+		System.out.println("exiting create3DCharArray");
+	}
+
+	public static int[][] create2DIntArray(int lengthOfWord1, int lengthOfWord2, boolean verbose)
+	{
+		int numOfRows = lengthOfWord1 + 1;
+		int numOfCols = lengthOfWord2 + 1;
+
+		int[][] endPointArray = new int[numOfRows][numOfCols];
+
+		for (int i = 0; i < numOfRows; ++i)
+			for (int j = 0; j < numOfCols; ++j)
+				endPointArray[i][j] = -1;
+
+		return endPointArray;
+	}
+
+	/**
+	 * 
+	 * @param lengthOfWord1
+	 * @param lengthOfWord2
+	 * @param verbose
+	 * @return
+	 */
+	public static char[][][] create3DCharArrayOptimalSize(int lengthOfWord1, int lengthOfWord2, boolean verbose)
+	{
+		System.out.println("inside create3DCharArrayOptimalSize");
+		int numOfRows = lengthOfWord1 + 1;
+		int numOfCols = lengthOfWord2 + 1;
+		int maxSize = numOfRows + numOfCols;
+		System.out.println("maxSize = " + maxSize);
+		char[][][] traceArray = new char[numOfRows][numOfCols][maxSize];
+
+		for (int i = 0; i < numOfRows; ++i)
+		{
+			for (int j = 0; j < numOfCols; ++j)
+			{
+				for (int k = 0; k < i + j; k++)
+				{
+					// System.out.print("i=" + i + ",j=" + j + ",k=" + k);
+					traceArray[i][j][k] = 'x';
+				}
+			}
+		}
+		if (verbose)
+		{
+			StringBuilder sb = new StringBuilder("---\n");
+			for (int i = 0; i < numOfRows; ++i)
+			{
+				sb.append("|");
+				for (int j = 0; j < numOfCols; ++j)
+				{
+					for (int k = 0; k < i + j; ++k)
+					{
+						sb.append(traceArray[i][j][k]);
+					}
+					sb.append("|");
+				}
+				sb.append("\n");
+			}
+			System.out.println("sb=\n" + sb);
+		}
+		System.out.println(PerformanceAnalytics.getHeapInformation());
+		System.out.println("exiting create3DCharArrayOptimalSize");
+		return traceArray;
+	}
+
+	public static void charArrayExperiments()
+	{
+		int capacity = 10;
+
+		char[][][] traceArray = new char[capacity][capacity][capacity];
+
+		for (int i = 0; i < capacity; i++)
+		{
+			for (int j = 0; j < capacity; j++)
+			{
+				for (int k = 0; k < capacity; k++)
+				{
+					traceArray[i][j][k] = 'a';
+				}
+			}
+		}
+
+		StringBuilder sb = new StringBuilder("---\n");
+		for (int i = 0; i < capacity; i++)
+		{
+			// sb.append("i=").append(i).append("|");
+			sb.append("|");
+			for (int j = 0; j < capacity; j++)
+			{
+				// System.out.print("i=" + i + ",j=" + j + "\t\t");
+				for (int k = 0; k < capacity; k++)
+				{
+					sb.append(traceArray[i][j][k]);
+				}
+				sb.append("|");
+			}
+			sb.append("\n");
+		}
+		System.out.println("sb=\n" + sb.toString());
+		// Arrays.asList(traceArray).stream().forEach(System.out::println);
+
+		// for (int i = 0; i < traceArray.length; i++)
+		// {
+		//
+		// for (int j = 0; j < traceArray[0].length; j++)
+		// {
+		// System.out.print("i=" + i + ",j=" + j + "\t\t");
+		// for (int k = 0; k < traceArray[0][0].length; k++)
+		// {
+		// System.out.print("_k=" + k);
+		// }
+		// System.out.println();
+		// }
+		// }
 	}
 
 	public static void stringConcatPerformance()
@@ -582,4 +746,5 @@ public class StringUtils
 	{
 		return (str.length() - str.replace(subStr, "").length()) / subStr.length();
 	}
+
 }

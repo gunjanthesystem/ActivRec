@@ -151,4 +151,26 @@ public class TestDummy1
 		System.out.println("arr.equals(arr2) =" + arr.equals(arr2));
 		// td.fun1();
 	}
+
+	public static String testStringBuilder()
+	{
+		StringBuilder sb = new StringBuilder("ajooba");
+
+		for (int i = 0; i < 10; i++)
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				sb.append("i = " + i + "j = " + j + ": ajooba\n");
+			}
+		}
+		return sb.toString();
+	}
+
+	public static void main(String args[])
+	{
+		int a = 1;
+		char aChar = (char) (a + '0'); // http://stackoverflow.com/questions/17984975/convert-int-to-char-in-java
+		System.out.println(aChar);
+		// System.out.println(testStringBuilder());
+	}
 }

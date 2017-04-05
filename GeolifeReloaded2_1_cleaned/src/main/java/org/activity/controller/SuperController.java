@@ -14,7 +14,8 @@ public class SuperController
 		long at = System.currentTimeMillis();
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 
-		System.out.println(PerformanceAnalytics.getHeapInformation());
+		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
+				+ PerformanceAnalytics.getHeapPercentageFree());
 		String commonPath = "./dataWritten/";// RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -82,6 +83,163 @@ public class ActivityObject implements Serializable
 	int photos_count, checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count;// spot_categories;
 	double distanceInMFromNext;
 	long durationInSecondsFromNext;
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + activityID;
+		result = prime * result + ((activityName == null) ? 0 : activityName.hashCode());
+		result = prime * result + ((avgAltitude == null) ? 0 : avgAltitude.hashCode());
+		result = prime * result + checkins_count;
+		result = prime * result + ((dimensionIDNameValues == null) ? 0 : dimensionIDNameValues.hashCode());
+		result = prime * result + ((dimensions == null) ? 0 : dimensions.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(distanceInMFromNext);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(distanceTravelled);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (int) (durationInSeconds ^ (durationInSeconds >>> 32));
+		result = prime * result + (int) (durationInSecondsFromNext ^ (durationInSecondsFromNext >>> 32));
+		result = prime * result + ((endAltitude == null) ? 0 : endAltitude.hashCode());
+		result = prime * result + ((endLatitude == null) ? 0 : endLatitude.hashCode());
+		result = prime * result + ((endLongitude == null) ? 0 : endLongitude.hashCode());
+		result = prime * result + ((endTimestamp == null) ? 0 : endTimestamp.hashCode());
+		result = prime * result + highlights_count;
+		result = prime * result + items_count;
+		result = prime * result + ((lats == null) ? 0 : lats.hashCode());
+		result = prime * result + Arrays.hashCode(levelWiseCatIDs);
+		result = prime * result + ((locationIDs == null) ? 0 : locationIDs.hashCode());
+		result = prime * result + ((locationName == null) ? 0 : locationName.hashCode());
+		result = prime * result + ((lons == null) ? 0 : lons.hashCode());
+		result = prime * result + max_items_count;
+		result = prime * result + photos_count;
+		result = prime * result + radius_meters;
+		result = prime * result + ((startAltitude == null) ? 0 : startAltitude.hashCode());
+		result = prime * result + ((startLatitude == null) ? 0 : startLatitude.hashCode());
+		result = prime * result + ((startLongitude == null) ? 0 : startLongitude.hashCode());
+		result = prime * result + ((startTimestamp == null) ? 0 : startTimestamp.hashCode());
+		result = prime * result + ((userID == null) ? 0 : userID.hashCode());
+		result = prime * result + users_count;
+		result = prime * result + ((workingLevelCatIDs == null) ? 0 : workingLevelCatIDs.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		ActivityObject other = (ActivityObject) obj;
+		if (activityID != other.activityID) return false;
+		if (activityName == null)
+		{
+			if (other.activityName != null) return false;
+		}
+		else if (!activityName.equals(other.activityName)) return false;
+		if (avgAltitude == null)
+		{
+			if (other.avgAltitude != null) return false;
+		}
+		else if (!avgAltitude.equals(other.avgAltitude)) return false;
+		if (checkins_count != other.checkins_count) return false;
+		if (dimensionIDNameValues == null)
+		{
+			if (other.dimensionIDNameValues != null) return false;
+		}
+		else if (!dimensionIDNameValues.equals(other.dimensionIDNameValues)) return false;
+		if (dimensions == null)
+		{
+			if (other.dimensions != null) return false;
+		}
+		else if (!dimensions.equals(other.dimensions)) return false;
+		if (Double.doubleToLongBits(distanceInMFromNext) != Double.doubleToLongBits(other.distanceInMFromNext))
+			return false;
+		if (Double.doubleToLongBits(distanceTravelled) != Double.doubleToLongBits(other.distanceTravelled))
+			return false;
+		if (durationInSeconds != other.durationInSeconds) return false;
+		if (durationInSecondsFromNext != other.durationInSecondsFromNext) return false;
+		if (endAltitude == null)
+		{
+			if (other.endAltitude != null) return false;
+		}
+		else if (!endAltitude.equals(other.endAltitude)) return false;
+		if (endLatitude == null)
+		{
+			if (other.endLatitude != null) return false;
+		}
+		else if (!endLatitude.equals(other.endLatitude)) return false;
+		if (endLongitude == null)
+		{
+			if (other.endLongitude != null) return false;
+		}
+		else if (!endLongitude.equals(other.endLongitude)) return false;
+		if (endTimestamp == null)
+		{
+			if (other.endTimestamp != null) return false;
+		}
+		else if (!endTimestamp.equals(other.endTimestamp)) return false;
+		if (highlights_count != other.highlights_count) return false;
+		if (items_count != other.items_count) return false;
+		if (lats == null)
+		{
+			if (other.lats != null) return false;
+		}
+		else if (!lats.equals(other.lats)) return false;
+		if (!Arrays.equals(levelWiseCatIDs, other.levelWiseCatIDs)) return false;
+		if (locationIDs == null)
+		{
+			if (other.locationIDs != null) return false;
+		}
+		else if (!locationIDs.equals(other.locationIDs)) return false;
+		if (locationName == null)
+		{
+			if (other.locationName != null) return false;
+		}
+		else if (!locationName.equals(other.locationName)) return false;
+		if (lons == null)
+		{
+			if (other.lons != null) return false;
+		}
+		else if (!lons.equals(other.lons)) return false;
+		if (max_items_count != other.max_items_count) return false;
+		if (photos_count != other.photos_count) return false;
+		if (radius_meters != other.radius_meters) return false;
+		if (startAltitude == null)
+		{
+			if (other.startAltitude != null) return false;
+		}
+		else if (!startAltitude.equals(other.startAltitude)) return false;
+		if (startLatitude == null)
+		{
+			if (other.startLatitude != null) return false;
+		}
+		else if (!startLatitude.equals(other.startLatitude)) return false;
+		if (startLongitude == null)
+		{
+			if (other.startLongitude != null) return false;
+		}
+		else if (!startLongitude.equals(other.startLongitude)) return false;
+		if (startTimestamp == null)
+		{
+			if (other.startTimestamp != null) return false;
+		}
+		else if (!startTimestamp.equals(other.startTimestamp)) return false;
+		if (userID == null)
+		{
+			if (other.userID != null) return false;
+		}
+		else if (!userID.equals(other.userID)) return false;
+		if (users_count != other.users_count) return false;
+		if (workingLevelCatIDs == null)
+		{
+			if (other.workingLevelCatIDs != null) return false;
+		}
+		else if (!workingLevelCatIDs.equals(other.workingLevelCatIDs)) return false;
+		return true;
+	}
 
 	/**
 	 * Constructor for Gowalla activity object
