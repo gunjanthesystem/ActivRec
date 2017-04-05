@@ -12,6 +12,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.generator.DatabaseCreatorGowallaQuicker0;
 import org.activity.io.Serializer;
+import org.activity.objects.TraceMatrix;
 import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
 import org.activity.util.UtilityBelt;
@@ -164,7 +165,7 @@ public final class Constant
 	public static String distanceUsed = "HJEditDistance"; // "FeatureWiseEditDistance",FeatureWiseEditDistance,
 															// OTMDSAMEditDistance
 
-	public static boolean useJarForMySimpleLevenshteinDistance = true;// true;
+	public static boolean useJarForMySimpleLevenshteinDistance = false;// true;
 
 	/****** Evaluation Constants Start ***********/
 	public static final boolean EvalPrecisionRecallFMeasure = false;// true;// false;
@@ -173,6 +174,8 @@ public final class Constant
 	static TimeZone timeZoneForExperiments = null;
 
 	public static final int RoundingPrecision = 4;
+
+	public static TraceMatrix reusableTraceMatrix;
 	////////////////////////////////////////////////////////////////////////
 
 	public static void setDefaultTimeZone(String timeZoneString)
@@ -253,6 +256,25 @@ public final class Constant
 		// Constant.setDistanceUsed("HJEditDistance");
 	}
 
+	/**
+	 * setDatabaseName setUserIDs setInvalidNames setActivityNames setCommonPath setReusableTraceMatrix
+	 * 
+	 * 
+	 * @param givenCommonpath
+	 * @param databaseName
+	 * @param maxActsInDay
+	 */
+	public static void initialise(String givenCommonpath, String databaseName, int maxActsInDay)
+	{
+		Constant.setDatabaseName(databaseName);
+		Constant.UsingSQLDatabase = false;
+		Constant.setUserIDs();
+		Constant.setInvalidNames();
+		Constant.setActivityNames();
+		Constant.setCommonPath(givenCommonpath);
+		Constant.setReusableTraceMatrix(maxActsInDay, maxActsInDay);
+		// Constant.setDistanceUsed("HJEditDistance");
+	}
 	// /**
 	// * Seems its not being used 26 Jab 2016)
 	// * @param givenCommonpath
@@ -412,6 +434,11 @@ public final class Constant
 	{
 		commonPath = commonpath;// "/home/gunjan/MATLAB/bin/DCU data works/July20/New_10_Aug/";
 	}// public static final String dataLoaderPath="/home/gunjan/MATLAB/bin/DCU data works/July20/New_10_Aug/";
+
+	public static void setReusableTraceMatrix(int wordLen1, int wordLen2)
+	{
+		reusableTraceMatrix = new TraceMatrix(wordLen1, wordLen2);
+	}
 
 	public static String getCommonPath()
 	{

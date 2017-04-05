@@ -174,13 +174,28 @@ public class PerformanceAnalytics
 		double heapFreeSize = Runtime.getRuntime().freeMemory() / (1024 * 1024);
 
 		double percentageFreeOfCurrent = StatsUtils.round((heapFreeSize / heapSize) * 100, 2);
-		double percentageFreeOfMax = StatsUtils.round((heapFreeSize / heapMaxSize) * 100, 2);
-
 		double usedMem = heapSize - heapFreeSize;
+
+		double percentageFreeOfMax = StatsUtils.round(((heapMaxSize - usedMem) / heapMaxSize) * 100, 2);
+
 		s.append("--% free(current heap) = " + percentageFreeOfCurrent);
 		s.append("\t% free(in max heap) = " + percentageFreeOfMax);
 		s.append("--");
 		return s.toString();
+	}
+
+	/**
+	 * Not sure if correct
+	 * 
+	 * @return
+	 */
+	public static double getHeapPercentageFreeValue()
+	{
+		double heapSize = (Runtime.getRuntime().totalMemory()) / (1048576),
+				heapMaxSize = Runtime.getRuntime().maxMemory() / (1048576),
+				heapFreeSize = Runtime.getRuntime().freeMemory() / (1048576);
+
+		return StatsUtils.round(100 * (heapMaxSize - (heapSize - heapFreeSize)) / heapMaxSize, 2);
 	}
 
 }

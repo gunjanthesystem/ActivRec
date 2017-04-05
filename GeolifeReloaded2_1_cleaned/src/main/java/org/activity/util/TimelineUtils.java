@@ -393,21 +393,28 @@ public class TimelineUtils
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines = new LinkedHashMap<>();
 
+		// StringBuilder sbNumOfActsPerDayPerUser;
+		// WritingToFile.appendLineToFileAbsolute("User,Date,NumOfActsInDay\n", "NumOfActsPerUserPerDay.csv");
+
 		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject>>> userEntry : activityObjectsDatewise.entrySet())
 		{
 			String userID = userEntry.getKey();
 			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>();
 
+			// sbNumOfActsPerDayPerUser = new StringBuilder();// "User,Day,NumOfActs\n");
 			for (Entry<Date, ArrayList<ActivityObject>> dateEntry : userEntry.getValue().entrySet())
-
 			{
 				Date date = dateEntry.getKey();
 				ArrayList<ActivityObject> activityObjectsInDay = dateEntry.getValue();
-				String dateID = date.toString();
-				String dayName = DateTimeUtils.getWeekDayFromWeekDayInt(date.getDay());// DateTimeUtils.getWeekDayFromWeekDayInt(date.getDayOfWeek().getValue());
+				// String dateID = date.toString();
+				// String dayName = DateTimeUtils.getWeekDayFromWeekDayInt(date.getDay());//
+				// DateTimeUtils.getWeekDayFromWeekDayInt(date.getDayOfWeek().getValue());
 				dayTimelines.put(date, new Timeline(activityObjectsInDay, true, true));
+				// sbNumOfActsPerDayPerUser.append(userID).append(',').append(date.toString()).append(',')
+				// .append(activityObjectsInDay.size()).append("\n");
 			}
-
+			// WritingToFile.appendLineToFileAbsolute(sbNumOfActsPerDayPerUser.toString(),
+			// "NumOfActsPerUserPerDay.csv");
 			userDaytimelines.put(userID, dayTimelines);
 		}
 
@@ -416,6 +423,7 @@ public class TimelineUtils
 				"created timelines for" + userDaytimelines.size() + " users in " + ((ct4 - ct1) / 1000) + " seconds");
 
 		System.out.println("exiting createUserTimelinesFromCheckinEntriesGowalla");
+		System.exit(0);
 		return userDaytimelines;
 	}
 
@@ -2672,7 +2680,7 @@ public class TimelineUtils
 	public static TimelineWithNext getCurrentTimelineFromLongerTimelineMUCount(Timeline longerTimeline,
 			Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsD)
 	{
-		System.out.println("------Inside getCurrentTimelineFromLongerTimelineMUCount");
+		// $$System.out.println("------Inside getCurrentTimelineFromLongerTimelineMUCount");
 
 		int matchingUnitInCounts = (int) matchingUnitInCountsD;
 
@@ -2729,7 +2737,7 @@ public class TimelineUtils
 					"Error: the current timeline does not have #activity objs = adjusted matching unit"));
 		}
 
-		System.out.println("------Exiting getCurrentTimelineFromLongerTimelineMUCount");
+		// $$System.out.println("------Exiting getCurrentTimelineFromLongerTimelineMUCount");
 		return currentTimeline;
 	}
 

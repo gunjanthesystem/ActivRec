@@ -60,11 +60,15 @@ public class ControllerWithoutServer
 			// new ConnectDatabase(Constant.getDatabaseName()); // all method and variable in this class are static
 			// new Constant(commonPath, Constant.getDatabaseName());
 
+			System.out.println("Just before Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
+					+ PerformanceAnalytics.getHeapPercentageFree());
 			/*
 			 * $ Disabled for Gowalla dataset for now// ConnectDatabase.initialise(Constant.getDatabaseName()); // all
 			 * method and variable in this class are static
 			 */
-			Constant.initialise(commonPath, Constant.getDatabaseName());
+			Constant.initialise(commonPath, Constant.getDatabaseName());// , 550);
+			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
+					+ PerformanceAnalytics.getHeapPercentageFree());
 
 			long bt = System.currentTimeMillis();
 
@@ -172,7 +176,7 @@ public class ControllerWithoutServer
 			WritingToFile.writeToNewFile(
 					multipleWorkingLevelCatIds.stream().map(s -> s.toString()).collect(Collectors.joining("\n")),
 					Constant.outputCoreResultsPath + "SetmultipleWorkingLevelCatIds.csv");
-			System.exit(0);
+			// System.exit(0);
 			/////////// end of temp
 			// int countOfSampleUsers = 0;
 			// $$$
@@ -214,6 +218,8 @@ public class ControllerWithoutServer
 			// ,// "1001" };
 			System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
+			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
+					Constant.getCommonPath() + "NumOfActsPerUserPerDate.csv");
 			String commonBasePath = Constant.getCommonPath();
 
 			// // important curtain 1 start 10 Feb 2017

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.io.ReadingFromFile;
@@ -18,6 +19,7 @@ import org.activity.stats.entropy.MultiscaleEntropy;
 import org.activity.stats.entropy.SampleEntropyG;
 import org.activity.stats.entropy.SampleEntropyIQM;
 import org.activity.ui.PopUps;
+import org.activity.util.PerformanceAnalytics;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -59,53 +61,52 @@ public class TestExperiments
 
 	}
 
-	public static void checkEditDistance2()
+	public static void checkEditDistance2(String s1, String s2)
 	{
 		// Constant.setDatabaseName("dcu_data_2");
 		// Constant.verboseLevenstein = true;
 		// new AlignmentBasedDistance().getMySimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
 		// // new AlignmentBasedDistance().getWeightedLevenshteinDistance("AAB", "AAS", 1, 1, 2);
 		VerbosityConstants.verboseLevenstein = true;
-
-		System.out.println(new AlignmentBasedDistance().getMySimpleLevenshteinDistance("gunjankumarmanaligaurgunjan",
-				"manaligaurgunjanmanaligaurgunjan", 1, 1, 2));
+		System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistance(s1, s2, 1, 1, 2));
 		// System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace("gunjankumar",
 		// "manaligaur", 1, 1, 2));
 		// new AlignmentBasedDistance().getSimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
 	}
 
-	public static void checkEditDistance1()
+	public static void checkEditDistance1(String s1, String s2)
 	{
-		// Constant.setDatabaseName("dcu_data_2");
-		// Constant.verboseLevenstein = true;
-		// new AlignmentBasedDistance().getMySimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
-		// // new AlignmentBasedDistance().getWeightedLevenshteinDistance("AAB", "AAS", 1, 1, 2);
 		VerbosityConstants.verboseLevenstein = true;
-
-		System.out.println(new AlignmentBasedDistance().getMySimpleLevenshteinDistanceSlower2(
-				"gunjankumarmanaligaurgunjan", "manaligaurgunjanmanaligaurgunjan", 1, 1, 2));
-		// System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace("gunjankumar",
-		// "manaligaur", 1, 1, 2));
-		// new AlignmentBasedDistance().getSimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
+		System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceSlower2(s1, s2, 1, 1, 2));
 	}
 
-	public static void checkEditDistance0()
+	public static void checkEditDistance0(String s1, String s2)
 	{
-		// Constant.setDatabaseName("dcu_data_2");
-		// Constant.verboseLevenstein = true;
-		// new AlignmentBasedDistance().getMySimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
-		// // new AlignmentBasedDistance().getWeightedLevenshteinDistance("AAB", "AAS", 1, 1, 2);
 		VerbosityConstants.verboseLevenstein = true;
-
-		System.out.println(new AlignmentBasedDistance().getMySimpleLevenshteinDistanceSlower1(
-				"gunjankumarmanaligaurgunjan", "manaligaurgunjanmanaligaurgunjan", 1, 1, 2));
-		// System.out.println(new AlignmentBasedDistance().getMySimpleLevenshteinDistanceSlower1("ape", "aces", 1, 1,
-		// 2));
-
-		// System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace("gunjankumar",
-		// "manaligaur", 1, 1, 2));
-		// new AlignmentBasedDistance().getSimpleLevenshteinDistance("AAB", "AAS", 1, 1, 2);
+		System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistanceSlower1(s1, s2, 1, 1, 2));
 	}
+
+	public static void checkEditDistanceLengthOfTraces(String w1, String w2)
+	{
+		VerbosityConstants.verboseLevenstein = true;
+		System.out.println(AlignmentBasedDistance.getMySimpleLevenshteinDistance(w1, w2, 1, 1, 2));
+	}
+
+	// /**
+	// *
+	// * @param fun
+	// * @param objToApply1
+	// * @param objToApply2
+	// * @param label
+	// * @return
+	// */
+	// public static Pair<String, Double> applyLevenshteinFunction(BiFunction<String, String, Pair<String, Double>> fun,
+	// String objToApply1, String objToApply2, String label, TraceMatrix traceMatrix)
+	// {
+	// Pair<String, Double> res = (Pair<String, Double>) fun.apply(objToApply1, objToApply2);
+	//
+	// return null;
+	// }
 
 	/**
 	 * Returns the median of the int values of the string.
@@ -419,12 +420,9 @@ public class TestExperiments
 
 	public static void executeApacheExec()
 	{
-		String line = "runmse \"/home/gunjan/cprograms/Testy1\" \"/home/gunjan/cprograms/delete7.mse\"";// mseG -m 1 -M
-																										// 12 -b 1 -r
-																										// 0.2 -R 0.2 -n
-																										// 2
-																										// <\"/home/gunjan/cprograms/Testy1\">
-																										// \"/home/gunjan/cprograms/delete14.mse\"";
+		String line = "runmse \"/home/gunjan/cprograms/Testy1\" \"/home/gunjan/cprograms/delete7.mse\"";
+		// mseG -m 1 -M 12 -b 1 -r 0.2 -R 0.2 -n 2 <\"/home/gunjan/cprograms/Testy1\">
+		// \"/home/gunjan/cprograms/delete14.mse\"";
 		CommandLine cmdLine = CommandLine.parse(line);
 		System.out.println("Command line as string: " + cmdLine);
 		DefaultExecutor executor = new DefaultExecutor();
@@ -484,22 +482,114 @@ public class TestExperiments
 		System.out.printf("\nSample Entropy gunjan = %f", sampleEntropyGunjan);// System.out.printf("dexp: %f\n", dexp);
 	}
 
-	public static void main(String[] args)
+	public static void main1(String[] args)
 	{
+		checkEditDistanceLengthOfTraces("g", "m");
+		checkEditDistanceLengthOfTraces("g", "ma");
+		checkEditDistanceLengthOfTraces("g", "man");
+		checkEditDistanceLengthOfTraces("g", "mana");
+
+		checkEditDistanceLengthOfTraces("gu", "mana");
+		checkEditDistanceLengthOfTraces("gun", "mana");
+
+		checkEditDistanceLengthOfTraces("mmm", "nnnn");
+		checkEditDistanceLengthOfTraces("mmmmm", "nnnn");
+	}
+
+	public static void main(String args[])
+	{
+		// checkEditDistancePerformance();
+		checkEditDistancePerformanceWithTraceMatrix();
+	}
+
+	public static void checkEditDistancePerformance()
+	{
+		System.out.println("\n--- Inside checkEditDistancePerformance ---");
+		System.out.println(PerformanceAnalytics.getHeapInformation());
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+
+		System.out.println("Creating strings:");
+		String s1 = "gunjankumarmanaligaurgunjan", s2 = "manaligaurgunjanmanaligaurgunjan";
+		System.out.println("\ns1 = " + s1 + "\ns2 = " + s2);
+		for (int i = 0; i < 4; i++)
+		{
+			s1 += s1;
+			s2 += s2;
+		}
+		System.out.println("s1.length=" + s1.length() + " s2.length=" + s2.length());
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+
+		// System.out.println("Creating tracematrix:");
+		// TraceMatrix tm = new TraceMatrix(s1.length(), s2.length());
+		// System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+
+		VerbosityConstants.verboseLevenstein = false;
+
+		System.out.println("\n >> Executing getMySimpleLevenshteinDistanceSlower1");
 		long t1 = System.nanoTime();
-
-		checkEditDistance0();
+		Pair<String, Double> r1 = AlignmentBasedDistance.getMySimpleLevenshteinDistanceSlower1(s1, s2, 1, 1, 2);
+		System.out.println(r1.toString());
 		long t2 = System.nanoTime();
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
 
-		checkEditDistance1();
+		System.out.println("\n >> Executing getMySimpleLevenshteinDistanceSlower2");
 		long t3 = System.nanoTime();
-
-		checkEditDistance2();
+		Pair<String, Double> r2 = AlignmentBasedDistance.getMySimpleLevenshteinDistanceSlower2(s1, s2, 1, 1, 2);
+		System.out.println(r2.toString());
 		long t4 = System.nanoTime();
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
 
-		System.out.println("checkEditDistance0=" + (t2 - t1));
-		System.out.println("checkEditDistance1=" + (t3 - t2));
-		System.out.println("checkEditDistance2=" + (t4 - t3));
+		System.out.println("\n >> Executing getMySimpleLevenshteinDistance");
+		long t5 = System.nanoTime();
+		Pair<String, Double> r3 = AlignmentBasedDistance.getMySimpleLevenshteinDistance(s1, s2, 1, 1, 2);
+		System.out.println(r3.toString());
+		long t6 = System.nanoTime();
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+
+		System.out.println("\n >> getMySimpleLevenshteinDistanceSlower1=" + (t2 - t1) / 1000000 + " ms");
+		System.out.println(" >> getMySimpleLevenshteinDistanceSlower2=" + (t4 - t3) / 1000000 + " ms");
+		System.out.println(" >> getMySimpleLevenshteinDistance       =" + (t6 - t5) / 1000000 + " ms");
+		System.out.println("--- Exiting checkEditDistancePerformance ---\n");
+
+	}
+
+	public static void checkEditDistancePerformanceWithTraceMatrix()
+	{
+		System.out.println("\n--- Inside checkEditDistancePerformanceWithTraceMatrix ---");
+
+		System.out.println(PerformanceAnalytics.getHeapInformation());
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+
+		System.out.println("Creating strings:");
+		String s1 = "gunjankumarmanaligaurgunjan", s2 = "manaligaurgunjanmanaligaurgunjan";
+		// String s1 = "g", s2 = "manaliiiiii";
+		System.out.println("\ns1 = " + s1 + "\ns2 = " + s2);
+		for (int i = 0; i < 4; i++)
+		{
+			s1 += s1;
+			s2 += s2;
+		}
+		// String s1 = "g", s2 = "ma";
+		System.out.println("s1.length=" + s1.length() + " s2.length=" + s2.length());
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+
+		System.out.println("Creating tracematrix:");
+		Constant.setReusableTraceMatrix(s1.length(), s2.length());
+		// /wordLen1, wordLen2); TraceMatrix tm = new TraceMatrix(
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+
+		VerbosityConstants.verboseLevenstein = false;
+
+		System.out.println("\n >> Executing getMySimpleLevenshteinDistanceV3");
+		long t1 = System.nanoTime();
+		Pair<String, Double> r1 = AlignmentBasedDistance.getMySimpleLevenshteinDistance(s1, s2, 1, 1, 2);
+		System.out.println(r1.toString());
+		long t2 = System.nanoTime();
+		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+
+		System.out.println("\n >> getMySimpleLevenshteinDistanceV3     =" + (t2 - t1) / 1000000 + " ms");
+		System.out.println("--- Exiting checkEditDistancePerformanceWithTraceMatrix ---\n");
+
 	}
 
 	public static void main0(String[] args)

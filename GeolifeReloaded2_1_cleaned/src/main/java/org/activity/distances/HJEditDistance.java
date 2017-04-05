@@ -2,13 +2,11 @@ package org.activity.distances;
 
 import java.util.ArrayList;
 
-import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.stats.StatsUtils;
-import org.activity.util.ProcessUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
 
@@ -156,18 +154,13 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 		Pair<String, Double> levenshteinDistance = null;
 		long t1 = System.nanoTime();
-		if (!Constant.useJarForMySimpleLevenshteinDistance)
-		{
-			levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1,
-					stringCodeForActivityObjects2, 1, 1, 2);
-			System.out.println("getMySimpleLevenshteinDistance took " + (System.nanoTime() - t1) + " ns");
-		}
-		else
-		{
-			levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
-					stringCodeForActivityObjects2, Integer.toString(1), Integer.toString(1), Integer.toString(2));
-			System.out.println("getMySimpleLevenshteinProcesse took " + (System.nanoTime() - t1) + " ns");
-		}
+
+		levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1,
+				stringCodeForActivityObjects2, 1, 1, 2);
+
+		// { levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
+		// stringCodeForActivityObjects2, Integer.toString(1), Integer.toString(1), Integer.toString(2));
+		// System.out.println("getMySimpleLevenshteinProcesse took " + (System.nanoTime() - t1) + " ns");}
 
 		String[] splitted = RegexUtils.patternUnderScore.split(levenshteinDistance.getFirst());
 		// $$ levenshteinDistance.getFirst().split("_");// "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
@@ -176,6 +169,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		{
 			System.out.println("Trace =" + levenshteinDistance.getFirst() + "  simpleLevenshteinDistance112="
 					+ levenshteinDistance.getSecond());
+			System.out.println("getMySimpleLevenshteinDistance took " + (System.nanoTime() - t1) + " ns");
 		}
 
 		for (int i = 1; i < splitted.length; i++)
