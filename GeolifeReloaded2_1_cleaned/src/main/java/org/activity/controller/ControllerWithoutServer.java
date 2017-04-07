@@ -66,7 +66,8 @@ public class ControllerWithoutServer
 			 * $ Disabled for Gowalla dataset for now// ConnectDatabase.initialise(Constant.getDatabaseName()); // all
 			 * method and variable in this class are static
 			 */
-			Constant.initialise(commonPath, Constant.getDatabaseName());// , 550);
+			Constant.initialise(commonPath, Constant.getDatabaseName(), "./dataToRead/April7/mapCatIDsHierDist.kryo");
+			// ,// 550);
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 					+ PerformanceAnalytics.getHeapPercentageFree());
 

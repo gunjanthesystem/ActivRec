@@ -1,6 +1,7 @@
 package org.activity.constants;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -118,6 +119,8 @@ public final class Constant
 	 * But i don't want to waste time on investigating this now as I critically need to move my research "Forward"
 	 */
 	public static final boolean useTolerance = true;// false;
+
+	public static final boolean useHierarchicalDistance = true;
 	/**
 	 * Determines whether the sorting of candiates is stable or unstable
 	 */
@@ -143,8 +146,8 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;// NCount;//
-																						// Enums.LookPastType.NCount;
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// .Daywise;// NCount;//
+																					// Enums.LookPastType.NCount;
 	// "Count";// "Count";// "Hrs"// "Daywise"
 	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType = Enums.EditDistanceTimeDistanceType.NearerScaled;
 	// .FurtherScaled;
@@ -152,7 +155,7 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { /* 0, 1, 2, 3, */ 4, 6, 8, 10, 12 };// , 14, 16, 18 };
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12 };// , 14, 16, 18 };
 	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
 	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 
@@ -176,6 +179,8 @@ public final class Constant
 	public static final int RoundingPrecision = 4;
 
 	public static TraceMatrix reusableTraceMatrix;
+
+	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
 	////////////////////////////////////////////////////////////////////////
 
 	public static void setDefaultTimeZone(String timeZoneString)
@@ -253,7 +258,46 @@ public final class Constant
 		Constant.setInvalidNames();
 		Constant.setActivityNames();
 		Constant.setCommonPath(givenCommonpath);
+
 		// Constant.setDistanceUsed("HJEditDistance");
+	}
+
+	/**
+	 * 
+	 * @param givenCommonpath
+	 * @param databaseName
+	 * @param catIDsHierDistSerialisedFile
+	 */
+	public static void initialise(String givenCommonpath, String databaseName, String catIDsHierDistSerialisedFile)
+	{
+		Constant.setDatabaseName(databaseName);
+		Constant.UsingSQLDatabase = false;
+		Constant.setUserIDs();
+		Constant.setInvalidNames();
+		Constant.setActivityNames();
+		Constant.setCommonPath(givenCommonpath);
+		Constant.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
+		// Constant.setDistanceUsed("HJEditDistance");
+	}
+
+	//
+
+	/**
+	 * 
+	 * @param catIDsHierDistSerialisedFile
+	 */
+	private static void setCatIDsHierarchicalDistance(String catIDsHierDistSerialisedFile)
+	{
+		try
+		{
+			catIDsHierarchicalDistance = (HashMap<String, Double>) Serializer
+					.kryoDeSerializeThis(catIDsHierDistSerialisedFile);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -854,6 +898,7 @@ public final class Constant
 		s.append("\nuseJarForMySimpleLevenshteinDistance:" + useJarForMySimpleLevenshteinDistance);
 		// useJarForMySimpleLevenshteinDistance
 
+		s.append("\nuseHierarchicalDistance:" + useHierarchicalDistance);
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{
 			s.append("\nConsider all features for feature wise edit distance:"

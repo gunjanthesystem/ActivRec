@@ -20,15 +20,15 @@ import org.activity.util.UtilityBelt;
 /**
  * Trying to make it better and suitable for Gowalla dataset on 15 Sep 2016
  * <p>
- * thought on 5 April 2017. make the object leaner by removing redunant information (thought on 9 sept 2016: to reduce
- * size of object, remove method which can converted to static functional methods), but perhaps do not affect the size
- * of per object (ref:https://stackoverflow.com/questions/7060141/what-determines-java-object-size)
+ * (thought on 9 sept 2016: to reduce size of object, remove method which can converted to static functional methods),
+ * but perhaps do not affect the size of per object
+ * (ref:https://stackoverflow.com/questions/7060141/what-determines-java-object-size)
  * </p>
  * 
  * @author gunjan
  *
  */
-public class ActivityObject implements Serializable
+public class ActivityObject_backup5April2017 implements Serializable
 {
 	private static final long serialVersionUID = 5056824311499867608L;
 
@@ -54,10 +54,9 @@ public class ActivityObject implements Serializable
 	String workingLevelCatIDs;//
 
 	/**
-	 * CAN BE REMOVED AS THEY CAN BE COMPUTED FROM DIRECT CAT ID and for efficiency stored in a lookup map [0] level 1
-	 * catids, [1] level 2 catid
+	 * [0] level 1 catids, [1] level 2 catid
 	 */
-	// private String[] levelWiseCatIDs;
+	private String[] levelWiseCatIDs;
 
 	private Timestamp startTimestamp, endTimestamp;
 
@@ -104,7 +103,7 @@ public class ActivityObject implements Serializable
 	 * @param items_count
 	 * @param max_items_count
 	 */
-	public ActivityObject(int activityID, int locationID, String activityName, String locationName,
+	public ActivityObject_backup5April2017(int activityID, int locationID, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs)
@@ -161,7 +160,7 @@ public class ActivityObject implements Serializable
 	 * @param distanceInMFromNext
 	 * @param durationInSecsFromNext
 	 */
-	public ActivityObject(int activityID, int locationID, String activityName, String locationName,
+	public ActivityObject_backup5April2017(int activityID, int locationID, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
@@ -223,7 +222,7 @@ public class ActivityObject implements Serializable
 	 * @param distanceInMFromNext
 	 * @param durationInSecsFromNext
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject_backup5April2017(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
@@ -285,7 +284,7 @@ public class ActivityObject implements Serializable
 	 * @param durationInSecsFromNext
 	 * @param levelWiseCatIDs
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject_backup5April2017(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
@@ -320,7 +319,7 @@ public class ActivityObject implements Serializable
 		this.distanceInMFromNext = distanceInMFromNext;
 		this.durationInSecondsFromNext = durationInSecsFromNext;
 
-		// this.levelWiseCatIDs = levelWiseCatIDs;
+		this.levelWiseCatIDs = levelWiseCatIDs;
 
 	}
 
@@ -394,29 +393,29 @@ public class ActivityObject implements Serializable
 	//
 	// }
 
-	public double getDifferenceStartingGeoCoordinates(ActivityObject ao2)
+	public double getDifferenceStartingGeoCoordinates(ActivityObject_backup5April2017 ao2)
 	{
 		return StatsUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(), ao2.getStartLongitude());
 
 	}
 
-	public double getDifferenceEndingGeoCoordinates(ActivityObject ao2)
+	public double getDifferenceEndingGeoCoordinates(ActivityObject_backup5April2017 ao2)
 	{
 		return StatsUtils.haversine(endLatitude, endLongitude, ao2.getEndLatitude(), ao2.getEndLongitude());
 
 	}
 
-	public double getDifferenceAltitude(ActivityObject ao2)
+	public double getDifferenceAltitude(ActivityObject_backup5April2017 ao2)
 	{
 		return Double.parseDouble(this.getAvgAltitude()) - Double.parseDouble(ao2.getAvgAltitude());
 
 	}
 
-	public static String getArrayListOfActivityObjectsAsString(ArrayList<ActivityObject> arr)
+	public static String getArrayListOfActivityObjectsAsString(ArrayList<ActivityObject_backup5April2017> arr)
 	{
 		StringBuffer str = new StringBuffer("");
 
-		for (ActivityObject ao : arr)
+		for (ActivityObject_backup5April2017 ao : arr)
 		{
 			str.append(">>" + ao.toString());
 		}
@@ -430,7 +429,7 @@ public class ActivityObject implements Serializable
 	 * 
 	 * @param dimensionIDNameValues
 	 */
-	public ActivityObject(HashMap<String, String> dimensionIDNameValues) // (User_ID, 0), (Location_ID, 10100), ...
+	public ActivityObject_backup5April2017(HashMap<String, String> dimensionIDNameValues) // (User_ID, 0), (Location_ID, 10100), ...
 	{
 		// System.out.println("Inside ActivityObject contructor"); //@toremoveatruntime
 
@@ -680,14 +679,14 @@ public class ActivityObject implements Serializable
 		return sb.toString();
 	}
 
-	// /**
-	// *
-	// * @return
-	// */
-	// public String[] getLevelWiseCatIDs()
-	// {
-	// return levelWiseCatIDs;
-	// }
+	/**
+	 * 
+	 * @return
+	 */
+	public String[] getLevelWiseCatIDs()
+	{
+		return levelWiseCatIDs;
+	}
 
 	// /**
 	// * Create empty Activity Object
@@ -711,7 +710,7 @@ public class ActivityObject implements Serializable
 	 * @param durationInSeconds
 	 * @param startTimeStamp
 	 */
-	ActivityObject(String activityName, String location, long durationInSeconds, Timestamp startTimeStamp)
+	ActivityObject_backup5April2017(String activityName, String location, long durationInSeconds, Timestamp startTimeStamp)
 	{
 		this.activityName = activityName;
 		this.durationInSeconds = durationInSeconds;
@@ -738,14 +737,14 @@ public class ActivityObject implements Serializable
 		return dimensions;
 	}
 
-	// /**
-	// * Diabled on 5th April 2017 as not called.
-	// * @return
-	// */
-	// public Timestamp getMiddleTimestamp()
-	// {
-	// return new Timestamp(startTimestamp.getTime() + (endTimestamp.getTime() - startTimestamp.getTime()) / 2);
-	// }
+	/**
+	 * 
+	 * @return
+	 */
+	public Timestamp getMiddleTimestamp()
+	{
+		return new Timestamp(startTimestamp.getTime() + (endTimestamp.getTime() - startTimestamp.getTime()) / 2);
+	}
 
 	// public boolean equals(ActivityObject aeToCompare)
 	// {
@@ -854,11 +853,35 @@ public class ActivityObject implements Serializable
 
 	/**
 	 * 
+	 */
+	public void traverseActivityObject()
+	{
+		System.out.println("\n---Traversing Activity Event:--");
+		System.out.print("----Dimensions ID are: ");
+		traverseDimensionIDNameValues();
+		System.out.println("----Dimension attributes are: ");
+		dimensions.stream().forEach(d -> d.traverseDimensionAttributeNameValuepairs());
+	}
+
+	/**
+	 * 
+	 */
+	public void traverseDimensionIDNameValues()
+	{
+		for (Map.Entry<String, String> entry : this.dimensionIDNameValues.entrySet())
+		{
+			System.out.print(" " + entry.getKey() + " getDimensionAttributeValue: " + entry.getValue() + " ");
+		}
+		System.out.println("");
+	}
+
+	/**
+	 * 
 	 * @param name
 	 * @param start
 	 * @param end
 	 */
-	public ActivityObject(String name, Timestamp start, Timestamp end)
+	public ActivityObject_backup5April2017(String name, Timestamp start, Timestamp end)
 	{
 		// userName=user;
 		activityName = name;
@@ -1052,11 +1075,6 @@ public class ActivityObject implements Serializable
 		return ((this.startTimestamp.getTime() <= endInterval.getTime())
 				&& (this.endTimestamp.getTime() >= startInterval.getTime()));
 	} // courtesy:http://goo.gl/pnR3p1
-
-	public HashMap<String, String> getDimensionIDNameValues()
-	{
-		return dimensionIDNameValues;
-	}
 }
 
 //////////////////////////////////// DEACTIVATED CODE BELOW//////

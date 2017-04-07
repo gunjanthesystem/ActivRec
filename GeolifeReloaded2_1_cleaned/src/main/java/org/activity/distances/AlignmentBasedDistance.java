@@ -2,6 +2,7 @@ package org.activity.distances;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
@@ -2048,6 +2049,12 @@ public class AlignmentBasedDistance
 	{
 		// TraceMatrix traceMatrix = Constant.reusableTraceMatrix;
 		// traceMatrix.resetLengthOfCells();
+		boolean useHierarchicalDistance = Constant.useHierarchicalDistance;
+		HashMap<String, Double> catIDsHierarchicalDistance = null;
+		if (useHierarchicalDistance)
+		{
+			catIDsHierarchicalDistance = Constant.catIDsHierarchicalDistance;
+		}
 
 		TraceMatrix traceMatrix = new TraceMatrix(word1.length(), word2.length());
 
@@ -2061,7 +2068,7 @@ public class AlignmentBasedDistance
 		int len2 = word2.length();
 
 		// len1+1, len2+1, because finally return dp[len1][len2]
-		int[][] dist = new int[len1 + 1][len2 + 1];
+		double[][] dist = new double[len1 + 1][len2 + 1];
 		// StringBuilder[][] traceMatrix = new StringBuilder[len1 + 1][len2 + 1];
 
 		traceMatrix.resetLengthOfCells();
@@ -2119,15 +2126,29 @@ public class AlignmentBasedDistance
 				}
 				else
 				{
-					int replace = dist[i][j] + replaceWt;// 2; //diagonally previous, see slides from STANFORD NLP on
-															// min edit distance
-					int delete = dist[i][j + 1] + deleteWt;// 1;//deletion --previous row, i.e, cell above
-					int insert = dist[i + 1][j] + insertWt;// 1;// insertion --previous column, i.e, cell on left
+					double replace = dist[i][j] + replaceWt;// 2; //diagonally previous, see slides from STANFORD NLP
+					// on // min edit distance
+					if (useHierarchicalDistance)
+					{
+						Double hierWt = catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));
+						if (hierWt == null)
+						{
+							System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+									"Error in levenshtein distance: no hier dist found for: " + String.valueOf(c1)
+											+ String.valueOf(c2))
+									+ " hierWt= " + hierWt);
+						}
+						replace = dist[i][j]
+								+ replaceWt * catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));
+					}
+
+					double delete = dist[i][j + 1] + deleteWt;// 1;//deletion --previous row, i.e, cell above
+					double insert = dist[i + 1][j] + insertWt;// 1;// insertion --previous column, i.e, cell on left
 					// System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
 					// int min = replace > insert ? insert : replace;
 					// min = delete > min ? min : delete;
 					//
-					int min = -9999;
+					double min = -9999;
 
 					if (isMinimum(delete, delete, insert, replace))
 					{

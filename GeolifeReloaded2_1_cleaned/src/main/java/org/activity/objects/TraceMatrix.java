@@ -150,14 +150,14 @@ public class TraceMatrix
 
 			threeDCharMatrix[rowIndex][colIndex][currLengthOfThisCell++] = c4;
 			// 66
-			for (char charToAdd : Integer.toString(i5).toCharArray())
+			for (char charToAdd : IntegerUtils.intToCharArray(i5))// Integer.toString(i5).toCharArray())
 			{
 				threeDCharMatrix[rowIndex][colIndex][currLengthOfThisCell++] = charToAdd;
 			}
 
 			threeDCharMatrix[rowIndex][colIndex][currLengthOfThisCell++] = c6;
 
-			for (char charToAdd : Integer.toString(i7).toCharArray())
+			for (char charToAdd : IntegerUtils.intToCharArray(i7))// Integer.toString(i7).toCharArray())
 			{
 				threeDCharMatrix[rowIndex][colIndex][currLengthOfThisCell++] = charToAdd;
 			}

@@ -29,6 +29,7 @@ import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
+import org.activity.objects.Dimension;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
@@ -423,7 +424,7 @@ public class TimelineUtils
 				"created timelines for" + userDaytimelines.size() + " users in " + ((ct4 - ct1) / 1000) + " seconds");
 
 		System.out.println("exiting createUserTimelinesFromCheckinEntriesGowalla");
-		System.exit(0);
+		// System.exit(0);
 		return userDaytimelines;
 	}
 
@@ -2160,8 +2161,10 @@ public class TimelineUtils
 				numberOfTimelinesRemoved += 1;
 			}
 		}
-
-		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		}
 		return pruned;
 	}
 
@@ -2200,8 +2203,10 @@ public class TimelineUtils
 				numberOfTimelinesRemoved += 1;
 			}
 		}
-
-		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		}
 		return pruned;
 	}
 
@@ -2217,7 +2222,10 @@ public class TimelineUtils
 		LinkedHashMap<String, Pair<String, Double>> pruned = distanceScoresSortedFullCand.entrySet().stream()
 				.filter(e -> e.getValue().getSecond() <= threshold).collect(Collectors.toMap(e -> e.getKey(),
 						e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Pair<String, Double>>::new));
-		System.out.println("Number of timelines removed=" + (distanceScoresSortedFullCand.size() - pruned.size()));
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Number of timelines removed=" + (distanceScoresSortedFullCand.size() - pruned.size()));
+		}
 		return pruned;
 	}
 
@@ -2258,7 +2266,10 @@ public class TimelineUtils
 			}
 		}
 
-		System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
+		}
 		return pruned;
 	}
 
@@ -2803,7 +2814,7 @@ public class TimelineUtils
 	public static TimelineWithNext getCurrentTimelineFromLongerTimelineDaywise(
 			LinkedHashMap<Date, Timeline> testDayTimelines, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm)
 	{
-		System.out.println("------Inside getCurrentTimelineFromLongerTimelineDaywise");
+		// $$System.out.println("------Inside getCurrentTimelineFromLongerTimelineDaywise");
 
 		///////////////////////////////////////////////////////////////////
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
@@ -2857,7 +2868,7 @@ public class TimelineUtils
 					PopUps.getCurrentStackTracedErrorMsg("Error: currentTimeline.size() =" + currentTimeline.size()));
 		}
 
-		System.out.println("------Exiting getCurrentTimelineFromLongerTimelineDaywise");
+		// $$System.out.println("------Exiting getCurrentTimelineFromLongerTimelineDaywise");
 		return currentTimeline;
 	}
 
@@ -3309,6 +3320,31 @@ public class TimelineUtils
 		}
 		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distances,
 				indicesOfActObjsWithNearestST);
+	}
+
+	/**
+	 * 
+	 */
+	public static void traverseDimensionIDNameValues(HashMap<String, String> dimensionIDNameValues)
+	{
+		for (Map.Entry<String, String> entry : dimensionIDNameValues.entrySet())
+		{
+			System.out.print(" " + entry.getKey() + " getDimensionAttributeValue: " + entry.getValue() + " ");
+		}
+		System.out.println("");
+	}
+
+	/**
+	 * 
+	 */
+	public static void traverseActivityObject(HashMap<String, String> dimensionIDNameValues,
+			ArrayList<Dimension> dimensions)
+	{
+		System.out.println("\n---Traversing Activity Event:--");
+		System.out.print("----Dimensions ID are: ");
+		traverseDimensionIDNameValues(dimensionIDNameValues);
+		System.out.println("----Dimension attributes are: ");
+		dimensions.stream().forEach(d -> d.traverseDimensionAttributeNameValuepairs());
 	}
 }
 /////////////// UNUSED CODE
