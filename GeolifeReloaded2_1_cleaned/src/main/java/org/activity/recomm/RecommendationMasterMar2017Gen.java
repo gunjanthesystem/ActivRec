@@ -760,11 +760,13 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 			if (Constant.hasInvalidActivityNames)
 			{
 				trainingTimelinesDaywise = TimelineUtils.expungeInvalidsDT(trainingTimelineOrig);
-				System.out.println("Expunging invalids before recommendation process: expunging training timelines");
+				// $$ System.out.println("Expunging invalids before recommendation process: expunging training
+				// timelines");
 			}
 			else
 			{
-				System.out.println("Data assumed to have no invalid act names to be expunged from training timelines");
+				// $$System.out.println("Data assumed to have no invalid act names to be expunged from training
+				// timelines");
 			}
 		}
 
@@ -1349,7 +1351,7 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 	public static LinkedHashMap<String, Double> createRankedTopRecommendedActivityNamesSimpleV3_3(
 			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsWithDistance)
 	{
-		System.out.println("\ninside createRankedTopRecommendedActivityNamesSimpleV3_3:");
+		// $$System.out.println("\ninside createRankedTopRecommendedActivityNamesSimpleV3_3:");
 		// <ActivityName,RankScore>
 		LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs = new LinkedHashMap<>();
 

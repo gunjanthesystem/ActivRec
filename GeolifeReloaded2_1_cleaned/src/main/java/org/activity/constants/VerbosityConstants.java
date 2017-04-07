@@ -17,7 +17,7 @@ public class VerbosityConstants
 	// false it further
 	// minimises verbosity
 	public static final boolean verboseSAX = false;// false;
-	public static boolean verboseLevenstein = false;// false;
+	public static boolean verboseLevenstein = false;// false;// false;
 	public static final boolean verboseNormalisation = false;// false;// false;
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;

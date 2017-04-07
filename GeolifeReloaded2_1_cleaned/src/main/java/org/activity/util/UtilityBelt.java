@@ -1354,9 +1354,10 @@ public class UtilityBelt
 	public static void traverseActivityEvents(ArrayList<ActivityObject> activityEvents)
 	{
 		System.out.println("** Traversing Activity Events **");
-		for (int i = 0; i < activityEvents.size(); i++)
+		for (ActivityObject ao : activityEvents)
 		{
-			(activityEvents.get(i)).traverseActivityObject();
+			TimelineUtils.traverseActivityObject(ao.getDimensionIDNameValues(), ao.getDimensions());
+			// (activityEvents.get(i)).traverseActivityObject();
 		}
 		System.out.println("** End of Traversing Activity Events **");
 	}
@@ -1608,6 +1609,48 @@ public class UtilityBelt
 		intersection.retainAll(s2);
 		return intersection;
 	}
+
+	/**
+	 * 
+	 * @param <T>
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static <T> boolean hasCommonElement(Set<T> s1, Set<T> s2)
+	{
+		Set<T> intersection = new HashSet<T>(s1);
+		intersection.retainAll(s2);
+		if (intersection.size() > 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	// /**
+	// *
+	// * @param <T>
+	// * @param s1
+	// * @param s2
+	// * @return
+	// */
+	// public static <T> boolean hasCommonElement(Set<T> s1, T s2)
+	// {
+	// Set<T> intersection = new HashSet<T>(s1);
+	// intersection.retainAll(s2);
+	// if (intersection.size() > 0)
+	// {
+	// return true;
+	// }
+	// else
+	// {
+	// return false;
+	// }
+	// }
 	// public static
 
 	/**

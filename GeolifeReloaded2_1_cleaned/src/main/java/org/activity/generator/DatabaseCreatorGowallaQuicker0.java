@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
@@ -34,7 +35,9 @@ import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
 import org.activity.util.RegexUtils;
+import org.activity.util.StringCode;
 import org.activity.util.TimelineUtils;
+import org.activity.util.UtilityBelt;
 import org.joda.time.LocalDateTime;
 
 /**
@@ -64,7 +67,8 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar30/DatabaseCreatedMerged/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/April6/DatabaseCreatedMerged/";
+	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar30/DatabaseCreatedMerged/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb23/DatabaseCreatedNoMerge/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 	// commented out on 2 feb 2017
@@ -156,11 +160,17 @@ public class DatabaseCreatorGowallaQuicker0
 
 			int workingCatLevel = DomainConstants.gowallaWorkingCatLevel;
 
-			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = getWorkingLevelCatIDsForAllCatIDs(
+			Pair<TreeMap<Integer, String>, LinkedHashSet<Integer>> catIDWorkingLevelCatIDsDictResult = getWorkingLevelCatIDsForAllCatIDs(
 					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
+
+			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = catIDWorkingLevelCatIDsDictResult.getFirst();
+			LinkedHashSet<Integer> catIDsInHierarchy = catIDWorkingLevelCatIDsDictResult.getSecond();
 
 			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = getLevelWiseCatIDsForAllCatIDs(catIDNameDictionary,
 					rootOfCategoryTree, DomainConstants.numOfCatLevels);
+
+			HashMap<String, Double> mapCatIDsHierDist = createCatIDsHierarchicalDistMap(catIDLevelWiseCatIDsDict,
+					catIDNameDictionary, catIDsInHierarchy);
 
 			// sanity check to verify if no cat id as empty working lvel cat ids
 			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length > 0");
@@ -244,6 +254,8 @@ public class DatabaseCreatorGowallaQuicker0
 			Serializer.kryoSerializeThis(mapForAllCheckinData, commonPath + "mapForAllCheckinData.kryo");
 			Serializer.kryoSerializeThis(mapForAllUserData, commonPath + "mapForAllUserData.kryo");
 			Serializer.kryoSerializeThis(mapForAllLocationData, commonPath + "mapForAllLocationData.kryo");
+			Serializer.kryoSerializeThis(mapCatIDsHierDist, commonPath + "mapCatIDsHierDist.kryo");
+			// catIDsHierDistDict
 			// $Serializer.kryoSerializeThis(allData, commonPath + "GowallaAllData13Sep2016.kryo");
 			//// end of curtian1
 
@@ -305,6 +317,110 @@ public class DatabaseCreatorGowallaQuicker0
 		System.out.println("End of program");
 		PopUps.showMessage("End of data creation");
 		System.exit(0);
+	}
+
+	/**
+	 * 
+	 * @param catIDLevelWiseCatIDsDict
+	 * @param catIDNameDictionary
+	 * @param catIDsInHierarchy
+	 * @return
+	 */
+	private static HashMap<String, Double> createCatIDsHierarchicalDistMap(
+			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict, TreeMap<Integer, String> catIDNameDictionary,
+			LinkedHashSet<Integer> catIDsInHierarchy)
+	{
+		HashMap<String, Double> result = new HashMap<>();
+
+		StringBuilder sbCatIDStringCodeLog = new StringBuilder("CatID,CharCode\n");
+
+		for (Integer catID : catIDsInHierarchy)
+		{
+			sbCatIDStringCodeLog.append(catID).append(",").append(StringCode.getCharCodeFromActivityID(catID))
+					.append("\n");
+		}
+		WritingToFile.writeToNewFile(sbCatIDStringCodeLog.toString(),
+				Constant.getCommonPath() + "CatIDCharCodeMap.csv");
+
+		for (Integer catID1 : catIDsInHierarchy)
+		{
+			for (Integer catID2 : catIDsInHierarchy)
+			{
+				if (catID1.equals(catID2))
+				{
+					continue;
+				}
+				else
+				{
+					double dist = -1;
+
+					System.out.println("Comparing catID1:" + catID1 + " (" + catIDNameDictionary.get(catID1) + ") "
+							+ " catID2:" + catID2 + " (" + catIDNameDictionary.get(catID2) + ") ");
+					String[] levelWiseCatIDsForCatID1 = catIDLevelWiseCatIDsDict.get(catID1);
+					String[] levelWiseCatIDsForCatID2 = catIDLevelWiseCatIDsDict.get(catID2);
+
+					// String[] level1CatIDsForCatID1 = RegexUtils.patternDoubleUnderScore
+					// .split(levelWiseCatIDsForCatID1[0]);
+
+					HashSet<String> level1CatIDsForCatID1 = levelWiseCatIDsForCatID1[0] != null
+							? new HashSet<String>(Arrays
+									.asList(RegexUtils.patternDoubleUnderScore.split(levelWiseCatIDsForCatID1[0])))
+							: new HashSet<String>();
+
+					System.out.println("level1CatIDsForCatID1= " + level1CatIDsForCatID1);
+					// new HashSet<String>(
+					// Arrays.asList(RegexUtils.patternDoubleUnderScore.split(levelWiseCatIDsForCatID1[0])));
+
+					HashSet<String> level1CatIDsForCatID2 = levelWiseCatIDsForCatID2[0] != null
+							? new HashSet<String>(Arrays
+									.asList(RegexUtils.patternDoubleUnderScore.split(levelWiseCatIDsForCatID2[0])))
+							: new HashSet<String>();
+					System.out.println("level1CatIDsForCatID2= " + level1CatIDsForCatID2);
+
+					// HashSet<String> level2CatIDsForCatID1 = new HashSet<String>(
+					// Arrays.asList(RegexUtils.patternDoubleUnderScore.split(levelWiseCatIDsForCatID1[1])));
+					//
+					// HashSet<String> level2CatIDsForCatID2 = new HashSet<String>(
+					// Arrays.asList(RegexUtils.patternDoubleUnderScore.split(levelWiseCatIDsForCatID2[1])));
+
+					if (UtilityBelt.hasCommonElement(level1CatIDsForCatID1, level1CatIDsForCatID2))
+					{
+						System.out.println("\tsame level 1 parent");
+						dist = 0.4;
+					}
+					else if // (UtilityBelt.hasCommonElement(level1CatIDsForCatID2, Integer.to(catID1))
+					(level1CatIDsForCatID2.contains(Integer.toString(catID1)))
+					{
+						System.out.println("\tcatID1 is in level 1 of catID 2");
+						dist = 0.4;
+					}
+					else if // (UtilityBelt.hasCommonElement(level1CatIDsForCatID1, catID2))
+					(level1CatIDsForCatID1.contains(Integer.toString(catID2)))
+					{
+						System.out.println("\tcatID2 is in level 1 of catID 1");
+						dist = 0.4;
+					}
+					else
+					{
+						dist = 1;
+					}
+					System.out.println("dist = " + dist + "\n");
+					// result.put(Integer.toString(catID1) + "-" + Integer.toString(catID2), dist);
+					result.put(String.valueOf(StringCode.getCharCodeFromActivityID(catID1))
+							+ String.valueOf(StringCode.getCharCodeFromActivityID(catID2)), dist);
+				}
+			}
+		}
+
+		StringBuilder sbResult = new StringBuilder("CatIDs,Dist\n");
+
+		for (Entry<String, Double> e : result.entrySet())
+		{
+			sbResult.append(e.getKey()).append(',').append(e.getValue()).append("\n");
+		}
+
+		WritingToFile.writeToNewFile(sbResult.toString(), Constant.getCommonPath() + "CatIDDistDict.csv");
+		return result;
 	}
 
 	/**
@@ -709,11 +825,13 @@ public class DatabaseCreatorGowallaQuicker0
 	 *            new root, root with newly manually added catids
 	 * @return <catid, catid__catid__catid>
 	 */
-	private static TreeMap<Integer, String> getWorkingLevelCatIDsForAllCatIDs(
+	private static Pair<TreeMap<Integer, String>, LinkedHashSet<Integer>> getWorkingLevelCatIDsForAllCatIDs(
 			TreeMap<Integer, String> catIDNameDictionary, int workingCatLevel,
 			DefaultMutableTreeNode rootOfCategoryTree)
 	{
 		TreeMap<Integer, String> res = new TreeMap<>();
+		LinkedHashSet<Integer> catIDsInHierarchy = new LinkedHashSet<Integer>();
+
 		StringBuilder sb = new StringBuilder();
 		int numOfCatsWithMultipleWorkingLevelCats = 0, numOfCatsNotInHierarchyTree = 0, numOfCatsInHierarchyTree = 0;
 
@@ -727,6 +845,7 @@ public class DatabaseCreatorGowallaQuicker0
 			{
 				workingLevelCatIDs = givenLevelOrAboveCatIDs.stream().reduce((t, u) -> t + "__" + u).get();
 				numOfCatsInHierarchyTree += 1;
+				catIDsInHierarchy.add(cat.getKey());
 
 				if (givenLevelOrAboveCatIDs.size() > 1)
 				{
@@ -749,7 +868,7 @@ public class DatabaseCreatorGowallaQuicker0
 
 		WritingToFile.appendLineToFileAbsolute(s, commonPath + "MapWorkingLevelCatIDsForAllCatIDs.csv");
 
-		return res;
+		return new Pair<>(res, catIDsInHierarchy);
 	}
 
 	/**
@@ -1017,7 +1136,7 @@ public class DatabaseCreatorGowallaQuicker0
 		ArrayList<Integer> notFoundInFlatMap = new ArrayList<Integer>();
 		ArrayList<Integer> catIDsNotFoundInAnyLevel = new ArrayList<Integer>();
 
-		StringBuffer logRejectedCheckins = new StringBuffer();
+		StringBuilder logRejectedCheckins = new StringBuilder("LineNumOfCheckin,Reason,DirectCatID\n");
 		long countOfRejectedCheckinNotInHierarchy = 0, countOfRejectedCHeckinBelowLevel2 = 0,
 				countOfCinWithMultipleWorkingLevelCatIDs = 0;
 		System.out.println("----Inside createCheckinEntries----------------");
@@ -1060,7 +1179,8 @@ public class DatabaseCreatorGowallaQuicker0
 				{
 					String reason = isAcceptableDirectCatID.getSecond();
 					// maintaining a log of rejected checkins with the reason for rejection
-					logRejectedCheckins.append(countOfLines + "-" + reason + "\n");
+					logRejectedCheckins.append(countOfLines).append("-").append(reason).append("-").append(catIDDirect)
+							.append("\n");
 					if (reason.equals("NotInHierarchy"))
 					{
 						countOfRejectedCheckinNotInHierarchy += 1;
