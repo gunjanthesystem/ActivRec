@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.RegexUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.complex.Complex;
 
@@ -4270,6 +4272,261 @@ public class WritingToFile
 		}
 
 		return isEmpty;
+	}
+
+	/**
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param verbose
+	 * @param absFileNameToWrite
+	 * @return
+	 */
+	public static Pair<Long, Long> writeNumberOfActsWithMultipleWorkingLevelCatID(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean verbose,
+			String absFileNameToWrite)
+	{
+		long numOfActWithMultipleWorkingLevelCatID = 0, numOfAOs = 0;
+		HashSet<String> multipleWorkingLevelCatIds = new HashSet<>();
+	
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+		{
+			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+			{
+				for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+				{
+					numOfAOs += 1;
+					if (RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs()).length > 1)
+					{
+						multipleWorkingLevelCatIds.add(ao.getWorkingLevelCatIDs());
+						numOfActWithMultipleWorkingLevelCatID += 1;
+					}
+				}
+			}
+		}
+	
+		if (verbose)
+		{
+			System.out.println("num of AOs = " + numOfAOs);
+			System.out.println("numOfActWithMultipleWorkingLevelCatID = " + numOfActWithMultipleWorkingLevelCatID);
+			System.out.println("% ActWithMultipleWorkingLevelCatID = "
+					+ ((numOfActWithMultipleWorkingLevelCatID / numOfAOs) * 100));
+		}
+	
+		writeToNewFile(
+				multipleWorkingLevelCatIds.stream().map(s -> s.toString()).collect(Collectors.joining("\n")),
+				absFileNameToWrite);
+	
+		return new Pair<Long, Long>(numOfActWithMultipleWorkingLevelCatID, numOfAOs);
+	}
+
+	/**
+	 * Make each row of equal length (i.e., same num of columns by filling in with "NA"s. This is to facilitate reading
+	 * data in R.
+	 * 
+	 * @param map
+	 * @param catIDNameDictionary
+	 * @param absfileNameToUse
+	 * @param insertNAs
+	 * @param writeCatName
+	 */
+	public static void writeConsectiveCountsEqualLength(LinkedHashMap<String, ArrayList<Integer>> map,
+			TreeMap<Integer, String> catIDNameDictionary, String absfileNameToUse, boolean insertNAs,
+			boolean writeCatName)
+	{
+		int maxNumOfVals = -1; // max consec counts over all cat ids
+	
+		// find the max size
+		maxNumOfVals = (map.entrySet().stream().mapToInt(e -> e.getValue().size()).max()).getAsInt();
+		// maxNumOfVals += 1; // 1 additional column for header
+		// for (Entry<String, ArrayList<Integer>> e : map.entrySet())
+		// {
+		// // if(e.getValue().size()>maxSizeOfArrayList)
+		// }
+	
+		int numOfCatIDsInMap = 0;
+		try
+		{
+			BufferedWriter bw = getBWForNewFile(absfileNameToUse);
+			for (Entry<String, ArrayList<Integer>> entry : map.entrySet())
+			{
+				String catID = entry.getKey();
+				ArrayList<Integer> consecCounts = entry.getValue();
+	
+				if (consecCounts.size() != 0)
+				{
+					int numOfNAsToBeInserted = maxNumOfVals - consecCounts.size();
+					StringBuilder sb = new StringBuilder();
+	
+					if (writeCatName)
+					{
+						sb.append(catID + ":" + catIDNameDictionary.get(Integer.valueOf(catID)));
+					}
+					else
+					{
+						sb.append(catID + ":");
+					}
+					numOfCatIDsInMap += 1;
+	
+					for (Integer t : consecCounts)
+					{
+						sb.append("," + t);
+					}
+	
+					if (insertNAs)
+					{
+						for (int i = 0; i < numOfNAsToBeInserted; i++)
+						{
+							sb.append(",NA");
+						}
+					}
+	
+					bw.write(sb.toString() + "\n");
+				}
+			}
+			bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.out.println("Num of catIDs in dictionary = " + catIDNameDictionary.size());
+		System.out.println("Num of catIDs in working dataset = " + numOfCatIDsInMap);
+		System.out.println("maxNumOfVals = " + maxNumOfVals);
+	}
+	// LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>();
+	//
+	// // convert checkinentries to activity objects
+	// for (Entry<String, TreeMap<Date, ArrayList<CheckinEntry>>> userEntry : checkinEntriesDatewise.entrySet()) // over
+	// users
+	// {
+	// String userID = userEntry.getKey();
+	// TreeMap<Date, ArrayList<ActivityObject>> dayWiseForThisUser = new TreeMap<>();
+	//
+	// for (Entry<Date, ArrayList<CheckinEntry>> dateEntry : userEntry.getValue().entrySet()) // over dates
+	// {
+	// Date date = dateEntry.getKey();
+	// ArrayList<ActivityObject> activityObjectsForThisUserThisDate = new ArrayList<>();
+	//
+	// for (CheckinEntry e : dateEntry.getValue())// over checkins
+	// {
+	// int activityID = e.getActivityID();
+	// int locationID = e.getLocationID();
+	//
+	// String activityName = "";//
+	// String locationName = "";//
+	// Timestamp startTimestamp = e.getTimestamp();
+	// String startLatitude = e.getStartLatitude();
+	// String startLongitude = e.getStartLongitude();
+	// String startAltitude = "";//
+	// String userIDInside = e.getUserID();
+	//
+	// // sanity check start
+	// if (userIDInside.equals(userID) == false)
+	// {
+	// System.err.println("Sanity check failed in createUserTimelinesFromCheckinEntriesGowalla()");
+	// }
+	// // sanity check end
+	//
+	// LocationGowalla loc = locationObjects.get(String.valueOf(locationID));
+	// int photos_count = loc.getPhotos_count();
+	// int checkins_count = loc.getCheckins_count();
+	// int users_count = loc.getUsers_count();
+	// int radius_meters = loc.getRadius_meters();
+	// int highlights_count = loc.getHighlights_count();
+	// int items_count = loc.getItems_count();
+	// int max_items_count = loc.getMax_items_count();
+	//
+	// ActivityObject ao = new ActivityObject(activityID, locationID, activityName, locationName, startTimestamp,
+	// startLatitude, startLongitude, startAltitude, userID, photos_count, checkins_count, users_count, radius_meters,
+	// highlights_count, items_count, max_items_count);
+	//
+	// activityObjectsForThisUserThisDate.add(ao);
+	// }
+	// dayWiseForThisUser.put(date, activityObjectsForThisUserThisDate);
+	// }
+	// activityObjectsDatewise.put(userID, dayWiseForThisUser);
+	// }
+	//
+	// System.out.println("inside createUserTimelinesFromCheckinEntriesGowalla");
+	//
+	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines =
+	// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+	//
+	// // userid, usertimeline
+	// LinkedHashMap<String, ArrayList<ActivityObject>> perUserActivityEvents = new LinkedHashMap<String,
+	// ArrayList<ActivityObject>>();
+	//
+	// for (Map.Entry<String, TreeMap<Timestamp, CheckinEntry>> perUserCheckinEntry : checkinEntries.entrySet()) //
+	// Iterate over Users
+	// {
+	//
+	// String userID = perUserCheckinEntry.getKey();
+	// TreeMap<Timestamp, CheckinEntry> checkinEntriesForThisUser = perUserCheckinEntry.getValue();
+	//
+	// System.out.println("user:" + userID + " #CheckinEntries =" + checkinEntriesForThisUser.size());
+	//
+	// LinkedHashMap<Date, ArrayList<ActivityObject>> perDateActivityObjectsForThisUser =
+	// new LinkedHashMap<Date, ArrayList<ActivityObject>>();
+	//
+	// for (Map.Entry<Timestamp, CheckinEntry> checkin : checkinEntriesForThisUser.entrySet()) // iterare over activity
+	// events for this user
+	// {
+	// Timestamp ts = checkin.getKey();
+	// CheckinEntry checkinEntry = checkin.getValue();
+	// Date date = DateTimeUtils.getDate(ts);// (Date)
+	// activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension", "Date"); // start date
+	//
+	// if (!(perDateActivityObjectsForThisUser.containsKey(date)))
+	// {
+	// perDateActivityObjectsForThisUser.put(date, new ArrayList<ActivityObject>());
+	// }
+	//
+	// perDateActivityObjectsForThisUser.get(date).add(activityEventsForThisUser.get(i));
+	// }
+	//
+	// perDateActivityEventsForThisUser has been created now.
+
+	/**
+	 * 
+	 * @param map
+	 * @param catIDNameDictionary
+	 * @param absfileNameToUse
+	 */
+	public static void writeConsectiveCounts(LinkedHashMap<String, ArrayList<Integer>> map,
+			TreeMap<Integer, String> catIDNameDictionary, String absfileNameToUse)
+	{
+		int numOfCatIDsInMap = 0;
+		try
+		{
+			BufferedWriter bw = getBWForNewFile(absfileNameToUse);
+			for (Entry<String, ArrayList<Integer>> entry : map.entrySet())
+			{
+				String catID = entry.getKey();
+				ArrayList<Integer> consecCounts = entry.getValue();
+	
+				if (consecCounts.size() != 0)
+				{
+					StringBuilder sb = new StringBuilder();
+					sb.append(catID + ":" + catIDNameDictionary.get(Integer.valueOf(catID)));
+	
+					numOfCatIDsInMap += 1;
+	
+					for (Integer t : consecCounts)
+					{
+						sb.append("," + t);
+					}
+	
+					bw.write(sb.toString() + "\n");
+				}
+			}
+			bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.out.println("Num of catIDs in dictionary = " + catIDNameDictionary.size());
+		System.out.println("Num of catIDs in working dataset = " + numOfCatIDsInMap);
 	}
 
 	// public static void writeSimpleLinkedHashMapToFileAppendDouble(LinkedHashMap<String, Double> map, String fileName,

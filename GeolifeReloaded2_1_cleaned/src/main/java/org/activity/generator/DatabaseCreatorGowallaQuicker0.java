@@ -67,7 +67,7 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/April6/DatabaseCreatedMerged/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/April6/DatabaseCreatedUnMerged/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar30/DatabaseCreatedMerged/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb23/DatabaseCreatedNoMerge/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
@@ -102,7 +102,7 @@ public class DatabaseCreatorGowallaQuicker0
 	public static final int continuityThresholdInSeconds = gowallaContinuityThresholdInSecs;// = Integer.MAX_VALUE;//
 	public static final int continuityThresholdInMeters = 600;// = Integer.MAX_VALUE;//
 
-	static final boolean merge = true;// false;
+	static final boolean merge = false;// true;// false;
 	// *
 	// 60; // changed from 30
 	// min in DCU
@@ -596,11 +596,11 @@ public class DatabaseCreatorGowallaQuicker0
 			System.out.println("Num of checkins read = " + checkinsCount);
 			System.out.println("checkinsWithInvalidGeocoords read = " + checkinsWithInvalidGeocoords);
 
-			TimelineUtils.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
+			WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-			TimelineUtils.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
+			WritingToFile.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "ComparedAtributewiseConsecCounts.csv", false, false);
-			TimelineUtils.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
+			WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "UserwiseConsecCounts.csv", false, false);
 
 			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
@@ -797,9 +797,9 @@ public class DatabaseCreatorGowallaQuicker0
 			}
 
 			System.out.println("Num of aos read = " + checkinsCount);
-			TimelineUtils.writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
+			WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-			TimelineUtils.writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
+			WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
 					commonPathToWrite + "UserwiseConsecCountsEqualLength.csv", false, false);
 
 			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),

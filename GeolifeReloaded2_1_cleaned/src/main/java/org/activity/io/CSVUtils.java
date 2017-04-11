@@ -46,7 +46,7 @@ public class CSVUtils
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SNoDupsbAllDistanceInM.csv",
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SAllDupssbAllDistanceInM.csv");
 
-		gowallaMain();//
+		gowallaMain2();//
 	}
 
 	public static void testSideConcat()
@@ -154,6 +154,36 @@ public class CSVUtils
 			concatenateCSVFiles(listOfrrCOlFiles, true, pathToWrite + fileNameHeadString + "ListOfrrColFiles.csv");
 
 			// concatenateCSVFiles(ArrayList<String>, boolean, String)
+		}
+	}
+
+	public static void gowallaMain2()
+	{
+		// String[] fileNameHeadStrings = { "", "BO" };
+
+		// for (String fileNameHeadString : fileNameHeadStrings)
+		{
+			// String fileNameHeadString = "";// "BO";// for baseline occurrence file, empty for algo file
+
+			String commonPathToRead = "./DD/Target/";
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+			String pathToWrite = "./DD/Target/";
+			// + "///home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Analysis2/";
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
+
+			String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+
+			ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
+
+			for (int i = 0; i < s.length; i++)
+			{
+				String pathToRead = commonPathToRead + s[i] + "/";
+
+				listOfAllMRRFiles.add(pathToRead + "CountTimeCategoryOfRecommPoitns.csv");
+			}
+
+			concatenateCSVFiles(listOfAllMRRFiles, true, pathToWrite + "AllCountTimeCategoryOfRecommPoitns.csv");
+
 		}
 	}
 
