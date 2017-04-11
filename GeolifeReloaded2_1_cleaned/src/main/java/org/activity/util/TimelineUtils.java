@@ -1,6 +1,5 @@
 package org.activity.util;
 
-import java.io.BufferedWriter;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -336,24 +335,22 @@ public class TimelineUtils
 		LinkedHashMap<String, TreeMap<Date, ArrayList<T>>> daywiseMap = new LinkedHashMap<>();
 		System.out.println("starting convertTimewiseMapToDatewiseMap");
 
-		for (Map.Entry<String, TreeMap<Timestamp, T>> perUserCheckinEntry : timewiseMap.entrySet()) // Iterate over
-																									// Users
-		{
+		for (Map.Entry<String, TreeMap<Timestamp, T>> perUserCheckinEntry : timewiseMap.entrySet())
+		{ // Iterate over Users
+
 			String userID = perUserCheckinEntry.getKey();
 			TreeMap<Timestamp, T> checkinEntriesForThisUser = perUserCheckinEntry.getValue();
 
 			TreeMap<Date, ArrayList<T>> daywiseForThisUser = new TreeMap<>();
 
-			for (Map.Entry<Timestamp, T> checkin : checkinEntriesForThisUser.entrySet()) // iterare over activity events
-																							// for this user
+			for (Map.Entry<Timestamp, T> checkin : checkinEntriesForThisUser.entrySet())
 			{
+				// iterare over activity events for this user
 				LocalDate ldate = DateTimeUtils.getLocalDate(checkin.getKey(), tz);// converting to ldate to removing
 																					// hidden time.
-
 				Date date = Date.valueOf(ldate);// ldate.get//DateTimeUtils.getDate(checkin.getKey());// (Date)
 												// activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension",
-												// "Date"); // start
-				// date
+												// "Date"); // start date
 				// Date ldate = DateTimeUtils.getLocalDate(checkin.getKey(), dft);
 
 				if ((daywiseForThisUser.containsKey(date)) == false)
@@ -362,7 +359,6 @@ public class TimelineUtils
 				}
 				daywiseForThisUser.get(date).add(checkin.getValue());
 			}
-
 			daywiseMap.put(userID, daywiseForThisUser);
 		}
 		return daywiseMap;
@@ -392,7 +388,9 @@ public class TimelineUtils
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = convertCheckinEntriesToActivityObjectsGowalla(
 				checkinEntriesDatewise, locationObjects);
 
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines = new LinkedHashMap<>();
+		int optimalSizeWrtUsers = (int) (Math.ceil(activityObjectsDatewise.size() / 0.75));
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines = new LinkedHashMap<>(
+				optimalSizeWrtUsers);
 
 		// StringBuilder sbNumOfActsPerDayPerUser;
 		// WritingToFile.appendLineToFileAbsolute("User,Date,NumOfActsInDay\n", "NumOfActsPerUserPerDay.csv");
@@ -400,7 +398,8 @@ public class TimelineUtils
 		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject>>> userEntry : activityObjectsDatewise.entrySet())
 		{
 			String userID = userEntry.getKey();
-			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>();
+			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>(
+					(int) (Math.ceil(userEntry.getValue().size() / 0.75)));
 
 			// sbNumOfActsPerDayPerUser = new StringBuilder();// "User,Day,NumOfActs\n");
 			for (Entry<Date, ArrayList<ActivityObject>> dateEntry : userEntry.getValue().entrySet())
@@ -677,9 +676,9 @@ public class TimelineUtils
 			}
 
 			System.out.println("Num of aos read = " + aoCount);
-			writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
+			WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-			writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
+			WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
 					commonPathToWrite + "UserwiseConsecCountsEqualLength.csv", false, false);
 
 			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
@@ -693,216 +692,6 @@ public class TimelineUtils
 		return catIDLengthConsecutives;
 
 	}
-
-	/**
-	 * 
-	 * @param map
-	 * @param catIDNameDictionary
-	 * @param absfileNameToUse
-	 */
-	public static void writeConsectiveCounts(LinkedHashMap<String, ArrayList<Integer>> map,
-			TreeMap<Integer, String> catIDNameDictionary, String absfileNameToUse)
-	{
-		int numOfCatIDsInMap = 0;
-		try
-		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
-			for (Entry<String, ArrayList<Integer>> entry : map.entrySet())
-			{
-				String catID = entry.getKey();
-				ArrayList<Integer> consecCounts = entry.getValue();
-
-				if (consecCounts.size() != 0)
-				{
-					StringBuilder sb = new StringBuilder();
-					sb.append(catID + ":" + catIDNameDictionary.get(Integer.valueOf(catID)));
-
-					numOfCatIDsInMap += 1;
-
-					for (Integer t : consecCounts)
-					{
-						sb.append("," + t);
-					}
-
-					bw.write(sb.toString() + "\n");
-				}
-			}
-			bw.close();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		System.out.println("Num of catIDs in dictionary = " + catIDNameDictionary.size());
-		System.out.println("Num of catIDs in working dataset = " + numOfCatIDsInMap);
-	}
-
-	/**
-	 * Make each row of equal length (i.e., same num of columns by filling in with "NA"s. This is to facilitate reading
-	 * data in R.
-	 * 
-	 * @param map
-	 * @param catIDNameDictionary
-	 * @param absfileNameToUse
-	 * @param insertNAs
-	 * @param writeCatName
-	 */
-	public static void writeConsectiveCountsEqualLength(LinkedHashMap<String, ArrayList<Integer>> map,
-			TreeMap<Integer, String> catIDNameDictionary, String absfileNameToUse, boolean insertNAs,
-			boolean writeCatName)
-	{
-		int maxNumOfVals = -1; // max consec counts over all cat ids
-
-		// find the max size
-		maxNumOfVals = (map.entrySet().stream().mapToInt(e -> e.getValue().size()).max()).getAsInt();
-		// maxNumOfVals += 1; // 1 additional column for header
-		// for (Entry<String, ArrayList<Integer>> e : map.entrySet())
-		// {
-		// // if(e.getValue().size()>maxSizeOfArrayList)
-		// }
-
-		int numOfCatIDsInMap = 0;
-		try
-		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
-			for (Entry<String, ArrayList<Integer>> entry : map.entrySet())
-			{
-				String catID = entry.getKey();
-				ArrayList<Integer> consecCounts = entry.getValue();
-
-				if (consecCounts.size() != 0)
-				{
-					int numOfNAsToBeInserted = maxNumOfVals - consecCounts.size();
-					StringBuilder sb = new StringBuilder();
-
-					if (writeCatName)
-					{
-						sb.append(catID + ":" + catIDNameDictionary.get(Integer.valueOf(catID)));
-					}
-					else
-					{
-						sb.append(catID + ":");
-					}
-					numOfCatIDsInMap += 1;
-
-					for (Integer t : consecCounts)
-					{
-						sb.append("," + t);
-					}
-
-					if (insertNAs)
-					{
-						for (int i = 0; i < numOfNAsToBeInserted; i++)
-						{
-							sb.append(",NA");
-						}
-					}
-
-					bw.write(sb.toString() + "\n");
-				}
-			}
-			bw.close();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		System.out.println("Num of catIDs in dictionary = " + catIDNameDictionary.size());
-		System.out.println("Num of catIDs in working dataset = " + numOfCatIDsInMap);
-		System.out.println("maxNumOfVals = " + maxNumOfVals);
-	}
-	// LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>();
-	//
-	// // convert checkinentries to activity objects
-	// for (Entry<String, TreeMap<Date, ArrayList<CheckinEntry>>> userEntry : checkinEntriesDatewise.entrySet()) // over
-	// users
-	// {
-	// String userID = userEntry.getKey();
-	// TreeMap<Date, ArrayList<ActivityObject>> dayWiseForThisUser = new TreeMap<>();
-	//
-	// for (Entry<Date, ArrayList<CheckinEntry>> dateEntry : userEntry.getValue().entrySet()) // over dates
-	// {
-	// Date date = dateEntry.getKey();
-	// ArrayList<ActivityObject> activityObjectsForThisUserThisDate = new ArrayList<>();
-	//
-	// for (CheckinEntry e : dateEntry.getValue())// over checkins
-	// {
-	// int activityID = e.getActivityID();
-	// int locationID = e.getLocationID();
-	//
-	// String activityName = "";//
-	// String locationName = "";//
-	// Timestamp startTimestamp = e.getTimestamp();
-	// String startLatitude = e.getStartLatitude();
-	// String startLongitude = e.getStartLongitude();
-	// String startAltitude = "";//
-	// String userIDInside = e.getUserID();
-	//
-	// // sanity check start
-	// if (userIDInside.equals(userID) == false)
-	// {
-	// System.err.println("Sanity check failed in createUserTimelinesFromCheckinEntriesGowalla()");
-	// }
-	// // sanity check end
-	//
-	// LocationGowalla loc = locationObjects.get(String.valueOf(locationID));
-	// int photos_count = loc.getPhotos_count();
-	// int checkins_count = loc.getCheckins_count();
-	// int users_count = loc.getUsers_count();
-	// int radius_meters = loc.getRadius_meters();
-	// int highlights_count = loc.getHighlights_count();
-	// int items_count = loc.getItems_count();
-	// int max_items_count = loc.getMax_items_count();
-	//
-	// ActivityObject ao = new ActivityObject(activityID, locationID, activityName, locationName, startTimestamp,
-	// startLatitude, startLongitude, startAltitude, userID, photos_count, checkins_count, users_count, radius_meters,
-	// highlights_count, items_count, max_items_count);
-	//
-	// activityObjectsForThisUserThisDate.add(ao);
-	// }
-	// dayWiseForThisUser.put(date, activityObjectsForThisUserThisDate);
-	// }
-	// activityObjectsDatewise.put(userID, dayWiseForThisUser);
-	// }
-	//
-	// System.out.println("inside createUserTimelinesFromCheckinEntriesGowalla");
-	//
-	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines =
-	// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
-	//
-	// // userid, usertimeline
-	// LinkedHashMap<String, ArrayList<ActivityObject>> perUserActivityEvents = new LinkedHashMap<String,
-	// ArrayList<ActivityObject>>();
-	//
-	// for (Map.Entry<String, TreeMap<Timestamp, CheckinEntry>> perUserCheckinEntry : checkinEntries.entrySet()) //
-	// Iterate over Users
-	// {
-	//
-	// String userID = perUserCheckinEntry.getKey();
-	// TreeMap<Timestamp, CheckinEntry> checkinEntriesForThisUser = perUserCheckinEntry.getValue();
-	//
-	// System.out.println("user:" + userID + " #CheckinEntries =" + checkinEntriesForThisUser.size());
-	//
-	// LinkedHashMap<Date, ArrayList<ActivityObject>> perDateActivityObjectsForThisUser =
-	// new LinkedHashMap<Date, ArrayList<ActivityObject>>();
-	//
-	// for (Map.Entry<Timestamp, CheckinEntry> checkin : checkinEntriesForThisUser.entrySet()) // iterare over activity
-	// events for this user
-	// {
-	// Timestamp ts = checkin.getKey();
-	// CheckinEntry checkinEntry = checkin.getValue();
-	// Date date = DateTimeUtils.getDate(ts);// (Date)
-	// activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension", "Date"); // start date
-	//
-	// if (!(perDateActivityObjectsForThisUser.containsKey(date)))
-	// {
-	// perDateActivityObjectsForThisUser.put(date, new ArrayList<ActivityObject>());
-	// }
-	//
-	// perDateActivityObjectsForThisUser.get(date).add(activityEventsForThisUser.get(i));
-	// }
-	//
-	// perDateActivityEventsForThisUser has been created now.
 
 	// LinkedHashMap<Date, UserDayTimeline> dayTimelines = new LinkedHashMap<Date, UserDayTimeline>();
 	//
@@ -932,15 +721,16 @@ public class TimelineUtils
 			LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise,
 			LinkedHashMap<Integer, LocationGowalla> locationObjects)
 	{
-		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>();
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
+				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
+
 		System.out.println("starting convertCheckinEntriesToActivityObjectsGowalla");
 		System.out.println("Num of locationObjects received = " + locationObjects.size() + " with keys as follows");
 
-		// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
-		StringBuilder locInfo = new StringBuilder();
-		locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
 		if (VerbosityConstants.WriteLocationMap)
-		{
+		{// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
+			StringBuilder locInfo = new StringBuilder();
+			locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
 			WritingToFile.writeToNewFile(locInfo.toString(), Constant.outputCoreResultsPath + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
 
@@ -950,16 +740,16 @@ public class TimelineUtils
 		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
 
 		// convert checkinentries to activity objects
-		for (Entry<String, TreeMap<Date, ArrayList<CheckinEntry>>> userEntry : checkinEntriesDatewise.entrySet()) // over
-																													// users
-		{
+		for (Entry<String, TreeMap<Date, ArrayList<CheckinEntry>>> userEntry : checkinEntriesDatewise.entrySet())
+		{// over users
 			String userID = userEntry.getKey();
 			TreeMap<Date, ArrayList<ActivityObject>> dayWiseForThisUser = new TreeMap<>();
-
+			// System.out.print("\nuser: " + userID);
 			for (Entry<Date, ArrayList<CheckinEntry>> dateEntry : userEntry.getValue().entrySet()) // over dates
 			{
-				Date date = dateEntry.getKey();
-				ArrayList<ActivityObject> activityObjectsForThisUserThisDate = new ArrayList<>();
+				// Date date = dateEntry.getKey();
+				ArrayList<ActivityObject> activityObjectsForThisUserThisDate = new ArrayList<>(
+						dateEntry.getValue().size());
 
 				// System.out.println(
 				// "--* user:" + userID + " date:" + date.toString() + " has " + dateEntry.getValue().size() + "
@@ -1053,7 +843,7 @@ public class TimelineUtils
 					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
 				}
-				dayWiseForThisUser.put(date, activityObjectsForThisUserThisDate);
+				dayWiseForThisUser.put(dateEntry.getKey(), activityObjectsForThisUserThisDate);
 			}
 			activityObjectsDatewise.put(userID, dayWiseForThisUser);
 		}

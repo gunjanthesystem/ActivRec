@@ -139,8 +139,19 @@ public class PerformanceAnalytics
 
 		double usedMem = heapSize - heapFreeSize;
 		s.append("\nUsed memory within the heap = " + usedMem + " MB");
-		s.append("\n--------\n");
+		s.append("\n--------");
 		return s.toString();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static Double getUsedMemoryInMB()
+	{
+		double heapSize = (Runtime.getRuntime().totalMemory()) / (1024 * 1024);
+		double heapFreeSize = Runtime.getRuntime().freeMemory() / (1024 * 1024);
+		return heapSize - heapFreeSize;
 	}
 
 	/**

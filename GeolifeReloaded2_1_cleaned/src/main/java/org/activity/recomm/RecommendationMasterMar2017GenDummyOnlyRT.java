@@ -56,7 +56,7 @@ import org.activity.util.UtilityBelt;
  * @since 22 March, 2017
  * @author gunjan
  */
-public class RecommendationMasterMar2017Gen implements RecommendationMasterI// IRecommenderMaster
+public class RecommendationMasterMar2017GenDummyOnlyRT implements RecommendationMasterI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
 
@@ -198,6 +198,10 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		return 0;
 	}
 
+	public RecommendationMasterMar2017GenDummyOnlyRT(boolean dummy2)
+	{
+	}
+
 	/**
 	 * Recommendation for a particular RT
 	 * 
@@ -214,7 +218,7 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 	 * @param caseType
 	 * @param lookPastType
 	 */
-	public RecommendationMasterMar2017Gen(LinkedHashMap<Date, Timeline> trainingTimelines,
+	public RecommendationMasterMar2017GenDummyOnlyRT(LinkedHashMap<Date, Timeline> trainingTimelines,
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
 			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold, double matchingUnitInCountsOrHours,
 			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy)
@@ -252,218 +256,224 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		this.activityAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 		this.activityNameAtRecommPoint = this.activityAtRecommPoint.getActivityName();
 
-		// All check OK
-		// //////////////////////////
-		long recommMasterT1 = System.currentTimeMillis();
-		this.candidateTimelines = extractCandidateTimelines(trainingTimelines, lookPastType, this.dateAtRecomm,
-				this.timeAtRecomm, this.userIDAtRecomm, matchingUnitInCountsOrHours, this.activityAtRecommPoint);
-		long recommMasterT2 = System.currentTimeMillis();
-		long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
-		// ///////////////////////////
-		if (VerbosityConstants.verbose)
-		{
-			System.out.println("Current timeline: " + currentTimeline.getActivityObjectNamesWithTimestampsInSequence()
-					+ "; activitiesGuidingRecomm.size =" + this.activitiesGuidingRecomm.size());
-			System.out.println("\nActivity at Recomm point (Current Activity) =" + activityNameAtRecommPoint);
-			System.out.println("Number of candidate timelines =" + candidateTimelines.size());
-			System.out.println("the candidate timelines are as follows:");
-			candidateTimelines.entrySet().stream()
-					.forEach(t -> System.out.println(t.getValue().getActivityObjectNamesInSequence()));
-		}
-
-		if (candidateTimelines.size() == 0)
-		{
-			System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
-					+ " at time:" + timeAtRecomm + "  because there are no candidate timelines");
-			// this.singleNextRecommendedActivity = null;
-			this.hasCandidateTimelines = false;
-			// this.topNextActivities =null;
-			this.nextActivityObjectsFromCands = null;
-			this.thresholdPruningNoEffect = true;
-			return;
-		}
-		else
-		{
-			this.hasCandidateTimelines = true;
-		}
-		// System.out.println("\nDebug note192_223: getActivityNamesGuidingRecommwithTimestamps() " +
-		// getActivityNamesGuidingRecommwithTimestamps() +
-		// " size of current timeline="
+		// // All check OK
+		// // //////////////////////////
+		// long recommMasterT1 = System.currentTimeMillis();
+		// this.candidateTimelines = extractCandidateTimelines(trainingTimelines, lookPastType, this.dateAtRecomm,
+		// this.timeAtRecomm, this.userIDAtRecomm, matchingUnitInCountsOrHours, this.activityAtRecommPoint);
+		// long recommMasterT2 = System.currentTimeMillis();
+		// long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
+		// // ///////////////////////////
+		// if (VerbosityConstants.verbose)
+		// {
+		// System.out.println("Current timeline: " + currentTimeline.getActivityObjectNamesWithTimestampsInSequence()
+		// + "; activitiesGuidingRecomm.size =" + this.activitiesGuidingRecomm.size());
+		// System.out.println("\nActivity at Recomm point (Current Activity) =" + activityNameAtRecommPoint);
+		// System.out.println("Number of candidate timelines =" + candidateTimelines.size());
+		// System.out.println("the candidate timelines are as follows:");
+		// candidateTimelines.entrySet().stream()
+		// .forEach(t -> System.out.println(t.getValue().getActivityObjectNamesInSequence()));
+		// }
+		//
+		// if (candidateTimelines.size() == 0)
+		// {
+		// System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
+		// + " at time:" + timeAtRecomm + " because there are no candidate timelines");
+		// // this.singleNextRecommendedActivity = null;
+		// this.hasCandidateTimelines = false;
+		// // this.topNextActivities =null;
+		// this.nextActivityObjectsFromCands = null;
+		// this.thresholdPruningNoEffect = true;
+		// return;
+		// }
+		// else
+		// {
+		// this.hasCandidateTimelines = true;
+		// }
+		// // System.out.println("\nDebug note192_223: getActivityNamesGuidingRecommwithTimestamps() " +
+		// // getActivityNamesGuidingRecommwithTimestamps() +
+		// // " size of current timeline="
+		// // + currentTimeline.getActivityObjectsInTimeline().size());
+		// // /////////////////////
+		// // TODO CHECK: HOW THE EFFECT OF THIS DIFFERS FROM THE EXPERIMENTS DONE FOR IIWAS: in iiWAS normalisation was
+		// // after thresholding (correct), here
+		// // normalisation is before thresholding which should be changed
+		// long recommMasterT3 = System.currentTimeMillis();
+		// Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes
+		// = getNormalisedDistancesForCandidateTimelines(
+		// candidateTimelines, activitiesGuidingRecomm, caseType, this.userIDAtRecomm, this.dateAtRecomm,
+		// this.timeAtRecomm, Constant.getDistanceUsed(), this.lookPastType, this.hjEditDistance,
+		// this.featureWiseEditDistance, this.featureWiseWeightedEditDistance, this.OTMDSAMEditDistance);
+		//
+		// LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted = normalisedDistFromCandsRes.getFirst();
+		// this.endPointIndicesConsideredInCands = normalisedDistFromCandsRes.getSecond();
+		//
+		// long recommMasterT4 = System.currentTimeMillis();
+		// long timeTakenToComputeNormEditDistances = recommMasterT4 - recommMasterT3;
+		//
+		// // System.out.println("\nDebug note192_229: getActivityNamesGuidingRecommwithTimestamps() " +
+		// // getActivityNamesGuidingRecommwithTimestamps() +" size of current timeline=" +
+		// // currentTimeline.getActivityObjectsInTimeline().size());
+		// // ########Sanity check
+		// if (distancesMapUnsorted.size() != candidateTimelines.size())
+		// {
+		// System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+		// "Error editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
+		// + ") != candidateTimelines.size() (" + candidateTimelines.size() + ")"));
+		// errorExists = true;
+		// }
+		// // ##############
+		//
+		// // /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry
+		// for
+		// // such candidate timelines from the distance scores map. // no pruning for baseline closest ST
+		// if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == false)
+		// {
+		// Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
+		// distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm);
+		// distancesMapUnsorted = prunedRes.getFirst();
+		// this.thresholdAsDistance = prunedRes.getSecond();
+		// this.thresholdPruningNoEffect = prunedRes.getThird();
+		// }
+		// // ////////////////////////////////
+		//
+		// if (distancesMapUnsorted.size() == 0)
+		// {
+		// System.out.println("Warning: No candidate timelines below threshold distance");
+		// hasCandidateTimelinesBelowThreshold = false;
+		// return;
+		// }
+		// else
+		// {
+		// hasCandidateTimelinesBelowThreshold = true;
+		// }
+		//
+		// // Is this sorting necessary?
+		// distancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
+		// .sortByValueAscendingStrStrDoub(distancesMapUnsorted);
+		//
+		// if (caseType.equals(Enums.CaseType.CaseBasedV1))
+		// {
+		// System.out.println("this is CaseBasedV1");
+		// this.similarityOfEndPointActivityObjectCand = getCaseSimilarityEndPointActivityObjectCand(
+		// candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, this.dateAtRecomm.toString(),
+		// this.timeAtRecomm.toString(), alignmentBasedDistance);//
+		// getDistanceScoresforCandidateTimelines(candidateTimelines,activitiesGuidingRecomm);
+		// }
+		//
+		// this.nextActivityObjectsFromCands = fetchNextActivityObjects(distancesSortedMap, candidateTimelines,
+		// this.lookPastType, endPointIndicesConsideredInCands);
+		//
+		// if (!this.lookPastType.equals(Enums.LookPastType.ClosestTime))
+		// {
+		// if (this.nextActivityObjectsFromCands.size() != distancesSortedMap.size()
+		// || distancesSortedMap.size() != this.candidateTimelines.size())
+		// {
+		// System.err.println(
+		// "Error at Sanity 349 (RecommenderMaster: this.topNextActivityObjects.size() ==
+		// editDistancesSortedMapFullCand.size() && editDistancesSortedMapFullCand.size()==
+		// this.candidateTimelines.size() not satisfied");
+		// errorExists = true;
+		// }
+		// }
+		// else if (this.lookPastType.equals(Enums.LookPastType.ClosestTime))
+		// {
+		// this.nextActivityObjectsFromCands = new LinkedHashMap<>();
+		// }
+		//
+		// if (VerbosityConstants.verbose)
+		// {
+		// System.out.println("---------editDistancesSortedMap.size()=" + distancesSortedMap.size());
+		//
+		// StringBuilder sbToWrite1 = new StringBuilder(
+		// ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" + "\n lookPastType:" + lookPastType
+		// + "\n The candidate timelines in increasing order of distance are:\n");
+		// distancesSortedMap.entrySet().stream().forEach(
+		// e -> sbToWrite1.append("candID:" + e.getKey() + " dist:" + e.getValue().getSecond() + "\n acts:"
+		// + candidateTimelines.get(e.getKey()).getActivityObjectNamesInSequence() + "\n"));
+		// sbToWrite1.append("Top next activities are:\n");// +this.topNextRecommendedActivities);
+		// nextActivityObjectsFromCands.entrySet().stream().forEach(e -> sbToWrite1
+		// .append(" >>" + e.getValue().getFirst().getActivityName() + ":" + e.getValue().getSecond()));
+		// System.out.println(sbToWrite1.toString());
+		//
+		// System.out.println("\nDebug note192_end: getActivityNamesGuidingRecommwithTimestamps() "
+		// + getActivityNamesGuidingRecommwithTimestamps() + " size of current timeline="
 		// + currentTimeline.getActivityObjectsInTimeline().size());
-		// /////////////////////
-		// TODO CHECK: HOW THE EFFECT OF THIS DIFFERS FROM THE EXPERIMENTS DONE FOR IIWAS: in iiWAS normalisation was
-		// after thresholding (correct), here
-		// normalisation is before thresholding which should be changed
-		long recommMasterT3 = System.currentTimeMillis();
-		Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes = getNormalisedDistancesForCandidateTimelines(
-				candidateTimelines, activitiesGuidingRecomm, caseType, this.userIDAtRecomm, this.dateAtRecomm,
-				this.timeAtRecomm, Constant.getDistanceUsed(), this.lookPastType, this.hjEditDistance,
-				this.featureWiseEditDistance, this.featureWiseWeightedEditDistance, this.OTMDSAMEditDistance);
-
-		LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted = normalisedDistFromCandsRes.getFirst();
-		this.endPointIndicesConsideredInCands = normalisedDistFromCandsRes.getSecond();
-
-		long recommMasterT4 = System.currentTimeMillis();
-		long timeTakenToComputeNormEditDistances = recommMasterT4 - recommMasterT3;
-
-		// System.out.println("\nDebug note192_229: getActivityNamesGuidingRecommwithTimestamps() " +
-		// getActivityNamesGuidingRecommwithTimestamps() +" size of current timeline=" +
-		// currentTimeline.getActivityObjectsInTimeline().size());
-		// ########Sanity check
-		if (distancesMapUnsorted.size() != candidateTimelines.size())
-		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
-					"Error editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
-							+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")"));
-			errorExists = true;
-		}
-		// ##############
-
-		// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry for
-		// such candidate timelines from the distance scores map. // no pruning for baseline closest ST
-		if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == false)
-		{
-			Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
-					distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm);
-			distancesMapUnsorted = prunedRes.getFirst();
-			this.thresholdAsDistance = prunedRes.getSecond();
-			this.thresholdPruningNoEffect = prunedRes.getThird();
-		}
-		// ////////////////////////////////
-
-		if (distancesMapUnsorted.size() == 0)
-		{
-			System.out.println("Warning: No candidate timelines below threshold distance");
-			hasCandidateTimelinesBelowThreshold = false;
-			return;
-		}
-		else
-		{
-			hasCandidateTimelinesBelowThreshold = true;
-		}
-
-		// Is this sorting necessary?
-		distancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
-				.sortByValueAscendingStrStrDoub(distancesMapUnsorted);
-
-		if (caseType.equals(Enums.CaseType.CaseBasedV1))
-		{
-			System.out.println("this is CaseBasedV1");
-			this.similarityOfEndPointActivityObjectCand = getCaseSimilarityEndPointActivityObjectCand(
-					candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, this.dateAtRecomm.toString(),
-					this.timeAtRecomm.toString(), alignmentBasedDistance);// getDistanceScoresforCandidateTimelines(candidateTimelines,activitiesGuidingRecomm);
-		}
-
-		this.nextActivityObjectsFromCands = fetchNextActivityObjects(distancesSortedMap, candidateTimelines,
-				this.lookPastType, endPointIndicesConsideredInCands);
-
-		if (!this.lookPastType.equals(Enums.LookPastType.ClosestTime))
-		{
-			if (this.nextActivityObjectsFromCands.size() != distancesSortedMap.size()
-					|| distancesSortedMap.size() != this.candidateTimelines.size())
-			{
-				System.err.println(
-						"Error at Sanity 349 (RecommenderMaster: this.topNextActivityObjects.size() == editDistancesSortedMapFullCand.size() && editDistancesSortedMapFullCand.size()== this.candidateTimelines.size()  not satisfied");
-				errorExists = true;
-			}
-		}
-		else if (this.lookPastType.equals(Enums.LookPastType.ClosestTime))
-		{
-			this.nextActivityObjectsFromCands = new LinkedHashMap<>();
-		}
-
-		if (VerbosityConstants.verbose)
-		{
-			System.out.println("---------editDistancesSortedMap.size()=" + distancesSortedMap.size());
-
-			StringBuilder sbToWrite1 = new StringBuilder(
-					">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" + "\n lookPastType:" + lookPastType
-							+ "\n The candidate timelines  in increasing order of distance are:\n");
-			distancesSortedMap.entrySet().stream().forEach(
-					e -> sbToWrite1.append("candID:" + e.getKey() + " dist:" + e.getValue().getSecond() + "\n acts:"
-							+ candidateTimelines.get(e.getKey()).getActivityObjectNamesInSequence() + "\n"));
-			sbToWrite1.append("Top next activities are:\n");// +this.topNextRecommendedActivities);
-			nextActivityObjectsFromCands.entrySet().stream().forEach(e -> sbToWrite1
-					.append(" >>" + e.getValue().getFirst().getActivityName() + ":" + e.getValue().getSecond()));
-			System.out.println(sbToWrite1.toString());
-
-			System.out.println("\nDebug note192_end: getActivityNamesGuidingRecommwithTimestamps() "
-					+ getActivityNamesGuidingRecommwithTimestamps() + " size of current timeline="
-					+ currentTimeline.getActivityObjectsInTimeline().size());
-		}
-
-		if (VerbosityConstants.WriteEditDistancePerRtPerCand)
-		{
-			WritingToFile.writeEditDistancesPerRtPerCand(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm,
-					this.distancesSortedMap, this.candidateTimelines, this.nextActivityObjectsFromCands,
-					this.activitiesGuidingRecomm, activityAtRecommPoint,
-					VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
-					VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand,
-					this.endPointIndicesConsideredInCands);
-		}
-
-		//////// Create ranked recommended act names
-		this.recommendedActivityNamesWithRankscores = createRankedTopRecommendedActivityNames(
-				this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand,
-				this.lookPastType, this.distancesSortedMap);
-
-		this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityNamesWithRankScoresString(
-				this.recommendedActivityNamesWithRankscores);
-		this.rankedRecommendedActNamesWithoutRankScoresStr = getRankedRecommendedActivityNamesWithoutRankScoresString(
-				this.recommendedActivityNamesWithRankscores);
+		// }
 		//
-		this.normEditSimilarity = (ArrayList<Double>) this.nextActivityObjectsFromCands.entrySet().stream()
-				.map(e -> e.getValue().getSecond()).collect(Collectors.toList());
-
-		if (this.caseType.equals(Enums.CaseType.CaseBasedV1))
-		{
-			this.simEndActivityObjForCorr = (ArrayList<Double>) this.nextActivityObjectsFromCands.entrySet().stream()
-					.map(nActObj -> similarityOfEndPointActivityObjectCand.get(nActObj.getKey()))
-					.collect(Collectors.toList());
-		}
+		// if (VerbosityConstants.WriteEditDistancePerRtPerCand)
+		// {
+		// WritingToFile.writeEditDistancesPerRtPerCand(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm,
+		// this.distancesSortedMap, this.candidateTimelines, this.nextActivityObjectsFromCands,
+		// this.activitiesGuidingRecomm, activityAtRecommPoint,
+		// VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
+		// VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand,
+		// this.endPointIndicesConsideredInCands);
+		// }
 		//
-		if (VerbosityConstants.verbose)
-		{
-			System.out.println(
-					"Debug: rankedRecommendedActNamesWithRankScoresStr= " + rankedRecommendedActNamesWithRankScoresStr);
-			System.out.println("Debug: rankedRecommendedActNamesWithoutRankScoresStr= "
-					+ rankedRecommendedActNamesWithoutRankScoresStr);
-			System.out.println("Constant.removeCurrentActivityNameFromRecommendations = "
-					+ Constant.removeCurrentActivityNameFromRecommendations);
-		}
-		////////
-
-		if (Constant.removeCurrentActivityNameFromRecommendations)
-		{/*
-			 * IMPORTANT: If the next activity after the current activity object in the current timeline is an invalid
-			 * activity, then we can include the current activity in the list of recommended activities, otherwise the
-			 * current activity has to be removed from the list of recommended activities
-			 */
-			if (currentTimeline.getImmediateNextActivityInvalid() == 0) // not invalid
-			{
-				this.recommendedActivityNamesWithRankscores = removeRecommPointActivityFromRankedRecomm(
-						recommendedActivityNamesWithRankscores, activityNameAtRecommPoint);
-				System.out.println("removing recomm point activity (Current Activity) from list of recommendation");
-			}
-		}
-
-		// System.out.println("Debug note192_2: current timeline " +
-		// currentTimeline.getActivityObjectNamesInSequence());
-
-		////////
-		long recommMasterTEnd = System.currentTimeMillis();
-
-		// start of curtain for performance string writing
-		// String performanceString = this.userIDAtRecomm + "," + this.dateAtRecomm + "," + this.timeAtRecomm + ","
-		// + matchingUnitInCountsOrHours + "," + trainingTimelines.size() + "," + this.trainingTimeline.size() + ","
-		// + this.activitiesGuidingRecomm.size() + "," + this.candidateTimelines.size() + ","
-		// + getSumOfActivityObjects(candidateTimelines) + "," + (recommMasterTEnd - recommMasterT0) + ","
-		// + timeTakenToFetchCandidateTimelines + "," + timeTakenToComputeNormEditDistances + "\n";
-		// WritingToFile.appendLineToFileAbsolute(performanceString, performanceFileName);
-		// end of curtain for performance string writing
-		//////////////
-
-		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
+		// //////// Create ranked recommended act names
+		// this.recommendedActivityNamesWithRankscores = createRankedTopRecommendedActivityNames(
+		// this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand,
+		// this.lookPastType, this.distancesSortedMap);
+		//
+		// this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityNamesWithRankScoresString(
+		// this.recommendedActivityNamesWithRankscores);
+		// this.rankedRecommendedActNamesWithoutRankScoresStr =
+		// getRankedRecommendedActivityNamesWithoutRankScoresString(
+		// this.recommendedActivityNamesWithRankscores);
+		// //
+		// this.normEditSimilarity = (ArrayList<Double>) this.nextActivityObjectsFromCands.entrySet().stream()
+		// .map(e -> e.getValue().getSecond()).collect(Collectors.toList());
+		//
+		// if (this.caseType.equals(Enums.CaseType.CaseBasedV1))
+		// {
+		// this.simEndActivityObjForCorr = (ArrayList<Double>) this.nextActivityObjectsFromCands.entrySet().stream()
+		// .map(nActObj -> similarityOfEndPointActivityObjectCand.get(nActObj.getKey()))
+		// .collect(Collectors.toList());
+		// }
+		// //
+		// if (VerbosityConstants.verbose)
+		// {
+		// System.out.println(
+		// "Debug: rankedRecommendedActNamesWithRankScoresStr= " + rankedRecommendedActNamesWithRankScoresStr);
+		// System.out.println("Debug: rankedRecommendedActNamesWithoutRankScoresStr= "
+		// + rankedRecommendedActNamesWithoutRankScoresStr);
+		// System.out.println("Constant.removeCurrentActivityNameFromRecommendations = "
+		// + Constant.removeCurrentActivityNameFromRecommendations);
+		// }
+		// ////////
+		//
+		// if (Constant.removeCurrentActivityNameFromRecommendations)
+		// {/*
+		// * IMPORTANT: If the next activity after the current activity object in the current timeline is an invalid
+		// * activity, then we can include the current activity in the list of recommended activities, otherwise the
+		// * current activity has to be removed from the list of recommended activities
+		// */
+		// if (currentTimeline.getImmediateNextActivityInvalid() == 0) // not invalid
+		// {
+		// this.recommendedActivityNamesWithRankscores = removeRecommPointActivityFromRankedRecomm(
+		// recommendedActivityNamesWithRankscores, activityNameAtRecommPoint);
+		// System.out.println("removing recomm point activity (Current Activity) from list of recommendation");
+		// }
+		// }
+		//
+		// // System.out.println("Debug note192_2: current timeline " +
+		// // currentTimeline.getActivityObjectNamesInSequence());
+		//
+		// ////////
+		// long recommMasterTEnd = System.currentTimeMillis();
+		//
+		// // start of curtain for performance string writing
+		// // String performanceString = this.userIDAtRecomm + "," + this.dateAtRecomm + "," + this.timeAtRecomm + ","
+		// // + matchingUnitInCountsOrHours + "," + trainingTimelines.size() + "," + this.trainingTimeline.size() + ","
+		// // + this.activitiesGuidingRecomm.size() + "," + this.candidateTimelines.size() + ","
+		// // + getSumOfActivityObjects(candidateTimelines) + "," + (recommMasterTEnd - recommMasterT0) + ","
+		// // + timeTakenToFetchCandidateTimelines + "," + timeTakenToComputeNormEditDistances + "\n";
+		// // WritingToFile.appendLineToFileAbsolute(performanceString, performanceFileName);
+		// // end of curtain for performance string writing
+		// //////////////
+		//
+		// System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
 	}
 
 	/**
