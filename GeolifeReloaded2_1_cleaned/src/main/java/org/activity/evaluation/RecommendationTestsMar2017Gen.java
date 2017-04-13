@@ -6,12 +6,14 @@ import java.io.PrintStream;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
@@ -27,6 +29,7 @@ import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.PerformanceAnalytics;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
@@ -284,6 +287,20 @@ public class RecommendationTestsMar2017Gen
 								userName = ConnectDatabase.getUserName(userId);// ConnectDatabase.getUserNameFromDatabase(userId);
 							}
 
+							if (Constant.blacklistingUsersWithLargeMaxActsPerDay)
+							{
+								if (Constant.getDatabaseName().equals("gowalla1"))
+								{
+									if (Arrays.asList(DomainConstants.gowallaUserIDsWithGT553MaxActsPerDay)
+											.contains(userId))
+									{
+										System.out.println("Skipping user: " + userId
+												+ " as in gowallaUserIDsWithGT553MaxActsPerDay");
+										continue;
+									}
+								}
+							}
+
 							// BufferedWriter bwMaxNumOfDistinctRecommendations = WritingToFile
 							// .getBWForNewFile(commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
 							// bwMaxNumOfDistinctRecommendations.write("DateOfRecomm" + ",TimeOfRecomm"
@@ -535,6 +552,12 @@ public class RecommendationTestsMar2017Gen
 
 									System.out.println("time taken by recommMaster = "
 											+ (System.currentTimeMillis() - ta1) + " ms");
+
+									WritingToFile.appendLineToFileAbsolute(
+											(System.currentTimeMillis() - ta1) + ","
+													+ PerformanceAnalytics.getUsedMemoryInMB() + "\n",
+											Constant.getCommonPath() + "recommMasterPerformance.csv");
+
 									System.out.println("Back to RecommendationTests: received "
 											+ recommP1.getNumOfCandidateTimelines()// candidateTimelines.size()
 											+ " candidate timelines for matching unit " + matchingUnit);

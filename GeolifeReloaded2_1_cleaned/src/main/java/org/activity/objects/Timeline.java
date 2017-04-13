@@ -533,11 +533,14 @@ public class Timeline implements Serializable
 	 */
 	public int getIndexOfActivityObjectAtTime(Timestamp ts)
 	{
-		ArrayList<Integer> res = new ArrayList<>();
-		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
+		ArrayList<Integer> res = new ArrayList<>(1);
+		long givenTimeInms = ts.getTime();
+
+		int numOfAOsInTimeline = this.activityObjectsInTimeline.size();
+		for (int i = 0; i < numOfAOsInTimeline; i++)
 		{
 			ActivityObject ao = activityObjectsInTimeline.get(i);
-			if (ao.getStartTimestamp().getTime() <= ts.getTime() && ao.getEndTimestamp().getTime() >= ts.getTime())
+			if (ao.getStartTimestampInms() <= givenTimeInms && ao.getEndTimestampInms() >= givenTimeInms)
 			{
 				res.add(i);
 			}
@@ -571,11 +574,12 @@ public class Timeline implements Serializable
 	 */
 	public ActivityObject getActivityObjectAtTime(Timestamp ts)
 	{
-		ArrayList<ActivityObject> res = new ArrayList<>();
+		ArrayList<ActivityObject> res = new ArrayList<>(1);
 
+		long givenTSInms = ts.getTime();
 		for (ActivityObject ao : activityObjectsInTimeline)
 		{
-			if (ao.getStartTimestamp().getTime() <= ts.getTime() && ao.getEndTimestamp().getTime() >= ts.getTime())
+			if (ao.getStartTimestampInms() <= givenTSInms && ao.getEndTimestampInms() >= givenTSInms)
 			{
 				res.add(ao);
 			}

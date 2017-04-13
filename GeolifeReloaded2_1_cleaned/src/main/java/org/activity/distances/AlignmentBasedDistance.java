@@ -10,7 +10,7 @@ import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
-import org.activity.objects.TraceMatrix;
+import org.activity.objects.TraceMatrixLeaner1;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -2056,7 +2056,7 @@ public class AlignmentBasedDistance
 			catIDsHierarchicalDistance = Constant.catIDsHierarchicalDistance;
 		}
 
-		TraceMatrix traceMatrix = new TraceMatrix(word1.length(), word2.length());
+		TraceMatrixLeaner1 traceMatrix = new TraceMatrixLeaner1(word1.length(), word2.length());
 
 		// long performanceTime1 = System.currentTimeMillis();
 		if (VerbosityConstants.verboseLevenstein)// Constant.verbose ||
@@ -2130,7 +2130,12 @@ public class AlignmentBasedDistance
 					// on // min edit distance
 					if (useHierarchicalDistance)
 					{
-						Double hierWt = catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));
+						// Double hierWt = catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));
+						// TODO: check if it is actually using the hierwt, we change to StringBuilder after prv verified
+						// version
+						Double hierWt = catIDsHierarchicalDistance
+								.get(new StringBuilder(2).append(c1).append(c2).toString());
+
 						if (hierWt == null)
 						{
 							System.err.println(PopUps.getCurrentStackTracedErrorMsg(

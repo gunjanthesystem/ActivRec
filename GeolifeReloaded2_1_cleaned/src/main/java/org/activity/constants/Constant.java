@@ -120,7 +120,7 @@ public final class Constant
 	 */
 	public static final boolean useTolerance = true;// false;
 
-	public static final boolean useHierarchicalDistance = true;
+	public static final boolean useHierarchicalDistance = false;// true;
 	/**
 	 * Determines whether the sorting of candiates is stable or unstable
 	 */
@@ -143,6 +143,8 @@ public final class Constant
 	 * timeline in daywise
 	 */
 	public static final boolean BLACKLISTING = false;// true;// true;
+
+	public static final boolean blacklistingUsersWithLargeMaxActsPerDay = true;
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false;
 
@@ -878,6 +880,8 @@ public final class Constant
 		s.append("\nbreakTiesWithShuffle:" + breakTiesWithShuffle);
 		s.append("\nEXPUNGE_INVALIDS_B4_RECOMM_PROCESS:" + EXPUNGE_INVALIDS_B4_RECOMM_PROCESS);
 		s.append("\nBLACKLISTING:" + BLACKLISTING);
+		s.append("\nblacklistingUsersWithLargeMaxActsPerDay:" + blacklistingUsersWithLargeMaxActsPerDay);
+
 		s.append("\nremoveCurrentActivityNameFromRecommendations:" + removeCurrentActivityNameFromRecommendations);
 		s.append("\nhasInvalidActivityNames:" + hasInvalidActivityNames);
 

@@ -157,8 +157,8 @@ public class DateTimeUtils
 	{
 		Timestamp timestamp;
 
-		String[] splittedTime = timeString.split(":");
-		String[] splittedDate = dateString.split("-");
+		String[] splittedTime = RegexUtils.patternColon.split(timeString);// timeString.split(":");
+		String[] splittedDate = RegexUtils.patternHyphen.split(dateString);// dateString.split("-");
 
 		timestamp = new Timestamp(Integer.parseInt(splittedDate[0]) - 1900, // year
 				Integer.parseInt(splittedDate[1]) - 1, // month
@@ -169,6 +169,25 @@ public class DateTimeUtils
 				0); // nanoseconds
 
 		return timestamp;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static long getTimestampAsLongms(String timeString, String dateString)
+	{
+		Timestamp timestamp;
+
+		String[] splittedTime = RegexUtils.patternColon.split(timeString);// timeString.split(":");
+		String[] splittedDate = RegexUtils.patternHyphen.split(dateString);// dateString.split("-");
+
+		timestamp = new Timestamp(Integer.parseInt(splittedDate[0]) - 1900, // year
+				Integer.parseInt(splittedDate[1]) - 1, // month
+				Integer.parseInt(splittedDate[2]), // day
+				Integer.parseInt(splittedTime[0]), // hours
+				Integer.parseInt(splittedTime[1]), // minutes
+				Integer.parseInt(splittedTime[2]), // seconds
+				0); // nanoseconds
+
+		return timestamp.getTime();
 	}
 
 	/**

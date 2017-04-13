@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
-import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.io.ReadingFromFile;
@@ -559,6 +558,7 @@ public class TestExperiments
 
 		System.out.println(PerformanceAnalytics.getHeapInformation());
 		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+		System.out.println("Used memory (MB):" + PerformanceAnalytics.getUsedMemoryInMB());
 
 		System.out.println("Creating strings:");
 		String s1 = "gunjankumarmanaligaurgunjan", s2 = "manaligaurgunjanmanaligaurgunjan";
@@ -573,10 +573,10 @@ public class TestExperiments
 		System.out.println("s1.length=" + s1.length() + " s2.length=" + s2.length());
 		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
 
-		System.out.println("Creating tracematrix:");
-		Constant.setReusableTraceMatrix(s1.length(), s2.length());
+		// System.out.println("Creating tracematrix:");
+		// Constant.setReusableTraceMatrix(s1.length(), s2.length());
 		// /wordLen1, wordLen2); TraceMatrix tm = new TraceMatrix(
-		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
+		// System.out.println(PerformanceAnalytics.getHeapPercentageFree());
 
 		VerbosityConstants.verboseLevenstein = false;
 
@@ -586,7 +586,7 @@ public class TestExperiments
 		System.out.println(r1.toString());
 		long t2 = System.nanoTime();
 		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
-
+		System.out.println(PerformanceAnalytics.getHeapInformation());
 		System.out.println("\n >> getMySimpleLevenshteinDistanceV3     =" + (t2 - t1) / 1000000 + " ms");
 		System.out.println("--- Exiting checkEditDistancePerformanceWithTraceMatrix ---\n");
 

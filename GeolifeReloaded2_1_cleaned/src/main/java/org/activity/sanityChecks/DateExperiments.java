@@ -1,6 +1,7 @@
 package org.activity.sanityChecks;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 
@@ -22,22 +23,27 @@ public class DateExperiments
 		int size = 10000000;
 		String aLongString = aLongStringsb.toString();
 
-		// createSqlDateMap(aLongString, size);
-		createLocalDateMap(aLongString, size);
-		// createUtilDateMap(aLongString, size);
+		Date date1 = new Date(System.currentTimeMillis());
+		// createSqlDateMap(aLongString, size, date1);
+		// createLocalDateMap(aLongString, size);
+		// createLongDateMap(aLongString, size, System.currentTimeMillis());
+		createTimestampMap(aLongString, size, System.currentTimeMillis());
+		// createTimestampMapAsLong(aLongString, size, System.currentTimeMillis());
+
+		// createUtilDateMap(aLongString, size, date1);
 
 	}
 
-	public static void createSqlDateMap(String aLongString, int numOfElements)
+	public static void createSqlDateMap(String aLongString, int numOfElements, Date date1)
 	{
 		System.out.println("Inside createSqlDateMap");
 		System.out.println("Before:" + PerformanceAnalytics.getHeapInformation());
 		double d1 = PerformanceAnalytics.getUsedMemoryInMB();
 		LinkedHashMap<Date, String> objSqlDate = new LinkedHashMap<>();
-		long sd1 = 50000;
+		// long sd1 = 50000;
 		for (int i = 0; i < numOfElements; i++)
 		{
-			objSqlDate.put(new Date(sd1 + 1000 * i), aLongString);
+			objSqlDate.put(new Date(date1.getTime() + 1000 * i), aLongString);
 		}
 		System.out.println("used memory  = " + (PerformanceAnalytics.getUsedMemoryInMB() - d1) + " MB");
 		// System.out.println("Num of elements = " + objSqlDate.size());
@@ -45,17 +51,16 @@ public class DateExperiments
 
 	}
 
-	public static void createUtilDateMap(String aLongString, int numOfElements)
+	public static void createUtilDateMap(String aLongString, int numOfElements, Date date1)
 	{
 		System.out.println("Inside createUtilDateMap");
 		System.out.println("Before:" + PerformanceAnalytics.getHeapInformation());
 		double d1 = PerformanceAnalytics.getUsedMemoryInMB();
 		LinkedHashMap<java.util.Date, String> objSqlDate = new LinkedHashMap<>();
 
-		long sd1 = 50000;
 		for (int i = 0; i < numOfElements; i++)
 		{
-			objSqlDate.put(new Date(sd1 + 1000 * i), aLongString);
+			objSqlDate.put(new java.util.Date(date1.getTime() + 1000 * i), aLongString);
 		}
 		System.out.println("used memory  = " + (PerformanceAnalytics.getUsedMemoryInMB() - d1) + " MB");
 		// System.out.println("Num of elements = " + objSqlDate.size());
@@ -73,6 +78,70 @@ public class DateExperiments
 		for (int i = 0; i < numOfElements; i++)
 		{
 			objSqlDate.put(ld1.plusDays(i), aLongString);
+		}
+		System.out.println("used memory  = " + (PerformanceAnalytics.getUsedMemoryInMB() - d1) + " MB");
+		// System.out.println("Num of elements = " + objSqlDate.size());
+		System.out.println("After" + PerformanceAnalytics.getHeapInformation());
+	}
+
+	public static void createLongDateMap(String aLongString, int numOfElements, Long date1)
+	{
+		System.out.println("Inside createLongDateMap");
+		System.out.println("Before:" + PerformanceAnalytics.getHeapInformation());
+		double d1 = PerformanceAnalytics.getUsedMemoryInMB();
+		LinkedHashMap<Long, String> objSqlDate = new LinkedHashMap<>();
+
+		for (int i = 0; i < numOfElements; i++)
+		{
+			objSqlDate.put(date1 + i * 1000, aLongString);
+		}
+		System.out.println("used memory  = " + (PerformanceAnalytics.getUsedMemoryInMB() - d1) + " MB");
+		// System.out.println("Num of elements = " + objSqlDate.size());
+		System.out.println("After" + PerformanceAnalytics.getHeapInformation());
+	}
+
+	public static void createLongDateMap2(String aLongString, int numOfElements, Long date1)
+	{
+		System.out.println("Inside createLongDateMap");
+		System.out.println("Before:" + PerformanceAnalytics.getHeapInformation());
+		double d1 = PerformanceAnalytics.getUsedMemoryInMB();
+		LinkedHashMap<Long, String> objSqlDate = new LinkedHashMap<>();
+
+		for (int i = 0; i < numOfElements; i++)
+		{
+			objSqlDate.put(date1 + i * 1000, aLongString);
+		}
+		System.out.println("used memory  = " + (PerformanceAnalytics.getUsedMemoryInMB() - d1) + " MB");
+		// System.out.println("Num of elements = " + objSqlDate.size());
+		System.out.println("After" + PerformanceAnalytics.getHeapInformation());
+	}
+
+	public static void createTimestampMap(String aLongString, int numOfElements, Long date1)
+	{
+		System.out.println("Inside createTimestampMap");
+		System.out.println("Before:" + PerformanceAnalytics.getHeapInformation());
+		double d1 = PerformanceAnalytics.getUsedMemoryInMB();
+		LinkedHashMap<Timestamp, String> objSqlDate = new LinkedHashMap<>();
+
+		for (int i = 0; i < numOfElements; i++)
+		{
+			objSqlDate.put(new Timestamp(date1 + 1000 * i), aLongString);
+		}
+		System.out.println("used memory  = " + (PerformanceAnalytics.getUsedMemoryInMB() - d1) + " MB");
+		// System.out.println("Num of elements = " + objSqlDate.size());
+		System.out.println("After" + PerformanceAnalytics.getHeapInformation());
+	}
+
+	public static void createTimestampMapAsLong(String aLongString, int numOfElements, Long date1)
+	{
+		System.out.println("Inside createTimestampMap");
+		System.out.println("Before:" + PerformanceAnalytics.getHeapInformation());
+		double d1 = PerformanceAnalytics.getUsedMemoryInMB();
+		LinkedHashMap<Long, String> objSqlDate = new LinkedHashMap<>();
+
+		for (int i = 0; i < numOfElements; i++)
+		{
+			objSqlDate.put((date1 + 1000 * i), aLongString);
 		}
 		System.out.println("used memory  = " + (PerformanceAnalytics.getUsedMemoryInMB() - d1) + " MB");
 		// System.out.println("Num of elements = " + objSqlDate.size());
