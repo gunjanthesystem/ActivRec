@@ -37,6 +37,12 @@ public class DomainConstants
 	public static String[] featureNames = { "ActivityName", "StartTime", "Duration", "DistanceTravelled",
 			"StartGeoCoordinates", "EndGeoCoordinates", "AvgAltitude" };
 
+	public static final int gowallaUserIDsWithGT553MaxActsPerDay[] = { 5195, 9298, 9751, 16425, 17012, 18382, 19416,
+			19957, 20316, 23150, 28509, 30293, 30603, 42300, 44718, 46646, 74010, 74274, 76390, 79509, 79756, 86755,
+			103951, 105189, 106328, 114774, 118023, 136677, 154692, 179386, 194812, 213489, 224943, 235659, 246993,
+			251408, 269889, 311530, 338587, 395223, 563986, 624892, 862876, 1722363, 2084969, 2096330, 2103094, 2126604,
+			2190642 };
+
 	public final static int numOfCatLevels = 3;
 
 	public DomainConstants()

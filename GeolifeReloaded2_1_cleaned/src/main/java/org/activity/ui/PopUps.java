@@ -3,6 +3,7 @@ package org.activity.ui;
 import java.awt.HeadlessException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.Timestamp;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
@@ -86,6 +87,7 @@ public class PopUps
 	{
 		StringBuilder sb = new StringBuilder("Error:" + errorMsg + "\n" + "--------- current stack -------\n");
 		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
+		sb.append("timestamp:" + new Timestamp(System.currentTimeMillis()));
 		return sb.append("--------- ------- ----- -------").toString();
 	}
 

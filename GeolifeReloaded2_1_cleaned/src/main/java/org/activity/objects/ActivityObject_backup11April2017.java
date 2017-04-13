@@ -28,7 +28,7 @@ import org.activity.util.UtilityBelt;
  * @author gunjan
  *
  */
-public class ActivityObject implements Serializable
+public class ActivityObject_backup11April2017 implements Serializable
 {
 	private static final long serialVersionUID = 5056824311499867608L;
 
@@ -59,10 +59,7 @@ public class ActivityObject implements Serializable
 	 */
 	// private String[] levelWiseCatIDs;
 
-	/**
-	 * Changed from sql.timestamp to long for performance reasons.
-	 */
-	private long startTimestampInms, endTimestampInms;
+	private Timestamp startTimestamp, endTimestamp;
 
 	/**
 	 * Not available in Gowalla dataset
@@ -107,7 +104,7 @@ public class ActivityObject implements Serializable
 	 * @param items_count
 	 * @param max_items_count
 	 */
-	public ActivityObject(int activityID, int locationID, String activityName, String locationName,
+	public ActivityObject_backup11April2017(int activityID, int locationID, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs)
@@ -125,8 +122,8 @@ public class ActivityObject implements Serializable
 		locationIDs.add(locationID);
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
-		this.startTimestampInms = startTimestamp.getTime();
-		this.endTimestampInms = startTimestamp.getTime();
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = startTimestamp;
 		this.startLatitude = startLatitude;
 		this.startLongitude = startLongitude;
 		this.startAltitude = startAltitude;
@@ -164,7 +161,7 @@ public class ActivityObject implements Serializable
 	 * @param distanceInMFromNext
 	 * @param durationInSecsFromNext
 	 */
-	public ActivityObject(int activityID, int locationID, String activityName, String locationName,
+	public ActivityObject_backup11April2017(int activityID, int locationID, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
@@ -182,8 +179,8 @@ public class ActivityObject implements Serializable
 
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
-		this.startTimestampInms = startTimestamp.getTime();
-		this.endTimestampInms = startTimestamp.getTime();
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = startTimestamp;
 		this.startLatitude = startLatitude;
 		this.startLongitude = startLongitude;
 		this.startAltitude = startAltitude;
@@ -226,7 +223,7 @@ public class ActivityObject implements Serializable
 	 * @param distanceInMFromNext
 	 * @param durationInSecsFromNext
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject_backup11April2017(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
@@ -243,8 +240,8 @@ public class ActivityObject implements Serializable
 
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
-		this.startTimestampInms = startTimestamp.getTime();
-		this.endTimestampInms = startTimestamp.getTime();
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = startTimestamp;
 		this.startLatitude = startLatitude;
 		this.startLongitude = startLongitude;
 		this.startAltitude = startAltitude;
@@ -288,7 +285,7 @@ public class ActivityObject implements Serializable
 	 * @param durationInSecsFromNext
 	 * @param levelWiseCatIDs
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject_backup11April2017(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
@@ -305,8 +302,8 @@ public class ActivityObject implements Serializable
 
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
-		this.startTimestampInms = startTimestamp.getTime();
-		this.endTimestampInms = startTimestamp.getTime();
+		this.startTimestamp = startTimestamp;
+		this.endTimestamp = startTimestamp;
 		this.startLatitude = startLatitude;
 		this.startLongitude = startLongitude;
 		this.startAltitude = startAltitude;
@@ -352,10 +349,10 @@ public class ActivityObject implements Serializable
 		return "ActivityObject [dimensions=" + dimensions + ", dimensionIDNameValues=" + dimensionIDNameValues
 				+ ", activityID=" + activityID + ", locationID=" + this.getLocationIDs('-') + ", activityName="
 				+ activityName + ", locationName=" + locationName + ", workingLevelCatIDs=" + workingLevelCatIDs
-				+ ", startTimestamp=" + startTimestampInms + ", endTimestamp=" + endTimestampInms
-				+ ", durationInSeconds=" + durationInSeconds + ", startLatitude=" + startLatitude + ", endLatitude="
-				+ endLatitude + ", startLongitude=" + startLongitude + ", endLongitude=" + endLongitude
-				+ ", startAltitude=" + startAltitude + ", endAltitude=" + endAltitude + ", avgAltitude=" + avgAltitude
+				+ ", startTimestamp=" + startTimestamp + ", endTimestamp=" + endTimestamp + ", durationInSeconds="
+				+ durationInSeconds + ", startLatitude=" + startLatitude + ", endLatitude=" + endLatitude
+				+ ", startLongitude=" + startLongitude + ", endLongitude=" + endLongitude + ", startAltitude="
+				+ startAltitude + ", endAltitude=" + endAltitude + ", avgAltitude=" + avgAltitude
 				+ ", distanceTravelled=" + distanceTravelled + ", userID=" + userID + ", photos_count=" + photos_count
 				+ ", checkins_count=" + checkins_count + ", users_count=" + users_count + ", radius_meters="
 				+ radius_meters + ", highlights_count=" + highlights_count + ", items_count=" + items_count
@@ -367,7 +364,7 @@ public class ActivityObject implements Serializable
 		return "activityID=" + activityID + "__locationID="
 				+ this.getLocationIDs('-') /*
 											 * + "__activityName=" + activityName + "__ locationName=" + locationName
-											 */ + "__workLvlCat=" + workingLevelCatIDs + "__startTS=" + startTimestampInms
+											 */ + "__workLvlCat=" + workingLevelCatIDs + "__startTS=" + startTimestamp
 				+ "__startLat=" + startLatitude + "__startLon=" + startLongitude /*
 																					 * + "__ startAlt=" + startAltitude
 																					 */ + "__userID=" + userID
@@ -380,9 +377,9 @@ public class ActivityObject implements Serializable
 	public String toString()
 	{
 		if (Constant.getDatabaseName().equals("dcu_data_2"))// // ;"geolife1";// default database name, dcu_data_2";/
-			return activityName + "-" + startTimestampInms + "-" + durationInSeconds;// +" -"+startLatitude+",";
+			return activityName + "-" + startTimestamp + "-" + durationInSeconds;// +" -"+startLatitude+",";
 		else if (Constant.getDatabaseName().equals("geolife1"))
-			return activityName + "-" + startTimestampInms + "-" + durationInSeconds + " -" + startLatitude + ","
+			return activityName + "-" + startTimestamp + "-" + durationInSeconds + " -" + startLatitude + ","
 					+ startLongitude + "-" + endLatitude + "," + endLongitude + "-" + avgAltitude;
 		else
 			return "empty";
@@ -397,29 +394,29 @@ public class ActivityObject implements Serializable
 	//
 	// }
 
-	public double getDifferenceStartingGeoCoordinates(ActivityObject ao2)
+	public double getDifferenceStartingGeoCoordinates(ActivityObject_backup11April2017 ao2)
 	{
 		return StatsUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(), ao2.getStartLongitude());
 
 	}
 
-	public double getDifferenceEndingGeoCoordinates(ActivityObject ao2)
+	public double getDifferenceEndingGeoCoordinates(ActivityObject_backup11April2017 ao2)
 	{
 		return StatsUtils.haversine(endLatitude, endLongitude, ao2.getEndLatitude(), ao2.getEndLongitude());
 
 	}
 
-	public double getDifferenceAltitude(ActivityObject ao2)
+	public double getDifferenceAltitude(ActivityObject_backup11April2017 ao2)
 	{
 		return Double.parseDouble(this.getAvgAltitude()) - Double.parseDouble(ao2.getAvgAltitude());
 
 	}
 
-	public static String getArrayListOfActivityObjectsAsString(ArrayList<ActivityObject> arr)
+	public static String getArrayListOfActivityObjectsAsString(ArrayList<ActivityObject_backup11April2017> arr)
 	{
 		StringBuffer str = new StringBuffer("");
 
-		for (ActivityObject ao : arr)
+		for (ActivityObject_backup11April2017 ao : arr)
 		{
 			str.append(">>" + ao.toString());
 		}
@@ -433,7 +430,7 @@ public class ActivityObject implements Serializable
 	 * 
 	 * @param dimensionIDNameValues
 	 */
-	public ActivityObject(HashMap<String, String> dimensionIDNameValues) // (User_ID, 0), (Location_ID, 10100), ...
+	public ActivityObject_backup11April2017(HashMap<String, String> dimensionIDNameValues) // (User_ID, 0), (Location_ID, 10100), ...
 	{
 		// System.out.println("Inside ActivityObject contructor"); //@toremoveatruntime
 
@@ -507,25 +504,20 @@ public class ActivityObject implements Serializable
 			}
 		}
 		// THIS IS TIME NOT TIMESTAMP..AS DATE IS SAME
-		this.startTimestampInms = DateTimeUtils.getTimestampAsLongms(startTimeString, startDateString); // in iiWAS ver,
-		// dateString
-		// is used here instead of
-		// startDateString
-		this.endTimestampInms = DateTimeUtils.getTimestampAsLongms(endTimeString, endDateString);// in iiWAS ver,
-																									// dateString is
-		// used
-		// here instead of
-		// endDateString
+		this.startTimestamp = DateTimeUtils.getTimestamp(startTimeString, startDateString); // in iiWAS ver, dateString
+																							// is used here instead of
+																							// startDateString
+		this.endTimestamp = DateTimeUtils.getTimestamp(endTimeString, endDateString);// in iiWAS ver, dateString is used
+																						// here instead of endDateString
 
-		this.durationInSeconds = (this.endTimestampInms - this.startTimestampInms) / 1000 + 1;
+		this.durationInSeconds = (this.endTimestamp.getTime() - this.startTimestamp.getTime()) / 1000 + 1;
 		// +1 because 1 seconds
 		// was decremented while loading data for resolving consecutive activities primarliy for visualisation
 
 		if (this.durationInSeconds < 0)
 		{
-			System.err.println(
-					"Error: Negative duration in seconds:startTimestamp=" + startTimestampInms + " endTimestamp="
-							+ endTimestampInms + " i.e., " + this.endTimestampInms + "-" + this.startTimestampInms);
+			System.err.println("Error: Negative duration in seconds:startTimestamp=" + startTimestamp + " endTimestamp="
+					+ endTimestamp + " i.e., " + this.endTimestamp.getTime() + "-" + this.startTimestamp.getTime());
 			System.err.println("\t\t StartDateString:" + startDateString + " StartTimeString:" + startTimeString
 					+ "\n\t\t EndDateString:" + endDateString + " EndTimeString:" + endTimeString);
 		}
@@ -719,12 +711,12 @@ public class ActivityObject implements Serializable
 	 * @param durationInSeconds
 	 * @param startTimeStamp
 	 */
-	ActivityObject(String activityName, String location, long durationInSeconds, Timestamp startTimeStamp)
+	ActivityObject_backup11April2017(String activityName, String location, long durationInSeconds, Timestamp startTimeStamp)
 	{
 		this.activityName = activityName;
 		this.durationInSeconds = durationInSeconds;
 		this.locationName = location;
-		this.startTimestampInms = startTimeStamp.getTime();
+		this.startTimestamp = startTimeStamp;
 	}
 
 	/**
@@ -866,12 +858,12 @@ public class ActivityObject implements Serializable
 	 * @param start
 	 * @param end
 	 */
-	public ActivityObject(String name, Timestamp start, Timestamp end)
+	public ActivityObject_backup11April2017(String name, Timestamp start, Timestamp end)
 	{
 		// userName=user;
 		activityName = name;
-		startTimestampInms = start.getTime();
-		endTimestampInms = end.getTime();
+		startTimestamp = start;
+		endTimestamp = end;
 	}
 
 	public String getActivityName()
@@ -879,42 +871,14 @@ public class ActivityObject implements Serializable
 		return activityName;
 	}
 
-	/**
-	 * TODO: change this and corresponding calling methods to work with long
-	 * 
-	 * @return
-	 */
 	public Timestamp getStartTimestamp()
 	{
-		return new Timestamp(startTimestampInms);
+		return startTimestamp;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public long getStartTimestampInms()
-	{
-		return startTimestampInms;
-	}
-
-	/**
-	 * TODO: change this and corresponding calling methods to work with long
-	 * 
-	 * @return
-	 */
 	public Timestamp getEndTimestamp()
 	{
-		return new Timestamp(endTimestampInms);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public long getEndTimestampInms()
-	{
-		return endTimestampInms;
+		return endTimestamp;
 	}
 
 	/**
@@ -923,7 +887,7 @@ public class ActivityObject implements Serializable
 	 */
 	public LocalDate getEndDate()
 	{
-		return getEndTimestamp().toLocalDateTime().toLocalDate();/// DateTimeUtils.getDate(endTimestamp);
+		return endTimestamp.toLocalDateTime().toLocalDate();/// DateTimeUtils.getDate(endTimestamp);
 	}
 
 	// /////////////////////////// To be removed later after refactoring
@@ -934,12 +898,12 @@ public class ActivityObject implements Serializable
 
 	public void setStartTimestamp(Timestamp start)
 	{
-		startTimestampInms = start.getTime();
+		startTimestamp = start;
 	}
 
 	public void setEndTimestamp(Timestamp end)
 	{
-		endTimestampInms = end.getTime();
+		endTimestamp = end;
 	}
 
 	public String getUserID()
@@ -1048,7 +1012,8 @@ public class ActivityObject implements Serializable
 		 * If Activity Event: AAAAAAAAAAAA and interval to check: iiiiii
 		 */
 		// if(this.startTimestamp.before(startInterval) && this.endTimestamp.after(endInterval))
-		if ((this.startTimestampInms <= startInterval.getTime()) && (this.endTimestampInms >= endInterval.getTime()))
+		if ((this.startTimestamp.getTime() <= startInterval.getTime())
+				&& (this.endTimestamp.getTime() >= endInterval.getTime()))
 		{
 			value = true;
 		}
@@ -1057,15 +1022,14 @@ public class ActivityObject implements Serializable
 	}
 
 	/**
-	 * TODO: remove creating of Timestamp
 	 * 
 	 * @param startStampPoint
 	 * @return
 	 */
 	public boolean startsOnOrBefore(Timestamp startStampPoint)
 	{
-		if (new Timestamp(startTimestampInms).before(startStampPoint)
-				|| new Timestamp(startTimestampInms).equals(startStampPoint))
+
+		if (this.startTimestamp.before(startStampPoint) || this.startTimestamp.equals(startStampPoint))
 			return true;
 		else
 			return false;
@@ -1085,8 +1049,8 @@ public class ActivityObject implements Serializable
 	 */
 	public boolean doesOverlap(Timestamp startInterval, Timestamp endInterval)
 	{
-		return ((this.startTimestampInms <= endInterval.getTime())
-				&& (this.endTimestampInms >= startInterval.getTime()));
+		return ((this.startTimestamp.getTime() <= endInterval.getTime())
+				&& (this.endTimestamp.getTime() >= startInterval.getTime()));
 	} // courtesy:http://goo.gl/pnR3p1
 
 	public HashMap<String, String> getDimensionIDNameValues()

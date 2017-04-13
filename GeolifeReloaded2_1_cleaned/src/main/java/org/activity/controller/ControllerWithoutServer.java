@@ -16,7 +16,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
-import org.activity.evaluation.RecommendationTestsMar2017Gen;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -298,6 +297,7 @@ public class ControllerWithoutServer
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
 			String[] groupsOf100UsersLabels, String commonBasePath) throws IOException
 	{
+
 		for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
 		{
 			// important so as to wipe the previously assigned user ids
@@ -340,9 +340,10 @@ public class ControllerWithoutServer
 
 			System.out.println("Just Before recommendationsTest\n" + PerformanceAnalytics.getHeapInformation());
 
-			RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
-					Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
-					Constant.percentageInTraining);
+			// $$RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
+			// Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
+			// Constant.percentageInTraining);
+
 			/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
 
 			// RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new

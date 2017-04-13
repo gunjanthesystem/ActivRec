@@ -173,4 +173,6 @@ public class TestDummy1
 		System.out.println(aChar);
 		// System.out.println(testStringBuilder());
 	}
+
+	// public static void checkMemory
 }

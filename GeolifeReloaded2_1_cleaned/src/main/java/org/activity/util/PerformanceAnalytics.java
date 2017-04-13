@@ -116,6 +116,7 @@ public class PerformanceAnalytics
 	}
 
 	/**
+	 * ref:http://www.javaworld.com/article/2077496/testing-debugging/java-tip-130--do-you-know-your-data-size-.html
 	 * 
 	 * @return
 	 */
