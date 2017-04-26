@@ -32,6 +32,7 @@ import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
+import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineUtils;
 
 /**
@@ -299,6 +300,12 @@ public class RecommendationTestsMar2017Gen
 										continue;
 									}
 								}
+								else
+								{
+									System.err.println("Warning: Constant.blacklistingUsersWithLargeMaxActsPerDay= "
+											+ Constant.blacklistingUsersWithLargeMaxActsPerDay
+											+ " but blacklisted user not defined for this database");
+								}
 							}
 
 							// BufferedWriter bwMaxNumOfDistinctRecommendations = WritingToFile
@@ -366,6 +373,16 @@ public class RecommendationTestsMar2017Gen
 								numOfValidRTs.put(userId, 0);
 								continue;
 							}
+
+							///////////
+							if (true)
+							{
+								TimelineTransformers.writeUserActNamesSeq(userId, userTrainingTimelines,
+										userTestTimelines, userAllDatesTimeslines);
+								continue;// TEMPORARY // continue to next user //TODO
+							}
+							//////////
+
 							// ////////////////////////////////////////
 							// if (matchingUnitIterator == 0) // do this only for one matching unit as it does not
 							// change per matching unit

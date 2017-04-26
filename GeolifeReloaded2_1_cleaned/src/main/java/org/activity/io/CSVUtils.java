@@ -46,7 +46,7 @@ public class CSVUtils
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SNoDupsbAllDistanceInM.csv",
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SAllDupssbAllDistanceInM.csv");
 
-		gowallaMain2();//
+		gowallaMain();// gowallaMain2();//
 	}
 
 	public static void testSideConcat()
@@ -155,6 +155,36 @@ public class CSVUtils
 
 			// concatenateCSVFiles(ArrayList<String>, boolean, String)
 		}
+	}
+
+	public static void gowallaMainDaywise()
+	{
+
+		// String fileNameHeadString = "";// "BO";// for baseline occurrence file, empty for algo file
+
+		String commonPathToRead = "./DD/Target/";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+		String pathToWrite = "./DD/Target/";
+		// + "///home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Analysis2/";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
+
+		String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+
+		ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
+		ArrayList<String> listOfrrCOlFiles = new ArrayList<String>();
+		// ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
+
+		for (int i = 0; i < s.length; i++)
+		{
+			String pathToRead = commonPathToRead + s[i];
+
+			listOfAllMRRFiles.add(pathToRead + "/AlgoAllMeanReciprocalRank.csv");
+			listOfrrCOlFiles.add(pathToRead + "rrValsForBestMUCol.csv");
+		}
+
+		concatenateCSVFilesSideways(listOfAllMRRFiles, true, pathToWrite + "AllMRR.csv");
+		concatenateCSVFiles(listOfrrCOlFiles, true, pathToWrite + "ListOfrrColFiles.csv");
+
 	}
 
 	public static void gowallaMain2()
