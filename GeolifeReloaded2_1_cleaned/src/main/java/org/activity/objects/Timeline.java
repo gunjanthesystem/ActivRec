@@ -216,7 +216,7 @@ public class Timeline implements Serializable
 	public String getActivityObjectNamesInSequence()
 	{
 		StringBuilder sb = new StringBuilder();
-		activityObjectsInTimeline.stream().forEach(ao -> sb.append(" >>" + ao.getActivityName()));
+		activityObjectsInTimeline.stream().forEachOrdered(ao -> sb.append(" >>" + ao.getActivityName()));
 		return sb.toString();
 	}
 
@@ -325,7 +325,31 @@ public class Timeline implements Serializable
 	{
 		StringBuilder stringCodeForTimeline = new StringBuilder();
 
-		activityObjectsInTimeline.stream().forEach(ao -> stringCodeForTimeline.append(ao.getStringCode()));
+		activityObjectsInTimeline.stream().forEachOrdered(ao -> stringCodeForTimeline.append(ao.getStringCode()));
+
+		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getActivityObjectsAsStringCode(): stringCodeOfTimeline.length()!= timelineForUser.getActivityObjectsInTimeline().size()"));
+		}
+		return stringCodeForTimeline.toString();
+	}
+
+	/**
+	 * Returns a string whose characters in sequence are the codes for the activity names of the timeline.
+	 * <p>
+	 * <font color= green>Capable of handling atleast 400 different kinds of activity names<font>
+	 * 
+	 * 
+	 * @param delimiter
+	 * @return
+	 */
+	public String getActivityObjectsAsStringCode(String delimiter)
+	{
+		StringBuilder stringCodeForTimeline = new StringBuilder();
+
+		activityObjectsInTimeline.stream()
+				.forEachOrdered(ao -> stringCodeForTimeline.append(ao.getStringCode()).append(delimiter));
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{
@@ -519,7 +543,7 @@ public class Timeline implements Serializable
 		{
 			System.out.print(
 					"\t Inside getActivityObjectsBetweenTime: activity objects inside " + st + " and " + et + " are: ");
-			activityObjectsIn.stream().forEach(ao -> System.out.print(">>" + ao.getActivityName()));
+			activityObjectsIn.stream().forEachOrdered(ao -> System.out.print(">>" + ao.getActivityName()));
 			System.out.println();
 		}
 		// /////////////////////////////////

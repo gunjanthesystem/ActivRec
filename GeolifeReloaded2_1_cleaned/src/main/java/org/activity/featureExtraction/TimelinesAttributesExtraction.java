@@ -17,6 +17,7 @@ import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
+import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -618,9 +619,9 @@ public class TimelinesAttributesExtraction
 	public LinkedHashMap<String, Double> getSequenceEntropyAfterExpungingInvalids(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineStats
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
 				.transformToSequenceDayWise(usersDayTimelines);// , false);
-		LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineStats
+		LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
 				.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
 		LinkedHashMap<String, Double> seqEntropy = TimelineStats.getShannonEntropy(sequenceCharInvalidsExpungedNoTS);
 

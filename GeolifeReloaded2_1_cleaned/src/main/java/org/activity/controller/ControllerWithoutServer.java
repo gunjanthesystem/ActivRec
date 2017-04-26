@@ -16,6 +16,8 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
+import org.activity.evaluation.RecommendationTestsMar2017Gen;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -297,9 +299,11 @@ public class ControllerWithoutServer
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
 			String[] groupsOf100UsersLabels, String commonBasePath) throws IOException
 	{
+		// LinkedHashMap<Integer, String> indexOfBlackListedUsers = new LinkedHashMap<>();
 
 		for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
 		{
+			System.out.println("-- iteration start for groupsOf100UsersLabel = " + groupsOf100UsersLabel);
 			// important so as to wipe the previously assigned user ids
 			Constant.initialise(commonPath, Constant.getDatabaseName());
 
@@ -307,7 +311,7 @@ public class ControllerWithoutServer
 			int endUserIndex = startUserIndex + 99;// 199;// 140; // 199
 			Constant.outputCoreResultsPath = commonBasePath + groupsOf100UsersLabel + "/";
 			Files.createDirectories(Paths.get(Constant.outputCoreResultsPath)); // added on 9th Feb 2017
-			int indexOfSampleUsers = 0;
+			int indexOfSampleUser = 0;
 
 			/// sample users
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsers = new LinkedHashMap<>(134);
@@ -315,20 +319,41 @@ public class ControllerWithoutServer
 
 			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
+				System.out.println(" indexOfSampleUser = " + indexOfSampleUser);
 				// countOfSampleUsers += 1;
-				if (indexOfSampleUsers < startUserIndex)
+				if (indexOfSampleUser < startUserIndex)
 				{
-					indexOfSampleUsers += 1;
+					System.out.println(" " + indexOfSampleUser + "<" + startUserIndex + " hence skipping");
+
+					indexOfSampleUser += 1;
 					continue;
 				}
-				if (indexOfSampleUsers > endUserIndex)
+				if (indexOfSampleUser > endUserIndex)
 				{
-					indexOfSampleUsers += 1;
+					System.out.println(" " + indexOfSampleUser + ">" + startUserIndex + " hence breaking");
+
+					indexOfSampleUser += 1;
 					break;
 				}
-				sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+
+				if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+				{
+					System.out.println(" " + indexOfSampleUser + " Skipping user: " + userEntry.getKey()
+							+ " as in gowallaUserIDsWithGT553MaxActsPerDay");
+					WritingToFile.appendLineToFileAbsolute(indexOfSampleUser + "," + userEntry.getKey() + "\n",
+							"IndexOfBlacklistedUsers.csv");
+					indexOfSampleUser += 1;
+					continue;
+				}
+				else
+				{
+					System.out.println(" choosing this ");
+
+					sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+					indexOfSampleUser += 1;
+				}
 				// $$System.out.println("putting in user= " + userEntry.getKey());
-				indexOfSampleUsers += 1;
+
 			}
 			System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
 			System.out.println(" -- Users = " + sampledUsers.keySet().toString());
@@ -340,14 +365,16 @@ public class ControllerWithoutServer
 
 			System.out.println("Just Before recommendationsTest\n" + PerformanceAnalytics.getHeapInformation());
 
-			// $$RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
-			// Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
-			// Constant.percentageInTraining);
+			RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
+					Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
+					Constant.percentageInTraining);
 
 			/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
 
 			// RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new
 			// RecommendationTestsDayWise2FasterJan2016(sampledUsers);
+
+			System.out.println("-- iteration end for groupsOf100UsersLabel = " + groupsOf100UsersLabel);
 		}
 	}
 

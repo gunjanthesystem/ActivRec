@@ -43,7 +43,39 @@ public class DomainConstants
 			251408, 269889, 311530, 338587, 395223, 563986, 624892, 862876, 1722363, 2084969, 2096330, 2103094, 2126604,
 			2190642 };
 
+	public static final int gowallaUserIDsWithGT553MaxActsPerDayIndex[] = { 117, 148, 152, 215, 223, 236, 245, 250, 251,
+			266, 306, 313, 314, 333, 338, 341, 431, 433, 437, 447, 449, 471, 510, 515, 520, 543, 547, 607, 634, 661,
+			678, 696, 714, 729, 741, 749, 761, 792, 816, 841, 855, 861, 869, 894, 902, 907, 912, 921, 934, };
+
 	public final static int numOfCatLevels = 3;
+
+	public static boolean isGowallaUserIDWithGT553MaxActsPerDay(int userID)
+	{
+		boolean blacklisted = false;
+
+		for (int a : gowallaUserIDsWithGT553MaxActsPerDay)
+		{
+			if (a == userID)
+			{
+				return true;
+			}
+		}
+		return blacklisted;
+	}
+
+	public static boolean isGowallaUserIDWithGT553MaxActsPerDayIndex(int userID)
+	{
+		boolean blacklisted = false;
+
+		for (int a : gowallaUserIDsWithGT553MaxActsPerDayIndex)
+		{
+			if (a == userID)
+			{
+				return true;
+			}
+		}
+		return blacklisted;
+	}
 
 	public DomainConstants()
 	{

@@ -52,7 +52,9 @@ public class GenerateSyntheticDataForHMMExperiments
 
 	public static void main(String[] args)
 	{
-		new GenerateSyntheticDataForHMMExperiments();
+		// new GenerateSyntheticDataForHMMExperiments();
+		// generateSyntheticDataForHMMExperiments2();
+		generateSyntheticDataForHMMExperimentsR();
 	}
 
 	public static char getSimpleCharCodeFromActivityID(int activityID)
@@ -68,6 +70,68 @@ public class GenerateSyntheticDataForHMMExperiments
 			e.printStackTrace();
 		}
 		return code;
+	}
+
+	public static void generateSyntheticDataForHMMExperiments2()
+	{
+		StringBuilder sb = new StringBuilder();
+
+		String header = "SEQUENCE_ID,TIME_ID,ActivityName";
+		sb.append(header + "\n");
+
+		for (int seqID = 0; seqID < 500; seqID++)
+		{
+			for (int timeID = 0; timeID < 500/* 1000 */; timeID++)
+			{
+				int activityID = timeID % 4; // = StatsUtils.randomInRangeWithBias(0, 5, 4, 0.55);
+				sb.append(seqID + "," + timeID + "," + getSimpleCharCodeFromActivityID(activityID) + "\n");
+			}
+		}
+
+		String nameLabel = "SynthDataTrivial2";
+		WritingToFile.writeToNewFile(sb.toString(),
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".csv");// Jan26HMM
+
+		CSV2Arff csv2arff = new CSV2Arff(
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".csv",
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".arff");
+	}
+
+	public static void generateSyntheticDataForHMMExperimentsR()
+	{
+
+		int tLen = 50;
+		int numUsers = 10;
+		StringBuilder header = new StringBuilder("UserID");
+
+		for (int i = 1; i <= tLen; i++)
+		{
+			header.append(',').append('t').append(i);
+		}
+		header.append('\n');
+
+		for (int u = 1; u <= numUsers; u++)
+		{
+			StringBuilder tdata = new StringBuilder();
+			tdata.append(u);
+			for (int i = 1; i <= tLen; i++)
+			{
+				int activityID = StatsUtils.randomInRangeWithBias(0, 4, 4, 0.70);// (i - 1) % 4)
+
+				tdata.append(',').append(getSimpleCharCodeFromActivityID(activityID));
+			}
+			tdata.append('\n');
+
+			header.append(tdata);
+		}
+
+		String nameLabel = "SynthDataRBias70";
+		WritingToFile.writeToNewFile(header.toString(),
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".csv");// Jan26HMM
+
+		// CSV2Arff csv2arff = new CSV2Arff(
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".csv",
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".arff");
 	}
 
 }

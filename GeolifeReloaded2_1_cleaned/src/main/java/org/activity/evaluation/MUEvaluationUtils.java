@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import org.activity.clustering.weka.WekaUtilityBelt;
 import org.activity.clustering.weka.WekaUtilityBelt.ClustersRangeScheme;
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
@@ -93,8 +94,8 @@ public class MUEvaluationUtils
 				Files.createDirectories(Paths.get(pathToWrite));
 				pathToWrite += "/";
 
-				gowallaEvals(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2);
-				gowallaEvalsBaselineOccurrence(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2);
+				gowallaEvals(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2, s[i]);
+				gowallaEvalsBaselineOccurrence(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2, s[i]);
 			}
 		}
 		catch (FileAlreadyExistsException e)
@@ -109,7 +110,7 @@ public class MUEvaluationUtils
 	}
 
 	public static void gowallaEvals(String commonPathToRead, String rootPathToWriteResults,
-			ClustersRangeScheme clusteringRangeScheme)
+			ClustersRangeScheme clusteringRangeScheme, String groupID)
 	{
 		// String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
 		// String rootPathToWriteResults = commonPathToRead;//
@@ -159,6 +160,21 @@ public class MUEvaluationUtils
 		{
 			userIter += 1;
 			String user = entryForUser.getKey();
+
+			int tuser = Integer.valueOf(user.substring(4));
+			int actualUserID = (tuser - 1) + (Integer.valueOf(groupID) - 1);
+
+			System.out.println("tuser = " + tuser + " actualUserID= " + actualUserID);
+
+			if (Constant.blacklistingUsersWithLargeMaxActsPerDay
+					&& DomainConstants.isGowallaUserIDWithGT553MaxActsPerDayIndex(actualUserID))
+			// if (Constant.blacklistingUsersWithLargeMaxActsPerDay
+			// && DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(user)))
+			{
+				System.out.println(" Skipping user: " + (actualUserID) + " as in gowallaUserIDsWithGT553MaxActsPerDay");
+				continue;
+			}
+
 			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
 			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString)
 					.collect(Collectors.joining("__"));
@@ -203,8 +219,7 @@ public class MUEvaluationUtils
 			String rrLine = "";
 			try (Stream<String> lines = Files.lines(Paths.get(fileNameRRBestMU)))
 			{
-
-				rrLine = lines.skip(userIter).findFirst().get();
+				rrLine = lines.skip(userIter).findFirst().get(); // get the line corresponding to this user
 			}
 			catch (Exception e)
 			{
@@ -234,7 +249,7 @@ public class MUEvaluationUtils
 	}
 
 	public static void gowallaEvalsBaselineOccurrence(String commonPathToRead, String rootPathToWriteResults,
-			ClustersRangeScheme clusteringRangeScheme)
+			ClustersRangeScheme clusteringRangeScheme, String groupID)
 	{
 		// String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
 		// String rootPathToWriteResults = commonPathToRead;//
@@ -282,6 +297,21 @@ public class MUEvaluationUtils
 			userIter += 1;
 
 			String user = entryForUser.getKey();
+
+			int tuser = Integer.valueOf(user.substring(4));
+			int actualUserID = (tuser - 1) + (Integer.valueOf(groupID) - 1);
+
+			System.out.println("tuser = " + tuser + " actualUserID= " + actualUserID);
+
+			if (Constant.blacklistingUsersWithLargeMaxActsPerDay
+					&& DomainConstants.isGowallaUserIDWithGT553MaxActsPerDayIndex(actualUserID))
+			// if (Constant.blacklistingUsersWithLargeMaxActsPerDay
+			// && DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(user)))
+			{
+				System.out.println(" Skipping user: " + (actualUserID) + " as in gowallaUserIDsWithGT553MaxActsPerDay");
+				continue;
+			}
+
 			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
 			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString)
 					.collect(Collectors.joining("__"));
