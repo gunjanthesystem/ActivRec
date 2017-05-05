@@ -2369,6 +2369,114 @@ public class TimelineUtils
 	}
 
 	/**
+	 * Checks if there is atleast N valid AOs after the given index in the given timeline on the same day as the AO at
+	 * given index
+	 * 
+	 * @param givenActivityObjectIndex
+	 * @param givenTimelineToCheckIn
+	 * @param N
+	 * @return
+	 */
+	public static boolean hasAtleastNValidAOsAfterItInTheDay(int givenActivityObjectIndex,
+			Timeline givenTimelineToCheckIn, int N)
+	{
+		ArrayList<ActivityObject> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
+
+		// abcde: len=5, if N = 3, valid indices = 0,1 invalid indices = 2,3,4 >(5-1-3) > 1
+		// trivial case
+		if (givenActivityObjectIndex > (aosInGivenTimelineToCheckIn.size() - 1 - N))
+		{
+			return false;
+		}
+
+		boolean hasAtleastNValidAOsAfterItInTheDay = false;
+
+		LocalDate dateOfAOAtGivenIndex = givenTimelineToCheckIn.getActivityObjectAtPosition(givenActivityObjectIndex)
+				.getEndTimestamp().toLocalDateTime().toLocalDate();
+
+		int i = -1;
+		int numOfValidNextAOs = 0;
+		for (i = givenActivityObjectIndex + 1; i < aosInGivenTimelineToCheckIn.size(); i++)
+		{
+			// System.out.println("for index " + i);
+			LocalDate dateOfThisAO = aosInGivenTimelineToCheckIn.get(i).getEndTimestamp().toLocalDateTime()
+					.toLocalDate();
+			// System.out.println("dateOfAOAtGivenIndex = " + dateOfAOAtGivenIndex + " dateOfThisAO = " + dateOfThisAO);
+			// System.out
+			// .println("dateOfThisAO.equals(dateOfAOAtGivenIndex = " + dateOfThisAO.equals(dateOfAOAtGivenIndex));
+
+			if (dateOfThisAO.equals(dateOfAOAtGivenIndex)) // only look at aos in same day
+			{
+				// System.out.println("found same date");
+				if (UtilityBelt.isValidActivityName(aosInGivenTimelineToCheckIn.get(i).getActivityName()))
+				{
+					// System.out.println("found valid act");
+					numOfValidNextAOs += 1;
+					if (numOfValidNextAOs >= N)
+					{
+						hasAtleastNValidAOsAfterItInTheDay = true;
+						break;
+					}
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("-------\n\tinside hasAtleastNValidAOsAfterItInTheDay\n\tactivityIndexAfterWhichToCheck="
+					+ givenActivityObjectIndex + " N = " + N + " hasAtleastNValidAOsAfterItInTheDay = "
+					+ hasAtleastNValidAOsAfterItInTheDay);
+			givenTimelineToCheckIn.printActivityObjectNamesInSequence();
+			System.out.println("\tNumber of activities in timeline=" + aosInGivenTimelineToCheckIn.size());
+		}
+
+		return hasAtleastNValidAOsAfterItInTheDay;
+	}
+
+	/**
+	 * 
+	 * @param t
+	 * @param timestamp
+	 * @param N
+	 * @return
+	 */
+	public static ArrayList<ActivityObject> getNextNValidAOsAfterActivityAtThisTimeSameDay(Timeline t,
+			Timestamp timestamp, int N)
+	{
+		ArrayList<ActivityObject> result = new ArrayList<>(N);
+		LocalDate dateOfGivenTS = timestamp.toLocalDateTime().toLocalDate();
+
+		int indexOfActivityObjectAtGivenTimestamp = t.getIndexOfActivityObjectAtTime(timestamp);
+
+		for (int i = 0; i < N; i++)
+		{
+			ActivityObject ao = t
+					.getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp + 0);
+
+			if (ao.getEndTimestamp().toLocalDateTime().toLocalDate().equals(dateOfGivenTS))
+			{// DateTimeUtils.isSameDate(ao.getStartTimestamp(), // timestamp))
+				result.add(ao);
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (result.size() != N)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error in getNextNValidAOsAfterActivityAtThisTimeSameDay result.size(): " + result.size() + "!= N:"
+							+ N));
+		}
+		return result;
+	}
+
+	/**
 	 * 
 	 * @param usersTimelines
 	 * @param userIDsToExpunge
@@ -3136,6 +3244,7 @@ public class TimelineUtils
 		System.out.println("----Dimension attributes are: ");
 		dimensions.stream().forEach(d -> d.traverseDimensionAttributeNameValuepairs());
 	}
+
 }
 /////////////// UNUSED CODE
 

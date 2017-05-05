@@ -264,6 +264,7 @@ public class ActivityObject implements Serializable
 	}
 
 	/**
+	 * Constructor for Gowalla
 	 * 
 	 * @param activityID
 	 * @param locationIDs

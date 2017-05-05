@@ -290,6 +290,12 @@ public class DateTimeUtils
 		return timestamp.toLocalDateTime().toLocalDate();
 	}
 
+	/**
+	 * 
+	 * @param ts1
+	 * @param ts2
+	 * @return
+	 */
 	public static boolean isSameDate(Timestamp ts1, Timestamp ts2)
 	{
 		if (ts1.getYear() != ts2.getYear()) return false;

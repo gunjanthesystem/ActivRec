@@ -2,8 +2,11 @@ package org.activity.util;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.io.WritingToFile;
@@ -11,6 +14,7 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.stats.HilbertCurveUtils;
 import org.activity.stats.TimelineStats;
+import org.activity.ui.PopUps;
 
 /**
  * 
@@ -645,7 +649,7 @@ public class TimelineTransformers
 	 * @param userTestTimelines
 	 * @param userAllDatesTimeslines
 	 */
-	public static void writeUserActNamesSeq(int userID, LinkedHashMap<Date, Timeline> userTrainingTimelines,
+	public static void writeUserActNamesSeqAsCode(int userID, LinkedHashMap<Date, Timeline> userTrainingTimelines,
 			LinkedHashMap<Date, Timeline> userTestTimelines, LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
 		StringBuilder sbTraining = new StringBuilder(String.valueOf(userID) + ",");
@@ -654,6 +658,101 @@ public class TimelineTransformers
 		sbTraining.append("\n");
 		WritingToFile.appendLineToFileAbsolute(sbTraining.toString(),
 				Constant.getCommonPath() + "TrainingTimelinesAsSeqOfCodes.csv");
+	}
+
+	/**
+	 * 
+	 * @param userTrainingTimelines
+	 * @param userTestTimelines
+	 * @param userAllDatesTimeslines
+	 */
+	public static void writeUserActNamesSeqAsNames(int userID, LinkedHashMap<Date, Timeline> userTrainingTimelines,
+			LinkedHashMap<Date, Timeline> userTestTimelines, LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
+	{
+		StringBuilder sbTraining = new StringBuilder(String.valueOf(userID) + ",");
+
+		userTrainingTimelines.entrySet().stream()
+				.forEachOrdered(tl -> sbTraining.append(timelineToSeqOfActNames(tl.getValue(), ",")));
+
+		sbTraining.append("\n");
+		WritingToFile.appendLineToFileAbsolute(sbTraining.toString(),
+				Constant.getCommonPath() + "TrainingTimelinesAsSeqOfCodes.csv");
+	}
+
+	/**
+	 * 
+	 * @param timeline
+	 * @param catIDNameDictionary
+	 * @param delimiter
+	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
+	 *         given delimiter
+	 */
+	public static String timelineToSeqOfActNames(Timeline timeline, String delimiter)
+	{
+		StringBuilder s = new StringBuilder();
+		ArrayList<ActivityObject> aosInTimeline = timeline.getActivityObjectsInTimeline();
+
+		TreeMap<Integer, String> catIDNameDictionary = Constant.catIDNameDictionary;
+
+		for (ActivityObject ao : aosInTimeline)
+		{
+			String catIDName = catIDNameDictionary.get(Integer.valueOf(ao.getActivityName()));
+			if (catIDName == null || catIDName.length() == 0)
+			{
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+						"Error: Didnt find cat id name for cat id :" + ao.getActivityName()));
+			}
+			s.append(catIDName).append(delimiter);
+		}
+
+		// aosInTimeline.stream()
+		// .forEachOrdered(ao -> s.append(catIDNameDictionary.get(Integer.valueOf(ao.getActivityName()))));
+
+		return s.toString();
+	}
+
+	/**
+	 * 
+	 * @param timeline
+	 * @param catIDNameDictionary
+	 * @param delimiter
+	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
+	 *         given delimiter
+	 */
+	public static String timelineToSeqOfActIDs(Timeline timeline, String delimiter)
+	{
+		StringBuilder s = new StringBuilder();
+		ArrayList<ActivityObject> aosInTimeline = timeline.getActivityObjectsInTimeline();
+		// TreeMap<Integer, String> catIDNameDictionary = Constant.catIDNameDictionary;
+		for (ActivityObject ao : aosInTimeline)
+		{
+			Integer catID = Integer.valueOf(ao.getActivityName());
+			if (catID == null || catID < 0)
+			{
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+						"Error: atID == null || catID < 0:  cat id :" + catID + " for actname" + ao.getActivityName()));
+			}
+			s.append(catID).append(delimiter);
+		}
+
+		// aosInTimeline.stream()
+		// .forEachOrdered(ao -> s.append(catIDNameDictionary.get(Integer.valueOf(ao.getActivityName()))));
+
+		return s.toString();
+	}
+
+	/**
+	 * 
+	 * @param timeline
+	 * @param catIDNameDictionary
+	 * @param delimiter
+	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
+	 *         given delimiter
+	 */
+	public static ArrayList<Integer> timelineToSeqOfActIDs(ArrayList<ActivityObject> givenAOs)
+	{
+		return (ArrayList<Integer>) givenAOs.stream().map(ao -> Integer.valueOf(ao.getActivityName()))
+				.collect(Collectors.toList());
 	}
 
 }

@@ -9,6 +9,11 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 
+/**
+ * 
+ * @author gunjan
+ *
+ */
 public interface RecommendationMasterI
 {
 	public int getNumOfCandidateTimelines();
