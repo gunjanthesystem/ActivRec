@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
-import org.activity.evaluation.RecommendationTestsMar2017Gen;
+import org.activity.evaluation.RecommendationTestsMar2017GenSeq;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -67,7 +67,10 @@ public class ControllerWithoutServer
 			 * $ Disabled for Gowalla dataset for now// ConnectDatabase.initialise(Constant.getDatabaseName()); // all
 			 * method and variable in this class are static
 			 */
-			Constant.initialise(commonPath, Constant.getDatabaseName(), "./dataToRead/April7/mapCatIDsHierDist.kryo");
+			// specific for Gowalla dataset
+			Constant.initialise(commonPath, Constant.getDatabaseName(), "./dataToRead/April7/mapCatIDsHierDist.kryo",
+					DomainConstants.pathToSerialisedCatIDNameDictionary);
+
 			// ,// 550);
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 					+ PerformanceAnalytics.getHeapPercentageFree());
@@ -365,7 +368,13 @@ public class ControllerWithoutServer
 
 			System.out.println("Just Before recommendationsTest\n" + PerformanceAnalytics.getHeapInformation());
 
-			RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
+			// // start of curtain may 4 2017
+			// RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
+			// Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
+			// Constant.percentageInTraining);
+			// // end of curtain may 4 2017
+
+			RecommendationTestsMar2017GenSeq recommendationsTest = new RecommendationTestsMar2017GenSeq(sampledUsers,
 					Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
 					Constant.percentageInTraining);
 

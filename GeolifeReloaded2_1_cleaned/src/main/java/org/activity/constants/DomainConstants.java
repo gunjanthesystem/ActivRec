@@ -49,6 +49,8 @@ public class DomainConstants
 
 	public final static int numOfCatLevels = 3;
 
+	public final static String pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
+
 	public static boolean isGowallaUserIDWithGT553MaxActsPerDay(int userID)
 	{
 		boolean blacklisted = false;

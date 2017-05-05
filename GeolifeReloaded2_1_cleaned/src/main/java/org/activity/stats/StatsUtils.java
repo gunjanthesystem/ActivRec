@@ -64,7 +64,6 @@ public class StatsUtils
 	public static DescriptiveStatistics getDescriptiveStatistics(ArrayList<Double> valsReceived)
 	{
 		double vals[] = new double[valsReceived.size()];
-
 		for (int i = 0; i < valsReceived.size(); i++)
 		{
 			vals[i] = valsReceived.get(i);
@@ -671,13 +670,96 @@ public class StatsUtils
 				+ "Sum = " + nf.format(dstats.getSum()) + "\n" + "-------------------------------\n";
 
 		message.append(m1);
-		WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite); // TODO
-																													// check
-																													// if
-																													// this
-																													// works
-																													// corrcetly
-		// System.out.println(m1);
+		WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+		// TODO check if this works corrcetly System.out.println(m1);
+
+		return dstats;
+	}
+
+	/**
+	 * 
+	 * @param valsReceived
+	 * @param nameForValue
+	 * @param fileNameToWrite
+	 * @return
+	 */
+	public static DescriptiveStatistics getDescriptiveStatisticsDouble(ArrayList<Double> valsReceived,
+			String nameForValue, String fileNameToWrite)
+	{
+
+		double values[] = new double[valsReceived.size()];
+		for (int i = 0; i < valsReceived.size(); i++)
+		{
+			values[i] = valsReceived.get(i);
+		}
+
+		DescriptiveStatistics dstats = new DescriptiveStatistics(values);
+		NumberFormat nf = NumberFormat.getInstance();
+		nf.setMaximumIntegerDigits(30);
+
+		StringBuilder message = new StringBuilder("-------------------------------\nDescriptive stats for "
+				+ nameForValue + "\n-------------------------------\n");
+
+		if (dstats.getN() != values.length)
+		{
+			System.err.println("Error in getDescriptiveStatistics:dstats.getN() != values.length ");
+		}
+
+		String m1 = "Count = " + nf.format(dstats.getN()) + "\n" + "Maximum = " + nf.format(dstats.getMax()) + "\n"
+				+ "Minimum = " + nf.format(dstats.getMin()) + "\n" + "Arithmetic mean = " + nf.format(dstats.getMean())
+				+ "\n" + "Standard deviation = " + nf.format(dstats.getStandardDeviation()) + "\n" + "Q1 = "
+				+ nf.format(dstats.getPercentile(25)) + "\n" + "Q2(median) = " + nf.format(dstats.getPercentile(50))
+				+ "\n" + "Q3 = " + nf.format(dstats.getPercentile(75)) + "\n" + "Skewness = "
+				+ nf.format(dstats.getSkewness()) + "\n" + "Kurtosis = " + nf.format(dstats.getKurtosis()) + "\n"
+				+ "Sum = " + nf.format(dstats.getSum()) + "\n" + "-------------------------------\n";
+
+		message.append(m1);
+		WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+		// TODO check if this works corrcetly System.out.println(m1);
+
+		return dstats;
+	}
+
+	/**
+	 * 
+	 * @param valsReceived
+	 * @param nameForValue
+	 * @param fileNameToWrite
+	 * @return
+	 */
+	public static DescriptiveStatistics getDescriptiveStatisticsLong(ArrayList<Long> valsReceived, String nameForValue,
+			String fileNameToWrite)
+	{
+
+		double values[] = new double[valsReceived.size()];
+		for (int i = 0; i < valsReceived.size(); i++)
+		{
+			values[i] = valsReceived.get(i);
+		}
+
+		DescriptiveStatistics dstats = new DescriptiveStatistics(values);
+		NumberFormat nf = NumberFormat.getInstance();
+		nf.setMaximumIntegerDigits(30);
+
+		StringBuilder message = new StringBuilder("-------------------------------\nDescriptive stats for "
+				+ nameForValue + "\n-------------------------------\n");
+
+		if (dstats.getN() != values.length)
+		{
+			System.err.println("Error in getDescriptiveStatistics:dstats.getN() != values.length ");
+		}
+
+		String m1 = "Count = " + nf.format(dstats.getN()) + "\n" + "Maximum = " + nf.format(dstats.getMax()) + "\n"
+				+ "Minimum = " + nf.format(dstats.getMin()) + "\n" + "Arithmetic mean = " + nf.format(dstats.getMean())
+				+ "\n" + "Standard deviation = " + nf.format(dstats.getStandardDeviation()) + "\n" + "Q1 = "
+				+ nf.format(dstats.getPercentile(25)) + "\n" + "Q2(median) = " + nf.format(dstats.getPercentile(50))
+				+ "\n" + "Q3 = " + nf.format(dstats.getPercentile(75)) + "\n" + "Skewness = "
+				+ nf.format(dstats.getSkewness()) + "\n" + "Kurtosis = " + nf.format(dstats.getKurtosis()) + "\n"
+				+ "Sum = " + nf.format(dstats.getSum()) + "\n" + "-------------------------------\n";
+
+		message.append(m1);
+		WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+		// TODO check if this works corrcetly System.out.println(m1);
 
 		return dstats;
 	}

@@ -40,11 +40,9 @@ import org.activity.util.UtilityBelt;
 
 /**
  * 
- * 
- * Aim: to combine daywise and MU and ClosesetTime implementation into one: to reduce redundant code and chances of
- * error.
  * <p>
- * Fork of org.activity.recomm.RecommendationMasterMUMar2017
+ * Fork of org.activity.recomm.RecommendationMasterMar2017GenS modified for recommending sequences by allowing
+ * updateable current timeline
  * <p>
  * ALERT!: DO NOT USER THRESHOLDING WITH THIS CLASS since here the edit distances are normalised before thredholding,
  * however, they should have been normalised after thresholding as was the case in iiWAS version of the code This
@@ -54,10 +52,10 @@ import org.activity.util.UtilityBelt;
  * Timelines are sets of Activity Objects, (and they do not necessarily belong to one day.) (the matching unit used here
  * HJ version) In this version we calculate edit distance of the full candidate and not the least distant subcandidate
  * 
- * @since 22 March, 2017
+ * @since 02 May, 2017
  * @author gunjan
  */
-public class RecommendationMasterMar2017Gen implements RecommendationMasterI// IRecommenderMaster
+public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
 
@@ -214,11 +212,14 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 	 * @param matchingUnitInCountsOrHours
 	 * @param caseType
 	 * @param lookPastType
+	 * @param dummy
+	 * @param actObjsToAddToCurrentTimeline
 	 */
-	public RecommendationMasterMar2017Gen(LinkedHashMap<Date, Timeline> trainingTimelines,
+	public RecommendationMasterMar2017GenSeq(LinkedHashMap<Date, Timeline> trainingTimelines,
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
 			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold, double matchingUnitInCountsOrHours,
-			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy)
+			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
+			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
 	{
 
 		try
@@ -693,6 +694,82 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 			LookPastType lookPastType2, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm,
 			double matchingUnitInCountsOrHours)
 	{
+		TimelineWithNext extractedCurrentTimeline = null;
+		LinkedHashMap<Date, Timeline> testTimelinesDaywise = testTimelinesOrig;
+
+		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+		{
+			if (Constant.hasInvalidActivityNames)
+			{
+				testTimelinesDaywise = TimelineUtils.expungeInvalidsDT(testTimelinesOrig);
+				// $$System.out.println("Expunging invalids before recommendation process: expunging test timelines");
+			}
+			else
+			{
+				// $$System.out.println("Data assumed to have no invalid act names to be expunged from test timelines");
+			}
+		}
+
+		// //////////////////
+		if (lookPastType2.equals(Enums.LookPastType.Daywise) || lookPastType2.equals(Enums.LookPastType.ClosestTime))
+		{
+			extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineDaywise(testTimelinesDaywise,
+					dateAtRecomm, timeAtRecomm, userIDAtRecomm);
+		}
+		else
+		{
+			// converting day timelines into continuous timelines suitable to be used for matching unit views
+			Timeline testTimeline = TimelineUtils.dayTimelinesToATimeline(testTimelinesDaywise, false, true);
+
+			if (lookPastType2.equals(Enums.LookPastType.NCount))
+			{
+				extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(testTimeline,
+						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+			}
+
+			else if (lookPastType2.equals(Enums.LookPastType.NHours))
+			{
+				extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUHours(testTimeline,
+						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+			}
+			else
+			{
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: Unrecognised lookPastType "));
+				System.exit(-1);
+			}
+		}
+		// ////////////////////
+		if (extractedCurrentTimeline == null)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: current timeline is empty"));
+			System.exit(-1);
+			// this.errorExists = true;
+		}
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println(
+					"Extracted current timeline: " + extractedCurrentTimeline.getActivityObjectNamesInSequence());
+		}
+		return extractedCurrentTimeline;
+	}
+
+	/**
+	 * 
+	 * @param testTimelinesOrig
+	 * @param lookPastType2
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param userIDAtRecomm
+	 * @param matchingUnitInCountsOrHours
+	 * @param actObjsToAddToCurrentTimeline
+	 * @return
+	 */
+	private static TimelineWithNext extractCurrentTimelineSeq(LinkedHashMap<Date, Timeline> testTimelinesOrig,
+			LookPastType lookPastType2, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm,
+			double matchingUnitInCountsOrHours, ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
+	{
+
+		// CURSOR 2 May 2017
 		TimelineWithNext extractedCurrentTimeline = null;
 		LinkedHashMap<Date, Timeline> testTimelinesDaywise = testTimelinesOrig;
 

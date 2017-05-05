@@ -1,6 +1,9 @@
 package org.activity.sanityChecks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -166,12 +169,32 @@ public class TestDummy1
 		return sb.toString();
 	}
 
-	public static void main(String args[])
+	public static void main2(String args[])
 	{
 		int a = 1;
 		char aChar = (char) (a + '0'); // http://stackoverflow.com/questions/17984975/convert-int-to-char-in-java
 		System.out.println(aChar);
 		// System.out.println(testStringBuilder());
+	}
+
+	public static void main(String args[])
+	{
+		HashMap<String, ArrayList<String>> map = new HashMap<>();
+
+		map.put("India", new ArrayList<String>(Arrays.asList("New Delhi", "Mumbai")));
+		map.put("China", new ArrayList<String>(Arrays.asList("Beijing", "Shanghai")));
+		map.put("Indonesia", new ArrayList<String>(Arrays.asList("Jakarta", "Surabaya")));
+
+		map.get("India").add("Kolkata");
+
+		List<String> citiesOfIndia = map.get("India");
+		citiesOfIndia.add("Bangalore");
+
+		StringBuilder sb = new StringBuilder();
+		map.entrySet().stream().peek(e -> sb.append("\n" + e.getKey() + "\t")).map(e -> e.getValue())
+				.flatMap(v -> v.stream()).forEachOrdered(v -> sb.append(v + ","));
+
+		System.out.println(sb.toString());
 	}
 
 	// public static void checkMemory
