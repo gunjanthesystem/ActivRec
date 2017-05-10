@@ -2447,8 +2447,12 @@ public class TimelineUtils
 	public static ArrayList<ActivityObject> getNextNValidAOsAfterActivityAtThisTimeSameDay(Timeline t,
 			Timestamp timestamp, int N)
 	{
-		ArrayList<ActivityObject> result = new ArrayList<>(N);
+
 		LocalDate dateOfGivenTS = timestamp.toLocalDateTime().toLocalDate();
+		System.out.println("Inside getNextNValidAOsAfterActivityAtThisTimeSameDay\n given ts=" + timestamp.toString()
+				+ " localdate extracted=" + dateOfGivenTS.toString());
+
+		ArrayList<ActivityObject> result = new ArrayList<>(N);
 
 		int indexOfActivityObjectAtGivenTimestamp = t.getIndexOfActivityObjectAtTime(timestamp);
 
@@ -2457,7 +2461,12 @@ public class TimelineUtils
 			ActivityObject ao = t
 					.getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp + 0);
 
-			if (ao.getEndTimestamp().toLocalDateTime().toLocalDate().equals(dateOfGivenTS))
+			System.out.println("Debug:\nTimestamp of ao = " + ao.getEndTimestamp());
+			LocalDate dateOfAO = ao.getEndTimestamp().toLocalDateTime().toLocalDate();
+			System.out.println("LocalDate of ao = " + dateOfAO);
+			System.out.println("dateOfAO.equals(dateOfGivenTS)=" + dateOfAO.equals(dateOfGivenTS));
+
+			if (dateOfAO.equals(dateOfGivenTS))
 			{// DateTimeUtils.isSameDate(ao.getStartTimestamp(), // timestamp))
 				result.add(ao);
 			}
@@ -2473,6 +2482,10 @@ public class TimelineUtils
 					"Error in getNextNValidAOsAfterActivityAtThisTimeSameDay result.size(): " + result.size() + "!= N:"
 							+ N));
 		}
+
+		System.out.println("Next valid acts: ");
+		result.stream().forEach((ActivityObject ao) -> System.out.print(ao.toStringAllGowallaTS() + ">>"));
+		System.out.println("Exiting getNextNValidAOsAfterActivityAtThisTimeSameDay");
 		return result;
 	}
 

@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,13 +31,11 @@ import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017Gen;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
-import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
-import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineUtils;
 
 /**
@@ -82,10 +81,11 @@ public class RecommendationTestsMar2017GenSeq
 	int recommSeqLength;
 
 	/**
-	 * (UserId,ActName,RepresentativeAO)
-	 */
-	LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
-	LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
+	 * // * (UserId,ActName,RepresentativeAO) //
+	 */ // currently doing it for each matching unit
+	// LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
+	// LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new
+	// LinkedHashMap<>();
 
 	/**
 	 * ALERT: this is not to be used while thresholding <User,<MRR0, MRR2, .... > >
@@ -102,7 +102,7 @@ public class RecommendationTestsMar2017GenSeq
 	 */
 	public RecommendationTestsMar2017GenSeq(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines,
 			Enums.LookPastType lookPastType, Enums.CaseType caseType, Enums.TypeOfThreshold[] typeOfThresholds,
-			int[] userIDs, double percentageInTraining)
+			int[] userIDs, double percentageInTraining)// , int lengthOfRecommendedSequence)
 	{
 		System.out.println(
 				"\n\n **********Entering RecommendationTestsMar2017********** " + lookPastType + " " + caseType);
@@ -139,6 +139,8 @@ public class RecommendationTestsMar2017GenSeq
 		// System.exit(-1);}
 
 		setMatchingUnitArray(lookPastType);
+
+		// buildRepresentativeActivityObjectsForUsers()
 
 		for (Enums.TypeOfThreshold typeOfThreshold : typeOfThresholds)
 		{
@@ -283,7 +285,16 @@ public class RecommendationTestsMar2017GenSeq
 						// LinkedHashMap<Integer, LinkedHashMap<Timestamp, Integer>> rtsWithMoreThan4ValidsAfter = new
 						// LinkedHashMap<>();
 						StringBuilder sbNumOfValidsAfterAnRT = new StringBuilder();
+
 						// int userCount = 0;
+						/**
+						 * This can be made class variable and does not need to be repeated for each matching unit, but
+						 * in current setup we are doing it for each matching unit. Note: this is very small performance
+						 * effect, hence should not be of major concern. (UserId,ActName,RepresentativeAO)
+						 */
+						LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
+						LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
+
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
 							System.out.println("\nUser id=" + userId);
@@ -373,18 +384,22 @@ public class RecommendationTestsMar2017GenSeq
 							LinkedHashMap<Date, Timeline> userTrainingTimelines = trainTestTimelines.get(0);
 							LinkedHashMap<Date, Timeline> userTestTimelines = trainTestTimelines.get(1);
 
-							if (true)
-							{
-								Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUser(
-										userId,
-										TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-										Constant.getActivityNames());
-
-								LinkedHashMap<String, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
-								mapOfRepAOs.put(userId, repAOsForThisUser);
-								mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
-								continue;
-							}
+							////// START of build representative activity objects for this user.
+							// if (true)// representativeAOsNotComputed == false) //do this
+							// {// we only need to do it once for each user and dont need to repeat it for each matching
+							// unit, so we can take it out of the for loop, however, it that we will also need to
+							// take out the train-test splitting of timelines out of the loop, which can be done as
+							// well
+							Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUser(
+									userId, TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
+									Constant.getActivityNames(),
+									TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
+							LinkedHashMap<String, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
+							mapOfRepAOs.put(userId, repAOsForThisUser);
+							mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
+							// continue;
+							// }
+							////// END of build representative activity objects for this user.
 
 							if (userTrainingTimelines.size() == 0)
 							{
@@ -396,13 +411,13 @@ public class RecommendationTestsMar2017GenSeq
 								continue;
 							}
 
-							///////////
-							if (true)
-							{
-								TimelineTransformers.writeUserActNamesSeqAsNames(userId, userTrainingTimelines,
-										userTestTimelines, userAllDatesTimeslines);
-								continue;// TEMPORARY // continue to next user //TODO
-							}
+							/////////// WRITE activity names as sequence for HMM or markov chains
+							// $$ if (true)
+							// {
+							// TimelineTransformers.writeUserActNamesSeqAsNames(userId, userTrainingTimelines,
+							// userTestTimelines, userAllDatesTimeslines);
+							// continue;// TEMPORARY // continue to next user
+							// $$ }
 							//////////
 
 							// ////////////////////////////////////////
@@ -415,24 +430,27 @@ public class RecommendationTestsMar2017GenSeq
 							String actNamesCountsWithoutCountOverTrain = "";
 							String actNamesDurationsWithoutDurationOverTrain = "";
 
-							if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
-							{
-								mapsForCountDurationBaselines = WritingToFile.writeBasicActivityStatsAndGetBaselineMaps(
-										userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
+							// START OF Curtain disable trivial baselines
+							// if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
+							// {
+							// mapsForCountDurationBaselines = WritingToFile.writeBasicActivityStatsAndGetBaselineMaps(
+							// userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
+							// LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays =
+							// (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+							// .get("activityNameCountPairsOverAllTrainingDays");
+							// ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
+							// actNamesCountsWithoutCountOverTrain = getActivityNameCountPairsWithoutCount(
+							// activityNameCountPairsOverAllTrainingDays);
+							//
+							// LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays =
+							// (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+							// .get("activityNameDurationPairsOverAllTrainingDays");
+							// ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
+							// actNamesDurationsWithoutDurationOverTrain = getActivityNameDurationPairsWithoutDuration(
+							// activityNameDurationPairsOverAllTrainingDays);
+							// }
+							// END OF Curtain disable trivial baselines
 
-								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-										.get("activityNameCountPairsOverAllTrainingDays");
-								ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
-								actNamesCountsWithoutCountOverTrain = getActivityNameCountPairsWithoutCount(
-										activityNameCountPairsOverAllTrainingDays);
-
-								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-										.get("activityNameDurationPairsOverAllTrainingDays");
-								ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
-								actNamesDurationsWithoutDurationOverTrain = getActivityNameDurationPairsWithoutDuration(
-										activityNameDurationPairsOverAllTrainingDays);
-
-							}
 							// else if (matchingUnitIterator == 0) // do this only for one matching unit as it does not
 							// // change per matching unit
 							// {
@@ -548,7 +566,7 @@ public class RecommendationTestsMar2017GenSeq
 									// using LocalDate for comparison
 									ArrayList<ActivityObject> nextValidActivityObjectsAfterRecommPoint1 = TimelineUtils
 											.getNextNValidAOsAfterActivityAtThisTimeSameDay(testDayTimelineForUser,
-													endTimeStamp, 3);
+													endTimeStamp, recommSeqLength);
 
 									// timestamp sanity check start
 									{
@@ -574,9 +592,9 @@ public class RecommendationTestsMar2017GenSeq
 														+ userId + " Next activity Objects after " + endTimeStamp
 														+ " nextValidActivityObjectsAfterRecommPoint1.size() ="
 														+ nextValidActivityObjectsAfterRecommPoint1.size()
-														+ " expected =" + recommSeqLength)
-												+ "\nif it was such, we should have not reached this point of execution");
-										// because isNoValidActivityAfterItInTheDay already checked if there exists a
+														+ " expected =" + recommSeqLength
+														+ "\nif it was such, we should have not reached this point of execution"));
+										// because hasAtleastNValidAOsAfterItInTheDay already checked if there exists N
 										// next valid activity
 										PopUps.showError(
 												"Error in Sanity Check RT407: nextValidActivityObjectsAfterRecommPoint1.size()!=recommSeqLength, if it was such, we should have not reached this point of execution");
@@ -1034,33 +1052,9 @@ public class RecommendationTestsMar2017GenSeq
 
 						System.out.println("Time taken for executing Recommendation Tests for this matching unit ="
 								+ (recommTestsEndtime - recommTestsStarttime) / 1000 + "seconds");
-						{
-							StringBuilder sbTemp = new StringBuilder();
-							for (Entry<Integer, LinkedHashMap<String, ActivityObject>> uEntry : mapOfRepAOs.entrySet())
-							{
-								sbTemp.append("User:" + uEntry.getKey()).append("\nRepresentative Act Objs:\n");
-								uEntry.getValue().entrySet().stream().forEachOrdered(
-										e -> sbTemp.append(e.getKey() + "--" + e.getValue().toStringAllGowalla()));
-							}
-							WritingToFile.appendLineToFileAbsolute(sbTemp.toString(),
-									Constant.getCommonPath() + "RepAO.txt");
-						}
-						{
-							StringBuilder sbTemp = new StringBuilder();
-							for (Entry<Integer, LinkedHashMap<String, Pair<Double, Double>>> uEntry : mapOfMedianPreSuccDuration
-									.entrySet())
-							{
-								sbTemp.append("User:" + uEntry.getKey())
-										.append("\nMedian Prec Succeeding durations:\n");
-								uEntry.getValue().entrySet().stream()
-										.forEachOrdered(e -> sbTemp.append(e.getKey() + "--" + "PreMed:"
-												+ e.getValue().getFirst() + " SuccMed:" + e.getValue().getSecond()));
 
-							}
-							WritingToFile.appendLineToFileAbsolute(sbTemp.toString(),
-									Constant.getCommonPath() + "PreSucMedianDuration.txt");
+						writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
 
-						}
 						consoleLogStream.close();
 
 					} // end of loop over matching unit
@@ -1081,6 +1075,42 @@ public class RecommendationTestsMar2017GenSeq
 		}
 		// PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
 		System.out.println("**********Exiting Recommendation Tests**********");
+
+	}
+
+	/**
+	 * 
+	 * @param mapOfRepAOs
+	 * @param mapOfMedianPreSuccDuration
+	 */
+	private static void writeRepAOs(LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs,
+			LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration,
+			String commonPath)
+	{
+
+		StringBuilder sbTemp = new StringBuilder();
+
+		WritingToFile.appendLineToFileAbsolute("UserID,ActID,RepAO\n", commonPath + "RepAO.txt");
+
+		for (Entry<Integer, LinkedHashMap<String, ActivityObject>> uEntry : mapOfRepAOs.entrySet())
+		{
+			// sbTemp.append("\nUser:" + uEntry.getKey()).append("Rep AOs:\n");
+			uEntry.getValue().entrySet().stream().forEachOrdered(e -> sbTemp
+					.append(uEntry.getKey() + "," + e.getKey() + "," + e.getValue().toStringAllGowallaTS() + "\n"));
+		}
+		WritingToFile.appendLineToFileAbsolute(sbTemp.toString(), commonPath + "RepAO.txt");
+
+		StringBuilder sbTemp2 = new StringBuilder();
+		WritingToFile.appendLineToFileAbsolute("UserID,ActID,PreceedingMedian,SuceedingMedian",
+				commonPath + "PreSucMedianDuration.txt");
+		for (Entry<Integer, LinkedHashMap<String, Pair<Double, Double>>> uEntry : mapOfMedianPreSuccDuration.entrySet())
+		{
+			// sbTemp2.append("\nUser:" + uEntry.getKey()).append("\nMedian Prec Succeeding durations:\n");
+			uEntry.getValue().entrySet().stream().forEachOrdered(e -> sbTemp2.append(uEntry.getKey() + "," + e.getKey()
+					+ "," + e.getValue().getFirst() + "," + e.getValue().getSecond() + "\n"));
+
+		}
+		WritingToFile.appendLineToFileAbsolute(sbTemp2.toString(), commonPath + "PreSucMedianDuration.txt");
 
 	}
 
@@ -1259,12 +1289,14 @@ public class RecommendationTestsMar2017GenSeq
 	 * 
 	 * 
 	 * @param userId
-	 * @param userTrainingTimeline
+	 * @param userTrainingTimelines
 	 * @param allPossibleActivityNames
+	 * @param userTestTimelines
+	 *            only to find which act names occur in test but not in training
 	 * @return
 	 */
 	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> buildRepresentativeAOsForUser(
-			int userId, Timeline userTrainingTimelines, String[] allPossibleActivityNames)
+			int userId, Timeline userTrainingTimelines, String[] allPossibleActivityNames, Timeline userTestTimelines)
 	{
 		// mapOfRepAOs;
 		boolean sanityCheck = false;
@@ -1280,11 +1312,11 @@ public class RecommendationTestsMar2017GenSeq
 				System.err.println("Error: database is  not gowalla1:" + Constant.getDatabaseName());
 				System.exit(-1);
 			}
-			if (mapOfRepAOs.containsKey(userId))
-			{
-				System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
-				System.exit(-1);
-			}
+			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
+			// {
+			// System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
+			// System.exit(-1);
+			// }
 
 			else
 			{
@@ -1297,8 +1329,7 @@ public class RecommendationTestsMar2017GenSeq
 				LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName = new LinkedHashMap<>();
 				LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName = new LinkedHashMap<>();
 
-				// iterate over all possible activity names.
-				// initialise to preserve order.
+				// iterate over all possible activity names. initialise to preserve order.
 				for (String actName : allPossibleActivityNames)
 				{
 					aosForEachActName.put(actName, new ArrayList<>());
@@ -1307,21 +1338,27 @@ public class RecommendationTestsMar2017GenSeq
 				}
 
 				// populate the map for list of aos for each act name
-				long durationFromPreviousInSecs = 0;
+				// long durationFromPreviousInSecs = 0;
 				long prevTimestamp = 0;
 				String prevActNameEncountered = null;
+
+				LinkedHashSet<String> distinctActNamesEncounteredInTraining = new LinkedHashSet<>();
 
 				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
 				{
 					String actNameEncountered = ao.getActivityName();
+					distinctActNamesEncounteredInTraining.add(actNameEncountered);
+
+					// add this act objec to the correct map entry in map of aos for given act names
 					ArrayList<ActivityObject> aosStored = aosForEachActName.get(actNameEncountered);
 					if (aosStored == null)
 					{
 						System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: encountered act name '"
 								+ actNameEncountered + "' is not in the list of all possible act names"));
 					}
-					aosStored.add(ao); // add the new AO encounted to the map's list. So map is updated
+					aosStored.add(ao); // add the new AO encountered to the map's list. So map is updated
 
+					// store the preceeding and succeeding durations
 					long currentTimestamp = ao.getStartTimestamp().getTime();
 
 					if (prevTimestamp != 0)
@@ -1331,12 +1368,24 @@ public class RecommendationTestsMar2017GenSeq
 
 					if (prevActNameEncountered != null)
 					{
+						// add the succeeding duration for the previous AO
 						durationFromNextForEachActName.get(prevActNameEncountered)
 								.add(currentTimestamp - prevTimestamp);
 					}
 					prevTimestamp = currentTimestamp;
 					prevActNameEncountered = actNameEncountered;
 				}
+
+				/////////////
+
+				// $$ analyseActNameNotInTraining(userId, allPossibleActivityNames,
+				// distinctActNamesEncounteredInTraining,
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/" + "ActNamesNotInTraining.csv",
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/"
+				// + "ActNamesInTestButNotInTraining.csv",
+				// userTestTimelines);
+
+				/////////////
 
 				////////////////////////// sanity check
 				if (sanityCheck)
@@ -1383,11 +1432,10 @@ public class RecommendationTestsMar2017GenSeq
 
 				////////////////////////// sanity check end
 
-				Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUser(
+				Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserV2(
 						userId, aosForEachActName, durationFromPrevForEachActName, durationFromNextForEachActName);
 				repAOsForThisUser = result.getFirst();
 				actMedianPreSuccDuration = result.getSecond();
-
 			}
 		}
 		catch (Exception e)
@@ -1396,10 +1444,58 @@ public class RecommendationTestsMar2017GenSeq
 		}
 		long t2 = System.currentTimeMillis();
 		System.out.println("Exiting buildRepresentativeActivityObjects for user " + userId + " time taken = "
-				+ ((t2 - t1) / 1000) + "secs");
+				+ ((t2 - t1) * 1.0 / 1000) + "secs");
 
 		return new Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>(
 				repAOsForThisUser, actMedianPreSuccDuration);
+	}
+
+	/**
+	 * Analyse activity names which are not in training timelines for each user.
+	 * 
+	 * @param userId
+	 * @param allPossibleActivityNames
+	 * @param distinctActNamesEncounteredInTraining
+	 * @param fileNameToWrite
+	 * @param userTestTimelines
+	 */
+	private static void analyseActNameNotInTraining(int userId, String[] allPossibleActivityNames,
+			LinkedHashSet<String> distinctActNamesEncounteredInTraining, String fileNameToWrite,
+			String fileNameToWrite2, Timeline userTestTimelines)
+	{
+		System.out.println("#Distinct act names encountered in training for this user = "
+				+ distinctActNamesEncounteredInTraining.size());
+		System.out.println("#All possible act names = " + allPossibleActivityNames.length);
+
+		int numOfActNamesNotInTraining = (allPossibleActivityNames.length
+				- distinctActNamesEncounteredInTraining.size());
+		System.out.println("#act names not in training timelines for this user = " + numOfActNamesNotInTraining);
+		System.out.println("Acts not in trainings: ");
+		LinkedHashSet<String> actNamesNotInTraining = new LinkedHashSet<String>(
+				Arrays.asList(allPossibleActivityNames));
+		actNamesNotInTraining.removeAll(distinctActNamesEncounteredInTraining);
+
+		String actNameNotInTrainingSB = actNamesNotInTraining.stream().collect(Collectors.joining("__"));
+		WritingToFile.appendLineToFileAbsolute(
+				"U:" + userId + "," + numOfActNamesNotInTraining + "," + actNameNotInTrainingSB.toString() + "\n",
+				fileNameToWrite);
+
+		////////////// Look at act names in Test set and see if they were in training timelines or not.
+		LinkedHashSet<String> actNamesInTestSet = new LinkedHashSet<String>();
+		userTestTimelines.getActivityObjectsInTimeline().stream()
+				.forEach(ao -> actNamesInTestSet.add(ao.getActivityName()));
+
+		LinkedHashSet<String> actNamesInTestButNotInTraining = new LinkedHashSet<String>(actNamesInTestSet);
+		actNamesInTestButNotInTraining.removeAll(distinctActNamesEncounteredInTraining);
+		System.out.println(
+				"#act names in test but not in training  for this user = " + actNamesInTestButNotInTraining.size());
+
+		String actNamesInTestButNotInTrainingS = actNamesInTestButNotInTraining.stream()
+				.collect(Collectors.joining("__"));
+
+		WritingToFile.appendLineToFileAbsolute("U:" + userId + "," + actNamesInTestButNotInTraining.size() + ","
+				+ actNamesInTestButNotInTrainingS + "\n", fileNameToWrite2);
+
 	}
 
 	/**
@@ -1410,7 +1506,7 @@ public class RecommendationTestsMar2017GenSeq
 	 * @param durationFromNextForEachActName
 	 * @return
 	 */
-	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUser(
+	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserV1(
 			int userID, LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName,
 			LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName,
 			LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName)
@@ -1435,27 +1531,106 @@ public class RecommendationTestsMar2017GenSeq
 				String actName = actNameEntry.getKey();
 				ArrayList<ActivityObject> aos = actNameEntry.getValue();
 
-				double medianDurationFromPrevForEachActName = StatsUtils.getDescriptiveStatisticsLong(
-						durationFromPrevForEachActName.get(actName), "durationFromPrevForEachActName",
-						userID + "__" + actName + "durationFromPrevForEachActName.txt").getPercentile(50);
+				double medianDurationFromPrevForEachActName = StatsUtils
+						.getDescriptiveStatisticsLong(durationFromPrevForEachActName.get(actName),
+								"durationFromPrevForEachActName",
+								userID + "__" + actName + "durationFromPrevForEachActName.txt", false)
+						.getPercentile(50);
 
-				double medianDurationFromNextForEachActName = StatsUtils.getDescriptiveStatisticsLong(
-						durationFromNextForEachActName.get(actName), "durationFromPrevForEachActName",
-						userID + "__" + actName + "durationFromPrevForEachActName.txt").getPercentile(50);
+				double medianDurationFromNextForEachActName = StatsUtils
+						.getDescriptiveStatisticsLong(durationFromNextForEachActName.get(actName),
+								"durationFromPrevForEachActName",
+								userID + "__" + actName + "durationFromPrevForEachActName.txt", false)
+						.getPercentile(50);
 
 				// double medianSecondsFromMidnight =
 				Timestamp mediaStartTS = getMedianSecondsSinceMidnightTimestamp(
 						aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID, actName);
 
 				double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
-				int medianCinsCount = (int) StatsUtils
-						.getDescriptiveStatistics(cinsCount, "cinsCount", userID + "__" + actName + "cinsCount.txt")
-						.getPercentile(50);
+				int medianCinsCount = (int) StatsUtils.getDescriptiveStatistics(cinsCount, "cinsCount",
+						userID + "__" + actName + "cinsCount.txt", false).getPercentile(50);
 
 				// NOTE: we only need to take care of feature which are used for edit distance computation.
 				ActivityObject repAOForThisActNameForThisUser = new ActivityObject((int) Integer.valueOf(actName),
 						new ArrayList<Integer>(), actName, "", mediaStartTS, "", "", "", String.valueOf(userID), -1,
 						medianCinsCount, -1, -1, -1, -1, -1, actName + "__", -1, -1, new String[] { "" });
+
+				repAOs.put(actName, repAOForThisActNameForThisUser);
+				actMedPreSuccDuration.put(actName,
+						new Pair<>(medianDurationFromPrevForEachActName, medianDurationFromNextForEachActName));
+
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		System.out.println("Exiting computeRepresentativeActivityObject for userID" + userID);
+		return new Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>(repAOs,
+				actMedPreSuccDuration);
+	}
+
+	/**
+	 * 
+	 * @param userID
+	 * @param aosForEachActName
+	 * @param durationFromPrevForEachActName
+	 * @param durationFromNextForEachActName
+	 * @return
+	 */
+	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserV2(
+			int userID, LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName,
+			LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName,
+			LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName)
+	{
+		System.out.println("Inside computeRepresentativeActivityObject for userID" + userID);
+		LinkedHashMap<String, ActivityObject> repAOs = new LinkedHashMap<String, ActivityObject>();
+		LinkedHashMap<String, Pair<Double, Double>> actMedPreSuccDuration = new LinkedHashMap<>();
+
+		try
+		{
+			if (!Constant.getDatabaseName().equals("gowalla1"))
+			{
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+						"Error: this method is currently only suitable for gowalla dataset"));
+				System.exit(-1);
+			}
+
+			// feature of Gowalla activity object used in edit distance and necessary for recommendation.
+			for (Entry<String, ArrayList<ActivityObject>> actNameEntry : aosForEachActName.entrySet())
+			{
+				String actName = actNameEntry.getKey();
+				ArrayList<ActivityObject> aos = actNameEntry.getValue();
+
+				double medianDurationFromPrevForEachActName = StatsUtils
+						.getDescriptiveStatisticsLong(durationFromPrevForEachActName.get(actName),
+								"durationFromPrevForEachActName",
+								userID + "__" + actName + "durationFromPrevForEachActName.txt", false)
+						.getPercentile(50);
+
+				double medianDurationFromNextForEachActName = StatsUtils
+						.getDescriptiveStatisticsLong(durationFromNextForEachActName.get(actName),
+								"durationFromPrevForEachActName",
+								userID + "__" + actName + "durationFromPrevForEachActName.txt", false)
+						.getPercentile(50);
+
+				// Dummy because we are not going to actually use this, we will instead extract the timestamp from the
+				// preceeding duration + timestamp of preceeding activity object. But we assign this median anyway to
+				// avoid having it as numm which causes exception.
+				Timestamp dummyMedianStartTS = getMedianSecondsSinceMidnightTimestamp(
+						aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID, actName);
+
+				// double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
+				// int medianCinsCount = (int) StatsUtils
+				// .getDescriptiveStatistics(cinsCount, "cinsCount", userID + "__" + actName + "cinsCount.txt")
+				// .getPercentile(50);
+
+				// NOTE: we only need to take care of feature which are used for edit distance computation.
+				ActivityObject repAOForThisActNameForThisUser = new ActivityObject((int) Integer.valueOf(actName),
+						new ArrayList<Integer>(), actName, "", dummyMedianStartTS, "", "", "", String.valueOf(userID),
+						-1, -1, -1, -1, -1, -1, -1, actName + "__", -1, -1, new String[] { "" });
 
 				repAOs.put(actName, repAOForThisActNameForThisUser);
 				actMedPreSuccDuration.put(actName,
@@ -1490,7 +1665,7 @@ public class RecommendationTestsMar2017GenSeq
 					.mapToDouble(t -> t.getHours() * 60 * 60 + t.getMinutes() * 60 + t.getSeconds()).toArray();
 
 			medianSecsSinceMidnight = StatsUtils.getDescriptiveStatistics(secsSinceMidnight, "secsSinceMidnight",
-					userID + "__" + actName + "secsSinceMidnight.txt").getPercentile(50);
+					userID + "__" + actName + "secsSinceMidnight.txt", false).getPercentile(50);
 		}
 		catch (Exception e)
 		{

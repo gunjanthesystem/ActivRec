@@ -56,7 +56,7 @@ public class Descriptive
 			// for a user.
 			double[] rawArray = raw.stream().mapToDouble(l -> l.doubleValue()).toArray();
 			DescriptiveStatistics dsStart = StatsUtils.getDescriptiveStatistics(rawArray,
-					"Difference of StartGeo location in km", user + "Stats_StartDiff.txt");
+					"Difference of StartGeo location in km", user + "Stats_StartDiff.txt", true);
 			WritingToFile.appendLineToFile(String.valueOf(dsStart.getPercentile(75)),
 					"ThirdQuartileStartEndGeoDiff.csv");
 			rawStartAllCount += raw.size();
@@ -65,7 +65,7 @@ public class Descriptive
 					",", 0, false);
 			double[] rawArray2 = raw2.stream().mapToDouble(l -> l.doubleValue()).toArray();
 			DescriptiveStatistics dsEnd = StatsUtils.getDescriptiveStatistics(rawArray2,
-					"Difference of EndGeo location in km", user + "Stats_EndDiffStats.txt");
+					"Difference of EndGeo location in km", user + "Stats_EndDiffStats.txt", true);
 			WritingToFile.appendLineToFile(String.valueOf(dsEnd.getPercentile(75)), "ThirdQuartileStartEndGeoDiff.csv");
 
 			rawEndAllCount += raw2.size();

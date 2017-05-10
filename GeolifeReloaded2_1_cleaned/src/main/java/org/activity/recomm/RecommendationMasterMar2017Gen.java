@@ -329,8 +329,9 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 			// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry
 			// for
 			// such candidate timelines from the distance scores map. // no pruning for baseline closest ST
-			if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == false)
-			{
+			if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == true)
+			{// changed from "Constant.useThreshold ==false)" on May 10 but should not affect result since we were not
+				// doing thresholding anyway
 				Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
 						distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm);
 				distancesMapUnsorted = prunedRes.getFirst();
