@@ -2204,7 +2204,7 @@ public class TimelineStats
 			}
 		}
 		StatsUtils.getDescriptiveStatistics(durationsForAll.stream().mapToDouble(l -> l.doubleValue()).toArray(),
-				"Durations For All users", "DurationsForAllUsers");
+				"Durations For All users", "DurationsForAllUsers", true);
 		System.out.println("Number of activity-objects with duration < 1 minutes: " + countLessOneMinute
 				+ ", % of total = " + (((double) countLessOneMinute / count) * 100));
 		System.out.println("Number of activity-objects with duration = 1 second: " + countOneSecondDuration

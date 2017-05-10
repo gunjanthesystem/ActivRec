@@ -29,6 +29,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
+import org.activity.sanityChecks.TimelineSanityChecks;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -251,14 +252,25 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			System.out.println("	User at Recomm = " + this.userAtRecomm + "\tDate at Recomm = " + this.dateAtRecomm
 					+ "\tTime at Recomm = " + this.timeAtRecomm);
 
-			this.currentTimeline = extractCurrentTimeline(testTimelines, lookPastType, this.dateAtRecomm,
-					this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours);
+			this.currentTimeline = extractCurrentTimelineSeq(testTimelines, lookPastType, this.dateAtRecomm,
+					this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours,
+					actObjsToAddToCurrentTimeline);
 
 			this.activitiesGuidingRecomm = currentTimeline.getActivityObjectsInTimeline(); // CURRENT TIMELINE
 			this.activityAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 			this.activityNameAtRecommPoint = this.activityAtRecommPoint.getActivityName();
 
-			// All check OK
+			// sanity check
+			if (activityNameAtRecommPoint.equals(actObjsToAddToCurrentTimeline
+					.get(actObjsToAddToCurrentTimeline.size() - 1).getActivityName()) == false)
+			{
+				System.err.println(
+						"Error act name of actAtRecommPoint and last act in acts to add do not match: activityNameAtRecommPoint= "
+								+ activityNameAtRecommPoint + " last act in acts to add = "
+								+ actObjsToAddToCurrentTimeline.get(actObjsToAddToCurrentTimeline.size() - 1)
+										.getActivityName());
+			}
+
 			// //////////////////////////
 			long recommMasterT1 = System.currentTimeMillis();
 			this.candidateTimelines = extractCandidateTimelines(trainingTimelines, lookPastType, this.dateAtRecomm,
@@ -328,10 +340,10 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// ##############
 
 			// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry
-			// for
-			// such candidate timelines from the distance scores map. // no pruning for baseline closest ST
-			if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == false)
-			{
+			// for such candidate timelines from the distance scores map. // no pruning for baseline closest ST
+			if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == true)
+			{// changed from "Constant.useThreshold ==false)" on May 10 but should not affect result since we were not
+				// doing thresholding anyway
 				Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
 						distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm);
 				distancesMapUnsorted = prunedRes.getFirst();
@@ -763,70 +775,52 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param matchingUnitInCountsOrHours
 	 * @param actObjsToAddToCurrentTimeline
 	 * @return
+	 * @since May 2, 2017
 	 */
 	private static TimelineWithNext extractCurrentTimelineSeq(LinkedHashMap<Date, Timeline> testTimelinesOrig,
 			LookPastType lookPastType2, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm,
 			double matchingUnitInCountsOrHours, ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
 	{
 
-		// CURSOR 2 May 2017
-		TimelineWithNext extractedCurrentTimeline = null;
-		LinkedHashMap<Date, Timeline> testTimelinesDaywise = testTimelinesOrig;
-
-		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-		{
-			if (Constant.hasInvalidActivityNames)
-			{
-				testTimelinesDaywise = TimelineUtils.expungeInvalidsDT(testTimelinesOrig);
-				// $$System.out.println("Expunging invalids before recommendation process: expunging test timelines");
-			}
-			else
-			{
-				// $$System.out.println("Data assumed to have no invalid act names to be expunged from test timelines");
-			}
-		}
+		TimelineWithNext extractedCurrentTimeline = extractCurrentTimeline(testTimelinesOrig, lookPastType2,
+				dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
 
 		// //////////////////
+		ArrayList<ActivityObject> actObjsForCurrTimeline = new ArrayList<>(
+				extractedCurrentTimeline.getActivityObjectsInTimeline());
+
+		// sanity check is act objs to add are later than act objs in timeline
+		TimelineSanityChecks.checkIfChronoLogicalOrder(actObjsForCurrTimeline, actObjsToAddToCurrentTimeline);
+
+		actObjsForCurrTimeline.addAll(actObjsToAddToCurrentTimeline);
+
+		// NOTE: WE ARE NOT SETTING NEXT ACTIVITY OBJECT OF CURRENT TIMELINE HERE.
 		if (lookPastType2.equals(Enums.LookPastType.Daywise) || lookPastType2.equals(Enums.LookPastType.ClosestTime))
 		{
-			extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineDaywise(testTimelinesDaywise,
-					dateAtRecomm, timeAtRecomm, userIDAtRecomm);
+			extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, true, true);
 		}
-		else
+		else if (lookPastType2.equals(Enums.LookPastType.NCount) || lookPastType2.equals(Enums.LookPastType.NHours))
 		{
-			// converting day timelines into continuous timelines suitable to be used for matching unit views
-			Timeline testTimeline = TimelineUtils.dayTimelinesToATimeline(testTimelinesDaywise, false, true);
-
-			if (lookPastType2.equals(Enums.LookPastType.NCount))
-			{
-				extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(testTimeline,
-						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
-			}
-
-			else if (lookPastType2.equals(Enums.LookPastType.NHours))
-			{
-				extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUHours(testTimeline,
-						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
-			}
-			else
-			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: Unrecognised lookPastType "));
-				System.exit(-1);
-			}
+			extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, false, true);
 		}
+		extractedCurrentTimeline.setImmediateNextActivityIsInvalid(-1);
 		// ////////////////////
-		if (extractedCurrentTimeline == null)
+		if (extractedCurrentTimeline.getActivityObjectsInTimeline().size() == 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: current timeline is empty"));
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error: extractCurrentTimeline extractedCurrentTimeline.getActivityObjectsInTimeline().size()="
+							+ extractedCurrentTimeline.getActivityObjectsInTimeline().size()));
 			System.exit(-1);
 			// this.errorExists = true;
 		}
 		if (VerbosityConstants.verbose)
 		{
-			System.out.println(
-					"Extracted current timeline: " + extractedCurrentTimeline.getActivityObjectNamesInSequence());
+			System.out.println("Extracted current timeline extractCurrentTimeline: "
+					+ extractedCurrentTimeline.getActivityObjectNamesInSequence());
 		}
+
 		return extractedCurrentTimeline;
+
 	}
 
 	/**

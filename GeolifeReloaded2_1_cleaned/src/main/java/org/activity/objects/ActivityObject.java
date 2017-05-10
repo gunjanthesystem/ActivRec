@@ -378,6 +378,22 @@ public class ActivityObject implements Serializable
 				+ durationInSecondsFromNext;
 	}
 
+	public String toStringAllGowallaTS()
+	{
+		return "actID=" + activityID + "__locID="
+				+ this.getLocationIDs('-') /*
+											 * + "__activityName=" + activityName + "__ locationName=" + locationName
+											 */ + "__workLvlCat=" + workingLevelCatIDs + "__stTS="
+				+ new Timestamp(startTimestampInms)
+				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
+				+ "__stLat=" + startLatitude + "__stLon=" + startLongitude /*
+																			 * + "__ startAlt=" + startAltitude
+																			 */ + "__uID=" + userID + "__photos_c="
+				+ photos_count + "__cins_c=" + checkins_count + "__users_c=" + users_count + "__radius_m="
+				+ radius_meters + "__highlts_count=" + highlights_count + "__items_c=" + items_count + "__max_items_c="
+				+ max_items_count + "__distNext=" + distanceInMFromNext + "__durNext=" + durationInSecondsFromNext;
+	}
+
 	public String toString()
 	{
 		if (Constant.getDatabaseName().equals("dcu_data_2"))// // ;"geolife1";// default database name, dcu_data_2";/

@@ -646,7 +646,7 @@ public class StatsUtils
 	}
 
 	public static DescriptiveStatistics getDescriptiveStatistics(double[] values, String nameForValue,
-			String fileNameToWrite)
+			String fileNameToWrite, boolean writeStatsToFile)
 	{
 
 		DescriptiveStatistics dstats = new DescriptiveStatistics(values);
@@ -670,8 +670,11 @@ public class StatsUtils
 				+ "Sum = " + nf.format(dstats.getSum()) + "\n" + "-------------------------------\n";
 
 		message.append(m1);
-		WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
-		// TODO check if this works corrcetly System.out.println(m1);
+
+		if (writeStatsToFile)
+		{
+			WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+		} // TODO check if this works corrcetly System.out.println(m1);
 
 		return dstats;
 	}
@@ -728,7 +731,7 @@ public class StatsUtils
 	 * @return
 	 */
 	public static DescriptiveStatistics getDescriptiveStatisticsLong(ArrayList<Long> valsReceived, String nameForValue,
-			String fileNameToWrite)
+			String fileNameToWrite, boolean writeStatsToFile)
 	{
 
 		double values[] = new double[valsReceived.size()];
@@ -758,8 +761,11 @@ public class StatsUtils
 				+ "Sum = " + nf.format(dstats.getSum()) + "\n" + "-------------------------------\n";
 
 		message.append(m1);
-		WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
-		// TODO check if this works corrcetly System.out.println(m1);
+
+		if (writeStatsToFile)
+		{
+			WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+		} // TODO check if this works corrcetly System.out.println(m1);
 
 		return dstats;
 	}
