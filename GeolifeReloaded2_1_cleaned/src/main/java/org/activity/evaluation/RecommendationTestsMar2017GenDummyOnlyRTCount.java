@@ -468,7 +468,7 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 									String endTimeString = endTimeStamp.getHours() + ":" + endTimeStamp.getMinutes()
 											+ ":" + endTimeStamp.getSeconds();
 									String timeCategory = DateTimeUtils
-											.getTimeCategoryOfTheDay(endTimeStamp.getHours());
+											.getTimeCategoryOfDay(endTimeStamp.getHours());
 
 									if (TimelineUtils.isNoValidActivityAfterItInTheDay(indexOfAOInDay,
 											testDayTimelineForUser))

@@ -19,7 +19,6 @@ import org.activity.objects.CheckinEntry;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
-import org.activity.util.StringUtils;
 
 /**
  * Just to check/run some random snippets of code NOT IMPORTANT
@@ -78,6 +77,7 @@ public class TestDummy2
 
 	public static void main(String args[])
 	{
+		checkRegexUtils();
 		// checkStackTrace();
 		// testDirectoryDeletion();
 		// List<String> list = Arrays.asList(new String[] { "gunjan", "manali", "sukany" });
@@ -94,9 +94,11 @@ public class TestDummy2
 		// sb.append(" Really? ");
 		// System.out.println(sb.toString());
 
-		String[] list = new String[] { "Manali", "Gunjan", "Manali", "Gunjan", "Manali" };
-		System.out.println(StringUtils.fCat(new StringBuilder("test\n"), list).toString());
-		//
+		/////////////////
+		// String[] list = new String[] { "Manali", "Gunjan", "Manali", "Gunjan", "Manali" };
+		// System.out.println(StringUtils.fCat(new StringBuilder("test\n"), list).toString());
+		/////////////////
+
 		// Timestamp t1 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
 		// Timestamp t2 = new Timestamp(2000, 12, 1, 10, 10, 10, 10);
 		//
