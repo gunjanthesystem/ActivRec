@@ -377,7 +377,7 @@ public class Evaluation
 				for (int j = 0; j < currentLineArray.size(); j++) // iterating over recommendation times (or columns)
 				{
 					int hourOfTheDay = getHourFromMetaString(currentLineArray.get(j));
-					if (DateTimeUtils.getTimeCategoryOfTheDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
+					if (DateTimeUtils.getTimeCategoryOfDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
 							|| timeCategory.equals("All"))
 					{
 						countOfRecommendationTimesConsidered++;
@@ -543,7 +543,7 @@ public class Evaluation
 				for (int j = 0; j < currentLineArray.size(); j++) // iterating over recommendation times (or columns)
 				{
 					int hourOfTheDay = getHourFromMetaString(currentLineArray.get(j));
-					if (DateTimeUtils.getTimeCategoryOfTheDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
+					if (DateTimeUtils.getTimeCategoryOfDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
 							|| timeCategory.equals("All"))
 					{
 						countOfRecommendationTimesConsidered++;

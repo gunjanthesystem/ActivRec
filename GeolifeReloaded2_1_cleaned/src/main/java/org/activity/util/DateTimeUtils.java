@@ -528,7 +528,7 @@ public class DateTimeUtils
 		return timeStamp;
 	}
 
-	public static String getTimeCategoryOfTheDay(int hour)
+	public static String getTimeCategoryOfDay(int hour)
 	{
 		String timeCategory = null;
 
