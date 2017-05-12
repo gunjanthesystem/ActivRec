@@ -376,7 +376,7 @@ public class ControllerWithoutServer
 
 			RecommendationTestsMar2017GenSeq recommendationsTest = new RecommendationTestsMar2017GenSeq(sampledUsers,
 					Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
-					Constant.percentageInTraining);
+					Constant.percentageInTraining, 3);
 
 			/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
 

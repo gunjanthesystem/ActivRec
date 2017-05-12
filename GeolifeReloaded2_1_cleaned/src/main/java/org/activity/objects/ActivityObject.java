@@ -2,6 +2,7 @@ package org.activity.objects;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -384,7 +385,7 @@ public class ActivityObject implements Serializable
 				+ this.getLocationIDs('-') /*
 											 * + "__activityName=" + activityName + "__ locationName=" + locationName
 											 */ + "__workLvlCat=" + workingLevelCatIDs + "__stTS="
-				+ new Timestamp(startTimestampInms)
+				+ Instant.ofEpochMilli(startTimestampInms).toString()
 				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
 				+ "__stLat=" + startLatitude + "__stLon=" + startLongitude /*
 																			 * + "__ startAlt=" + startAltitude

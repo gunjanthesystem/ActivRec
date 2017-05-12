@@ -2459,12 +2459,12 @@ public class TimelineUtils
 		for (int i = 0; i < N; i++)
 		{
 			ActivityObject ao = t
-					.getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp + 0);
+					.getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp + i);
 
-			System.out.println("Debug:\nTimestamp of ao = " + ao.getEndTimestamp());
+			// System.out.println("Debug:\nTimestamp of ao = " + ao.getEndTimestamp());FOUND OKAY in RUN
 			LocalDate dateOfAO = ao.getEndTimestamp().toLocalDateTime().toLocalDate();
-			System.out.println("LocalDate of ao = " + dateOfAO);
-			System.out.println("dateOfAO.equals(dateOfGivenTS)=" + dateOfAO.equals(dateOfGivenTS));
+			// System.out.println("LocalDate of ao = " + dateOfAO);
+			// System.out.println("dateOfAO.equals(dateOfGivenTS)=" + dateOfAO.equals(dateOfGivenTS));
 
 			if (dateOfAO.equals(dateOfGivenTS))
 			{// DateTimeUtils.isSameDate(ao.getStartTimestamp(), // timestamp))
@@ -2483,9 +2483,12 @@ public class TimelineUtils
 							+ N));
 		}
 
-		System.out.println("Next valid acts: ");
-		result.stream().forEach((ActivityObject ao) -> System.out.print(ao.toStringAllGowallaTS() + ">>"));
-		System.out.println("Exiting getNextNValidAOsAfterActivityAtThisTimeSameDay");
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Next valid acts: ");
+			result.stream().forEach((ActivityObject ao) -> System.out.print(ao.toStringAllGowallaTS() + ">>"));
+			System.out.println("Exiting getNextNValidAOsAfterActivityAtThisTimeSameDay");
+		}
 		return result;
 	}
 
@@ -2633,9 +2636,9 @@ public class TimelineUtils
 		{
 			System.out.println("longer timeline=" + longerTimeline.getActivityObjectNamesWithTimestampsInSequence());// getActivityObjectNamesInSequence());
 			// currentTimeline.getActivityObjectNamesWithTimestampsInSequence());
+			System.out.println("Start index of current timeline=" + indexOfCurrentStart
+					+ "\nEnd index of current timeline=" + indexOfCurrentEnd + "\nAdjusted MU:" + matchingUnitInCounts);
 		}
-		System.out.println("Start index of current timeline=" + indexOfCurrentStart + "\nEnd index of current timeline="
-				+ indexOfCurrentEnd + "\nAdjusted MU:" + matchingUnitInCounts);
 
 		// identify the recommendation point in longer timeline
 		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
@@ -2906,7 +2909,9 @@ public class TimelineUtils
 	 * @param activitiesGuidingRecomm2
 	 * @param userIDAtRecomm
 	 * @param dateAtRecomm
+	 *            only used for writing to file
 	 * @param timeAtRecomm
+	 *            only used for writing to file
 	 * @param hasInvalidActivityNames
 	 * @param invalidActName1
 	 * @param invalidActName2
@@ -2968,7 +2973,9 @@ public class TimelineUtils
 	 * @param activitiesGuidingRecomm
 	 * @param userAtRecomm
 	 * @param dateAtRecomm
+	 *            only used for writing to file
 	 * @param timeAtRecomm
+	 *            only used for writing to file
 	 * @param candidateID
 	 * @param hasInvalidActivityNames
 	 * @param invalidActName1
