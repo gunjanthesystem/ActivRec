@@ -14,13 +14,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
-import org.activity.constants.SeqRecommConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
@@ -29,12 +29,10 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017GenSeq;
-import org.activity.sanityChecks.DateTimeSanityChecks;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.PerformanceAnalytics;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
@@ -103,10 +101,10 @@ public class RecommendationTestsMar2017GenSeq
 	 */
 	public RecommendationTestsMar2017GenSeq(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines,
 			Enums.LookPastType lookPastType, Enums.CaseType caseType, Enums.TypeOfThreshold[] typeOfThresholds,
-			int[] userIDs, double percentageInTraining)// , int lengthOfRecommendedSequence)
+			int[] userIDs, double percentageInTraining, int lengthOfRecommendedSequence)
 	{
-		System.out.println(
-				"\n\n **********Entering RecommendationTestsMar2017********** " + lookPastType + " " + caseType);
+		System.out.println("\n\n **********Entering RecommendationTestsMar2017GenSeq********** " + lookPastType + " "
+				+ caseType + " lengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
 		long recommTestsStarttime = System.currentTimeMillis();
 
 		this.lookPastType = lookPastType;
@@ -116,7 +114,7 @@ public class RecommendationTestsMar2017GenSeq
 		this.typeOfThresholds = typeOfThresholds;
 		this.userIDs = userIDs;
 
-		this.recommSeqLength = SeqRecommConstants.RecommSeqLen;
+		this.recommSeqLength = lengthOfRecommendedSequence;// SeqRecommConstants.RecommSeqLen;
 
 		if (userIDs == null || userIDs.length == 0) // if userid is not set in constant class, in case of gowalla
 		{
@@ -183,8 +181,17 @@ public class RecommendationTestsMar2017GenSeq
 								.redirectConsoleOutput(commonPath + "consoleLog.txt");
 
 						BufferedWriter metaBufferWriter = WritingToFile.getBWForNewFile(commonPath + "meta.csv");
-						BufferedWriter actualBufferWriter = WritingToFile
-								.getBWForNewFile(commonPath + "dataActual.csv");
+
+						BufferedWriter recommSeqBufferWriter = WritingToFile
+								.getBWForNewFile(commonPath + "dataRecommSequence.csv");// **
+
+						BufferedWriter recommSeqWithScoreBufferWriter = WritingToFile
+								.getBWForNewFile(commonPath + "dataRecommSequenceWithScore.csv");// **
+
+						BufferedWriter actualSeqBufferWriter = WritingToFile
+								.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
+
+						ArrayList<BufferedWriter> actualBufferWriter = new ArrayList<>(this.recommSeqLength);
 
 						BufferedWriter topNextActsWithoutDistance = WritingToFile
 								.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
@@ -198,28 +205,33 @@ public class RecommendationTestsMar2017GenSeq
 						BufferedWriter rtsRejWithNoDWButMUCandsCands = WritingToFile
 								.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
 
-						BufferedWriter rankedRecommWithScoreWriter[] = new BufferedWriter[this.recommSeqLength];
+						ArrayList<BufferedWriter> rankedRecommWithScoreWriter = new ArrayList<>(this.recommSeqLength);
 
-						BufferedWriter rankedRecommWithoutScoreWriter[] = new BufferedWriter[this.recommSeqLength];
+						ArrayList<BufferedWriter> rankedRecommWithoutScoreWriter = new ArrayList<>(
+								this.recommSeqLength);
 
 						BufferedWriter metaIfCurrentTargetSameWriter = WritingToFile
 								.getBWForNewFile(commonPath + "metaIfCurrentTargetSameWriter.csv");
 
-						BufferedWriter numOfCandidateTimelinesWriter[] = new BufferedWriter[this.recommSeqLength];
-						BufferedWriter bwRaw[] = new BufferedWriter[this.recommSeqLength];
+						ArrayList<BufferedWriter> numOfCandidateTimelinesWriter = new ArrayList<>(this.recommSeqLength);
+						ArrayList<BufferedWriter> bwRaw = new ArrayList<>(this.recommSeqLength);
 
 						for (int i = 0; i < this.recommSeqLength; i++)
 						{
-							numOfCandidateTimelinesWriter[i] = WritingToFile
-									.getBWForNewFile(commonPath + "numOfCandidateTimelines.csv");
-							bwRaw[i] = WritingToFile.getBWForNewFile(commonPath + "Raw" + i + ".csv");
-							bwRaw[i].write(
+							numOfCandidateTimelinesWriter.add(i,
+									WritingToFile.getBWForNewFile(commonPath + "numOfCandidateTimelines" + i + ".csv"));
+							bwRaw.add(i, WritingToFile.getBWForNewFile(commonPath + "Raw" + i + ".csv"));
+							bwRaw.get(i).write(
 									"User,DateOfRecomm,TimeOfRecomm,TimeCategoryOfRecomm,CurrentTimeline, CurrentActivity(ActivityAtRecommPoint),NumberOfValidActivities_in_Current_Timeline,NumberOfActivities_in_Current_Timeline,NumOfCandidateTimelinesBelowThresh, WeekDayOfRecomm,Target(ActualActivity), RecommendedActivities, NumOfDistinctRecomms, PearsonCorrOfCandSimsAndEndCaseSims, AvgRestSimilarity, StdDevRestSimilarity, AvgEndSimilarity, StdDevEndSimilarity,IsCurrentActTargetActSame\n");// LastActivityOnRecommDay");//,ActivitiesOnRecommDayUntiRecomm");
 
-							rankedRecommWithScoreWriter[i] = WritingToFile
-									.getBWForNewFile(commonPath + "dataRankedRecommendationWithScores.csv");
-							rankedRecommWithoutScoreWriter[i] = WritingToFile
-									.getBWForNewFile(commonPath + "dataRankedRecommendationWithoutScores.csv");
+							rankedRecommWithScoreWriter.add(i, WritingToFile
+									.getBWForNewFile(commonPath + "dataRankedRecommendationWithScores" + i + ".csv"));
+							rankedRecommWithoutScoreWriter.add(i, WritingToFile.getBWForNewFile(
+									commonPath + "dataRankedRecommendationWithoutScores" + i + ".csv"));
+
+							actualBufferWriter.add(i,
+									WritingToFile.getBWForNewFile(commonPath + "dataActual" + i + ".csv"));
+
 						}
 
 						/**
@@ -311,10 +323,11 @@ public class RecommendationTestsMar2017GenSeq
 						 */
 						LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
 						LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
-
+						// PopUps.showMessage("Starting iteration over user");
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
 							System.out.println("\nUser id=" + userId);
+							// PopUps.showMessage("\nUser id=" + userId);
 							String userName = "";
 							if (Constant.getDatabaseName().equals("gowalla1"))
 							{
@@ -325,6 +338,7 @@ public class RecommendationTestsMar2017GenSeq
 								userName = ConnectDatabase.getUserName(userId);// ConnectDatabase.getUserNameFromDatabase(userId);
 							}
 
+							// PopUps.showMessage("before blacklisting");
 							if (Constant.blacklistingUsersWithLargeMaxActsPerDay)
 							{
 								if (Constant.getDatabaseName().equals("gowalla1"))
@@ -334,6 +348,8 @@ public class RecommendationTestsMar2017GenSeq
 									{
 										System.out.println("Skipping user: " + userId
 												+ " as in gowallaUserIDsWithGT553MaxActsPerDay");
+										// PopUps.showMessage("Skipping user: " + userId
+										// + " as in gowallaUserIDsWithGT553MaxActsPerDay");
 										continue;
 									}
 								}
@@ -344,7 +360,7 @@ public class RecommendationTestsMar2017GenSeq
 											+ " but blacklisted user not defined for this database");
 								}
 							}
-
+							// PopUps.showMessage("after blacklisting");
 							// BufferedWriter bwMaxNumOfDistinctRecommendations = WritingToFile
 							// .getBWForNewFile(commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
 							// bwMaxNumOfDistinctRecommendations.write("DateOfRecomm" + ",TimeOfRecomm"
@@ -352,8 +368,12 @@ public class RecommendationTestsMar2017GenSeq
 							// Threshold)\n");
 
 							// replacing iterative write with StringBuilder for better performance
-							StringBuilder sbMaxNumOfDistinctRecommendations[] = new StringBuilder[recommSeqLength];
-							Arrays.stream(sbMaxNumOfDistinctRecommendations).forEach(sb -> sb.append(
+							ArrayList<StringBuilder> sbMaxNumOfDistinctRecommendations = new ArrayList<>(
+									recommSeqLength);
+							IntStream.range(0, this.recommSeqLength)
+									.forEachOrdered(i -> sbMaxNumOfDistinctRecommendations.add(new StringBuilder()));
+
+							sbMaxNumOfDistinctRecommendations.parallelStream().forEach(sb -> sb.append(
 									"DateOfRecomm ,TimeOfRecomm ,Week_Day,MaxNumOfDistictRecommendation,NumOfCandidateTimelines(after applying Threshold)\n"));
 
 							// BufferedWriter bwNumOfCandTimelinesBelowThreshold = WritingToFile
@@ -363,8 +383,12 @@ public class RecommendationTestsMar2017GenSeq
 							// + ",Week_Day,ThresholdAsDistance,NumOfCandidateTimelinesBelowThreshold,\n");
 
 							// replacing iterative write with StringBuilder for better performance
-							StringBuilder sbNumOfCandTimelinesBelowThreshold[] = new StringBuilder[recommSeqLength];
-							Arrays.stream(sbNumOfCandTimelinesBelowThreshold).forEach(sb -> sb.append(
+							ArrayList<StringBuilder> sbNumOfCandTimelinesBelowThreshold = new ArrayList<StringBuilder>(
+									recommSeqLength);
+							IntStream.range(0, this.recommSeqLength)
+									.forEachOrdered(i -> sbNumOfCandTimelinesBelowThreshold.add(new StringBuilder()));
+
+							sbNumOfCandTimelinesBelowThreshold.parallelStream().forEach(sb -> sb.append(
 									"DateOfRecomm ,TimeOfRecomm ,Week_Day,ThresholdAsDistance,NumOfCandidateTimelinesBelowThreshold,\n"));
 
 							// BufferedWriter bwRecommTimesWithEditDistances = WritingToFile
@@ -372,13 +396,15 @@ public class RecommendationTestsMar2017GenSeq
 							// bwRecommTimesWithEditDistances.write("DateOfRecomm" + ",TimeOfRecomm,"
 							// +
 							// "CandidateTimelineID,TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,EndIndexOf(Sub)Cand,CandidateTimeline,WeekDayOfRecomm\n");
-							StringBuilder sbRecommTimesWithEditDistances[] = new StringBuilder[recommSeqLength];
-							Arrays.stream(sbRecommTimesWithEditDistances).forEach(sb -> sb.append("DateOfRecomm"
+							ArrayList<StringBuilder> sbRecommTimesWithEditDistances = new ArrayList<>(recommSeqLength);
+							IntStream.range(0, this.recommSeqLength)
+									.forEachOrdered(i -> sbRecommTimesWithEditDistances.add(new StringBuilder()));
+
+							sbRecommTimesWithEditDistances.parallelStream().forEach(sb -> sb.append("DateOfRecomm"
 									+ ",TimeOfRecomm,"
 									+ "CandidateTimelineID,TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,EndIndexOf(Sub)Cand,CandidateTimeline,WeekDayOfRecomm\n"));
 
 							userAllDatesTimeslines = usersTimelines.get(Integer.toString(userId));// userId);
-
 							if (userAllDatesTimeslines == null)
 							{
 								System.err.println("Error: userAllDatesTimeslines = " + userAllDatesTimeslines
@@ -408,6 +434,7 @@ public class RecommendationTestsMar2017GenSeq
 							// unit, so we can take it out of the for loop, however, it that we will also need to
 							// take out the train-test splitting of timelines out of the loop, which can be done as
 							// well
+
 							Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUser(
 									userId, TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
 									Constant.getActivityNames(),
@@ -415,6 +442,7 @@ public class RecommendationTestsMar2017GenSeq
 							LinkedHashMap<String, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
 							mapOfRepAOs.put(userId, repAOsForThisUser);
 							mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
+
 							// continue;
 							// }
 							////// END of build representative activity objects for this user.
@@ -498,6 +526,7 @@ public class RecommendationTestsMar2017GenSeq
 							int numberOfMorningRTs = 0, numberOfAfternoonRTs = 0, numberOfEveningRTs = 0;
 							// Generating Recommendation Timestamps
 							// generate date and times for recommendation
+
 							for (Map.Entry<Date, Timeline> testDayTimelineEntry : userTestTimelines.entrySet())
 							{
 								Date testDate = testDayTimelineEntry.getKey();
@@ -517,30 +546,55 @@ public class RecommendationTestsMar2017GenSeq
 										.getActivityObjectsInDay();
 
 								////////// added to improve write speed
-								StringBuilder bwRawToWriteForThisUserDate[] = new StringBuilder[recommSeqLength];
+								ArrayList<StringBuilder> bwRawToWriteForThisUserDate = new ArrayList<>(recommSeqLength);
+								IntStream.range(0, this.recommSeqLength)
+										.forEachOrdered(i -> bwRawToWriteForThisUserDate.add(new StringBuilder()));
+
 								StringBuilder metaToWriteForThisUserDate = new StringBuilder();
-								StringBuilder dataActualToWriteForThisUserDate = new StringBuilder();
+								StringBuilder recommSequenceWithScoreForThisUserDate = new StringBuilder();
+								StringBuilder recommSequenceWithoutScoreForThisUserDate = new StringBuilder();
+
+								ArrayList<StringBuilder> dataActualToWriteForThisUserDateIter = new ArrayList<>(
+										recommSeqLength);
+								IntStream.range(0, this.recommSeqLength).forEachOrdered(
+										i -> dataActualToWriteForThisUserDateIter.add(new StringBuilder()));
+
 								StringBuilder dataActualSeqActsToWriteForThisUserDate = new StringBuilder();
 								StringBuilder metaIfCurrentTargetSameToWriteForThisUserDate = new StringBuilder();
-								StringBuilder numOfCandidateTimelinesForThisUserDate[] = new StringBuilder[recommSeqLength];
+
+								ArrayList<StringBuilder> numOfCandidateTimelinesForThisUserDate = new ArrayList<>(
+										recommSeqLength);
+								IntStream.range(0, this.recommSeqLength).forEachOrdered(
+										i -> numOfCandidateTimelinesForThisUserDate.add(new StringBuilder()));
 
 								StringBuilder topNextActsWithoutDistToWriteForThisUserDate = new StringBuilder();
 								StringBuilder topNextActsWithDistToWriteForThisUserDate = new StringBuilder();
-								StringBuilder rankedRecommWithScoreToWriteForThisUserDate[] = new StringBuilder[recommSeqLength];
-								StringBuilder rankedRecommWithoutScoreToWriteForThisUserDate[] = new StringBuilder[recommSeqLength];
+
+								ArrayList<StringBuilder> rankedRecommWithScoreToWriteForThisUserDate = new ArrayList<>(
+										recommSeqLength);
+								IntStream.range(0, this.recommSeqLength).forEachOrdered(
+										i -> rankedRecommWithScoreToWriteForThisUserDate.add(new StringBuilder()));
+
+								ArrayList<StringBuilder> rankedRecommWithoutScoreToWriteForThisUserDate = new ArrayList<>(
+										recommSeqLength);
+								IntStream.range(0, this.recommSeqLength).forEachOrdered(
+										i -> rankedRecommWithoutScoreToWriteForThisUserDate.add(new StringBuilder()));
+
 								StringBuilder baseLineOccurrenceToWriteForThisUserDate = new StringBuilder();
 								StringBuilder baseLineDurationToWriteForThisUserDate = new StringBuilder();
 								///////////
 
 								// loop over the activity objects for this day
 								// will not make recommendation for days which have only one activity
+								// PopUps.showMessage(
+								// "Just before iterating over AOs in test: activityObjectsInTestDay.size() = "
+								// + activityObjectsInTestDay.size());
 								for (int indexOfAOInDay = 0; indexOfAOInDay < activityObjectsInTestDay.size()
 										- 1; indexOfAOInDay++)
 								{
 									ActivityObject activityObjectInTestDay = activityObjectsInTestDay
 											.get(indexOfAOInDay);
 									String activityNameInTestDay = activityObjectInTestDay.getActivityName();
-
 									System.out.println(
 											"----\nIterating over potential recommendation times: current activityNameInTestDay="
 													+ activityNameInTestDay);// (activityObjectsInThatDay.get(j).getActivityName()));
@@ -555,7 +609,6 @@ public class RecommendationTestsMar2017GenSeq
 										System.out.println("Skipping because " + Constant.INVALID_ACTIVITY2);
 										continue;
 									}
-
 									// Recommendation is made at the end time of the activity object in consideration
 									Timestamp endTimeStamp = activityObjectInTestDay.getEndTimestamp();// getStartTimestamp();
 
@@ -586,7 +639,8 @@ public class RecommendationTestsMar2017GenSeq
 													endTimeStamp, this.recommSeqLength);
 
 									// timestamp sanity check start
-									DateTimeSanityChecks.assertEqualsTimestamp(date, month, year, endTimeStamp);
+									// $DateTimeSanityChecks.assertEqualsTimestamp(date, month, year, endTimeStamp);
+									// FOUND ABOVE OKAY IN RUN
 
 									if (nextValidActivityObjectsAfterRecommPoint1.size() != recommSeqLength)
 									{
@@ -602,7 +656,6 @@ public class RecommendationTestsMar2017GenSeq
 										PopUps.showError(
 												"Error in Sanity Check RT407: nextValidActivityObjectsAfterRecommPoint1.size()!=recommSeqLength, if it was such, we should have not reached this point of execution");
 									}
-
 									System.out.println("User id" + userId + " Next activity Object after recomm time:"
 											+ endTimeStamp + " ="
 											+ nextValidActivityObjectAfterRecommPoint1.getActivityName());
@@ -624,7 +677,6 @@ public class RecommendationTestsMar2017GenSeq
 														+ nextValidActivityObjectsAfterRecommPoint1.get(0)
 																.getActivityName()));
 									}
-
 									if (VerbosityConstants.WriteNumOfValidsAfterAnRTInSameDay)
 									{
 										int numOfValidsAOsAfterThisRT = testDayTimelineForUser
@@ -656,54 +708,178 @@ public class RecommendationTestsMar2017GenSeq
 									recommendationTimes[0] = endTimeStamp;// the first RT is endTS of current AO
 
 									String topRecommendedActNames[] = new String[recommSeqLength];
+									boolean skipThisRTNoCandTimelines = false; // skip this RT because no cand timelines
 
 									for (int i = 0; i < recommSeqLength; i++)
 									{
-										if (VerbosityConstants.verbose)
+										// if (VerbosityConstants.verbose)
 										{
-											System.out.println(
-													"Recommendation Iteration " + i + "repAOsFromPrevRecomms.size:"
-															+ repAOsFromPrevRecomms.size() + " rt:" + recommMasters[i]);
-											System.out.println("repAOsFromPrevRecomms:");
-											repAOsFromPrevRecomms.stream().forEachOrdered(
-													ao -> System.out.print(">>" + ao.toStringAllGowallaTS()));
+											System.out.println("\n** Recommendation Iteration " + i
+													+ ": repAOsFromPrevRecomms.size:" + repAOsFromPrevRecomms.size()
+													+ " rt:" + recommendationTimes[i]);
+											if (VerbosityConstants.verbose)
+											{
+												System.out.println("repAOsFromPrevRecomms:");
+												repAOsFromPrevRecomms.stream().forEachOrdered(
+														ao -> System.out.print("  >>" + ao.toStringAllGowallaTS()));
+											}
 										}
-
 										recommTimesStrings[i] = recommendationTimes[i].getHours() + ":"
 												+ recommendationTimes[i].getMinutes() + ":"
 												+ recommendationTimes[i].getSeconds();
 
 										recommMasters[i] = new RecommendationMasterMar2017GenSeq(userTrainingTimelines,
-												userTestTimelines, dateToRecomm, recommTimesStrings[i], userId,
+												userTestTimelines, dateToRecomm, recommTimesStrings[0], userId,
 												thresholdValue, typeOfThreshold, matchingUnit, caseType,
 												this.lookPastType, false, repAOsFromPrevRecomms);
+										// Note: RT passed to the recommendation master is always endTimestamp. This is
+										// intentional to make the current implementation of extracing current timeline
+										// work. RT is only important forextraction of current timeline
 
-										ArrayList<String> splittedRankedRecommendedActName = (ArrayList<String>) Arrays
-												.asList(RegexUtils.patternDoubleUnderScore.split(recommMasters[i]
-														.getRankedRecommendedActNamesWithoutRankScores()));
+										//////////////////////////
+										RecommendationMasterI recommMaster = recommMasters[i];
+										////////////////////////////////////////////////////////////////////////
 
-										System.out.println("debug 645: splittedRankedRecommendedActName = "
-												+ splittedRankedRecommendedActName.toString());
+										double thresholdAsDistance = recommMasters[0].getThresholdAsDistance();
+										// check if all seq recomms for this RT has daywise candidate timelines
+										if (recommMaster.hasCandidateTimeslines() == false)
+										{
+											rtsWithNoCandsWriter.write(userId + "," + dateToRecomm + ","
+													+ indexOfAOInDay + "," + recommTimesStrings[0] + "," + weekDay + ","
+													+ timeCategory + ","
+													+ recommMaster.getActivityObjectAtRecomm().getActivityName() + ","
+													+ i + ",\n");// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
+											System.out.println(
+													"Cannot make recommendation at this point as there are no candidate timelines for recommMaster i = "
+															+ i);
+											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
+											// endTimeStamp+"," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
+											sbNumOfCandTimelinesBelowThreshold.get(i)
+													.append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
+															+ "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
+											skipThisRTNoCandTimelines = true;
+											break;
+										}
+										////////////////////////////////////////////////////////////////////////
+										// check if all seq recomms for this RT will have daywise candidate timelines
+										boolean hasDayWiseCandidateTimelines = TimelineUtils
+												.hasDaywiseCandidateTimelines(userTrainingTimelines,
+														recommMaster.getActsGuidingRecomm(),
+														recommMaster.getDateAtRecomm(),
+														recommMaster.getActivityObjectAtRecomm());
+
+										if (hasDayWiseCandidateTimelines == false)
+										{
+											rtsRejWithNoDWButMUCandsCands.write(userId + "," + dateToRecomm + ","
+													+ indexOfAOInDay + "," + recommendationTimes[0] + "," + weekDay
+													+ "," + timeCategory + ","
+													+ recommMaster.getActivityObjectAtRecomm().getActivityName()
+													+ "HasMUCandsButNoDWCands," + i + "\n");
+											System.out.println(
+													"Cannot make recommendation at this point as there are no daywise candidate timelines, even though there are mu candidate timelines");
+											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
+											// endTimeStamp+","+weekDay+","+thresholdAsDistance + "," + 0 + "\n");
+											sbNumOfCandTimelinesBelowThreshold.get(i)
+													.append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
+															+ "," + thresholdAsDistance + "," + 0 + "\n");
+											skipThisRTNoCandTimelines = true;
+											break; // continue;
+										}
+										///////////////////////////////////////////////////////////////////////
+										// check if all seq recomms for this RT will have candidate timelines below
+										// threshold
+										if (recommMaster.hasCandidateTimelinesBelowThreshold() == false)
+										{
+											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
+											// endTimeStamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
+											// bwNumOfCandTimelinesBelowThreshold.newLine();
+											sbNumOfCandTimelinesBelowThreshold.get(i)
+													.append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
+															+ "," + thresholdAsDistance + "," + 0 + "\n");
+											System.out.println(
+													"Cannot make recommendation at this point as there are no candidate timelines BELOW THRESHOLD");
+											skipThisRTNoCandTimelines = true;
+											break; // continue;
+										}
+										sbNumOfCandTimelinesBelowThreshold.get(i)
+												.append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
+														+ "," + thresholdAsDistance + ","
+														+ recommMaster.getNumOfCandTimelinesBelowThresh() + "," + i
+														+ "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
+
+										/// Sanity check
+										if (recommMaster.getRankedRecommendedActNamesWithoutRankScores().length() <= 0)
+										{
+											System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+													"Error in Sanity Check RT 800:recommMaster.getRankedRecommendedActivityNamesWithoutRankScores().length()<=0, but there are candidate timelines, i ="
+															+ i));
+										}
+
+										// TODO: disable for now as next activity after recomm is invalid is not used
+										// and probably not set.
+										// $$if (recommMaster.isNextActivityJustAfterRecommPointIsInvalid())
+										// $${ bwNextActInvalid.write(userId + "," + endTimeStamp + "," + i + "\n");}
+
+										/////////////////////////
+
+										// issue here solved
+										if (recommMasters[i] == null)
+										{
+											System.err.println(
+													PopUps.getCurrentStackTracedErrorMsg("recommMasters[i] = null"));
+											System.exit(-1);
+										}
+
+										if (VerbosityConstants.verbose)
+										{
+											System.out.println(
+													"recommMasters[i] .getRankedRecommendedActNamesWithoutRankScores()"
+															+ recommMasters[i]
+																	.getRankedRecommendedActNamesWithoutRankScores());
+										}
+										String[] splittedRankedRecommendedActName = RegexUtils.patternDoubleUnderScore
+												.split(recommMasters[i]
+														.getRankedRecommendedActNamesWithoutRankScores());
+
+										// PopUps.showMessage("splittedRankedRecommendedActName.length="
+										// + splittedRankedRecommendedActName.length);
+										// ArrayList<String> splittedRankedRecommendedActName = (ArrayList<String>)
+										// Arrays
+										// .asList(RegexUtils.patternDoubleUnderScore.split(recommMasters[i]
+										// .getRankedRecommendedActNamesWithoutRankScores()));
+
+										// PopUps.showMessage("here12_1");
+										// $System.out.println("debug 645: splittedRankedRecommendedActName = "
+										// $ + Arrays.asList(splittedRankedRecommendedActName));
 
 										// get the top recommended activity names from previous recommendation
-										topRecommendedActNames[i] = splittedRankedRecommendedActName.get(1);
-
+										topRecommendedActNames[i] = splittedRankedRecommendedActName[1];
+										// PopUps.showMessage("here12_2");
 										ActivityObject repAOForTopRecommActName = getRepresentativeAO(
 												topRecommendedActNames[i], mapOfRepAOs, mapOfMedianPreSuccDuration,
 												userId, recommendationTimes[i]);
-
+										// PopUps.showMessage("here12_3");
 										repAOsFromPrevRecomms.add(repAOForTopRecommActName);
-										recommendationTimes[i + 1] = repAOForTopRecommActName.getEndTimestamp();
+
+										if (i < (recommSeqLength - 1))
+										{
+											recommendationTimes[i + 1] = repAOForTopRecommActName.getEndTimestamp();
+										} // PopUps.showMessage("here12_4");
+									}
+
+									if (skipThisRTNoCandTimelines)
+									{
+										continue;
 									}
 									// end of curtain April 7
-
+									// PopUps.showMessage("here13");
 									System.out.println("time taken by recommMaster = "
 											+ (System.currentTimeMillis() - ta1) + " ms");
-
-									WritingToFile.appendLineToFileAbsolute(
-											(System.currentTimeMillis() - ta1) + ","
-													+ PerformanceAnalytics.getUsedMemoryInMB() + "\n",
-											Constant.getCommonPath() + "recommMasterPerformance.csv");
+									// $$ Disabled for speed
+									// $$ WritingToFile.appendLineToFileAbsolute(
+									// $$ (System.currentTimeMillis() - ta1) + ","
+									// $$ + PerformanceAnalytics.getUsedMemoryInMB() + "\n",
+									// $$ Constant.getCommonPath() + "recommMasterPerformance.csv");
 
 									System.out.println(
 											"Back to RecommendationTests: received following #of cand timelines for mu "
@@ -746,92 +922,102 @@ public class RecommendationTestsMar2017GenSeq
 										pruningHasSaturated = false;
 									}
 
-									boolean skipThisRTNoCandTimelines = false; // skip this RT because no cand timelines
+									// boolean skipThisRTNoCandTimelines = false; // skip this RT because no cand
+									// timelines
 
 									// pruningHasSaturated=recommP1.hasThresholdPruningNoEffect();
 
 									// Check if this RT should rejected because no candidate timelins
 									for (int i = 0; i < recommMasters.length; i++)
 									{
-										RecommendationMasterI recommMaster = recommMasters[0];
-										////////////////////////////////////////////////////////////////////////
-										// check if all seq recomms for this RT has daywise candidate timelines
-										if (recommMaster.hasCandidateTimeslines() == false)
-										{
-											rtsWithNoCandsWriter.write(userId + "," + dateToRecomm + ","
-													+ indexOfAOInDay + "," + recommTimesStrings[0] + "," + weekDay + ","
-													+ timeCategory + ","
-													+ recommMaster.getActivityObjectAtRecomm().getActivityName() + ","
-													+ i + ",\n");// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
-											System.out.println(
-													"Cannot make recommendation at this point as there are no candidate timelines for recommMaster i = "
-															+ i);
-											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
-											// endTimeStamp+"," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
-											sbNumOfCandTimelinesBelowThreshold[i]
-													.append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
-															+ "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
-											skipThisRTNoCandTimelines = true;
-											break;
-										}
-										////////////////////////////////////////////////////////////////////////
-										// check if all seq recomms for this RT will have daywise candidate timelines
-										boolean hasDayWiseCandidateTimelines = TimelineUtils
-												.hasDaywiseCandidateTimelines(userTrainingTimelines,
-														recommMaster.getActsGuidingRecomm(),
-														recommMaster.getDateAtRecomm(),
-														recommMaster.getActivityObjectAtRecomm());
-
-										if (hasDayWiseCandidateTimelines == false)
-										{
-											rtsRejWithNoDWButMUCandsCands.write(userId + "," + dateToRecomm + ","
-													+ indexOfAOInDay + "," + recommendationTimes[0] + "," + weekDay
-													+ "," + timeCategory + ","
-													+ recommMaster.getActivityObjectAtRecomm().getActivityName()
-													+ "HasMUCandsButNoDWCands," + i + "\n");
-											System.out.println(
-													"Cannot make recommendation at this point as there are no daywise candidate timelines, even though there are mu candidate timelines");
-											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
-											// endTimeStamp+","+weekDay+","+thresholdAsDistance + "," + 0 + "\n");
-											sbNumOfCandTimelinesBelowThreshold[i]
-													.append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
-															+ "," + thresholdAsDistance + "," + 0 + "\n");
-											skipThisRTNoCandTimelines = true;
-											break; // continue;
-										}
-										///////////////////////////////////////////////////////////////////////
-										// check if all seq recomms for this RT will have candidate timelines below
-										// threshold
-										if (recommMaster.hasCandidateTimelinesBelowThreshold() == false)
-										{
-											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
-											// endTimeStamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
-											// bwNumOfCandTimelinesBelowThreshold.newLine();
-											sbNumOfCandTimelinesBelowThreshold[i]
-													.append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
-															+ "," + thresholdAsDistance + "," + 0 + "\n");
-											System.out.println(
-													"Cannot make recommendation at this point as there are no candidate timelines BELOW THRESHOLD");
-											skipThisRTNoCandTimelines = true;
-											break; // continue;
-										}
-										sbNumOfCandTimelinesBelowThreshold[i].append(dateToRecomm + ","
-												+ recommendationTimes[i] + "," + weekDay + "," + thresholdAsDistance
-												+ "," + recommMaster.getNumOfCandTimelinesBelowThresh() + "," + i
-												+ "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
-
-										/// Sanity check
-										if (recommMaster.getRankedRecommendedActNamesWithoutRankScores().length() <= 0)
-										{
-											System.err.println(PopUps.getCurrentStackTracedErrorMsg(
-													"Error in Sanity Check RT 800:recommMaster.getRankedRecommendedActivityNamesWithoutRankScores().length()<=0, but there are candidate timelines, i ="
-															+ i));
-										}
-
-										// TODO: disable for now as next activity after recomm is invalid is not used
-										// and probably not set.
-										// $$if (recommMaster.isNextActivityJustAfterRecommPointIsInvalid())
-										// $${ bwNextActInvalid.write(userId + "," + endTimeStamp + "," + i + "\n");}
+										// RecommendationMasterI recommMaster = recommMasters[i];
+										// ////////////////////////////////////////////////////////////////////////
+										// // check if all seq recomms for this RT has daywise candidate timelines
+										// if (recommMaster.hasCandidateTimeslines() == false)
+										// {
+										// rtsWithNoCandsWriter.write(userId + "," + dateToRecomm + ","
+										// + indexOfAOInDay + "," + recommTimesStrings[0] + "," + weekDay + ","
+										// + timeCategory + ","
+										// + recommMaster.getActivityObjectAtRecomm().getActivityName() + ","
+										// + i + ",\n");//
+										// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
+										// System.out.println(
+										// "Cannot make recommendation at this point as there are no candidate timelines
+										// for recommMaster i = "
+										// + i);
+										// // bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
+										// // endTimeStamp+"," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
+										// sbNumOfCandTimelinesBelowThreshold.get(i)
+										// .append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
+										// + "," + thresholdAsDistance + "," + 0 + "\n");//
+										// bwNumOfCandTimelinesBelowThreshold.newLine();
+										// skipThisRTNoCandTimelines = true;
+										// break;
+										// }
+										// ////////////////////////////////////////////////////////////////////////
+										// // check if all seq recomms for this RT will have daywise candidate timelines
+										// boolean hasDayWiseCandidateTimelines = TimelineUtils
+										// .hasDaywiseCandidateTimelines(userTrainingTimelines,
+										// recommMaster.getActsGuidingRecomm(),
+										// recommMaster.getDateAtRecomm(),
+										// recommMaster.getActivityObjectAtRecomm());
+										//
+										// if (hasDayWiseCandidateTimelines == false)
+										// {
+										// rtsRejWithNoDWButMUCandsCands.write(userId + "," + dateToRecomm + ","
+										// + indexOfAOInDay + "," + recommendationTimes[0] + "," + weekDay
+										// + "," + timeCategory + ","
+										// + recommMaster.getActivityObjectAtRecomm().getActivityName()
+										// + "HasMUCandsButNoDWCands," + i + "\n");
+										// System.out.println(
+										// "Cannot make recommendation at this point as there are no daywise candidate
+										// timelines, even though there are mu candidate timelines");
+										// // bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
+										// // endTimeStamp+","+weekDay+","+thresholdAsDistance + "," + 0 + "\n");
+										// sbNumOfCandTimelinesBelowThreshold.get(i)
+										// .append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
+										// + "," + thresholdAsDistance + "," + 0 + "\n");
+										// skipThisRTNoCandTimelines = true;
+										// break; // continue;
+										// }
+										// ///////////////////////////////////////////////////////////////////////
+										// // check if all seq recomms for this RT will have candidate timelines below
+										// // threshold
+										// if (recommMaster.hasCandidateTimelinesBelowThreshold() == false)
+										// {
+										// // bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
+										// // endTimeStamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
+										// // bwNumOfCandTimelinesBelowThreshold.newLine();
+										// sbNumOfCandTimelinesBelowThreshold.get(i)
+										// .append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
+										// + "," + thresholdAsDistance + "," + 0 + "\n");
+										// System.out.println(
+										// "Cannot make recommendation at this point as there are no candidate timelines
+										// BELOW THRESHOLD");
+										// skipThisRTNoCandTimelines = true;
+										// break; // continue;
+										// }
+										// sbNumOfCandTimelinesBelowThreshold.get(i)
+										// .append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay
+										// + "," + thresholdAsDistance + ","
+										// + recommMaster.getNumOfCandTimelinesBelowThresh() + "," + i
+										// + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
+										//
+										// /// Sanity check
+										// if (recommMaster.getRankedRecommendedActNamesWithoutRankScores().length() <=
+										// 0)
+										// {
+										// System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+										// "Error in Sanity Check RT
+										// 800:recommMaster.getRankedRecommendedActivityNamesWithoutRankScores().length()<=0,
+										// but there are candidate timelines, i ="
+										// + i));
+										// }
+										//
+										// // TODO: disable for now as next activity after recomm is invalid is not used
+										// // and probably not set.
+										// // $$if (recommMaster.isNextActivityJustAfterRecommPointIsInvalid())
+										// // $${ bwNextActInvalid.write(userId + "," + endTimeStamp + "," + i + "\n");}
 
 									}
 									if (skipThisRTNoCandTimelines)
@@ -856,7 +1042,7 @@ public class RecommendationTestsMar2017GenSeq
 											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
 											// endTimeStamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
 											// bwNumOfCandTimelinesBelowThreshold.newLine();
-											sbNumOfCandTimelinesBelowThreshold[0]
+											sbNumOfCandTimelinesBelowThreshold.get(0)
 													.append(dateToRecomm + "," + recommendationTimes[0] + "," + weekDay
 															+ "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
 											continue;
@@ -879,11 +1065,11 @@ public class RecommendationTestsMar2017GenSeq
 
 									// target activity for recommendation
 									String actActualDone = nextValidActivityObjectAfterRecommPoint1.getActivityName();
-									ArrayList<String> actsActualDone = (ArrayList<String>) nextValidActivityObjectsAfterRecommPoint1
+									ArrayList<String> actsActualDoneInSeq = (ArrayList<String>) nextValidActivityObjectsAfterRecommPoint1
 											.stream().map(ao -> ao.getActivityName()).collect(Collectors.toList());
 
-									String actsActualDoneString = nextValidActivityObjectsAfterRecommPoint1.stream()
-											.map(ao -> ao.getActivityName()).collect(Collectors.joining(">"));
+									String actsActualDoneInSeqString = nextValidActivityObjectsAfterRecommPoint1
+											.stream().map(ao -> ao.getActivityName()).collect(Collectors.joining(">"));
 									// String nextActivityForRecommAtStartWithoutDistance = recommP1
 									// .getNextActivityNamesWithoutDistanceString();
 									// String nextActivityForRecommAtStartWithDistance = recommP1
@@ -920,19 +1106,26 @@ public class RecommendationTestsMar2017GenSeq
 									// String rankedRecommWithoutScoreForThisRT = recommP1
 									// .getRankedRecommendedActNamesWithoutRankScores();
 
-									System.out.println("** Ranked Recommendation=" + topRankedRecommSequenceWithScore
-											+ ", while actual was=" + actsActualDoneString);// rankedRecommWithoutScoreForThisRT
-
-									System.out.println("topRankedRecommSequenceWithoutScore = "
-											+ topRankedRecommSequenceWithoutScore);
-
+									if (VerbosityConstants.verbose)
+									{
+										System.out
+												.println("** Ranked Recommendation=" + topRankedRecommSequenceWithScore
+														+ ", while actual was=" + actsActualDoneInSeqString);// rankedRecommWithoutScoreForThisRT
+										System.out.println("topRankedRecommSequenceWithoutScore = "
+												+ topRankedRecommSequenceWithoutScore);
+									}
 									// metaBufferWriter.write(userId + "_" + dateToRecomm + "_" + endTimeString + ",");
 									metaToWriteForThisUserDate.append(userId).append("_").append(dateToRecomm)
 											.append("_").append(recommTimesStrings[0]).append(",");
 
-									// actualBufferWriter.write(actActualDone + ",");
-									dataActualToWriteForThisUserDate.append(actActualDone).append(",");
-									dataActualSeqActsToWriteForThisUserDate.append(actsActualDoneString).append(",");
+									recommSequenceWithScoreForThisUserDate.append(topRankedRecommSequenceWithScore)
+											.append(",");
+									recommSequenceWithoutScoreForThisUserDate
+											.append(topRankedRecommSequenceWithoutScore).append(",");
+
+									// dataActualToWriteForThisUserDateIter.append(actActualDone).append(",");
+									dataActualSeqActsToWriteForThisUserDate.append(actsActualDoneInSeqString)
+											.append(",");
 
 									// curtain WriteTopNextActivities on 11 May start, disabled as not essential
 									// if (VerbosityConstants.WriteTopNextActivitiesWithoutDistance)
@@ -951,22 +1144,37 @@ public class RecommendationTestsMar2017GenSeq
 									// topNextActsWithoutDistance.write(nextActivityForRecommAtStartWithoutDistance +
 									// ",");
 									// topNextActsWithDistance.write(nextActivityForRecommAtStartWithDistance + ",");
+									// System.out.println("recommMasters[0].getActivityNamesGuidingRecomm(): "
+									// + recommMasters[0].getActivityNamesGuidingRecomm());
+									// System.out.println("recommMasters[1].getActivityNamesGuidingRecomm(): "
+									// + recommMasters[1].getActivityNamesGuidingRecomm());
+									// System.out.println("recommMasters[2].getActivityNamesGuidingRecomm(): "
+									// + recommMasters[2].getActivityNamesGuidingRecomm());
 
-									for (int i = 0; i < rankedRecommWithScoreForThisRTIter.size(); i++)
+									for (int i = 0; i < this.recommSeqLength; i++)
 									{
-										rankedRecommWithScoreToWriteForThisUserDate[i]
+										// actualBufferWriter.write(actActualDone + ",");
+										// write each actual done separately
+										// IntStream.range(0, this.recommSeqLength)
+										// .forEach(i -> dataActualToWriteForThisUserDateIter.get(i)
+										// .append(actsActualDoneInSeq.get(i)));
+
+										dataActualToWriteForThisUserDateIter.get(i).append(actsActualDoneInSeq.get(i))
+												.append(",");
+
+										rankedRecommWithScoreToWriteForThisUserDate.get(i)
 												.append(rankedRecommWithScoreForThisRTIter.get(i)).append(",");
 										// rankedRecommWithScore.write(rankedRecommAtStartWithScore + ",");
 										// rankedRecommWithScoreToWriteForThisUserDate.append(rankedRecommWithScoreForThisRT)
 										// .append(",");
 
-										rankedRecommWithoutScoreToWriteForThisUserDate[i]
+										rankedRecommWithoutScoreToWriteForThisUserDate.get(i)
 												.append(rankedRecommWithoutScoreForThisRTIter.get(i)).append(",");
 										// rankedRecommWithoutScore.write(rankedRecommAtStartWithoutScore + ",");
 										// rankedRecommWithoutScoreToWriteForThisUserDate
 										// .append(rankedRecommWithoutScoreForThisRT).append(",");
 
-										numOfCandidateTimelinesForThisUserDate[i]
+										numOfCandidateTimelinesForThisUserDate.get(i)
 												.append(recommMasters[i].getNumOfCandTimelinesBelowThresh())
 												.append("\n");
 										// numOfCandidateTimelinesForThisUserDate
@@ -976,35 +1184,61 @@ public class RecommendationTestsMar2017GenSeq
 										String[] splittedRecomm = RegexUtils.patternDoubleUnderScore
 												.split(rankedRecommWithoutScoreForThisRTIter.get(i));
 
-										sbMaxNumOfDistinctRecommendations[i]
+										sbMaxNumOfDistinctRecommendations.get(i)
 												.append(dateToRecomm + "," + recommendationTimes[i] + "," + weekDay + // UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())+
 														"," + (splittedRecomm.length - 1) + ","
 														+ recommMasters[i].getNumOfCandTimelinesBelowThresh() + "\n");
 
-										bwRawToWriteForThisUserDate[i] = StringUtils.fCat(
-												bwRawToWriteForThisUserDate[i], userName, ",", dateToRecomm, ",",
-												recommTimesStrings[i], ",", timeCategory, ",",
-												recommMasters[i].getActivityNamesGuidingRecomm/* withTimestamps */(),
-												",", recommMasters[i].getActivityObjectAtRecomm().getActivityName(),
-												",",
-												Integer.toString(
-														recommMasters[i].getNumOfValidActsInActsGuidingRecomm()),
-												",",
-												Integer.toString(recommMasters[i].getNumOfActsInActsGuidingRecomm()),
-												",",
-												Integer.toString(recommMasters[i].getNumOfCandTimelinesBelowThresh()),
-												",", weekDay, ",", actActualDone, ",",
-												rankedRecommWithScoreForThisRTIter.get(i), ",",
-												Integer.toString(recommMasters[i].getNumOfDistinctRecommendations()),
-												",,,,,,"
+										bwRawToWriteForThisUserDate.get(i).append(userName + "," + dateToRecomm + ","
+												+ recommTimesStrings[i] + "," + timeCategory + ","
+												+ recommMasters[i].getActivityNamesGuidingRecomm()/* withTimestamps */
+												+ "," + recommMasters[i].getActivityObjectAtRecomm().getActivityName()
+												+ ","
+												+ Integer.toString(
+														recommMasters[i].getNumOfValidActsInActsGuidingRecomm())
+												+ ","
+												+ Integer.toString(recommMasters[i].getNumOfActsInActsGuidingRecomm())
+												+ ","
+												+ Integer.toString(recommMasters[i].getNumOfCandTimelinesBelowThresh())
+												+ "," + weekDay + "," + actsActualDoneInSeq.get(i) + ","
+												+ rankedRecommWithScoreForThisRTIter.get(i) + ","
+												+ Integer.toString(recommMasters[i].getNumOfDistinctRecommendations())
+												+ ",,,,,,"
+												// recommMasters[2].getActivityNamesGuidingRecomm()
 												// , recommP1.getRestAndEndSimilaritiesCorrelation() , ","
 												// , recommP1.getAvgRestSimilarity() , "," ,
 												// recommP1.getSDRestSimilarity()
 												// , "," , recommP1.getAvgEndSimilarity() , "," ,
 												// recommP1.getSDEndSimilarity()
-												, ",", Boolean.toString((recommMasters[i].getActivityObjectAtRecomm()
-														.getActivityName().equals(actsActualDone.get(i)))),
-												"\n");// ,",",recommP1.getActivitiesGuidingRecomm());
+												+ Boolean.toString((recommMasters[i].getActivityObjectAtRecomm()
+														.getActivityName().equals(actsActualDoneInSeq.get(i))))
+												+ "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
+
+										// bwRawToWriteForThisUserDate.add(i, StringUtils.fCat(
+										// bwRawToWriteForThisUserDate.get(i), userName, ",", dateToRecomm, ",",
+										// recommTimesStrings[i], ",", timeCategory, ",",
+										// recommMasters[i].getActivityNamesGuidingRecomm/* withTimestamps */(),
+										// ",", recommMasters[i].getActivityObjectAtRecomm().getActivityName(),
+										// ",",
+										// Integer.toString(
+										// recommMasters[i].getNumOfValidActsInActsGuidingRecomm()),
+										// ",",
+										// Integer.toString(recommMasters[i].getNumOfActsInActsGuidingRecomm()),
+										// ",",
+										// Integer.toString(recommMasters[i].getNumOfCandTimelinesBelowThresh()),
+										// ",", weekDay, ",", actsActualDoneInSeq.get(i), ",",
+										// rankedRecommWithScoreForThisRTIter.get(i), ",",
+										// Integer.toString(recommMasters[i].getNumOfDistinctRecommendations()),
+										// ",,,,,,"
+										// //recommMasters[2].getActivityNamesGuidingRecomm()
+										// //, recommP1.getRestAndEndSimilaritiesCorrelation() , ","
+										// // , recommP1.getAvgRestSimilarity() , "," ,
+										// // recommP1.getSDRestSimilarity()
+										// // , "," , recommP1.getAvgEndSimilarity() , "," ,
+										// // recommP1.getSDEndSimilarity()
+										// , ",", Boolean.toString((recommMasters[i].getActivityObjectAtRecomm()
+										// .getActivityName().equals(actsActualDoneInSeq.get(i)))),
+										// "\n"));// ,",",recommP1.getActivitiesGuidingRecomm());
 
 										/////////////////
 									}
@@ -1065,7 +1299,9 @@ public class RecommendationTestsMar2017GenSeq
 								} // end of for loop over all activity objects in test date
 
 								metaBufferWriter.write(metaToWriteForThisUserDate.toString());
-								actualBufferWriter.write(dataActualToWriteForThisUserDate.toString());
+								recommSeqBufferWriter.write(recommSequenceWithoutScoreForThisUserDate.toString());
+								recommSeqWithScoreBufferWriter.write(recommSequenceWithScoreForThisUserDate.toString());
+								actualSeqBufferWriter.write(dataActualSeqActsToWriteForThisUserDate.toString());
 
 								if (VerbosityConstants.WriteTopNextActivitiesWithoutDistance)
 								{
@@ -1092,13 +1328,15 @@ public class RecommendationTestsMar2017GenSeq
 
 								for (int i = 0; i < this.recommSeqLength; i++)
 								{
-									bwRaw[i].write(bwRawToWriteForThisUserDate[i].toString());
-									rankedRecommWithScoreWriter[i]
-											.write(rankedRecommWithScoreToWriteForThisUserDate[i].toString());
-									rankedRecommWithoutScoreWriter[i]
-											.write(rankedRecommWithoutScoreToWriteForThisUserDate[i].toString());
-									numOfCandidateTimelinesWriter[i]
-											.write(numOfCandidateTimelinesForThisUserDate[i].toString());
+									bwRaw.get(i).write(bwRawToWriteForThisUserDate.get(i).toString());
+									rankedRecommWithScoreWriter.get(i)
+											.write(rankedRecommWithScoreToWriteForThisUserDate.get(i).toString());
+									rankedRecommWithoutScoreWriter.get(i)
+											.write(rankedRecommWithoutScoreToWriteForThisUserDate.get(i).toString());
+									numOfCandidateTimelinesWriter.get(i)
+											.write(numOfCandidateTimelinesForThisUserDate.get(i).toString());
+									actualBufferWriter.get(i)
+											.write(dataActualToWriteForThisUserDateIter.get(i).toString());
 								}
 
 								// numOfCandidateTimelinesWriter.write(numOfCandidateTimelinesForThisUserDate.toString());
@@ -1117,14 +1355,17 @@ public class RecommendationTestsMar2017GenSeq
 							// RecommendationMaster recommendationMaster=new RecommendationMaster(userTimelines,
 							// userTrainingTimelines,userTestTimelines,dateAtRecomm,timeAtRecomm,userAtRecomm);
 							metaBufferWriter.newLine();
-							actualBufferWriter.newLine();
+							recommSeqBufferWriter.newLine();
+							recommSeqWithScoreBufferWriter.newLine();
+							actualSeqBufferWriter.newLine();
 							topNextActsWithoutDistance.newLine();
 							topNextActsWithDistance.newLine();
 
 							for (int i = 0; i < this.recommSeqLength; i++)
 							{
-								rankedRecommWithScoreWriter[i].newLine();
-								rankedRecommWithoutScoreWriter[i].newLine();
+								rankedRecommWithScoreWriter.get(i).newLine();
+								rankedRecommWithoutScoreWriter.get(i).newLine();
+								actualBufferWriter.get(i).newLine();
 							}
 
 							baseLineOccurrence.newLine();
@@ -1151,7 +1392,10 @@ public class RecommendationTestsMar2017GenSeq
 						numActsInEachCandbw.close();
 
 						metaBufferWriter.close();
-						actualBufferWriter.close();
+						metaBufferWriter.close();
+						recommSeqWithScoreBufferWriter.close();
+						actualSeqBufferWriter.close();
+
 						topNextActsWithoutDistance.close();
 						topNextActsWithDistance.close();
 
@@ -1174,10 +1418,11 @@ public class RecommendationTestsMar2017GenSeq
 
 						for (int i = 0; i < this.recommSeqLength; i++)
 						{
-							bwRaw[i].close();
-							rankedRecommWithScoreWriter[i].close();
-							rankedRecommWithoutScoreWriter[i].close();
-							numOfCandidateTimelinesWriter[i].close();
+							bwRaw.get(i).close();
+							rankedRecommWithScoreWriter.get(i).close();
+							rankedRecommWithoutScoreWriter.get(i).close();
+							numOfCandidateTimelinesWriter.get(i).close();
+							actualBufferWriter.get(i).close();
 						}
 
 						// $$new Evaluation();
@@ -1201,7 +1446,7 @@ public class RecommendationTestsMar2017GenSeq
 						System.out.println("Time taken for executing Recommendation Tests for this matching unit ="
 								+ (recommTestsEndtime - recommTestsStarttime) / 1000 + "seconds");
 
-						writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
+						// writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
 
 						consoleLogStream.close();
 
@@ -1260,10 +1505,13 @@ public class RecommendationTestsMar2017GenSeq
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
 
-		System.out.println(
-				"Debug: getRepresentativeAO: old recommendationTime " + recommendationTime.toLocalDateTime().toString()
-						+ " new recommendationTime " + newRecommTimestamp.toLocalDateTime().toString());
-
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Debug: getRepresentativeAO: old recommendationTime="
+					+ recommendationTime.toLocalDateTime().toString() + "medianPreceedingDuration="
+					+ medianPreceedingDuration + "  new recommendationTime="
+					+ newRecommTimestamp.toLocalDateTime().toString());
+		}
 		repAO.setEndTimestamp(newRecommTimestamp);
 
 		return repAO;

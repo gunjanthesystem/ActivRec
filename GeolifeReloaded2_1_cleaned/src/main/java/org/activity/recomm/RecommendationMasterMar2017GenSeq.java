@@ -222,7 +222,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
 			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
 	{
-
+		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
 		try
 		{
 			System.out
@@ -252,34 +252,62 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			System.out.println("	User at Recomm = " + this.userAtRecomm + "\tDate at Recomm = " + this.dateAtRecomm
 					+ "\tTime at Recomm = " + this.timeAtRecomm);
 
-			this.currentTimeline = extractCurrentTimelineSeq(testTimelines, lookPastType, this.dateAtRecomm,
-					this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours,
-					actObjsToAddToCurrentTimeline);
+			if (actObjsToAddToCurrentTimeline.size() > 0)
+			{
+				this.currentTimeline = extractCurrentTimelineSeq(testTimelines, lookPastType, this.dateAtRecomm,
+						this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours,
+						actObjsToAddToCurrentTimeline);
+			}
+			else
+			{
+				this.currentTimeline = extractCurrentTimeline(testTimelines, lookPastType, this.dateAtRecomm,
+						this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours);
+			}
 
 			this.activitiesGuidingRecomm = currentTimeline.getActivityObjectsInTimeline(); // CURRENT TIMELINE
+
+			if (actObjsToAddToCurrentTimeline.size() > 0)
+			{
+				if (this.activitiesGuidingRecomm.size() <= matchingUnitInCountsOrHours)
+				{
+					System.err
+							.println("Error: this.activitiesGuidingRecomm.size()" + this.activitiesGuidingRecomm.size()
+									+ "<=matchingUnitInCountsOrHours" + matchingUnitInCountsOrHours);
+				}
+			}
+
 			this.activityAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 			this.activityNameAtRecommPoint = this.activityAtRecommPoint.getActivityName();
 
-			// sanity check
-			if (activityNameAtRecommPoint.equals(actObjsToAddToCurrentTimeline
-					.get(actObjsToAddToCurrentTimeline.size() - 1).getActivityName()) == false)
+			// sanity check start
+			if (actObjsToAddToCurrentTimeline.size() > 0)
 			{
-				System.err.println(
-						"Error act name of actAtRecommPoint and last act in acts to add do not match: activityNameAtRecommPoint= "
-								+ activityNameAtRecommPoint + " last act in acts to add = "
-								+ actObjsToAddToCurrentTimeline.get(actObjsToAddToCurrentTimeline.size() - 1)
-										.getActivityName());
+				if (activityNameAtRecommPoint.equals(actObjsToAddToCurrentTimeline
+						.get(actObjsToAddToCurrentTimeline.size() - 1).getActivityName()) == false)
+				{
+					System.err.println(
+							"Error act name of actAtRecommPoint and last act in acts to add do not match: activityNameAtRecommPoint= "
+									+ activityNameAtRecommPoint + " last act in acts to add = "
+									+ actObjsToAddToCurrentTimeline.get(actObjsToAddToCurrentTimeline.size() - 1)
+											.getActivityName());
+				}
 			}
 
+			// sanity check end
 			// //////////////////////////
 			long recommMasterT1 = System.currentTimeMillis();
 			this.candidateTimelines = extractCandidateTimelines(trainingTimelines, lookPastType, this.dateAtRecomm,
-					this.timeAtRecomm, this.userIDAtRecomm, matchingUnitInCountsOrHours, this.activityAtRecommPoint);
+					/* this.timeAtRecomm, */ this.userIDAtRecomm, matchingUnitInCountsOrHours,
+					this.activityAtRecommPoint);
 			long recommMasterT2 = System.currentTimeMillis();
 			long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
 			// ///////////////////////////
 			if (VerbosityConstants.verbose)
 			{
+				System.out.println("activitiesGuidingRecomm.size()=" + activitiesGuidingRecomm.size()
+						+ " matchingUnitInCountsOrHours=" + matchingUnitInCountsOrHours + " activityAtRecommPoint = "
+						+ activityAtRecommPoint.getActivityName());
+
 				System.out
 						.println("Current timeline: " + currentTimeline.getActivityObjectNamesWithTimestampsInSequence()
 								+ "; activitiesGuidingRecomm.size =" + this.activitiesGuidingRecomm.size());
@@ -751,7 +779,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			}
 		}
 		// ////////////////////
-		if (extractedCurrentTimeline == null)
+		if (extractedCurrentTimeline == null || extractedCurrentTimeline.getActivityObjectsInTimeline().size() == 0)
 		{
 			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: current timeline is empty"));
 			System.exit(-1);
@@ -781,7 +809,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			LookPastType lookPastType2, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm,
 			double matchingUnitInCountsOrHours, ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
 	{
-
+		// System.out.println("called extractCurrentTimelineSeq");
 		TimelineWithNext extractedCurrentTimeline = extractCurrentTimeline(testTimelinesOrig, lookPastType2,
 				dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
 
@@ -828,7 +856,6 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param trainingTimelineOrig
 	 * @param lookPastType2
 	 * @param dateAtRecomm
-	 * @param timeAtRecomm
 	 * @param userIDAtRecomm
 	 * @param matchingUnitInCountsOrHours
 	 * @param activityAtRecommPoint
@@ -836,7 +863,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 */
 	private static LinkedHashMap<String, Timeline> extractCandidateTimelines(
 			LinkedHashMap<Date, Timeline> trainingTimelineOrig, LookPastType lookPastType2, Date dateAtRecomm,
-			Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsOrHours,
+			/* Time timeAtRecomm, */ String userIDAtRecomm, double matchingUnitInCountsOrHours,
 			ActivityObject activityAtRecommPoint)
 	{
 		LinkedHashMap<String, Timeline> candidateTimelines = null;

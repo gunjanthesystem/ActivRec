@@ -24,15 +24,19 @@ public class TimelineSanityChecks
 		if (TimelineUtils.isChronological(listOfActObjs1) == false)
 		{
 			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
-					"Error in checkIfChronoLogicalOrder: listOfActObjs1 = " + listOfActObjs1));
+					"Error in checkIfChronoLogicalOrder: listOfActObjs1 isChronological false"));
+			listOfActObjs1.stream().forEachOrdered(ao -> System.err.println(">>" + ao.toStringAllGowallaTS()));
 			inOrder = false;
 		}
-		if (TimelineUtils.isChronological(listOfActObjs2) == false)
-		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
-					"Error in checkIfChronoLogicalOrder: listOfActObjs2 = " + listOfActObjs2));
-			inOrder = false;
-		}
+
+		// Need not be chronological
+		// if (TimelineUtils.isChronological(listOfActObjs2) == false)
+		// {
+		// System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+		// "Error in checkIfChronoLogicalOrder: listOfActObjs2 isChronological false"));
+		// listOfActObjs2.stream().forEachOrdered(ao -> System.err.println(">>" + ao.toStringAllGowallaTS()));
+		// inOrder = false;
+		// }
 
 		OptionalLong maxTimeInList1 = listOfActObjs1.stream().mapToLong(ao -> ao.getEndTimestampInms()).max();
 		OptionalLong minTimeInList2 = listOfActObjs2.stream().mapToLong(ao -> ao.getEndTimestampInms()).min();
