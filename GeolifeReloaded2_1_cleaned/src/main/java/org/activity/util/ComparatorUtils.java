@@ -670,6 +670,27 @@ public class ComparatorUtils
 		return duplicates;
 	}
 
+	/**
+	 * Checks if all values are same
+	 * <p>
+	 * ref: https://goo.gl/t0YF4N
+	 * 
+	 * @param checkValue
+	 * @param otherValues
+	 * @return
+	 */
+	public static boolean areAllEqual(int checkValue, int... otherValues)
+	{
+		for (int value : otherValues)
+		{
+			if (value != checkValue)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/////////////////
 	// TODO this method needs refactoring (30 Sep changes: intersectingIntervalInSeconds replaced by doesOverlap
 	// 21Oct public static String getActivityNameForInterval(Timestamp earliestTimestamp, Timestamp lastTimestamp, int

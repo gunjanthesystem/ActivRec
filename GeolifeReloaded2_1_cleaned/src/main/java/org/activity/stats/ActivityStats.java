@@ -52,8 +52,8 @@ public class ActivityStats
 	 * 
 	 * @param usersDayTimelinesAll
 	 */
-	public static void writeDistinctActivities(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
+	public static void
+			writeDistinctActivities(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
 		Constant.setCommonPath(Constant.outputCoreResultsPath);
 

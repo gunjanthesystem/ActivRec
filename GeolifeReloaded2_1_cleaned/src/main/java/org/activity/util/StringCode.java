@@ -1,11 +1,14 @@
 package org.activity.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.SaxConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
+import org.activity.objects.BalancedIntegerTree;
 import org.activity.stats.HilbertCurveUtils;
 import org.activity.ui.PopUps;
 import org.apache.commons.lang3.ArrayUtils;
@@ -295,8 +298,8 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
-					SaxConstants.SAXStartTimeAlphabsetSize);
+			resultant =
+					SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, SaxConstants.SAXStartTimeAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -401,8 +404,8 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
-					SaxConstants.SAXDurationAlphabsetSize);
+			resultant =
+					SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, SaxConstants.SAXDurationAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -441,8 +444,8 @@ public class StringCode
 
 		try
 		{
-			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(),
-					SaxConstants.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
+			resultant =
+					SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
 			// actObjs.size(),
 			// new
 			// NormalAlphabet(), 10);
@@ -855,6 +858,180 @@ public class StringCode
 			activityObjects.stream().forEach(ao -> System.out.print(ao.getActivityName() + " "));
 			System.out.println("\tCode: " + codeS);
 		}
+		return codeS;
+	}
+
+	/**
+	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID
+	 * and hence is guaranteed to be unique for at least 400 activities.
+	 * 
+	 * 
+	 * @param activityObjects
+	 * @param hierarchyLevelForEDForAO
+	 * @return list of stringCodes, where each string code is for list of act name sequence in the list of act objs.
+	 *         Note, we have multiple string codes when a cat id has multiple given level cat ids in hierarchy, for
+	 *         example cat ID 157 Vineyard has Community as well as Food as its parent.
+	 * @param verbose
+	 * @return
+	 */
+	public static ArrayList<String> getStringCodeForActivityObjectsV2(ArrayList<ActivityObject> activityObjects,
+			int hierarchyLevelForEDForAO, boolean verbose)
+	{
+
+		ArrayList<String> codeS = new ArrayList<>();
+		ArrayList<ArrayList<Integer>> correspondCatLevelWords = new ArrayList<>();
+
+		boolean anyCatHasMultipleCorrHierCat = false;
+
+		// Working category level, i.e., the category level used in the act objects are same as the level desired
+		if (DomainConstants.gowallaWorkingCatLevel == hierarchyLevelForEDForAO)
+		{
+			return (ArrayList<String>) Collections.singletonList(getStringCodeForActivityObjects(activityObjects));
+		}
+
+		// Working category level, i.e., the category level used in the act objects is lower (more specific) than the
+		// level desired
+
+		else if (DomainConstants.gowallaWorkingCatLevel > hierarchyLevelForEDForAO)
+		{
+			if (hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance)
+			{
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+						"Error: hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance"));
+			}
+
+			BalancedIntegerTree integerTrie = new BalancedIntegerTree();
+
+			for (ActivityObject ao : activityObjects)
+			{
+				// extract the corresponding hierarchy level cat id, its a list because there can be more than one. for
+				// example, Vineyard is in Community as well as Food
+				ArrayList<Integer> desiredHierarchyLevelActiIDs =
+						DomainConstants.getGivenLevelCatID(ao.getActivityID());
+				// convert to ArrayList of String/Character
+				// ArrayList<String> desiredHierarchyLevelActiIDsChar = (ArrayList<String>) desiredHierarchyLevelActiIDs
+				// .stream().map(i -> Integer.toString(i)).collect(Collectors.toList());
+
+				integerTrie.addToAllLeaves(desiredHierarchyLevelActiIDs);
+				System.out.println(
+						"Debug: integerTrie.addToAllLeaves(desiredHierarchyLevelActiIDs), where desiredHierarchyLevelActiIDs = "
+								+ desiredHierarchyLevelActiIDs);
+
+				if (desiredHierarchyLevelActiIDs.size() > 1)
+				{
+					anyCatHasMultipleCorrHierCat = true;
+				}
+			}
+
+			correspondCatLevelWords = integerTrie.getAllWords();
+
+			// now we have got Strings of catid, there will be multiple string if any cat id as multiple desired level
+			// cat ids
+			for (ArrayList<Integer> word : correspondCatLevelWords)
+			{
+				StringBuilder sb = new StringBuilder();
+				for (Integer id : word)
+				{
+					sb.append(StringCode.getCharCodeFromActivityID(id));
+				}
+				codeS.add(sb.toString());
+			}
+		}
+		else
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error: DomainConstants.gowallaWorkingCatLevel < hierarchyLevelForEDForAO"));
+		}
+
+		if (verbose)
+		{
+			System.out.print("\nInside getStringCodeForActivityObjects: act ids :");
+			activityObjects.stream().forEachOrdered(ao -> System.out.print("-" + ao.getActivityID()));
+			System.out.println("\nactIDSeq = " + correspondCatLevelWords.size());
+
+			System.out.println("\nWords for corr level " + hierarchyLevelForEDForAO + " act ids: ");
+			correspondCatLevelWords.stream().forEachOrdered(word -> System.out.print("-" + word.toString()));
+
+			System.out.println("\nReturned CodeS: " + codeS);
+		}
+
+		if (anyCatHasMultipleCorrHierCat == false && codeS.size() > 1)
+		{
+			System.err.println(
+					PopUps.getCurrentStackTracedErrorMsg("anyCatHasMultipleCorrHierCat==false && codeS.size()>1"));
+		}
+
+		if (codeS.size() != correspondCatLevelWords.size())
+		{
+			System.err
+					.println(PopUps.getCurrentStackTracedErrorMsg("codeS.size() != correspondCatLevelStrings.size()"));
+
+		}
+		// System.out.println("Inside getStringCodeForActivityObjects() oldOne:"
+		// + getStringCodeForActivityObjects(activityObjects) + " new one returned=" + codeS);
+
+		return codeS;
+	}
+
+	/**
+	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID
+	 * and hence is guaranteed to be unique for at least 400 activities.
+	 * 
+	 * 
+	 * @param activityObjects
+	 * @param hierarchyLevelForEDForAO
+	 * @return list of stringCodes, where each string code is for list of act name sequence in the list of act objs.
+	 *         Note, we have multiple string codes when a cat id has multiple given level cat ids in hierarchy, for
+	 *         example cat ID 157 Vineyard has Community as well as Food as its parent.
+	 */
+	public static String getStringCodeForActivityObjectsV1(ArrayList<ActivityObject> activityObjects,
+			int hierarchyLevelForEDForAO)
+	{
+		// System.out.println("Inside getStringCodeForActivityObjects");
+		String codeS = "";
+
+		// Working category level, i.e., the category level used in the act objects are same as the level desired
+		if (DomainConstants.gowallaWorkingCatLevel == hierarchyLevelForEDForAO)
+		{
+			return getStringCodeForActivityObjects(activityObjects);
+		}
+
+		// Working category level, i.e., the category level used in the act objects is lower (more specific) than the
+		// level desired
+		else if (DomainConstants.gowallaWorkingCatLevel > hierarchyLevelForEDForAO)
+		{
+			if (hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance)
+			{
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+						"Error: hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance"));
+			}
+
+			StringBuilder code = new StringBuilder();
+
+			for (ActivityObject ao : activityObjects)
+			{
+				int workingLevelActID = ao.getActivityID();
+				ArrayList<Integer> desiredHierarchyLevelActiIDs = DomainConstants.getGivenLevelCatID(workingLevelActID);
+
+				// System.out.println("workingLevelActID=" + workingLevelActID + " desiredHierarchyLevelActiID="
+				// + desiredHierarchyLevelActiID);
+
+				if (desiredHierarchyLevelActiIDs.size() == 1)
+				{
+					code.append(StringCode.getCharCodeFromActivityID(desiredHierarchyLevelActiIDs.get(0)));
+				}
+			}
+			codeS = code.toString();
+		}
+		else
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error: DomainConstants.gowallaWorkingCatLevel <                hierarchyLevelForEDForAO"));
+
+		}
+
+		// System.out.println("Inside getStringCodeForActivityObjects() oldOne:"
+		// + getStringCodeForActivityObjects(activityObjects) + " new one returned=" + codeS);
 
 		return codeS;
 	}

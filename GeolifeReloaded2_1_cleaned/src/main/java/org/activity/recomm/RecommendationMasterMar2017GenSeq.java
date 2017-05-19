@@ -59,6 +59,7 @@ import org.activity.util.UtilityBelt;
 public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
+	private double reductionInMatchingUnit = 0;
 
 	// private Timeline trainingTimeline;
 	// private Timeline testTimeline;
@@ -252,27 +253,38 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			System.out.println("	User at Recomm = " + this.userAtRecomm + "\tDate at Recomm = " + this.dateAtRecomm
 					+ "\tTime at Recomm = " + this.timeAtRecomm);
 
+			//////
+			Pair<TimelineWithNext, Double> extCurrTimelineRes = null;
 			if (actObjsToAddToCurrentTimeline.size() > 0)
 			{
-				this.currentTimeline = extractCurrentTimelineSeq(testTimelines, lookPastType, this.dateAtRecomm,
+				extCurrTimelineRes = extractCurrentTimelineSeq(testTimelines, lookPastType, this.dateAtRecomm,
 						this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours,
 						actObjsToAddToCurrentTimeline);
 			}
 			else
 			{
-				this.currentTimeline = extractCurrentTimeline(testTimelines, lookPastType, this.dateAtRecomm,
+				extCurrTimelineRes = extractCurrentTimeline(testTimelines, lookPastType, this.dateAtRecomm,
 						this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours);
 			}
+			this.currentTimeline = extCurrTimelineRes.getFirst();
+			this.reductionInMatchingUnit = extCurrTimelineRes.getSecond();
+			//////
 
 			this.activitiesGuidingRecomm = currentTimeline.getActivityObjectsInTimeline(); // CURRENT TIMELINE
 
 			if (actObjsToAddToCurrentTimeline.size() > 0)
 			{
-				if (this.activitiesGuidingRecomm.size() <= matchingUnitInCountsOrHours)
+				if (reductionInMatchingUnit == 0 && activitiesGuidingRecomm.size() <= matchingUnitInCountsOrHours)
 				{
-					System.err
-							.println("Error: this.activitiesGuidingRecomm.size()" + this.activitiesGuidingRecomm.size()
-									+ "<=matchingUnitInCountsOrHours" + matchingUnitInCountsOrHours);
+					System.out.println("Error: actsGuidingRecomm.size():" + this.activitiesGuidingRecomm.size() + "<=MU"
+							+ matchingUnitInCountsOrHours + " (even without reduced mu");
+				}
+
+				else if (activitiesGuidingRecomm.size() <= matchingUnitInCountsOrHours)
+				{
+					System.out.println("Warning: actsGuidingRecomm.size():" + this.activitiesGuidingRecomm.size()
+							+ "<=MU" + matchingUnitInCountsOrHours + " (with mu reduction =" + reductionInMatchingUnit
+							+ ")");
 				}
 			}
 
@@ -730,12 +742,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param matchingUnitInCountsOrHours
 	 * @return
 	 */
-	private static TimelineWithNext extractCurrentTimeline(LinkedHashMap<Date, Timeline> testTimelinesOrig,
-			LookPastType lookPastType2, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm,
-			double matchingUnitInCountsOrHours)
+	private static Pair<TimelineWithNext, Double> extractCurrentTimeline(
+			LinkedHashMap<Date, Timeline> testTimelinesOrig, LookPastType lookPastType2, Date dateAtRecomm,
+			Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsOrHours)
 	{
 		TimelineWithNext extractedCurrentTimeline = null;
 		LinkedHashMap<Date, Timeline> testTimelinesDaywise = testTimelinesOrig;
+		double reductionInMu = 0;// done when not enough acts in past to look into, only relevant for NCount
 
 		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 		{
@@ -763,8 +776,10 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			if (lookPastType2.equals(Enums.LookPastType.NCount))
 			{
-				extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(testTimeline,
-						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+				Pair<TimelineWithNext, Double> result = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(
+						testTimeline, dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+				extractedCurrentTimeline = result.getFirst();
+				reductionInMu = result.getSecond();
 			}
 
 			else if (lookPastType2.equals(Enums.LookPastType.NHours))
@@ -790,7 +805,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			System.out.println(
 					"Extracted current timeline: " + extractedCurrentTimeline.getActivityObjectNamesInSequence());
 		}
-		return extractedCurrentTimeline;
+		return new Pair<>(extractedCurrentTimeline, reductionInMu);
 	}
 
 	/**
@@ -805,13 +820,15 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @return
 	 * @since May 2, 2017
 	 */
-	private static TimelineWithNext extractCurrentTimelineSeq(LinkedHashMap<Date, Timeline> testTimelinesOrig,
-			LookPastType lookPastType2, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm,
-			double matchingUnitInCountsOrHours, ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
+	private static Pair<TimelineWithNext, Double> extractCurrentTimelineSeq(
+			LinkedHashMap<Date, Timeline> testTimelinesOrig, LookPastType lookPastType2, Date dateAtRecomm,
+			Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsOrHours,
+			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
 	{
 		// System.out.println("called extractCurrentTimelineSeq");
-		TimelineWithNext extractedCurrentTimeline = extractCurrentTimeline(testTimelinesOrig, lookPastType2,
-				dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+		Pair<TimelineWithNext, Double> extractedCurrentTimelineResult = extractCurrentTimeline(testTimelinesOrig,
+				lookPastType2, dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+		TimelineWithNext extractedCurrentTimeline = extractedCurrentTimelineResult.getFirst();
 
 		// //////////////////
 		ArrayList<ActivityObject> actObjsForCurrTimeline = new ArrayList<>(
@@ -847,7 +864,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 					+ extractedCurrentTimeline.getActivityObjectNamesInSequence());
 		}
 
-		return extractedCurrentTimeline;
+		return new Pair<>(extractedCurrentTimeline, extractedCurrentTimelineResult.getSecond());
 
 	}
 

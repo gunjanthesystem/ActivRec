@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
@@ -405,8 +406,8 @@ public class AlignmentBasedDistance
 			// $$ added on 2nd march 2017 start: nearerScaledTimeDistance
 			else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.NearerScaled))
 			{
-				long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
-						ao2.getStartTimestamp());
+				long absTimeDiffInSeconds =
+						DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(), ao2.getStartTimestamp());
 				if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
 				{
 					double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
@@ -423,8 +424,8 @@ public class AlignmentBasedDistance
 			// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
 			else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.FurtherScaled))
 			{
-				long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
-						ao2.getStartTimestamp());
+				long absTimeDiffInSeconds =
+						DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(), ao2.getStartTimestamp());
 				if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
 				{
 					double timeDistance = absTimeDiffInSeconds / 10800;
@@ -1879,9 +1880,9 @@ public class AlignmentBasedDistance
 					// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j].toString()).append("_N(")
 					// .append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1)).append(")");
 
-					traceMatrix[i + 1][j + 1] = StringUtils.fCat(traceMatrix[i + 1][j + 1],
-							traceMatrix[i][j].toString(), "_N(", Integer.toString(i + 1), "-", Integer.toString(j + 1),
-							")");
+					traceMatrix[i + 1][j + 1] =
+							StringUtils.fCat(traceMatrix[i + 1][j + 1], traceMatrix[i][j].toString(), "_N(",
+									Integer.toString(i + 1), "-", Integer.toString(j + 1), ")");
 
 					// System.out.println("Equal" + " Trace " + traceMatrix[i + 1][j + 1]);// "_N(" + (i + 1) + "-" + (j
 					// + 1) + ")");
@@ -1906,9 +1907,9 @@ public class AlignmentBasedDistance
 						// .append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
 						// .append(")");
 
-						traceMatrix[i + 1][j + 1] = StringUtils.fCat(traceMatrix[i + 1][j + 1],
-								traceMatrix[i][j + 1].toString(), "_D(", Integer.toString(i + 1), "-",
-								Integer.toString(j + 1), ")");
+						traceMatrix[i + 1][j + 1] =
+								StringUtils.fCat(traceMatrix[i + 1][j + 1], traceMatrix[i][j + 1].toString(), "_D(",
+										Integer.toString(i + 1), "-", Integer.toString(j + 1), ")");
 
 						min = delete;
 						// System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);// "
@@ -1920,9 +1921,9 @@ public class AlignmentBasedDistance
 						// traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j] + "_I(" + (i + 1) + "-" + (j + 1) +
 						// ")");
 
-						traceMatrix[i + 1][j + 1] = StringUtils.fCat(traceMatrix[i + 1][j + 1],
-								traceMatrix[i + 1][j].toString(), "_I(", Integer.toString(i + 1), "-",
-								Integer.toString(j + 1), ")");
+						traceMatrix[i + 1][j + 1] =
+								StringUtils.fCat(traceMatrix[i + 1][j + 1], traceMatrix[i + 1][j].toString(), "_I(",
+										Integer.toString(i + 1), "-", Integer.toString(j + 1), ")");
 						// traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j].toString()).append("_I(")
 						// .append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
 						// .append(")");
@@ -1935,9 +1936,9 @@ public class AlignmentBasedDistance
 					{
 						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_S(" + (i + 1) + "-" + (j + 1) + ")");
 
-						traceMatrix[i + 1][j + 1] = StringUtils.fCat(traceMatrix[i + 1][j + 1],
-								traceMatrix[i][j].toString(), "_S(", Integer.toString(i + 1), "-",
-								Integer.toString(j + 1), ")");
+						traceMatrix[i + 1][j + 1] =
+								StringUtils.fCat(traceMatrix[i + 1][j + 1], traceMatrix[i][j].toString(), "_S(",
+										Integer.toString(i + 1), "-", Integer.toString(j + 1), ")");
 
 						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j].toString()).append("_S(")
 						// .append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
@@ -2053,7 +2054,7 @@ public class AlignmentBasedDistance
 		HashMap<String, Double> catIDsHierarchicalDistance = null;
 		if (useHierarchicalDistance)
 		{
-			catIDsHierarchicalDistance = Constant.catIDsHierarchicalDistance;
+			catIDsHierarchicalDistance = DomainConstants.catIDsHierarchicalDistance;
 		}
 
 		TraceMatrixLeaner1 traceMatrix = new TraceMatrixLeaner1(word1.length(), word2.length());
@@ -2133,8 +2134,8 @@ public class AlignmentBasedDistance
 						// Double hierWt = catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));
 						// TODO: check if it is actually using the hierwt, we change to StringBuilder after prv verified
 						// version
-						Double hierWt = catIDsHierarchicalDistance
-								.get(new StringBuilder(2).append(c1).append(c2).toString());
+						Double hierWt =
+								catIDsHierarchicalDistance.get(new StringBuilder(2).append(c1).append(c2).toString());
 
 						if (hierWt == null)
 						{
@@ -2243,6 +2244,54 @@ public class AlignmentBasedDistance
 	///// end of faster
 
 	///// end of faster v3
+
+	/**
+	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
+	 * 
+	 * @since May 19, 2017
+	 * @param word1
+	 * @param word2
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @return Pair{Levenshtein distance,trace of operations}
+	 */
+	public static Pair<String, Double> getLowestMySimpleLevenshteinDistance(ArrayList<String> word1s,
+			ArrayList<String> word2s, int insertWt, int deleteWt, int replaceWt)// , TraceMatrix traceMatrix)
+	{
+		Pair<String, Double> lowestRes = new Pair<>();
+
+		ArrayList<Pair<String, Double>> levenshteinDists = new ArrayList<>();
+
+		for (String word1 : word1s)
+		{
+			for (String word2 : word2s)
+			{
+				levenshteinDists.add(getMySimpleLevenshteinDistance(word1, word2, insertWt, deleteWt, replaceWt));
+			}
+		}
+
+		double min = Double.MAX_VALUE;
+		for (Pair<String, Double> p : levenshteinDists)
+		{
+			double val = p.getSecond();
+			if (val < min)
+			{
+				lowestRes = p;
+				min = val;
+			}
+		}
+
+		if (VerbosityConstants.verboseLevenstein)
+		{
+			System.out.println("Word1s: " + word1s.toString() + "  Word2s:" + word2s.toString());
+			System.out.println("levenshteinDists = " + levenshteinDists);
+			System.out.println("lowestRes = " + lowestRes.toString());
+		}
+
+		return lowestRes;
+	}
+
 	/**
 	 * Computes Levenshtein distance between the given strings.</br>
 	 * 

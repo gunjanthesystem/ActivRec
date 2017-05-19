@@ -160,7 +160,8 @@ public class WritingToFile
 		List<Double> rowLabels = new ArrayList<Double>();
 
 		// (User, Pair( MUs having Max MRR, max MRR))
-		LinkedHashMap<String, Pair<List<Double>, Double>> usersMaxMUMRRMap = new LinkedHashMap<String, Pair<List<Double>, Double>>();
+		LinkedHashMap<String, Pair<List<Double>, Double>> usersMaxMUMRRMap =
+				new LinkedHashMap<String, Pair<List<Double>, Double>>();
 
 		if (hasRowHeader)
 		{
@@ -170,8 +171,8 @@ public class WritingToFile
 		}
 		else
 		{
-			int numOfRows = ReadingFromFile.oneColumnReaderDouble(absFileNameToRead, ",", 0, booleanHasColHeader)
-					.size();
+			int numOfRows =
+					ReadingFromFile.oneColumnReaderDouble(absFileNameToRead, ",", 0, booleanHasColHeader).size();
 			for (int i = 0; i < numOfRows; i++)
 			{
 				rowLabels.add(Double.valueOf(i)); // Row = 0 to Row = <numOfUsers-1>
@@ -183,8 +184,8 @@ public class WritingToFile
 
 		for (int colInd = startColIndx; colInd <= lastColIndx; colInd++) // each column is for a user
 		{
-			List<Double> mrrVals = ReadingFromFile.oneColumnReaderDouble(absFileNameToRead, ",", colInd,
-					booleanHasColHeader);
+			List<Double> mrrVals =
+					ReadingFromFile.oneColumnReaderDouble(absFileNameToRead, ",", colInd, booleanHasColHeader);
 
 			// (MU,MRR)
 			LinkedHashMap<Double, Double> mrrMap = new LinkedHashMap<Double, Double>();
@@ -1810,8 +1811,9 @@ public class WritingToFile
 						// String splittedP[]=entriesForUser.get(i-1).split(Pattern.quote("||"));
 						// preceedingActivity=splittedP[1];
 						preceedingActivity = entriesForUser.get(i - 1).getMode();
-						timeDiffWithPrev = (te.getTimestamp().getTime()
-								- entriesForUser.get(i - 1).getTimestamp().getTime()) / 1000;
+						timeDiffWithPrev =
+								(te.getTimestamp().getTime() - entriesForUser.get(i - 1).getTimestamp().getTime())
+										/ 1000;
 					}
 
 					if (i == (entriesForUser.size() - 2)) // no succeeding activity as it is the last activity
@@ -1824,8 +1826,9 @@ public class WritingToFile
 						// String splittedS[]=entriesForUser.get(i+1).split(Pattern.quote("||"));
 						// succeedingActivity=splittedS[1];
 						succeedingActivity = entriesForUser.get(i + 1).getMode();
-						timeDiffWithNext = (entriesForUser.get(i + 1).getTimestamp().getTime()
-								- te.getTimestamp().getTime()) / 1000;
+						timeDiffWithNext =
+								(entriesForUser.get(i + 1).getTimestamp().getTime() - te.getTimestamp().getTime())
+										/ 1000;
 					}
 
 					if (!(succeedingActivity.equals("--") || preceedingActivity.equals("--"))
@@ -2539,8 +2542,8 @@ public class WritingToFile
 
 				if (writeCandidateTimeline)
 				{
-					candidateTimelineAsString = candidateTimelines.get(candTimelineID)
-							.getActivityObjectNamesWithTimestampsInSequence();
+					candidateTimelineAsString =
+							candidateTimelines.get(candTimelineID).getActivityObjectNamesWithTimestampsInSequence();
 				}
 
 				if (writeEditOperations)
@@ -2632,8 +2635,8 @@ public class WritingToFile
 
 				if (writeCandidateTimeline)
 				{
-					candidateTimelineAsString = candidateTimelines.get(candTimelineID)
-							.getActivityObjectNamesWithTimestampsInSequence();
+					candidateTimelineAsString =
+							candidateTimelines.get(candTimelineID).getActivityObjectNamesWithTimestampsInSequence();
 				}
 
 				if (writeEditOperations)
@@ -2659,12 +2662,13 @@ public class WritingToFile
 
 				///
 				Integer endPointIndexInCand = endPointIndicesInCands.get(candTimelineID);
-				ActivityObject endPointActivityInCandidate = candidateTimelines.get(candTimelineID)
-						.getActivityObjectAtPosition(endPointIndexInCand);
+				ActivityObject endPointActivityInCandidate =
+						candidateTimelines.get(candTimelineID).getActivityObjectAtPosition(endPointIndexInCand);
 				// difference in start time of end point activity of candidate and start
 				// time of current activity
-				long diffStartTimeForEndPointsCand_n_GuidingInSecs = (currentActivityObject.getStartTimestamp()
-						.getTime() - endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
+				long diffStartTimeForEndPointsCand_n_GuidingInSecs =
+						(currentActivityObject.getStartTimestamp().getTime()
+								- endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
 				// difference in end time of end point activity of candidate and end time of
 				// current activity
 				long diffEndTimeForEndPointsCand_n_GuidingInSecs = (currentActivityObject.getEndTimestamp().getTime()
@@ -3328,11 +3332,8 @@ public class WritingToFile
 		if (VerbosityConstants.verbose) System.out.println("Inside writeActivityCountsInGivenDayTimelines");
 
 		/* <Activity Name, count over all days> */
-		LinkedHashMap<String, Long> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Long>(); // count
-																													// over
-																													// all
-																													// the
-																													// days
+		LinkedHashMap<String, Long> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Long>();
+		// count over all the days
 		String[] activityNames = Constant.getActivityNames();// .activityNames;
 		try
 		{
@@ -3449,8 +3450,7 @@ public class WritingToFile
 
 		writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
 				commonPath + "ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count");
-		// TODO check if it indeed
-		// should be an append
+		// TODO check if it indeed should be an append
 
 		if (VerbosityConstants.verbose) System.out.println("Exiting writeActivityCountsInGivenDayTimelines");
 
@@ -3541,8 +3541,9 @@ public class WritingToFile
 			{
 				String actName = entryWrite.getKey();
 				Double val = entryWrite.getValue();
-				double percentageOccurrenceOverTimeline = ((double) activityNameCountPairsOverAllDayTimelines
-						.get(actName) / (double) numOfTimelines) * 100;
+				double percentageOccurrenceOverTimeline =
+						((double) activityNameCountPairsOverAllDayTimelines.get(actName) / (double) numOfTimelines)
+								* 100;
 				activityNameCountPairsOverAllDayTimelines.put(actName, percentageOccurrenceOverTimeline);
 				// bw.write("," + percentageOccurrenceOverTimeline);
 				toWrite.append("," + percentageOccurrenceOverTimeline);
@@ -3585,7 +3586,8 @@ public class WritingToFile
 	{
 		commonPath = Constant.getCommonPath();//
 		// <User , <day-month-year, <activity name, count of occurence> >>
-		LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Integer>>> dataToWrite = new LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Integer>>>();
+		LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Integer>>> dataToWrite =
+				new LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Integer>>>();
 		String[] activityNames = Constant.getActivityNames();// .activityNames;
 		for (Map.Entry<String, TreeMap<Timestamp, String>> entryForUser : allData.entrySet())
 		{
@@ -3596,7 +3598,8 @@ public class WritingToFile
 				System.out.println("\nUser =" + entryForUser.getKey());
 
 				// <day-month-year, <ActvityName, count of occurence>>
-				TreeMap<String, LinkedHashMap<String, Integer>> mapForEachUser = new TreeMap<String, LinkedHashMap<String, Integer>>();
+				TreeMap<String, LinkedHashMap<String, Integer>> mapForEachUser =
+						new TreeMap<String, LinkedHashMap<String, Integer>>();
 
 				int countOfDays = 0;
 
@@ -3719,7 +3722,8 @@ public class WritingToFile
 	{
 		commonPath = Constant.getCommonPath();//
 		// <User , <day-month-year, <activity name, sum of duration in seconds> >>
-		LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Long>>> dataToWrite = new LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Long>>>();
+		LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Long>>> dataToWrite =
+				new LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Long>>>();
 		String[] activityNames = Constant.getActivityNames();// .activityNames;
 		for (Map.Entry<String, TreeMap<Timestamp, String>> entryForUser : allData.entrySet())
 		{
@@ -3730,7 +3734,8 @@ public class WritingToFile
 				System.out.println("\nUser =" + entryForUser.getKey());
 
 				// <day-month-year, <ActvityName, count of occurence>>
-				TreeMap<String, LinkedHashMap<String, Long>> mapForEachUser = new TreeMap<String, LinkedHashMap<String, Long>>();
+				TreeMap<String, LinkedHashMap<String, Long>> mapForEachUser =
+						new TreeMap<String, LinkedHashMap<String, Long>>();
 
 				int countOfDays = 0;
 
@@ -3756,8 +3761,8 @@ public class WritingToFile
 					}
 
 					String activityNameInEntry = GeolifeDataLoader.getActivityNameFromDataEntry(entry.getValue());
-					long activityDurationInEntry = GeolifeDataLoader
-							.getDurationInSecondsFromDataEntry(entry.getValue());
+					long activityDurationInEntry =
+							GeolifeDataLoader.getDurationInSecondsFromDataEntry(entry.getValue());
 
 					Long currentDurationForActivityInDay = mapForEachUser.get(day).get(activityNameInEntry);
 
@@ -4032,7 +4037,8 @@ public class WritingToFile
 		LinkedHashMap<Date, Timeline> timelinesCursor = null;
 
 		// the thing to return, contains two hashmaps used for count and duration baselines
-		LinkedHashMap<String, LinkedHashMap<String, ?>> resultsToReturn = new LinkedHashMap<String, LinkedHashMap<String, ?>>();
+		LinkedHashMap<String, LinkedHashMap<String, ?>> resultsToReturn =
+				new LinkedHashMap<String, LinkedHashMap<String, ?>>();
 
 		// Needed for base line recommendations (based on training set only)
 		LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays;
@@ -4062,32 +4068,32 @@ public class WritingToFile
 
 			if (timelinesSet.equals("TrainingTimelines"))
 			{
-				activityNameCountPairsOverAllTrainingDays = WritingToFile
-						.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
+				activityNameCountPairsOverAllTrainingDays =
+						WritingToFile.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
 				activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 						.sortByValueDesc(activityNameCountPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameCountPairsOverAllTrainingDays",
 						activityNameCountPairsOverAllTrainingDays);
 
-				activityNameDurationPairsOverAllTrainingDays = WritingToFile
-						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
+				activityNameDurationPairsOverAllTrainingDays =
+						WritingToFile.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
 				activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 						.sortByValueDesc(activityNameDurationPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameDurationPairsOverAllTrainingDays",
 						activityNameDurationPairsOverAllTrainingDays);
 
-				activityNameOccPercentageOverAllTrainingDays = WritingToFile
-						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet);
+				activityNameOccPercentageOverAllTrainingDays =
+						WritingToFile.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet);
 			}
 
 			else
 			{
-				LinkedHashMap<String, Long> actCountRes1 = WritingToFile
-						.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
-				LinkedHashMap<String, Long> actDurationRes1 = WritingToFile
-						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
-				LinkedHashMap<String, Double> actOccPercentageRes1 = WritingToFile
-						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet);
+				LinkedHashMap<String, Long> actCountRes1 =
+						WritingToFile.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
+				LinkedHashMap<String, Long> actDurationRes1 =
+						WritingToFile.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
+				LinkedHashMap<String, Double> actOccPercentageRes1 =
+						WritingToFile.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet);
 
 				writeSimpleLinkedHashMapToFileAppend(actCountRes1,
 						commonPath + "ActivityCounts" + timelinesSet + ".csv", "dummy", "dummy");
@@ -4287,7 +4293,7 @@ public class WritingToFile
 	{
 		long numOfActWithMultipleWorkingLevelCatID = 0, numOfAOs = 0;
 		HashSet<String> multipleWorkingLevelCatIds = new HashSet<>();
-	
+
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 		{
 			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
@@ -4303,7 +4309,7 @@ public class WritingToFile
 				}
 			}
 		}
-	
+
 		if (verbose)
 		{
 			System.out.println("num of AOs = " + numOfAOs);
@@ -4311,11 +4317,10 @@ public class WritingToFile
 			System.out.println("% ActWithMultipleWorkingLevelCatID = "
 					+ ((numOfActWithMultipleWorkingLevelCatID / numOfAOs) * 100));
 		}
-	
-		writeToNewFile(
-				multipleWorkingLevelCatIds.stream().map(s -> s.toString()).collect(Collectors.joining("\n")),
+
+		writeToNewFile(multipleWorkingLevelCatIds.stream().map(s -> s.toString()).collect(Collectors.joining("\n")),
 				absFileNameToWrite);
-	
+
 		return new Pair<Long, Long>(numOfActWithMultipleWorkingLevelCatID, numOfAOs);
 	}
 
@@ -4334,7 +4339,7 @@ public class WritingToFile
 			boolean writeCatName)
 	{
 		int maxNumOfVals = -1; // max consec counts over all cat ids
-	
+
 		// find the max size
 		maxNumOfVals = (map.entrySet().stream().mapToInt(e -> e.getValue().size()).max()).getAsInt();
 		// maxNumOfVals += 1; // 1 additional column for header
@@ -4342,7 +4347,7 @@ public class WritingToFile
 		// {
 		// // if(e.getValue().size()>maxSizeOfArrayList)
 		// }
-	
+
 		int numOfCatIDsInMap = 0;
 		try
 		{
@@ -4351,12 +4356,12 @@ public class WritingToFile
 			{
 				String catID = entry.getKey();
 				ArrayList<Integer> consecCounts = entry.getValue();
-	
+
 				if (consecCounts.size() != 0)
 				{
 					int numOfNAsToBeInserted = maxNumOfVals - consecCounts.size();
 					StringBuilder sb = new StringBuilder();
-	
+
 					if (writeCatName)
 					{
 						sb.append(catID + ":" + catIDNameDictionary.get(Integer.valueOf(catID)));
@@ -4366,12 +4371,12 @@ public class WritingToFile
 						sb.append(catID + ":");
 					}
 					numOfCatIDsInMap += 1;
-	
+
 					for (Integer t : consecCounts)
 					{
 						sb.append("," + t);
 					}
-	
+
 					if (insertNAs)
 					{
 						for (int i = 0; i < numOfNAsToBeInserted; i++)
@@ -4379,7 +4384,7 @@ public class WritingToFile
 							sb.append(",NA");
 						}
 					}
-	
+
 					bw.write(sb.toString() + "\n");
 				}
 			}
@@ -4503,19 +4508,19 @@ public class WritingToFile
 			{
 				String catID = entry.getKey();
 				ArrayList<Integer> consecCounts = entry.getValue();
-	
+
 				if (consecCounts.size() != 0)
 				{
 					StringBuilder sb = new StringBuilder();
 					sb.append(catID + ":" + catIDNameDictionary.get(Integer.valueOf(catID)));
-	
+
 					numOfCatIDsInMap += 1;
-	
+
 					for (Integer t : consecCounts)
 					{
 						sb.append("," + t);
 					}
-	
+
 					bw.write(sb.toString() + "\n");
 				}
 			}
@@ -4527,6 +4532,22 @@ public class WritingToFile
 		}
 		System.out.println("Num of catIDs in dictionary = " + catIDNameDictionary.size());
 		System.out.println("Num of catIDs in working dataset = " + numOfCatIDsInMap);
+	}
+
+	/**
+	 * Closes multiple BufferedReaders
+	 * 
+	 * @param br1
+	 * @param brs
+	 * @throws IOException
+	 */
+	public static void closeBufferedWriters(BufferedWriter br1, BufferedWriter... brs) throws IOException
+	{
+		br1.close();
+		for (BufferedWriter br : brs)
+		{
+			br.close();
+		}
 	}
 
 	// public static void writeSimpleLinkedHashMapToFileAppendDouble(LinkedHashMap<String, Double> map, String fileName,

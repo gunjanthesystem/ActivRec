@@ -1,12 +1,10 @@
 package org.activity.constants;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -152,13 +150,14 @@ public final class Constant
 	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// .Daywise;// NCount;//
 																					// Enums.LookPastType.NCount;
 	// "Count";// "Count";// "Hrs"// "Daywise"
-	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType = Enums.EditDistanceTimeDistanceType.NearerScaled;
+	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType =
+			Enums.EditDistanceTimeDistanceType.NearerScaled;
 	// .FurtherScaled;
 
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12 };// , 14, 16, 18 };
+	public static final double matchingUnitAsPastCount[] = { 4, 0, 1, 2, 3, 6, 8, 10, 12 };// , 14, 16, 18 };
 	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
 	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 
@@ -183,8 +182,10 @@ public final class Constant
 
 	public static TraceMatrix reusableTraceMatrix;
 
-	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
-	public static TreeMap<Integer, String> catIDNameDictionary = null;
+	/**
+	 * determines the hierarchical level of the activity name to be used in edit distance computation
+	 */
+	public static final int HierarchicalLevelForEditDistance = 1;// 2, -1 when not used
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -283,46 +284,13 @@ public final class Constant
 		Constant.setInvalidNames();
 		Constant.setActivityNames();
 		Constant.setCommonPath(givenCommonpath);
-		Constant.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
-
-		Constant.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
+		DomainConstants.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
+		DomainConstants.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
+		DomainConstants.setCatIDGivenLevelCatIDMap();
 		// Constant.setDistanceUsed("HJEditDistance");
 	}
 
 	//
-
-	private static void setCatIDNameDictionary(String pathToSerialisedCatIDNameDictionary)
-	{
-		try
-		{
-			catIDNameDictionary = (TreeMap<Integer, String>) Serializer
-					.kryoDeSerializeThis(pathToSerialisedCatIDNameDictionary);
-
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-	}
-
-	/**
-	 * 
-	 * @param catIDsHierDistSerialisedFile
-	 */
-	private static void setCatIDsHierarchicalDistance(String catIDsHierDistSerialisedFile)
-	{
-		try
-		{
-			catIDsHierarchicalDistance = (HashMap<String, Double>) Serializer
-					.kryoDeSerializeThis(catIDsHierDistSerialisedFile);
-
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * setDatabaseName setUserIDs setInvalidNames setActivityNames setCommonPath setReusableTraceMatrix
@@ -661,8 +629,8 @@ public final class Constant
 			case "gowalla1":
 				DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
 						.deSerializeThis(DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName);
-				LinkedHashSet<String> res = UIUtilityBox.getNodesAtGivenDepth(DomainConstants.gowallaWorkingCatLevel,
-						rootOfCategoryTree);
+				LinkedHashSet<String> res =
+						UIUtilityBox.getNodesAtGivenDepth(DomainConstants.gowallaWorkingCatLevel, rootOfCategoryTree);
 				System.out.println(
 						"num of nodes at depth " + DomainConstants.gowallaWorkingCatLevel + " are: " + res.size());
 				activityNames = res.toArray(new String[res.size()]);
@@ -881,7 +849,7 @@ public final class Constant
 	{
 		StringBuilder s = new StringBuilder();
 
-		s.append("~~~~~~~~~~~~~~~~~~ALL GLOBAL CONSTANT~~~~~~~~~~~~~~~~~~~\nDatabase used:" + DATABASE_NAME);
+		s.append("~~~~~~~~~~~~~~~~~~ALL GLOBAL CONSTANTS~~~~~~~~~~~~~~~~~~~\nDatabase used:" + DATABASE_NAME);
 		s.append("\ntimeZoneForExperiments:" + timeZoneForExperiments.toString());
 		s.append("\nINVALID ACTIVITY 1:" + INVALID_ACTIVITY1);
 		s.append("\nINVALID ACTIVITY 2:" + INVALID_ACTIVITY2);
@@ -925,6 +893,8 @@ public final class Constant
 		// useJarForMySimpleLevenshteinDistance
 
 		s.append("\nuseHierarchicalDistance:" + useHierarchicalDistance);
+		s.append("\nHierarchicalLevelForEditDistance:" + HierarchicalLevelForEditDistance);
+
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{
 			s.append("\nConsider all features for feature wise edit distance:"

@@ -12,8 +12,11 @@ import java.util.ArrayList;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Triple;
+import org.activity.ui.PopUps;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 
@@ -28,34 +31,42 @@ public class EvaluationSeq
 	public static String commonPath;// =Constant.commonPath;
 
 	static final int theKOriginal = 5;
-	public static final String[] timeCategories = { "All", "Morning", "Afternoon", "Evening" };
+	public static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
 
 	public EvaluationSeq(int seqLength)
 	{
-		for (int i = 0; i < seqLength; i++)
+		try
 		{
-			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArrays = evaluationForSeqIndex(
-					i);
+			for (int i = 0; i < seqLength; i++)
+			{
+				Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArrays =
+						readDataForSeqIndex(i);
+				ArrayList<ArrayList<String>> arrayMeta = readArrays.getFirst();
+				ArrayList<ArrayList<String>> arrayTopK = readArrays.getSecond();// new ArrayList<ArrayList<String>>();
+				ArrayList<ArrayList<String>> arrayActual = readArrays.getThird();
 
-			/**
-			 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation
-			 * times and a cell contains the meta information (userid_dateOfRt_timeOfRt) for the corresponding user for
-			 * corresponding recommendation time
-			 */
-			ArrayList<ArrayList<String>> arrayMeta = readArrays.getFirst();
-			/**
-			 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation
-			 * times and a cell contains the topK recommended items for the corresponding user for corresponding
-			 * recommendation time
-			 */
-			ArrayList<ArrayList<String>> arrayTopK = readArrays.getSecond();// new ArrayList<ArrayList<String>>();
-			/**
-			 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation
-			 * times and a cell contains the actual next item (e.g. Activity Name) for the corresponding user for
-			 * corresponding recommendation time
-			 */
-			ArrayList<ArrayList<String>> arrayActual = new ArrayList<ArrayList<String>>();
+				doEvaluation(arrayMeta, arrayTopK, arrayActual, timeCategories, Constant.EvalPrecisionRecallFMeasure,
+						theKOriginal, "Algo");
+
+				// if (Constant.DoBaselineOccurrence)
+				// {
+				// doEvaluation(arrayMeta, arrayBaselineOccurrence, arrayActual, timeCategories,
+				// Constant.EvalPrecisionRecallFMeasure, theKOriginal, "BaselineOccurrence");
+				// }
+				// if (Constant.DoBaselineDuration)
+				// {
+				// doEvaluation(arrayMeta, arrayBaselineDuration, arrayActual, timeCategories,
+				// Constant.EvalPrecisionRecallFMeasure, theKOriginal, "BaselineDuration");
+				// }
+			}
 		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		// System.out.println("All test stats done");
+		// PopUps.showMessage("All test stats done");
+
 	}
 
 	/**
@@ -63,14 +74,14 @@ public class EvaluationSeq
 	 * @param seqIndex
 	 * @return
 	 */
-	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> evaluationForSeqIndex(
-			int seqIndex)// EvaluationSeq
+	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>>
+			readDataForSeqIndex(int seqIndex)
 	{
 		commonPath = Constant.getCommonPath();
 		System.out.println("Inside Evaluation: common path is:" + commonPath);
 
-		BufferedReader brMeta = null, brTopK = null, brActual = null, brBaseLineOccurrence = null,
-				brBaseLineDuration = null, brCurrentTargetSame = null;
+		BufferedReader brMeta = null, brTopK = null, brActual = null;
+		// , brBaseLineOccurrence = null,brBaseLineDuration = null, brCurrentTargetSame = null;
 
 		/**
 		 * A 2 dimensional arraylist, with rows corresponding to user and columns corresponding to recommendation times
@@ -118,7 +129,6 @@ public class EvaluationSeq
 		{
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine, baseLineOccurrenceCurrentLine,
 					baseLineDurationCurrentLine, currentTargetSame;
-
 			brMeta = new BufferedReader(new FileReader(commonPath + "meta.csv"));
 			brTopK = new BufferedReader(
 					new FileReader(commonPath + "dataRankedRecommendationWithoutScores" + seqIndex + ".csv"));// /dataRecommTop5.csv"));
@@ -126,237 +136,127 @@ public class EvaluationSeq
 
 			// brCurrentTargetSame = new BufferedReader(new FileReader(commonPath +
 			// "metaIfCurrentTargetSameWriter.csv"));
-			//
 			// brBaseLineOccurrence = new BufferedReader(new FileReader(commonPath + "dataBaseLineOccurrence.csv"));
 			// brBaseLineDuration = new BufferedReader(new FileReader(commonPath + "dataBaseLineDuration.csv"));
 
-			int countOfLinesMeta = 0;
-
 			StringBuilder consoleLogBuilder = new StringBuilder();
-			// consoleLogBuilder.append(
-			while ((metaCurrentLine = brMeta.readLine()) != null)
-			{
-				ArrayList<String> currentLineArray = new ArrayList<String>();
-				// System.out.println(metaCurrentLine);
-				String[] tokensInCurrentMetaLine = RegexUtils.patternComma.split(metaCurrentLine);// $$
-																									// metaCurrentLine.split(",");
-				// System.out.println("number of tokens in this meta line=" + tokensInCurrentMetaLine.length);
-				consoleLogBuilder.append("meta line num:" + (countOfLinesMeta + 1) + "#tokensInLine:"
-						+ tokensInCurrentMetaLine.length + "\n");
-				for (int i = 0; i < tokensInCurrentMetaLine.length; i++)
-				{
-					currentLineArray.add(tokensInCurrentMetaLine[i]);
-				}
-				arrayMeta.add(currentLineArray);
-				countOfLinesMeta++;
-			}
-			consoleLogBuilder.append("\n number of meta lines =" + countOfLinesMeta + "\n");
 
-			int countOfLinesTopK = 0;
-			while ((topKCurrentLine = brTopK.readLine()) != null)
-			{
-				ArrayList<String> currentLineArray = new ArrayList<String>();
-				// System.out.println("topKCurrentLine is" + topKCurrentLine);
-				String[] tokensInCurrentTopKLine = RegexUtils.patternComma.split(topKCurrentLine);// $$
-																									// topKCurrentLine.split(",");
-				// System.out.println("number of tokens in this topK line=" + tokensInCurrentTopKLine.length);
-				consoleLogBuilder.append("topk line num:" + (countOfLinesTopK + 1) + "#tokensInLine:"
-						+ tokensInCurrentTopKLine.length + "\n");
-				for (int i = 0; i < tokensInCurrentTopKLine.length; i++)
-				{
-					currentLineArray.add(tokensInCurrentTopKLine[i]);
-				}
-				arrayTopK.add(currentLineArray);
-				countOfLinesTopK++;
-			}
-			consoleLogBuilder.append("\n number of topK lines =" + countOfLinesTopK + "\n");
+			Triple<ArrayList<ArrayList<String>>, Integer, String> metaExtracted = extractDataFromFile(brMeta, "meta");
+			arrayMeta = metaExtracted.getFirst();
+			int countOfLinesMeta = metaExtracted.getSecond();
+			consoleLogBuilder.append(metaExtracted.getThird());
 
-			// int countOfLinesBaselineOccurrence = 0;
-			// while ((baseLineOccurrenceCurrentLine = brBaseLineOccurrence.readLine()) != null)
-			// {
-			// ArrayList<String> currentLineArray = new ArrayList<String>();
-			// // System.out.println("baseLineOccurrenceCurrentLine is" + baseLineOccurrenceCurrentLine);
-			// String[] tokensInCurrentBaseLineOccurrenceLine = RegexUtils.patternComma
-			// .split(baseLineOccurrenceCurrentLine);// $$baseLineOccurrenceCurrentLine.split(",");
-			// // System.out.println("number of tokens in this baselineOccurrence line=" +
-			// // tokensInCurrentBaseLineOccurrenceLine.length);
-			// consoleLogBuilder.append("baselineOccurrence line num:" + (countOfLinesBaselineOccurrence + 1)
-			// + "#tokensInLine:" + tokensInCurrentBaseLineOccurrenceLine.length + "\n");
-			//
-			// for (int i = 0; i < tokensInCurrentBaseLineOccurrenceLine.length; i++)
-			// {
-			// currentLineArray.add(tokensInCurrentBaseLineOccurrenceLine[i]);
-			// }
-			// arrayBaselineOccurrence.add(currentLineArray);
-			// countOfLinesBaselineOccurrence++;
-			// }
-			// consoleLogBuilder.append("\n number of baselineOccurrence lines =" + countOfLinesBaselineOccurrence +
-			// "\n");
+			Triple<ArrayList<ArrayList<String>>, Integer, String> topKExtracted = extractDataFromFile(brTopK, "topK");
+			arrayTopK = topKExtracted.getFirst();
+			int countOfLinesTopK = topKExtracted.getSecond();
+			consoleLogBuilder.append(topKExtracted.getThird());
 
-			// int countOfLinesBaselineDuration = 0;
-			// while ((baseLineDurationCurrentLine = brBaseLineDuration.readLine()) != null)
-			// {
-			// ArrayList<String> currentLineArray = new ArrayList<String>();
-			// // System.out.println("baseLineDurationCurrentLine is" + baseLineDurationCurrentLine);
-			// String[] tokensInCurrentBaseLineDurationLine = RegexUtils.patternComma
-			// .split(baseLineDurationCurrentLine);// $$baseLineDurationCurrentLine.split(",");
-			// // System.out.println("number of tokens in this baseLineDuration line=" +
-			// // tokensInCurrentBaseLineDurationLine.length);
-			// consoleLogBuilder.append("baseLineDuration line num:" + (countOfLinesBaselineDuration + 1)
-			// + "#tokensInLine:" + tokensInCurrentBaseLineDurationLine.length + "\n");
-			//
-			// for (int i = 0; i < tokensInCurrentBaseLineDurationLine.length; i++)
-			// {
-			// currentLineArray.add(tokensInCurrentBaseLineDurationLine[i]);
-			// }
-			// arrayBaselineDuration.add(currentLineArray);
-			// countOfLinesBaselineDuration++;
-			// }
-			// consoleLogBuilder.append("\n number of baseLineDuration lines =" + countOfLinesBaselineDuration + "\n");
-
-			int countOfLinesActual = 0;
-			while ((actualCurrentLine = brActual.readLine()) != null)
-			{
-				ArrayList<String> currentLineArray = new ArrayList<String>();
-				// System.out.println(actualCurrentLine);
-				String[] tokensInCurrentActualLine = RegexUtils.patternComma.split(actualCurrentLine);// $$actualCurrentLine.split(",");
-				// System.out.println("number of token in this actual line=" + tokensInCurrentActualLine.length);
-				consoleLogBuilder.append("actual line num:" + (countOfLinesActual + 1) + "#tokensInLine:"
-						+ tokensInCurrentActualLine.length + "\n");
-
-				for (int i = 0; i < tokensInCurrentActualLine.length; i++)
-				{
-					currentLineArray.add(tokensInCurrentActualLine[i]);
-				}
-				arrayActual.add(currentLineArray);
-				countOfLinesActual++;
-			}
-
-			// int countOfLinesCurrentTargetSame = 0;
-			// while ((actualCurrentLine = brCurrentTargetSame.readLine()) != null)
-			// {
-			// ArrayList<Boolean> currentLineArray = new ArrayList<Boolean>(); // System.out.println(actualCurrentLine);
-			// String[] tokensInCurrentTargetSameLine = RegexUtils.patternComma.split(actualCurrentLine);//
-			// $$actualCurrentLine.split(",");
-			// // System.out.println("number of token in this actual line=" + tokensInCurrentActualLine.length);
-			// consoleLogBuilder.append("current target same line num:" + (countOfLinesCurrentTargetSame + 1)
-			// + "#tokensInLine:" + tokensInCurrentTargetSameLine.length + "\n");
-			//
-			// for (String val : tokensInCurrentTargetSameLine)
-			// {
-			// if (val.equals("true") || val.equals("1"))
-			// {
-			// currentLineArray.add(true);
-			// }
-			//
-			// else if (val.equals("false") || val.equals("0"))
-			// {
-			// currentLineArray.add(false);
-			// }
-			//
-			// else
-			// {
-			// new Exception(
-			// "Error in org.activity.evaluation.Evaluation.Evaluation(): unknown token for brCurrentTargetSame = "
-			// + val);
-			// }
-			// }
-			// arrayCurrentTargetSame.add(currentLineArray);
-			// countOfLinesCurrentTargetSame++;
-			// }
+			Triple<ArrayList<ArrayList<String>>, Integer, String> actualExtracted =
+					extractDataFromFile(brActual, "actual");
+			arrayActual = actualExtracted.getFirst();
+			int countOfLinesActual = actualExtracted.getSecond();
+			consoleLogBuilder.append(actualExtracted.getThird());
 
 			consoleLogBuilder.append("\n number of actual lines =" + countOfLinesTopK + "\n");
 			consoleLogBuilder.append("size of meta array=" + arrayMeta.size() + "     size of topK array="
-					+ arrayTopK.size() + "   size of actual array=" + arrayActual.size()
-					+ "   size of current target same array=" + arrayCurrentTargetSame.size() + "\n");
+					+ arrayTopK.size() + "   size of actual array=" + arrayMeta.size() + "\n");
+			// + " size of current target same array=" + arrayCurrentTargetSame.size() + "\n");
+
+			if (ComparatorUtils.areAllEqual(countOfLinesMeta, countOfLinesTopK, countOfLinesActual, arrayMeta.size(),
+					arrayTopK.size(), arrayActual.size()) == false)
+			{
+				System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error line numbers mismatch: countOfLinesMeta="
+						+ countOfLinesMeta + ",countOfLinesTopK=" + countOfLinesTopK + " countOfLinesActual="
+						+ countOfLinesActual + ", arrayMeta.size()=" + arrayMeta.size() + ", arrayTopK.size()="
+						+ arrayTopK.size() + ", arrayActual.size()=" + arrayActual.size()));
+			}
 
 			System.out.println(consoleLogBuilder.toString());
 			consoleLogBuilder.setLength(0); // empty the consolelog stringbuilder
 			// //////////////////////////// finished creating and populating the data structures needed
 
-			for (String timeCategory : timeCategories)
-			{
-				if (Constant.EvalPrecisionRecallFMeasure)
-				{
-					for (int theK = theKOriginal; theK > 0; theK--)
-					{
-						writePrecisionRecallFMeasure("Algo", timeCategory, theK, arrayMeta, arrayTopK, arrayActual);
-						// if (Constant.DoBaselineOccurrence)
-						// {
-						// writePrecisionRecallFMeasure("BaselineOccurrence", timeCategory, theK, arrayMeta,
-						// arrayBaselineOccurrence, arrayActual);
-						// }
-						// if (Constant.DoBaselineDuration)
-						// {
-						// writePrecisionRecallFMeasure("BaselineDuration", timeCategory, theK, arrayMeta,
-						// arrayBaselineDuration, arrayActual);
-						// }
-					}
-				}
-
-				writeReciprocalRank("Algo", timeCategory, arrayMeta, arrayTopK, arrayActual);
-				writeMeanReciprocalRank("Algo", timeCategory, countOfLinesTopK); // average over data points
-
-				// if (Constant.DoBaselineOccurrence)
-				// {
-				// writeReciprocalRank("BaselineOccurrence", timeCategory, arrayMeta, arrayBaselineOccurrence,
-				// arrayActual);
-				// writeMeanReciprocalRank("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
-				//
-				// }
-				//
-				// if (Constant.DoBaselineDuration)
-				// {
-				// writeReciprocalRank("BaselineDuration", timeCategory, arrayMeta, arrayBaselineDuration,
-				// arrayActual);
-				// writeMeanReciprocalRank("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-				// }
-
-				if (Constant.EvalPrecisionRecallFMeasure)
-				{
-					// writeAvgPrecisionsForAllKs("Algo", timeCategory, countOfLinesTopK); // average over data points
-					writeAvgRecallsForAllKs("Algo", timeCategory, countOfLinesTopK);
-					// writeAvgFMeasuresForAllKs("Algo", timeCategory, countOfLinesTopK);
-
-					// if (Constant.DoBaselineOccurrence)
-					// {
-					// // writeAvgPrecisionsForAllKs("BaselineOccurrence",timeCategory,countOfLinesBaselineOccurrence);
-					// writeAvgRecallsForAllKs("BaselineOccurrence", timeCategory, countOfLinesBaselineOccurrence);
-					// // writeAvgFMeasuresForAllKs("BaselineOccurrence",timeCategory,countOfLinesBaselineOccurrence);
-					// }
-					// if (Constant.DoBaselineDuration)
-					// {
-					// // writeAvgPrecisionsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-					// writeAvgRecallsForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-					// // writeAvgFMeasuresForAllKs("BaselineDuration", timeCategory, countOfLinesBaselineDuration);
-					// }
-				}
-				break;// only 'All' time category
-			}
-			System.out.println("All test stats done");
-			// PopUps.showMessage("All test stats done");
+			ReadingFromFile.closeBufferedReaders(brMeta, brTopK, brActual);
 		}
 
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
-		finally
-		{
-			try
-			{
-				brMeta.close();
-				brTopK.close();
-				brActual.close();
-			}
-			catch (IOException ex)
-			{
-				ex.printStackTrace();
-			}
-		}
-
 		return new Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>>(
 				arrayMeta, arrayActual, arrayTopK);
+	}
+
+	/**
+	 * writePrecisionRecallFMeasure, writeReciprocalRank, writeMeanReciprocalRank, writeAvgPrecisionsForAllKs,
+	 * writeAvgRecallsForAllKs, writeAvgFMeasuresForAllKs
+	 * 
+	 * @param arrayMeta
+	 * @param arrayTopK
+	 * @param arrayActual
+	 * @param timeCategories
+	 * @param evalPrecisionRecallFMeasure
+	 * @param theKOriginal
+	 */
+	private static void doEvaluation(ArrayList<ArrayList<String>> arrayMeta, ArrayList<ArrayList<String>> arrayTopK,
+			ArrayList<ArrayList<String>> arrayActual, String[] timeCategories, boolean evalPrecisionRecallFMeasure,
+			int theKOriginal, String algoLabel)
+	{
+		int numOfUsers = arrayTopK.size();
+		for (String timeCategory : timeCategories)
+		{
+			writeReciprocalRank(algoLabel, timeCategory, arrayMeta, arrayTopK, arrayActual);
+			writeMeanReciprocalRank(algoLabel, timeCategory, numOfUsers); // average over data points
+
+			if (evalPrecisionRecallFMeasure)
+			{
+				for (int theK = theKOriginal; theK > 0; theK--)
+				{
+					writePrecisionRecallFMeasure(algoLabel, timeCategory, theK, arrayMeta, arrayTopK, arrayActual);
+				}
+
+				writeAvgPrecisionsForAllKs(algoLabel, timeCategory, numOfUsers); // average over data points
+				writeAvgRecallsForAllKs(algoLabel, timeCategory, numOfUsers);
+				writeAvgFMeasuresForAllKs(algoLabel, timeCategory, numOfUsers);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param dataToRead
+	 * @param label
+	 * @return Triple (arrayData, countOfLinesData, log.toString())
+	 * @throws IOException
+	 */
+	private static Triple<ArrayList<ArrayList<String>>, Integer, String> extractDataFromFile(BufferedReader dataToRead,
+			String label) throws IOException
+	{
+		// outer arraylist: rows, inner arraylist: cols
+		ArrayList<ArrayList<String>> arrayData = new ArrayList<ArrayList<String>>();
+		StringBuilder log = new StringBuilder();
+		int countOfLinesData = 0;
+
+		String dataCurrentLine;
+		while ((dataCurrentLine = dataToRead.readLine()) != null)
+		{
+			ArrayList<String> currentLineArray = new ArrayList<String>();
+			// System.out.println(metaCurrentLine);
+			String[] tokensInCurrentDataLine = RegexUtils.patternComma.split(dataCurrentLine);
+			// System.out.println("number of tokens in this meta line=" + tokensInCurrentMetaLine.length);
+			log.append(label + " line num:" + (countOfLinesData + 1) + "#tokensInLine:" + tokensInCurrentDataLine.length
+					+ "\n");
+
+			for (int i = 0; i < tokensInCurrentDataLine.length; i++)
+			{
+				currentLineArray.add(tokensInCurrentDataLine[i]);
+			}
+
+			arrayData.add(currentLineArray);
+			countOfLinesData++;
+		}
+		log.append("\n number of " + label + " lines =" + countOfLinesData + "\n");
+
+		return new Triple<ArrayList<ArrayList<String>>, Integer, String>(arrayData, countOfLinesData, log.toString());
 	}
 
 	/**
@@ -377,21 +277,12 @@ public class EvaluationSeq
 			ArrayList<ArrayList<String>> arrayMeta, ArrayList<ArrayList<String>> arrayTopK,
 			ArrayList<ArrayList<String>> arrayActual)
 	{
-		// BufferedReader brMeta = null, brTopK = null, brActual = null;
 		String commonPath = Constant.getCommonPath();
-		BufferedWriter bwRR = null;// , bwTopKRecall = null, bwTopKF = null, bwNumberOfRecommendationTimes = null;
+		BufferedWriter bwRR = null;
 		try
 		{
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine;
-			// File fileRR = new File(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
-			// fileRR.delete();
-			// if (!fileRR.exists())
-			// {
-			// fileRR.createNewFile();
-			// }
-			// bwRR = new BufferedWriter(new FileWriter(fileRR.getAbsoluteFile()));
 			bwRR = WritingToFile.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
-
 			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
 					+ "   size of actual array=" + arrayActual.size());
 
@@ -416,11 +307,6 @@ public class EvaluationSeq
 						// $$ arrayTopK.get(i).get(j).split("__");
 						// topK is of the form string: __a__b__c__d__e is of length 6...
 						// value at index 0 is empty.
-						if (VerbosityConstants.verbose)
-						{
-							System.out.println("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j));
-							System.out.println("actual string =" + actual);
-						}
 
 						int rank = -99;
 						for (int y = 1; y <= topKString.length - 1; y++)
@@ -443,28 +329,19 @@ public class EvaluationSeq
 						bwRR.write(RR + ",");
 						if (VerbosityConstants.verbose)
 						{
+							System.out.println("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j));
+							System.out.println("actual string =" + actual);
 							System.out.println("RR = " + RR);
 						}
 					}
 				} // end of current line array
 				bwRR.write("\n");
 			}
-
+			bwRR.close();
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				bwRR.close();
-			}
-			catch (IOException ex)
-			{
-				ex.printStackTrace();
-			}
 		}
 	}
 
@@ -504,13 +381,13 @@ public class EvaluationSeq
 			 * FileReader("/home/gunjan/dataRecommTop5.csv")); brActual = new BufferedReader(new
 			 * FileReader("/home/gunjan/dataActual.csv"));
 			 */
-			File fileTopKPrecision = new File(
-					commonPath + fileNamePhrase + timeCategory + "top" + theK + "Precision.csv");
+			File fileTopKPrecision =
+					new File(commonPath + fileNamePhrase + timeCategory + "top" + theK + "Precision.csv");
 			File fileTopKRecall = new File(commonPath + fileNamePhrase + timeCategory + "top" + theK + "Recall.csv");
 			File fileTopKF = new File(commonPath + fileNamePhrase + timeCategory + "top" + theK + "FMeasure.csv");
 
-			File fileNumberOfRecommendationTimes = new File(
-					commonPath + fileNamePhrase + timeCategory + "NumOfRecommendationTimes.csv");
+			File fileNumberOfRecommendationTimes =
+					new File(commonPath + fileNamePhrase + timeCategory + "NumOfRecommendationTimes.csv");
 			// File fileAccuracy = new File("/home/gunjan/accuracy.csv");
 
 			fileTopKPrecision.delete();
@@ -543,8 +420,8 @@ public class EvaluationSeq
 			bwTopKRecall = new BufferedWriter(new FileWriter(fileTopKRecall.getAbsoluteFile()));
 			bwTopKF = new BufferedWriter(new FileWriter(fileTopKF.getAbsoluteFile()));
 
-			bwNumberOfRecommendationTimes = new BufferedWriter(
-					new FileWriter(fileNumberOfRecommendationTimes.getAbsoluteFile()));
+			bwNumberOfRecommendationTimes =
+					new BufferedWriter(new FileWriter(fileNumberOfRecommendationTimes.getAbsoluteFile()));
 
 			// bwAccuracy = new BufferedWriter(new FileWriter(fileAccuracy.getAbsoluteFile()));
 
@@ -683,16 +560,9 @@ public class EvaluationSeq
 		{
 			try
 			{
-				/*
-				 * brMeta.close(); brTopK.close(); brActual.close();
-				 */
-				bwTopKPrecision.close();
-				bwTopKRecall.close();
-				bwTopKF.close();
-
-				bwNumberOfRecommendationTimes.close();
+				WritingToFile.closeBufferedWriters(bwTopKPrecision, bwTopKRecall, bwTopKF,
+						bwNumberOfRecommendationTimes);
 				// bwAccuracy.close();
-
 			}
 			catch (IOException ex)
 			{
@@ -710,39 +580,18 @@ public class EvaluationSeq
 	 */
 	public static void writeMeanReciprocalRank(String fileNamePhrase, String timeCategory, int numUsers)
 	{
-		// BufferedReader br= null;
 		String commonPath = Constant.getCommonPath();
 		try
 		{
-			File file = new File(commonPath + fileNamePhrase + timeCategory + "MeanReciprocalRank.csv");
-
-			file.delete();
-			file.createNewFile();
-
-			// File validRTCountFile = new File(commonPath + fileNamePhrase + timeCategory +
-			// "AvgReciprocalRankCountValidRT.csv");
-			// validRTCountFile.delete();
-			// validRTCountFile.createNewFile();
-			// BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-
-			bw.write(",MRR");
-			// bwValidRTCount.write(",RTCount_RR");
-
-			bw.newLine();
-			// bwValidRTCount.newLine();
+			BufferedWriter bw = WritingToFile
+					.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "MeanReciprocalRank.csv");
+			bw.write(",MRR\n");
 
 			for (int user = 0; user < numUsers; user++)
 			{
-
 				bw.write("User_" + user + ","); // TODO: currently this starts from User_0, change it to start from
 												// User_1 but this will also require necessary changes in other
 												// places
-				// bwValidRTCount.write("User_" + user + ",");
-				// for (int K = theKOriginal; K > 0; K--)
-				// {
 				BufferedReader br = new BufferedReader(
 						new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
 				String currentLine;
@@ -760,7 +609,6 @@ public class EvaluationSeq
 					if (lineNumber == user)
 					{
 						String[] rrValuesForThisUser = RegexUtils.patternComma.split(currentLine);
-						// currentLine.split(",");
 						// get avg of all these rr values
 						// concern: splitting on empty lines gives an array of length1, also splitting on one values
 						// line gives an array of length 1
@@ -845,8 +693,8 @@ public class EvaluationSeq
 			file.delete();
 			file.createNewFile();
 
-			File validRTCountFile = new File(
-					commonPath + fileNamePhrase + timeCategory + "AvgPrecisionCountValidRT.csv");
+			File validRTCountFile =
+					new File(commonPath + fileNamePhrase + timeCategory + "AvgPrecisionCountValidRT.csv");
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
@@ -906,27 +754,6 @@ public class EvaluationSeq
 							{ // calculate sum
 								for (int i = 0; i < pValuesForThisUserForThisK.length; i++)
 								{
-									// pValuesForThisUserForThisK[i]=Double.parseDouble(tokensInCurrentLine[i]);
-									// double toAdd=0;
-									// try{
-									// toAdd = Double.parseDouble(pValuesForThisUserForThisK[i]);
-									// }
-									//
-									// catch(NumberFormatException e)
-									// {
-									// toAdd=0;
-									// }
-									//
-									// sum+= toAdd;
-
-									// if(pValuesForThisUserForThisK[i]!=null)
-									// {
-									// System.out.println(">>user="+user+" K="+K+" lineNumber(user)="+lineNumber+" is
-									// not null ="+pValuesForThisUserForThisK[i]);
-									// sum = sum + Double.parseDouble(pValuesForThisUserForThisK[i]);
-									// }
-									// else
-									// System.out.println("pValuesForThisUserForThisK(K="+K+"[i="+i+"] is null");
 									double pValueRead = Double.parseDouble(pValuesForThisUserForThisK[i]);
 
 									if (pValueRead >= 0) // negative P value for a given RT for given K means that we
@@ -1083,6 +910,12 @@ public class EvaluationSeq
 		}
 	}
 
+	/**
+	 * 
+	 * @param fileNamePhrase
+	 * @param timeCategory
+	 * @param numUsers
+	 */
 	public static void writeAvgFMeasuresForAllKs(String fileNamePhrase, String timeCategory, int numUsers)
 	{
 		// BufferedReader br= null;
@@ -1101,8 +934,8 @@ public class EvaluationSeq
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 
-			File validRTCountFile = new File(
-					commonPath + fileNamePhrase + timeCategory + "AvgFMeasureCountValidRT.csv");
+			File validRTCountFile =
+					new File(commonPath + fileNamePhrase + timeCategory + "AvgFMeasureCountValidRT.csv");
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
@@ -1202,12 +1035,16 @@ public class EvaluationSeq
 	public static int getHourFromMetaString(String metaString) // example metaString: 1_10/4/2014_18:39:3
 	{
 		String[] splitted1 = RegexUtils.patternUnderScore.split(metaString);
-		// metaString.split(literalUnderscore);//// Pattern.quote("_"));
 		String[] splitted2 = RegexUtils.patternColon.split(splitted1[2]);
-		// splitted1[2].split(literalColon);// // Pattern.quote(":"));
 		return Integer.valueOf(splitted2[0]);
 	}
 
+	/**
+	 * 
+	 * @param value
+	 * @param places
+	 * @return
+	 */
 	public static double round(double value, int places)
 	{
 		if (places < 0) throw new IllegalArgumentException();
@@ -1216,72 +1053,5 @@ public class EvaluationSeq
 		bd = bd.setScale(places, RoundingMode.HALF_UP);
 		return bd.doubleValue();
 	}
-	/*
-	 * public static void writeAvgRecallForAllKs() { //BufferedReader br= null;
-	 * 
-	 * try { File file = new File("/home/gunjan/AvgRecall.csv");
-	 * 
-	 * file.delete();
-	 * 
-	 * if (!file.exists()) { file.createNewFile(); }
-	 * 
-	 * FileWriter fw = new FileWriter(file.getAbsoluteFile()); BufferedWriter bw = new BufferedWriter(fw);
-	 * 
-	 * for(int K=theKOriginal;K>0;K--) { bw.write(",Avg_Recall_Top"+K); }
-	 * 
-	 * bw.newLine(); for(int K=theKOriginal;K>0;K--) { BufferedReader br =new BufferedReader(new
-	 * FileReader("/home/gunjan/top"+K+"Recall.csv"));
-	 * 
-	 * String currentLine;
-	 * 
-	 * while ((currentLine = br.readLine()) != null) { String[] rValuesForThisUserForThisK=currentLine.split(",");
-	 * //double[] pValuesForThisUserForThisK = new double[tokensInCurrentLine.length];
-	 * 
-	 * double avgRValueForThisUserForThisK = 0; double sum=0;
-	 * 
-	 * for(int i=0;i<rValuesForThisUserForThisK.length;i++) {
-	 * //pValuesForThisUserForThisK[i]=Double.parseDouble(tokensInCurrentLine[i]); sum = sum +
-	 * Double.parseDouble(rValuesForThisUserForThisK[i]); }
-	 * 
-	 * avgRValueForThisUserForThisK = sum/rValuesForThisUserForThisK.length;
-	 * System.out.println("Calculating avg recall (K="+K+"):"+sum+"/"+rValuesForThisUserForThisK.length); } br.close();
-	 * } bw.close(); }
-	 * 
-	 * catch (IOException e) { e.printStackTrace(); } }
-	 * 
-	 * 
-	 * 
-	 * 
-	 * public static void writeAvgFForAllKs() { //BufferedReader br= null;
-	 * 
-	 * try { File file = new File("/home/gunjan/AvgFMeasure.csv");
-	 * 
-	 * file.delete();
-	 * 
-	 * if (!file.exists()) { file.createNewFile(); }
-	 * 
-	 * FileWriter fw = new FileWriter(file.getAbsoluteFile()); BufferedWriter bw = new BufferedWriter(fw);
-	 * 
-	 * for(int K=theKOriginal;K>0;K--) { bw.write(",Avg_FMeasure_Top"+K); }
-	 * 
-	 * bw.newLine(); for(int K=theKOriginal;K>0;K--) { BufferedReader br =new BufferedReader(new
-	 * FileReader("/home/gunjan/top"+K+"FMeasure.csv"));
-	 * 
-	 * String currentLine;
-	 * 
-	 * while ((currentLine = br.readLine()) != null) { String[] fValuesForThisUserForThisK=currentLine.split(",");
-	 * //double[] pValuesForThisUserForThisK = new double[tokensInCurrentLine.length];
-	 * 
-	 * double avgFValueForThisUserForThisK = 0; double sum=0;
-	 * 
-	 * for(int i=0;i<fValuesForThisUserForThisK.length;i++) {
-	 * //pValuesForThisUserForThisK[i]=Double.parseDouble(tokensInCurrentLine[i]); sum = sum +
-	 * Double.parseDouble(fValuesForThisUserForThisK[i]); }
-	 * 
-	 * avgFValueForThisUserForThisK = sum/fValuesForThisUserForThisK.length;
-	 * System.out.println("Calculating avg recall (K="+K+"):"+sum+"/"+fValuesForThisUserForThisK.length); } br.close();
-	 * } bw.close(); }
-	 * 
-	 * catch (IOException e) { e.printStackTrace(); } }
-	 */
+
 }

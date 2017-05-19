@@ -1,5 +1,19 @@
 package org.activity.constants;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
+import org.activity.io.Serializer;
+import org.activity.io.WritingToFile;
+import org.activity.ui.PopUps;
+import org.activity.util.RegexUtils;
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 
  * @author gunjan
@@ -30,18 +44,18 @@ public class DomainConstants
 	 * Most active users in the geolife dataset
 	 */
 
-	public static final int above10RTsUserIDsGeolifeData[] = { 62, 84, 52, 68, 167, 179, 153, 85, 128, 10, 126, 111,
-			163, 65, 91, 82, 139, 108 };
+	public static final int above10RTsUserIDsGeolifeData[] =
+			{ 62, 84, 52, 68, 167, 179, 153, 85, 128, 10, 126, 111, 163, 65, 91, 82, 139, 108 };
 	public static final int gowallaWorkingCatLevel = 2; // -1 indicates original working cat
 	static int[] gowallaUserIDs = null;
 	public static String[] featureNames = { "ActivityName", "StartTime", "Duration", "DistanceTravelled",
 			"StartGeoCoordinates", "EndGeoCoordinates", "AvgAltitude" };
 
-	public static final int gowallaUserIDsWithGT553MaxActsPerDay[] = { 5195, 9298, 9751, 16425, 17012, 18382, 19416,
-			19957, 20316, 23150, 28509, 30293, 30603, 42300, 44718, 46646, 74010, 74274, 76390, 79509, 79756, 86755,
-			103951, 105189, 106328, 114774, 118023, 136677, 154692, 179386, 194812, 213489, 224943, 235659, 246993,
-			251408, 269889, 311530, 338587, 395223, 563986, 624892, 862876, 1722363, 2084969, 2096330, 2103094, 2126604,
-			2190642 };
+	public static final int gowallaUserIDsWithGT553MaxActsPerDay[] =
+			{ 5195, 9298, 9751, 16425, 17012, 18382, 19416, 19957, 20316, 23150, 28509, 30293, 30603, 42300, 44718,
+					46646, 74010, 74274, 76390, 79509, 79756, 86755, 103951, 105189, 106328, 114774, 118023, 136677,
+					154692, 179386, 194812, 213489, 224943, 235659, 246993, 251408, 269889, 311530, 338587, 395223,
+					563986, 624892, 862876, 1722363, 2084969, 2096330, 2103094, 2126604, 2190642 };
 
 	public static final int gowallaUserIDsWithGT553MaxActsPerDayIndex[] = { 117, 148, 152, 215, 223, 236, 245, 250, 251,
 			266, 306, 313, 314, 333, 338, 341, 431, 433, 437, 447, 449, 471, 510, 515, 520, 543, 547, 607, 634, 661,
@@ -49,7 +63,154 @@ public class DomainConstants
 
 	public final static int numOfCatLevels = 3;
 
+	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
+	public static TreeMap<Integer, String> catIDNameDictionary = null;
+
 	public final static String pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
+	public final static String pathToSerialisedLevelWiseCatIDsDict =
+			"./dataToRead/May17/mapCatIDLevelWiseCatIDsDict.kryo";
+
+	public static TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap;
+	// public static final Integer hierarchyLevelForEditDistance = 1;// is in Constant class
+
+	public static void main(String args[])
+	{
+		getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict, 1, true);
+	}
+
+	public static void setCatIDNameDictionary(String pathToSerialisedCatIDNameDictionary)
+	{
+		try
+		{
+			catIDNameDictionary =
+					(TreeMap<Integer, String>) Serializer.kryoDeSerializeThis(pathToSerialisedCatIDNameDictionary);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param catIDsHierDistSerialisedFile
+	 */
+	public static void setCatIDsHierarchicalDistance(String catIDsHierDistSerialisedFile)
+	{
+		try
+		{
+			catIDsHierarchicalDistance =
+					(HashMap<String, Double>) Serializer.kryoDeSerializeThis(catIDsHierDistSerialisedFile);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static void setCatIDGivenLevelCatIDMap()
+	{
+		catIDGivenLevelCatIDMap = getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict,
+				Constant.HierarchicalLevelForEditDistance, true);
+	}
+
+	public static ArrayList<Integer> getGivenLevelCatID(int givenCatID)
+	{
+		if (catIDGivenLevelCatIDMap == null)
+		{
+			System.out.println(PopUps.getCurrentStackTracedErrorMsg("Error: catIDGivenLevelCatIDMap==null"));
+			System.exit(1);
+		}
+
+		if (catIDGivenLevelCatIDMap.get(givenCatID) == null)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error: catIDGivenLevelCatIDMap.get(givenCatID" + givenCatID + ")==null"));
+		}
+
+		return catIDGivenLevelCatIDMap.get(givenCatID);
+	}
+
+	/**
+	 * 
+	 * @param pathToSerialisedLevelWiseCatIDsDict
+	 * @param givenLevel
+	 * @param writeToFile
+	 * @return
+	 */
+	public static TreeMap<Integer, ArrayList<Integer>> getGivenLevelCatIDForAllCatIDs(
+			String pathToSerialisedLevelWiseCatIDsDict, int givenLevel, boolean writeToFile)
+	{
+		TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap = new TreeMap<>();
+		ArrayList<Integer> catIDsWithNoGivenLevelCatID = new ArrayList<>();
+
+		if (givenLevel > 3 || givenLevel < 1)
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Error: only three levels for Gowalla while given level =" + givenLevel));
+		}
+
+		TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict =
+				(TreeMap<Integer, String[]>) Serializer.kryoDeSerializeThis(pathToSerialisedLevelWiseCatIDsDict);
+
+		for (Entry<Integer, String[]> catIDEntry : catIDLevelWiseCatIDsDict.entrySet())
+		{
+			// System.out.println(catIDEntry.getKey() + "-" + catIDEntry.getValue());
+			String[] arr = catIDEntry.getValue();
+			String givenLevelCatIDs = arr[givenLevel - 1];
+
+			if (givenLevelCatIDs == null)
+			{
+				// does not have a single numeric catID and does not contain "__" which would be for multiple cat ids
+				// does not have given level cat id.
+				catIDsWithNoGivenLevelCatID.add(catIDEntry.getKey());
+				continue;
+			}
+
+			else if (givenLevelCatIDs.contains("__") == true)
+			{
+				String[] splitted = RegexUtils.patternDoubleUnderScore.split(givenLevelCatIDs);
+				ArrayList<Integer> splittedCatIDs = (ArrayList<Integer>) Arrays.stream(splitted)
+						.map(s -> Integer.valueOf(s)).collect(Collectors.toList());
+				catIDGivenLevelCatIDMap.put(catIDEntry.getKey(), splittedCatIDs);
+				continue;
+			}
+
+			else if (StringUtils.isNumeric(givenLevelCatIDs))
+			{
+				catIDGivenLevelCatIDMap.put(catIDEntry.getKey(),
+						new ArrayList<>(Collections.singletonList(Integer.valueOf(givenLevelCatIDs))));
+			}
+
+			else
+			{// does not have a single numeric catID and does not contain "__" which would be for multiple cat ids
+				// does not have given level cat id.
+				catIDsWithNoGivenLevelCatID.add(catIDEntry.getKey());
+				continue;
+			}
+
+		}
+
+		if (writeToFile)
+		{
+			System.out.println("Num of catIDs with no given level = " + catIDsWithNoGivenLevelCatID.size());
+			System.out.println("Num of catIDs with given level = " + catIDGivenLevelCatIDMap.size());
+
+			StringBuilder sb1 = new StringBuilder();
+			catIDGivenLevelCatIDMap.entrySet().stream()
+					.forEach(e -> sb1.append(e.getKey()).append("-").append(e.getValue()).append("\n"));
+			WritingToFile.writeToNewFile(sb1.toString(), "catIDGivenLevelCatIDMap.csv");
+
+			StringBuilder sb2 = new StringBuilder();
+			catIDsWithNoGivenLevelCatID.stream().forEach(e -> sb2.append(String.valueOf(e)).append("\n"));
+			WritingToFile.writeToNewFile(sb2.toString(), "catIDsWithNoGivenLevelCatID.csv");
+		}
+
+		return catIDGivenLevelCatIDMap;
+	}
 
 	public static boolean isGowallaUserIDWithGT553MaxActsPerDay(int userID)
 	{

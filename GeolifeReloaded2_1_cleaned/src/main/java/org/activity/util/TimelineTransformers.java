@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
@@ -29,10 +30,11 @@ public class TimelineTransformers
 	 * @param ts
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toTimeSeriesIntWithZeroValuedInvalids(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts)
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>
+			toTimeSeriesIntWithZeroValuedInvalids(LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
 
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -67,7 +69,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toIntsFromActivityObjects(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
 
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -95,7 +98,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toIntsFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -125,7 +129,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toDurationsFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -155,7 +160,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toStartTimeFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -182,10 +188,12 @@ public class TimelineTransformers
 		return r;
 	}
 
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toDistanceTravelledFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>
+			toDistanceTravelledFromActivityObjectsDummyTime(
+					LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -215,7 +223,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toAvgAltitudeFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -245,7 +254,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toStartAltitudeFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -275,7 +285,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toEndAltitudeFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -302,10 +313,12 @@ public class TimelineTransformers
 		return r;
 	}
 
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toStartGeoCoordinatesFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>
+			toStartGeoCoordinatesFromActivityObjectsDummyTime(
+					LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -340,7 +353,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toEndGeoCoordinatesFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -382,7 +396,8 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, String>> toCharsFromActivityObjects(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, String>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, String>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, String>> r =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, String>>();
 		System.out.println("inside toCharsFromActivityObjects");
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
@@ -514,11 +529,14 @@ public class TimelineTransformers
 	 * @param intervalSizeInSeconds
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> transformToEqualIntervalTimeSeriesDayWise(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersDayTimelines, int intervalSizeInSeconds)
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>
+			transformToEqualIntervalTimeSeriesDayWise(
+					LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersDayTimelines,
+					int intervalSizeInSeconds)
 	{
 		System.out.println("inside transformToEqualIntervalTimeSeriesDayWise");
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries = new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>();
 
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : allUsersDayTimelines.entrySet())
 		{
@@ -532,9 +550,9 @@ public class TimelineTransformers
 				Timeline dayTimeline = entryForDay.getValue();
 
 				Timestamp cursorTimestamp = dayTimeline.getActivityObjectAtPosition(0).getStartTimestamp();
-				Timestamp endTimestamp = dayTimeline
-						.getActivityObjectAtPosition(dayTimeline.getActivityObjectsInDay().size() - 1)
-						.getEndTimestamp();
+				Timestamp endTimestamp =
+						dayTimeline.getActivityObjectAtPosition(dayTimeline.getActivityObjectsInDay().size() - 1)
+								.getEndTimestamp();
 
 				while (cursorTimestamp.before(endTimestamp))
 				{
@@ -568,11 +586,12 @@ public class TimelineTransformers
 	 * @return
 	 */
 	// StartTimestamp, Activity Object
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> transformToSequenceDayWise(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersDayTimelines)
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>
+			transformToSequenceDayWise(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersDayTimelines)
 	{
 		System.out.println("inside transformToSequenceDayWise");
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceOfAOs = new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceOfAOs =
+				new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>();
 
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : allUsersDayTimelines.entrySet())
 		{
@@ -613,8 +632,8 @@ public class TimelineTransformers
 	 * @param intervalSizeInSeconds
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> transformToEqualIntervalTimeSeries(
-			LinkedHashMap<String, Timeline> timelines, int intervalSizeInSeconds)
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>
+			transformToEqualIntervalTimeSeries(LinkedHashMap<String, Timeline> timelines, int intervalSizeInSeconds)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries = new LinkedHashMap<>();
 
@@ -692,7 +711,7 @@ public class TimelineTransformers
 		StringBuilder s = new StringBuilder();
 		ArrayList<ActivityObject> aosInTimeline = timeline.getActivityObjectsInTimeline();
 
-		TreeMap<Integer, String> catIDNameDictionary = Constant.catIDNameDictionary;
+		TreeMap<Integer, String> catIDNameDictionary = DomainConstants.catIDNameDictionary;
 
 		for (ActivityObject ao : aosInTimeline)
 		{
