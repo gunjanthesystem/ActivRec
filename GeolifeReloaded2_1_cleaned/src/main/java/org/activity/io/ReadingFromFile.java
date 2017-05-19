@@ -288,7 +288,8 @@ public class ReadingFromFile
 		}
 		else
 		{
-			String fileName = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Jan27Daywise/recommPointsWithNoCandidates.csv";
+			String fileName =
+					"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Jan27Daywise/recommPointsWithNoCandidates.csv";
 			res = twoColumnReaderString(fileName, ",", 0, 3, true);
 			System.out.println("The blacklisted RTs are: ");
 			res.stream().forEach(System.out::println);
@@ -310,5 +311,21 @@ public class ReadingFromFile
 		Double[] vals2 = vals.toArray(new Double[vals.size()]);
 		double[] vals3 = ArrayUtils.toPrimitive(vals2);
 		return vals3[rowIndex];
+	}
+
+	/**
+	 * Closes multiple BufferedReaders
+	 * 
+	 * @param br1
+	 * @param brs
+	 * @throws IOException
+	 */
+	public static void closeBufferedReaders(BufferedReader br1, BufferedReader... brs) throws IOException
+	{
+		br1.close();
+		for (BufferedReader br : brs)
+		{
+			br.close();
+		}
 	}
 }

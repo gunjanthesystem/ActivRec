@@ -1,7 +1,9 @@
 package org.activity.distances;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
@@ -149,14 +151,31 @@ public class HJEditDistance extends AlignmentBasedDistance
 		ArrayList<ActivityObject> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
 
 		double dAct = 0, dFeat = 0, distanceTotal = 0;
-		String stringCodeForActivityObjects1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
-		String stringCodeForActivityObjects2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
+
+		// multiple string codes when an AO in the list has act name which at desired level can have multiple ids. For
+		// example Vineyards is under Community as well as Food
+		ArrayList<String> stringCodesForActivityObjects1, stringCodesForActivityObjects2;
+
+		if (Constant.HierarchicalLevelForEditDistance > 0)
+		{
+			stringCodesForActivityObjects1 = StringCode.getStringCodeForActivityObjectsV2(activityObjects1,
+					Constant.HierarchicalLevelForEditDistance, true);
+			stringCodesForActivityObjects2 = StringCode.getStringCodeForActivityObjectsV2(activityObjects2,
+					Constant.HierarchicalLevelForEditDistance, true);
+		}
+		else
+		{
+			stringCodesForActivityObjects1 = (ArrayList<String>) Collections
+					.singletonList(StringCode.getStringCodeForActivityObjects(activityObjects1));
+			stringCodesForActivityObjects2 = (ArrayList<String>) Collections
+					.singletonList(StringCode.getStringCodeForActivityObjects(activityObjects2));
+		}
 
 		Pair<String, Double> levenshteinDistance = null;
 		long t1 = System.nanoTime();
 
-		levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1,
-				stringCodeForActivityObjects2, 1, 1, 2);
+		levenshteinDistance = getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1,
+				stringCodesForActivityObjects2, 1, 1, 2);// getMySimpleLevenshteinDistance
 
 		// { levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
 		// stringCodeForActivityObjects2, Integer.toString(1), Integer.toString(1), Integer.toString(2));

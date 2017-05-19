@@ -244,7 +244,8 @@ public class RecommendationMasterMUMar2017// implements RecommendationMasterI// 
 		if (lookPastType.equals(Enums.LookPastType.NCount))// .equalsIgnoreCase("Count"))
 		{
 			this.currentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(testTimeline,
-					this.dateAtRecomm, this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours);
+					this.dateAtRecomm, this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours)
+					.getFirst();
 		}
 		else if (lookPastType.equals(Enums.LookPastType.NHours))// .equalsIgnoreCase("Hrs"))
 		{

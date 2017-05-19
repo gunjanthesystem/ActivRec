@@ -897,6 +897,11 @@ public class ActivityObject implements Serializable
 		return activityName;
 	}
 
+	public int getActivityID()
+	{
+		return this.activityID;
+	}
+
 	/**
 	 * TODO: change this and corresponding calling methods to work with long
 	 * 

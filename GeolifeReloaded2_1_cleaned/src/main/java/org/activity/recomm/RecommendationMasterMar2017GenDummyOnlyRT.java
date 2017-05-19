@@ -717,7 +717,7 @@ public class RecommendationMasterMar2017GenDummyOnlyRT implements Recommendation
 			if (lookPastType2.equals(Enums.LookPastType.NCount))
 			{
 				extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(testTimeline,
-						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours).getFirst();
 			}
 
 			else if (lookPastType2.equals(Enums.LookPastType.NHours))

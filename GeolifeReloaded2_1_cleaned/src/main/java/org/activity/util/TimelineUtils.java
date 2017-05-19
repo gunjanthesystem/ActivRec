@@ -2600,13 +2600,13 @@ public class TimelineUtils
 	 * @param timeAtRecomm
 	 * @param userIDAtRecomm
 	 * @param matchingUnitInCounts
-	 * @return
+	 * @return Pair(current_TimelineWithNext, reductionInMU)
 	 */
-	public static TimelineWithNext getCurrentTimelineFromLongerTimelineMUCount(Timeline longerTimeline,
+	public static Pair<TimelineWithNext, Double> getCurrentTimelineFromLongerTimelineMUCount(Timeline longerTimeline,
 			Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsD)
 	{
 		// $$System.out.println("------Inside getCurrentTimelineFromLongerTimelineMUCount");
-
+		double reductionInMU = 0;
 		int matchingUnitInCounts = (int) matchingUnitInCountsD;
 
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
@@ -2618,10 +2618,9 @@ public class TimelineUtils
 
 		if (indexOfCurrentEnd - matchingUnitInCounts < 0)
 		{
-			System.out.println(
-					"Warning: reducing matching units since don't have enough past to look in past,indexOfCurrentEnd("
-							+ indexOfCurrentEnd + ")" + "- matchingUnitInCounts(" + matchingUnitInCounts + ")="
-							+ (indexOfCurrentEnd - matchingUnitInCounts));
+			reductionInMU = matchingUnitInCounts - indexOfCurrentEnd;
+			System.out.println("Warning: reducing mu since not enough past,indexOfCurrentEnd(" + indexOfCurrentEnd + ")"
+					+ "- muInCounts(" + matchingUnitInCounts + ")=" + (indexOfCurrentEnd - matchingUnitInCounts));
 			matchingUnitInCounts = indexOfCurrentEnd;
 		}
 
@@ -2663,7 +2662,7 @@ public class TimelineUtils
 		}
 
 		// $$System.out.println("------Exiting getCurrentTimelineFromLongerTimelineMUCount");
-		return currentTimeline;
+		return new Pair<>(currentTimeline, reductionInMU);
 	}
 
 	/**

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.activity.util.RegexUtils;
 
@@ -177,7 +178,7 @@ public class TestDummy1
 		// System.out.println(testStringBuilder());
 	}
 
-	public static void main(String args[])
+	public static void checkReferencing(String args[])
 	{
 		HashMap<String, ArrayList<String>> map = new HashMap<>();
 
@@ -197,5 +198,13 @@ public class TestDummy1
 		System.out.println(sb.toString());
 	}
 
+	public static void main(String args[])
+	{
+		String[] arr = new String[] { "Gunjan", "Manali" };
+
+		ArrayList<String> list = (ArrayList<String>) Arrays.stream(arr).collect(Collectors.toList());
+
+		System.out.println("list = " + list.toString());
+	}
 	// public static void checkMemory
 }
