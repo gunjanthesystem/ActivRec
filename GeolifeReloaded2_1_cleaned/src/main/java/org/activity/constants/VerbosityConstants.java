@@ -12,19 +12,19 @@ public class VerbosityConstants
 	/**
 	 * Controlling the verbosity of console log output
 	 */
-	public static final boolean verbose = false;// false;// false;// true;// false;// false;
+	public static final boolean verbose = false;// true;// false;// false;// true;// false;// false;
 	public static final boolean verboseTimelineCleaning = false;// true;// false;// false; // verbosity level 2: if
 	// false it further
 	// minimises verbosity
 	public static final boolean verboseSAX = false;// false;
-	public static boolean verboseLevenstein = false;// false;// false;// false;
+	public static boolean verboseLevenstein = false;// true;// false;// false;// false;// false;
 	public static final boolean verboseNormalisation = false;// false;// false;
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;
 	public static final boolean verboseOTMDSAM = false;
 	public static final boolean verboseDistance = false;// false;
 	public static final boolean verboseRankScoreCalcToConsole = false;// false;
-	public static final boolean verboseEvaluationMetricsToConsole = false;// false;
+	public static final boolean verboseEvaluationMetricsToConsole = true;// false;
 	/**
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv
 	 * and EditDistancePerRtPerCand.csv have some similar information and have corresponding records.

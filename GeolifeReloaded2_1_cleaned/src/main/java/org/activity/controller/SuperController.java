@@ -1,6 +1,7 @@
 package org.activity.controller;
 
 import org.activity.constants.Constant;
+import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
@@ -88,7 +89,11 @@ public class SuperController
 															// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
-		new ControllerWithoutServer();
+
+		new EvaluationSeq(3, "./dataWritten/", Constant.matchingUnitAsPastCount);
+		// //curtain may 19 2017 start
+		// new ControllerWithoutServer();
+		// //curtain may 19 2017 end
 		// **************************************************************************************************************//
 		// Constant.DATABASE_NAME = "dcu_data_2";// geolife1
 		// Constant.caseType = "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3

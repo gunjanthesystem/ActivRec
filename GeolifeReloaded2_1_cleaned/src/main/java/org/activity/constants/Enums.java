@@ -44,4 +44,9 @@ public class Enums
 	{
 		BinaryThreshold, NearerScaled, FurtherScaled;
 	}
+
+	public enum SummaryStat
+	{
+		Mean, Median, Mode;
+	}
 }

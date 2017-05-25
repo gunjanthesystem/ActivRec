@@ -157,7 +157,7 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 4, 0, 1, 2, 3, 6, 8, 10, 12 };// , 14, 16, 18 };
+	public static final double matchingUnitAsPastCount[] = { 4, 0, 1, 2 };// , 3, 6, 8, 10, 12 };// , 14, 16, 18 };
 	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
 	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 

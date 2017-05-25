@@ -1013,10 +1013,10 @@ public class UtilityBelt
 			// if(activityName.equals("Others"))
 			// activityName="Ajooba";
 
-			Timestamp startTimestamp = DateTimeUtils.getIncrementedTimestamp(earliestTimestamp,
-					(counter * timeUnitInSeconds));
-			Timestamp endTimestamp = DateTimeUtils.getIncrementedTimestamp(earliestTimestamp,
-					((counter + 1) * timeUnitInSeconds));
+			Timestamp startTimestamp =
+					DateTimeUtils.getIncrementedTimestamp(earliestTimestamp, (counter * timeUnitInSeconds));
+			Timestamp endTimestamp =
+					DateTimeUtils.getIncrementedTimestamp(earliestTimestamp, ((counter + 1) * timeUnitInSeconds));
 
 			// Merge consecutively similar activities
 			while (((counter + 1) < lengthInIntervalsOfSplittedTimelines)
@@ -1051,8 +1051,16 @@ public class UtilityBelt
 			) // matching date to identify same day
 			{
 				counter++;
-				endTimestamp = DateTimeUtils.getIncrementedTimestamp(earliestTimestamp,
-						((counter + 1) * timeUnitInSeconds)); // end time stamp of the new merged activity event
+				endTimestamp =
+						DateTimeUtils.getIncrementedTimestamp(earliestTimestamp, ((counter + 1) * timeUnitInSeconds)); // end
+																														// time
+																														// stamp
+																														// of
+																														// the
+																														// new
+																														// merged
+																														// activity
+																														// event
 				// check if it is split for the last interval of the day
 			}
 
@@ -1080,8 +1088,8 @@ public class UtilityBelt
 			String JSONObjectString = " {\"Activity Name\":\"" + activityName + "\",";
 
 			JSONObjectString = JSONObjectString + "\"End Time\":\"" + DateTimeUtils.getTimeString(endTimestamp) + "\",";
-			JSONObjectString = JSONObjectString + "\"Start Time\":\"" + DateTimeUtils.getTimeString(startTimestamp)
-					+ "\",";
+			JSONObjectString =
+					JSONObjectString + "\"Start Time\":\"" + DateTimeUtils.getTimeString(startTimestamp) + "\",";
 
 			JSONObjectString = JSONObjectString + "\"User ID\":" + 99 + ",";
 			JSONObjectString = JSONObjectString + "\"Date\":\"" + DateTimeUtils.getDateString(startTimestamp) + "\" },";
@@ -1462,8 +1470,8 @@ public class UtilityBelt
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reformatUserIDs(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> map)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>>
+			reformatUserIDs(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> map)
 	{
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearranged = new LinkedHashMap<>();
 
@@ -1604,6 +1612,19 @@ public class UtilityBelt
 	 * @return
 	 */
 	public static Set<Integer> getIntersection(Set<Integer> s1, Set<Integer> s2)
+	{
+		Set<Integer> intersection = new HashSet<Integer>(s1);
+		intersection.retainAll(s2);
+		return intersection;
+	}
+
+	/**
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static Set<Integer> getIntersection(List<Integer> s1, List<Integer> s2)
 	{
 		Set<Integer> intersection = new HashSet<Integer>(s1);
 		intersection.retainAll(s2);

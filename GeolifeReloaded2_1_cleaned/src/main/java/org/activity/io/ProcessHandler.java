@@ -1,4 +1,4 @@
-package org.activity.util;
+package org.activity.io;
 
 import java.nio.ByteBuffer;
 

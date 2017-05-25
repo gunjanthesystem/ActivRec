@@ -23,7 +23,8 @@ public class BalancedIntegerTree
 
 	public BalancedIntegerTree()
 	{
-		// root = getSampleTree();
+		root = new DefaultMutableTreeNode();
+		root.setUserObject(-1);
 	}
 
 	public int getNumOfStrings()
@@ -37,43 +38,36 @@ public class BalancedIntegerTree
 	}
 
 	/**
-	 * 
+	 *
 	 * @param c
 	 */
 	public void addToAllLeaves(Integer c)
 	{
-		if (root == null)
-		{
-			root = new DefaultMutableTreeNode(c);
-		}
-		else
-		{
-			this.getAllLeaves().stream().forEach(l -> l.add(new DefaultMutableTreeNode(c)));
-		}
+		this.getAllLeaves().stream().forEach(l -> l.add(new DefaultMutableTreeNode(c)));
 	}
 
-	/**
-	 * 
-	 * @param cArr
-	 */
-	public void addToAllLeaves(Integer cArr[])
-	{
-		if (root == null)
-		{
-			root = new DefaultMutableTreeNode(cArr);
-		}
-		else
-		{
-			ArrayList<DefaultMutableTreeNode> allLeaves = this.getAllLeaves();
-			for (DefaultMutableTreeNode leaf : allLeaves)
-			{
-				for (Integer c : cArr)
-				{
-					leaf.add(new DefaultMutableTreeNode(c));
-				}
-			}
-		}
-	}
+	// /**
+	// *
+	// * @param cArr
+	// */
+	// public void addToAllLeaves(Integer cArr[])
+	// {
+	// if (root == null)
+	// {
+	// root = new DefaultMutableTreeNode(cArr);
+	// }
+	// else
+	// {
+	// ArrayList<DefaultMutableTreeNode> allLeaves = this.getAllLeaves();
+	// for (DefaultMutableTreeNode leaf : allLeaves)
+	// {
+	// for (Integer c : cArr)
+	// {
+	// leaf.add(new DefaultMutableTreeNode(c));
+	// }
+	// }
+	// }
+	// }
 
 	/**
 	 * 
@@ -81,22 +75,17 @@ public class BalancedIntegerTree
 	 */
 	public void addToAllLeaves(ArrayList<Integer> cArr)
 	{
-		System.out.println("Debug: addToAllLeaves(ArrayList<>) called");
-		if (root == null)
+		// System.out.println("Debug: addToAllLeaves(ArrayList<>) called");
+		ArrayList<DefaultMutableTreeNode> allLeaves = this.getAllLeaves();
+		for (DefaultMutableTreeNode leaf : allLeaves)
 		{
-			root = new DefaultMutableTreeNode(cArr);
-		}
-		else
-		{
-			ArrayList<DefaultMutableTreeNode> allLeaves = this.getAllLeaves();
-			for (DefaultMutableTreeNode leaf : allLeaves)
+			for (Integer i : cArr)
 			{
-				for (Integer i : cArr)
-				{
-					leaf.add(new DefaultMutableTreeNode(i));
-				}
-				// cArr.stream().forEach(c -> leaf.add(new DefaultMutableTreeNode(c)));
+				DefaultMutableTreeNode n = new DefaultMutableTreeNode();
+				n.setUserObject(i);
+				leaf.add(n);// new DefaultMutableTreeNode(i));
 			}
+			// cArr.stream().forEach(c -> leaf.add(new DefaultMutableTreeNode(c)));
 		}
 	}
 
@@ -156,10 +145,12 @@ public class BalancedIntegerTree
 			ArrayList<Integer> word = new ArrayList<>(strlen);
 
 			Enumeration<DefaultMutableTreeNode> e = leaf.pathFromAncestorEnumeration(root);
+			DefaultMutableTreeNode skipRoot = e.nextElement(); // skip the -1 root
+
 			while (e.hasMoreElements())
 			{
 				DefaultMutableTreeNode temp = e.nextElement();
-				System.out.print("\nDebug: temp.getUserObject().toString()" + temp.getUserObject().toString());
+				// System.out.print("\nDebug: temp.getUserObject().toString()" + temp.getUserObject().toString());
 				word.add((Integer) temp.getUserObject());// e.nextElement().toString()));// TODO can we improve this?
 			}
 			allStrings.add(word);
@@ -222,14 +213,18 @@ public class BalancedIntegerTree
 	public static void main(String args[])
 	{
 		BalancedIntegerTree bt = new BalancedIntegerTree();
-		bt.setRoot(getSampleTree());
+		// bt.setRoot(getSampleTree());
 		ArrayList<DefaultMutableTreeNode> allLeaves;// = bt.getAllLeaves();
 		// System.out.println("all leaves = " + allLeaves.toString());
 		//
 		ArrayList<ArrayList<Integer>> allStrings;// = bt.getAllStrings();
 		// System.out.println("allStrings = " + allStrings.toString());
 
-		bt.addToAllLeaves(99);
+		ArrayList<Integer> cList0 = new ArrayList<>();
+		cList0.add(99);
+		bt.addToAllLeaves(cList0);
+
+		// bt.addToAllLeaves(99);
 
 		allLeaves = bt.getAllLeaves();
 		System.out.println("all leaves = " + allLeaves.toString());
@@ -241,7 +236,7 @@ public class BalancedIntegerTree
 
 		ArrayList<Integer> cList = new ArrayList<>();
 		cList.add(22);
-		cList.add(33);
+		// cList.add(33);
 
 		char[] cArr = new char[] { 'm', 'n' };
 

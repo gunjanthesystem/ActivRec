@@ -2285,6 +2285,10 @@ public class AlignmentBasedDistance
 		if (VerbosityConstants.verboseLevenstein)
 		{
 			System.out.println("Word1s: " + word1s.toString() + "  Word2s:" + word2s.toString());
+			if (word1s.size() > 1 || word2s.size() > 1)
+			{
+				System.out.println("more than one word!");
+			}
 			System.out.println("levenshteinDists = " + levenshteinDists);
 			System.out.println("lowestRes = " + lowestRes.toString());
 		}

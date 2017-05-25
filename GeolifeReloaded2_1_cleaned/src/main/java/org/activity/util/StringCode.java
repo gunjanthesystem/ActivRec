@@ -913,9 +913,9 @@ public class StringCode
 				// .stream().map(i -> Integer.toString(i)).collect(Collectors.toList());
 
 				integerTrie.addToAllLeaves(desiredHierarchyLevelActiIDs);
-				System.out.println(
-						"Debug: integerTrie.addToAllLeaves(desiredHierarchyLevelActiIDs), where desiredHierarchyLevelActiIDs = "
-								+ desiredHierarchyLevelActiIDs);
+				// System.out.println(
+				// "Debug: integerTrie.addToAllLeaves(desiredHierarchyLevelActiIDs), where desiredHierarchyLevelActiIDs
+				// = "+ desiredHierarchyLevelActiIDs);
 
 				if (desiredHierarchyLevelActiIDs.size() > 1)
 				{
@@ -947,9 +947,9 @@ public class StringCode
 		{
 			System.out.print("\nInside getStringCodeForActivityObjects: act ids :");
 			activityObjects.stream().forEachOrdered(ao -> System.out.print("-" + ao.getActivityID()));
-			System.out.println("\nactIDSeq = " + correspondCatLevelWords.size());
+			System.out.println("\ncorrespondCatLevelWords.size() = " + correspondCatLevelWords.size());
 
-			System.out.println("\nWords for corr level " + hierarchyLevelForEDForAO + " act ids: ");
+			System.out.print("Words for corr level " + hierarchyLevelForEDForAO + " act ids: ");
 			correspondCatLevelWords.stream().forEachOrdered(word -> System.out.print("-" + word.toString()));
 
 			System.out.println("\nReturned CodeS: " + codeS);
