@@ -19,6 +19,7 @@ public class RegexUtils
 	public static final Pattern patternComma = Pattern.compile(",");// Pattern.compile(",");
 	public static final Pattern patternOpeningRoundBrace = Pattern.compile("\\(");
 	public static final Pattern patternClosingRoundBrace = Pattern.compile("\\)");
+	public static final Pattern patternGreaterThan = Pattern.compile(">");
 
 	/**
 	 * to find out how many times this method is being called when a variable in declaration calls it.

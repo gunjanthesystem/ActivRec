@@ -159,9 +159,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 		if (Constant.HierarchicalLevelForEditDistance > 0)
 		{
 			stringCodesForActivityObjects1 = StringCode.getStringCodeForActivityObjectsV2(activityObjects1,
-					Constant.HierarchicalLevelForEditDistance, true);
+					Constant.HierarchicalLevelForEditDistance, false);
 			stringCodesForActivityObjects2 = StringCode.getStringCodeForActivityObjectsV2(activityObjects2,
-					Constant.HierarchicalLevelForEditDistance, true);
+					Constant.HierarchicalLevelForEditDistance, false);
 		}
 		else
 		{

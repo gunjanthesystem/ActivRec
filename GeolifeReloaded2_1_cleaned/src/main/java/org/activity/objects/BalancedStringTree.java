@@ -8,6 +8,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.activity.ui.PopUps;
 
 /**
+ * SEE LINE 86 BEFORE USE
  * 
  * @author gunjan
  *
@@ -83,7 +84,7 @@ public class BalancedStringTree
 	{
 		if (root == null)
 		{
-			root = new DefaultMutableTreeNode(cArr);
+			root = new DefaultMutableTreeNode(cArr);// TODO: CHECK ITS CORRECTNESS BEFORE USER
 		}
 		else
 		{

@@ -6,19 +6,29 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.SummaryStat;
 import org.activity.constants.VerbosityConstants;
+import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
+import org.activity.objects.Pair;
 import org.activity.objects.Triple;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
+import org.activity.util.UtilityBelt;
 
 /**
  * (note: In earlier version (before 14 April 2015, this class was name as TestStats.java)
@@ -32,37 +42,390 @@ public class EvaluationSeq
 
 	static final int theKOriginal = 5;
 	public static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
+	String groupsOf100UsersLabels[] = { "1", "101" };// , "201", "301", "401", "501", "601", "701", "801", "901" };
 
-	public EvaluationSeq(int seqLength)
+	static ArrayList<ArrayList<String>> listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
+			listOfPerAgreementsFilesL1;
+
+	/**
+	 * 
+	 * @param seqLength
+	 * @param outputCoreResultsPath
+	 * @param matchingUnitAsPastCount
+	 */
+	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount)
 	{
+		// commonPath = "./dataWritten/";
+
+		// Initialise list of list of filenames
+		// we need to concated results for different user groups, 1-100,102-200, and so on
+		listOfNumAgreementsFiles = new ArrayList<>();
+		listOfPerAgreementsFiles = new ArrayList<>();
+		listOfNumAgreementsFilesL1 = new ArrayList<>();
+		listOfPerAgreementsFilesL1 = new ArrayList<>();
+		// we concatenate results for each mu over all users (groups)
+		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+		{
+			listOfNumAgreementsFiles.add(muIndex, new ArrayList<String>());
+			listOfPerAgreementsFiles.add(muIndex, new ArrayList<String>());
+			listOfNumAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+			listOfPerAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+		}
+
 		try
 		{
-			for (int i = 0; i < seqLength; i++)
+			for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
 			{
-				Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArrays =
-						readDataForSeqIndex(i);
-				ArrayList<ArrayList<String>> arrayMeta = readArrays.getFirst();
-				ArrayList<ArrayList<String>> arrayTopK = readArrays.getSecond();// new ArrayList<ArrayList<String>>();
-				ArrayList<ArrayList<String>> arrayActual = readArrays.getThird();
+				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
+				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
+				Constant.initialise(commonPath, Constant.getDatabaseName(),
+						"./dataToRead/April7/mapCatIDsHierDist.kryo",
+						DomainConstants.pathToSerialisedCatIDNameDictionary);
 
-				doEvaluation(arrayMeta, arrayTopK, arrayActual, timeCategories, Constant.EvalPrecisionRecallFMeasure,
-						theKOriginal, "Algo");
+				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+				{
+					double mu = matchingUnitAsPastCount[muIndex];
+					commonPath =
+							outputCoreResultsPath + groupsOf100UsersLabel + "/MatchingUnit" + String.valueOf(mu) + "/";
+					Constant.setCommonPath(commonPath);
+					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
 
-				// if (Constant.DoBaselineOccurrence)
-				// {
-				// doEvaluation(arrayMeta, arrayBaselineOccurrence, arrayActual, timeCategories,
-				// Constant.EvalPrecisionRecallFMeasure, theKOriginal, "BaselineOccurrence");
-				// }
-				// if (Constant.DoBaselineDuration)
-				// {
-				// doEvaluation(arrayMeta, arrayBaselineDuration, arrayActual, timeCategories,
-				// Constant.EvalPrecisionRecallFMeasure, theKOriginal, "BaselineDuration");
-				// }
+					PrintStream consoleLogStream =
+							WritingToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
+
+					doEvaluationSeq(seqLength, commonPath, commonPath, true);
+					// PopUps.showMessage("FINISHED EVAL FOR mu = " + mu + " USERGROUP=" + groupsOf100UsersLabel);
+
+					// create lists of filenames of results for different MUs which need to be concatenated
+					String algoLabel = "Algo";
+
+					for (String timeCategory : timeCategories)
+					{
+						listOfNumAgreementsFiles.get(muIndex)
+								.add(commonPath + algoLabel + timeCategory + "NumDirectAgreements.csv");
+						listOfPerAgreementsFiles.get(muIndex)
+								.add(commonPath + algoLabel + timeCategory + "PercentageDirectAgreements.csv");
+						listOfNumAgreementsFilesL1.get(muIndex)
+								.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectAgreements.csv");
+						listOfPerAgreementsFilesL1.get(muIndex)
+								.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectAgreements.csv");
+					}
+					consoleLogStream.close();
+				}
+
 			}
+
+			// PopUps.showMessage("BREAKING");
+			ArrayList<String> listOfWrittenFiles =
+					concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount, listOfNumAgreementsFiles,
+							listOfPerAgreementsFiles, listOfNumAgreementsFilesL1, listOfPerAgreementsFilesL1);
+
+			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
+					"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
+			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
+
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats);
+
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param seqLength
+	 * @param pathToRead
+	 * @param matchingUnitAsPastCount
+	 * @param fileNamePhraseToRead
+	 * @param stat
+	 * @return
+	 */
+	private static ArrayList<ArrayList<Double>> getSummaryPerMUPerSeqIndex(int seqLength, String pathToRead,
+			double[] matchingUnitAsPastCount, String fileNamePhraseToRead, SummaryStat stat)
+	{
+		// outerlist is for mu, inner list for seq index
+		ArrayList<ArrayList<Double>> summaryPerMUPerSeqIndex = new ArrayList<ArrayList<Double>>();
+
+		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+		{
+			int mu = (int) matchingUnitAsPastCount[muIndex];
+
+			ArrayList<Double> summaryStatsPerIndex = StatsUtils
+					.getColumnSummaryStatDouble(pathToRead + fileNamePhraseToRead + mu + ".csv", seqLength, 4, stat);
+
+			summaryPerMUPerSeqIndex.add(summaryStatsPerIndex);
+		}
+
+		return summaryPerMUPerSeqIndex;
+		// WritingToFile.writeArrayListOfArrayList(finalSummaryStat, pathToWrite + fileNamePhraseToRead + stat + ".csv",
+		// "", ",");
+	}
+
+	private static void summariseResults(int seqLength, String pathToWrite, double[] matchingUnitAsPastCount,
+			String[] fileNamePhrases, SummaryStat[] summaryStats)
+	{
+		// String[] fileNamePhrases = { "", "" };
+		// SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
+		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "Summarise.txt");
+
+		// ArrayList<String> rowNames =
+		ArrayList<String> rowNames = (ArrayList<String>) DoubleStream.of(matchingUnitAsPastCount).boxed()
+				.map(v -> v.toString()).collect(Collectors.toList());
+		// (ArrayList<String>) Stream.of(matchingUnitAsPastCount).map(v -> v.toString())
+		// .collect(Collectors.toList());// .toArray(String[]::new);
+		ArrayList<String> colNames = (ArrayList<String>) IntStream.range(0, seqLength).boxed().map(v -> v.toString())
+				.collect(Collectors.toList());
+		// String[] colNames = (String[]) IntStream.range(0, seqLength).boxed().map(v -> v.toString()).toArray();
+
+		// PopUps.showMessage("rowNames: " + rowNames + " \ncolNames: " + colNames);
+
+		for (String fileNamePhraseToRead : fileNamePhrases)
+		{
+
+			for (SummaryStat stat : summaryStats)
+			{
+				ArrayList<ArrayList<Double>> summaryPerMUPerSeqIndex = getSummaryPerMUPerSeqIndex(seqLength,
+						pathToWrite, matchingUnitAsPastCount, fileNamePhraseToRead, SummaryStat.Mean);
+				WritingToFile.writeArrayListOfArrayList(summaryPerMUPerSeqIndex,
+						pathToWrite + stat + fileNamePhraseToRead + ".csv", ",", colNames, rowNames);
+			}
+		}
+		consoleLogStream.close();
+	}
+
+	/**
+	 * 
+	 * @param seqLength
+	 * @param pathToWrite
+	 * @param matchingUnitAsPastCount
+	 */
+	private static void summariseResultsV0(int seqLength, String pathToWrite, double[] matchingUnitAsPastCount)
+	{
+		{
+			PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "Summarise.txt");
+
+			StringBuilder sbQ1 = new StringBuilder();
+			StringBuilder sbQ11 = new StringBuilder();
+			StringBuilder sbQ2 = new StringBuilder();
+			StringBuilder sbQ22 = new StringBuilder();
+			StringBuilder sbQ3 = new StringBuilder();
+			StringBuilder sbQ33 = new StringBuilder();
+			StringBuilder sbQ4 = new StringBuilder();
+			StringBuilder sbQ44 = new StringBuilder();
+
+			for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+			{
+				int mu = (int) matchingUnitAsPastCount[muIndex];
+
+				Pair<ArrayList<Double>, ArrayList<Double>> res1 =
+						getMeanMedian(pathToWrite + "AllNumDirectAgreements" + mu + ".csv", seqLength, 4);
+
+				for (int k = 0; k < res1.getFirst().size(); k++)
+				{
+					sbQ1.append(res1.getFirst().get(k));
+					sbQ11.append(res1.getSecond().get(k));
+
+					if (k == res1.getFirst().size() - 1)
+					{
+						sbQ1.append("\n");
+						sbQ11.append("\n");
+					}
+					else
+					{
+						sbQ1.append(",");
+						sbQ11.append(",");
+					}
+				}
+
+				Pair<ArrayList<Double>, ArrayList<Double>> res2 =
+						getMeanMedian(pathToWrite + "AllPerDirectAgreements" + mu + ".csv", seqLength, 4);
+				for (int k = 0; k < res2.getFirst().size(); k++)
+				{
+					sbQ2.append(res2.getFirst().get(k));
+					sbQ22.append(res2.getSecond().get(k));
+
+					if (k == res2.getFirst().size() - 1)
+					{
+						sbQ2.append("\n");
+						sbQ22.append("\n");
+					}
+					else
+					{
+						sbQ2.append(",");
+						sbQ22.append(",");
+					}
+				}
+
+				Pair<ArrayList<Double>, ArrayList<Double>> res3 =
+						getMeanMedian(pathToWrite + "AllNumDirectAgreementsL1" + mu + ".csv", seqLength, 4);
+				for (int k = 0; k < res3.getFirst().size(); k++)
+				{
+					sbQ3.append(res3.getFirst().get(k));
+					sbQ33.append(res3.getSecond().get(k));
+
+					if (k == res3.getFirst().size() - 1)
+					{
+						sbQ3.append("\n");
+						sbQ33.append("\n");
+					}
+					else
+					{
+						sbQ3.append(",");
+						sbQ33.append(",");
+					}
+				}
+
+				Pair<ArrayList<Double>, ArrayList<Double>> res4 =
+						getMeanMedian(pathToWrite + "AllPerDirectAgreementsL1" + mu + ".csv", seqLength, 4);
+				for (int k = 0; k < res4.getFirst().size(); k++)
+				{
+					sbQ4.append(res4.getFirst().get(k));
+					sbQ44.append(res4.getSecond().get(k));
+
+					if (k == res4.getFirst().size() - 1)
+					{
+						sbQ4.append("\n");
+						sbQ44.append("\n");
+					}
+					else
+					{
+						sbQ4.append(",");
+						sbQ44.append(",");
+					}
+				}
+			}
+
+			WritingToFile.writeToNewFile(sbQ1.toString(), pathToWrite + "NumAgreementMean.csv");
+			WritingToFile.writeToNewFile(sbQ11.toString(), pathToWrite + "NumAgreementMedian.csv");
+
+			WritingToFile.writeToNewFile(sbQ2.toString(), pathToWrite + "PerAgreementMean.csv");
+			WritingToFile.writeToNewFile(sbQ22.toString(), pathToWrite + "PerAgreementMedian.csv");
+
+			WritingToFile.writeToNewFile(sbQ3.toString(), pathToWrite + "NumAgreementMeanL1.csv");
+			WritingToFile.writeToNewFile(sbQ33.toString(), pathToWrite + "NumAgreementMedianL1.csv");
+
+			WritingToFile.writeToNewFile(sbQ4.toString(), pathToWrite + "PerAgreementMeanL1.csv");
+			WritingToFile.writeToNewFile(sbQ44.toString(), pathToWrite + "PerAgreementMedianL1.csv");
+			consoleLogStream.close();
+		}
+	}
+
+	/**
+	 * For each mu, concatenate results files for each groups of users, so that we get single files containing results
+	 * for all users.
+	 * 
+	 * @param pathToWriteLog
+	 * @param matchingUnitAsPastCount
+	 * @param listOfNumAgreementsFiles
+	 * @param listOfPerAgreementsFiles
+	 * @param listOfNumAgreementsFilesL1
+	 * @param listOfPerAgreementsFilesL1
+	 * @return
+	 */
+	private static ArrayList<String> concatenateFiles(String pathToWrite, double matchingUnitAsPastCount[],
+			ArrayList<ArrayList<String>> listOfNumAgreementsFiles,
+			ArrayList<ArrayList<String>> listOfPerAgreementsFiles,
+			ArrayList<ArrayList<String>> listOfNumAgreementsFilesL1,
+			ArrayList<ArrayList<String>> listOfPerAgreementsFilesL1)
+	{
+		ArrayList<String> listOfWrittenFiles = new ArrayList();
+		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVConcatLog.txt");
+
+		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+		{
+			int mu = (int) matchingUnitAsPastCount[muIndex];
+			// PopUps.showMessage("Will now concatenate:" + listOfNumAgreementsFiles.get(muIndex).size() + "files");
+			// PopUps.showMessage("listOfNumAgreementsFilesget(muIndex) = " +
+			// listOfNumAgreementsFiles.get(muIndex));
+
+			CSVUtils.concatenateCSVFiles(listOfNumAgreementsFiles.get(muIndex), true,
+					pathToWrite + "AllNumDirectAgreements_" + mu + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllNumDirectAgreements" + mu + ".csv");
+
+			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFiles.get(muIndex), true,
+					pathToWrite + "AllPerDirectAgreements_" + mu + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreements" + mu + ".csv");
+
+			CSVUtils.concatenateCSVFiles(listOfNumAgreementsFilesL1.get(muIndex), true,
+					pathToWrite + "AllNumDirectAgreementsL1_" + mu + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllNumDirectAgreementsL1" + mu + ".csv");
+
+			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFilesL1.get(muIndex), true,
+					pathToWrite + "AllPerDirectAgreementsL1_" + mu + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreementsL1" + mu + ".csv");
+		}
+		consoleLogStream.close();
+
+		return listOfWrittenFiles;
+
+	}
+
+	/**
+	 * 
+	 * @param fileToRead
+	 * @param seqLength
+	 * @param roundOfPlaces
+	 * @return
+	 */
+	public static Pair<ArrayList<Double>, ArrayList<Double>> getMeanMedian(String fileToRead, int seqLength,
+			int roundOfPlaces)
+	{
+		int[] columnIndicesToRead = IntStream.range(0, seqLength).toArray();
+		ArrayList<ArrayList<Double>> columnWiseVals =
+				ReadingFromFile.allColumnsReaderDouble(fileToRead, ",", columnIndicesToRead, false);
+
+		ArrayList<Double> all1ValsMean = new ArrayList<>();
+		ArrayList<Double> all1ValsMedian = new ArrayList<>();
+
+		for (ArrayList<Double> valsForAColumn : columnWiseVals)
+		{
+			all1ValsMean.add(StatsUtils.meanOfArrayList(valsForAColumn, roundOfPlaces));
+			all1ValsMedian.add(StatsUtils.meanOfArrayList(valsForAColumn, roundOfPlaces));
+		}
+
+		return new Pair<ArrayList<Double>, ArrayList<Double>>(all1ValsMean, all1ValsMedian);
+	}
+
+	/**
+	 * 
+	 * @param seqLength
+	 * @param pathToReadResults
+	 * @param pathToWrite
+	 */
+	public void doEvaluationSeq(int seqLength, String pathToReadResults, String pathToWrite, boolean verbose)
+	{
+		try
+		{
+			// for (int i = 0; i < seqLength; i++)
+			// {
+			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArrays =
+					readDataForSeqIndex(seqLength, pathToReadResults, verbose);
+
+			ArrayList<ArrayList<String>> arrayMeta = readArrays.getFirst();
+			ArrayList<ArrayList<String>> arrayRecommendedSequence = readArrays.getThird();
+			ArrayList<ArrayList<String>> arrayActualSequence = readArrays.getSecond();
+
+			doEvaluationSeq(arrayMeta, arrayRecommendedSequence, arrayActualSequence, timeCategories, "Algo", verbose,
+					pathToWrite, seqLength);
+
+			// if (Constant.DoBaselineOccurrence)
+			// {
+			// doEvaluation(arrayMeta, arrayBaselineOccurrence, arrayActual, timeCategories,
+			// Constant.EvalPrecisionRecallFMeasure, theKOriginal, "BaselineOccurrence");
+			// }
+			// if (Constant.DoBaselineDuration)
+			// {
+			// doEvaluation(arrayMeta, arrayBaselineDuration, arrayActual, timeCategories,
+			// Constant.EvalPrecisionRecallFMeasure, theKOriginal, "BaselineDuration");
+			// }
+			// }
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			PopUps.showException(e, "org.activity.evaluation.EvaluationSeq.doEvaluationSeq()");
 		}
 		// System.out.println("All test stats done");
 		// PopUps.showMessage("All test stats done");
@@ -75,7 +438,7 @@ public class EvaluationSeq
 	 * @return
 	 */
 	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>>
-			readDataForSeqIndex(int seqIndex)
+			readDataForSeqIndex(int seqIndex, String pathToReadResults, boolean verbose)
 	{
 		commonPath = Constant.getCommonPath();
 		System.out.println("Inside Evaluation: common path is:" + commonPath);
@@ -129,10 +492,9 @@ public class EvaluationSeq
 		{
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine, baseLineOccurrenceCurrentLine,
 					baseLineDurationCurrentLine, currentTargetSame;
-			brMeta = new BufferedReader(new FileReader(commonPath + "meta.csv"));
-			brTopK = new BufferedReader(
-					new FileReader(commonPath + "dataRankedRecommendationWithoutScores" + seqIndex + ".csv"));// /dataRecommTop5.csv"));
-			brActual = new BufferedReader(new FileReader(commonPath + "dataActual" + seqIndex + ".csv"));
+			brMeta = new BufferedReader(new FileReader(pathToReadResults + "meta.csv"));
+			brTopK = new BufferedReader(new FileReader(pathToReadResults + "dataRecommSequenceWithScore.csv"));// /dataRecommTop5.csv"));
+			brActual = new BufferedReader(new FileReader(pathToReadResults + "dataActualSequence.csv"));
 
 			// brCurrentTargetSame = new BufferedReader(new FileReader(commonPath +
 			// "metaIfCurrentTargetSameWriter.csv"));
@@ -141,18 +503,20 @@ public class EvaluationSeq
 
 			StringBuilder consoleLogBuilder = new StringBuilder();
 
-			Triple<ArrayList<ArrayList<String>>, Integer, String> metaExtracted = extractDataFromFile(brMeta, "meta");
+			Triple<ArrayList<ArrayList<String>>, Integer, String> metaExtracted =
+					extractDataFromFile(brMeta, "meta", verbose);
 			arrayMeta = metaExtracted.getFirst();
 			int countOfLinesMeta = metaExtracted.getSecond();
 			consoleLogBuilder.append(metaExtracted.getThird());
 
-			Triple<ArrayList<ArrayList<String>>, Integer, String> topKExtracted = extractDataFromFile(brTopK, "topK");
+			Triple<ArrayList<ArrayList<String>>, Integer, String> topKExtracted =
+					extractDataFromFile(brTopK, "topK", verbose);
 			arrayTopK = topKExtracted.getFirst();
 			int countOfLinesTopK = topKExtracted.getSecond();
 			consoleLogBuilder.append(topKExtracted.getThird());
 
 			Triple<ArrayList<ArrayList<String>>, Integer, String> actualExtracted =
-					extractDataFromFile(brActual, "actual");
+					extractDataFromFile(brActual, "actual", verbose);
 			arrayActual = actualExtracted.getFirst();
 			int countOfLinesActual = actualExtracted.getSecond();
 			consoleLogBuilder.append(actualExtracted.getThird());
@@ -181,9 +545,305 @@ public class EvaluationSeq
 		catch (IOException e)
 		{
 			e.printStackTrace();
+			PopUps.showException(e, "org.activity.evaluation.EvaluationSeq.readDataForSeqIndex(int, String, boolean)");
 		}
 		return new Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>>(
 				arrayMeta, arrayActual, arrayTopK);
+	}
+
+	/**
+	 * writePrecisionRecallFMeasure, writeReciprocalRank, writeMeanReciprocalRank, writeAvgPrecisionsForAllKs,
+	 * writeAvgRecallsForAllKs, writeAvgFMeasuresForAllKs
+	 * 
+	 * 
+	 * 
+	 * @param arrayMeta
+	 * @param arrayRecommendedSeq
+	 * @param arrayActualSeq
+	 * @param timeCategories
+	 * @param algoLabel
+	 */
+	private static void doEvaluationSeq(ArrayList<ArrayList<String>> arrayMeta,
+			ArrayList<ArrayList<String>> arrayRecommendedSeq, ArrayList<ArrayList<String>> arrayActualSeq,
+			String[] timeCategories, String algoLabel, boolean verbose, String pathToWrite, int seqLength)
+	{
+		int numOfUsers = arrayMeta.size();
+		if (verbose)
+		{
+			System.out.println("Inside doEvaluationSeq\nNum of users = " + numOfUsers);
+		}
+
+		for (String timeCategory : timeCategories)
+		{
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements = computeDirectAgreements(algoLabel,
+					timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, -1);
+
+			writeDirectAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite);
+			writeNumAndPercentageDirectAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite,
+					seqLength);
+
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreementsL1 =
+					computeDirectAgreements(algoLabel, timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, 1);
+
+			writeDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite);
+			writeNumAndPercentageDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
+					seqLength);
+
+		}
+	}
+
+	/**
+	 * 
+	 * @param fileNamePhrase
+	 * @param timeCategory
+	 * @param arrayDirectAgreements
+	 * @param pathToWrite
+	 */
+	private static void writeNumAndPercentageDirectAgreements(String fileNamePhrase, String timeCategory,
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite, int seqLength)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			StringBuilder sbPercentage = new StringBuilder();
+			for (int i = 0; i < arrayDirectAgreements.size(); i++)
+			{
+				ArrayList<ArrayList<Integer>> arrayForAUser = arrayDirectAgreements.get(i);
+				for (int seqIndex = 0; seqIndex < seqLength; seqIndex++)
+				{
+					int sumAgreementsForThisIndex = 0;
+					for (int j = 0; j < arrayForAUser.size(); j++)
+					{
+						ArrayList<Integer> arrayForAnRt = arrayForAUser.get(j);
+						if (arrayForAnRt.get(seqIndex) == 1)
+						{
+							sumAgreementsForThisIndex += 1;
+						}
+						// if (VerbosityConstants.verboseEvaluationMetricsToConsole)
+						// {System.out.println("arrayForAnRt = " + arrayForAnRt); }
+					}
+
+					double percentageAgreement =
+							StatsUtils.round((sumAgreementsForThisIndex * 100.0) / arrayForAUser.size(), 4);
+					sbPercentage.append(percentageAgreement);
+					sb.append(sumAgreementsForThisIndex);
+
+					if (seqIndex == seqLength - 1)
+					{
+						sb.append("\n");
+						sbPercentage.append("\n");
+					}
+					else
+					{
+						sb.append(",");
+						sbPercentage.append(",");
+					}
+				}
+			}
+
+			WritingToFile.writeToNewFile(sb.toString(),
+					pathToWrite + fileNamePhrase + timeCategory + "NumDirectAgreements.csv");
+			WritingToFile.writeToNewFile(sbPercentage.toString(),
+					pathToWrite + fileNamePhrase + timeCategory + "PercentageDirectAgreements.csv");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			PopUps.showException(e, "org.activity.evaluation.EvaluationSeq.writeNumAndPercentageDirectAgreements()");
+		}
+	}
+
+	/**
+	 * 
+	 * @param fileNamePhrase
+	 * @param timeCategory
+	 * @param arrayDirectAgreements
+	 * @param pathToWrite
+	 */
+	private static void writeDirectAgreements(String fileNamePhrase, String timeCategory,
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < arrayDirectAgreements.size(); i++)
+			// ArrayList<ArrayList<Integer>> arrayForAUser : // arrayDirectAgreements)
+			{
+				ArrayList<ArrayList<Integer>> arrayForAUser = arrayDirectAgreements.get(i);
+				for (int j = 0; j < arrayForAUser.size(); j++)
+				// ArrayList<Integer> arrayForAnRt : arrayForAUser)
+				{
+					ArrayList<Integer> arrayForAnRt = arrayForAUser.get(j);
+
+					if (VerbosityConstants.verboseEvaluationMetricsToConsole)
+					{
+						System.out.println("arrayForAnRt = " + arrayForAnRt);
+					}
+
+					arrayForAnRt.stream().forEachOrdered(v -> sb.append(v));
+					if (j == arrayForAUser.size() - 1)
+					{
+						sb.append("\n");
+					}
+					else
+					{
+						sb.append(",");
+					}
+				}
+			}
+
+			WritingToFile.writeToNewFile(sb.toString(),
+					pathToWrite + fileNamePhrase + timeCategory + "DirectAgreements.csv");
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			PopUps.showException(e, "org.activity.evaluation.EvaluationSeq.writeDirectAgreements()");
+		}
+	}
+
+	/**
+	 * 
+	 * @param algoLabel
+	 * @param timeCategory
+	 * @param arrayMeta
+	 * @param arrayRecommendedSeq
+	 * @param arrayActualSeq
+	 * @return ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements
+	 */
+	private static ArrayList<ArrayList<ArrayList<Integer>>> computeDirectAgreements(String fileNamePhrase,
+			String timeCategory, ArrayList<ArrayList<String>> arrayMeta,
+			ArrayList<ArrayList<String>> arrayRecommendedSeq, ArrayList<ArrayList<String>> arrayActualSeq,
+			int levelAtWhichToMatch)
+	{
+		ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements = new ArrayList<>();
+
+		try
+		{
+			System.out.println("size of meta array=" + arrayMeta.size() + "     size of arrayRecommendedSeq array="
+					+ arrayRecommendedSeq.size() + "   size of arrayActualSeq array=" + arrayActualSeq.size());
+
+			for (int i = 0; i < arrayMeta.size(); i++) // iterating over users (or rows)
+			{
+				ArrayList<String> currentMetaLineArray = arrayMeta.get(i);
+				int countOfRecommendationTimesConsidered = 0; // =count of meta entries considered
+				ArrayList<ArrayList<Integer>> directAgreementsForThisUser = new ArrayList<>();
+
+				for (int j = 0; j < currentMetaLineArray.size(); j++)// iterating over RTs (or columns)
+				{
+					int hourOfTheDay = getHourFromMetaString(currentMetaLineArray.get(j));
+
+					if (DateTimeUtils.getTimeCategoryOfDay(hourOfTheDay).equalsIgnoreCase(timeCategory)
+							|| timeCategory.equals("All")) // TODO check why ALL
+					{
+						countOfRecommendationTimesConsidered++;
+
+						String[] splittedActualSequence =
+								RegexUtils.patternGreaterThan.split(arrayActualSeq.get(i).get(j));
+
+						String[] splittedRecommSequence =
+								RegexUtils.patternGreaterThan.split(arrayRecommendedSeq.get(i).get(j));
+
+						if (splittedActualSequence.length != splittedRecommSequence.length)
+						{
+							System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+									"splittedActualSequence.length != splittedRecommSequence.length"));
+						}
+						ArrayList<Integer> directAgreement = new ArrayList<>();
+
+						System.out.print("\tsplittedRecomm = ");
+						for (int y = 0; y < splittedActualSequence.length; y++)
+						{
+							// removing score
+							String splittedRecomm[] = RegexUtils.patternColon.split(splittedRecommSequence[y]);
+							System.out.print(">" + splittedRecomm[0]);
+
+							if (isAgree(splittedActualSequence[y], splittedRecomm[0], levelAtWhichToMatch))// splittedActualSequence[y].equals(splittedRecomm[0]))
+							{
+								System.out.print("Eureka!");
+								directAgreement.add(1);
+							}
+							else
+							{
+								directAgreement.add(0);
+							}
+						}
+						// System.out.println();
+						directAgreementsForThisUser.add(directAgreement);
+
+						if (VerbosityConstants.verbose)
+						{
+							System.out.println("\tarrayRecommendedSeq=" + arrayRecommendedSeq.get(i).get(j));
+							System.out.println("\tarrayActualSeq string =" + arrayActualSeq.get(i).get(j));
+							System.out.println("\tdirectAgreement" + directAgreement);
+							System.out.println("\n-------------------");
+						}
+					} // end of if for this time categegory
+				} // end of current line array
+				arrayDirectAgreements.add(directAgreementsForThisUser);
+				// bwRR.write("\n");
+			} // end of loop over user
+				// bwRR.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		return arrayDirectAgreements;
+	}
+
+	/**
+	 * 
+	 * @param catID1
+	 * @param catID2
+	 * @param levelAtWhichToMatch
+	 * @return
+	 */
+	private static boolean isAgree(String catID1, String catID2, int levelAtWhichToMatch)
+	{
+		try
+		{
+
+			if (levelAtWhichToMatch == -1)
+			{
+				return catID1.equals(catID2);
+			}
+			else if (levelAtWhichToMatch > 0 && levelAtWhichToMatch < 3)
+			{
+				ArrayList<Integer> catID1AtGivenLevel = DomainConstants.getGivenLevelCatID(Integer.valueOf(catID1));
+				ArrayList<Integer> catID2AtGivenLevel = DomainConstants.getGivenLevelCatID(Integer.valueOf(catID2));
+
+				int intersection = UtilityBelt.getIntersection(catID1AtGivenLevel, catID2AtGivenLevel).size();
+
+				System.out.println("catID1= " + catID1 + " catID2=" + catID2);
+				System.out.println(
+						"catID1AtGivenLevel= " + catID1AtGivenLevel + " catID2AtGivenLevel=" + catID2AtGivenLevel);
+				System.out.println("Intersection.size = " + intersection);
+
+				if (intersection > 0)
+				{
+					System.out.println("got intersection");
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+
+			}
+			else
+			{
+				System.err.println(
+						PopUps.getCurrentStackTracedErrorMsg("Unknown levelAtWhichToMatch = " + levelAtWhichToMatch));
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	/**
@@ -197,9 +857,9 @@ public class EvaluationSeq
 	 * @param evalPrecisionRecallFMeasure
 	 * @param theKOriginal
 	 */
-	private static void doEvaluation(ArrayList<ArrayList<String>> arrayMeta, ArrayList<ArrayList<String>> arrayTopK,
-			ArrayList<ArrayList<String>> arrayActual, String[] timeCategories, boolean evalPrecisionRecallFMeasure,
-			int theKOriginal, String algoLabel)
+	private static void doEvaluationNonSeq(ArrayList<ArrayList<String>> arrayMeta,
+			ArrayList<ArrayList<String>> arrayTopK, ArrayList<ArrayList<String>> arrayActual, String[] timeCategories,
+			boolean evalPrecisionRecallFMeasure, int theKOriginal, String algoLabel)
 	{
 		int numOfUsers = arrayTopK.size();
 		for (String timeCategory : timeCategories)
@@ -229,7 +889,7 @@ public class EvaluationSeq
 	 * @throws IOException
 	 */
 	private static Triple<ArrayList<ArrayList<String>>, Integer, String> extractDataFromFile(BufferedReader dataToRead,
-			String label) throws IOException
+			String label, boolean verbose) throws IOException
 	{
 		// outer arraylist: rows, inner arraylist: cols
 		ArrayList<ArrayList<String>> arrayData = new ArrayList<ArrayList<String>>();
@@ -243,9 +903,11 @@ public class EvaluationSeq
 			// System.out.println(metaCurrentLine);
 			String[] tokensInCurrentDataLine = RegexUtils.patternComma.split(dataCurrentLine);
 			// System.out.println("number of tokens in this meta line=" + tokensInCurrentMetaLine.length);
-			log.append(label + " line num:" + (countOfLinesData + 1) + "#tokensInLine:" + tokensInCurrentDataLine.length
-					+ "\n");
-
+			if (verbose)
+			{
+				log.append(label + " line num:" + (countOfLinesData + 1) + "#tokensInLine:"
+						+ tokensInCurrentDataLine.length + "\n");
+			}
 			for (int i = 0; i < tokensInCurrentDataLine.length; i++)
 			{
 				currentLineArray.add(tokensInCurrentDataLine[i]);

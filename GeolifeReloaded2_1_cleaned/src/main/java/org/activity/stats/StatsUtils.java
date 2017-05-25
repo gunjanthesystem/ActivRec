@@ -8,8 +8,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.SummaryStat;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -798,7 +801,33 @@ public class StatsUtils
 		return round(StatUtils.mean(vals), roundOffToPlaces);
 	}
 
+	/**
+	 * 
+	 * @param arr
+	 * @param roundOffToPlaces
+	 * @return
+	 */
 	public static double medianOfArrayListInt(ArrayList<Integer> arr, int roundOffToPlaces)
+	{
+		if (arr.size() == 0) return 0;
+
+		double[] vals = new double[arr.size()];
+
+		for (int i = 0; i < arr.size(); i++)
+		{
+			vals[i] = arr.get(i); // java 1.5+ style (outboxing)
+		}
+
+		return round(StatUtils.percentile(vals, 50), roundOffToPlaces);
+	}
+
+	/**
+	 * 
+	 * @param arr
+	 * @param roundOffToPlaces
+	 * @return
+	 */
+	public static double medianOfArrayList(ArrayList<Double> arr, int roundOffToPlaces)
 	{
 		if (arr.size() == 0) return 0;
 
@@ -987,5 +1016,46 @@ public class StatsUtils
 			return 0;
 		}
 
+	}
+
+	/**
+	 * 
+	 * @param fileToRead
+	 * @param numOfColumns
+	 * @param roundToPlaces
+	 * @param stat
+	 *            Mean, Media
+	 * @return
+	 */
+	public static ArrayList<Double> getColumnSummaryStatDouble(String fileToRead, int numOfColumns, int roundToPlaces,
+			SummaryStat stat)
+	{
+		int[] columnIndicesToRead = IntStream.range(0, numOfColumns).toArray();
+		ArrayList<ArrayList<Double>> columnWiseVals =
+				ReadingFromFile.allColumnsReaderDouble(fileToRead, ",", columnIndicesToRead, false);
+	
+		ArrayList<Double> columnWiseSummary = new ArrayList<>();
+	
+		switch (stat)
+		{
+		case Mean:
+			for (ArrayList<Double> valsForAColumn : columnWiseVals)
+			{
+				columnWiseSummary.add(meanOfArrayList(valsForAColumn, roundToPlaces));
+			}
+			break;
+		case Median:
+			for (ArrayList<Double> valsForAColumn : columnWiseVals)
+			{
+				columnWiseSummary.add(medianOfArrayList(valsForAColumn, roundToPlaces));
+			}
+			break;
+		default:
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					"Unknown stat: " + stat.toString() + " reading file: " + fileToRead));
+			System.exit(-1);
+		}
+	
+		return columnWiseSummary;
 	}
 }

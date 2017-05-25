@@ -1,0 +1,677 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (mmap) failed to map 1054867456 bytes for committing reserved memory.
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   In 32 bit mode, the process size limit was hit
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Use 64 bit Java on a 64 bit OS
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (os_linux.cpp:2627), pid=16983, tid=0x00007fb16d771700
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_112-b15) (build 1.8.0_112-b15)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.112-b15 mixed mode linux-amd64 compressed oops)
+# Core dump written. Default location: /home/gunjan/git/GeolifeReloaded2_1_cleaned/core or core.16983
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007fb19807c000):  VMThread [stack: 0x00007fb16d671000,0x00007fb16d772000] [id=16994]
+
+Stack: [0x00007fb16d671000,0x00007fb16d772000],  sp=0x00007fb16d770210,  free space=1020k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [libjvm.so+0xac6f7a]  VMError::report_and_die()+0x2ba
+V  [libjvm.so+0x4fc71b]  report_vm_out_of_memory(char const*, int, unsigned long, VMErrorType, char const*)+0x8b
+V  [libjvm.so+0x923b13]  os::Linux::commit_memory_impl(char*, unsigned long, bool)+0x103
+V  [libjvm.so+0x924069]  os::pd_commit_memory(char*, unsigned long, unsigned long, bool)+0x29
+V  [libjvm.so+0x91e37a]  os::commit_memory(char*, unsigned long, unsigned long, bool)+0x2a
+V  [libjvm.so+0x992da3]  PSVirtualSpace::expand_by(unsigned long)+0x53
+V  [libjvm.so+0x983670]  PSOldGen::expand(unsigned long)+0x170
+V  [libjvm.so+0x98387b]  PSOldGen::resize(unsigned long)+0x1cb
+V  [libjvm.so+0x98b571]  PSParallelCompact::invoke_no_policy(bool)+0x991
+V  [libjvm.so+0x990ecd]  PSScavenge::invoke()+0x1ad
+V  [libjvm.so+0x947ac0]  ParallelScavengeHeap::failed_mem_allocate(unsigned long)+0x70
+V  [libjvm.so+0xac8997]  VM_ParallelGCFailedAllocation::doit()+0x97
+V  [libjvm.so+0xad0475]  VM_Operation::evaluate()+0x55
+V  [libjvm.so+0xace84a]  VMThread::evaluate_operation(VM_Operation*)+0xba
+V  [libjvm.so+0xacebce]  VMThread::loop()+0x1ce
+V  [libjvm.so+0xacf040]  VMThread::run()+0x70
+V  [libjvm.so+0x926138]  java_start(Thread*)+0x108
+
+VM_Operation (0x00007fb19edf1230): ParallelGCFailedAllocation, mode: safepoint, requested by thread 0x00007fb19800e000
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x00007fb1980ef000 JavaThread "Service Thread" daemon [_thread_blocked, id=17001, stack(0x00007fb16cd89000,0x00007fb16ce8a000)]
+  0x00007fb1980c2000 JavaThread "C1 CompilerThread2" daemon [_thread_blocked, id=17000, stack(0x00007fb16ce8a000,0x00007fb16cf8b000)]
+  0x00007fb1980c0000 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=16999, stack(0x00007fb16cf8b000,0x00007fb16d08c000)]
+  0x00007fb1980bd000 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=16998, stack(0x00007fb16d08c000,0x00007fb16d18d000)]
+  0x00007fb1980bb800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=16997, stack(0x00007fb16d18d000,0x00007fb16d28e000)]
+  0x00007fb198088800 JavaThread "Finalizer" daemon [_thread_blocked, id=16996, stack(0x00007fb16d46f000,0x00007fb16d570000)]
+  0x00007fb198083800 JavaThread "Reference Handler" daemon [_thread_blocked, id=16995, stack(0x00007fb16d570000,0x00007fb16d671000)]
+  0x00007fb19800e000 JavaThread "main" [_thread_blocked, id=16989, stack(0x00007fb19ecf2000,0x00007fb19edf3000)]
+
+Other Threads:
+=>0x00007fb19807c000 VMThread [stack: 0x00007fb16d671000,0x00007fb16d772000] [id=16994]
+  0x00007fb1980f2800 WatcherThread [stack: 0x00007fb16cc88000,0x00007fb16cd89000] [id=17002]
+
+VM state:at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x00007fb19800b640] ExpandHeap_lock - owner thread: 0x00007fb19807c000
+[0x00007fb19800bcc0] Threads_lock - owner thread: 0x00007fb19807c000
+[0x00007fb19800c1c0] Heap_lock - owner thread: 0x00007fb19800e000
+
+Heap:
+ PSYoungGen      total 1264128K, used 16799K [0x00000006d5580000, 0x000000075d080000, 0x00000007c0000000)
+  eden space 310272K, 0% used [0x00000006d5580000,0x00000006d5580000,0x00000006e8480000)
+  from space 953856K, 1% used [0x0000000722d00000,0x0000000723d67db8,0x000000075d080000)
+  to   space 956416K, 0% used [0x00000006e8480000,0x00000006e8480000,0x0000000722a80000)
+ ParOldGen       total 6659584K, used 6659539K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 99% used [0x0000000500000000,0x0000000696774fc8,0x0000000696780000)
+ Metaspace       used 9000K, capacity 9398K, committed 9600K, reserved 1058816K
+  class space    used 955K, capacity 1095K, committed 1152K, reserved 1048576K
+
+Card table byte_map: [0x00007fb1879ff000,0x00007fb189000000] byte_map_base: 0x00007fb1851ff000
+
+Marking Bits: (ParMarkBitMap*) 0x00007fb19e211c80
+ Begin Bits: [0x00007fb170851000, 0x00007fb17b851000)
+ End Bits:   [0x00007fb17b851000, 0x00007fb186851000)
+
+Polling page: 0x00007fb19ee3a000
+
+CodeCache: size=245760Kb used=5615Kb max_used=5615Kb free=240144Kb
+ bounds [0x00007fb189000000, 0x00007fb189590000, 0x00007fb198000000]
+ total_blobs=1801 nmethods=1444 adapters=271
+ compilation: enabled
+
+Compilation events (10 events):
+Event: 88.765 Thread 0x00007fb1980c2000 1456       3       java.lang.StrictMath::floorOrCeil (128 bytes)
+Event: 88.766 Thread 0x00007fb1980c2000 nmethod 1456 0x00007fb189566650 code [0x00007fb1895667e0, 0x00007fb189566c70]
+Event: 88.766 Thread 0x00007fb1980c2000 1454       3       java.lang.Math::ceil (5 bytes)
+Event: 88.766 Thread 0x00007fb1980c2000 nmethod 1454 0x00007fb189566210 code [0x00007fb1895663c0, 0x00007fb189566588]
+Event: 88.824 Thread 0x00007fb1980c2000 1457       3       java.util.LinkedHashMap::<init> (11 bytes)
+Event: 88.824 Thread 0x00007fb1980c2000 nmethod 1457 0x00007fb18956f610 code [0x00007fb18956f7a0, 0x00007fb18956f9a8]
+Event: 88.903 Thread 0x00007fb1980c2000 1458 %     3       org.activity.util.TimelineUtils::createUserTimelinesFromCheckinEntriesGowalla @ 150 (302 bytes)
+Event: 88.908 Thread 0x00007fb1980c2000 nmethod 1458% 0x00007fb189577990 code [0x00007fb189577fe0, 0x00007fb18957bd38]
+Event: 88.909 Thread 0x00007fb1980c2000 1459       3       org.activity.util.TimelineUtils::createUserTimelinesFromCheckinEntriesGowalla (302 bytes)
+Event: 88.913 Thread 0x00007fb1980c2000 nmethod 1459 0x00007fb18957e450 code [0x00007fb18957eaa0, 0x00007fb1895825f8]
+
+GC Heap History (10 events):
+Event: 87.071 GC heap after
+Heap after GC invocations=100 (full 10):
+ PSYoungGen      total 1286144K, used 680768K [0x00000006d5580000, 0x0000000763f00000, 0x00000007c0000000)
+  eden space 241664K, 0% used [0x00000006d5580000,0x00000006d5580000,0x00000006e4180000)
+  from space 1044480K, 65% used [0x0000000723f00000,0x000000074d7d0000,0x0000000763b00000)
+  to   space 1046016K, 0% used [0x00000006e4180000,0x00000006e4180000,0x0000000723f00000)
+ ParOldGen       total 6659584K, used 5854750K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 87% used [0x0000000500000000,0x0000000665587a38,0x0000000696780000)
+ Metaspace       used 8876K, capacity 9256K, committed 9600K, reserved 1058816K
+  class space    used 941K, capacity 1054K, committed 1152K, reserved 1048576K
+}
+Event: 87.232 GC heap before
+{Heap before GC invocations=101 (full 10):
+ PSYoungGen      total 1286144K, used 922432K [0x00000006d5580000, 0x0000000763f00000, 0x00000007c0000000)
+  eden space 241664K, 100% used [0x00000006d5580000,0x00000006e4180000,0x00000006e4180000)
+  from space 1044480K, 65% used [0x0000000723f00000,0x000000074d7d0000,0x0000000763b00000)
+  to   space 1046016K, 0% used [0x00000006e4180000,0x00000006e4180000,0x0000000723f00000)
+ ParOldGen       total 6659584K, used 5854750K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 87% used [0x0000000500000000,0x0000000665587a38,0x0000000696780000)
+ Metaspace       used 8876K, capacity 9256K, committed 9600K, reserved 1058816K
+  class space    used 941K, capacity 1054K, committed 1152K, reserved 1048576K
+Event: 87.602 GC heap after
+Heap after GC invocations=101 (full 10):
+ PSYoungGen      total 829440K, used 587616K [0x00000006d5580000, 0x0000000761600000, 0x00000007c0000000)
+  eden space 241664K, 0% used [0x00000006d5580000,0x00000006d5580000,0x00000006e4180000)
+  from space 587776K, 99% used [0x00000006e4180000,0x0000000707f58000,0x0000000707f80000)
+  to   space 1009664K, 0% used [0x0000000723c00000,0x0000000723c00000,0x0000000761600000)
+ ParOldGen       total 6659584K, used 6009034K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 90% used [0x0000000500000000,0x000000066ec32aa8,0x0000000696780000)
+ Metaspace       used 8876K, capacity 9256K, committed 9600K, reserved 1058816K
+  class space    used 941K, capacity 1054K, committed 1152K, reserved 1048576K
+}
+Event: 87.757 GC heap before
+{Heap before GC invocations=102 (full 10):
+ PSYoungGen      total 829440K, used 829280K [0x00000006d5580000, 0x0000000761600000, 0x00000007c0000000)
+  eden space 241664K, 100% used [0x00000006d5580000,0x00000006e4180000,0x00000006e4180000)
+  from space 587776K, 99% used [0x00000006e4180000,0x0000000707f58000,0x0000000707f80000)
+  to   space 1009664K, 0% used [0x0000000723c00000,0x0000000723c00000,0x0000000761600000)
+ ParOldGen       total 6659584K, used 6009034K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 90% used [0x0000000500000000,0x000000066ec32aa8,0x0000000696780000)
+ Metaspace       used 8876K, capacity 9256K, committed 9600K, reserved 1058816K
+  class space    used 941K, capacity 1054K, committed 1152K, reserved 1048576K
+Event: 88.090 GC heap after
+Heap after GC invocations=102 (full 10):
+ PSYoungGen      total 1217024K, used 489600K [0x00000006d5580000, 0x000000075d400000, 0x00000007c0000000)
+  eden space 274944K, 0% used [0x00000006d5580000,0x00000006d5580000,0x00000006e6200000)
+  from space 942080K, 51% used [0x0000000723c00000,0x0000000741a20000,0x000000075d400000)
+  to   space 975872K, 0% used [0x00000006e6200000,0x00000006e6200000,0x0000000721b00000)
+ ParOldGen       total 6659584K, used 6168211K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 92% used [0x0000000500000000,0x00000006787a4c20,0x0000000696780000)
+ Metaspace       used 8876K, capacity 9256K, committed 9600K, reserved 1058816K
+  class space    used 941K, capacity 1054K, committed 1152K, reserved 1048576K
+}
+Event: 88.323 GC heap before
+{Heap before GC invocations=103 (full 10):
+ PSYoungGen      total 1217024K, used 764544K [0x00000006d5580000, 0x000000075d400000, 0x00000007c0000000)
+  eden space 274944K, 100% used [0x00000006d5580000,0x00000006e6200000,0x00000006e6200000)
+  from space 942080K, 51% used [0x0000000723c00000,0x0000000741a20000,0x000000075d400000)
+  to   space 975872K, 0% used [0x00000006e6200000,0x00000006e6200000,0x0000000721b00000)
+ ParOldGen       total 6659584K, used 6168211K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 92% used [0x0000000500000000,0x00000006787a4c20,0x0000000696780000)
+ Metaspace       used 8997K, capacity 9398K, committed 9600K, reserved 1058816K
+  class space    used 955K, capacity 1095K, committed 1152K, reserved 1048576K
+Event: 88.666 GC heap after
+Heap after GC invocations=103 (full 10):
+ PSYoungGen      total 1250816K, used 406368K [0x00000006d5580000, 0x000000075d400000, 0x00000007c0000000)
+  eden space 274944K, 0% used [0x00000006d5580000,0x00000006d5580000,0x00000006e6200000)
+  from space 975872K, 41% used [0x00000006e6200000,0x00000006feed8000,0x0000000721b00000)
+  to   space 957440K, 0% used [0x0000000722d00000,0x0000000722d00000,0x000000075d400000)
+ ParOldGen       total 6659584K, used 6311619K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 94% used [0x0000000500000000,0x00000006813b0c20,0x0000000696780000)
+ Metaspace       used 8997K, capacity 9398K, committed 9600K, reserved 1058816K
+  class space    used 955K, capacity 1095K, committed 1152K, reserved 1048576K
+}
+Event: 88.930 GC heap before
+{Heap before GC invocations=104 (full 10):
+ PSYoungGen      total 1250816K, used 681312K [0x00000006d5580000, 0x000000075d400000, 0x00000007c0000000)
+  eden space 274944K, 100% used [0x00000006d5580000,0x00000006e6200000,0x00000006e6200000)
+  from space 975872K, 41% used [0x00000006e6200000,0x00000006feed8000,0x0000000721b00000)
+  to   space 957440K, 0% used [0x0000000722d00000,0x0000000722d00000,0x000000075d400000)
+ ParOldGen       total 6659584K, used 6311619K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 94% used [0x0000000500000000,0x00000006813b0c20,0x0000000696780000)
+ Metaspace       used 9000K, capacity 9398K, committed 9600K, reserved 1058816K
+  class space    used 955K, capacity 1095K, committed 1152K, reserved 1048576K
+Event: 89.249 GC heap after
+Heap after GC invocations=104 (full 10):
+ PSYoungGen      total 1264128K, used 294400K [0x00000006d5580000, 0x000000075d080000, 0x00000007c0000000)
+  eden space 310272K, 0% used [0x00000006d5580000,0x00000006d5580000,0x00000006e8480000)
+  from space 953856K, 30% used [0x0000000722d00000,0x0000000734c80000,0x000000075d080000)
+  to   space 956416K, 0% used [0x00000006e8480000,0x00000006e8480000,0x0000000722a80000)
+ ParOldGen       total 6659584K, used 6431803K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 96% used [0x0000000500000000,0x000000068890ec20,0x0000000696780000)
+ Metaspace       used 9000K, capacity 9398K, committed 9600K, reserved 1058816K
+  class space    used 955K, capacity 1095K, committed 1152K, reserved 1048576K
+}
+Event: 89.249 GC heap before
+{Heap before GC invocations=105 (full 11):
+ PSYoungGen      total 1264128K, used 294400K [0x00000006d5580000, 0x000000075d080000, 0x00000007c0000000)
+  eden space 310272K, 0% used [0x00000006d5580000,0x00000006d5580000,0x00000006e8480000)
+  from space 953856K, 30% used [0x0000000722d00000,0x0000000734c80000,0x000000075d080000)
+  to   space 956416K, 0% used [0x00000006e8480000,0x00000006e8480000,0x0000000722a80000)
+ ParOldGen       total 6659584K, used 6431803K [0x0000000500000000, 0x0000000696780000, 0x00000006d5580000)
+  object space 6659584K, 96% used [0x0000000500000000,0x000000068890ec20,0x0000000696780000)
+ Metaspace       used 9000K, capacity 9398K, committed 9600K, reserved 1058816K
+  class space    used 955K, capacity 1095K, committed 1152K, reserved 1048576K
+
+Deoptimization events (10 events):
+Event: 58.678 Thread 0x00007fb19800e000 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007fb1892ad46c method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 203
+Event: 58.678 Thread 0x00007fb19800e000 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007fb1892ad46c method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 203
+Event: 58.692 Thread 0x00007fb19800e000 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007fb1892ad46c method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 203
+Event: 58.692 Thread 0x00007fb19800e000 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007fb1892ad46c method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 203
+Event: 59.737 Thread 0x00007fb19800e000 Uncommon trap: reason=predicate action=maybe_recompile pc=0x00007fb1894cc24c method=java.util.AbstractCollection.toArray([Ljava/lang/Object;)[Ljava/lang/Object; @ 49
+Event: 59.847 Thread 0x00007fb19800e000 Uncommon trap: reason=array_check action=maybe_recompile pc=0x00007fb1894b15f8 method=java.util.AbstractCollection.toArray([Ljava/lang/Object;)[Ljava/lang/Object; @ 119
+Event: 59.848 Thread 0x00007fb19800e000 Uncommon trap: reason=array_check action=maybe_recompile pc=0x00007fb1894b15f8 method=java.util.AbstractCollection.toArray([Ljava/lang/Object;)[Ljava/lang/Object; @ 119
+Event: 59.848 Thread 0x00007fb19800e000 Uncommon trap: reason=array_check action=maybe_recompile pc=0x00007fb1894b15f8 method=java.util.AbstractCollection.toArray([Ljava/lang/Object;)[Ljava/lang/Object; @ 119
+Event: 59.848 Thread 0x00007fb19800e000 Uncommon trap: reason=array_check action=maybe_recompile pc=0x00007fb1894b15f8 method=java.util.AbstractCollection.toArray([Ljava/lang/Object;)[Ljava/lang/Object; @ 119
+Event: 88.250 Thread 0x00007fb19800e000 Uncommon trap: reason=uninitialized action=reinterpret pc=0x00007fb189514068 method=org.activity.util.TimelineUtils.convertCheckinEntriesToActivityObjectsGowalla(Ljava/util/LinkedHashMap;Ljava/util/LinkedHashMap;)Ljava/util/LinkedHashMap; @ 838
+
+Internal exceptions (10 events):
+Event: 0.108 Thread 0x00007fb19800e000 Exception <a 'java/security/PrivilegedActionException'> (0x00000006d5848650) thrown at [/HUDSON3/workspace/8-2-build-linux-amd64/jdk8u112/7884/hotspot/src/share/vm/prims/jvm.cpp, line 1390]
+Event: 0.122 Thread 0x00007fb19800e000 Exception <a 'java/security/PrivilegedActionException'> (0x00000006d5879d78) thrown at [/HUDSON3/workspace/8-2-build-linux-amd64/jdk8u112/7884/hotspot/src/share/vm/prims/jvm.cpp, line 1390]
+Event: 0.122 Thread 0x00007fb19800e000 Exception <a 'java/security/PrivilegedActionException'> (0x00000006d587a170) thrown at [/HUDSON3/workspace/8-2-build-linux-amd64/jdk8u112/7884/hotspot/src/share/vm/prims/jvm.cpp, line 1390]
+Event: 0.143 Thread 0x00007fb19800e000 Exception <a 'java/security/PrivilegedActionException'> (0x00000006d5af8540) thrown at [/HUDSON3/workspace/8-2-build-linux-amd64/jdk8u112/7884/hotspot/src/share/vm/prims/jvm.cpp, line 1390]
+Event: 0.143 Thread 0x00007fb19800e000 Exception <a 'java/security/PrivilegedActionException'> (0x00000006d5af8938) thrown at [/HUDSON3/workspace/8-2-build-linux-amd64/jdk8u112/7884/hotspot/src/share/vm/prims/jvm.cpp, line 1390]
+Event: 0.208 Thread 0x00007fb19800e000 Exception <a 'java/lang/NoSuchFieldError': method resolution failed> (0x00000006d5c1f2f0) thrown at [/HUDSON3/workspace/8-2-build-linux-amd64/jdk8u112/7884/hotspot/src/share/vm/prims/methodHandles.cpp, line 1146]
+Event: 0.210 Thread 0x00007fb19800e000 Exception <a 'java/lang/NoSuchFieldError': method resolution failed> (0x00000006d5c2cac0) thrown at [/HUDSON3/workspace/8-2-build-linux-amd64/jdk8u112/7884/hotspot/src/share/vm/prims/methodHandles.cpp, line 1146]
+Event: 0.699 Thread 0x00007fb19800e000 Exception <a 'java/lang/ArrayIndexOutOfBoundsException'> (0x00000006d7430488) thrown at [/HUDSON3/workspace/8-2-build-linux-amd64/jdk8u112/7884/hotspot/src/share/vm/runtime/sharedRuntime.cpp, line 605]
+Event: 38.559 Thread 0x00007fb19800e000 Implicit null exception at 0x00007fb1893446f9 to 0x00007fb18934530d
+Event: 38.560 Thread 0x00007fb19800e000 Implicit null exception at 0x00007fb189356ec3 to 0x00007fb189357be9
+
+Events (10 events):
+Event: 88.258 loading class java/util/stream/MatchOps$1MatchSink done
+Event: 88.258 loading class java/util/stream/SliceOps$1$1
+Event: 88.258 loading class java/util/stream/SliceOps$1$1 done
+Event: 88.323 Executing VM operation: ParallelGCFailedAllocation
+Event: 88.666 Executing VM operation: ParallelGCFailedAllocation done
+Event: 88.676 Executing VM operation: RevokeBias
+Event: 88.676 Executing VM operation: RevokeBias done
+Event: 88.680 Executing VM operation: RevokeBias
+Event: 88.680 Executing VM operation: RevokeBias done
+Event: 88.930 Executing VM operation: ParallelGCFailedAllocation
+
+
+Dynamic libraries:
+00400000-00401000 r-xp 00000000 08:04 1180653                            /usr/lib/jvm/java-8-jdk/jre/bin/java
+00600000-00601000 rw-p 00000000 08:04 1180653                            /usr/lib/jvm/java-8-jdk/jre/bin/java
+006b2000-006d3000 rw-p 00000000 00:00 0                                  [heap]
+500000000-696780000 rw-p 00000000 00:00 0 
+6d5580000-75d080000 rw-p 00000000 00:00 0 
+75d080000-7c0000000 ---p 00000000 00:00 0 
+7c0000000-7c0120000 rw-p 00000000 00:00 0 
+7c0120000-800000000 ---p 00000000 00:00 0 
+7fb138000000-7fb138021000 rw-p 00000000 00:00 0 
+7fb138021000-7fb13c000000 ---p 00000000 00:00 0 
+7fb13c000000-7fb13c021000 rw-p 00000000 00:00 0 
+7fb13c021000-7fb140000000 ---p 00000000 00:00 0 
+7fb140000000-7fb140b5e000 rw-p 00000000 00:00 0 
+7fb140b5e000-7fb144000000 ---p 00000000 00:00 0 
+7fb144000000-7fb144450000 rw-p 00000000 00:00 0 
+7fb144450000-7fb148000000 ---p 00000000 00:00 0 
+7fb148000000-7fb148021000 rw-p 00000000 00:00 0 
+7fb148021000-7fb14c000000 ---p 00000000 00:00 0 
+7fb14c000000-7fb14e578000 rw-p 00000000 00:00 0 
+7fb14e578000-7fb150000000 ---p 00000000 00:00 0 
+7fb150000000-7fb150021000 rw-p 00000000 00:00 0 
+7fb150021000-7fb154000000 ---p 00000000 00:00 0 
+7fb154000000-7fb154021000 rw-p 00000000 00:00 0 
+7fb154021000-7fb158000000 ---p 00000000 00:00 0 
+7fb158000000-7fb15b223000 rw-p 00000000 00:00 0 
+7fb15b223000-7fb15c000000 ---p 00000000 00:00 0 
+7fb15c000000-7fb15c290000 rw-p 00000000 00:00 0 
+7fb15c290000-7fb160000000 ---p 00000000 00:00 0 
+7fb160000000-7fb163f57000 rw-p 00000000 00:00 0 
+7fb163f57000-7fb164000000 ---p 00000000 00:00 0 
+7fb164000000-7fb166fd9000 rw-p 00000000 00:00 0 
+7fb166fd9000-7fb168000000 ---p 00000000 00:00 0 
+7fb168000000-7fb16bc44000 rw-p 00000000 00:00 0 
+7fb16bc44000-7fb16c000000 ---p 00000000 00:00 0 
+7fb16c7ba000-7fb16c7fa000 rw-p 00000000 00:00 0 
+7fb16c7fa000-7fb16c9ba000 ---p 00000000 00:00 0 
+7fb16c9ba000-7fb16c9bb000 r--s 00223000 08:04 8401667                    /home/gunjan/EclipseWorkspace/EditDistanceStandAlone/build/libs/EditDistanceStandAlone-capsule.jar
+7fb16c9bb000-7fb16c9bf000 r--s 0001e000 08:04 8657503                    /home/gunjan/git/GeolifeReloaded2_1_cleaned/libs/hgapi83_amidst-64.jar
+7fb16c9bf000-7fb16c9c0000 r--s 00223000 08:04 8657850                    /home/gunjan/git/GeolifeReloaded2_1_cleaned/libs/EditDistanceStandAlone-capsule.jar
+7fb16c9c0000-7fb16c9e5000 r--s 004f5000 08:04 8657504                    /home/gunjan/git/GeolifeReloaded2_1_cleaned/libs/spmf.zip
+7fb16c9e5000-7fb16c9e7000 r--s 00027000 08:04 9438017                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/core/1.1.2/574b480eca62f535fad6d259e144fee3ef24b66e/core-1.1.2.jar
+7fb16c9e7000-7fb16c9e9000 r--s 00001000 08:04 9438015                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil/jniloader/1.1/4840f897eeb54d67ee14e478f8a45cc9937f3ce1/jniloader-1.1.jar
+7fb16c9e9000-7fb16c9ea000 r--s 0000d000 08:04 9438013                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/native_system-java/1.1/3c6a2455f96b354a6940dce1393abb35ed7641da/native_system-java-1.1.jar
+7fb16c9ea000-7fb16c9eb000 r--s 0000d000 08:04 9438011                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/native_ref-java/1.1/408c71ffbc3646dda7bee1e22bf19101e5e9ee90/native_ref-java-1.1.jar
+7fb16c9eb000-7fb16c9ed000 r--s 00088000 08:04 9438009                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-win-i686/1.1/c25fd1881cf93f7716f47b7deec859f6b6b7be50/netlib-native_system-win-i686-1.1-natives.jar
+7fb16c9ed000-7fb16c9ee000 r--s 0009b000 08:04 9438007                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-win-x86_64/1.1/222c7915be1daf1c26a4206f375d4957ae5f9d81/netlib-native_system-win-x86_64-1.1-natives.jar
+7fb16c9ee000-7fb16c9ef000 r--s 0004b000 08:04 9438005                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-armhf/1.1/27ae9f6a9c88b3f8d12ffa52d62941615f8ed416/netlib-native_system-linux-armhf-1.1-natives.jar
+7fb16c9ef000-7fb16c9f0000 r--s 0006a000 08:04 9438003                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-i686/1.1/dd43225560dbd9115d306f9be3ca195aed236b78/netlib-native_system-linux-i686-1.1-natives.jar
+7fb16c9f0000-7fb16c9f1000 r--s 0006f000 08:04 9438001                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-x86_64/1.1/163e88facabe7fa29952890dc2d3429e28501120/netlib-native_system-linux-x86_64-1.1-natives.jar
+7fb16c9f1000-7fb16c9f2000 r--s 00087000 08:04 9437999                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-osx-x86_64/1.1/d724e33675dc8eaa5c8fcb05a3aaca6f3339afa7/netlib-native_system-osx-x86_64-1.1-natives.jar
+7fb16c9f2000-7fb16c9f3000 r--s 00126000 08:04 9437997                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-armhf/1.1/ec467162f74710fd8897cff6888534ceaf297d9a/netlib-native_ref-linux-armhf-1.1-natives.jar
+7fb16c9f3000-7fb16c9f4000 r--s 001bd000 08:04 9437995                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-win-i686/1.1/167fb794a26cb0bfc74890c704c7137b1d5b50fd/netlib-native_ref-win-i686-1.1-natives.jar
+7fb16c9f4000-7fb16c9f5000 r--s 00232000 08:04 9437993                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-win-x86_64/1.1/4ab54511c2844546279d9f8e427c73953b794686/netlib-native_ref-win-x86_64-1.1-natives.jar
+7fb16c9f5000-7fb16c9f6000 r--s 0016b000 08:04 9437990                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-i686/1.1/eedd845b214aea560bce317d778ebb52f8f46038/netlib-native_ref-linux-i686-1.1-natives.jar
+7fb16c9f6000-7fb16c9f8000 r--s 001aa000 08:04 9437988                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-x86_64/1.1/5a3e5787d03c39790d5ae08cce189dd1ccc4a38/netlib-native_ref-linux-x86_64-1.1-natives.jar
+7fb16c9f8000-7fb16c9fa000 r--s 001c0000 08:04 9437986                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-osx-x86_64/1.1/80da53ec862f283dc3b191b9dbd3166ea6671831/netlib-native_ref-osx-x86_64-1.1-natives.jar
+7fb16c9fa000-7fb16c9fb000 r--s 00001000 08:04 208                        /home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.0.2/8382c6cdc18c8c8ad7840024fa340509cf16be11/error_prone_annotations-2.0.2.jar
+7fb16c9fb000-7fb16c9fe000 r--s 00006000 08:04 206                        /home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/1.3.9/40719ea6961c0cb6afaeb6a921eaa1f6afd4cfdf/jsr305-1.3.9.jar
+7fb16c9fe000-7fb16ca04000 r--s 0004b000 08:04 9437984                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.jfree/jcommon/1.0.23/a316f336ca996e0c6bec4e4fbd49be8f5e1c3968/jcommon-1.0.23.jar
+7fb16ca04000-7fb16ca05000 r--s 00000000 08:04 9437982                    /home/gunjan/.gradle/caches/modules-2/files-2.1/net.jcip/jcip-annotations/1.0/afba4942caaeaf46aab0b976afd57cc7c181467e/jcip-annotations-1.0.jar
+7fb16ca05000-7fb16ca0b000 r--s 00026000 08:04 9437980                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-runtime/1.0.2/8ec2d49a780ddba5e9b6860a72969e4d5bbc0c55/kotlin-runtime-1.0.2.jar
+7fb16ca0b000-7fb16ca0d000 r--s 0000c000 08:04 9437977                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.ow2.asm/asm/5.0.4/da08b8cce7bbf903602a25a3a163ae252435795/asm-5.0.4.jar
+7fb16ca0d000-7fb16ca0f000 r--s 00011000 08:04 9437975                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.cedarsoftware/json-io/2.5.1/dd7fe37e5d02b93b014df08655da2b9e0dc2700a/json-io-2.5.1.jar
+7fb16ca0f000-7fb16ca11000 r--s 0000d000 08:04 9437973                    /home/gunjan/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.1/5043bfebc3db072ed80fbd362e7caf00e885d8ae/commons-logging-1.1.1.jar
+7fb16ca11000-7fb16ca13000 r--s 00009000 08:04 9437971                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar
+7fb16ca13000-7fb16ca16000 r--s 00018000 08:04 9312811                    /home/gunjan/.gradle/caches/modules-2/files-2.1/commons-io/commons-io/1.4/a8762d07e76cfde2395257a5da47ba7c1dbd3dce/commons-io-1.4.jar
+7fb16ca16000-7fb16ca1a000 r--s 000dc000 08:04 9570848                    /home/gunjan/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/1c12d070e602efd8021891cdd7fd18bc129372d4/jna-4.1.0.jar
+7fb16ca1a000-7fb16ca2c000 r--s 000a7000 08:04 204                        /home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.guava/guava-testlib/19.0/ce5b880b206de3f76d364988a6308c68c726f74a/guava-testlib-19.0.jar
+7fb16ca2c000-7fb16ca35000 r--s 0006f000 08:04 9438180                    /home/gunjan/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/5af35056b4d257e4b64b9e8069c0746e8b08629f/log4j-1.2.17.jar
+7fb16ca35000-7fb16ca46000 r--s 0016e000 08:04 9437969                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.jfree/jfreechart/1.0.19/ba9ee7dbb2e4c57a6901c79f614ed2dea9cc0e20/jfreechart-1.0.19.jar
+7fb16ca46000-7fb16ca48000 r--s 0000e000 08:04 9437967                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.beust/jcommander/1.48/bfcb96281ea3b59d626704f74bc6d625ff51cbce/jcommander-1.48.jar
+7fb16ca48000-7fb16ca49000 r--s 00002000 08:04 9437963                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.12/42db62298b899818ff17352cbc00050e940bbfb0/slf4j-simple-1.7.12.jar
+7fb16ca49000-7fb16ca59000 r--s 00088000 08:04 9437961                    /home/gunjan/.gradle/caches/modules-2/files-2.1/joda-time/joda-time/2.8.2/d27c24204c5e507b16fec01006b3d0f1ec42aed4/joda-time-2.8.2.jar
+7fb16ca59000-7fb16ca69000 r--s 00085000 08:04 9437959                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.mchange/mchange-commons-java/0.2.11/2a6a6c1fe25f28f5a073171956ce6250813467ef/mchange-commons-java-0.2.11.jar
+7fb16ca69000-7fb16ca6b000 r--s 00016000 08:04 9437957                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.googlecode.netlib-java/netlib-java/1.1/4a9c3b55b23430e5a6ad86101a88aea500ba8086/netlib-java-1.1.jar
+7fb16ca6b000-7fb16ca7d000 r--s 00112000 08:04 9437955                    /home/gunjan/.gradle/caches/modules-2/files-2.1/net.sourceforge.f2j/arpack_combined_all/0.1/225619a060b42605b4d9fd4af11815664abf26eb/arpack_combined_all-0.1.jar
+7fb16ca7d000-7fb16ca82000 r--s 0003d000 08:04 9437953                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.googlecode.matrix-toolkits-java/mtj/1.0.4/e14ed840ff5e15de92dba2d1af29201fa70a0f35/mtj-1.0.4.jar
+7fb16ca82000-7fb16ca86000 r--s 0002f000 08:04 9437951                    /home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/bounce/0.18/d774f9a0aa5cbe08dea8907720c64c417aed861/bounce-0.18.jar
+7fb16ca86000-7fb16ca87000 r--s 00005000 08:04 9437949                    /home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/java-cup-11b-runtime/2015.03.26/5466fad5c5866f33e3230c30ca623e7e8deff1f8/java-cup-11b-runtime-2015.03.26.jar
+7fb16ca87000-7fb16ca89000 r--s 00016000 08:04 9437943                    /home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/java-cup-11b/2015.03.26/6e97c5abd2e76d83220f09f72de0b89b6de18dc1/java-cup-11b-2015.03.26.jar
+7fb16ca89000-7fb16ca8d000 r--s 0001a000 08:04 9437936                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.mapdb/elsa/3.0.0-M5/d7c1920d084e741e04844f512af24012e745e809/elsa-3.0.0-M5.jar
+7fb16ca8d000-7fb16ca8f000 r--s 00038000 08:04 9437934                    /home/gunjan/.gradle/caches/modules-2/files-2.1/net.jpountz.lz4/lz4/1.3.0/c708bb2590c0652a642236ef45d9f99ff842a2ce/lz4-1.3.0.jar
+7fb16ca8f000-7fb16cabb000 r--s 00208000 08:04 9437932                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/19.0/6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9/guava-19.0.jar
+7fb16cabb000-7fb16cabd000 r--s 00009000 08:04 11439006                   /home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections-forkjoin/7.1.1/892b970cb03461f8c10daba778edbef3f0a26846/eclipse-collections-forkjoin-7.1.1.jar
+7fb16cabd000-7fb16cb5b000 r--s 00896000 08:04 11439004                   /home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections/7.1.1/83eca9f03f1f2d055df453d72036c5ce2e82896b/eclipse-collections-7.1.1.jar
+7fb16cb5b000-7fb16cb7e000 r--s 000a0000 08:04 11439002                   /home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections-api/7.1.1/806c2b3bef5364d1a1668f25ce70100fa2c6b919/eclipse-collections-api-7.1.1.jar
+7fb16cb7e000-7fb16cb87000 r--s 00084000 08:04 9437924                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.0.2/22063f19bfd8e50f21fc310842a91ff5b31bb272/kotlin-stdlib-1.0.2.jar
+7fb16cb87000-7fb16cb88000 r--s 00001000 08:04 9437922                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/minlog/1.3.0/ff07b5f1b01d2f92bb00a337f9a94873712f0827/minlog-1.3.0.jar
+7fb16cb88000-7fb16cb8a000 r--s 00004000 08:04 9437920                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/reflectasm/1.11.3/8b102eed2f12412b254946811111ea48bc03a266/reflectasm-1.11.3.jar
+7fb16cb8a000-7fb16cb8c000 r--s 0000d000 08:04 9437918                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.cedarsoftware/java-util/1.9.0/c5f6deb3213a693d0cc20a78b1052ecc9a2df09c/java-util-1.9.0.jar
+7fb16cb8c000-7fb16cb8e000 r--s 0000b000 08:04 9437916                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/2.4/2916b6c96b50c5b3ec4452ed99401db745aabb27/objenesis-2.4.jar
+7fb16cb8e000-7fb16cb97000 r--s 000ae000 08:04 9437914                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.javassist/javassist/3.19.0-GA/50120f69224dd8684b445a6f3a5b08fe9b5c60f6/javassist-3.19.0-GA.jar
+7fb16cb97000-7fb16cb9b000 r--s 00041000 08:04 9437912                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.8.1/fd13b1c033741d48291315c6370f7d475a42dccf/jackson-core-2.8.1.jar
+7fb16cb9b000-7fb16cba3000 r--s 00045000 08:04 9437910                    /home/gunjan/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/2973d150c0dc1fefe998f834810d68f278ea58ec/junit-4.12.jar
+7fb16cba3000-7fb16cba5000 r--s 0000b000 08:04 9312810                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.zeroturnaround/zt-exec/1.9/a6c5747098b1ede9f4a6e9c36eaebb357a4430ed/zt-exec-1.9.jar
+7fb16cba5000-7fb16cba8000 r--s 00012000 08:04 9312574                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.zaxxer/nuprocess/1.1.0/9479382344b61b36dd3ca1ec1b10aaa91295d632/nuprocess-1.1.0.jar
+7fb16cba8000-7fb16cbd0000 r--s 00241000 08:04 263                        /home/gunjan/.gradle/caches/modules-2/files-2.1/net.sf.trove4j/trove4j/3.0.3/42ccaf4761f0dfdfa805c9e340d99a755907e2dd/trove4j-3.0.3.jar
+7fb16cbd0000-7fb16cbd3000 r--s 0001b000 08:04 9438178                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.uzaygezen/uzaygezen-core/0.2/611b82d4c4b4f67cc3d83cf0697ec660fcee2fff/uzaygezen-core-0.2.jar
+7fb16cbd3000-7fb16cbd5000 r--s 0001e000 08:04 9437908                    /home/gunjan/.gradle/caches/modules-2/files-2.1/net.seninp/jmotif-sax/1.1.1/22909acc5e5c67cd9a4517070a7fb4f7ef926ab3/jmotif-sax-1.1.1.jar
+7fb16cbd5000-7fb16cbdd000 r--s 00042000 08:04 9437906                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.n52.matlab/matlab-control/5.0.0/ced8fdb8664759574b2f340aa00844f757dfcad0/matlab-control-5.0.0.jar
+7fb16cbdd000-7fb16cbe8000 r--s 000b6000 08:04 9437904                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.tinyjee.jgraphx/jgraphx/3.4.1.3/a62939cbd5af2dff663e91d061b3e4edc7b8df85/jgraphx-3.4.1.3.jar
+7fb16cbe8000-7fb16cbeb000 r--s 0001f000 08:04 9437902                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.zaxxer/HikariCP/2.5.1/b896b711e2d98fedf403de590559a123b5fbf1a6/HikariCP-2.5.1.jar
+7fb16cbeb000-7fb16cbf2000 r--s 00073000 08:04 9437900                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.mchange/c3p0/0.9.5.2/5f86cb6130bc6e8475615ed82d5b5e6fb226a86a/c3p0-0.9.5.2.jar
+7fb16cbf2000-7fb16cbf9000 r--s 00067000 08:04 9437898                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.mariadb.jdbc/mariadb-java-client/1.5.4/bd0e2e8494245c2885a79fc92bc3693c88cbfab4/mariadb-java-client-1.5.4.jar
+7fb16cbf9000-7fb16cc02000 r--s 00062000 08:04 9437894                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.jgrapht/jgrapht-core/1.0.0/c2adf22c2d37721489de12e70f5c226832045071/jgrapht-core-1.0.0.jar
+7fb16cc02000-7fb16cc61000 r--s 00835000 08:04 9437892                    /home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka/weka-stable/3.8.0/5f6547867e775b416982cdcaa2dbef67855a6669/weka-stable-3.8.0.jar
+7fb16cc61000-7fb16cc88000 r--s 001f6000 08:04 9437884                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-math3/3.6.1/e4ba98f1d4b3c80ec46392f25e094a6a2e58fcbf/commons-math3-3.6.1.jar
+7fb16cc88000-7fb16cc89000 ---p 00000000 00:00 0 
+7fb16cc89000-7fb16cd89000 rw-p 00000000 00:00 0 
+7fb16cd89000-7fb16cd8c000 ---p 00000000 00:00 0 
+7fb16cd8c000-7fb16ce8a000 rw-p 00000000 00:00 0 
+7fb16ce8a000-7fb16ce8d000 ---p 00000000 00:00 0 
+7fb16ce8d000-7fb16cf8b000 rw-p 00000000 00:00 0 
+7fb16cf8b000-7fb16cf8e000 ---p 00000000 00:00 0 
+7fb16cf8e000-7fb16d08c000 rw-p 00000000 00:00 0 
+7fb16d08c000-7fb16d08f000 ---p 00000000 00:00 0 
+7fb16d08f000-7fb16d18d000 rw-p 00000000 00:00 0 
+7fb16d18d000-7fb16d190000 ---p 00000000 00:00 0 
+7fb16d190000-7fb16d28e000 rw-p 00000000 00:00 0 
+7fb16d28e000-7fb16d46f000 r--p 00000000 08:04 9986683                    /usr/lib/locale/locale-archive
+7fb16d46f000-7fb16d472000 ---p 00000000 00:00 0 
+7fb16d472000-7fb16d570000 rw-p 00000000 00:00 0 
+7fb16d570000-7fb16d573000 ---p 00000000 00:00 0 
+7fb16d573000-7fb16d671000 rw-p 00000000 00:00 0 
+7fb16d671000-7fb16d672000 ---p 00000000 00:00 0 
+7fb16d672000-7fb16e726000 rw-p 00000000 00:00 0 
+7fb16e726000-7fb16e8ff000 r--s 03d2c000 08:04 1180452                    /usr/lib/jvm/java-8-jdk/jre/lib/rt.jar
+7fb16e8ff000-7fb186851000 rw-p 00000000 00:00 0 
+7fb186851000-7fb186852000 ---p 00000000 00:00 0 
+7fb186852000-7fb186952000 rw-p 00000000 00:00 0 
+7fb186952000-7fb186953000 ---p 00000000 00:00 0 
+7fb186953000-7fb186a53000 rw-p 00000000 00:00 0 
+7fb186a53000-7fb186a54000 ---p 00000000 00:00 0 
+7fb186a54000-7fb187808000 rw-p 00000000 00:00 0 
+7fb187808000-7fb1879ff000 ---p 00000000 00:00 0 
+7fb1879ff000-7fb1886b3000 rw-p 00000000 00:00 0 
+7fb1886b3000-7fb1888a9000 ---p 00000000 00:00 0 
+7fb1888a9000-7fb188ce8000 rw-p 00000000 00:00 0 
+7fb188ce8000-7fb188fff000 ---p 00000000 00:00 0 
+7fb188fff000-7fb189000000 rw-p 00000000 00:00 0 
+7fb189000000-7fb189590000 rwxp 00000000 00:00 0 
+7fb189590000-7fb198000000 ---p 00000000 00:00 0 
+7fb198000000-7fb198757000 rw-p 00000000 00:00 0 
+7fb198757000-7fb19c000000 ---p 00000000 00:00 0 
+7fb19c000000-7fb19c001000 r--s 00007000 08:04 202                        /home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.mgunlogson/cuckoofilter4j/1.0.1/1ecac9da72e10f966c90d23c5d774f972d3e940f/cuckoofilter4j-1.0.1.jar
+7fb19c001000-7fb19c00a000 r--s 000aa000 08:04 9437890                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.mapdb/mapdb/3.0.2/bcd8209dda05a358318b29719a9e76b21d5e4683/mapdb-3.0.2.jar
+7fb19c00a000-7fb19c00b000 ---p 00000000 00:00 0 
+7fb19c00b000-7fb19c122000 rw-p 00000000 00:00 0 
+7fb19c122000-7fb19c4cb000 ---p 00000000 00:00 0 
+7fb19c4cb000-7fb19c4e5000 r-xp 00000000 08:04 1180541                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libzip.so
+7fb19c4e5000-7fb19c6e5000 ---p 0001a000 08:04 1180541                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libzip.so
+7fb19c6e5000-7fb19c6e6000 rw-p 0001a000 08:04 1180541                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libzip.so
+7fb19c6e6000-7fb19c6f1000 r-xp 00000000 08:04 9962652                    /usr/lib/libnss_files-2.25.so
+7fb19c6f1000-7fb19c8f0000 ---p 0000b000 08:04 9962652                    /usr/lib/libnss_files-2.25.so
+7fb19c8f0000-7fb19c8f1000 r--p 0000a000 08:04 9962652                    /usr/lib/libnss_files-2.25.so
+7fb19c8f1000-7fb19c8f2000 rw-p 0000b000 08:04 9962652                    /usr/lib/libnss_files-2.25.so
+7fb19c8f2000-7fb19c8f8000 rw-p 00000000 00:00 0 
+7fb19c8f8000-7fb19c923000 r-xp 00000000 08:04 1180515                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libjava.so
+7fb19c923000-7fb19cb22000 ---p 0002b000 08:04 1180515                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libjava.so
+7fb19cb22000-7fb19cb24000 rw-p 0002a000 08:04 1180515                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libjava.so
+7fb19cb24000-7fb19cb31000 r-xp 00000000 08:04 1180562                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libverify.so
+7fb19cb31000-7fb19cd30000 ---p 0000d000 08:04 1180562                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libverify.so
+7fb19cd30000-7fb19cd32000 rw-p 0000c000 08:04 1180562                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/libverify.so
+7fb19cd32000-7fb19cd39000 r-xp 00000000 08:04 9962272                    /usr/lib/librt-2.25.so
+7fb19cd39000-7fb19cf38000 ---p 00007000 08:04 9962272                    /usr/lib/librt-2.25.so
+7fb19cf38000-7fb19cf39000 r--p 00006000 08:04 9962272                    /usr/lib/librt-2.25.so
+7fb19cf39000-7fb19cf3a000 rw-p 00007000 08:04 9962272                    /usr/lib/librt-2.25.so
+7fb19cf3a000-7fb19d04c000 r-xp 00000000 08:04 9962314                    /usr/lib/libm-2.25.so
+7fb19d04c000-7fb19d24b000 ---p 00112000 08:04 9962314                    /usr/lib/libm-2.25.so
+7fb19d24b000-7fb19d24c000 r--p 00111000 08:04 9962314                    /usr/lib/libm-2.25.so
+7fb19d24c000-7fb19d24d000 rw-p 00112000 08:04 9962314                    /usr/lib/libm-2.25.so
+7fb19d24d000-7fb19df1b000 r-xp 00000000 08:04 1180572                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/server/libjvm.so
+7fb19df1b000-7fb19e11b000 ---p 00cce000 08:04 1180572                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/server/libjvm.so
+7fb19e11b000-7fb19e1f4000 rw-p 00cce000 08:04 1180572                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/server/libjvm.so
+7fb19e1f4000-7fb19e23f000 rw-p 00000000 00:00 0 
+7fb19e23f000-7fb19e3da000 r-xp 00000000 08:04 9963120                    /usr/lib/libc-2.25.so
+7fb19e3da000-7fb19e5d9000 ---p 0019b000 08:04 9963120                    /usr/lib/libc-2.25.so
+7fb19e5d9000-7fb19e5dd000 r--p 0019a000 08:04 9963120                    /usr/lib/libc-2.25.so
+7fb19e5dd000-7fb19e5df000 rw-p 0019e000 08:04 9963120                    /usr/lib/libc-2.25.so
+7fb19e5df000-7fb19e5e3000 rw-p 00000000 00:00 0 
+7fb19e5e3000-7fb19e5e6000 r-xp 00000000 08:04 9962388                    /usr/lib/libdl-2.25.so
+7fb19e5e6000-7fb19e7e5000 ---p 00003000 08:04 9962388                    /usr/lib/libdl-2.25.so
+7fb19e7e5000-7fb19e7e6000 r--p 00002000 08:04 9962388                    /usr/lib/libdl-2.25.so
+7fb19e7e6000-7fb19e7e7000 rw-p 00003000 08:04 9962388                    /usr/lib/libdl-2.25.so
+7fb19e7e7000-7fb19e7fc000 r-xp 00000000 08:04 1180570                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/jli/libjli.so
+7fb19e7fc000-7fb19e9fc000 ---p 00015000 08:04 1180570                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/jli/libjli.so
+7fb19e9fc000-7fb19e9fd000 rw-p 00015000 08:04 1180570                    /usr/lib/jvm/java-8-jdk/jre/lib/amd64/jli/libjli.so
+7fb19e9fd000-7fb19ea16000 r-xp 00000000 08:04 9963199                    /usr/lib/libpthread-2.25.so
+7fb19ea16000-7fb19ec15000 ---p 00019000 08:04 9963199                    /usr/lib/libpthread-2.25.so
+7fb19ec15000-7fb19ec16000 r--p 00018000 08:04 9963199                    /usr/lib/libpthread-2.25.so
+7fb19ec16000-7fb19ec17000 rw-p 00019000 08:04 9963199                    /usr/lib/libpthread-2.25.so
+7fb19ec17000-7fb19ec1b000 rw-p 00000000 00:00 0 
+7fb19ec1b000-7fb19ec3e000 r-xp 00000000 08:04 9963124                    /usr/lib/ld-2.25.so
+7fb19ec3e000-7fb19ec40000 r--s 0000c000 08:04 9437896                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.json/json/20160810/aca5eb39e2a12fddd6c472b240afe9ebea3a6733/json-20160810.jar
+7fb19ec40000-7fb19ec48000 r--s 00048000 08:04 9437888                    /home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/kryo/4.0.0/9f5c64c1315ec79bee0f56bb88e4ae94b65048ce/kryo-4.0.0.jar
+7fb19ec48000-7fb19ecf2000 rw-p 00000000 00:00 0 
+7fb19ecf2000-7fb19ecf5000 ---p 00000000 00:00 0 
+7fb19ecf5000-7fb19edf5000 rw-p 00000000 00:00 0 
+7fb19edf5000-7fb19edfc000 r--s 00057000 08:04 9437886                    /home/gunjan/.gradle/caches/modules-2/files-2.1/de.ruedigermoeller/fst/2.48/a04da9aca9ecc7dcf19c5e25b89bc21468e2a3e7/fst-2.48.jar
+7fb19edfc000-7fb19ee04000 r--s 0006e000 08:04 9437882                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/6c6c702c89bfff3cd9e80b04d668c5e190d588c6/commons-lang3-3.5.jar
+7fb19ee04000-7fb19ee06000 r--s 0000c000 08:04 9437880                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-exec/1.3/8dfb9facd0830a27b1b5f29f84593f0aeee7773b/commons-exec-1.3.jar
+7fb19ee06000-7fb19ee07000 r--s 00009000 08:04 9308247                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-csv/1.4/fc2512d2109144df353501266ac4bbe179058afd/commons-csv-1.4.jar
+7fb19ee07000-7fb19ee09000 r--s 00009000 08:04 9308245                    /home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.21/139535a69a4239db087de9bab0bee568bf8e0b70/slf4j-api-1.7.21.jar
+7fb19ee09000-7fb19ee31000 rw-p 00000000 00:00 0 
+7fb19ee31000-7fb19ee39000 rw-s 00000000 00:27 56                         /tmp/hsperfdata_gunjan/16983
+7fb19ee39000-7fb19ee3a000 rw-p 00000000 00:00 0 
+7fb19ee3a000-7fb19ee3b000 ---p 00000000 00:00 0 
+7fb19ee3b000-7fb19ee3d000 rw-p 00000000 00:00 0 
+7fb19ee3d000-7fb19ee3e000 r--p 00022000 08:04 9963124                    /usr/lib/ld-2.25.so
+7fb19ee3e000-7fb19ee3f000 rw-p 00023000 08:04 9963124                    /usr/lib/ld-2.25.so
+7fb19ee3f000-7fb19ee40000 rw-p 00000000 00:00 0 
+7ffefe52b000-7ffefe54f000 rw-p 00000000 00:00 0                          [stack]
+7ffefe56b000-7ffefe56d000 r--p 00000000 00:00 0                          [vvar]
+7ffefe56d000-7ffefe56f000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+
+VM Arguments:
+jvm_args: -Xmx11g -Dfile.encoding=UTF-8 
+java_command: org.activity.controller.SuperController
+java_class_path (initial): /home/gunjan/git/GeolifeReloaded2_1_cleaned/bin:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.21/139535a69a4239db087de9bab0bee568bf8e0b70/slf4j-api-1.7.21.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-csv/1.4/fc2512d2109144df353501266ac4bbe179058afd/commons-csv-1.4.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-exec/1.3/8dfb9facd0830a27b1b5f29f84593f0aeee7773b/commons-exec-1.3.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/6c6c702c89bfff3cd9e80b04d668c5e190d588c6/commons-lang3-3.5.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-math3/3.6.1/e4ba98f1d4b3c80ec46392f25e094a6a2e58fcbf/commons-math3-3.6.1.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/de.ruedigermoeller/fst/2.48/a04da9aca9ecc7dcf19c5e25b89bc21468e2a3e7/fst-2.48.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/kryo/4.0.0/9f5c64c1315ec79bee0f56bb88e4ae94b65048ce/kryo-4.0.0.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.mapdb/mapdb/3.0.2/bcd8209dda05a358318b29719a9e76b21d5e4683/mapdb-3.0.2.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka/weka-stable/3.8.0/5f6547867e775b416982cdcaa2dbef67855a6669/weka-stable-3.8.0.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jgrapht/jgrapht-core/1.0.0/c2adf22c2d37721489de12e70f5c226832045071/jgrapht-core-1.0.0.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.json/json/20160810/aca5eb39e2a12fddd6c472b240afe9ebea3a6733/json-20160810.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/org.mariadb.jdbc/mariadb-java-client/1.5.4/bd0e2e8494245c2885a79fc92bc3693c88cbfab4/mariadb-java-client-1.5.4.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/com.mchange/c3p0/0.9.5.2/5f86cb6130bc6e8475615ed82d5b5e6fb226a86a/c3p0-0.9.5.2.jar:/home/gunjan/.gradle/caches/modules-2/files-2.1/com.zaxxer/HikariCP/2.5.1/b896b711e2d
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/opt/android-sdk/platform-tools:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+SHELL=/bin/bash
+DISPLAY=:0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0xac7800], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGBUS: [libjvm.so+0xac7800], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGFPE: [libjvm.so+0x920990], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGPIPE: [libjvm.so+0x920990], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGXFSZ: [libjvm.so+0x920990], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGILL: [libjvm.so+0x920990], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGUSR1: SIG_DFL, sa_mask[0]=00000000000000000000000000000000, sa_flags=none
+SIGUSR2: [libjvm.so+0x9221d0], sa_mask[0]=00100000000000000000000000000000, sa_flags=SA_RESTART|SA_SIGINFO
+SIGHUP: [libjvm.so+0x9235d0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGINT: SIG_IGN, sa_mask[0]=00000000000000000000000000000000, sa_flags=none
+SIGTERM: [libjvm.so+0x9235d0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGQUIT: [libjvm.so+0x9235d0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+
+
+---------------  S Y S T E M  ---------------
+
+OS:DISTRIB_ID=ManjaroLinux
+DISTRIB_RELEASE=17.0.1
+DISTRIB_CODENAME=Gellivara
+DISTRIB_DESCRIPTION="Manjaro Linux"
+
+uname:Linux 4.9.27-1-MANJARO #1 SMP PREEMPT Mon May 8 08:48:50 UTC 2017 x86_64
+libc:glibc 2.25 NPTL 2.25 
+rlimit: STACK 8192k, CORE infinity, NPROC 62736, NOFILE 4096, AS infinity
+load average:3.43 2.00 1.53
+
+/proc/meminfo:
+MemTotal:       16344012 kB
+MemFree:          157988 kB
+MemAvailable:     506880 kB
+Buffers:           19748 kB
+Cached:          1472524 kB
+SwapCached:            0 kB
+Active:         14641200 kB
+Inactive:        1199052 kB
+Active(anon):   14361308 kB
+Inactive(anon):   916936 kB
+Active(file):     279892 kB
+Inactive(file):   282116 kB
+Unevictable:          64 kB
+Mlocked:              64 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:               124 kB
+Writeback:             0 kB
+AnonPages:      14262052 kB
+Mapped:           795932 kB
+Shmem:            930208 kB
+Slab:             138084 kB
+SReclaimable:      87512 kB
+SUnreclaim:        50572 kB
+KernelStack:       14800 kB
+PageTables:        97900 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     8172004 kB
+Committed_AS:   22042188 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:           0 kB
+VmallocChunk:          0 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:   7442432 kB
+ShmemHugePages:        0 kB
+ShmemPmdMapped:        0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:      211608 kB
+DirectMap2M:    10180608 kB
+DirectMap1G:     6291456 kB
+
+
+CPU:total 4 (2 cores per cpu, 2 threads per core) family 6 model 69 stepping 1, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, erms, lzcnt, ht, tsc, tscinvbit, bmi1, bmi2
+
+/proc/cpuinfo:
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 69
+model name	: Intel(R) Core(TM) i5-4278U CPU @ 2.60GHz
+stepping	: 1
+microcode	: 0x1f
+cpu MHz		: 2810.583
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid xsaveopt dtherm ida arat pln pts
+bugs		:
+bogomips	: 5202.26
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 39 bits physical, 48 bits virtual
+power management:
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 69
+model name	: Intel(R) Core(TM) i5-4278U CPU @ 2.60GHz
+stepping	: 1
+microcode	: 0x1f
+cpu MHz		: 3099.877
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 1
+cpu cores	: 2
+apicid		: 2
+initial apicid	: 2
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid xsaveopt dtherm ida arat pln pts
+bugs		:
+bogomips	: 5203.61
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 39 bits physical, 48 bits virtual
+power management:
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 69
+model name	: Intel(R) Core(TM) i5-4278U CPU @ 2.60GHz
+stepping	: 1
+microcode	: 0x1f
+cpu MHz		: 2812.646
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 1
+initial apicid	: 1
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid xsaveopt dtherm ida arat pln pts
+bugs		:
+bogomips	: 5204.50
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 39 bits physical, 48 bits virtual
+power management:
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 69
+model name	: Intel(R) Core(TM) i5-4278U CPU @ 2.60GHz
+stepping	: 1
+microcode	: 0x1f
+cpu MHz		: 3099.877
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 1
+cpu cores	: 2
+apicid		: 3
+initial apicid	: 3
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid xsaveopt dtherm ida arat pln pts
+bugs		:
+bogomips	: 5204.91
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 39 bits physical, 48 bits virtual
+power management:
+
+
+
+Memory: 4k page, physical 16344012k(157988k free), swap 0k(0k free)
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (25.112-b15) for linux-amd64 JRE (1.8.0_112-b15), built on Sep 22 2016 21:10:53 by "java_re" with gcc 4.3.0 20080428 (Red Hat 4.3.0-8)
+
+time: Fri May 19 02:50:53 2017
+elapsed time: 101 seconds (0d 0h 1m 41s)
+

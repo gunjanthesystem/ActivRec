@@ -328,4 +328,34 @@ public class ReadingFromFile
 			br.close();
 		}
 	}
+
+	/**
+	 * Reads the file columnwise
+	 * 
+	 * 
+	 * @param fileToRead
+	 * @param columnIndicesToRead
+	 * @param hasHeader
+	 * @return arraylist(columns) of arraylist(values in the column)
+	 */
+	public static ArrayList<ArrayList<Double>> allColumnsReaderDouble(String fileToRead, String delimiter,
+			int[] columnIndicesToRead, boolean hasHeader)
+	{
+		ArrayList<ArrayList<Double>> allVals = new ArrayList<>();
+
+		int numOfColsRead = 0;
+		for (int colIndex : columnIndicesToRead)
+		{
+			allVals.add(numOfColsRead++,
+					(ArrayList<Double>) oneColumnReaderDouble(fileToRead, delimiter, colIndex, false));
+		}
+
+		if (columnIndicesToRead.length != allVals.size())
+		{
+			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: columnIndicesToRead.length"
+					+ columnIndicesToRead.length + " != allVals.size()" + allVals.size()));
+		}
+
+		return allVals;
+	}
 }

@@ -544,7 +544,88 @@ public class WritingToFile
 		}
 	}
 
-	public static void writeArrayListOfArrayList(ArrayList<ArrayList<Double>> arrayArrayList, String fileNameToUse,
+	/**
+	 * 
+	 * @param arrayArrayList
+	 * @param absFileNameToWrite
+	 * @param headerLine
+	 * @param delimiter
+	 */
+	public static void writeArrayListOfArrayList(ArrayList<ArrayList<Double>> arrayArrayList, String absFileNameToWrite,
+			String headerLine, String delimiter)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			if (headerLine.length() > 0)
+			{
+				sb.append(headerLine + "\n");
+			}
+
+			for (ArrayList<Double> outerList : arrayArrayList)
+			{
+				sb.append(outerList.stream().map(v -> v.toString()).collect(Collectors.joining(delimiter)));
+				sb.append("\n");
+			}
+
+			WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+
+		}
+
+		catch (Exception e)
+		{
+			PopUps.showException(e, "org.activity.io.WritingToFile.writeArrayListOfArrayList()");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param arrayArrayList
+	 * @param absFileNameToWrite
+	 * @param delimiter
+	 * @param colNames
+	 * @param rowNames
+	 */
+	public static void writeArrayListOfArrayList(ArrayList<ArrayList<Double>> arrayArrayList, String absFileNameToWrite,
+			String delimiter, ArrayList<String> colNames, ArrayList<String> rowNames)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(delimiter + colNames.stream().collect(Collectors.joining(delimiter)) + "\n");
+
+			int count = 0;
+			for (ArrayList<Double> outerList : arrayArrayList)
+			{
+				String vals = outerList.stream().map(v -> v.toString()).collect(Collectors.joining(delimiter));
+
+				sb.append(rowNames.get(count++) + delimiter + vals);
+				sb.append("\n");
+			}
+
+			WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+
+		}
+
+		catch (Exception e)
+		{
+			PopUps.showException(e, "org.activity.io.WritingToFile.writeArrayListOfArrayList()");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * @deprecated
+	 * @param arrayArrayList
+	 * @param fileNameToUse
+	 * @param headerLine
+	 * @param commonPath
+	 */
+	public static void writeArrayListOfArrayListV0(ArrayList<ArrayList<Double>> arrayArrayList, String fileNameToUse,
 			String headerLine, String commonPath)
 	{
 		// commonPath = Constant.getCommonPath();//
