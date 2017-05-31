@@ -718,7 +718,7 @@ public class TimelineTransformers
 			String catIDName = catIDNameDictionary.get(Integer.valueOf(ao.getActivityName()));
 			if (catIDName == null || catIDName.length() == 0)
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error: Didnt find cat id name for cat id :" + ao.getActivityName()));
 			}
 			s.append(catIDName).append(delimiter);
@@ -748,7 +748,7 @@ public class TimelineTransformers
 			Integer catID = Integer.valueOf(ao.getActivityName());
 			if (catID == null || catID < 0)
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error: atID == null || catID < 0:  cat id :" + catID + " for actname" + ao.getActivityName()));
 			}
 			s.append(catID).append(delimiter);

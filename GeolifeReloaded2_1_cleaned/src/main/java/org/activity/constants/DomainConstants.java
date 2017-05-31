@@ -12,6 +12,7 @@ import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
+import org.activity.util.StringCode;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -65,10 +66,13 @@ public class DomainConstants
 
 	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
 	public static TreeMap<Integer, String> catIDNameDictionary = null;
+	public static TreeMap<Integer, Character> catIDCharCodeMap = null;
+	public static TreeMap<Character, Integer> charCodeCatIDMap = null;
 
 	public final static String pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
 	public final static String pathToSerialisedLevelWiseCatIDsDict =
 			"./dataToRead/May17/mapCatIDLevelWiseCatIDsDict.kryo";
+	public final static String pathToSerialisedCatIDsHierDist = "./dataToRead/April7/mapCatIDsHierDist.kryo";
 
 	public static TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap;
 	// public static final Integer hierarchyLevelForEditDistance = 1;// is in Constant class
@@ -76,6 +80,35 @@ public class DomainConstants
 	public static void main(String args[])
 	{
 		getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict, 1, true);
+	}
+
+	/**
+	 * 
+	 */
+	public static void setCatIDCharCodeMap()
+	{
+		try
+		{
+			if (catIDNameDictionary == null)
+			{
+				PopUps.getTracedErrorMsg("catIDNameDictionary is null");
+				System.exit(-2);
+			}
+
+			catIDCharCodeMap = new TreeMap<>();// HashBiMap.create(catIDNameDictionary.size());
+			charCodeCatIDMap = new TreeMap<>();
+			// new HashBiMap<Integer, Character>();
+			for (Integer actID : catIDNameDictionary.keySet())
+			{
+				catIDCharCodeMap.put(actID, StringCode.getCharCodeFromActivityID(actID));
+				charCodeCatIDMap.put(StringCode.getCharCodeFromActivityID(actID), actID);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 	public static void setCatIDNameDictionary(String pathToSerialisedCatIDNameDictionary)
@@ -121,13 +154,13 @@ public class DomainConstants
 	{
 		if (catIDGivenLevelCatIDMap == null)
 		{
-			System.out.println(PopUps.getCurrentStackTracedErrorMsg("Error: catIDGivenLevelCatIDMap==null"));
+			System.out.println(PopUps.getTracedErrorMsg("Error: catIDGivenLevelCatIDMap==null"));
 			System.exit(1);
 		}
 
 		if (catIDGivenLevelCatIDMap.get(givenCatID) == null)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: catIDGivenLevelCatIDMap.get(givenCatID" + givenCatID + ")==null"));
 		}
 
@@ -149,7 +182,7 @@ public class DomainConstants
 
 		if (givenLevel > 3 || givenLevel < 1)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: only three levels for Gowalla while given level =" + givenLevel));
 		}
 

@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.objects.ActivityObject;
@@ -54,8 +55,8 @@ public class ComparatorUtils
 			else
 				stringB = b.toString();
 
-			Exception e = new Exception(
-					"Assertion failed - Error in assertEquals ( " + stringA + " != " + stringB + " )");
+			Exception e =
+					new Exception("Assertion failed - Error in assertEquals ( " + stringA + " != " + stringB + " )");
 			PopUps.showException(e, "assertEquals");
 			// PopUps.showError("Error: Assertion failed: \n" + ExceptionUtils.getStackTrace(e));
 			System.err.println("Error: Assertion failed: \n" + ExceptionUtils.getStackTrace(e));
@@ -100,6 +101,27 @@ public class ComparatorUtils
 		{
 			Collections.shuffle(list);
 		}
+
+		Collections.sort(list, new Comparator<Map.Entry<K, V>>()
+			{
+				@Override
+				public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2)
+				{
+					return (o2.getValue()).compareTo(o1.getValue());
+				}
+			});
+
+		Map<K, V> result = new LinkedHashMap<>();
+		for (Map.Entry<K, V> entry : list)
+		{
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
+
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValueDescNoShuffle(Map<K, V> map)
+	{
+		List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
 
 		Collections.sort(list, new Comparator<Map.Entry<K, V>>()
 			{
@@ -204,8 +226,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<Integer, Double>> sortByValueAscending2(
-			LinkedHashMap<String, Pair<Integer, Double>> map)
+	public static LinkedHashMap<String, Pair<Integer, Double>>
+			sortByValueAscending2(LinkedHashMap<String, Pair<Integer, Double>> map)
 	{
 		List<Map.Entry<String, Pair<Integer, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -240,8 +262,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Integer, Pair<String, Double>> sortByValueAscendingIntStrDoub(
-			LinkedHashMap<Integer, Pair<String, Double>> map)
+	public static LinkedHashMap<Integer, Pair<String, Double>>
+			sortByValueAscendingIntStrDoub(LinkedHashMap<Integer, Pair<String, Double>> map)
 	{
 		List<Map.Entry<Integer, Pair<String, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -276,12 +298,12 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<String, Double>> sortByValueAscendingStrStrDoub(
-			LinkedHashMap<String, Pair<String, Double>> map)
+	public static LinkedHashMap<String, Pair<String, Double>>
+			sortByValueAscendingStrStrDoub(LinkedHashMap<String, Pair<String, Double>> map)
 	{
 		if (map.size() == 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: map.size = " + map.size()));
+			System.err.println(PopUps.getTracedErrorMsg("Error: map.size = " + map.size()));
 		}
 
 		List<Map.Entry<String, Pair<String, Double>>> list = new LinkedList<>(map.entrySet());
@@ -317,8 +339,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Integer, Pair<Integer, Double>> sortByValueAscending3(
-			LinkedHashMap<Integer, Pair<Integer, Double>> map)
+	public static LinkedHashMap<Integer, Pair<Integer, Double>>
+			sortByValueAscending3(LinkedHashMap<Integer, Pair<Integer, Double>> map)
 	{
 		List<Map.Entry<Integer, Pair<Integer, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -353,8 +375,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Pair<Integer, Double>> sortByValueAscending4(
-			LinkedHashMap<Date, Pair<Integer, Double>> map)
+	public static LinkedHashMap<Date, Pair<Integer, Double>>
+			sortByValueAscending4(LinkedHashMap<Date, Pair<Integer, Double>> map)
 	{
 		List<Map.Entry<Date, Pair<Integer, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -388,8 +410,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> sortByValueAscending5(
-			LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> map)
+	public static LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>
+			sortByValueAscending5(LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> map)
 	{
 		List<Map.Entry<Date, Triple<Integer, ActivityObject, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -424,8 +446,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Triple<Integer, String, Double>> sortTripleByThirdValueAscending6(
-			LinkedHashMap<Date, Triple<Integer, String, Double>> map)
+	public static LinkedHashMap<Date, Triple<Integer, String, Double>>
+			sortTripleByThirdValueAscending6(LinkedHashMap<Date, Triple<Integer, String, Double>> map)
 	{
 		List<Map.Entry<Date, Triple<Integer, String, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -691,6 +713,43 @@ public class ComparatorUtils
 		return true;
 	}
 
+	/**
+	 * Returns the keys associated with highest value in the map.
+	 * ref:https://stackoverflow.com/questions/5911174/finding-key-associated-with-max-value-in-a-java-map
+	 * <p>
+	 * if more than one key have highest value, then the list of of size>1
+	 * <p>
+	 * Sanity Checked OK
+	 * 
+	 * @param map
+	 *            the class of value in given map must implement Comparator
+	 * @return
+	 */
+	public static <K, V extends Comparable<? super V>> List<?> getKeysWithMaxValues(Map<K, V> map)
+	{
+		V max = map.entrySet().stream().max((entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue())).get()
+				.getValue();
+
+		List<?> listOfMaxKeys = map.entrySet().stream().filter(entry -> entry.getValue().equals(max))
+				.map(Map.Entry::getKey).collect(Collectors.toList());
+
+		return listOfMaxKeys;
+	}
+
+	public static void main(String args[])
+	{
+		HashMap<String, Long> map = new HashMap<>();
+
+		map.put("a", Long.valueOf(12));
+		map.put("b", Long.valueOf(12));
+		map.put("c", Long.valueOf(2));
+		map.put("d", Long.valueOf(1));
+		map.put("f", Long.valueOf(12));
+		map.put("g", Long.valueOf(10));
+
+		List<String> keyWithMaxValue = (List<String>) getKeysWithMaxValues(map);
+		System.out.println("keyWithMaxValue = " + keyWithMaxValue);
+	}
 	/////////////////
 	// TODO this method needs refactoring (30 Sep changes: intersectingIntervalInSeconds replaced by doesOverlap
 	// 21Oct public static String getActivityNameForInterval(Timestamp earliestTimestamp, Timestamp lastTimestamp, int

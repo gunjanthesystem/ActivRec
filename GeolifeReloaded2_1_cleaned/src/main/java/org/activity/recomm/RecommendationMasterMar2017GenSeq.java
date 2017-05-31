@@ -191,7 +191,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			PopUps.showError(
 					"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
 							+ dname);
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
 							+ dname));
 			System.exit(-1);
@@ -372,7 +372,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// ########Sanity check
 			if (distancesMapUnsorted.size() != candidateTimelines.size())
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
 								+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")"));
 				errorExists = true;
@@ -529,7 +529,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			PopUps.getCurrentStackTracedErrorMsg("Exception in recommendation master");
+			PopUps.getTracedErrorMsg("Exception in recommendation master");
 		}
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
@@ -560,7 +560,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		else
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("Error: type of threshold unknown in recommendation master"));
+					PopUps.getTracedErrorMsg("Error: type of threshold unknown in recommendation master"));
 			// errorExists = true;
 			System.exit(-2);
 		}
@@ -615,14 +615,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
 						similarityOfEndPointActObjCands);
 			default:
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error:unrecognised case type = " + caseType));
+				System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised case type = " + caseType));
 				return null;
 			}
 		}
 		else
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("Error:unrecognised lookpast type = " + lookPastType));
+					PopUps.getTracedErrorMsg("Error:unrecognised lookpast type = " + lookPastType));
 			return null;
 		}
 
@@ -718,13 +718,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		else
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: Unrecognised lookPastType "));
+			System.err.println(PopUps.getTracedErrorMsg("Error: Unrecognised lookPastType "));
 			System.exit(-1);
 		}
 
 		if (normalisedDistanceForCandTimelines == null || normalisedDistanceForCandTimelines.size() == 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: normalisedDistanceForCandTimelines.size=" + normalisedDistanceForCandTimelines.size()));
 		}
 
@@ -789,14 +789,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			}
 			else
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: Unrecognised lookPastType "));
+				System.err.println(PopUps.getTracedErrorMsg("Error: Unrecognised lookPastType "));
 				System.exit(-1);
 			}
 		}
 		// ////////////////////
 		if (extractedCurrentTimeline == null || extractedCurrentTimeline.getActivityObjectsInTimeline().size() == 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: current timeline is empty"));
+			System.err.println(PopUps.getTracedErrorMsg("Error: current timeline is empty"));
 			System.exit(-1);
 			// this.errorExists = true;
 		}
@@ -852,7 +852,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// ////////////////////
 		if (extractedCurrentTimeline.getActivityObjectsInTimeline().size() == 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: extractCurrentTimeline extractedCurrentTimeline.getActivityObjectsInTimeline().size()="
 							+ extractedCurrentTimeline.getActivityObjectsInTimeline().size()));
 			System.exit(-1);
@@ -927,7 +927,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 		else
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: Unrecognised lookPastType "));
+			System.err.println(PopUps.getTracedErrorMsg("Error: Unrecognised lookPastType "));
 			System.exit(-1);
 		}
 
@@ -1193,7 +1193,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		if (recommendedActivityNamesRankscorePairs == null || recommendedActivityNamesRankscorePairs.size() == 0)
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
+					PopUps.getTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
 							+ recommendedActivityNamesRankscorePairs.size());
 		}
 
@@ -1521,7 +1521,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		if (recommendedActivityNamesRankscorePairs == null || recommendedActivityNamesRankscorePairs.size() == 0)
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
+					PopUps.getTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
 							+ recommendedActivityNamesRankscorePairs.size());
 		}
 		return recommendedActivityNamesRankscorePairs;
@@ -1648,12 +1648,12 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 				if (candidateTimeline.size() <= 0)
 				{
-					System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error :candID=" + candID
+					System.err.println(PopUps.getTracedErrorMsg("Error :candID=" + candID
 							+ " not found, thus candidateTimeline.size=" + candidateTimeline.size()));
 				}
 				else if (nextActivityObjectForCand == null)
 				{
-					System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error nextActivityObjectForCand == null"));
+					System.err.println(PopUps.getTracedErrorMsg("Error nextActivityObjectForCand == null"));
 				}
 
 				nextActObjs.put(candID,
@@ -1671,7 +1671,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		if (nextActObjs == null || nextActObjs.size() == 0)
 		{
 			System.err
-					.println(PopUps.getCurrentStackTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
+					.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
 		}
 		// this.topNextActivityObjects = topActivityObjects;
 		return nextActObjs;
@@ -1708,19 +1708,19 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				// TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfCandTimeline);
 				if (candUserDayTimeline == null)
 				{
-					System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: candUserDayTimeline is null"));
+					System.err.println(PopUps.getTracedErrorMsg("Error: candUserDayTimeline is null"));
 					System.exit(-1);
 				}
 				if (!candUserDayTimeline.isShouldBelongToSingleDay())
 				{
-					System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					System.err.println(PopUps.getTracedErrorMsg(
 							"Error: for daytimeline candUserDayTimeline.isShouldBelongToSingleDay()= "
 									+ candUserDayTimeline.isShouldBelongToSingleDay()));
 					System.exit(-1);
 				}
 				if (endPointIndexInCand < 0)
 				{
-					System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					System.err.println(PopUps.getTracedErrorMsg(
 							"Error: for daytimeline endPointIndexInCand=" + endPointIndexInCand));
 					System.exit(-1);
 				}
@@ -1743,7 +1743,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		if (nextActObjs == null || nextActObjs.size() == 0)
 		{
 			System.err
-					.println(PopUps.getCurrentStackTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
+					.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
 		}
 
 		// System.out.println("-------exiting fetchNextActivityObjectsDaywise\n");
@@ -1775,7 +1775,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			return null;
 		default:
 			System.err
-					.println(PopUps.getCurrentStackTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
+					.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
 			return null;
 		}
 
@@ -1853,7 +1853,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				break;
 
 			default:
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type" + caseType));
 				break;
 			}
@@ -2164,14 +2164,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			PopUps.showError(
 					"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand():Unknown distance specified:"
 							+ distanceUsed);
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand(): Unknown distance specified:"
 							+ distanceUsed));
 			// throw new Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance
 			// specified:" + dname);
 			System.exit(-1);
 		}
-		System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+		System.err.println(PopUps.getTracedErrorMsg(
 				"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand()"
 						+ " reaching unreachable code"));
 		System.exit(-2);
@@ -2618,7 +2618,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
 					break;
 				default:
-					System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					System.err.println(PopUps.getTracedErrorMsg(
 							"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
 					break;
 				}
@@ -2628,7 +2628,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			{
 				// editDistanceForThisCandidate =
 				// editSimilarity.getEditDistance(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"ERROR in getEditDistancesOfEndPointActivityCand(): This method should not have been called for case type="
 								+ caseType));
 				errorExists = true;
@@ -2636,7 +2636,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			}
 			else
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"ERROR in getEditDistancesOfEndPointActivityCand(): This method should not have been called for case type="
 								+ caseType));
 				errorExists = true;
@@ -2645,7 +2645,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			if (endPointEditDistanceForThisCandidate < 0)
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error in getCaseSimilarityEndPointActivityObjectCand: endPointEditDistanceForThisCandidate "
 								+ endPointEditDistanceForThisCandidate + " is not correct"));
 				System.exit(-99);
@@ -2699,7 +2699,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 		else
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getCandidateTimelinesMU: Unrecognised matching unit type " + lookPastType));
 			System.exit(-2);
 			return null;

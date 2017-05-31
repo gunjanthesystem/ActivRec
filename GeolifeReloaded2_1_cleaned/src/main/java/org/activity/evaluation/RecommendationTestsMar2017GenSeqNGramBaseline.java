@@ -44,7 +44,7 @@ import org.activity.util.TimelineUtils;
  * @author gunjan
  *
  */
-public class RecommendationTestsMar2017GenSeq
+public class RecommendationTestsMar2017GenSeqNGramBaseline
 {
 	// String typeOfMatching; //"Daywise","
 	double percentageInTraining;// = 0.8;
@@ -99,7 +99,7 @@ public class RecommendationTestsMar2017GenSeq
 	 * @param userIDs
 	 * @param percentageInTraining
 	 */
-	public RecommendationTestsMar2017GenSeq(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines,
+	public RecommendationTestsMar2017GenSeqNGramBaseline(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines,
 			Enums.LookPastType lookPastType, Enums.CaseType caseType, Enums.TypeOfThreshold[] typeOfThresholds,
 			int[] userIDs, double percentageInTraining, int lengthOfRecommendedSequence)
 	{

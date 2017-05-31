@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -3968,12 +3969,12 @@ public class WritingToFile
 	 * Write a Map to file
 	 * 
 	 * @param map
-	 * @param fileName
+	 * @param absFileName
 	 *            with fullPath
 	 * @param headerKey
 	 * @param headerValue
 	 */
-	public static void writeSimpleMapToFile(Map<String, Long> map, String fileName, String headerKey,
+	public static void writeSimpleMapToFile(Map<String, Long> map, String absFileName, String headerKey,
 			String headerValue)
 	{
 		commonPath = Constant.getCommonPath();//
@@ -3983,23 +3984,21 @@ public class WritingToFile
 		}
 		try
 		{
-			File fileToWrite = new File(fileName);
-			fileToWrite.delete();
-			fileToWrite.createNewFile();
 
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fileToWrite));// ,true));
+			StringBuilder sb = new StringBuilder();
+			sb.append(headerKey + "," + headerValue + "\n");
 
-			bw.write(headerKey + "," + headerValue);
-			bw.newLine();
+			// File fileToWrite = new File(fileName); fileToWrite.delete(); fileToWrite.createNewFile();
+			// BufferedWriter bw = new BufferedWriter(new FileWriter(fileToWrite));// ,true));
+			// bw.write(headerKey + "," + headerValue); bw.newLine();
 
 			for (Map.Entry<String, Long> entry : map.entrySet())
 			{
-				bw.write(entry.getKey() + "," + entry.getValue());
-
-				bw.newLine();
+				// bw.write(entry.getKey() + "," + entry.getValue());bw.newLine();
+				sb.append(entry.getKey() + "," + entry.getValue() + "\n");
 			}
-
-			bw.close();
+			WritingToFile.writeToNewFile(sb.toString(), absFileName);
+			// bw.close();
 		}
 		catch (Exception e)
 		{
@@ -4023,23 +4022,22 @@ public class WritingToFile
 		// System.out.println("Inside writeSimpleLinkedHashMapToFile" + " commonPath=" + commonPath);
 		try
 		{
-			File fileToWrite = new File(absFileName);
-			fileToWrite.delete();
-			fileToWrite.createNewFile();
+			StringBuilder sb = new StringBuilder();
+			// File fileToWrite = new File(absFileName); fileToWrite.delete(); fileToWrite.createNewFile();
+			// BufferedWriter bw = new BufferedWriter(new FileWriter(fileToWrite));// ,true));
+			// bw.write(headerKey + "," + headerValue); bw.newLine();
 
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fileToWrite));// ,true));
-
-			bw.write(headerKey + "," + headerValue);
-			bw.newLine();
+			sb.append(headerKey + "," + headerValue + "\n");
 
 			for (Map.Entry<String, ?> entry : map.entrySet())
 			{
-				bw.write(entry.getKey() + "," + entry.getValue().toString());
-				// System.out.println(entry.getKey() + "," + entry.getValue());
-				bw.newLine();
+				// bw.write(entry.getKey() + "," + entry.getValue().toString());
+				// // System.out.println(entry.getKey() + "," + entry.getValue()); bw.newLine();
+				sb.append(entry.getKey() + "," + entry.getValue().toString() + "\n");
 			}
 
-			bw.close();
+			WritingToFile.writeToNewFile(sb.toString(), absFileName);
+			// bw.close();
 		}
 		catch (Exception e)
 		{
@@ -4059,10 +4057,13 @@ public class WritingToFile
 			String headerKey, String headerValue)
 	{
 		// commonPath = Constant.getCommonPath();//
-		System.out.println(
-				"Debug Feb24:  inside writeSimpleLinkedHashMapToFileAppend: is correct order of activity names = "
-						+ Constant.areActivityNamesInCorrectOrder(map));
 
+		if (Constant.areActivityNamesInCorrectOrder(map) == false)
+		{
+			System.err.println(
+					"Debug Feb24: Error inside writeSimpleLinkedHashMapToFileAppend: is correct order of activity names = "
+							+ Constant.areActivityNamesInCorrectOrder(map));
+		}
 		// Constant.areActivityNamesInCorrectOrder(map);
 
 		StringBuilder toWrite = new StringBuilder();
@@ -4629,6 +4630,76 @@ public class WritingToFile
 		{
 			br.close();
 		}
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @param absFileNameToUse
+	 * @param delimiterForKeys
+	 * @param delimiterForValues
+	 */
+	public static <K2, K3, V, K1> void writeMapOfMapOfMapOfList(Map<K1, Map<K2, Map<K3, List<V>>>> map,
+			String absFileNameToUse, String delimiterForKeys, String delimiterForValues)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("Key1,Key2,Key3,Vals\n");
+
+		for (Entry<K1, Map<K2, Map<K3, List<V>>>> firstLevelEntry : map.entrySet())
+		{
+			sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys);
+
+			for (Entry<K2, Map<K3, List<V>>> secondLevelEntry : firstLevelEntry.getValue().entrySet())
+			{
+				sb.append(secondLevelEntry.getKey().toString() + delimiterForKeys);
+				for (Entry<K3, List<V>> thirdLevelEntry : secondLevelEntry.getValue().entrySet())
+				{
+					sb.append(thirdLevelEntry.getKey().toString() + delimiterForKeys);
+
+					String s = thirdLevelEntry.getValue().stream().map(v -> v.toString())
+							.collect(Collectors.joining(delimiterForValues));
+					sb.append(s).append("\n");
+				}
+			}
+		}
+		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @param absFileNameToUse
+	 * @param delimiterForKeys
+	 * @param delimiterForValues
+	 */
+	public static void writeMapOfMapOfMapOfList(
+			LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>>> map,
+			String absFileNameToUse, String delimiterForKeys, String delimiterForValues)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("Key1,Key2,Key3,Vals\n");
+
+		for (Entry<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>>> firstLevelEntry : map
+				.entrySet())
+		{
+			sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys);
+
+			for (Entry<Integer, HashMap<String, ArrayList<Character>>> secondLevelEntry : firstLevelEntry.getValue()
+					.entrySet())
+			{
+				sb.append(secondLevelEntry.getKey().toString() + delimiterForKeys);
+				for (Entry<String, ArrayList<Character>> thirdLevelEntry : secondLevelEntry.getValue().entrySet())
+				{
+					sb.append(thirdLevelEntry.getKey().toString() + delimiterForKeys);
+
+					String s = thirdLevelEntry.getValue().stream().map(v -> v.toString())
+							.collect(Collectors.joining(delimiterForValues));
+					sb.append(s).append("\n");
+				}
+			}
+		}
+		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+
 	}
 
 	// public static void writeSimpleLinkedHashMapToFileAppendDouble(LinkedHashMap<String, Double> map, String fileName,

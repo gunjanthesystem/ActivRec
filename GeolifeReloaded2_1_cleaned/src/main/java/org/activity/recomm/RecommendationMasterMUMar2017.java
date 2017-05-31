@@ -165,7 +165,7 @@ public class RecommendationMasterMUMar2017// implements RecommendationMasterI// 
 			PopUps.showError(
 					"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
 							+ dname);
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
 							+ dname));
 			System.exit(-1);
@@ -255,13 +255,13 @@ public class RecommendationMasterMUMar2017// implements RecommendationMasterI// 
 		else
 		{
 			System.err.println(PopUps
-					.getCurrentStackTracedErrorMsg("Error: Unrecognised lookPastType in RecommendationMasterMUCount"));
+					.getTracedErrorMsg("Error: Unrecognised lookPastType in RecommendationMasterMUCount"));
 			System.exit(-154);
 		}
 		// ////////////////////
 		if (currentTimeline == null)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: current timeline is empty"));
+			System.err.println(PopUps.getTracedErrorMsg("Error: current timeline is empty"));
 			errorExists = true;
 		}
 
@@ -2302,7 +2302,7 @@ public class RecommendationMasterMUMar2017// implements RecommendationMasterI// 
 		}
 		else
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getCandidateTimelinesMU: Unrecognised matching unit type " + lookPastType));
 			System.exit(-2);
 			return null;

@@ -220,7 +220,7 @@ public class TestDummy2
 
 	public static void checkStackTrace3()
 	{
-		System.out.println(PopUps.getCurrentStackTracedErrorMsg("XYZ error occurred"));
+		System.out.println(PopUps.getTracedErrorMsg("XYZ error occurred"));
 		// StackTraceElement[] stacktraceElements = Thread.currentThread().getStackTrace();
 		//
 		// Arrays.stream(stacktraceElements).forEach(e -> System.out.println(e.toString()));

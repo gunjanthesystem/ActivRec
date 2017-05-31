@@ -17,7 +17,7 @@ public class DateTimeSanityChecks
 		if (!temp1.equals(endTimeStamp))
 		{
 			System.err
-					.println(PopUps.getCurrentStackTracedErrorMsg("Error in sanity check timestamp concern line 534 "));
+					.println(PopUps.getTracedErrorMsg("Error in sanity check timestamp concern line 534 "));
 			return false;
 		}
 

@@ -321,7 +321,7 @@ public class UIUtilityBox
 										else
 										{
 
-											System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+											System.err.println(PopUps.getTracedErrorMsg(
 													"Error: levelOfGrandChild= " + levelOfGrandChild
 															+ " Not expected more than three levels. foundnode.getLevel() = "
 															+ foundnode.getLevel() + ", while level to look for is: "

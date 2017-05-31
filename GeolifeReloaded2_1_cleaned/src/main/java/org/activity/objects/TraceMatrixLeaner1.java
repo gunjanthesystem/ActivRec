@@ -81,7 +81,7 @@ public class TraceMatrixLeaner1
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Exception  in TraceMatrix("));
+			System.err.println(PopUps.getTracedErrorMsg("Exception  in TraceMatrix("));
 			System.exit(-1);
 		}
 		// System.out.println("this.toString() :\n" + this.toStringActualLength());

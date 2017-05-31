@@ -1,7 +1,6 @@
 package org.activity.controller;
 
 import org.activity.constants.Constant;
-import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
@@ -17,7 +16,7 @@ public class SuperController
 
 		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
-		String commonPath = "./dataWritten/";// RecommUnmergedNCount/";
+		String commonPath = "./dataWritten/";// dataWrittenSeqEditL1 RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
@@ -38,9 +37,7 @@ public class SuperController
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/Test/";
 
 		// String performanceFileName = "/run/media/gunjan/HOME/gunjan/Geolife Data
-		// Works/GeolifePerformance/Test/Performance.csv";
-		// String performanceStringHeader =
-		// "
+		// Works/GeolifePerformance/Test/Performance.csv"; String performanceStringHeader = "
 		// UserAtRecomm,DateAtRecomm,TimeAtRecomm,MatchingUnit,NumOfTrainingDays,NumOfValidActObjsInTrainingTimelines,NumOfValidActObjsInCurrentTimelines,NumOfCandidateTimelines,SumOfValidActObjsInAllCandTimelines,TotalTimeForRecomm,
 		// TimeToGenerateCands,TimeToComputeEdistDistances\n";
 
@@ -90,9 +87,11 @@ public class SuperController
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
 
-		new EvaluationSeq(3, "./dataWritten/", Constant.matchingUnitAsPastCount);
+		// //curtain may 26 2017 start
+		// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);
+		// //curtain may 26 2017 end
 		// //curtain may 19 2017 start
-		// new ControllerWithoutServer();
+		new ControllerWithoutServer();
 		// //curtain may 19 2017 end
 		// **************************************************************************************************************//
 		// Constant.DATABASE_NAME = "dcu_data_2";// geolife1
@@ -292,8 +291,11 @@ public class SuperController
 
 		String errors = Searcher.search(commonPath, "consoleLog", "rror");
 		String exceptions = Searcher.search(commonPath, "consoleLog", "xception");
-
 		WritingToFile.writeToNewFile(errors + "\n" + exceptions, commonPath + "ErrorsExceptions.txt");
+
+		errors = Searcher.search(commonPath, "Log", "rror");
+		exceptions = Searcher.search(commonPath, "Log", "xception");
+		WritingToFile.writeToNewFile(errors + "\n" + exceptions, commonPath + "ErrorsExceptions2.txt");
 
 		long bt = System.currentTimeMillis();
 		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");

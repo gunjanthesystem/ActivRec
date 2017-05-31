@@ -23,7 +23,7 @@ public class TimelineSanityChecks
 
 		if (TimelineUtils.isChronological(listOfActObjs1) == false)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in checkIfChronoLogicalOrder: listOfActObjs1 isChronological false"));
 			listOfActObjs1.stream().forEachOrdered(ao -> System.err.println(">>" + ao.toStringAllGowallaTS()));
 			inOrder = false;
@@ -45,7 +45,7 @@ public class TimelineSanityChecks
 		{
 			if (maxTimeInList1.getAsLong() > minTimeInList2.getAsLong())
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error in checkIfChronoLogicalOrder: maxTimeInList1.getAsLong()=" + maxTimeInList1.getAsLong()
 								+ " > minTimeInList2.getAsLong() = " + minTimeInList2.getAsLong()));
 				inOrder = false;
@@ -55,7 +55,7 @@ public class TimelineSanityChecks
 
 		else
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in checkIfChronoLogicalOrder: maxTimeInList1.isPresent() = " + maxTimeInList1.isPresent()
 							+ "&& minTimeInList2.isPresent() = " + minTimeInList2.isPresent()));
 		}
