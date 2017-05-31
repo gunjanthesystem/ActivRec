@@ -53,17 +53,17 @@ public class Timeline implements Serializable
 		if (activityObjects.size() == 0)
 		{
 			System.err.println(PopUps
-					.getCurrentStackTracedErrorMsg("Error in creating Timeline: Empty Activity Objects provided"));
+					.getTracedErrorMsg("Error in creating Timeline: Empty Activity Objects provided"));
 			System.exit(5);
 		}
 		if (Constant.checkIfTimelineCreatedIsChronological && !TimelineUtils.isChronological(activityObjects))
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: in Timeline(ArrayList<ActivityObject> activityObjects), CHRONOLOGY NOT PRESERVED"));
 		}
 		if (shouldBelongToSingleDay && !TimelineUtils.isSameDay(activityObjects))
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: in Timeline(ArrayList<ActivityObject> activityObjects), shouldBelongToSingleDay= "
 							+ shouldBelongToSingleDay + " but TimelineUtils.isSameDay(activityObjects)="
 							+ TimelineUtils.isSameDay(activityObjects)));
@@ -300,7 +300,7 @@ public class Timeline implements Serializable
 	{
 		if (to > this.activityObjectsInTimeline.size())
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getActivityObjectsInTimelineFromToIndex: 'to' index out of bounds. Num of Activity Objects in Timeline="
 							+ this.activityObjectsInTimeline.size() + " while 'to' index is=" + to));
 			return null;
@@ -329,7 +329,7 @@ public class Timeline implements Serializable
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getActivityObjectsAsStringCode(): stringCodeOfTimeline.length()!= timelineForUser.getActivityObjectsInTimeline().size()"));
 		}
 		return stringCodeForTimeline.toString();
@@ -353,7 +353,7 @@ public class Timeline implements Serializable
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getActivityObjectsAsStringCode(): stringCodeOfTimeline.length()!= timelineForUser.getActivityObjectsInTimeline().size()"));
 		}
 		return stringCodeForTimeline.toString();
@@ -403,7 +403,7 @@ public class Timeline implements Serializable
 
 		if (indexOfFirstOccurrence < 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in hasAValidActAfterFirstOccurOfThisActName: No Occurrence of the given activity in the given timeline, throwing exception"));
 		}
 
@@ -499,7 +499,7 @@ public class Timeline implements Serializable
 		ActivityObject ae = activityObjectsInTimeline.get(getIndexOfActivityObjectAtTime(timestamp) + 1);
 		if (ae == null)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getNextActivityAfterActivityAtThisTime. No next activity after ts = " + timestamp));
 		}
 		return ae;
@@ -516,7 +516,7 @@ public class Timeline implements Serializable
 		// System.out.println("To find next activity object at :"+timestamp);
 		if (index + 1 > activityObjectsInTimeline.size() - 1)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getNextActivityAfterActivityAtThisPosition: array index out of bounds"));
 		}
 		ae = activityObjectsInTimeline.get(index + 1);
@@ -573,13 +573,13 @@ public class Timeline implements Serializable
 		if (res.size() == 0)
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
+					PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
 			return -99;
 		}
 
 		if (res.size() > 1)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
 			return -99;
 		}
@@ -612,13 +612,13 @@ public class Timeline implements Serializable
 		if (res.size() == 0)
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
+					PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
 			return null;
 		}
 
 		if (res.size() > 1)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
 			return null;
 		}
@@ -724,7 +724,7 @@ public class Timeline implements Serializable
 	{
 		if (!this.shouldBelongToSingleDay)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in Timeline.getActivityObjectsInDay(). shouldBelongToSingleDay= "
 							+ shouldBelongToSingleDay));
 		}
@@ -740,7 +740,7 @@ public class Timeline implements Serializable
 	{
 		if (!this.shouldBelongToSingleUser)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in Timeline.getActivityObjectsInDay(). shouldBelongToSingleUser= "
 							+ shouldBelongToSingleUser));
 		}
@@ -797,7 +797,7 @@ public class Timeline implements Serializable
 	{
 		if (!this.isShouldBelongToSingleDay())
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in Timeline.getTimeDiffValidAOInDayWithStartTimeNearestTo: isShouldBelongToSingleDay ="
 							+ this.isShouldBelongToSingleDay()
 							+ " while this method should only be called for day timeline "));

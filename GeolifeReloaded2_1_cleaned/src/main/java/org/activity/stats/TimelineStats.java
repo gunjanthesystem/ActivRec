@@ -18,11 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.activity.clustering.Cluster;
 import org.activity.clustering.KCentroids;
 import org.activity.clustering.KCentroidsTimelines;
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
 import org.activity.io.WritingToFile;
@@ -75,16 +77,10 @@ public class TimelineStats
 	 * ActivityRegularityAnalysisTwoLevel";// "ActivityRegularityAnalysisOneLevel";// "Clustering";// "Clustering";// //
 	 * NGramAnalysis"; // "TimeSeriesAnalysis", "FeatureAnalysis"
 	 */
-	public static final String typeOfAnalysis = "TimelineStats";// "NGramAnalysis";// "TimelineStats";//
-																// "TimeSeriesCorrelationAnalysis";//
-																// "SampleEntropyPerMAnalysis";//
-																// "SampleEntropyPerMAnalysis";//
-																// "TimeSeriesAnalysis";//
-
-	// "AlgorithmicAnalysis2";//
-	// "Clustering";//
-
-	// "ClusteringTimelineHolistic";// "
+	public static final String typeOfAnalysis = "NGramAnalysis";
+	// "TimelineStats";// "NGramAnalysis";// "TimeSeriesCorrelationAnalysis";// "SampleEntropyPerMAnalysis";//
+	// "SampleEntropyPerMAnalysis";//
+	// "TimeSeriesAnalysis";// "AlgorithmicAnalysis2"; "Clustering";// "ClusteringTimelineHolistic";// "
 
 	/**
 	 * <UserID, num of activity-objects in timeline>
@@ -95,9 +91,9 @@ public class TimelineStats
 	 * 
 	 * @param usersTimelines
 	 */
-	@SuppressWarnings("unused")
-	public static void timelineStatsController(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
+	// @SuppressWarnings("unused")
+	public static void
+			timelineStatsController(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
 		Constant.setCommonPath(Constant.outputCoreResultsPath);
 		// PopUps.showMessage("Inside timelineStats controller");
@@ -137,17 +133,29 @@ public class TimelineStats
 		PopUps.showMessage("path to write: " + pathToWrite);
 		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 		// /////////////////////
-		writeNumOfActivityObjectsInTimelines(usersDayTimelinesAll, "NumOfActivityObjectsInUncleanedTimelines");
-		writeNumOfValidActivityObjectsInTimelines(usersDayTimelinesAll,
-				"NumOfValidActivityObjectsInUncleanedTimelines");
-		writeNumOfDaysInTimelines(usersDayTimelinesAll, "NumOfDaysInUncleanedTimelines");
-		writeAvgNumOfDistinctActsPerDayInTimelines(usersDayTimelinesAll, "AvgNumOfDistinctActsInUncleanedTimelines");
-		writeAvgNumOfTotalActsPerDayInTimelines(usersDayTimelinesAll, "AvgNumOfTotalActsInUncleanedTimelines");
-		// //////////////////
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>();
-		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
-		usersDayTimelines = TimelineUtils.rearrangeDayTimelinesOrderForDataset(usersDayTimelines);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
-		WritingToFile.writeUsersDayTimelines(usersDayTimelines, "users", true, true, true);// users
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines =
+				new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>();
+		if (!Constant.getDatabaseName().equals("gowalla1"))
+		{
+
+			writeNumOfActivityObjectsInTimelines(usersDayTimelinesAll, "NumOfActivityObjectsInUncleanedTimelines");
+			writeNumOfValidActivityObjectsInTimelines(usersDayTimelinesAll,
+					"NumOfValidActivityObjectsInUncleanedTimelines");
+			writeNumOfDaysInTimelines(usersDayTimelinesAll, "NumOfDaysInUncleanedTimelines");
+			writeAvgNumOfDistinctActsPerDayInTimelines(usersDayTimelinesAll,
+					"AvgNumOfDistinctActsInUncleanedTimelines");
+			writeAvgNumOfTotalActsPerDayInTimelines(usersDayTimelinesAll, "AvgNumOfTotalActsInUncleanedTimelines");
+			// //////////////////
+
+			usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
+			usersDayTimelines = TimelineUtils.rearrangeDayTimelinesOrderForDataset(usersDayTimelines);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
+
+			WritingToFile.writeUsersDayTimelines(usersDayTimelines, "users", true, true, true);// users
+		}
+		else
+		{
+			usersDayTimelines = usersDayTimelinesAll;
+		}
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines);
 
 		writeNumOfActivityObjectsInTimelines(usersDayTimelines, "NumOfActivityObjectsInCleanedTimelines");
@@ -184,8 +192,8 @@ public class TimelineStats
 		case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
 		{
 			LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-			LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineUtils
-					.expungeInvalids(usersTimelines);
+			LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged =
+					TimelineUtils.expungeInvalids(usersTimelines);
 
 			applyKCentroidsTimelinesTwoLevel(usersTimelinesInvalidsExpunged);
 			break;
@@ -193,22 +201,25 @@ public class TimelineStats
 
 		case "ActivityRegularityAnalysisOneLevel":
 		{
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
-					.transformToSequenceDayWise(usersDayTimelines);
-			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
-					.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
-			traverseHashMapStringString(sequenceCharInvalidsExpungedNoTS);
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll =
+					TimelineTransformers.transformToSequenceDayWise(usersDayTimelines);
+			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS =
+					TimelineTransformers.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+
+			System.out.println(traverseHashMapStringString(sequenceCharInvalidsExpungedNoTS));
+
 			// < User, ActivityName, MU, Avg pairwise distance of back-segments>
-			LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityOne = applyActivityRegularityAnalysisOneLevel(
-					sequenceCharInvalidsExpungedNoTS);
+			LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityOne =
+					applyActivityRegularityAnalysisOneLevel(sequenceCharInvalidsExpungedNoTS);
+
 			writeActivityRegularity(regularityForEachTargetActivityOne, typeOfAnalysis);
 			break;
 		}
 
 		case "ActivityRegularityAnalysisTwoLevel":
 		{
-			LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityTwo = applyActivityRegularityAnalysisTwoLevel(
-					usersDayTimelines);
+			LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityTwo =
+					applyActivityRegularityAnalysisTwoLevel(usersDayTimelines);
 			// < User, ActivityName, MU, Avg pairwise distance of back-segments>
 			writeActivityRegularity(regularityForEachTargetActivityTwo, typeOfAnalysis);
 			break;
@@ -226,12 +237,12 @@ public class TimelineStats
 
 		case "Clustering":
 		{
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
-					.transformToSequenceDayWise(usersDayTimelines);// , false);
-			LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged = TimelineTransformers
-					.toCharsFromActivityObjects(sequenceAll, true);
-			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
-					.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll =
+					TimelineTransformers.transformToSequenceDayWise(usersDayTimelines);// , false);
+			LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged =
+					TimelineTransformers.toCharsFromActivityObjects(sequenceAll, true);
+			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS =
+					TimelineTransformers.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
 
 			applyKCentroids(sequenceCharInvalidsExpungedNoTS);
 			break;
@@ -241,12 +252,15 @@ public class TimelineStats
 		{
 			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
-			userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+			if (Constant.hasInvalidActivityNames)
+			{
+				userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+			}
 
 			WritingToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
 					pathToWrite + "UserNumOfActivityObjects.csv", "UserID", "NumOfActivityObjects");
 
-			performNGramAnalysis(userTimelines, 1, 20, (pathToWrite));
+			performNGramAnalysis(userTimelines, 1, 5/* 20 */, (pathToWrite));
 			break;
 		}
 
@@ -288,8 +302,8 @@ public class TimelineStats
 	 * 
 	 * @param usersDayTimelines
 	 */
-	public static void performSampleEntropyVsMAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	public static void
+			performSampleEntropyVsMAnalysis(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
@@ -302,12 +316,14 @@ public class TimelineStats
 		// {"activityNameSequenceIntInvalidsExpungedDummyTime","startTimeSequenceIntInvalidsExpungedDummyTime","durationSequenceIntInvalidsExpungedDummyTime","startGeoCoordinatesSequenceIntInvalidsExpungedDummyTime","endGeoCoordinatesSequenceIntInvalidsExpungedDummyTime","distanceTravelledSequenceIntInvalidsExpungedDummyTime","avgAltitudeSequenceIntInvalidsExpungedDummyTime"};
 		String[] featureNames = Constant.getFeatureNames();
 
-		LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>> userLevelSampEn = new LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>>();
+		LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>> userLevelSampEn =
+				new LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>>();
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
 
-			LinkedHashMap<String, LinkedHashMap<Integer, Double>> featureLevelSampEn = new LinkedHashMap<String, LinkedHashMap<Integer, Double>>();
+			LinkedHashMap<String, LinkedHashMap<Integer, Double>> featureLevelSampEn =
+					new LinkedHashMap<String, LinkedHashMap<Integer, Double>>();
 			for (String featureName : featureNames)
 			{
 				String absfileNameToRead = path + userIDN + featureName + "SequenceIntInvalidsExpungedDummyTime.csv";
@@ -340,8 +356,8 @@ public class TimelineStats
 		traverseSampleEntropies(userLevelSampEn);
 	}
 
-	public static void traverseSampleEntropies(
-			LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>> all)
+	public static void
+			traverseSampleEntropies(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>> all)
 	{
 		System.out.println("Traversing sample entropies");
 		for (Entry<String, LinkedHashMap<String, LinkedHashMap<Integer, Double>>> userEntry : all.entrySet())
@@ -389,8 +405,8 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> performSampleEntropyVsMAnalysis2(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	public static LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>>
+			performSampleEntropyVsMAnalysis2(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
@@ -403,12 +419,14 @@ public class TimelineStats
 		// {"activityNameSequenceIntInvalidsExpungedDummyTime","startTimeSequenceIntInvalidsExpungedDummyTime","durationSequenceIntInvalidsExpungedDummyTime","startGeoCoordinatesSequenceIntInvalidsExpungedDummyTime","endGeoCoordinatesSequenceIntInvalidsExpungedDummyTime","distanceTravelledSequenceIntInvalidsExpungedDummyTime","avgAltitudeSequenceIntInvalidsExpungedDummyTime"};
 		String[] featureNames = Constant.getFeatureNames();
 
-		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userLevelSampEn = new LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>>();
+		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userLevelSampEn =
+				new LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>>();
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
 
-			LinkedHashMap<Integer, LinkedHashMap<String, Double>> mLevelSampEn = new LinkedHashMap<Integer, LinkedHashMap<String, Double>>();
+			LinkedHashMap<Integer, LinkedHashMap<String, Double>> mLevelSampEn =
+					new LinkedHashMap<Integer, LinkedHashMap<String, Double>>();
 
 			for (int m = mMin; m <= mMax; m += mStep)
 			{
@@ -416,8 +434,8 @@ public class TimelineStats
 
 				for (String featureName : featureNames)
 				{
-					String absfileNameToRead = path + userIDN + featureName
-							+ "SequenceIntInvalidsExpungedDummyTime.csv";
+					String absfileNameToRead =
+							path + userIDN + featureName + "SequenceIntInvalidsExpungedDummyTime.csv";
 
 					double r;
 
@@ -448,8 +466,8 @@ public class TimelineStats
 		return userLevelSampEn;
 	}
 
-	public static void traverseSampleEntropies2(
-			LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> all)
+	public static void
+			traverseSampleEntropies2(LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> all)
 	{
 		System.out.println("Traversing sample entropies2");
 		for (Entry<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userEntry : all.entrySet())
@@ -561,8 +579,8 @@ public class TimelineStats
 		}
 	}
 
-	public static LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>> performTimeSeriesCorrelationAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	public static LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>>
+			performTimeSeriesCorrelationAnalysis(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
@@ -570,22 +588,24 @@ public class TimelineStats
 		PearsonsCorrelation pc = new PearsonsCorrelation();
 		String[] featureNames = Constant.getFeatureNames();
 
-		LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>> featSeriesCorr = new LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>>();
+		LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>> featSeriesCorr =
+				new LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>>();
 
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
-			LinkedHashMap<Pair<String, String>, Double> featSeriesCorrUserLevel = new LinkedHashMap<Pair<String, String>, Double>();
+			LinkedHashMap<Pair<String, String>, Double> featSeriesCorrUserLevel =
+					new LinkedHashMap<Pair<String, String>, Double>();
 
 			for (int i = 0; i < featureNames.length; i++)
 			{
 				for (int j = i + 1; j < featureNames.length; j++)
 				{
-					String absfileNameToRead1 = path + userIDN + featureNames[i]
-							+ "SequenceIntInvalidsExpungedDummyTime.csv";
+					String absfileNameToRead1 =
+							path + userIDN + featureNames[i] + "SequenceIntInvalidsExpungedDummyTime.csv";
 					double valsTS1[] = UtilityBelt.getTimeSeriesVals(absfileNameToRead1);
-					String absfileNameToRead2 = path + userIDN + featureNames[j]
-							+ "SequenceIntInvalidsExpungedDummyTime.csv";
+					String absfileNameToRead2 =
+							path + userIDN + featureNames[j] + "SequenceIntInvalidsExpungedDummyTime.csv";
 					double valsTS2[] = UtilityBelt.getTimeSeriesVals(absfileNameToRead2);
 
 					double correlation = pc.correlation(valsTS1, valsTS2);
@@ -647,20 +667,20 @@ public class TimelineStats
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesIntInvalidsExpunged =
 		// toIntsFromActivityObjects(timeSeries, true);
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
-				.transformToSequenceDayWise(usersDayTimelines);// , false);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceInt = TimelineTransformers
-				.toIntsFromActivityObjects(sequenceAll, false);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntZeroValuedInvalids = TimelineTransformers
-				.toTimeSeriesIntWithZeroValuedInvalids(sequenceAll);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntInvalidsExpunged = TimelineTransformers
-				.toIntsFromActivityObjects(sequenceAll, true);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> activityNameSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
-				.toIntsFromActivityObjectsDummyTime(sequenceAll, true);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> durationSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
-				.toDurationsFromActivityObjectsDummyTime(sequenceAll, true);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> startTimesSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
-				.toStartTimeFromActivityObjectsDummyTime(sequenceAll, true);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll =
+				TimelineTransformers.transformToSequenceDayWise(usersDayTimelines);// , false);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceInt =
+				TimelineTransformers.toIntsFromActivityObjects(sequenceAll, false);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntZeroValuedInvalids =
+				TimelineTransformers.toTimeSeriesIntWithZeroValuedInvalids(sequenceAll);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntInvalidsExpunged =
+				TimelineTransformers.toIntsFromActivityObjects(sequenceAll, true);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> activityNameSequenceIntInvalidsExpungedDummyTime =
+				TimelineTransformers.toIntsFromActivityObjectsDummyTime(sequenceAll, true);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> durationSequenceIntInvalidsExpungedDummyTime =
+				TimelineTransformers.toDurationsFromActivityObjectsDummyTime(sequenceAll, true);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> startTimesSequenceIntInvalidsExpungedDummyTime =
+				TimelineTransformers.toStartTimeFromActivityObjectsDummyTime(sequenceAll, true);
 
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> startGeoSequenceIntInvalidsExpungedDummyTime = null,
 				endGeoSequenceIntInvalidsExpungedDummyTime = null;
@@ -670,18 +690,18 @@ public class TimelineStats
 
 		if (Constant.getDatabaseName().equals("geolife1"))
 		{
-			startGeoSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
-					.toStartGeoCoordinatesFromActivityObjectsDummyTime(sequenceAll, true);
-			endGeoSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
-					.toEndGeoCoordinatesFromActivityObjectsDummyTime(sequenceAll, true);
-			distanceTravelledIntInvalidsExpungedDummyTime = TimelineTransformers
-					.toDistanceTravelledFromActivityObjectsDummyTime(sequenceAll, true);
-			startAltitudeIntInvalidsExpungedDummyTime = TimelineTransformers
-					.toStartAltitudeFromActivityObjectsDummyTime(sequenceAll, true);
-			endAltitudeIntInvalidsExpungedDummyTime = TimelineTransformers
-					.toEndAltitudeFromActivityObjectsDummyTime(sequenceAll, true);
-			avgAltitudeIntInvalidsExpungedDummyTime = TimelineTransformers
-					.toAvgAltitudeFromActivityObjectsDummyTime(sequenceAll, true);
+			startGeoSequenceIntInvalidsExpungedDummyTime =
+					TimelineTransformers.toStartGeoCoordinatesFromActivityObjectsDummyTime(sequenceAll, true);
+			endGeoSequenceIntInvalidsExpungedDummyTime =
+					TimelineTransformers.toEndGeoCoordinatesFromActivityObjectsDummyTime(sequenceAll, true);
+			distanceTravelledIntInvalidsExpungedDummyTime =
+					TimelineTransformers.toDistanceTravelledFromActivityObjectsDummyTime(sequenceAll, true);
+			startAltitudeIntInvalidsExpungedDummyTime =
+					TimelineTransformers.toStartAltitudeFromActivityObjectsDummyTime(sequenceAll, true);
+			endAltitudeIntInvalidsExpungedDummyTime =
+					TimelineTransformers.toEndAltitudeFromActivityObjectsDummyTime(sequenceAll, true);
+			avgAltitudeIntInvalidsExpungedDummyTime =
+					TimelineTransformers.toAvgAltitudeFromActivityObjectsDummyTime(sequenceAll, true);
 		}
 		// LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS =
 		// toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
@@ -732,29 +752,29 @@ public class TimelineStats
 	 * 
 	 * @param usersDayTimelines
 	 */
-	public static void performTimeSeriesEntropyAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	public static void
+			performTimeSeriesEntropyAnalysis(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries = TimelineTransformers
-				.transformToEqualIntervalTimeSeriesDayWise(usersDayTimelines, intervalInSecs);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries =
+				TimelineTransformers.transformToEqualIntervalTimeSeriesDayWise(usersDayTimelines, intervalInSecs);
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesInt = toTimeSeriesInt(timeSeries, false);
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesIntZeroValuedInvalids =
 		// toTimeSeriesIntWithZeroValuedInvalids(timeSeries);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, String>> timeSeriesCharInvalidsExpunged = TimelineTransformers
-				.toCharsFromActivityObjects(timeSeries, true);
-		LinkedHashMap<String, String> timeSeriesCharInvalidsExpungedNoTS = TimelineTransformers
-				.toCharsFromActivityObjectsNoTimestamp(timeSeries, true);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, String>> timeSeriesCharInvalidsExpunged =
+				TimelineTransformers.toCharsFromActivityObjects(timeSeries, true);
+		LinkedHashMap<String, String> timeSeriesCharInvalidsExpungedNoTS =
+				TimelineTransformers.toCharsFromActivityObjectsNoTimestamp(timeSeries, true);
 		LinkedHashMap<String, Double> tsEntropy = getShannonEntropy(timeSeriesCharInvalidsExpungedNoTS);// , true);
 
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
-				.transformToSequenceDayWise(usersDayTimelines);// , false);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll =
+				TimelineTransformers.transformToSequenceDayWise(usersDayTimelines);// , false);
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceInt = toTimeSeriesInt(sequenceAll, false);
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntZeroValuedInvalids =
 		// toTimeSeriesIntWithZeroValuedInvalids(sequenceAll);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged = TimelineTransformers
-				.toCharsFromActivityObjects(sequenceAll, true);
-		LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
-				.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged =
+				TimelineTransformers.toCharsFromActivityObjects(sequenceAll, true);
+		LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS =
+				TimelineTransformers.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
 		LinkedHashMap<String, Double> seqEntropy = getShannonEntropy(sequenceCharInvalidsExpungedNoTS);
 
 		WritingToFile.writeAllTimestampedActivityObjects(timeSeries, "Time" + intervalInSecs + "Series");
@@ -780,8 +800,9 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 * @return
 	 */
-	private static LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> applyActivityRegularityAnalysisTwoLevel(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	private static LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>>
+			applyActivityRegularityAnalysisTwoLevel(
+					LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		LinkedHashMap<String, Timeline> allTimelines = new LinkedHashMap<String, Timeline>();
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
@@ -792,7 +813,8 @@ public class TimelineStats
 			allTimelines.put(entry.getKey(), newTimeline);
 		}
 
-		LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivity = new LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>>();
+		LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivity =
+				new LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>>();
 
 		for (Map.Entry<String, Timeline> entry : allTimelines.entrySet())
 		{
@@ -801,7 +823,8 @@ public class TimelineStats
 
 			String[] activityNames = Constant.getActivityNames();
 
-			LinkedHashMap<String, TreeMap<Double, Double>> activityNamesMap = new LinkedHashMap<String, TreeMap<Double, Double>>();
+			LinkedHashMap<String, TreeMap<Double, Double>> activityNamesMap =
+					new LinkedHashMap<String, TreeMap<Double, Double>>();
 
 			for (String activityName : activityNames)
 			{
@@ -826,11 +849,12 @@ public class TimelineStats
 	 * 
 	 * @param sequenceCharInvalidsExpungedNoTS
 	 */
-	private static LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> applyActivityRegularityAnalysisOneLevel(
-			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS)
+	private static LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>>
+			applyActivityRegularityAnalysisOneLevel(LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS)
 	{
 		// <User, ActityName, matching unit, AvgPariwiseEditDistance>
-		LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivity = new LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>>();
+		LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivity =
+				new LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>>();
 
 		for (Map.Entry<String, String> entry : sequenceCharInvalidsExpungedNoTS.entrySet())
 		{
@@ -839,7 +863,8 @@ public class TimelineStats
 
 			String[] activityNames = Constant.getActivityNames();
 
-			LinkedHashMap<String, TreeMap<Double, Double>> activityNamesMap = new LinkedHashMap<String, TreeMap<Double, Double>>();
+			LinkedHashMap<String, TreeMap<Double, Double>> activityNamesMap =
+					new LinkedHashMap<String, TreeMap<Double, Double>>();
 			for (String activityName : activityNames)
 			{
 				if (UtilityBelt.isValidActivityName(activityName))
@@ -848,8 +873,8 @@ public class TimelineStats
 					TreeMap<Double, Double> mapOfAvgEDPerMU = new TreeMap<>();
 					for (Double mu : MUs)
 					{
-						double avgPairwiseED = getAvgPairwiseFirstLevelEditDistance(mu, activityName,
-								timelinesAsString);
+						double avgPairwiseED =
+								getAvgPairwiseFirstLevelEditDistance(mu, activityName, timelinesAsString);
 						mapOfAvgEDPerMU.put(mu, avgPairwiseED);
 					}
 					activityNamesMap.put(activityName, mapOfAvgEDPerMU);
@@ -964,8 +989,8 @@ public class TimelineStats
 		{
 			// NOTE: going back matchingUnitCounts FROM THE index.
 			int newStartIndex = (int) ((endIndex - muInCounts) >= 0 ? (endIndex - muInCounts) : 0);
-			ArrayList<ActivityObject> activityObjectsForSegment = timeline
-					.getActivityObjectsInTimelineFromToIndex(newStartIndex, endIndex + 1);
+			ArrayList<ActivityObject> activityObjectsForSegment =
+					timeline.getActivityObjectsInTimelineFromToIndex(newStartIndex, endIndex + 1);
 			segments.add(activityObjectsForSegment);
 			// System.out.println("Num of elements in this segment = " + activityObjectsForSegment.size());
 		}
@@ -1044,8 +1069,9 @@ public class TimelineStats
 			for (int j = i; j < segments.size(); j++)// TODO SHOULD I START FROM J=I+1
 			{
 				HJEditDistance hjDist = new HJEditDistance();
-				Pair<String, Double> dist = hjDist.getHJEditDistanceWithTrace(segments.get(i), segments.get(j), "", "",
-						"", "1");// new Long(1)
+				Pair<String, Double> dist =
+						hjDist.getHJEditDistanceWithTrace(segments.get(i), segments.get(j), "", "", "", "1");// new
+																												// Long(1)
 				sumOfDistances += (dist.getSecond());// , 1, 1, 2);
 				count++;
 			}
@@ -1077,10 +1103,16 @@ public class TimelineStats
 			for (int j = i + 1; j < segments.size(); j++)// should i START FROM J=I+1
 			{
 				HJEditDistance hjDist = new HJEditDistance();
-				Pair<String, Double> dist = hjDist.getHJEditDistanceWithTrace(segments.get(i), segments.get(j), "", "",
-						"", "1");// new Pair("a", new Double(2));// ALERT
-									// ALERT ALTER ALERT
-									// ALERT
+				Pair<String, Double> dist =
+						hjDist.getHJEditDistanceWithTrace(segments.get(i), segments.get(j), "", "", "", "1");// new
+																												// Pair("a",
+																												// new
+																												// Double(2));//
+																												// ALERT
+																												// ALERT
+																												// ALTER
+																												// ALERT
+																												// ALERT
 				distances.add(dist.getSecond());// , 1, 1, 2);
 				count++;
 			}
@@ -1146,7 +1178,8 @@ public class TimelineStats
 			 * NOT REALLY ABLE TO TAKE ADVANTAGE OF MAP, CANT MATCH UNIQUELY USING KEY, also issues with using HashSet
 			 * as key
 			 **/
-			LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> mapOfResults = new LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>();
+			LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> mapOfResults =
+					new LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>();
 
 			for (int i = 0; i < numOfKCentroidsExperiments; i++)
 			{
@@ -1203,12 +1236,13 @@ public class TimelineStats
 			 * NOT REALLY ABLE TO TAKE ADVANTAGE OF MAP, CANT MATCH UNIQUELY USING KEY, also issues with using HashSet
 			 * as key
 			 **/
-			LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> mapOfResults = new LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>();
+			LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> mapOfResults =
+					new LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>();
 
 			for (int i = 0; i < numOfKCentroidsExperiments; i++)
 			{
-				KCentroidsTimelines kcentroids = new KCentroidsTimelines(numberOfClusters, 50,
-						timelinesInvalidsExpunged);
+				KCentroidsTimelines kcentroids =
+						new KCentroidsTimelines(numberOfClusters, 50, timelinesInvalidsExpunged);
 				KCentroids.setCreateDistancesMap(false);
 
 				ArrayList<Cluster> clusters = (kcentroids.getListOfClusters());
@@ -1247,11 +1281,12 @@ public class TimelineStats
 	 * @return
 	 */
 	@SuppressWarnings("unused")
-	public static LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> sortByIntraClusterVarianceAndFilter(
-			LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> map)
+	public static LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>
+			sortByIntraClusterVarianceAndFilter(
+					LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> map)
 	{
-		List<Map.Entry<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>> list = new LinkedList<>(
-				map.entrySet());
+		List<Map.Entry<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>> list =
+				new LinkedList<>(map.entrySet());
 
 		Collections.sort(list,
 				new Comparator<Map.Entry<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>>()
@@ -1297,7 +1332,8 @@ public class TimelineStats
 			LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> mapOfResults,
 			ArrayList<Cluster> clusteringToCheck)
 	{
-		LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> mapOfNewResults = new LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>();
+		LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> mapOfNewResults =
+				new LinkedHashMap<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>>();
 
 		for (Map.Entry<ArrayList<Cluster>, Triple<String, Integer, ArrayList<Double>>> entry : mapOfResults.entrySet())
 		{
@@ -1464,8 +1500,8 @@ public class TimelineStats
 	 * @param timelines
 	 * @return
 	 */
-	public static LinkedHashMap<String, Integer> getNumOfActivityObjectsInTimeline(
-			LinkedHashMap<String, Timeline> timelines)
+	public static LinkedHashMap<String, Integer>
+			getNumOfActivityObjectsInTimeline(LinkedHashMap<String, Timeline> timelines)
 	{
 		LinkedHashMap<String, Integer> userNumOfAOsInTimeline = new LinkedHashMap<String, Integer>();
 
@@ -1565,18 +1601,112 @@ public class TimelineStats
 		for (Map.Entry<String, Timeline> entry : timelines.entrySet())
 		{
 			String userID = entry.getKey();
+
+			///////////////
+			if (Constant.blacklistingUsersWithLargeMaxActsPerDay)
+			{
+				if (Constant.getDatabaseName().equals("gowalla1"))
+				{
+					if (Arrays.asList(DomainConstants.gowallaUserIDsWithGT553MaxActsPerDay)
+							.contains(Integer.valueOf(userID)))
+					{
+						System.out.println("Skipping user: " + userID + " as in gowallaUserIDsWithGT553MaxActsPerDay");
+						// PopUps.showMessage("Skipping user: " + userId
+						// + " as in gowallaUserIDsWithGT553MaxActsPerDay");
+						continue;
+					}
+				}
+				else
+				{
+					System.err.println("Warning: Constant.blacklistingUsersWithLargeMaxActsPerDay= "
+							+ Constant.blacklistingUsersWithLargeMaxActsPerDay
+							+ " but blacklisted user not defined for this database");
+				}
+			}
+			///////////////
+
 			Timeline timelineForUser = entry.getValue();
 			String stringCodeOfTimeline = timelineForUser.getActivityObjectsAsStringCode(); // convert activity names to
 																							// char codes.
 			// System.out.println("Timeline as String code =" + stringCodeOfTimeline);
 			for (int n = startN; n <= endN; n++)
 			{
-				HashMap<String, Long> freqDistr = getNGramOccurrenceDistribution(stringCodeOfTimeline, n);
+				LinkedHashMap<String, Long> freqDistr = getNGramOccurrenceDistribution(stringCodeOfTimeline, n);
+
+				freqDistr = (LinkedHashMap<String, Long>) ComparatorUtils.sortByValueDescNoShuffle(freqDistr);
+
 				WritingToFile.writeSimpleMapToFile(freqDistr, pathForResultFiles + n + "gram" + userID + "FreqDist.csv",
 						"subsequence", "count");
+
+				/// If there is a need to write n-grams as actname or act ids instead of char codes
+				LinkedHashMap<String, Long> freqDistrWithActNames =
+						freqDistr.entrySet().stream().collect(Collectors.toMap(e -> getNGramAsActName(e.getKey(), "--"),
+								e -> e.getValue(), (e1, e2) -> e1, LinkedHashMap::new));
+
+				LinkedHashMap<String, Long> freqDistrWithActID =
+						freqDistr.entrySet().stream().collect(Collectors.toMap(e -> getNGramAsActID(e.getKey(), "--"),
+								e -> e.getValue(), (e1, e2) -> e1, LinkedHashMap::new));
+
+				WritingToFile.writeSimpleMapToFile(freqDistrWithActNames,
+						pathForResultFiles + n + "gram" + userID + "FreqDistActName.csv", "subsequence", "count");
+
+				WritingToFile.writeSimpleMapToFile(freqDistrWithActID,
+						pathForResultFiles + n + "gram" + userID + "FreqDistActID.csv", "subsequence", "count");
+				///
 			}
 		}
 		System.out.println("Finsished NGram Analysis");
+	}
+
+	/**
+	 * 
+	 * @param nGram
+	 * @param delimiter
+	 * @return
+	 */
+	public static String getNGramAsActName(String nGram, String delimiter)
+	{
+		// System.out.println("Debug: inside getNGramAsActName for ngram:" + nGram);
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < nGram.length(); i++)
+		{
+			char c = nGram.charAt(i);
+			Integer actID = DomainConstants.charCodeCatIDMap.get(c);
+			String actName = DomainConstants.catIDNameDictionary.get(actID);
+			// System.out.println("Debug: actID:" + actID + " actName:" + actName);
+			sb.append(actName);
+			if (i != (nGram.length() - 1))
+			{
+				sb.append(delimiter);
+			}
+		}
+		// System.out.println("Debug: returning " + sb.toString() + " for nGram:" + nGram);
+
+		return sb.toString();
+	}
+
+	/**
+	 * 
+	 * @param nGram
+	 * @param delimiter
+	 * @return
+	 */
+	public static String getNGramAsActID(String nGram, String delimiter)
+	{
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < nGram.length(); i++)
+		{
+			char c = nGram.charAt(i);
+			Integer actID = DomainConstants.charCodeCatIDMap.get(c);
+			sb.append(actID.toString());
+			if (i != (nGram.length() - 1))
+			{
+				sb.append(delimiter);
+			}
+		}
+		// System.out.println("Debug: returning " + sb.toString() + " for nGram:" + nGram);
+		return sb.toString();
 	}
 
 	public static void traverseMapMapMap(
@@ -1767,8 +1897,9 @@ public class TimelineStats
 				for (Entry<Pair<String, Integer>, double[]> entryTwoGram : entryMU.getValue().entrySet()) // over each
 																											// user
 				{
-					List<Double> editDistancesPairwiseTrailsList = Arrays
-							.asList(ArrayUtils.toObject(entryTwoGram.getValue())); // converting from double[] to list.
+					List<Double> editDistancesPairwiseTrailsList =
+							Arrays.asList(ArrayUtils.toObject(entryTwoGram.getValue())); // converting from double[] to
+																							// list.
 					editDistancesOverAllTwoGrams.addAll(new ArrayList(editDistancesPairwiseTrailsList));
 					// countOccurrencesOfAllTwoGrams += entryTwoGram.getKey().getSecond();
 					// DescriptiveStatistics ds = new DescriptiveStatistics(entryTwoGram.getValue());
@@ -1779,8 +1910,9 @@ public class TimelineStats
 					// wtdMin += ds.getMin();
 				}
 
-				double[] editDistancesOverAllTwoGramsArray = editDistancesOverAllTwoGrams.stream()
-						.mapToDouble(Double::doubleValue).toArray(); // via method reference
+				double[] editDistancesOverAllTwoGramsArray =
+						editDistancesOverAllTwoGrams.stream().mapToDouble(Double::doubleValue).toArray(); // via method
+																											// reference
 
 				DescriptiveStatistics ds = new DescriptiveStatistics(editDistancesOverAllTwoGramsArray);
 
@@ -1892,18 +2024,20 @@ public class TimelineStats
 	{
 		System.out.println("Performing Algorithmic Analysis");
 		// <UserID, < Pair(each two gram, num of occcur of this two gram) , < given mu, pairwise edit distances>>>
-		LinkedHashMap<String, LinkedHashMap<Pair<String, Integer>, LinkedHashMap<Double, double[]>>> result = new LinkedHashMap<String, LinkedHashMap<Pair<String, Integer>, LinkedHashMap<Double, double[]>>>();
+		LinkedHashMap<String, LinkedHashMap<Pair<String, Integer>, LinkedHashMap<Double, double[]>>> result =
+				new LinkedHashMap<String, LinkedHashMap<Pair<String, Integer>, LinkedHashMap<Double, double[]>>>();
 
 		for (Map.Entry<String, Timeline> entry : timelines.entrySet()) // over each user
 		{
 			// <Pair(each two gram,num of occur) , < given mu, pairwise edit distances>>
-			LinkedHashMap<Pair<String, Integer>, LinkedHashMap<Double, double[]>> resultForAUser = new LinkedHashMap<Pair<String, Integer>, LinkedHashMap<Double, double[]>>();
+			LinkedHashMap<Pair<String, Integer>, LinkedHashMap<Double, double[]>> resultForAUser =
+					new LinkedHashMap<Pair<String, Integer>, LinkedHashMap<Double, double[]>>();
 
 			String userID = entry.getKey();
 			Timeline timelineForUser = entry.getValue();
 
-			HashMap<String, ArrayList<Integer>> freqDistrTwoGrams = getNGramOccurrenceDistributionWithIndices(
-					timelineForUser.getActivityObjectsAsStringCode(), 2);
+			HashMap<String, ArrayList<Integer>> freqDistrTwoGrams =
+					getNGramOccurrenceDistributionWithIndices(timelineForUser.getActivityObjectsAsStringCode(), 2);
 			int numOfDistinctTwoGrams = freqDistrTwoGrams.size();
 
 			System.out.println("Number of two grams = " + numOfDistinctTwoGrams);
@@ -1921,8 +2055,8 @@ public class TimelineStats
 					double mu = Constant.matchingUnitAsPastCount[muIndex];
 
 					// obtain the trail segments for this mu.
-					ArrayList<ArrayList<ActivityObject>> trailSegments = getTrailSegments(mu, startIndices,
-							timelineForUser);
+					ArrayList<ArrayList<ActivityObject>> trailSegments =
+							getTrailSegments(mu, startIndices, timelineForUser);
 
 					double pairwiseTwoLevelEditDistances[] = getPairwiseTwoLevelEDs(trailSegments);
 					resultForATwoGram.put(mu, pairwiseTwoLevelEditDistances);
@@ -1946,18 +2080,20 @@ public class TimelineStats
 		System.out.println("Performing Algorithmic Analysis2");
 		// <UserID, < given mu , < Pair(each two gram, num of occcur of this two gram), pairwise edit distances of
 		// trails>>>
-		LinkedHashMap<String, LinkedHashMap<Double, LinkedHashMap<Pair<String, Integer>, double[]>>> result2 = new LinkedHashMap<String, LinkedHashMap<Double, LinkedHashMap<Pair<String, Integer>, double[]>>>();
+		LinkedHashMap<String, LinkedHashMap<Double, LinkedHashMap<Pair<String, Integer>, double[]>>> result2 =
+				new LinkedHashMap<String, LinkedHashMap<Double, LinkedHashMap<Pair<String, Integer>, double[]>>>();
 
 		for (Map.Entry<String, Timeline> entry : timelines.entrySet()) // over each user
 		{
 			// < given mu , < Pair(each two gram, num of occcur of this two gram), pairwise edit distances of trails>>
-			LinkedHashMap<Double, LinkedHashMap<Pair<String, Integer>, double[]>> resultForAUser = new LinkedHashMap<Double, LinkedHashMap<Pair<String, Integer>, double[]>>();
+			LinkedHashMap<Double, LinkedHashMap<Pair<String, Integer>, double[]>> resultForAUser =
+					new LinkedHashMap<Double, LinkedHashMap<Pair<String, Integer>, double[]>>();
 
 			String userID = entry.getKey();
 			Timeline timelineForUser = entry.getValue();
 
-			HashMap<String, ArrayList<Integer>> freqDistrTwoGrams = getNGramOccurrenceDistributionWithIndices(
-					timelineForUser.getActivityObjectsAsStringCode(), 2);
+			HashMap<String, ArrayList<Integer>> freqDistrTwoGrams =
+					getNGramOccurrenceDistributionWithIndices(timelineForUser.getActivityObjectsAsStringCode(), 2);
 			int numOfDistinctTwoGrams = freqDistrTwoGrams.size();
 
 			System.out.println("Number of two grams = " + numOfDistinctTwoGrams);
@@ -1969,7 +2105,8 @@ public class TimelineStats
 				double mu = Constant.matchingUnitAsPastCount[muIndex];
 
 				// < given mu, pairwise edit distances>
-				LinkedHashMap<Pair<String, Integer>, double[]> resultForAMU = new LinkedHashMap<Pair<String, Integer>, double[]>();
+				LinkedHashMap<Pair<String, Integer>, double[]> resultForAMU =
+						new LinkedHashMap<Pair<String, Integer>, double[]>();
 
 				for (Map.Entry<String, ArrayList<Integer>> entryTwoGram : freqDistrTwoGrams.entrySet())
 				{
@@ -1977,8 +2114,8 @@ public class TimelineStats
 					ArrayList<Integer> startIndices = entryTwoGram.getValue();
 
 					// obtain the trail segments for this mu and this 2gram.
-					ArrayList<ArrayList<ActivityObject>> trailSegments = getTrailSegments(mu, startIndices,
-							timelineForUser);
+					ArrayList<ArrayList<ActivityObject>> trailSegments =
+							getTrailSegments(mu, startIndices, timelineForUser);
 
 					double pairwiseTwoLevelEditDistances[] = getPairwiseTwoLevelEDs(trailSegments);
 					resultForAMU.put(new Pair(twoGram, startIndices.size()), pairwiseTwoLevelEditDistances);
@@ -2004,12 +2141,19 @@ public class TimelineStats
 		}
 	}
 
-	public static void traverseHashMapStringString(HashMap<String, String> map)
+	/**
+	 * 
+	 * @param map
+	 */
+	public static String traverseHashMapStringString(HashMap<String, String> map)
 	{
+		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, String> entry : map.entrySet())
 		{
-			System.out.println(entry.getKey() + ":" + entry.getValue());
+			sb.append(entry.getKey()).append(":").append(entry.getValue());
+			// System.out.println(entry.getKey() + ":" + entry.getValue());
 		}
+		return sb.toString();
 	}
 
 	/**
@@ -2273,7 +2417,11 @@ public class TimelineStats
 		{
 			String userName = entry.getKey();
 			WritingToFile.writeActivityCountsInGivenDayTimelines(userName, entry.getValue(), "AllTimelines");
-			WritingToFile.writeActivityDurationInGivenDayTimelines(userName, entry.getValue(), "AllTimelines");
+
+			if (!Constant.getDatabaseName().equals("gowalla1"))
+			{// since gowalla data does not have duration
+				WritingToFile.writeActivityDurationInGivenDayTimelines(userName, entry.getValue(), "AllTimelines");
+			}
 			WritingToFile.writeActivityOccPercentageOfTimelines(userName, entry.getValue(), "AllTimelines");
 		}
 	}
@@ -2544,8 +2692,8 @@ public class TimelineStats
 	 * @param fileNameToUse
 	 * @return
 	 */
-	public static LinkedHashMap<String, Complex[]> getFTDouble(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> ts)// , String fileNameToUse)
+	public static LinkedHashMap<String, Complex[]>
+			getFTDouble(LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> ts)// , String fileNameToUse)
 	{
 		LinkedHashMap<String, Complex[]> transforms = new LinkedHashMap<String, Complex[]>();
 		FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
@@ -2636,20 +2784,22 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>> performHjorthParameterAnalysis(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	public static LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>>
+			performHjorthParameterAnalysis(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
 
 		String[] featureNames = Constant.getFeatureNames();
 
-		LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>> userLevelHjorthParams = new LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>>();
+		LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>> userLevelHjorthParams =
+				new LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>>();
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
 
-			LinkedHashMap<String, Triple<Double, Double, Double>> featureLevelHjorthParams = new LinkedHashMap<String, Triple<Double, Double, Double>>();
+			LinkedHashMap<String, Triple<Double, Double, Double>> featureLevelHjorthParams =
+					new LinkedHashMap<String, Triple<Double, Double, Double>>();
 
 			for (String featureName : featureNames)
 			{
@@ -2669,8 +2819,8 @@ public class TimelineStats
 		return userLevelHjorthParams;
 	}
 
-	public static void writeHjorthParameters(
-			LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>> all)
+	public static void
+			writeHjorthParameters(LinkedHashMap<String, LinkedHashMap<String, Triple<Double, Double, Double>>> all)
 	{
 		System.out.println("Writing writeHjorthParameters");
 		for (Entry<String, LinkedHashMap<String, Triple<Double, Double, Double>>> userEntry : all.entrySet())

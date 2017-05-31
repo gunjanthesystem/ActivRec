@@ -70,7 +70,7 @@ public class StringCode
 		String name = null;
 
 		String msg = "Alert!: you are using org.activity.util.StringCode.getActivityNameFromStringCode(String)! ";
-		PopUps.showMessage(PopUps.getCurrentStackTracedErrorMsg(msg));
+		PopUps.showMessage(PopUps.getTracedErrorMsg(msg));
 		System.err.println(msg);
 
 		char[] charCode = code.toCharArray();
@@ -109,8 +109,8 @@ public class StringCode
 		// }
 
 		String msg = "Error!: you are using org.activity.util.StringCode.getStringCodeFromActivityName(String)! ";
-		PopUps.showMessage(PopUps.getCurrentStackTracedErrorMsg(msg));
-		System.err.println(PopUps.getCurrentStackTracedErrorMsg(msg));
+		PopUps.showMessage(PopUps.getTracedErrorMsg(msg));
+		System.err.println(PopUps.getTracedErrorMsg(msg));
 		// System.err.println(msg);
 		// PopUps.getCurrentStackTracedErrorMsg(msg);
 
@@ -199,7 +199,7 @@ public class StringCode
 			else
 			{
 				System.out.println(
-						PopUps.getCurrentStackTracedErrorMsg("Unknown invalid act name: = " + invalidActivityName));
+						PopUps.getTracedErrorMsg("Unknown invalid act name: = " + invalidActivityName));
 			}
 		}
 		catch (Exception e)
@@ -896,7 +896,7 @@ public class StringCode
 		{
 			if (hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance)
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error: hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance"));
 			}
 
@@ -939,7 +939,7 @@ public class StringCode
 		}
 		else
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: DomainConstants.gowallaWorkingCatLevel < hierarchyLevelForEDForAO"));
 		}
 
@@ -958,13 +958,13 @@ public class StringCode
 		if (anyCatHasMultipleCorrHierCat == false && codeS.size() > 1)
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("anyCatHasMultipleCorrHierCat==false && codeS.size()>1"));
+					PopUps.getTracedErrorMsg("anyCatHasMultipleCorrHierCat==false && codeS.size()>1"));
 		}
 
 		if (codeS.size() != correspondCatLevelWords.size())
 		{
 			System.err
-					.println(PopUps.getCurrentStackTracedErrorMsg("codeS.size() != correspondCatLevelStrings.size()"));
+					.println(PopUps.getTracedErrorMsg("codeS.size() != correspondCatLevelStrings.size()"));
 
 		}
 		// System.out.println("Inside getStringCodeForActivityObjects() oldOne:"
@@ -1002,7 +1002,7 @@ public class StringCode
 		{
 			if (hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance)
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error: hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance"));
 			}
 
@@ -1025,7 +1025,7 @@ public class StringCode
 		}
 		else
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: DomainConstants.gowallaWorkingCatLevel <                hierarchyLevelForEDForAO"));
 
 		}

@@ -352,7 +352,7 @@ public class ReadingFromFile
 
 		if (columnIndicesToRead.length != allVals.size())
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error: columnIndicesToRead.length"
+			System.err.println(PopUps.getTracedErrorMsg("Error: columnIndicesToRead.length"
 					+ columnIndicesToRead.length + " != allVals.size()" + allVals.size()));
 		}
 

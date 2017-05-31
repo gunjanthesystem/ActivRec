@@ -134,7 +134,7 @@ public class AlignmentBasedDistance
 			break;
 
 		default:
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised database name:"
 							+ Constant.getDatabaseName()));
 			// PopUps.showError(
@@ -1747,7 +1747,7 @@ public class AlignmentBasedDistance
 
 					if (min == -9999)
 					{
-						System.out.println(PopUps.getCurrentStackTracedErrorMsg("Error in minDistance"));
+						System.out.println(PopUps.getTracedErrorMsg("Error in minDistance"));
 					}
 
 					dist[i + 1][j + 1] = min;
@@ -1951,7 +1951,7 @@ public class AlignmentBasedDistance
 
 					if (min == -9999)
 					{
-						System.out.println(PopUps.getCurrentStackTracedErrorMsg("Error in minDistance"));
+						System.out.println(PopUps.getTracedErrorMsg("Error in minDistance"));
 					}
 
 					dist[i + 1][j + 1] = min;
@@ -2139,7 +2139,7 @@ public class AlignmentBasedDistance
 
 						if (hierWt == null)
 						{
-							System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+							System.err.println(PopUps.getTracedErrorMsg(
 									"Error in levenshtein distance: no hier dist found for: " + String.valueOf(c1)
 											+ String.valueOf(c2))
 									+ " hierWt= " + hierWt);
@@ -2195,7 +2195,7 @@ public class AlignmentBasedDistance
 
 					if (min == -9999)
 					{
-						System.out.println(PopUps.getCurrentStackTracedErrorMsg("Error in minDistance"));
+						System.out.println(PopUps.getTracedErrorMsg("Error in minDistance"));
 					}
 
 					dist[i + 1][j + 1] = min;

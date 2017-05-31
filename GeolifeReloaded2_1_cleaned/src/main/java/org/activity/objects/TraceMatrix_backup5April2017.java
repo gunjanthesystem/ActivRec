@@ -198,7 +198,7 @@ public class TraceMatrix_backup5April2017
 		{
 			System.out.println("nRows= " + nRows + ", nCols= " + nCols + ", maxSizeOfCell = " + maxSizeOfCell);// );
 			System.out.println("traceMatrix:\n" + this.toString());
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in org.activity.objects.TraceMatrix.addCharsToCell() , rowIndex=" + rowIndex + ", colIndex="
 							+ colIndex));
 			e.printStackTrace();

@@ -145,7 +145,7 @@ public final class Constant
 
 	public static final boolean blacklistingUsersWithLargeMaxActsPerDay = true;
 
-	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false;
+	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = true;
 
 	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// .Daywise;// NCount;//
 																					// Enums.LookPastType.NCount;
@@ -157,7 +157,7 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 4, 0, 1, 2 };// , 3, 6, 8, 10, 12 };// , 14, 16, 18 };
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12 };// , 14, 16, 18 };
 	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
 	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 
@@ -286,6 +286,7 @@ public final class Constant
 		Constant.setCommonPath(givenCommonpath);
 		DomainConstants.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
 		DomainConstants.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
+		DomainConstants.setCatIDCharCodeMap();
 		DomainConstants.setCatIDGivenLevelCatIDMap();
 		// Constant.setDistanceUsed("HJEditDistance");
 	}
@@ -865,7 +866,7 @@ public final class Constant
 		s.append("\ndistanceUsed:" + distanceUsed);
 
 		s.append("\nuseTolerance:" + useTolerance);
-		s.append("\ntypeOfThresholds:" + typeOfThresholds);
+		s.append("\ntypeOfThresholds:" + Arrays.asList(typeOfThresholds));
 		// s.append("\nuseThreshold:" + useThreshold);
 		s.append("\nbreakTiesWithShuffle:" + breakTiesWithShuffle);
 		s.append("\nEXPUNGE_INVALIDS_B4_RECOMM_PROCESS:" + EXPUNGE_INVALIDS_B4_RECOMM_PROCESS);
@@ -883,6 +884,7 @@ public final class Constant
 
 		s.append("\nDoBaselineDuration:" + DoBaselineDuration);
 		s.append("\nDoBaselineOccurrence:" + DoBaselineOccurrence);
+		s.append("\nDoBaselineNGramSeq:" + DoBaselineNGramSeq);
 
 		s.append("\ncheckIfTimelineCreatedIsChronological:" + checkIfTimelineCreatedIsChronological);
 		s.append("\ncheckArrayOfFeatures:" + checkArrayOfFeatures);

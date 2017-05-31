@@ -496,7 +496,7 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 									{
 										System.err.println("Error in Sanity Check RT407: User id" + userId
 												+ " Next activity Object after " + endTimeStamp + " is null");
-										System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+										System.err.println(PopUps.getTracedErrorMsg(
 												"nextValidActivityAfteractivityRecommPoint1 is null, if it was such, we should have not reached this point of execution"));
 										// because isNoValidActivityAfterItInTheDay already checked if there exists a
 										// next valid activity

@@ -1039,7 +1039,7 @@ public class RecommendationMasterDayWise2FasterMar2017 // implements Recommendat
 				.collect(Collectors.toList());
 		if (foundTimelines.size() != 1)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getCandidateTimesline(String timelineID): foundTimelines.size()=" + foundTimelines.size()
 							+ " while expected 1"));
 		}

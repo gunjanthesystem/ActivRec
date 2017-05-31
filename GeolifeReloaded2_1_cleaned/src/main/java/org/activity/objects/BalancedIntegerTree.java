@@ -108,7 +108,7 @@ public class BalancedIntegerTree
 		}
 		if (root.getLeafCount() != leaves.size())
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"root.getLeafCount()" + root.getLeafCount() + "!=leaves.size()" + leaves.size()));
 		}
 		return leaves;

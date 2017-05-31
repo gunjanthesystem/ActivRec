@@ -27,6 +27,7 @@ import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
+import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.PerformanceAnalytics;
@@ -200,8 +201,10 @@ public class ControllerWithoutServer
 			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
 
 			// // important curtain 1 start 10 Feb 2017
-			sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
+			// sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
 			// // important curtain 1 end 10 Feb 2017
+
+			TimelineStats.timelineStatsController(usersCleanedDayTimelines);
 			//////////// for Gowalla end
 
 			// WritingToFile.writeUsersDayTimelines(usersDayTimelinesOriginal, "usersDayTimelinesOriginal", true, true,
@@ -374,9 +377,9 @@ public class ControllerWithoutServer
 			// Constant.percentageInTraining);
 			// // end of curtain may 4 2017
 
-			RecommendationTestsMar2017GenSeq recommendationsTest = new RecommendationTestsMar2017GenSeq(sampledUsers,
-					Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
-					Constant.percentageInTraining, 3);
+			RecommendationTestsMar2017GenSeq recommendationsTest =
+					new RecommendationTestsMar2017GenSeq(sampledUsers, Constant.lookPastType, Constant.caseType,
+							Constant.typeOfThresholds, Constant.getUserIDs(), Constant.percentageInTraining, 3);
 
 			/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
 
@@ -420,7 +423,8 @@ public class ControllerWithoutServer
 			break;
 
 		case "geolife1":
-			pathToLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayAPR21obj";
+			pathToLatestSerialisedJSONArray =
+					"/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayAPR21obj";
 			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayMAY27obj";
 			// GeolifeJSONArrayFeb13.obj";
 			pathForLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArray"
@@ -436,7 +440,8 @@ public class ControllerWithoutServer
 			// UserTimelinesFeb13.lmap";
 
 			// After UMAP submission 19th April 2016
-			pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
+			pathToLatestSerialisedTimelines =
+					"/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
 
 			pathForLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelines"
 					+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + ".lmap";
@@ -445,17 +450,23 @@ public class ControllerWithoutServer
 			break;
 
 		case "dcu_data_2":
-			pathToLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArrayOct29.obj";
-			pathForLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArray"
-					+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + "obj";
+			pathToLatestSerialisedJSONArray =
+					"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArrayOct29.obj";
+			pathForLatestSerialisedJSONArray =
+					"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArray"
+							+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+							+ "obj";
 
-			pathToLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
+			pathToLatestSerialisedTimelines =
+					"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
 			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
 			// Works/WorkingSet7July/DCUUserTimelinesJUN15.lmap";
 			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
 			// Works/WorkingSet7July/DCUUserTimelinesMAY7.lmap"; DCUUserTimelinesOct29.lmap";
-			pathForLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
-					+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + ".lmap";
+			pathForLatestSerialisedTimelines =
+					"/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
+							+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+							+ ".lmap";
 
 			commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
 			break;
@@ -479,7 +490,8 @@ public class ControllerWithoutServer
 		// date_dimension_table.Date,time_dimension_table.Start_Time," +
 				" activity_fact_table.Activity_ID, activity_fact_table.Time_ID, activity_fact_table.Location_ID, activity_fact_table.Date_ID";
 
-		String orderByString = "activity_fact_table.User_ID, date_dimension_table.Date, time_dimension_table.Start_Time";
+		String orderByString =
+				"activity_fact_table.User_ID, date_dimension_table.Date, time_dimension_table.Start_Time";
 		// String whereQueryString ="where activity_dimension_table.Activity_Name!='Not Available' &&
 		// activity_dimension_table.Activity_Name!='Unknown'";
 
@@ -526,14 +538,16 @@ public class ControllerWithoutServer
 			System.out.println("gowallaDataFolder = " + gowallaDataFolder);
 			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
 			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/DatabaseCreation/";
-			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData = (LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>) Serializer
-					.kryoDeSerializeThis(gowallaDataFolder + "mapForAllCheckinData.kryo");
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData =
+					(LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>) Serializer
+							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllCheckinData.kryo");
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllCheckinData.kryo");
 			LinkedHashMap<String, UserGowalla> mapForAllUserData = (LinkedHashMap<String, UserGowalla>) Serializer
 					.kryoDeSerializeThis(gowallaDataFolder + "mapForAllUserData.kryo");
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllUserData.kryo");
-			LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData = (LinkedHashMap<Integer, LocationGowalla>) Serializer
-					.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
+			LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData =
+					(LinkedHashMap<Integer, LocationGowalla>) Serializer
+							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
 
 			System.out.println("before creating timelines while having deserialised objects in memory\n"
@@ -545,8 +559,8 @@ public class ControllerWithoutServer
 		}
 		else
 		{
-			ArrayList<ActivityObject> allActivityEvents = UtilityBelt
-					.createActivityObjectsFromJsonArray(jsonArrayD.getJSONArray());
+			ArrayList<ActivityObject> allActivityEvents =
+					UtilityBelt.createActivityObjectsFromJsonArray(jsonArrayD.getJSONArray());
 			// UtilityBelt.traverseActivityEvents(allActivityEvents); // Debugging Check: OK
 			usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromActivityObjects(allActivityEvents);
 		}
@@ -585,15 +599,15 @@ public class ControllerWithoutServer
 	{
 		if (databaseName.equals("gowalla1"))
 		{
-			usersDayTimelinesOriginal = reduceGowallaTimelines(Constant.getDatabaseName(), usersDayTimelinesOriginal,
-					true);
+			usersDayTimelinesOriginal =
+					reduceGowallaTimelines(Constant.getDatabaseName(), usersDayTimelinesOriginal, true);
 		}
 
 		///// clean timelines
 		System.out.println(
 				"\n-- Removes day timelines with no valid activity, with <=1 distinct valid activity, and the weekend day timelines.");
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = TimelineUtils
-				.cleanDayTimelines(usersDayTimelinesOriginal);
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines =
+				TimelineUtils.cleanDayTimelines(usersDayTimelinesOriginal);
 		if (writeToFile)
 		{// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines, "usersCleanedDayTimelines", false,
 			// false, false,"GowallaUserDayTimelinesCleaned.csv");// users
@@ -653,7 +667,7 @@ public class ControllerWithoutServer
 
 		if (databaseName.equals("gowalla1") == false)
 		{
-			String msg = PopUps.getCurrentStackTracedErrorMsg(
+			String msg = PopUps.getTracedErrorMsg(
 					"Error in reduceTimelines(): should not be called for databases other than gowalla1. Called for database: "
 							+ databaseName);
 			System.err.println(msg);

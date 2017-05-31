@@ -31,8 +31,33 @@ import gnu.trove.set.hash.THashSet;
 public class CSVUtils
 {
 
+	public static void temp()
+	{
+		String commonPath =
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_MAY26NGramAnalysis_AllUsers/";
+
+		List<String> userIDs = ReadingFromFile.oneColumnReaderString(
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_MAY26NGramAnalysis_AllUsers/gowalla1NumOfDaysInCleanedTimelines.csv",
+				",", 2, true);
+
+		for (int n = 1; n <= 20; n++)
+		{
+			for (String u : userIDs)
+			{
+				String fileNameToRead = commonPath + n + "gram" + u + "FreqDist.csv";
+				System.out.println(fileNameToRead);
+
+				ArrayList<String> vals =
+						(ArrayList<String>) ReadingFromFile.oneColumnReaderString(fileNameToRead, ",", 1, true);
+
+			}
+		}
+
+	}
+
 	public static void main(String[] args)
 	{
+		temp();
 		// testSideConcat();
 		// removeDuplicateRowsGowalla();
 		// $$removeDuplicateRowsFromRawGowalla();
@@ -46,7 +71,7 @@ public class CSVUtils
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SNoDupsbAllDistanceInM.csv",
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SAllDupssbAllDistanceInM.csv");
 
-		gowallaMain();// gowallaMain2();//
+		// gowallaMain();// gowallaMain2();//
 	}
 
 	public static void testSideConcat()

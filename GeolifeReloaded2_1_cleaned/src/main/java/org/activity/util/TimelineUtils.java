@@ -1044,7 +1044,7 @@ public class TimelineUtils
 		{
 			if (entry.getValue().containsAtLeastOneValidActivity() == false)
 			{ // if the day timelines contains no valid activity, then don't consider it for training or test
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error in splitTestTrainingTimelines: 45: userAllDatesTimeslines contains a day timeline with no valid activity, but we already tried to remove it"));
 				continue;
 			}
@@ -1091,7 +1091,7 @@ public class TimelineUtils
 
 		if (trainTestTimelines.size() > 2)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in splitTestTrainingTimelines: there are more than two (train+test) timelines in returned result, there are "
 							+ trainTestTimelines.size() + " timelines."));
 			System.exit(-43);
@@ -2136,7 +2136,7 @@ public class TimelineUtils
 
 			if (!dayTimeline.isShouldBelongToSingleDay())
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+				System.err.println(PopUps.getTracedErrorMsg(
 						"Error in extractDaywiseCandidateTimelines: dayTimeline.isShouldBelongToSingleDay()="
 								+ dayTimeline.isShouldBelongToSingleDay()));
 			}
@@ -2149,7 +2149,7 @@ public class TimelineUtils
 			{
 				if (dayOfTimeline.toString().equals(dateAtRecomm.toString()) == true)
 				{
-					System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+					System.err.println(PopUps.getTracedErrorMsg(
 							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly"));
 					continue;
 				}
@@ -2233,7 +2233,7 @@ public class TimelineUtils
 		LinkedHashMap<String, Timeline> timelines = new LinkedHashMap<>();
 		if (usersTimelines.size() == 0 || usersTimelines == null)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in dayTimelinesToTimelines(): userTimeline.size = " + usersTimelines.size()));
 		}
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersTimelines.entrySet())
@@ -2478,7 +2478,7 @@ public class TimelineUtils
 
 		if (result.size() != N)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getNextNValidAOsAfterActivityAtThisTimeSameDay result.size(): " + result.size() + "!= N:"
 							+ N));
 		}
@@ -2562,7 +2562,7 @@ public class TimelineUtils
 	{
 		if (timelineToPrune == null)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error inside UtulityBelt.expungeInvalids: timelineToPrune is null"));
 		}
 
@@ -2657,7 +2657,7 @@ public class TimelineUtils
 		if (currentTimeline.getActivityObjectsInTimeline().size() != (matchingUnitInCounts + 1))
 		// note: this is matching unit in counts reduced
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: the current timeline does not have #activity objs = adjusted matching unit"));
 		}
 
@@ -2751,7 +2751,7 @@ public class TimelineUtils
 		if (currentDayTimeline == null || !(currentDayTimeline.size() > 0))
 		{
 			System.err.println(PopUps
-					.getCurrentStackTracedErrorMsg("Error: currentDayTimeline.size() =" + currentDayTimeline.size()));
+					.getTracedErrorMsg("Error: currentDayTimeline.size() =" + currentDayTimeline.size()));
 		}
 		///////////////////////////////////////////////////////////////////
 
@@ -2778,7 +2778,7 @@ public class TimelineUtils
 		if (!(currentTimeline.size() > 0))
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("Error: currentTimeline.size() =" + currentTimeline.size()));
+					PopUps.getTracedErrorMsg("Error: currentTimeline.size() =" + currentTimeline.size()));
 		}
 
 		// $$System.out.println("------Exiting getCurrentTimelineFromLongerTimelineDaywise");
@@ -2795,7 +2795,7 @@ public class TimelineUtils
 	{
 		if (activityObjectsInDay.size() == 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in isSameDay activityObjectsInDay.size()= " + activityObjectsInDay.size()));
 		}
 		Timestamp firstTimestamp = activityObjectsInDay.get(0).getStartTimestamp();
@@ -2837,7 +2837,7 @@ public class TimelineUtils
 
 		if (allActivityObjects.size() == 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in 'dayTimelinesToATimeline' creating Timeline: Empty Activity Objects provided"));
 			System.exit(-1);
 		}
@@ -3032,7 +3032,7 @@ public class TimelineUtils
 			break;
 		}
 		default:
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error unknown distance:" + distanceUsed));
+			System.err.println(PopUps.getTracedErrorMsg("Error unknown distance:" + distanceUsed));
 			System.exit(-1);
 		}
 
@@ -3042,7 +3042,7 @@ public class TimelineUtils
 
 		if (distanceScoresForEachSubsequence.size() == 0)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error no subsequence to be considered for distance,distanceScoresForEachSubsequence.size() = "
 							+ distanceScoresForEachSubsequence.size()));
 		}

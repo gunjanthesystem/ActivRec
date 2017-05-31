@@ -83,7 +83,7 @@ public class PopUps
 		}
 	}
 
-	public static String getCurrentStackTracedErrorMsg(String errorMsg)
+	public static String getTracedErrorMsg(String errorMsg)
 	{
 		StringBuilder sb = new StringBuilder("Error:" + errorMsg + "\n" + "--------- current stack -------\n");
 		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));

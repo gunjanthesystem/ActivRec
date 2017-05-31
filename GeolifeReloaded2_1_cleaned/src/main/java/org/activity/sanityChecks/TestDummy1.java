@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
+import org.activity.stats.StatsUtils;
 import org.activity.util.RegexUtils;
 
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.IntArraySerializer;
@@ -200,11 +202,25 @@ public class TestDummy1
 
 	public static void main(String args[])
 	{
-		String[] arr = new String[] { "Gunjan", "Manali" };
+		// String[] arr = new String[] { "Gunjan", "Manali" };
+		// ArrayList<String> list = (ArrayList<String>) Arrays.stream(arr).collect(Collectors.toList());
+		// System.out.println("list = " + list.toString());
 
-		ArrayList<String> list = (ArrayList<String>) Arrays.stream(arr).collect(Collectors.toList());
+		double arr1[] = { 1, 2, 3, 4, 5, 17 };
 
-		System.out.println("list = " + list.toString());
+		ArrayList<Double> list1 = (ArrayList<Double>) DoubleStream.of(arr1).boxed().collect(Collectors.toList());
+
+		System.out.println("mean = " + StatsUtils.meanOfArrayList(list1, 4));
+		System.out.println("median = " + StatsUtils.medianOfArrayList(list1, 4));
+
+		double arr2[] = { 1, 0, 1, 2, 3, 4, 5, 17 };
+		for (int j = 0; j < 3; j++)
+		{
+			System.out.println("j = " + j);
+			System.out.println(DoubleStream.of(arr2).boxed().limit(j + 1).peek(v -> System.out.print(v + ","))
+					.allMatch(v -> v == 1));
+		}
+
 	}
 	// public static void checkMemory
 }

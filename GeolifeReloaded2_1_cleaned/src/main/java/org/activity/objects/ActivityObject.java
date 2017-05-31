@@ -864,7 +864,7 @@ public class ActivityObject implements Serializable
 		if (dimensionToFetch == null)
 		{
 			System.err.println(
-					PopUps.getCurrentStackTracedErrorMsg("Error in getDimensionAttributeValue() for dimension name = "
+					PopUps.getTracedErrorMsg("Error in getDimensionAttributeValue() for dimension name = "
 							+ dimensionName + ", dimension attribute name = " + dimensionAttributeName
 							+ "\n No such dimension found for this activity event."));
 			System.exit(2); // Check later if it is wise or unwise to exit in such case

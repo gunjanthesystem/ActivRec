@@ -178,7 +178,7 @@ public class WekaUtilityBelt
 		else
 		{
 			clusterLabel = "NoCluster";
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getClusterLabelClustering2 " + MUVal + " not falling inside any cluster"));
 		}
 		return clusterLabel;

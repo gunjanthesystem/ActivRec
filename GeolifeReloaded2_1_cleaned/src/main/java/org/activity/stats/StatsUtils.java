@@ -783,8 +783,9 @@ public class StatsUtils
 		{
 			vals[i] = arr.get(i); // java 1.5+ style (outboxing)
 		}
-
+		// System.out.println("mean called");
 		return round(StatUtils.mean(vals), roundOffToPlaces);
+
 	}
 
 	public static double meanOfArrayListInt(ArrayList<Integer> arr, int roundOffToPlaces)
@@ -838,6 +839,7 @@ public class StatsUtils
 			vals[i] = arr.get(i); // java 1.5+ style (outboxing)
 		}
 
+		// System.out.println("median called");
 		return round(StatUtils.percentile(vals, 50), roundOffToPlaces);
 	}
 
@@ -1033,9 +1035,9 @@ public class StatsUtils
 		int[] columnIndicesToRead = IntStream.range(0, numOfColumns).toArray();
 		ArrayList<ArrayList<Double>> columnWiseVals =
 				ReadingFromFile.allColumnsReaderDouble(fileToRead, ",", columnIndicesToRead, false);
-	
+
 		ArrayList<Double> columnWiseSummary = new ArrayList<>();
-	
+
 		switch (stat)
 		{
 		case Mean:
@@ -1051,11 +1053,11 @@ public class StatsUtils
 			}
 			break;
 		default:
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Unknown stat: " + stat.toString() + " reading file: " + fileToRead));
 			System.exit(-1);
 		}
-	
+
 		return columnWiseSummary;
 	}
 }

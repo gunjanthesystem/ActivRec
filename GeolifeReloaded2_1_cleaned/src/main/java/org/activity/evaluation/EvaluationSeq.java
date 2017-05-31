@@ -38,14 +38,18 @@ import org.activity.util.UtilityBelt;
  */
 public class EvaluationSeq
 {
-	public static String commonPath;// =Constant.commonPath;
-
+	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
-	public static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	String groupsOf100UsersLabels[] = { "1", "101" };// , "201", "301", "401", "501", "601", "701", "801", "901" };
+	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
+	String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 
-	static ArrayList<ArrayList<String>> listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
+	// for each individual seq index
+	ArrayList<ArrayList<String>> listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
 			listOfPerAgreementsFilesL1;
+
+	// for top k indices in a sequence
+	ArrayList<ArrayList<String>> listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
+			listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1;
 
 	/**
 	 * 
@@ -57,20 +61,7 @@ public class EvaluationSeq
 	{
 		// commonPath = "./dataWritten/";
 
-		// Initialise list of list of filenames
-		// we need to concated results for different user groups, 1-100,102-200, and so on
-		listOfNumAgreementsFiles = new ArrayList<>();
-		listOfPerAgreementsFiles = new ArrayList<>();
-		listOfNumAgreementsFilesL1 = new ArrayList<>();
-		listOfPerAgreementsFilesL1 = new ArrayList<>();
-		// we concatenate results for each mu over all users (groups)
-		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
-		{
-			listOfNumAgreementsFiles.add(muIndex, new ArrayList<String>());
-			listOfPerAgreementsFiles.add(muIndex, new ArrayList<String>());
-			listOfNumAgreementsFilesL1.add(muIndex, new ArrayList<String>());
-			listOfPerAgreementsFilesL1.add(muIndex, new ArrayList<String>());
-		}
+		intialiseListOfFilenames(matchingUnitAsPastCount);
 
 		try
 		{
@@ -79,7 +70,7 @@ public class EvaluationSeq
 				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
-						"./dataToRead/April7/mapCatIDsHierDist.kryo",
+						DomainConstants.pathToSerialisedCatIDsHierDist,
 						DomainConstants.pathToSerialisedCatIDNameDictionary);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
@@ -109,6 +100,15 @@ public class EvaluationSeq
 								.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectAgreements.csv");
 						listOfPerAgreementsFilesL1.get(muIndex)
 								.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectAgreements.csv");
+
+						listOfNumTopKAgreementsFiles.get(muIndex)
+								.add(commonPath + algoLabel + timeCategory + "NumDirectTopKAgreements.csv");
+						listOfPerTopKAgreementsFiles.get(muIndex)
+								.add(commonPath + algoLabel + timeCategory + "PercentageDirectTopKAgreements.csv");
+						listOfNumTopKAgreementsFilesL1.get(muIndex)
+								.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectTopKAgreements.csv");
+						listOfPerTopKAgreementsFilesL1.get(muIndex).add(
+								commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectTopKAgreements.csv");
 					}
 					consoleLogStream.close();
 				}
@@ -120,16 +120,59 @@ public class EvaluationSeq
 					concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount, listOfNumAgreementsFiles,
 							listOfPerAgreementsFiles, listOfNumAgreementsFilesL1, listOfPerAgreementsFilesL1);
 
+			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
+					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
+					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1);
+
 			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
 					"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
+			String[] fileNamePhrasesTopK = { "AllNumDirectTopKAgreements_", "AllPerDirectTopKAgreements_",
+					"AllNumDirectTopKAgreementsL1_", "AllPerDirectTopKAgreementsL1_" };
+
 			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
 
-			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats);
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
+					"SummaryLog");
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
+					summaryStats, "SummaryTopKLog");
 
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param matchingUnitAsPastCount
+	 */
+	private void intialiseListOfFilenames(double[] matchingUnitAsPastCount)
+	{
+		// Initialise list of list of filenames
+		// we need to concated results for different user groups, 1-100,102-200, and so on
+		listOfNumAgreementsFiles = new ArrayList<>();
+		listOfPerAgreementsFiles = new ArrayList<>();
+		listOfNumAgreementsFilesL1 = new ArrayList<>();
+		listOfPerAgreementsFilesL1 = new ArrayList<>();
+
+		listOfNumTopKAgreementsFiles = new ArrayList<>();
+		listOfPerTopKAgreementsFiles = new ArrayList<>();
+		listOfNumTopKAgreementsFilesL1 = new ArrayList<>();
+		listOfPerTopKAgreementsFilesL1 = new ArrayList<>();
+
+		// we concatenate results for each mu over all users (groups)
+		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+		{
+			listOfNumAgreementsFiles.add(muIndex, new ArrayList<String>());
+			listOfPerAgreementsFiles.add(muIndex, new ArrayList<String>());
+			listOfNumAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+			listOfPerAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+
+			listOfNumTopKAgreementsFiles.add(muIndex, new ArrayList<String>());
+			listOfPerTopKAgreementsFiles.add(muIndex, new ArrayList<String>());
+			listOfNumTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+			listOfPerTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
 		}
 	}
 
@@ -163,12 +206,20 @@ public class EvaluationSeq
 		// "", ",");
 	}
 
+	/**
+	 * 
+	 * @param seqLength
+	 * @param pathToWrite
+	 * @param matchingUnitAsPastCount
+	 * @param fileNamePhrases
+	 * @param summaryStats
+	 */
 	private static void summariseResults(int seqLength, String pathToWrite, double[] matchingUnitAsPastCount,
-			String[] fileNamePhrases, SummaryStat[] summaryStats)
+			String[] fileNamePhrases, SummaryStat[] summaryStats, String consoleLogFileName)
 	{
 		// String[] fileNamePhrases = { "", "" };
 		// SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "Summarise.txt");
+		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + consoleLogFileName);
 
 		// ArrayList<String> rowNames =
 		ArrayList<String> rowNames = (ArrayList<String>) DoubleStream.of(matchingUnitAsPastCount).boxed()
@@ -183,11 +234,11 @@ public class EvaluationSeq
 
 		for (String fileNamePhraseToRead : fileNamePhrases)
 		{
-
 			for (SummaryStat stat : summaryStats)
 			{
 				ArrayList<ArrayList<Double>> summaryPerMUPerSeqIndex = getSummaryPerMUPerSeqIndex(seqLength,
-						pathToWrite, matchingUnitAsPastCount, fileNamePhraseToRead, SummaryStat.Mean);
+						pathToWrite, matchingUnitAsPastCount, fileNamePhraseToRead, stat);
+
 				WritingToFile.writeArrayListOfArrayList(summaryPerMUPerSeqIndex,
 						pathToWrite + stat + fileNamePhraseToRead + ".csv", ",", colNames, rowNames);
 			}
@@ -330,7 +381,7 @@ public class EvaluationSeq
 			ArrayList<ArrayList<String>> listOfNumAgreementsFilesL1,
 			ArrayList<ArrayList<String>> listOfPerAgreementsFilesL1)
 	{
-		ArrayList<String> listOfWrittenFiles = new ArrayList();
+		ArrayList<String> listOfWrittenFiles = new ArrayList<String>();
 		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVConcatLog.txt");
 
 		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
@@ -355,6 +406,56 @@ public class EvaluationSeq
 			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFilesL1.get(muIndex), true,
 					pathToWrite + "AllPerDirectAgreementsL1_" + mu + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreementsL1" + mu + ".csv");
+		}
+		consoleLogStream.close();
+
+		return listOfWrittenFiles;
+
+	}
+
+	/**
+	 * For each mu, concatenate results top k results' files for each groups of users, so that we get single files
+	 * containing results for all users.
+	 * 
+	 * @param pathToWriteLog
+	 * @param matchingUnitAsPastCount
+	 * @param listOfNumAgreementsFiles
+	 * @param listOfPerAgreementsFiles
+	 * @param listOfNumAgreementsFilesL1
+	 * @param listOfPerAgreementsFilesL1
+	 * @return
+	 */
+	private static ArrayList<String> concatenateTopKFiles(String pathToWrite, double matchingUnitAsPastCount[],
+			ArrayList<ArrayList<String>> listOfNumTopKAgreementsFiles,
+			ArrayList<ArrayList<String>> listOfPerTopKAgreementsFiles,
+			ArrayList<ArrayList<String>> listOfNumTopKAgreementsFilesL1,
+			ArrayList<ArrayList<String>> listOfPerTopKAgreementsFilesL1)
+	{
+		ArrayList<String> listOfWrittenFiles = new ArrayList<String>();
+		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVTopKConcatLog.txt");
+
+		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+		{
+			int mu = (int) matchingUnitAsPastCount[muIndex];
+			// PopUps.showMessage("Will now concatenate:" + listOfNumAgreementsFiles.get(muIndex).size() + "files");
+			// PopUps.showMessage("listOfNumAgreementsFilesget(muIndex) = " +
+			// listOfNumAgreementsFiles.get(muIndex));
+
+			CSVUtils.concatenateCSVFiles(listOfNumTopKAgreementsFiles.get(muIndex), true,
+					pathToWrite + "AllNumDirectTopKAgreements_" + mu + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllNumDirectTopKAgreements_" + mu + ".csv");
+
+			CSVUtils.concatenateCSVFiles(listOfPerTopKAgreementsFiles.get(muIndex), true,
+					pathToWrite + "AllPerDirectTopKAgreements_" + mu + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreements_" + mu + ".csv");
+
+			CSVUtils.concatenateCSVFiles(listOfNumTopKAgreementsFilesL1.get(muIndex), true,
+					pathToWrite + "AllNumDirectTopKAgreementsL1_" + mu + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllNumDirectTopKAgreementsL1_" + mu + ".csv");
+
+			CSVUtils.concatenateCSVFiles(listOfPerTopKAgreementsFilesL1.get(muIndex), true,
+					pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + ".csv");
 		}
 		consoleLogStream.close();
 
@@ -529,7 +630,7 @@ public class EvaluationSeq
 			if (ComparatorUtils.areAllEqual(countOfLinesMeta, countOfLinesTopK, countOfLinesActual, arrayMeta.size(),
 					arrayTopK.size(), arrayActual.size()) == false)
 			{
-				System.err.println(PopUps.getCurrentStackTracedErrorMsg("Error line numbers mismatch: countOfLinesMeta="
+				System.err.println(PopUps.getTracedErrorMsg("Error line numbers mismatch: countOfLinesMeta="
 						+ countOfLinesMeta + ",countOfLinesTopK=" + countOfLinesTopK + " countOfLinesActual="
 						+ countOfLinesActual + ", arrayMeta.size()=" + arrayMeta.size() + ", arrayTopK.size()="
 						+ arrayTopK.size() + ", arrayActual.size()=" + arrayActual.size()));
@@ -575,19 +676,23 @@ public class EvaluationSeq
 
 		for (String timeCategory : timeCategories)
 		{
+			// Direct category level: level 2
 			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements = computeDirectAgreements(algoLabel,
 					timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, -1);
 
 			writeDirectAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite);
 			writeNumAndPercentageDirectAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite,
 					seqLength);
+			writeDirectTopKAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite, seqLength);
 
+			// category level: level 1
 			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreementsL1 =
 					computeDirectAgreements(algoLabel, timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, 1);
 
 			writeDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite);
 			writeNumAndPercentageDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
 					seqLength);
+			writeDirectTopKAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite, seqLength);
 
 		}
 	}
@@ -654,11 +759,12 @@ public class EvaluationSeq
 	}
 
 	/**
+	 * Agreements at each index of the sequence individually
 	 * 
 	 * @param fileNamePhrase
 	 * @param timeCategory
 	 * @param arrayDirectAgreements
-	 * @param pathToWrite
+	 * @param pathToWritex
 	 */
 	private static void writeDirectAgreements(String fileNamePhrase, String timeCategory,
 			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite)
@@ -700,6 +806,70 @@ public class EvaluationSeq
 		{
 			e.printStackTrace();
 			PopUps.showException(e, "org.activity.evaluation.EvaluationSeq.writeDirectAgreements()");
+		}
+	}
+
+	/**
+	 * Agreementa at Top 1, top 2....top (seq length)
+	 * 
+	 * @param fileNamePhrase
+	 * @param timeCategory
+	 * @param arrayDirectAgreements
+	 * @param pathToWrite
+	 */
+	private static void writeDirectTopKAgreements(String fileNamePhrase, String timeCategory,
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite, int seqLength)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			StringBuilder sbPercentage = new StringBuilder();
+
+			for (int i = 0; i < arrayDirectAgreements.size(); i++)
+			{
+				ArrayList<ArrayList<Integer>> arrayForAUser = arrayDirectAgreements.get(i);
+
+				for (int topKSeqIndex = 0; topKSeqIndex < seqLength; topKSeqIndex++)
+				{
+					int sumAgreementsForThisTopK = 0;
+
+					for (ArrayList<Integer> arrayForAnRt : arrayForAUser)// int j = 0; j < arrayForAUser.size(); j++)
+					{
+						// check if arrayForAnRt(0)...to...arrayForAnRt(topKSeqIndex) are 1 (matched/agreement).
+						boolean areAllOnes = arrayForAnRt.stream().limit(topKSeqIndex + 1).allMatch(v -> v == 1);
+						if (areAllOnes)
+						{
+							sumAgreementsForThisTopK += 1;
+						}
+					}
+
+					double percentageAgreement =
+							StatsUtils.round((sumAgreementsForThisTopK * 100.0) / arrayForAUser.size(), 4);
+					sbPercentage.append(percentageAgreement);
+					sb.append(sumAgreementsForThisTopK);
+
+					if (topKSeqIndex == seqLength - 1)
+					{
+						sb.append("\n");
+						sbPercentage.append("\n");
+					}
+					else
+					{
+						sb.append(",");
+						sbPercentage.append(",");
+					}
+				}
+			}
+
+			WritingToFile.writeToNewFile(sb.toString(),
+					pathToWrite + fileNamePhrase + timeCategory + "NumDirectTopKAgreements.csv");
+			WritingToFile.writeToNewFile(sbPercentage.toString(),
+					pathToWrite + fileNamePhrase + timeCategory + "PercentageDirectTopKAgreements.csv");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			PopUps.showException(e, "org.activity.evaluation.EvaluationSeq.writeDirectTopKAgreements()");
 		}
 	}
 
@@ -747,7 +917,7 @@ public class EvaluationSeq
 
 						if (splittedActualSequence.length != splittedRecommSequence.length)
 						{
-							System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+							System.err.println(PopUps.getTracedErrorMsg(
 									"splittedActualSequence.length != splittedRecommSequence.length"));
 						}
 						ArrayList<Integer> directAgreement = new ArrayList<>();
@@ -756,10 +926,10 @@ public class EvaluationSeq
 						for (int y = 0; y < splittedActualSequence.length; y++)
 						{
 							// removing score
-							String splittedRecomm[] = RegexUtils.patternColon.split(splittedRecommSequence[y]);
-							System.out.print(">" + splittedRecomm[0]);
+							String splittedRecommY[] = RegexUtils.patternColon.split(splittedRecommSequence[y]);
+							System.out.print(">" + splittedRecommY[0]);
 
-							if (isAgree(splittedActualSequence[y], splittedRecomm[0], levelAtWhichToMatch))// splittedActualSequence[y].equals(splittedRecomm[0]))
+							if (isAgree(splittedActualSequence[y], splittedRecommY[0], levelAtWhichToMatch))// splittedActualSequence[y].equals(splittedRecomm[0]))
 							{
 								System.out.print("Eureka!");
 								directAgreement.add(1);
@@ -836,7 +1006,7 @@ public class EvaluationSeq
 			else
 			{
 				System.err.println(
-						PopUps.getCurrentStackTracedErrorMsg("Unknown levelAtWhichToMatch = " + levelAtWhichToMatch));
+						PopUps.getTracedErrorMsg("Unknown levelAtWhichToMatch = " + levelAtWhichToMatch));
 			}
 		}
 		catch (Exception e)

@@ -248,7 +248,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 				.collect(Collectors.toList());
 		if (foundTimelines.size() != 1)
 		{
-			System.err.println(PopUps.getCurrentStackTracedErrorMsg(
+			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in getCandidateTimesline(String timelineID): foundTimelines.size()=" + foundTimelines.size()
 							+ " while expected 1"));
 		}
