@@ -811,7 +811,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	/**
 	 * 
 	 * @param testTimelinesOrig
-	 * @param lookPastType2
+	 * @param lookPastType
 	 * @param dateAtRecomm
 	 * @param timeAtRecomm
 	 * @param userIDAtRecomm
@@ -821,13 +821,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @since May 2, 2017
 	 */
 	private static Pair<TimelineWithNext, Double> extractCurrentTimelineSeq(
-			LinkedHashMap<Date, Timeline> testTimelinesOrig, LookPastType lookPastType2, Date dateAtRecomm,
+			LinkedHashMap<Date, Timeline> testTimelinesOrig, LookPastType lookPastType, Date dateAtRecomm,
 			Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsOrHours,
 			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
 	{
 		// System.out.println("called extractCurrentTimelineSeq");
 		Pair<TimelineWithNext, Double> extractedCurrentTimelineResult = extractCurrentTimeline(testTimelinesOrig,
-				lookPastType2, dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+				lookPastType, dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
 		TimelineWithNext extractedCurrentTimeline = extractedCurrentTimelineResult.getFirst();
 
 		// //////////////////
@@ -840,11 +840,11 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		actObjsForCurrTimeline.addAll(actObjsToAddToCurrentTimeline);
 
 		// NOTE: WE ARE NOT SETTING NEXT ACTIVITY OBJECT OF CURRENT TIMELINE HERE.
-		if (lookPastType2.equals(Enums.LookPastType.Daywise) || lookPastType2.equals(Enums.LookPastType.ClosestTime))
+		if (lookPastType.equals(Enums.LookPastType.Daywise) || lookPastType.equals(Enums.LookPastType.ClosestTime))
 		{
 			extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, true, true);
 		}
-		else if (lookPastType2.equals(Enums.LookPastType.NCount) || lookPastType2.equals(Enums.LookPastType.NHours))
+		else if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		{
 			extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, false, true);
 		}

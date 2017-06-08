@@ -236,8 +236,8 @@ public class TimelineUtils
 	 * @param allActivityEvents
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 */
-	public static <T> LinkedHashMap<String, TreeMap<LocalDate, ArrayList<T>>> convertTimewiseMapToDatewiseMap(
-			LinkedHashMap<String, TreeMap<Timestamp, T>> timewiseMap, TimeZone dft)
+	public static <T> LinkedHashMap<String, TreeMap<LocalDate, ArrayList<T>>>
+			convertTimewiseMapToDatewiseMap(LinkedHashMap<String, TreeMap<Timestamp, T>> timewiseMap, TimeZone dft)
 	{
 		LinkedHashMap<String, TreeMap<LocalDate, ArrayList<T>>> daywiseMap = new LinkedHashMap<>();
 		System.out.println("starting convertTimewiseMapToDatewiseMap");
@@ -281,8 +281,8 @@ public class TimelineUtils
 	 * @param allActivityEvents
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 */
-	public static <T> LinkedHashMap<String, TreeMap<Date, ArrayList<T>>> convertTimewiseMapToDatewiseMap(
-			LinkedHashMap<String, TreeMap<Timestamp, T>> timewiseMap)
+	public static <T> LinkedHashMap<String, TreeMap<Date, ArrayList<T>>>
+			convertTimewiseMapToDatewiseMap(LinkedHashMap<String, TreeMap<Timestamp, T>> timewiseMap)
 	{
 		LinkedHashMap<String, TreeMap<Date, ArrayList<T>>> daywiseMap = new LinkedHashMap<>();
 		System.out.println("starting convertTimewiseMapToDatewiseMap");
@@ -329,8 +329,8 @@ public class TimelineUtils
 	 * @param tz
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 */
-	public static <T> LinkedHashMap<String, TreeMap<Date, ArrayList<T>>> convertTimewiseMapToDatewiseMap2(
-			LinkedHashMap<String, TreeMap<Timestamp, T>> timewiseMap, TimeZone tz)
+	public static <T> LinkedHashMap<String, TreeMap<Date, ArrayList<T>>>
+			convertTimewiseMapToDatewiseMap2(LinkedHashMap<String, TreeMap<Timestamp, T>> timewiseMap, TimeZone tz)
 	{
 		LinkedHashMap<String, TreeMap<Date, ArrayList<T>>> daywiseMap = new LinkedHashMap<>();
 		System.out.println("starting convertTimewiseMapToDatewiseMap");
@@ -382,15 +382,15 @@ public class TimelineUtils
 		long ct1 = System.currentTimeMillis();
 
 		System.out.println("starting createUserTimelinesFromCheckinEntriesGowalla");
-		LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise = convertTimewiseMapToDatewiseMap2(
-				checkinEntries, Constant.getTimeZone());
+		LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise =
+				convertTimewiseMapToDatewiseMap2(checkinEntries, Constant.getTimeZone());
 
-		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = convertCheckinEntriesToActivityObjectsGowalla(
-				checkinEntriesDatewise, locationObjects);
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise =
+				convertCheckinEntriesToActivityObjectsGowalla(checkinEntriesDatewise, locationObjects);
 
 		int optimalSizeWrtUsers = (int) (Math.ceil(activityObjectsDatewise.size() / 0.75));
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines = new LinkedHashMap<>(
-				optimalSizeWrtUsers);
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines =
+				new LinkedHashMap<>(optimalSizeWrtUsers);
 
 		// StringBuilder sbNumOfActsPerDayPerUser;
 		// WritingToFile.appendLineToFileAbsolute("User,Date,NumOfActsInDay\n", "NumOfActsPerUserPerDay.csv");
@@ -398,8 +398,8 @@ public class TimelineUtils
 		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject>>> userEntry : activityObjectsDatewise.entrySet())
 		{
 			String userID = userEntry.getKey();
-			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>(
-					(int) (Math.ceil(userEntry.getValue().size() / 0.75)));
+			LinkedHashMap<Date, Timeline> dayTimelines =
+					new LinkedHashMap<>((int) (Math.ceil(userEntry.getValue().size() / 0.75)));
 
 			// sbNumOfActsPerDayPerUser = new StringBuilder();// "User,Day,NumOfActs\n");
 			for (Entry<Date, ArrayList<ActivityObject>> dateEntry : userEntry.getValue().entrySet())
@@ -433,8 +433,8 @@ public class TimelineUtils
 	 * @deprecated INCOMPLETE
 	 * @param usersDayTimelines
 	 */
-	public static void countConsecutiveSimilarActivities(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	public static void
+			countConsecutiveSimilarActivities(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		// <User__Date, time difference between then in secs>
 		LinkedHashMap<String, Double> mapForConsecutive2s = new LinkedHashMap<>();
@@ -482,14 +482,14 @@ public class TimelineUtils
 	 * @param absPathToCatIDDictionary
 	 * @return Pair(catIDLengthConsecutives, catIDNameDictionary)
 	 */
-	public static Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> getEmptyMapOfCatIDs(
-			String absPathToCatIDDictionary)
+	public static Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>>
+			getEmptyMapOfCatIDs(String absPathToCatIDDictionary)
 	{
 		System.out.println("Entering org.activity.util.TimelineUtils.getEmptyMapOfCatIDs(String)");
 		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecutives = new LinkedHashMap<>();
 
-		TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
-				.kryoDeSerializeThis(absPathToCatIDDictionary);
+		TreeMap<Integer, String> catIDNameDictionary =
+				(TreeMap<Integer, String>) Serializer.kryoDeSerializeThis(absPathToCatIDDictionary);
 		System.out.println("Num of catids in dictionary = " + catIDNameDictionary.size() + "\n");
 
 		for (Integer catID : catIDNameDictionary.keySet())
@@ -515,8 +515,8 @@ public class TimelineUtils
 			String absPathToCatIDDictionary)
 	{
 		// LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
-		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 = getEmptyMapOfCatIDs(
-				absPathToCatIDDictionary);
+		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 =
+				getEmptyMapOfCatIDs(absPathToCatIDDictionary);
 		// <catid, [1,1,2,4,1,1,1,6]>
 		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecutives = r1.getFirst();
 		// <catid,catname>
@@ -717,12 +717,13 @@ public class TimelineUtils
 	 * @param locationObjects
 	 * @return
 	 */
-	private static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> convertCheckinEntriesToActivityObjectsGowalla(
-			LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise,
-			LinkedHashMap<Integer, LocationGowalla> locationObjects)
+	private static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>>
+			convertCheckinEntriesToActivityObjectsGowalla(
+					LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise,
+					LinkedHashMap<Integer, LocationGowalla> locationObjects)
 	{
-		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
-				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise =
+				new LinkedHashMap<>((int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
 
 		System.out.println("starting convertCheckinEntriesToActivityObjectsGowalla");
 		System.out.println("Num of locationObjects received = " + locationObjects.size() + " with keys as follows");
@@ -748,8 +749,8 @@ public class TimelineUtils
 			for (Entry<Date, ArrayList<CheckinEntry>> dateEntry : userEntry.getValue().entrySet()) // over dates
 			{
 				// Date date = dateEntry.getKey();
-				ArrayList<ActivityObject> activityObjectsForThisUserThisDate = new ArrayList<>(
-						dateEntry.getValue().size());
+				ArrayList<ActivityObject> activityObjectsForThisUserThisDate =
+						new ArrayList<>(dateEntry.getValue().size());
 
 				// System.out.println(
 				// "--* user:" + userID + " date:" + date.toString() + " has " + dateEntry.getValue().size() + "
@@ -871,8 +872,8 @@ public class TimelineUtils
 	 * @param allActivityEvents
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createUserTimelinesFromActivityObjects(
-			ArrayList<ActivityObject> allActivityEvents)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>>
+			createUserTimelinesFromActivityObjects(ArrayList<ActivityObject> allActivityEvents)
 	{
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userTimelines = new LinkedHashMap<>();
 		// userid, usertimeline
@@ -909,12 +910,14 @@ public class TimelineUtils
 			String userID = perUserActivityEventsEntry.getKey();
 			ArrayList<ActivityObject> activityEventsForThisUser = perUserActivityEventsEntry.getValue();
 
-			LinkedHashMap<Date, ArrayList<ActivityObject>> perDateActivityEventsForThisUser = new LinkedHashMap<Date, ArrayList<ActivityObject>>();
+			LinkedHashMap<Date, ArrayList<ActivityObject>> perDateActivityEventsForThisUser =
+					new LinkedHashMap<Date, ArrayList<ActivityObject>>();
 
 			for (int i = 0; i < activityEventsForThisUser.size(); i++) // iterare over activity events for this user
 			{
-				Date date = (Date) activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension",
-						"Date"); // start date
+				Date date =
+						(Date) activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension", "Date"); // start
+																														// date
 				if (!(perDateActivityEventsForThisUser.containsKey(date)))
 				{
 					perDateActivityEventsForThisUser.put(date, new ArrayList<ActivityObject>());
@@ -946,8 +949,8 @@ public class TimelineUtils
 	 * @param usersTimelines
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> cleanDayTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>>
+			cleanDayTimelines(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
 	{
 		System.out.println("Inside cleanDayTimelines(): total num of users before cleaning = " + usersTimelines.size());
 		long ct = System.currentTimeMillis();
@@ -956,9 +959,9 @@ public class TimelineUtils
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
 
-			LinkedHashMap<Date, Timeline> cleanedDayTimelines = TimelineUtils.cleanUserDayTimelines(
-					usersTimelinesEntry.getValue(), Constant.getCommonPath() + "LogCleanedDayTimelines_",
-					usersTimelinesEntry.getKey());
+			LinkedHashMap<Date, Timeline> cleanedDayTimelines =
+					TimelineUtils.cleanUserDayTimelines(usersTimelinesEntry.getValue(),
+							Constant.getCommonPath() + "LogCleanedDayTimelines_", usersTimelinesEntry.getKey());
 
 			if (VerbosityConstants.verboseTimelineCleaning)
 			{
@@ -1248,8 +1251,8 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Timeline> removeWeekendDayTimelines(
-			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
+	public static LinkedHashMap<Date, Timeline>
+			removeWeekendDayTimelines(LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<>(); // changed from ArrayList to LinkedHashSet on 17
@@ -1328,8 +1331,8 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Timeline> removeWeekdaysDayTimelines(
-			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
+	public static LinkedHashMap<Date, Timeline>
+			removeWeekdaysDayTimelines(LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
@@ -1362,8 +1365,8 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Timeline> removeDayTimelinesWithNoValidAct(
-			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
+	public static LinkedHashMap<Date, Timeline>
+			removeDayTimelinesWithNoValidAct(LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
@@ -1441,8 +1444,8 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return HashMap of day timelines <Date, UserDayTimeline>
 	 */
-	public static LinkedHashMap<Date, Timeline> removeDayTimelinesWithOneOrLessDistinctValidAct(
-			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
+	public static LinkedHashMap<Date, Timeline>
+			removeDayTimelinesWithOneOrLessDistinctValidAct(LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
 		// boolean verbose = VerbosityConstants.verboseTimelineCleaning;
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
@@ -1524,8 +1527,8 @@ public class TimelineUtils
 	 * @param userAllDatesTimeslines
 	 * @return HashMap of day timelines <Date, UserDayTimeline>
 	 */
-	public static LinkedHashMap<Date, Timeline> removeDayTimelinesLessDistinctValidAct(
-			LinkedHashMap<Date, Timeline> userAllDatesTimeslines, int lowerLimit)
+	public static LinkedHashMap<Date, Timeline>
+			removeDayTimelinesLessDistinctValidAct(LinkedHashMap<Date, Timeline> userAllDatesTimeslines, int lowerLimit)
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
@@ -1575,8 +1578,8 @@ public class TimelineUtils
 	 * @param orderKeys
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearrangeDayTimelinesByGivenOrder(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> map, int[] orderKeys)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>>
+			rearrangeDayTimelinesByGivenOrder(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> map, int[] orderKeys)
 	{
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearranged = new LinkedHashMap<>();
 
@@ -1616,8 +1619,8 @@ public class TimelineUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<String, Timeline> rearrangeTimelinesOrderForDataset(
-			LinkedHashMap<String, Timeline> userMaps)
+	public static LinkedHashMap<String, Timeline>
+			rearrangeTimelinesOrderForDataset(LinkedHashMap<String, Timeline> userMaps)
 	{
 		LinkedHashMap<String, Timeline> rearranged = new LinkedHashMap<String, Timeline>();
 		rearranged = rearrangeTimelinesByGivenOrder(userMaps, Constant.getUserIDs());
@@ -1633,8 +1636,8 @@ public class TimelineUtils
 	 */
 	// LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userTimelines = new LinkedHashMap<String,
 	// LinkedHashMap<Date, UserDayTimeline>>();
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearrangeDayTimelinesOrderForDataset(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userMaps)
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>>
+			rearrangeDayTimelinesOrderForDataset(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userMaps)
 	{
 		System.out.println("rearrangeDayTimelinesOrderForDataset received: " + userMaps.size() + " users");
 		long ct1 = System.currentTimeMillis();
@@ -1655,8 +1658,8 @@ public class TimelineUtils
 	 * @param usersDayTimelinesOriginal
 	 * @return
 	 */
-	public static Pair<Boolean, String> hasDuplicateDates(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal)
+	public static Pair<Boolean, String>
+			hasDuplicateDates(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal)
 	{
 		boolean hasDuplicateDates = false;
 		String usersWithDuplicateDates = new String();
@@ -1814,7 +1817,8 @@ public class TimelineUtils
 	public static LinkedHashMap<Date, Triple<Integer, String, Double>> removeAboveThresholdDISD(
 			LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScoresSorted, double threshold)
 	{
-		LinkedHashMap<Date, Triple<Integer, String, Double>> pruned = new LinkedHashMap<Date, Triple<Integer, String, Double>>();
+		LinkedHashMap<Date, Triple<Integer, String, Double>> pruned =
+				new LinkedHashMap<Date, Triple<Integer, String, Double>>();
 
 		System.out.println("Inside removeAboveThreshold");
 		for (Map.Entry<Date, Triple<Integer, String, Double>> entry : distanceScoresSorted.entrySet()) // Iterate over
@@ -1845,8 +1849,8 @@ public class TimelineUtils
 	 * @param threshold
 	 * @return a Map of String ID (Key) of candidate timelines and their corresponding edit distance(value)
 	 */
-	public static LinkedHashMap<String, Double> removeAboveThreshold2(
-			LinkedHashMap<String, Double> distanceScoresSorted, double threshold)
+	public static LinkedHashMap<String, Double>
+			removeAboveThreshold2(LinkedHashMap<String, Double> distanceScoresSorted, double threshold)
 	{
 		LinkedHashMap<String, Double> pruned = new LinkedHashMap<String, Double>();
 		int numberOfTimelinesRemoved = 0;
@@ -1880,8 +1884,8 @@ public class TimelineUtils
 	 * @param threshold
 	 * @return a Map of String ID (Key) of candidate timelines and their corresponding edit distance(value)
 	 */
-	public static LinkedHashMap<String, Pair<Integer, Double>> removeAboveThreshold3(
-			LinkedHashMap<String, Pair<Integer, Double>> distanceScoresSorted, double threshold)
+	public static LinkedHashMap<String, Pair<Integer, Double>>
+			removeAboveThreshold3(LinkedHashMap<String, Pair<Integer, Double>> distanceScoresSorted, double threshold)
 	{
 		LinkedHashMap<String, Pair<Integer, Double>> pruned = new LinkedHashMap<String, Pair<Integer, Double>>();
 
@@ -1924,8 +1928,8 @@ public class TimelineUtils
 	 * @param threshold
 	 * @return a Map of TimelineID (Key) and their corresponding edit distance(value)
 	 */
-	public static LinkedHashMap<Integer, Double> removeAboveThreshold4FullCand(
-			LinkedHashMap<Integer, Double> distanceScoresSortedFullCand, double threshold)
+	public static LinkedHashMap<Integer, Double>
+			removeAboveThreshold4FullCand(LinkedHashMap<Integer, Double> distanceScoresSortedFullCand, double threshold)
 	{
 		LinkedHashMap<Integer, Double> pruned = new LinkedHashMap<Integer, Double>();
 
@@ -2027,8 +2031,8 @@ public class TimelineUtils
 	 * @param threshold
 	 * @return a Map of TimelineID (Key) and their corresponding edit distance(value)
 	 */
-	public static LinkedHashMap<Integer, Pair<Integer, Double>> removeAboveThreshold4(
-			LinkedHashMap<Integer, Pair<Integer, Double>> distanceScoresSorted, double threshold)
+	public static LinkedHashMap<Integer, Pair<Integer, Double>>
+			removeAboveThreshold4(LinkedHashMap<Integer, Pair<Integer, Double>> distanceScoresSorted, double threshold)
 	{
 		LinkedHashMap<Integer, Pair<Integer, Double>> pruned = new LinkedHashMap<Integer, Pair<Integer, Double>>();
 
@@ -2132,7 +2136,7 @@ public class TimelineUtils
 		{
 			totalNumberOfProbableCands += 1;
 			Date dayOfTimeline = dayTimelineEntry.getKey();
-			Timeline dayTimeline = dayTimelineEntry.getValue();//
+			Timeline dayTimeline = dayTimelineEntry.getValue();
 
 			if (!dayTimeline.isShouldBelongToSingleDay())
 			{
@@ -2173,16 +2177,16 @@ public class TimelineUtils
 			}
 		}
 
-		if (VerbosityConstants.verbose)
+		if (VerbosityConstants.verbose || VerbosityConstants.tempVerbose)
 		{
-			System.out.println("Inside extractDaywiseCandidateTimelines: #cand timelines = " + count
-					+ " numCandsRejectedDueToNoNextActivity =" + numCandsRejectedDueToNoNextActivity
-					+ "  numCandsRejectedDueToNoCurrentActivityAtNonLast"
+			System.out.println("Inside extractDaywiseCandidateTimelines:dayTimelinesForUser.size()="
+					+ dayTimelinesForUser + " #cand timelines = " + count + " numCandsRejectedDueToNoNextActivity ="
+					+ numCandsRejectedDueToNoNextActivity + "  numCandsRejectedDueToNoCurrentActivityAtNonLast ="
 					+ numCandsRejectedDueToNoCurrentActivityAtNonLast);
 		}
 		if (count == 0)
 		{
-			System.err.println("Warning: No candidate timelines found");
+			System.err.println("Warning: No DaywiseCandidateTimelines found");
 		}
 		return candidateTimelines;
 	}
@@ -2227,8 +2231,8 @@ public class TimelineUtils
 	 * @param usersTimelines
 	 * @return LinkedHashMap<User ID as String, Timeline of the user with user id as integer as timeline id>
 	 */
-	public static LinkedHashMap<String, Timeline> dayTimelinesToTimelines(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
+	public static LinkedHashMap<String, Timeline>
+			dayTimelinesToTimelines(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
 	{
 		LinkedHashMap<String, Timeline> timelines = new LinkedHashMap<>();
 		if (usersTimelines.size() == 0 || usersTimelines == null)
@@ -2331,8 +2335,8 @@ public class TimelineUtils
 		for (i = givenActivityObjectIndex + 1; i < aosInGivenTimelineToCheckIn.size(); i++)
 		{
 			// System.out.println("for index " + i);
-			LocalDate dateOfThisAO = aosInGivenTimelineToCheckIn.get(i).getEndTimestamp().toLocalDateTime()
-					.toLocalDate();
+			LocalDate dateOfThisAO =
+					aosInGivenTimelineToCheckIn.get(i).getEndTimestamp().toLocalDateTime().toLocalDate();
 
 			// System.out.println("dateOfAOAtGivenIndex = " + dateOfAOAtGivenIndex + " dateOfThisAO = " + dateOfThisAO);
 			// System.out
@@ -2399,8 +2403,8 @@ public class TimelineUtils
 		for (i = givenActivityObjectIndex + 1; i < aosInGivenTimelineToCheckIn.size(); i++)
 		{
 			// System.out.println("for index " + i);
-			LocalDate dateOfThisAO = aosInGivenTimelineToCheckIn.get(i).getEndTimestamp().toLocalDateTime()
-					.toLocalDate();
+			LocalDate dateOfThisAO =
+					aosInGivenTimelineToCheckIn.get(i).getEndTimestamp().toLocalDateTime().toLocalDate();
 			// System.out.println("dateOfAOAtGivenIndex = " + dateOfAOAtGivenIndex + " dateOfThisAO = " + dateOfThisAO);
 			// System.out
 			// .println("dateOfThisAO.equals(dateOfAOAtGivenIndex = " + dateOfThisAO.equals(dateOfAOAtGivenIndex));
@@ -2458,8 +2462,8 @@ public class TimelineUtils
 
 		for (int i = 0; i < N; i++)
 		{
-			ActivityObject ao = t
-					.getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp + i);
+			ActivityObject ao =
+					t.getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp + i);
 
 			// System.out.println("Debug:\nTimestamp of ao = " + ao.getEndTimestamp());FOUND OKAY in RUN
 			LocalDate dateOfAO = ao.getEndTimestamp().toLocalDateTime().toLocalDate();
@@ -2478,9 +2482,9 @@ public class TimelineUtils
 
 		if (result.size() != N)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in getNextNValidAOsAfterActivityAtThisTimeSameDay result.size(): " + result.size() + "!= N:"
-							+ N));
+			System.err.println(
+					PopUps.getTracedErrorMsg("Error in getNextNValidAOsAfterActivityAtThisTimeSameDay result.size(): "
+							+ result.size() + "!= N:" + N));
 		}
 
 		if (VerbosityConstants.verbose)
@@ -2562,8 +2566,8 @@ public class TimelineUtils
 	{
 		if (timelineToPrune == null)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error inside UtulityBelt.expungeInvalids: timelineToPrune is null"));
+			System.err.println(
+					PopUps.getTracedErrorMsg("Error inside UtulityBelt.expungeInvalids: timelineToPrune is null"));
 		}
 
 		ArrayList<ActivityObject> arrayToPrune = timelineToPrune.getActivityObjectsInTimeline();
@@ -2576,7 +2580,7 @@ public class TimelineUtils
 		return prunedTimeline;
 	}
 
-	public static int getNumberOfWeekendsInGivenDayTimelines(LinkedHashMap<Date, Timeline> userTimelines)
+	public static int getNumOfWeekendsInGivenDayTimelines(LinkedHashMap<Date, Timeline> userTimelines)
 	{
 		int numberOfWeekends = 0;
 		for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
@@ -2609,9 +2613,9 @@ public class TimelineUtils
 		double reductionInMU = 0;
 		int matchingUnitInCounts = (int) matchingUnitInCountsD;
 
-		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
-				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
-				0);
+		Timestamp currentEndTimestamp =
+				new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(), dateAtRecomm.getDate(),
+						timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(), 0);
 		// long currentEndTime=currentEndTimestamp.getTime();
 
 		int indexOfCurrentEnd = longerTimeline.getIndexOfActivityObjectAtTime(currentEndTimestamp);
@@ -2640,17 +2644,17 @@ public class TimelineUtils
 		}
 
 		// identify the recommendation point in longer timeline
-		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
-				.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
+		ArrayList<ActivityObject> activityObjectsInCurrentTimeline =
+				longerTimeline.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
 
-		ActivityObject nextValidActivityObject = longerTimeline
-				.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
-		ActivityObject nextActivityObject = longerTimeline
-				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
+		ActivityObject nextValidActivityObject =
+				longerTimeline.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
+		ActivityObject nextActivityObject =
+				longerTimeline.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
-		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
-				nextValidActivityObject, false, true);
+		TimelineWithNext currentTimeline =
+				new TimelineWithNext(activityObjectsInCurrentTimeline, nextValidActivityObject, false, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
 
 		// System.out.println("Current timeline="+currentTimeline.getActivityObjectNamesInSequence());
@@ -2682,9 +2686,9 @@ public class TimelineUtils
 	{
 		System.out.println("------- Inside getCurrentTimelineFromLongerTimelineMUHours");
 
-		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
-				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
-				0);
+		Timestamp currentEndTimestamp =
+				new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(), dateAtRecomm.getDate(),
+						timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(), 0);
 		long currentEndTime = currentEndTimestamp.getTime();
 
 		// this is a safe cast in this case
@@ -2697,16 +2701,16 @@ public class TimelineUtils
 				+ currentEndTimestamp);
 
 		// identify the recommendation point in longer timeline
-		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
-				.getActivityObjectsBetweenTime(currentStartTimestamp, currentEndTimestamp);
+		ArrayList<ActivityObject> activityObjectsInCurrentTimeline =
+				longerTimeline.getActivityObjectsBetweenTime(currentStartTimestamp, currentEndTimestamp);
 
-		ActivityObject nextValidActivityObject = longerTimeline
-				.getNextValidActivityAfterActivityAtThisTime(currentEndTimestamp);
+		ActivityObject nextValidActivityObject =
+				longerTimeline.getNextValidActivityAfterActivityAtThisTime(currentEndTimestamp);
 		ActivityObject nextActivityObject = longerTimeline.getNextActivityAfterActivityAtThisTime(currentEndTimestamp);
 
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
-		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
-				nextValidActivityObject, false, true);
+		TimelineWithNext currentTimeline =
+				new TimelineWithNext(activityObjectsInCurrentTimeline, nextValidActivityObject, false, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
 		System.out.println("------- Exiting getCurrentTimelineFromLongerTimelineMUHours");
 		return currentTimeline;
@@ -2730,9 +2734,9 @@ public class TimelineUtils
 		// $$System.out.println("------Inside getCurrentTimelineFromLongerTimelineDaywise");
 
 		///////////////////////////////////////////////////////////////////
-		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
-				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
-				0);
+		Timestamp currentEndTimestamp =
+				new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(), dateAtRecomm.getDate(),
+						timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(), 0);
 		// Timestamp currentEndTimestamp2 = new Timestamp(timeAtRecomm.getTime()); INCORRECT 1970 year
 		// check if timestamps are actually equally, if yes, prefer the cleaner method INCORRECT 1970 year
 		// System.out.println("Debug sanity check Note: currentEndTimestamp2.equals(currentEndTimestamp) ="
@@ -2750,26 +2754,26 @@ public class TimelineUtils
 		}
 		if (currentDayTimeline == null || !(currentDayTimeline.size() > 0))
 		{
-			System.err.println(PopUps
-					.getTracedErrorMsg("Error: currentDayTimeline.size() =" + currentDayTimeline.size()));
+			System.err.println(
+					PopUps.getTracedErrorMsg("Error: currentDayTimeline.size() =" + currentDayTimeline.size()));
 		}
 		///////////////////////////////////////////////////////////////////
 
 		int indexOfCurrentEnd = currentDayTimeline.getIndexOfActivityObjectAtTime(currentEndTimestamp);
 
 		// identify the recommendation point in longer timeline
-		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = currentDayTimeline
-				.getActivityObjectsInTimelineFromToIndex(0, indexOfCurrentEnd + 1);
+		ArrayList<ActivityObject> activityObjectsInCurrentTimeline =
+				currentDayTimeline.getActivityObjectsInTimelineFromToIndex(0, indexOfCurrentEnd + 1);
 
-		ActivityObject nextValidActivityObject = currentDayTimeline
-				.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
-		ActivityObject nextActivityObject = currentDayTimeline
-				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
+		ActivityObject nextValidActivityObject =
+				currentDayTimeline.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
+		ActivityObject nextActivityObject =
+				currentDayTimeline.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
 
-		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
-				nextValidActivityObject, true, true);
+		TimelineWithNext currentTimeline =
+				new TimelineWithNext(activityObjectsInCurrentTimeline, nextValidActivityObject, true, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
 
 		// if (VerbosityConstants.verbose)
@@ -2777,8 +2781,7 @@ public class TimelineUtils
 
 		if (!(currentTimeline.size() > 0))
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error: currentTimeline.size() =" + currentTimeline.size()));
+			System.err.println(PopUps.getTracedErrorMsg("Error: currentTimeline.size() =" + currentTimeline.size()));
 		}
 
 		// $$System.out.println("------Exiting getCurrentTimelineFromLongerTimelineDaywise");
@@ -2886,16 +2889,15 @@ public class TimelineUtils
 	 * that they can be compared
 	 * 
 	 * @param trainingTimelines
-	 * @param activitiesGuidingRecomm
 	 * @param dateAtRecomm
 	 * @param activityAtRecommPoint
 	 * @return
 	 */
 	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, Date dateAtRecomm, ActivityObject activityAtRecommPoint)
-	{
-		LinkedHashMap<Date, Timeline> candidateTimelines = extractDaywiseCandidateTimelines(trainingTimelines,
-				dateAtRecomm, activityAtRecommPoint);
+			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
+	{// ArrayList<ActivityObject> activitiesGuidingRecomm,*/
+		LinkedHashMap<Date, Timeline> candidateTimelines =
+				extractDaywiseCandidateTimelines(trainingTimelines, dateAtRecomm, activityAtRecommPoint);
 		if (candidateTimelines.size() > 0)
 			return true;
 		else
@@ -2918,10 +2920,11 @@ public class TimelineUtils
 	 * @param HJEditDistance
 	 * @return
 	 */
-	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getEditDistancesForDaywiseCandidateTimelines(
-			LinkedHashMap<String, Timeline> candidateTimelines2, ArrayList<ActivityObject> activitiesGuidingRecomm2,
-			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasInvalidActivityNames,
-			String invalidActName1, String invalidActName2, String distanceUsed, HJEditDistance hjEditDistance)
+	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>
+			getEditDistancesForDaywiseCandidateTimelines(LinkedHashMap<String, Timeline> candidateTimelines2,
+					ArrayList<ActivityObject> activitiesGuidingRecomm2, String userIDAtRecomm, String dateAtRecomm,
+					String timeAtRecomm, boolean hasInvalidActivityNames, String invalidActName1,
+					String invalidActName2, String distanceUsed, HJEditDistance hjEditDistance)
 	{
 		// <Date of CandidateTimeline, (End point index of least distant subsequence, String containing the trace of
 		// edit operations performed, edit distance of
@@ -2990,14 +2993,15 @@ public class TimelineUtils
 	{
 
 		// find the end points in the userDayTimeline
-		char activityAtRecommPointAsStringCode = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1)
-				.getStringCode();
+		char activityAtRecommPointAsStringCode =
+				activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1).getStringCode();
 		String activitiesGuidingAsStringCode = StringCode.getStringCodeForActivityObjects(activitiesGuidingRecomm);
 		String userDayTimelineAsStringCode = candidateDayTimeline.getActivityObjectsAsStringCode();
 
-		ArrayList<Integer> indicesOfEndPointActivityInDayButNotLastValid = getIndicesOfEndPointActivityInDayButNotLastValid(
-				userDayTimelineAsStringCode, activityAtRecommPointAsStringCode, hasInvalidActivityNames,
-				Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2);
+		ArrayList<Integer> indicesOfEndPointActivityInDayButNotLastValid =
+				getIndicesOfEndPointActivityInDayButNotLastValid(userDayTimelineAsStringCode,
+						activityAtRecommPointAsStringCode, hasInvalidActivityNames, Constant.INVALID_ACTIVITY1,
+						Constant.INVALID_ACTIVITY2);
 
 		// System.out.println(
 		// "Inside getEditDistancesLeastDistantSubcands: indicesOfEndPointActivityInDayButNotLastValid.size() ="
@@ -3048,15 +3052,15 @@ public class TimelineUtils
 		}
 
 		// we only consider the most similar subsequence . i.e. the first entry in this Map
-		List<Entry<Integer, Pair<String, Double>>> subseqWithLeastEditDist = distanceScoresForEachSubsequence.entrySet()
-				.stream().limit(1).collect(Collectors.toList());
+		List<Entry<Integer, Pair<String, Double>>> subseqWithLeastEditDist =
+				distanceScoresForEachSubsequence.entrySet().stream().limit(1).collect(Collectors.toList());
 
 		int endPointIndexForSubsequenceWithHighestSimilarity = subseqWithLeastEditDist.get(0).getKey();// -1;
-		String traceEditOperationsForSubsequenceWithHighestSimilarity = subseqWithLeastEditDist.get(0).getValue()
-				.getFirst();
+		String traceEditOperationsForSubsequenceWithHighestSimilarity =
+				subseqWithLeastEditDist.get(0).getValue().getFirst();
 		double distanceScoreForSubsequenceWithHighestSimilarity = subseqWithLeastEditDist.get(0).getValue().getSecond();// -9999;
-		distanceScoreForSubsequenceWithHighestSimilarity = StatsUtils
-				.round(distanceScoreForSubsequenceWithHighestSimilarity, Constant.RoundingPrecision);
+		distanceScoreForSubsequenceWithHighestSimilarity =
+				StatsUtils.round(distanceScoreForSubsequenceWithHighestSimilarity, Constant.RoundingPrecision);
 
 		// finding the end point index with highest similarity WHICH HAS A VALID ACTIVITY AFTER IT
 		// removed some legacy code from here since we have already checked if there exists valid act after every of the
@@ -3203,10 +3207,11 @@ public class TimelineUtils
 	 * @param distanceUsed
 	 * @return {candID, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
 	 */
-	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getClosestTimeDistancesForDaywiseCandidateTimelines(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
-			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasinvalidactivitynames,
-			String iNVALID_ACTIVITY1, String iNVALID_ACTIVITY2, String distanceUsed)
+	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>
+			getClosestTimeDistancesForDaywiseCandidateTimelines(LinkedHashMap<String, Timeline> candidateTimelines,
+					ArrayList<ActivityObject> activitiesGuidingRecomm, String userIDAtRecomm, String dateAtRecomm,
+					String timeAtRecomm, boolean hasinvalidactivitynames, String iNVALID_ACTIVITY1,
+					String iNVALID_ACTIVITY2, String distanceUsed)
 	{
 
 		// timelineID, <Index for the nearest Activity Object, Diff of Start time of nearest Activity

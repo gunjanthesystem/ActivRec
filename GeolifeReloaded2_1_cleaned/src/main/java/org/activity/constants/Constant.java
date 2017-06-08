@@ -147,7 +147,7 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = true;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// .Daywise;// NCount;//
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NGram;// .Daywise;// NCount;//
 																					// Enums.LookPastType.NCount;
 	// "Count";// "Count";// "Hrs"// "Daywise"
 	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType =
