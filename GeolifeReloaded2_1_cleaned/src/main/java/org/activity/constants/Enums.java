@@ -14,7 +14,7 @@ public class Enums
 	 */
 	public enum LookPastType
 	{
-		NCount, NHours, Daywise, ClosestTime
+		NCount, NHours, Daywise, ClosestTime, NGram;
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package org.activity.controller;
 
 import org.activity.constants.Constant;
+import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
@@ -16,7 +17,7 @@ public class SuperController
 
 		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
-		String commonPath = "./dataWritten/";// dataWrittenSeqEditL1 RecommUnmergedNCount/";
+		String commonPath = "./dataWrittenNGramBaseline/";// dataWrittenSeqEditL1 RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
@@ -88,10 +89,10 @@ public class SuperController
 		Constant.setDistanceUsed("HJEditDistance");
 
 		// //curtain may 26 2017 start
-		// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);
+		new EvaluationSeq(3, commonPath);// , Constant.matchingUnitAsPastCount);
 		// //curtain may 26 2017 end
 		// //curtain may 19 2017 start
-		new ControllerWithoutServer();
+		// new ControllerWithoutServer();
 		// //curtain may 19 2017 end
 		// **************************************************************************************************************//
 		// Constant.DATABASE_NAME = "dcu_data_2";// geolife1

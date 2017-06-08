@@ -150,8 +150,8 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 						if (this.lookPastType.equals(Enums.LookPastType.NCount)
 								|| this.lookPastType.equals(Enums.LookPastType.NHours))
 						{
-							String dirToCreate = Constant.outputCoreResultsPath + "/MatchingUnit"
-									+ String.valueOf(matchingUnit);
+							String dirToCreate =
+									Constant.outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit);
 							WritingToFile.createDirectory(dirToCreate);// Creating the directory for that matching unit
 							commonPath = dirToCreate + "/";
 						}
@@ -163,61 +163,61 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());
 
-						PrintStream consoleLogStream = WritingToFile
-								.redirectConsoleOutput(commonPath + "consoleLog.txt");
+						PrintStream consoleLogStream =
+								WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 
 						BufferedWriter metaBufferWriter = WritingToFile.getBWForNewFile(commonPath + "meta.csv");
-						BufferedWriter actualBufferWriter = WritingToFile
-								.getBWForNewFile(commonPath + "dataActual.csv");
+						BufferedWriter actualBufferWriter =
+								WritingToFile.getBWForNewFile(commonPath + "dataActual.csv");
 
-						BufferedWriter topNextActsWithoutDistance = WritingToFile
-								.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
-						BufferedWriter topNextActsWithDistance = WritingToFile
-								.getBWForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
+						BufferedWriter topNextActsWithoutDistance =
+								WritingToFile.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
+						BufferedWriter topNextActsWithDistance =
+								WritingToFile.getBWForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
 						BufferedWriter rtsInvalidWriter = WritingToFile
 								.getBWForNewFile(commonPath + "recommPointsInvalidBecuzNoValidActivityAfterThis.csv");
-						BufferedWriter rtsWithNoCandsWriter = WritingToFile
-								.getBWForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
+						BufferedWriter rtsWithNoCandsWriter =
+								WritingToFile.getBWForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
 
-						BufferedWriter rtsRejWithNoDWButMUCandsCands = WritingToFile
-								.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
+						BufferedWriter rtsRejWithNoDWButMUCandsCands =
+								WritingToFile.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
 
-						BufferedWriter rankedRecommWithScoreWriter = WritingToFile
-								.getBWForNewFile(commonPath + "dataRankedRecommendationWithScores.csv");
-						BufferedWriter rankedRecommWithoutScoreWriter = WritingToFile
-								.getBWForNewFile(commonPath + "dataRankedRecommendationWithoutScores.csv");
+						BufferedWriter rankedRecommWithScoreWriter =
+								WritingToFile.getBWForNewFile(commonPath + "dataRankedRecommendationWithScores.csv");
+						BufferedWriter rankedRecommWithoutScoreWriter =
+								WritingToFile.getBWForNewFile(commonPath + "dataRankedRecommendationWithoutScores.csv");
 
-						BufferedWriter metaIfCurrentTargetSameWriter = WritingToFile
-								.getBWForNewFile(commonPath + "metaIfCurrentTargetSameWriter.csv");
+						BufferedWriter metaIfCurrentTargetSameWriter =
+								WritingToFile.getBWForNewFile(commonPath + "metaIfCurrentTargetSameWriter.csv");
 
-						BufferedWriter numOfCandidateTimelinesWriter = WritingToFile
-								.getBWForNewFile(commonPath + "numOfCandidateTimelines.csv");
+						BufferedWriter numOfCandidateTimelinesWriter =
+								WritingToFile.getBWForNewFile(commonPath + "numOfCandidateTimelines.csv");
 
 						/**
 						 * Contains list of activity names sorted by frequency of occurrence/duration. Num of unique
 						 * sorted lists = number of users, however, each list is repeated so as maintain structural
 						 * conformity with dataRankedRecommendationWithoutScores.csv
 						 */
-						BufferedWriter baseLineOccurrence = WritingToFile
-								.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
-						BufferedWriter baseLineDuration = WritingToFile
-								.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
+						BufferedWriter baseLineOccurrence =
+								WritingToFile.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
+						BufferedWriter baseLineDuration =
+								WritingToFile.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
 
 						BufferedWriter bwRaw = WritingToFile.getBWForNewFile(commonPath + "Raw.csv");
 
-						BufferedWriter bwNumOfWeekendsInTraining = WritingToFile
-								.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
-						BufferedWriter bwNumOfWeekendsInAll = WritingToFile
-								.getBWForNewFile(commonPath + "NumberOfWeekendsInAll.csv");
-						BufferedWriter bwCountTimeCategoryOfRecomm = WritingToFile
-								.getBWForNewFile(commonPath + "CountTimeCategoryOfRecommPoitns.csv");
-						BufferedWriter bwNextActInvalid = WritingToFile
-								.getBWForNewFile(commonPath + "NextActivityIsInvalid.csv");
-						BufferedWriter bwWriteNormalisationOfDistance = WritingToFile
-								.getBWForNewFile(commonPath + "NormalisationDistances.csv");
+						BufferedWriter bwNumOfWeekendsInTraining =
+								WritingToFile.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
+						BufferedWriter bwNumOfWeekendsInAll =
+								WritingToFile.getBWForNewFile(commonPath + "NumberOfWeekendsInAll.csv");
+						BufferedWriter bwCountTimeCategoryOfRecomm =
+								WritingToFile.getBWForNewFile(commonPath + "CountTimeCategoryOfRecommPoitns.csv");
+						BufferedWriter bwNextActInvalid =
+								WritingToFile.getBWForNewFile(commonPath + "NextActivityIsInvalid.csv");
+						BufferedWriter bwWriteNormalisationOfDistance =
+								WritingToFile.getBWForNewFile(commonPath + "NormalisationDistances.csv");
 
-						BufferedWriter bwNumOfValidAOsAfterRTInDay = WritingToFile
-								.getBWForNewFile(commonPath + "NumOfValidAOsAfterRTInDay.csv");
+						BufferedWriter bwNumOfValidAOsAfterRTInDay =
+								WritingToFile.getBWForNewFile(commonPath + "NumOfValidAOsAfterRTInDay.csv");
 
 						rtsInvalidWriter.write(
 								"User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity\n");
@@ -364,14 +364,16 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 								mapsForCountDurationBaselines = WritingToFile.writeBasicActivityStatsAndGetBaselineMaps(
 										userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
 
-								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-										.get("activityNameCountPairsOverAllTrainingDays");
+								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays =
+										(LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+												.get("activityNameCountPairsOverAllTrainingDays");
 								ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
 								actNamesCountsWithoutCountOverTrain = getActivityNameCountPairsWithoutCount(
 										activityNameCountPairsOverAllTrainingDays);
 
-								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-										.get("activityNameDurationPairsOverAllTrainingDays");
+								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays =
+										(LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+												.get("activityNameDurationPairsOverAllTrainingDays");
 								ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
 								actNamesDurationsWithoutDurationOverTrain = getActivityNameDurationPairsWithoutDuration(
 										activityNameDurationPairsOverAllTrainingDays);
@@ -389,14 +391,14 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 							 * ********************************
 							 */
 
-							int numberOfWeekendsInTraining = TimelineUtils
-									.getNumberOfWeekendsInGivenDayTimelines(userTrainingTimelines);
+							int numberOfWeekendsInTraining =
+									TimelineUtils.getNumOfWeekendsInGivenDayTimelines(userTrainingTimelines);
 							int numberOfWeekdaysInTraining = userTrainingTimelines.size() - numberOfWeekendsInTraining;
 							bwNumOfWeekendsInTraining.write(userName + "," + numberOfWeekendsInTraining + ","
 									+ numberOfWeekdaysInTraining + "\n");
 
-							int numberOfWeekendsInAll = TimelineUtils
-									.getNumberOfWeekendsInGivenDayTimelines(userAllDatesTimeslines);
+							int numberOfWeekendsInAll =
+									TimelineUtils.getNumOfWeekendsInGivenDayTimelines(userAllDatesTimeslines);
 							int numberOfWeekdaysInAll = userAllDatesTimeslines.size() - numberOfWeekendsInAll;
 							bwNumOfWeekendsInAll
 									.write(userName + "," + numberOfWeekendsInAll + "," + numberOfWeekdaysInAll + "\n");
@@ -421,8 +423,8 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 
 								String weekDay = DateTimeUtils.getWeekDayFromWeekDayInt(testDate.getDay());
 
-								ArrayList<ActivityObject> activityObjectsInTestDay = testDayTimelineForUser
-										.getActivityObjectsInDay();
+								ArrayList<ActivityObject> activityObjectsInTestDay =
+										testDayTimelineForUser.getActivityObjectsInDay();
 
 								////////// added to improve write speed
 								StringBuilder bwRawToWriteForThisUserDate = new StringBuilder();
@@ -444,8 +446,8 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 								for (int indexOfAOInDay = 0; indexOfAOInDay < activityObjectsInTestDay.size()
 										- 1; indexOfAOInDay++)
 								{
-									ActivityObject activityObjectInTestDay = activityObjectsInTestDay
-											.get(indexOfAOInDay);
+									ActivityObject activityObjectInTestDay =
+											activityObjectsInTestDay.get(indexOfAOInDay);
 									String activityNameInTestDay = activityObjectInTestDay.getActivityName();
 
 									System.out.println(
@@ -467,8 +469,7 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 									Timestamp endTimeStamp = activityObjectInTestDay.getEndTimestamp();// getStartTimestamp();
 									String endTimeString = endTimeStamp.getHours() + ":" + endTimeStamp.getMinutes()
 											+ ":" + endTimeStamp.getSeconds();
-									String timeCategory = DateTimeUtils
-											.getTimeCategoryOfDay(endTimeStamp.getHours());
+									String timeCategory = DateTimeUtils.getTimeCategoryOfDay(endTimeStamp.getHours());
 
 									if (TimelineUtils.isNoValidActivityAfterItInTheDay(indexOfAOInDay,
 											testDayTimelineForUser))
@@ -487,8 +488,8 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 									}
 
 									// Target Activity, actual next activity
-									ActivityObject nextValidActivityObjectAfterRecommPoint1 = testDayTimelineForUser
-											.getNextValidActivityAfterActivityAtThisTime(
+									ActivityObject nextValidActivityObjectAfterRecommPoint1 =
+											testDayTimelineForUser.getNextValidActivityAfterActivityAtThisTime(
 													new Timestamp(year - 1900, month - 1, date, endTimeStamp.getHours(),
 															endTimeStamp.getMinutes(), endTimeStamp.getSeconds(), 0));
 
@@ -590,7 +591,7 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 									////////////////////////////////////////////////////////////////////////
 									// check if this RT will have daywise candidate timelines
 									boolean hasDayWiseCandidateTimelines = TimelineUtils.hasDaywiseCandidateTimelines(
-											userTrainingTimelines, recommP1.getActsGuidingRecomm(),
+											userTrainingTimelines, /* recommP1.getActsGuidingRecomm(), */
 											recommP1.getDateAtRecomm(), recommP1.getActivityObjectAtRecomm());
 
 									if (hasDayWiseCandidateTimelines == false)
@@ -995,8 +996,8 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 			// recommP1.getCandidateTimeslines() .get(candidateTimelineID);
 
 			int endPointIndexThisCandidate = candidateTimeline.getActivityObjectsInTimeline().size() - 1;
-			ActivityObject endPointActivityInCandidate = candidateTimeline.getActivityObjectsInTimeline()
-					.get(endPointIndexThisCandidate);
+			ActivityObject endPointActivityInCandidate =
+					candidateTimeline.getActivityObjectsInTimeline().get(endPointIndexThisCandidate);
 
 			// difference in start time of end point activity of candidate and start
 			// time of current activity
@@ -1062,8 +1063,8 @@ public class RecommendationTestsMar2017GenDummyOnlyRTCount<K>
 		return result.toString();
 	}
 
-	public static String getActivityNameDurationPairsWithoutDuration(
-			LinkedHashMap<String, Long> nameDurationPairsSorted)
+	public static String
+			getActivityNameDurationPairsWithoutDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
 	{
 		// String result = "";
 		StringBuilder result = new StringBuilder();

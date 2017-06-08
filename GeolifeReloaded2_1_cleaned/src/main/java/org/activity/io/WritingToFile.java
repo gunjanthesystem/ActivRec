@@ -4682,18 +4682,100 @@ public class WritingToFile
 		for (Entry<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>>> firstLevelEntry : map
 				.entrySet())
 		{
-			sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys);
+			// sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys);
 
 			for (Entry<Integer, HashMap<String, ArrayList<Character>>> secondLevelEntry : firstLevelEntry.getValue()
 					.entrySet())
 			{
-				sb.append(secondLevelEntry.getKey().toString() + delimiterForKeys);
+
 				for (Entry<String, ArrayList<Character>> thirdLevelEntry : secondLevelEntry.getValue().entrySet())
 				{
-					sb.append(thirdLevelEntry.getKey().toString() + delimiterForKeys);
+					sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys)
+							.append(secondLevelEntry.getKey().toString() + delimiterForKeys)
+							.append(thirdLevelEntry.getKey().toString() + delimiterForKeys);
 
 					String s = thirdLevelEntry.getValue().stream().map(v -> v.toString())
 							.collect(Collectors.joining(delimiterForValues));
+					sb.append(s).append("\n");
+				}
+			}
+		}
+		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @param absFileNameToUse
+	 * @param delimiterForKeys
+	 * @param delimiterForValues
+	 */
+	public static void writeMapOfMapOfMapOfListInt(
+			LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Integer>>>> map,
+			String absFileNameToUse, String delimiterForKeys, String delimiterForValues)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("Key1,Key2,Key3,Vals\n");
+
+		for (Entry<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Integer>>>> firstLevelEntry : map
+				.entrySet())
+		{
+			// sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys);
+
+			for (Entry<Integer, HashMap<String, ArrayList<Integer>>> secondLevelEntry : firstLevelEntry.getValue()
+					.entrySet())
+			{
+				// sb.append(secondLevelEntry.getKey().toString() + delimiterForKeys);
+				for (Entry<String, ArrayList<Integer>> thirdLevelEntry : secondLevelEntry.getValue().entrySet())
+				{
+					sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys)
+							.append(secondLevelEntry.getKey().toString() + delimiterForKeys)
+							.append(thirdLevelEntry.getKey().toString() + delimiterForKeys);
+
+					String s = thirdLevelEntry.getValue().stream().map(v -> v.toString())
+							.collect(Collectors.joining(delimiterForValues));
+
+					sb.append(s).append("\n");
+				}
+			}
+		}
+		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @param absFileNameToUse
+	 * @param delimiterForKeys
+	 * @param delimiterForValues
+	 */
+	public static void writeMapOfMapOfMapOfListString(
+			LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<String>>>> map,
+			String absFileNameToUse, String delimiterForKeys, String delimiterForValues)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("Key1,Key2,Key3,Vals\n");
+
+		for (Entry<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<String>>>> firstLevelEntry : map
+				.entrySet())
+		{
+			// sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys);
+
+			for (Entry<Integer, HashMap<String, ArrayList<String>>> secondLevelEntry : firstLevelEntry.getValue()
+					.entrySet())
+			{
+				// sb.append(secondLevelEntry.getKey().toString() + delimiterForKeys);
+				for (Entry<String, ArrayList<String>> thirdLevelEntry : secondLevelEntry.getValue().entrySet())
+				{
+					sb.append(firstLevelEntry.getKey().toString() + delimiterForKeys)
+							.append(secondLevelEntry.getKey().toString() + delimiterForKeys)
+							.append(thirdLevelEntry.getKey().toString() + delimiterForKeys);
+
+					String s = thirdLevelEntry.getValue().stream().map(v -> v.toString())
+							.collect(Collectors.joining(delimiterForValues));
+
 					sb.append(s).append("\n");
 				}
 			}

@@ -41,7 +41,8 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+	static final String groupsOf100UsersLabels[] =
+			{ "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 
 	// for each individual seq index
 	ArrayList<ArrayList<String>> listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
@@ -50,6 +51,98 @@ public class EvaluationSeq
 	// for top k indices in a sequence
 	ArrayList<ArrayList<String>> listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
 			listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1;
+
+	/**
+	 * FOR NO MUs, useful for baseline
+	 * 
+	 * @param seqLength
+	 * @param outputCoreResultsPath
+	 * @param matchingUnitAsPastCount
+	 */
+	public EvaluationSeq(int seqLength, String outputCoreResultsPath)
+	{
+		// commonPath = "./dataWritten/";
+
+		intialiseListOfFilenamesNoMU();
+
+		try
+		{
+			for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
+			{
+				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
+				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
+				Constant.initialise(commonPath, Constant.getDatabaseName(),
+						DomainConstants.pathToSerialisedCatIDsHierDist,
+						DomainConstants.pathToSerialisedCatIDNameDictionary);
+
+				// for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+				// {
+				// double mu = matchingUnitAsPastCount[muIndex];
+				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
+				Constant.setCommonPath(commonPath);
+				System.out.println("\nCommon path=" + Constant.getCommonPath());
+				PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
+
+				doEvaluationSeq(seqLength, commonPath, commonPath, true);
+				// PopUps.showMessage("FINISHED EVAL FOR mu = " + mu + " USERGROUP=" + groupsOf100UsersLabel);
+
+				// create lists of filenames of results for different MUs which need to be concatenated
+				String algoLabel = "Algo";
+				int muIndex = 0;
+
+				for (String timeCategory : timeCategories)
+				{
+					listOfNumAgreementsFiles.get(muIndex)
+							.add(commonPath + algoLabel + timeCategory + "NumDirectAgreements.csv");
+					listOfPerAgreementsFiles.get(muIndex)
+							.add(commonPath + algoLabel + timeCategory + "PercentageDirectAgreements.csv");
+					listOfNumAgreementsFilesL1.get(muIndex)
+							.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectAgreements.csv");
+					listOfPerAgreementsFilesL1.get(muIndex)
+							.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectAgreements.csv");
+
+					listOfNumTopKAgreementsFiles.get(muIndex)
+							.add(commonPath + algoLabel + timeCategory + "NumDirectTopKAgreements.csv");
+					listOfPerTopKAgreementsFiles.get(muIndex)
+							.add(commonPath + algoLabel + timeCategory + "PercentageDirectTopKAgreements.csv");
+					listOfNumTopKAgreementsFilesL1.get(muIndex)
+							.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectTopKAgreements.csv");
+					listOfPerTopKAgreementsFilesL1.get(muIndex)
+							.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectTopKAgreements.csv");
+				}
+				consoleLogStream.close();
+				// }
+
+			}
+
+			double matchingUnitAsPastCount[] = { 0 };
+			// PopUps.showMessage("BREAKING");
+			ArrayList<String> listOfWrittenFiles =
+					concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount, listOfNumAgreementsFiles,
+							listOfPerAgreementsFiles, listOfNumAgreementsFilesL1, listOfPerAgreementsFilesL1);
+
+			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
+					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
+					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1);
+
+			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
+					"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
+			String[] fileNamePhrasesTopK = { "AllNumDirectTopKAgreements_", "AllPerDirectTopKAgreements_",
+					"AllNumDirectTopKAgreementsL1_", "AllPerDirectTopKAgreementsL1_" };
+
+			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
+
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
+					"SummaryLog");
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
+					summaryStats, "SummaryTopKLog");
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * 
@@ -174,6 +267,37 @@ public class EvaluationSeq
 			listOfNumTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
 			listOfPerTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
 		}
+	}
+
+	/**
+	 * 
+	 * @param matchingUnitAsPastCount
+	 */
+	private void intialiseListOfFilenamesNoMU()
+	{
+		// Initialise list of list of filenames
+		// we need to concated results for different user groups, 1-100,102-200, and so on
+		listOfNumAgreementsFiles = new ArrayList<>();
+		listOfPerAgreementsFiles = new ArrayList<>();
+		listOfNumAgreementsFilesL1 = new ArrayList<>();
+		listOfPerAgreementsFilesL1 = new ArrayList<>();
+
+		listOfNumTopKAgreementsFiles = new ArrayList<>();
+		listOfPerTopKAgreementsFiles = new ArrayList<>();
+		listOfNumTopKAgreementsFilesL1 = new ArrayList<>();
+		listOfPerTopKAgreementsFilesL1 = new ArrayList<>();
+
+		// we concatenate results for each mu over all users (groups)
+		int muIndex = 0;
+		listOfNumAgreementsFiles.add(muIndex, new ArrayList<String>());
+		listOfPerAgreementsFiles.add(muIndex, new ArrayList<String>());
+		listOfNumAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+		listOfPerAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+
+		listOfNumTopKAgreementsFiles.add(muIndex, new ArrayList<String>());
+		listOfPerTopKAgreementsFiles.add(muIndex, new ArrayList<String>());
+		listOfNumTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+		listOfPerTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
 	}
 
 	/**
@@ -536,6 +660,8 @@ public class EvaluationSeq
 	/**
 	 * 
 	 * @param seqIndex
+	 * @param pathToReadResults
+	 * @param verbose
 	 * @return
 	 */
 	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>>
@@ -1005,8 +1131,7 @@ public class EvaluationSeq
 			}
 			else
 			{
-				System.err.println(
-						PopUps.getTracedErrorMsg("Unknown levelAtWhichToMatch = " + levelAtWhichToMatch));
+				System.err.println(PopUps.getTracedErrorMsg("Unknown levelAtWhichToMatch = " + levelAtWhichToMatch));
 			}
 		}
 		catch (Exception e)

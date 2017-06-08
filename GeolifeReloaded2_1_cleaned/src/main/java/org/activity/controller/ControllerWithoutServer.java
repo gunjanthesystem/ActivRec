@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
-import org.activity.evaluation.RecommendationTestsMar2017GenSeq;
+import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned2;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -27,7 +27,6 @@ import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
-import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.PerformanceAnalytics;
@@ -196,15 +195,18 @@ public class ControllerWithoutServer
 
 			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 					Constant.getCommonPath() + "NumOfActsPerUserPerDate.csv");
+
 			String commonBasePath = Constant.getCommonPath();
 
 			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
 
 			// // important curtain 1 start 10 Feb 2017
-			// sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
+			sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
 			// // important curtain 1 end 10 Feb 2017
 
-			TimelineStats.timelineStatsController(usersCleanedDayTimelines);
+			// // important curtain 2 start 2 June 2017
+			// $$TimelineStats.timelineStatsController(usersCleanedDayTimelines);
+			// // important curtain 2 start 2 June 2017
 			//////////// for Gowalla end
 
 			// WritingToFile.writeUsersDayTimelines(usersDayTimelinesOriginal, "usersDayTimelinesOriginal", true, true,
@@ -314,7 +316,7 @@ public class ControllerWithoutServer
 			Constant.initialise(commonPath, Constant.getDatabaseName());
 
 			int startUserIndex = Integer.valueOf(groupsOf100UsersLabel) - 1;// 100
-			int endUserIndex = startUserIndex + 99;// 199;// 140; // 199
+			int endUserIndex = startUserIndex + 99;// $$ should be 99;// 199;// 140; // 199
 			Constant.outputCoreResultsPath = commonBasePath + groupsOf100UsersLabel + "/";
 			Files.createDirectories(Paths.get(Constant.outputCoreResultsPath)); // added on 9th Feb 2017
 			int indexOfSampleUser = 0;
@@ -377,8 +379,8 @@ public class ControllerWithoutServer
 			// Constant.percentageInTraining);
 			// // end of curtain may 4 2017
 
-			RecommendationTestsMar2017GenSeq recommendationsTest =
-					new RecommendationTestsMar2017GenSeq(sampledUsers, Constant.lookPastType, Constant.caseType,
+			RecommendationTestsMar2017GenSeqCleaned2 recommendationsTest =
+					new RecommendationTestsMar2017GenSeqCleaned2(sampledUsers, Constant.lookPastType, Constant.caseType,
 							Constant.typeOfThresholds, Constant.getUserIDs(), Constant.percentageInTraining, 3);
 
 			/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
