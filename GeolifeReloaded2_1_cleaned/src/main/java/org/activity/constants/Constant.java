@@ -89,7 +89,7 @@ public final class Constant
 	 * Can be disabled for better performance for subsequent runs if previous run of experiments shows that timelines
 	 * created had no chronological anomaly
 	 */
-	public static final boolean checkIfTimelineCreatedIsChronological = false;
+	public static final boolean checkIfTimelineCreatedIsChronological = true;// false;
 
 	/**
 	 * Percentage/100 for training test split of dataset
@@ -147,9 +147,20 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = true;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NGram;// .Daywise;// NCount;//
-																					// Enums.LookPastType.NCount;
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.ClosestTime;// .NGram;// .Daywise;//
+																							// NCount;//
+	// Enums.LookPastType.NCount;
 	// "Count";// "Count";// "Hrs"// "Daywise"
+	/**
+	 * determines if current timeline is allowed to go beyod the day boundaries, note that until the KDD paper, we were
+	 * restricting this baseline to day boundaries
+	 */
+	public static final boolean ClosestTimeAllowSpillOverDays = true;
+	/**
+	 * Determines if candidate timelines only includes those days which contain the current activity name
+	 */
+	public static final boolean ClosestTimeFilterCandidates = false;
+
 	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType =
 			Enums.EditDistanceTimeDistanceType.NearerScaled;
 	// .FurtherScaled;
@@ -859,6 +870,8 @@ public final class Constant
 		s.append("\nactivityNames:" + Arrays.toString(activityNames));
 
 		s.append("\nlookPastType:" + lookPastType);
+		s.append("\nClosestTimeAllowSpillOverDays:" + ClosestTimeAllowSpillOverDays);
+		s.append("\nClosestTimeFilterCandidates:" + ClosestTimeFilterCandidates);
 		s.append("\ncaseType:" + caseType);
 		s.append("\nrankScoring: " + rankScoring);
 		s.append("\nALPHA:" + ALPHA);

@@ -95,6 +95,12 @@ public class TimelineTransformers
 		return r;
 	}
 
+	/**
+	 * 
+	 * @param ts
+	 * @param validsOnly
+	 * @return
+	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toIntsFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{
@@ -718,8 +724,8 @@ public class TimelineTransformers
 			String catIDName = catIDNameDictionary.get(Integer.valueOf(ao.getActivityName()));
 			if (catIDName == null || catIDName.length() == 0)
 			{
-				System.err.println(PopUps.getTracedErrorMsg(
-						"Error: Didnt find cat id name for cat id :" + ao.getActivityName()));
+				System.err.println(
+						PopUps.getTracedErrorMsg("Error: Didnt find cat id name for cat id :" + ao.getActivityName()));
 			}
 			s.append(catIDName).append(delimiter);
 		}

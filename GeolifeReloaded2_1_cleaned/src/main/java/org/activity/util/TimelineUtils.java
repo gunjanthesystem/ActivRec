@@ -34,6 +34,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
+import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.json.JSONArray;
@@ -2857,6 +2858,54 @@ public class TimelineUtils
 		return concatenatedTimeline;
 	}
 
+	//
+	/**
+	 * Same as dayTimelinesToATimeline but with String keys instead of Date
+	 * <p>
+	 * Creates a Timeline consisting of the Activity Objects from the given LinkedHashMap of UserDay Timelines thus
+	 * essentially converts mulitple day timelines into a single continuous single timeline
+	 * 
+	 * @param dayTimelines
+	 *            LinkedHashMap of UserDayTimelines
+	 * 
+	 * @param shouldBelongToSingleDay
+	 *            should the Timeline to be returned belong to a single day
+	 * @param shouldBelongToSingleUser
+	 *            should the Timeline to be returned belong to a single user
+	 * @since 12 June 2017
+	 */
+	public static Timeline dayTimelinesToATimeline2(LinkedHashMap<String, Timeline> dayTimelines,
+			boolean shouldBelongToSingleDay, boolean shouldBelongToSingleUser)
+	{
+		long dt = System.currentTimeMillis();
+		Timeline concatenatedTimeline = null;
+
+		ArrayList<ActivityObject> allActivityObjects = new ArrayList<>();
+
+		for (Map.Entry<String, Timeline> entry : dayTimelines.entrySet())
+		{
+			allActivityObjects.addAll(entry.getValue().getActivityObjectsInTimeline());
+		}
+
+		if (allActivityObjects.size() == 0)
+		{
+			PopUps.printTracedErrorMsgWithExit("creating Timeline: Empty Activity Objects provided");
+		}
+
+		else
+		{
+			concatenatedTimeline = new Timeline(allActivityObjects, shouldBelongToSingleDay, shouldBelongToSingleUser);
+			if (VerbosityConstants.verbose)
+			{
+				System.out.println("Creating timelines for " + dayTimelines.size() + " daytimelines  takes "
+						+ (System.currentTimeMillis() - dt) / 1000 + " secs");
+			}
+		}
+		return concatenatedTimeline;
+	}
+
+	//
+
 	public static void traverseMapOfTimelines(LinkedHashMap<String, Timeline> map)
 	{
 		System.out.println("traversing map of day timelines");
@@ -3199,8 +3248,8 @@ public class TimelineUtils
 	 * @param candidateTimelines
 	 * @param activitiesGuidingRecomm
 	 * @param userIDAtRecomm
-	 * @param string
-	 * @param string2
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
 	 * @param hasinvalidactivitynames
 	 * @param iNVALID_ACTIVITY1
 	 * @param iNVALID_ACTIVITY2
@@ -3216,6 +3265,7 @@ public class TimelineUtils
 
 		// timelineID, <Index for the nearest Activity Object, Diff of Start time of nearest Activity
 		// Object with start time of current Activity Object>
+		// {Date of CandidateTimeline as string, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
 		LinkedHashMap<String, Pair<String, Double>> distances = new LinkedHashMap<>();
 
 		/**
@@ -3224,6 +3274,7 @@ public class TimelineUtils
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
 		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
 		for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
 		{
@@ -3232,7 +3283,7 @@ public class TimelineUtils
 			 * current Activity Object and the distance is diff of their start times
 			 */
 			Triple<Integer, ActivityObject, Double> score = (entry.getValue()
-					.getTimeDiffValidAOInDayWithStartTimeNearestTo(activityObjectAtRecommPoint.getStartTimestamp()));
+					.getTimeDiffValidAOInDayWithStartTimeNearestTo(startTimestampOfActObjAtRecommPoint));
 
 			distances.put(entry.getKey(),
 					new Pair<String, Double>(score.getSecond().getActivityName(), score.getThird()));
@@ -3242,6 +3293,168 @@ public class TimelineUtils
 		}
 		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distances,
 				indicesOfActObjsWithNearestST);
+	}
+
+	///////
+	/**
+	 * This is not restricted to daywise view of candidate timelines. The candidate timelines are considered as one
+	 * single timelines.
+	 * <p>
+	 * Gets the start time distances of the (valid) Activity Object in each candidate timeline which is nearest to the
+	 * start time of the current Activity Object
+	 * <p>
+	 * <font color = blue> can be optimized. No need to extract unique dates as the candidate timelines are already
+	 * unique dates. However, need to check this and refactor carefully</font>
+	 * 
+	 * @param candidateTimelines
+	 * @param activitiesGuidingRecomm
+	 * @param userIDAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param hasinvalidactivitynames
+	 * @param iNVALID_ACTIVITY1
+	 * @param iNVALID_ACTIVITY2
+	 * @param distanceUsed
+	 * @return {candID, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
+	 * @since 12 June 2017
+	 */
+	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>
+			getClosestTimeDistancesForCandidateTimelines(LinkedHashMap<String, Timeline> candidateTimelines,
+					ArrayList<ActivityObject> activitiesGuidingRecomm, String userIDAtRecomm, String dateAtRecomm,
+					String timeAtRecomm, boolean hasinvalidactivitynames, String iNVALID_ACTIVITY1,
+					String iNVALID_ACTIVITY2, String distanceUsed, boolean verbose)
+	{
+		// timelineID, <Index for the nearest Activity Object, Diff of Start time of nearest Activity
+		// Object with start time of current Activity Object>
+		// {Date of CandidateTimeline as string, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
+		LinkedHashMap<String, Pair<String, Double>> distances = new LinkedHashMap<>();
+
+		/**
+		 * {Date of CandidateTimeline as string, End point index of least distant subsequence}}
+		 */
+		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
+
+		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
+
+		Timeline candidateTimelinesAsOne = TimelineUtils.dayTimelinesToATimeline2(candidateTimelines, false, true);
+
+		// find how many times this time occurs in the candidate timelines.
+		LinkedHashSet<LocalDate> uniqueDatesInCands = TimelineUtils.getUniqueDates(candidateTimelinesAsOne, verbose);
+
+		Sanity.eq(uniqueDatesInCands.size(), candidateTimelines.size(),
+				"Error: we were expecting uniqueDatesInCands.size() = " + uniqueDatesInCands.size()
+						+ " candidateTimelines.size() =" + candidateTimelines.size() + " to be equal");
+		// since the candidate timelines were indeed day timelines here.
+		if (verbose)
+		{
+			System.out.println("\nuniqueDatesInCands.size() = " + uniqueDatesInCands.size()
+					+ " candidateTimelines.size() =" + candidateTimelines.size());
+		}
+
+		ArrayList<Timestamp> timestampsToLookInto =
+				createTimestampsToLookAt(uniqueDatesInCands, startTimestampOfActObjAtRecommPoint, verbose);
+
+		for (Timestamp tsToLookInto : timestampsToLookInto)
+		// for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
+		{
+
+			// Actually these dates as string should be same as keys candidateTimelines
+			Date d = new Date(tsToLookInto.getYear(), tsToLookInto.getMonth(), tsToLookInto.getDate());
+			/*
+			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
+			 * current Activity Object and the distance is diff of their start times
+			 */
+			Triple<Integer, ActivityObject, Double> score =
+					candidateTimelinesAsOne.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, verbose);
+
+			distances.put(d.toString(),
+					new Pair<String, Double>(score.getSecond().getActivityName(), score.getThird()));
+
+			indicesOfActObjsWithNearestST.put(d.toString(), score.getFirst());
+			// System.out.println("now we put "+entry.getKey()+" and score="+score);
+		}
+
+		// these two should be identical
+		candidateTimelines.keySet();
+		distances.keySet();
+
+		if (!candidateTimelines.keySet().equals(distances.keySet()))
+		{
+			String candKeys = candidateTimelines.keySet().stream().collect(Collectors.joining("\n"));
+			String distKeys = distances.keySet().stream().collect(Collectors.joining("\n"));
+			System.out.println("candidateTimelines.keySet()== distances.keySet(): "
+					+ (candidateTimelines.keySet().equals(distances.keySet())));
+			System.out.println("distKeys==candKeys : " + (distKeys.equals(candKeys)));
+			System.out.println("candKeys = " + candKeys);
+			System.out.println("distKeys = " + distKeys);
+
+		}
+
+		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distances,
+				indicesOfActObjsWithNearestST);
+	}
+
+	///////
+
+	/**
+	 * For each given date in givenDates, create a timestamp for the given time in givenTime
+	 * 
+	 * @param uniqueDatesInCands
+	 * @param startTimestampOfActObjAtRecommPoint
+	 * @return
+	 */
+	public static ArrayList<Timestamp> createTimestampsToLookAt(LinkedHashSet<LocalDate> givenDates,
+			Timestamp givenTime, boolean verbose)
+	{
+		ArrayList<Timestamp> createdTimestamp = new ArrayList<>();
+		int hrs = givenTime.getHours();
+		int mins = givenTime.getMinutes();
+		int secs = givenTime.getSeconds();
+
+		for (LocalDate d : givenDates)
+		{
+			createdTimestamp.add(
+					new Timestamp(d.getYear() - 1900, d.getMonthValue() - 1, d.getDayOfMonth(), hrs, mins, secs, 0));
+		}
+
+		// sanity check
+		if (verbose)
+		{
+			System.out.println("\nInside createTimestampsToLookAt:\ngiven dates=");
+			givenDates.stream().forEachOrdered(d -> System.out.print(d.toString() + "\t"));
+			System.out.println("\ncreateTimestampsToLookAt=");
+			createdTimestamp.stream().forEachOrdered(d -> System.out.print(d.toString() + "\t"));
+		}
+
+		return createdTimestamp;
+	}
+
+	/**
+	 * Returns list of unqiue dates in the timeline (from start timestamps of activity objects in timeline)
+	 * 
+	 * @param candidateTimelinesAsOne
+	 * @return
+	 */
+	public static LinkedHashSet<LocalDate> getUniqueDates(Timeline givenTimeline, boolean verbose)
+	{
+		LinkedHashSet<LocalDate> uniqueDates = new LinkedHashSet<>();
+		ArrayList<ActivityObject> aosInTimeline = givenTimeline.getActivityObjectsInTimeline();
+
+		for (ActivityObject ao : aosInTimeline)
+		{
+			uniqueDates.add(Instant.ofEpochMilli(ao.getStartTimestampInms()).atZone(Constant.getTimeZone().toZoneId())
+					.toLocalDate());
+		}
+
+		if (verbose)
+		{
+			System.out.println("\nInside getUniqueDates.\n givenTimeline=\n");
+			givenTimeline.printActivityObjectNamesWithTimestampsInSequence("\n");
+			System.out.println("\nuniqueDates:\n");
+			uniqueDates.stream().forEachOrdered(d -> System.out.print(d.toString() + "\t"));
+		}
+		return uniqueDates;
 	}
 
 	/**

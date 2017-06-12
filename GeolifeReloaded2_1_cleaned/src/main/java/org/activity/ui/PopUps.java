@@ -93,7 +93,7 @@ public class PopUps
 
 	public static void printTracedErrorMsgWithExit(String errorMsg)
 	{
-		StringBuilder sb = new StringBuilder("Error:" + errorMsg + "\n" + "--------- current stack -------\n");
+		StringBuilder sb = new StringBuilder("\nError:" + errorMsg + "\n" + "--------- current stack -------\n");
 		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		sb.append("timestamp:" + new Timestamp(System.currentTimeMillis()));
 		System.err.println(sb.toString() + "--------- ------- EXITWITH WITH NON ZERO STATUS----- -------");
@@ -101,14 +101,23 @@ public class PopUps
 		// return sb.append("--------- ------- ----- -------").toString();
 	}
 
+	/**
+	 * 
+	 * @param errorMsg
+	 */
 	public static void printTracedErrorMsg(String errorMsg)
 	{
-		StringBuilder sb = new StringBuilder("Error:" + errorMsg + "\n" + "--------- current stack -------\n");
+		StringBuilder sb = new StringBuilder("\nError:" + errorMsg + "\n" + "--------- current stack -------\n");
 		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		System.err.println(sb.toString() + "------------");
 		// return sb.append("--------- ------- ----- -------").toString();
 	}
 
+	/**
+	 * 
+	 * @param errorMsg
+	 * @return
+	 */
 	public static String getCurrentStackTracedWarningMsg(String errorMsg)
 	{
 		StringBuilder sb = new StringBuilder("Warning:" + errorMsg + "\n" + "--------- current stack -------\n");

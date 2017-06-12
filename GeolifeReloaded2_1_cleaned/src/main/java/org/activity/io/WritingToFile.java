@@ -965,6 +965,12 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * 
+	 * @param ts
+	 * @param fileNameToUse
+	 * @param userName
+	 */
 	public static void writeTimeSeriesIntForUser(LinkedHashMap<Timestamp, Integer> ts, String fileNameToUse,
 			String userName)
 	{
@@ -988,12 +994,8 @@ public class WritingToFile
 			{
 				String timestamp = entry.getKey().toString();
 
-				bw.write(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n"); // also
-																											// removes
-																											// the last
-																											// nano
-																											// seconds
-																											// precision
+				bw.write(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");
+				// also removes the last nano seconds precision
 			}
 			bw.close();
 		}
@@ -1320,6 +1322,11 @@ public class WritingToFile
 		return null;
 	}
 
+	/**
+	 * 
+	 * @param ts
+	 * @param fileNameToUse
+	 */
 	public static void writeAllTimeSeriesInt(LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> ts,
 			String fileNameToUse)
 	{

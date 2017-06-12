@@ -40,6 +40,8 @@ import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
 
 /**
+ * Used as of 8 June 2017
+ * </p>
  * Fork of org.activity.evaluation.RecommendationTestsMar2017GenSeq, extending it to recommending sequences Executes the
  * experiments for generating recommendations
  * 
@@ -613,8 +615,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 									System.out.print("User id" + userId + " Next activity Objects after recomm time:"
 											+ endTimeStamp + " = ");
-									nextValidActivityObjectsAfterRecommPoint1.stream()
-											.forEachOrdered(ao -> System.out.print(ao.getActivityName() + ","));
+									nextValidActivityObjectsAfterRecommPoint1.stream().forEachOrdered(ao -> System.out
+											.print(ao.getActivityName() + ":" + ao.getEndTimestamp() + ","));
 
 									Sanity.eq(nextValidActivityObjectAfterRecommPoint1.getActivityName(),
 											nextValidActivityObjectsAfterRecommPoint1.get(0).getActivityName(),
@@ -1304,7 +1306,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 			WritingToFile.createDirectory(dirToCreate);// Creating the directory for that matching unit
 			commonPath = dirToCreate + "/";
 		}
-		else // daywise
+		else // daywise //baseline closest time
 		{
 			commonPath = outputCoreResultsPath;
 		}
@@ -1345,6 +1347,13 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
 
+		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+		{
+			System.err.println("recommendationTime = " + recommendationTime + " newRecommTimestamp= "
+					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDuration
+					+ " for topRecommActName =" + topRecommActName);
+		}
+
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Debug: getRepresentativeAO: old recommendationTime="
@@ -1352,7 +1361,16 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 					+ medianPreceedingDuration + "  new recommendationTime="
 					+ newRecommTimestamp.toLocalDateTime().toString());
 		}
-		repAO.setEndTimestamp(newRecommTimestamp);
+		repAO.setEndTimestamp(newRecommTimestamp); // only end timestamp used, make sure there is no start timestamp,
+		// since we are making recommendation at end timestamps and gowalla act objs are points in time.
+		repAO.setStartTimestamp(newRecommTimestamp);
+
+		// {
+		// System.err.println("Debug1357: inside getRepresentativeAO: recommendationTime = " + recommendationTime
+		// + " newRecommTimestamp= " + newRecommTimestamp + ". medianPreceedingDuration = "
+		// + medianPreceedingDuration + " for topRecommActName =" + topRecommActName);
+		// System.out.println("repAO = " + repAO.toStringAllGowallaTS());
+		// }
 
 		return repAO;
 	}

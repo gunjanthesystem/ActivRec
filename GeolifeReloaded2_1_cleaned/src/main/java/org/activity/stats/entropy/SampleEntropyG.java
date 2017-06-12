@@ -61,6 +61,11 @@ public class SampleEntropyG
 		return ds.getStandardDeviation();
 	}
 
+	/**
+	 * 
+	 * @param filePath
+	 * @return
+	 */
 	public static double[] getTimeSeriesVals(String filePath)
 	{
 		List<Double> vals = ReadingFromFile.oneColumnReaderDouble(filePath, ",", 1, false);
