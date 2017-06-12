@@ -1,0 +1,88 @@
+package org.activity.sanityChecks;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.TimeZone;
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.activity.constants.Constant;
+import org.activity.objects.ActivityObject;
+import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
+import org.activity.util.TimelineUtils;
+
+public class TimelineUtilsChecks
+{
+	static final String actNames[] = { "a", "b", "c" };
+
+	public static void setup()
+	{
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
+		Constant.setDefaultTimeZone("UTC");
+	}
+
+	public static void main(String args[])
+	{
+		setup();
+		check12June(); // All Okay, is following spill over days.
+	}
+
+	/**
+	 * Check the following methods:
+	 * <p>
+	 * TimelineUtils.getUniqueDates()
+	 * <p>
+	 * TimelineUtils.createTimestampsToLookAt()
+	 * <p>
+	 * org.activity.objects.Timeline.getTimeDiffValidAOWithStartTimeNearestTo()
+	 * <p>
+	 */
+	public static void check12June()
+	{
+		Timeline timeline1 = createDummyTimeline(20);
+		timeline1.printActivityObjectNamesWithTimestampsInSequence("\n");
+
+		LinkedHashSet<LocalDate> uniqueDatesInCands = TimelineUtils.getUniqueDates(timeline1, true);
+
+		Timestamp startTimestampOfActObjAtRecommPoint = new Timestamp(1900, 1 - 1, 0, 23, 55, 0, 0);
+
+		ArrayList<Timestamp> timestampsToLookInto =
+				TimelineUtils.createTimestampsToLookAt(uniqueDatesInCands, startTimestampOfActObjAtRecommPoint, true);
+
+		for (Timestamp tsToLookInto : timestampsToLookInto)
+		{
+
+			Date d = new Date(tsToLookInto.getYear() - 1900, tsToLookInto.getMonth() - 1, tsToLookInto.getDate());
+			/*
+			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
+			 * current Activity Object and the distance is diff of their start times
+			 */
+			Triple<Integer, ActivityObject, Double> score =
+					timeline1.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, true);
+
+		}
+	}
+
+	public static Timeline createDummyTimeline(int numOfAOs)
+	{
+		Timestamp ts0 = new Timestamp(2010 - 1900, 1 - 1, 1, 0, 0, 0, 0);
+		ArrayList<ActivityObject> aos = new ArrayList<>();
+
+		int randomActIndex, randomNextSecs;
+		Timestamp currentTS = ts0;
+		for (int i = 0; i < numOfAOs; i++)
+		{
+			randomActIndex = ThreadLocalRandom.current().nextInt(0, actNames.length);
+			randomNextSecs = ThreadLocalRandom.current().nextInt(1000, 20000);
+
+			Timestamp ts = new Timestamp(currentTS.getTime() + randomNextSecs * 1000);
+			aos.add(new ActivityObject(actNames[randomActIndex], ts, ts));
+			currentTS = ts;
+		}
+
+		return new Timeline(aos, false, true);
+	}
+}

@@ -38,6 +38,8 @@ import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
 
 /**
+ * <font color =orange> Superceded by cleaner version RecommendationTestsMar2017GenSeqCleaned2</font>
+ * <p>
  * Fork of org.activity.evaluation.RecommendationTestsMar2017Gen, extending it to recommending sequences Executes the
  * experiments for generating recommendations
  * 
@@ -722,10 +724,11 @@ public class RecommendationTestsMar2017GenSeq
 												+ recommendationTimes[seqIndex].getMinutes() + ":"
 												+ recommendationTimes[seqIndex].getSeconds();
 
-										recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeq(userTrainingTimelines,
-												userTestTimelines, dateToRecomm, recommTimesStrings[0], userId,
-												thresholdValue, typeOfThreshold, matchingUnit, caseType,
-												this.lookPastType, false, repAOsFromPrevRecomms);
+										recommMasters[seqIndex] =
+												new RecommendationMasterMar2017GenSeq(userTrainingTimelines,
+														userTestTimelines, dateToRecomm, recommTimesStrings[0], userId,
+														thresholdValue, typeOfThreshold, matchingUnit, caseType,
+														this.lookPastType, false, repAOsFromPrevRecomms);
 										// Note: RT passed to the recommendation master is always endTimestamp. This is
 										// intentional to make the current implementation of extracting current timeline
 										// work. RT is only important for extraction of current timeline
@@ -749,8 +752,8 @@ public class RecommendationTestsMar2017GenSeq
 											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
 											// endTimeStamp+"," + weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
 											sbsNumOfCandTimelinesBelowThreshold.get(seqIndex)
-													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + "," + weekDay
-															+ "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
+													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + ","
+															+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
 											skipThisRTNoCandTimelines = true;
 											break;
 										}
@@ -774,8 +777,8 @@ public class RecommendationTestsMar2017GenSeq
 											// bwNumOfCandTimelinesBelowThreshold.write(dateToRecomm + "," +
 											// endTimeStamp+","+weekDay+","+thresholdAsDistance + "," + 0 + "\n");
 											sbsNumOfCandTimelinesBelowThreshold.get(seqIndex)
-													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + "," + weekDay
-															+ "," + thresholdAsDistance + "," + 0 + "\n");
+													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + ","
+															+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
 											skipThisRTNoCandTimelines = true;
 											break; // continue;
 										}
@@ -788,18 +791,18 @@ public class RecommendationTestsMar2017GenSeq
 											// endTimeStamp + "," + weekDay + "," + thresholdAsDistance + "," + 0);
 											// bwNumOfCandTimelinesBelowThreshold.newLine();
 											sbsNumOfCandTimelinesBelowThreshold.get(seqIndex)
-													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + "," + weekDay
-															+ "," + thresholdAsDistance + "," + 0 + "\n");
+													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + ","
+															+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
 											System.out.println(
 													"Cannot make recommendation at this point as there are no candidate timelines BELOW THRESHOLD");
 											skipThisRTNoCandTimelines = true;
 											break; // continue;
 										}
 										sbsNumOfCandTimelinesBelowThreshold.get(seqIndex)
-												.append(dateToRecomm + "," + recommendationTimes[seqIndex] + "," + weekDay
-														+ "," + thresholdAsDistance + ","
-														+ recommMaster.getNumOfCandTimelinesBelowThresh() + "," + seqIndex
-														+ "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
+												.append(dateToRecomm + "," + recommendationTimes[seqIndex] + ","
+														+ weekDay + "," + thresholdAsDistance + ","
+														+ recommMaster.getNumOfCandTimelinesBelowThresh() + ","
+														+ seqIndex + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
 
 										/// Sanity check
 										if (recommMaster.getRankedRecommendedActNamesWithoutRankScores().length() <= 0)
@@ -848,15 +851,16 @@ public class RecommendationTestsMar2017GenSeq
 										// get the top recommended activity names from previous recommendation
 										topRecommendedActNames[seqIndex] = splittedRankedRecommendedActName[1];
 										// PopUps.showMessage("here12_2");
-										ActivityObject repAOForTopRecommActName =
-												getRepresentativeAO(topRecommendedActNames[seqIndex], mapOfRepAOs,
-														mapOfMedianPreSuccDuration, userId, recommendationTimes[seqIndex]);
+										ActivityObject repAOForTopRecommActName = getRepresentativeAO(
+												topRecommendedActNames[seqIndex], mapOfRepAOs,
+												mapOfMedianPreSuccDuration, userId, recommendationTimes[seqIndex]);
 										// PopUps.showMessage("here12_3");
 										repAOsFromPrevRecomms.add(repAOForTopRecommActName);
 
 										if (seqIndex < (recommSeqLength - 1))
 										{
-											recommendationTimes[seqIndex + 1] = repAOForTopRecommActName.getEndTimestamp();
+											recommendationTimes[seqIndex + 1] =
+													repAOForTopRecommActName.getEndTimestamp();
 										} // PopUps.showMessage("here12_4");
 									}
 

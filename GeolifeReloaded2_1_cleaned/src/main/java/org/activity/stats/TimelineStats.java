@@ -77,7 +77,7 @@ public class TimelineStats
 	 * ActivityRegularityAnalysisTwoLevel";// "ActivityRegularityAnalysisOneLevel";// "Clustering";// "Clustering";// //
 	 * NGramAnalysis"; // "TimeSeriesAnalysis", "FeatureAnalysis"
 	 */
-	public static final String typeOfAnalysis = "NGramAnalysis";
+	public static final String typeOfAnalysis = "SampleEntropyPerMAnalysis";// "NGramAnalysis";
 	// "TimelineStats";// "NGramAnalysis";// "TimeSeriesCorrelationAnalysis";// "SampleEntropyPerMAnalysis";//
 	// "SampleEntropyPerMAnalysis";//
 	// "TimeSeriesAnalysis";// "AlgorithmicAnalysis2"; "Clustering";// "ClusteringTimelineHolistic";// "
@@ -411,8 +411,8 @@ public class TimelineStats
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
 
-		int mMin = 1;
-		int mMax = 15;
+		int mMin = 2;// 1;
+		int mMax = 3;// 15;
 		int mStep = 1;
 		double rOriginal = 0.15d;
 		// String[] inputFileNamePhrases =

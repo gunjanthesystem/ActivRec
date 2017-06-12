@@ -205,7 +205,7 @@ public class ControllerWithoutServer
 			// // important curtain 1 end 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017
-			// $$TimelineStats.timelineStatsController(usersCleanedDayTimelines);
+			// TimelineStats.timelineStatsController(usersCleanedDayTimelines);
 			// // important curtain 2 start 2 June 2017
 			//////////// for Gowalla end
 

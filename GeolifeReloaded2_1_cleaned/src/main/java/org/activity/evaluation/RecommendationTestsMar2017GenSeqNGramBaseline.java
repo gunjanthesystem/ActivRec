@@ -38,6 +38,8 @@ import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
 
 /**
+ * Used as of 8 June 2017
+ * <p>
  * Fork of org.activity.evaluation.RecommendationTestsMar2017Gen, extending it to recommending sequences Executes the
  * experiments for generating recommendations
  * 

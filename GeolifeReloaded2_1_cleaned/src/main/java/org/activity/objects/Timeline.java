@@ -52,8 +52,7 @@ public class Timeline implements Serializable
 	{
 		if (activityObjects.size() == 0)
 		{
-			System.err.println(PopUps
-					.getTracedErrorMsg("Error in creating Timeline: Empty Activity Objects provided"));
+			System.err.println(PopUps.getTracedErrorMsg("Error in creating Timeline: Empty Activity Objects provided"));
 			System.exit(5);
 		}
 		if (Constant.checkIfTimelineCreatedIsChronological && !TimelineUtils.isChronological(activityObjects))
@@ -238,6 +237,16 @@ public class Timeline implements Serializable
 		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
 		{
 			System.out.print(">>" + activityObjectsInTimeline.get(i).getActivityName() + "--"
+					+ activityObjectsInTimeline.get(i).getStartTimestamp() + "--"
+					+ activityObjectsInTimeline.get(i).getEndTimestamp());
+		}
+	}
+
+	public void printActivityObjectNamesWithTimestampsInSequence(String delimiter)
+	{
+		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
+		{
+			System.out.print(delimiter + activityObjectsInTimeline.get(i).getActivityName() + "--"
 					+ activityObjectsInTimeline.get(i).getStartTimestamp() + "--"
 					+ activityObjectsInTimeline.get(i).getEndTimestamp());
 		}
@@ -572,15 +581,14 @@ public class Timeline implements Serializable
 
 		if (res.size() == 0)
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
+			System.err.println(PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
 			return -99;
 		}
 
 		if (res.size() > 1)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
+			System.err.println(PopUps
+					.getTracedErrorMsg("Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
 			return -99;
 		}
 		else
@@ -611,15 +619,14 @@ public class Timeline implements Serializable
 
 		if (res.size() == 0)
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
+			System.err.println(PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
 			return null;
 		}
 
 		if (res.size() > 1)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
+			System.err.println(PopUps
+					.getTracedErrorMsg("Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
 			return null;
 		}
 		else
@@ -724,8 +731,8 @@ public class Timeline implements Serializable
 	{
 		if (!this.shouldBelongToSingleDay)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in Timeline.getActivityObjectsInDay(). shouldBelongToSingleDay= "
+			System.err.println(
+					PopUps.getTracedErrorMsg("Error in Timeline.getActivityObjectsInDay(). shouldBelongToSingleDay= "
 							+ shouldBelongToSingleDay));
 		}
 		return this.activityObjectsInTimeline;
@@ -740,8 +747,8 @@ public class Timeline implements Serializable
 	{
 		if (!this.shouldBelongToSingleUser)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in Timeline.getActivityObjectsInDay(). shouldBelongToSingleUser= "
+			System.err.println(
+					PopUps.getTracedErrorMsg("Error in Timeline.getActivityObjectsInDay(). shouldBelongToSingleUser= "
 							+ shouldBelongToSingleUser));
 		}
 		return this.activityObjectsInTimeline.get(0).userID;
@@ -797,11 +804,8 @@ public class Timeline implements Serializable
 	{
 		if (!this.isShouldBelongToSingleDay())
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in Timeline.getTimeDiffValidAOInDayWithStartTimeNearestTo: isShouldBelongToSingleDay ="
-							+ this.isShouldBelongToSingleDay()
-							+ " while this method should only be called for day timeline "));
-			System.exit(-1);
+			PopUps.printTracedErrorMsgWithExit("isShouldBelongToSingleDay =" + this.isShouldBelongToSingleDay()
+					+ " while this method should only be called for day timeline ");
 		}
 
 		/** Seconds in that day before the timestamp t which is start timestamp of the current activity object **/
@@ -843,4 +847,72 @@ public class Timeline implements Serializable
 				this.activityObjectsInTimeline.get(indexOfActivityObjectNearestST), (double) leastDistantSTVal);
 	}
 
+	/////
+
+	////
+	/**
+	 * Finds the valid Activity Object in this timeline whose start timestamp (including date) is nearest to the given
+	 * timestamp
+	 * <p>
+	 * <font color = orange>not restricted to daywise view of timelines</font>
+	 *
+	 *
+	 * @param givenTimestamp
+	 *            * @param verbose
+	 * @return Triple (indexOfActivityObject with nearest start time to given timestamp, that activity object, abs time
+	 *         difference in secs between the st of this ao and st of current ao t)
+	 * 
+	 * @since 12 June 2017
+	 */
+	public Triple<Integer, ActivityObject, Double> getTimeDiffValidAOWithStartTimeNearestTo(Timestamp givenTimestamp,
+			boolean verbose)
+	{
+		long givenTimestampLong = givenTimestamp.getTime();
+		// if (this.isShouldBelongToSingleDay())
+		// {
+		// PopUps.printTracedErrorMsgWithExit("isShouldBelongToSingleDay =" + this.isShouldBelongToSingleDay()
+		// + " while this method should only be called for day timeline ");
+		// }
+
+		/** Seconds in that day before the timestamp t which is start timestamp of the current activity object **/
+		// long secsCO_ST_InDay = t.getHours() * 60 * 60 + t.getMinutes() * 60 + t.getSeconds();
+		//
+		int indexOfActivityObjectNearestST = Integer.MIN_VALUE;
+		long leastDistantSTVal = Long.MAX_VALUE;
+
+		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
+		{
+			if (activityObjectsInTimeline.get(i).isInvalidActivityName())
+			{
+				continue;
+			}
+
+			long aoST = activityObjectsInTimeline.get(i).getStartTimestamp().getTime();
+
+			/** Seconds in that day before the Activity Object's start timestamp **/
+			// long secsAO_ST_InDay = aoST.getHours() * 60 * 60 + aoST.getMinutes() * 60 + aoST.getSeconds();
+
+			long absDiffSecs = Math.abs(aoST - givenTimestampLong);
+			// room for optimisation by not iterating over the whole timeline, can do it later
+			if (absDiffSecs < leastDistantSTVal)
+			{
+				leastDistantSTVal = absDiffSecs;
+				indexOfActivityObjectNearestST = i;
+			}
+		}
+
+		ActivityObject nearestActObj = this.activityObjectsInTimeline.get(indexOfActivityObjectNearestST);
+		if (verbose)
+		{
+			// System.out.println("timeline = ");
+			// this.printActivityObjectNamesWithTimestampsInSequence();
+			System.out.println("\ngivenTimestamp =" + givenTimestamp + "index of Activity Object with nearest ST  is: "
+					+ indexOfActivityObjectNearestST + " with st: " + nearestActObj.getStartTimestamp()
+					+ "\nwith time diff of " + leastDistantSTVal + "millisecs = " + (leastDistantSTVal / (1000.0 * 60))
+					+ "secs act name = " + nearestActObj.getActivityName());
+		}
+
+		return new Triple<Integer, ActivityObject, Double>(indexOfActivityObjectNearestST, nearestActObj,
+				(double) leastDistantSTVal);
+	}
 }

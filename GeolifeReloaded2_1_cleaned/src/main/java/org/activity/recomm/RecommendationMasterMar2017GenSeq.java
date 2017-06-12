@@ -29,6 +29,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
+import org.activity.sanityChecks.Sanity;
 import org.activity.sanityChecks.TimelineSanityChecks;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -226,8 +227,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
 		try
 		{
-			System.out
-					.println("\n-----------Starting RecommendationMasterMar2017Gen " + lookPastType + "-------------");
+			System.out.println(
+					"\n-----------Starting RecommendationMasterMar2017GenSeq " + lookPastType + "-------------");
 
 			String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 			long recommMasterT0 = System.currentTimeMillis();
@@ -237,9 +238,10 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			this.lookPastType = lookPastType;
 			this.caseType = caseType;
 
-			if (!this.lookPastType.equals(Enums.LookPastType.Daywise))
+			if (!lookPastType.equals(LookPastType.Daywise) && !lookPastType.equals(LookPastType.ClosestTime))
+			{
 				this.matchingUnitInCountsOrHours = matchingUnitInCountsOrHours;
-
+			}
 			errorExists = false;
 
 			this.hasCandidateTimelines = true;
@@ -257,29 +259,29 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			Pair<TimelineWithNext, Double> extCurrTimelineRes = null;
 			if (actObjsToAddToCurrentTimeline.size() > 0)
 			{
-				extCurrTimelineRes = extractCurrentTimelineSeq(testTimelines, lookPastType, this.dateAtRecomm,
-						this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours,
-						actObjsToAddToCurrentTimeline);
+				extCurrTimelineRes =
+						extractCurrentTimelineSeq(testTimelines, lookPastType, this.dateAtRecomm, this.timeAtRecomm,
+								this.userIDAtRecomm, this.matchingUnitInCountsOrHours, actObjsToAddToCurrentTimeline);
 			}
 			else
 			{
 				extCurrTimelineRes = extractCurrentTimeline(testTimelines, lookPastType, this.dateAtRecomm,
 						this.timeAtRecomm, this.userIDAtRecomm, this.matchingUnitInCountsOrHours);
 			}
+
 			this.currentTimeline = extCurrTimelineRes.getFirst();
 			this.reductionInMatchingUnit = extCurrTimelineRes.getSecond();
 			//////
 
 			this.activitiesGuidingRecomm = currentTimeline.getActivityObjectsInTimeline(); // CURRENT TIMELINE
 
-			if (actObjsToAddToCurrentTimeline.size() > 0)
+			if (actObjsToAddToCurrentTimeline.size() > 0 && this.lookPastType == LookPastType.NCount)
 			{
 				if (reductionInMatchingUnit == 0 && activitiesGuidingRecomm.size() <= matchingUnitInCountsOrHours)
 				{
-					System.out.println("Error: actsGuidingRecomm.size():" + this.activitiesGuidingRecomm.size() + "<=MU"
+					System.err.println("Error: actsGuidingRecomm.size():" + this.activitiesGuidingRecomm.size() + "<=MU"
 							+ matchingUnitInCountsOrHours + " (even without reduced mu");
 				}
-
 				else if (activitiesGuidingRecomm.size() <= matchingUnitInCountsOrHours)
 				{
 					System.out.println("Warning: actsGuidingRecomm.size():" + this.activitiesGuidingRecomm.size()
@@ -355,10 +357,11 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// after thresholding (correct), here
 			// normalisation is before thresholding which should be changed
 			long recommMasterT3 = System.currentTimeMillis();
-			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes = getNormalisedDistancesForCandidateTimelines(
-					candidateTimelines, activitiesGuidingRecomm, caseType, this.userIDAtRecomm, this.dateAtRecomm,
-					this.timeAtRecomm, Constant.getDistanceUsed(), this.lookPastType, this.hjEditDistance,
-					this.featureWiseEditDistance, this.featureWiseWeightedEditDistance, this.OTMDSAMEditDistance);
+			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes =
+					getNormalisedDistancesForCandidateTimelines(candidateTimelines, activitiesGuidingRecomm, caseType,
+							this.userIDAtRecomm, this.dateAtRecomm, this.timeAtRecomm, Constant.getDistanceUsed(),
+							this.lookPastType, this.hjEditDistance, this.featureWiseEditDistance,
+							this.featureWiseWeightedEditDistance, this.OTMDSAMEditDistance);
 
 			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted = normalisedDistFromCandsRes.getFirst();
 			this.endPointIndicesConsideredInCands = normalisedDistFromCandsRes.getSecond();
@@ -372,9 +375,20 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// ########Sanity check
 			if (distancesMapUnsorted.size() != candidateTimelines.size())
 			{
-				System.err.println(PopUps.getTracedErrorMsg(
-						"Error editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
-								+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")"));
+				PopUps.printTracedErrorMsg("editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
+						+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")");
+				String distancesMapUnsortedAsString = distancesMapUnsorted.entrySet().stream()
+						.map(e -> e.getKey() + " - " + e.getValue().getFirst() + "_" + e.getValue().getSecond())
+						.collect(Collectors.joining("\n"));
+				String candidateTimelinesAsString = candidateTimelines.entrySet().stream()
+						.map(e -> e.getKey() + " - " + e.getValue().getActivityObjectNamesWithTimestampsInSequence())
+						.collect(Collectors.joining("\n"));
+
+				WritingToFile.appendLineToFileAbsolute(
+						"User = " + this.userIDAtRecomm + "\ndistancesMapUnsortedAsString =\n"
+								+ distancesMapUnsortedAsString + "\n\n candidateTimelinesAsString =\n"
+								+ candidateTimelinesAsString,
+						Constant.getCommonPath() + "ErrorLog376distancesMapUnsorted.txt");
 				errorExists = true;
 			}
 			// ##############
@@ -437,9 +451,9 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			{
 				System.out.println("---------editDistancesSortedMap.size()=" + distancesSortedMap.size());
 
-				StringBuilder sbToWrite1 = new StringBuilder(
-						">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" + "\n lookPastType:" + lookPastType
-								+ "\n The candidate timelines  in increasing order of distance are:\n");
+				StringBuilder sbToWrite1 =
+						new StringBuilder(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" + "\n lookPastType:"
+								+ lookPastType + "\n The candidate timelines  in increasing order of distance are:\n");
 				distancesSortedMap.entrySet().stream()
 						.forEach(e -> sbToWrite1.append("candID:" + e.getKey() + " dist:" + e.getValue().getSecond()
 								+ "\n acts:" + candidateTimelines.get(e.getKey()).getActivityObjectNamesInSequence()
@@ -465,14 +479,15 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			}
 
 			//////// Create ranked recommended act names
-			this.recommendedActivityNamesWithRankscores = createRankedTopRecommendedActivityNames(
-					this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand,
-					this.lookPastType, this.distancesSortedMap);
+			this.recommendedActivityNamesWithRankscores =
+					createRankedTopRecommendedActivityNames(this.nextActivityObjectsFromCands, this.caseType,
+							similarityOfEndPointActivityObjectCand, this.lookPastType, this.distancesSortedMap);
 
-			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityNamesWithRankScoresString(
-					this.recommendedActivityNamesWithRankscores);
-			this.rankedRecommendedActNamesWithoutRankScoresStr = getRankedRecommendedActivityNamesWithoutRankScoresString(
-					this.recommendedActivityNamesWithRankscores);
+			this.rankedRecommendedActNamesWithRankScoresStr =
+					getRankedRecommendedActivityNamesWithRankScoresString(this.recommendedActivityNamesWithRankscores);
+			this.rankedRecommendedActNamesWithoutRankScoresStr =
+					getRankedRecommendedActivityNamesWithoutRankScoresString(
+							this.recommendedActivityNamesWithRankscores);
 			//
 			this.normEditSimilarity = (ArrayList<Double>) this.nextActivityObjectsFromCands.entrySet().stream()
 					.map(e -> e.getValue().getSecond()).collect(Collectors.toList());
@@ -559,8 +574,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 		else
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error: type of threshold unknown in recommendation master"));
+			System.err.println(PopUps.getTracedErrorMsg("Error: type of threshold unknown in recommendation master"));
 			// errorExists = true;
 			System.exit(-2);
 		}
@@ -621,8 +635,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 		else
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error:unrecognised lookpast type = " + lookPastType));
+			System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookpast type = " + lookPastType));
 			return null;
 		}
 
@@ -657,11 +670,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 *         subsequence}}
 	 */
 
-	private static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getNormalisedDistancesForCandidateTimelines(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
-			CaseType caseType, String userIDAtRecomm, Date dateAtRecomm, Time timeAtRecomm, String distanceUsed,
-			LookPastType lookPastType, HJEditDistance hjEditDistance, FeatureWiseEditDistance featureWiseEditDistance,
-			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance)
+	// @SuppressWarnings("unused")
+	private static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>
+			getNormalisedDistancesForCandidateTimelines(LinkedHashMap<String, Timeline> candidateTimelines,
+					ArrayList<ActivityObject> activitiesGuidingRecomm, CaseType caseType, String userIDAtRecomm,
+					Date dateAtRecomm, Time timeAtRecomm, String distanceUsed, LookPastType lookPastType,
+					HJEditDistance hjEditDistance, FeatureWiseEditDistance featureWiseEditDistance,
+					FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance,
+					OTMDSAMEditDistance OTMDSAMEditDistance)
 	{
 		// {CandID,Trace,EditDist}
 		LinkedHashMap<String, Pair<String, Double>> normalisedDistanceForCandTimelines = null;
@@ -672,9 +688,9 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		if (lookPastType.equals(Enums.LookPastType.Daywise))
 		{
-			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes = TimelineUtils
-					.getEditDistancesForDaywiseCandidateTimelines(candidateTimelines, activitiesGuidingRecomm,
-							userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes =
+					TimelineUtils.getEditDistancesForDaywiseCandidateTimelines(candidateTimelines,
+							activitiesGuidingRecomm, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
 							Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
 							distanceUsed, hjEditDistance);
 
@@ -697,17 +713,28 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// endIndexSubseqConsideredInCand = (LinkedHashMap<String, Integer>) candidateTimelines.entrySet().stream()
 			// .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1));
 
-			endIndexSubseqConsideredInCand = candidateTimelines.entrySet().stream()
-					.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1, (v1, v2) -> v1,
-							LinkedHashMap<String, Integer>::new));
+			endIndexSubseqConsideredInCand =
+					candidateTimelines.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(),
+							e -> e.getValue().size() - 1, (v1, v2) -> v1, LinkedHashMap<String, Integer>::new));
 		}
 		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))
 		{
-			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes = TimelineUtils
-					.getClosestTimeDistancesForDaywiseCandidateTimelines(candidateTimelines, activitiesGuidingRecomm,
-							userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
-							Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
-							distanceUsed);
+			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes = null;
+
+			if (Constant.ClosestTimeAllowSpillOverDays == false)
+			{
+				editDistancesRes = TimelineUtils.getClosestTimeDistancesForDaywiseCandidateTimelines(candidateTimelines,
+						activitiesGuidingRecomm, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+						Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
+						distanceUsed);
+			}
+			else
+			{
+				editDistancesRes = TimelineUtils.getClosestTimeDistancesForCandidateTimelines(candidateTimelines,
+						activitiesGuidingRecomm, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+						Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
+						distanceUsed, false);
+			}
 
 			LinkedHashMap<String, Pair<String, Double>> candEditDistances = editDistancesRes.getFirst();
 			normalisedDistanceForCandTimelines = normalisedDistancesOverTheSet(candEditDistances, userIDAtRecomm,
@@ -724,8 +751,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		if (normalisedDistanceForCandTimelines == null || normalisedDistanceForCandTimelines.size() == 0)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error: normalisedDistanceForCandTimelines.size=" + normalisedDistanceForCandTimelines.size()));
+			PopUps.printTracedErrorMsg(
+					"Error: normalisedDistanceForCandTimelines.size=" + normalisedDistanceForCandTimelines.size());
 		}
 
 		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(
@@ -768,6 +795,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		{
 			extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineDaywise(testTimelinesDaywise,
 					dateAtRecomm, timeAtRecomm, userIDAtRecomm);
+			// for closest-time approach, only the current activity name is important, we do not actually need the
+			// complete current timeline
 		}
 		else
 		{
@@ -809,6 +838,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	}
 
 	/**
+	 * <p>
+	 * Note: the extracted current timeline does not have a next act obj
 	 * 
 	 * @param testTimelinesOrig
 	 * @param lookPastType
@@ -831,31 +862,52 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		TimelineWithNext extractedCurrentTimeline = extractedCurrentTimelineResult.getFirst();
 
 		// //////////////////
-		ArrayList<ActivityObject> actObjsForCurrTimeline = new ArrayList<>(
-				extractedCurrentTimeline.getActivityObjectsInTimeline());
+		ArrayList<ActivityObject> actObjsForCurrTimeline =
+				new ArrayList<>(extractedCurrentTimeline.getActivityObjectsInTimeline());
 
 		// sanity check is act objs to add are later than act objs in timeline
 		TimelineSanityChecks.checkIfChronoLogicalOrder(actObjsForCurrTimeline, actObjsToAddToCurrentTimeline);
 
+		// temp for debug
+		// { System.out.println("Debug 847 inside extractCurrentTimelineSeq, \nactObjsForCurrTimeline = ");
+		// actObjsForCurrTimeline.stream().forEachOrdered(ao -> System.err.println(">>" + ao.toStringAllGowallaTS()));
+		// System.out.println("actObjsToAddToCurrentTimeline = ");
+		// actObjsToAddToCurrentTimeline.stream()
+		// .forEachOrdered(ao -> System.err.println(">>" + ao.toStringAllGowallaTS())); }
+
+		// this addition can cause the timeline to spill over days
 		actObjsForCurrTimeline.addAll(actObjsToAddToCurrentTimeline);
 
 		// NOTE: WE ARE NOT SETTING NEXT ACTIVITY OBJECT OF CURRENT TIMELINE HERE.
-		if (lookPastType.equals(Enums.LookPastType.Daywise) || lookPastType.equals(Enums.LookPastType.ClosestTime))
+		if (lookPastType.equals(Enums.LookPastType.Daywise))// || lookPastType.equals(Enums.LookPastType.ClosestTime))
 		{
 			extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, true, true);
 		}
+
+		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))
+		{
+			if (Constant.ClosestTimeAllowSpillOverDays)
+			{// ALLOWING SPILL OVER ONTO NEXT DAY
+				extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, false, true);
+			}
+			else
+			{
+				extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, true, true);
+			}
+		}
+
 		else if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		{
 			extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, false, true);
 		}
+
 		extractedCurrentTimeline.setImmediateNextActivityIsInvalid(-1);
 		// ////////////////////
 		if (extractedCurrentTimeline.getActivityObjectsInTimeline().size() == 0)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
+			PopUps.printTracedErrorMsgWithExit(
 					"Error: extractCurrentTimeline extractedCurrentTimeline.getActivityObjectsInTimeline().size()="
-							+ extractedCurrentTimeline.getActivityObjectsInTimeline().size()));
-			System.exit(-1);
+							+ extractedCurrentTimeline.getActivityObjectsInTimeline().size());
 			// this.errorExists = true;
 		}
 		if (VerbosityConstants.verbose)
@@ -902,17 +954,32 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 
 		// //////////////////
-		if (lookPastType2.equals(Enums.LookPastType.Daywise) || lookPastType2.equals(Enums.LookPastType.ClosestTime))
+		if (lookPastType2.equals(Enums.LookPastType.Daywise)
+				|| (lookPastType2.equals(Enums.LookPastType.ClosestTime) && Constant.ClosestTimeFilterCandidates))
 		{
 			// Obtain {Date,Timeline}
 			LinkedHashMap<Date, Timeline> candidateTimelinesDate = TimelineUtils
 					.extractDaywiseCandidateTimelines(trainingTimelinesDaywise, dateAtRecomm, activityAtRecommPoint);
 
 			// convert to {Date as String, Timeline}(LinkedHashMap<String, Timeline>)
-			candidateTimelines = candidateTimelinesDate.entrySet().stream()
-					.collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue(), (v1, v2) -> v1,
-							LinkedHashMap<String, Timeline>::new));
+			candidateTimelines =
+					candidateTimelinesDate.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().toString(),
+							e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Timeline>::new));
 		}
+		// take all training day timelines as candidate timelines, i.e., no filtering of candidate timelines for closest
+		// time approach
+		else if (lookPastType2.equals(Enums.LookPastType.ClosestTime) && !Constant.ClosestTimeFilterCandidates)
+		{
+			// convert to {Date as String, Timeline}(LinkedHashMap<String, Timeline>)
+			candidateTimelines =
+					trainingTimelinesDaywise.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().toString(),
+							e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Timeline>::new));
+
+			Sanity.eq(candidateTimelines.size(), trainingTimelinesDaywise.size(),
+					"candidateTimelines.size() = " + candidateTimelines.size() + "!= trainingTimelinesDaywise.size() = "
+							+ trainingTimelinesDaywise.size());
+		}
+
 		else if (lookPastType2.equals(Enums.LookPastType.NCount) || lookPastType2.equals(Enums.LookPastType.NHours))
 		{
 			// converting day timelines into continuous timelines suitable to be used for matching unit views
@@ -937,15 +1004,20 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			System.out.println(PopUps.getCurrentStackTracedWarningMsg("Warning: candidate timeline is empty"));
 			// this.errorExists = true;
 		}
-
 		return candidateTimelines;
 	}
 
+	/**
+	 * 
+	 */
 	public Date getDateAtRecomm()
 	{
 		return dateAtRecomm;
 	}
 
+	/**
+	 * 
+	 */
 	public String getActivityNamesGuidingRecomm()
 	{
 		StringBuilder res = new StringBuilder();
@@ -1187,14 +1259,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 		// // Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric
 		// value of rank)
-		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
-				.sortByValueDesc(recommendedActivityNamesRankscorePairs);
+		recommendedActivityNamesRankscorePairs =
+				(LinkedHashMap<String, Double>) ComparatorUtils.sortByValueDesc(recommendedActivityNamesRankscorePairs);
 
 		if (recommendedActivityNamesRankscorePairs == null || recommendedActivityNamesRankscorePairs.size() == 0)
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
-							+ recommendedActivityNamesRankscorePairs.size());
+			System.err.println(PopUps.getTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
+					+ recommendedActivityNamesRankscorePairs.size());
 		}
 
 		return recommendedActivityNamesRankscorePairs;
@@ -1212,7 +1283,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			LinkedHashMap<String, Pair<String, Double>> closestActObjsWithSTDiffInSecs)
 	// LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceSortedMap)
 	{
-		System.out.println("Debug inside createRankedTopRecommendedActivityNamesClosestTime:");
+		// System.out.println("Debug inside createRankedTopRecommendedActivityNamesClosestTime:");
 
 		LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs = new LinkedHashMap<>(); // <ActivityName,RankScore>
 
@@ -1233,8 +1304,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			}
 		}
 
-		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
-				.sortByValueDesc(recommendedActivityNamesRankscorePairs);
+		recommendedActivityNamesRankscorePairs =
+				(LinkedHashMap<String, Double>) ComparatorUtils.sortByValueDesc(recommendedActivityNamesRankscorePairs);
 		// Sorted in descending order of ranked score: higher ranked score means higher value of rank
 
 		return recommendedActivityNamesRankscorePairs;
@@ -1515,14 +1586,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		// Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value
 		// of rank)
-		recommendedActivityNamesRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
-				.sortByValueDesc(recommendedActivityNamesRankscorePairs);
+		recommendedActivityNamesRankscorePairs =
+				(LinkedHashMap<String, Double>) ComparatorUtils.sortByValueDesc(recommendedActivityNamesRankscorePairs);
 
 		if (recommendedActivityNamesRankscorePairs == null || recommendedActivityNamesRankscorePairs.size() == 0)
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
-							+ recommendedActivityNamesRankscorePairs.size());
+			System.err.println(PopUps.getTracedErrorMsg("Error: recommendedActivityNamesRankscorePairs.size() = ")
+					+ recommendedActivityNamesRankscorePairs.size());
 		}
 		return recommendedActivityNamesRankscorePairs;
 	}
@@ -1670,8 +1740,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		if (nextActObjs == null || nextActObjs.size() == 0)
 		{
-			System.err
-					.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
+			System.err.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
 		}
 		// this.topNextActivityObjects = topActivityObjects;
 		return nextActObjs;
@@ -1720,13 +1789,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				}
 				if (endPointIndexInCand < 0)
 				{
-					System.err.println(PopUps.getTracedErrorMsg(
-							"Error: for daytimeline endPointIndexInCand=" + endPointIndexInCand));
+					System.err.println(PopUps
+							.getTracedErrorMsg("Error: for daytimeline endPointIndexInCand=" + endPointIndexInCand));
 					System.exit(-1);
 				}
 
-				ActivityObject nextValidAO = candUserDayTimeline
-						.getNextValidActivityAfterActivityAtThisPosition(endPointIndexInCand);
+				ActivityObject nextValidAO =
+						candUserDayTimeline.getNextValidActivityAfterActivityAtThisPosition(endPointIndexInCand);
 				nextActObjs.put(timelineID, new Pair<ActivityObject, Double>(nextValidAO, distanceOfCandTimeline));
 
 				if (VerbosityConstants.verbose)
@@ -1742,8 +1811,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		if (nextActObjs == null || nextActObjs.size() == 0)
 		{
-			System.err
-					.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
+			System.err.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
 		}
 
 		// System.out.println("-------exiting fetchNextActivityObjectsDaywise\n");
@@ -1774,8 +1842,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		case ClosestTime:
 			return null;
 		default:
-			System.err
-					.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
+			System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
 			return null;
 		}
 
@@ -1830,8 +1897,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				}
 				else
 				{
-					editDistanceForThisCandidate = hjEditDistance
-							.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+					editDistanceForThisCandidate =
+							hjEditDistance.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
 									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
 									userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
 				}
@@ -1882,13 +1949,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 *            used only for writing to file
 	 * @return <CanditateTimelineID, <FeatureName,>Pair<Trace,Edit distance of this candidate>>>
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> getFeatureWiseEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
-			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			FeatureWiseEditDistance featureWiseEditDistance)
+	public static LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>>
+			getFeatureWiseEditDistancesForCandidateTimelinesFullCand(LinkedHashMap<String, Timeline> candidateTimelines,
+					ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
+					String dateAtRecomm, String timeAtRecomm, FeatureWiseEditDistance featureWiseEditDistance)
 	{
 		// <CandidateTimeline ID, Edit distance>
-		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise =
+				new LinkedHashMap<>();
 
 		for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
 		{
@@ -1903,14 +1971,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
 																	// again
 				{
-					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-							.getFeatureWiseEditDistanceWithoutEndCurrentActivity(
+					featureWiseEditDistancesForThisCandidate =
+							featureWiseEditDistance.getFeatureWiseEditDistanceWithoutEndCurrentActivity(
 									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
 				}
 				else
 				{
-					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-							.getFeatureWiseEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+					featureWiseEditDistancesForThisCandidate =
+							featureWiseEditDistance.getFeatureWiseEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
 									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
 				}
 				break;
@@ -1920,17 +1988,23 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 				{
-					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-							.getFeatureWiseEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),
-									activitiesGuidingRecomm);// , userAtRecomm, dateAtRecomm, timeAtRecomm,
-																// candidateTimelineId);
+					featureWiseEditDistancesForThisCandidate =
+							featureWiseEditDistance.getFeatureWiseEditDistanceWithTrace(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);// ,
+																												// userAtRecomm,
+																												// dateAtRecomm,
+																												// timeAtRecomm,
+																												// candidateTimelineId);
 				}
 				else
 				{
-					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-							.getFeatureWiseEditDistanceInvalidsExpunged(entry.getValue().getActivityObjectsInTimeline(),
-									activitiesGuidingRecomm);// , userAtRecomm, dateAtRecomm, timeAtRecomm,
-																// candidateTimelineId);
+					featureWiseEditDistancesForThisCandidate =
+							featureWiseEditDistance.getFeatureWiseEditDistanceInvalidsExpunged(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);// ,
+																												// userAtRecomm,
+																												// dateAtRecomm,
+																												// timeAtRecomm,
+																												// candidateTimelineId);
 				}
 				break;
 
@@ -1997,8 +2071,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				}
 				else
 				{
-					editDistanceForThisCandidate = OTMDSAMEditDistance
-							.getOTMDSAMEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+					editDistanceForThisCandidate =
+							OTMDSAMEditDistance.getOTMDSAMEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
 									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
 									userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
 				}
@@ -2049,13 +2123,16 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param featureWiseWeightedEditDistance
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> getFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
-			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance)
+	public static LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>>
+			getFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
+					LinkedHashMap<String, Timeline> candidateTimelines,
+					ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
+					String dateAtRecomm, String timeAtRecomm,
+					FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance)
 	{
 		// <CandidateTimeline ID, Edit distance>
-		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise =
+				new LinkedHashMap<>();
 
 		for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
 		{
@@ -2070,8 +2147,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
 																	// again
 				{
-					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-							.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivity(
+					featureWiseWeightedEditDistancesForThisCandidate =
+							featureWiseWeightedEditDistance.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivity(
 									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
 				}
 				else
@@ -2087,14 +2164,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 				{
-					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-							.getFeatureWiseWeightedEditDistanceRawValsWithTrace(
+					featureWiseWeightedEditDistancesForThisCandidate =
+							featureWiseWeightedEditDistance.getFeatureWiseWeightedEditDistanceRawValsWithTrace(
 									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
 				}
 				else
 				{
-					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-							.getFeatureWiseWeightedEditDistanceInvalidsExpunged(
+					featureWiseWeightedEditDistancesForThisCandidate =
+							featureWiseWeightedEditDistance.getFeatureWiseWeightedEditDistanceInvalidsExpunged(
 									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
 				}
 				break;
@@ -2205,12 +2282,12 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance)
 	{
-		LinkedHashMap<String, Pair<String, Double>> candEditDistances = getHJEditDistancesForCandidateTimelinesFullCand(
-				candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
-				hjEditDistance);
+		LinkedHashMap<String, Pair<String, Double>> candEditDistances =
+				getHJEditDistancesForCandidateTimelinesFullCand(candidateTimelines, activitiesGuidingRecomm, caseType,
+						userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance);
 
-		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = normalisedDistancesOverTheSet(
-				candEditDistances, userAtRecomm, dateAtRecomm, timeAtRecomm);
+		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances =
+				normalisedDistancesOverTheSet(candEditDistances, userAtRecomm, dateAtRecomm, timeAtRecomm);
 
 		return normalisedCandEditDistances;
 	}
@@ -2226,19 +2303,20 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param featureWiseEditDistance
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
-			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			FeatureWiseEditDistance featureWiseEditDistance)
+	public static LinkedHashMap<String, Pair<String, Double>>
+			getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(
+					LinkedHashMap<String, Timeline> candidateTimelines,
+					ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
+					String dateAtRecomm, String timeAtRecomm, FeatureWiseEditDistance featureWiseEditDistance)
 	{
-		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise = getFeatureWiseEditDistancesForCandidateTimelinesFullCand(
-				candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
-				featureWiseEditDistance);
+		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise =
+				getFeatureWiseEditDistancesForCandidateTimelinesFullCand(candidateTimelines, activitiesGuidingRecomm,
+						caseType, userAtRecomm, dateAtRecomm, timeAtRecomm, featureWiseEditDistance);
 
-		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedCandEditDistances = normalisedFeatureWiseDistancesOverTheSet(
-				candEditDistancesFeatureWise);
-		LinkedHashMap<String, Pair<String, Double>> aggregatedNormalisedCandEditDistances = aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(
-				normalisedCandEditDistances);
+		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedCandEditDistances =
+				normalisedFeatureWiseDistancesOverTheSet(candEditDistancesFeatureWise);
+		LinkedHashMap<String, Pair<String, Double>> aggregatedNormalisedCandEditDistances =
+				aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(normalisedCandEditDistances);
 
 		if (VerbosityConstants.verboseNormalisation)
 		{
@@ -2261,17 +2339,18 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param OTMDSAMEditDistance
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedOTMDSAMEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
-			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			OTMDSAMEditDistance OTMDSAMEditDistance)
+	public static LinkedHashMap<String, Pair<String, Double>>
+			getNormalisedOTMDSAMEditDistancesForCandidateTimelinesFullCand(
+					LinkedHashMap<String, Timeline> candidateTimelines,
+					ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
+					String dateAtRecomm, String timeAtRecomm, OTMDSAMEditDistance OTMDSAMEditDistance)
 	{
-		LinkedHashMap<String, Pair<String, Double>> candEditDistances = getOTMDSAMEditDistancesForCandidateTimelinesFullCand(
-				candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
-				OTMDSAMEditDistance);
+		LinkedHashMap<String, Pair<String, Double>> candEditDistances =
+				getOTMDSAMEditDistancesForCandidateTimelinesFullCand(candidateTimelines, activitiesGuidingRecomm,
+						caseType, userAtRecomm, dateAtRecomm, timeAtRecomm, OTMDSAMEditDistance);
 
-		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = normalisedDistancesOverTheSet(
-				candEditDistances, userAtRecomm, dateAtRecomm, timeAtRecomm);
+		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances =
+				normalisedDistancesOverTheSet(candEditDistances, userAtRecomm, dateAtRecomm, timeAtRecomm);
 
 		return normalisedCandEditDistances;
 	}
@@ -2287,19 +2366,22 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param featureWiseWeightedEditDistance
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
-			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance)
+	public static LinkedHashMap<String, Pair<String, Double>>
+			getNormalisedFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
+					LinkedHashMap<String, Timeline> candidateTimelines,
+					ArrayList<ActivityObject> activitiesGuidingRecomm, Enums.CaseType caseType, String userAtRecomm,
+					String dateAtRecomm, String timeAtRecomm,
+					FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance)
 	{
-		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise = getFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
-				candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
-				featureWiseWeightedEditDistance);
+		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> candEditDistancesFeatureWise =
+				getFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+						activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
+						featureWiseWeightedEditDistance);
 
-		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedCandEditDistances = normalisedFeatureWiseDistancesOverTheSet(
-				candEditDistancesFeatureWise);
-		LinkedHashMap<String, Pair<String, Double>> aggregatedNormalisedCandEditDistances = aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(
-				normalisedCandEditDistances);
+		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedCandEditDistances =
+				normalisedFeatureWiseDistancesOverTheSet(candEditDistancesFeatureWise);
+		LinkedHashMap<String, Pair<String, Double>> aggregatedNormalisedCandEditDistances =
+				aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(normalisedCandEditDistances);
 
 		if (VerbosityConstants.verboseNormalisation)
 		{
@@ -2315,11 +2397,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param setOfFeatureWiseDistances
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedFeatureWiseDistancesOverTheSet(
-			LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> setOfFeatureWiseDistances)
+	public static LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>>
+			normalisedFeatureWiseDistancesOverTheSet(
+					LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> setOfFeatureWiseDistances)
 	{
 
-		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedDistancesPerCand = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedDistancesPerCand =
+				new LinkedHashMap<>();
 
 		int numOfFeatures = Constant.getNumberOfFeatures();
 
@@ -2405,7 +2489,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		{
 			String candID = entry.getKey();
 			LinkedHashMap<String, Pair<String, Double>> featureWiseDistances = entry.getValue();
-			LinkedHashMap<String, Pair<String, Double>> normalisedFeatureWiseDistances = new LinkedHashMap<String, Pair<String, Double>>();
+			LinkedHashMap<String, Pair<String, Double>> normalisedFeatureWiseDistances =
+					new LinkedHashMap<String, Pair<String, Double>>();
 
 			int featureIndex = 0;
 			for (Map.Entry<String, Pair<String, Double>> distEntry : featureWiseDistances.entrySet())
@@ -2413,8 +2498,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			{
 				String featureName = distEntry.getKey();
 				double distanceValue = distEntry.getValue().getSecond();
-				double normalisedDistanceValue = StatsUtils.minMaxNorm(distanceValue, maxs[featureIndex],
-						mins[featureIndex]);
+				double normalisedDistanceValue =
+						StatsUtils.minMaxNorm(distanceValue, maxs[featureIndex], mins[featureIndex]);
 				normalisedFeatureWiseDistances.put(featureName,
 						new Pair<String, Double>(distEntry.getValue().getFirst(), normalisedDistanceValue));
 				featureIndex++;
@@ -2430,8 +2515,9 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param normalisedCandEditDistances
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<String, Double>> aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedCandEditDistances)
+	public static LinkedHashMap<String, Pair<String, Double>>
+			aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(
+					LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedCandEditDistances)
 	{
 		LinkedHashMap<String, Pair<String, Double>> aggregatedFeatureWiseDistances = new LinkedHashMap<>();
 
@@ -2452,8 +2538,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				featureIndex++;
 			}
 
-			distanceAggregatedOverFeatures = StatsUtils
-					.round(distanceAggregatedOverFeatures / Constant.getNumberOfFeatures(), 4);
+			distanceAggregatedOverFeatures =
+					StatsUtils.round(distanceAggregatedOverFeatures / Constant.getNumberOfFeatures(), 4);
 			aggregatedFeatureWiseDistances.put(candID, new Pair("", distanceAggregatedOverFeatures));
 		}
 		return aggregatedFeatureWiseDistances;
@@ -2521,8 +2607,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		for (Map.Entry<String, Pair<String, Double>> distEntry : setOfDistances.entrySet())
 		{
-			Double normalisedEditDistanceVal = Double
-					.valueOf(StatsUtils.minMaxNorm(distEntry.getValue().getSecond(), max, min));
+			Double normalisedEditDistanceVal =
+					Double.valueOf(StatsUtils.minMaxNorm(distEntry.getValue().getSecond(), max, min));
 
 			if (VerbosityConstants.WriteNormalisation)
 			{
@@ -2602,10 +2688,11 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			if (caseType.equals(Enums.CaseType.CaseBasedV1))// "CaseBasedV1")) // CaseBasedV1
 			{
-				ActivityObject endPointActivityObjectCandidate = (activityObjectsInCand
-						.get(activityObjectsInCand.size() - 1)); // only the end point activity object
-				ActivityObject endPointActivityObjectCurrentTimeline = (activitiesGuidingRecomm
-						.get(activitiesGuidingRecomm.size() - 1)); // activityObjectAtRecommPoint
+				ActivityObject endPointActivityObjectCandidate =
+						(activityObjectsInCand.get(activityObjectsInCand.size() - 1)); // only the end point activity
+																						// object
+				ActivityObject endPointActivityObjectCurrentTimeline =
+						(activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1)); // activityObjectAtRecommPoint
 
 				switch (Constant.getDatabaseName()) // (Constant.DATABASE_NAME)
 				{
@@ -2749,8 +2836,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				// second (because this is convention followed in data generation)
 				int newCandEndIndex = i;
 				// NOTE: going back matchingUnitCounts FROM THE index.
-				int newCandStartIndex = (newCandEndIndex - matchingUnitInCounts) >= 0
-						? (newCandEndIndex - matchingUnitInCounts) : 0;
+				int newCandStartIndex =
+						(newCandEndIndex - matchingUnitInCounts) >= 0 ? (newCandEndIndex - matchingUnitInCounts) : 0;
 
 				// $$System.out.println("\n\tStart index of candidate timeline=" + newCandStartIndex);
 				// $$System.out.println("\tEnd index of candidate timeline=" + newCandEndIndex);
@@ -2758,8 +2845,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimeline
 						.getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandEndIndex + 1);
 				// getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp);
-				ActivityObject nextValidActivityForCandidate = trainingTimeline
-						.getNextValidActivityAfterActivityAtThisPosition(newCandEndIndex);
+				ActivityObject nextValidActivityForCandidate =
+						trainingTimeline.getNextValidActivityAfterActivityAtThisPosition(newCandEndIndex);
 
 				if (nextValidActivityForCandidate == null)
 				{
@@ -2767,8 +2854,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 					System.out.println("\tThis candidate rejected due to no next valid activity object;");
 					continue;
 				}
-				TimelineWithNext newCandidate = new TimelineWithNext(activityObjectsForCandidate,
-						nextValidActivityForCandidate, false, true);// trainingTimeline.getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp));
+				TimelineWithNext newCandidate =
+						new TimelineWithNext(activityObjectsForCandidate, nextValidActivityForCandidate, false, true);// trainingTimeline.getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp));
 				// $$System.out.println("Created new candidate timeline (with next)");
 				// $$System.out.println("\tActivity names:" + newCandidate.getActivityObjectNamesInSequence());
 				// $$System.out.println("\tNext activity:" + newCandidate.getNextActivityObject().getActivityName());
@@ -2807,8 +2894,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			if (ae.getActivityName().equals(activityAtRecommPoint.getActivityName())) // same name as current activity
 			{
-				Timestamp newCandEndTimestamp = new Timestamp(
-						ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
+				Timestamp newCandEndTimestamp =
+						new Timestamp(ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
 				// decreasing 1 second (because this is convention followed in data generation)
 
 				// NOTE: going back matchingUnitHours FROM THE START TIMESTAMP and not the end timestamp.
@@ -2816,8 +2903,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				// this cast is safe because in this case number of milliseconds won't be in decimals
 				long matchingUnitInMilliSeconds = (long) (matchingUnitInHours * 60 * 60 * 1000);// .multiply(new
 																								// BigDecimal(60*60*1000)).longValue();
-				Timestamp newCandStartTimestamp = new Timestamp(
-						ae.getStartTimestamp().getTime() - matchingUnitInMilliSeconds);
+				Timestamp newCandStartTimestamp =
+						new Timestamp(ae.getStartTimestamp().getTime() - matchingUnitInMilliSeconds);
 
 				// $$System.out.println("\n\tStarttime of candidate timeline=" + newCandStartTimestamp);
 				// $$System.out.println("\tEndtime of candidate timeline=" + newCandEndTimestamp);
@@ -2826,10 +2913,10 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				 * Note: if newCandStartTimestamp here is earlier than when the training timeline started, even then
 				 * this works correctly since we are considering intersection of what is available
 				 */
-				ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimeline
-						.getActivityObjectsBetweenTime(newCandStartTimestamp, newCandEndTimestamp);
-				ActivityObject nextValidActivityForCandidate = trainingTimeline
-						.getNextValidActivityAfterActivityAtThisTime(newCandEndTimestamp);
+				ArrayList<ActivityObject> activityObjectsForCandidate =
+						trainingTimeline.getActivityObjectsBetweenTime(newCandStartTimestamp, newCandEndTimestamp);
+				ActivityObject nextValidActivityForCandidate =
+						trainingTimeline.getNextValidActivityAfterActivityAtThisTime(newCandEndTimestamp);
 
 				if (nextValidActivityForCandidate == null)
 				{
@@ -2837,8 +2924,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 					System.out.println("\tThis candidate rejected due to no next valid activity object;");
 					continue;
 				}
-				TimelineWithNext newCandidate = new TimelineWithNext(activityObjectsForCandidate,
-						nextValidActivityForCandidate, false, true);// trainingTimeline.getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp));
+				TimelineWithNext newCandidate =
+						new TimelineWithNext(activityObjectsForCandidate, nextValidActivityForCandidate, false, true);// trainingTimeline.getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp));
 				// $$System.out.println("Created new candidate timeline (with next)");
 				// $$System.out.println("\tActivity names:" + newCandidate.getActivityObjectNamesInSequence());
 				// $$System.out.println("\tNext activity:" + newCandidate.getNextActivityObject().getActivityName());
