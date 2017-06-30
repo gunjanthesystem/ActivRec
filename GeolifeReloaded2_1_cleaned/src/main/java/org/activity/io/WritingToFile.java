@@ -974,30 +974,17 @@ public class WritingToFile
 	public static void writeTimeSeriesIntForUser(LinkedHashMap<Timestamp, Integer> ts, String fileNameToUse,
 			String userName)
 	{
-		commonPath = Constant.getCommonPath();//
 		try
 		{
-			String fileName = commonPath + userName + fileNameToUse + ".csv";
-
-			File file = new File(fileName);
-
-			file.delete();
-			if (!file.exists())
-			{
-				file.createNewFile();
-			}
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-			BufferedWriter bw = new BufferedWriter(fw);
-
+			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<Timestamp, Integer> entry : ts.entrySet())
 			{
 				String timestamp = entry.getKey().toString();
 
-				bw.write(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");
+				sb.append(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");
 				// also removes the last nano seconds precision
 			}
-			bw.close();
+			WritingToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
 		}
 
 		catch (Exception e)
@@ -1006,37 +993,25 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * 
+	 * @param ts
+	 * @param fileNameToUse
+	 * @param userName
+	 */
 	public static void writeTimeSeriesDoubleForUser(LinkedHashMap<Timestamp, Double> ts, String fileNameToUse,
 			String userName)
 	{
-		commonPath = Constant.getCommonPath();//
 		try
 		{
-			String fileName = commonPath + userName + fileNameToUse + ".csv";
-
-			File file = new File(fileName);
-
-			file.delete();
-			if (!file.exists())
-			{
-				file.createNewFile();
-			}
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-			BufferedWriter bw = new BufferedWriter(fw);
-
+			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<Timestamp, Double> entry : ts.entrySet())
 			{
 				String timestamp = entry.getKey().toString();
-
-				bw.write(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n"); // also
-																											// removes
-																											// the last
-																											// nano
-																											// seconds
-																											// precision
+				sb.append(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");
+				// also removes the last nano seconds precision
 			}
-			bw.close();
+			WritingToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
 		}
 
 		catch (Exception e)
@@ -1045,39 +1020,27 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * 
+	 * @param ts
+	 * @param fileNameToUse
+	 * @param userName
+	 */
 	public static void writeTimeSeriesLongForUser(LinkedHashMap<Timestamp, Long> ts, String fileNameToUse,
 			String userName)
 	{
-		commonPath = Constant.getCommonPath();//
 		try
 		{
-			String fileName = commonPath + userName + fileNameToUse + ".csv";
-
-			File file = new File(fileName);
-
-			file.delete();
-			if (!file.exists())
-			{
-				file.createNewFile();
-			}
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-			BufferedWriter bw = new BufferedWriter(fw);
-
+			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<Timestamp, Long> entry : ts.entrySet())
 			{
 				String timestamp = entry.getKey().toString();
-
-				bw.write(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n"); // also
-																											// removes
-																											// the last
-																											// nano
-																											// seconds
-																											// precision
+				sb.append(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");// bw.write
+				// also removes the last nano seconds precision
 			}
-			bw.close();
+			WritingToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
+			// bw.close();
 		}
-
 		catch (Exception e)
 		{
 			e.printStackTrace();
@@ -1323,6 +1286,7 @@ public class WritingToFile
 	}
 
 	/**
+	 * Write the time series,to userwise files
 	 * 
 	 * @param ts
 	 * @param fileNameToUse
@@ -1345,6 +1309,12 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * Write time series to userwise files
+	 * 
+	 * @param ts
+	 * @param fileNameToUse
+	 */
 	public static void writeAllTimeSeriesDouble(LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> ts,
 			String fileNameToUse)
 	{
@@ -1363,6 +1333,12 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * Write the time series ,user wise to the files
+	 * 
+	 * @param ts
+	 * @param fileNameToUse
+	 */
 	public static void writeAllTimeSeriesLong(LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> ts,
 			String fileNameToUse)
 	{
@@ -2855,6 +2831,12 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param timelinesPhrase
+	 */
 	public static void writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(String userName,
 			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase)
 	{
@@ -2864,7 +2846,6 @@ public class WritingToFile
 		try
 		{
 			System.out.println("writing " + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv");
-
 			String fileName = commonPath + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv";
 
 			File file = new File(fileName);
@@ -2962,6 +2943,12 @@ public class WritingToFile
 		System.out.println("Exiting writeUsersDayTimelinesSameFile()");
 	}
 
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @param timelinesPhrase
+	 * @param fileName
+	 */
 	public static void writeNumOfActsPerUsersDayTimelinesSameFile(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
 			String fileName)
@@ -2987,6 +2974,43 @@ public class WritingToFile
 		System.out.println("Exiting writeNumOfActsPerUsersDayTimelinesSameFile()");
 	}
 
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @param timelinesPhrase
+	 * @param fileName
+	 */
+	public static void writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
+			String fileName)
+	{
+		// System.out.println("Common path=" + commonPath);
+		commonPath = Constant.getCommonPath();//
+		System.out.println("Inside writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(): num of users received = "
+				+ usersDayTimelines.size());
+		System.out.println("Common path=" + commonPath);
+		try
+		{
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
+			{
+				writeNumOfDistinctValidActsInGivenDayTimelinesSameFile(entry.getKey(), entry.getValue(),
+						timelinesPhrase, fileName);
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+		System.out.println("Exiting writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile()");
+	}
+
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @param absFileName
+	 */
 	public static void writeNumOfDaysPerUsersDayTimelinesSameFile(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String absFileName)
 	{
@@ -2995,7 +3019,7 @@ public class WritingToFile
 		System.out.println("Inside writeNumOfDaysPerUsersDayTimelinesSameFile(): num of users received = "
 				+ usersDayTimelines.size());
 		System.out.println("Common path=" + commonPath);
-		StringBuffer msg = new StringBuffer();
+		StringBuilder msg = new StringBuilder();
 		msg.append("User,#Days\n");
 		try
 		{
@@ -3217,7 +3241,7 @@ public class WritingToFile
 				{
 					if (Constant.getDatabaseName().equals("gowalla1"))
 					{
-						toWrite.append(ActivityObjects.get(i).toStringAllGowalla());
+						toWrite.append(ActivityObjects.get(i).toStringAllGowallaTSWithName());// toStringAllGowalla());//toStringAllGowallaTSWithName
 					}
 					else
 					{
@@ -3261,6 +3285,13 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param timelinesPhrase
+	 * @param fileName
+	 */
 	public static void writeNumOfActsInGivenDayTimelinesSameFile(String userName,
 			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase, String fileName)
 	{
@@ -3268,7 +3299,7 @@ public class WritingToFile
 		try
 		{
 			fileName = commonPath + fileName;
-			StringBuffer toWrite = new StringBuffer();
+			StringBuilder toWrite = new StringBuilder();
 			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 				toWrite.append(
@@ -3284,6 +3315,37 @@ public class WritingToFile
 		}
 	}
 
+	/////
+	/**
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param timelinesPhrase
+	 * @param fileName
+	 */
+	public static void writeNumOfDistinctValidActsInGivenDayTimelinesSameFile(String userName,
+			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase, String fileName)
+	{
+		commonPath = Constant.getCommonPath();//
+		try
+		{
+			fileName = commonPath + fileName;
+			StringBuilder toWrite = new StringBuilder();
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
+			{
+				toWrite.append(userName + "," + entry.getKey() + ","
+						+ entry.getValue().countNumberOfValidDistinctActivities() + "\n");
+			}
+			WritingToFile.appendLineToFileAbsolute(toWrite.toString(), fileName);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+	}
+
+	/////
 	/**
 	 * Sums the duration in seconds of activities for each of the days of given day timelines and writes it to a file
 	 * and sums the duration activities over all days of given timelines and return it as a LinkedHashMap
@@ -3449,6 +3511,7 @@ public class WritingToFile
 				}
 				// bw.write("," + activityName);
 				bwString.append("," + activityName);
+				// System.out.println("ajooba:activityName = " + activityName + " bwString" + bwString.toString());
 				activityNameCountPairsOverAllDayTimelines.put(activityName, new Long(0));
 			}
 			// bw.newLine();
@@ -3577,15 +3640,27 @@ public class WritingToFile
 			StringBuilder toWrite = new StringBuilder();
 			// bw.write(",");
 
+			int actIndex = -1;
 			for (String activityName : activityNames)
 			{
+				actIndex += 1;
 				if (UtilityBelt.isValidActivityName(activityName) == false)
 				// if(activityName.equals("Unknown")|| activityName.equals("Not Available"))
 				{
 					continue;
 				}
-				// bw.write("," + activityName);
-				toWrite.append("," + activityName);
+
+				if (Constant.getDatabaseName().equals("gowalla1"))
+				{
+					// bw.write("," + activityName);
+					toWrite.append("," + Constant.activityNamesGowallaLabels.get(actIndex));
+				}
+				else
+				{
+					// bw.write("," + activityName);
+					toWrite.append("," + activityName);
+
+				}
 
 				activityNameCountPairsOverAllDayTimelines.put(activityName, new Double(0));
 			}

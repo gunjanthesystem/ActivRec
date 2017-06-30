@@ -28,6 +28,7 @@ public class DataLoader
 		{
 			// PopUps.showMessage("entering data loader");
 			CSV2Arff convertor = new CSV2Arff(inputFilePath, outputFilePath);// "./SampleDatasets/Mine/Output2.arff");
+			// convertor.
 			this.outputArffFile = convertor.getOutPutFileName();
 
 			source = new DataSource(outputArffFile);

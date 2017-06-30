@@ -63,15 +63,18 @@ public class MUEvaluationUtils
 		// After UMAP corrected TZ experiments start
 		String iterationRootPath = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/MUExperimentsBLNCount/";// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Feb11ImpBLNCount/";//
 																														// Feb7ImpIterations/";
-		String rootPathToWriteResults = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/GroundTruthComparisonsApril21/Clustering0MUTil30/";// 8/Mod2/";
+		String rootPathToWriteResults =
+				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/GroundTruthComparisonsApril21/Clustering0MUTil30/";// 8/Mod2/";
 		executeForMultipleIterationsOfExperiments(ClustersRangeScheme.CLUSTERING0, iterationRootPath,
 				rootPathToWriteResults);
 
-		rootPathToWriteResults = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/GroundTruthComparisonsApril21/Clustering1MUTil30/";// 8/Mod2/";
+		rootPathToWriteResults =
+				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/GroundTruthComparisonsApril21/Clustering1MUTil30/";// 8/Mod2/";
 		executeForMultipleIterationsOfExperiments(ClustersRangeScheme.CLUSTERING1, iterationRootPath,
 				rootPathToWriteResults);
 
-		rootPathToWriteResults = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/GroundTruthComparisonsApril21/Clustering2MUTil30/";// 8/Mod2/";
+		rootPathToWriteResults =
+				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/GroundTruthComparisonsApril21/Clustering2MUTil30/";// 8/Mod2/";
 		executeForMultipleIterationsOfExperiments(ClustersRangeScheme.CLUSTERING2, iterationRootPath,
 				rootPathToWriteResults);
 		// After UMAP corrected TZ experiments start
@@ -109,6 +112,13 @@ public class MUEvaluationUtils
 		}
 	}
 
+	/**
+	 * 
+	 * @param commonPathToRead
+	 * @param rootPathToWriteResults
+	 * @param clusteringRangeScheme
+	 * @param groupID
+	 */
 	public static void gowallaEvals(String commonPathToRead, String rootPathToWriteResults,
 			ClustersRangeScheme clusteringRangeScheme, String groupID)
 	{
@@ -124,20 +134,20 @@ public class MUEvaluationUtils
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the cluster label for minimal MU having max MRR
-		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(ComparatorUtils.getUserIDComparator());
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the majority cluster label over all MUs having max
 		// MRR
-		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(ComparatorUtils.getUserIDComparator());
 
 		//////////////////////
 
 		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "AllMRR.csv";
-		int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName,
-				"Algo");
+		int numOfUsers =
+				WritingToFile.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName, "Algo");
 
 		String MUsByDescendingMRRFileName = rootPathToWriteResults + "MUsByDescendingMRR.csv";
 
@@ -176,18 +186,18 @@ public class MUEvaluationUtils
 			}
 
 			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
-			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString)
-					.collect(Collectors.joining("__"));
+			String MUsHavingMaxMRRAsString =
+					MUsHavingMaxMRR.stream().map(Object::toString).collect(Collectors.joining("__"));
 
 			Double maxMRR = entryForUser.getValue().getSecond();
 			Double minMUHavingMaxMRR = Collections.min(MUsHavingMaxMRR);
 
 			////////////
-			String clusterLabelAccToMinMUHavMaxMRR = WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR,
-					clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
+			String clusterLabelAccToMinMUHavMaxMRR =
+					WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR, clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
 
-			String clusterLabelAccToMajorityMUsHavMaxMRR = getClusterLabelForMajorityMUs(MUsHavingMaxMRR,
-					clusteringRangeScheme);
+			String clusterLabelAccToMajorityMUsHavMaxMRR =
+					getClusterLabelForMajorityMUs(MUsHavingMaxMRR, clusteringRangeScheme);
 			////////////
 
 			WritingToFile.appendLineToFileAbsolute(
@@ -197,8 +207,8 @@ public class MUEvaluationUtils
 
 			TreeMap<String, Integer> mapOfClusterCountsForThisUserMinMU, mapOfClusterCountsForThisUserMajMU;
 
-			countsForClusterLabelAccToMinMUHavMaxMRR = incrementCount(user, clusterLabelAccToMinMUHavMaxMRR,
-					countsForClusterLabelAccToMinMUHavMaxMRR);
+			countsForClusterLabelAccToMinMUHavMaxMRR =
+					incrementCount(user, clusterLabelAccToMinMUHavMaxMRR, countsForClusterLabelAccToMinMUHavMaxMRR);
 			countsForClusterLabelAccToMajorityMUsHavMaxMRR = incrementCount(user, clusterLabelAccToMajorityMUsHavMaxMRR,
 					countsForClusterLabelAccToMajorityMUsHavMaxMRR);
 
@@ -263,14 +273,14 @@ public class MUEvaluationUtils
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the cluster label for minimal MU having max MRR
-		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(ComparatorUtils.getUserIDComparator());
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the majority cluster label over all MUs having max
 		// MRR
-		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(ComparatorUtils.getUserIDComparator());
 
 		//////////////////////
 
@@ -313,18 +323,18 @@ public class MUEvaluationUtils
 			}
 
 			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
-			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString)
-					.collect(Collectors.joining("__"));
+			String MUsHavingMaxMRRAsString =
+					MUsHavingMaxMRR.stream().map(Object::toString).collect(Collectors.joining("__"));
 
 			Double maxMRR = entryForUser.getValue().getSecond();
 			Double minMUHavingMaxMRR = Collections.min(MUsHavingMaxMRR);
 
 			////////////
-			String clusterLabelAccToMinMUHavMaxMRR = WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR,
-					clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
+			String clusterLabelAccToMinMUHavMaxMRR =
+					WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR, clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
 
-			String clusterLabelAccToMajorityMUsHavMaxMRR = getClusterLabelForMajorityMUs(MUsHavingMaxMRR,
-					clusteringRangeScheme);
+			String clusterLabelAccToMajorityMUsHavMaxMRR =
+					getClusterLabelForMajorityMUs(MUsHavingMaxMRR, clusteringRangeScheme);
 			////////////
 
 			WritingToFile.appendLineToFileAbsolute(
@@ -334,8 +344,8 @@ public class MUEvaluationUtils
 
 			TreeMap<String, Integer> mapOfClusterCountsForThisUserMinMU, mapOfClusterCountsForThisUserMajMU;
 
-			countsForClusterLabelAccToMinMUHavMaxMRR = incrementCount(user, clusterLabelAccToMinMUHavMaxMRR,
-					countsForClusterLabelAccToMinMUHavMaxMRR);
+			countsForClusterLabelAccToMinMUHavMaxMRR =
+					incrementCount(user, clusterLabelAccToMinMUHavMaxMRR, countsForClusterLabelAccToMinMUHavMaxMRR);
 			countsForClusterLabelAccToMajorityMUsHavMaxMRR = incrementCount(user, clusterLabelAccToMajorityMUsHavMaxMRR,
 					countsForClusterLabelAccToMajorityMUsHavMaxMRR);
 			//
@@ -413,22 +423,22 @@ public class MUEvaluationUtils
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the cluster label for minimal MU having max MRR
-		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(ComparatorUtils.getUserIDComparator());
 
 		// (User, (ClusterLabel, Count of iterations in which it is resultant cluster label))
 		// .. here the resultant cluster label for an iteration is the majority cluster label over all MUs having max
 		// MRR
-		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR = new TreeMap<String, TreeMap<String, Integer>>(
-				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMajorityMUsHavMaxMRR =
+				new TreeMap<String, TreeMap<String, Integer>>(ComparatorUtils.getUserIDComparator());
 
 		for (int iter = 1; iter <= 10/* 20 */; iter++)
 		{
 			String iterationMURootPath = iterationRootPath + "Iteration" + iter + "/";
 
 			String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "Iteration" + iter + "AllMRR.csv";
-			int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName,
-					"Algo");
+			int numOfUsers =
+					WritingToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName, "Algo");
 
 			String MUsByDescendingMRRFileName = rootPathToWriteResults + "Iteration" + iter + "MUsByDescendingMRR.csv";
 			// (UserID, Pair( MUs having Max MRR, max MRR))
@@ -447,17 +457,17 @@ public class MUEvaluationUtils
 			{
 				String user = entryForUser.getKey();
 				List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
-				String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString)
-						.collect(Collectors.joining("__"));
+				String MUsHavingMaxMRRAsString =
+						MUsHavingMaxMRR.stream().map(Object::toString).collect(Collectors.joining("__"));
 
 				Double maxMRR = entryForUser.getValue().getSecond();
 
 				Double minMUHavingMaxMRR = Collections.min(MUsHavingMaxMRR);
-				String clusterLabelAccToMinMUHavMaxMRR = WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR,
-						clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
+				String clusterLabelAccToMinMUHavMaxMRR =
+						WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR, clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
 
-				String clusterLabelAccToMajorityMUsHavMaxMRR = getClusterLabelForMajorityMUs(MUsHavingMaxMRR,
-						clusteringRangeScheme);
+				String clusterLabelAccToMajorityMUsHavMaxMRR =
+						getClusterLabelForMajorityMUs(MUsHavingMaxMRR, clusteringRangeScheme);
 
 				WritingToFile.appendLineToFileAbsolute(
 						user + "," + MUsHavingMaxMRRAsString + "," + maxMRR + "," + minMUHavingMaxMRR + ","
@@ -466,8 +476,8 @@ public class MUEvaluationUtils
 
 				TreeMap<String, Integer> mapOfClusterCountsForThisUserMinMU, mapOfClusterCountsForThisUserMajMU;
 
-				countsForClusterLabelAccToMinMUHavMaxMRR = incrementCount(user, clusterLabelAccToMinMUHavMaxMRR,
-						countsForClusterLabelAccToMinMUHavMaxMRR);
+				countsForClusterLabelAccToMinMUHavMaxMRR =
+						incrementCount(user, clusterLabelAccToMinMUHavMaxMRR, countsForClusterLabelAccToMinMUHavMaxMRR);
 				countsForClusterLabelAccToMajorityMUsHavMaxMRR = incrementCount(user,
 						clusterLabelAccToMajorityMUsHavMaxMRR, countsForClusterLabelAccToMajorityMUsHavMaxMRR);
 
@@ -494,7 +504,8 @@ public class MUEvaluationUtils
 	public static void executeForSingleExperiment(ClustersRangeScheme clusteringRangeScheme)
 	{
 
-		String iterationRootPath = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/";// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June";//Feb7ImpIterations/";
+		String iterationRootPath =
+				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/";// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June";//Feb7ImpIterations/";
 		String rootPathToWriteResults = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsFeb8/June18/";
 		WritingToFile.appendLineToFileAbsolute(WekaUtilityBelt.getClustersRangeSchemeString(clusteringRangeScheme),
 				rootPathToWriteResults + "ClustersRangeSchemeUsed.txt");
@@ -502,8 +513,8 @@ public class MUEvaluationUtils
 		String iterationMURootPath = iterationRootPath;// + "Iteration" + iter + "/";
 
 		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "AllMRR.csv";
-		int numOfUsers = WritingToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName,
-				"Algo");
+		int numOfUsers =
+				WritingToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName, "Algo");
 
 		String MUsByDescendingMRRFileName = rootPathToWriteResults + "MUsByDescendingMRR.csv";
 
@@ -524,18 +535,18 @@ public class MUEvaluationUtils
 		{
 			String user = entryForUser.getKey();
 			List<Double> MUsHavingMaxMRR = entryForUser.getValue().getFirst();
-			String MUsHavingMaxMRRAsString = MUsHavingMaxMRR.stream().map(Object::toString)
-					.collect(Collectors.joining("__"));
+			String MUsHavingMaxMRRAsString =
+					MUsHavingMaxMRR.stream().map(Object::toString).collect(Collectors.joining("__"));
 
 			Double maxMRR = entryForUser.getValue().getSecond();
 
 			Double minMUHavingMaxMRR = Collections.min(MUsHavingMaxMRR);
 			// String clusterLabelAccToMinMUHavMaxMRR = WekaUtilityBelt.getClusterLabelClustering0(minMUHavingMaxMRR);//
 			// getClusterLabel(minMUHavingMaxMRR);
-			String clusterLabelAccToMinMUHavMaxMRR = WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR,
-					clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
-			String clusterLabelAccToMajorityMUsHavMaxMRR = getClusterLabelForMajorityMUs(MUsHavingMaxMRR,
-					clusteringRangeScheme);
+			String clusterLabelAccToMinMUHavMaxMRR =
+					WekaUtilityBelt.getClusterLabel(minMUHavingMaxMRR, clusteringRangeScheme);// getClusterLabel(minMUHavingMaxMRR);
+			String clusterLabelAccToMajorityMUsHavMaxMRR =
+					getClusterLabelForMajorityMUs(MUsHavingMaxMRR, clusteringRangeScheme);
 
 			WritingToFile.appendLineToFileAbsolute(
 					user + "," + MUsHavingMaxMRRAsString + "," + maxMRR + "," + minMUHavingMaxMRR + ","
@@ -638,8 +649,8 @@ public class MUEvaluationUtils
 		return countsForClusterLabels;
 	}
 
-	private static TreeMap<String, TreeMap<String, Integer>> initialiseCounts(
-			TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR)
+	private static TreeMap<String, TreeMap<String, Integer>>
+			initialiseCounts(TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR)
 	{
 
 		return countsForClusterLabelAccToMinMUHavMaxMRR;

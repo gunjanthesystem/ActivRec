@@ -9,8 +9,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -386,6 +388,29 @@ public class ActivityObject implements Serializable
 											 * + "__activityName=" + activityName + "__ locationName=" + locationName
 											 */ + "__workLvlCat=" + workingLevelCatIDs + "__stTS="
 				+ Instant.ofEpochMilli(startTimestampInms).toString()
+				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
+				+ "__stLat=" + startLatitude + "__stLon=" + startLongitude /*
+																			 * + "__ startAlt=" + startAltitude
+																			 */ + "__uID=" + userID + "__photos_c="
+				+ photos_count + "__cins_c=" + checkins_count + "__users_c=" + users_count + "__radius_m="
+				+ radius_meters + "__highlts_count=" + highlights_count + "__items_c=" + items_count + "__max_items_c="
+				+ max_items_count + "__distNext=" + distanceInMFromNext + "__durNext=" + durationInSecondsFromNext;
+	}
+
+	public String toStringAllGowallaTSWithName()
+	{
+
+		if (DomainConstants.locIDLocationObjectDictionary == null)
+		{
+			System.out.println("Error: DomainConstants.locIDLocationObjectDictionary ==null");
+		}
+		String locationName =
+				locationIDs.stream().map(lid -> DomainConstants.locIDLocationObjectDictionary.get(lid).locationName)
+						.collect(Collectors.joining("-"));
+
+		return "actID=" + activityID + "__locID=" + this.getLocationIDs('-') + "__activityName="
+				+ DomainConstants.catIDNameDictionary.get(activityID) + "__ locationName=" + locationName
+				+ "__workLvlCat=" + workingLevelCatIDs + "__stTS=" + Instant.ofEpochMilli(startTimestampInms).toString()
 				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
 				+ "__stLat=" + startLatitude + "__stLon=" + startLongitude /*
 																			 * + "__ startAlt=" + startAltitude
@@ -863,10 +888,9 @@ public class ActivityObject implements Serializable
 
 		if (dimensionToFetch == null)
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error in getDimensionAttributeValue() for dimension name = "
-							+ dimensionName + ", dimension attribute name = " + dimensionAttributeName
-							+ "\n No such dimension found for this activity event."));
+			System.err.println(PopUps.getTracedErrorMsg("Error in getDimensionAttributeValue() for dimension name = "
+					+ dimensionName + ", dimension attribute name = " + dimensionAttributeName
+					+ "\n No such dimension found for this activity event."));
 			System.exit(2); // Check later if it is wise or unwise to exit in such case
 		}
 

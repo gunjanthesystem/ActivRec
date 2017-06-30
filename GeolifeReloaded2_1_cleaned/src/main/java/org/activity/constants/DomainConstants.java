@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
+import org.activity.objects.LocationGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
@@ -52,6 +54,8 @@ public class DomainConstants
 	public static String[] featureNames = { "ActivityName", "StartTime", "Duration", "DistanceTravelled",
 			"StartGeoCoordinates", "EndGeoCoordinates", "AvgAltitude" };
 
+	public static String[] gowallaFeatureNames = { "ActivityName", "StartTime" };
+
 	public static final int gowallaUserIDsWithGT553MaxActsPerDay[] =
 			{ 5195, 9298, 9751, 16425, 17012, 18382, 19416, 19957, 20316, 23150, 28509, 30293, 30603, 42300, 44718,
 					46646, 74010, 74274, 76390, 79509, 79756, 86755, 103951, 105189, 106328, 114774, 118023, 136677,
@@ -66,16 +70,22 @@ public class DomainConstants
 
 	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
 	public static TreeMap<Integer, String> catIDNameDictionary = null;
+	public static LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionary = null;
 	public static TreeMap<Integer, Character> catIDCharCodeMap = null;
 	public static TreeMap<Character, Integer> charCodeCatIDMap = null;
 
 	public final static String pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
+	public final static String pathToSerialisedLocationObjects =
+			"./dataToRead/Mar30/DatabaseCreatedMerged/mapForAllLocationData.kryo";
 	public final static String pathToSerialisedLevelWiseCatIDsDict =
 			"./dataToRead/May17/mapCatIDLevelWiseCatIDsDict.kryo";
 	public final static String pathToSerialisedCatIDsHierDist = "./dataToRead/April7/mapCatIDsHierDist.kryo";
 
 	public static TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap;
 	// public static final Integer hierarchyLevelForEditDistance = 1;// is in Constant class
+
+	public final static String[] gowallaUserGroupsLabels =
+			{ "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 
 	public static void main(String args[])
 	{
@@ -126,6 +136,20 @@ public class DomainConstants
 
 	}
 
+	public static void setLocIDLocationObjectDictionary(String pathToSerialisedLocationObjects)
+	{
+		try
+		{
+			locIDLocationObjectDictionary = (LinkedHashMap<Integer, LocationGowalla>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedLocationObjects);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
 	/**
 	 * 
 	 * @param catIDsHierDistSerialisedFile
@@ -160,8 +184,8 @@ public class DomainConstants
 
 		if (catIDGivenLevelCatIDMap.get(givenCatID) == null)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error: catIDGivenLevelCatIDMap.get(givenCatID" + givenCatID + ")==null"));
+			System.err.println(
+					PopUps.getTracedErrorMsg("Error: catIDGivenLevelCatIDMap.get(givenCatID" + givenCatID + ")==null"));
 		}
 
 		return catIDGivenLevelCatIDMap.get(givenCatID);
@@ -182,8 +206,8 @@ public class DomainConstants
 
 		if (givenLevel > 3 || givenLevel < 1)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error: only three levels for Gowalla while given level =" + givenLevel));
+			System.err.println(
+					PopUps.getTracedErrorMsg("Error: only three levels for Gowalla while given level =" + givenLevel));
 		}
 
 		TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict =

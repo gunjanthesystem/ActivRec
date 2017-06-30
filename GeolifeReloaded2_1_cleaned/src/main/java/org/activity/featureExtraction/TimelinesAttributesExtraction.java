@@ -14,6 +14,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
+import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
@@ -39,7 +40,7 @@ public class TimelinesAttributesExtraction
 	// LinkedHashMap<String, String> userIDActualClassMap;
 	LinkedHashMap<String, String> groundTruth; // the map containg (raw user id, manual cluster)
 
-	private final int minEpochSampEn = 2, maxEpochSampEn = 4;
+	private final int minEpochSampEn = 1, maxEpochSampEn = 3;// 4;
 
 	// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsFeb8/CountsForClusterLabelAccToMinMUHavMaxMRR.csv",
 	// 4, true);
@@ -84,7 +85,9 @@ public class TimelinesAttributesExtraction
 		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 		LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineUtils.expungeInvalids(usersTimelines);
 
-		sanityCheckDayTimelineToTimelineConversion(usersDayTimelines, usersTimelines);
+		Sanity.eq(usersDayTimelines.size(), usersTimelines.size(),
+				"(usersDayTimelines.size() !=usersTimelines.size())");
+		// sanityCheckDayTimelineToTimelineConversion(usersDayTimelines, usersTimelines);
 
 		// $$ addDoubleFeatureToFeatureVectors(getNumberOfActivityObjects(usersTimelinesInvalidsExpunged),
 		// "NumOfActivityObjects");
@@ -94,67 +97,82 @@ public class TimelinesAttributesExtraction
 				getNumberOfValidDistinctActivitiesUponLengthOfTimeline(usersTimelinesInvalidsExpunged),
 				"NumOfValidDistinctActivities/LengthOfTimeline");
 		//
-
-		TimelineStats.performTimeSeriesAnalysis((usersDayTimelines));//
-		TimelineStats.performSampleEntropyVsMAnalysis2((usersDayTimelines));// UtilityBelt.reformatUserIDs
-
-		for (int m = minEpochSampEn; m <= maxEpochSampEn; m++)
-		{
-			for (String featureName : Constant.getFeatureNames())
-			{
-				addDoubleAttributeToAttributeVectors(
-						getFeatureSampleEntropyAfterExpungingInvalids((usersDayTimelines), featureName, m),
-						"SampEn" + featureName + m);
-			}
-			addDoubleAttributeToAttributeVectors(
-					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Sum", m), "SampEn" + "Sum" + m);
-			addDoubleAttributeToAttributeVectors(
-					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Avg", m), "SampEn" + "Avg" + m);
-			addDoubleAttributeToAttributeVectors(
-					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "StdDev", m),
-					"SampEn" + "StdDev" + m);
-			addDoubleAttributeToAttributeVectors(
-					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Median", m),
-					"SampEn" + "Median" + m);
-		}
-
-		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> NGramFeatureVectors = getNGramAttributes(
-				usersTimelinesInvalidsExpunged, 2, 3, pathToWrite);//
-		writeNGramAttributes(NGramFeatureVectors, "NGramFeatures");
-		addNGramAttributeVectorsToAttributeVectors(NGramFeatureVectors);
-
-		// ///////////HJorth Paramaters//////////////////////////////////////////////////////
-		TimelineStats.performHjorthParameterAnalysis(usersDayTimelines);
-		for (String featureName : Constant.getFeatureNames())
-		{
-			if (featureName.equals("ActivityName")) // not a numerical feature, hence derivative based metric is not
-													// suitable i think
-			{
-				continue;
-			}
-			else
-			{
-				addDoubleAttributeToAttributeVectors(
-						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 0),
-						"" + featureName + "Activity");
-				addDoubleAttributeToAttributeVectors(
-						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
-						"" + featureName + "Mobility");
-				addDoubleAttributeToAttributeVectors(
-						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
-						"" + featureName + "Complexity");
-			}
-		}
+		//// curtian 1
+		// TimelineStats.transformAndWriteAsTimeseries((usersDayTimelines));//
+		// TimelineStats.performSampleEntropyVsMAnalysis2(usersDayTimelines, minEpochSampEn, maxEpochSampEn);//
+		// // UtilityBelt.reformatUserIDs
+		//
+		// System.out.println("Just after performSampleEntropyVsMAnalysis2");
+		// for (int m = minEpochSampEn; m <= maxEpochSampEn; m++)
+		// {
+		// System.out.println(" m = " + m);
+		// for (String featureName : Constant.getFeatureNames())
+		// {
+		// System.out.println("featureName = " + featureName);
+		// addDoubleAttributeToAttributeVectors(
+		// getFeatureSampleEntropyAfterExpungingInvalids((usersDayTimelines), featureName, m),
+		// "SampEn" + featureName + m);
+		// }
+		//
+		// addDoubleAttributeToAttributeVectors(
+		// getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Sum", m), "SampEn" + "Sum" + m);
+		// addDoubleAttributeToAttributeVectors(
+		// getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Avg", m), "SampEn" + "Avg" + m);
+		// addDoubleAttributeToAttributeVectors(
+		// getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "StdDev", m),
+		// "SampEn" + "StdDev" + m);
+		// addDoubleAttributeToAttributeVectors(
+		// getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Median", m),
+		// "SampEn" + "Median" + m);
+		// }
+		//
+		// LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> NGramFeatureVectors =
+		// getNGramAttributes(usersTimelinesInvalidsExpunged, 2, 3, pathToWrite);//
+		// writeNGramAttributes(NGramFeatureVectors, "NGramFeatures");
+		// addNGramAttributeVectorsToAttributeVectors(NGramFeatureVectors);
+		//
+		// // ///////////HJorth Paramaters//////////////////////////////////////////////////////
+		// TimelineStats.performHjorthParameterAnalysis(usersDayTimelines);
+		// for (String featureName : Constant.getFeatureNames())
+		// {
+		// if (featureName.equals("ActivityName")) // not a numerical feature, hence derivative based metric is not
+		// // suitable i think
+		// {
+		// continue;
+		// }
+		// else
+		// {
+		// addDoubleAttributeToAttributeVectors(
+		// getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 0),
+		// "" + featureName + "Activity");
+		// addDoubleAttributeToAttributeVectors(
+		// getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
+		// "" + featureName + "Mobility");
+		// addDoubleAttributeToAttributeVectors(
+		// getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
+		// "" + featureName + "Complexity");
+		// }
+		// }
+		// // curtain1
 		// ///////////////////////////////////////////////////////////////////
 
 		// addStringFeatureToFeatureVectors(getManualClustering(1), "ManualClustering1");
 		// addStringFeatureToFeatureVectors(getManualClustering(2), "ManualClustering2");
 		// manualClustering = WekaUtilityBelt.getManualClustering(9, UtilityBelt.getListOfUsers(usersDayTimelines),
 		// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/ManualClustersUserAbove10RTs.csv", true);
-		groundTruth = WekaUtilityBelt.getGroundTruth(groundTruthToRead.getSecond(),
-				UtilityBelt.getListOfUsers(usersDayTimelines), groundTruthToRead.getFirst(),
-				groundTruthToRead.getThird());
 
+		if (Constant.getDatabaseName().equals("gowalla1"))
+		{
+			groundTruth = WekaUtilityBelt.getGroundTruthGowalla(3, 1, groundTruthToRead.getFirst(), true);
+
+			// WekaUtilityBelt.getGroundTruthGowalla(0, 9, groundTruthToRead.getFirst(), true);
+		}
+		else
+		{
+			groundTruth = WekaUtilityBelt.getGroundTruth(groundTruthToRead.getSecond(),
+					UtilityBelt.getListOfUsers(usersDayTimelines), groundTruthToRead.getFirst(),
+					groundTruthToRead.getThird());
+		}
 		// manualClustering = WekaUtilityBelt.getManualClustering(2, UtilityBelt.getListOfUsers(usersDayTimelines));
 
 		addStringAttributeToAttributeVectors(groundTruth, "ManualClustering2");
@@ -162,7 +180,8 @@ public class TimelinesAttributesExtraction
 		// userIDActualClassMap = WekaUtilityBelt.getUserActualClusterMap(manualClustering);
 		// $$ addDoubleFeatureToFeatureVectors(getBestMU(3), "BestMU");
 
-		this.absoluteNameOfAttributesFile = writeTimelineAttributeVectors("TimelineFeatureVectors");// writeTimelineFeatureVectorsWithoutUserID
+		this.absoluteNameOfAttributesFile =
+				writeTimelineAttributeVectors(Constant.getCommonPath() + "TimelineFeatureVectors.csv");// writeTimelineFeatureVectorsWithoutUserID
 		// writeTimelineFeatureVectors("TimelineFeatureVectors");
 
 		// consoleLogStream.close();
@@ -212,7 +231,8 @@ public class TimelinesAttributesExtraction
 	private LinkedHashMap<String, Double> getBestMU(int indexOfColumn)
 	{
 		LinkedHashMap<String, Double> bestMU = new LinkedHashMap<String, Double>();
-		String fileName = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/ManualClustersUserAbove10RTs.csv";
+		String fileName =
+				"/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/ManualClustersUserAbove10RTs.csv";
 
 		List<Double> clusterLabel1 = ReadingFromFile.oneColumnReaderDouble(fileName, ",", indexOfColumn, true); // ensure
 																												// that
@@ -248,29 +268,50 @@ public class TimelinesAttributesExtraction
 	private String writeTimelineAttributeVectors(String fileNamePhrase)
 	{
 		WritingToFile.appendLineToFile("UserID", fileNamePhrase); // first column wil be user name
+		String separator = "\t";
 
+		StringBuilder sb = new StringBuilder();
 		for (String label : attributeLabels)
 		{
-			WritingToFile.appendLineToFile("," + label, fileNamePhrase);
+			sb.append(separator + label);
+			// WritingToFile.appendLineToFile(separator + label, fileNamePhrase);
 		}
 
-		WritingToFile.appendLineToFile("\n", fileNamePhrase);
+		sb.append("\n");
+		// WritingToFile.appendLineToFile("\n", fileNamePhrase);
 
 		for (Map.Entry<String, ArrayList<String>> entry : timelineAttributeVectors.entrySet()) // iterating over users
 		{
-			int indexOfUserID = Constant.getIndexOfUserID(Integer.valueOf(entry.getKey()));
+			// int indexOfUserID = Constant.getIndexOfUserID(Integer.valueOf(entry.getKey()));
+			//
+			// WritingToFile.appendLineToFile("User" + (indexOfUserID + 1), fileNamePhrase); // starting user id from 1
+			// by
+			// incrementing 0 indexed
+			// values by 1
 
-			WritingToFile.appendLineToFile("User" + (indexOfUserID + 1), fileNamePhrase); // starting user id from 1 by
-																							// incrementing 0 indexed
-																							// values by 1
+			// WritingToFile.appendLineToFile(entry.getKey(), fileNamePhrase);
+			sb.append(entry.getKey());// , fileNamePhrase);
 
 			for (String attributeValue : entry.getValue())
 			{
-				WritingToFile.appendLineToFile("," + attributeValue, fileNamePhrase);
+				// if (attributeValue.trim().length() == 0)
+				// {
+				// attributeValue = "NULL";
+				// }
+				sb.append(separator + attributeValue);// , fileNamePhrase);
 			}
-			WritingToFile.appendLineToFile("\n", fileNamePhrase);
+
+			if (entry.getValue().size() < attributeLabels.size())
+			// entry.getValue().contains("ManualClustering2") == false)
+			{
+				sb.append(separator + "NULL");// , fileNamePhrase);
+			}
+
+			sb.append("\n");
+			// WritingToFile.appendLineToFile("\n", fileNamePhrase);
 		}
 
+		WritingToFile.writeToNewFile(sb.toString(), fileNamePhrase);
 		return Constant.getCommonPath() + fileNamePhrase;
 	}
 
@@ -282,13 +323,14 @@ public class TimelinesAttributesExtraction
 	private String writeTimelineAttributeVectorsWithoutUserID(String fileNamePhrase)
 	{
 		int count = -1;
+		String separator = "\t";
 		for (String label : attributeLabels)
 		{
 			count += 1;
 			if (count == 0)
 				WritingToFile.appendLineToFile(label, fileNamePhrase);
 			else
-				WritingToFile.appendLineToFile("," + label, fileNamePhrase);
+				WritingToFile.appendLineToFile(separator + label, fileNamePhrase);
 		}
 
 		WritingToFile.appendLineToFile("\n", fileNamePhrase);
@@ -306,7 +348,14 @@ public class TimelinesAttributesExtraction
 				if (count == 0)
 					WritingToFile.appendLineToFile(featureValue, fileNamePhrase);
 				else
-					WritingToFile.appendLineToFile("," + featureValue, fileNamePhrase);
+				{
+					if (featureValue.trim().length() == 0)
+					{
+						featureValue = "NULL";
+					}
+					WritingToFile.appendLineToFile(separator + featureValue, fileNamePhrase);
+				}
+
 			}
 			WritingToFile.appendLineToFile("\n", fileNamePhrase);
 		}
@@ -326,11 +375,13 @@ public class TimelinesAttributesExtraction
 			LinkedHashMap<String, Timeline> timelines, int startN, int endN, String pathForResultFiles)
 	{
 		System.out.println("Performing NGram Analysis");
-		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> features = new LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>>();
+		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> features =
+				new LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>>();
 
 		for (Map.Entry<String, Timeline> entry : timelines.entrySet()) // iterating over users
 		{
-			LinkedHashMap<Integer, LinkedHashMap<String, Double>> featuresForThisUser = new LinkedHashMap<Integer, LinkedHashMap<String, Double>>();
+			LinkedHashMap<Integer, LinkedHashMap<String, Double>> featuresForThisUser =
+					new LinkedHashMap<Integer, LinkedHashMap<String, Double>>();
 
 			String userID = entry.getKey();
 			Timeline timelineForUser = entry.getValue();
@@ -342,8 +393,8 @@ public class TimelinesAttributesExtraction
 
 			for (int n = startN; n <= endN; n++) // iterating over NGRams
 			{
-				LinkedHashMap<String, Long> freqDistr = TimelineStats
-						.getNGramOccurrenceDistribution(stringCodeOfTimeline, n);
+				LinkedHashMap<String, Long> freqDistr =
+						TimelineStats.getNGramOccurrenceDistribution(stringCodeOfTimeline, n);
 
 				DescriptiveStatistics dsFreqDistrVals = getDescriptiveStatsOfValues(freqDistr);
 
@@ -577,8 +628,8 @@ public class TimelinesAttributesExtraction
 	 * 
 	 * @param usersDayTimelines
 	 */
-	public void initialiseTimelineAttributeVectors(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	public void
+			initialiseTimelineAttributeVectors(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		System.out.println("Inside initialiseTimelineAttributeVectors ");
 		timelineAttributeVectors = new LinkedHashMap<String, ArrayList<String>>();
@@ -600,8 +651,9 @@ public class TimelinesAttributesExtraction
 			// Start of Sanity Check
 			if (instanceID != (indexInConstantClasss + 1))
 			{
-				String msg = "Error in org.activity.featureExtraction.TimelinesAttributesExtraction.initialiseTimelineAttributeVectors()"
-						+ "Instance ID is not matching the index of user id used in Constant";
+				String msg =
+						"Error in org.activity.featureExtraction.TimelinesAttributesExtraction.initialiseTimelineAttributeVectors()"
+								+ "Instance ID is not matching the index of user id used in Constant";
 				PopUps.showError(msg);
 			}
 			// End of Sanity Check
@@ -609,6 +661,7 @@ public class TimelinesAttributesExtraction
 		}
 
 		attributeLabels = new ArrayList<String>();
+		System.out.println("Exiting initialiseTimelineAttributeVectors ");
 	}
 
 	/**
@@ -619,16 +672,17 @@ public class TimelinesAttributesExtraction
 	public LinkedHashMap<String, Double> getSequenceEntropyAfterExpungingInvalids(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
-				.transformToSequenceDayWise(usersDayTimelines);// , false);
-		LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
-				.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll =
+				TimelineTransformers.transformToSequenceDayWise(usersDayTimelines);// , false);
+		LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS =
+				TimelineTransformers.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
 		LinkedHashMap<String, Double> seqEntropy = TimelineStats.getShannonEntropy(sequenceCharInvalidsExpungedNoTS);
 
 		return seqEntropy;
 	}
 
 	/**
+	 * Changed from m - 1 to m-minEpocj on 23 June 2017
 	 * 
 	 * @param usersDayTimelines
 	 * @param featureName
@@ -647,8 +701,10 @@ public class TimelinesAttributesExtraction
 			String userIDN = entry.getKey();
 			// System.out.println(" m =" + m);
 
-			double sampen = ReadingFromFile
-					.getValByRowCol(Constant.getCommonPath() + userIDN + featureName + "SampEn.csv", m - 1, 1, false);
+			double sampen = ReadingFromFile.getValByRowCol(
+					Constant.getCommonPath() + userIDN + featureName + "SampEn.csv", m - minEpochSampEn, 1, false);// m
+																													// -
+																													// 1
 
 			// System.out.println(" putting " + userIDN + " , " + sampen);
 			res.put(userIDN, sampen);
@@ -681,7 +737,7 @@ public class TimelinesAttributesExtraction
 		{
 			String userIDN = entry.getKey();
 			double sampen = ReadingFromFile.getValByRowCol(Constant.getCommonPath() + userIDN + aggName + "SampEn.csv",
-					m - 1, 1, false);
+					m - minEpochSampEn, 1, false);// m - 1, 1, false);
 			res.put(userIDN, sampen);
 		}
 		// System.out.println("res from getAggSampleEntropyAfterExpungingInvalids = " + res.isEmpty());
@@ -737,8 +793,8 @@ public class TimelinesAttributesExtraction
 		return res;
 	}
 
-	public LinkedHashMap<String, Double> getNumberOfValidDistinctActivities(
-			LinkedHashMap<String, Timeline> usersTimelines)
+	public LinkedHashMap<String, Double>
+			getNumberOfValidDistinctActivities(LinkedHashMap<String, Timeline> usersTimelines)
 	{
 		LinkedHashMap<String, Double> res = new LinkedHashMap<String, Double>();
 
@@ -750,8 +806,13 @@ public class TimelinesAttributesExtraction
 		return res;
 	}
 
-	public LinkedHashMap<String, Double> getNumberOfValidDistinctActivitiesUponLengthOfTimeline(
-			LinkedHashMap<String, Timeline> usersTimelines)
+	/**
+	 * 
+	 * @param usersTimelines
+	 * @return (UserID, (numOfDistinctActivityObjects / numOfAOsInTimeline))
+	 */
+	public LinkedHashMap<String, Double>
+			getNumberOfValidDistinctActivitiesUponLengthOfTimeline(LinkedHashMap<String, Timeline> usersTimelines)
 	{
 		LinkedHashMap<String, Double> res = new LinkedHashMap<String, Double>();
 
@@ -759,6 +820,7 @@ public class TimelinesAttributesExtraction
 		{
 			int numOfAOsInTimeline = entry.getValue().size();
 			double numOfDistinctActivityObjects = entry.getValue().countNumberOfValidDistinctActivities();
+
 			res.put(entry.getKey(), new Double(numOfDistinctActivityObjects / numOfAOsInTimeline));
 		}
 		return res;
@@ -773,15 +835,29 @@ public class TimelinesAttributesExtraction
 		return this.absoluteNameOfAttributesFile + ".csv";
 	}
 
+	/**
+	 * 
+	 * @param toAdd
+	 * @param featureLabel
+	 */
 	public void addStringAttributeToAttributeVectors(LinkedHashMap<String, String> toAdd, String featureLabel)
 	{
 		if (toAdd == null || toAdd.size() == 0)
 		{
 			new Exception("Error in addStringFeatureToFeatureVectors: toAdd.size = " + toAdd.size());
 		}
+
 		for (Map.Entry<String, String> entry : toAdd.entrySet())
 		{
-			this.timelineAttributeVectors.get(entry.getKey()).add(entry.getValue());
+			try
+			{
+				this.timelineAttributeVectors.get(entry.getKey()).add(entry.getValue());
+			}
+			catch (Exception e)
+			{
+				PopUps.printTracedErrorMsg("Exception for entry.getKey()= " + entry.getKey());
+				e.printStackTrace();
+			}
 		}
 		this.attributeLabels.add(featureLabel);
 	}

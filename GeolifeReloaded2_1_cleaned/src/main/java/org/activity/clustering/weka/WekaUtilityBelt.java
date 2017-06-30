@@ -236,6 +236,39 @@ public class WekaUtilityBelt
 	}
 
 	/**
+	 * 
+	 * @param indexOfUser
+	 * @param indexOfGroupLabel
+	 * @param absFileNameToRead
+	 * @param hasColHeader
+	 * @return
+	 */
+	public static LinkedHashMap<String, String> getGroundTruthGowalla(int indexOfUser, int indexOfGroupLabel,
+			String absFileNameToRead, boolean hasColHeader)
+	{
+		LinkedHashMap<String, String> clustering1 = new LinkedHashMap<String, String>();
+		String fileName = absFileNameToRead;// "/run/media/gunjan/HOME/gunjan/Geolife Data
+											// Works/stats/wekaResults/ManualClustersUserAbove10RTs.csv";
+
+		System.out.println("\n Ground truth is being read from file: " + fileName + " at column " + indexOfGroupLabel);
+		List<String> clusterLabels =
+				ReadingFromFile.oneColumnReaderString(fileName, "\t", indexOfGroupLabel, hasColHeader);
+		System.out.println("clusterLabels= " + clusterLabels.toString());
+
+		List<String> userLabels = ReadingFromFile.oneColumnReaderString(fileName, "\t", indexOfUser, hasColHeader);
+		System.out.println("userLabels= " + userLabels.toString());
+
+		for (int i = 0; i < userLabels.size(); i++)
+		{
+			// String userID = userLabels.get(i).replace("U", "");
+			clustering1.put(userLabels.get(i), clusterLabels.get(i));
+		}
+
+		return clustering1;
+
+	}
+
+	/**
 	 * If there are more than one predicted class and then pick one randonly
 	 * 
 	 * @param bigString
@@ -686,7 +719,8 @@ public class WekaUtilityBelt
 	public static LinkedHashMap<String, String> getManualClustering(int indexOfColumn)
 	{
 		LinkedHashMap<String, String> clustering1 = new LinkedHashMap<String, String>();
-		String fileName = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/ManualClustersUserAbove10RTs.csv";
+		String fileName =
+				"/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/ManualClustersUserAbove10RTs.csv";
 
 		List<String> clusterLabel = ReadingFromFile.oneColumnReaderString(fileName, ",", indexOfColumn, true); // ALERT:
 																												// ensure

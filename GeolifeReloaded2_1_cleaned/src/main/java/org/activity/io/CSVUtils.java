@@ -544,7 +544,7 @@ public class CSVUtils
 	 * @param hasColumnHeader
 	 *            to make sure columnHeadersAreNotRepeated
 	 */
-	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
+	public static void concatenateCSVFilesOriginal(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
 			String absfileToWrite)
 	{
 		int countOfFiles = 0, countOfTotalLines = 0;
@@ -565,11 +565,65 @@ public class CSVUtils
 				{
 					countOfLines += 1;
 
-					if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for
-																					// non-first files
+					// Changed on 25 June
+					// if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for
+					if (hasColumnHeader && countOfLines == 1) // dont write the header for
+																// non-first files
 					{
 						continue;
 					}
+					// System.out.println(r.toString());
+					printer.printRecord(r);
+
+				}
+				System.out.println(countOfLines + " lines read for this user");
+				countOfTotalLines += countOfLines;
+
+				printer.close();
+			}
+			System.out.println("Concatenated file: " + absfileToWrite);
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param listOfAbsFileNames
+	 * @param hasColumnHeader
+	 *            to make sure columnHeadersAreNotRepeated
+	 */
+	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
+			String absfileToWrite)
+	{
+		int countOfFiles = 0, countOfTotalLines = 0;
+		try
+		{
+			for (String fileToRead : listOfAbsFileNames)
+			{
+				countOfFiles += 1;
+				List<CSVRecord> csvRecords = CSVUtils.getCSVRecords(fileToRead);
+
+				// System.out.println("read records from " + fileToRead + " are :");
+
+				BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
+				CSVPrinter printer = new CSVPrinter(bw, CSVFormat.DEFAULT);
+
+				int countOfLines = 0;
+				for (CSVRecord r : csvRecords)
+				{
+					countOfLines += 1;
+					// Changed on 25 June
+					// if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for
+					// if (hasColumnHeader && countOfLines == 1) // dont write the header for
+					// // non-first files
+					// {
+					// continue;
+					// }
 					// System.out.println(r.toString());
 					printer.printRecord(r);
 

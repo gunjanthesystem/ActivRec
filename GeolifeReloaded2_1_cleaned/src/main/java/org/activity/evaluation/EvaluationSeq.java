@@ -62,18 +62,23 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath)
 	{
 		// commonPath = "./dataWritten/";
+		System.out.println("Inside EvaluationSeq for NO MU");
 
 		intialiseListOfFilenamesNoMU();
-
+		int totalNumOfUsersComputedFor = 0;
 		try
 		{
+			PrintStream consoleLogStream =
+					WritingToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
+
 			for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
 			{
 				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						DomainConstants.pathToSerialisedCatIDsHierDist,
-						DomainConstants.pathToSerialisedCatIDNameDictionary);
+						DomainConstants.pathToSerialisedCatIDNameDictionary,
+						DomainConstants.pathToSerialisedLocationObjects);
 
 				// for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				// {
@@ -81,9 +86,15 @@ public class EvaluationSeq
 				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 				Constant.setCommonPath(commonPath);
 				System.out.println("\nCommon path=" + Constant.getCommonPath());
-				PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
+				// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
-				doEvaluationSeq(seqLength, commonPath, commonPath, true);
+				// PrintStream consoleLogStream =
+				// WritingToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
+
+				int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, true);
+				totalNumOfUsersComputedFor += numOfUsersComputerFor;
+				System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
+				System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
 				// PopUps.showMessage("FINISHED EVAL FOR mu = " + mu + " USERGROUP=" + groupsOf100UsersLabel);
 
 				// create lists of filenames of results for different MUs which need to be concatenated
@@ -110,7 +121,7 @@ public class EvaluationSeq
 					listOfPerTopKAgreementsFilesL1.get(muIndex)
 							.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectTopKAgreements.csv");
 				}
-				consoleLogStream.close();
+				// consoleLogStream.close();
 				// }
 
 			}
@@ -136,7 +147,7 @@ public class EvaluationSeq
 					"SummaryLog");
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
 					summaryStats, "SummaryTopKLog");
-
+			// consoleLogStream.close();
 		}
 		catch (Exception e)
 		{
@@ -155,7 +166,7 @@ public class EvaluationSeq
 		// commonPath = "./dataWritten/";
 
 		intialiseListOfFilenames(matchingUnitAsPastCount);
-
+		int totalNumOfUsersComputedFor = 0;
 		try
 		{
 			for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
@@ -164,7 +175,8 @@ public class EvaluationSeq
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						DomainConstants.pathToSerialisedCatIDsHierDist,
-						DomainConstants.pathToSerialisedCatIDNameDictionary);
+						DomainConstants.pathToSerialisedCatIDNameDictionary,
+						DomainConstants.pathToSerialisedLocationObjects);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -177,7 +189,11 @@ public class EvaluationSeq
 					PrintStream consoleLogStream =
 							WritingToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
-					doEvaluationSeq(seqLength, commonPath, commonPath, true);
+					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, true);
+					totalNumOfUsersComputedFor += numOfUsersComputerFor;
+					System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
+					System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
+
 					// PopUps.showMessage("FINISHED EVAL FOR mu = " + mu + " USERGROUP=" + groupsOf100UsersLabel);
 
 					// create lists of filenames of results for different MUs which need to be concatenated
@@ -618,9 +634,11 @@ public class EvaluationSeq
 	 * @param seqLength
 	 * @param pathToReadResults
 	 * @param pathToWrite
+	 * @return
 	 */
-	public void doEvaluationSeq(int seqLength, String pathToReadResults, String pathToWrite, boolean verbose)
+	public int doEvaluationSeq(int seqLength, String pathToReadResults, String pathToWrite, boolean verbose)
 	{
+		int numOfUsersComputedFor = Integer.MIN_VALUE;
 		try
 		{
 			// for (int i = 0; i < seqLength; i++)
@@ -632,8 +650,8 @@ public class EvaluationSeq
 			ArrayList<ArrayList<String>> arrayRecommendedSequence = readArrays.getThird();
 			ArrayList<ArrayList<String>> arrayActualSequence = readArrays.getSecond();
 
-			doEvaluationSeq(arrayMeta, arrayRecommendedSequence, arrayActualSequence, timeCategories, "Algo", verbose,
-					pathToWrite, seqLength);
+			numOfUsersComputedFor = doEvaluationSeq(arrayMeta, arrayRecommendedSequence, arrayActualSequence,
+					timeCategories, "Algo", verbose, pathToWrite, seqLength);
 
 			// if (Constant.DoBaselineOccurrence)
 			// {
@@ -646,6 +664,7 @@ public class EvaluationSeq
 			// Constant.EvalPrecisionRecallFMeasure, theKOriginal, "BaselineDuration");
 			// }
 			// }
+
 		}
 		catch (Exception e)
 		{
@@ -654,7 +673,7 @@ public class EvaluationSeq
 		}
 		// System.out.println("All test stats done");
 		// PopUps.showMessage("All test stats done");
-
+		return numOfUsersComputedFor;
 	}
 
 	/**
@@ -789,12 +808,14 @@ public class EvaluationSeq
 	 * @param arrayActualSeq
 	 * @param timeCategories
 	 * @param algoLabel
+	 * @return
 	 */
-	private static void doEvaluationSeq(ArrayList<ArrayList<String>> arrayMeta,
+	private static int doEvaluationSeq(ArrayList<ArrayList<String>> arrayMeta,
 			ArrayList<ArrayList<String>> arrayRecommendedSeq, ArrayList<ArrayList<String>> arrayActualSeq,
 			String[] timeCategories, String algoLabel, boolean verbose, String pathToWrite, int seqLength)
 	{
 		int numOfUsers = arrayMeta.size();
+		int numOfUsersFromDirectAgreements = Integer.MIN_VALUE;
 		if (verbose)
 		{
 			System.out.println("Inside doEvaluationSeq\nNum of users = " + numOfUsers);
@@ -820,7 +841,10 @@ public class EvaluationSeq
 					seqLength);
 			writeDirectTopKAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite, seqLength);
 
+			numOfUsersFromDirectAgreements = arrayDirectAgreements.size();
 		}
+
+		return numOfUsersFromDirectAgreements;
 	}
 
 	/**
@@ -895,6 +919,11 @@ public class EvaluationSeq
 	private static void writeDirectAgreements(String fileNamePhrase, String timeCategory,
 			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite)
 	{
+		System.out
+				.println("Ajooba writeDirectAgreements: arrayDirectAgreements.size()= " + arrayDirectAgreements.size());
+		// PopUps.showMessage(
+		// "Ajooba writeDirectAgreements: arrayDirectAgreements.size()= " + arrayDirectAgreements.size());
+
 		try
 		{
 			StringBuilder sb = new StringBuilder();
@@ -1001,11 +1030,12 @@ public class EvaluationSeq
 
 	/**
 	 * 
-	 * @param algoLabel
+	 * @param fileNamePhrase
 	 * @param timeCategory
 	 * @param arrayMeta
 	 * @param arrayRecommendedSeq
 	 * @param arrayActualSeq
+	 * @param levelAtWhichToMatch
 	 * @return ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements
 	 */
 	private static ArrayList<ArrayList<ArrayList<Integer>>> computeDirectAgreements(String fileNamePhrase,
@@ -1048,7 +1078,10 @@ public class EvaluationSeq
 						}
 						ArrayList<Integer> directAgreement = new ArrayList<>();
 
-						System.out.print("\tsplittedRecomm = ");
+						if (VerbosityConstants.verboseEvaluationMetricsToConsole)
+						{
+							System.out.print("\tsplittedRecomm = ");
+						}
 						for (int y = 0; y < splittedActualSequence.length; y++)
 						{
 							// removing score
@@ -1057,7 +1090,10 @@ public class EvaluationSeq
 
 							if (isAgree(splittedActualSequence[y], splittedRecommY[0], levelAtWhichToMatch))// splittedActualSequence[y].equals(splittedRecomm[0]))
 							{
-								System.out.print("Eureka!");
+								if (VerbosityConstants.verboseEvaluationMetricsToConsole)
+								{
+									System.out.print("Eureka!");
+								}
 								directAgreement.add(1);
 							}
 							else
@@ -1113,10 +1149,13 @@ public class EvaluationSeq
 
 				int intersection = UtilityBelt.getIntersection(catID1AtGivenLevel, catID2AtGivenLevel).size();
 
-				System.out.println("catID1= " + catID1 + " catID2=" + catID2);
-				System.out.println(
-						"catID1AtGivenLevel= " + catID1AtGivenLevel + " catID2AtGivenLevel=" + catID2AtGivenLevel);
-				System.out.println("Intersection.size = " + intersection);
+				if (VerbosityConstants.verboseEvaluationMetricsToConsole)
+				{
+					System.out.println("catID1= " + catID1 + " catID2=" + catID2);
+					System.out.println(
+							"catID1AtGivenLevel= " + catID1AtGivenLevel + " catID2AtGivenLevel=" + catID2AtGivenLevel);
+					System.out.println("Intersection.size = " + intersection);
+				}
 
 				if (intersection > 0)
 				{

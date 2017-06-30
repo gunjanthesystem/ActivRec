@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.activity.clustering.Cluster;
@@ -36,6 +37,7 @@ import org.activity.stats.entropy.SampleEntropyG;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
+import org.activity.util.GeoUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineUtils;
@@ -77,7 +79,7 @@ public class TimelineStats
 	 * ActivityRegularityAnalysisTwoLevel";// "ActivityRegularityAnalysisOneLevel";// "Clustering";// "Clustering";// //
 	 * NGramAnalysis"; // "TimeSeriesAnalysis", "FeatureAnalysis"
 	 */
-	public static final String typeOfAnalysis = "SampleEntropyPerMAnalysis";// "NGramAnalysis";
+	public static final String typeOfAnalysis = "TimelineStats";// "NGramAnalysis";
 	// "TimelineStats";// "NGramAnalysis";// "TimeSeriesCorrelationAnalysis";// "SampleEntropyPerMAnalysis";//
 	// "SampleEntropyPerMAnalysis";//
 	// "TimeSeriesAnalysis";// "AlgorithmicAnalysis2"; "Clustering";// "ClusteringTimelineHolistic";// "
@@ -177,16 +179,16 @@ public class TimelineStats
 
 		case "TimeSeriesCorrelationAnalysis":
 		{
-			performTimeSeriesAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelines));
+			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));
 			performTimeSeriesCorrelationAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelines));
 			break;
 		}
 
 		case "SampleEntropyPerMAnalysis":
 		{
-			performTimeSeriesAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelines));
+			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));
 			// String pathForStoredTimelines
-			performSampleEntropyVsMAnalysis2(UtilityBelt.reformatUserIDs(usersDayTimelines));
+			performSampleEntropyVsMAnalysis2(UtilityBelt.reformatUserIDs(usersDayTimelines), 2, 3);
 			break;
 		}
 		case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
@@ -226,7 +228,7 @@ public class TimelineStats
 		}
 		case "TimeSeriesAnalysis":
 		{
-			performTimeSeriesAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelines));// UtilityBelt.reformatUserIDs(usersDayTimelines)
+			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));// UtilityBelt.reformatUserIDs(usersDayTimelines)
 			break;
 		}
 		case "TimeSeriesEntropyAnalysis":// TimeSeriesAnalysis2
@@ -399,38 +401,43 @@ public class TimelineStats
 	}
 
 	/**
-	 * Must be preceeded by org.activity.stats.TimelineStats.performTimeSeriesAnalysis(LinkedHashMap<String,
+	 * Computes sample entropies for each feature for difference m (epoch lengths) and write them and their aggregated
+	 * values across features to files.
+	 * <p>
+	 * Must be preceeded by org.activity.stats.TimelineStats.transformAndWriteAsTimeseries(LinkedHashMap<String,
 	 * LinkedHashMap<Date, Timeline>>)
 	 * 
 	 * @param usersDayTimelines
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>>
-			performSampleEntropyVsMAnalysis2(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+			performSampleEntropyVsMAnalysis2(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
+					int mMin, int mMax)
 	{
 		String path = Constant.getCommonPath();
 		int numOfUser = usersDayTimelines.size();
 
-		int mMin = 2;// 1;
-		int mMax = 3;// 15;
+		// int mMin = 2;// 1;
+		// int mMax = 3;// 15;
 		int mStep = 1;
 		double rOriginal = 0.15d;
 		// String[] inputFileNamePhrases =
 		// {"activityNameSequenceIntInvalidsExpungedDummyTime","startTimeSequenceIntInvalidsExpungedDummyTime","durationSequenceIntInvalidsExpungedDummyTime","startGeoCoordinatesSequenceIntInvalidsExpungedDummyTime","endGeoCoordinatesSequenceIntInvalidsExpungedDummyTime","distanceTravelledSequenceIntInvalidsExpungedDummyTime","avgAltitudeSequenceIntInvalidsExpungedDummyTime"};
 		String[] featureNames = Constant.getFeatureNames();
+		System.out.println("featureNames = " + Arrays.asList(featureNames).toString());
 
 		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userLevelSampEn =
-				new LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>>();
+				new LinkedHashMap<>();
+
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
 
-			LinkedHashMap<Integer, LinkedHashMap<String, Double>> mLevelSampEn =
-					new LinkedHashMap<Integer, LinkedHashMap<String, Double>>();
+			LinkedHashMap<Integer, LinkedHashMap<String, Double>> mLevelSampEn = new LinkedHashMap<>();
 
 			for (int m = mMin; m <= mMax; m += mStep)
 			{
-				LinkedHashMap<String, Double> sampleEntropies = new LinkedHashMap<String, Double>();// < m , SampEn>
+				LinkedHashMap<String, Double> sampleEntropies = new LinkedHashMap<>();// < m , SampEn>
 
 				for (String featureName : featureNames)
 				{
@@ -460,28 +467,36 @@ public class TimelineStats
 			userLevelSampEn.put(userIDN, mLevelSampEn);
 		}
 
-		traverseSampleEntropies2(userLevelSampEn);
-		traverseSampleEntropiesAggregate(userLevelSampEn);
+		writeSampleEntropiesOfFeatures(userLevelSampEn);
+		writeSampleEntropiesAggregatedAcrossFeaturesForEachM(userLevelSampEn);
 
 		return userLevelSampEn;
 	}
 
-	public static void
-			traverseSampleEntropies2(LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> all)
+	/**
+	 * writeSampleEntropiesForFeatures
+	 * <p>
+	 * formely called traverseSampleEntropies2()
+	 * 
+	 * @param all
+	 */
+	public static void writeSampleEntropiesOfFeatures(
+			LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> all)
 	{
-		System.out.println("Traversing sample entropies2");
+		System.out.println("Inside writeSampleEntropiesOfFeatures");
+
 		for (Entry<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userEntry : all.entrySet())
 		{
 			String userIDN = userEntry.getKey();
+			System.out.println("userIDN = " + userIDN);
 
-			double[] sumSampEn = new double[Constant.getNumberOfFeatures()];
-			double[] countValidSampEn = new double[Constant.getNumberOfFeatures()];
-
-			for (int i = 0; i < Constant.getNumberOfFeatures(); i++)
-			{
-				sumSampEn[i] = 0d;
-				countValidSampEn[i] = 0d;
-			}
+			// double[] sumSampEn = new double[Constant.getNumberOfFeatures()];
+			// double[] countValidSampEn = new double[Constant.getNumberOfFeatures()];
+			// for (int i = 0; i < Constant.getNumberOfFeatures(); i++)
+			// {
+			// sumSampEn[i] = 0d;
+			// countValidSampEn[i] = 0d;
+			// }
 
 			for (Entry<Integer, LinkedHashMap<String, Double>> mEntry : userEntry.getValue().entrySet())
 			{
@@ -506,14 +521,23 @@ public class TimelineStats
 		}
 	}
 
-	public static void traverseSampleEntropiesAggregate(
+	/**
+	 * Write sampleEntropies aggregated across features for fach m (epoch length)
+	 * <p>
+	 * formely called traverseSampleEntropiesAggregate()
+	 * <p>
+	 * note: SampEnCalculationsApache.csv seems to be just for logging
+	 * 
+	 * @param all
+	 */
+	public static void writeSampleEntropiesAggregatedAcrossFeaturesForEachM(
 			LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> all)
 	{
-		System.out.println("Traversing sample entropies2");
+		System.out.println("Inside writeSampleEntropiesAggregated");
 		for (Entry<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userEntry : all.entrySet())
 		{
 			String userIDN = userEntry.getKey();
-
+			System.out.println("userIDN = " + userIDN);
 			// double[] sumSampEn = new double[Constant.getNumberOfFeatures()];
 			// double[] countValidSampEn = new double[Constant.getNumberOfFeatures()];
 			//
@@ -537,7 +561,7 @@ public class TimelineStats
 				double sampleEntropySum = 0, sampleEntropyMedian = 0, sampleEntropyStdDev = 0;
 				double countValid = 0;
 				// double[] sampleEntropyVals = new double[mEntry.getValue().size()];
-				ArrayList<Double> sampleEntropyVals = new ArrayList<Double>();
+				ArrayList<Double> sampleEntropyVals = new ArrayList<>();
 
 				int i = 0;
 				for (Entry<String, Double> featureEntry : mEntry.getValue().entrySet())
@@ -651,11 +675,16 @@ public class TimelineStats
 	}
 
 	/**
+	 * Convert timelines into timeseries of activities and features, also with equally spaced dummy time interval and
+	 * write to files.
+	 * <p>
+	 * formely this method as called performTimeSeriesAnalysis()
 	 * 
 	 * @param usersDayTimelines
 	 *            already cleaned and rearranged
 	 */
-	public static void performTimeSeriesAnalysis(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	public static void
+			transformAndWriteAsTimeseries(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines); relocated to when calling this method
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries =
@@ -671,17 +700,24 @@ public class TimelineStats
 				TimelineTransformers.transformToSequenceDayWise(usersDayTimelines);// , false);
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceInt =
 				TimelineTransformers.toIntsFromActivityObjects(sequenceAll, false);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntZeroValuedInvalids =
-				TimelineTransformers.toTimeSeriesIntWithZeroValuedInvalids(sequenceAll);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntInvalidsExpunged =
-				TimelineTransformers.toIntsFromActivityObjects(sequenceAll, true);
+
+		// start of relevant if invalids exists in the dataset
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntZeroValuedInvalids = null;
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntInvalidsExpunged = null;
+		if (Constant.hasInvalidActivityNames)
+		{
+			sequenceIntZeroValuedInvalids = TimelineTransformers.toTimeSeriesIntWithZeroValuedInvalids(sequenceAll);
+			sequenceIntInvalidsExpunged = TimelineTransformers.toIntsFromActivityObjects(sequenceAll, true);
+		}
+		// end of relevant if invalids exists in the dataset
+
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> activityNameSequenceIntInvalidsExpungedDummyTime =
 				TimelineTransformers.toIntsFromActivityObjectsDummyTime(sequenceAll, true);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> durationSequenceIntInvalidsExpungedDummyTime =
-				TimelineTransformers.toDurationsFromActivityObjectsDummyTime(sequenceAll, true);
+
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> startTimesSequenceIntInvalidsExpungedDummyTime =
 				TimelineTransformers.toStartTimeFromActivityObjectsDummyTime(sequenceAll, true);
 
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> durationSequenceIntInvalidsExpungedDummyTime = null;
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> startGeoSequenceIntInvalidsExpungedDummyTime = null,
 				endGeoSequenceIntInvalidsExpungedDummyTime = null;
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> distanceTravelledIntInvalidsExpungedDummyTime = null,
@@ -690,6 +726,8 @@ public class TimelineStats
 
 		if (Constant.getDatabaseName().equals("geolife1"))
 		{
+			durationSequenceIntInvalidsExpungedDummyTime =
+					TimelineTransformers.toDurationsFromActivityObjectsDummyTime(sequenceAll, true);
 			startGeoSequenceIntInvalidsExpungedDummyTime =
 					TimelineTransformers.toStartGeoCoordinatesFromActivityObjectsDummyTime(sequenceAll, true);
 			endGeoSequenceIntInvalidsExpungedDummyTime =
@@ -717,18 +755,23 @@ public class TimelineStats
 
 		WritingToFile.writeAllTimestampedActivityObjects(sequenceAll, "Sequence");
 		WritingToFile.writeAllTimeSeriesInt(sequenceInt, "SequenceInt");
-		WritingToFile.writeAllTimeSeriesInt(sequenceIntZeroValuedInvalids, "SequenceIntZeroValuedInvalids ");
-		WritingToFile.writeAllTimeSeriesInt(sequenceIntInvalidsExpunged, "SequenceIntInvalidsExpunged");
+
+		if (Constant.hasInvalidActivityNames)
+		{
+			WritingToFile.writeAllTimeSeriesInt(sequenceIntZeroValuedInvalids, "SequenceIntZeroValuedInvalids ");
+			WritingToFile.writeAllTimeSeriesInt(sequenceIntInvalidsExpunged, "SequenceIntInvalidsExpunged");
+		}
 
 		WritingToFile.writeAllTimeSeriesInt(activityNameSequenceIntInvalidsExpungedDummyTime,
 				"ActivityNameSequenceIntInvalidsExpungedDummyTime");
-		WritingToFile.writeAllTimeSeriesLong(durationSequenceIntInvalidsExpungedDummyTime,
-				"DurationSequenceIntInvalidsExpungedDummyTime");
+
 		WritingToFile.writeAllTimeSeriesLong(startTimesSequenceIntInvalidsExpungedDummyTime,
 				"StartTimeSequenceIntInvalidsExpungedDummyTime");
 
 		if (Constant.getDatabaseName().equals("geolife1"))
 		{
+			WritingToFile.writeAllTimeSeriesLong(durationSequenceIntInvalidsExpungedDummyTime,
+					"DurationSequenceIntInvalidsExpungedDummyTime");
 			WritingToFile.writeAllTimeSeriesLong(startGeoSequenceIntInvalidsExpungedDummyTime,
 					"StartGeoCoordinatesSequenceIntInvalidsExpungedDummyTime");
 			WritingToFile.writeAllTimeSeriesLong(endGeoSequenceIntInvalidsExpungedDummyTime,
@@ -1453,7 +1496,7 @@ public class TimelineStats
 			Triple<String, Integer, ArrayList<Double>> info = entry.getValue();
 			ArrayList<Double> clusterQualityInfo = info.getThird();
 
-			StringBuffer stringToWrite = new StringBuffer();
+			StringBuilder stringToWrite = new StringBuilder();
 
 			for (Cluster c : clusters)
 			{
@@ -1489,6 +1532,11 @@ public class TimelineStats
 		return r;
 	}
 
+	/**
+	 * 
+	 * @param ao
+	 * @return
+	 */
 	public static int getMagnifiedIntCodeForActivityObject(ActivityObject ao)
 	{
 		int r = (ConnectDatabase.getActivityID(ao.getActivityName()) + 0) * 100;
@@ -2371,7 +2419,7 @@ public class TimelineStats
 
 		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		s.append("User, User, NumOfActivityObjects");
 		for (Map.Entry<String, Timeline> entry : usersTimelines.entrySet())
 		{
@@ -2392,7 +2440,7 @@ public class TimelineStats
 	{
 		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		s.append("User, User, NumOfActivityObjects");
 		for (Map.Entry<String, Timeline> entry : usersTimelines.entrySet())
 		{
@@ -2433,7 +2481,7 @@ public class TimelineStats
 	public static void writeNumOfValidActivityObjectsInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append("User, User, NumOfValidActivityObjects");
 		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
@@ -2458,7 +2506,7 @@ public class TimelineStats
 	public static void writeNumOfDaysInTimelines(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
 			String fileNamePhrase)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		s.append("User, User, NumOfDays, NumOfWeekDays,NumOfWeekends,%OfWeekdays");
 		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
@@ -2488,7 +2536,7 @@ public class TimelineStats
 	public static void writeStatsNumOfDistinctActsPerDayInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append(
 				"User, User, MeanNumOfDistinctActsPerDay, MedianNumOfDistinctActsPerDay, IQRNumOfDistinctActsPerDay, MaxNumOfDistinctActsPerDay, MinNumOfDistinctActsPerDay,SumNumOfDistinctActsPerDay,TotalNumOfDistinctActsOverAllTimelines");
@@ -2521,7 +2569,7 @@ public class TimelineStats
 	public static void writeAllNumOfDistinctActsPerDayInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 
@@ -2546,7 +2594,7 @@ public class TimelineStats
 	public static void writeAvgNumOfDistinctActsPerDayInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append("User, User, AvgNumOfDistinctActsPerDay,Mean,Median, IQR");
 		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
@@ -2579,7 +2627,7 @@ public class TimelineStats
 	public static void writeStatsNumOfTotalActsPerDayInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append(
 				"User, User, MeanNumOfTotalActsPerDay, MedianNumOfTotalActsPerDay, IQRNumOfTotalActsPerDay, MaxNumOfTotalActsPerDay, MinNumOfTotalActsPerDay,SumNumOfTotalActsPerDay,TotalNumOfActsOverAllTimelines");
@@ -2613,7 +2661,7 @@ public class TimelineStats
 	public static void writeAllNumOfTotalActsPerDayInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String numOfTotalActsPerDay = new String();
@@ -2636,7 +2684,7 @@ public class TimelineStats
 	public static void writeAvgNumOfTotalActsPerDayInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		// PopUps.showMessage("inside writeavgdis");
 		s.append("User,User, AvgNumOfTotalActsPerDay,Mean,Median,IQR");
 		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
@@ -2839,5 +2887,40 @@ public class TimelineStats
 				WritingToFile.appendLineToFile(toWrite, fileNameToUse);
 			}
 		}
+	}
+
+	/**
+	 * Writes the number of times each city occurs over all users.
+	 * 
+	 * @param usersDayTimelines
+	 * @param absFileNamePhrase
+	 */
+	public static void writeAllCitiesCounts(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
+			String absFileNamePhrase)
+	{
+		System.out.println("Inside writeAllCitiesCounts");
+		StringBuilder s = new StringBuilder();
+		LinkedHashMap<String, Double> cityCountMap = new LinkedHashMap<>();
+		List<String> citiesForAllUsers = new ArrayList<>();
+		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
+		{
+			System.out.println("user id =" + entry.getKey());
+			// List<String> citiesForUser = new ArrayList<>();
+			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
+			{
+				List<String> citiesInDay = entryDay.getValue().getActivityObjectsInTimeline().stream()
+						.map(ao -> GeoUtils.getCityFromLatLon(ao.getStartLatitude(), ao.getStartLongitude()))
+						.collect(Collectors.toList());
+
+				citiesForAllUsers.addAll(citiesInDay);
+			}
+
+			// s.append(numOfDistinctActsPerDay.substring(0, numOfDistinctActsPerDay.length() - 1) + "\n");
+		}
+		Map<String, Long> counted = citiesForAllUsers.stream()
+				.collect(Collectors.groupingByConcurrent(Function.identity(), Collectors.counting()));
+
+		counted.entrySet().stream().forEach(e -> s.append(e.getKey() + "||" + e.getValue() + "\n"));
+		WritingToFile.writeToNewFile(s.toString(), absFileNamePhrase);
 	}
 }

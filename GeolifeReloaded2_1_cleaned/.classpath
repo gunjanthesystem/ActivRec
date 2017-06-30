@@ -14,5 +14,6 @@
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry kind="lib" path="/home/gunjan/EclipseWorkspace/EditDistanceStandAlone/build/libs/EditDistanceStandAlone-capsule.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SPMFExperiments"/>
+	<classpathentry kind="lib" path="/home/gunjan/Immovables/reverseGeoCodingJava/reverseGeocoding.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
