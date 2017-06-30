@@ -15,6 +15,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.activity.clustering.weka.TimelineWEKAClusteringController;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned2;
@@ -69,7 +70,8 @@ public class ControllerWithoutServer
 			 */
 			// specific for Gowalla dataset
 			Constant.initialise(commonPath, Constant.getDatabaseName(), "./dataToRead/April7/mapCatIDsHierDist.kryo",
-					DomainConstants.pathToSerialisedCatIDNameDictionary);
+					DomainConstants.pathToSerialisedCatIDNameDictionary,
+					DomainConstants.pathToSerialisedLocationObjects);
 
 			// ,// 550);
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
@@ -154,7 +156,7 @@ public class ControllerWithoutServer
 			}
 			//////////// for Gowalla start
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			//////////// false, false, false, "GowallaUserDayTimelines.csv");
+			// false, false, false, "GowallaUserDayTimelines.csv");
 			System.out.println("Before reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = ControllerWithoutServer
 					.reduceAndCleanTimelines(Constant.getDatabaseName(), usersDayTimelinesOriginal, true);
@@ -200,8 +202,10 @@ public class ControllerWithoutServer
 
 			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
 
+			// TimelineStats.writeAllCitiesCounts(usersCleanedDayTimelines,
+			// Constant.outputCoreResultsPath + "AllCitiesCount");
 			// // important curtain 1 start 10 Feb 2017
-			sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
+			// $sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
 			// // important curtain 1 end 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017
@@ -256,7 +260,7 @@ public class ControllerWithoutServer
 			/**** CURRENT END ****/
 
 			/** To get some stats on the generated timelines **/
-			// TimelineStats.timelineStatsController(usersTimelines);
+			// $$TimelineStats.timelineStatsController(usersCleanedDayTimelines);// usersTimelines);
 			// TimelineStats.timelineStatsController(usersDayTimelines);
 			// $$ TimelineStats.timelineStatsController(usersDayTimelinesOriginal);
 
@@ -268,8 +272,9 @@ public class ControllerWithoutServer
 			// UtilityBelt.rearrangeDayTimelinesOrderForDataset(usersCleanedRearrangedDayTimelines);
 
 			/** CURRENT **/
-			// $$ TimelineWEKAClusteringController clustering = new
-			// TimelineWEKAClusteringController(usersCleanedRearrangedDayTimelines, null);
+			TimelineWEKAClusteringController clustering =
+					new TimelineWEKAClusteringController(usersCleanedDayTimelines, null);
+			// usersCleanedRearrangedDayTimelines, null);
 
 			/** END OF CURRENT **/
 
@@ -550,6 +555,7 @@ public class ControllerWithoutServer
 			LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData =
 					(LinkedHashMap<Integer, LocationGowalla>) Serializer
 							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
+
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
 
 			System.out.println("before creating timelines while having deserialised objects in memory\n"
@@ -645,8 +651,13 @@ public class ControllerWithoutServer
 
 			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfActsCleanedReduced3.csv");// us
+
 			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 					Constant.getCommonPath() + "NumOfDaysPerUserCleanedReduced3.csv");
+
+			WritingToFile.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
+					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfDistinctValidActsCleanedReduced3.csv");// us
+
 			System.out.println("Num of users cleaned reduced3  = " + usersCleanedDayTimelines.size());
 		}
 		return usersCleanedDayTimelines;

@@ -1,10 +1,12 @@
 package org.activity.constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -37,7 +39,7 @@ public final class Constant
 	public static String INVALID_ACTIVITY2 = "";// "Not Available";
 
 	static String[] activityNames;
-
+	public static ArrayList<String> activityNamesGowallaLabels;
 	static String DATABASE_NAME = "";// ;"geolife1";// default database name,
 										// dcu_data_2";// "geolife1";// "start_base_2";databaseName
 	public static String rankScoring = "";// "sum";// default product"; // "sum"
@@ -287,7 +289,7 @@ public final class Constant
 	 * @param pathToSerialisedCatIDNameDictionary
 	 */
 	public static void initialise(String givenCommonpath, String databaseName, String catIDsHierDistSerialisedFile,
-			String pathToSerialisedCatIDNameDictionary)
+			String pathToSerialisedCatIDNameDictionary, String pathToSerialisedLocationObjects)
 	{
 		Constant.setDatabaseName(databaseName);
 		Constant.UsingSQLDatabase = false;
@@ -297,6 +299,7 @@ public final class Constant
 		Constant.setCommonPath(givenCommonpath);
 		DomainConstants.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
 		DomainConstants.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
+		DomainConstants.setLocIDLocationObjectDictionary(pathToSerialisedLocationObjects);
 		DomainConstants.setCatIDCharCodeMap();
 		DomainConstants.setCatIDGivenLevelCatIDMap();
 		// Constant.setDistanceUsed("HJEditDistance");
@@ -646,6 +649,12 @@ public final class Constant
 				System.out.println(
 						"num of nodes at depth " + DomainConstants.gowallaWorkingCatLevel + " are: " + res.size());
 				activityNames = res.toArray(new String[res.size()]);
+
+				// StringBuilder sb = new StringBuilder();
+				System.out.println(Arrays.asList(activityNames).stream().collect(Collectors.joining(",")));
+
+				// activityNamesGowallaLabels = (ArrayList<String>) Arrays.asList(activityNames).stream()
+				// .map(a -> DomainConstants.catIDNameDictionary.get(a)).collect(Collectors.toList());
 				// gowallaActivityNames;
 				break;
 			default:
@@ -702,7 +711,14 @@ public final class Constant
 
 		for (int i = 0; i < num; i++)
 		{
-			featureNamesSub[i] = DomainConstants.featureNames[i];
+			if (Constant.getDatabaseName().equals("gowalla1"))
+			{
+				featureNamesSub[i] = DomainConstants.gowallaFeatureNames[i];
+			}
+			else
+			{
+				featureNamesSub[i] = DomainConstants.featureNames[i];
+			}
 		}
 		return featureNamesSub;// or 5 //activity name, start time, duration, dist travelled, start geo, end geo, avg
 								// altitude

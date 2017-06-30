@@ -33,12 +33,11 @@ public class TimelineTransformers
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>
 			toTimeSeriesIntWithZeroValuedInvalids(LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r =
-				new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<>();
 
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
-			LinkedHashMap<Timestamp, Integer> dataToPut = new LinkedHashMap<Timestamp, Integer>();
+			LinkedHashMap<Timestamp, Integer> dataToPut = new LinkedHashMap<>();
 
 			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
 			{
@@ -96,6 +95,7 @@ public class TimelineTransformers
 	}
 
 	/**
+	 * Putting at equally spaced time intervals
 	 * 
 	 * @param ts
 	 * @param validsOnly
@@ -107,6 +107,7 @@ public class TimelineTransformers
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r =
 				new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
+
 		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Integer> dataToPut = new LinkedHashMap<Timestamp, Integer>();
@@ -163,6 +164,12 @@ public class TimelineTransformers
 		return r;
 	}
 
+	/**
+	 * 
+	 * @param ts
+	 * @param validsOnly
+	 * @return
+	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toStartTimeFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
 	{

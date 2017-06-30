@@ -619,6 +619,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	/**
 	 * 
 	 * @param activityNameAtRecommPoint
+	 * @param userID
+	 * @param nGram
 	 * @return
 	 */
 	private LinkedHashMap<String, Double> createRankedTopRecommendedActivityNamesNGram(String activityNameAtRecommPoint,

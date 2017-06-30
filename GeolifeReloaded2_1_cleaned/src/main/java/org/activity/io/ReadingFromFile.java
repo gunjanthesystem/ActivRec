@@ -76,7 +76,7 @@ public class ReadingFromFile
 				raw = br.lines().map((String s) -> (s.split(Pattern.quote(delimiter))[columnIndex]))
 						.collect(Collectors.toList());
 			}
-			System.out.println("Size of raw =" + raw.size());
+			// System.out.println("Size of raw =" + raw.size());
 			br.close();
 		}
 
@@ -122,7 +122,7 @@ public class ReadingFromFile
 				raw = br.lines().map((String s) -> Long.parseLong(s.split(Pattern.quote(delimiter))[columnIndex]))
 						.collect(Collectors.toList());
 			}
-			System.out.println("Size of raw =" + raw.size());
+			// System.out.println("Size of raw =" + raw.size());
 			br.close();
 		}
 
@@ -168,7 +168,7 @@ public class ReadingFromFile
 				raw = br.lines().map((String s) -> Double.parseDouble(s.split(Pattern.quote(delimiter))[columnIndex]))
 						.collect(Collectors.toList());
 			}
-			System.out.println("Size of raw =" + raw.size());
+			// System.out.println("Size of raw =" + raw.size());
 			br.close();
 		}
 
@@ -301,16 +301,30 @@ public class ReadingFromFile
 	 * 
 	 * @param filePath
 	 * @param rowIndex
+	 *            starts from 0
 	 * @param colIndex
+	 *            starts from 0
 	 * @param hasColHeader
 	 * @return
 	 */
 	public static double getValByRowCol(String filePath, int rowIndex, int colIndex, boolean hasColHeader)
 	{
-		List<Double> vals = oneColumnReaderDouble(filePath, ",", colIndex, hasColHeader);
-		Double[] vals2 = vals.toArray(new Double[vals.size()]);
-		double[] vals3 = ArrayUtils.toPrimitive(vals2);
-		return vals3[rowIndex];
+		double res = Double.NaN;
+		try
+		{
+			List<Double> valsInColumnAsList = oneColumnReaderDouble(filePath, ",", colIndex, hasColHeader);
+			Double[] valsInColumnAsArray = valsInColumnAsList.toArray(new Double[valsInColumnAsList.size()]);
+			double[] valsInColumnAsPrimitiveArray = ArrayUtils.toPrimitive(valsInColumnAsArray);
+
+			res = valsInColumnAsPrimitiveArray[rowIndex];
+		}
+		catch (Exception e)
+		{
+			PopUps.printTracedErrorMsg("Error in getValByRowCol filePath =" + filePath + " rowIndex= " + rowIndex
+					+ " colIndex=" + colIndex + " hasColHeader=" + hasColHeader);
+		}
+		return res;
+
 	}
 
 	/**
@@ -352,8 +366,8 @@ public class ReadingFromFile
 
 		if (columnIndicesToRead.length != allVals.size())
 		{
-			System.err.println(PopUps.getTracedErrorMsg("Error: columnIndicesToRead.length"
-					+ columnIndicesToRead.length + " != allVals.size()" + allVals.size()));
+			System.err.println(PopUps.getTracedErrorMsg("Error: columnIndicesToRead.length" + columnIndicesToRead.length
+					+ " != allVals.size()" + allVals.size()));
 		}
 
 		return allVals;
