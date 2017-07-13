@@ -2575,7 +2575,7 @@ public class RecommendationMasterMar2017Gen implements RecommendationMasterI// I
 		StringBuilder code = new StringBuilder();
 		for (ActivityObject ao : activityObjects)
 		{
-			code.append(ao.getStringCode());
+			code.append(ao.getCharCode());
 		}
 		return code.toString();
 	}

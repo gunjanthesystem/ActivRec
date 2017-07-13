@@ -219,6 +219,13 @@ public class Timeline implements Serializable
 		return sb.toString();
 	}
 
+	public String getPrimaryDimensionValsInSequence()
+	{
+		StringBuilder sb = new StringBuilder();
+		activityObjectsInTimeline.stream().forEachOrdered(ao -> sb.append(" >>" + ao.getPrimaryDimensionVal()));
+		return sb.toString();
+	}
+
 	///////////////
 	public String getActivityObjectNamesInSequenceWithFeatures()
 	{
@@ -334,7 +341,7 @@ public class Timeline implements Serializable
 	{
 		StringBuilder stringCodeForTimeline = new StringBuilder();
 
-		activityObjectsInTimeline.stream().forEachOrdered(ao -> stringCodeForTimeline.append(ao.getStringCode()));
+		activityObjectsInTimeline.stream().forEachOrdered(ao -> stringCodeForTimeline.append(ao.getCharCode()));
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{
@@ -358,7 +365,7 @@ public class Timeline implements Serializable
 		StringBuilder stringCodeForTimeline = new StringBuilder();
 
 		activityObjectsInTimeline.stream()
-				.forEachOrdered(ao -> stringCodeForTimeline.append(ao.getStringCode()).append(delimiter));
+				.forEachOrdered(ao -> stringCodeForTimeline.append(ao.getCharCode()).append(delimiter));
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{
@@ -390,6 +397,29 @@ public class Timeline implements Serializable
 		for (int i = 0; i < this.activityObjectsInTimeline.size() - 1; i++)
 		{
 			if (this.activityObjectsInTimeline.get(i).getActivityName().equals(activityNameToCheck))
+			{
+				containsCount++;
+			}
+		}
+		return containsCount;
+	}
+
+	/**
+	 * Count num of non-last activity objects with the at least one matching primary dimension val of the given.
+	 * <p>
+	 * e.g., if primary dimension is activity id, then it works similar to countContainsActivityNameButNotAsLast(),
+	 * i.e., count the number of non-last aos which have activity ids same as given primaryDimensionVal. Primary
+	 * dimension is an array list because in case of merger an activity object can have multiple values for a dimension.
+	 * 
+	 * @param activityNameToCheck
+	 * @return num of non-last activity objects with the at least one matching primary dimension val of the given
+	 */
+	public int countContainsPrimaryDimensionValButNotAsLast(ArrayList<Integer> givenPrimaryDimensionVal)
+	{
+		int containsCount = 0;
+		for (int i = 0; i < this.activityObjectsInTimeline.size() - 1; i++)
+		{
+			if (this.activityObjectsInTimeline.get(i).equalsWrtPrimaryDimension(givenPrimaryDimensionVal))
 			{
 				containsCount++;
 			}
@@ -437,6 +467,46 @@ public class Timeline implements Serializable
 	}
 
 	/**
+	 * TODO: Make sure the new change ,i.e. running until <size() is compatible with implemention of both Daywise and
+	 * start time approach.
+	 * 
+	 * @param actNameToCheck
+	 * @return
+	 */
+	public boolean hasAValidActAfterFirstOccurOfThisPrimaryDimensionVal(ArrayList<Integer> primaryDimensionVal)
+	{
+		boolean hasValidAfter = false;
+
+		int indexOfFirstOccurrence = getIndexOfFirstOccurOfThisPrimaryDimensionVal(primaryDimensionVal);
+		// getIndexOfFirstOccurOfThisActName(actNameToCheck);
+
+		if (indexOfFirstOccurrence < 0)
+		{
+			PopUps.printTracedErrorMsg(
+					"Error in hasAValidActAfterFirstOccurOfThisActName: No Occurrence of the given activity in the given timeline, throwing exception");
+		}
+
+		// not the last activity of the timeline
+		if (indexOfFirstOccurrence < this.activityObjectsInTimeline.size() - 1)
+		{
+			// changed the loop upper limit in Mar 2017: changed back again for compatibility with prev results for
+			// comparison. TODO
+			// new: for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size(); i++)
+			// old: for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size() - 1; i++)
+			// only affect is slight reduction in num of RTs
+			for (int i = indexOfFirstOccurrence + 1; i < this.activityObjectsInTimeline.size() - 1; i++)
+			{
+				if (UtilityBelt.isValidActivityObject(activityObjectsInTimeline.get(i)))
+				{
+					hasValidAfter = true;
+					break;
+				}
+			}
+		}
+		return hasValidAfter;
+	}
+
+	/**
 	 * 
 	 * @param activityNameToCheck
 	 * @return
@@ -460,6 +530,27 @@ public class Timeline implements Serializable
 		for (int i = 0; i < this.activityObjectsInTimeline.size()/* - 1 */; i++)
 		{
 			if (this.activityObjectsInTimeline.get(i).getActivityName().equals(actNameToCheck))
+			{
+				indexOfFirstOccurrence = i;
+				break;
+			}
+		}
+		return indexOfFirstOccurrence;
+	}
+
+	/**
+	 * 
+	 * @param actNameToCheck
+	 * @return
+	 * @since 11 July 2017
+	 */
+	public int getIndexOfFirstOccurOfThisPrimaryDimensionVal(ArrayList<Integer> primaryDimensionVal)
+	{
+		int indexOfFirstOccurrence = -99;
+
+		for (int i = 0; i < this.activityObjectsInTimeline.size(); i++)
+		{
+			if (this.activityObjectsInTimeline.get(i).equalsWrtPrimaryDimension(primaryDimensionVal))
 			{
 				indexOfFirstOccurrence = i;
 				break;
@@ -690,7 +781,7 @@ public class Timeline implements Serializable
 	}
 
 	/**
-	 * @deprecated be careful, as in current setup we are not replying on it and timeline id for daywise timeline is the
+	 * @deprecated be careful, as in current setup we are not relying on it and timeline id for daywise timeline is the
 	 *             date as string while otherwise it is the count,i.e, serial number of the timeline as String
 	 * @return
 	 */

@@ -439,7 +439,7 @@ public class AlignmentBasedDistance
 			// System.out.println("@@ UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size() = "
 			// + UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size());
 
-			if (UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size() == 0)
+			if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
 			// ao1.getLocationIDs() != ao2.getLocationIDs()) // if no matching locationIDs then add wt to dfeat
 			{
 				dfeat += wtLocation;

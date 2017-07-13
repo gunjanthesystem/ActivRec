@@ -2268,7 +2268,7 @@ public class RecommendationMasterMUMar2017// implements RecommendationMasterI// 
 			// String activityName= activityObjects.get(i).getActivityName();
 			// int activityID= generateSyntheticData.getActivityid(activityName);
 
-			code += activityObjects.get(i).getStringCode(); // Character.toString ((char)(activityID+65)); //getting the
+			code += activityObjects.get(i).getCharCode(); // Character.toString ((char)(activityID+65)); //getting the
 															// ascii code for (activity id+65)
 		}
 

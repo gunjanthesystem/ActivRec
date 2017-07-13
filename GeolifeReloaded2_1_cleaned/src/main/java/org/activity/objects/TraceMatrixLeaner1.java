@@ -234,7 +234,8 @@ public class TraceMatrixLeaner1
 		}
 		catch (Exception e)
 		{
-			System.out.println("nRows= " + nRows + ", nCols= " + nCols);// + ", maxSizeOfCell = " + maxSizeOfCell);// );
+			System.out.println("Exception: nRows= " + nRows + ", nCols= " + nCols);// + ", maxSizeOfCell = " +
+																					// maxSizeOfCell);// );
 			// System.out.println("traceMatrix:\n" + this.toString());
 			// $$ System.err.println(("Error in org.activity.objects.TraceMatrix.addCharsToCell() , rowIndex=" +
 			// rowIndex

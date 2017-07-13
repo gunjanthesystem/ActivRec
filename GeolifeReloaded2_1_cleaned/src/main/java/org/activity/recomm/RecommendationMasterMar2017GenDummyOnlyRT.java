@@ -2544,7 +2544,7 @@ public class RecommendationMasterMar2017GenDummyOnlyRT implements Recommendation
 		StringBuilder code = new StringBuilder();
 		for (ActivityObject ao : activityObjects)
 		{
-			code.append(ao.getStringCode());
+			code.append(ao.getCharCode());
 		}
 		return code.toString();
 	}

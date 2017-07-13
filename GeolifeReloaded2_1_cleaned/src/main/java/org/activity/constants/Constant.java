@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.generator.DatabaseCreatorGowallaQuicker0;
 import org.activity.io.Serializer;
@@ -37,6 +38,13 @@ public final class Constant
 
 	public static String INVALID_ACTIVITY1 = "";// "Unknown";
 	public static String INVALID_ACTIVITY2 = "";// "Not Available";
+
+	// Added on 11 July 2017
+	public static Integer INVALID_ACTIVITY1_ID = -997;// "Unknown";
+	public static Integer INVALID_ACTIVITY2_ID = -998;// "Not Available";
+	// end of Added on 11 July 2017
+
+	public static final PrimaryDimension primaryDimension = PrimaryDimension.ActivityID;
 
 	static String[] activityNames;
 	public static ArrayList<String> activityNamesGowallaLabels;
@@ -163,8 +171,7 @@ public final class Constant
 	 */
 	public static final boolean ClosestTimeFilterCandidates = false;
 
-	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType =
-			Enums.EditDistanceTimeDistanceType.NearerScaled;
+	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType = Enums.EditDistanceTimeDistanceType.NearerScaled;
 	// .FurtherScaled;
 
 	/**
@@ -644,8 +651,8 @@ public final class Constant
 			case "gowalla1":
 				DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
 						.deSerializeThis(DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName);
-				LinkedHashSet<String> res =
-						UIUtilityBox.getNodesAtGivenDepth(DomainConstants.gowallaWorkingCatLevel, rootOfCategoryTree);
+				LinkedHashSet<String> res = UIUtilityBox.getNodesAtGivenDepth(DomainConstants.gowallaWorkingCatLevel,
+						rootOfCategoryTree);
 				System.out.println(
 						"num of nodes at depth " + DomainConstants.gowallaWorkingCatLevel + " are: " + res.size());
 				activityNames = res.toArray(new String[res.size()]);
@@ -884,7 +891,7 @@ public final class Constant
 		s.append("\nCommon path:" + commonPath);
 		s.append("\npercentageInTraining:" + percentageInTraining);
 		s.append("\nactivityNames:" + Arrays.toString(activityNames));
-
+		s.append("\nPrimaryDimension:" + primaryDimension);
 		s.append("\nlookPastType:" + lookPastType);
 		s.append("\nClosestTimeAllowSpillOverDays:" + ClosestTimeAllowSpillOverDays);
 		s.append("\nClosestTimeFilterCandidates:" + ClosestTimeFilterCandidates);
