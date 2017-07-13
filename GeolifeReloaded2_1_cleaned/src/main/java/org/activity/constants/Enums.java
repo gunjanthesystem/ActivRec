@@ -49,4 +49,9 @@ public class Enums
 	{
 		Mean, Median, Mode;
 	}
+
+	public enum PrimaryDimension
+	{
+		ActivityID, LocationID;
+	}
 }

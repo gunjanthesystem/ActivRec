@@ -3,8 +3,18 @@ package org.activity.objects;
 public class LocationObject
 {
 	int locationId;
-	public String latitude, longitude, altitude;
+	String latitude, longitude, altitude;
 	public String locationName, locationCategory, city, county, country, continent;
+
+	public String getLatitude()
+	{
+		return latitude;
+	}
+
+	public String getLongitude()
+	{
+		return longitude;
+	}
 
 	public static String getLocationName(int seed)
 	{

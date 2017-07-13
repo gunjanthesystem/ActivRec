@@ -2,9 +2,12 @@ package org.activity.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.SaxConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
@@ -17,6 +20,66 @@ import org.apache.commons.lang3.ArrayUtils;
 
 public class StringCode
 {
+	/**
+	 * For all unique primary dimension vals in the two given list of aos, generate unique char codes
+	 * <p>
+	 * can i generate string code specific for a particular edit distance computation, dynamically, i,e, it has to be
+	 * unique not for all unique location ids in the dataset but not only the total number of unique location ids in the
+	 * two timelines amongst whom the edit distance is being computed. Note: one activity object can also have multiple
+	 * loc ids when it is actually a merged activity object.
+	 * 
+	 * @param activityObjects1
+	 * @param activityObjects2
+	 * @return map of {primary dimension value, char code}
+	 */
+	public static HashMap<Integer, Character> getLocallyUniqueCharCodeMap(ArrayList<ActivityObject> activityObjects1,
+			ArrayList<ActivityObject> activityObjects2, PrimaryDimension primaryDimension)
+	{
+		LinkedHashSet<Integer> uniquePrimaryDimensionVals = new LinkedHashSet<>();
+
+		for (ActivityObject ao : activityObjects1)
+		{
+			uniquePrimaryDimensionVals.addAll(ao.getPrimaryDimensionVal());
+		}
+
+		for (ActivityObject ao : activityObjects2)
+		{
+			uniquePrimaryDimensionVals.addAll(ao.getPrimaryDimensionVal());
+		}
+
+		int numOfUniqueVals = uniquePrimaryDimensionVals.size();
+
+		if (numOfUniqueVals > 400)
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: numOfUniqueVals = " + numOfUniqueVals + " >400, beyond implementation range");
+		}
+
+		ArrayList<Integer> uniquePrimaryDimensionValsList = new ArrayList<>(uniquePrimaryDimensionVals);
+		HashMap<Integer, Character> charCodeMap = new HashMap<>(numOfUniqueVals);
+
+		for (int i = 0; i < uniquePrimaryDimensionValsList.size(); i++)
+		{
+			Integer val = uniquePrimaryDimensionValsList.get(i);
+			char charCode = getCharCodeForInt(val);
+			charCodeMap.put(val, charCode);
+		}
+
+		if (VerbosityConstants.tempVerbose)
+		{
+			StringBuilder sb = new StringBuilder("\nInside org.activity.util.StringCode.getLocalCharCodeMap():\n");
+			sb.append("aos1 = \n");
+			activityObjects1.stream().forEach(ao -> sb.append(ao.toStringAllGowallaTS()));
+			sb.append("aos2 = \n");
+			activityObjects2.stream().forEach(ao -> sb.append(ao.toStringAllGowallaTS()));
+			sb.append("uniquePrimaryDimensionVals = \n" + uniquePrimaryDimensionVals.toString());
+			charCodeMap.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey() + "--" + e.getValue() + "\n"));
+			System.out.println(sb.toString());
+		}
+
+		return charCodeMap;
+	}
+
 	/**
 	 * 
 	 * @param activityObjects1
@@ -177,6 +240,47 @@ public class StringCode
 	}
 
 	/**
+	 * Returns the 1-character code to be used for the Activity Name.
+	 * <p>
+	 * This code is derived from the ActivityID and hence is guaranteed to be unique for at least 400 activities. Will
+	 * use unicode char sfrom 192-591
+	 * <p>
+	 * 65-90: A-Z Latin Alphabet: Uppercase
+	 * <p>
+	 * 91-96: ASCII Punctuation & Symbols
+	 * <p>
+	 * 97-122: a-z Latin Alphabet: Lowercase
+	 * <p>
+	 * 123-126: ASCII Punctuation & Symbols
+	 * 
+	 * <p>
+	 * 192-255: Letters and math symbols of Latin 1 supplement
+	 * <p>
+	 * 256-383:Latin Extended-A - 128 chars
+	 * <p>
+	 * 384-591:Latin Extended-B - 208 chars
+	 * <p>
+	 * <font color = blue>So, 62 chars from 65-126 and 400 chars from 192 - 591</font>
+	 * 
+	 * @param activityName
+	 * @return
+	 */
+	public static char getCharCodeForInt(int integerVal)
+	{
+		// uncode char from 127 to 159 are non printable, hence do not use them
+		char code = '\u0000';// null character new String();
+		try
+		{
+			code = (char) (integerVal + 192);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return code;
+	}
+
+	/**
 	 * 
 	 * @param invalidActivityName
 	 * @return<font color= red> 'A' for invalid act 1, 'B' for invalid act 2</font>
@@ -198,8 +302,7 @@ public class StringCode
 			}
 			else
 			{
-				System.out.println(
-						PopUps.getTracedErrorMsg("Unknown invalid act name: = " + invalidActivityName));
+				System.out.println(PopUps.getTracedErrorMsg("Unknown invalid act name: = " + invalidActivityName));
 			}
 		}
 		catch (Exception e)
@@ -268,7 +371,10 @@ public class StringCode
 	public static String[] getStringCodesForStartTime(ArrayList<ActivityObject> actObjs1,
 			ArrayList<ActivityObject> actObjs2)
 	{
-		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForStartTime");
+		if (VerbosityConstants.verboseSAX)
+		{
+			System.out.println("Inside getStringCodeForStartTime");
+		}
 
 		String finalResultant[] = new String[2];
 
@@ -281,7 +387,10 @@ public class StringCode
 			stamps1[i] = actObjs1.get(i).getStartTimestamp().getTime();
 			if (VerbosityConstants.verboseSAX) System.out.print(vals1[i] + " ");
 		}
-		if (VerbosityConstants.verboseSAX) System.out.println();
+		if (VerbosityConstants.verboseSAX)
+		{
+			System.out.println();
+		}
 
 		double vals2[] = new double[actObjs2.size()];
 		long stamps2[] = new long[actObjs2.size()];
@@ -290,7 +399,10 @@ public class StringCode
 			vals2[i] = DateTimeUtils.getTimeInDayInSeconds(actObjs2.get(i).getStartTimestamp()); // should i convert it
 																									// to minutes
 			stamps2[i] = actObjs2.get(i).getStartTimestamp().getTime();
-			if (VerbosityConstants.verboseSAX) System.out.print(vals2[i] + " ");
+			if (VerbosityConstants.verboseSAX)
+			{
+				System.out.print(vals2[i] + " ");
+			}
 		}
 
 		double valsAll[] = ArrayUtils.addAll(vals1, vals2);
@@ -298,8 +410,8 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant =
-					SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, SaxConstants.SAXStartTimeAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
+					SaxConstants.SAXStartTimeAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -321,6 +433,11 @@ public class StringCode
 		return finalResultant;
 	}
 
+	/**
+	 * 
+	 * @param actObjs
+	 * @return
+	 */
 	public static String getStringCodeForDuration(ArrayList<ActivityObject> actObjs)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDuration");
@@ -340,10 +457,8 @@ public class StringCode
 
 		try
 		{
-			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXDurationAlphabsetSize);// SAXFactory.ts2string(ts,
-																													// actObjs.size(),
-																													// new
-			// NormalAlphabet(), 10);
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXDurationAlphabsetSize);
+			// SAXFactory.ts2string(ts, actObjs.size(), new NormalAlphabet(), 10);
 			// System.out.println("String representation = "+ resultant);
 		}
 
@@ -404,8 +519,8 @@ public class StringCode
 		String resultant;
 		try
 		{
-			resultant =
-					SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length, SaxConstants.SAXDurationAlphabsetSize);
+			resultant = SAXUtils.getSAXString(valsAll, stampsAll, stampsAll.length,
+					SaxConstants.SAXDurationAlphabsetSize);
 			finalResultant[0] = resultant.substring(0, stamps1.length);
 			finalResultant[1] = resultant.substring(stamps1.length, stampsAll.length);
 		}
@@ -444,8 +559,8 @@ public class StringCode
 
 		try
 		{
-			resultant =
-					SAXUtils.getSAXString(vals, stamps, actObjs.size(), SaxConstants.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
+			resultant = SAXUtils.getSAXString(vals, stamps, actObjs.size(),
+					SaxConstants.SAXDistanceTravelledAlphabsetSize);// SAXFactory.ts2string(ts,
 			// actObjs.size(),
 			// new
 			// NormalAlphabet(), 10);
@@ -847,7 +962,7 @@ public class StringCode
 
 		for (ActivityObject ao : activityObjects)
 		{
-			code.append(ao.getStringCode());
+			code.append(ao.getCharCode());
 		}
 		// activityObjects.stream().forEach(ao -> code.append(ao.getStringCode()));
 		String codeS = code.toString();
@@ -859,6 +974,75 @@ public class StringCode
 			System.out.println("\tCode: " + codeS);
 		}
 		return codeS;
+	}
+
+	/**
+	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID
+	 * and hence is guaranteed to be unique for at least 400 activities.
+	 * 
+	 * @param activityObjects
+	 * @return
+	 * @since 13 July 2017
+	 */
+	public static ArrayList<String> getStringCodeForActivityObjects(ArrayList<ActivityObject> activityObjects,
+			PrimaryDimension primaryDimension, HashMap<Integer, Character> uniqueCharCodes, boolean verbose)
+	{
+		StringBuilder code = new StringBuilder();
+
+		ArrayList<ArrayList<Integer>> v = multiValSeqTo1ValSeq(activityObjects, primaryDimension, verbose);
+
+		for (ActivityObject ao : activityObjects)
+		{
+			code.append(ao.getCharCode());
+		}
+		// activityObjects.stream().forEach(ao -> code.append(ao.getStringCode()));
+		String codeS = code.toString();
+
+		if (VerbosityConstants.verbose || VerbosityConstants.verboseSAX)
+		{
+			System.out.print("\tInside getStringCodeForActivityObjects:\n Act Names:");
+			activityObjects.stream().forEach(ao -> System.out.print(ao.getActivityName() + " "));
+			System.out.println("\tCode: " + codeS);
+		}
+		return codeS;
+	}
+
+	/**
+	 * extracting multiple lists(sequences) with single valued elements from one sequence of multi-valued elements,
+	 * where the "one sequence of multi value elements" is the sequence of primary dimension vals from the given list of
+	 * act objs
+	 * 
+	 * @param activityObjects
+	 * @param primaryDimension
+	 * @since 13 July 2017
+	 */
+	public static ArrayList<ArrayList<Integer>> multiValSeqTo1ValSeq(ArrayList<ActivityObject> activityObjects,
+			PrimaryDimension primaryDimension, boolean verbose)
+	{
+		ArrayList<ArrayList<Integer>> words = null;
+		try
+		{
+			BalancedIntegerTree integerTrie = new BalancedIntegerTree();
+			for (ActivityObject ao : activityObjects)
+			{
+				// each act obj can have multiple values for the primary dimension because of merger.
+				integerTrie.addToAllLeaves(ao.getPrimaryDimensionVal());
+			}
+			words = integerTrie.getAllWords();
+			if (verbose)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("\nInside multiValSeqTo1ValSeq: act ids as multi valued seq :\n");
+				activityObjects.stream().forEachOrdered(ao -> sb.append("-" + ao.getPrimaryDimensionVal()));
+				System.out.print("Extracted multiple sequence of 1 val:\n ");
+				words.stream().forEachOrdered(w -> sb.append("-" + w.toString()));
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return words;
 	}
 
 	/**
@@ -906,8 +1090,8 @@ public class StringCode
 			{
 				// extract the corresponding hierarchy level cat id, its a list because there can be more than one. for
 				// example, Vineyard is in Community as well as Food
-				ArrayList<Integer> desiredHierarchyLevelActiIDs =
-						DomainConstants.getGivenLevelCatID(ao.getActivityID());
+				ArrayList<Integer> desiredHierarchyLevelActiIDs = DomainConstants
+						.getGivenLevelCatID(ao.getActivityID());
 				// convert to ArrayList of String/Character
 				// ArrayList<String> desiredHierarchyLevelActiIDsChar = (ArrayList<String>) desiredHierarchyLevelActiIDs
 				// .stream().map(i -> Integer.toString(i)).collect(Collectors.toList());
@@ -939,8 +1123,8 @@ public class StringCode
 		}
 		else
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error: DomainConstants.gowallaWorkingCatLevel < hierarchyLevelForEDForAO"));
+			System.err.println(PopUps
+					.getTracedErrorMsg("Error: DomainConstants.gowallaWorkingCatLevel < hierarchyLevelForEDForAO"));
 		}
 
 		if (verbose)
@@ -957,14 +1141,12 @@ public class StringCode
 
 		if (anyCatHasMultipleCorrHierCat == false && codeS.size() > 1)
 		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("anyCatHasMultipleCorrHierCat==false && codeS.size()>1"));
+			PopUps.printTracedErrorMsg("anyCatHasMultipleCorrHierCat==false && codeS.size()>1");
 		}
 
 		if (codeS.size() != correspondCatLevelWords.size())
 		{
-			System.err
-					.println(PopUps.getTracedErrorMsg("codeS.size() != correspondCatLevelStrings.size()"));
+			PopUps.printTracedErrorMsg("codeS.size() != correspondCatLevelStrings.size()");
 
 		}
 		// System.out.println("Inside getStringCodeForActivityObjects() oldOne:"

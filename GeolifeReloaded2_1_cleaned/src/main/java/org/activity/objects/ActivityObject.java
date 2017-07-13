@@ -9,10 +9,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -33,7 +35,9 @@ import org.activity.util.UtilityBelt;
  */
 public class ActivityObject implements Serializable
 {
+
 	private static final long serialVersionUID = 5056824311499867608L;
+	private static PrimaryDimension primaryDimension = Constant.primaryDimension;
 
 	/**
 	 * this was to keep activity object generic but not entirely successfull IMHO
@@ -49,7 +53,8 @@ public class ActivityObject implements Serializable
 	/**
 	 * an activity object can have multiple location ids if it is a merged
 	 */
-	LinkedHashSet<Integer> locationIDs;
+	// LinkedHashSet<Integer> locationIDs;
+	ArrayList<Integer> locationIDs;
 	String activityName, locationName;
 	/**
 	 * workingLevelCatIDs are "__" separated catID for the given working level in hierarhcy
@@ -91,6 +96,69 @@ public class ActivityObject implements Serializable
 	long durationInSecondsFromNext;
 
 	/**
+	 * 
+	 * @param ao
+	 * @param primaryDimension
+	 * @return
+	 */
+	public ArrayList<Integer> getPrimaryDimensionVal()
+	{
+		switch (primaryDimension)
+		{
+		case ActivityID:
+			return new ArrayList<>(this.getActivityID());// only one activity name is expected even when merged.
+		case LocationID:
+			return this.getLocationIDs();
+		default:
+			return null;
+		}
+	}
+
+	/**
+	 * Whether this activity object and ao2 are equal with respect to the current primary dimension. They are considered
+	 * equal if they share any value, i.e., size of intersection of primary values>1
+	 * 
+	 * @param ao
+	 * @param primaryDimension
+	 * @return
+	 */
+	public boolean equalsWrtPrimaryDimension(ActivityObject ao2)
+	{
+		Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
+				ao2.getPrimaryDimensionVal());
+		if (intersection.size() > 1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Whether this activity object and primaryDimensionValToCompare are equal with respect to the current primary
+	 * dimension. They are considered equal if they share any value, i.e., size of intersection of primary values>1
+	 * 
+	 * @param ao
+	 * @param primaryDimension
+	 * @return
+	 */
+	public boolean equalsWrtPrimaryDimension(ArrayList<Integer> primaryDimensionValToCompare)
+	{
+		Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
+				primaryDimensionValToCompare);
+		if (intersection.size() > 1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
 	 * Constructor for Gowalla activity object
 	 * 
 	 * @param activityID
@@ -124,7 +192,7 @@ public class ActivityObject implements Serializable
 		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
 															// considering one working level cat id
 
-		this.locationIDs = new LinkedHashSet<Integer>();
+		this.locationIDs = new ArrayList<>();// LinkedHashSet<Integer>();
 		locationIDs.add(locationID);
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
@@ -142,7 +210,6 @@ public class ActivityObject implements Serializable
 		this.items_count = items_count;
 		this.max_items_count = max_items_count;
 		this.workingLevelCatIDs = workingLevelCatIDs;
-
 	}
 
 	/**
@@ -180,7 +247,7 @@ public class ActivityObject implements Serializable
 		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
 															// considering one working level cat id
 
-		this.locationIDs = new LinkedHashSet<Integer>();
+		this.locationIDs = new ArrayList<Integer>();
 		locationIDs.add(locationID);
 
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
@@ -242,7 +309,7 @@ public class ActivityObject implements Serializable
 		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
 															// considering one working level cat id
 
-		this.locationIDs = new LinkedHashSet<Integer>(locationIDs);
+		this.locationIDs = new ArrayList<Integer>(locationIDs);
 
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
@@ -298,14 +365,11 @@ public class ActivityObject implements Serializable
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
 			long durationInSecsFromNext, String[] levelWiseCatIDs)
 	{
-
 		// this.activityID = activityID;
-
-		String splittedwlci[] = workingLevelCatIDs.split("__");
+		String splittedwlci[] = RegexUtils.patternDoubleUnderScore.split(workingLevelCatIDs);// workingLevelCatIDs.split("__");
 		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
 															// considering one working level cat id
-
-		this.locationIDs = new LinkedHashSet<Integer>(locationIDs);
+		this.locationIDs = new ArrayList<>(locationIDs);
 
 		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
 		this.locationName = locationName;
@@ -326,9 +390,7 @@ public class ActivityObject implements Serializable
 
 		this.distanceInMFromNext = distanceInMFromNext;
 		this.durationInSecondsFromNext = durationInSecsFromNext;
-
 		// this.levelWiseCatIDs = levelWiseCatIDs;
-
 	}
 
 	public double getDistanceInMFromNext()
@@ -371,14 +433,14 @@ public class ActivityObject implements Serializable
 		return "activityID=" + activityID + "__locationID="
 				+ this.getLocationIDs('-') /*
 											 * + "__activityName=" + activityName + "__ locationName=" + locationName
-											 */ + "__workLvlCat=" + workingLevelCatIDs + "__startTS=" + startTimestampInms
-				+ "__startLat=" + startLatitude + "__startLon=" + startLongitude /*
-																					 * + "__ startAlt=" + startAltitude
-																					 */ + "__userID=" + userID
-				+ "__photos_count=" + photos_count + "__cins_count=" + checkins_count + "__users_count=" + users_count
-				+ "__radius_m=" + radius_meters + "__highlts_count=" + highlights_count + "__items_count=" + items_count
-				+ "__max_items_count=" + max_items_count + "__distNext=" + distanceInMFromNext + "__durNext="
-				+ durationInSecondsFromNext;
+											 */ + "__workLvlCat=" + workingLevelCatIDs + "__startTS="
+				+ startTimestampInms + "__startLat=" + startLatitude + "__startLon="
+				+ startLongitude /*
+									 * + "__ startAlt=" + startAltitude
+									 */ + "__userID=" + userID + "__photos_count=" + photos_count + "__cins_count="
+				+ checkins_count + "__users_count=" + users_count + "__radius_m=" + radius_meters + "__highlts_count="
+				+ highlights_count + "__items_count=" + items_count + "__max_items_count=" + max_items_count
+				+ "__distNext=" + distanceInMFromNext + "__durNext=" + durationInSecondsFromNext;
 	}
 
 	public String toStringAllGowallaTS()
@@ -404,9 +466,9 @@ public class ActivityObject implements Serializable
 		{
 			System.out.println("Error: DomainConstants.locIDLocationObjectDictionary ==null");
 		}
-		String locationName =
-				locationIDs.stream().map(lid -> DomainConstants.locIDLocationObjectDictionary.get(lid).locationName)
-						.collect(Collectors.joining("-"));
+		String locationName = locationIDs.stream()
+				.map(lid -> DomainConstants.locIDLocationObjectDictionary.get(lid).locationName)
+				.collect(Collectors.joining("-"));
 
 		return "actID=" + activityID + "__locID=" + this.getLocationIDs('-') + "__activityName="
 				+ DomainConstants.catIDNameDictionary.get(activityID) + "__ locationName=" + locationName
@@ -517,9 +579,8 @@ public class ActivityObject implements Serializable
 		 */
 		if (Constant.getDatabaseName().equalsIgnoreCase("dcu_data_2"))// (Constant.DATABASE_NAME.equalsIgnoreCase("dcu_data_2"))
 		{
-			endDateString = getDimensionAttributeValue("Date_Dimension", "Date").toString(); // because in DCU dataset
-																								// all Activity objects
-																								// are broken over days
+			endDateString = getDimensionAttributeValue("Date_Dimension", "Date").toString();
+			// because in DCU dataset all Activity objects are broken over days
 		}
 		else
 		{// geolife1
@@ -719,7 +780,16 @@ public class ActivityObject implements Serializable
 	 * 
 	 * @return
 	 */
-	public HashSet<Integer> getLocationIDs()
+	public HashSet<Integer> getUniqueLocationIDs()
+	{
+		return new LinkedHashSet<Integer>(locationIDs);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public ArrayList<Integer> getLocationIDs()
 	{
 		return locationIDs;
 	}
@@ -845,7 +915,7 @@ public class ActivityObject implements Serializable
 	 * @since 30 Nov 2016
 	 * @return
 	 */
-	public char getStringCode()
+	public char getCharCode()
 	{
 		return StringCode.getCharCodeFromActivityID(this.activityID);
 	}

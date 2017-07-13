@@ -172,43 +172,43 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());
 
-						PrintStream consoleLogStream =
-								WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
+						PrintStream consoleLogStream = WritingToFile
+								.redirectConsoleOutput(commonPath + "consoleLog.txt");
 
 						BufferedWriter metaBw = WritingToFile.getBWForNewFile(commonPath + "meta.csv");
 
-						BufferedWriter recommSeqWithoutScoreBw =
-								WritingToFile.getBWForNewFile(commonPath + "dataRecommSequence.csv");// **
+						BufferedWriter recommSeqWithoutScoreBw = WritingToFile
+								.getBWForNewFile(commonPath + "dataRecommSequence.csv");// **
 
-						BufferedWriter recommSeqWithScoreBw =
-								WritingToFile.getBWForNewFile(commonPath + "dataRecommSequenceWithScore.csv");// **
+						BufferedWriter recommSeqWithScoreBw = WritingToFile
+								.getBWForNewFile(commonPath + "dataRecommSequenceWithScore.csv");// **
 
-						BufferedWriter actualSeqBw =
-								WritingToFile.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
+						BufferedWriter actualSeqBw = WritingToFile
+								.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
 
 						ArrayList<BufferedWriter> bwsDataActual = new ArrayList<>(this.recommSeqLength);
 
-						BufferedWriter topNextActsWithoutDistance =
-								WritingToFile.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
-						BufferedWriter topNextActsWithDistance =
-								WritingToFile.getBWForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
+						BufferedWriter topNextActsWithoutDistance = WritingToFile
+								.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
+						BufferedWriter topNextActsWithDistance = WritingToFile
+								.getBWForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
 
 						BufferedWriter rtsRejNoValidActAfterWriter = WritingToFile
 								.getBWForNewFile(commonPath + "recommPointsInvalidBecuzNoValidActivityAfterThis.csv");
-						BufferedWriter rtsRejWithNoCandsWriter =
-								WritingToFile.getBWForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
+						BufferedWriter rtsRejWithNoCandsWriter = WritingToFile
+								.getBWForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
 						BufferedWriter rtsRejWithNoCandsBelowThreshWriter = WritingToFile
 								.getBWForNewFile(commonPath + "recommPointsWithNoCandidatesBelowThresh.csv");
-						BufferedWriter rtsRejBlackListedWriter =
-								WritingToFile.getBWForNewFile(commonPath + "recommPointsRejBlacklisted.csv");
-						BufferedWriter rtsRejWithNoDWButMUCandsCands =
-								WritingToFile.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
+						BufferedWriter rtsRejBlackListedWriter = WritingToFile
+								.getBWForNewFile(commonPath + "recommPointsRejBlacklisted.csv");
+						BufferedWriter rtsRejWithNoDWButMUCandsCands = WritingToFile
+								.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
 
 						ArrayList<BufferedWriter> bwsRankedRecommWithScore = new ArrayList<>(this.recommSeqLength);
 						ArrayList<BufferedWriter> bwRankedRecommWithoutScore = new ArrayList<>(this.recommSeqLength);
 
-						BufferedWriter metaIfCurrentTargetSameWriter =
-								WritingToFile.getBWForNewFile(commonPath + "metaIfCurrentTargetSameWriter.csv");
+						BufferedWriter metaIfCurrentTargetSameWriter = WritingToFile
+								.getBWForNewFile(commonPath + "metaIfCurrentTargetSameWriter.csv");
 
 						ArrayList<BufferedWriter> numOfCandidateTimelinesWriter = new ArrayList<>(this.recommSeqLength);
 						ArrayList<BufferedWriter> bwsRaw = new ArrayList<>(this.recommSeqLength);
@@ -234,24 +234,24 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						 * sorted lists = number of users, however, each list is repeated so as maintain structural
 						 * conformity with dataRankedRecommendationWithoutScores.csv
 						 */
-						BufferedWriter baseLineOccurrence =
-								WritingToFile.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
-						BufferedWriter baseLineDuration =
-								WritingToFile.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
+						BufferedWriter baseLineOccurrence = WritingToFile
+								.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
+						BufferedWriter baseLineDuration = WritingToFile
+								.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
 
-						BufferedWriter bwNumOfWeekendsInTraining =
-								WritingToFile.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
-						BufferedWriter bwNumOfWeekendsInAll =
-								WritingToFile.getBWForNewFile(commonPath + "NumberOfWeekendsInAll.csv");
-						BufferedWriter bwCountTimeCategoryOfRecomm =
-								WritingToFile.getBWForNewFile(commonPath + "CountTimeCategoryOfRecommPoitns.csv");
-						BufferedWriter bwNextActInvalid =
-								WritingToFile.getBWForNewFile(commonPath + "NextActivityIsInvalid.csv");
-						BufferedWriter bwWriteNormalisationOfDistance =
-								WritingToFile.getBWForNewFile(commonPath + "NormalisationDistances.csv");
+						BufferedWriter bwNumOfWeekendsInTraining = WritingToFile
+								.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
+						BufferedWriter bwNumOfWeekendsInAll = WritingToFile
+								.getBWForNewFile(commonPath + "NumberOfWeekendsInAll.csv");
+						BufferedWriter bwCountTimeCategoryOfRecomm = WritingToFile
+								.getBWForNewFile(commonPath + "CountTimeCategoryOfRecommPoitns.csv");
+						BufferedWriter bwNextActInvalid = WritingToFile
+								.getBWForNewFile(commonPath + "NextActivityIsInvalid.csv");
+						BufferedWriter bwWriteNormalisationOfDistance = WritingToFile
+								.getBWForNewFile(commonPath + "NormalisationDistances.csv");
 
-						BufferedWriter bwNumOfValidAOsAfterRTInDay =
-								WritingToFile.getBWForNewFile(commonPath + "NumOfValidAOsAfterRTInDay.csv");
+						BufferedWriter bwNumOfValidAOsAfterRTInDay = WritingToFile
+								.getBWForNewFile(commonPath + "NumOfValidAOsAfterRTInDay.csv");
 
 						rtsRejNoValidActAfterWriter.write(
 								"User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity\n");
@@ -319,10 +319,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						 * in current setup we are doing it for each matching unit. Note: this is very small performance
 						 * effect, hence should not be of major concern. (UserId,ActName,RepresentativeAO)
 						 */
-						LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs =
-								new LinkedHashMap<>();
-						LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration =
-								new LinkedHashMap<>();
+						LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
+						LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
 						// PopUps.showMessage("Starting iteration over user");
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
@@ -346,16 +344,16 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							// PopUps.showMessage("after blacklisting");
 
 							// replacing iterative write with StringBuilder for better performance
-							ArrayList<StringBuilder> sbsMaxNumOfDistinctRecommendations =
-									new ArrayList<>(recommSeqLength);
+							ArrayList<StringBuilder> sbsMaxNumOfDistinctRecommendations = new ArrayList<>(
+									recommSeqLength);
 							IntStream.range(0, this.recommSeqLength)
 									.forEachOrdered(i -> sbsMaxNumOfDistinctRecommendations.add(new StringBuilder()));
 							sbsMaxNumOfDistinctRecommendations.parallelStream().forEach(sb -> sb.append(
 									"DateOfRecomm ,TimeOfRecomm ,Week_Day,MaxNumOfDistictRecommendation,NumOfCandidateTimelines(after applying Threshold)\n"));
 
 							// replacing iterative write with StringBuilder for better performance
-							ArrayList<StringBuilder> sbsNumOfCandTimelinesBelowThreshold =
-									new ArrayList<StringBuilder>(recommSeqLength);
+							ArrayList<StringBuilder> sbsNumOfCandTimelinesBelowThreshold = new ArrayList<StringBuilder>(
+									recommSeqLength);
 							IntStream.range(0, this.recommSeqLength)
 									.forEachOrdered(i -> sbsNumOfCandTimelinesBelowThreshold.add(new StringBuilder()));
 							sbsNumOfCandTimelinesBelowThreshold.parallelStream().forEach(sb -> sb.append(
@@ -398,11 +396,10 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							// take out the train-test splitting of timelines out of the loop, which can be done as
 							// well
 
-							Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResult =
-									buildRepresentativeAOsForUser(userId,
-											TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-											Constant.getActivityNames(),
-											TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
+							Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUser(
+									userId, TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
+									Constant.getActivityNames(),
+									TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
 							LinkedHashMap<String, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
 							mapOfRepAOs.put(userId, repAOsForThisUser);
 							mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
@@ -468,14 +465,14 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							 * ********************************
 							 */
 
-							int numOfWeekendsInTraining =
-									TimelineUtils.getNumOfWeekendsInGivenDayTimelines(userTrainingTimelines);
+							int numOfWeekendsInTraining = TimelineUtils
+									.getNumOfWeekendsInGivenDayTimelines(userTrainingTimelines);
 							int numOfWeekdaysInTraining = userTrainingTimelines.size() - numOfWeekendsInTraining;
 							bwNumOfWeekendsInTraining.write(
 									userName + "," + numOfWeekendsInTraining + "," + numOfWeekdaysInTraining + "\n");
 
-							int numOfWeekendsInAll =
-									TimelineUtils.getNumOfWeekendsInGivenDayTimelines(userAllDatesTimeslines);
+							int numOfWeekendsInAll = TimelineUtils
+									.getNumOfWeekendsInGivenDayTimelines(userAllDatesTimeslines);
 							int numOfWeekdaysInAll = userAllDatesTimeslines.size() - numOfWeekendsInAll;
 							bwNumOfWeekendsInAll
 									.write(userName + "," + numOfWeekendsInAll + "," + numOfWeekdaysInAll + "\n");
@@ -501,12 +498,12 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 								String weekDay = DateTimeUtils.getWeekDayFromWeekDayInt(testDate.getDay());
 
-								ArrayList<ActivityObject> activityObjectsInTestDay =
-										testDayTimelineForUser.getActivityObjectsInDay();
+								ArrayList<ActivityObject> activityObjectsInTestDay = testDayTimelineForUser
+										.getActivityObjectsInDay();
 
 								////////// added to improve write speed
-								ArrayList<StringBuilder> sbsRawToWriteForThisUserDate =
-										new ArrayList<>(recommSeqLength);
+								ArrayList<StringBuilder> sbsRawToWriteForThisUserDate = new ArrayList<>(
+										recommSeqLength);
 								IntStream.range(0, this.recommSeqLength)
 										.forEachOrdered(i -> sbsRawToWriteForThisUserDate.add(new StringBuilder()));
 
@@ -514,29 +511,29 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 								StringBuilder recommSequenceWithScoreForThisUserDate = new StringBuilder();
 								StringBuilder recommSequenceWithoutScoreForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> sbsDataActualToWriteForThisUserDate =
-										new ArrayList<>(recommSeqLength);
+								ArrayList<StringBuilder> sbsDataActualToWriteForThisUserDate = new ArrayList<>(
+										recommSeqLength);
 								IntStream.range(0, this.recommSeqLength).forEachOrdered(
 										i -> sbsDataActualToWriteForThisUserDate.add(new StringBuilder()));
 
 								StringBuilder dataActualSeqActsToWriteForThisUserDate = new StringBuilder();
 								StringBuilder metaIfCurrentTargetSameToWriteForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> sbsNumOfCandTimelinesForThisUserDate =
-										new ArrayList<>(recommSeqLength);
+								ArrayList<StringBuilder> sbsNumOfCandTimelinesForThisUserDate = new ArrayList<>(
+										recommSeqLength);
 								IntStream.range(0, this.recommSeqLength).forEachOrdered(
 										i -> sbsNumOfCandTimelinesForThisUserDate.add(new StringBuilder()));
 
 								StringBuilder topNextActsWithoutDistToWriteForThisUserDate = new StringBuilder();
 								StringBuilder topNextActsWithDistToWriteForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> rankedRecommWithScoreToWriteForThisUserDate =
-										new ArrayList<>(recommSeqLength);
+								ArrayList<StringBuilder> rankedRecommWithScoreToWriteForThisUserDate = new ArrayList<>(
+										recommSeqLength);
 								IntStream.range(0, this.recommSeqLength).forEachOrdered(
 										i -> rankedRecommWithScoreToWriteForThisUserDate.add(new StringBuilder()));
 
-								ArrayList<StringBuilder> rankedRecommWithoutScoreToWriteForThisUserDate =
-										new ArrayList<>(recommSeqLength);
+								ArrayList<StringBuilder> rankedRecommWithoutScoreToWriteForThisUserDate = new ArrayList<>(
+										recommSeqLength);
 								IntStream.range(0, this.recommSeqLength).forEachOrdered(
 										i -> rankedRecommWithoutScoreToWriteForThisUserDate.add(new StringBuilder()));
 
@@ -552,12 +549,19 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 								for (int indexOfAOInDay = 0; indexOfAOInDay < activityObjectsInTestDay.size()
 										- 1; indexOfAOInDay++)
 								{
-									ActivityObject activityObjectInTestDay =
-											activityObjectsInTestDay.get(indexOfAOInDay);
+									ActivityObject activityObjectInTestDay = activityObjectsInTestDay
+											.get(indexOfAOInDay);
+
 									String activityNameInTestDay = activityObjectInTestDay.getActivityName();
+									ArrayList<Integer> primaryDimensionValInTestDay = activityObjectInTestDay
+											.getPrimaryDimensionVal();
+
 									System.out.println(
 											"----\nIterating over potential recommendation times: current activityNameInTestDay="
-													+ activityNameInTestDay);// (activityObjectsInThatDay.get(j).getActivityName()));
+													+ activityNameInTestDay + "  primaryDimensionValInTestDay="
+													+ primaryDimensionValInTestDay);
+
+									// (activityObjectsInThatDay.get(j).getActivityName()));
 
 									if (activityNameInTestDay.equals(Constant.INVALID_ACTIVITY1))
 									{// ("Unknown"))
@@ -587,16 +591,16 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 									}
 
 									// Target Activity, actual next activity
-									ActivityObject nextValidActivityObjectAfterRecommPoint1 =
-											testDayTimelineForUser.getNextValidActivityAfterActivityAtThisTime(
+									ActivityObject nextValidActivityObjectAfterRecommPoint1 = testDayTimelineForUser
+											.getNextValidActivityAfterActivityAtThisTime(
 													new Timestamp(year - 1900, month - 1, date, endTimeStamp.getHours(),
 															endTimeStamp.getMinutes(), endTimeStamp.getSeconds(), 0));
 
 									// checked if it is giving correct results: concern: passing end ts directly and
 									// using LocalDate for comparison
-									ArrayList<ActivityObject> nextValidActivityObjectsAfterRecommPoint1 =
-											TimelineUtils.getNextNValidAOsAfterActivityAtThisTimeSameDay(
-													testDayTimelineForUser, endTimeStamp, this.recommSeqLength);
+									ArrayList<ActivityObject> nextValidActivityObjectsAfterRecommPoint1 = TimelineUtils
+											.getNextNValidAOsAfterActivityAtThisTimeSameDay(testDayTimelineForUser,
+													endTimeStamp, this.recommSeqLength);
 									// timestamp sanity check start
 									// $DateTimeSanityChecks.assertEqualsTimestamp(date, month, year, endTimeStamp);
 									// FOUND ABOVE OKAY IN RUN
@@ -689,18 +693,17 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 										if (this.lookPastType.equals(Enums.LookPastType.NGram))
 										{
-											recommMasters[seqIndex] =
-													new RecommendationMasterMar2017GenSeqNGramBaseline(
-															userTrainingTimelines, userTestTimelines, dateToRecomm,
-															recommTimesStrings[0], userId, repAOsFromPrevRecomms);
+											recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqNGramBaseline(
+													userTrainingTimelines, userTestTimelines, dateToRecomm,
+													recommTimesStrings[0], userId, repAOsFromPrevRecomms);
 										}
 										else
 										{
-											recommMasters[seqIndex] =
-													new RecommendationMasterMar2017GenSeq(userTrainingTimelines,
-															userTestTimelines, dateToRecomm, recommTimesStrings[0],
-															userId, thresholdValue, typeOfThreshold, matchingUnit,
-															caseType, this.lookPastType, false, repAOsFromPrevRecomms);
+											recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeq(
+													userTrainingTimelines, userTestTimelines, dateToRecomm,
+													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
+													matchingUnit, caseType, this.lookPastType, false,
+													repAOsFromPrevRecomms);
 										}
 
 										// Note: RT passed to the recommendation master is always endTimestamp. This is
@@ -753,8 +756,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 										////////////////////////////////////////////////////////////////////////
 										// check if all seq recomms for this RT will have daywise candidate timelines
-										boolean hasDayWiseCandidateTimelines =
-												TimelineUtils.hasDaywiseCandidateTimelines(userTrainingTimelines,
+										boolean hasDayWiseCandidateTimelines = TimelineUtils
+												.hasDaywiseCandidateTimelines(userTrainingTimelines,
 														recommMaster.getDateAtRecomm(),
 														recommMaster.getActivityObjectAtRecomm());
 
@@ -805,8 +808,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 															+ recommMasters[seqIndex]
 																	.getRankedRecommendedActNamesWithoutRankScores());
 										}
-										String[] splittedRankedRecommendedActName =
-												RegexUtils.patternDoubleUnderScore.split(recommMasters[seqIndex]
+										String[] splittedRankedRecommendedActName = RegexUtils.patternDoubleUnderScore
+												.split(recommMasters[seqIndex]
 														.getRankedRecommendedActNamesWithoutRankScores());
 
 										// PopUps.showMessage("splittedRankedRecommendedActName.length="
@@ -831,8 +834,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 										if (seqIndex < (recommSeqLength - 1))
 										{
-											recommendationTimes[seqIndex + 1] =
-													repAOForTopRecommActName.getEndTimestamp();
+											recommendationTimes[seqIndex + 1] = repAOForTopRecommActName
+													.getEndTimestamp();
 										} // PopUps.showMessage("here12_4");
 									} // END of loop over iterative recommendation for each seq index
 
@@ -903,9 +906,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 									// target activity for recommendation
 									String actActualDone = nextValidActivityObjectAfterRecommPoint1.getActivityName();
-									ArrayList<String> actsActualDoneInSeq =
-											(ArrayList<String>) nextValidActivityObjectsAfterRecommPoint1.stream()
-													.map(ao -> ao.getActivityName()).collect(Collectors.toList());
+									ArrayList<String> actsActualDoneInSeq = (ArrayList<String>) nextValidActivityObjectsAfterRecommPoint1
+											.stream().map(ao -> ao.getActivityName()).collect(Collectors.toList());
 
 									String actsActualDoneInSeqString = nextValidActivityObjectsAfterRecommPoint1
 											.stream().map(ao -> ao.getActivityName()).collect(Collectors.joining(">"));
@@ -914,15 +916,15 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 											.map(rm -> rm.getActivityObjectAtRecomm().getActivityName())
 											.collect(Collectors.joining(">"));
 
-									ArrayList<String> rankedRecommWithScoreForThisRTIter =
-											(ArrayList<String>) Arrays.stream(recommMasters)
-													.map(rm -> rm.getRankedRecommendedActNamesWithRankScores())
-													.collect(Collectors.toList());
+									ArrayList<String> rankedRecommWithScoreForThisRTIter = (ArrayList<String>) Arrays
+											.stream(recommMasters)
+											.map(rm -> rm.getRankedRecommendedActNamesWithRankScores())
+											.collect(Collectors.toList());
 
-									ArrayList<String> rankedRecommWithoutScoreForThisRTIter =
-											(ArrayList<String>) Arrays.stream(recommMasters)
-													.map(rm -> rm.getRankedRecommendedActNamesWithoutRankScores())
-													.collect(Collectors.toList());
+									ArrayList<String> rankedRecommWithoutScoreForThisRTIter = (ArrayList<String>) Arrays
+											.stream(recommMasters)
+											.map(rm -> rm.getRankedRecommendedActNamesWithoutRankScores())
+											.collect(Collectors.toList());
 
 									// extract the top 1 ranked recommendation from each recommendation master
 									String topRankedRecommSequenceWithScore = rankedRecommWithScoreForThisRTIter
@@ -991,9 +993,9 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 										if (VerbosityConstants.WriteRaw)
 										{
-											sbsRawToWriteForThisUserDate.get(i).append(userName + "," + dateToRecomm
-													+ "," + recommTimesStrings[i] + "," + timeCategory + ","
-													+ recommMasters[i]
+											sbsRawToWriteForThisUserDate.get(i).append(userName
+													+ "," + dateToRecomm + "," + recommTimesStrings[i] + ","
+													+ timeCategory + "," + recommMasters[i]
 															.getActivityNamesGuidingRecomm()/* withTimestamps */
 													+ ","
 													+ recommMasters[i].getActivityObjectAtRecomm().getActivityName()
@@ -1437,8 +1439,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 			// recommP1.getCandidateTimeslines() .get(candidateTimelineID);
 
 			int endPointIndexThisCandidate = candidateTimeline.getActivityObjectsInTimeline().size() - 1;
-			ActivityObject endPointActivityInCandidate =
-					candidateTimeline.getActivityObjectsInTimeline().get(endPointIndexThisCandidate);
+			ActivityObject endPointActivityInCandidate = candidateTimeline.getActivityObjectsInTimeline()
+					.get(endPointIndexThisCandidate);
 
 			// difference in start time of end point activity of candidate and start
 			// time of current activity
@@ -1504,8 +1506,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		return result.toString();
 	}
 
-	public static String
-			getActivityNameDurationPairsWithoutDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
+	public static String getActivityNameDurationPairsWithoutDuration(
+			LinkedHashMap<String, Long> nameDurationPairsSorted)
 	{
 		// String result = "";
 		StringBuilder result = new StringBuilder();
@@ -1596,9 +1598,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	 *            only to find which act names occur in test but not in training
 	 * @return
 	 */
-	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>
-			buildRepresentativeAOsForUser(int userId, Timeline userTrainingTimelines, String[] allPossibleActivityNames,
-					Timeline userTestTimelines)
+	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> buildRepresentativeAOsForUser(
+			int userId, Timeline userTrainingTimelines, String[] allPossibleActivityNames, Timeline userTestTimelines)
 	{
 		// mapOfRepAOs;
 		boolean sanityCheck = false;
@@ -1712,10 +1713,10 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().size()));
 				}
 
-				long sumOfCountOfAOsFroMap =
-						aosForEachActName.entrySet().stream().flatMap(e -> e.getValue().stream()).count();
-				long sumOfCountOfAOsFromTimeline =
-						userTrainingTimelines.getActivityObjectsInTimeline().stream().count();
+				long sumOfCountOfAOsFroMap = aosForEachActName.entrySet().stream().flatMap(e -> e.getValue().stream())
+						.count();
+				long sumOfCountOfAOsFromTimeline = userTrainingTimelines.getActivityObjectsInTimeline().stream()
+						.count();
 
 				// .map(e -> e.getValue().getActivityObjectsInTimeline().size()).count();
 				System.out.println("sumOfCountOfAOsFroMap= " + sumOfCountOfAOsFroMap);
@@ -1734,9 +1735,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 				////////////////////////// sanity check end
 
-				Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> result =
-						computeRepresentativeActivityObjectForUserV2(userId, aosForEachActName,
-								durationFromPrevForEachActName, durationFromNextForEachActName);
+				Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserV2(
+						userId, aosForEachActName, durationFromPrevForEachActName, durationFromNextForEachActName);
 				repAOsForThisUser = result.getFirst();
 				actMedianPreSuccDuration = result.getSecond();
 			}
@@ -1770,12 +1770,12 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 				+ distinctActNamesEncounteredInTraining.size());
 		System.out.println("#All possible act names = " + allPossibleActivityNames.length);
 
-		int numOfActNamesNotInTraining =
-				(allPossibleActivityNames.length - distinctActNamesEncounteredInTraining.size());
+		int numOfActNamesNotInTraining = (allPossibleActivityNames.length
+				- distinctActNamesEncounteredInTraining.size());
 		System.out.println("#act names not in training timelines for this user = " + numOfActNamesNotInTraining);
 		System.out.println("Acts not in trainings: ");
-		LinkedHashSet<String> actNamesNotInTraining =
-				new LinkedHashSet<String>(Arrays.asList(allPossibleActivityNames));
+		LinkedHashSet<String> actNamesNotInTraining = new LinkedHashSet<String>(
+				Arrays.asList(allPossibleActivityNames));
 		actNamesNotInTraining.removeAll(distinctActNamesEncounteredInTraining);
 
 		String actNameNotInTrainingSB = actNamesNotInTraining.stream().collect(Collectors.joining("__"));
@@ -1793,8 +1793,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		System.out.println(
 				"#act names in test but not in training  for this user = " + actNamesInTestButNotInTraining.size());
 
-		String actNamesInTestButNotInTrainingS =
-				actNamesInTestButNotInTraining.stream().collect(Collectors.joining("__"));
+		String actNamesInTestButNotInTrainingS = actNamesInTestButNotInTraining.stream()
+				.collect(Collectors.joining("__"));
 
 		WritingToFile.appendLineToFileAbsolute("U:" + userId + "," + actNamesInTestButNotInTraining.size() + ","
 				+ actNamesInTestButNotInTrainingS + "\n", fileNameToWrite2);
@@ -1809,11 +1809,10 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	 * @param durationFromNextForEachActName
 	 * @return
 	 */
-	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>
-			computeRepresentativeActivityObjectForUserV1(int userID,
-					LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName,
-					LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName,
-					LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName)
+	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserV1(
+			int userID, LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName,
+			LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName,
+			LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName)
 	{
 		System.out.println("Inside computeRepresentativeActivityObject for userID" + userID);
 		LinkedHashMap<String, ActivityObject> repAOs = new LinkedHashMap<String, ActivityObject>();
@@ -1884,11 +1883,10 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	 * @param durationFromNextForEachActName
 	 * @return
 	 */
-	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>
-			computeRepresentativeActivityObjectForUserV2(int userID,
-					LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName,
-					LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName,
-					LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName)
+	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserV2(
+			int userID, LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName,
+			LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName,
+			LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName)
 	{
 		System.out.println("Inside computeRepresentativeActivityObject for userID" + userID);
 		LinkedHashMap<String, ActivityObject> repAOs = new LinkedHashMap<String, ActivityObject>();

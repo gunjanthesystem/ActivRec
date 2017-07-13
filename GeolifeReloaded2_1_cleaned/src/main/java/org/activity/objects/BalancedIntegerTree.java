@@ -32,6 +32,11 @@ public class BalancedIntegerTree
 		return root.getLeafCount();
 	}
 
+	/**
+	 * Note: the root node value is not included in the word
+	 * 
+	 * @param r
+	 */
 	public void setRoot(DefaultMutableTreeNode r)
 	{
 		this.root = r;
@@ -134,6 +139,11 @@ public class BalancedIntegerTree
 	// return allStrings;
 	// }
 
+	/**
+	 * Note: the root node value is not included in the word
+	 * 
+	 * @return
+	 */
 	public ArrayList<ArrayList<Integer>> getAllWords()
 	{
 		ArrayList<DefaultMutableTreeNode> allLeaves = this.getAllLeaves();
@@ -198,27 +208,34 @@ public class BalancedIntegerTree
 		DefaultMutableTreeNode j = new DefaultMutableTreeNode(10);
 		DefaultMutableTreeNode k = new DefaultMutableTreeNode(11);
 		a.add(b);
-		a.add(c);
-		b.add(d);
-		b.add(e);
-		c.add(f);
-		c.add(g);
-		d.add(h);
-		e.add(i);
-		f.add(j);
-		g.add(k);
+		// a.add(c);
+		// b.add(d);
+		// b.add(e);
+		// c.add(f);
+		// c.add(g);
+		// d.add(h);
+		// e.add(i);
+		// f.add(j);
+		// g.add(k);
 		return a;
 	}
 
+	/**
+	 * Note: it is not including the root node in the word. its not printing the root node
+	 * 
+	 * @param args
+	 */
 	public static void main(String args[])
 	{
 		BalancedIntegerTree bt = new BalancedIntegerTree();
 		// bt.setRoot(getSampleTree());
-		ArrayList<DefaultMutableTreeNode> allLeaves;// = bt.getAllLeaves();
+		ArrayList<DefaultMutableTreeNode> allLeaves;
+		// = bt.getAllLeaves();
 		// System.out.println("all leaves = " + allLeaves.toString());
 		//
-		ArrayList<ArrayList<Integer>> allStrings;// = bt.getAllStrings();
-		// System.out.println("allStrings = " + allStrings.toString());
+		ArrayList<ArrayList<Integer>> allStrings;
+		// = bt.getAllWords();
+		// System.out.println("allWords = " + allStrings.toString());
 
 		ArrayList<Integer> cList0 = new ArrayList<>();
 		cList0.add(99);

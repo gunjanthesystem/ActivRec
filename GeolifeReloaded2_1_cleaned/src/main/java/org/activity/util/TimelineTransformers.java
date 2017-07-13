@@ -429,7 +429,7 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = dataEntry.getValue().getStringCode();
+					value = dataEntry.getValue().getCharCode();
 					dataToPut.put(dataEntry.getKey(), String.valueOf(value));
 				}
 
@@ -473,7 +473,7 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = String.valueOf(dataEntry.getValue().getStringCode());
+					value = String.valueOf(dataEntry.getValue().getCharCode());
 					dataToPut.append(value);
 				}
 
@@ -521,7 +521,7 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = String.valueOf(dataEntry.getValue().getStringCode());
+					value = String.valueOf(dataEntry.getValue().getCharCode());
 					dataToPut.append(value);
 				}
 
