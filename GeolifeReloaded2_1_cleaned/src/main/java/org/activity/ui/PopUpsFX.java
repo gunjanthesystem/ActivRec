@@ -35,9 +35,15 @@ public class PopUpsFX extends Application
 		alert.setTitle("Message1");
 		alert.setContentText(msg);
 		alert.showAndWait();
-		alert.setHeight(150);
-		alert.setHeight(300);
 
+		alert.getDialogPane();
+		// alert.setHeight(150);
+		// alert.setHeight(300);
+
+		// alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+		// alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label);
+		// .stream().filter(node -> node instanceof Label).forEach(node ->
+		// ((Label)node).setMinHeight(Region.USE_PREF_SIZE))
 		// JFrame frame = new JFrame();
 		// // frame.setSize(200, 150);
 		// // frame.getContentPane( ).setLayout(new BorderLayout( ));

@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -21,6 +22,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
@@ -83,6 +85,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 	int recommSeqLength;
 
+	PrimaryDimension primaryDimension;
 	/**
 	 * // * (UserId,ActName,RepresentativeAO) //
 	 */ // currently doing it for each matching unit
@@ -114,6 +117,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		System.out.println("\n\n **********Entering RecommendationTestsMar2017GenSeq********** " + lookPastType + " "
 				+ caseType + " lengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
 		long recommTestsStarttime = System.currentTimeMillis();
+
+		this.primaryDimension = Constant.primaryDimension;
 
 		this.lookPastType = lookPastType;
 		this.caseType = caseType;
@@ -319,8 +324,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						 * in current setup we are doing it for each matching unit. Note: this is very small performance
 						 * effect, hence should not be of major concern. (UserId,ActName,RepresentativeAO)
 						 */
-						LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
-						LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
+						LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
+						LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
 						// PopUps.showMessage("Starting iteration over user");
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
@@ -396,11 +401,27 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							// take out the train-test splitting of timelines out of the loop, which can be done as
 							// well
 
-							Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUser(
+							Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUserPD(
 									userId, TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-									Constant.getActivityNames(),
-									TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
-							LinkedHashMap<String, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
+									TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true),
+									Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs());
+
+							// Start of Sanity Check for buildRepresentativeAOsForUserPD()
+							if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+							{
+								// for Activity ID as primary dimension, the output of buildRepresentativeAOsForUserPD
+								// and buildRepresentativeAOsForUser shoule be same (except data type)
+								Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName = buildRepresentativeAOsForUser(
+										userId,
+										TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
+										Constant.getActivityNames(),
+										TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
+
+								Sanity.compare(repAOResult, repAOResultActName);
+							}
+							// end of Sanity Check for buildRepresentativeAOsForUserPD()
+
+							LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
 							mapOfRepAOs.put(userId, repAOsForThisUser);
 							mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
 							////// END of build representative activity objects for this user.
@@ -619,16 +640,19 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 									System.out.print("User id" + userId + " Next activity Objects after recomm time:"
 											+ endTimeStamp + " = ");
-									nextValidActivityObjectsAfterRecommPoint1.stream().forEachOrdered(ao -> System.out
-											.print(ao.getActivityName() + ":" + ao.getEndTimestamp() + ","));
 
-									Sanity.eq(nextValidActivityObjectAfterRecommPoint1.getActivityName(),
-											nextValidActivityObjectsAfterRecommPoint1.get(0).getActivityName(),
-											"Error in Sanity check 575\nnextValidActivityObjectAfterRecommPoint1.getActivityName() ="
-													+ nextValidActivityObjectAfterRecommPoint1.getActivityName()
-													+ "!= nextValidActivityObjectsAfterRecommPoint1.get(0).getActivityName()"
-													+ nextValidActivityObjectsAfterRecommPoint1.get(0)
-															.getActivityName());
+									nextValidActivityObjectsAfterRecommPoint1.stream().forEachOrdered(ao -> System.out
+											.print(ao.getPrimaryDimensionVal("/") + ":" + ao.getEndTimestamp() + ","));
+
+									// TODO do again 14 Jul 2017
+									// Sanity.eq(nextValidActivityObjectAfterRecommPoint1.getActivityName(),
+									// nextValidActivityObjectsAfterRecommPoint1.get(0).getActivityName(),
+									// "Error in Sanity check
+									// 575\nnextValidActivityObjectAfterRecommPoint1.getActivityName() ="
+									// + nextValidActivityObjectAfterRecommPoint1.getActivityName()
+									// + "!= nextValidActivityObjectsAfterRecommPoint1.get(0).getActivityName()"
+									// + nextValidActivityObjectsAfterRecommPoint1.get(0)
+									// .getActivityName());
 
 									if (VerbosityConstants.WriteNumOfValidsAfterAnRTInSameDay)
 									{
@@ -673,7 +697,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 									Timestamp recommendationTimes[] = new Timestamp[recommSeqLength];
 									recommendationTimes[0] = endTimeStamp;// the first RT is endTS of current AO
 
-									String topRecommendedActNames[] = new String[recommSeqLength];
+									String topRecommendedPrimarDimensionVal[] = new String[recommSeqLength];
 									boolean skipThisRTNoCandTimelines = false; // skip this RT because no cand timelines
 
 									for (int seqIndex = 0; seqIndex < recommSeqLength; seqIndex++)
@@ -722,11 +746,13 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 													"Cannot make recommendation at this point as there are no candidate timelines for recommMaster i = "
 															+ seqIndex);
 
-											rtsRejWithNoCandsWriter.write(userId + "," + dateToRecomm + ","
-													+ indexOfAOInDay + "," + recommTimesStrings[0] + "," + weekDay + ","
-													+ timeCategory + ","
-													+ recommMaster.getActivityObjectAtRecomm().getActivityName() + ","
-													+ seqIndex + ",\n");// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
+											rtsRejWithNoCandsWriter
+													.write(userId + "," + dateToRecomm + "," + indexOfAOInDay + ","
+															+ recommTimesStrings[0] + "," + weekDay + "," + timeCategory
+															+ ","
+															+ recommMaster.getActivityObjectAtRecomm()
+																	.getPrimaryDimensionVal("/")
+															+ "," + seqIndex + ",\n");// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
 											sbsNumOfCandTimelinesBelowThreshold.get(seqIndex)
 													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + ","
 															+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
@@ -742,11 +768,13 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 											System.out.println(
 													"Cannot make recommendation at this point as there are no candidate timelines BELOW THRESHOLD");
 
-											rtsRejWithNoCandsBelowThreshWriter.write(userId + "," + dateToRecomm + ","
-													+ indexOfAOInDay + "," + recommTimesStrings[0] + "," + weekDay + ","
-													+ timeCategory + ","
-													+ recommMaster.getActivityObjectAtRecomm().getActivityName() + ","
-													+ seqIndex + ",\n");// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
+											rtsRejWithNoCandsBelowThreshWriter
+													.write(userId + "," + dateToRecomm + "," + indexOfAOInDay + ","
+															+ recommTimesStrings[0] + "," + weekDay + "," + timeCategory
+															+ ","
+															+ recommMaster.getActivityObjectAtRecomm()
+																	.getPrimaryDimensionVal("/")
+															+ "," + seqIndex + ",\n");// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
 											sbsNumOfCandTimelinesBelowThreshold.get(seqIndex)
 													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + ","
 															+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");
@@ -765,8 +793,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 										{
 											rtsRejWithNoDWButMUCandsCands.write(userId + "," + dateToRecomm + ","
 													+ indexOfAOInDay + "," + recommendationTimes[0] + "," + weekDay
-													+ "," + timeCategory + ","
-													+ recommMaster.getActivityObjectAtRecomm().getActivityName()
+													+ "," + timeCategory + "," + recommMaster
+															.getActivityObjectAtRecomm().getPrimaryDimensionVal("/")
 													+ ",HasMUCandsButNoDWCands," + seqIndex + "\n");
 											System.out.println(
 													"Cannot make recommendation at this point as there are no daywise candidate timelines, even though there are mu candidate timelines");
@@ -824,11 +852,12 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 										// $ + Arrays.asList(splittedRankedRecommendedActName));
 
 										// get the top recommended activity names from previous recommendation
-										topRecommendedActNames[seqIndex] = splittedRankedRecommendedActName[1];
+										topRecommendedPrimarDimensionVal[seqIndex] = splittedRankedRecommendedActName[1];
 										// PopUps.showMessage("here12_2");
 										ActivityObject repAOForTopRecommActName = getRepresentativeAO(
-												topRecommendedActNames[seqIndex], mapOfRepAOs,
-												mapOfMedianPreSuccDuration, userId, recommendationTimes[seqIndex]);
+												Integer.valueOf(topRecommendedPrimarDimensionVal[seqIndex]),
+												mapOfRepAOs, mapOfMedianPreSuccDuration, userId,
+												recommendationTimes[seqIndex], this.primaryDimension);
 										// PopUps.showMessage("here12_3");
 										repAOsFromPrevRecomms.add(repAOForTopRecommActName);
 
@@ -905,15 +934,21 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 									}
 
 									// target activity for recommendation
-									String actActualDone = nextValidActivityObjectAfterRecommPoint1.getActivityName();
+									String actActualDone = nextValidActivityObjectAfterRecommPoint1
+											.getPrimaryDimensionVal("/");// .getActivityName();
 									ArrayList<String> actsActualDoneInSeq = (ArrayList<String>) nextValidActivityObjectsAfterRecommPoint1
-											.stream().map(ao -> ao.getActivityName()).collect(Collectors.toList());
+											.stream().map(ao -> ao.getPrimaryDimensionVal("/"))
+											.collect(Collectors.toList());
+
+									// .stream().map(ao -> ao.getActivityName()).collect(Collectors.toList());
 
 									String actsActualDoneInSeqString = nextValidActivityObjectsAfterRecommPoint1
-											.stream().map(ao -> ao.getActivityName()).collect(Collectors.joining(">"));
+											.stream().map(ao -> ao.getPrimaryDimensionVal("/"))
+											.collect(Collectors.joining(">"));
+									// .stream().map(ao -> ao.getActivityName()).collect(Collectors.joining(">"));
 									// current activity
 									String actsAtRecommPoint = Arrays.stream(recommMasters)
-											.map(rm -> rm.getActivityObjectAtRecomm().getActivityName())
+											.map(rm -> rm.getActivityObjectAtRecomm().getPrimaryDimensionVal("/"))
 											.collect(Collectors.joining(">"));
 
 									ArrayList<String> rankedRecommWithScoreForThisRTIter = (ArrayList<String>) Arrays
@@ -1377,6 +1412,69 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		return repAO;
 	}
 
+	//
+	/**
+	 * 
+	 * @param topPrimaryDimensionVal
+	 * @param mapOfRepAOs
+	 * @param mapOfMedianPreSuccDuration
+	 * @param userId
+	 * @param recommendationTime
+	 * @param primaryDimension
+	 * @return
+	 * @since 14 July 2017
+	 */
+	private ActivityObject getRepresentativeAO(Integer topPrimaryDimensionVal,
+			LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs,
+			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration, int userId,
+			Timestamp recommendationTime, PrimaryDimension primaryDimension)
+	{
+		ActivityObject repAO = mapOfRepAOs.get(userId).get(topPrimaryDimensionVal);
+		if (repAO == null)
+		{
+			PopUps.printTracedErrorMsgWithExit("Error in getRepresentativeAO: topRecommActName:"
+					+ topPrimaryDimensionVal + " not found in mapOfRepAo");
+		}
+
+		double medianPreceedingDuration = mapOfMedianPreSuccDuration.get(userId).get(topPrimaryDimensionVal).getFirst();
+		if (medianPreceedingDuration <= 0)
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error in getRepresentativeAO: medianPreceedingDuration = " + medianPreceedingDuration);
+		}
+
+		long recommTime = recommendationTime.getTime();
+
+		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+
+		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+		{
+			System.err.println("recommendationTime = " + recommendationTime + " newRecommTimestamp= "
+					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDuration
+					+ " for topRecommActName =" + topPrimaryDimensionVal);
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Debug: getRepresentativeAO: old recommendationTime="
+					+ recommendationTime.toLocalDateTime().toString() + "medianPreceedingDuration="
+					+ medianPreceedingDuration + "  new recommendationTime="
+					+ newRecommTimestamp.toLocalDateTime().toString());
+		}
+		repAO.setEndTimestamp(newRecommTimestamp); // only end timestamp used, make sure there is no start timestamp,
+		// since we are making recommendation at end timestamps and gowalla act objs are points in time.
+		repAO.setStartTimestamp(newRecommTimestamp);
+
+		// {
+		// System.err.println("Debug1357: inside getRepresentativeAO: recommendationTime = " + recommendationTime
+		// + " newRecommTimestamp= " + newRecommTimestamp + ". medianPreceedingDuration = "
+		// + medianPreceedingDuration + " for topRecommActName =" + topRecommActName);
+		// System.out.println("repAO = " + repAO.toStringAllGowallaTS());
+		// }
+
+		return repAO;
+	}
+
 	/**
 	 * 
 	 * @param mapOfRepAOs
@@ -1567,17 +1665,17 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	{
 		switch (typeOfThreshold)
 		{
-		case Percent:// "Percent":
-			this.thresholdsArray = percentThresholds;
-			break;
-		case Global:// "Global":
-			this.thresholdsArray = globalThresholds;
-			break;
-		// case "None":
-		// this.thresholdsArray = new int[] { 10000000 };
-		// break;
-		default:
-			System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
+			case Percent:// "Percent":
+				this.thresholdsArray = percentThresholds;
+				break;
+			case Global:// "Global":
+				this.thresholdsArray = globalThresholds;
+				break;
+			// case "None":
+			// this.thresholdsArray = new int[] { 10000000 };
+			// break;
+			default:
+				System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
 		}
 	}
 
@@ -1750,6 +1848,212 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 				+ ((t2 - t1) * 1.0 / 1000) + "secs");
 
 		return new Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>(
+				repAOsForThisUser, actMedianPreSuccDuration);
+	}
+
+	/**
+	 * for each user, for each activity (category id), create a representative avg activity object.
+	 * <p>
+	 * For example,
+	 * 
+	 * for user 1, for activity ‘Asian Food’, create an Activity Object with activity name as ‘Asian Food’ and other
+	 * features are the average values of the features all the ‘Asian Food’ activity objects occurring the training set
+	 * of user 1.
+	 * 
+	 * @param userId
+	 * @param userTrainingTimelines
+	 * @param userTestTimelines
+	 *            only to find which act names occur in test but not in training
+	 * @param uniqueLocIDs
+	 * @param uniqueActivityIDs
+	 * @return
+	 */
+	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPD(
+			int userId, Timeline userTrainingTimelines, Timeline userTestTimelines, Set<Integer> uniqueLocIDs,
+			Set<Integer> uniqueActivityIDs)
+	{
+		// mapOfRepAOs;
+		boolean sanityCheck = false;
+		System.out.println("Inside buildRepresentativeAOsForUserPD for user " + userId);
+		LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
+		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
+
+		long t1 = System.currentTimeMillis();
+		try
+		{
+			if (Constant.getDatabaseName().equals("gowalla1") == false)
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + Constant.getDatabaseName());
+			}
+			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
+			// { System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
+			// System.exit(-1); }
+
+			else
+			{
+				LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal = new LinkedHashMap<>();
+				/**
+				 * Useful for deciding upon the start timestamp from representative AO
+				 */
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
+
+				Set<Integer> allPossiblePDVals = null;
+				if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+				{
+					allPossiblePDVals = uniqueActivityIDs;// uniqueLocIDs,Set<Integer>
+				}
+				else if (Constant.primaryDimension.equals(PrimaryDimension.LocationID))
+				{
+					allPossiblePDVals = uniqueLocIDs;
+				}
+				else
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: unknown primary dimension");
+				}
+
+				// iterate over all possible primary dimension vals to initialise to preserve order.
+				for (Integer pdVal : allPossiblePDVals)
+				{
+					aosForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromPrevForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromNextForEachPDVal.put(pdVal, new ArrayList<>());
+				}
+
+				// populate the map for list of aos for each act name
+				// long durationFromPreviousInSecs = 0;
+				long prevTimestamp = 0;
+				Set<Integer> prevPDValEncountered = null;
+				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
+
+				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
+				{
+					Set<Integer> uniquePdValsInAO = new LinkedHashSet<>(ao.getPrimaryDimensionVal());
+					distinctPDValsEncounteredInTraining.addAll(ao.getPrimaryDimensionVal());
+
+					for (Integer pdVal : uniquePdValsInAO)
+					{
+						// add this act object to the correct map entry in map of aos for given act names
+						ArrayList<ActivityObject> aosStored = aosForEachPDVal.get(pdVal);
+						if (aosStored == null)
+						{
+							PopUps.printTracedErrorMsg("Error: encountered pdval '" + pdVal
+									+ "' is not in the list of all possible pd vals");
+						}
+						aosStored.add(ao); // add the new AO encountered to the map's list. So map is updated
+					}
+
+					// store the preceeding and succeeding durations
+					long currentTimestamp = ao.getStartTimestamp().getTime();
+
+					if (prevTimestamp != 0)
+					{ // add the preceeding duration for this AO
+						for (Integer pdVal : uniquePdValsInAO)
+						{
+							durationFromPrevForEachPDVal.get(pdVal).add(currentTimestamp - prevTimestamp);
+						}
+					}
+
+					if (prevPDValEncountered != null)
+					{
+						// add the succeeding duration for the previous AO
+						for (Integer prevPDVal : prevPDValEncountered)
+						{
+							durationFromNextForEachPDVal.get(prevPDVal).add(currentTimestamp - prevTimestamp);
+						}
+					}
+
+					prevTimestamp = currentTimestamp;
+					prevPDValEncountered = uniquePdValsInAO;
+				}
+
+				/////////////
+
+				// $$ analyseActNameNotInTraining(userId, allPossibleActivityNames,
+				// distinctActNamesEncounteredInTraining,
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/" + "ActNamesNotInTraining.csv",
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/"
+				// + "ActNamesInTestButNotInTraining.csv",
+				// userTestTimelines);
+
+				/////////////
+
+				////////////////////////// sanity check
+				if (sanityCheck)
+				{
+					System.out.println("Timeline of AOs");
+
+					userTrainingTimelines.getActivityObjectsInTimeline().stream().forEachOrdered(ao -> System.out
+							.print(ao.getPrimaryDimensionVal("/") + "-" + ao.getStartTimestampInms() + ">>"));
+
+					System.out.println("durationFromPrevForEachPDValue:");
+					durationFromPrevForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
+
+					System.out.println("durationFromNextForEachPDValue:");
+					durationFromNextForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
+					// SANITY CHECK OK for durationFromPrevForEachActName durationFromNextForEachActName
+
+					////////////////////////// sanity check
+					System.out.println("Count of aos for each pd value:");
+					aosForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().size()));
+				}
+
+				long sumOfCountOfAOsFroMap = aosForEachPDVal.entrySet().stream().flatMap(e -> e.getValue().stream())
+						.count();
+				long sumOfCountOfAOsFromTimeline = userTrainingTimelines.getActivityObjectsInTimeline().stream()
+						.count();
+
+				// .map(e -> e.getValue().getActivityObjectsInTimeline().size()).count();
+				System.out.println("sumOfCountOfAOsFroMap= " + sumOfCountOfAOsFroMap);
+				System.out.println("sumOfCountOfAOsFromTimeline= " + sumOfCountOfAOsFromTimeline);
+
+				// This sanity check below is relevant only for activity id as primary dimension, since it is in that
+				// case each activity object has only one primary dimension val (activity id). It won't hold in case of
+				// location ids since one activity object can have multiple location ids because of mergers, i.e,
+				// sumOfCountOfAOsFroMap>sumOfCountOfAOsFromTimeline
+				if (primaryDimension.equals(PrimaryDimension.ActivityID))
+				{
+					if (sumOfCountOfAOsFroMap != sumOfCountOfAOsFromTimeline)
+					{
+						PopUps.printTracedErrorMsg(
+								"Sanity check failed in buildRepresentativeAOsForUserPD\n(sumOfCountOfAOsFroMap) != "
+										+ sumOfCountOfAOsFroMap + " (sumOfCountOfAOsFromTimeline)"
+										+ sumOfCountOfAOsFromTimeline);
+					}
+				}
+				else// (primaryDimension.equals(PrimaryDimension.LocationID))
+				{
+					if (sumOfCountOfAOsFroMap < sumOfCountOfAOsFromTimeline)
+					{
+						PopUps.printTracedErrorMsg(
+								"Sanity check failed in buildRepresentativeAOsForUserPD\n(sumOfCountOfAOsFroMap) != "
+										+ sumOfCountOfAOsFroMap + " (sumOfCountOfAOsFromTimeline)"
+										+ sumOfCountOfAOsFromTimeline);
+					}
+				}
+				// SANITY CHECK OK for daosForEachActName
+
+				////////////////////////// sanity check end
+
+				Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
+						userId, aosForEachPDVal, durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
+
+				repAOsForThisUser = result.getFirst();
+				actMedianPreSuccDuration = result.getSecond();
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		long t2 = System.currentTimeMillis();
+		System.out.println("Exiting buildRepresentativeAOsForUserPD for user " + userId + " time taken = "
+				+ ((t2 - t1) * 1.0 / 1000) + "secs");
+
+		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(
 				repAOsForThisUser, actMedianPreSuccDuration);
 	}
 
@@ -1952,14 +2256,122 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	}
 
 	/**
+	 * 
+	 * @param userID
+	 * @param aosForEachPDVal
+	 * @param durationFromPrevForEachPDVal
+	 * @param durationFromNextForEachPDVal
+	 * @return
+	 */
+	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserPDV2(
+			int userID, LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal,
+			LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal,
+			LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal)
+	{
+		System.out.println("Inside computeRepresentativeActivityObjectForUserPDV2 for userID" + userID);
+		LinkedHashMap<Integer, ActivityObject> repAOs = new LinkedHashMap<>();
+		LinkedHashMap<Integer, Pair<Double, Double>> actMedPreSuccDuration = new LinkedHashMap<>();
+
+		try
+		{
+			if (!Constant.getDatabaseName().equals("gowalla1"))
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: this method is currently only suitable for gowalla dataset");
+			}
+
+			// feature of Gowalla activity object used in edit distance and necessary for recommendation.
+			for (Entry<Integer, ArrayList<ActivityObject>> pdValEntry : aosForEachPDVal.entrySet())
+			{
+				Integer pdVal = pdValEntry.getKey();
+				ArrayList<ActivityObject> aos = pdValEntry.getValue();
+
+				double medianDurationFromPrevForEachActName = StatsUtils.getDescriptiveStatisticsLong(
+						durationFromPrevForEachPDVal.get(pdVal), "durationFromPrevForEachActName",
+						userID + "__" + pdVal + "durationFromPrevForEachActName.txt", false).getPercentile(50);
+
+				double medianDurationFromNextForEachActName = StatsUtils.getDescriptiveStatisticsLong(
+						durationFromNextForEachPDVal.get(pdVal), "durationFromPrevForEachActName",
+						userID + "__" + pdVal + "durationFromPrevForEachActName.txt", false).getPercentile(50);
+
+				// Dummy because we are not going to actually use this, we will instead extract the timestamp from the
+				// preceeding duration + timestamp of preceeding activity object. But we assign this median anyway to
+				// avoid having it as numm which causes exception.
+				Timestamp dummyMedianStartTS = getMedianSecondsSinceMidnightTimestamp(
+						aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID,
+						pdVal.toString());
+
+				// double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
+				// int medianCinsCount = (int) StatsUtils
+				// .getDescriptiveStatistics(cinsCount, "cinsCount", userID + "__" + actName + "cinsCount.txt")
+				// .getPercentile(50);
+
+				// NOTE: we only need to take care of feature which are used for edit distance computation.
+				// Instantiate the representative activity object.
+				int activityID = -1;
+				ArrayList<Integer> locationIDs = new ArrayList<>();
+				String activityName = "";
+				// String locationName = "";
+				String workingLevelCatIDs = "";
+
+				switch (this.primaryDimension)
+				{
+					case ActivityID:
+					{
+						activityID = pdVal;
+						activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
+						workingLevelCatIDs = pdVal + "__";
+						break;
+					}
+					case LocationID:
+					{
+						locationIDs.add(pdVal);
+						workingLevelCatIDs = pdVal + "__";
+						// locationName =
+						// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+						// if (locationName == null || locationName.length() == 0)
+						// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+						break;
+					}
+					default:
+						PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + primaryDimension);
+						break;
+				}
+				// ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String
+				// locationName, Timestamp startTimestamp, String startLatitude, String startLongitude, String
+				// startAltitude, String userID, int photos_count, int checkins_count, int users_count, int
+				// radius_meters, int highlights_count, int items_count, int max_items_count, String workingLevelCatIDs,
+				// double distanceInMFromNext, long durationInSecsFromNext, String[] levelWiseCatIDs)
+
+				ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs,
+						activityName, "", dummyMedianStartTS, "", "", "", String.valueOf(userID), -1, -1, -1, -1, -1,
+						-1, -1, workingLevelCatIDs, -1, -1, new String[] { "" });
+
+				repAOs.put(pdVal, repAOForThisActNameForThisUser);
+				actMedPreSuccDuration.put(pdVal,
+						new Pair<>(medianDurationFromPrevForEachActName, medianDurationFromNextForEachActName));
+
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		System.out.println("Exiting computeRepresentativeActivityObjectForUserPDV2 for userID" + userID);
+		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(repAOs,
+				actMedPreSuccDuration);
+	}
+
+	/**
 	 * Returns the median seconds since midnight for the given timestamps
 	 * 
 	 * @param tss
-	 * @param actName
 	 * @param userID
+	 * @param actName
+	 *            just used for nameing the filename to write the result to
 	 * @return
 	 */
-	private double getMedianSeconds(List<Timestamp> tss, int userID, String actName)
+	private static double getMedianSeconds(List<Timestamp> tss, int userID, String actName)
 	{
 		double medianSecsSinceMidnight = -1;
 		try
@@ -1982,11 +2394,12 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	 * year, month, date while hours, mins, seconds extracted from the median.
 	 * 
 	 * @param tss
-	 * @param actName
 	 * @param userID
+	 * @param actName
+	 *            just used for naming the filename to write result to
 	 * @return
 	 */
-	private Timestamp getMedianSecondsSinceMidnightTimestamp(List<Timestamp> tss, int userID, String actName)
+	private static Timestamp getMedianSecondsSinceMidnightTimestamp(List<Timestamp> tss, int userID, String actName)
 	{
 		Timestamp ts = null;
 		try

@@ -13,12 +13,14 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.activity.io.WritingToFile;
 import org.activity.objects.CheckinEntry;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
+import org.activity.util.UtilityBelt;
 
 /**
  * Just to check/run some random snippets of code NOT IMPORTANT
@@ -75,9 +77,18 @@ public class TestDummy2
 
 	}
 
+	public static void checkIntersection()
+	{
+		ArrayList<Integer> a1 = (ArrayList<Integer>) Stream.of(1, 2, 3).collect(Collectors.toList());
+		ArrayList<Integer> a2 = (ArrayList<Integer>) Stream.of(12, 2, 35).collect(Collectors.toList());
+		System.out.println(UtilityBelt.getIntersection(a1, a2));
+		System.out.println(UtilityBelt.getIntersection(a1, a2).size());
+	}
+
 	public static void main(String args[])
 	{
-		checkRegexUtils();
+		checkIntersection();
+		// checkRegexUtils();
 		// checkStackTrace();
 		// testDirectoryDeletion();
 		// List<String> list = Arrays.asList(new String[] { "gunjan", "manali", "sukany" });

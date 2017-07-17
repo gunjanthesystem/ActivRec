@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,9 +45,12 @@ public final class Constant
 	public static Integer INVALID_ACTIVITY2_ID = -998;// "Not Available";
 	// end of Added on 11 July 2017
 
-	public static final PrimaryDimension primaryDimension = PrimaryDimension.ActivityID;
+	public static final PrimaryDimension primaryDimension = PrimaryDimension.LocationID;// LocationID;
 
 	static String[] activityNames;
+	static Set<Integer> uniqueActivityIDs;
+	static Set<Integer> uniqueLocationIDs;
+
 	public static ArrayList<String> activityNamesGowallaLabels;
 	static String DATABASE_NAME = "";// ;"geolife1";// default database name,
 										// dcu_data_2";// "geolife1";// "start_base_2";databaseName
@@ -155,10 +159,11 @@ public final class Constant
 
 	public static final boolean blacklistingUsersWithLargeMaxActsPerDay = true;
 
-	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = true;
+	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.ClosestTime;// .NGram;// .Daywise;//
-																							// NCount;//
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// ClosestTime;// .NGram;//
+																					// .Daywise;//
+																					// NCount;//
 	// Enums.LookPastType.NCount;
 	// "Count";// "Count";// "Hrs"// "Daywise"
 	/**
@@ -205,7 +210,7 @@ public final class Constant
 	/**
 	 * determines the hierarchical level of the activity name to be used in edit distance computation
 	 */
-	public static final int HierarchicalLevelForEditDistance = 1;// 2, -1 when not used
+	public static final int HierarchicalCatIDLevelForEditDistance = 2;// 1;// 2, -1 when not used
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -416,29 +421,31 @@ public final class Constant
 
 		switch (dname)
 		{
-		case "HJEditDistance":
-			distanceUsed = "HJEditDistance";
-			break;
-		case "FeatureWiseEditDistance":
-			distanceUsed = "FeatureWiseEditDistance";
-			break;
+			case "HJEditDistance":
+				distanceUsed = "HJEditDistance";
+				break;
+			case "FeatureWiseEditDistance":
+				distanceUsed = "FeatureWiseEditDistance";
+				break;
 
-		case "FeatureWiseWeightedEditDistance":
-			distanceUsed = "FeatureWiseWeightedEditDistance";
-			break;
+			case "FeatureWiseWeightedEditDistance":
+				distanceUsed = "FeatureWiseWeightedEditDistance";
+				break;
 
-		case "OTMDSAMEditDistance":
-			distanceUsed = "OTMDSAMEditDistance";
-			break;
-		default:
-			PopUps.showError(
-					"Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:" + dname);
-			System.err.println(
-					"Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:" + dname);
-			// throw new
-			// Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:"
-			// + dname);
-			System.exit(-1);
+			case "OTMDSAMEditDistance":
+				distanceUsed = "OTMDSAMEditDistance";
+				break;
+			default:
+				PopUps.showError(
+						"Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:"
+								+ dname);
+				System.err.println(
+						"Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:"
+								+ dname);
+				// throw new
+				// Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:"
+				// + dname);
+				System.exit(-1);
 		}
 		// if(dname.trim().equals("HJEditDistance")
 	}
@@ -550,35 +557,36 @@ public final class Constant
 		{
 			switch (DATABASE_NAME)
 			{
-			case "geolife1":
-				switch (Constant.howManyUsers)
-				{
-				case "AllUsers":
-					userIDs = DomainConstants.allUserIDsGeolifeData;
+				case "geolife1":
+					switch (Constant.howManyUsers)
+					{
+						case "AllUsers":
+							userIDs = DomainConstants.allUserIDsGeolifeData;
+							break;
+						case "TenUsers":
+							userIDs = DomainConstants.tenUserIDsGeolifeData;
+							break;
+						case "UsersAbove10RTs":
+							userIDs = DomainConstants.above10RTsUserIDsGeolifeData;
+							break;
+						default:
+							UtilityBelt
+									.showErrorExceptionPopup("unknown Constant.howManyUsers =" + Constant.howManyUsers);
+							break;
+					}
+					// userIDs = userIDsGeolifeData;
 					break;
-				case "TenUsers":
-					userIDs = DomainConstants.tenUserIDsGeolifeData;
+				case "dcu_data_2":
+					userIDs = DomainConstants.userIDsDCUData;
 					break;
-				case "UsersAbove10RTs":
-					userIDs = DomainConstants.above10RTsUserIDsGeolifeData;
+				case "gowalla1":
+					userIDs = DomainConstants.gowallaUserIDs;
 					break;
 				default:
-					UtilityBelt.showErrorExceptionPopup("unknown Constant.howManyUsers =" + Constant.howManyUsers);
-					break;
-				}
-				// userIDs = userIDsGeolifeData;
-				break;
-			case "dcu_data_2":
-				userIDs = DomainConstants.userIDsDCUData;
-				break;
-			case "gowalla1":
-				userIDs = DomainConstants.gowallaUserIDs;
-				break;
-			default:
-				System.out.println(DATABASE_NAME.equals("dcu_data_2"));
-				System.err.println("Error in setUserIDs: unrecognised database name:" + DATABASE_NAME);
-				throw new Exception();
-				// break;
+					System.out.println(DATABASE_NAME.equals("dcu_data_2"));
+					System.err.println("Error in setUserIDs: unrecognised database name:" + DATABASE_NAME);
+					throw new Exception();
+					// break;
 			}
 		}
 		catch (Exception e)
@@ -610,24 +618,24 @@ public final class Constant
 		{
 			switch (DATABASE_NAME)
 			{
-			case "geolife1":
-				INVALID_ACTIVITY1 = "Unknown";
-				INVALID_ACTIVITY2 = "Not Available";
-				break;
-			case "dcu_data_2":
-				INVALID_ACTIVITY1 = "Unknown";
-				INVALID_ACTIVITY2 = "Others";
-				break;
+				case "geolife1":
+					INVALID_ACTIVITY1 = "Unknown";
+					INVALID_ACTIVITY2 = "Not Available";
+					break;
+				case "dcu_data_2":
+					INVALID_ACTIVITY1 = "Unknown";
+					INVALID_ACTIVITY2 = "Others";
+					break;
 
-			case "gowalla1":
-				INVALID_ACTIVITY1 = "Unknown";
-				INVALID_ACTIVITY2 = "Not Available";
-				break;
+				case "gowalla1":
+					INVALID_ACTIVITY1 = "Unknown";
+					INVALID_ACTIVITY2 = "Not Available";
+					break;
 
-			default:
-				System.err.println("Error in setInvalidNames: unrecognised database name:" + DATABASE_NAME);
-				throw new Exception();
-				// break;
+				default:
+					System.err.println("Error in setInvalidNames: unrecognised database name:" + DATABASE_NAME);
+					throw new Exception();
+					// break;
 			}
 		}
 		catch (Exception e)
@@ -642,32 +650,94 @@ public final class Constant
 		{
 			switch (DATABASE_NAME)
 			{
-			case "geolife1":
-				activityNames = DomainConstants.GeolifeActivityNames;
-				break;
-			case "dcu_data_2":
-				activityNames = DomainConstants.DCUDataActivityNames;
-				break;
-			case "gowalla1":
-				DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
-						.deSerializeThis(DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName);
-				LinkedHashSet<String> res = UIUtilityBox.getNodesAtGivenDepth(DomainConstants.gowallaWorkingCatLevel,
-						rootOfCategoryTree);
-				System.out.println(
-						"num of nodes at depth " + DomainConstants.gowallaWorkingCatLevel + " are: " + res.size());
-				activityNames = res.toArray(new String[res.size()]);
+				case "geolife1":
+					activityNames = DomainConstants.GeolifeActivityNames;
+					break;
+				case "dcu_data_2":
+					activityNames = DomainConstants.DCUDataActivityNames;
+					break;
+				case "gowalla1":
+					DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
+							.deSerializeThis(DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName);
+					LinkedHashSet<String> res = UIUtilityBox
+							.getNodesAtGivenDepth(DomainConstants.gowallaWorkingCatLevel, rootOfCategoryTree);
+					System.out.println(
+							"num of nodes at depth " + DomainConstants.gowallaWorkingCatLevel + " are: " + res.size());
+					activityNames = res.toArray(new String[res.size()]);
 
-				// StringBuilder sb = new StringBuilder();
-				System.out.println(Arrays.asList(activityNames).stream().collect(Collectors.joining(",")));
+					// StringBuilder sb = new StringBuilder();
+					System.out.println(Arrays.asList(activityNames).stream().collect(Collectors.joining(",")));
 
-				// activityNamesGowallaLabels = (ArrayList<String>) Arrays.asList(activityNames).stream()
-				// .map(a -> DomainConstants.catIDNameDictionary.get(a)).collect(Collectors.toList());
-				// gowallaActivityNames;
-				break;
-			default:
-				System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
-				throw new Exception();
+					// activityNamesGowallaLabels = (ArrayList<String>) Arrays.asList(activityNames).stream()
+					// .map(a -> DomainConstants.catIDNameDictionary.get(a)).collect(Collectors.toList());
+					// gowallaActivityNames;
+					break;
+				default:
+					System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
+					throw new Exception();
+					// break;
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static Set<Integer> getUniqueLocIDs()
+	{
+		return uniqueLocationIDs;
+	}
+
+	public static Set<Integer> getUniqueActivityIDs()
+	{
+		return uniqueActivityIDs;
+	}
+
+	public static void setUniqueLocIDs(Set<Integer> locIDs)
+	{
+		try
+		{
+			switch (DATABASE_NAME)
+			{
+				// case "geolife1":
+				// activityNames = DomainConstants.GeolifeActivityNames;
 				// break;
+				// case "dcu_data_2":
+				// activityNames = DomainConstants.DCUDataActivityNames;
+				// break;
+				case "gowalla1":
+					uniqueLocationIDs = locIDs;
+					break;
+				default:
+					PopUps.printTracedErrorMsgWithExit(
+							"Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static void setUniqueActivityIDs(Set<Integer> activityIDs)
+	{
+		try
+		{
+			switch (DATABASE_NAME)
+			{
+				// case "geolife1":
+				// activityNames = DomainConstants.GeolifeActivityNames;
+				// break;
+				// case "dcu_data_2":
+				// activityNames = DomainConstants.DCUDataActivityNames;
+				// break;
+				case "gowalla1":
+					uniqueActivityIDs = activityIDs;
+					break;
+				default:
+					PopUps.printTracedErrorMsgWithExit(
+							"Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
 			}
 		}
 		catch (Exception e)
@@ -681,17 +751,17 @@ public final class Constant
 
 		switch (DATABASE_NAME)
 		{
-		case "geolife1":
-			return 7;// or 5 //activity name, start time, duration, dist travelled, start geo, end geo, avg altitude
-		// break;
-		case "dcu_data_2":
-			return 3; // activity name, start time, duration
-		case "gowalla1":
-			return 2; // activity name, start time
-		// break;
-		default:
-			System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
-			return -1;
+			case "geolife1":
+				return 7;// or 5 //activity name, start time, duration, dist travelled, start geo, end geo, avg altitude
+			// break;
+			case "dcu_data_2":
+				return 3; // activity name, start time, duration
+			case "gowalla1":
+				return 2; // activity name, start time
+			// break;
+			default:
+				System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
+				return -1;
 		}
 
 	}
@@ -931,7 +1001,7 @@ public final class Constant
 		// useJarForMySimpleLevenshteinDistance
 
 		s.append("\nuseHierarchicalDistance:" + useHierarchicalDistance);
-		s.append("\nHierarchicalLevelForEditDistance:" + HierarchicalLevelForEditDistance);
+		s.append("\nHierarchicalLevelForEditDistance:" + HierarchicalCatIDLevelForEditDistance);
 
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{

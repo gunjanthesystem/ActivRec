@@ -80,7 +80,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 */
 	private TimelineWithNext currentTimeline; // =current timelines
 	private ArrayList<ActivityObject> activitiesGuidingRecomm; // Current Timeline ,
-	private ActivityObject activityAtRecommPoint; // current Activity Object
+	private ActivityObject activityObjectAtRecommPoint; // current Activity Object
 	// private String activityNameAtRecommPoint;// current Activity Name
 	private ArrayList<Integer> primaryDimensionValAtRecommPoint;// when activity is primary dimension, this is an
 																// activity id, when
@@ -176,30 +176,30 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		//
 		switch (dname)
 		{
-		case "HJEditDistance":
-			hjEditDistance = new HJEditDistance();
-			break;
+			case "HJEditDistance":
+				hjEditDistance = new HJEditDistance();
+				break;
 
-		case "FeatureWiseEditDistance":
-			featureWiseEditDistance = new FeatureWiseEditDistance();
-			break;
+			case "FeatureWiseEditDistance":
+				featureWiseEditDistance = new FeatureWiseEditDistance();
+				break;
 
-		case "FeatureWiseWeightedEditDistance":
-			featureWiseWeightedEditDistance = new FeatureWiseWeightedEditDistance();
-			break;
+			case "FeatureWiseWeightedEditDistance":
+				featureWiseWeightedEditDistance = new FeatureWiseWeightedEditDistance();
+				break;
 
-		case "OTMDSAMEditDistance":
-			OTMDSAMEditDistance = new OTMDSAMEditDistance();
-			break;
+			case "OTMDSAMEditDistance":
+				OTMDSAMEditDistance = new OTMDSAMEditDistance();
+				break;
 
-		default:
-			PopUps.showError(
-					"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
-							+ dname);
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
-							+ dname));
-			System.exit(-1);
+			default:
+				PopUps.showError(
+						"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
+								+ dname);
+				System.err.println(PopUps.getTracedErrorMsg(
+						"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
+								+ dname));
+				System.exit(-1);
 		}
 		return 0;
 	}
@@ -294,9 +294,9 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				}
 			}
 
-			this.activityAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+			this.activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 			// this.activityNameAtRecommPoint = this.activityAtRecommPoint.getActivityName();
-			this.primaryDimensionValAtRecommPoint = this.activityAtRecommPoint.getPrimaryDimensionVal();
+			this.primaryDimensionValAtRecommPoint = this.activityObjectAtRecommPoint.getPrimaryDimensionVal();
 
 			// sanity check start
 			if (actObjsToAddToCurrentTimeline.size() > 0)
@@ -321,7 +321,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			long recommMasterT1 = System.currentTimeMillis();
 			this.candidateTimelines = extractCandidateTimelines(trainingTimelines, lookPastType, this.dateAtRecomm,
 					/* this.timeAtRecomm, */ this.userIDAtRecomm, matchingUnitInCountsOrHours,
-					this.activityAtRecommPoint);
+					this.activityObjectAtRecommPoint);
 			long recommMasterT2 = System.currentTimeMillis();
 			long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
 			// ///////////////////////////
@@ -329,7 +329,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			{
 				System.out.println("activitiesGuidingRecomm.size()=" + activitiesGuidingRecomm.size()
 						+ " matchingUnitInCountsOrHours=" + matchingUnitInCountsOrHours + " activityAtRecommPoint = "
-						+ activityAtRecommPoint.getActivityName());
+						+ activityObjectAtRecommPoint.getActivityName());
 
 				System.out
 						.println("Current timeline: " + currentTimeline.getActivityObjectNamesWithTimestampsInSequence()
@@ -393,7 +393,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 						.map(e -> e.getKey() + " - " + e.getValue().getFirst() + "_" + e.getValue().getSecond())
 						.collect(Collectors.joining("\n"));
 				String candidateTimelinesAsString = candidateTimelines.entrySet().stream()
-						.map(e -> e.getKey() + " - " + e.getValue().getActivityObjectNamesWithTimestampsInSequence())
+						.map(e -> e.getKey() + " - " + e.getValue().getActivityObjectPDValsWithTimestampsInSequence())
+						// .getActivityObjectNamesWithTimestampsInSequence())
 						.collect(Collectors.joining("\n"));
 
 				WritingToFile.appendLineToFileAbsolute(
@@ -468,11 +469,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 								+ "\n The candidate timelines  in increasing order of distance are:\n");
 				distancesSortedMap.entrySet().stream()
 						.forEach(e -> sbToWrite1.append("candID:" + e.getKey() + " dist:" + e.getValue().getSecond()
-								+ "\n acts:" + candidateTimelines.get(e.getKey()).getActivityObjectNamesInSequence()
+								+ "\n acts:" + candidateTimelines.get(e.getKey()).getPrimaryDimensionValsInSequence()
+								// .getActivityObjectNamesInSequence()
 								+ "\n"));
 				sbToWrite1.append("Top next activities are:\n");// +this.topNextRecommendedActivities);
-				nextActivityObjectsFromCands.entrySet().stream().forEach(e -> sbToWrite1
-						.append(" >>" + e.getValue().getFirst().getActivityName() + ":" + e.getValue().getSecond()));
+				nextActivityObjectsFromCands.entrySet().stream()
+						.forEach(e -> sbToWrite1.append(" >>" + e.getValue().getFirst().getPrimaryDimensionVal()// .getActivityName()
+								+ ":" + e.getValue().getSecond()));
 				System.out.println(sbToWrite1.toString());
 
 				System.out.println("\nDebug note192_end: getActivityNamesGuidingRecommwithTimestamps() "
@@ -484,20 +487,20 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			{
 				WritingToFile.writeEditDistancesPerRtPerCand(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm,
 						this.distancesSortedMap, this.candidateTimelines, this.nextActivityObjectsFromCands,
-						this.activitiesGuidingRecomm, activityAtRecommPoint,
+						this.activitiesGuidingRecomm, activityObjectAtRecommPoint,
 						VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
 						VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand,
-						this.endPointIndicesConsideredInCands);
+						this.endPointIndicesConsideredInCands, Constant.primaryDimension);
 			}
 
 			//////// Create ranked recommended act names
-			this.recommendedActivityNamesWithRankscores = createRankedTopRecommendedActivityNames(
+			this.recommendedActivityNamesWithRankscores = createRankedTopRecommendedActivityPDVals(
 					this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand,
 					this.lookPastType, this.distancesSortedMap);
 
-			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityNamesWithRankScoresString(
+			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityPDvalsWithRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
-			this.rankedRecommendedActNamesWithoutRankScoresStr = getRankedRecommendedActivityNamesWithoutRankScoresString(
+			this.rankedRecommendedActNamesWithoutRankScoresStr = getRankedRecommendedActivityPDValsithoutRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
 			//
 			this.normEditSimilarity = (ArrayList<Double>) this.nextActivityObjectsFromCands.entrySet().stream()
@@ -529,8 +532,9 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				 */
 				if (currentTimeline.getImmediateNextActivityInvalid() == 0) // not invalid
 				{
-					this.recommendedActivityNamesWithRankscores = removeRecommPointActivityFromRankedRecomm(
-							recommendedActivityNamesWithRankscores, activityNameAtRecommPoint);
+					// TODO
+					// this.recommendedActivityNamesWithRankscores = removeRecommPointActivityFromRankedRecomm(
+					// recommendedActivityNamesWithRankscores, activityNameAtRecommPoint);
 					System.out.println("removing recomm point activity (Current Activity) from list of recommendation");
 				}
 			}
@@ -619,7 +623,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 *            diff of st}}
 	 * @return
 	 */
-	private static LinkedHashMap<String, Double> createRankedTopRecommendedActivityNames(
+	private static LinkedHashMap<String, Double> createRankedTopRecommendedActivityPDVals(
 			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsFromCands, CaseType caseType,
 			LinkedHashMap<String, Double> similarityOfEndPointActObjCands, LookPastType lookPastType,
 			LinkedHashMap<String, Pair<String, Double>> distancesSortedMap)
@@ -634,14 +638,15 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		{
 			switch (caseType)
 			{
-			case SimpleV3:
-				return createRankedTopRecommendedActivityNamesSimpleV3_3(nextActivityObjectsFromCands);
-			case CaseBasedV1:
-				return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
-						similarityOfEndPointActObjCands);
-			default:
-				System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised case type = " + caseType));
-				return null;
+				case SimpleV3:
+					// createRankedTopRecommendedPDValsSimpleV3_3
+					return createRankedTopRecommendedPDValsSimpleV3_3(nextActivityObjectsFromCands);
+				case CaseBasedV1:
+					return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
+							similarityOfEndPointActObjCands);
+				default:
+					System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised case type = " + caseType));
+					return null;
 			}
 		}
 		else
@@ -1606,6 +1611,74 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		return recommendedActivityNamesRankscorePairs;
 	}
 
+	/**
+	 * TODO check correctness
+	 * <p>
+	 * Generates a ranked list of recommended Activity Objects and sets recommendedActivityNamesRankscorePairs
+	 * 
+	 * and calls the following setter methods setRecommendedActivityNamesWithRankscores
+	 * setRankedRecommendedActivityNamesWithRankScores setRankedRecommendedActivityNamesWithoutRankScores
+	 * 
+	 * Is function with Constants Beta and rank scoring
+	 * 
+	 * @since IN VERSION 2 WE HAD MIN MAX NORMALISATION INSIDE THIS FUNCTION, IN THIS V3 WE WILL NOT HAVE NORMALISATION
+	 *        OF EDIT DISTANCE INSIDE THIS FUNCTION AS THE NORMALISATION IS DONE BEFOREHAND IN THE METHOD WHICH FETCHED
+	 *        THE NORMALISED EDIT DISTANCE FOR CANDIDATE TIMELINES
+	 * @param topNextActivityObjectsWithDistance
+	 * @return {ActivityName,Rankscore} sorted by descending order of rank score
+	 */
+	public static LinkedHashMap<String, Double> createRankedTopRecommendedPDValsSimpleV3_3(
+			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsWithDistance)
+	{
+		// $$System.out.println("\ninside createRankedTopRecommendedActivityNamesSimpleV3_3:");
+		// <ActivityName,RankScore>
+		LinkedHashMap<String, Double> recommendedActivityPDValsRankscorePairs = new LinkedHashMap<>();
+
+		StringBuilder rankScoreCalc = new StringBuilder();
+
+		for (Map.Entry<String, Pair<ActivityObject, Double>> nextActObj : nextActivityObjectsWithDistance.entrySet())
+		{ // String candTimelineID = nextActObj.getKey();
+			double normEditDistanceVal = nextActObj.getValue().getSecond();
+
+			for (Integer pdVal : nextActObj.getValue().getFirst().getPrimaryDimensionVal())
+			{// if the next activity object is a merged one
+				String nextActivityPDVal = pdVal.toString();
+
+				// represents similarity
+				double simRankScore = (1d - normEditDistanceVal);// * simEndPointActivityObject;
+				rankScoreCalc.append("Simple RANK SCORE (1- normED) =" + "1-" + normEditDistanceVal + "\n");
+
+				if (recommendedActivityPDValsRankscorePairs.containsKey(nextActivityPDVal) == false)
+				{
+					recommendedActivityPDValsRankscorePairs.put(nextActivityPDVal, simRankScore);
+				}
+				else
+				{
+					recommendedActivityPDValsRankscorePairs.put(nextActivityPDVal,
+							recommendedActivityPDValsRankscorePairs.get(nextActivityPDVal) + simRankScore);
+				}
+			}
+
+		}
+
+		if (VerbosityConstants.verboseRankScoreCalcToConsole)
+		{
+			System.out.println(rankScoreCalc.toString());
+		}
+
+		// Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value
+		// of rank)
+		recommendedActivityPDValsRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
+				.sortByValueDesc(recommendedActivityPDValsRankscorePairs);
+
+		if (recommendedActivityPDValsRankscorePairs == null || recommendedActivityPDValsRankscorePairs.size() == 0)
+		{
+			PopUps.printTracedErrorMsg("Error: recommendedActivityPDValsRankscorePairs.size() = "
+					+ recommendedActivityPDValsRankscorePairs.size());
+		}
+		return recommendedActivityPDValsRankscorePairs;
+	}
+
 	// /////////////////////////////////////////////////////////////////////
 	// /**
 	// * Set Map of <recommended Activity Name, sim rank score>
@@ -1629,14 +1702,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	/**
 	 * Generate the string: '__recommendedActivityName1:simRankScore1__recommendedActivityName2:simRankScore2'
 	 * 
-	 * @param recommendedActivityNameRankscorePairs
+	 * @param recommendedActivityPDValRankscorePairs
 	 */
-	private static String getRankedRecommendedActivityNamesWithRankScoresString(
-			LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
+	private static String getRankedRecommendedActivityPDvalsWithRankScoresString(
+			LinkedHashMap<String, Double> recommendedActivityPDValRankscorePairs)
 	{
 		StringBuilder topRankedString = new StringBuilder();// String topRankedString= new String();
 		StringBuilder msg = new StringBuilder();
-		for (Map.Entry<String, Double> entry : recommendedActivityNameRankscorePairs.entrySet())
+		for (Map.Entry<String, Double> entry : recommendedActivityPDValRankscorePairs.entrySet())
 		{
 			String recommAct = entry.getKey();
 			double roundedRankScore = Evaluation.round(entry.getValue(), 4);
@@ -1660,7 +1733,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param recommendedActivityNameRankscorePairs
 	 * @return
 	 */
-	private static String getRankedRecommendedActivityNamesWithoutRankScoresString(
+	private static String getRankedRecommendedActivityPDValsithoutRankScoresString(
 			LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
 	{
 		StringBuilder rankedRecommendationWithoutRankScores = new StringBuilder();
@@ -1842,17 +1915,18 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		switch (lookPastType)
 		{
-		case Daywise:
-			return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines, endPointIndicesForDaywise);
-		case NCount:
-			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-		case NHours:
-			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-		case ClosestTime:
-			return null;
-		default:
-			System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
-			return null;
+			case Daywise:
+				return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines,
+						endPointIndicesForDaywise);
+			case NCount:
+				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+			case NHours:
+				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+			case ClosestTime:
+				return null;
+			default:
+				System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
+				return null;
 		}
 
 	}
@@ -1896,42 +1970,43 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			switch (caseType)
 			{
-			case CaseBasedV1:
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-				// invalids are already expunged, no need to expunge again
-				{
-					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithoutEndCurrentActivity(
-							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candidateTimelineId);
-				}
-				else
-				{
-					editDistanceForThisCandidate = hjEditDistance
-							.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
-									userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
-				}
-				break;
+				case CaseBasedV1:
+					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+					// invalids are already expunged, no need to expunge again
+					{
+						editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithoutEndCurrentActivity(
+								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+								dateAtRecomm, timeAtRecomm, candidateTimelineId);
+					}
+					else
+					{
+						editDistanceForThisCandidate = hjEditDistance
+								.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
+										userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
+					}
+					break;
 
-			case SimpleV3:// "SimpleV3":
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-				{
-					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
-							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candidateTimelineId);
-				}
-				else
-				{
-					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceInvalidsExpunged(
-							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candidateTimelineId);
-				}
-				break;
+				case SimpleV3:// "SimpleV3":
+					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+					{
+						editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
+								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+								dateAtRecomm, timeAtRecomm, candidateTimelineId);
+					}
+					else
+					{
+						editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceInvalidsExpunged(
+								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+								dateAtRecomm, timeAtRecomm, candidateTimelineId);
+					}
+					break;
 
-			default:
-				System.err.println(PopUps.getTracedErrorMsg(
-						"Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type" + caseType));
-				break;
+				default:
+					System.err.println(PopUps.getTracedErrorMsg(
+							"Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type"
+									+ caseType));
+					break;
 			}
 
 			candEditDistances.put(candidateTimelineId, editDistanceForThisCandidate);
@@ -1973,52 +2048,53 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			switch (caseType)
 			{
-			case CaseBasedV1:// "CaseBasedV1":
-				// editDistanceForThisCandidate =
-				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
-																	// again
-				{
-					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-							.getFeatureWiseEditDistanceWithoutEndCurrentActivity(
-									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-				}
-				else
-				{
-					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-							.getFeatureWiseEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-				}
-				break;
+				case CaseBasedV1:// "CaseBasedV1":
+					// editDistanceForThisCandidate =
+					// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
+																		// expunge
+																		// again
+					{
+						featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
+								.getFeatureWiseEditDistanceWithoutEndCurrentActivity(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+					}
+					else
+					{
+						featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
+								.getFeatureWiseEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+					}
+					break;
 
-			case SimpleV3:// "SimpleV3":
-				// editDistanceForThisCandidate =
-				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-				{
-					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-							.getFeatureWiseEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),
-									activitiesGuidingRecomm);// ,
-																// userAtRecomm,
-																// dateAtRecomm,
-																// timeAtRecomm,
-																// candidateTimelineId);
-				}
-				else
-				{
-					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-							.getFeatureWiseEditDistanceInvalidsExpunged(entry.getValue().getActivityObjectsInTimeline(),
-									activitiesGuidingRecomm);// ,
-																// userAtRecomm,
-																// dateAtRecomm,
-																// timeAtRecomm,
-																// candidateTimelineId);
-				}
-				break;
+				case SimpleV3:// "SimpleV3":
+					// editDistanceForThisCandidate =
+					// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+					{
+						featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
+								.getFeatureWiseEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),
+										activitiesGuidingRecomm);// ,
+																	// userAtRecomm,
+																	// dateAtRecomm,
+																	// timeAtRecomm,
+																	// candidateTimelineId);
+					}
+					else
+					{
+						featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
+								.getFeatureWiseEditDistanceInvalidsExpunged(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);// ,
+																													// userAtRecomm,
+																													// dateAtRecomm,
+																													// timeAtRecomm,
+																													// candidateTimelineId);
+					}
+					break;
 
-			default:
-				System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
-				break;
+				default:
+					System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
+					break;
 			}
 			/*
 			 * if(caseType.equals("CaseBasedV1")) { editDistanceForThisCandidate =
@@ -2067,45 +2143,47 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			switch (caseType)
 			{
-			case CaseBasedV1:// "CaseBasedV1":
-				// editDistanceForThisCandidate =
-				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
-																	// again
-				{
-					editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceWithoutEndCurrentActivity(
-							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candidateTimelineId);
-				}
-				else
-				{
-					editDistanceForThisCandidate = OTMDSAMEditDistance
-							.getOTMDSAMEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
-									userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
-				}
-				break;
+				case CaseBasedV1:// "CaseBasedV1":
+					// editDistanceForThisCandidate =
+					// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
+																		// expunge
+																		// again
+					{
+						editDistanceForThisCandidate = OTMDSAMEditDistance
+								.getOTMDSAMEditDistanceWithoutEndCurrentActivity(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
+										userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
+					}
+					else
+					{
+						editDistanceForThisCandidate = OTMDSAMEditDistance
+								.getOTMDSAMEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
+										userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
+					}
+					break;
 
-			case SimpleV3:// "SimpleV3":
-				// editDistanceForThisCandidate =
-				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-				{
-					editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceWithTrace(
-							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candidateTimelineId);
-				}
-				else
-				{
-					editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceInvalidsExpunged(
-							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candidateTimelineId);
-				}
-				break;
+				case SimpleV3:// "SimpleV3":
+					// editDistanceForThisCandidate =
+					// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+					{
+						editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceWithTrace(
+								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+								dateAtRecomm, timeAtRecomm, candidateTimelineId);
+					}
+					else
+					{
+						editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceInvalidsExpunged(
+								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+								dateAtRecomm, timeAtRecomm, candidateTimelineId);
+					}
+					break;
 
-			default:
-				System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
-				break;
+				default:
+					System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
+					break;
 			}
 			/*
 			 * if(caseType.equals("CaseBasedV1")) { editDistanceForThisCandidate =
@@ -2146,44 +2224,45 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			switch (caseType)
 			{
-			case CaseBasedV1:// "CaseBasedV1":
-				// editDistanceForThisCandidate =
-				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to expunge
-																	// again
-				{
-					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-							.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivity(
-									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-				}
-				else
-				{
-					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-							.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-				}
-				break;
+				case CaseBasedV1:// "CaseBasedV1":
+					// editDistanceForThisCandidate =
+					// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
+																		// expunge
+																		// again
+					{
+						featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
+								.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivity(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+					}
+					else
+					{
+						featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
+								.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+					}
+					break;
 
-			case SimpleV3:// "SimpleV3":
-				// editDistanceForThisCandidate =
-				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-				{
-					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-							.getFeatureWiseWeightedEditDistanceRawValsWithTrace(
-									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-				}
-				else
-				{
-					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-							.getFeatureWiseWeightedEditDistanceInvalidsExpunged(
-									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-				}
-				break;
+				case SimpleV3:// "SimpleV3":
+					// editDistanceForThisCandidate =
+					// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+					{
+						featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
+								.getFeatureWiseWeightedEditDistanceRawValsWithTrace(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+					}
+					else
+					{
+						featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
+								.getFeatureWiseWeightedEditDistanceInvalidsExpunged(
+										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+					}
+					break;
 
-			default:
-				System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
-				break;
+				default:
+					System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
+					break;
 			}
 			/*
 			 * if(caseType.equals("CaseBasedV1")) { editDistanceForThisCandidate =
@@ -2224,34 +2303,34 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		switch (distanceUsed)
 		{
-		case "HJEditDistance":
-			return getNormalisedHJEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
-					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
-					hjEditDistance);
-		case "FeatureWiseEditDistance":
-			return getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
-					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
-					featureWiseEditDistance);
+			case "HJEditDistance":
+				return getNormalisedHJEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
+						timeAtRecomm.toString(), hjEditDistance);
+			case "FeatureWiseEditDistance":
+				return getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
+						timeAtRecomm.toString(), featureWiseEditDistance);
 
-		case "FeatureWiseWeightedEditDistance":
-			return getNormalisedFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
-					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
-					featureWiseWeightedEditDistance);
+			case "FeatureWiseWeightedEditDistance":
+				return getNormalisedFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
+						timeAtRecomm.toString(), featureWiseWeightedEditDistance);
 
-		case "OTMDSAMEditDistance":
-			return getNormalisedOTMDSAMEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
-					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
-					OTMDSAMEditDistance);
-		default:
-			PopUps.showError(
-					"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand():Unknown distance specified:"
-							+ distanceUsed);
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand(): Unknown distance specified:"
-							+ distanceUsed));
-			// throw new Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance
-			// specified:" + dname);
-			System.exit(-1);
+			case "OTMDSAMEditDistance":
+				return getNormalisedOTMDSAMEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
+						timeAtRecomm.toString(), OTMDSAMEditDistance);
+			default:
+				PopUps.showError(
+						"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand():Unknown distance specified:"
+								+ distanceUsed);
+				System.err.println(PopUps.getTracedErrorMsg(
+						"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand(): Unknown distance specified:"
+								+ distanceUsed));
+				// throw new Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance
+				// specified:" + dname);
+				System.exit(-1);
 		}
 		System.err.println(PopUps.getTracedErrorMsg(
 				"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand()"
@@ -2692,18 +2771,19 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 				switch (Constant.getDatabaseName()) // (Constant.DATABASE_NAME)
 				{
-				case "geolife1":
-					endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityGeolifeData(
-							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
-					break;
-				case "dcu_data_2":
-					endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityDCUData(
-							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
-					break;
-				default:
-					System.err.println(PopUps.getTracedErrorMsg(
-							"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
-					break;
+					case "geolife1":
+						endPointEditDistanceForThisCandidate = alignmentBasedDistance
+								.getCaseBasedV1SimilarityGeolifeData(endPointActivityObjectCandidate,
+										endPointActivityObjectCurrentTimeline, userID);
+						break;
+					case "dcu_data_2":
+						endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityDCUData(
+								endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
+						break;
+					default:
+						System.err.println(PopUps.getTracedErrorMsg(
+								"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
+						break;
 				}
 
 			}
@@ -2830,8 +2910,11 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			{
 				boolean a = ae.equalsWrtPrimaryDimension(activityAtRecommPoint);
 				boolean b = ae.getActivityName().equals(activityAtRecommPoint.getActivityName());
-				Sanity.eq(a, b, "ae.equalsWrtPrimaryDimension(activityAtRecommPoint) =" + a
-						+ " != ae.getActivityName().equals(activityAtRecommPoint.getActivityName()) =" + b);
+				Sanity.eq(a, b, "\nactivityAtRecommPoint=" + activityAtRecommPoint.toStringAllGowallaTS() + "\nae = "
+						+ ae.toStringAllGowallaTS() + "\nae.pdvals = " + ae.getPrimaryDimensionVal("/")
+						// + "\nactivityAtRecommPoint=" + activityAtRecommPoint.toStringAllGowallaTS()
+						+ "\nae.equalsWrtPrimaryDimension(activityAtRecommPoint) =" + a
+						+ " != ae.getActivityName().equals(activityAtRecommPoint.getActivityName()) =" + b + "\n");
 			}
 			// end sanity check
 
@@ -3104,7 +3187,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 	public ActivityObject getActivityObjectAtRecomm()
 	{
-		return this.activityAtRecommPoint;
+		return this.activityObjectAtRecommPoint;
 	}
 
 	/**
@@ -3156,18 +3239,22 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		return result.toString();
 	}
 
+	// Names not changed to PD vals because this method is inherited from abstract class
 	public String getActivityNamesGuidingRecommwithTimestamps()
 	{
 		StringBuilder res = new StringBuilder();
 		for (ActivityObject ae : activitiesGuidingRecomm)
 		{
-			res = StringUtils.fCat(res, "  ", ae.getActivityName(), "__", ae.getStartTimestamp().toString(), "_to_",
-					ae.getEndTimestamp().toString());
+			res = StringUtils.fCat(res, "  ", ae.getActivityName(), "__", ae.getPrimaryDimensionVal().toString(), "__",
+					ae.getStartTimestamp().toString(), "_to_", ae.getEndTimestamp().toString());
 			// res.append(" " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp());
 		}
 		return res.toString();
 	}
 
+	/**
+	 * @return rankedRecommendedActivityPDValsithoutRankScoresString
+	 */
 	public String getRankedRecommendedActNamesWithoutRankScores()
 	{
 		return this.rankedRecommendedActNamesWithoutRankScoresStr;

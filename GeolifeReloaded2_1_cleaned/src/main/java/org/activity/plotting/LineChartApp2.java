@@ -78,7 +78,7 @@ public class LineChartApp2 extends Application
 	public void start(Stage primaryStage) throws Exception
 	{
 		ObservableList<Series<Double, Double>> listOfSeries = FXUtils
-				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData());
+				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(3, 10));
 
 		NumberAxis xAxis = new NumberAxis();// "Values for X-Axis", 0, 3, 1);
 		NumberAxis yAxis = new NumberAxis();// "Values for Y-Axis", 0, 3, 1);

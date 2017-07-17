@@ -25,6 +25,11 @@ public class LocationObject
 		return "";
 	}
 
+	public String getLocationName()
+	{
+		return this.locationName;
+	}
+
 	public void setAltitude(String alt)
 	{
 		this.altitude = alt;

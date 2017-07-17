@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
@@ -105,10 +106,25 @@ public class Dashboard extends Application
 		Tab lineChartTab = new Tab("lineChart");
 
 		ObservableList<Series<Double, Double>> listOfSeries = FXUtils
-				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData());
+				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(5, 20));
 		LineChart lineChart = new LineChart(new NumberAxis(), new NumberAxis(), listOfSeries);
-		Tooltip t = new Tooltip("test");
-		Tooltip.install(lineChart, t);
+
+		ObservableList<Series<Double, Double>> lineChartDataSeriess = lineChart.getData();
+
+		for (Series<Double, Double> dataSeries : lineChartDataSeriess)
+		{
+			ObservableList<Data<Double, Double>> dataForASeries = dataSeries.getData();
+
+			for (Data<Double, Double> d : dataForASeries)
+			{
+				Tooltip.install(d.getNode(),
+						new Tooltip("ajooba: \n" + d.getXValue().doubleValue() + "," + d.getYValue().doubleValue()));
+				// String.format("%2.1f ^ 2 = %2.1f", d.getXValue().doubleValue(), d.getYValue().doubleValue())));
+			}
+		}
+
+		// Tooltip t = new Tooltip("test");
+		// Tooltip.install(lineChart, t);
 
 		lineChartTab.setContent(lineChart);// new LineChart(new NumberAxis(), new NumberAxis(), listOfSeries));
 		lineChartTab.setClosable(true);

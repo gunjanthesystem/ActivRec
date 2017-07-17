@@ -16,7 +16,7 @@ public class SuperController
 
 		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
-		String commonPath = "./dataWritten/";
+		String commonPath = "./dataWritten/July17/";
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";

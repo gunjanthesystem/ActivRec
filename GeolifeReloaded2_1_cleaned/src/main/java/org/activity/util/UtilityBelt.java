@@ -1652,6 +1652,7 @@ public class UtilityBelt
 	{
 		Set<Integer> intersection = new HashSet<Integer>(s1);
 		intersection.retainAll(s2);
+		// System.out.println("Inside checkIntersection\ns1=" + s1 + "\ns2=" + s2 + "\nintersection=" + intersection);
 		return intersection;
 	}
 

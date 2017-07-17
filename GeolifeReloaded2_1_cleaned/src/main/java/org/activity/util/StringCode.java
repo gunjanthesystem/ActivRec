@@ -984,39 +984,64 @@ public class StringCode
 	 * @return
 	 * @since 13 July 2017
 	 */
-	public static ArrayList<String> getStringCodeForActivityObjects(ArrayList<ActivityObject> activityObjects,
+	public static ArrayList<String> getStringCodesForActivityObjects(ArrayList<ActivityObject> activityObjects,
 			PrimaryDimension primaryDimension, HashMap<Integer, Character> uniqueCharCodes, boolean verbose)
 	{
-		StringBuilder code = new StringBuilder();
 
-		ArrayList<ArrayList<Integer>> v = multiValSeqTo1ValSeq(activityObjects, primaryDimension, verbose);
+		ArrayList<String> stringCodeforAOs = new ArrayList<>();
+		// for given seq of aos, extract all possible sequence of val. if all aos had single value for primary dimension
+		// (such as in no merger), then we will get only one ArrayList, other multiple arraylist, one for each possible
+		// sequence.
+		// such as if primary vals for AOs: 1,2/3,5,6 (here the second element is merger of 2 and 3) then we will get
+		// seq: 1,2,5,6 and 1,3,5,6 .
+		ArrayList<ArrayList<Integer>> possibleSequencesOfPrimaryDimensionVals = multiValSeqTo1ValSeqs(activityObjects,
+				primaryDimension, verbose);
 
-		for (ActivityObject ao : activityObjects)
+		for (ArrayList<Integer> seqOfPDVals : possibleSequencesOfPrimaryDimensionVals)
 		{
-			code.append(ao.getCharCode());
+			StringBuilder sb = new StringBuilder();
+			for (Integer v : seqOfPDVals)
+			{
+				Character code = uniqueCharCodes.get(v);
+				if (code == null)
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: char code for primary dimension " + primaryDimension
+							+ " val = " + v + " not found in uniqueCharCodes =" + uniqueCharCodes.toString());
+				}
+				sb.append(code);
+			}
+			stringCodeforAOs.add(sb.toString());
 		}
-		// activityObjects.stream().forEach(ao -> code.append(ao.getStringCode()));
-		String codeS = code.toString();
 
-		if (VerbosityConstants.verbose || VerbosityConstants.verboseSAX)
+		if (VerbosityConstants.verbose)
 		{
-			System.out.print("\tInside getStringCodeForActivityObjects:\n Act Names:");
-			activityObjects.stream().forEach(ao -> System.out.print(ao.getActivityName() + " "));
-			System.out.println("\tCode: " + codeS);
+			StringBuilder sb = new StringBuilder();
+			sb.append("\tInside getStringCodeForActivityObjects:\n Act Names:");
+			activityObjects.stream().forEachOrdered(ao -> sb.append(ao.getActivityName() + " "));
+			System.out.print("\nPrimary dimension vals:");
+			activityObjects.stream().forEachOrdered(ao -> sb.append(ao.getPrimaryDimensionVal() + " "));
+			System.out.print("\npossibleSequencesOfPrimaryDimensionVals:");
+			possibleSequencesOfPrimaryDimensionVals.stream().forEachOrdered(p -> sb.append(p.toString() + " "));
+			stringCodeforAOs.stream().forEachOrdered(s -> sb.append(s.toString() + " "));
+			System.out.println(sb.toString());
 		}
-		return codeS;
+		return stringCodeforAOs;
 	}
 
 	/**
 	 * extracting multiple lists(sequences) with single valued elements from one sequence of multi-valued elements,
 	 * where the "one sequence of multi value elements" is the sequence of primary dimension vals from the given list of
 	 * act objs
+	 * <p>
+	 * TODO NEEDS TO BE CHECKED FOR CORRECTNESS
 	 * 
 	 * @param activityObjects
 	 * @param primaryDimension
 	 * @since 13 July 2017
+	 * @return List{List of primary dimension vals } in other words, multiple lists(sequences) with single valued
+	 *         elements
 	 */
-	public static ArrayList<ArrayList<Integer>> multiValSeqTo1ValSeq(ArrayList<ActivityObject> activityObjects,
+	public static ArrayList<ArrayList<Integer>> multiValSeqTo1ValSeqs(ArrayList<ActivityObject> activityObjects,
 			PrimaryDimension primaryDimension, boolean verbose)
 	{
 		ArrayList<ArrayList<Integer>> words = null;
@@ -1032,10 +1057,10 @@ public class StringCode
 			if (verbose)
 			{
 				StringBuilder sb = new StringBuilder();
-				sb.append("\nInside multiValSeqTo1ValSeq: act ids as multi valued seq :\n");
+				sb.append("\nInside multiValSeqTo1ValSeq: \n INPUT- act ids as multi valued seq :\n");
 				activityObjects.stream().forEachOrdered(ao -> sb.append("-" + ao.getPrimaryDimensionVal()));
-				System.out.print("Extracted multiple sequence of 1 val:\n ");
-				words.stream().forEachOrdered(w -> sb.append("-" + w.toString()));
+				System.out.print("\n OUTPUT: Extracted multiple sequences of 1 val:\n ");
+				words.stream().forEachOrdered(w -> sb.append("--" + w.toString()));
 			}
 		}
 		catch (Exception e)
@@ -1078,7 +1103,7 @@ public class StringCode
 
 		else if (DomainConstants.gowallaWorkingCatLevel > hierarchyLevelForEDForAO)
 		{
-			if (hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance)
+			if (hierarchyLevelForEDForAO != Constant.HierarchicalCatIDLevelForEditDistance)
 			{
 				System.err.println(PopUps.getTracedErrorMsg(
 						"Error: hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance"));
@@ -1182,7 +1207,7 @@ public class StringCode
 		// level desired
 		else if (DomainConstants.gowallaWorkingCatLevel > hierarchyLevelForEDForAO)
 		{
-			if (hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance)
+			if (hierarchyLevelForEDForAO != Constant.HierarchicalCatIDLevelForEditDistance)
 			{
 				System.err.println(PopUps.getTracedErrorMsg(
 						"Error: hierarchyLevelForEDForAO != Constant.HierarchicalLevelForEditDistance"));
