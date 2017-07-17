@@ -73,7 +73,7 @@ public class DomainConstants
 
 	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
 	public static TreeMap<Integer, String> catIDNameDictionary = null;
-	public static LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionary = null;
+	static LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionary = null;
 	public static TreeMap<Integer, Character> catIDCharCodeMap = null;
 	public static TreeMap<Character, Integer> charCodeCatIDMap = null;
 
@@ -324,6 +324,11 @@ public class DomainConstants
 
 	}
 
+	public static LinkedHashMap<Integer, LocationGowalla> getLocIDLocationObjectDictionary()
+	{
+		return locIDLocationObjectDictionary;
+	}
+
 	/**
 	 * 
 	 * @param catIDsHierDistSerialisedFile
@@ -345,7 +350,7 @@ public class DomainConstants
 	public static void setCatIDGivenLevelCatIDMap()
 	{
 		catIDGivenLevelCatIDMap = getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict,
-				Constant.HierarchicalLevelForEditDistance, true);
+				Constant.HierarchicalCatIDLevelForEditDistance, true);
 	}
 
 	public static ArrayList<Integer> getGivenLevelCatID(int givenCatID)

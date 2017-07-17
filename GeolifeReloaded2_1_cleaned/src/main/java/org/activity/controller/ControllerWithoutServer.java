@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
@@ -201,18 +200,26 @@ public class ControllerWithoutServer
 			String commonBasePath = Constant.getCommonPath();
 
 			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
-			TreeSet<Integer> uniqueLocIDs = getUniqueLocIDs(usersCleanedDayTimelines);
-			Serializer.serializeThis(uniqueLocIDs, "./dataWritten/UniqueLocIDsInCleanedTimeines.ser");
-			TreeSet<Integer> uniqueLocIDs1 = (TreeSet<Integer>) Serializer
-					.deSerializeThis("./dataWritten/UniqueLocIDsInCleanedTimeines.ser");
-			Serializer.kryoSerializeThis(uniqueLocIDs, "./dataWritten/UniqueLocIDsInCleanedTimeines.kryo");
-			TreeSet<Integer> uniqueLocIDs2 = (TreeSet<Integer>) Serializer
-					.kryoDeSerializeThis("./dataWritten/UniqueLocIDsInCleanedTimeines.kryo");
+
+			///////////////////
+			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
+			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines));
+			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines));
+			///////////////////
+			/*
+			 * TreeSet<Integer> uniqueLocIDs = getUniqueLocIDs(usersCleanedDayTimelines);
+			 * Serializer.serializeThis(uniqueLocIDs, "./dataWritten/UniqueLocIDsInCleanedTimeines.ser");
+			 * TreeSet<Integer> uniqueLocIDs1 = (TreeSet<Integer>) Serializer
+			 * .deSerializeThis("./dataWritten/UniqueLocIDsInCleanedTimeines.ser");
+			 * Serializer.kryoSerializeThis(uniqueLocIDs, "./dataWritten/UniqueLocIDsInCleanedTimeines.kryo");
+			 * TreeSet<Integer> uniqueLocIDs2 = (TreeSet<Integer>) Serializer
+			 * .kryoDeSerializeThis("./dataWritten/UniqueLocIDsInCleanedTimeines.kryo");
+			 */
+
 			// TimelineStats.writeAllCitiesCounts(usersCleanedDayTimelines,
 			// Constant.outputCoreResultsPath + "AllCitiesCount");
 			// // important curtain 1 start 10 Feb 2017
-			// $$sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels,
-			// commonBasePath);
+			sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
 			// // important curtain 1 end 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017
@@ -305,36 +312,6 @@ public class ControllerWithoutServer
 		{
 			e.printStackTrace();
 		}
-
-	}
-
-	/**
-	 * 
-	 * @param usersCleanedDayTimelines
-	 * @return
-	 */
-	public static TreeSet<Integer> getUniqueLocIDs(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
-	{
-		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
-		try
-		{
-			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
-			{
-				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
-				{
-					e2.getValue().getActivityObjectsInTimeline().stream()
-							.forEach(ao -> uniqueLocIDs.addAll(ao.getLocationIDs()));
-				}
-			}
-			System.out.println("Inside getUniqueLocIDs: uniqueLocIDs.size()=" + uniqueLocIDs.size());
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		return uniqueLocIDs;
 
 	}
 
@@ -446,70 +423,74 @@ public class ControllerWithoutServer
 
 		switch (databaseName)
 		{
-		case "gowalla1":
-			pathToLatestSerialisedJSONArray = null;// "";
-			pathForLatestSerialisedJSONArray = "" + currentDateTime.getMonth().toString().substring(0, 3)
-					+ currentDateTime.getDayOfMonth() + "obj";
-			pathToLatestSerialisedTimelines = null;
-			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelinesNOV30.kryo";
-			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines.kryo";
-			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";//
-			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";
-			pathForLatestSerialisedTimelines = null;
-			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines"
-			// + currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
-			// + ".kryo";
-			commonPath = Constant.outputCoreResultsPath;
-			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/";
-			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
-			// run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//
-			/// "/run/media/gunjan/BoX2/GowallaSpaceSpace/GowallaDataWorksSep16/";
-			break;
+			case "gowalla1":
+				pathToLatestSerialisedJSONArray = null;// "";
+				pathForLatestSerialisedJSONArray = "" + currentDateTime.getMonth().toString().substring(0, 3)
+						+ currentDateTime.getDayOfMonth() + "obj";
+				pathToLatestSerialisedTimelines = null;
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelinesNOV30.kryo";
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines.kryo";
+				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";//
+				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";
+				pathForLatestSerialisedTimelines = null;
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines"
+				// + currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+				// + ".kryo";
+				commonPath = Constant.outputCoreResultsPath;
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/";
+				// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
+				// run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//
+				/// "/run/media/gunjan/BoX2/GowallaSpaceSpace/GowallaDataWorksSep16/";
+				break;
 
-		case "geolife1":
-			pathToLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayAPR21obj";
-			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayMAY27obj";
-			// GeolifeJSONArrayFeb13.obj";
-			pathForLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArray"
-					+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + "obj";
+			case "geolife1":
+				pathToLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayAPR21obj";
+				// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayMAY27obj";
+				// GeolifeJSONArrayFeb13.obj";
+				pathForLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArray"
+						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+						+ "obj";
 
-			// $$UMAP submission
-			// $$pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data
-			// Works/UserTimelinesJUN18.lmap";//
-			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesJUN15.lmap";//
-			// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link to Geolife Data
-			// Works/UserTimelinesAPR15.lmap";//
-			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR10.lmap";//
-			// UserTimelinesFeb13.lmap";
+				// $$UMAP submission
+				// $$pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data
+				// Works/UserTimelinesJUN18.lmap";//
+				// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesJUN15.lmap";//
+				// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link to Geolife Data
+				// Works/UserTimelinesAPR15.lmap";//
+				// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR10.lmap";//
+				// UserTimelinesFeb13.lmap";
 
-			// After UMAP submission 19th April 2016
-			pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
+				// After UMAP submission 19th April 2016
+				pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
 
-			pathForLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelines"
-					+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + ".lmap";
-			commonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";// version 3 based on rank score
-																				// function
-			break;
+				pathForLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelines"
+						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+						+ ".lmap";
+				commonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";// version 3 based on rank score
+																					// function
+				break;
 
-		case "dcu_data_2":
-			pathToLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArrayOct29.obj";
-			pathForLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArray"
-					+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + "obj";
+			case "dcu_data_2":
+				pathToLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArrayOct29.obj";
+				pathForLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArray"
+						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+						+ "obj";
 
-			pathToLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
-			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
-			// Works/WorkingSet7July/DCUUserTimelinesJUN15.lmap";
-			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
-			// Works/WorkingSet7July/DCUUserTimelinesMAY7.lmap"; DCUUserTimelinesOct29.lmap";
-			pathForLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
-					+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth() + ".lmap";
+				pathToLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
+				// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
+				// Works/WorkingSet7July/DCUUserTimelinesJUN15.lmap";
+				// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
+				// Works/WorkingSet7July/DCUUserTimelinesMAY7.lmap"; DCUUserTimelinesOct29.lmap";
+				pathForLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
+						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+						+ ".lmap";
 
-			commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
-			break;
+				commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
+				break;
 
-		default:
-			System.err.println("Error: unrecognised database name");
-			break;
+			default:
+				System.err.println("Error: unrecognised database name");
+				break;
 		}
 
 	}

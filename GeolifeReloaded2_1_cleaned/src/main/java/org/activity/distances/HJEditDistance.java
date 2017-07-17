@@ -141,9 +141,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @return Pair<Trace as String, Edit Distance> ///we can also do n Pair<Trace as String, Pair <total Edit Distance,
 	 *         act level edit distance> /
 	 */
-	public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
-			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
-			String timeAtRecomm, String candidateTimelineId)
+	public final Pair<String, Double> getHJEditDistanceWithTraceUntil13July2017(
+			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		if (VerbosityConstants.verboseDistance)
 		{
@@ -160,12 +160,12 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// example Vineyards is under Community as well as Food
 		ArrayList<String> stringCodesForActivityObjects1, stringCodesForActivityObjects2;
 
-		if (Constant.HierarchicalLevelForEditDistance > 0)
+		if (Constant.HierarchicalCatIDLevelForEditDistance > 0)
 		{
 			stringCodesForActivityObjects1 = StringCode.getStringCodeForActivityObjectsV2(activityObjects1,
-					Constant.HierarchicalLevelForEditDistance, false);
+					Constant.HierarchicalCatIDLevelForEditDistance, false);
 			stringCodesForActivityObjects2 = StringCode.getStringCodeForActivityObjectsV2(activityObjects2,
-					Constant.HierarchicalLevelForEditDistance, false);
+					Constant.HierarchicalCatIDLevelForEditDistance, false);
 		}
 		else
 		{
@@ -306,12 +306,12 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// example Vineyards is under Community as well as Food
 		ArrayList<String> stringCodesForActivityObjects1, stringCodesForActivityObjects2;
 
-		if (Constant.HierarchicalLevelForEditDistance > 0)
+		if (Constant.HierarchicalCatIDLevelForEditDistance > 0)
 		{
 			stringCodesForActivityObjects1 = StringCode.getStringCodeForActivityObjectsV2(activityObjects1,
-					Constant.HierarchicalLevelForEditDistance, false);
+					Constant.HierarchicalCatIDLevelForEditDistance, false);
 			stringCodesForActivityObjects2 = StringCode.getStringCodeForActivityObjectsV2(activityObjects2,
-					Constant.HierarchicalLevelForEditDistance, false);
+					Constant.HierarchicalCatIDLevelForEditDistance, false);
 		}
 		else
 		{
@@ -435,11 +435,13 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param primaryDimension
 	 * @return Pair<Trace as String, Edit Distance> ///we can also do n Pair<Trace as String, Pair <total Edit Distance,
 	 *         act level edit distance> /
+	 * @since 14 July 2017
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
 			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
-			String timeAtRecomm, String candidateTimelineId, PrimaryDimension primaryDimension)
+			String timeAtRecomm, String candidateTimelineId)// , PrimaryDimension primaryDimension)
 	{
+		PrimaryDimension primaryDimension = Constant.primaryDimension;
 		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("calc HJeditDist between " + activityObjects1Original.size() + " & "
@@ -458,26 +460,31 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// example Vineyards is under Community as well as Food
 		ArrayList<String> stringCodesForActivityObjects1, stringCodesForActivityObjects2;
 
-		if (Constant.HierarchicalLevelForEditDistance > 0)
-		{
-			stringCodesForActivityObjects1 = StringCode.getStringCodeForActivityObjectsV2(activityObjects1,
-					Constant.HierarchicalLevelForEditDistance, false);
-			stringCodesForActivityObjects2 = StringCode.getStringCodeForActivityObjectsV2(activityObjects2,
-					Constant.HierarchicalLevelForEditDistance, false);
-		}
-		else
-		{
-			stringCodesForActivityObjects1 = (ArrayList<String>) Collections
-					.singletonList(StringCode.getStringCodeForActivityObjects(activityObjects1));
-			stringCodesForActivityObjects2 = (ArrayList<String>) Collections
-					.singletonList(StringCode.getStringCodeForActivityObjects(activityObjects2));
-		}
+		// //start of curtain 17 July 2017
+		// if (Constant.HierarchicalCatIDLevelForEditDistance > 0)
+		// {// TODO: need to implement this for multi dimensional case, e.g., recommending location
+		// // PopUps.printTracedErrorMsgWithExit("Constant.HierarchicalLevelForEditDistance > 0) not implemented yet");
+		// stringCodesForActivityObjects1 = StringCode.getStringCodeForActivityObjectsV2(activityObjects1,
+		// Constant.HierarchicalCatIDLevelForEditDistance, false);
+		// stringCodesForActivityObjects2 = StringCode.getStringCodeForActivityObjectsV2(activityObjects2,
+		// Constant.HierarchicalCatIDLevelForEditDistance, false);
+		// }
+		// else
+		// {
+		// //end of curtain 17 July 2017
+		stringCodesForActivityObjects1 = StringCode.getStringCodesForActivityObjects(activityObjects1, primaryDimension,
+				uniqueCharCodes, VerbosityConstants.verbose);
+		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects(activityObjects2, primaryDimension,
+				uniqueCharCodes, VerbosityConstants.verbose);
+		// }
 
 		Pair<String, Double> levenshteinDistance = null;
 		long t1 = System.nanoTime();
 
-		levenshteinDistance = getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1,
-				stringCodesForActivityObjects2, 1, 1, 2);// getMySimpleLevenshteinDistance
+		levenshteinDistance =
+
+				getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1, stringCodesForActivityObjects2, 1,
+						1, 2);// getMySimpleLevenshteinDistance
 
 		// { levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
 		// stringCodeForActivityObjects2, Integer.toString(1), Integer.toString(1), Integer.toString(2));

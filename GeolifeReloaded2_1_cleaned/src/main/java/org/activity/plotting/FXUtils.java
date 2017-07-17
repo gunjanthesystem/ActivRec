@@ -1,6 +1,7 @@
 package org.activity.plotting;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.activity.objects.Pair;
@@ -71,19 +72,25 @@ public class FXUtils
 
 	/**
 	 * 
-	 * @return
+	 * @param numOfDataSeries
+	 * @param numOfDataPointsInEachSeries
+	 * @return {("A",(1,2)),("B",(2,3))}
 	 */
-	public static ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>> getSyntheticData()
+	public static ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>> getSyntheticData(int numOfDataSeries,
+			int numOfDataPointsInEachSeries)
 	{
+		// {("A",(1,2)),("B",(2,3))}
 		ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>> data = new ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>>();
-
-		for (double series = 1; series <= 3; series++)
+		Random r = new Random();
+		for (double series = 1; series <= numOfDataSeries; series++)
 		{
 			ArrayList<Pair<Double, Double>> dataForASeries = new ArrayList<>();
 
-			for (double x = 1; x <= 10; x++)
+			for (double x = 1; x <= numOfDataPointsInEachSeries; x++)
 			{
-				dataForASeries.add(new Pair<Double, Double>(x + series, x + 2));
+				int yIncrease = r.nextInt(100);
+				// System.out.println("yIncrease = " + yIncrease);
+				dataForASeries.add(new Pair<Double, Double>(x + 10 + series, x + yIncrease));
 			}
 			data.add(new Pair<String, ArrayList<Pair<Double, Double>>>(String.valueOf(series), dataForASeries));
 		}

@@ -272,6 +272,24 @@ public class Timeline implements Serializable
 		return res.toString();
 	}
 
+	/**
+	 * PDVals: primary dimension values
+	 * 
+	 * @return
+	 */
+	public String getActivityObjectPDValsWithTimestampsInSequence()
+	{
+		StringBuilder res = new StringBuilder();
+
+		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
+		{
+			res.append(">>" + activityObjectsInTimeline.get(i).getPrimaryDimensionVal() + "--"
+					+ activityObjectsInTimeline.get(i).getStartTimestamp() + "--"
+					+ activityObjectsInTimeline.get(i).getEndTimestamp());
+		}
+		return res.toString();
+	}
+
 	public String getActivityObjectNamesWithoutTimestampsInSequence()
 	{
 		StringBuilder res = new StringBuilder("");
@@ -417,11 +435,17 @@ public class Timeline implements Serializable
 	public int countContainsPrimaryDimensionValButNotAsLast(ArrayList<Integer> givenPrimaryDimensionVal)
 	{
 		int containsCount = 0;
+		// System.out.println("givenPrimaryDimensionVal = " + givenPrimaryDimensionVal);
+
 		for (int i = 0; i < this.activityObjectsInTimeline.size() - 1; i++)
 		{
+			// System.out.println("activityObjectsInTimeline.get(i).getPrimaryDimensionVal() = "
+			// + this.activityObjectsInTimeline.get(i).getPrimaryDimensionVal());
+
 			if (this.activityObjectsInTimeline.get(i).equalsWrtPrimaryDimension(givenPrimaryDimensionVal))
 			{
 				containsCount++;
+				// System.out.println("TRUE: containsCount = " + containsCount);
 			}
 		}
 		return containsCount;

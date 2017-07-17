@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -2151,10 +2152,12 @@ public class TimelineUtils
 				int a = dayTimeline.countContainsActivityNameButNotAsLast(activityAtRecommPoint.getActivityName());
 				int b = dayTimeline
 						.countContainsPrimaryDimensionValButNotAsLast(activityAtRecommPoint.getPrimaryDimensionVal());
-				Sanity.eq(a, b,
-						"dayTimeline.countContainsActivityNameButNotAsLast(actAtRecommPoint.getActivityName()) = " + a
-								+ " != dayTimeline.countContainsPrimaryDimensionValButNotAsLast(actAtRecommPoint.getPrimaryDimensionVal())"
-								+ b);
+				Sanity.eq(a, b, "\nactivityAtRecommPoint=" + activityAtRecommPoint.toStringAllGowallaTS()
+						+ "\ndayTimeline=" + dayTimeline.getActivityObjectNamesInSequence()
+						+ "\ndayTimeline.countContainsActivityNameButNotAsLast(actAtRecommPoint.getActivityName()) = "
+						+ a
+						+ " != dayTimeline.countContainsPrimaryDimensionValButNotAsLast(actAtRecommPoint.getPrimaryDimensionVal())"
+						+ b);
 			}
 			// end sanity check
 
@@ -3508,6 +3511,110 @@ public class TimelineUtils
 		traverseDimensionIDNameValues(dimensionIDNameValues);
 		System.out.println("----Dimension attributes are: ");
 		dimensions.stream().forEach(d -> d.traverseDimensionAttributeNameValuepairs());
+	}
+
+	/**
+	 * Extract unique location IDs from the given timelines
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 */
+	public static TreeSet<Integer> getUniqueLocIDs(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
+	{
+		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			{
+				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				{
+					e2.getValue().getActivityObjectsInTimeline().stream()
+							.forEach(ao -> uniqueLocIDs.addAll(ao.getLocationIDs()));
+				}
+			}
+			System.out.println("Inside getUniqueLocIDs: uniqueLocIDs.size()=" + uniqueLocIDs.size());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return uniqueLocIDs;
+	}
+
+	/**
+	 * Extract unique location IDs from the given timelines
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 */
+	public static void countNumOfMultipleLocationIDs(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
+	{
+
+		int numOfSingleLocID = 0, numOfMultipleLocIDs = 0, numOfAOs = 0;
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			{
+				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				{
+					for (ActivityObject ao : e2.getValue().getActivityObjectsInTimeline())
+					{
+						numOfAOs += 1;
+						if (ao.getLocationIDs().size() > 1)
+						{
+							numOfMultipleLocIDs += 1;
+						}
+						else if (ao.getLocationIDs().size() == 1)
+						{
+							numOfSingleLocID += 1;
+						}
+						else
+						{
+							PopUps.printTracedErrorMsg("(ao.getLocationIDs().size() = " + ao.getLocationIDs().size());
+						}
+					}
+
+				}
+			}
+			System.out.println("Inside countNumOfMultipleLocationIDs: \nnumOfAOs=" + numOfAOs + "\nnumOfSingleLocID="
+					+ numOfSingleLocID + "\nnumOfMultipleLocIDs" + numOfMultipleLocIDs);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		// return uniqueLocIDs;
+	}
+
+	/**
+	 * Extract unique activity IDs from the given timelines
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 */
+	public static TreeSet<Integer> getUniqueActivityIDs(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
+	{
+		TreeSet<Integer> uniqueActIDs = new TreeSet<>();
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			{
+				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				{
+					e2.getValue().getActivityObjectsInTimeline().stream()
+							.forEach(ao -> uniqueActIDs.add(ao.getActivityID()));
+				}
+			}
+			System.out.println("Inside getUniqueActivityIDs: uniqueActIDs.size()=" + uniqueActIDs.size());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return uniqueActIDs;
 	}
 
 }
