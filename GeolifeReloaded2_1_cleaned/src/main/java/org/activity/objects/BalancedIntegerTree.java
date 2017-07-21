@@ -6,6 +6,7 @@ import java.util.Enumeration;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.activity.ui.PopUps;
+import org.activity.util.PerformanceAnalytics;
 
 /**
  * 
@@ -21,6 +22,9 @@ public class BalancedIntegerTree
 		return root;
 	}
 
+	/**
+	 * Creates a BalancedIntegerTree with -1 as root. Note: root is not included in the words.
+	 */
 	public BalancedIntegerTree()
 	{
 		root = new DefaultMutableTreeNode();
@@ -101,7 +105,8 @@ public class BalancedIntegerTree
 	private ArrayList<DefaultMutableTreeNode> getAllLeaves()
 	{
 		ArrayList<DefaultMutableTreeNode> leaves = new ArrayList<DefaultMutableTreeNode>(root.getLeafCount());
-		Enumeration enumeration = root.depthFirstEnumeration();
+		Enumeration<?> enumeration = root.depthFirstEnumeration();
+
 		while (enumeration.hasMoreElements())
 		{
 			DefaultMutableTreeNode t = (DefaultMutableTreeNode) enumeration.nextElement();
@@ -149,23 +154,43 @@ public class BalancedIntegerTree
 		ArrayList<DefaultMutableTreeNode> allLeaves = this.getAllLeaves();
 		ArrayList<ArrayList<Integer>> allStrings = new ArrayList<ArrayList<Integer>>();
 		int strlen = root.getDepth();
-
-		for (DefaultMutableTreeNode leaf : allLeaves)
+		int numOfLeavesTraversed = 0;
+		try
 		{
-			ArrayList<Integer> word = new ArrayList<>(strlen);
-
-			Enumeration<DefaultMutableTreeNode> e = leaf.pathFromAncestorEnumeration(root);
-			DefaultMutableTreeNode skipRoot = e.nextElement(); // skip the -1 root
-
-			while (e.hasMoreElements())
+			for (DefaultMutableTreeNode leaf : allLeaves)
 			{
-				DefaultMutableTreeNode temp = e.nextElement();
-				// System.out.print("\nDebug: temp.getUserObject().toString()" + temp.getUserObject().toString());
-				word.add((Integer) temp.getUserObject());// e.nextElement().toString()));// TODO can we improve this?
+				numOfLeavesTraversed += 1;
+				ArrayList<Integer> word = new ArrayList<>(strlen);
+
+				Enumeration<DefaultMutableTreeNode> e = leaf.pathFromAncestorEnumeration(root);
+				DefaultMutableTreeNode skipRoot = e.nextElement(); // skip the -1 root
+
+				while (e.hasMoreElements())
+				{
+					DefaultMutableTreeNode temp = e.nextElement();
+					// System.out.print("\nDebug: temp.getUserObject().toString()" + temp.getUserObject().toString());
+					word.add((Integer) temp.getUserObject());// e.nextElement().toString()));// TODO can we improve
+				}
+				allStrings.add(word);
 			}
-			allStrings.add(word);
 		}
 
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.out.println("numOfLeavesTraversed = " + numOfLeavesTraversed);
+			System.out.println("Heap Info:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
+					+ PerformanceAnalytics.getHeapPercentageFree());
+
+		}
+		catch (OutOfMemoryError e)
+		{
+			e.printStackTrace();
+			System.out.println("numOfLeavesTraversed = " + numOfLeavesTraversed);
+			System.out.println("Heap Info:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
+					+ PerformanceAnalytics.getHeapPercentageFree());
+
+		}
 		return allStrings;
 	}
 

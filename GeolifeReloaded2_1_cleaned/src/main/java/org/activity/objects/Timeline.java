@@ -128,7 +128,7 @@ public class Timeline implements Serializable
 	{
 		// System.out.println("To find next activity object at :"+timestamp);
 		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectAtTime(timestamp);
-		return getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp);
+		return getNextValidActivityAfterActivityAtThisPositionPD(indexOfActivityObjectAtGivenTimestamp);
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class Timeline implements Serializable
 			System.out.println(
 					"\t Inside getNextValidActivityAfterActivityAtThisPosition(): Index of activity object to look after is "
 							+ indexOfActivityObject);
-			System.err.println("\t The timeline is:" + this.getActivityObjectNamesInSequence());
+			System.out.println("\t The timeline is:" + this.getActivityObjectNamesInSequence());
 			if (nextValidActivityObject.getActivityName()
 					.equals(activityObjectsInTimeline.get(indexOfActivityObject).getActivityName()))
 			{
@@ -192,6 +192,72 @@ public class Timeline implements Serializable
 				System.err.println("\t Next valid activity object found at index:" + indexOfNextValidActivityObject);
 			}
 			System.out.println("\t Next valid activity is " + nextValidActivityObject.getActivityName());
+		}
+
+		return nextValidActivityObject;
+	}
+
+	/**
+	 * Returns the next valid Activity Object in the Timeline after the given index.
+	 * <p>
+	 * 
+	 * 
+	 * @param indexOfActivityObject
+	 * @return
+	 */
+	public ActivityObject getNextValidActivityAfterActivityAtThisPositionPD(int indexOfActivityObject)
+	{
+		ActivityObject nextValidActivityObject = null;
+		int indexOfNextValidActivityObject = -99;
+
+		if (indexOfActivityObject == this.activityObjectsInTimeline.size() - 1)// there are no next activities
+		{
+			System.out.println("\t No next activity in this timeline");
+			return null;
+		}
+
+		for (int i = indexOfActivityObject + 1; i < activityObjectsInTimeline.size(); i++)
+		{
+			if (UtilityBelt.isValidActivityObject(activityObjectsInTimeline.get(i)))
+			{
+				nextValidActivityObject = activityObjectsInTimeline.get(i);
+				indexOfNextValidActivityObject = i;
+				break;
+			}
+			else
+			{
+				System.out.println("\t\t (note: immediate next was an invalid activity)");
+				continue;
+			}
+		}
+
+		if (nextValidActivityObject == null)
+		{
+			System.err.println("Warning: No next valid activity after this index in the given timeline");
+			System.err.println("\tThe timeline is:" + this.getActivityObjectNamesInSequence());
+			System.err.println("\tEnd index index is:" + indexOfActivityObject);
+			return nextValidActivityObject;
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			// System.out.println("To find next activity object after index :" + indexOfActivityObject);
+			System.out.println(
+					"\t Inside getNextValidActivityAfterActivityAtThisPosition(): Index of activity object to look after is "
+							+ indexOfActivityObject);
+			System.out.println("\t The timeline is:" + this.getPrimaryDimensionValsInSequence());
+
+			if (nextValidActivityObject.equalsWrtPrimaryDimension(activityObjectsInTimeline.get(indexOfActivityObject)))
+			// nextValidActivityObject.getActivityName().equals(activityObjectsInTimeline.get(indexOfActivityObject).getActivityName()))
+			{
+				System.err.println("\n\t Warning: Next Valid activity has pd vals as current activity (for timelineID:"
+						+ timelineID + ") PD Vals="
+						+ activityObjectsInTimeline.get(indexOfActivityObject).getPrimaryDimensionVal("/"));
+				// System.err.println("\t The timeline is:"+this.getActivityObjectNamesInSequence());
+				// System.err.println("\t End point index was:" + indexOfActivityObject);
+				System.err.println("\t Next valid activity object found at index:" + indexOfNextValidActivityObject);
+			}
+			System.out.println("\t Next valid activity is " + nextValidActivityObject.getPrimaryDimensionVal("/"));
 		}
 
 		return nextValidActivityObject;
@@ -219,10 +285,14 @@ public class Timeline implements Serializable
 		return sb.toString();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getPrimaryDimensionValsInSequence()
 	{
 		StringBuilder sb = new StringBuilder();
-		activityObjectsInTimeline.stream().forEachOrdered(ao -> sb.append(" >>" + ao.getPrimaryDimensionVal()));
+		activityObjectsInTimeline.stream().forEachOrdered(ao -> sb.append(" >>" + ao.getPrimaryDimensionVal("/")));
 		return sb.toString();
 	}
 

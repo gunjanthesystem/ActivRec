@@ -2216,8 +2216,9 @@ public class TimelineUtils
 		if (VerbosityConstants.verbose || VerbosityConstants.tempVerbose)
 		{
 			System.out.println("Inside extractDaywiseCandidateTimelines:dayTimelinesForUser.size()="
-					+ dayTimelinesForUser + " #cand timelines = " + count + " numCandsRejectedDueToNoNextActivity ="
-					+ numCandsRejectedDueToNoNextActivity + "  numCandsRejectedDueToNoCurrentActivityAtNonLast ="
+					+ dayTimelinesForUser.size() + " #cand timelines = " + count
+					+ " numCandsRejectedDueToNoNextActivity =" + numCandsRejectedDueToNoNextActivity
+					+ "  numCandsRejectedDueToNoCurrentActivityAtNonLast ="
 					+ numCandsRejectedDueToNoCurrentActivityAtNonLast);
 		}
 		if (count == 0)
@@ -2470,7 +2471,8 @@ public class TimelineUtils
 			System.out.println("-------\n\tinside hasAtleastNValidAOsAfterItInTheDay\n\tactivityIndexAfterWhichToCheck="
 					+ givenActivityObjectIndex + " N = " + N + " hasAtleastNValidAOsAfterItInTheDay = "
 					+ hasAtleastNValidAOsAfterItInTheDay);
-			givenTimelineToCheckIn.printActivityObjectNamesInSequence();
+			// givenTimelineToCheckIn.printActivityObjectNamesInSequence();
+			System.out.println(givenTimelineToCheckIn.getPrimaryDimensionValsInSequence());
 			System.out.println("\tNumber of activities in timeline=" + aosInGivenTimelineToCheckIn.size());
 		}
 
@@ -2499,7 +2501,7 @@ public class TimelineUtils
 		for (int i = 0; i < N; i++)
 		{
 			ActivityObject ao = t
-					.getNextValidActivityAfterActivityAtThisPosition(indexOfActivityObjectAtGivenTimestamp + i);
+					.getNextValidActivityAfterActivityAtThisPositionPD(indexOfActivityObjectAtGivenTimestamp + i);
 
 			// System.out.println("Debug:\nTimestamp of ao = " + ao.getEndTimestamp());FOUND OKAY in RUN
 			LocalDate dateOfAO = ao.getEndTimestamp().toLocalDateTime().toLocalDate();
@@ -2684,7 +2686,7 @@ public class TimelineUtils
 				.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
 
 		ActivityObject nextValidActivityObject = longerTimeline
-				.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
+				.getNextValidActivityAfterActivityAtThisPositionPD(indexOfCurrentEnd);
 		ActivityObject nextActivityObject = longerTimeline
 				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 
@@ -2802,7 +2804,7 @@ public class TimelineUtils
 				.getActivityObjectsInTimelineFromToIndex(0, indexOfCurrentEnd + 1);
 
 		ActivityObject nextValidActivityObject = currentDayTimeline
-				.getNextValidActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
+				.getNextValidActivityAfterActivityAtThisPositionPD(indexOfCurrentEnd);
 		ActivityObject nextActivityObject = currentDayTimeline
 				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 
@@ -3097,29 +3099,29 @@ public class TimelineUtils
 		// getting distance scores for each subcandidate
 		switch (distanceUsed)
 		{
-		case "HJEditDistance":
-		{
-			// HJEditDistance editSimilarity = new HJEditDistance();
-			for (Integer indexOfEndPointWithValidAfterIt : indicesOfEndPointActivityInDayButNotLastValid)
+			case "HJEditDistance":
 			{
-				// long t1 = System.currentTimeMillis();
-				Pair<String, Double> distance = hjEditDistance.getHJEditDistanceWithTrace(
-						candidateDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
-								indexOfEndPointWithValidAfterIt + 1),
-						activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateID);
-				// System.out.println(
-				// "getHJEditDistanceWithTrace computed in: " + (System.currentTimeMillis() - t1) + " ms");
-				distanceScoresForEachSubsequence.put(indexOfEndPointWithValidAfterIt, distance);
-				// System.out.println("Distance between:\n
-				// activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
-				// "\n and subsequence of
-				// Cand:"+UtilityBelt.getActivityNamesFromArrayList(userDayTimeline.getActivityObjectsInDayFromToIndex(0,indicesOfEndPointActivityInDay1.get(i)+1)));
+				// HJEditDistance editSimilarity = new HJEditDistance();
+				for (Integer indexOfEndPointWithValidAfterIt : indicesOfEndPointActivityInDayButNotLastValid)
+				{
+					// long t1 = System.currentTimeMillis();
+					Pair<String, Double> distance = hjEditDistance.getHJEditDistanceWithTrace(
+							candidateDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
+									indexOfEndPointWithValidAfterIt + 1),
+							activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateID);
+					// System.out.println(
+					// "getHJEditDistanceWithTrace computed in: " + (System.currentTimeMillis() - t1) + " ms");
+					distanceScoresForEachSubsequence.put(indexOfEndPointWithValidAfterIt, distance);
+					// System.out.println("Distance between:\n
+					// activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
+					// "\n and subsequence of
+					// Cand:"+UtilityBelt.getActivityNamesFromArrayList(userDayTimeline.getActivityObjectsInDayFromToIndex(0,indicesOfEndPointActivityInDay1.get(i)+1)));
+				}
+				break;
 			}
-			break;
-		}
-		default:
-			System.err.println(PopUps.getTracedErrorMsg("Error unknown distance:" + distanceUsed));
-			System.exit(-1);
+			default:
+				System.err.println(PopUps.getTracedErrorMsg("Error unknown distance:" + distanceUsed));
+				System.exit(-1);
 		}
 
 		// sort by each subcand by edit distance
@@ -3615,6 +3617,47 @@ public class TimelineUtils
 			e.printStackTrace();
 		}
 		return uniqueActIDs;
+	}
+
+	/**
+	 * Extract unique activity IDs from the given timelines
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 */
+	public static LinkedHashMap<String, TreeSet<Integer>> getUniquePDValPerUser(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("User,#UniquePDVals\n");
+		LinkedHashMap<String, TreeSet<Integer>> uniquePDValsPerUser = new LinkedHashMap<>();
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			{
+				String user = e.getKey();
+				TreeSet<Integer> uniquePDValsForThisUser = new TreeSet<>();
+				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				{
+					e2.getValue().getActivityObjectsInTimeline().stream()
+							.forEach(ao -> uniquePDValsForThisUser.addAll(ao.getPrimaryDimensionVal()));
+				}
+				uniquePDValsPerUser.put(user, uniquePDValsForThisUser);
+				sb.append(user + "," + uniquePDValsForThisUser.size() + "\n");
+			}
+			// System.out.println("Inside getUniqueActivityIDs: uniqueActIDs.size()=" + uniqueActIDs.size());
+
+			if (writeToFile)
+			{
+				WritingToFile.writeToNewFile(sb.toString(),
+						Constant.outputCoreResultsPath + "NumOfUniquePDValPerUser.csv");
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return uniquePDValsPerUser;
 	}
 
 }

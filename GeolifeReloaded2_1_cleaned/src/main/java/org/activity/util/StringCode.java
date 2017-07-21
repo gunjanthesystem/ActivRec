@@ -67,13 +67,16 @@ public class StringCode
 
 		if (VerbosityConstants.tempVerbose)
 		{
-			StringBuilder sb = new StringBuilder("\nInside org.activity.util.StringCode.getLocalCharCodeMap():\n");
-			sb.append("aos1 = \n");
-			activityObjects1.stream().forEach(ao -> sb.append(ao.toStringAllGowallaTS()));
-			sb.append("aos2 = \n");
-			activityObjects2.stream().forEach(ao -> sb.append(ao.toStringAllGowallaTS()));
-			sb.append("uniquePrimaryDimensionVals = \n" + uniquePrimaryDimensionVals.toString());
-			charCodeMap.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey() + "--" + e.getValue() + "\n"));
+			StringBuilder sb = new StringBuilder(
+					"\nInside org.activity.util.StringCode.getLocallyUniqueCharCodeMap():\n");
+			sb.append("\naos1 = \n");
+			activityObjects1.stream().forEach(ao -> sb.append(">>" + ao.getPrimaryDimensionVal("/")));// toStringAllGowallaTS()));
+			sb.append("\naos2 = \n");
+			activityObjects2.stream().forEach(ao -> sb.append(">>" + ao.getPrimaryDimensionVal("/")));// (ao.toStringAllGowallaTS()));
+			sb.append("\nuniquePrimaryDimensionVals = \n" + uniquePrimaryDimensionVals.toString() + "\n");
+			sb.append("Char code map:\n");
+			charCodeMap.entrySet().stream()
+					.forEachOrdered(e -> sb.append(">>" + e.getKey() + "--" + e.getValue() + "\n"));
 			System.out.println(sb.toString());
 		}
 
@@ -92,28 +95,28 @@ public class StringCode
 	{
 		switch (featureName)
 		{
-		case "StartTime":
-			return getStringCodesForStartTime(activityObjects1, activityObjects2);
+			case "StartTime":
+				return getStringCodesForStartTime(activityObjects1, activityObjects2);
 
-		case "Duration":
-			return getStringCodesForDuration(activityObjects1, activityObjects2);
+			case "Duration":
+				return getStringCodesForDuration(activityObjects1, activityObjects2);
 
-		case "DistanceTravelled":
-			return getStringCodesForDistanceTravelled(activityObjects1, activityObjects2);
+			case "DistanceTravelled":
+				return getStringCodesForDistanceTravelled(activityObjects1, activityObjects2);
 
-		case "StartGeoCoordinates":
-			return getStringCodesForStartGeoCoordinates(activityObjects1, activityObjects2);
+			case "StartGeoCoordinates":
+				return getStringCodesForStartGeoCoordinates(activityObjects1, activityObjects2);
 
-		case "EndGeoCoordinates":
-			return getStringCodesForEndGeoCoordinates(activityObjects1, activityObjects2);
+			case "EndGeoCoordinates":
+				return getStringCodesForEndGeoCoordinates(activityObjects1, activityObjects2);
 
-		case "AvgAltitude":
-			return getStringCodesForAvgAltitudes(activityObjects1, activityObjects2);
+			case "AvgAltitude":
+				return getStringCodesForAvgAltitudes(activityObjects1, activityObjects2);
 
-		default:
-			System.err.println(
-					"Error in org.activity.util.StringCode.getStringCodeForFeature(ArrayList<ActivityObject>, String): unsuitable feature name"
-							+ featureName);
+			default:
+				System.err.println(
+						"Error in org.activity.util.StringCode.getStringCodeForFeature(ArrayList<ActivityObject>, String): unsuitable feature name"
+								+ featureName);
 		}
 		System.err.println(
 				"Error in org.activity.util.StringCode.getStringCodeForFeature(ArrayList<ActivityObject>, String): reached unreachable code.");
@@ -990,8 +993,8 @@ public class StringCode
 
 		ArrayList<String> stringCodeforAOs = new ArrayList<>();
 		// for given seq of aos, extract all possible sequence of val. if all aos had single value for primary dimension
-		// (such as in no merger), then we will get only one ArrayList, other multiple arraylist, one for each possible
-		// sequence.
+		// (such as in no merger), then we will get only one ArrayList, otherwis multiple arraylist, one for each
+		// possible sequence.
 		// such as if primary vals for AOs: 1,2/3,5,6 (here the second element is merger of 2 and 3) then we will get
 		// seq: 1,2,5,6 and 1,3,5,6 .
 		ArrayList<ArrayList<Integer>> possibleSequencesOfPrimaryDimensionVals = multiValSeqTo1ValSeqs(activityObjects,
@@ -1017,12 +1020,13 @@ public class StringCode
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append("\tInside getStringCodeForActivityObjects:\n Act Names:");
-			activityObjects.stream().forEachOrdered(ao -> sb.append(ao.getActivityName() + " "));
-			System.out.print("\nPrimary dimension vals:");
-			activityObjects.stream().forEachOrdered(ao -> sb.append(ao.getPrimaryDimensionVal() + " "));
-			System.out.print("\npossibleSequencesOfPrimaryDimensionVals:");
-			possibleSequencesOfPrimaryDimensionVals.stream().forEachOrdered(p -> sb.append(p.toString() + " "));
-			stringCodeforAOs.stream().forEachOrdered(s -> sb.append(s.toString() + " "));
+			activityObjects.stream().forEachOrdered(ao -> sb.append(">>" + ao.getActivityName()));
+			sb.append("\nPrimary dimension vals:");
+			activityObjects.stream().forEachOrdered(ao -> sb.append(">>" + ao.getPrimaryDimensionVal("/")));
+			sb.append("\npossibleSequencesOfPrimaryDimensionVals:");
+			possibleSequencesOfPrimaryDimensionVals.stream().forEachOrdered(p -> sb.append(p.toString() + "  "));
+			sb.append("\ncorresponding string codes:");
+			stringCodeforAOs.stream().forEachOrdered(s -> sb.append(s.toString() + "  "));
 			System.out.println(sb.toString());
 		}
 		return stringCodeforAOs;
@@ -1045,13 +1049,16 @@ public class StringCode
 			PrimaryDimension primaryDimension, boolean verbose)
 	{
 		ArrayList<ArrayList<Integer>> words = null;
+		// System.out.println("Inside multiValSeqTo1ValSeqs");
 		try
 		{
 			BalancedIntegerTree integerTrie = new BalancedIntegerTree();
 			for (ActivityObject ao : activityObjects)
 			{
 				// each act obj can have multiple values for the primary dimension because of merger.
-				integerTrie.addToAllLeaves(ao.getPrimaryDimensionVal());
+				ArrayList<Integer> pdValsForThisAO = ao.getPrimaryDimensionVal();
+				integerTrie.addToAllLeaves(pdValsForThisAO);
+				// System.out.println("pdValsForThisAO = " + pdValsForThisAO);
 			}
 			words = integerTrie.getAllWords();
 			if (verbose)
@@ -1059,8 +1066,9 @@ public class StringCode
 				StringBuilder sb = new StringBuilder();
 				sb.append("\nInside multiValSeqTo1ValSeq: \n INPUT- act ids as multi valued seq :\n");
 				activityObjects.stream().forEachOrdered(ao -> sb.append("-" + ao.getPrimaryDimensionVal()));
-				System.out.print("\n OUTPUT: Extracted multiple sequences of 1 val:\n ");
+				sb.append("\n OUTPUT: Extracted multiple sequences of 1 val:\n ");
 				words.stream().forEachOrdered(w -> sb.append("--" + w.toString()));
+				System.out.println(sb.toString());
 			}
 		}
 		catch (Exception e)

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
@@ -121,27 +122,27 @@ public class AlignmentBasedDistance
 
 		switch (Constant.getDatabaseName())
 		{
-		case "geolife1":
-			wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled
-					+ wtStartGeo + wtEndGeo + +wtAvgAltitude, 4);
-			break;
-		case "dcu_data_2":
-			wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration, 4);
-			break;
+			case "geolife1":
+				wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled
+						+ wtStartGeo + wtEndGeo + +wtAvgAltitude, 4);
+				break;
+			case "dcu_data_2":
+				wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration, 4);
+				break;
 
-		case "gowalla1":
-			wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtLocation + wtLocPopularity, 4);
-			break;
+			case "gowalla1":
+				wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtLocation + wtLocPopularity, 4);
+				break;
 
-		default:
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised database name:"
-							+ Constant.getDatabaseName()));
-			// PopUps.showError(
-			// "Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised
-			// database name:"
-			// + Constant.getDatabaseName());
-			break;
+			default:
+				System.err.println(PopUps.getTracedErrorMsg(
+						"Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised database name:"
+								+ Constant.getDatabaseName()));
+				// PopUps.showError(
+				// "Error in org.activity.distances.AlignmentBasedDistance.setWtOfFullActivityObject(): unrecognised
+				// database name:"
+				// + Constant.getDatabaseName());
+				break;
 		}
 
 		costInsertActivityObject = defaultCostInsert * wtFullActivityObject; // 1 cost of insert operation 4.5
@@ -392,68 +393,8 @@ public class AlignmentBasedDistance
 		// experiments do not show any visible difference in results { dfeat+=costReplaceStartTime; }
 		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
 		{
-			// $$ curtain on 2 Mar 2017 start
-			if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.BinaryThreshold))
-			{
-				if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(),
-						startTimeToleranceInSeconds) == false) // if not same within 60mins then add wt to dfeat
-				{
-					dfeat += wtStartTime;
-				}
-			}
-			// $$ curtain on 2 Mar 2017 end
-
-			// $$ added on 2nd march 2017 start: nearerScaledTimeDistance
-			else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.NearerScaled))
-			{
-				long absTimeDiffInSeconds =
-						DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(), ao2.getStartTimestamp());
-				if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
-				{
-					double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
-					dfeat += (timeDistance * wtStartTime);
-				}
-				else // absTimeDiffInSeconds > startTimeToleranceInSeconds
-				{
-					dfeat += (1.0 * wtStartTime);
-				}
-			}
-			// $$ added on 2nd march 2017 end
-
-			// $$ added on 3rd march 2017 start: furtherScaledTimeDistance
-			// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
-			else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.FurtherScaled))
-			{
-				long absTimeDiffInSeconds =
-						DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(), ao2.getStartTimestamp());
-				if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
-				{
-					double timeDistance = absTimeDiffInSeconds / 10800;
-					dfeat += (timeDistance * wtStartTime);
-				}
-			}
-			// $$ added on 3rd march 2017 end
-
-			// System.out.println("@@ ao1.getLocationIDs() = " + ao1.getLocationIDs());
-			// System.out.println("@@ ao2.getLocationIDs() = " + ao2.getLocationIDs());
-			// System.out.println("@@ UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size() = "
-			// + UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size());
-
-			if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
-			// ao1.getLocationIDs() != ao2.getLocationIDs()) // if no matching locationIDs then add wt to dfeat
-			{
-				dfeat += wtLocation;
-			}
-
-			double c1 = ao1.getCheckins_count();
-			double c2 = ao2.getCheckins_count();
-			double popularityDistance = (Math.abs(c1 - c2) / Math.max(c1, c2));
-			/// 1 - (Math.abs(c1 - c2) / Math.max(c1, c2));
-
-			// add more weight if they are more different, popDistance should be higher if they are more different
-			dfeat += popularityDistance * this.wtLocPopularity;
+			dfeat = getFeatureLevelDistanceGowallaPD(ao1, ao2);
 		}
-
 		else
 		{
 			if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(),
@@ -488,6 +429,100 @@ public class AlignmentBasedDistance
 				}
 			}
 		}
+		return dfeat;
+	}
+
+	/**
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @return
+	 */
+	public double getFeatureLevelDistanceGowallaPD(ActivityObject ao1, ActivityObject ao2)
+	{
+		double dfeat = 0;
+		// if(ao1.getStartTimestamp().getTime() != (ao2.getStartTimestamp().getTime()) )//is wrong since its comparing
+		// timestamps and not time of days...however, results for our
+		// experiments do not show any visible difference in results { dfeat+=costReplaceStartTime; }
+		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
+		{
+			// $$ curtain on 2 Mar 2017 start
+			if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.BinaryThreshold))
+			{
+				if (DateTimeUtils.isSameTimeInTolerance(ao1.getStartTimestamp(), ao2.getStartTimestamp(),
+						startTimeToleranceInSeconds) == false) // if not same within 60mins then add wt to dfeat
+				{
+					dfeat += wtStartTime;
+				}
+			}
+			// $$ curtain on 2 Mar 2017 end
+
+			// $$ added on 2nd march 2017 start: nearerScaledTimeDistance
+			else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.NearerScaled))
+			{
+				long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
+						ao2.getStartTimestamp());
+				if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
+				{
+					double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
+					dfeat += (timeDistance * wtStartTime);
+				}
+				else // absTimeDiffInSeconds > startTimeToleranceInSeconds
+				{
+					dfeat += (1.0 * wtStartTime);
+				}
+			}
+			// $$ added on 2nd march 2017 end
+
+			// $$ added on 3rd march 2017 start: furtherScaledTimeDistance
+			// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
+			else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.FurtherScaled))
+			{
+				long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSeconds(ao1.getStartTimestamp(),
+						ao2.getStartTimestamp());
+				if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
+				{
+					double timeDistance = absTimeDiffInSeconds / 10800;
+					dfeat += (timeDistance * wtStartTime);
+				}
+			}
+			// $$ added on 3rd march 2017 end
+
+			// System.out.println("@@ ao1.getLocationIDs() = " + ao1.getLocationIDs());
+			// System.out.println("@@ ao2.getLocationIDs() = " + ao2.getLocationIDs());
+			// System.out.println("@@ UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size() = "
+			// + UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size());
+
+			if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+			{
+				if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
+				// ao1.getLocationIDs() != ao2.getLocationIDs()) // if no matching locationIDs then add wt to dfeat
+				{
+					dfeat += wtLocation;
+				}
+			}
+			else if (Constant.primaryDimension.equals(PrimaryDimension.LocationID))
+			{
+				if (ao1.getActivityID() == ao2.getActivityID())
+				{
+					dfeat += wtActivityName;
+				}
+			}
+
+			double c1 = ao1.getCheckins_count();
+			double c2 = ao2.getCheckins_count();
+			double popularityDistance = (Math.abs(c1 - c2) / Math.max(c1, c2));
+			/// 1 - (Math.abs(c1 - c2) / Math.max(c1, c2));
+
+			// add more weight if they are more different, popDistance should be higher if they are more different
+			dfeat += popularityDistance * this.wtLocPopularity;
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: getFeatureLevelDistanceGowallaPD() called for database: " + Constant.getDatabaseName());
+		}
+
 		return dfeat;
 	}
 
@@ -1880,9 +1915,9 @@ public class AlignmentBasedDistance
 					// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j].toString()).append("_N(")
 					// .append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1)).append(")");
 
-					traceMatrix[i + 1][j + 1] =
-							StringUtils.fCat(traceMatrix[i + 1][j + 1], traceMatrix[i][j].toString(), "_N(",
-									Integer.toString(i + 1), "-", Integer.toString(j + 1), ")");
+					traceMatrix[i + 1][j + 1] = StringUtils.fCat(traceMatrix[i + 1][j + 1],
+							traceMatrix[i][j].toString(), "_N(", Integer.toString(i + 1), "-", Integer.toString(j + 1),
+							")");
 
 					// System.out.println("Equal" + " Trace " + traceMatrix[i + 1][j + 1]);// "_N(" + (i + 1) + "-" + (j
 					// + 1) + ")");
@@ -1907,9 +1942,9 @@ public class AlignmentBasedDistance
 						// .append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
 						// .append(")");
 
-						traceMatrix[i + 1][j + 1] =
-								StringUtils.fCat(traceMatrix[i + 1][j + 1], traceMatrix[i][j + 1].toString(), "_D(",
-										Integer.toString(i + 1), "-", Integer.toString(j + 1), ")");
+						traceMatrix[i + 1][j + 1] = StringUtils.fCat(traceMatrix[i + 1][j + 1],
+								traceMatrix[i][j + 1].toString(), "_D(", Integer.toString(i + 1), "-",
+								Integer.toString(j + 1), ")");
 
 						min = delete;
 						// System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);// "
@@ -1921,9 +1956,9 @@ public class AlignmentBasedDistance
 						// traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j] + "_I(" + (i + 1) + "-" + (j + 1) +
 						// ")");
 
-						traceMatrix[i + 1][j + 1] =
-								StringUtils.fCat(traceMatrix[i + 1][j + 1], traceMatrix[i + 1][j].toString(), "_I(",
-										Integer.toString(i + 1), "-", Integer.toString(j + 1), ")");
+						traceMatrix[i + 1][j + 1] = StringUtils.fCat(traceMatrix[i + 1][j + 1],
+								traceMatrix[i + 1][j].toString(), "_I(", Integer.toString(i + 1), "-",
+								Integer.toString(j + 1), ")");
 						// traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j].toString()).append("_I(")
 						// .append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
 						// .append(")");
@@ -1936,9 +1971,9 @@ public class AlignmentBasedDistance
 					{
 						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_S(" + (i + 1) + "-" + (j + 1) + ")");
 
-						traceMatrix[i + 1][j + 1] =
-								StringUtils.fCat(traceMatrix[i + 1][j + 1], traceMatrix[i][j].toString(), "_S(",
-										Integer.toString(i + 1), "-", Integer.toString(j + 1), ")");
+						traceMatrix[i + 1][j + 1] = StringUtils.fCat(traceMatrix[i + 1][j + 1],
+								traceMatrix[i][j].toString(), "_S(", Integer.toString(i + 1), "-",
+								Integer.toString(j + 1), ")");
 
 						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j].toString()).append("_S(")
 						// .append(Integer.toString(i + 1)).append("-").append(Integer.toString(j + 1))
@@ -2134,15 +2169,14 @@ public class AlignmentBasedDistance
 						// Double hierWt = catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));
 						// TODO: check if it is actually using the hierwt, we change to StringBuilder after prv verified
 						// version
-						Double hierWt =
-								catIDsHierarchicalDistance.get(new StringBuilder(2).append(c1).append(c2).toString());
+						Double hierWt = catIDsHierarchicalDistance
+								.get(new StringBuilder(2).append(c1).append(c2).toString());
 
 						if (hierWt == null)
 						{
-							System.err.println(PopUps.getTracedErrorMsg(
-									"Error in levenshtein distance: no hier dist found for: " + String.valueOf(c1)
-											+ String.valueOf(c2))
-									+ " hierWt= " + hierWt);
+							System.err.println(
+									PopUps.getTracedErrorMsg("Error in levenshtein distance: no hier dist found for: "
+											+ String.valueOf(c1) + String.valueOf(c2)) + " hierWt= " + hierWt);
 						}
 						replace = dist[i][j]
 								+ replaceWt * catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));

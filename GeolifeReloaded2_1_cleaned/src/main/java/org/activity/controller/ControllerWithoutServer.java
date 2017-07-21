@@ -205,6 +205,7 @@ public class ControllerWithoutServer
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
 			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines));
 			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines));
+			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true);
 			///////////////////
 			/*
 			 * TreeSet<Integer> uniqueLocIDs = getUniqueLocIDs(usersCleanedDayTimelines);

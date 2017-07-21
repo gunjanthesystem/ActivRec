@@ -37,6 +37,7 @@ import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.PerformanceAnalytics;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
@@ -401,7 +402,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							// take out the train-test splitting of timelines out of the loop, which can be done as
 							// well
 
-							Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUserPD(
+							Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUserPDV2(
 									userId, TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
 									TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true),
 									Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs());
@@ -417,7 +418,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 										Constant.getActivityNames(),
 										TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
 
-								Sanity.compare(repAOResult, repAOResultActName);
+								Sanity.compareOnlyNonEmpty(repAOResult, repAOResultActName);
 							}
 							// end of Sanity Check for buildRepresentativeAOsForUserPD()
 
@@ -2058,6 +2059,207 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	}
 
 	/**
+	 * Fork of buildRepresentativeAOsForUserPDV() intiated to reduce memory consumption
+	 * <p>
+	 * for each user, for each activity (category id), create a representative avg activity object.
+	 * <p>
+	 * For example,
+	 * 
+	 * for user 1, for activity ‘Asian Food’, create an Activity Object with activity name as ‘Asian Food’ and other
+	 * features are the average values of the features all the ‘Asian Food’ activity objects occurring the training set
+	 * of user 1.
+	 * 
+	 * @param userId
+	 * @param userTrainingTimelines
+	 * @param userTestTimelines
+	 *            only to find which act names occur in test but not in training
+	 * @param uniqueLocIDs
+	 * @param uniqueActivityIDs
+	 * @return
+	 */
+	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPDV2(
+			int userId, Timeline userTrainingTimelines, Timeline userTestTimelines, Set<Integer> uniqueLocIDs,
+			Set<Integer> uniqueActivityIDs)
+	{
+		// mapOfRepAOs;
+		boolean sanityCheck = false;
+		System.out.println("Inside buildRepresentativeAOsForUserPDV2 for user " + userId);
+		LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
+		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
+
+		long t1 = System.currentTimeMillis();
+		try
+		{
+			if (Constant.getDatabaseName().equals("gowalla1") == false)
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + Constant.getDatabaseName());
+			}
+			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
+			// { System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
+			// System.exit(-1); }
+
+			else
+			{
+				LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal = new LinkedHashMap<>();
+				/**
+				 * Useful for deciding upon the start timestamp from representative AO
+				 */
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
+
+				// earlier version was using all possible vals fro PD but now using only those in training data.
+				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
+
+				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
+				{
+					distinctPDValsEncounteredInTraining.addAll(ao.getPrimaryDimensionVal());
+				}
+				System.out.println(
+						"distinctPDValsEncounteredInTraining.size() = " + distinctPDValsEncounteredInTraining.size());
+
+				// iterate over all possible primary dimension vals to initialise to preserve order.
+				for (Integer pdVal : distinctPDValsEncounteredInTraining)
+				{
+					aosForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromPrevForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromNextForEachPDVal.put(pdVal, new ArrayList<>());
+				}
+
+				// populate the map for list of aos for each act name
+				// long durationFromPreviousInSecs = 0;
+				long prevTimestamp = 0;
+				Set<Integer> prevPDValEncountered = null;
+
+				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
+				{
+					Set<Integer> uniquePdValsInAO = new LinkedHashSet<>(ao.getPrimaryDimensionVal());
+					for (Integer pdVal : uniquePdValsInAO)
+					{
+						// add this act object to the correct map entry in map of aos for given act names
+						ArrayList<ActivityObject> aosStored = aosForEachPDVal.get(pdVal);
+						if (aosStored == null)
+						{
+							PopUps.printTracedErrorMsg("Error: encountered pdval '" + pdVal
+									+ "' is not in the list of pd vals from training data");
+						}
+						aosStored.add(ao); // add the new AO encountered to the map's list. So map is updated
+					}
+
+					// store the preceeding and succeeding durations
+					long currentTimestamp = ao.getStartTimestamp().getTime();
+
+					if (prevTimestamp != 0)
+					{ // add the preceeding duration for this AO
+						for (Integer pdVal : uniquePdValsInAO)
+						{
+							durationFromPrevForEachPDVal.get(pdVal).add(currentTimestamp - prevTimestamp);
+						}
+					}
+
+					if (prevPDValEncountered != null)
+					{
+						// add the succeeding duration for the previous AO
+						for (Integer prevPDVal : prevPDValEncountered)
+						{
+							durationFromNextForEachPDVal.get(prevPDVal).add(currentTimestamp - prevTimestamp);
+						}
+					}
+
+					prevTimestamp = currentTimestamp;
+					prevPDValEncountered = uniquePdValsInAO;
+				}
+
+				/////////////
+
+				// $$ analyseActNameNotInTraining(userId, allPossibleActivityNames,
+				// distinctActNamesEncounteredInTraining,
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/" + "ActNamesNotInTraining.csv",
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/"
+				// + "ActNamesInTestButNotInTraining.csv",
+				// userTestTimelines);
+
+				/////////////
+
+				////////////////////////// sanity check
+				if (sanityCheck)
+				{
+					System.out.println("Timeline of AOs");
+
+					userTrainingTimelines.getActivityObjectsInTimeline().stream().forEachOrdered(ao -> System.out
+							.print(ao.getPrimaryDimensionVal("/") + "-" + ao.getStartTimestampInms() + ">>"));
+
+					System.out.println("durationFromPrevForEachPDValue:");
+					durationFromPrevForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
+
+					System.out.println("durationFromNextForEachPDValue:");
+					durationFromNextForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
+					// SANITY CHECK OK for durationFromPrevForEachActName durationFromNextForEachActName
+
+					////////////////////////// sanity check
+					System.out.println("Count of aos for each pd value:");
+					aosForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().size()));
+				}
+
+				long sumOfCountOfAOsFroMap = aosForEachPDVal.entrySet().stream().flatMap(e -> e.getValue().stream())
+						.count();
+				long sumOfCountOfAOsFromTimeline = userTrainingTimelines.getActivityObjectsInTimeline().stream()
+						.count();
+
+				// .map(e -> e.getValue().getActivityObjectsInTimeline().size()).count();
+				System.out.println("sumOfCountOfAOsFroMap= " + sumOfCountOfAOsFroMap);
+				System.out.println("sumOfCountOfAOsFromTimeline= " + sumOfCountOfAOsFromTimeline);
+
+				// This sanity check below is relevant only for activity id as primary dimension, since it is in that
+				// case each activity object has only one primary dimension val (activity id). It won't hold in case of
+				// location ids since one activity object can have multiple location ids because of mergers, i.e,
+				// sumOfCountOfAOsFroMap>sumOfCountOfAOsFromTimeline
+				if (primaryDimension.equals(PrimaryDimension.ActivityID))
+				{
+					if (sumOfCountOfAOsFroMap != sumOfCountOfAOsFromTimeline)
+					{
+						PopUps.printTracedErrorMsg(
+								"Sanity check failed in buildRepresentativeAOsForUserPDV2\n(sumOfCountOfAOsFroMap) != "
+										+ sumOfCountOfAOsFroMap + " (sumOfCountOfAOsFromTimeline)"
+										+ sumOfCountOfAOsFromTimeline);
+					}
+				}
+				else// (primaryDimension.equals(PrimaryDimension.LocationID))
+				{
+					if (sumOfCountOfAOsFroMap < sumOfCountOfAOsFromTimeline)
+					{
+						PopUps.printTracedErrorMsg(
+								"Sanity check failed in buildRepresentativeAOsForUserPDV2\n(sumOfCountOfAOsFroMap) != "
+										+ sumOfCountOfAOsFroMap + " (sumOfCountOfAOsFromTimeline)"
+										+ sumOfCountOfAOsFromTimeline);
+					}
+				}
+				// SANITY CHECK OK for daosForEachActName
+
+				////////////////////////// sanity check end
+
+				Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
+						userId, aosForEachPDVal, durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
+
+				repAOsForThisUser = result.getFirst();
+				actMedianPreSuccDuration = result.getSecond();
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		long t2 = System.currentTimeMillis();
+		System.out.println("Exiting buildRepresentativeAOsForUserPDV2 for user " + userId + " time taken = "
+				+ ((t2 - t1) * 1.0 / 1000) + "secs");
+
+		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(
+				repAOsForThisUser, actMedianPreSuccDuration);
+	}
+
+	/**
 	 * Analyse activity names which are not in training timelines for each user.
 	 * 
 	 * @param userId
@@ -2226,8 +2428,11 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 				// Dummy because we are not going to actually use this, we will instead extract the timestamp from the
 				// preceeding duration + timestamp of preceeding activity object. But we assign this median anyway to
 				// avoid having it as numm which causes exception.
-				Timestamp dummyMedianStartTS = getMedianSecondsSinceMidnightTimestamp(
-						aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID, actName);
+				Timestamp dummyMedianStartTS = new Timestamp(0);
+				// Disabled on 20 July 2017 to improve speed and compatibility for checking method from primary
+				// dimension perspective. It was not being used anyway.
+				// $ getMedianSecondsSinceMidnightTimestamp(
+				// $ aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID, actName);
 
 				// double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
 				// int medianCinsCount = (int) StatsUtils
@@ -2272,6 +2477,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		LinkedHashMap<Integer, ActivityObject> repAOs = new LinkedHashMap<>();
 		LinkedHashMap<Integer, Pair<Double, Double>> actMedPreSuccDuration = new LinkedHashMap<>();
 
+		System.out.println(
+				PerformanceAnalytics.getHeapInformation() + "\n" + PerformanceAnalytics.getHeapPercentageFree());
 		try
 		{
 			if (!Constant.getDatabaseName().equals("gowalla1"))
@@ -2280,11 +2487,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 			}
 
 			// feature of Gowalla activity object used in edit distance and necessary for recommendation.
-			for (Entry<Integer, ArrayList<ActivityObject>> pdValEntry : aosForEachPDVal.entrySet())
+			for (Integer pdVal : durationFromPrevForEachPDVal.keySet())// aosForEachPDVal.entrySet())
 			{
-				Integer pdVal = pdValEntry.getKey();
-				ArrayList<ActivityObject> aos = pdValEntry.getValue();
-
 				double medianDurationFromPrevForEachActName = StatsUtils.getDescriptiveStatisticsLong(
 						durationFromPrevForEachPDVal.get(pdVal), "durationFromPrevForEachActName",
 						userID + "__" + pdVal + "durationFromPrevForEachActName.txt", false).getPercentile(50);
@@ -2296,9 +2500,11 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 				// Dummy because we are not going to actually use this, we will instead extract the timestamp from the
 				// preceeding duration + timestamp of preceeding activity object. But we assign this median anyway to
 				// avoid having it as numm which causes exception.
-				Timestamp dummyMedianStartTS = getMedianSecondsSinceMidnightTimestamp(
-						aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID,
-						pdVal.toString());
+				Timestamp dummyMedianStartTS = new Timestamp(0);
+				// Disable getMedianSecondsSinceMidnightTimestamp for speed as we were not using it anyway.
+				// getMedianSecondsSinceMidnightTimestamp(
+				// aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID,
+				// pdVal.toString());
 
 				// double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
 				// int medianCinsCount = (int) StatsUtils
