@@ -846,7 +846,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
-					"Extracted current timeline: " + extractedCurrentTimeline.getActivityObjectNamesInSequence());
+					"Extracted current timeline: " + extractedCurrentTimeline.getPrimaryDimensionValsInSequence());
 		}
 		return new Pair<>(extractedCurrentTimeline, reductionInMu);
 	}
@@ -1877,7 +1877,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				}
 
 				ActivityObject nextValidAO = candUserDayTimeline
-						.getNextValidActivityAfterActivityAtThisPosition(endPointIndexInCand);
+						.getNextValidActivityAfterActivityAtThisPositionPD(endPointIndexInCand);
 				nextActObjs.put(timelineID, new Pair<ActivityObject, Double>(nextValidAO, distanceOfCandTimeline));
 
 				if (VerbosityConstants.verbose)
@@ -2937,7 +2937,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 						.getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandEndIndex + 1);
 				// getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp);
 				ActivityObject nextValidActivityForCandidate = trainingTimeline
-						.getNextValidActivityAfterActivityAtThisPosition(newCandEndIndex);
+						.getNextValidActivityAfterActivityAtThisPositionPD(newCandEndIndex);
 
 				if (nextValidActivityForCandidate == null)
 				{

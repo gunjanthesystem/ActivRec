@@ -182,7 +182,7 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10, 12 };// , 14, 16, 18 };
+	public static final double matchingUnitAsPastCount[] = { 4, 3, 0, 1, 2, 6, 8, 10, 12 };// , 14, 16, 18 };
 	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
 	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 
@@ -311,7 +311,10 @@ public final class Constant
 		Constant.setCommonPath(givenCommonpath);
 		DomainConstants.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
 		DomainConstants.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
-		DomainConstants.setLocIDLocationObjectDictionary(pathToSerialisedLocationObjects);
+		// Disabled setLocIDLocationObjectDictionary as it was not essential, we only needed loc name and full objects
+		// were taking signficantmemory space.
+		// DomainConstants.setLocIDLocationObjectDictionary(pathToSerialisedLocationObjects);
+		DomainConstants.setLocationIDNameDictionary(pathToSerialisedLocationObjects);
 		DomainConstants.setCatIDCharCodeMap();
 		DomainConstants.setCatIDGivenLevelCatIDMap();
 		// Constant.setDistanceUsed("HJEditDistance");
@@ -958,6 +961,8 @@ public final class Constant
 		s.append("\ntimeZoneForExperiments:" + timeZoneForExperiments.toString());
 		s.append("\nINVALID ACTIVITY 1:" + INVALID_ACTIVITY1);
 		s.append("\nINVALID ACTIVITY 2:" + INVALID_ACTIVITY2);
+		s.append("\nINVALID_ACTIVITY1_ID:" + INVALID_ACTIVITY1_ID);
+		s.append("\nINVALID_ACTIVITY2_ID:" + INVALID_ACTIVITY2_ID);
 		s.append("\nCommon path:" + commonPath);
 		s.append("\npercentageInTraining:" + percentageInTraining);
 		s.append("\nactivityNames:" + Arrays.toString(activityNames));

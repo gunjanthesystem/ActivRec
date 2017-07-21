@@ -50,16 +50,13 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	// private static LinkedHashMap<Integer, LinkedHashMap<Integer, Integer>> nextMostFreqActBasedOn2Grams;
 
 	// (UserID,(nOfN-Gram,(CurrentSubNGram,ListOfActsIDsWithMaxCountAsCHarCode))
-	private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>>> nextMostFreqActsBasedOnNGrams =
-			new LinkedHashMap<>();
+	private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>>> nextMostFreqActsBasedOnNGrams = new LinkedHashMap<>();
 
 	// (UserID,(nOfN-Gram,(CurrentSubNGram,ListOfActsIDsWithMaxCountAsActID))
-	private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Integer>>>> nextMostFreqActsBasedOnNGramsActID =
-			new LinkedHashMap<>();
+	private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Integer>>>> nextMostFreqActsBasedOnNGramsActID = new LinkedHashMap<>();
 
 	// (UserID,(nOfN-Gram,(CurrentSubNGram,ListOfActsIDsWithMaxCountAsActName))
-	private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<String>>>> nextMostFreqActsBasedOnNGramsActName =
-			new LinkedHashMap<>();
+	private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<String>>>> nextMostFreqActsBasedOnNGramsActName = new LinkedHashMap<>();
 
 	// // (UserID,(nOfN-Gram,(currentActID,NextActID)))
 	// private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<Integer, Integer>>>
@@ -172,15 +169,14 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	 * @return e.g. for expanded 2 gram (a--(b,3);a--(c,29);a--(d,10)), for expanded 3 gram
 	 *         (ab--(c,3);ab--(d,29);ab--(e,10))
 	 */
-	private static LinkedHashMap<Integer, HashMap<String, HashMap<Character, Long>>>
-			computeNGramCountsExpandedForThisUser(int userAtRecomm,
-					LinkedHashMap<Integer, HashMap<String, Long>> nGramCountsFromTrainingTimelines, int maxNOfNGrams)
+	private static LinkedHashMap<Integer, HashMap<String, HashMap<Character, Long>>> computeNGramCountsExpandedForThisUser(
+			int userAtRecomm, LinkedHashMap<Integer, HashMap<String, Long>> nGramCountsFromTrainingTimelines,
+			int maxNOfNGrams)
 	{
 		/**
 		 * (nOfgram, (currentSubNgrm,(nextActAsCharCode,Count))
 		 */
-		LinkedHashMap<Integer, HashMap<String, HashMap<Character, Long>>> nGramCountsExpandedForThisUser =
-				new LinkedHashMap<>();
+		LinkedHashMap<Integer, HashMap<String, HashMap<Character, Long>>> nGramCountsExpandedForThisUser = new LinkedHashMap<>();
 		try
 		{
 			for (int n = 2; n <= maxNOfNGrams; n++)
@@ -259,8 +255,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 				LinkedHashMap<Integer, HashMap<String, Long>> nGramCountsFromTrainingTimelines = new LinkedHashMap<>();
 				System.out.println("initialising nGramCountsFromTrainingTimelines for user : " + userAtRecomm);
 
-				Timeline trainingTimelinesAsATimeline =
-						TimelineUtils.dayTimelinesToATimeline(trainingTimelines, false, true);
+				Timeline trainingTimelinesAsATimeline = TimelineUtils.dayTimelinesToATimeline(trainingTimelines, false,
+						true);
 
 				if (Constant.hasInvalidActivityNames)
 				{
@@ -271,8 +267,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 				for (int n = 2; n <= maxNOfNGrams; n++)
 				{
-					HashMap<String, Long> freqDistr =
-							TimelineStats.getNGramOccurrenceDistribution(stringCodeOfTimeline, n);
+					HashMap<String, Long> freqDistr = TimelineStats.getNGramOccurrenceDistribution(stringCodeOfTimeline,
+							n);
 					writeFreqDistr(userAtRecomm, n, freqDistr);
 					nGramCountsFromTrainingTimelines.put(n, freqDistr);
 					System.out.println("Counted for n = " + n + " " + freqDistr.size() + " ngrams");
@@ -281,18 +277,17 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 					// "count");
 				}
 				// user id
-				LinkedHashMap<Integer, HashMap<String, HashMap<Character, Long>>> nGramCountsExpanded =
-						computeNGramCountsExpandedForThisUser(userAtRecomm, nGramCountsFromTrainingTimelines,
-								maxNOfNGrams);
+				LinkedHashMap<Integer, HashMap<String, HashMap<Character, Long>>> nGramCountsExpanded = computeNGramCountsExpandedForThisUser(
+						userAtRecomm, nGramCountsFromTrainingTimelines, maxNOfNGrams);
 
-				LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>> nextActsBasedOnNGram =
-						computeNextActsBasedOnNGram(nGramCountsExpanded, userAtRecomm);
+				LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>> nextActsBasedOnNGram = computeNextActsBasedOnNGram(
+						nGramCountsExpanded, userAtRecomm);
 
-				LinkedHashMap<Integer, HashMap<String, ArrayList<Integer>>> nextActsBasedOnNGramActID =
-						computeNextActsBasedOnNGramActID(nGramCountsExpanded, userAtRecomm, ">");
+				LinkedHashMap<Integer, HashMap<String, ArrayList<Integer>>> nextActsBasedOnNGramActID = computeNextActsBasedOnNGramActID(
+						nGramCountsExpanded, userAtRecomm, ">");
 
-				LinkedHashMap<Integer, HashMap<String, ArrayList<String>>> nextActsBasedOnNGramActName =
-						computeNextActsBasedOnNGramActName(nGramCountsExpanded, userAtRecomm, ">");
+				LinkedHashMap<Integer, HashMap<String, ArrayList<String>>> nextActsBasedOnNGramActName = computeNextActsBasedOnNGramActName(
+						nGramCountsExpanded, userAtRecomm, ">");
 
 				allNGramData.put(userAtRecomm, nGramCountsFromTrainingTimelines);
 				nextMostFreqActsBasedOnNGrams.put(userAtRecomm, nextActsBasedOnNGram);
@@ -375,8 +370,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 				for (Entry<String, HashMap<Character, Long>> curSubNGramEntry : nGramsEntry.getValue().entrySet())
 				{
-					ArrayList<Character> nextActsWithMaxCount =
-							(ArrayList<Character>) ComparatorUtils.getKeysWithMaxValues(curSubNGramEntry.getValue());
+					ArrayList<Character> nextActsWithMaxCount = (ArrayList<Character>) ComparatorUtils
+							.getKeysWithMaxValues(curSubNGramEntry.getValue());
 					nextActsForEachCurrentSubNGram.put(curSubNGramEntry.getKey(), nextActsWithMaxCount);
 				}
 				res.put(nGramsEntry.getKey(), nextActsForEachCurrentSubNGram);
@@ -413,8 +408,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 				for (Entry<String, HashMap<Character, Long>> curSubNGramEntry : nGramsEntry.getValue().entrySet())
 				{
-					ArrayList<Character> nextActsWithMaxCount =
-							(ArrayList<Character>) ComparatorUtils.getKeysWithMaxValues(curSubNGramEntry.getValue());
+					ArrayList<Character> nextActsWithMaxCount = (ArrayList<Character>) ComparatorUtils
+							.getKeysWithMaxValues(curSubNGramEntry.getValue());
 
 					ArrayList<Integer> nextActsWithMaxCountActID = (ArrayList<Integer>) nextActsWithMaxCount.stream()
 							.map(c -> DomainConstants.charCodeCatIDMap.get(c)).collect(Collectors.toList());
@@ -460,8 +455,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 				for (Entry<String, HashMap<Character, Long>> curSubNGramEntry : nGramsEntry.getValue().entrySet())
 				{
-					ArrayList<Character> nextActsWithMaxCount =
-							(ArrayList<Character>) ComparatorUtils.getKeysWithMaxValues(curSubNGramEntry.getValue());
+					ArrayList<Character> nextActsWithMaxCount = (ArrayList<Character>) ComparatorUtils
+							.getKeysWithMaxValues(curSubNGramEntry.getValue());
 
 					ArrayList<String> nextActsWithMaxCountActID = (ArrayList<String>) nextActsWithMaxCount.stream()
 							.map(c -> DomainConstants.catIDNameDictionary.get(DomainConstants.charCodeCatIDMap.get(c)))
@@ -534,17 +529,17 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 			// if its subsequent seq index recommendation then take the last ao of the prev recomms
 			if (actObjsToAddToCurrentTimeline.size() > 0)
 			{
-				this.activityAtRecommPoint =
-						actObjsToAddToCurrentTimeline.get(actObjsToAddToCurrentTimeline.size() - 1);
+				this.activityAtRecommPoint = actObjsToAddToCurrentTimeline
+						.get(actObjsToAddToCurrentTimeline.size() - 1);
 				this.activitiesGuidingRecomm = new ArrayList<ActivityObject>();
 				activitiesGuidingRecomm.add(activityAtRecommPoint);
 
 			}
 			else // extract current activity object with mu=0
 			{
-				Pair<TimelineWithNext, Double> currentTimelineTemp =
-						TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(testTimeline, this.dateAtRecomm,
-								this.timeAtRecomm, this.userIDAtRecomm, 0);
+				Pair<TimelineWithNext, Double> currentTimelineTemp = TimelineUtils
+						.getCurrentTimelineFromLongerTimelineMUCount(testTimeline, this.dateAtRecomm, this.timeAtRecomm,
+								this.userIDAtRecomm, 0);
 				this.activitiesGuidingRecomm = currentTimelineTemp.getFirst().getActivityObjectsInTimeline();
 				if (activitiesGuidingRecomm.size() != 1)
 				{
@@ -593,9 +588,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 			{
 				this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityNamesWithRankScoresString(
 						this.recommendedActivityNamesWithRankscores);
-				this.rankedRecommendedActNamesWithoutRankScoresStr =
-						getRankedRecommendedActivityNamesWithoutRankScoresString(
-								this.recommendedActivityNamesWithRankscores);
+				this.rankedRecommendedActNamesWithoutRankScoresStr = getRankedRecommendedActivityNamesWithoutRankScoresString(
+						this.recommendedActivityNamesWithRankscores);
 			}
 			// //
 			if (VerbosityConstants.verbose)
@@ -635,12 +629,12 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		// (UserID,(nOfN-Gram,(CurrentSubNGram,ListOfActsIDsWithMaxCountAsCHarCode))
 		// private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>>>
 		// nextMostFreqActsBasedOnNGrams;
-		HashMap<String, ArrayList<Character>> nextMostFreqActsForThisUserN =
-				nextMostFreqActsBasedOnNGrams.get(userID).get(nGram);
+		HashMap<String, ArrayList<Character>> nextMostFreqActsForThisUserN = nextMostFreqActsBasedOnNGrams.get(userID)
+				.get(nGram);
 
 		// is of length 1 as we are working with 2grams now.
-		Character currentSubNGramChar =
-				DomainConstants.catIDCharCodeMap.get(Integer.valueOf(activityNameAtRecommPoint));
+		Character currentSubNGramChar = DomainConstants.catIDCharCodeMap
+				.get(Integer.valueOf(activityNameAtRecommPoint));
 		String currentSubNGram = currentSubNGramChar.toString();
 
 		ArrayList<Character> listOfActsIDsWithMaxCountAsCharCode = nextMostFreqActsForThisUserN.get(currentSubNGram);
@@ -732,7 +726,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
-					"Extracted current timeline: " + extractedCurrentTimeline.getActivityObjectNamesInSequence());
+					"Extracted current timeline: " + extractedCurrentTimeline.getPrimaryDimensionValsInSequence());// .getActivityObjectNamesInSequence());
 		}
 		return new Pair<>(extractedCurrentTimeline, reductionInMu);
 	}
@@ -760,8 +754,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		TimelineWithNext extractedCurrentTimeline = extractedCurrentTimelineResult.getFirst();
 
 		// //////////////////
-		ArrayList<ActivityObject> actObjsForCurrTimeline =
-				new ArrayList<>(extractedCurrentTimeline.getActivityObjectsInTimeline());
+		ArrayList<ActivityObject> actObjsForCurrTimeline = new ArrayList<>(
+				extractedCurrentTimeline.getActivityObjectsInTimeline());
 
 		// sanity check is act objs to add are later than act objs in timeline
 		TimelineSanityChecks.checkIfChronoLogicalOrder(actObjsForCurrTimeline, actObjsToAddToCurrentTimeline);

@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.ActivityObject;
@@ -220,16 +221,19 @@ public class UtilityBelt
 			return true;
 		}
 
-		ArrayList<Integer> primaryDimensionVals = ao.getPrimaryDimensionVal();
-		if (primaryDimensionVals.contains(Constant.INVALID_ACTIVITY1_ID)
-				|| primaryDimensionVals.contains(Constant.INVALID_ACTIVITY2_ID))
-		{
-			return false;
-		}
 		else
 		{
-			return true;
+			ArrayList<Integer> primaryDimensionVals = ao.getPrimaryDimensionVal();
+			if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+			{
+				if (primaryDimensionVals.contains(Constant.INVALID_ACTIVITY1_ID)
+						|| primaryDimensionVals.contains(Constant.INVALID_ACTIVITY2_ID))
+				{
+					return false;
+				}
+			}
 		}
+		return true;
 	}
 
 	/**

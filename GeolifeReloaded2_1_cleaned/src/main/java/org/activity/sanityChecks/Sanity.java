@@ -240,4 +240,85 @@ public class Sanity
 		}
 
 	}
+
+	/**
+	 * To check sanity of
+	 * org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned2.buildRepresentativeAOsForUserPD()
+	 * 
+	 * @param repAOResult
+	 * @param repAOResultActName
+	 */
+	public static void compareOnlyNonEmpty(
+			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultPD,
+			Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName)
+	{
+		if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: org.activity.sanityChecks.Sanity.compare() should not be called when primary dimension is : "
+							+ Constant.primaryDimension);
+		}
+		System.out.println("Inside compare for repAOResultPD and repAOResultActName\n");
+		LinkedHashMap<Integer, ActivityObject> repAOsPD = repAOResultPD.getFirst();
+		LinkedHashMap<String, ActivityObject> repAOsActName = repAOResultActName.getFirst();
+
+		if (repAOsPD.size() != repAOsActName.size())
+		{
+			System.out.println(
+					"Alert! repAOsPD.size()=" + repAOsPD.size() + "repAOsActName.size()=" + repAOsActName.size());
+		}
+		// their size can be unequal repAOsPD < repAOsActName because repAOsPD is only for distinct activity names in
+		// training data for that user while repAOsActName for all distinct activity names in the dataset.
+		// However the representive activity object should be same for each primary dimension val in repAOResultPD.
+		for (Entry<Integer, ActivityObject> repAOPDEntry : repAOsPD.entrySet())
+		{
+			Integer actID = repAOPDEntry.getKey();
+			ActivityObject repAOPD = repAOPDEntry.getValue();
+
+			String actName = String.valueOf(actID);
+			// corresponding entry from
+			ActivityObject repAOActName = repAOsActName.get(actName);
+
+			if (repAOPD.equals(repAOActName))
+			{
+				// System.out.println("repAOPD==repAOActName");
+			}
+			else
+			{
+				System.err.println("Error: for actID:" + actID + ", repAOPD!=repAOActName\nrepAOPD="
+						+ repAOPD.toStringAllGowallaTS() + "\nrepAOActName=" + repAOActName.toStringAllGowallaTS());
+			}
+		}
+
+		LinkedHashMap<Integer, Pair<Double, Double>> medianPreSucDurationPD = repAOResultPD.getSecond();
+		LinkedHashMap<String, Pair<Double, Double>> medianPreSucDurationActName = repAOResultActName.getSecond();
+
+		if (medianPreSucDurationPD.size() != medianPreSucDurationActName.size())
+		{
+			System.out.println("Alert! medianPreSucDurationPD.size()=" + medianPreSucDurationPD.size()
+					+ "medianPreSucDurationActName.size()=" + medianPreSucDurationActName.size());
+		}
+
+		for (Entry<Integer, Pair<Double, Double>> medianPreSucDurationPDEntry : medianPreSucDurationPD.entrySet())
+		{
+			Integer actID = medianPreSucDurationPDEntry.getKey();
+			Pair<Double, Double> medianPreSucPD = medianPreSucDurationPDEntry.getValue();
+
+			String actName = String.valueOf(actID);
+			// corresponding entry from
+			Pair<Double, Double> medianPreSucActName = medianPreSucDurationActName.get(actName);
+
+			if (medianPreSucPD.equals(medianPreSucActName))
+			{
+				// System.out.println("medianPreSucPD==medianPreSucActName");
+			}
+			else
+			{
+				System.err.println("Error: for actID:" + actID
+						+ ", medianPreSucPD!=medianPreSucActName\nmedianPreSucPD=" + medianPreSucPD.toString()
+						+ "\nmedianPreSucActName=" + medianPreSucActName.toString());
+			}
+		}
+
+	}
 }

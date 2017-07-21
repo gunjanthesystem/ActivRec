@@ -121,7 +121,9 @@ public class ActivityObject implements Serializable
 				return arr;
 			// return new ArrayList<>(this.getActivityID());// only one activity name is expected even when merged.
 			case LocationID:
-				return this.getLocationIDs();
+				LinkedHashSet<Integer> uniqueLocationIDs = new LinkedHashSet<>(this.getLocationIDs());
+				return new ArrayList<Integer>(uniqueLocationIDs);
+			// this.getLocationIDs();
 			default:
 				PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
 				return null;
@@ -480,13 +482,13 @@ public class ActivityObject implements Serializable
 	public String toStringAllGowallaTSWithName()
 	{
 
-		if (DomainConstants.getLocIDLocationObjectDictionary() == null)
-		{
-			System.out.println("Error: DomainConstants.locIDLocationObjectDictionary ==null");
-		}
-		String locationName = locationIDs.stream()
-				.map(lid -> DomainConstants.getLocIDLocationObjectDictionary().get(lid).locationName)
+		// if (DomainConstants.getLocIDLocationObjectDictionary() == null)
+		// {
+		// System.out.println("Error: DomainConstants.locIDLocationObjectDictionary ==null");
+		// }
+		String locationName = locationIDs.stream().map(lid -> DomainConstants.getLocationIDNameDictionary().get(lid))
 				.collect(Collectors.joining("-"));
+		// .getLocIDLocationObjectDictionary().get(lid).locationName)
 
 		return "actID=" + activityID + "__locID=" + this.getLocationIDs('-') + "__activityName="
 				+ DomainConstants.catIDNameDictionary.get(activityID) + "__ locationName=" + locationName

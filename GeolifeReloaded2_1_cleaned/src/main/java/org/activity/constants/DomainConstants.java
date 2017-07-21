@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
+import org.activity.objects.ActivityObject;
 import org.activity.objects.LocationGowalla;
+import org.activity.objects.Pair;
 import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -74,6 +76,7 @@ public class DomainConstants
 	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
 	public static TreeMap<Integer, String> catIDNameDictionary = null;
 	static LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionary = null;
+	static LinkedHashMap<Integer, String> locIDNameDictionary = null;
 	public static TreeMap<Integer, Character> catIDCharCodeMap = null;
 	public static TreeMap<Character, Integer> charCodeCatIDMap = null;
 
@@ -89,6 +92,23 @@ public class DomainConstants
 
 	public final static String[] gowallaUserGroupsLabels = { "1", "101", "201", "301", "401", "501", "601", "701",
 			"801", "901" };
+
+	// keeping it globally to avoid recomputing for each matching unit
+	// {UserID, {{PDVal,repAO},{PDVal,{precDuration,succDuration}}}
+	static LinkedHashMap<Integer, Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>> userIDRepAOResultMap;
+
+	public static void setUserIDRepAOResultMap(int userID)
+	{
+		if (userIDRepAOResultMap.containsKey(userID))
+		{
+			System.out.println("userIDRepAOResultMap had already been created for user=" + userID);
+		}
+		else
+		{
+
+		}
+
+	}
 
 	public static void main(String args[])
 	{
@@ -310,6 +330,10 @@ public class DomainConstants
 
 	}
 
+	/**
+	 * 
+	 * @param pathToSerialisedLocationObjects
+	 */
 	public static void setLocIDLocationObjectDictionary(String pathToSerialisedLocationObjects)
 	{
 		try
@@ -321,7 +345,31 @@ public class DomainConstants
 		{
 			e.printStackTrace();
 		}
+	}
 
+	public static void setLocationIDNameDictionary(String pathToSerialisedLocationObjects)
+	{
+		try
+		{
+			LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionaryTemp = (LinkedHashMap<Integer, LocationGowalla>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedLocationObjects);
+
+			LinkedHashMap<Integer, String> locIDNameDict = new LinkedHashMap<>();
+			for (Entry<Integer, LocationGowalla> entry : locIDLocationObjectDictionaryTemp.entrySet())
+			{
+				locIDNameDict.put(entry.getKey(), entry.getValue().getLocationName());
+			}
+			locIDNameDictionary = locIDNameDict;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static LinkedHashMap<Integer, String> getLocationIDNameDictionary()
+	{
+		return locIDNameDictionary;
 	}
 
 	public static LinkedHashMap<Integer, LocationGowalla> getLocIDLocationObjectDictionary()

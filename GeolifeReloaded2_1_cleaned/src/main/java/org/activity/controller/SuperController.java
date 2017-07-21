@@ -12,11 +12,12 @@ public class SuperController
 	public static void main(String[] args)
 	{
 		long at = System.currentTimeMillis();
-		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
+		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC"y)); // added on April 21, 2016
 
 		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
-		String commonPath = "./dataWritten/July17/";
+		String commonPath = "./dataWritten/July18/";
+		System.out.println("commonPath = " + commonPath);
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
