@@ -26,7 +26,7 @@ public class VerbosityConstants
 	public static final boolean verboseOTMDSAM = false;
 	public static final boolean verboseDistance = false;// false;
 	public static final boolean verboseRankScoreCalcToConsole = false;// false;
-	public static final boolean verboseEvaluationMetricsToConsole = false;// true;// false;
+	public static final boolean verboseEvaluationMetricsToConsole = true;// true;// false;
 	/**
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv
 	 * and EditDistancePerRtPerCand.csv have some similar information and have corresponding records.

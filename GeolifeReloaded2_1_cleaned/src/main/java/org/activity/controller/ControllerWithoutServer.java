@@ -190,7 +190,8 @@ public class ControllerWithoutServer
 			// good curtain 7 Feb 2017 end
 			// end of consecutive counts
 
-			String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+			String groupsOf100UsersLabels[] = { /* "1", "101", "201", */"301", "401", "501", "601", "701", "801",
+					"901" };
 			// ,// "1001" };
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 

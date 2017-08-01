@@ -106,7 +106,7 @@ public class Dashboard extends Application
 		Tab lineChartTab = new Tab("lineChart");
 
 		ObservableList<Series<Double, Double>> listOfSeries = FXUtils
-				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(5, 20));
+				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50));
 		LineChart lineChart = new LineChart(new NumberAxis(), new NumberAxis(), listOfSeries);
 
 		ObservableList<Series<Double, Double>> lineChartDataSeriess = lineChart.getData();

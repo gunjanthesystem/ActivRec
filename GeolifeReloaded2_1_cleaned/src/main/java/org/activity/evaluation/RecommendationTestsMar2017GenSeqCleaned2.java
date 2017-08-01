@@ -328,6 +328,14 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
 						LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
 						// PopUps.showMessage("Starting iteration over user");
+
+						LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers = null;
+						if (Constant.collaborativeCandidates)
+						{
+							trainTestTimelinesForAllUsers = TimelineUtils
+									.splitAllUsersTestTrainingTimelines(usersTimelines, percentageInTraining);
+						}
+
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
 							System.out.println("\nUser id=" + userId);
@@ -395,20 +403,60 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							LinkedHashMap<Date, Timeline> userTrainingTimelines = trainTestTimelines.get(0);
 							LinkedHashMap<Date, Timeline> userTestTimelines = trainTestTimelines.get(1);
 
+							if (Constant.collaborativeCandidates)
+							{
+								// trainTestTimelinesForAllUsers = TimelineUtils
+								// .splitAllUsersTestTrainingTimelines(usersTimelines, percentageInTraining);
+
+								// Sanity check: make sure train test split for current user is same for both approaches
+								// start of sanity check
+								List<LinkedHashMap<Date, Timeline>> trainTestTimelinesCollForThisUser = trainTestTimelinesForAllUsers
+										.get(Integer.toString(userId));
+								// get the training test timelines for current user
+								LinkedHashMap<Date, Timeline> userTrainingTimelinesColl = trainTestTimelinesCollForThisUser
+										.get(0);
+								LinkedHashMap<Date, Timeline> userTestTimelinesColl = trainTestTimelinesCollForThisUser
+										.get(1);
+								if (!userTrainingTimelinesColl.equals(userTrainingTimelines))
+								{
+									System.err.println(
+											"Error: !userTrainingTimelinesColl.equals(userTrainingTimelines) for user:"
+													+ userId + " userTrainingTimelinesColl.size()="
+													+ userTrainingTimelinesColl.size() + "userTestTimelinesColl.size()="
+													+ userTestTimelinesColl.size());
+								}
+								else
+								{
+									System.out.println("Timesplit OK.");
+								}
+								// end of sanity check
+							}
+
 							////// START of build representative activity objects for this user.
 							// if (true)// representativeAOsNotComputed == false) //do this
 							// we only need to do it once for each user and dont need to repeat it for each matching
 							// unit, so we can take it out of the for loop, however, it that we will also need to
 							// take out the train-test splitting of timelines out of the loop, which can be done as
 							// well
+							Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = null;
+							if (Constant.collaborativeCandidates)
+							{
+								repAOResult = buildRepresentativeAOsForUserPDVCOll(userId,
+										trainTestTimelinesForAllUsers, Constant.getUniqueLocIDs(),
+										Constant.getUniqueActivityIDs());
+							}
 
-							Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = buildRepresentativeAOsForUserPDV2(
-									userId, TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-									TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true),
-									Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs());
+							else
+							{
+								repAOResult = buildRepresentativeAOsForUserPDV2(userId,
+										TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
+										TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true),
+										Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs());
 
+							}
 							// Start of Sanity Check for buildRepresentativeAOsForUserPD()
-							if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+							if (!Constant.collaborativeCandidates
+									&& Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
 							{
 								// for Activity ID as primary dimension, the output of buildRepresentativeAOsForUserPD
 								// and buildRepresentativeAOsForUser shoule be same (except data type)
@@ -728,7 +776,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 													userTrainingTimelines, userTestTimelines, dateToRecomm,
 													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
 													matchingUnit, caseType, this.lookPastType, false,
-													repAOsFromPrevRecomms);
+													repAOsFromPrevRecomms, trainTestTimelinesForAllUsers);
 										}
 
 										// Note: RT passed to the recommendation master is always endTimestamp. This is
@@ -1297,6 +1345,218 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		}
 		// PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
 		System.out.println("**********Exiting Recommendation Tests**********");
+
+	}
+
+	/**
+	 * 
+	 * @param userId
+	 * @param trainTestTimelinesForAllUsers
+	 * @param uniqueLocIDs
+	 * @param uniqueActivityIDs
+	 * @return
+	 */
+	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPDVCOll(
+			int userId, LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
+			Set<Integer> uniqueLocIDs, Set<Integer> uniqueActivityIDs)
+	{
+
+		// mapOfRepAOs;
+		boolean sanityCheck = false;
+		System.out.println("Inside buildRepresentativeAOsForUserPDV2 for user " + userId);
+		LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
+		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
+		LinkedHashMap<String, Timeline> collTrainingTimelines = new LinkedHashMap<>();
+
+		long t1 = System.currentTimeMillis();
+		try
+		{
+			if (Constant.getDatabaseName().equals("gowalla1") == false)
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + Constant.getDatabaseName());
+			}
+			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
+			// { System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
+			// System.exit(-1); }
+
+			else
+			{
+				LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal = new LinkedHashMap<>();
+				/**
+				 * Useful for deciding upon the start timestamp from representative AO
+				 */
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
+
+				// earlier version was using all possible vals fro PD but now using only those in training data.
+				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
+
+				for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsers
+						.entrySet())
+				{
+					int userIdCursor = Integer.valueOf(trainTestForAUser.getKey());
+					if (userIdCursor != userId)
+					{
+						Timeline userTrainingTimeline = TimelineUtils
+								.dayTimelinesToATimeline(trainTestForAUser.getValue().get(0), false, true);
+
+						for (ActivityObject ao : userTrainingTimeline.getActivityObjectsInTimeline())
+						{
+							distinctPDValsEncounteredInTraining.addAll(ao.getPrimaryDimensionVal());
+						}
+						collTrainingTimelines.put(trainTestForAUser.getKey(), userTrainingTimeline);
+					}
+				}
+
+				System.out.println("distinctPDValsEncounteredInCOllTraining.size() = "
+						+ distinctPDValsEncounteredInTraining.size());
+
+				// iterate over all possible primary dimension vals to initialise to preserve order.
+				for (Integer pdVal : distinctPDValsEncounteredInTraining)
+				{
+					aosForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromPrevForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromNextForEachPDVal.put(pdVal, new ArrayList<>());
+				}
+
+				// populate the map for list of aos for each act name
+				int countAOs = 0;
+				for (Entry<String, Timeline> trainingTimelineEntry : collTrainingTimelines.entrySet())
+				{
+					String userID = trainingTimelineEntry.getKey();
+
+					// long durationFromPreviousInSecs = 0;
+					long prevTimestamp = 0;
+					Set<Integer> prevPDValEncountered = null;
+
+					for (ActivityObject ao : trainingTimelineEntry.getValue().getActivityObjectsInTimeline())
+					{
+						countAOs += 1;
+						Set<Integer> uniquePdValsInAO = new LinkedHashSet<>(ao.getPrimaryDimensionVal());
+						for (Integer pdVal : uniquePdValsInAO)
+						{
+							// add this act object to the correct map entry in map of aos for given act names
+							ArrayList<ActivityObject> aosStored = aosForEachPDVal.get(pdVal);
+							if (aosStored == null)
+							{
+								PopUps.printTracedErrorMsg("Error: encountered pdval '" + pdVal
+										+ "' is not in the list of pd vals from training data");
+							}
+							aosStored.add(ao); // add the new AO encountered to the map's list. So map is updated
+						}
+
+						// store the preceeding and succeeding durations
+						long currentTimestamp = ao.getStartTimestamp().getTime();
+
+						if (prevTimestamp != 0)
+						{ // add the preceeding duration for this AO
+							for (Integer pdVal : uniquePdValsInAO)
+							{
+								durationFromPrevForEachPDVal.get(pdVal).add(currentTimestamp - prevTimestamp);
+							}
+						}
+
+						if (prevPDValEncountered != null)
+						{
+							// add the succeeding duration for the previous AO
+							for (Integer prevPDVal : prevPDValEncountered)
+							{
+								durationFromNextForEachPDVal.get(prevPDVal).add(currentTimestamp - prevTimestamp);
+							}
+						}
+
+						prevTimestamp = currentTimestamp;
+						prevPDValEncountered = uniquePdValsInAO;
+					}
+				}
+				/////////////
+
+				// $$ analyseActNameNotInTraining(userId, allPossibleActivityNames,
+				// distinctActNamesEncounteredInTraining,
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/" + "ActNamesNotInTraining.csv",
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/"
+				// + "ActNamesInTestButNotInTraining.csv",
+				// userTestTimelines);
+
+				/////////////
+
+				////////////////////////// sanity check
+				if (sanityCheck)
+				{
+					System.out.println("Timeline of AOs");
+
+					// userTrainingTimelines.getActivityObjectsInTimeline().stream().forEachOrdered(ao -> System.out
+					// .print(ao.getPrimaryDimensionVal("/") + "-" + ao.getStartTimestampInms() + ">>"));
+
+					System.out.println("durationFromPrevForEachPDValue:");
+					durationFromPrevForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
+
+					System.out.println("durationFromNextForEachPDValue:");
+					durationFromNextForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
+					// SANITY CHECK OK for durationFromPrevForEachActName durationFromNextForEachActName
+
+					////////////////////////// sanity check
+					System.out.println("Count of aos for each pd value:");
+					aosForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().size()));
+				}
+
+				long sumOfCountOfAOsFroMap = aosForEachPDVal.entrySet().stream().flatMap(e -> e.getValue().stream())
+						.count();
+				long sumOfCountOfAOsFromTimeline = countAOs;// userTrainingTimelines.getActivityObjectsInTimeline().stream()
+				// .count();
+
+				// .map(e -> e.getValue().getActivityObjectsInTimeline().size()).count();
+				System.out.println("sumOfCountOfAOsFroMap= " + sumOfCountOfAOsFroMap);
+				System.out.println("sumOfCountOfAOsFromTimeline= " + sumOfCountOfAOsFromTimeline);
+
+				// This sanity check below is relevant only for activity id as primary dimension, since it is in that
+				// case each activity object has only one primary dimension val (activity id). It won't hold in case of
+				// location ids since one activity object can have multiple location ids because of mergers, i.e,
+				// sumOfCountOfAOsFroMap>sumOfCountOfAOsFromTimeline
+				if (primaryDimension.equals(PrimaryDimension.ActivityID))
+				{
+					if (sumOfCountOfAOsFroMap != sumOfCountOfAOsFromTimeline)
+					{
+						PopUps.printTracedErrorMsg(
+								"Sanity check failed in buildRepresentativeAOsForUserPDV2\n(sumOfCountOfAOsFroMap) != "
+										+ sumOfCountOfAOsFroMap + " (sumOfCountOfAOsFromTimeline)"
+										+ sumOfCountOfAOsFromTimeline);
+					}
+				}
+				else// (primaryDimension.equals(PrimaryDimension.LocationID))
+				{
+					if (sumOfCountOfAOsFroMap < sumOfCountOfAOsFromTimeline)
+					{
+						PopUps.printTracedErrorMsg(
+								"Sanity check failed in buildRepresentativeAOsForUserPDV2\n(sumOfCountOfAOsFroMap) != "
+										+ sumOfCountOfAOsFroMap + " (sumOfCountOfAOsFromTimeline)"
+										+ sumOfCountOfAOsFromTimeline);
+					}
+				}
+				// SANITY CHECK OK for daosForEachActName
+
+				////////////////////////// sanity check end
+
+				Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
+						userId, aosForEachPDVal, durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
+
+				repAOsForThisUser = result.getFirst();
+				actMedianPreSuccDuration = result.getSecond();
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		long t2 = System.currentTimeMillis();
+		System.out.println("Exiting buildRepresentativeAOsForUserPDV2 for user " + userId + " time taken = "
+				+ ((t2 - t1) * 1.0 / 1000) + "secs");
+
+		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(
+				repAOsForThisUser, actMedianPreSuccDuration);
 
 	}
 
@@ -2078,7 +2338,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	 * @return
 	 */
 	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPDV2(
-			int userId, Timeline userTrainingTimelines, Timeline userTestTimelines, Set<Integer> uniqueLocIDs,
+			int userId, Timeline userTrainingTimelines, Timeline userTestTimelinesqq, Set<Integer> uniqueLocIDs,
 			Set<Integer> uniqueActivityIDs)
 	{
 		// mapOfRepAOs;

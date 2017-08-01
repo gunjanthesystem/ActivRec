@@ -16,7 +16,7 @@ public class SuperController
 
 		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
-		String commonPath = "./dataWritten/July18/";
+		String commonPath = "./dataWritten/July31/";
 		System.out.println("commonPath = " + commonPath);
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
@@ -91,7 +91,7 @@ public class SuperController
 		Constant.setDistanceUsed("HJEditDistance");
 
 		// //curtain may 26 2017 start
-		// new EvaluationSeq(3, commonPath);// , Constant.matchingUnitAsPastCount);
+		// $$new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);
 		// //curtain may 26 2017 end
 		// //curtain may 19 2017 start
 		new ControllerWithoutServer();
