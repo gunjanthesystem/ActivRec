@@ -45,7 +45,7 @@ public final class Constant
 	public static Integer INVALID_ACTIVITY2_ID = -998;// "Not Available";
 	// end of Added on 11 July 2017
 
-	public static final PrimaryDimension primaryDimension = PrimaryDimension.LocationID;// LocationID;
+	public static final PrimaryDimension primaryDimension = PrimaryDimension.ActivityID;// LocationID;
 
 	static String[] activityNames;
 	static Set<Integer> uniqueActivityIDs;
@@ -161,13 +161,13 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// ClosestTime;// .NGram;//
-																					// .Daywise;//
-																					// NCount;//
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.ClosestTime;// ClosestTime;// .NGram;//
+	// .Daywise;//
+	// NCount;//
 	// Enums.LookPastType.NCount;
 	// "Count";// "Count";// "Hrs"// "Daywise"
 	/**
-	 * determines if current timeline is allowed to go beyod the day boundaries, note that until the KDD paper, we were
+	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
 	 * restricting this baseline to day boundaries
 	 */
 	public static final boolean ClosestTimeAllowSpillOverDays = true;
@@ -210,8 +210,9 @@ public final class Constant
 	/**
 	 * determines the hierarchical level of the activity name to be used in edit distance computation
 	 */
-	public static final int HierarchicalCatIDLevelForEditDistance = 2;// 1;// 2, -1 when not used
+	public static final int HierarchicalCatIDLevelForEditDistance = 1;// 2;// 1;// 2, -1 when not used
 
+	public static final boolean collaborativeCandidates = true;
 	////////////////////////////////////////////////////////////////////////
 
 	public static void setDefaultTimeZone(String timeZoneString)
@@ -1007,6 +1008,7 @@ public final class Constant
 
 		s.append("\nuseHierarchicalDistance:" + useHierarchicalDistance);
 		s.append("\nHierarchicalLevelForEditDistance:" + HierarchicalCatIDLevelForEditDistance);
+		s.append("\ncollaborativeCandidates:" + collaborativeCandidates);
 
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{

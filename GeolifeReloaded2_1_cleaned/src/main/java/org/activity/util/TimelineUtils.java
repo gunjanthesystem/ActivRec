@@ -1032,6 +1032,54 @@ public class TimelineUtils
 	}
 
 	/**
+	 * training test split for all users simulatneously.
+	 * <p>
+	 * Earlier we are doing train test split for each user’s timeline iteratively, for collaborative approach we need
+	 * training timelines for all users simulatneously, hence need to do training test split simulatneously.
+	 * 
+	 * @param allUsersAllDatesTimeslines
+	 * @param percentageInTraining
+	 * @return
+	 * @since 25 July 2017
+	 */
+	public static LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> splitAllUsersTestTrainingTimelines(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersAllDatesTimeslines,
+			double percentageInTraining)
+	{
+		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> res = new LinkedHashMap<>();
+
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> oneUserAllDatesTimelinesEntry : allUsersAllDatesTimeslines
+					.entrySet())
+			{
+				String userID = oneUserAllDatesTimelinesEntry.getKey();
+				System.out.println("splitAllUsersTestTrainingTimelines: userID = " + userID);
+				LinkedHashMap<Date, Timeline> oneUserAllDatesTimelines = oneUserAllDatesTimelinesEntry.getValue();
+
+				// //////////////////REMOVING SELECTED TIMELINES FROM DATASET////////////////////
+				oneUserAllDatesTimelines = TimelineUtils.cleanUserDayTimelines(oneUserAllDatesTimelines,
+						Constant.getCommonPath() + "InsideSplitAllUsersTestTrainingTimelines", userID);
+				// ////////////////////////////////////////////////////////////////////////////////
+
+				// Splitting the set of timelines into training set and test set.
+				List<LinkedHashMap<Date, Timeline>> trainTestTimelines = TimelineUtils
+						.splitTestTrainingTimelines(oneUserAllDatesTimelines, percentageInTraining);
+				// LinkedHashMap<Date, Timeline> userTrainingTimelines = trainTestTimelines.get(0);
+				// LinkedHashMap<Date, Timeline> userTestTimelines = trainTestTimelines.get(1);
+				res.put(userID, trainTestTimelines);
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+
+		}
+		return res;
+	}
+
+	/**
 	 * 
 	 * @param userAllDatesTimeslines
 	 * @param percentageInTraining
@@ -2594,6 +2642,28 @@ public class TimelineUtils
 	}
 
 	/**
+	 * Expunge invalids from training and test timelines for all users.
+	 * 
+	 * @param trainTestTimelinesForAllUsersOrig
+	 * @return
+	 */
+	public static LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> expungeInvalidsDTAllUsers(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersOrig)
+	{
+		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers = null;
+
+		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> entry : trainTestTimelinesForAllUsersOrig.entrySet())
+		{
+			List<LinkedHashMap<Date, Timeline>> list = new ArrayList<>();
+			list.add(expungeInvalidsDT(entry.getValue().get(0)));// trainingTimelinesForThisUser
+			list.add(expungeInvalidsDT(entry.getValue().get(1)));// testTimelinesForThisUser
+
+			trainTestTimelinesForAllUsers.put(entry.getKey(), list);
+		}
+		return trainTestTimelinesForAllUsers;
+	}
+
+	/**
 	 * Removes the invalid activity objects from the given Timeline. Invalid Activity Objects are Activity Objects with
 	 * Activity Name as 'Others' or 'Unknown'
 	 * 
@@ -3431,6 +3501,206 @@ public class TimelineUtils
 	///////
 
 	/**
+	 * Fork of getClosestTimeDistancesForCandidateTimelines
+	 * <p>
+	 * This is not restricted to daywise view of candidate timelines. The candidate timelines are considered as one
+	 * single timelines.
+	 * <p>
+	 * Gets the start time distances of the (valid) Activity Object in each candidate timeline which is nearest to the
+	 * start time of the current Activity Object
+	 * <p>
+	 * <font color = blue> can be optimized. No need to extract unique dates as the candidate timelines are already
+	 * unique dates. However, need to check this and refactor carefully</font>
+	 * 
+	 * @param candidateTimelines
+	 *            from other multiple users {UserID__DateAsString,Timeline}
+	 * @param activitiesGuidingRecomm
+	 * @param userIDAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param hasinvalidactivitynames
+	 * @param iNVALID_ACTIVITY1
+	 * @param iNVALID_ACTIVITY2
+	 * @param distanceUsed
+	 * @return {candID, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
+	 * @since 21 July 2017
+	 */
+	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getClosestTimeDistancesForCandidateTimelinesColl(
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasinvalidactivitynames,
+			String iNVALID_ACTIVITY1, String iNVALID_ACTIVITY2, String distanceUsed, boolean verbose)
+	{
+		// timelineID, <Index for the nearest Activity Object, Diff of Start time of nearest Activity
+		// Object with start time of current Activity Object>
+		// {UserID__DateAsStringCandidateTimeline, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
+		LinkedHashMap<String, Pair<String, Double>> distances = new LinkedHashMap<>();
+
+		/**
+		 * {UserID__DateAsStringCandidateTimeline, End point index of least distant subsequence}}
+		 */
+		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
+
+		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
+
+		LinkedHashMap<String, LinkedHashMap<String, Timeline>> userWiseCandidateTimelines = toUserwiseTimelines(
+				candidateTimelines);
+
+		for (Entry<String, LinkedHashMap<String, Timeline>> cand : userWiseCandidateTimelines.entrySet())
+		{
+			String anotherUserID = cand.getKey();
+			LinkedHashMap<String, Timeline> candTimelinesFromAnotherUser = cand.getValue();
+			// Was there any essential need for this in the first place, i.e., even in non-collaborative approach? Yes,
+			// there was since we want to allow closest activity from previous day as well in cases when the act is near
+			// midnight
+			Timeline candTimelinesFromAnotherUserAsOne = TimelineUtils
+					.dayTimelinesToATimeline2(candTimelinesFromAnotherUser, false, true);
+
+			// find how many times this time occurs in the candidate timelines.
+			LinkedHashSet<LocalDate> uniqueDatesInCands = TimelineUtils
+					.getUniqueDates(candTimelinesFromAnotherUserAsOne, verbose);
+
+			// @@@@@
+			Sanity.eq(uniqueDatesInCands.size(), candTimelinesFromAnotherUser.size(),
+					"Error: we were expecting uniqueDatesInCands.size() = " + uniqueDatesInCands.size()
+							+ " candTimelinesFromAnotherUser.size() =" + candTimelinesFromAnotherUser.size()
+							+ " to be equal");
+			// since the candTimelinesFromAnotherUser were indeed day timelines here.
+			if (verbose)
+			{
+				System.out.println("\nanotherUserID= " + anotherUserID + "  uniqueDatesInCands.size() = "
+						+ uniqueDatesInCands.size() + " candTimelinesFromAnotherUser.size() ="
+						+ candTimelinesFromAnotherUser.size());
+			}
+
+			ArrayList<Timestamp> timestampsToLookInto = createTimestampsToLookAt(uniqueDatesInCands,
+					startTimestampOfActObjAtRecommPoint, verbose);
+
+			// for (Entry<String, Timeline> cand : candidateTimelines.entrySet())
+			// { for (ActivityObject ao : cand.getValue().getActivityObjectsInTimeline())
+			// { uniqueDates.add(Instant.ofEpochMilli(ao.getStartTimestampInms())
+			// .atZone(Constant.getTimeZone().toZoneId()).toLocalDate()); } }
+
+			for (Timestamp tsToLookInto : timestampsToLookInto)
+			// for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
+			{
+				// Actually these dates as string should be same as keys candidateTimelines
+				Date d = new Date(tsToLookInto.getYear(), tsToLookInto.getMonth(), tsToLookInto.getDate());
+				/*
+				 * For this candTimelinesFromAnotherUserAsOne, find the Activity Object with start timestamp nearest to
+				 * the start timestamp of current Activity Object and the distance is diff of their start times
+				 */
+				Triple<Integer, ActivityObject, Double> score = candTimelinesFromAnotherUserAsOne
+						.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, verbose);
+
+				distances.put(anotherUserID + "__" + d.toString(),
+						new Pair<String, Double>(score.getSecond().getActivityName(), score.getThird()));
+
+				indicesOfActObjsWithNearestST.put(anotherUserID + "__" + d.toString(), score.getFirst());
+				// System.out.println("now we put "+entry.getKey()+" and score="+score);
+			}
+		}
+
+		// these two should be identical
+		String candKeys = candidateTimelines.keySet().stream().collect(Collectors.joining("\n"));
+		String distKeys = distances.keySet().stream().collect(Collectors.joining("\n"));
+
+		StringBuilder msg = new StringBuilder();
+		msg.append("candidateTimelines.keySet()== distances.keySet() ?: "
+				+ (candidateTimelines.keySet().equals(distances.keySet())) + "\n");
+		msg.append("distKeys==candKeys : " + (distKeys.equals(candKeys)) + "\n");
+		// msg.append("candKeys = " + candKeys + "\n");
+		// msg.append("distKeys = " + distKeys + "\n");
+		System.out.println(msg);
+
+		if (!candidateTimelines.keySet().equals(distances.keySet()))
+		{
+
+			String candKeyse = candidateTimelines.keySet().stream().collect(Collectors.joining("\n"));
+			String distKeyse = distances.keySet().stream().collect(Collectors.joining("\n"));
+
+			StringBuilder errorMsg = new StringBuilder();
+			errorMsg.append("candidateTimelines.keySet()== distances.keySet() ?: "
+					+ (candidateTimelines.keySet().equals(distances.keySet())) + "\n");
+			errorMsg.append("distKeys==candKeys : " + (distKeys.equals(candKeys)) + "\n");
+			errorMsg.append("candKeys = " + candKeys + "\n");
+			errorMsg.append("distKeys = " + distKeys + "\n");
+			PopUps.printTracedErrorMsgWithExit(errorMsg.toString());
+		}
+
+		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distances,
+				indicesOfActObjsWithNearestST);
+	}
+
+	///////
+
+	/**
+	 * 
+	 * @param givenTimelinesWithUserIDInKey
+	 *            {UserID__DateAsString, Timeline}
+	 * 
+	 * @return {UserID,{DateAsString, Timeline}}
+	 */
+	private static LinkedHashMap<String, LinkedHashMap<String, Timeline>> toUserwiseTimelines(
+			LinkedHashMap<String, Timeline> givenTimelinesWithUserIDInKey)
+	{
+		LinkedHashMap<String, LinkedHashMap<String, Timeline>> userWiseTimelines = new LinkedHashMap<>();
+		try
+		{
+			for (Entry<String, Timeline> t : givenTimelinesWithUserIDInKey.entrySet())
+			{
+				String[] keySplitted = RegexUtils.patternDoubleUnderScore.split(t.getKey());
+				if (keySplitted.length != 2)
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: expected key with UserID__DateAsString but found "
+							+ t.getKey() + "keySplitted.length= " + keySplitted.length + " != 2");
+				}
+				else
+				{
+					// converting to integer intermediately to ensure that it is user id as number
+					String userID = String.valueOf(Integer.valueOf(keySplitted[0]));
+					String dateAsString = keySplitted[1];
+
+					if (userWiseTimelines.containsKey(userID))
+					{
+						userWiseTimelines.get(userID).put(dateAsString, t.getValue());
+						// HERE
+					}
+					else
+					{
+						LinkedHashMap<String, Timeline> aTimelineForThisUser = new LinkedHashMap<>();
+						aTimelineForThisUser.put(dateAsString, t.getValue());
+						userWiseTimelines.put(userID, aTimelineForThisUser);
+					}
+				}
+			}
+
+			// start of sanity check
+			int numOfGivenTimelines = givenTimelinesWithUserIDInKey.size();
+			int numOfReturnedTimeslines = 0;// userWiseTimelines.entrySet().stream().map(e->e.getValue().size()).
+			for (Entry<String, LinkedHashMap<String, Timeline>> temp : userWiseTimelines.entrySet())
+			{
+				numOfReturnedTimeslines += temp.getValue().size();
+			}
+			System.out.println("In toUserwiseTimelines(): numOfGivenTimelines:" + numOfGivenTimelines
+					+ "\t numOfReturnedTimeslines:" + numOfReturnedTimeslines);
+			Sanity.eq(numOfGivenTimelines, numOfReturnedTimeslines, "numOfGivenTimelines:" + numOfGivenTimelines
+					+ " != numOfReturnedTimeslines:" + numOfReturnedTimeslines);
+			// end of sanity check
+			if (numOfGivenTimelines != numOfReturnedTimeslines)
+			{
+				PopUps.printTracedErrorMsgWithExit("numOfGivenTimelines:" + numOfGivenTimelines
+						+ " != numOfReturnedTimeslines:" + numOfReturnedTimeslines);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return userWiseTimelines;
+	}
+
+	/**
 	 * For each given date in givenDates, create a timestamp for the given time in givenTime
 	 * 
 	 * @param uniqueDatesInCands
@@ -3484,6 +3754,39 @@ public class TimelineUtils
 		{
 			System.out.println("\nInside getUniqueDates.\n givenTimeline=\n");
 			givenTimeline.printActivityObjectNamesWithTimestampsInSequence("\n");
+			System.out.println("\nuniqueDates:\n");
+			uniqueDates.stream().forEachOrdered(d -> System.out.print(d.toString() + "\t"));
+		}
+		return uniqueDates;
+	}
+
+	/**
+	 * Returns list of unqiue dates in the timeline (from start timestamps of activity objects in timeline)
+	 * 
+	 * @param candidateTimelinesAsOne
+	 * @return
+	 */
+	public static LinkedHashSet<LocalDate> getUniqueDates2(LinkedHashMap<String, Timeline> candidateTimelines,
+			boolean verbose)
+	{
+		LinkedHashSet<LocalDate> uniqueDates = new LinkedHashSet<>();
+
+		for (Entry<String, Timeline> cand : candidateTimelines.entrySet())
+		{
+			for (ActivityObject ao : cand.getValue().getActivityObjectsInTimeline())
+			{
+				uniqueDates.add(Instant.ofEpochMilli(ao.getStartTimestampInms())
+						.atZone(Constant.getTimeZone().toZoneId()).toLocalDate());
+			}
+		}
+		if (verbose)
+		{
+			System.out.println("\nInside getUniqueDates.\n givenTimeline=\n");
+			for (Entry<String, Timeline> cand : candidateTimelines.entrySet())
+			{
+				cand.getValue().printActivityObjectNamesWithTimestampsInSequence("\n");
+			}
+
 			System.out.println("\nuniqueDates:\n");
 			uniqueDates.stream().forEachOrdered(d -> System.out.print(d.toString() + "\t"));
 		}

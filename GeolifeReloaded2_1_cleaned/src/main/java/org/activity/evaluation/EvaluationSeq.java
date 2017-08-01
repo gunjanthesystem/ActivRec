@@ -41,8 +41,8 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	static final String groupsOf100UsersLabels[] =
-			{ "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+	static final String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801",
+			"901" };
 
 	// for each individual seq index
 	ArrayList<ArrayList<String>> listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
@@ -68,8 +68,8 @@ public class EvaluationSeq
 		int totalNumOfUsersComputedFor = 0;
 		try
 		{
-			PrintStream consoleLogStream =
-					WritingToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
+			PrintStream consoleLogStream = WritingToFile
+					.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
 
 			for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
 			{
@@ -128,9 +128,9 @@ public class EvaluationSeq
 
 			double matchingUnitAsPastCount[] = { 0 };
 			// PopUps.showMessage("BREAKING");
-			ArrayList<String> listOfWrittenFiles =
-					concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount, listOfNumAgreementsFiles,
-							listOfPerAgreementsFiles, listOfNumAgreementsFilesL1, listOfPerAgreementsFilesL1);
+			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
+					listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
+					listOfPerAgreementsFilesL1);
 
 			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
 					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
@@ -181,13 +181,13 @@ public class EvaluationSeq
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
 					double mu = matchingUnitAsPastCount[muIndex];
-					commonPath =
-							outputCoreResultsPath + groupsOf100UsersLabel + "/MatchingUnit" + String.valueOf(mu) + "/";
+					commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/MatchingUnit" + String.valueOf(mu)
+							+ "/";
 					Constant.setCommonPath(commonPath);
 					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
 
-					PrintStream consoleLogStream =
-							WritingToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
+					PrintStream consoleLogStream = WritingToFile
+							.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
 					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, true);
 					totalNumOfUsersComputedFor += numOfUsersComputerFor;
@@ -225,9 +225,9 @@ public class EvaluationSeq
 			}
 
 			// PopUps.showMessage("BREAKING");
-			ArrayList<String> listOfWrittenFiles =
-					concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount, listOfNumAgreementsFiles,
-							listOfPerAgreementsFiles, listOfNumAgreementsFilesL1, listOfPerAgreementsFilesL1);
+			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
+					listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
+					listOfPerAgreementsFilesL1);
 
 			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
 					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
@@ -410,8 +410,8 @@ public class EvaluationSeq
 			{
 				int mu = (int) matchingUnitAsPastCount[muIndex];
 
-				Pair<ArrayList<Double>, ArrayList<Double>> res1 =
-						getMeanMedian(pathToWrite + "AllNumDirectAgreements" + mu + ".csv", seqLength, 4);
+				Pair<ArrayList<Double>, ArrayList<Double>> res1 = getMeanMedian(
+						pathToWrite + "AllNumDirectAgreements" + mu + ".csv", seqLength, 4);
 
 				for (int k = 0; k < res1.getFirst().size(); k++)
 				{
@@ -430,8 +430,8 @@ public class EvaluationSeq
 					}
 				}
 
-				Pair<ArrayList<Double>, ArrayList<Double>> res2 =
-						getMeanMedian(pathToWrite + "AllPerDirectAgreements" + mu + ".csv", seqLength, 4);
+				Pair<ArrayList<Double>, ArrayList<Double>> res2 = getMeanMedian(
+						pathToWrite + "AllPerDirectAgreements" + mu + ".csv", seqLength, 4);
 				for (int k = 0; k < res2.getFirst().size(); k++)
 				{
 					sbQ2.append(res2.getFirst().get(k));
@@ -449,8 +449,8 @@ public class EvaluationSeq
 					}
 				}
 
-				Pair<ArrayList<Double>, ArrayList<Double>> res3 =
-						getMeanMedian(pathToWrite + "AllNumDirectAgreementsL1" + mu + ".csv", seqLength, 4);
+				Pair<ArrayList<Double>, ArrayList<Double>> res3 = getMeanMedian(
+						pathToWrite + "AllNumDirectAgreementsL1" + mu + ".csv", seqLength, 4);
 				for (int k = 0; k < res3.getFirst().size(); k++)
 				{
 					sbQ3.append(res3.getFirst().get(k));
@@ -468,8 +468,8 @@ public class EvaluationSeq
 					}
 				}
 
-				Pair<ArrayList<Double>, ArrayList<Double>> res4 =
-						getMeanMedian(pathToWrite + "AllPerDirectAgreementsL1" + mu + ".csv", seqLength, 4);
+				Pair<ArrayList<Double>, ArrayList<Double>> res4 = getMeanMedian(
+						pathToWrite + "AllPerDirectAgreementsL1" + mu + ".csv", seqLength, 4);
 				for (int k = 0; k < res4.getFirst().size(); k++)
 				{
 					sbQ4.append(res4.getFirst().get(k));
@@ -614,8 +614,8 @@ public class EvaluationSeq
 			int roundOfPlaces)
 	{
 		int[] columnIndicesToRead = IntStream.range(0, seqLength).toArray();
-		ArrayList<ArrayList<Double>> columnWiseVals =
-				ReadingFromFile.allColumnsReaderDouble(fileToRead, ",", columnIndicesToRead, false);
+		ArrayList<ArrayList<Double>> columnWiseVals = ReadingFromFile.allColumnsReaderDouble(fileToRead, ",",
+				columnIndicesToRead, false);
 
 		ArrayList<Double> all1ValsMean = new ArrayList<>();
 		ArrayList<Double> all1ValsMedian = new ArrayList<>();
@@ -643,8 +643,8 @@ public class EvaluationSeq
 		{
 			// for (int i = 0; i < seqLength; i++)
 			// {
-			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArrays =
-					readDataForSeqIndex(seqLength, pathToReadResults, verbose);
+			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArrays = readDataForSeqIndex(
+					seqLength, pathToReadResults, verbose);
 
 			ArrayList<ArrayList<String>> arrayMeta = readArrays.getFirst();
 			ArrayList<ArrayList<String>> arrayRecommendedSequence = readArrays.getThird();
@@ -683,8 +683,8 @@ public class EvaluationSeq
 	 * @param verbose
 	 * @return
 	 */
-	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>>
-			readDataForSeqIndex(int seqIndex, String pathToReadResults, boolean verbose)
+	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readDataForSeqIndex(
+			int seqIndex, String pathToReadResults, boolean verbose)
 	{
 		commonPath = Constant.getCommonPath();
 		System.out.println("Inside Evaluation: common path is:" + commonPath);
@@ -749,20 +749,20 @@ public class EvaluationSeq
 
 			StringBuilder consoleLogBuilder = new StringBuilder();
 
-			Triple<ArrayList<ArrayList<String>>, Integer, String> metaExtracted =
-					extractDataFromFile(brMeta, "meta", verbose);
+			Triple<ArrayList<ArrayList<String>>, Integer, String> metaExtracted = extractDataFromFile(brMeta, "meta",
+					verbose);
 			arrayMeta = metaExtracted.getFirst();
 			int countOfLinesMeta = metaExtracted.getSecond();
 			consoleLogBuilder.append(metaExtracted.getThird());
 
-			Triple<ArrayList<ArrayList<String>>, Integer, String> topKExtracted =
-					extractDataFromFile(brTopK, "topK", verbose);
+			Triple<ArrayList<ArrayList<String>>, Integer, String> topKExtracted = extractDataFromFile(brTopK, "topK",
+					verbose);
 			arrayTopK = topKExtracted.getFirst();
 			int countOfLinesTopK = topKExtracted.getSecond();
 			consoleLogBuilder.append(topKExtracted.getThird());
 
-			Triple<ArrayList<ArrayList<String>>, Integer, String> actualExtracted =
-					extractDataFromFile(brActual, "actual", verbose);
+			Triple<ArrayList<ArrayList<String>>, Integer, String> actualExtracted = extractDataFromFile(brActual,
+					"actual", verbose);
 			arrayActual = actualExtracted.getFirst();
 			int countOfLinesActual = actualExtracted.getSecond();
 			consoleLogBuilder.append(actualExtracted.getThird());
@@ -833,8 +833,8 @@ public class EvaluationSeq
 			writeDirectTopKAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite, seqLength);
 
 			// category level: level 1
-			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreementsL1 =
-					computeDirectAgreements(algoLabel, timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, 1);
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreementsL1 = computeDirectAgreements(algoLabel,
+					timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, 1);
 
 			writeDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite);
 			writeNumAndPercentageDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
@@ -878,8 +878,8 @@ public class EvaluationSeq
 						// {System.out.println("arrayForAnRt = " + arrayForAnRt); }
 					}
 
-					double percentageAgreement =
-							StatsUtils.round((sumAgreementsForThisIndex * 100.0) / arrayForAUser.size(), 4);
+					double percentageAgreement = StatsUtils
+							.round((sumAgreementsForThisIndex * 100.0) / arrayForAUser.size(), 4);
 					sbPercentage.append(percentageAgreement);
 					sb.append(sumAgreementsForThisIndex);
 
@@ -998,8 +998,8 @@ public class EvaluationSeq
 						}
 					}
 
-					double percentageAgreement =
-							StatsUtils.round((sumAgreementsForThisTopK * 100.0) / arrayForAUser.size(), 4);
+					double percentageAgreement = StatsUtils
+							.round((sumAgreementsForThisTopK * 100.0) / arrayForAUser.size(), 4);
 					sbPercentage.append(percentageAgreement);
 					sb.append(sumAgreementsForThisTopK);
 
@@ -1065,11 +1065,11 @@ public class EvaluationSeq
 					{
 						countOfRecommendationTimesConsidered++;
 
-						String[] splittedActualSequence =
-								RegexUtils.patternGreaterThan.split(arrayActualSeq.get(i).get(j));
+						String[] splittedActualSequence = RegexUtils.patternGreaterThan
+								.split(arrayActualSeq.get(i).get(j));
 
-						String[] splittedRecommSequence =
-								RegexUtils.patternGreaterThan.split(arrayRecommendedSeq.get(i).get(j));
+						String[] splittedRecommSequence = RegexUtils.patternGreaterThan
+								.split(arrayRecommendedSeq.get(i).get(j));
 
 						if (splittedActualSequence.length != splittedRecommSequence.length)
 						{
@@ -1086,8 +1086,13 @@ public class EvaluationSeq
 						{
 							// removing score
 							String splittedRecommY[] = RegexUtils.patternColon.split(splittedRecommSequence[y]);
-							System.out.print(">" + splittedRecommY[0]);
+							System.out.print(">" + splittedRecommY[0]);// + "levelAtWhichToMatch = " +
+																		// levelAtWhichToMatch);
 
+							if (splittedActualSequence[y] == null)
+							{
+								System.out.println("splittedActualSequence");
+							}
 							if (isAgree(splittedActualSequence[y], splittedRecommY[0], levelAtWhichToMatch))// splittedActualSequence[y].equals(splittedRecomm[0]))
 							{
 								if (VerbosityConstants.verboseEvaluationMetricsToConsole)
@@ -1135,9 +1140,10 @@ public class EvaluationSeq
 	 */
 	private static boolean isAgree(String catID1, String catID2, int levelAtWhichToMatch)
 	{
+
 		try
 		{
-
+			// TODO
 			if (levelAtWhichToMatch == -1)
 			{
 				return catID1.equals(catID2);
@@ -1151,7 +1157,8 @@ public class EvaluationSeq
 
 				if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 				{
-					System.out.println("catID1= " + catID1 + " catID2=" + catID2);
+					System.out.println("levelAtWhichToMatch =" + levelAtWhichToMatch + "\ncatID1= " + catID1
+							+ " catID2=" + catID2);
 					System.out.println(
 							"catID1AtGivenLevel= " + catID1AtGivenLevel + " catID2AtGivenLevel=" + catID2AtGivenLevel);
 					System.out.println("Intersection.size = " + intersection);
@@ -1377,13 +1384,13 @@ public class EvaluationSeq
 			 * FileReader("/home/gunjan/dataRecommTop5.csv")); brActual = new BufferedReader(new
 			 * FileReader("/home/gunjan/dataActual.csv"));
 			 */
-			File fileTopKPrecision =
-					new File(commonPath + fileNamePhrase + timeCategory + "top" + theK + "Precision.csv");
+			File fileTopKPrecision = new File(
+					commonPath + fileNamePhrase + timeCategory + "top" + theK + "Precision.csv");
 			File fileTopKRecall = new File(commonPath + fileNamePhrase + timeCategory + "top" + theK + "Recall.csv");
 			File fileTopKF = new File(commonPath + fileNamePhrase + timeCategory + "top" + theK + "FMeasure.csv");
 
-			File fileNumberOfRecommendationTimes =
-					new File(commonPath + fileNamePhrase + timeCategory + "NumOfRecommendationTimes.csv");
+			File fileNumberOfRecommendationTimes = new File(
+					commonPath + fileNamePhrase + timeCategory + "NumOfRecommendationTimes.csv");
 			// File fileAccuracy = new File("/home/gunjan/accuracy.csv");
 
 			fileTopKPrecision.delete();
@@ -1416,8 +1423,8 @@ public class EvaluationSeq
 			bwTopKRecall = new BufferedWriter(new FileWriter(fileTopKRecall.getAbsoluteFile()));
 			bwTopKF = new BufferedWriter(new FileWriter(fileTopKF.getAbsoluteFile()));
 
-			bwNumberOfRecommendationTimes =
-					new BufferedWriter(new FileWriter(fileNumberOfRecommendationTimes.getAbsoluteFile()));
+			bwNumberOfRecommendationTimes = new BufferedWriter(
+					new FileWriter(fileNumberOfRecommendationTimes.getAbsoluteFile()));
 
 			// bwAccuracy = new BufferedWriter(new FileWriter(fileAccuracy.getAbsoluteFile()));
 
@@ -1689,8 +1696,8 @@ public class EvaluationSeq
 			file.delete();
 			file.createNewFile();
 
-			File validRTCountFile =
-					new File(commonPath + fileNamePhrase + timeCategory + "AvgPrecisionCountValidRT.csv");
+			File validRTCountFile = new File(
+					commonPath + fileNamePhrase + timeCategory + "AvgPrecisionCountValidRT.csv");
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
@@ -1930,8 +1937,8 @@ public class EvaluationSeq
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 
-			File validRTCountFile =
-					new File(commonPath + fileNamePhrase + timeCategory + "AvgFMeasureCountValidRT.csv");
+			File validRTCountFile = new File(
+					commonPath + fileNamePhrase + timeCategory + "AvgFMeasureCountValidRT.csv");
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));

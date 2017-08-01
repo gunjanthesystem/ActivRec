@@ -48,7 +48,7 @@ public class ActivityObject implements Serializable
 	 */
 	HashMap<String, String> dimensionIDNameValues; //
 
-	int activityID;
+	private int activityID;
 	/**
 	 * an activity object can have multiple location ids if it is a merged
 	 */
@@ -140,18 +140,51 @@ public class ActivityObject implements Serializable
 	 */
 	public boolean equalsWrtPrimaryDimension(ActivityObject ao2)
 	{
+		switch (Constant.primaryDimension)
+		{
+			case ActivityID:
+				return this.activityID == ao2.getActivityID();
+			case LocationID:
+				// actually this approach for Location ID also works for activity id but is slower since set
+				// intersection, hence create a lighter methods for activityID
+				Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
+						ao2.getPrimaryDimensionVal());
+
+				if (intersection.size() > 0)
+				{// System.out.println("intersection.size() = " + intersection.size() + " returning TRUE");
+					return true;
+				}
+				else
+				{ // System.out.println("intersection.size() = " + intersection.size() + " returning FALSE");
+					return false;
+				}
+			default:
+				PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
+				return false;
+		}
+	}
+
+	/**
+	 * Whether this activity object and ao2 are equal with respect to the current primary dimension. They are considered
+	 * equal if they share any value, i.e., size of intersection of primary values>1
+	 * 
+	 * @param ao
+	 * @param primaryDimension
+	 * @return
+	 */
+	public boolean equalsWrtPrimaryDimension0(ActivityObject ao2)
+	{
+		// actually this approach for Location ID also works for activity id but is slower since set
+		// intersection, hence create a lighter methods for activityID
 		Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
 				ao2.getPrimaryDimensionVal());
 
 		if (intersection.size() > 0)
-		{
-			// System.out.println("intersection.size() = " + intersection.size() + " returning TRUE");
+		{// System.out.println("intersection.size() = " + intersection.size() + " returning TRUE");
 			return true;
 		}
 		else
-
-		{
-			// System.out.println("intersection.size() = " + intersection.size() + " returning FALSE");
+		{ // System.out.println("intersection.size() = " + intersection.size() + " returning FALSE");
 			return false;
 		}
 	}

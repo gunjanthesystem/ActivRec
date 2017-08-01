@@ -296,6 +296,8 @@ public class Timeline implements Serializable
 		return sb.toString();
 	}
 
+	//
+
 	///////////////
 	public String getActivityObjectNamesInSequenceWithFeatures()
 	{
@@ -1100,4 +1102,39 @@ public class Timeline implements Serializable
 		return new Triple<Integer, ActivityObject, Double>(indexOfActivityObjectNearestST, nearestActObj,
 				(double) leastDistantSTVal);
 	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((activityObjectsInTimeline == null) ? 0 : activityObjectsInTimeline.hashCode());
+		result = prime * result + (shouldBelongToSingleDay ? 1231 : 1237);
+		result = prime * result + (shouldBelongToSingleUser ? 1231 : 1237);
+		result = prime * result + ((timelineID == null) ? 0 : timelineID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Timeline other = (Timeline) obj;
+		if (activityObjectsInTimeline == null)
+		{
+			if (other.activityObjectsInTimeline != null) return false;
+		}
+		else if (!activityObjectsInTimeline.equals(other.activityObjectsInTimeline)) return false;
+		if (shouldBelongToSingleDay != other.shouldBelongToSingleDay) return false;
+		if (shouldBelongToSingleUser != other.shouldBelongToSingleUser) return false;
+		if (timelineID == null)
+		{
+			if (other.timelineID != null) return false;
+		}
+		else if (!timelineID.equals(other.timelineID)) return false;
+		return true;
+	}
+
 }
