@@ -41,8 +41,10 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	static final String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801",
-			"901" };
+	static final String groupsOf100UsersLabels[] = { "401" };// "1", "101", "201", "301", "401", "501", "601", "701",
+																// "801",
+	// static final String thresholds =
+	// "901" };
 
 	// for each individual seq index
 	ArrayList<ArrayList<String>> listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
@@ -254,6 +256,230 @@ public class EvaluationSeq
 
 	/**
 	 * 
+	 * @param seqLength
+	 * @param outputCoreResultsPath
+	 * @param matchingUnitAsPastCount
+	 */
+	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount,
+			int thresholdVal)
+	{
+		// commonPath = "./dataWritten/";
+
+		intialiseListOfFilenames(matchingUnitAsPastCount);
+		int totalNumOfUsersComputedFor = 0;
+		try
+		{
+			for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
+			{
+				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/" + thresholdVal + "/";
+				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
+				Constant.initialise(commonPath, Constant.getDatabaseName(),
+						DomainConstants.pathToSerialisedCatIDsHierDist,
+						DomainConstants.pathToSerialisedCatIDNameDictionary,
+						DomainConstants.pathToSerialisedLocationObjects);
+
+				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+				{
+					double mu = matchingUnitAsPastCount[muIndex];
+					commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/MatchingUnit" + String.valueOf(mu)
+							+ "/";
+					Constant.setCommonPath(commonPath);
+					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
+
+					PrintStream consoleLogStream = WritingToFile
+							.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
+
+					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, true);
+					totalNumOfUsersComputedFor += numOfUsersComputerFor;
+					System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
+					System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
+
+					// PopUps.showMessage("FINISHED EVAL FOR mu = " + mu + " USERGROUP=" + groupsOf100UsersLabel);
+
+					// create lists of filenames of results for different MUs which need to be concatenated
+					String algoLabel = "Algo";
+
+					for (String timeCategory : timeCategories)
+					{
+						listOfNumAgreementsFiles.get(muIndex)
+								.add(commonPath + algoLabel + timeCategory + "NumDirectAgreements.csv");
+						listOfPerAgreementsFiles.get(muIndex)
+								.add(commonPath + algoLabel + timeCategory + "PercentageDirectAgreements.csv");
+						listOfNumAgreementsFilesL1.get(muIndex)
+								.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectAgreements.csv");
+						listOfPerAgreementsFilesL1.get(muIndex)
+								.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectAgreements.csv");
+
+						listOfNumTopKAgreementsFiles.get(muIndex)
+								.add(commonPath + algoLabel + timeCategory + "NumDirectTopKAgreements.csv");
+						listOfPerTopKAgreementsFiles.get(muIndex)
+								.add(commonPath + algoLabel + timeCategory + "PercentageDirectTopKAgreements.csv");
+						listOfNumTopKAgreementsFilesL1.get(muIndex)
+								.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectTopKAgreements.csv");
+						listOfPerTopKAgreementsFilesL1.get(muIndex).add(
+								commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectTopKAgreements.csv");
+					}
+					consoleLogStream.close();
+				}
+
+			}
+
+			// PopUps.showMessage("BREAKING");
+			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
+					listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
+					listOfPerAgreementsFilesL1);
+
+			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
+					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
+					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1);
+
+			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
+					"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
+			String[] fileNamePhrasesTopK = { "AllNumDirectTopKAgreements_", "AllPerDirectTopKAgreements_",
+					"AllNumDirectTopKAgreementsL1_", "AllPerDirectTopKAgreementsL1_" };
+
+			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
+
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
+					"SummaryLog");
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
+					summaryStats, "SummaryTopKLog");
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	////
+	/**
+	 * 
+	 * @param seqLength
+	 * @param outputCoreResultsPath
+	 * @param matchingUnitAsPastCount
+	 * @param globalThresholds
+	 */
+	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount,
+			int thresholdsArray[])
+	{
+		// commonPath = "./dataWritten/";
+		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
+		int totalNumOfUsersComputedFor = 0;
+		try
+		{
+			for (int thresholdValue : thresholdsArray)
+			{
+				// listOfNumAgreementsFiles.clear();
+				// listOfPerAgreementsFiles.clear();
+				// listOfNumAgreementsFilesL1.clear();
+				// listOfPerAgreementsFilesL1.clear();
+				//
+				// listOfNumTopKAgreementsFiles.clear();
+				// listOfPerTopKAgreementsFiles.clear();
+				//
+				// listOfNumTopKAgreementsFilesL1.clear();
+				// listOfPerTopKAgreementsFilesL1.clear();
+				System.out.println("intialiseListOfFilenames");
+				intialiseListOfFilenames(matchingUnitAsPastCount);
+
+				for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
+				{
+					String pathT = outputCoreResultsPath + groupsOf100UsersLabel + "/" + thresholdValue;
+					System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
+
+					Constant.initialise(pathT, Constant.getDatabaseName(),
+							DomainConstants.pathToSerialisedCatIDsHierDist,
+							DomainConstants.pathToSerialisedCatIDNameDictionary,
+							DomainConstants.pathToSerialisedLocationObjects);
+					System.out.println("Constant.initialise done ---");
+					// outputCoreResultsPath = commonPathT;
+
+					for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+					{
+						double mu = matchingUnitAsPastCount[muIndex];
+						commonPath = pathT + "/MatchingUnit" + String.valueOf(mu) + "/";
+						Constant.setCommonPath(commonPath);
+
+						System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
+
+						// PrintStream consoleLogStream = WritingToFile
+						// .redirectConsoleOutput(commonPath + "EvaluationLog.txt");
+
+						int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, false);
+						totalNumOfUsersComputedFor += numOfUsersComputerFor;
+						System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
+						System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
+
+						// PopUps.showMessage("FINISHED EVAL FOR mu = " + mu + " USERGROUP=" + groupsOf100UsersLabel);
+
+						// create lists of filenames of results for different MUs which need to be concatenated
+						String algoLabel = "Algo";
+
+						for (String timeCategory : timeCategories)
+						{
+							listOfNumAgreementsFiles.get(muIndex)
+									.add(commonPath + algoLabel + timeCategory + "NumDirectAgreements.csv");
+							listOfPerAgreementsFiles.get(muIndex)
+									.add(commonPath + algoLabel + timeCategory + "PercentageDirectAgreements.csv");
+							listOfNumAgreementsFilesL1.get(muIndex)
+									.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectAgreements.csv");
+							listOfPerAgreementsFilesL1.get(muIndex).add(
+									commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectAgreements.csv");
+
+							listOfNumTopKAgreementsFiles.get(muIndex)
+									.add(commonPath + algoLabel + timeCategory + "NumDirectTopKAgreements.csv");
+							listOfPerTopKAgreementsFiles.get(muIndex)
+									.add(commonPath + algoLabel + timeCategory + "PercentageDirectTopKAgreements.csv");
+							listOfNumTopKAgreementsFilesL1.get(muIndex)
+									.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectTopKAgreements.csv");
+							listOfPerTopKAgreementsFilesL1.get(muIndex).add(commonPath + algoLabel + "L1" + timeCategory
+									+ "PercentageDirectTopKAgreements.csv");
+						}
+						// consoleLogStream.close();
+					} // end of loop over MUs
+
+					StringBuilder sb = new StringBuilder();
+					sb.append("listOfNumAgreementsFiles= " + listOfNumAgreementsFiles + "\n");
+					sb.append("listOfPerAgreementsFiles= " + listOfPerAgreementsFiles + "\n");
+					sb.append("listOfNumAgreementsFilesL1= " + listOfNumAgreementsFilesL1 + "\n");
+					sb.append("listOfPerAgreementsFilesL1= " + listOfPerAgreementsFilesL1 + "\n");
+					sb.append("listOfNumTopKAgreementsFiles= " + listOfNumTopKAgreementsFiles + "\n");
+					System.out.println(sb.toString());
+					// PopUps.showMessage(sb.toString());
+
+					ArrayList<String> listOfWrittenFiles = concatenateFiles(pathT, matchingUnitAsPastCount,
+							listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
+							listOfPerAgreementsFilesL1);
+
+					ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(pathT, matchingUnitAsPastCount,
+							listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles, listOfNumTopKAgreementsFilesL1,
+							listOfPerTopKAgreementsFilesL1);
+
+					String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
+							"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
+					String[] fileNamePhrasesTopK = { "AllNumDirectTopKAgreements_", "AllPerDirectTopKAgreements_",
+							"AllNumDirectTopKAgreementsL1_", "AllPerDirectTopKAgreementsL1_" };
+
+					SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
+
+					summariseResults(seqLength, pathT, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
+							"SummaryLog");
+					summariseResults(seqLength, pathT, matchingUnitAsPastCount, fileNamePhrasesTopK, summaryStats,
+							"SummaryTopKLog");
+				} // end of loop over thresholds
+			} // end of loop over users
+			consoleLogStream.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	////
+
+	/**
+	 * 
 	 * @param matchingUnitAsPastCount
 	 */
 	private void intialiseListOfFilenames(double[] matchingUnitAsPastCount)
@@ -359,8 +585,10 @@ public class EvaluationSeq
 	{
 		// String[] fileNamePhrases = { "", "" };
 		// SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + consoleLogFileName);
+		// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + consoleLogFileName);
 
+		System.out.println("fileNamePhrases = " + fileNamePhrases.toString());
+		System.out.println("summaryStats = " + summaryStats);
 		// ArrayList<String> rowNames =
 		ArrayList<String> rowNames = (ArrayList<String>) DoubleStream.of(matchingUnitAsPastCount).boxed()
 				.map(v -> v.toString()).collect(Collectors.toList());
@@ -383,7 +611,7 @@ public class EvaluationSeq
 						pathToWrite + stat + fileNamePhraseToRead + ".csv", ",", colNames, rowNames);
 			}
 		}
-		consoleLogStream.close();
+		// consoleLogStream.close();
 	}
 
 	/**
@@ -522,7 +750,7 @@ public class EvaluationSeq
 			ArrayList<ArrayList<String>> listOfPerAgreementsFilesL1)
 	{
 		ArrayList<String> listOfWrittenFiles = new ArrayList<String>();
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVConcatLog.txt");
+		// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVConcatLog.txt");
 
 		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 		{
@@ -547,7 +775,7 @@ public class EvaluationSeq
 					pathToWrite + "AllPerDirectAgreementsL1_" + mu + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreementsL1" + mu + ".csv");
 		}
-		consoleLogStream.close();
+		// consoleLogStream.close();
 
 		return listOfWrittenFiles;
 
@@ -572,7 +800,7 @@ public class EvaluationSeq
 			ArrayList<ArrayList<String>> listOfPerTopKAgreementsFilesL1)
 	{
 		ArrayList<String> listOfWrittenFiles = new ArrayList<String>();
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVTopKConcatLog.txt");
+		// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVTopKConcatLog.txt");
 
 		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 		{
@@ -597,7 +825,7 @@ public class EvaluationSeq
 					pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + ".csv");
 		}
-		consoleLogStream.close();
+		// consoleLogStream.close();
 
 		return listOfWrittenFiles;
 
@@ -639,6 +867,7 @@ public class EvaluationSeq
 	public int doEvaluationSeq(int seqLength, String pathToReadResults, String pathToWrite, boolean verbose)
 	{
 		int numOfUsersComputedFor = Integer.MIN_VALUE;
+		System.out.println("Inside  doEvaluationSeq");
 		try
 		{
 			// for (int i = 0; i < seqLength; i++)
@@ -671,6 +900,8 @@ public class EvaluationSeq
 			e.printStackTrace();
 			PopUps.showException(e, "org.activity.evaluation.EvaluationSeq.doEvaluationSeq()");
 		}
+		System.out.println("Exiting  doEvaluationSeq");
+
 		// System.out.println("All test stats done");
 		// PopUps.showMessage("All test stats done");
 		return numOfUsersComputedFor;
@@ -816,7 +1047,7 @@ public class EvaluationSeq
 	{
 		int numOfUsers = arrayMeta.size();
 		int numOfUsersFromDirectAgreements = Integer.MIN_VALUE;
-		if (verbose)
+		// if (verbose)
 		{
 			System.out.println("Inside doEvaluationSeq\nNum of users = " + numOfUsers);
 		}
@@ -1166,7 +1397,10 @@ public class EvaluationSeq
 
 				if (intersection > 0)
 				{
-					System.out.println("got intersection");
+					if (VerbosityConstants.verboseEvaluationMetricsToConsole)
+					{
+						System.out.println("got intersection");
+					}
 					return true;
 				}
 				else

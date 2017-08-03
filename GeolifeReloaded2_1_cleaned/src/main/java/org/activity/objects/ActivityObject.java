@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -199,15 +200,29 @@ public class ActivityObject implements Serializable
 	 */
 	public boolean equalsWrtPrimaryDimension(ArrayList<Integer> primaryDimensionValToCompare)
 	{
-		Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
-				primaryDimensionValToCompare);
-		if (intersection.size() > 0)
+		if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
 		{
-			return true;
+			if (primaryDimensionValToCompare.size() != 1)
+			{
+				PopUps.printTracedErrorMsgWithExit(" Error: expected 1 val for primaryDimensionValToCompare but got "
+						+ primaryDimensionValToCompare.size() + " vals, Constant.primaryDimension="
+						+ Constant.primaryDimension);
+			}
+			return (primaryDimensionValToCompare.get(0) == this.activityID);
 		}
-		else
+		else // is generic and will also apply for activity id as primary dimension but the above if block written for
+				// better performance
 		{
-			return false;
+			Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
+					primaryDimensionValToCompare);
+			if (intersection.size() > 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
 
@@ -1309,6 +1324,11 @@ public class ActivityObject implements Serializable
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param other
+	 * @return
+	 */
 	public boolean equals(ActivityObject other)
 	{
 		if (this == other) return true;

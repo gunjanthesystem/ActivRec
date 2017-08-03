@@ -4321,19 +4321,19 @@ public class WritingToFile
 		{
 			switch (timelinesSet)
 			{
-			case "AllTimelines":
-				timelinesCursor = userAllDatesTimeslines;
-				break;
-			case "TrainingTimelines":
-				timelinesCursor = userTrainingTimelines;
-				break;
-			case "TestTimelines":
-				timelinesCursor = userTestTimelines;
-				break;
-			default:
-				PopUps.showError(
-						"Error in org.activity.tests.RecommendationTestsDaywiseJan2016: Unrecognised timelinesSet");
-				break;
+				case "AllTimelines":
+					timelinesCursor = userAllDatesTimeslines;
+					break;
+				case "TrainingTimelines":
+					timelinesCursor = userTrainingTimelines;
+					break;
+				case "TestTimelines":
+					timelinesCursor = userTestTimelines;
+					break;
+				default:
+					PopUps.showError(
+							"Error in org.activity.tests.RecommendationTestsDaywiseJan2016: Unrecognised timelinesSet");
+					break;
 			}
 
 			if (timelinesSet.equals("TrainingTimelines"))
@@ -4509,8 +4509,7 @@ public class WritingToFile
 			System.out.println("creating directory: " + directory);
 			try
 			{
-				directory.mkdir();
-				result = true;
+				result = directory.mkdir();
 			}
 			catch (SecurityException se)
 			{

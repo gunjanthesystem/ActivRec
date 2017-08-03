@@ -454,13 +454,28 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			if (!this.lookPastType.equals(Enums.LookPastType.ClosestTime))
 			{
-				if (this.nextActivityObjectsFromCands.size() != distancesSortedMap.size()
-						|| distancesSortedMap.size() != this.candidateTimelines.size())
+				if (!Sanity.eq(this.nextActivityObjectsFromCands.size(), distancesSortedMap.size(),
+						"Error at Sanity 349 (RecommenderMaster: this.topNextActivityObjects.size() == editDistancesSortedMapFullCand.size() not satisfied"))
 				{
-					System.err.println(
-							"Error at Sanity 349 (RecommenderMaster: this.topNextActivityObjects.size() == editDistancesSortedMapFullCand.size() && editDistancesSortedMapFullCand.size()== this.candidateTimelines.size()  not satisfied");
 					errorExists = true;
 				}
+
+				// Disabled logging for performance
+				// System.out
+				// .println("this.nextActivityObjectsFromCands.size()= " + this.nextActivityObjectsFromCands.size()
+				// + "\ndistancesSortedMap.size()=" + distancesSortedMap.size()
+				// + "\nthis.candidateTimelines.size()=" + this.candidateTimelines.size());
+
+				// this will not be true when thresholding
+				if (this.thresholdPruningNoEffect)
+				{
+					if (!Sanity.eq(distancesSortedMap.size(), this.candidateTimelines.size(),
+							"Error at Sanity 349 (RecommenderMaster: editDistancesSortedMapFullCand.size()== this.candidateTimelines.size()  not satisfied"))
+					{
+						errorExists = true;
+					}
+				}
+
 			}
 			else if (this.lookPastType.equals(Enums.LookPastType.ClosestTime))
 			{
@@ -584,10 +599,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted, TypeOfThreshold typeOfThreshold,
 			double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm)
 	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("Inside pruneAboveThreshold:\n");
+
 		double thresholdAsDistance = -1;
 		if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
 		{
-			thresholdAsDistance = thresholdVal;
+			thresholdAsDistance = thresholdVal / 100;
 		}
 		else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
 		{
@@ -600,16 +618,35 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// errorExists = true;
 			System.exit(-2);
 		}
+		sb.append("thresholdAsDistance=" + thresholdAsDistance + "\n before pruning distancesMapUnsorted =\n");
+		for (Entry<String, Pair<String, Double>> e : distancesMapUnsorted.entrySet())
+		{
+			sb.append(e.getKey() + "--" + e.getValue().toString() + "\n");
+		}
 
 		int countCandBeforeThresholdPruning = distancesMapUnsorted.size();// distanceScoresSorted.size();
 		distancesMapUnsorted = TimelineUtils.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
 		int countCandAfterThresholdPruning = distancesMapUnsorted.size();
 
+		sb.append("After pruning distancesMapUnsorted =\n");
+		for (Entry<String, Pair<String, Double>> e : distancesMapUnsorted.entrySet())
+		{
+			sb.append(e.getKey() + "--" + e.getValue().toString() + "\n");
+		}
+
+		sb.append("thresholdAsDistance=" + thresholdAsDistance + " countCandBeforeThresholdPruning="
+				+ countCandBeforeThresholdPruning + "countCandAfterThresholdPruning=" + countCandAfterThresholdPruning
+				+ "\n");
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println(sb.toString());
+		}
 		boolean thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
+
 		if (!thresholdPruningNoEffect)
 		{
-			System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
-			PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
+			// System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
+			// PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
 			if (!Constant.useThreshold)
 			{
 				System.err.println("Error: threshold pruning is happening.");// +msg);
@@ -1859,11 +1896,15 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		try
 		{
-			if (editDistanceSortedFullCand.size() < 5)
+			// Disabled on Aug 2 2017 as its just logging
+			if (VerbosityConstants.verbose)
 			{
-				System.err.println("\nWarning: # candidate timelines = editDistanceSortedFullCand.size() ="
-						+ editDistanceSortedFullCand.size() + "<5");
-				// errorExists = true;
+				if (editDistanceSortedFullCand.size() < 5)
+				{
+					System.err.println("\nWarning: #cands = editDistanceSortedFullCand.size() ="
+							+ editDistanceSortedFullCand.size() + "<5");
+					// errorExists = true;
+				}
 			}
 
 			for (Map.Entry<String, Pair<String, Double>> candDistEntry : editDistanceSortedFullCand.entrySet())
@@ -3060,7 +3101,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			ActivityObject ae = activityObjectsInTraining.get(i);
 
 			// start sanity check for equalsWrtPrimaryDimension() //can be removed after check
-			if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+			if (VerbosityConstants.checkSanityPDImplementn
+					&& Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
 			{
 				boolean a = ae.equalsWrtPrimaryDimension(activityAtRecommPoint);
 				boolean b = ae.getActivityName().equals(activityAtRecommPoint.getActivityName());
@@ -3137,9 +3179,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// long tS = System.nanoTime();
 
 		// System.out.println("\nInside extractCandidateTimelinesMUCountColl(): userIDAtRecomm=" + userIDAtRecomm);//
-		// for
-		// creating
-		// timelines");
+		// for creating timelines");
 		// System.out.println("Inside extractCandidateTimelinesMUCountColl :trainTestTimelinesForAllUsers.size()= "
 		// + trainTestTimelinesForAllUsers.size());
 		// System.out.println("activityAtRecommPoint:" + activityAtRecommPoint.getPrimaryDimensionVal("/"));
@@ -3154,13 +3194,14 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				.entrySet())
 		{
 			String userIdCursor = trainTestForAUser.getKey();
-			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
-			Timeline trainingTimelineForThisUser = TimelineUtils
-					.dayTimelinesToATimeline(trainingTimelineForThisUserDate, false, true);
-			// convert datetime to continouse timeline
 
 			if (!userIDAtRecomm.equals(userIdCursor))// exclude the current user.
 			{
+				LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
+				Timeline trainingTimelineForThisUser = TimelineUtils
+						.dayTimelinesToATimeline(trainingTimelineForThisUserDate, false, true);
+				// convert datetime to continouse timeline
+
 				int numOfValidCurrentActsEncountered = 0;
 				// System.out.println("userIDAtRecomm=" + userIDAtRecomm + " userIdCursor=" + userIdCursor);
 				// find the most recent occurrence of current activity name
@@ -3257,7 +3298,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 				if (numOfValidCurrentActsEncountered == 0)
 				{
-					System.out.println("\tU:" + userIdCursor + " rejected due to no cur act");
+					// $$ DIsabled for performance
+					// $$System.out.println("\tU:" + userIdCursor + " rejected due to no cur act");
 					numUsersRejectedDueToNoValidCands += 1;
 				}
 			} // end of if user id matches
@@ -3270,7 +3312,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 		// System.out.println("trainTestTimelinesForAllUsers.size() = " + trainTestTimelinesForAllUsers.size());
 		// System.out.println("candidateTimelines.size() = " + candidateTimelines.size());
-		// System.out.println("numUsersRejectedDueToNoValidCands = " + numUsersRejectedDueToNoValidCands);
+		System.out.println("numUsersRejectedDueToNoValidCands = " + numUsersRejectedDueToNoValidCands);
 		Sanity.eq(trainTestTimelinesForAllUsers.size() - 1,
 				(candidateTimelines.size() + numUsersRejectedDueToNoValidCands),
 				"trainTestTimelinesForAllUsers.size()!= (candidateTimelines.size() + numUsersRejectedDueToNoValidCands)");
@@ -3308,7 +3350,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			ActivityObject ae = activityObjectsInTraining.get(i);
 
 			// start sanity check for equalsWrtPrimaryDimension() //can be removed after check
-			if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+			if (VerbosityConstants.checkSanityPDImplementn
+					&& Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
 			{
 				boolean a = ae.equalsWrtPrimaryDimension(activityAtRecommPoint);
 				boolean b = ae.getActivityName().equals(activityAtRecommPoint.getActivityName());

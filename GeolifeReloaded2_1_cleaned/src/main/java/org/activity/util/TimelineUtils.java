@@ -2195,7 +2195,8 @@ public class TimelineUtils
 			}
 
 			// start sanity check for countContainsPrimaryDimensionValButNotAsLast()
-			if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+			if (VerbosityConstants.checkSanityPDImplementn
+					&& Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
 			{
 				int a = dayTimeline.countContainsActivityNameButNotAsLast(activityAtRecommPoint.getActivityName());
 				int b = dayTimeline
@@ -2226,7 +2227,8 @@ public class TimelineUtils
 				}
 
 				// start sanity check for hasAValidActAfterFirstOccurOfThisPrimaryDimensionVal()
-				if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+				if (VerbosityConstants.checkSanityPDImplementn
+						&& Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
 				{
 					boolean a = dayTimeline
 							.hasAValidActAfterFirstOccurOfThisActName(activityAtRecommPoint.getActivityName());
@@ -2940,11 +2942,32 @@ public class TimelineUtils
 		Timeline concatenatedTimeline = null;
 
 		ArrayList<ActivityObject> allActivityObjects = new ArrayList<>();
+		// ArrayList<ActivityObject> allActivityObjectsDummy = new ArrayList<>();
 
-		for (Map.Entry<Date, Timeline> entry : dayTimelines.entrySet())
+		// long t1 = System.nanoTime();
+		// TODO: this method is a signficant performance eater, find way to optimise it.
+		for (Map.Entry<Date, Timeline> entryOneDayTimeline : dayTimelines.entrySet())
 		{
-			allActivityObjects.addAll(entry.getValue().getActivityObjectsInTimeline());
+			allActivityObjects.addAll(entryOneDayTimeline.getValue().getActivityObjectsInTimeline());
 		}
+		// long t2 = System.nanoTime();
+
+		// Start of dummy: was trying Collections.addAll if it gave better performance but it wasnt better
+		// for (Map.Entry<Date, Timeline> entryOneDayTimeline : dayTimelines.entrySet())
+		// {
+		// ArrayList<ActivityObject> aosInThisDayTimeline = entryOneDayTimeline.getValue()
+		// .getActivityObjectsInTimeline();
+		// Collections.addAll(allActivityObjectsDummy,
+		// aosInThisDayTimeline.toArray(new ActivityObject[aosInThisDayTimeline.size()]));
+		// }
+		// long t3 = System.nanoTime();
+
+		// System.out.println("Approach original: " + (t2 - t1) + " ns");
+		// System.out.println("Approach new : " + (t3 - t2) + " ns");
+		// System.out.println("% change : " + 100.0 * ((t3 - t2) - (t2 - t1)) / (t2 - t1));
+		// System.out.println("allActivityObjectsDummy.equals(allActivityObjects) = "
+		// + allActivityObjectsDummy.equals(allActivityObjects));
+		// end of dummy
 
 		if (allActivityObjects.size() == 0)
 		{
@@ -2959,7 +2982,7 @@ public class TimelineUtils
 			if (VerbosityConstants.verbose)
 			{
 				System.out.println("Creating timelines for " + dayTimelines.size() + " daytimelines  takes "
-						+ (System.currentTimeMillis() - dt) / 1000 + " secs");
+						+ (System.currentTimeMillis() - dt) + " ms");
 			}
 		}
 		return concatenatedTimeline;
