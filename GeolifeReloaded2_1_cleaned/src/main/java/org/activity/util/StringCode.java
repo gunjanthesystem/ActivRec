@@ -997,8 +997,41 @@ public class StringCode
 		// possible sequence.
 		// such as if primary vals for AOs: 1,2/3,5,6 (here the second element is merger of 2 and 3) then we will get
 		// seq: 1,2,5,6 and 1,3,5,6 .
-		ArrayList<ArrayList<Integer>> possibleSequencesOfPrimaryDimensionVals = multiValSeqTo1ValSeqs(activityObjects,
-				primaryDimension, verbose);
+		ArrayList<ArrayList<Integer>> possibleSequencesOfPrimaryDimensionVals = new ArrayList<>();
+		// multiValSeqTo1ValSeqs(activityObjects,primaryDimension, verbose);
+
+		if (primaryDimension.equals(PrimaryDimension.ActivityID)) // each ao has single act id
+		{
+			ArrayList<Integer> listOfActIDs = new ArrayList<>();
+			for (ActivityObject ao : activityObjects)
+			{
+				listOfActIDs.add(ao.getActivityID());
+			}
+			possibleSequencesOfPrimaryDimensionVals.add(listOfActIDs);
+
+			// sanity check start
+			if (VerbosityConstants.checkSanityPDImplementn)
+			{
+				ArrayList<ArrayList<Integer>> dummyPossibleSequencesOfPrimaryDimensionVals = multiValSeqTo1ValSeqs(
+						activityObjects, primaryDimension, verbose);
+
+				System.out.println("Debug: dummyPossibleSequencesOfPrimaryDimensionVals= "
+						+ dummyPossibleSequencesOfPrimaryDimensionVals.toString());
+
+				System.out.println("Debug: possibleSequencesOfPrimaryDimensionVals= "
+						+ possibleSequencesOfPrimaryDimensionVals.toString());
+
+				if (!dummyPossibleSequencesOfPrimaryDimensionVals.equals(possibleSequencesOfPrimaryDimensionVals))
+				{
+					PopUps.printTracedErrorMsg(
+							"dummyPossibleSequencesOfPrimaryDimensionVals.equals(possibleSequencesOfPrimaryDimensionVals");
+				}
+			} // sanity check end
+		}
+		else
+		{
+			possibleSequencesOfPrimaryDimensionVals = multiValSeqTo1ValSeqs(activityObjects, primaryDimension, verbose);
+		}
 
 		for (ArrayList<Integer> seqOfPDVals : possibleSequencesOfPrimaryDimensionVals)
 		{

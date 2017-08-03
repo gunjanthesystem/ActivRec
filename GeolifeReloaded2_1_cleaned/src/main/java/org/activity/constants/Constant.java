@@ -103,7 +103,7 @@ public final class Constant
 	 * Can be disabled for better performance for subsequent runs if previous run of experiments shows that timelines
 	 * created had no chronological anomaly
 	 */
-	public static final boolean checkIfTimelineCreatedIsChronological = true;// false;
+	public static final boolean checkIfTimelineCreatedIsChronological = false;// true;// false;
 
 	/**
 	 * Percentage/100 for training test split of dataset
@@ -120,7 +120,7 @@ public final class Constant
 	/**
 	 * Determines if thresholding is used to eliminate candidate timelines beyond the threshold distance
 	 */
-	public static final boolean useThreshold = false;
+	public static final boolean useThreshold = true;
 
 	/**
 	 * Determines whether tolerance is used for comparing features when calculating edit distance
@@ -161,7 +161,7 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.ClosestTime;// ClosestTime;// .NGram;//
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// ClosestTime;// .NGram;//
 	// .Daywise;//
 	// NCount;//
 	// Enums.LookPastType.NCount;
@@ -182,7 +182,8 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 4, 3, 0, 1, 2, 6, 8, 10, 12 };// , 14, 16, 18 };
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8, 10 /* , 12 */ };// , 14, 16,
+																									// 18 };
 	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
 	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 

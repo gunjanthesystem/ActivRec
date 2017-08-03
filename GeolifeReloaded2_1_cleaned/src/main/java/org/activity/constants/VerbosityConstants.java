@@ -8,6 +8,12 @@ package org.activity.constants;
  */
 public class VerbosityConstants
 {
+	/**
+	 * Check sanity of implementations for primary dimension perspective, these sanity checks are for when pd is
+	 * activity id, since the earlier methods to compared with are for activity name and activity name and activity id
+	 * are same for gowalla dataset.
+	 */
+	public static final boolean checkSanityPDImplementn = false;
 
 	/**
 	 * Controlling the verbosity of console log output
@@ -26,12 +32,12 @@ public class VerbosityConstants
 	public static final boolean verboseOTMDSAM = false;
 	public static final boolean verboseDistance = false;// false;
 	public static final boolean verboseRankScoreCalcToConsole = false;// false;
-	public static final boolean verboseEvaluationMetricsToConsole = true;// true;// false;
+	public static final boolean verboseEvaluationMetricsToConsole = false;// true;// true;// false;
 	/**
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv
 	 * and EditDistancePerRtPerCand.csv have some similar information and have corresponding records.
 	 */
-	public static final boolean WriteEditDistancePerRtPerCand = false;// true;// false;// false;// false; //
+	public static final boolean WriteEditDistancePerRtPerCand = false;// false;// true;// false;// false;// false; //
 	public static final boolean WriteCandInEditDistancePerRtPerCand = false;// false;// false;// false;
 	public static boolean WriteNumActsPerRTPerCand = false;// false; // this information is redundant as well
 	public static final boolean WriteRedundant = false;

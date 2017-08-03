@@ -43,6 +43,13 @@ public class TimelineWithNext extends Timeline
 		return this.nextActivityObject;
 	}
 
+	// public List<ActivityObject> getActivityObjectsInTimelineWithNext()
+	// {
+	// ArrayList<ActivityObject> a = new ArrayList(this.getActivityObjectsInTimeline());
+	// a.add(nextActivityObject);
+	// return null;
+	// }
+
 	/**
 	 * Sets whether the immediate next Activity Object is valid or not
 	 * 

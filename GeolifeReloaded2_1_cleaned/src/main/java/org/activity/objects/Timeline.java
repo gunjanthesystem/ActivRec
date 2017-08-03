@@ -81,7 +81,10 @@ public class Timeline implements Serializable
 		}
 		else
 		{
-			timelineID = String.valueOf(countTimelinesCreatedUntilNow);
+			// timelineID = String.valueOf(countTimelinesCreatedUntilNow);
+			timelineID = Integer.toString(countTimelinesCreatedUntilNow);
+			// changed from String.valueOf on 2 Aug 2017 for performance
+			// Integer.toString(i)
 		}
 	}
 

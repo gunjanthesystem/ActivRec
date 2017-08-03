@@ -29,6 +29,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
+import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017GenSeq;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
@@ -62,8 +63,9 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	 * the activities guiding recommendation are pruned out from set of candidate timelines
 	 */
 	Enums.TypeOfThreshold typeOfThresholds[];// = { "Global" };// Global"};//"Percent",
-	int globalThresholds[] = { 10000000 };// {50,100,150,200,250,300,350,400,450,500,550,600,650,700,1000};
-	int percentThresholds[] = { 100 };// {50,60,70,80,90,100};
+	public final int globalThresholds[] = { 75 };// },30, 50, 60, 70, 75, 80, 90, 95 };// 10000000 };//
+	// {50,100,150,200,250,300,350,400,450,500,550,600,650,700,1000};
+	int percentThresholds[] = { 50, 60, 70, 80, 90, 100 };// { 100 };// {50,60,70,80,90,100};
 
 	CaseType caseType;// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
 	LookPastType lookPastType;// = "Count";// "Hrs" "Daywise"
@@ -87,6 +89,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	int recommSeqLength;
 
 	PrimaryDimension primaryDimension;
+	String databaseName;
 	/**
 	 * // * (UserId,ActName,RepresentativeAO) //
 	 */ // currently doing it for each matching unit
@@ -120,7 +123,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		long recommTestsStarttime = System.currentTimeMillis();
 
 		this.primaryDimension = Constant.primaryDimension;
-
+		this.databaseName = Constant.getDatabaseName();
 		this.lookPastType = lookPastType;
 		this.caseType = caseType;
 
@@ -143,7 +146,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		List<String> blackListedRTs = null;
 		if (Constant.BLACKLISTING)
 		{
-			blackListedRTs = ReadingFromFile.getBlackListedRTs(Constant.getDatabaseName());
+			blackListedRTs = ReadingFromFile.getBlackListedRTs(this.databaseName);
 		}
 
 		// check if directory is empty to prevent overwriting of results
@@ -174,7 +177,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						Constant.setCurrentMatchingUnit(matchingUnit); // used for sanity checks
 						System.out.println("Executing RecommendationTests for matching unit: " + matchingUnit);
 
-						commonPath = computeCommonPath(matchingUnit, lookPastType, Constant.outputCoreResultsPath);
+						commonPath = computeCommonPath(matchingUnit, lookPastType, Constant.outputCoreResultsPath,
+								thresholdValue);
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());
 
@@ -341,7 +345,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							System.out.println("\nUser id=" + userId);
 							// PopUps.showMessage("\nUser id=" + userId);
 							String userName = "";
-							if (Constant.getDatabaseName().equals("gowalla1"))
+							if (this.databaseName.equals("gowalla1"))
 							{
 								userName = String.valueOf(userId);
 							}
@@ -436,43 +440,27 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							// if (true)// representativeAOsNotComputed == false) //do this
 							// we only need to do it once for each user and dont need to repeat it for each matching
 							// unit, so we can take it out of the for loop, however, it that we will also need to
-							// take out the train-test splitting of timelines out of the loop, which can be done as
-							// well
+							// take out the train-test splitting of timelines out of the loop, however that can be done
+							// as well
 							Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = null;
-							if (Constant.collaborativeCandidates)
+							if (!Constant.collaborativeCandidates)
 							{
-								repAOResult = buildRepresentativeAOsForUserPDVCOll(userId,
-										trainTestTimelinesForAllUsers, Constant.getUniqueLocIDs(),
-										Constant.getUniqueActivityIDs());
-							}
+								repAOResult = prebuildRepresentativeActivityObjects(trainTestTimelinesForAllUsers,
+										userId, userTrainingTimelines, userTestTimelines);
 
+								LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
+								mapOfRepAOs.put(userId, repAOsForThisUser);
+								mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
+							}
 							else
-							{
-								repAOResult = buildRepresentativeAOsForUserPDV2(userId,
-										TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-										TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true),
-										Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs());
-
+							{// collaborative approach
+								// disabled on 1 Aug 2017, will do just-in-time computation of representative act object
+								// based only on candidate timelines
+								// $$repAOResult = buildRepresentativeAOsForUserPDVCOll(userId,
+								// $$ trainTestTimelinesForAllUsers, Constant.getUniqueLocIDs(),
+								// $$ Constant.getUniqueActivityIDs());
 							}
-							// Start of Sanity Check for buildRepresentativeAOsForUserPD()
-							if (!Constant.collaborativeCandidates
-									&& Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
-							{
-								// for Activity ID as primary dimension, the output of buildRepresentativeAOsForUserPD
-								// and buildRepresentativeAOsForUser shoule be same (except data type)
-								Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName = buildRepresentativeAOsForUser(
-										userId,
-										TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-										Constant.getActivityNames(),
-										TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
 
-								Sanity.compareOnlyNonEmpty(repAOResult, repAOResultActName);
-							}
-							// end of Sanity Check for buildRepresentativeAOsForUserPD()
-
-							LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
-							mapOfRepAOs.put(userId, repAOsForThisUser);
-							mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
 							////// END of build representative activity objects for this user.
 
 							if (userTrainingTimelines.size() == 0)
@@ -792,7 +780,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 										if (recommMaster.hasCandidateTimeslines() == false)
 										{
 											System.out.println(
-													"Cannot make recommendation at this point as there are no candidate timelines for recommMaster i = "
+													"Can't make recommendation at this point as no cand timelines for recommMaster i = "
 															+ seqIndex);
 
 											rtsRejWithNoCandsWriter
@@ -903,10 +891,25 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 										// get the top recommended activity names from previous recommendation
 										topRecommendedPrimarDimensionVal[seqIndex] = splittedRankedRecommendedActName[1];
 										// PopUps.showMessage("here12_2");
-										ActivityObject repAOForTopRecommActName = getRepresentativeAO(
-												Integer.valueOf(topRecommendedPrimarDimensionVal[seqIndex]),
-												mapOfRepAOs, mapOfMedianPreSuccDuration, userId,
-												recommendationTimes[seqIndex], this.primaryDimension);
+										ActivityObject repAOForTopRecommActName = null;
+
+										if (Constant.collaborativeCandidates)
+										{
+											// for just-in-time computation of representative activity object
+											repAOForTopRecommActName = getRepresentativeAOColl(
+													Integer.valueOf(topRecommendedPrimarDimensionVal[seqIndex]), userId,
+													recommendationTimes[seqIndex], this.primaryDimension, recommMaster);
+										}
+										else
+										{
+											repAOForTopRecommActName = getRepresentativeAO(
+													Integer.valueOf(topRecommendedPrimarDimensionVal[seqIndex]),
+													mapOfRepAOs, mapOfMedianPreSuccDuration, userId,
+													recommendationTimes[seqIndex], this.primaryDimension);
+											// also use this for collaborative approach when using prebuilt
+											// representative AOs created from training timelines of other users.
+										}
+
 										// PopUps.showMessage("here12_3");
 										repAOsFromPrevRecomms.add(repAOForTopRecommActName);
 
@@ -1350,6 +1353,44 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 	/**
 	 * 
+	 * @param trainTestTimelinesForAllUsers
+	 * @param userId
+	 * @param userTrainingTimelines
+	 * @param userTestTimelines
+	 * @return
+	 */
+	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> prebuildRepresentativeActivityObjects(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers, int userId,
+			LinkedHashMap<Date, Timeline> userTrainingTimelines, LinkedHashMap<Date, Timeline> userTestTimelines)
+	{
+		Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = null;
+
+		// if (Constant.collaborativeCandidates)
+		// { repAOResult = buildRepresentativeAOsForUserPDVCOll(userId, trainTestTimelinesForAllUsers,
+		// Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs()); } else {
+		repAOResult = buildRepresentativeAOsForUserPDV2(userId,
+				TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
+				TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true), Constant.getUniqueLocIDs(),
+				Constant.getUniqueActivityIDs());
+
+		// Start of Sanity Check for buildRepresentativeAOsForUserPD()
+		if (VerbosityConstants.checkSanityPDImplementn && Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+		{
+			// for Activity ID as primary dimension, the output of
+			// buildRepresentativeAOsForUserPD and buildRepresentativeAOsForUser should be same
+			// (except data type)
+			Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName = buildRepresentativeAOsForUser(
+					userId, TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
+					Constant.getActivityNames(), TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
+			Sanity.compareOnlyNonEmpty(repAOResult, repAOResultActName);
+		}
+		// end of Sanity Check for buildRepresentativeAOsForUserPD()
+		// }
+		return repAOResult;
+	}
+
+	/**
+	 * 
 	 * @param userId
 	 * @param trainTestTimelinesForAllUsers
 	 * @param uniqueLocIDs
@@ -1360,7 +1401,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 			int userId, LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			Set<Integer> uniqueLocIDs, Set<Integer> uniqueActivityIDs)
 	{
-
+		// BookMark
 		// mapOfRepAOs;
 		boolean sanityCheck = false;
 		System.out.println("Inside buildRepresentativeAOsForUserPDV2 for user " + userId);
@@ -1371,9 +1412,9 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		long t1 = System.currentTimeMillis();
 		try
 		{
-			if (Constant.getDatabaseName().equals("gowalla1") == false)
+			if (this.databaseName.equals("gowalla1") == false)
 			{
-				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + Constant.getDatabaseName());
+				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + this.databaseName);
 			}
 			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
 			// { System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
@@ -1613,6 +1654,35 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 	/**
 	 * 
+	 * @param matchingUnit
+	 * @param lookPastType
+	 * @param outputCoreResultsPath
+	 */
+	private static String computeCommonPath(double matchingUnit, Enums.LookPastType lookPastType,
+			String outputCoreResultsPath, int thresholdVal)
+	{
+		String commonPath = null;
+		// matching unit is only relevant if it is not daywise
+		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
+		{
+			String dirToCreate = outputCoreResultsPath + thresholdVal + "/MatchingUnit" + String.valueOf(matchingUnit);
+
+			WritingToFile.createDirectory(outputCoreResultsPath + thresholdVal);
+
+			WritingToFile.createDirectory(
+					outputCoreResultsPath + thresholdVal + "/MatchingUnit" + String.valueOf(matchingUnit));
+			// Creating the directory for that matching unit
+			commonPath = dirToCreate + "/";
+		}
+		else // daywise //baseline closest time
+		{
+			commonPath = outputCoreResultsPath;
+		}
+		return commonPath;
+	}
+
+	/**
+	 * 
 	 * @param topRecommActName
 	 * @param mapOfRepAOs
 	 * @param mapOfMedianPreSuccDuration
@@ -1736,12 +1806,152 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		return repAO;
 	}
 
+	//
+	/**
+	 * 
+	 * @param topPrimaryDimensionVal
+	 * @param userId
+	 * @param recommendationTime
+	 * @param primaryDimension
+	 * @param recommMaster
+	 * @return
+	 * @since 1 August 2017
+	 */
+	private ActivityObject getRepresentativeAOColl(Integer topPrimaryDimensionVal, int userId,
+			Timestamp recommendationTime, PrimaryDimension primaryDimension, RecommendationMasterI recommMaster)
+	{
+		// StringBuilder verboseMsg = new StringBuilder();
+		// System.out.println("Inside getRepresentativeAOColl(): topPrimaryDimensionVal=" + topPrimaryDimensionVal +
+		// "\n");
+
+		ArrayList<Long> durationPreceeding = new ArrayList<>();
+		ArrayList<ActivityObject> aosWithSamePDVal = new ArrayList<>();
+
+		// iterate over the candidate timelines (which are to be used to create representative activity objects)
+		// System.out.println("#cands = " + recommMaster.getCandidateTimelineIDs().size());
+		for (String candID : recommMaster.getCandidateTimelineIDs())
+		{
+			TimelineWithNext candTimeline = (TimelineWithNext) recommMaster.getCandidateTimeline(candID);
+			// candTimeline.printActivityObjectNamesWithTimestampsInSequence();
+			// System.out.println("next act=" + candTimeline.getNextActivityObject().toStringAllGowallaTS());
+			ArrayList<ActivityObject> actObjs = candTimeline.getActivityObjectsInTimeline();
+			actObjs.add(candTimeline.getNextActivityObject());
+
+			// note cand will contain MU+1 acts, +1 next act
+			// not always true, sometimes cand will have less aos
+			// $$Sanity.eq(actObjs.size(), Constant.getCurrentMatchingUnit() + 2, "actObjs.size():" + actObjs.size()
+			// $$ + "!= Constant.getCurrentMatchingUnit():" + Constant.getCurrentMatchingUnit());
+
+			// System.out.println("actObjs.size():" + actObjs.size() + "!= Constant.getCurrentMatchingUnit():"
+			// + Constant.getCurrentMatchingUnit());
+
+			long prevTS = -99, currentTS = -99;
+			for (ActivityObject ao : actObjs)
+			{
+				currentTS = ao.getStartTimestamp().getTime();
+
+				// contains the act name we are looking for
+				if (ao.getPrimaryDimensionVal().contains(topPrimaryDimensionVal))
+				{
+					aosWithSamePDVal.add(ao);
+
+					if (prevTS > 0)
+					{
+						durationPreceeding.add(currentTS - prevTS);
+					}
+				}
+				prevTS = currentTS;
+			}
+			// System.out.println("");
+		}
+
+		// StringBuilder sb = new StringBuilder();
+		// System.out.println("durationPreceeding= " + durationPreceeding.toString());
+		// System.out.println("aosWithSamePDVal= ");
+		// aosWithSamePDVal.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
+		// System.out.println(sb.toString());
+
+		double medianPreceedingDuration = StatsUtils.getDescriptiveStatisticsLong(durationPreceeding,
+				"durationPreceeding", userId + "__" + topPrimaryDimensionVal + "durationPreceeding.txt", false)
+				.getPercentile(50);
+
+		// double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
+		// int medianCinsCount = (int) StatsUtils
+		// .getDescriptiveStatistics(cinsCount, "cinsCount", userID + "__" + actName + "cinsCount.txt")
+		// .getPercentile(50);
+
+		// NOTE: we only need to take care of feature which are used for edit distance computation.
+		// Instantiate the representative activity object.
+		int activityID = -1;
+		ArrayList<Integer> locationIDs = new ArrayList<>();
+		String activityName = "";
+		// String locationName = "";
+		String workingLevelCatIDs = "";
+
+		switch (primaryDimension)
+		{
+			case ActivityID:
+			{
+				activityID = topPrimaryDimensionVal;
+				if (Constant.getDatabaseName().equals("gowalla1"))
+				{// for gowalla dataset, act id and act name are same
+					activityName = String.valueOf(topPrimaryDimensionVal);
+					workingLevelCatIDs = topPrimaryDimensionVal + "__";
+				}
+				else
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
+				}
+
+				break;
+			}
+			case LocationID:
+			{
+				locationIDs.add(topPrimaryDimensionVal);
+				workingLevelCatIDs = topPrimaryDimensionVal + "__";
+				// locationName =
+				// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+				// if (locationName == null || locationName.length() == 0)
+				// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+				break;
+			}
+			default:
+				PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
+				break;
+		}
+
+		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+
+		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,
+				-1, -1, new String[] { "" });
+
+		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+		{
+			System.out.print("Warning: recommendationTime = " + recommendationTime + " newRecommTimestamp= "
+					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDuration
+					+ " for topRecommActName =" + topPrimaryDimensionVal);
+		}
+		//
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Debug: getRepresentativeAO: old recommendationTime="
+					+ recommendationTime.toLocalDateTime().toString() + "medianPreceedingDuration="
+					+ medianPreceedingDuration + " new recommendationTime="
+					+ newRecommTimestamp.toLocalDateTime().toString());
+		}
+		// System.out.println("repAO=" + repAOForThisActNameForThisUser.toStringAllGowallaTS());
+
+		return repAOForThisActNameForThisUser;
+	}
+	//
+
 	/**
 	 * 
 	 * @param mapOfRepAOs
 	 * @param mapOfMedianPreSuccDuration
 	 */
-	private static void writeRepAOs(LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs,
+	private void writeRepAOs(LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs,
 			LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration,
 			String commonPath)
 	{
@@ -1924,6 +2134,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	 */
 	public void setThresholdsArray(Enums.TypeOfThreshold typeOfThreshold)
 	{
+		System.out.println("setThresholdsArray");
 		switch (typeOfThreshold)
 		{
 			case Percent:// "Percent":
@@ -1969,9 +2180,9 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		long t1 = System.currentTimeMillis();
 		try
 		{
-			if (Constant.getDatabaseName().equals("gowalla1") == false)
+			if (this.databaseName.equals("gowalla1") == false)
 			{
-				System.err.println("Error: database is  not gowalla1:" + Constant.getDatabaseName());
+				System.err.println("Error: database is  not gowalla1:" + this.databaseName);
 				System.exit(-1);
 			}
 			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
@@ -2142,9 +2353,9 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		long t1 = System.currentTimeMillis();
 		try
 		{
-			if (Constant.getDatabaseName().equals("gowalla1") == false)
+			if (this.databaseName.equals("gowalla1") == false)
 			{
-				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + Constant.getDatabaseName());
+				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + this.databaseName);
 			}
 			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
 			// { System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
@@ -2319,7 +2530,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	}
 
 	/**
-	 * Fork of buildRepresentativeAOsForUserPDV() intiated to reduce memory consumption
+	 * Fork of buildRepresentativeAOsForUserPDV() intiated to reduce memory consumption (for primary dimension version
+	 * 2)
 	 * <p>
 	 * for each user, for each activity (category id), create a representative avg activity object.
 	 * <p>
@@ -2350,9 +2562,9 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		long t1 = System.currentTimeMillis();
 		try
 		{
-			if (Constant.getDatabaseName().equals("gowalla1") == false)
+			if (this.databaseName.equals("gowalla1") == false)
 			{
-				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + Constant.getDatabaseName());
+				PopUps.printTracedErrorMsgWithExit("Error: database is  not gowalla1:" + this.databaseName);
 			}
 			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
 			// { System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
@@ -2476,7 +2688,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 				// case each activity object has only one primary dimension val (activity id). It won't hold in case of
 				// location ids since one activity object can have multiple location ids because of mergers, i.e,
 				// sumOfCountOfAOsFroMap>sumOfCountOfAOsFromTimeline
-				if (primaryDimension.equals(PrimaryDimension.ActivityID))
+				if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
 				{
 					if (sumOfCountOfAOsFroMap != sumOfCountOfAOsFromTimeline)
 					{
@@ -2586,7 +2798,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 		try
 		{
-			if (!Constant.getDatabaseName().equals("gowalla1"))
+			if (!this.databaseName.equals("gowalla1"))
 			{
 				System.err.println(
 						PopUps.getTracedErrorMsg("Error: this method is currently only suitable for gowalla dataset"));
@@ -2660,7 +2872,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 		try
 		{
-			if (!Constant.getDatabaseName().equals("gowalla1"))
+			if (!this.databaseName.equals("gowalla1"))
 			{
 				System.err.println(
 						PopUps.getTracedErrorMsg("Error: this method is currently only suitable for gowalla dataset"));
@@ -2741,7 +2953,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 				PerformanceAnalytics.getHeapInformation() + "\n" + PerformanceAnalytics.getHeapPercentageFree());
 		try
 		{
-			if (!Constant.getDatabaseName().equals("gowalla1"))
+			if (!this.databaseName.equals("gowalla1"))
 			{
 				PopUps.printTracedErrorMsgWithExit("Error: this method is currently only suitable for gowalla dataset");
 			}
@@ -2779,7 +2991,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 				// String locationName = "";
 				String workingLevelCatIDs = "";
 
-				switch (this.primaryDimension)
+				switch (primaryDimension)
 				{
 					case ActivityID:
 					{
@@ -2799,7 +3011,8 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						break;
 					}
 					default:
-						PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + primaryDimension);
+						PopUps.printTracedErrorMsgWithExit(
+								"Error: unknown primaryDimension = " + Constant.primaryDimension);
 						break;
 				}
 				// ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String

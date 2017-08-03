@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -200,7 +201,7 @@ public class TestDummy1
 		System.out.println(sb.toString());
 	}
 
-	public static void main(String args[])
+	public static void main3(String args[])
 	{
 		// String[] arr = new String[] { "Gunjan", "Manali" };
 		// ArrayList<String> list = (ArrayList<String>) Arrays.stream(arr).collect(Collectors.toList());
@@ -221,6 +222,51 @@ public class TestDummy1
 					.allMatch(v -> v == 1));
 		}
 
+	}
+
+	public static void main(String args[])
+	{
+		compareToString();
+	}
+
+	public static void compareToString()
+	{
+		Random r = new Random();
+
+		int iter = 10000;
+
+		long t1 = System.nanoTime();
+		for (int i = 0; i < iter; i++)
+		{
+			int num = r.nextInt(5000);
+
+			String s = String.valueOf(num);
+		}
+		long t2 = System.nanoTime();
+		for (int i = 0; i < iter; i++)
+		{
+			int num = r.nextInt(5000);
+
+			String s = String.valueOf(num);
+		}
+		long t3 = System.nanoTime();
+		for (int i = 0; i < iter; i++)
+		{
+			int num = r.nextInt(5000);
+			String s = Integer.toString(num);
+		}
+		long t4 = System.nanoTime();
+		for (int i = 0; i < iter; i++)
+		{
+			int num = r.nextInt(5000);
+			String s = Integer.toString(num);
+		}
+		long t5 = System.nanoTime();
+
+		System.out.println("t2-t1=" + (t2 - t1));
+		System.out.println("t3-t2=" + (t3 - t2));
+		System.out.println("t4-t3=" + (t4 - t3));
+		System.out.println("t5-t4=" + (t5 - t4));
 	}
 	// public static void checkMemory
 }

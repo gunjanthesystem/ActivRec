@@ -91,7 +91,7 @@ public class SuperController
 		Constant.setDistanceUsed("HJEditDistance");
 
 		// //curtain may 26 2017 start
-		// $$new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);
+		// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
 		// //curtain may 26 2017 end
 		// //curtain may 19 2017 start
 		new ControllerWithoutServer();
