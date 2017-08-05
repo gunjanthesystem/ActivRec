@@ -734,7 +734,7 @@ public class RecommendationTestsMar2017GenSeqNGramBaseline
 										recommMasters[i] = new RecommendationMasterMar2017GenSeq(userTrainingTimelines,
 												userTestTimelines, dateToRecomm, recommTimesStrings[0], userId,
 												thresholdValue, typeOfThreshold, matchingUnit, caseType,
-												this.lookPastType, false, repAOsFromPrevRecomms, null);
+												this.lookPastType, false, repAOsFromPrevRecomms, null, null);
 										// Note: RT passed to the recommendation master is always endTimestamp. This is
 										// intentional to make the current implementation of extracing current timeline
 										// work. RT is only important forextraction of current timeline

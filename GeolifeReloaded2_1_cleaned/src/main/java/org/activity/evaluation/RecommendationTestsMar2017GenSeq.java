@@ -725,7 +725,7 @@ public class RecommendationTestsMar2017GenSeq
 												userTrainingTimelines, userTestTimelines, dateToRecomm,
 												recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
 												matchingUnit, caseType, this.lookPastType, false, repAOsFromPrevRecomms,
-												null);
+												null, null);
 										// Note: RT passed to the recommendation master is always endTimestamp. This is
 										// intentional to make the current implementation of extracting current timeline
 										// work. RT is only important for extraction of current timeline
