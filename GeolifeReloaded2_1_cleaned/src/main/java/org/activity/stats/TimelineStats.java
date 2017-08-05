@@ -170,128 +170,133 @@ public class TimelineStats
 		writeActivityStats(usersDayTimelines, "ActivityStats");
 		switch (typeOfAnalysis)
 		{
-		/**
-		 * For each user, for sequence of each features, get Sample Entropy vs m (segment length)
-		 */
+			/**
+			 * For each user, for sequence of each features, get Sample Entropy vs m (segment length)
+			 */
 
-		case "TimeSeriesCorrelationAnalysis":
-		{
-			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));
-			performTimeSeriesCorrelationAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelines));
-			break;
-		}
-
-		case "SampleEntropyPerMAnalysis":
-		{
-			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));
-			// String pathForStoredTimelines
-			performSampleEntropyVsMAnalysis2(UtilityBelt.reformatUserIDs(usersDayTimelines), 2, 3);
-			break;
-		}
-		case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
-		{
-			LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-			LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineUtils
-					.expungeInvalids(usersTimelines);
-
-			applyKCentroidsTimelinesTwoLevel(usersTimelinesInvalidsExpunged);
-			break;
-		}
-
-		case "ActivityRegularityAnalysisOneLevel":
-		{
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
-					.transformToSequenceDayWise(usersDayTimelines);
-			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
-					.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
-
-			System.out.println(traverseHashMapStringString(sequenceCharInvalidsExpungedNoTS));
-
-			// < User, ActivityName, MU, Avg pairwise distance of back-segments>
-			LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityOne = applyActivityRegularityAnalysisOneLevel(
-					sequenceCharInvalidsExpungedNoTS);
-
-			writeActivityRegularity(regularityForEachTargetActivityOne, typeOfAnalysis);
-			break;
-		}
-
-		case "ActivityRegularityAnalysisTwoLevel":
-		{
-			LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityTwo = applyActivityRegularityAnalysisTwoLevel(
-					usersDayTimelines);
-			// < User, ActivityName, MU, Avg pairwise distance of back-segments>
-			writeActivityRegularity(regularityForEachTargetActivityTwo, typeOfAnalysis);
-			break;
-		}
-		case "TimeSeriesAnalysis":
-		{
-			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));// UtilityBelt.reformatUserIDs(usersDayTimelines)
-			break;
-		}
-		case "TimeSeriesEntropyAnalysis":// TimeSeriesAnalysis2
-		{
-			performTimeSeriesEntropyAnalysis(usersDayTimelines);
-			break;
-		}
-
-		case "Clustering":
-		{
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
-					.transformToSequenceDayWise(usersDayTimelines);// , false);
-			LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged = TimelineTransformers
-					.toCharsFromActivityObjects(sequenceAll, true);
-			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
-					.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
-
-			applyKCentroids(sequenceCharInvalidsExpungedNoTS);
-			break;
-		}
-
-		case "NGramAnalysis":
-		{
-			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-
-			if (Constant.hasInvalidActivityNames)
+			case "TimeSeriesCorrelationAnalysis":
 			{
-				userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+				transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));
+				performTimeSeriesCorrelationAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelines));
+				break;
 			}
 
-			WritingToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
-					pathToWrite + "UserNumOfActivityObjects.csv", "UserID", "NumOfActivityObjects");
+			case "SampleEntropyPerMAnalysis":
+			{
+				transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));
+				// String pathForStoredTimelines
+				performSampleEntropyVsMAnalysis2(UtilityBelt.reformatUserIDs(usersDayTimelines), 2, 3);
+				break;
+			}
+			case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
+			{
+				LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils
+						.dayTimelinesToTimelines(usersDayTimelines);
+				LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineUtils
+						.expungeInvalids(usersTimelines);
 
-			performNGramAnalysis(userTimelines, 1, 5/* 20 */, (pathToWrite));
-			break;
-		}
+				applyKCentroidsTimelinesTwoLevel(usersTimelinesInvalidsExpunged);
+				break;
+			}
 
-		case "AlgorithmicAnalysis":
-		{
-			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-			userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+			case "ActivityRegularityAnalysisOneLevel":
+			{
+				LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
+						.transformToSequenceDayWise(usersDayTimelines);
+				LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
+						.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
 
-			performAlgorithmicAnalysis(userTimelines, 1, 20, (pathToWrite));
-			break;
-		}
-		case "AlgorithmicAnalysis2":
-		{
-			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-			userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+				System.out.println(traverseHashMapStringString(sequenceCharInvalidsExpungedNoTS));
 
-			performAlgorithmicAnalysis2(userTimelines, 1, 20, (pathToWrite));
-			break;
-		}
-		case "FeatureAnalysis":
-		{
-			LinkedHashMap<String, Timeline> userTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
+				// < User, ActivityName, MU, Avg pairwise distance of back-segments>
+				LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityOne = applyActivityRegularityAnalysisOneLevel(
+						sequenceCharInvalidsExpungedNoTS);
 
-			userTimelines = TimelineUtils.expungeInvalids(userTimelines);
-			writeAllFeaturesValues(userTimelines, pathToWrite);
-			break;
-		}
+				writeActivityRegularity(regularityForEachTargetActivityOne, typeOfAnalysis);
+				break;
+			}
 
-		default:
-		{
-			System.err.println("Unknown typeOfAnalysis =" + typeOfAnalysis);
-		}
+			case "ActivityRegularityAnalysisTwoLevel":
+			{
+				LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityTwo = applyActivityRegularityAnalysisTwoLevel(
+						usersDayTimelines);
+				// < User, ActivityName, MU, Avg pairwise distance of back-segments>
+				writeActivityRegularity(regularityForEachTargetActivityTwo, typeOfAnalysis);
+				break;
+			}
+			case "TimeSeriesAnalysis":
+			{
+				transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));// UtilityBelt.reformatUserIDs(usersDayTimelines)
+				break;
+			}
+			case "TimeSeriesEntropyAnalysis":// TimeSeriesAnalysis2
+			{
+				performTimeSeriesEntropyAnalysis(usersDayTimelines);
+				break;
+			}
+
+			case "Clustering":
+			{
+				LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
+						.transformToSequenceDayWise(usersDayTimelines);// , false);
+				LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged = TimelineTransformers
+						.toCharsFromActivityObjects(sequenceAll, true);
+				LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
+						.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+
+				applyKCentroids(sequenceCharInvalidsExpungedNoTS);
+				break;
+			}
+
+			case "NGramAnalysis":
+			{
+				LinkedHashMap<String, Timeline> userTimelines = TimelineUtils
+						.dayTimelinesToTimelines(usersDayTimelines);
+
+				if (Constant.hasInvalidActivityNames)
+				{
+					userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+				}
+
+				WritingToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
+						pathToWrite + "UserNumOfActivityObjects.csv", "UserID", "NumOfActivityObjects");
+
+				performNGramAnalysis(userTimelines, 1, 5/* 20 */, (pathToWrite));
+				break;
+			}
+
+			case "AlgorithmicAnalysis":
+			{
+				LinkedHashMap<String, Timeline> userTimelines = TimelineUtils
+						.dayTimelinesToTimelines(usersDayTimelines);
+				userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+
+				performAlgorithmicAnalysis(userTimelines, 1, 20, (pathToWrite));
+				break;
+			}
+			case "AlgorithmicAnalysis2":
+			{
+				LinkedHashMap<String, Timeline> userTimelines = TimelineUtils
+						.dayTimelinesToTimelines(usersDayTimelines);
+				userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+
+				performAlgorithmicAnalysis2(userTimelines, 1, 20, (pathToWrite));
+				break;
+			}
+			case "FeatureAnalysis":
+			{
+				LinkedHashMap<String, Timeline> userTimelines = TimelineUtils
+						.dayTimelinesToTimelines(usersDayTimelines);
+
+				userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+				writeAllFeaturesValues(userTimelines, pathToWrite);
+				break;
+			}
+
+			default:
+			{
+				System.err.println("Unknown typeOfAnalysis =" + typeOfAnalysis);
+			}
 		}
 		consoleLogStream.close();
 	}
@@ -2877,6 +2882,7 @@ public class TimelineStats
 		// StringBuilder s = new StringBuilder();
 		// LinkedHashMap<String, Double> cityCountMap = new LinkedHashMap<>();
 		// List<String> citiesForAllUsers = new ArrayList<>();
+		//
 		// for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		// {
 		// System.out.println("user id =" + entry.getKey());

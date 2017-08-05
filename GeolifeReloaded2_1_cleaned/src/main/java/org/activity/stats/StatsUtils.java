@@ -1149,7 +1149,8 @@ public class StatsUtils
 		}
 		else
 		{
-			System.err.println(("Warning: Alert!! minMaxNorm: max - min <=0 =" + (max - min)));
+			System.err.println(("Warning: Alert!! val" + val + " = minMaxNorm: max(" + max + ")- min(" + min + ") <=0 ="
+					+ (max - min)));
 			return 0;
 		}
 
@@ -1175,22 +1176,22 @@ public class StatsUtils
 
 		switch (stat)
 		{
-		case Mean:
-			for (ArrayList<Double> valsForAColumn : columnWiseVals)
-			{
-				columnWiseSummary.add(meanOfArrayList(valsForAColumn, roundToPlaces));
-			}
-			break;
-		case Median:
-			for (ArrayList<Double> valsForAColumn : columnWiseVals)
-			{
-				columnWiseSummary.add(medianOfArrayList(valsForAColumn, roundToPlaces));
-			}
-			break;
-		default:
-			System.err.println(
-					PopUps.getTracedErrorMsg("Unknown stat: " + stat.toString() + " reading file: " + fileToRead));
-			System.exit(-1);
+			case Mean:
+				for (ArrayList<Double> valsForAColumn : columnWiseVals)
+				{
+					columnWiseSummary.add(meanOfArrayList(valsForAColumn, roundToPlaces));
+				}
+				break;
+			case Median:
+				for (ArrayList<Double> valsForAColumn : columnWiseVals)
+				{
+					columnWiseSummary.add(medianOfArrayList(valsForAColumn, roundToPlaces));
+				}
+				break;
+			default:
+				System.err.println(
+						PopUps.getTracedErrorMsg("Unknown stat: " + stat.toString() + " reading file: " + fileToRead));
+				System.exit(-1);
 		}
 
 		return columnWiseSummary;

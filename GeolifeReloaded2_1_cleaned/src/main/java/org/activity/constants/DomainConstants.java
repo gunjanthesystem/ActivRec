@@ -71,6 +71,19 @@ public class DomainConstants
 			266, 306, 313, 314, 333, 338, 341, 431, 433, 437, 447, 449, 471, 510, 515, 520, 543, 547, 607, 634, 661,
 			678, 696, 714, 729, 741, 749, 761, 792, 816, 841, 855, 861, 869, 894, 902, 907, 912, 921, 934, };
 
+	public static boolean isGowallaUserIDsWithGT553MaxActsPerDay(int uid)
+	{
+		boolean found = false;
+		for (int i : gowallaUserIDsWithGT553MaxActsPerDay)
+		{
+			if (i == uid)
+			{
+				found = true;
+			}
+		}
+		return found;
+	}
+
 	public final static int numOfCatLevels = 3;
 
 	public static HashMap<String, Double> catIDsHierarchicalDistance = null;

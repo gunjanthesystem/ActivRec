@@ -27,6 +27,7 @@ import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
+import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.PerformanceAnalytics;
@@ -190,10 +191,7 @@ public class ControllerWithoutServer
 			// good curtain 7 Feb 2017 end
 			// end of consecutive counts
 
-			String groupsOf100UsersLabels[] = {
-					"301"/*
-							 * "101", "201", /* "301", "401", "501", "601", "701", "801", "901", "1"
-							 */ };
+			String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 			// ,// "1001" };
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
@@ -220,8 +218,8 @@ public class ControllerWithoutServer
 			 * .kryoDeSerializeThis("./dataWritten/UniqueLocIDsInCleanedTimeines.kryo");
 			 */
 
-			// TimelineStats.writeAllCitiesCounts(usersCleanedDayTimelines,
-			// Constant.outputCoreResultsPath + "AllCitiesCount");
+			TimelineStats.writeAllCitiesCounts(usersCleanedDayTimelines,
+					Constant.outputCoreResultsPath + "AllCitiesCount");
 			// // important curtain 1 start 10 Feb 2017
 			sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
 			// // important curtain 1 end 10 Feb 2017
@@ -348,6 +346,7 @@ public class ControllerWithoutServer
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsers = new LinkedHashMap<>(134);
 			// (ceil) 100/0.75
 
+			int numOfUsersSkippedGT553MaxActsPerDay = 0;
 			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
 				System.out.println(" indexOfSampleUser = " + indexOfSampleUser);
@@ -373,6 +372,7 @@ public class ControllerWithoutServer
 							+ " as in gowallaUserIDsWithGT553MaxActsPerDay");
 					WritingToFile.appendLineToFileAbsolute(indexOfSampleUser + "," + userEntry.getKey() + "\n",
 							"IndexOfBlacklistedUsers.csv");
+					numOfUsersSkippedGT553MaxActsPerDay += 1;
 					indexOfSampleUser += 1;
 					continue;
 				}
@@ -386,6 +386,32 @@ public class ControllerWithoutServer
 				// $$System.out.println("putting in user= " + userEntry.getKey());
 
 			}
+
+			// start of get timelines for all users for collaborative approach
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsers = new LinkedHashMap<>(1000);
+			int numOfAllUsersSkippedGT553MaxActsPerDay = 0;
+			if (Constant.collaborativeCandidates)
+			{
+				for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+				{
+					if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+					{
+						numOfAllUsersSkippedGT553MaxActsPerDay += 1;
+						continue;
+					}
+					else
+					{
+						allUsers.put(userEntry.getKey(), userEntry.getValue());
+					}
+				}
+				System.out.println("got timelines for all users for coll cand: allUsers.size()= " + allUsers.size());
+				// Sanity.eq(numOfUsersSkippedGT553MaxActsPerDay, numOfAllUsersSkippedGT553MaxActsPerDay,
+				System.out.println("numOfUsersSkippedGT553MaxActsPerDay=" + numOfUsersSkippedGT553MaxActsPerDay
+						+ " numOfAllUsersSkippedGT553MaxActsPerDay=" + numOfAllUsersSkippedGT553MaxActsPerDay);
+
+			}
+			// end of get timelines for all users for collaborative approach
+
 			System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
 			System.out.println(" -- Users = " + sampledUsers.keySet().toString());
 
@@ -404,7 +430,7 @@ public class ControllerWithoutServer
 
 			RecommendationTestsMar2017GenSeqCleaned2 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned2(
 					sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds,
-					Constant.getUserIDs(), Constant.percentageInTraining, 3);
+					Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
 
 			/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
 
@@ -670,6 +696,31 @@ public class ControllerWithoutServer
 					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfDistinctValidActsCleanedReduced3.csv");// us
 
 			System.out.println("Num of users cleaned reduced3  = " + usersCleanedDayTimelines.size());
+
+			/// temp Start
+			////////// removed users with GT553 acts per day
+			System.out.println("\n-- removing users with GT553");
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> tempUsersCleanedDayTimelines = new LinkedHashMap<>();
+			for (Entry<String, LinkedHashMap<Date, Timeline>> uEntry : usersCleanedDayTimelines.entrySet())
+			{
+				if (!DomainConstants.isGowallaUserIDsWithGT553MaxActsPerDay(Integer.valueOf(uEntry.getKey())))
+				{
+					tempUsersCleanedDayTimelines.put(uEntry.getKey(), uEntry.getValue());
+				}
+			}
+
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(tempUsersCleanedDayTimelines,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced4.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(tempUsersCleanedDayTimelines,
+						Constant.getCommonPath() + "NumOfDaysPerUserReduced4.csv");
+				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
+				// false, false, false,"GowallaUserDayTimelinesReduced2.csv");// users
+			}
+			System.out.println("Num of users reduced4 = " + tempUsersCleanedDayTimelines.size());
+			//////////
+			// temp End
 		}
 		return usersCleanedDayTimelines;
 	}
