@@ -15,7 +15,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.generator.DatabaseCreatorGowallaQuicker0;
+import org.activity.io.EditDistanceMemorizer;
 import org.activity.io.Serializer;
+import org.activity.objects.Pair;
 import org.activity.objects.TraceMatrix;
 import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
@@ -182,7 +184,8 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */ };//
+	public static final double matchingUnitAsPastCount[] = { 3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */
+																				// };//
 																				// ,
 																				// 14, 16,
 																				// 18 };
@@ -226,7 +229,22 @@ public final class Constant
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
 	public static final int filterTopCands = -1;// 100;// -1 for no filter,
+
+	static EditDistanceMemorizer editDistancesMemorizer;
+	final static int editDistancesMemorizerBufferSize = 1;// 000000;
 	////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 
+	 * @param candTimelineID
+	 * @param currentTimelineID
+	 * @param editDistanceForThisCandidate
+	 */
+	public static void addToEditDistanceMemorizer(String candTimelineID, String currentTimelineID,
+			Pair<String, Double> editDistanceForThisCandidate)
+	{
+		editDistancesMemorizer.addToMemory(candTimelineID, currentTimelineID, editDistanceForThisCandidate);
+	}
 
 	public static void setDefaultTimeZone(String timeZoneString)
 	{
@@ -331,6 +349,8 @@ public final class Constant
 		DomainConstants.setLocationIDNameDictionary(pathToSerialisedLocationObjects);
 		DomainConstants.setCatIDCharCodeMap();
 		DomainConstants.setCatIDGivenLevelCatIDMap();
+
+		editDistancesMemorizer = new EditDistanceMemorizer(Constant.editDistancesMemorizerBufferSize);
 		// Constant.setDistanceUsed("HJEditDistance");
 	}
 
@@ -1026,6 +1046,8 @@ public final class Constant
 		s.append("\nonly1CandFromEachCollUser:" + only1CandFromEachCollUser);
 		s.append("\nfilterTopCands:" + filterTopCands);
 		s.append("\npreBuildRepAOGenericUser:" + preBuildRepAOGenericUser);
+
+		s.append("\neditDistancesMemorizerBufferSize:" + editDistancesMemorizerBufferSize);
 
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{

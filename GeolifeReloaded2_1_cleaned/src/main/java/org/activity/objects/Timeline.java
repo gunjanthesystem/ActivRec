@@ -75,17 +75,52 @@ public class Timeline implements Serializable
 
 		countTimelinesCreatedUntilNow += 1;
 
-		if (shouldBelongToSingleDay)
-		{
-			timelineID = String.valueOf(DateTimeUtils.getDate(activityObjects.get(0).getStartTimestamp()));
-		}
-		else
-		{
-			// timelineID = String.valueOf(countTimelinesCreatedUntilNow);
-			timelineID = Integer.toString(countTimelinesCreatedUntilNow);
-			// changed from String.valueOf on 2 Aug 2017 for performance
-			// Integer.toString(i)
-		}
+		// start curtain 7 Aug 2017
+		// if (shouldBelongToSingleDay)
+		// {
+		// timelineID = String.valueOf(DateTimeUtils.getDate(activityObjects.get(0).getStartTimestamp()));
+		// }
+		// else
+		// {
+		// // timelineID = String.valueOf(countTimelinesCreatedUntilNow);
+		// timelineID = Integer.toString(countTimelinesCreatedUntilNow);
+		// // changed from String.valueOf on 2 Aug 2017 for performance
+		// // Integer.toString(i)
+		// }
+		// end curtain 7 Aug 2017
+
+		// Start of new Timelineid on Aug 7 2017
+
+		// Not a good id as it depends on the order of timelines being created
+		// timelineID = Integer.toString(countTimelinesCreatedUntilNow);
+		timelineID = getTimelineIDFromAOs(activityObjects);
+		// WritingToFile.appendLineToFileAbsolute("\nTimeline id:" + timelineID,
+		// Constant.outputCoreResultsPath + "TimelineIDs.csv");
+		// End of new Timelineid on Aug 7 2017
+	}
+
+	/**
+	 * timelineID = firstActivityObject.getUserID() + "_" + firstActivityObject.getStartTimestampInms() + "_" +
+	 * lastActivityObject.getStartTimestampInms();
+	 * 
+	 * @param activityObjects
+	 * @return
+	 */
+	public static String getTimelineIDFromAOs(ArrayList<ActivityObject> activityObjects)
+	{
+		String timelineID = "-1";
+
+		ActivityObject firstActivityObject = activityObjects.get(0);
+		ActivityObject lastActivityObject = activityObjects.get(activityObjects.size() - 1);
+
+		// timelineID = firstActivityObject.getUserID() + "_" + (firstActivityObject.getStartTimestampInms() / 1000) +
+		// "_"
+		// + (lastActivityObject.getStartTimestampInms()/1000);
+
+		timelineID = firstActivityObject.getUserID() + "_" + (firstActivityObject.getStartTimestampInms() / 1000) + "_"
+				+ activityObjects.size();
+
+		return timelineID;
 	}
 
 	/**
@@ -880,8 +915,9 @@ public class Timeline implements Serializable
 	}
 
 	/**
-	 * @deprecated be careful, as in current setup we are not relying on it and timeline id for daywise timeline is the
-	 *             date as string while otherwise it is the count,i.e, serial number of the timeline as String
+	 * be careful, as in current setup we are not relying on it and timeline id for daywise timeline is the date as
+	 * string while otherwise it is the count,i.e, serial number of the timeline as String
+	 * 
 	 * @return
 	 */
 	public String getTimelineID()

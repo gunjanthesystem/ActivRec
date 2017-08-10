@@ -55,8 +55,8 @@ public class ComparatorUtils
 			else
 				stringB = b.toString();
 
-			Exception e =
-					new Exception("Assertion failed - Error in assertEquals ( " + stringA + " != " + stringB + " )");
+			Exception e = new Exception(
+					"Assertion failed - Error in assertEquals ( " + stringA + " != " + stringB + " )");
 			PopUps.showException(e, "assertEquals");
 			// PopUps.showError("Error: Assertion failed: \n" + ExceptionUtils.getStackTrace(e));
 			System.err.println("Error: Assertion failed: \n" + ExceptionUtils.getStackTrace(e));
@@ -226,8 +226,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<Integer, Double>>
-			sortByValueAscending2(LinkedHashMap<String, Pair<Integer, Double>> map)
+	public static LinkedHashMap<String, Pair<Integer, Double>> sortByValueAscending2(
+			LinkedHashMap<String, Pair<Integer, Double>> map)
 	{
 		List<Map.Entry<String, Pair<Integer, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -262,8 +262,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Integer, Pair<String, Double>>
-			sortByValueAscendingIntStrDoub(LinkedHashMap<Integer, Pair<String, Double>> map)
+	public static LinkedHashMap<Integer, Pair<String, Double>> sortByValueAscendingIntStrDoub(
+			LinkedHashMap<Integer, Pair<String, Double>> map)
 	{
 		List<Map.Entry<Integer, Pair<String, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -298,8 +298,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<String, Double>>
-			sortByValueAscendingStrStrDoub(LinkedHashMap<String, Pair<String, Double>> map)
+	public static LinkedHashMap<String, Pair<String, Double>> sortByValueAscendingStrStrDoub(
+			LinkedHashMap<String, Pair<String, Double>> map)
 	{
 		if (map.size() == 0)
 		{
@@ -326,7 +326,9 @@ public class ComparatorUtils
 		{
 			result.put(entry.getKey(), entry.getValue());
 		}
+
 		return result;
+
 	}
 
 	/**
@@ -339,8 +341,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Integer, Pair<Integer, Double>>
-			sortByValueAscending3(LinkedHashMap<Integer, Pair<Integer, Double>> map)
+	public static LinkedHashMap<Integer, Pair<Integer, Double>> sortByValueAscending3(
+			LinkedHashMap<Integer, Pair<Integer, Double>> map)
 	{
 		List<Map.Entry<Integer, Pair<Integer, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -375,8 +377,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Pair<Integer, Double>>
-			sortByValueAscending4(LinkedHashMap<Date, Pair<Integer, Double>> map)
+	public static LinkedHashMap<Date, Pair<Integer, Double>> sortByValueAscending4(
+			LinkedHashMap<Date, Pair<Integer, Double>> map)
 	{
 		List<Map.Entry<Date, Pair<Integer, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -410,8 +412,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>
-			sortByValueAscending5(LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> map)
+	public static LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> sortByValueAscending5(
+			LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> map)
 	{
 		List<Map.Entry<Date, Triple<Integer, ActivityObject, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
@@ -446,8 +448,8 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Triple<Integer, String, Double>>
-			sortTripleByThirdValueAscending6(LinkedHashMap<Date, Triple<Integer, String, Double>> map)
+	public static LinkedHashMap<Date, Triple<Integer, String, Double>> sortTripleByThirdValueAscending6(
+			LinkedHashMap<Date, Triple<Integer, String, Double>> map)
 	{
 		List<Map.Entry<Date, Triple<Integer, String, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)

@@ -30,7 +30,7 @@ public class VerbosityConstants
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;
 	public static final boolean verboseOTMDSAM = false;
-	public static final boolean verboseDistance = false;// false;
+	public static final boolean verboseDistance = true;// false;// false;
 	public static final boolean verboseRankScoreCalcToConsole = false;// false;
 	public static final boolean verboseEvaluationMetricsToConsole = false;// true;// true;// false;
 	/**

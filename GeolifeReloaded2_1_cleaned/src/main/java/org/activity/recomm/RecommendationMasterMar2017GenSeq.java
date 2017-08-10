@@ -26,6 +26,7 @@ import org.activity.distances.FeatureWiseWeightedEditDistance;
 import org.activity.distances.HJEditDistance;
 import org.activity.distances.OTMDSAMEditDistance;
 import org.activity.evaluation.Evaluation;
+import org.activity.io.EditDistanceMemorizer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
@@ -169,6 +170,11 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	private static final double timeInSecsForRankScoreNormalisation = 60 * 60; // 60 mins
 
 	/**
+	 * NOT BEING USED AT THE MOMENT
+	 */
+	EditDistanceMemorizer editDistancesMemorizer;
+
+	/**
 	 * 
 	 * @return
 	 */
@@ -246,7 +252,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			long recommMasterT0 = System.currentTimeMillis();
 
 			initialiseDistancesUsed(Constant.getDistanceUsed());
-
+			editDistancesMemorizer = new EditDistanceMemorizer();
 			this.lookPastType = lookPastType;
 			this.caseType = caseType;
 
@@ -386,7 +392,9 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes = getNormalisedDistancesForCandidateTimelines(
 					candidateTimelines, activitiesGuidingRecomm, caseType, this.userIDAtRecomm, this.dateAtRecomm,
 					this.timeAtRecomm, Constant.getDistanceUsed(), this.lookPastType, this.hjEditDistance,
-					this.featureWiseEditDistance, this.featureWiseWeightedEditDistance, this.OTMDSAMEditDistance);
+					this.featureWiseEditDistance, this.featureWiseWeightedEditDistance, this.OTMDSAMEditDistance,
+					this.editDistancesMemorizer);
+			// editDistancesMemorizer.serialise(this.userIDAtRecomm);
 
 			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted = normalisedDistFromCandsRes.getFirst();
 			this.endPointIndicesConsideredInCands = normalisedDistFromCandsRes.getSecond();
@@ -760,7 +768,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
 			CaseType caseType, String userIDAtRecomm, Date dateAtRecomm, Time timeAtRecomm, String distanceUsed,
 			LookPastType lookPastType, HJEditDistance hjEditDistance, FeatureWiseEditDistance featureWiseEditDistance,
-			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance)
+			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance,
+			EditDistanceMemorizer editDistancesMemorizer)
 	{
 		// {CandID,Trace,EditDist}
 		LinkedHashMap<String, Pair<String, Double>> normalisedDistanceForCandTimelines = null;
@@ -789,7 +798,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			normalisedDistanceForCandTimelines = getNormalisedDistancesForCandidateTimelinesFullCand(candidateTimelines,
 					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
 					distanceUsed, hjEditDistance, featureWiseEditDistance, featureWiseWeightedEditDistance,
-					OTMDSAMEditDistance);
+					OTMDSAMEditDistance, editDistancesMemorizer);
 
 			// for SeqNCount and SeqNHours approach, tne end point index considered in the candidate is the last
 			// activity object in that cand
@@ -942,6 +951,11 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// System.out.println("called extractCurrentTimelineSeq");
 		Pair<TimelineWithNext, Double> extractedCurrentTimelineResult = extractCurrentTimeline(testTimelinesOrig,
 				lookPastType, dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
+
+		// Start of added on 10 Aug 2017
+
+		// End of added on 10 Aug 2017
+
 		TimelineWithNext extractedCurrentTimeline = extractedCurrentTimelineResult.getFirst();
 
 		// //////////////////
@@ -2158,6 +2172,139 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		return candEditDistances;
 	}
 
+	/// Start of added on 9 Aug 2017
+	// ////////
+	/*
+	 * Fork of getHJEditDistancesForCandidateTimelinesFullCand() <p> Added: Aug 9, 2017: for better performance
+	 * (parallel) and memorising edit distance computations<p>
+	 * 
+	 * IMPORTANT POINT: THE CANDIDATE TIMELINE IS THE DIRECT CANDIDATE TIMELINE AND NOT THE LEAST DISTANT
+	 * SUBCANDIDATE.<p> Returns a map where each entry corresponds to a candidate timeline. The value of an entry is the
+	 * edit distance of that candidate timeline with the current timeline.
+	 * 
+	 * @param candidateTimelines
+	 * 
+	 * @param activitiesGuidingRecomm
+	 * 
+	 * @param caseType can be 'SimpleV3' or 'CaseBasedV1'
+	 * 
+	 * @param userAtRecomm used only for writing to file
+	 * 
+	 * @param dateAtRecomm used only for writing to file
+	 * 
+	 * @param timeAtRecomm used only for writing to file
+	 * 
+	 * @param hjEditDistance
+	 * 
+	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 */
+	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistsForCandsFullCandParallelWithMemory(
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
+	{
+		// <CandidateTimeline ID, Edit distance>
+		LinkedHashMap<String, Pair<String, Double>> candEditDistances = new LinkedHashMap<>();
+
+		candEditDistances = candidateTimelines.entrySet().parallelStream().collect(Collectors.toMap(
+				e -> (String) e.getKey(),
+				e -> (Pair<String, Double>) getEditDistances(e.getValue(), activitiesGuidingRecomm, userAtRecomm,
+						dateAtRecomm, timeAtRecomm, e.getKey(), caseType, hjEditDistance, editDistancesMemorizer),
+				(oldValue, newValue) -> newValue, LinkedHashMap::new));
+
+		String currentTimelineID = Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm);
+
+		// System.out.println("activitiesGuidingRecomm.size()=" + activitiesGuidingRecomm.size());
+		// long t1 = System.currentTimeMillis();
+		// for (Entry<String, Pair<String, Double>> candEditDist : candEditDistances.entrySet())
+		// {
+		// Constant.addToEditDistanceMemorizer(candEditDist.getKey(), currentTimelineID, candEditDist.getValue());
+		// }
+		// long t2 = System.currentTimeMillis();
+
+		// Start of 10 Aug temp curtain 1
+		// $ candEditDistances.entrySet().stream()
+		// $.forEach(e -> Constant.addToEditDistanceMemorizer(e.getKey(), currentTimelineID, e.getValue()));
+		// End of 10 Aug temp curtain 1
+		// long t3 = System.currentTimeMillis();
+
+		// System.out.println("Iter: " + (t2 - t1));
+		// System.out.println("Stre: " + (t3 - t2));
+		return candEditDistances;
+	}
+
+	/**
+	 * Created to facilitate parallel computation of edit distances
+	 * 
+	 * @param candTimeline
+	 * @param activitiesGuidingRecomm
+	 * @param userAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param candTimelineID
+	 * @param hjEditDistance
+	 * @param caseType
+	 * @return
+	 * @since 9 Aug 2017
+	 */
+	public static Pair<String, Double> getEditDistances(Timeline candTimeline,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
+			String timeAtRecomm, String candTimelineID, CaseType caseType, HJEditDistance hjEditDistance,
+			EditDistanceMemorizer editDistancesMemorizer)
+	{
+		Pair<String, Double> editDistanceForThisCandidate = null;
+
+		switch (caseType)
+		{
+			case CaseBasedV1:
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+				// invalids are already expunged, no need to expunge again
+				{
+					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithoutEndCurrentActivity(
+							candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+				}
+				else
+				{
+					editDistanceForThisCandidate = hjEditDistance
+							.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+									candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+									dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+				}
+				break;
+
+			case SimpleV3:// "SimpleV3":
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+				{
+					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
+							candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+				}
+				else
+				{
+					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceInvalidsExpunged(
+							candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+				}
+				break;
+
+			default:
+				System.err.println(PopUps.getTracedErrorMsg(
+						"Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type" + caseType));
+				break;
+		}
+
+		// editDistancesMemorizer.addToMemory(candTimelineID, Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm),
+		// editDistanceForThisCandidate);
+
+		// Constant.addToEditDistanceMemorizer(candTimelineID, Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm),
+		// editDistanceForThisCandidate);
+
+		return editDistanceForThisCandidate;
+	}
+
+	/// End of added on 9 Aug 2017
+
 	/**
 	 * Returns a map where each entry corresponds to a candidate timeline. The value of an entry is the edit distance of
 	 * that candidate timeline with the current timeline.
@@ -2441,7 +2588,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			String distanceUsed, HJEditDistance hjEditDistance, FeatureWiseEditDistance featureWiseEditDistance,
-			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance)
+			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance,
+			EditDistanceMemorizer editDistancesMemorizer)
 	{
 
 		switch (distanceUsed)
@@ -2449,7 +2597,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			case "HJEditDistance":
 				return getNormalisedHJEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
 						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
-						timeAtRecomm.toString(), hjEditDistance);
+						timeAtRecomm.toString(), hjEditDistance, editDistancesMemorizer);
 			case "FeatureWiseEditDistance":
 				return getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
 						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
@@ -2507,14 +2655,50 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedHJEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			HJEditDistance hjEditDistance)
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
 	{
 		// {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
-		LinkedHashMap<String, Pair<String, Double>> candEditDistances = getHJEditDistancesForCandidateTimelinesFullCand(
-				candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
-				hjEditDistance);
 
-		System.out.println("candEditDistances.size():" + candEditDistances.size());
+		// CurtainA start
+		// long t1 = System.currentTimeMillis();
+		// LinkedHashMap<String, Pair<String, Double>> candEditDistances =
+		// getHJEditDistancesForCandidateTimelinesFullCand(
+		// candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
+		// hjEditDistance);
+		// long t2 = System.currentTimeMillis();
+		//// CurtainA end
+
+		// long t3 = System.currentTimeMillis();
+		LinkedHashMap<String, Pair<String, Double>> candEditDistances/* Parallel */ = getHJEditDistsForCandsFullCandParallelWithMemory(
+				candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
+				hjEditDistance, editDistancesMemorizer);
+		// long t4 = System.currentTimeMillis();
+
+		// Start Sanity check
+		// System.out.println("Debug Aug 8 :1");
+		// System.out.println("getHJEditDistancesForCandidateTimelinesFullCand = \t" + (t2 - t1) + " ms");
+		// System.out.println("getHJEditDistsForCandsFullCandParallelWithMemory = \t" + (t4 - t3) + " ms");
+		//
+		// System.out.println("candEditDistances.size() = \t" + candEditDistances.size());
+		// System.out.println("candEditDistancesParallel.size() = \t" + candEditDistancesParallel.size());
+		//
+		// System.out.println("candEditDistances.equals(candEditDistancesParallel) =\t"
+		// + candEditDistances.equals(candEditDistancesParallel));
+		//
+		// if (candEditDistances.equals(candEditDistancesParallel) == false)
+		// {
+		// PopUps.printTracedErrorMsg("candEditDistances.equals(candEditDistancesParallel)==false");
+		// }
+		// // StringBuilder sbTemp1 = new StringBuilder();
+		// // sbTemp1.append("candEditDistances:\n");
+		// // candEditDistances.entrySet().stream()
+		// // .forEachOrdered(e -> sbTemp1.append(e.getKey() + "--" + e.getValue() + "\n"));
+		// // sbTemp1.append("candEditDistancesParallel:\n");
+		// // candEditDistancesParallel.entrySet().stream()
+		// // .forEachOrdered(e -> sbTemp1.append(e.getKey() + "--" + e.getValue() + "\n"));
+		// // System.out.println(sbTemp1.toString());
+		// End Sanity check
+		System.out.println("before filter candEditDistances.size():" + candEditDistances.size());
 		if (Constant.filterTopCands > 0)
 		{
 			System.out.print("... filtering");
@@ -2536,7 +2720,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			candEditDistances = candEditDistancesSortedFiltered;
 		}
 
-		System.out.println("candEditDistances.size():" + candEditDistances.size());
+		System.out.println("after filter candEditDistances.size():" + candEditDistances.size());
 		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = normalisedDistancesOverTheSet(
 				candEditDistances, userAtRecomm, dateAtRecomm, timeAtRecomm);
 
