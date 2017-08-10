@@ -85,9 +85,37 @@ public class TestDummy2
 		System.out.println(UtilityBelt.getIntersection(a1, a2).size());
 	}
 
+	public static void tryingOutTimelineIDs()
+	{
+
+		Timestamp t1 = new Timestamp(System.currentTimeMillis());
+		Timestamp t2 = new Timestamp(System.currentTimeMillis());
+
+		System.out.println("1_" + t1 + "_" + t2);
+		System.out.println("1_" + t1.getTime() + "_" + t2.getTime());
+
+	}
+
+	public static void mapCasts()
+	{
+		LinkedHashMap<Integer, String> linkedHashMap = new LinkedHashMap<>();
+		LinkedHashMap<Integer, String> linkedHashMap2 = new LinkedHashMap<>();
+		linkedHashMap.put(1, "One");
+		linkedHashMap.put(2, "Two");
+
+		// linkedHashMap2 = (LinkedHashMap<Integer, String>) linkedHashMap.entrySet().parallelStream()
+		// .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+
+		linkedHashMap2 = linkedHashMap.entrySet().parallelStream().collect(Collectors.toMap(e -> e.getKey(),
+				e -> e.getValue(), (oldValue, newValue) -> newValue, LinkedHashMap::new));
+		// HashMap<Integer, String> hashMap = new HashMap<>();
+	}
+
 	public static void main(String args[])
 	{
-		checkIntersection();
+		mapCasts();
+		// tryingOutTimelineIDs();
+		// checkIntersection();
 		// checkRegexUtils();
 		// checkStackTrace();
 		// testDirectoryDeletion();
