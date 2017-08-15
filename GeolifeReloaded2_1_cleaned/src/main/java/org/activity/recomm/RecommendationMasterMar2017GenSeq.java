@@ -2212,22 +2212,23 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 						dateAtRecomm, timeAtRecomm, e.getKey(), caseType, hjEditDistance, editDistancesMemorizer),
 				(oldValue, newValue) -> newValue, LinkedHashMap::new));
 
-		String currentTimelineID = Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm);
+		if (Constant.memorizeEditDistance)
+		{
+			String currentTimelineID = Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm);
+			// System.out.println("activitiesGuidingRecomm.size()=" + activitiesGuidingRecomm.size());
+			// long t1 = System.currentTimeMillis();
+			// for (Entry<String, Pair<String, Double>> candEditDist : candEditDistances.entrySet())
+			// {
+			// Constant.addToEditDistanceMemorizer(candEditDist.getKey(), currentTimelineID, candEditDist.getValue());
+			// }
+			// long t2 = System.currentTimeMillis();
 
-		// System.out.println("activitiesGuidingRecomm.size()=" + activitiesGuidingRecomm.size());
-		// long t1 = System.currentTimeMillis();
-		// for (Entry<String, Pair<String, Double>> candEditDist : candEditDistances.entrySet())
-		// {
-		// Constant.addToEditDistanceMemorizer(candEditDist.getKey(), currentTimelineID, candEditDist.getValue());
-		// }
-		// long t2 = System.currentTimeMillis();
-
-		// Start of 10 Aug temp curtain 1
-		// $ candEditDistances.entrySet().stream()
-		// $.forEach(e -> Constant.addToEditDistanceMemorizer(e.getKey(), currentTimelineID, e.getValue()));
-		// End of 10 Aug temp curtain 1
-		// long t3 = System.currentTimeMillis();
-
+			// Start of 10 Aug temp curtain 1
+			candEditDistances.entrySet().stream()
+					.forEach(e -> Constant.addToEditDistanceMemorizer(e.getKey(), currentTimelineID, e.getValue()));
+			// End of 10 Aug temp curtain 1
+			// long t3 = System.currentTimeMillis();
+		}
 		// System.out.println("Iter: " + (t2 - t1));
 		// System.out.println("Stre: " + (t3 - t2));
 		return candEditDistances;

@@ -75,28 +75,44 @@ public class Timeline implements Serializable
 
 		countTimelinesCreatedUntilNow += 1;
 
-		// start curtain 7 Aug 2017
-		// if (shouldBelongToSingleDay)
-		// {
-		// timelineID = String.valueOf(DateTimeUtils.getDate(activityObjects.get(0).getStartTimestamp()));
-		// }
-		// else
-		// {
-		// // timelineID = String.valueOf(countTimelinesCreatedUntilNow);
-		// timelineID = Integer.toString(countTimelinesCreatedUntilNow);
-		// // changed from String.valueOf on 2 Aug 2017 for performance
-		// // Integer.toString(i)
-		// }
-		// end curtain 7 Aug 2017
+		if (Constant.memorizeEditDistance == false)
+		{
+			// start curtain 7 Aug 2017
+			if (shouldBelongToSingleDay)
+			{
+				// timelineID =
+				// String.valueOf(DateTimeUtils.getDate(activityObjects.get(0).getStartTimestamp()));//Disabled on Aug
+				// 14 2017
+				timelineID = getTimelineIDFromAOs(activityObjects);
+			}
+			else
+			{
+				// timelineID = String.valueOf(countTimelinesCreatedUntilNow);
+				// long t1 = System.nanoTime();
+				timelineID = Integer.toString(countTimelinesCreatedUntilNow);
+				// long t2 = System.nanoTime();
 
-		// Start of new Timelineid on Aug 7 2017
+				// String timelineIDDummy = getTimelineIDFromAOs(activityObjects);
+				// long t3 = System.nanoTime();
 
-		// Not a good id as it depends on the order of timelines being created
-		// timelineID = Integer.toString(countTimelinesCreatedUntilNow);
-		timelineID = getTimelineIDFromAOs(activityObjects);
-		// WritingToFile.appendLineToFileAbsolute("\nTimeline id:" + timelineID,
-		// Constant.outputCoreResultsPath + "TimelineIDs.csv");
-		// End of new Timelineid on Aug 7 2017
+				// System.out.println("Debug: timelineid performance : ," + ((t3 - t2) - (t2 - t1)) + ", ns");
+				// changed from String.valueOf on 2 Aug 2017 for performance
+				// Integer.toString(i)
+			}
+			// end curtain 7 Aug 2017
+		}
+
+		else
+		{// Is slower in performance
+			// Start of new Timelineid on Aug 7 2017
+
+			// Not a good id as it depends on the order of timelines being created
+			// timelineID = Integer.toString(countTimelinesCreatedUntilNow);
+			timelineID = getTimelineIDFromAOs(activityObjects);//
+			// WritingToFile.appendLineToFileAbsolute("\nTimeline id:" + timelineID,
+			// Constant.outputCoreResultsPath + "TimelineIDs.csv");
+			// End of new Timelineid on Aug 7 2017
+		}
 	}
 
 	/**
@@ -108,19 +124,18 @@ public class Timeline implements Serializable
 	 */
 	public static String getTimelineIDFromAOs(ArrayList<ActivityObject> activityObjects)
 	{
-		String timelineID = "-1";
-
+		// String timelineID = "-1";
 		ActivityObject firstActivityObject = activityObjects.get(0);
-		ActivityObject lastActivityObject = activityObjects.get(activityObjects.size() - 1);
+		// $$ActivityObject lastActivityObject = activityObjects.get(activityObjects.size() - 1);
 
 		// timelineID = firstActivityObject.getUserID() + "_" + (firstActivityObject.getStartTimestampInms() / 1000) +
 		// "_"
 		// + (lastActivityObject.getStartTimestampInms()/1000);
 
-		timelineID = firstActivityObject.getUserID() + "_" + (firstActivityObject.getStartTimestampInms() / 1000) + "_"
-				+ activityObjects.size();
+		return (firstActivityObject.getUserID() + "_" + (firstActivityObject.getStartTimestampInms() / 1000) + "_"
+				+ activityObjects.size());
 
-		return timelineID;
+		// return timelineID;
 	}
 
 	/**
