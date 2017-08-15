@@ -71,6 +71,13 @@ public class DomainConstants
 			266, 306, 313, 314, 333, 338, 341, 431, 433, 437, 447, 449, 471, 510, 515, 520, 543, 547, 607, 634, 661,
 			678, 696, 714, 729, 741, 749, 761, 792, 816, 841, 855, 861, 869, 894, 902, 907, 912, 921, 934, };
 
+	public static final int gowallaUserIDInUserGroup1Users[] = { 50, 57, 60, 64, 72, 88, 98, 108, 120, 138, 151, 156,
+			159, 193, 204, 209, 214, 232, 233, 238, 262, 270, 341, 354, 359, 369, 421, 459, 484, 515, 564, 624, 648,
+			691, 702, 705, 708, 721, 776, 790, 825, 888, 938, 943, 990, 1082, 1094, 1152, 1177, 1199, 1276, 1343, 1356,
+			1399, 1456, 1462, 1471, 1520, 1556, 1564, 1572, 1665, 1729, 1730, 1774, 1793, 1856, 1903, 1925, 2026, 2028,
+			2045, 2046, 2133, 2214, 2224, 2232, 2444, 2479, 2616, 2643, 2691, 2702, 2723, 2732, 2755, 2825, 2839, 2900,
+			2962, 2980, 2999, 3006, 3014, 3028, 3050, 3099, 3129, 3186, 3396 };
+
 	public static boolean isGowallaUserIDsWithGT553MaxActsPerDay(int uid)
 	{
 		boolean found = false;
@@ -92,13 +99,6 @@ public class DomainConstants
 	static LinkedHashMap<Integer, String> locIDNameDictionary = null;
 	public static TreeMap<Integer, Character> catIDCharCodeMap = null;
 	public static TreeMap<Character, Integer> charCodeCatIDMap = null;
-
-	public final static String pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
-	public final static String pathToSerialisedLocationObjects = "./dataToRead/Mar30/DatabaseCreatedMerged/mapForAllLocationData.kryo";
-	public final static String pathToSerialisedUniqueLocIDsInCleanedTimelines = "./dataToRead/Mar30/DatabaseCreatedMerged/UniqueLocIDsInCleanedTimeines.ser";
-
-	public final static String pathToSerialisedLevelWiseCatIDsDict = "./dataToRead/May17/mapCatIDLevelWiseCatIDsDict.kryo";
-	public final static String pathToSerialisedCatIDsHierDist = "./dataToRead/April7/mapCatIDsHierDist.kryo";
 
 	public static TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap;
 	// public static final Integer hierarchyLevelForEditDistance = 1;// is in Constant class
@@ -128,7 +128,7 @@ public class DomainConstants
 		// getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict, 1, true);
 
 		LinkedHashMap<Integer, LinkedHashMap<Integer, Double>> locIDsHaversineDists = computeHaversineDistanceBetweenAllLocIDs(
-				pathToSerialisedLocationObjects);
+				PathConstants.pathToSerialisedLocationObjects);
 
 		// StringBuilder sb = new StringBuilder();
 		// for (Entry<Integer, LinkedHashMap<Integer, Double>> e1 : locIDsHaversineDists.entrySet())
@@ -155,7 +155,7 @@ public class DomainConstants
 		try
 		{
 			LinkedHashMap<Integer, LocationGowalla> locObjs = (LinkedHashMap<Integer, LocationGowalla>) Serializer
-					.kryoDeSerializeThis(pathToSerialisedLocationObjects);
+					.kryoDeSerializeThis(PathConstants.pathToSerialisedLocationObjects);
 
 			// TreeSet<Integer> uniqueLocIDsInCleanedTimelines = (TreeSet<Integer>) Serializer
 			// .deSerializeThis(pathToSerialisedUniqueLocIDsInCleanedTimelines);
@@ -410,7 +410,7 @@ public class DomainConstants
 
 	public static void setCatIDGivenLevelCatIDMap()
 	{
-		catIDGivenLevelCatIDMap = getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict,
+		catIDGivenLevelCatIDMap = getGivenLevelCatIDForAllCatIDs(PathConstants.pathToSerialisedLevelWiseCatIDsDict,
 				Constant.HierarchicalCatIDLevelForEditDistance, true);
 	}
 

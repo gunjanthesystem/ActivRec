@@ -74,11 +74,11 @@ public class DatageneratorUtils
 				// int numOfPlaceIDMerger
 				int countOfContinuousMerged = 1;
 
-				TreeMap<Timestamp, CheckinEntry> continuousMergedForThisUser = new TreeMap<Timestamp, CheckinEntry>();
+				TreeMap<Timestamp, CheckinEntry> continuousMergedForThisUser = new TreeMap<>();
 
 				CheckinEntry previousCheckinEntry = null; // should be null before starting for each user
-				ArrayList<CheckinEntry> checkinsToMerge = new ArrayList<CheckinEntry>(); // accumulated checkins to
-																							// merge into one
+				ArrayList<CheckinEntry> checkinsToMerge = new ArrayList<>(); // accumulated checkins to
+																				// merge into one
 
 				int countOfCheckins = 0;
 				for (Entry<Timestamp, CheckinEntry> checkinEntries : entryForUser.getValue().entrySet())
@@ -165,26 +165,26 @@ public class DatageneratorUtils
 	 */
 	private static CheckinEntry mergeCheckins(ArrayList<CheckinEntry> checkinsToMerge)
 	{
-
+		CheckinEntry firstCheckIn = checkinsToMerge.get(0);
 		if (checkinsToMerge.size() == 1)
 		{
-			return checkinsToMerge.get(0);
+			return firstCheckIn;// checkinsToMerge.get(0);
 		}
 
 		// CheckinEntry(String userID, Integer locationID, Timestamp ts, String latitude, String longitude,
 		// Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext)
 
-		String userID = checkinsToMerge.get(0).getUserID();
-		Timestamp ts = checkinsToMerge.get(0).getTimestamp();
-		Integer catID = checkinsToMerge.get(0).getActivityID();
-		String workingLevelCatIDs = checkinsToMerge.get(0).getWorkingLevelCatIDs();
-		double distanceInMFromPrev = checkinsToMerge.get(0).getDistanceInMetersFromPrev();
-		long durationInSecsFromPrev = checkinsToMerge.get(0).getDurationInSecsFromPrev();
-		String[] levelWiseCatIDs = checkinsToMerge.get(0).getLevelWiseCatIDs();
+		String userID = firstCheckIn.getUserID();
+		Timestamp ts = firstCheckIn.getTimestamp();
+		Integer catID = firstCheckIn.getActivityID();
+		String workingLevelCatIDs = firstCheckIn.getWorkingLevelCatIDs();
+		double distanceInMFromPrev = firstCheckIn.getDistanceInMetersFromPrev();
+		long durationInSecsFromPrev = firstCheckIn.getDurationInSecsFromPrev();
+		String[] levelWiseCatIDs = firstCheckIn.getLevelWiseCatIDs();
 
-		ArrayList<Integer> locationIDs = new ArrayList<>();
-		ArrayList<String> lats = new ArrayList<>();
-		ArrayList<String> lons = new ArrayList<>();
+		ArrayList<Integer> locationIDs = new ArrayList<>(checkinsToMerge.size());
+		ArrayList<String> lats = new ArrayList<>(checkinsToMerge.size());
+		ArrayList<String> lons = new ArrayList<>(checkinsToMerge.size());
 
 		for (CheckinEntry ce : checkinsToMerge)
 		{

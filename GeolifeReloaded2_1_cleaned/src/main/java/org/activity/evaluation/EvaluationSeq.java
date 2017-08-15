@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.SummaryStat;
+import org.activity.constants.PathConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
@@ -41,8 +42,8 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	static final String groupsOf100UsersLabels[] = { "1" };// "1", "101", "201", "301", "401", "501", "601", "701",
-															// "801",
+	static final String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801",
+			"901" };//
 	// static final String thresholds =
 	// "901" };
 
@@ -78,9 +79,8 @@ public class EvaluationSeq
 				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
-						DomainConstants.pathToSerialisedCatIDsHierDist,
-						DomainConstants.pathToSerialisedCatIDNameDictionary,
-						DomainConstants.pathToSerialisedLocationObjects);
+						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
+						PathConstants.pathToSerialisedLocationObjects);
 
 				// for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				// {
@@ -176,9 +176,8 @@ public class EvaluationSeq
 				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
-						DomainConstants.pathToSerialisedCatIDsHierDist,
-						DomainConstants.pathToSerialisedCatIDNameDictionary,
-						DomainConstants.pathToSerialisedLocationObjects);
+						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
+						PathConstants.pathToSerialisedLocationObjects);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -274,9 +273,8 @@ public class EvaluationSeq
 				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/" + thresholdVal + "/";
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
-						DomainConstants.pathToSerialisedCatIDsHierDist,
-						DomainConstants.pathToSerialisedCatIDNameDictionary,
-						DomainConstants.pathToSerialisedLocationObjects);
+						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
+						PathConstants.pathToSerialisedLocationObjects);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -388,10 +386,9 @@ public class EvaluationSeq
 					String pathT = outputCoreResultsPath + groupsOf100UsersLabel + "/" + thresholdValue;
 					System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 
-					Constant.initialise(pathT, Constant.getDatabaseName(),
-							DomainConstants.pathToSerialisedCatIDsHierDist,
-							DomainConstants.pathToSerialisedCatIDNameDictionary,
-							DomainConstants.pathToSerialisedLocationObjects);
+					Constant.initialise(pathT, Constant.getDatabaseName(), PathConstants.pathToSerialisedCatIDsHierDist,
+							PathConstants.pathToSerialisedCatIDNameDictionary,
+							PathConstants.pathToSerialisedLocationObjects);
 					System.out.println("Constant.initialise done ---");
 					// outputCoreResultsPath = commonPathT;
 

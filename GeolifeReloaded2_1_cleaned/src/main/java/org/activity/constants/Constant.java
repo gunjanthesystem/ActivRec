@@ -184,11 +184,12 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */
-																				// };//
-																				// ,
-																				// 14, 16,
-																				// 18 };
+	public static final double matchingUnitAsPastCount[] = { 1, 3, 5, 8 };// 0, 1, 2, 4, 6, 3, 8 };// 1,3,5,8,
+	// 3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,
+	// };//
+	// ,
+	// 14, 16,
+	// 18 };
 	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
 	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
 
@@ -223,15 +224,19 @@ public final class Constant
 	public static final boolean buildRepAOJustInTime = false;
 	public static final boolean preBuildRepAOGenericUser = true;
 
-	public static final boolean only1CandFromEachCollUser = true;// false;// true;
+	public static final boolean only1CandFromEachCollUser = false;// false;// true;
 
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int filterTopCands = -1;// 100;// -1 for no filter,
+	public static final int filterTopCands = 100;// 1500;// 100;// -1 for no filter,
 
 	static EditDistanceMemorizer editDistancesMemorizer;
 	final static int editDistancesMemorizerBufferSize = 1;// 000000;
+
+	public static final boolean memorizeEditDistance = false;
+
+	public static final boolean For9kUsers = false;
 	////////////////////////////////////////////////////////////////////////
 
 	/**
@@ -335,6 +340,7 @@ public final class Constant
 	public static void initialise(String givenCommonpath, String databaseName, String catIDsHierDistSerialisedFile,
 			String pathToSerialisedCatIDNameDictionary, String pathToSerialisedLocationObjects)
 	{
+
 		Constant.setDatabaseName(databaseName);
 		Constant.UsingSQLDatabase = false;
 		Constant.setUserIDs();
@@ -1048,6 +1054,8 @@ public final class Constant
 		s.append("\npreBuildRepAOGenericUser:" + preBuildRepAOGenericUser);
 
 		s.append("\neditDistancesMemorizerBufferSize:" + editDistancesMemorizerBufferSize);
+		s.append("\nmemorizeEditDistance:" + memorizeEditDistance);
+		s.append("\nFor9kUsers:" + For9kUsers);
 
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{

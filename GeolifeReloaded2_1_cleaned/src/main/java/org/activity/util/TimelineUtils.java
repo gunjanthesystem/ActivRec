@@ -388,6 +388,12 @@ public class TimelineUtils
 		LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise = convertTimewiseMapToDatewiseMap2(
 				checkinEntries, Constant.getTimeZone());
 
+		// Start of added on Aug 10 2017
+		// // Filter out days which have more than 500 checkins
+		// StringBuilder sb = new StringBuilder();
+		// checkinEntriesDatewise.entrySet().stream().forEachOrdered(e->sb.append(str));
+		// End of added on Aug 10 2017
+
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = convertCheckinEntriesToActivityObjectsGowalla(
 				checkinEntriesDatewise, locationObjects);
 
@@ -1737,20 +1743,87 @@ public class TimelineUtils
 	}
 
 	/**
+	 * Removes timelines with greater than upperLimit activity objects in a day
+	 * 
+	 * 
+	 * @param usersDayTimelinesOriginal
+	 * @param upperLimit
+	 * @param fileNameForLog
+	 * @param writeLog
+	 *            can be disabled to save heap space otherwise consumed by StringBuilder
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> removeDayTimelinesWithGreaterAct(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, int upperLimit,
+			String fileNameForLog, boolean writeLog)
+	{
+		System.out.println("Inside removeDayTimelinesWithGreaterAct");
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> result = new LinkedHashMap<>();
+		StringBuilder log = new StringBuilder();
+		ArrayList datesRemoved = new ArrayList<>();
+		log.append("User, #days(daytimelines) removed\n");
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
+		{
+			String user = userEntry.getKey();
+			LinkedHashMap<Date, Timeline> toKeepTimelines = new LinkedHashMap<>();
+
+			int countOfDatesRemovedForThisUser = 0;
+			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+			{
+				if (dateEntry.getValue().getActivityObjectsInTimeline().size() <= upperLimit)
+				{
+					toKeepTimelines.put(dateEntry.getKey(), dateEntry.getValue());
+				}
+				else
+				{
+					countOfDatesRemovedForThisUser += 1;
+					datesRemoved.add(dateEntry.getKey());
+					// datesRemoved.append(dateEntry.getKey().toString() + "_");
+				}
+			}
+
+			if (countOfDatesRemovedForThisUser > 0)
+			{
+				if (writeLog)
+				{
+					log.append(user + "," + countOfDatesRemovedForThisUser + "," + datesRemoved.toString() + "\n");
+					// System.out.println("For user:" + user + " #days(/daytimelines) removed = " +
+					// countOfDatesRemovedForThisUser + " (having <"
+					// + lowerLimit + " aos per day)");
+				}
+			}
+
+			if (toKeepTimelines.size() > 0)
+			{
+				result.put(user, toKeepTimelines);
+			}
+		}
+
+		WritingToFile.writeToNewFile(log.toString(), fileNameForLog);
+		System.out.println("Exiting removeDayTimelinesWithGreaterAct");
+		return result;
+	}
+
+	/**
 	 * Removes timelines with less than lowerLimit activity objects in a day
+	 * 
 	 * 
 	 * @param usersDayTimelinesOriginal
 	 * @param lowerLimit
+	 * @param fileNameForLog
+	 * @param writeLog
+	 *            can be disabled to save heap space otherwise consumed by StringBuilder
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> removeDayTimelinesWithLessAct(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, int lowerLimit,
-			String fileNameForLog)
+			String fileNameForLog, boolean writeLog)
 	{
 		System.out.println("Inside removeDayTimelinesWithLessValidAct");
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> result = new LinkedHashMap<>();
 		StringBuilder log = new StringBuilder();
-		StringBuilder datesRemoved = new StringBuilder();
+		ArrayList datesRemoved = new ArrayList<>();
 		log.append("User, #days(daytimelines) removed\n");
 
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
@@ -1768,16 +1841,20 @@ public class TimelineUtils
 				else
 				{
 					countOfDatesRemovedForThisUser += 1;
-					datesRemoved.append(dateEntry.getKey().toString() + "_");
+					datesRemoved.add(dateEntry.getKey());
+					// datesRemoved.append(dateEntry.getKey().toString() + "_");
 				}
 			}
 
 			if (countOfDatesRemovedForThisUser > 0)
 			{
-				log.append(user + "," + countOfDatesRemovedForThisUser + "," + datesRemoved.toString() + "\n");
-				// System.out.println("For user:" + user + " #days(/daytimelines) removed = " +
-				// countOfDatesRemovedForThisUser + " (having <"
-				// + lowerLimit + " aos per day)");
+				if (writeLog)
+				{
+					log.append(user + "," + countOfDatesRemovedForThisUser + "," + datesRemoved.toString() + "\n");
+					// System.out.println("For user:" + user + " #days(/daytimelines) removed = " +
+					// countOfDatesRemovedForThisUser + " (having <"
+					// + lowerLimit + " aos per day)");
+				}
 			}
 
 			if (toKeepTimelines.size() > 0)

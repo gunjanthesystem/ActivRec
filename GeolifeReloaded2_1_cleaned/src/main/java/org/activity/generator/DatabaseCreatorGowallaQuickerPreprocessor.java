@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ import org.activity.objects.TrajectoryEntry;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -1304,7 +1306,17 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 		{
 			JSONObject jObj = new JSONObject(jsonString);
 
-			String[] urlSplitted = jObj.get("url").toString().split("/");
+			String[] urlSplitted = RegexUtils.patternForwardSlash.split(jObj.get("url").toString());
+			// String[] urlSplittedOld = jObj.get("url").toString().split("/");
+
+//			if (!Arrays.asList(urlSplitted).equals(Arrays.asList(urlSplittedOld)))
+//			{
+//				System.out.println("Error: !urlSplitted.equals(urlSplittedOld)");
+//			}
+//
+//			System.out.println("Arrays.asList(urlSplitted)= " + Arrays.asList(urlSplitted));
+//			System.out.println("Arrays.asList(urlSplittedOld)= " + Arrays.asList(urlSplittedOld));
+
 			String catID = urlSplitted[urlSplitted.length - 1];
 
 			res = new Pair<String, String>(catID, jObj.get("name").toString());
@@ -6012,8 +6024,8 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile.getBWForNewFile(
-						commonPath + userID + activityNameToMerge + "MergerSandwichesLog.csv");
+				BufferedWriter bwMergerCaseLogs = WritingToFile
+						.getBWForNewFile(commonPath + userID + activityNameToMerge + "MergerSandwichesLog.csv");
 				bwMergerCaseLogs.write(
 						"TrajId,CurrentMode,NextMode,NextToNextMode,CurrentTS, NextTS,NextToNextTS,DurationOfNext,TimestampDifferenceForDuration\n");
 

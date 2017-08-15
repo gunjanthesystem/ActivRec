@@ -67,8 +67,9 @@ public class DatabaseCreatorGowallaQuicker0
 	// static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
-	public static String commonPath =
-			"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/May17/DatabaseCreatedMerged/";
+	public static String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Aug10/DatabaseCreatedMerged/";
+	// commented out on Aug 10 2017
+	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/May17/DatabaseCreatedMerged/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/April6/DatabaseCreatedUnMerged/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar30/DatabaseCreatedMerged/";
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb23/DatabaseCreatedNoMerge/";
@@ -78,13 +79,14 @@ public class DatabaseCreatorGowallaQuicker0
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";
 	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/";
 	// Data Works/";
-	public static final String rawPathToRead =
-			"/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/";
+	public static final String rawPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/";
 	// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another
 	// source/gowalla/";
 
-	public static final String checkinDataFileName =
-			"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+	public static final String checkinDataFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Aug10/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly10Aug2017.csv";
+	// commented out on Aug 10 2017
+	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+
 	// commented out on 2 feb 2017
 	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
 	// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9DataGenerationR/gw2CheckinsSpots1TargetUsersDatesOnly.csv";
@@ -93,13 +95,11 @@ public class DatabaseCreatorGowallaQuicker0
 
 	public static final String userLocationFileName = rawPathToRead + "gowalla_spots_subset1.csv";
 
-	public static final String categoryHierarchyTreeFileName =
-			"./dataToRead/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode";
+	public static final String categoryHierarchyTreeFileName = "./dataToRead/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode";
 	// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/RootOfCategoryTree24Nov2016.DMTreeNode";
 	static String nameForMapToBeSerialised = "mapForGowallaData25Nov2016.map";// "mapForGowallaData9Sep2016.map";
 
-	static final String catIDNameDictionaryFileName =
-			"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/UI/CatIDNameDictionary.kryo";
+	static final String catIDNameDictionaryFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/UI/CatIDNameDictionary.kryo";
 	// $$public static final int continuityThresholdInSeconds = 5 * 60; // changed from 30 min in DCU dataset...., if
 	// two timestamps are separated by less than equal to this value
 	// and
@@ -125,6 +125,7 @@ public class DatabaseCreatorGowallaQuicker0
 	// public static final int sandwichFillerDurationInSecs = 10 * 60;
 
 	// ******************END OF PARAMETERS TO SET*****************************//
+	final static boolean disableExpensiveWriting = true;
 
 	public static void main(String args[])
 	{
@@ -138,8 +139,8 @@ public class DatabaseCreatorGowallaQuicker0
 			Constant.setCommonPath(commonPath);
 			// commonPath = Constant.getCommonPath();
 			// Redirecting the console output
-			PrintStream consoleLogStream =
-					new PrintStream(new File(commonPath + "consoleLogDatabaseCreatorGowalla.txt"));
+			PrintStream consoleLogStream = new PrintStream(
+					new File(commonPath + "consoleLogDatabaseCreatorGowalla.txt"));
 			// System.setOut(new PrintStream(new FileOutputStream('/dev/stdout')));
 			System.setOut(new PrintStream(consoleLogStream));
 			System.setErr(consoleLogStream);
@@ -150,18 +151,18 @@ public class DatabaseCreatorGowallaQuicker0
 
 			//// start of curtian1
 			// get root of the category hierarchy tree
-			DefaultMutableTreeNode rootOfCategoryTree =
-					(DefaultMutableTreeNode) Serializer.deSerializeThis(categoryHierarchyTreeFileName);
+			DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
+					.deSerializeThis(categoryHierarchyTreeFileName);
 			//
-			TreeMap<Integer, String> catIDNameDictionary =
-					(TreeMap<Integer, String>) Serializer.kryoDeSerializeThis(catIDNameDictionaryFileName);
+			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
+					.kryoDeSerializeThis(catIDNameDictionaryFileName);
 			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
 			// commonPath + "CatIDNameDictionary.kryo");
 
 			int workingCatLevel = DomainConstants.gowallaWorkingCatLevel;
 
-			Pair<TreeMap<Integer, String>, LinkedHashSet<Integer>> catIDWorkingLevelCatIDsDictResult =
-					getWorkingLevelCatIDsForAllCatIDs(catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
+			Pair<TreeMap<Integer, String>, LinkedHashSet<Integer>> catIDWorkingLevelCatIDsDictResult = getWorkingLevelCatIDsForAllCatIDs(
+					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
 
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = catIDWorkingLevelCatIDsDictResult.getFirst();
 			LinkedHashSet<Integer> catIDsInHierarchy = catIDWorkingLevelCatIDsDictResult.getSecond();
@@ -169,8 +170,8 @@ public class DatabaseCreatorGowallaQuicker0
 			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = getLevelWiseCatIDsForAllCatIDs(catIDNameDictionary,
 					rootOfCategoryTree, DomainConstants.numOfCatLevels);
 
-			HashMap<String, Double> mapCatIDsHierDist =
-					createCatIDsHierarchicalDistMap(catIDLevelWiseCatIDsDict, catIDNameDictionary, catIDsInHierarchy);
+			HashMap<String, Double> mapCatIDsHierDist = createCatIDsHierarchicalDistMap(catIDLevelWiseCatIDsDict,
+					catIDNameDictionary, catIDsInHierarchy);
 
 			///////////////////////// Start of sanity check
 			// sanity check to verify if no cat id as empty working lvel cat ids
@@ -197,14 +198,13 @@ public class DatabaseCreatorGowallaQuicker0
 
 			////
 			// used in create checkin entries to determine if a cat id is acceptable
-			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap =
-					UIUtilityBox.getCatIDsFoundNodesMap(rootOfCategoryTree, catIDNameDictionary);
+			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap = UIUtilityBox
+					.getCatIDsFoundNodesMap(rootOfCategoryTree, catIDNameDictionary);
 
 			////
-			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> unmergedCheckinResult =
-					createCheckinEntries(checkinDataFileName, commonPath, rootOfCategoryTree,
-							catIDWorkingLevelCatIDsDict, catIDsFoundNodesMap, workingCatLevel,
-							catIDLevelWiseCatIDsDict);
+			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> unmergedCheckinResult = createCheckinEntries(
+					checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict,
+					catIDsFoundNodesMap, workingCatLevel, catIDLevelWiseCatIDsDict);
 
 			mapForAllCheckinData = unmergedCheckinResult.getFirst();
 
@@ -222,15 +222,21 @@ public class DatabaseCreatorGowallaQuicker0
 			System.out.println("ALERT! merge = " + merge);
 			if (merge)
 			{
-				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
-						commonPath + "mapForAllCheckinDataBeforeMerged.csv");
-				/////
-				// merge
-				// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged
+				if (!disableExpensiveWriting) // skipping writing on Aug 10 for performance.
+				{
+					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
+							commonPath + "mapForAllCheckinDataBeforeMerged.csv");
+				} /////
+					// merge
+					// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged
 				mapForAllCheckinData = DatageneratorUtils.mergeContinuousGowallaWithoutBOD4(mapForAllCheckinData,
 						commonPath, continuityThresholdInSeconds, continuityThresholdInMeters);
-				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
-						commonPath + "mapForAllCheckinDataAfterMerged.csv");
+
+				if (!disableExpensiveWriting)// skipping writing on Aug 10 for performance.
+				{
+					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
+							commonPath + "mapForAllCheckinDataAfterMerged.csv");
+				}
 			}
 			else
 			{
@@ -442,8 +448,8 @@ public class DatabaseCreatorGowallaQuicker0
 			String absPathToCatIDDictionary, Function<CheckinEntry, String> lambdaForConsecSameAttribute)
 	{
 		// LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
-		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 =
-				TimelineUtils.getEmptyMapOfCatIDs(absPathToCatIDDictionary);
+		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 = TimelineUtils
+				.getEmptyMapOfCatIDs(absPathToCatIDDictionary);
 
 		// <catid,catname>
 		TreeMap<Integer, String> catIDNameDictionary = r1.getSecond();
@@ -542,8 +548,8 @@ public class DatabaseCreatorGowallaQuicker0
 							// {
 							// consecValsCompAttrib = new ArrayList<>();
 							// }
-							ArrayList<Integer> consecValsCompAttrib =
-									comparedAttribLengthConsecs.get(prevValOfComparisonAttribute);
+							ArrayList<Integer> consecValsCompAttrib = comparedAttribLengthConsecs
+									.get(prevValOfComparisonAttribute);
 
 							if (consecValsCompAttrib == null)
 							{
@@ -632,8 +638,8 @@ public class DatabaseCreatorGowallaQuicker0
 			String absPathToCatIDDictionary)
 	{
 		// LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
-		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 =
-				TimelineUtils.getEmptyMapOfCatIDs(absPathToCatIDDictionary);
+		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 = TimelineUtils
+				.getEmptyMapOfCatIDs(absPathToCatIDDictionary);
 
 		// <catid, [1,1,2,4,1,1,1,6]>
 		LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecutives = r1.getFirst();
@@ -898,13 +904,13 @@ public class DatabaseCreatorGowallaQuicker0
 
 			for (int level = 1; level <= numOfLevels; level++)
 			{
-				Set<String> givenLevelOrAboveCatIDs =
-						UIUtilityBox.getGivenLevelCatIDs(String.valueOf(cat.getKey()), rootOfCategoryTree, level);
+				Set<String> givenLevelOrAboveCatIDs = UIUtilityBox.getGivenLevelCatIDs(String.valueOf(cat.getKey()),
+						rootOfCategoryTree, level);
 
 				if (givenLevelOrAboveCatIDs.size() > 0)
 				{
-					levelWiseCatIDsForThisCatID[level - 1] =
-							givenLevelOrAboveCatIDs.stream().reduce((t, u) -> t + "__" + u).get();
+					levelWiseCatIDsForThisCatID[level - 1] = givenLevelOrAboveCatIDs.stream()
+							.reduce((t, u) -> t + "__" + u).get();
 					numOfCatsInHierarchyTree += 1;
 
 					if (givenLevelOrAboveCatIDs.size() > 1)
@@ -959,8 +965,7 @@ public class DatabaseCreatorGowallaQuicker0
 	{
 		int countOfCheckinEntryObjects = 0;
 		int numOfDuplicateTimestamps = 0;
-		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> result =
-				new LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>();
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> result = new LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>();
 
 		Set<String> locationIDsInCheckinData = new HashSet<String>();
 
@@ -1021,8 +1026,8 @@ public class DatabaseCreatorGowallaQuicker0
 				// a direct catid is acceptable only if it is present in cat hierarchy tree at one of more nodes and
 				// atleast one of those nodes have direct level >= workingLevel (2).. in other words, ignore catid at
 				// level 1
-				Pair<Boolean, String> isAcceptableDirectCatID =
-						isAcceptableDirectCatIDFaster(catIDDirect, catIDsFoundNodesMap, workingCatLevel);
+				Pair<Boolean, String> isAcceptableDirectCatID = isAcceptableDirectCatIDFaster(catIDDirect,
+						catIDsFoundNodesMap, workingCatLevel);
 
 				// catIDWorkingLevelCatIDsDict
 
@@ -1101,7 +1106,7 @@ public class DatabaseCreatorGowallaQuicker0
 	 * <p>
 	 * Read the checkin file and create checkin entry objects
 	 * </p>
-	 * <font color = yellow>#CheckinsReadFromData = #checkinNotInHierarchy + #checkinsLevelNotAcceptable +
+	 * <font color = orange>#CheckinsReadFromData = #checkinNotInHierarchy + #checkinsLevelNotAcceptable +
 	 * #checkinsCreated + #checkinsDuplicateTimestampUser</font>
 	 * <p>
 	 * <font color = orange>Note: Gowalla checkin data read: there exists 281 instances where same user checkins at
@@ -1129,34 +1134,40 @@ public class DatabaseCreatorGowallaQuicker0
 	{
 		int countOfCheckinEntryObjects = 0;
 		int numOfDuplicateTimestamps = 0;
-		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> result =
-				new LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>();
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> result = new LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>();
 
 		Set<String> locationIDsInCheckinData = new HashSet<String>();
 
 		int countOfLines = 0;
 
-		String lineRead;
+		String lineRead = "";
 
 		ArrayList<Integer> notFoundInFlatMap = new ArrayList<Integer>();
 		ArrayList<Integer> catIDsNotFoundInAnyLevel = new ArrayList<Integer>();
 
 		StringBuilder logRejectedCheckins = new StringBuilder("LineNumOfCheckin,Reason,DirectCatID\n");
 		long countOfRejectedCheckinNotInHierarchy = 0, countOfRejectedCHeckinBelowLevel2 = 0,
-				countOfCinWithMultipleWorkingLevelCatIDs = 0;
+				countOfCinWithMultipleWorkingLevelCatIDs = 0, countOfRejectedCheckinNotInCatIDNameDict = 0;
 		System.out.println("----Inside createCheckinEntries----------------");
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
 			while ((lineRead = br.readLine()) != null)
 			{
+				// Start of temp limiter
+				// if (countOfLines > 5000000)
+				// {
+				// break;
+				// }
+				// end of temp limiter
+
 				countOfLines += 1;
 				if (countOfLines == 1)
 				{
 					continue; // skip the header line
 				}
 
-				if (countOfLines % 200000 == 0)
+				if (countOfLines % 200000/* 200000 */ == 0)
 				{
 					System.out.println(" #lines read = " + countOfLines);
 				}
@@ -1177,8 +1188,8 @@ public class DatabaseCreatorGowallaQuicker0
 				// a direct catid is acceptable only if it is present in cat hierarchy tree at one of more nodes and
 				// atleast one of those nodes have direct level >= workingLevel (2).. in other words, ignore catid at
 				// level 1
-				Pair<Boolean, String> isAcceptableDirectCatID =
-						isAcceptableDirectCatIDFaster(catIDDirect, catIDsFoundNodesMap, workingCatLevel);
+				Pair<Boolean, String> isAcceptableDirectCatID = isAcceptableDirectCatIDFaster(catIDDirect,
+						catIDsFoundNodesMap, workingCatLevel);
 
 				if (isAcceptableDirectCatID.getFirst() == false)
 				{
@@ -1194,6 +1205,10 @@ public class DatabaseCreatorGowallaQuicker0
 					{
 						countOfRejectedCHeckinBelowLevel2 += 1;
 					}
+					else if (reason.equals("NotInCatIDNameDict"))
+					{
+						countOfRejectedCheckinNotInCatIDNameDict += 1;
+					}
 					// int countOfRejectedCheckinNotInHierarchy = 0, countOfRejectedCHeckinBelowLevel2 = 0;
 					continue;
 				}
@@ -1202,9 +1217,9 @@ public class DatabaseCreatorGowallaQuicker0
 				{
 					countOfCinWithMultipleWorkingLevelCatIDs += 1;
 				}
-				CheckinEntry cobj =
-						new CheckinEntry(userID, locationID, ts, latitude, longitude, catIDDirect, workingLevelCatIDs,
-								distFromNextInM, durationFromNextInM, catIDLevelWiseCatIDsDict.get(catIDDirect));
+				CheckinEntry cobj = new CheckinEntry(userID, locationID, ts, latitude, longitude, catIDDirect,
+						workingLevelCatIDs, distFromNextInM, durationFromNextInM,
+						catIDLevelWiseCatIDsDict.get(catIDDirect));
 
 				countOfCheckinEntryObjects += 1;
 
@@ -1233,6 +1248,7 @@ public class DatabaseCreatorGowallaQuicker0
 
 			System.out.println("num of lines NotInHierarchy = " + countOfRejectedCheckinNotInHierarchy);
 			System.out.println("num of lines LevelNotAcceptable = " + countOfRejectedCHeckinBelowLevel2);
+			System.out.println("num of lines NotInCatIDNameDict = " + countOfRejectedCheckinNotInCatIDNameDict);
 			System.out.println(
 					"num of CheckinEntry objects created = countOfCheckinEntryObjects =" + countOfCheckinEntryObjects);
 			System.out.println("num of duplicate timestamps = " + numOfDuplicateTimestamps);
@@ -1247,6 +1263,7 @@ public class DatabaseCreatorGowallaQuicker0
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			System.err.println("lineRead=\n" + lineRead);
 		}
 
 		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
@@ -1271,6 +1288,21 @@ public class DatabaseCreatorGowallaQuicker0
 	{
 		// get nodes containing this catID
 		ArrayList<DefaultMutableTreeNode> foundNodes = catIdFoundNodesMap.get(String.valueOf(catIDToSearch));
+
+		if (foundNodes == null)
+		{
+			System.out.println("foundNodes==null");
+			return new Pair<Boolean, String>(false, "NotInCatIDNameDict");
+		}
+		// if (catIdFoundNodesMap == null)
+		// {
+		// System.out.println("catIdFoundNodesMap==null");
+		// }
+		// if (catIDToSearch == null)
+		// {
+		// System.out.println("catIDToSearch==null");
+		// }
+
 		// UIUtilityBox.recursiveDfsMulipleOccurences2OnlyCatID(
 		// rootOfCategoryTree, catIDToSearch.toString(), new ArrayList<DefaultMutableTreeNode>());
 
@@ -1459,7 +1491,7 @@ public class DatabaseCreatorGowallaQuicker0
 				Integer locID = Integer.valueOf(splittedLine[0]);
 
 				// only if this userid is in ur checkin data
-				if (locationIDsInCheckinData.contains(String.valueOf(locID)))
+				if (locationIDsInCheckinData.contains(Integer.toString(locID)))// String.valueOf(locID)))
 				{
 					Pair<String, String> spotCatIDName = DatabaseCreatorGowallaQuickerPreprocessor.getSpotCatIDName(
 							splittedLine[splittedLine.length - 2] + "," + splittedLine[splittedLine.length - 1]);
@@ -1524,8 +1556,8 @@ public class DatabaseCreatorGowallaQuicker0
 		System.out.println("locationIDsInCheckinData.size()=" + locationIDsInCheckinData.size());
 		try
 		{
-			HashMap<String, ArrayList<String>> spots1 =
-					readSpotSubsetWithFilter(locationFileNameToRead, locationIDsInCheckinData);
+			HashMap<String, ArrayList<String>> spots1 = readSpotSubsetWithFilter(locationFileNameToRead,
+					locationIDsInCheckinData);
 
 			for (Entry<String, ArrayList<String>> locEntry : spots1.entrySet())
 			{
@@ -1533,8 +1565,8 @@ public class DatabaseCreatorGowallaQuicker0
 
 				ArrayList<String> rest = locEntry.getValue();
 
-				Pair<String, String> spotCatIDName =
-						DatabaseCreatorGowallaQuickerPreprocessor.getSpotCatIDCatName(rest);
+				Pair<String, String> spotCatIDName = DatabaseCreatorGowallaQuickerPreprocessor
+						.getSpotCatIDCatName(rest);
 
 				String spotCatID = spotCatIDName.getFirst();
 				String spotCatName = spotCatIDName.getSecond();

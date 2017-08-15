@@ -473,6 +473,22 @@ public class StringUtils
 		return res.toString();
 	}
 
+	// public static String fastStringConcatFor2(String... stringsToConcat)
+	// {
+	// StringBuilder res = new StringBuilder();
+	//
+	// return fcat(res, stringsToConcat).toString();
+	// // for (int i = 0; i < stringsToConcat.length; i++)
+	// // {
+	// // res.append(stringsToConcat[i]);
+	// // }
+	// // // for (String s : stringsToConcat)
+	// // // {
+	// // // res.append(s);
+	// // // }
+	// // return res.toString();
+	// }
+
 	public static String stringConcat1(ArrayList<String> arrayOfStrings)
 	{
 		String res = new String();

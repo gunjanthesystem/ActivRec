@@ -16,7 +16,7 @@ public class SuperController
 
 		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
-		String commonPath = "./dataWritten/Aug8/";
+		String commonPath = "./dataWritten/Aug14_900U_100T_Coll/";
 		System.out.println("commonPath = " + commonPath);
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
@@ -90,13 +90,15 @@ public class SuperController
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
 
-		// //curtain may 26 2017 start
-		// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
-		// $$ new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);// , new int[] { 30, 50, 60, 70, 90 });
-		// //curtain may 26 2017 end
 		// //curtain may 19 2017 start
 		new ControllerWithoutServer();
 		// //curtain may 19 2017 end
+
+		// curtain may 26 2017 start
+		// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
+		// $$new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);// , new int[] { 30, 50, 60, 70, 90 });
+		// //curtain may 26 2017 end
+
 		// **************************************************************************************************************//
 		// Constant.DATABASE_NAME = "dcu_data_2";// geolife1
 		// Constant.caseType = "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
