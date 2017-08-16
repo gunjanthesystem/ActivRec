@@ -813,7 +813,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 												+ recommendationTimes[seqIndex].getMinutes() + ":"
 												+ recommendationTimes[seqIndex].getSeconds();
 
-										if (this.lookPastType.equals(Enums.LookPastType.NGram))
+										if (this.lookPastType.equals(Enums.LookPastType.NGram) && (!Constant.NGramColl))
 										{
 											recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqNGramBaseline(
 													userTrainingTimelines, userTestTimelines, dateToRecomm,
@@ -2534,7 +2534,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		}
 		else if (lookPastType.equals(Enums.LookPastType.NGram))// "Hrs"))
 		{
-			this.matchingUnitArray = new double[] { -9999 };
+			this.matchingUnitArray = new double[] { 0 };
 		}
 		// else if
 		else

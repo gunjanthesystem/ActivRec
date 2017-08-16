@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
@@ -234,16 +235,20 @@ public class ControllerWithoutServer
 			// $$TimelineStats.writeAllCitiesCounts(usersCleanedDayTimelines,
 			// $$ Constant.outputCoreResultsPath + "AllCitiesCount");
 			// // important curtain 1 start 10 Feb 2017
-			// Start of curtain Aug 11 2017
-			sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
-			// End of curtain Aug 11 2017
-
-			// Start of curtain Aug 14 2017
-			// selectGivenUsersExecuteRecommendationTests(usersCleanedDayTimelines,
-			// IntStream.of(DomainConstants.gowallaUserIDInUserGroup1Users).boxed().collect(Collectors.toList()),
-			// commonBasePath, "1");
-			// End of curtain Aug 14 2017
-
+			if (Constant.For9kUsers)
+			{
+				// Start of curtain Aug 14 2017
+				selectGivenUsersExecuteRecommendationTests(usersCleanedDayTimelines, IntStream
+						.of(DomainConstants.gowallaUserIDInUserGroup1Users).boxed().collect(Collectors.toList()),
+						commonBasePath, "1");
+				// End of curtain Aug 14 2017
+			}
+			else
+			{
+				// Start of curtain Aug 11 2017
+				sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
+				// End of curtain Aug 11 2017
+			}
 			// // important curtain 1 end 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017

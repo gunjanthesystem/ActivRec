@@ -43,8 +43,8 @@ public final class Constant
 	public static String INVALID_ACTIVITY2 = "";// "Not Available";
 
 	// Added on 11 July 2017
-	public static Integer INVALID_ACTIVITY1_ID = -997;// "Unknown";
-	public static Integer INVALID_ACTIVITY2_ID = -998;// "Not Available";
+	public static final Integer INVALID_ACTIVITY1_ID = -997;// "Unknown";
+	public static final Integer INVALID_ACTIVITY2_ID = -998;// "Not Available";
 	// end of Added on 11 July 2017
 
 	public static final PrimaryDimension primaryDimension = PrimaryDimension.ActivityID;// LocationID;
@@ -163,11 +163,9 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// ClosestTime;// .NGram;//
-	// .Daywise;//
-	// NCount;//
-	// Enums.LookPastType.NCount;
-	// "Count";// "Count";// "Hrs"// "Daywise"
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NGram;
+	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
+	// "Daywise"
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
 	 * restricting this baseline to day boundaries
@@ -176,7 +174,7 @@ public final class Constant
 	/**
 	 * Determines if candidate timelines only includes those days which contain the current activity name
 	 */
-	public static final boolean ClosestTimeFilterCandidates = false;
+	public static final boolean ClosestTimeFilterCandidates = true;// false;
 
 	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType = Enums.EditDistanceTimeDistanceType.NearerScaled;
 	// .FurtherScaled;
@@ -184,7 +182,7 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 1, 3, 5, 8 };// 0, 1, 2, 4, 6, 3, 8 };// 1,3,5,8,
+	public static final double matchingUnitAsPastCount[] = { 5, 3, 8 };// 0, 1, 2, 4, 6, 3, 8 };// 1,3,5,8,
 	// 3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,
 	// };//
 	// ,
@@ -224,20 +222,24 @@ public final class Constant
 	public static final boolean buildRepAOJustInTime = false;
 	public static final boolean preBuildRepAOGenericUser = true;
 
-	public static final boolean only1CandFromEachCollUser = false;// false;// true;
+	public static final boolean only1CandFromEachCollUser = true;// false;// false;// true;
 
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int filterTopCands = 100;// 1500;// 100;// -1 for no filter,
+	public static final int filterTopCands = -1;// 100;// 1500;// 100;// -1 for no filter,
 
 	static EditDistanceMemorizer editDistancesMemorizer;
 	final static int editDistancesMemorizerBufferSize = 1;// 000000;
 
 	public static final boolean memorizeEditDistance = false;
 
-	public static final boolean For9kUsers = false;
+	public static final boolean For9kUsers = true;
 	////////////////////////////////////////////////////////////////////////
+
+	public static final double ClosestTimeDiffThresholdInSecs = 10800; // 3 hrs
+
+	public static final boolean NGramColl = true;
 
 	/**
 	 * 
@@ -1017,8 +1019,9 @@ public final class Constant
 		s.append("\ndistanceUsed:" + distanceUsed);
 
 		s.append("\nuseTolerance:" + useTolerance);
+
 		s.append("\ntypeOfThresholds:" + Arrays.asList(typeOfThresholds));
-		// s.append("\nuseThreshold:" + useThreshold);
+		s.append("\nuseThreshold:" + useThreshold);
 		s.append("\nbreakTiesWithShuffle:" + breakTiesWithShuffle);
 		s.append("\nEXPUNGE_INVALIDS_B4_RECOMM_PROCESS:" + EXPUNGE_INVALIDS_B4_RECOMM_PROCESS);
 		s.append("\nBLACKLISTING:" + BLACKLISTING);

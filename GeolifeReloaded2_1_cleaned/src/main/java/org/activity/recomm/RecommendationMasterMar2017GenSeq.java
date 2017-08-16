@@ -260,6 +260,11 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			{
 				this.matchingUnitInCountsOrHours = matchingUnitInCountsOrHours;
 			}
+			else if (lookPastType.equals(LookPastType.NGram))
+			{
+				this.matchingUnitInCountsOrHours = 0;
+			}
+
 			errorExists = false;
 
 			this.hasCandidateTimelines = true;
@@ -271,10 +276,12 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			this.userAtRecomm = Integer.toString(userAtRecomm);
 			this.userIDAtRecomm = Integer.toString(userAtRecomm);
 			System.out.println("	User at Recomm = " + this.userAtRecomm + "\tDate at Recomm = " + this.dateAtRecomm
-					+ "\tTime at Recomm = " + this.timeAtRecomm);
+					+ "\tTime at Recomm = " + this.timeAtRecomm + "\nthis.matchingUnitInCountsOrHours="
+					+ this.matchingUnitInCountsOrHours);
 
 			//////
 			Pair<TimelineWithNext, Double> extCurrTimelineRes = null;
+
 			if (actObjsToAddToCurrentTimeline.size() > 0)
 			{
 				extCurrTimelineRes = extractCurrentTimelineSeq(testTimelines, lookPastType, this.dateAtRecomm,
@@ -329,7 +336,6 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 											.getPrimaryDimensionVal());
 				}
 			}
-
 			// sanity check end
 			// //////////////////////////
 			long recommMasterT1 = System.currentTimeMillis();
@@ -611,7 +617,9 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			//////////////
 		}
 
-		catch (Exception e)
+		catch (
+
+		Exception e)
 		{
 			e.printStackTrace();
 			PopUps.getTracedErrorMsg("Exception in recommendation master");
@@ -711,7 +719,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			return createRankedTopRecommendedActivityNamesClosestTime(distancesSortedMap);
 		}
 		else if ((lookPastType.equals(Enums.LookPastType.Daywise)) || (lookPastType.equals(Enums.LookPastType.NHours))
-				|| (lookPastType.equals(Enums.LookPastType.NCount)))
+				|| (lookPastType.equals(Enums.LookPastType.NCount)) || (lookPastType.equals(Enums.LookPastType.NGram)))
 		{
 			switch (caseType)
 			{
@@ -735,6 +743,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	}
 
 	/**
+	 * <p>
+	 * NOT NORMALISING FOR CLOSEST TIME APPROACH
 	 * 
 	 * @param candidateTimelines
 	 * @param activitiesGuidingRecomm
@@ -809,6 +819,27 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 					.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1, (v1, v2) -> v1,
 							LinkedHashMap<String, Integer>::new));
 		}
+		///
+		else if (lookPastType.equals(Enums.LookPastType.NGram))
+		{
+			LinkedHashMap<String, Pair<String, Double>> candEditDistances = new LinkedHashMap<>();
+			for (String candID : candidateTimelines.keySet())
+			{
+				candEditDistances.put(candID, new Pair<>("", Double.valueOf(0)));// assigning dist of 0 so, sim score
+																					// will be 1.
+			}
+			normalisedDistanceForCandTimelines = candEditDistances;
+
+			// for SeqNCount and SeqNHours approach, tne end point index considered in the candidate is the last
+			// activity object in that cand TODO
+			// endIndexSubseqConsideredInCand = (LinkedHashMap<String, Integer>) candidateTimelines.entrySet().stream()
+			// .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1));
+			endIndexSubseqConsideredInCand = candidateTimelines.entrySet().stream()
+					.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1, (v1, v2) -> v1,
+							LinkedHashMap<String, Integer>::new));
+		}
+		///
+
 		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))
 		{
 			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes = null;
@@ -822,16 +853,35 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			}
 			else
 			{
-				editDistancesRes = TimelineUtils.getClosestTimeDistancesForCandidateTimelinesColl(candidateTimelines,
-						activitiesGuidingRecomm, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
-						Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
-						distanceUsed, false);
+				// Curtain start 15 Aug
+				// editDistancesRes = TimelineUtils.getClosestTimeDistancesForCandidateTimelinesColl(candidateTimelines,
+				// activitiesGuidingRecomm, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+				// Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
+				// distanceUsed, false);
+				// Curtain end 15 Aug
+
+				editDistancesRes = TimelineUtils.getClosestTimeDistsForCandTimelinesColl1CandPerNeighbour(
+						candidateTimelines, activitiesGuidingRecomm, userIDAtRecomm, dateAtRecomm.toString(),
+						timeAtRecomm.toString(), Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1,
+						Constant.INVALID_ACTIVITY2, distanceUsed, /* Constant.ClosestTimeDiffThresholdInSecs * 1000, */
+						false);
+
 			}
 
 			LinkedHashMap<String, Pair<String, Double>> candEditDistances = editDistancesRes.getFirst();
-			normalisedDistanceForCandTimelines = normalisedDistancesOverTheSet(candEditDistances, userIDAtRecomm,
-					dateAtRecomm.toString(), timeAtRecomm.toString());
+			normalisedDistanceForCandTimelines = candEditDistances; // 15 Aug 2017, NOT NORMALISING TO PRESERVE THE
+																	// ACTUAL TIME DIFF
+			// Aug 15, 2017: Noticed that: for closest time approach, i was normalising the distance (time difference)
+			// over each set of candidate timelines (like the Ncount approach). And then while computing the score i am
+			// using score = 1-min(1,timeDiff/60mins). THIS IS INCORRECT since the timediff at this stage is not the
+			// actual timediff but normalised time diff, hence should not compared with 60 mins. Hence, time difference
+			// should not be normalised.
+			// see: createRankedTopRecommendedActivityNamesClosestTime()
 
+			// Start of Disabled on Aug 15 2017
+			// normalisedDistancesOverTheSet(candEditDistances, userIDAtRecomm,
+			// dateAtRecomm.toString(), timeAtRecomm.toString());
+			// Start of Disabled on Aug 15 2017
 			endIndexSubseqConsideredInCand = editDistancesRes.getSecond();
 		}
 
@@ -895,7 +945,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// converting day timelines into continuous timelines suitable to be used for matching unit views
 			Timeline testTimeline = TimelineUtils.dayTimelinesToATimeline(testTimelinesDaywise, false, true);
 
-			if (lookPastType2.equals(Enums.LookPastType.NCount))
+			if (lookPastType2.equals(Enums.LookPastType.NCount) || lookPastType2.equals(Enums.LookPastType.NGram))
 			{
 				Pair<TimelineWithNext, Double> result = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(
 						testTimeline, dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
@@ -908,6 +958,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUHours(testTimeline,
 						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
 			}
+
 			else
 			{
 				System.err.println(PopUps.getTracedErrorMsg("Error: Unrecognised lookPastType "));
@@ -921,7 +972,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			System.exit(-1);
 			// this.errorExists = true;
 		}
-		if (VerbosityConstants.verbose)
+		// if (VerbosityConstants.verbose)
 		{
 			System.out.println(
 					"Extracted current timeline: " + extractedCurrentTimeline.getPrimaryDimensionValsInSequence());
@@ -951,10 +1002,6 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// System.out.println("called extractCurrentTimelineSeq");
 		Pair<TimelineWithNext, Double> extractedCurrentTimelineResult = extractCurrentTimeline(testTimelinesOrig,
 				lookPastType, dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
-
-		// Start of added on 10 Aug 2017
-
-		// End of added on 10 Aug 2017
 
 		TimelineWithNext extractedCurrentTimeline = extractedCurrentTimelineResult.getFirst();
 
@@ -993,7 +1040,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			}
 		}
 
-		else if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
+		else if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours)
+				|| lookPastType.equals(Enums.LookPastType.NGram))
 		{
 			extractedCurrentTimeline = new TimelineWithNext(actObjsForCurrTimeline, null, false, true);
 		}
@@ -1061,8 +1109,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 
 		// //////////////////
-		if (lookPastType2.equals(Enums.LookPastType.Daywise)
-				|| (lookPastType2.equals(Enums.LookPastType.ClosestTime) && Constant.ClosestTimeFilterCandidates))
+		if (lookPastType2.equals(Enums.LookPastType.Daywise))
+		// || (lookPastType2.equals(Enums.LookPastType.ClosestTime) && Constant.ClosestTimeFilterCandidates))
 		{
 			// Obtain {Date,Timeline}
 			LinkedHashMap<Date, Timeline> candidateTimelinesDate = TimelineUtils
@@ -1073,55 +1121,42 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 					.collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue(), (v1, v2) -> v1,
 							LinkedHashMap<String, Timeline>::new));
 		}
+
+		/// aaaaaaa
+		else if (lookPastType2.equals(Enums.LookPastType.ClosestTime) && Constant.ClosestTimeFilterCandidates)
+		{
+			if (Constant.collaborativeCandidates)
+			{
+				candidateTimelines = extractCandidateTimelinesClosestTimeColl(activityAtRecommPoint, userIDAtRecomm,
+						trainTimelinesAllUsersContinuous, 24);
+
+				// extractCandClosestTimeColl2(userIDAtRecomm, trainTestTimelinesForAllUsers);
+				//
+				// candidateTimeline = extractCandidateTimelinesMUColl(/* trainingTimeline, */
+				// trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType2,
+				// activityAtRecommPoint, userIDAtRecomm, trainTimelinesAllUsersContinuous);
+			}
+			else
+			{
+				// Obtain {Date,Timeline}
+				LinkedHashMap<Date, Timeline> candidateTimelinesDate = TimelineUtils.extractDaywiseCandidateTimelines(
+						trainingTimelinesDaywise, dateAtRecomm, activityAtRecommPoint);
+
+				// convert to {Date as String, Timeline} to (LinkedHashMap<String, Timeline>)
+				candidateTimelines = candidateTimelinesDate.entrySet().stream()
+						.collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue(), (v1, v2) -> v1,
+								LinkedHashMap<String, Timeline>::new));
+			}
+		}
+		// aaaaaaa
+
 		// take all training day timelines as candidate timelines, i.e., no filtering of candidate timelines for closest
 		// time approach
 		else if (lookPastType2.equals(Enums.LookPastType.ClosestTime) && !Constant.ClosestTimeFilterCandidates)
 		{
 			if (Constant.collaborativeCandidates)
 			{
-				// all training timelines of all other users to be considered as candidate timelines.
-				candidateTimelines = new LinkedHashMap<>();
-				int numOfTrainingTimelinesForAllOtherUsers = 0;// for sanity check
-
-				for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsers
-						.entrySet())
-				{
-					String userIdCursor = trainTestForAUser.getKey();
-					LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
-
-					if (!userIDAtRecomm.equals(userIdCursor))// exclude the current user.
-					{
-						numOfTrainingTimelinesForAllOtherUsers += trainingTimelineForThisUserDate.size();
-
-						// convert to {Date as String, Timeline} to (LinkedHashMap<userID__DateAsString, Timeline>)
-						LinkedHashMap<String, Timeline> candidateTimelinesFromThisUser = trainingTimelineForThisUserDate
-								.entrySet().stream()
-								.collect(Collectors.toMap(e -> userIdCursor + "__" + e.getKey().toString(),
-										e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Timeline>::new));
-						candidateTimelines.putAll(candidateTimelinesFromThisUser);
-					}
-				}
-				// Verbosity start for sanity check
-				System.out.println("candidateTimelines.size() = " + candidateTimelines.size()
-						+ " numOfTrainingTimelinesForAllOtherUsers = " + numOfTrainingTimelinesForAllOtherUsers);
-
-				if (VerbosityConstants.verbose)
-				{
-					StringBuilder sbT = new StringBuilder();
-					sbT.append("Candidate timelines =\n");
-					for (Entry<String, Timeline> a : candidateTimelines.entrySet())
-					{
-						sbT.append("\n" + a.getKey() + ": \n" + a.getValue().getActivityObjectNamesInSequence());
-					}
-					System.out.println(sbT.toString());
-				}
-				// Verbosity end for sanity check
-
-				Sanity.eq(candidateTimelines.size(), numOfTrainingTimelinesForAllOtherUsers,
-						"candidateTimelines.size() = " + candidateTimelines.size()
-								+ "!= numOfTrainingTimelinesForAllOtherUsers = "
-								+ numOfTrainingTimelinesForAllOtherUsers);
-
+				candidateTimelines = extractCandClosestTimeColl1(userIDAtRecomm, trainTestTimelinesForAllUsers);
 			}
 			else
 			{
@@ -1137,20 +1172,22 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 		else if (lookPastType2.equals(Enums.LookPastType.NCount) || lookPastType2.equals(Enums.LookPastType.NHours))
 		{
-			// converting day timelines into continuous timelines suitable to be used for matching unit views
-			Timeline trainingTimeline = TimelineUtils.dayTimelinesToATimeline(trainingTimelinesDaywise, false, true);
-			// Obtain {String,TimelineWithNext}
 
 			LinkedHashMap<String, TimelineWithNext> candidateTimelinesWithNext = null;
 
 			if (Constant.collaborativeCandidates)
 			{
-				candidateTimelinesWithNext = extractCandidateTimelinesMUColl(trainingTimeline,
+				candidateTimelinesWithNext = extractCandidateTimelinesMUColl(/* trainingTimeline, */
 						trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType2,
 						activityAtRecommPoint, userIDAtRecomm, trainTimelinesAllUsersContinuous);
 			}
 			else
 			{
+				// converting day timelines into continuous timelines suitable to be used for matching unit views
+				Timeline trainingTimeline = TimelineUtils.dayTimelinesToATimeline(trainingTimelinesDaywise, false,
+						true);
+				// Obtain {String,TimelineWithNext}
+
 				candidateTimelinesWithNext = extractCandidateTimelinesMU(trainingTimeline, matchingUnitInCountsOrHours,
 						lookPastType2, activityAtRecommPoint);
 			}
@@ -1159,6 +1196,29 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			candidateTimelines = candidateTimelinesWithNext.entrySet().stream().collect(Collectors
 					.toMap(e -> e.getKey(), e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Timeline>::new));
 		}
+
+		///
+		else if (lookPastType2.equals(Enums.LookPastType.NGram))
+		{
+			LinkedHashMap<String, TimelineWithNext> candidateTimelinesWithNext = null;
+
+			if (Constant.collaborativeCandidates)
+			{
+				candidateTimelinesWithNext = extractCandidateTimelinesMUColl(/* trainingTimeline, */
+						trainTestTimelinesForAllUsers, 0, lookPastType2, activityAtRecommPoint, userIDAtRecomm,
+						trainTimelinesAllUsersContinuous);
+			}
+			else
+			{
+				PopUps.printTracedErrorMsgWithExit(
+						"Error: not implemented for this case here, instead look at the dedicated Recomm test for NGram.");
+			}
+
+			// convert to {String,Timeline}
+			candidateTimelines = candidateTimelinesWithNext.entrySet().stream().collect(Collectors
+					.toMap(e -> e.getKey(), e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Timeline>::new));
+		}
+		///
 		else
 		{
 			System.err.println(PopUps.getTracedErrorMsg("Error: Unrecognised lookPastType "));
@@ -1173,6 +1233,76 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 		return candidateTimelines;
 	}
+
+	/**
+	 * Take all training day timelines as candidate timelines, i.e., no filtering of candidate timelines for closest
+	 * time approach
+	 * 
+	 * @param userIDAtRecomm
+	 * @param trainTestTimelinesForAllUsers
+	 * @return Map{userID__DateAsString,cand timeline} where cand timelines are all the training day timelines from
+	 *         other users except current user
+	 */
+	private static LinkedHashMap<String, Timeline> extractCandClosestTimeColl1(String userIDAtRecomm,
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers)
+	{
+		LinkedHashMap<String, Timeline> candidateTimelines = new LinkedHashMap<>();
+		// all training timelines of all other users to be considered as candidate timelines.
+		int numOfTrainingTimelinesForAllOtherUsers = 0;// for sanity check
+
+		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsers
+				.entrySet())
+		{
+			String userIdCursor = trainTestForAUser.getKey();
+			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
+
+			if (!userIDAtRecomm.equals(userIdCursor))// exclude the current user.
+			{
+				numOfTrainingTimelinesForAllOtherUsers += trainingTimelineForThisUserDate.size();
+
+				// convert to {Date as String, Timeline} to (LinkedHashMap<userID__DateAsString, Timeline>)
+				LinkedHashMap<String, Timeline> candidateTimelinesFromThisUser = trainingTimelineForThisUserDate
+						.entrySet().stream().collect(Collectors.toMap(e -> userIdCursor + "__" + e.getKey().toString(),
+								e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Timeline>::new));
+				candidateTimelines.putAll(candidateTimelinesFromThisUser);
+			}
+		}
+		// Verbosity start for sanity check
+		System.out.println("candidateTimelines.size() = " + candidateTimelines.size()
+				+ " numOfTrainingTimelinesForAllOtherUsers = " + numOfTrainingTimelinesForAllOtherUsers);
+
+		if (VerbosityConstants.verbose)
+		{
+			StringBuilder sbT = new StringBuilder();
+			sbT.append("Candidate timelines =\n");
+			for (Entry<String, Timeline> a : candidateTimelines.entrySet())
+			{
+				sbT.append("\n" + a.getKey() + ": \n" + a.getValue().getActivityObjectNamesInSequence());
+			}
+			System.out.println(sbT.toString());
+		}
+		// Verbosity end for sanity check
+
+		Sanity.eq(candidateTimelines.size(), numOfTrainingTimelinesForAllOtherUsers,
+				"candidateTimelines.size() = " + candidateTimelines.size()
+						+ "!= numOfTrainingTimelinesForAllOtherUsers = " + numOfTrainingTimelinesForAllOtherUsers);
+		return candidateTimelines;
+	}
+
+	/**
+	 * Take all training day timelines as candidate timelines, i.e., no filtering of candidate timelines for closest
+	 * time approach
+	 * 
+	 * @param userIDAtRecomm
+	 * @param trainTestTimelinesForAllUsers
+	 * @return Map{userID__DateAsString,cand timeline} where cand timelines are all the training day timelines from
+	 *         other users except current user
+	 */
+	// private static LinkedHashMap<String, Timeline> extractCandClosestTimeColl2(String userIDAtRecomm,
+	// LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers)
+	// {
+	//
+	// }
 
 	/**
 	 * 
@@ -2081,6 +2211,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
 			case ClosestTime:
 				return null;
+			case NGram:
+				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
 			default:
 				System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
 				return null;
@@ -3230,7 +3362,6 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 	/**
 	 * 
-	 * @param trainingTimeline
 	 * @param trainTestTimelinesForAllUsers
 	 * @param matchingUnitInCountsOrHours
 	 * @param lookPastType
@@ -3238,7 +3369,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	 * @param userIDAtRecomm
 	 * @return
 	 */
-	private static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUColl(Timeline trainingTimeline,
+	private static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUColl(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			double matchingUnit, LookPastType lookPastType, ActivityObject activityAtRecommPoint, String userIDAtRecomm,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
@@ -3246,7 +3377,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		System.out.println("Inside extractCandidateTimelinesMUColl :trainTestTimelinesForAllUsers.size()= "
 				+ trainTestTimelinesForAllUsers.size());
 
-		if (lookPastType.equals(Enums.LookPastType.NCount))// IgnoreCase("Count"))
+		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NGram))// IgnoreCase("Count"))
 		{
 			if (matchingUnit % 1 != 0)
 			{
@@ -3266,6 +3397,13 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// {
 		// return extractCandidateTimelinesMUHours(trainingTimeline, matchingUnit, activityAtRecommPoint);
 		// }
+		// if (lookPastType.equals(Enums.LookPastType.ClosestTime))// IgnoreCase("Count"))
+		// {
+		// return extractCandidateTimelinesClosestTimeColl(/* trainingTimeline, trainTestTimelinesForAllUsers, */
+		// new Double(matchingUnit).intValue(), activityAtRecommPoint, userIDAtRecomm,
+		// trainTimelinesAllUsersContinuous, 24);
+		// }
+
 		else
 		{
 			System.err.println(PopUps.getTracedErrorMsg(
@@ -3563,6 +3701,198 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// for
 		return candidateTimelines;
 	}
+
+	////
+	///
+	/**
+	 * Create and fetch candidate timelines from the training timelines of other users. Finding Candidate timelines: for
+	 * each other user, iterate through the training timelines for the occurence of the Current Activity Name in the
+	 * candidate timeline, extract the sequence of activity objects from that occurrence_index until hoursExtension on
+	 * either side.
+	 * 
+	 * 
+	 * .In this way, we will have a NUMBER OF or only 1 (if Constant.only1CandFromEachCollUser is true) candidate
+	 * timelines from each user who have atleast one non-last occurrence of Current Activity Names in their training
+	 * timelines
+	 * 
+	 * @param matchingUnitInCounts
+	 * @param activityAtRecommPoint
+	 * @param userIDAtRecomm
+	 * @param trainTimelinesAllUsersContinuous
+	 * @return
+	 * @since 15Aug 2017
+	 */
+	private static LinkedHashMap<String, Timeline> extractCandidateTimelinesClosestTimeColl(
+			ActivityObject activityAtRecommPoint, String userIDAtRecomm,
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, int hoursExtension)
+	{
+		LinkedHashMap<String, Timeline> candidateTimelines = new LinkedHashMap<>();
+		// long tS = System.nanoTime();
+
+		System.out.println("\nInside extractCandidateTimelinesClosestTimeColl(): userIDAtRecomm=" + userIDAtRecomm);
+		// // // for // creating // timelines");
+		// System.out.println("Inside extractCandidateTimelinesMUCountColl :trainTestTimelinesForAllUsers.size()= "
+		// + trainTestTimelinesForAllUsers.size());
+		// System.out.println("activityAtRecommPoint:" + activityAtRecommPoint.getPrimaryDimensionVal("/"));
+		// totalNumberOfProbableCands=0; numCandsRejectedDueToNoCurrentActivityAtNonLast=0;
+		int numCandsRejectedDueToNoValidNextActivity = 0;
+		// long numOfAOsCompared = 0;
+		int numUsersRejectedDueToNoValidCands = 0;
+
+		// for user non-current user, get the training timelines
+		for (Entry<String, Timeline> trainTimelineAUser : trainTimelinesAllUsersContinuous.entrySet())
+		{
+			String userIdCursor = trainTimelineAUser.getKey();
+
+			if (!userIDAtRecomm.equals(userIdCursor))// exclude the current user.
+			{
+				Timeline trainingTimelineForThisUser = trainTimelineAUser.getValue();
+
+				int numOfValidCurrentActsEncountered = 0;
+				// System.out.println("userIDAtRecomm=" + userIDAtRecomm + " userIdCursor=" + userIdCursor);
+				// find the most recent occurrence of current activity name
+				// get training timeline
+				ArrayList<ActivityObject> activityObjectsInTraining = trainingTimelineForThisUser
+						.getActivityObjectsInTimeline();
+
+				// System.out.println("Num of activity objects in training timeline=" +
+				// activityObjectsInTraining.size());
+
+				// $$System.out.println("Current activity (activityAtRecommPoint)=" +
+				// this.activityAtRecommPoint.getActivityName());
+
+				// System.out.println("cand:" + trainingTimelineForThisUser.getPrimaryDimensionValsInSequence());
+
+				// long t1 = System.currentTimeMillis();
+				// starting from the second last activity and goes until first activity.
+				for (int i = activityObjectsInTraining.size() - 2; i >= 0; i--)
+				// for (int i = 0; i < activityObjectsInTraining.size() - 1; i++)
+				{
+					ActivityObject ae = activityObjectsInTraining.get(i);
+					// numOfAOsCompared += 1;
+					// System.out.println("ae = " + ae.getPrimaryDimensionVal("/"));
+					// System.out.println("activityAtRecommPoint:" + activityAtRecommPoint.getPrimaryDimensionVal("/"));
+					// start sanity check for equalsWrtPrimaryDimension() //Disabled as already checked in earlier
+					// methods
+					// if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+					// {boolean a = ae.equalsWrtPrimaryDimension(activityAtRecommPoint);
+					// boolean b = ae.getActivityName().equals(activityAtRecommPoint.getActivityName());
+					// Sanity.eq(a, b,
+					// "\nactivityAtRecommPoint=" + activityAtRecommPoint.toStringAllGowallaTS() + "\nae = "
+					// + ae.toStringAllGowallaTS() + "\nae.pdvals = " + ae.getPrimaryDimensionVal("/")
+					// // + "\nactivityAtRecommPoint=" + activityAtRecommPoint.toStringAllGowallaTS()
+					// + "\nae.equalsWrtPrimaryDimension(activityAtRecommPoint) =" + a
+					// + " != ae.getActivityName().equals(activityAtRecommPoint.getActivityName()) ="
+					// + b + "\n");}
+					// end sanity check
+
+					if (ae.equalsWrtPrimaryDimension(activityAtRecommPoint)) // same name as current activity)
+					{
+						// Timestamp newCandEndTimestamp= new
+						// Timestamp(ae.getStartTimestamp().getTime()+ae.getDurationInSeconds()*1000-1000); //decreasing
+						// 1 second (because this is convention followed in data generation)
+						// int newCandAnchorIndex = i;// newCandEndIndex
+						// NOTE: going back matchingUnitCounts FROM THE index.
+
+						// take the min of end timestamp as 24 hrs extension and end timestamp of seconds last AO in
+						// training
+						long newEndTSInms = ae.getEndTimestampInms() + (hoursExtension * 60 * 60 * 1000);
+						long endTSOfSecondLastAOInTraining = activityObjectsInTraining
+								.get(activityObjectsInTraining.size() - 1).getEndTimestampInms();
+
+						Timestamp newEndTS = new Timestamp(Math.min(newEndTSInms, endTSOfSecondLastAOInTraining));
+						Timestamp newStartTS = new Timestamp(
+								ae.getEndTimestampInms() - (hoursExtension * 60 * 60 * 1000));
+
+						ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimelineForThisUser
+								.getActivityObjectsBetweenTime(newStartTS, newEndTS);
+
+						// int newCandStartIndex = (newCandAnchorIndex - matchingUnitInCounts) >= 0
+						// ? (newCandAnchorIndex - matchingUnitInCounts)
+						// : 0;
+
+						// ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimelineForThisUser
+						// .getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandAnchorIndex + 1);
+						// getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp);
+
+						// next activity after last activity on AOs for this candidate
+						// ActivityObject nextValidActivityForCandidate = trainingTimelineForThisUser
+						// .getNextValidActivityAfterActivityAtThisTime(activityObjectsForCandidate
+						// .get(activityObjectsForCandidate.size() - 1).getEndTimestamp());
+
+						// if (nextValidActivityForCandidate == null)
+						// {
+						// numCandsRejectedDueToNoValidNextActivity += 1;
+						// System.out.println("\tThis candidate rejected due to no next valid activity object;");
+						// // if (i == 0)// this was first activity of the timeline
+						// // { System.out.println("\tThis iser rejected due to no next valid cand");
+						// // numUsersRejectedDueToNoValidCands += 1;break;
+						// // } else{
+						// continue;
+						// // }
+						// }
+						// else
+						// {
+						numOfValidCurrentActsEncountered += 1;
+						Timeline newCandidate = new Timeline(activityObjectsForCandidate, false, true);// trainingTimeline.getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp));
+						// System.out.println(
+						// "Created new candidate timeline (with next) from user (" + userIdCursor + ")");
+						// System.out.println("\tActivity names:" +
+						// newCandidate.getActivityObjectNamesInSequence());
+						// System.out.println(
+						// "\tNext activity:" + newCandidate.getNextActivityObject().getActivityName());
+						candidateTimelines.put(userIdCursor + "__" + newCandidate.getTimelineID(), newCandidate);
+
+						if (VerbosityConstants.verbose)
+						{
+							System.out.println("\n\tae.getEndTimestampInms()=" + ae.getEndTimestamp());
+							System.out.println("\tnewEndTS=" + newEndTS);
+							System.out.println("\tnewStartTS=" + newStartTS);
+							System.out.println(
+									"\tactivityObjectsForCandidate.size()=" + activityObjectsForCandidate.size());
+							System.out.println("userIdCursor + \"__\" + newCandidate.getTimelineID()= " + userIdCursor
+									+ "__" + newCandidate.getTimelineID());
+						}
+
+						if (Constant.only1CandFromEachCollUser)
+						{
+							break; // we only take one candidate timelines from each other user
+						}
+						// }
+					} // end of act name match
+				} // end of loop over acts in train timeline
+
+				if (numOfValidCurrentActsEncountered == 0)
+				{
+					// $$ DIsabled for performance
+					// $$System.out.println("\tU:" + userIdCursor + " rejected due to no cur act");
+					numUsersRejectedDueToNoValidCands += 1;
+				}
+			} // end of if user id matches
+		} // end of loop over users
+
+		// long t2 = System.nanoTime();
+		// System.out.println("total numOfAOsCompared = " + numOfAOsCompared);
+		// System.out.println("compared " + numOfAOsCompared + "(t2 - t1)=" + (t2 - tS) + " AOS: avg time "
+		// + ((t2 - tS) * 1.0) / numOfAOsCompared + "ns");
+
+		System.out.println("trainTimelinesAllUsersContinuous.size() = " + trainTimelinesAllUsersContinuous.size()
+				+ "\ncandidateTimelines.size() = " + candidateTimelines.size()
+				+ "\nnumUsersRejectedDueToNoValidCands = " + numUsersRejectedDueToNoValidCands
+				+ "\nnumCandsRejectedDueToNoValidNextActivity=" + numCandsRejectedDueToNoValidNextActivity);
+
+		if (Constant.only1CandFromEachCollUser)
+		{
+			Sanity.eq(trainTimelinesAllUsersContinuous.size() - 1,
+					(candidateTimelines.size() + numUsersRejectedDueToNoValidCands),
+					"trainTestTimelinesForAllUsers.size()!= (candidateTimelines.size() + numUsersRejectedDueToNoValidCands)");
+		}
+		// System.out.println("\n Exiting extractCandidateTimelinesMUCountColl(): userIDAtRecomm=" + userIDAtRecomm);//
+		// for
+		return candidateTimelines;
+	}
+
+	////
 
 	///
 	//

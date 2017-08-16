@@ -398,12 +398,14 @@ public class DomainConstants
 	{
 		try
 		{
+			// System.err.println("catIDsHierDistSerialisedFile= " + catIDsHierDistSerialisedFile);
 			catIDsHierarchicalDistance = (HashMap<String, Double>) Serializer
 					.kryoDeSerializeThis(catIDsHierDistSerialisedFile);
 
 		}
 		catch (Exception e)
 		{
+			System.err.println("catIDsHierDistSerialisedFile= " + catIDsHierDistSerialisedFile);
 			e.printStackTrace();
 		}
 	}
