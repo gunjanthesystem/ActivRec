@@ -2834,6 +2834,8 @@ public class TimelineUtils
 		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
 				.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
 
+		System.out.println("activityObjectsInCurrentTimeline.size()=" + activityObjectsInCurrentTimeline.size());
+
 		ActivityObject nextValidActivityObject = longerTimeline
 				.getNextValidActivityAfterActivityAtThisPositionPD(indexOfCurrentEnd);
 		ActivityObject nextActivityObject = longerTimeline
@@ -3716,8 +3718,8 @@ public class TimelineUtils
 		if (!candidateTimelines.keySet().equals(distances.keySet()))
 		{
 
-			String candKeyse = candidateTimelines.keySet().stream().collect(Collectors.joining("\n"));
-			String distKeyse = distances.keySet().stream().collect(Collectors.joining("\n"));
+			// String candKeyse = candidateTimelines.keySet().stream().collect(Collectors.joining("\n"));
+			// String distKeyse = distances.keySet().stream().collect(Collectors.joining("\n"));
 
 			StringBuilder errorMsg = new StringBuilder();
 			errorMsg.append("candidateTimelines.keySet()== distances.keySet() ?: "
@@ -3728,6 +3730,163 @@ public class TimelineUtils
 			PopUps.printTracedErrorMsgWithExit(errorMsg.toString());
 		}
 
+		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distances,
+				indicesOfActObjsWithNearestST);
+	}
+
+	///////
+
+	/**
+	 * <p>
+	 * This is not restricted to daywise view of candidate timelines. The candidate timelines are considered as one
+	 * single timelines.
+	 * <p>
+	 * Gets the start time distances of the (valid) Activity Object in each candidate timeline which is nearest to the
+	 * start time of the current Activity Object
+	 * <p>
+	 * <font color = blue> can be optimized. No need to extract unique dates as the candidate timelines are already
+	 * unique dates. However, need to check this and refactor carefully</font>
+	 * 
+	 * @param candidateTimelines
+	 * @param activitiesGuidingRecomm
+	 * @param userIDAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param hasinvalidactivitynames
+	 * @param iNVALID_ACTIVITY1
+	 * @param iNVALID_ACTIVITY2
+	 * @param distanceUsed
+	 * @param timeDiffThresholdInMilliSecs
+	 * @param verbose
+	 * @return {candID, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
+	 * @since 15 Aug 2017
+	 */
+	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getClosestTimeDistsForCandTimelinesColl1CandPerNeighbour(
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasinvalidactivitynames,
+			String iNVALID_ACTIVITY1, String iNVALID_ACTIVITY2, String distanceUsed,
+			/* double timeDiffThresholdInMilliSecs, */boolean verbose)
+	{
+		// timelineID, <Index for the nearest Activity Object, Diff of Start time of nearest Activity
+		// Object with start time of current Activity Object>
+		// {UserID__DateAsStringCandidateTimeline, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
+		LinkedHashMap<String, Pair<String, Double>> distances = new LinkedHashMap<>();
+
+		int numOfUsersWithNoRecomms = 0;
+		/**
+		 * {UserID__DateAsStringCandidateTimeline, End point index of least distant subsequence}}
+		 */
+		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
+
+		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
+
+		LinkedHashMap<String, LinkedHashMap<String, Timeline>> userWiseCandidateTimelines = toUserwiseTimelines(
+				candidateTimelines);
+
+		for (Entry<String, LinkedHashMap<String, Timeline>> cand : userWiseCandidateTimelines.entrySet())
+		{
+			String anotherUserID = cand.getKey();
+			LinkedHashMap<String, Timeline> candTimelinesFromAnotherUser = cand.getValue();
+			// Was there any essential need for this in the first place, i.e., even in non-collaborative approach? Yes,
+			// there was since we want to allow closest activity from previous day as well in cases when the act is near
+			// midnight
+			Timeline candTimelinesFromAnotherUserAsOne = TimelineUtils
+					.dayTimelinesToATimeline2(candTimelinesFromAnotherUser, false, true);
+
+			// find how many times this time occurs in the candidate timelines.
+			LinkedHashSet<LocalDate> uniqueDatesInCands = TimelineUtils
+					.getUniqueDates(candTimelinesFromAnotherUserAsOne, verbose);
+
+			// @@@@@
+			// Sanity.eq(uniqueDatesInCands.size(), candTimelinesFromAnotherUser.size(),
+			// "Error: we were expecting uniqueDatesInCands.size() = " + uniqueDatesInCands.size()
+			// + " candTimelinesFromAnotherUser.size() =" + candTimelinesFromAnotherUser.size()
+			// + " to be equal");
+			// since the candTimelinesFromAnotherUser were indeed day timelines here.
+
+			ArrayList<Timestamp> timestampsToLookInto = createTimestampsToLookAt(uniqueDatesInCands,
+					startTimestampOfActObjAtRecommPoint, verbose);
+
+			// for (Entry<String, Timeline> cand : candidateTimelines.entrySet())
+			// { for (ActivityObject ao : cand.getValue().getActivityObjectsInTimeline())
+			// { uniqueDates.add(Instant.ofEpochMilli(ao.getStartTimestampInms())
+			// .atZone(Constant.getTimeZone().toZoneId()).toLocalDate()); } }
+
+			TreeMap<Double, Triple<Integer, ActivityObject, Double>> timeDiffOfClosest = new TreeMap<>();
+			for (Timestamp tsToLookInto : timestampsToLookInto)
+			// for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
+			{
+				// Actually these dates as string should be same as keys candidateTimelines
+				// Date d = new Date(tsToLookInto.getYear(), tsToLookInto.getMonth(), tsToLookInto.getDate());
+
+				/*
+				 * For this candTimelinesFromAnotherUserAsOne, find the Activity Object with start timestamp nearest to
+				 * the start timestamp of current Activity Object and the distance is diff of their start times
+				 */
+				Triple<Integer, ActivityObject, Double> score = candTimelinesFromAnotherUserAsOne
+						.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, verbose);
+				// System.out.println("Score= " + score.toString());
+				timeDiffOfClosest.put(score.getThird(), score);
+			}
+
+			Triple<Integer, ActivityObject, Double> closestScore = timeDiffOfClosest.firstEntry().getValue();
+
+			if (closestScore != null)// closestScore.getThird() > timeDiffThresholdInMilliSecs)
+			{
+				distances.put(anotherUserID /* + "__" + d.toString() */,
+						new Pair<String, Double>(closestScore.getSecond().getActivityName(), closestScore.getThird()));
+				indicesOfActObjsWithNearestST.put(anotherUserID /* + "__" + d.toString() */, closestScore.getFirst());
+			}
+			else
+			{
+				numOfUsersWithNoRecomms += 1;
+				System.out.println("No recomm from this cand as no one");// is as close as " +
+																			// timeDiffThresholdInMilliSecs
+				// + " to their respective current times.");
+			}
+			if (verbose)
+			{
+				System.out.println("\nanotherUserID= " + anotherUserID + "  uniqueDatesInCands.size() = "
+						+ uniqueDatesInCands.size() + " candTimelinesFromAnotherUser.size() ="
+						+ candTimelinesFromAnotherUser.size());
+				System.out.println("timeDiffOfClosest = " + timeDiffOfClosest);
+				System.out.println("closestScore= " + closestScore);
+			}
+			// System.out.println("now we put "+entry.getKey()+" and score="+score);
+
+		}
+
+		System.out.println("numOfUsersWithNoRecomms = " + numOfUsersWithNoRecomms);
+
+		// these two should be identical: NOT HERE SINCE NOT DAYWISE
+		// //Start of curtain Aug 15
+		// String candKeys = candidateTimelines.keySet().stream().collect(Collectors.joining("\n"));
+		// String distKeys = distances.keySet().stream().collect(Collectors.joining("\n"));
+		//
+		// StringBuilder msg = new StringBuilder();
+		// msg.append("candidateTimelines.keySet()== distances.keySet() ?: "
+		// + (candidateTimelines.keySet().equals(distances.keySet())) + "\n");
+		// msg.append("distKeys==candKeys : " + (distKeys.equals(candKeys)) + "\n");
+		// // msg.append("candKeys = " + candKeys + "\n");
+		// // msg.append("distKeys = " + distKeys + "\n");
+		// System.out.println(msg);
+		//
+		// if (!candidateTimelines.keySet().equals(distances.keySet()))
+		// {
+		//
+		// // String candKeyse = candidateTimelines.keySet().stream().collect(Collectors.joining("\n"));
+		// // String distKeyse = distances.keySet().stream().collect(Collectors.joining("\n"));
+		//
+		// StringBuilder errorMsg = new StringBuilder();
+		// errorMsg.append("candidateTimelines.keySet()== distances.keySet() ?: "
+		// + (candidateTimelines.keySet().equals(distances.keySet())) + "\n");
+		// errorMsg.append("distKeys==candKeys : " + (distKeys.equals(candKeys)) + "\n");
+		// errorMsg.append("candKeys = " + candKeys + "\n");
+		// errorMsg.append("distKeys = " + distKeys + "\n");
+		// PopUps.printTracedErrorMsgWithExit(errorMsg.toString());
+		// }
+		// //End of curtain Aug 15
 		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distances,
 				indicesOfActObjsWithNearestST);
 	}
@@ -3753,7 +3912,8 @@ public class TimelineUtils
 				if (keySplitted.length != 2)
 				{
 					PopUps.printTracedErrorMsgWithExit("Error: expected key with UserID__DateAsString but found "
-							+ t.getKey() + "keySplitted.length= " + keySplitted.length + " != 2");
+							+ t.getKey() + "keySplitted.length= " + keySplitted.length
+							+ " != 2. see org.activity.recomm.RecommendationMasterMar2017GenSeq.extractCandClosestTimeColl1()");
 				}
 				else
 				{

@@ -787,6 +787,17 @@ public class Timeline implements Serializable
 		ArrayList<ActivityObject> activityObjectsIn = (ArrayList<ActivityObject>) activityObjectsInTimeline.stream()
 				.filter(ao -> ao.doesOverlap(st, et)).collect(Collectors.toList());
 
+		// ArrayList<ActivityObject> activityObjectsIn2 = new ArrayList<>();
+
+		// for (ActivityObject ao : activityObjectsInTimeline)
+		// {
+		// if (ao.doesOverlap(st, et))
+		// {
+		// activityObjectsIn2.add(ao);
+		// }
+		// }
+		// System.out.println("Debug Aug16: " + (activityObjectsIn.equals(activityObjectsIn2)));
+
 		// ////// for testing correctness
 		if (VerbosityConstants.verbose)
 		{
@@ -1101,7 +1112,7 @@ public class Timeline implements Serializable
 	 * @param givenTimestamp
 	 *            * @param verbose
 	 * @return Triple (indexOfActivityObject with nearest start time to given timestamp, that activity object, abs time
-	 *         difference in secs between the st of this ao and st of current ao t)
+	 *         difference in milli secs between the st of this ao and st of current ao t)
 	 * 
 	 * @since 12 June 2017
 	 */

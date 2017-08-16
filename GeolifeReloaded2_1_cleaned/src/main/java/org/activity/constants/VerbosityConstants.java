@@ -18,7 +18,8 @@ public class VerbosityConstants
 	/**
 	 * Controlling the verbosity of console log output
 	 */
-	public static final boolean verbose = false;// false;// false;// true;// false;// false;// true;// false;// false;
+	public static final boolean verbose = false;// false;// false;// false;// true;// false;// false;// true;// false;//
+												// false;
 	public static final boolean tempVerbose = false;// false;// true;// true;// false;// false;// true;// false;//
 													// false;
 	public static final boolean verboseTimelineCleaning = false;// true;// false;// false; // verbosity level 2: if

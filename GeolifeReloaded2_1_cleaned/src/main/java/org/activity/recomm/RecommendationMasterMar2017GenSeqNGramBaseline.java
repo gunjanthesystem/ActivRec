@@ -1,6 +1,8 @@
 package org.activity.recomm;
 
-//import java.math.BigDecimal;
+//TODO:enable:temporarily disabled on Aug 16,2017
+
+// import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -33,13 +35,12 @@ import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
-/**
- * For a given current timeline, recommend the second act of most frequentally occuring two-gram with the current
- * activity as the first act of that 2-gram
+/***
+ * For a given current timeline,recommend the second act of most frequentally occuring two-gram with the
+ * current*activity as the first act of that 2-gram**
  * 
  * @author gunjan
- *
- */
+ **/
 public class RecommendationMasterMar2017GenSeqNGramBaseline implements RecommendationMasterI// IRecommenderMaster
 {
 
@@ -161,7 +162,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	 * Example:<br>
 	 * 2-Gram, freq of that 2gram (ab,3;ac,29;ad,10) <br>
 	 * expanded 2 gram (a--(b,3);a--(c,29);a--(d,10))
-	 * 
+	 *
 	 * @param userAtRecomm
 	 * @param nGramCountsFromTrainingTimelines
 	 *            e.g. for freq of that 2gram (ab,3;ac,29;ad,10), for freq of that 3gram (abc,3;abd,29;abe,10)
@@ -234,7 +235,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	}
 
 	/**
-	 * 
+	 *
 	 * @param trainingTimelines
 	 * @param userAtRecomm
 	 */
@@ -315,7 +316,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	}
 
 	/**
-	 * 
+	 *
 	 * @param userAtRecomm
 	 * @param n
 	 * @param freqDistr
@@ -349,7 +350,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	}
 
 	/**
-	 * 
+	 *
 	 * @param nGramsCountsExpanded
 	 * @param userAtRecomm
 	 * @return (NOfNGram, (CurrentSubNGram,list of next acts with max count))
@@ -386,7 +387,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	}
 
 	/**
-	 * 
+	 *
 	 * @param nGramsCountsExpanded
 	 * @param userAtRecomm
 	 * @return (NOfNGram, (CurrentSubNGram,list of next acts with max count))
@@ -433,7 +434,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 	/**
 	 * NOTE: this is only for logging purpose.
-	 * 
+	 *
 	 * @param nGramsCountsExpanded
 	 * @param userAtRecomm
 	 * @return (NOfNGram, (CurrentSubNGram,list of next acts with max count))
@@ -481,7 +482,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 	/**
 	 * Recommendation for a particular RT
-	 * 
+	 *
 	 * @param trainingTimelines
 	 * @param testTimelines
 	 * @param dateAtRecomm
@@ -507,7 +508,10 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 			System.out
 					.println("\n-----------Starting RecommendationMasterMar2017GenSeqNGramBaseline " + "-------------");
 
-			initialiseNGramData(trainingTimelines, userAtRecomm, true, true);
+			if (Constant.NGramColl == false)
+			{
+				initialiseNGramData(trainingTimelines, userAtRecomm, true, true);
+			}
 
 			errorExists = false;
 
@@ -520,7 +524,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 			this.timeAtRecomm = Time.valueOf(timeAtRecomm);
 			this.userAtRecomm = Integer.toString(userAtRecomm);
 			this.userIDAtRecomm = Integer.toString(userAtRecomm);
-			System.out.println("	User at Recomm = " + this.userAtRecomm + "\tDate at Recomm = " + this.dateAtRecomm
+			System.out.println(" User at Recomm = " + this.userAtRecomm + "\tDate at Recomm = " + this.dateAtRecomm
 					+ "\tTime at Recomm = " + this.timeAtRecomm);
 
 			//////
@@ -565,12 +569,11 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 											.getActivityName());
 				}
 			}
-
 			// sanity check end
 			if (VerbosityConstants.verbose)
 			{
 				System.out.println("activitiesGuidingRecomm.size()=" + activitiesGuidingRecomm.size()
-						+ "  activityAtRecommPoint = " + activityAtRecommPoint.getActivityName());
+						+ " activityAtRecommPoint = " + activityAtRecommPoint.getActivityName());
 				System.out.println(" activitiesGuidingRecomm.size =" + this.activitiesGuidingRecomm.size());
 				System.out.println("\nActivity at Recomm point (Current Activity) =" + activityNameAtRecommPoint);
 			}
@@ -611,7 +614,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	}
 
 	/**
-	 * 
+	 *
 	 * @param activityNameAtRecommPoint
 	 * @param userID
 	 * @param nGram
@@ -624,7 +627,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		{
 			System.out.println("Debug inside createRankedTopRecommendedActivityNamesNGram:");
 		}
-		LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs = new LinkedHashMap<>(); // <ActivityName,RankScore>
+		LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs = new LinkedHashMap<>(); //
+		// <ActivityName,RankScore>
 
 		// (UserID,(nOfN-Gram,(CurrentSubNGram,ListOfActsIDsWithMaxCountAsCHarCode))
 		// private static LinkedHashMap<Integer, LinkedHashMap<Integer, HashMap<String, ArrayList<Character>>>>
@@ -656,7 +660,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	}
 
 	/**
-	 * 
+	 *
 	 * @param testTimelinesOrig
 	 * @param lookPastType2
 	 * @param dateAtRecomm
@@ -726,13 +730,14 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println(
-					"Extracted current timeline: " + extractedCurrentTimeline.getPrimaryDimensionValsInSequence());// .getActivityObjectNamesInSequence());
+					"Extracted current timeline: " + extractedCurrentTimeline.getPrimaryDimensionValsInSequence());//
+			// .getActivityObjectNamesInSequence());
 		}
 		return new Pair<>(extractedCurrentTimeline, reductionInMu);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param testTimelinesOrig
 	 * @param lookPastType2
 	 * @param dateAtRecomm
@@ -818,7 +823,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	// /////////////////////////////////////////////////////////////////////
 	/**
 	 * Generate the string: '__recommendedActivityName1:simRankScore1__recommendedActivityName2:simRankScore2'
-	 * 
+	 *
 	 * @param recommendedActivityNameRankscorePairs
 	 */
 	private static String getRankedRecommendedActivityNamesWithRankScoresString(
@@ -846,7 +851,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	// /////////////////////////////////////////////////////////////////////
 	/**
 	 * Generate string as '__recommendedActivityName1__recommendedActivityName2'
-	 * 
+	 *
 	 * @param recommendedActivityNameRankscorePairs
 	 * @return
 	 */
@@ -919,7 +924,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	public ArrayList<Timeline> getOnlyCandidateTimeslines()
 	{
 		return new ArrayList<Timeline>();// ) this.candidateTimelines.entrySet().stream().map(e -> (Timeline)
-											// e.getValue())
+		// e.getValue())
 		// .collect(Collectors.toList());
 	}
 
@@ -954,7 +959,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public double getThresholdAsDistance()
@@ -967,7 +972,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		if (hasCandidateTimelinesBelowThreshold == false)
 		{
 			System.err.println(
-					"Error: Sanity Check RM60 failed: trying to get number of candidate timelines below  threshold while there is no candidate below threshold, u shouldnt have called this function");
+					"Error: Sanity Check RM60 failed: trying to get number of candidate timelines below threshold while there is no  candidate below threshold, u shouldnt have called this function");
 		}
 		/*
 		 * Assuming that threshold has already been applied
@@ -977,7 +982,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 	/**
 	 * Returns next activity names as String
-	 * 
+	 *
 	 * @return
 	 */
 	public String getNextActNamesWithoutDistString()
@@ -990,7 +995,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 	/**
 	 * Returns next activity names with distance as String
-	 * 
+	 *
 	 * @return
 	 */
 	public String getNextActNamesWithDistString()
@@ -1006,7 +1011,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		StringBuilder res = new StringBuilder();
 		for (ActivityObject ae : activitiesGuidingRecomm)
 		{
-			res = StringUtils.fCat(res, "  ", ae.getActivityName(), "__", ae.getStartTimestamp().toString(), "_to_",
+			res = StringUtils.fCat(res, " ", ae.getActivityName(), "__", ae.getStartTimestamp().toString(), "_to_",
 					ae.getEndTimestamp().toString());
 			// res.append(" " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp());
 		}

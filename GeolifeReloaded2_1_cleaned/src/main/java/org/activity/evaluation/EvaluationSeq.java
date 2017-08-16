@@ -42,8 +42,8 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	static final String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801",
-			"901" };//
+	static final String groupsOf100UsersLabels[] = { "1" };// , "101", "201", "301", "401", "501", "601", "701", "801",
+	// "901" };//
 	// static final String thresholds =
 	// "901" };
 
@@ -67,6 +67,7 @@ public class EvaluationSeq
 		// commonPath = "./dataWritten/";
 		System.out.println("Inside EvaluationSeq for NO MU");
 
+		PathConstants.intialise(Constant.For9kUsers);
 		intialiseListOfFilenamesNoMU();
 		int totalNumOfUsersComputedFor = 0;
 		try
@@ -78,6 +79,10 @@ public class EvaluationSeq
 			{
 				commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
+				// Constant.initialise(commonPath, Constant.getDatabaseName(),
+				// PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
+				// PathConstants.pathToSerialisedLocationObjects);
+
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
 						PathConstants.pathToSerialisedLocationObjects);
@@ -155,6 +160,8 @@ public class EvaluationSeq
 		{
 			e.printStackTrace();
 		}
+
+		System.out.println("Exiting EvaluationSeq for NO MU");
 	}
 
 	/**
@@ -166,7 +173,8 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount)
 	{
 		// commonPath = "./dataWritten/";
-
+		System.out.println("outputCoreResultsPath= " + Constant.outputCoreResultsPath);
+		PathConstants.intialise(Constant.For9kUsers);
 		intialiseListOfFilenames(matchingUnitAsPastCount);
 		int totalNumOfUsersComputedFor = 0;
 		try
@@ -225,6 +233,9 @@ public class EvaluationSeq
 
 			}
 
+			WritingToFile.appendLineToFileAbsolute("Now will concatenate files: ",
+					Constant.outputCoreResultsPath + "Debug1.txt\n");
+			System.out.println("Now will concatenate files: ");
 			// PopUps.showMessage("BREAKING");
 			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
 					listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
@@ -239,13 +250,16 @@ public class EvaluationSeq
 			String[] fileNamePhrasesTopK = { "AllNumDirectTopKAgreements_", "AllPerDirectTopKAgreements_",
 					"AllNumDirectTopKAgreementsL1_", "AllPerDirectTopKAgreementsL1_" };
 
+			WritingToFile.appendLineToFileAbsolute("Now will write summary stats: ",
+					Constant.outputCoreResultsPath + "Debug1.txt\n");
+			System.out.println("Now will write summary stats: ");
 			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
 
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
 					"SummaryLog");
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
 					summaryStats, "SummaryTopKLog");
-
+			WritingToFile.appendLineToFileAbsolute("Finishing: ", Constant.outputCoreResultsPath + "Debug1.txt\n");
 		}
 		catch (Exception e)
 		{

@@ -557,6 +557,8 @@ public class ActivityObject implements Serializable
 		else if (Constant.getDatabaseName().equals("geolife1"))
 			return activityName + "-" + startTimestampInms + "-" + durationInSeconds + " -" + startLatitude + ","
 					+ startLongitude + "-" + endLatitude + "," + endLongitude + "-" + avgAltitude;
+		else if (Constant.getDatabaseName().equals("gowalla1"))
+			return this.toStringAllGowalla();
 		else
 			return "empty";
 	}
