@@ -163,7 +163,7 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NGram;
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 	/**
@@ -182,7 +182,8 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 5, 3, 8 };// 0, 1, 2, 4, 6, 3, 8 };// 1,3,5,8,
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4, 6, 3, 8
+																					// };// 1,3,5,8,
 	// 3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,
 	// };//
 	// ,
@@ -234,7 +235,7 @@ public final class Constant
 
 	public static final boolean memorizeEditDistance = false;
 
-	public static final boolean For9kUsers = true;
+	public static final boolean For9kUsers = false;
 	////////////////////////////////////////////////////////////////////////
 
 	public static final double ClosestTimeDiffThresholdInSecs = 10800; // 3 hrs

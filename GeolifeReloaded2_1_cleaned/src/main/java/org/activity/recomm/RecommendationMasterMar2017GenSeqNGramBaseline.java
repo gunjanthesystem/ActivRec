@@ -156,6 +156,10 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	 * guiding recommendations' is higher than the cost of replacing 'percentageDistanceThresh' % of Activity Objects in
 	 * the activities guiding recommendation are pruned out from set of candidate timelines
 	 */
+	public LinkedHashMap<String, String> getCandUserIDs()
+	{
+		return null;// NOT IMPLEMENENTED
+	}
 
 	/**
 	 * <p>

@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1137,7 +1138,11 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 										}
 
 										sbsNumOfCandTimelinesForThisUserDate.get(i)
-												.append(recommMasters[i].getNumOfCandTimelinesBelowThresh())
+												.append(recommMasters[i].getNumOfCandTimelinesBelowThresh()).append("|")
+												.append(new HashSet<>(recommMasters[i].getCandUserIDs().values()))
+												.append("|")
+												.append(new HashSet<>(
+														recommMasters[i].getCandUserIDs().values().size()))
 												.append("\n");
 
 										/////////////////

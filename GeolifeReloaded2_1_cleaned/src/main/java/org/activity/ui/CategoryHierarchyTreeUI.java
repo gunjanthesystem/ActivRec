@@ -73,8 +73,8 @@ public class CategoryHierarchyTreeUI extends Application
 			// Select the root node
 			treeView.getSelectionModel().selectFirst();
 
-			JSONProcessingGowallaCatHierachy preProcessGowalla = new JSONProcessingGowallaCatHierachy(
-					commonPath, checkinFileNameToRead);
+			JSONProcessingGowallaCatHierachy preProcessGowalla = new JSONProcessingGowallaCatHierachy(commonPath,
+					checkinFileNameToRead);
 
 			/////////
 			TreeMap<Integer, String> dict = preProcessGowalla.getCatIDNameDictionary();
@@ -108,6 +108,8 @@ public class CategoryHierarchyTreeUI extends Application
 					preProcessGowalla.getCatIDNameDictionary());
 
 			ScrollPane sp2 = new ScrollPane();
+			// sp2.setFitToWidth(true);
+			// sp.setHbarPolicy(ScrollBarPolicy.NEVER);
 			sp2.setContent(rightPane2);
 
 			HBox root = new HBox(treeView, rightPane, sp2);
@@ -130,6 +132,7 @@ public class CategoryHierarchyTreeUI extends Application
 
 			//////////
 			primaryStage.setTitle("Category Hierarchy");
+			scene.getStylesheets().add("gsheetNative.css");
 			primaryStage.setScene(scene);
 			// PopUps.showMessage("before staging");
 			primaryStage.show();
