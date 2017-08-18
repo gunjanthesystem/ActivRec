@@ -65,6 +65,8 @@ public interface RecommendationMasterI
 
 	public Date getDateAtRecomm();
 
+	public LinkedHashMap<String, String> getCandUserIDs();
+
 	// /**
 	// * not implemented in daywise and baseline st. yet. relevant for case-based approach
 	// *

@@ -77,7 +77,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 	private Time timeAtRecomm;
 	private String userAtRecomm;
 	private String userIDAtRecomm;
-
+	private LinkedHashMap<String, String> candUserIDs;
 	/**
 	 * Current Timeline sequence of activity objects happening from the recomm point back until the matching unit
 	 */
@@ -210,6 +210,11 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				System.exit(-1);
 		}
 		return 0;
+	}
+
+	public LinkedHashMap<String, String> getCandUserIDs()
+	{
+		return candUserIDs;
 	}
 
 	/**
@@ -349,6 +354,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			long recommMasterT2 = System.currentTimeMillis();
 			long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
+
+			candUserIDs = extractCandUserIDs(candidateTimelines);
 			// ///////////////////////////
 			if (VerbosityConstants.verbose)
 			{
@@ -626,6 +633,32 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		}
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
+	}
+
+	private static LinkedHashMap<String, String> extractCandUserIDs(LinkedHashMap<String, Timeline> candidateTimelines)
+	{
+		LinkedHashMap<String, String> candUserIDs = new LinkedHashMap<>();
+		try
+		{
+			for (Entry<String, Timeline> candE : candidateTimelines.entrySet())
+			{
+				if (candE.getValue().isShouldBelongToSingleUser())
+				{
+					candUserIDs.put(candE.getKey(), candE.getValue().getUserID());
+				}
+				else
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: not taking care of this case");
+				}
+
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		return candUserIDs;
 	}
 
 	/**
