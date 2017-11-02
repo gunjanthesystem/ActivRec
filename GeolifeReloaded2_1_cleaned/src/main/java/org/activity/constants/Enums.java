@@ -17,6 +17,11 @@ public class Enums
 		NCount, NHours, Daywise, ClosestTime, NGram;
 	}
 
+	public enum AltSeqPredictor
+	{
+		AKOM;
+	}
+
 	/**
 	 * CaseBasedV1, SimpleV3
 	 * 

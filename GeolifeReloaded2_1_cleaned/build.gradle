@@ -73,7 +73,14 @@ dependencies
 	//executing processes in java
 	compile group:'com.zaxxer',name:'nuprocess',version:'1.1.0'
 	compile group:'org.zeroturnaround',name:'zt-exec',version:'1.9'
-	 
+
+   //JavaFX UI controls
+    compile 'org.controlsfx:controlsfx:8.40.13'
+// compile 'org.controlsfx:controlsfx-samples:8.40.13'
+
+
+    // material design for javafx
+     compile 'com.jfoenix:jfoenix:1.4.0'
 	
 	//for amidst toolkit
 	//compile 'eu.amidst:module-all:0.6.1'
@@ -87,14 +94,19 @@ dependencies
 	
 	//compile name: 'spmf'
 	
-	compile fileTree(dir: 'libs', include: ['*.jar','*.zip'])
-	    
+	compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    //compile fileTree(dir: 'libs', include: ['*.jar','*.zip'])
 	// Declare the dependency for your favourite test framework you want to use in your tests.
 	// TestNG is also supported by the Gradle Test task. Just change the
 	// testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
 	// 'test.useTestNG()' to your build script.
 	testCompile 'junit:junit:4.12'
 	
+	
+	
+   //compile project('../:SPMFExperiments')
+
 	//compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
 }
 

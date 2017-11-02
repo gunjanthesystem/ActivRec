@@ -15,6 +15,9 @@ public class VerbosityConstants
 	 */
 	public static final boolean checkSanityPDImplementn = false;
 
+	public static final boolean printSanityCheck = false;
+
+	public static final boolean disableWritingToFileForSpeed = true;
 	/**
 	 * Controlling the verbosity of console log output
 	 */
@@ -59,6 +62,8 @@ public class VerbosityConstants
 	public static final boolean WriteTimelines = false;
 	public static final boolean WriteLocationMap = false;// true;
 	public static final boolean WriteNumOfValidsAfterAnRTInSameDay = false;
+	public static final boolean WriteNumberOfCandidateTimelinesBelow = false;
+	public static final boolean WriteMaxNumberOfDistinctRecommendation = false;
 
 	/**
 	 * to save writing non essential redudant stuffs
@@ -70,4 +75,5 @@ public class VerbosityConstants
 
 	public static final boolean writeRankedRecommsWOScoreForEachSeqIndex = false;
 	public static final boolean writeDataActualForEachSeqIndex = false;
+
 }

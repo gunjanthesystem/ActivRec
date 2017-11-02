@@ -1100,7 +1100,7 @@ public class RecommendationTestsMar2017GenSeq
 									// String rankedRecommWithoutScoreForThisRT = recommP1
 									// .getRankedRecommendedActNamesWithoutRankScores();
 
-									if (VerbosityConstants.verbose)
+									if (true)// TODO TEMP VerbosityConstants.verbose)
 									{
 										System.out
 												.println("** Ranked Recommendation=" + topRankedRecommSequenceWithScore

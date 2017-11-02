@@ -2296,11 +2296,25 @@ public class TimelineUtils
 			// if(dayTimeline.countContainsActivityNameButNotAsLast(activityAtRecommPoint.getActivityName()) > 0)
 			// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
 			{
-				if (dayOfTimeline.toString().equals(dateAtRecomm.toString()) == true)
+				// if ((Constant.noFutureCandInColl == true)
+				if ((dayOfTimeline.equals(dateAtRecomm)) || (dayOfTimeline.after(dateAtRecomm)))
 				{
-					PopUps.printTracedErrorMsg(
-							"Error: a prospective candidate timelines is of the same date as the dateToRecommend. Thus, not using training and test set correctly");
-					continue;
+					if (Constant.onlyPastFromRecommDateInCandInColl && (Constant.collaborativeCandidates))
+					{
+						// $ System.out.println("Ignoring:dayOfTimeline=" + dayOfTimeline + " dateAtRecomm =" +
+						// dateAtRecomm
+						// $ + " a prospective candidate timelines is of the same or after the date as the
+						// dateToRecommend.");
+						continue;
+					}
+					else // allowing future cand extraction here be CAREFUL
+					{
+						// TODO:TEMp Disable//$$ System.out.println("Warning in extractDaywiseCandidateTimelines
+						// :dayOfTimeline=" + dayOfTimeline
+						// $$ + " dateAtRecomm =" + dateAtRecomm
+						// $$ + " a prospective candidate timelines is of the same or after the date as the
+						// dateToRecommend. Thus, not using training and test set correctly");
+					}
 				}
 
 				// start sanity check for hasAValidActAfterFirstOccurOfThisPrimaryDimensionVal()
@@ -2348,9 +2362,14 @@ public class TimelineUtils
 					+ "  numCandsRejectedDueToNoCurrentActivityAtNonLast ="
 					+ numCandsRejectedDueToNoCurrentActivityAtNonLast);
 		}
-		if (count == 0)
+
+		if (VerbosityConstants.printSanityCheck)
 		{
-			System.err.println("Warning: No DaywiseCandidateTimelines found");
+			if (count == 0)
+			{
+
+				System.err.println("Warning: No DaywiseCandidateTimelines found");
+			}
 		}
 		return candidateTimelines;
 	}

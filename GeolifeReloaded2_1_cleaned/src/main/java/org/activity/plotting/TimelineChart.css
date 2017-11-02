@@ -1,0 +1,17 @@
+.activity-tooltip-label 
+{
+    -fx-font-size: 0.75em;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 2 5 2 0;
+}
+
+.activitybox-box 
+{
+    -fx-effect: dropshadow(two-pass-box , rgba(0,0,0,0.4) , 10, 0.0 , 2 , 4 );
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: rgba(0,0,0,0.3);
+    -fx-stroke-width: 4;
+}

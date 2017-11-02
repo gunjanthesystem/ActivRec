@@ -17,3 +17,8 @@ include 'services:webservice'
 */
 
 rootProject.name = 'GeolifeReloaded2_1_cleaned'
+
+
+//include ':SPMFExperiments'
+//project(':SPMFExperiments').projectDir = new File(settingsDir, '../SPMFExperiments')
+//new File(settingsDir, '../SPMFExperiments')

@@ -7,7 +7,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,6 +31,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterI;
+import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeq;
 import org.activity.recomm.RecommendationMasterMar2017GenSeq;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
 import org.activity.sanityChecks.Sanity;
@@ -337,22 +337,27 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
 						// PopUps.showMessage("Starting iteration over user");
 
-						// training test DAY timelines for all users
+						/**
+						 * training test DAY timelines for all users
+						 **/
 						LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
 
 						// training test timelines for all users continuous
 						LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous = null;
+
+						/**
+						 * {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
+						 */
+						Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser = null;
 
 						if (Constant.collaborativeCandidates)
 						{
 							trainTestTimelinesForAllUsersDW = TimelineUtils
 									.splitAllUsersTestTrainingTimelines(allUsersTimelines, percentageInTraining);
 							// sampledUsersTimelines
-
 							trainTimelinesAllUsersContinuous = getContinousTrainingTimelines(
 									trainTestTimelinesForAllUsersDW);
 						}
-
 						/// temp start
 						////// START of build representative activity objects for this user.
 						// if (true)// representativeAOsNotComputed == false) //do this
@@ -361,10 +366,6 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						// take out the train-test splitting of timelines out of the loop, however that can be done
 						// as well
 						// Start of curtain: incomplete: motive: faster speed
-						/**
-						 * {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
-						 */
-						Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser = null;
 						if (Constant.collaborativeCandidates)
 						{// collaborative approach
 							// disabled on 1 Aug 2017, will do just-in-time computation of representative act object
@@ -375,11 +376,10 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 										trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
 										Constant.getUniqueActivityIDs());
 							}
+							// end of curtain
+							////// END of build representative activity objects for this user.
+							/// temp end
 						}
-						// end of curtain
-						////// END of build representative activity objects for this user.
-
-						/// temp end
 
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
@@ -493,8 +493,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 								else
 								{// collaborative approach
 									// disabled on 1 Aug 2017, will do just-in-time computation of representative act
-									// object
-									// based only on candidate timelines
+									// object// based only on candidate timelines
 									if (Constant.buildRepAOJustInTime == false)
 									{
 										repAOResult = buildRepresentativeAOsForUserPDVCOll(userId,
@@ -733,13 +732,9 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 													+ recommSeqLength
 													+ "\nif it was such, we should have not reached this point of execution");
 
-									System.out.println("User id" + userId + " Next activity Object after recomm time:"
-											+ endTimeStamp + " ="
-											+ nextValidActivityObjectAfterRecommPoint1.getActivityName());
-
-									System.out.print("User id" + userId + " Next activity Objects after recomm time:"
-											+ endTimeStamp + " = ");
-
+									System.out.println("UserId" + userId + " Next AO after RT:" + endTimeStamp + " ="
+											+ nextValidActivityObjectAfterRecommPoint1.getActivityName()
+											+ "\nNext AOs after RT:" + endTimeStamp + " = ");
 									nextValidActivityObjectsAfterRecommPoint1.stream().forEachOrdered(ao -> System.out
 											.print(ao.getPrimaryDimensionVal("/") + ":" + ao.getEndTimestamp() + ","));
 
@@ -820,6 +815,16 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 													userTrainingTimelines, userTestTimelines, dateToRecomm,
 													recommTimesStrings[0], userId, repAOsFromPrevRecomms);
 										}
+										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.AKOM)// Alternative
+																										// algorith
+										{
+											recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeq(
+													userTrainingTimelines, userTestTimelines, dateToRecomm,
+													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
+													this.lookPastType, false, repAOsFromPrevRecomms,
+													trainTestTimelinesForAllUsersDW, trainTimelinesAllUsersContinuous);
+										}
+
 										else
 										{
 											recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeq(
@@ -1139,10 +1144,10 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 										sbsNumOfCandTimelinesForThisUserDate.get(i)
 												.append(recommMasters[i].getNumOfCandTimelinesBelowThresh()).append("|")
-												.append(new HashSet<>(recommMasters[i].getCandUserIDs().values()))
-												.append("|")
-												.append(new HashSet<>(
-														recommMasters[i].getCandUserIDs().values().size()))
+												// TODO disabled for speed on 1 Nov 2017 .append(new
+												// HashSet<>(recommMasters[i].getCandUserIDs().values()))
+												// .append("|")
+												// .append(new HashSet<>(recommMasters[i].getCandUserIDs().size()))
 												.append("\n");
 
 										/////////////////
@@ -1325,15 +1330,23 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 							baseLineOccurrence.newLine();
 							baseLineDuration.newLine();
 
-							WritingToFile.writeToNewFile(sbsMaxNumOfDistinctRecommendations.toString(),
-									commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
-							// bwMaxNumOfDistinctRecommendations.close();
+							if (VerbosityConstants.WriteMaxNumberOfDistinctRecommendation)
+							{
+								WritingToFile.writeToNewFile(sbsMaxNumOfDistinctRecommendations.toString(),
+										commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
+								// bwMaxNumOfDistinctRecommendations.close();
+							}
 
-							WritingToFile.writeToNewFile(sbsRecommTimesWithEditDistances.toString(),
-									commonPath + userName + "RecommTimesWithEditDistance.csv");
-							// bwRecommTimesWithEditDistances.close();
+							if (VerbosityConstants.WriteRecommendationTimesWithEditDistance)
+							{
+								WritingToFile.writeToNewFile(sbsRecommTimesWithEditDistances.toString(),
+										commonPath + userName + "RecommTimesWithEditDistance.csv");
+								// bwRecommTimesWithEditDistances.close();
+							}
 
 							// if (matchingUnitIterator == 0)
+							if (VerbosityConstants.WriteNumberOfCandidateTimelinesBelow)
+
 							{// write it only for one mu since it will remain same over
 								// mus and is only for stat purpose
 								WritingToFile.writeToNewFile(sbsNumOfCandTimelinesBelowThreshold.toString(),

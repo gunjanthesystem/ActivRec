@@ -1,7 +1,6 @@
 package org.activity.plotting;
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.activity.objects.Pair;
@@ -14,6 +13,11 @@ import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Tooltip;
 
+/**
+ * 
+ * @author gunjan
+ *
+ */
 public class FXUtils
 {
 
@@ -28,10 +32,14 @@ public class FXUtils
 		ObservableList<XYChart.Data<Double, Double>> obslistOfXYChartData = listOfPairData.stream()
 				.map(pair -> new XYChart.Data<>(pair.getFirst(), pair.getSecond()))
 				.collect(Collectors.toCollection(FXCollections::observableArrayList));
-
 		return obslistOfXYChartData;
 	}
 
+	/**
+	 * 
+	 * @param a
+	 * @param b
+	 */
 	public static void getTooltippeXYChartData(double a, double b)
 	{
 		XYChart.Data dataPoint = new XYChart.Data<>(a, b);
@@ -72,25 +80,19 @@ public class FXUtils
 
 	/**
 	 * 
-	 * @param numOfDataSeries
-	 * @param numOfDataPointsInEachSeries
-	 * @return {("A",(1,2)),("B",(2,3))}
+	 * @return
 	 */
-	public static ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>> getSyntheticData(int numOfDataSeries,
-			int numOfDataPointsInEachSeries)
+	public static ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>> getSyntheticData()
 	{
-		// {("A",(1,2)),("B",(2,3))}
 		ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>> data = new ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>>();
-		Random r = new Random();
-		for (double series = 1; series <= numOfDataSeries; series++)
+
+		for (double series = 1; series <= 3; series++)
 		{
 			ArrayList<Pair<Double, Double>> dataForASeries = new ArrayList<>();
 
-			for (double x = 1; x <= numOfDataPointsInEachSeries; x++)
+			for (double x = 1; x <= 10; x++)
 			{
-				int yIncrease = r.nextInt(100);
-				// System.out.println("yIncrease = " + yIncrease);
-				dataForASeries.add(new Pair<Double, Double>(x + 10 + series, x + yIncrease));
+				dataForASeries.add(new Pair<Double, Double>(x + series, x + 2));
 			}
 			data.add(new Pair<String, ArrayList<Pair<Double, Double>>>(String.valueOf(series), dataForASeries));
 		}
