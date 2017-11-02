@@ -126,6 +126,19 @@ public class PopUps
 	/**
 	 * 
 	 * @param errorMsg
+	 */
+	public static void printTracedWarningMsg(String errorMsg)
+	{
+		System.err.println(getCurrentStackTracedWarningMsg(errorMsg) + "\n------- ---------- -----");
+		// StringBuilder sb = new StringBuilder("\nError:" + errorMsg + "\n" + "--------- current stack -------\n");
+		// Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
+		// System.err.println(sb.toString() + "------------");
+		// return sb.append("--------- ------- ----- -------").toString();
+	}
+
+	/**
+	 * 
+	 * @param errorMsg
 	 * @return
 	 */
 	public static String getCurrentStackTracedWarningMsg(String errorMsg)

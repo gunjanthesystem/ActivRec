@@ -163,9 +163,18 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
+
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;
+
+	/**
+	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
+	 * restricting this baseline to day boundaries
+	 */
+	public static final boolean DaywiseAllowSpillOverDaysOfCurr = true;
+
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
 	 * restricting this baseline to day boundaries
@@ -224,6 +233,9 @@ public final class Constant
 	public static final boolean preBuildRepAOGenericUser = true;
 
 	public static final boolean only1CandFromEachCollUser = true;// false;// false;// true;
+
+	/** the dates for each cand from the neighbours must be < the current date **/
+	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
@@ -1011,6 +1023,8 @@ public final class Constant
 		s.append("\nactivityNames:" + Arrays.toString(activityNames));
 		s.append("\nPrimaryDimension:" + primaryDimension);
 		s.append("\nlookPastType:" + lookPastType);
+		s.append("\naltSeqPredictor:" + altSeqPredictor);
+		s.append("\nDaywiseAllowSpillOverDaysOfCurr:" + DaywiseAllowSpillOverDaysOfCurr);
 		s.append("\nClosestTimeAllowSpillOverDays:" + ClosestTimeAllowSpillOverDays);
 		s.append("\nClosestTimeFilterCandidates:" + ClosestTimeFilterCandidates);
 		s.append("\ncaseType:" + caseType);
@@ -1054,6 +1068,8 @@ public final class Constant
 		s.append("\ncollaborativeCandidates:" + collaborativeCandidates);
 		s.append("\nbuildRepAOJustInTime:" + buildRepAOJustInTime);
 		s.append("\nonly1CandFromEachCollUser:" + only1CandFromEachCollUser);
+		s.append("\nnoFutureCandInColl:" + onlyPastFromRecommDateInCandInColl);
+
 		s.append("\nfilterTopCands:" + filterTopCands);
 		s.append("\npreBuildRepAOGenericUser:" + preBuildRepAOGenericUser);
 

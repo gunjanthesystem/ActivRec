@@ -1,6 +1,6 @@
 package org.activity.ui;
 
-import org.activity.plotting.FXUtils;
+import org.activity.plotting0.FXUtils;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -58,7 +58,7 @@ public class Dashboard extends Application
 
 	public void start(Stage stage)
 	{
-		JavaFXUtils.printScreensDetails();
+		ScreenDetails.printScreensDetails();
 		// final Stage stageRef = stage;
 		// StageStyle stageStyle = StageStyle.DECORATED;
 
@@ -101,12 +101,17 @@ public class Dashboard extends Application
 
 	/////////////
 
-	TabPane createTabs()
+	/**
+	 * 
+	 * @return
+	 */
+	private TabPane createTabs()
 	{
 		Tab lineChartTab = new Tab("lineChart");
 
 		ObservableList<Series<Double, Double>> listOfSeries = FXUtils
 				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50));
+
 		LineChart lineChart = new LineChart(new NumberAxis(), new NumberAxis(), listOfSeries);
 
 		ObservableList<Series<Double, Double>> lineChartDataSeriess = lineChart.getData();

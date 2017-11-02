@@ -60,12 +60,23 @@ public class Timeline implements Serializable
 			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: in Timeline(ArrayList<ActivityObject> activityObjects), CHRONOLOGY NOT PRESERVED"));
 		}
+
 		if (shouldBelongToSingleDay && !TimelineUtils.isSameDay(activityObjects))
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error: in Timeline(ArrayList<ActivityObject> activityObjects), shouldBelongToSingleDay= "
-							+ shouldBelongToSingleDay + " but TimelineUtils.isSameDay(activityObjects)="
-							+ TimelineUtils.isSameDay(activityObjects)));
+			if (Constant.lookPastType == Constant.lookPastType.Daywise && Constant.DaywiseAllowSpillOverDaysOfCurr)
+			{
+				System.out.println(
+						"Alert: in Timeline(ArrayList<ActivityObject> activityObjects), shouldBelongToSingleDay= "
+								+ shouldBelongToSingleDay + " but TimelineUtils.isSameDay(activityObjects)="
+								+ TimelineUtils.isSameDay(activityObjects));
+			}
+			else
+			{
+				System.err.println(PopUps.getTracedErrorMsg(
+						"Error: in Timeline(ArrayList<ActivityObject> activityObjects), shouldBelongToSingleDay= "
+								+ shouldBelongToSingleDay + " but TimelineUtils.isSameDay(activityObjects)="
+								+ TimelineUtils.isSameDay(activityObjects)));
+			}
 		}
 
 		this.shouldBelongToSingleDay = shouldBelongToSingleDay;

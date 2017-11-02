@@ -46,8 +46,8 @@ public class TooltipContent extends GridPane
 
 	TooltipContent()
 	{
-		Label open = new Label("OPEN:");
-		Label close = new Label("CLOSE:");
+		Label open = new Label("EndTS:");
+		Label close = new Label("ActName:");
 		Label high = new Label("HIGH:");
 		Label low = new Label("LOW:");
 		open.getStyleClass().add("candlestick-tooltip-label");
@@ -65,11 +65,19 @@ public class TooltipContent extends GridPane
 		getChildren().addAll(open, openValue, close, closeValue, high, highValue, low, lowValue);
 	}
 
-	public void update(double open, double close, double high, double low)
+	public void update(double endTS, String actName, double high, double low)
 	{
-		openValue.setText(Double.toString(open));
-		closeValue.setText(Double.toString(close));
+		openValue.setText(Double.toString(endTS));
+		closeValue.setText(actName);
 		highValue.setText(Double.toString(high));
 		lowValue.setText(Double.toString(low));
+	}
+
+	public void update(String endTS, String actName, String high, String low)
+	{
+		openValue.setText(endTS);
+		closeValue.setText(actName);
+		highValue.setText(high);
+		lowValue.setText(low);
 	}
 }
