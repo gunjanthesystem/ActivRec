@@ -1,7 +1,10 @@
 package org.activity.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+
 import org.activity.constants.Constant;
-import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
@@ -9,15 +12,41 @@ import org.activity.util.Searcher;
 
 public class SuperController
 {
+
+	public static void main(String args[])
+	{
+		runExperiments();
+		// cleanUpSpace();
+	}
+
+	public static void cleanUpSpace()
+	{
+		String commonPath = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/July28_1/";
+
+		String s = ("cleanUpSpace called on commonPath=" + commonPath + "\n");
+		System.out.println(s);
+
+		String deleteConsoleLogs = Searcher.searchAndRandomDelete2(commonPath, "consoleLog",
+				Arrays.asList("rror", "xception"), 0.80);
+
+		System.out.println("result= " + deleteConsoleLogs);
+		// Timestamp
+
+		// .getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+		WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "CleanUpSafelyRandomlyDeleteConsoleLogsForSpace"
+				+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".txt");
+	}
+
 	// All correct
-	public static void main(String[] args)
+	public static void runExperiments()
 	{
 		long at = System.currentTimeMillis();
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC"y)); // added on April 21, 2016
 
 		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
-		String commonPath = "./dataWritten/Oct12_run1/";// Aug17/";
+		// String commonPath = "./dataWritten/Nov6_NCount916U916N100T/";// Aug17/";
+		String commonPath = "./dataWritten/Nov12_NCount916U916N1C500T/";// Aug17/";
 		System.out.println("commonPath = " + commonPath);
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
@@ -92,13 +121,13 @@ public class SuperController
 		Constant.setDistanceUsed("HJEditDistance");
 
 		// //curtain may 19 2017 start
-		// $$ new ControllerWithoutServer();
+		new ControllerWithoutServer();
 		// //curtain may 19 2017 end
 
 		// curtain may 26 2017 start
 		// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
-		// $$new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);// , new int[] { 30, 50, 60, 70, 90 });
-		new EvaluationSeq(3, commonPath);// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
+		// $$ new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);// , new int[] { 30, 50, 60, 70, 90 });
+		// $$new EvaluationSeq(3, commonPath);// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
 		// //curtain may 26 2017 end
 
 		// **************************************************************************************************************//
@@ -304,6 +333,9 @@ public class SuperController
 		errors = Searcher.search(commonPath, "Log", "rror");
 		exceptions = Searcher.search(commonPath, "Log", "xception");
 		WritingToFile.writeToNewFile(errors + "\n" + exceptions, commonPath + "ErrorsExceptions2.txt");
+
+		String deleteConsoleLogs = Searcher.searchAndRandomDelete(commonPath, "consoleLog", "rror", 0.65);
+		WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "SafelyRandomlyDeleteConsoleLogsForSpace.txt");
 
 		long bt = System.currentTimeMillis();
 		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");

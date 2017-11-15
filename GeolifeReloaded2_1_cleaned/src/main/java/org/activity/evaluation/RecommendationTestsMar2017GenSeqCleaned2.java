@@ -815,8 +815,9 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 													userTrainingTimelines, userTestTimelines, dateToRecomm,
 													recommTimesStrings[0], userId, repAOsFromPrevRecomms);
 										}
-										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.AKOM)// Alternative
-																										// algorith
+										else if (this.lookPastType.equals(Enums.LookPastType.Daywise)
+												&& (Constant.altSeqPredictor == Enums.AltSeqPredictor.AKOM))
+										// Alternative algorithm
 										{
 											recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeq(
 													userTrainingTimelines, userTestTimelines, dateToRecomm,

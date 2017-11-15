@@ -2829,8 +2829,8 @@ public class TimelineUtils
 		if (indexOfCurrentEnd - matchingUnitInCounts < 0)
 		{
 			reductionInMU = matchingUnitInCounts - indexOfCurrentEnd;
-			System.out.println("Warning: reducing mu since not enough past,indexOfCurrentEnd(" + indexOfCurrentEnd + ")"
-					+ "- muInCounts(" + matchingUnitInCounts + ")=" + (indexOfCurrentEnd - matchingUnitInCounts));
+			System.out.println("Warning: reducing mu since not enough past,indexOfCurrentEnd=" + indexOfCurrentEnd
+					+ ", muInCounts=" + matchingUnitInCounts + "), new MU=" + indexOfCurrentEnd);
 			matchingUnitInCounts = indexOfCurrentEnd;
 		}
 
@@ -2853,7 +2853,7 @@ public class TimelineUtils
 		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
 				.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
 
-		System.out.println("activityObjectsInCurrentTimeline.size()=" + activityObjectsInCurrentTimeline.size());
+		System.out.println("AOsInCurrTimeline.size()=" + activityObjectsInCurrentTimeline.size());
 
 		ActivityObject nextValidActivityObject = longerTimeline
 				.getNextValidActivityAfterActivityAtThisPositionPD(indexOfCurrentEnd);
