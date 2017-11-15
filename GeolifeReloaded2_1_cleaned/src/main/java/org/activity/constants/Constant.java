@@ -163,11 +163,12 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;// SWITCH_NOV10
+	public static final int AKOMHighestOrder = 3;// SWITCH_NOV10
 
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
@@ -192,14 +193,9 @@ public final class Constant
 	 * Number of past activities to look excluding the current activity
 	 */
 	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4, 6, 3, 8
-																					// };// 1,3,5,8,
-	// 3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,
-	// };//
-	// ,
-	// 14, 16,
-	// 18 };
-	// { 0, 1, 2, 3,// 4, 5, 6 };//// , 7, 8, 9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,
-	// 26, 28, 30 };// , 32,// 34, 36, 38, 40, 42 };
+	// };// 1,3,5,8,3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,};//14, 16,18 };{ 0, 1, 2, 3,// 4, 5, 6
+	// };//// , 7, 8,9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,26, 28, 30 };// , 32,// 34,
+	// 36, 38, 40,42 };
 
 	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 			17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
@@ -230,9 +226,9 @@ public final class Constant
 	public static final boolean collaborativeCandidates = true;
 
 	public static final boolean buildRepAOJustInTime = false;
-	public static final boolean preBuildRepAOGenericUser = true;
+	public static final boolean preBuildRepAOGenericUser = true; // TODO think about it
 
-	public static final boolean only1CandFromEachCollUser = true;// false;// false;// true;
+	public static final boolean only1CandFromEachCollUser = true;// false;// false;// true;//SWITCH_NOV10
 
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
@@ -240,14 +236,14 @@ public final class Constant
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int filterTopCands = -1;// 100;// 1500;// 100;// -1 for no filter,
+	public static final int filterTopCands = 500;/// -1;// 100;// 1500;// 100;// -1 for no filter, //SWITCH_NOV10
 
 	static EditDistanceMemorizer editDistancesMemorizer;
 	final static int editDistancesMemorizerBufferSize = 1;// 000000;
 
 	public static final boolean memorizeEditDistance = false;
 
-	public static final boolean For9kUsers = false;
+	public static final boolean For9kUsers = false;// false; //SWITCH_NOV10
 	////////////////////////////////////////////////////////////////////////
 
 	public static final double ClosestTimeDiffThresholdInSecs = 10800; // 3 hrs
@@ -1024,6 +1020,8 @@ public final class Constant
 		s.append("\nPrimaryDimension:" + primaryDimension);
 		s.append("\nlookPastType:" + lookPastType);
 		s.append("\naltSeqPredictor:" + altSeqPredictor);
+		s.append("\nAKOMHighestOrder:" + AKOMHighestOrder);
+
 		s.append("\nDaywiseAllowSpillOverDaysOfCurr:" + DaywiseAllowSpillOverDaysOfCurr);
 		s.append("\nClosestTimeAllowSpillOverDays:" + ClosestTimeAllowSpillOverDays);
 		s.append("\nClosestTimeFilterCandidates:" + ClosestTimeFilterCandidates);

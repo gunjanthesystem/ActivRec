@@ -586,7 +586,7 @@ public class RecommendationMasterMar2017AltAlgoSeq implements RecommendationMast
 
 			this.recommendedActivityNamesWithRankscores = getTopPredictedAKOMActivityPDVals(
 					this.activitiesGuidingRecomm, this.caseType, this.lookPastType, this.candidateTimelines, 1, false,
-					5);
+					Constant.AKOMHighestOrder);
 
 			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityPDvalsWithRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
