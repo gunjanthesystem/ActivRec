@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 import org.activity.constants.Constant;
+import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
@@ -15,13 +16,34 @@ public class SuperController
 
 	public static void main(String args[])
 	{
-		runExperiments();
+		String[] commonPaths = { "./dataWritten/Nov16_AKOM3_916U_1cand/" };// {
+																			// "./dataWritten/Nov16_AKOM3_916U_10cand/",
+		// "./dataWritten/Nov16_AKOM3_916U_50cand/",
+		// "./dataWritten/Nov16_AKOM3_916U_100cand/" };
+		// int[] numOfCandsPerUser = { 10, 50, 100 };
+		// {
+		// "/dataWritten/Nov10_AKOM1_9k1cand/"
+		// };
+		// { "./dataWritten/Nov12_NCount916U916N1C1500T/", "./dataWritten/Nov12_NCount916U916N1C750T/",
+		// "./dataWritten/Nov12_NCount916U916N1C500T/", "./dataWritten/Nov12_NCount916U916N1C250T/" };
+
+		// for (int i = commonPaths.length - 1; i >= 0; i--)
+		for (int i = 0; i <= commonPaths.length - 1; i++)
+		{
+			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
+			String commonPath = commonPaths[i];
+
+			runExperiments(commonPath, true, false, false);
+			System.out.println("finished for commonPath = " + commonPath);
+		}
+
+		System.out.println(" Exiting SuperController");
 		// cleanUpSpace();
 	}
 
 	public static void cleanUpSpace()
 	{
-		String commonPath = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/July28_1/";
+		String commonPath = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten_12May2017/";
 
 		String s = ("cleanUpSpace called on commonPath=" + commonPath + "\n");
 		System.out.println(s);
@@ -38,7 +60,7 @@ public class SuperController
 	}
 
 	// All correct
-	public static void runExperiments()
+	public static void runExperiments(String commonPath, boolean recommendation, boolean evaluation, boolean hasMUs)
 	{
 		long at = System.currentTimeMillis();
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC"y)); // added on April 21, 2016
@@ -46,7 +68,7 @@ public class SuperController
 		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
 		// String commonPath = "./dataWritten/Nov6_NCount916U916N100T/";// Aug17/";
-		String commonPath = "./dataWritten/Nov12_NCount916U916N1C500T/";// Aug17/";
+		// $$String commonPath = "./dataWritten/Nov12_NCount916U916N1C500T/";// Aug17/";
 		System.out.println("commonPath = " + commonPath);
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
@@ -120,16 +142,26 @@ public class SuperController
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
 
-		// //curtain may 19 2017 start
-		new ControllerWithoutServer();
-		// //curtain may 19 2017 end
+		if (recommendation)
+		{
+			// //curtain may 19 2017 start
+			new ControllerWithoutServer();
+			// //curtain may 19 2017 end
+		}
 
-		// curtain may 26 2017 start
-		// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
-		// $$ new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);// , new int[] { 30, 50, 60, 70, 90 });
-		// $$new EvaluationSeq(3, commonPath);// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
-		// //curtain may 26 2017 end
-
+		if (evaluation)
+		{// curtain may 26 2017 start
+			if (hasMUs)
+			{// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
+				new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);// , new int[] { 30, 50, 60,
+				// 70, 90// });
+			}
+			else
+			{
+				new EvaluationSeq(3, commonPath);// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90
+													// });
+			} // //curtain may 26 2017 end
+		}
 		// **************************************************************************************************************//
 		// Constant.DATABASE_NAME = "dcu_data_2";// geolife1
 		// Constant.caseType = "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
@@ -334,12 +366,12 @@ public class SuperController
 		exceptions = Searcher.search(commonPath, "Log", "xception");
 		WritingToFile.writeToNewFile(errors + "\n" + exceptions, commonPath + "ErrorsExceptions2.txt");
 
-		String deleteConsoleLogs = Searcher.searchAndRandomDelete(commonPath, "consoleLog", "rror", 0.65);
-		WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "SafelyRandomlyDeleteConsoleLogsForSpace.txt");
+		// String deleteConsoleLogs = Searcher.searchAndRandomDelete(commonPath, "consoleLog", "rror", 0.65);
+		// WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "SafelyRandomlyDeleteConsoleLogsForSpace.txt");
 
 		long bt = System.currentTimeMillis();
 		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");
 		PopUps.showMessage("All done in " + ((bt - at) / 1000) + " seconds");
-		System.exit(0);
+
 	}
 }

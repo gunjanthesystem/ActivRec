@@ -740,7 +740,7 @@ public class ComparatorUtils
 
 	public static void main(String args[])
 	{
-		HashMap<String, Long> map = new HashMap<>();
+		Map<String, Long> map = new LinkedHashMap<>();
 
 		map.put("a", Long.valueOf(12));
 		map.put("b", Long.valueOf(12));
@@ -751,6 +751,10 @@ public class ComparatorUtils
 
 		List<String> keyWithMaxValue = (List<String>) getKeysWithMaxValues(map);
 		System.out.println("keyWithMaxValue = " + keyWithMaxValue);
+
+		Collections.sort(new ArrayList<String>(map.keySet()), Collections.reverseOrder());
+		System.out.println(map);
+
 	}
 	/////////////////
 	// TODO this method needs refactoring (30 Sep changes: intersectingIntervalInSeconds replaced by doesOverlap
