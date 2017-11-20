@@ -163,10 +163,11 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 
+	// AltSeqPredictor IS ONLY USED WHEN lookPastType IS Daywise
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;// SWITCH_NOV10
 	public static final int AKOMHighestOrder = 3;// SWITCH_NOV10
 
@@ -228,7 +229,9 @@ public final class Constant
 	public static final boolean buildRepAOJustInTime = false;
 	public static final boolean preBuildRepAOGenericUser = true; // TODO think about it
 
-	public static final boolean only1CandFromEachCollUser = true;// false;// false;// true;//SWITCH_NOV10
+	public static final boolean only1CandFromEachCollUser = true;// false;// true;// false;// false;//
+																	// true;//SWITCH_NOV10
+	public static int numOfCandsFromEachCollUser = 1;
 
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
@@ -236,7 +239,7 @@ public final class Constant
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int filterTopCands = 500;/// -1;// 100;// 1500;// 100;// -1 for no filter, //SWITCH_NOV10
+	public static final int filterTopCands = -1;// 500;/// -1;// 100;// 1500;// 100;// -1 for no filter, //SWITCH_NOV10
 
 	static EditDistanceMemorizer editDistancesMemorizer;
 	final static int editDistancesMemorizerBufferSize = 1;// 000000;
@@ -1066,6 +1069,7 @@ public final class Constant
 		s.append("\ncollaborativeCandidates:" + collaborativeCandidates);
 		s.append("\nbuildRepAOJustInTime:" + buildRepAOJustInTime);
 		s.append("\nonly1CandFromEachCollUser:" + only1CandFromEachCollUser);
+		s.append("\nnumOfCandsFromEachCollUser:" + numOfCandsFromEachCollUser);
 		s.append("\nnoFutureCandInColl:" + onlyPastFromRecommDateInCandInColl);
 
 		s.append("\nfilterTopCands:" + filterTopCands);
