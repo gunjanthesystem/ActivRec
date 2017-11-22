@@ -32,8 +32,8 @@ import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeq;
-import org.activity.recomm.RecommendationMasterMar2017GenSeq;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
+import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
 import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -828,7 +828,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 
 										else
 										{
-											recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeq(
+											recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqNov2017(
 													userTrainingTimelines, userTestTimelines, dateToRecomm,
 													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
 													matchingUnit, caseType, this.lookPastType, false,
