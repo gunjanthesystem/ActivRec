@@ -685,7 +685,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		{
 			if (Constant.hasInvalidActivityNames)
 			{
-				testTimelinesDaywise = TimelineUtils.expungeInvalidsDT(testTimelinesOrig);
+				testTimelinesDaywise = TimelineUtils.expungeInvalidsDayTimelines(testTimelinesOrig);
 				// $$System.out.println("Expunging invalids before recommendation process: expunging test timelines");
 			}
 			else

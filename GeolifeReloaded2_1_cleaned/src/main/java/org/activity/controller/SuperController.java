@@ -16,8 +16,8 @@ public class SuperController
 
 	public static void main(String args[])
 	{
-		String[] commonPaths = { "./dataWritten/Nov16_AKOM3_916U_1cand/" };// {
-																			// "./dataWritten/Nov16_AKOM3_916U_10cand/",
+		String[] commonPaths = { "./dataWritten/Nov20_NCOUNT_916U_50cand_500T/" };// {
+		// "./dataWritten/Nov16_AKOM3_916U_10cand/",
 		// "./dataWritten/Nov16_AKOM3_916U_50cand/",
 		// "./dataWritten/Nov16_AKOM3_916U_100cand/" };
 		// int[] numOfCandsPerUser = { 10, 50, 100 };

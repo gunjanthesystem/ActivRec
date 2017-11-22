@@ -23,7 +23,6 @@ import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
-import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.HJEditDistance;
 import org.activity.io.Serializer;
@@ -2233,148 +2232,6 @@ public class TimelineUtils
 	}
 
 	/**
-	 * Find Candidate timelines, which are the timelines which contain the activity at the recommendation point (current
-	 * Activity). Also, this candidate timeline must contain the activityAtRecomm point at non-last position and there
-	 * is atleast one valid activity after this activityAtRecomm point
-	 * 
-	 * <p>
-	 * converted to a static method on Dec 5 2016
-	 * <p>
-	 * 
-	 * 
-	 * @param dayTimelinesForUser
-	 * @param dateAtRecomm
-	 * @param activityAtRecommPoint
-	 * @return
-	 */
-	public static LinkedHashMap<Date, Timeline> extractDaywiseCandidateTimelines(
-			LinkedHashMap<Date, Timeline> dayTimelinesForUser, // ArrayList<ActivityObject> activitiesGuidingRecomm,
-			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
-	{
-		LinkedHashMap<Date, Timeline> candidateTimelines = new LinkedHashMap<>();
-		int count = 0;
-		int totalNumberOfProbableCands = 0;
-		int numCandsRejectedDueToNoCurrentActivityAtNonLast = 0;
-		int numCandsRejectedDueToNoNextActivity = 0;
-
-		for (Map.Entry<Date, Timeline> dayTimelineEntry : dayTimelinesForUser.entrySet())
-		{
-			totalNumberOfProbableCands += 1;
-			Date dayOfTimeline = dayTimelineEntry.getKey();
-			Timeline dayTimeline = dayTimelineEntry.getValue();
-
-			if (!dayTimeline.isShouldBelongToSingleDay())
-			{
-				// System.err.println(PopUps.getTracedErrorMsg(
-				PopUps.printTracedErrorMsg(
-						"Error in extractDaywiseCandidateTimelines: dayTimeline.isShouldBelongToSingleDay()="
-								+ dayTimeline.isShouldBelongToSingleDay());
-			}
-
-			// start sanity check for countContainsPrimaryDimensionValButNotAsLast()
-			if (VerbosityConstants.checkSanityPDImplementn
-					&& Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
-			{
-				int a = dayTimeline.countContainsActivityNameButNotAsLast(activityAtRecommPoint.getActivityName());
-				int b = dayTimeline
-						.countContainsPrimaryDimensionValButNotAsLast(activityAtRecommPoint.getPrimaryDimensionVal());
-				Sanity.eq(a, b, "\nactivityAtRecommPoint=" + activityAtRecommPoint.toStringAllGowallaTS()
-						+ "\ndayTimeline=" + dayTimeline.getActivityObjectNamesInSequence()
-						+ "\ndayTimeline.countContainsActivityNameButNotAsLast(actAtRecommPoint.getActivityName()) = "
-						+ a
-						+ " != dayTimeline.countContainsPrimaryDimensionValButNotAsLast(actAtRecommPoint.getPrimaryDimensionVal())"
-						+ b);
-			}
-			// end sanity check
-
-			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for
-			// the day to be recommended (this should not be the case because test and training set are diffferent)
-			// and there is atleast one valid activity after this activityAtRecomm point
-			if (dayTimeline
-					.countContainsPrimaryDimensionValButNotAsLast(activityAtRecommPoint.getPrimaryDimensionVal()) > 0)
-			// disabled on 11 Jul'16
-			// if(dayTimeline.countContainsActivityNameButNotAsLast(activityAtRecommPoint.getActivityName()) > 0)
-			// && (entry.getKey().toString().equals(dateAtRecomm.toString())==false))
-			{
-				// if ((Constant.noFutureCandInColl == true)
-				if ((dayOfTimeline.equals(dateAtRecomm)) || (dayOfTimeline.after(dateAtRecomm)))
-				{
-					if (Constant.onlyPastFromRecommDateInCandInColl && (Constant.collaborativeCandidates))
-					{
-						// $ System.out.println("Ignoring:dayOfTimeline=" + dayOfTimeline + " dateAtRecomm =" +
-						// dateAtRecomm
-						// $ + " a prospective candidate timelines is of the same or after the date as the
-						// dateToRecommend.");
-						continue;
-					}
-					else // allowing future cand extraction here be CAREFUL
-					{
-						// TODO:TEMp Disable//$$ System.out.println("Warning in extractDaywiseCandidateTimelines
-						// :dayOfTimeline=" + dayOfTimeline
-						// $$ + " dateAtRecomm =" + dateAtRecomm
-						// $$ + " a prospective candidate timelines is of the same or after the date as the
-						// dateToRecommend. Thus, not using training and test set correctly");
-					}
-				}
-
-				// start sanity check for hasAValidActAfterFirstOccurOfThisPrimaryDimensionVal()
-				if (VerbosityConstants.checkSanityPDImplementn
-						&& Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
-				{
-					boolean a = dayTimeline
-							.hasAValidActAfterFirstOccurOfThisActName(activityAtRecommPoint.getActivityName());
-					boolean b = dayTimeline.hasAValidActAfterFirstOccurOfThisPrimaryDimensionVal(
-							activityAtRecommPoint.getPrimaryDimensionVal());
-					Sanity.eq(a, b,
-							"dayTimeline.hasAValidActAfterFirstOccurOfThisActName(activityAtRecommPoint.getActivityName()) = "
-									+ a
-									+ " != dayTimeline.hasAValidActAfterFirstOccurOfThisPrimaryDimensionVal(actAtRecommPoint.getPrimaryDimensionVal())"
-									+ b);
-				}
-				// end sanity check
-
-				if (dayTimeline.getActivityObjectsInTimeline().size() > 1
-						&& dayTimeline.hasAValidActAfterFirstOccurOfThisPrimaryDimensionVal(
-								activityAtRecommPoint.getPrimaryDimensionVal()))
-				// .hasAValidActAfterFirstOccurOfThisActName(activityAtRecommPoint.getActivityName()))
-				// if (dayTimeline.containsOnlySingleActivity() == false && dayTimeline
-				// .hasAValidActivityAfterFirstOccurrenceOfThisActivity(activityAtRecommPoint) == true)
-				{
-					candidateTimelines.put(dayOfTimeline, dayTimeline);
-					count++;
-				}
-				else
-				{
-					numCandsRejectedDueToNoNextActivity += 1;
-				}
-			}
-			else
-			{
-				numCandsRejectedDueToNoCurrentActivityAtNonLast += 1;
-			}
-		}
-
-		if (VerbosityConstants.verbose || VerbosityConstants.tempVerbose)
-		{
-			System.out.println("Inside extractDaywiseCandidateTimelines:dayTimelinesForUser.size()="
-					+ dayTimelinesForUser.size() + " #cand timelines = " + count
-					+ " numCandsRejectedDueToNoNextActivity =" + numCandsRejectedDueToNoNextActivity
-					+ "  numCandsRejectedDueToNoCurrentActivityAtNonLast ="
-					+ numCandsRejectedDueToNoCurrentActivityAtNonLast);
-		}
-
-		if (VerbosityConstants.printSanityCheck)
-		{
-			if (count == 0)
-			{
-
-				System.err.println("Warning: No DaywiseCandidateTimelines found");
-			}
-		}
-		return candidateTimelines;
-	}
-
-	/**
 	 * Cleaned , expunge all invalid activity objects and rearrange according to user id order in Constant.userID for
 	 * the current dataset </br>
 	 * <font color="red">NOT NEED ANYMORE AS IT HAS BEEN BROKEN DOWN INTO SMALLER SINGLE PURPOSE FUNCTIONS</font>
@@ -2733,7 +2590,7 @@ public class TimelineUtils
 	 * @param usersDayTimelines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Timeline> expungeInvalidsDT(LinkedHashMap<Date, Timeline> usersDayTimelines)
+	public static LinkedHashMap<Date, Timeline> expungeInvalidsDayTimelines(LinkedHashMap<Date, Timeline> usersDayTimelines)
 	{
 		return usersDayTimelines.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(),
 				e -> TimelineUtils.expungeInvalids(e.getValue()), (v1, v2) -> v1, LinkedHashMap<Date, Timeline>::new));
@@ -2745,7 +2602,7 @@ public class TimelineUtils
 	 * @param trainTestTimelinesForAllUsersOrig
 	 * @return
 	 */
-	public static LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> expungeInvalidsDTAllUsers(
+	public static LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> expungeInvalidsDayTimelinesAllUsers(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersOrig)
 	{
 		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers = null;
@@ -2753,8 +2610,8 @@ public class TimelineUtils
 		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> entry : trainTestTimelinesForAllUsersOrig.entrySet())
 		{
 			List<LinkedHashMap<Date, Timeline>> list = new ArrayList<>();
-			list.add(expungeInvalidsDT(entry.getValue().get(0)));// trainingTimelinesForThisUser
-			list.add(expungeInvalidsDT(entry.getValue().get(1)));// testTimelinesForThisUser
+			list.add(expungeInvalidsDayTimelines(entry.getValue().get(0)));// trainingTimelinesForThisUser
+			list.add(expungeInvalidsDayTimelines(entry.getValue().get(1)));// testTimelinesForThisUser
 
 			trainTestTimelinesForAllUsers.put(entry.getKey(), list);
 		}
@@ -3173,7 +3030,7 @@ public class TimelineUtils
 	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
 			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
 	{// ArrayList<ActivityObject> activitiesGuidingRecomm,*/
-		LinkedHashMap<Date, Timeline> candidateTimelines = extractDaywiseCandidateTimelines(trainingTimelines,
+		LinkedHashMap<Date, Timeline> candidateTimelines = TimelineExtractors.extractDaywiseCandidateTimelines(trainingTimelines,
 				dateAtRecomm, activityAtRecommPoint);
 		if (candidateTimelines.size() > 0)
 			return true;

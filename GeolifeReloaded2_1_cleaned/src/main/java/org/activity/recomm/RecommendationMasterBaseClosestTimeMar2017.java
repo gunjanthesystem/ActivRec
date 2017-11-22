@@ -20,6 +20,7 @@ import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
+import org.activity.util.TimelineExtractors;
 import org.activity.util.TimelineUtils;
 
 /**
@@ -143,7 +144,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 		System.out.println("\nActivity at Recomm point =" + this.activityAtRecommPoint.getActivityName());
 
 		// /////IMPORTANT
-		candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines, this.dateAtRecomm,
+		candidateTimelines = TimelineExtractors.extractDaywiseCandidateTimelines(trainingTimelines, this.dateAtRecomm,
 				this.activityAtRecommPoint);// trainingTimelines;
 
 		totalNumberOfProbableCands = candidateTimelines.size();

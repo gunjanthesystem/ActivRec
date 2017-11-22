@@ -28,6 +28,7 @@ import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
+import org.activity.util.TimelineExtractors;
 import org.activity.util.TimelineUtils;
 
 /**
@@ -150,7 +151,7 @@ public class RecommendationMasterDayWise2FasterMar2017 // implements Recommendat
 		System.out.println("\nActivity at Recomm point =" + this.activityAtRecommPoint.getActivityName());
 
 		// All check OK
-		this.candidateTimelines = TimelineUtils.extractDaywiseCandidateTimelines(trainingTimelines, this.dateAtRecomm,
+		this.candidateTimelines = TimelineExtractors.extractDaywiseCandidateTimelines(trainingTimelines, this.dateAtRecomm,
 				this.activityAtRecommPoint);
 
 		System.out.println("Number of candidate timelines =" + candidateTimelines.size());

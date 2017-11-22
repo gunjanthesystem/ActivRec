@@ -41,6 +41,7 @@ import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
+import org.activity.util.TimelineExtractors;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -956,7 +957,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		{
 			if (Constant.hasInvalidActivityNames)
 			{
-				testTimelinesDaywise = TimelineUtils.expungeInvalidsDT(testTimelinesOrig);
+				testTimelinesDaywise = TimelineUtils.expungeInvalidsDayTimelines(testTimelinesOrig);
 				// $$System.out.println("Expunging invalids before recommendation process: expunging test timelines");
 			}
 			else
@@ -1128,9 +1129,9 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		{
 			if (Constant.hasInvalidActivityNames)
 			{
-				trainingTimelinesDaywise = TimelineUtils.expungeInvalidsDT(trainingTimelineOrig);
+				trainingTimelinesDaywise = TimelineUtils.expungeInvalidsDayTimelines(trainingTimelineOrig);
 				trainTestTimelinesForAllUsers = TimelineUtils
-						.expungeInvalidsDTAllUsers(trainTestTimelinesForAllUsersOrig);
+						.expungeInvalidsDayTimelinesAllUsers(trainTestTimelinesForAllUsersOrig);
 				// $$ System.out.println("Expunging invalids before recommendation process: expunging training
 				// timelines");
 			}
@@ -1146,7 +1147,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// || (lookPastType2.equals(Enums.LookPastType.ClosestTime) && Constant.ClosestTimeFilterCandidates))
 		{
 			// Obtain {Date,Timeline}
-			LinkedHashMap<Date, Timeline> candidateTimelinesDate = TimelineUtils
+			LinkedHashMap<Date, Timeline> candidateTimelinesDate = TimelineExtractors
 					.extractDaywiseCandidateTimelines(trainingTimelinesDaywise, dateAtRecomm, activityAtRecommPoint);
 
 			// convert to {Date as String, Timeline} to (LinkedHashMap<String, Timeline>)
@@ -1172,7 +1173,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			else
 			{
 				// Obtain {Date,Timeline}
-				LinkedHashMap<Date, Timeline> candidateTimelinesDate = TimelineUtils.extractDaywiseCandidateTimelines(
+				LinkedHashMap<Date, Timeline> candidateTimelinesDate = TimelineExtractors.extractDaywiseCandidateTimelines(
 						trainingTimelinesDaywise, dateAtRecomm, activityAtRecommPoint);
 
 				// convert to {Date as String, Timeline} to (LinkedHashMap<String, Timeline>)
