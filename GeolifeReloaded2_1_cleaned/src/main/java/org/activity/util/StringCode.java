@@ -985,6 +985,36 @@ public class StringCode
 	 * 
 	 * @param activityObjects
 	 * @return
+	 */
+	public static char[] getCharCodeArrayForAOs(ArrayList<ActivityObject> activityObjects)
+	{
+		char[] code = new char[activityObjects.size()];
+
+		int i = 0;
+		for (ActivityObject ao : activityObjects)
+		{
+			code[i] = (ao.getCharCode());
+			i++;
+		}
+
+		// activityObjects.stream().forEach(ao -> code.append(ao.getStringCode()));
+		String codeS = code.toString();
+
+		if (VerbosityConstants.verbose || VerbosityConstants.verboseSAX)
+		{
+			System.out.print("\tInside getCharCodeArrayForActivityObjects:\n Act Names:");
+			activityObjects.stream().forEach(ao -> System.out.print(ao.getActivityName() + " "));
+			System.out.println("\tCode: " + codeS);
+		}
+		return code;
+	}
+
+	/**
+	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID
+	 * and hence is guaranteed to be unique for at least 400 activities.
+	 * 
+	 * @param activityObjects
+	 * @return
 	 * @since 13 July 2017
 	 */
 	public static ArrayList<String> getStringCodesForActivityObjects(ArrayList<ActivityObject> activityObjects,

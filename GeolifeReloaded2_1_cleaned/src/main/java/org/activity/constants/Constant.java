@@ -163,12 +163,12 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 
 	// AltSeqPredictor IS ONLY USED WHEN lookPastType IS Daywise
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.RNN1;// SWITCH_NOV10
 	public static final int AKOMHighestOrder = 3;// SWITCH_NOV10
 
 	/**
