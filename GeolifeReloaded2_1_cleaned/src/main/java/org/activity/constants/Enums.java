@@ -19,7 +19,7 @@ public class Enums
 
 	public enum AltSeqPredictor
 	{
-		AKOM;
+		AKOM, RNN1;
 	}
 
 	/**

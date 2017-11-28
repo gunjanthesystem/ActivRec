@@ -54,7 +54,7 @@ import org.activity.util.TimelineUtils;
  * @author gunjan
  *
  */
-public class RecommendationTestsMar2017GenSeqCleaned2
+public class RecommendationTestsMar2017GenSeqCleaned3
 {
 	// String typeOfMatching; //"Daywise","
 	double percentageInTraining;// = 0.8;
@@ -117,7 +117,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 	 *            for collaborative approach, all neighbours
 	 */
 	@SuppressWarnings("unused")
-	public RecommendationTestsMar2017GenSeqCleaned2(
+	public RecommendationTestsMar2017GenSeqCleaned3(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines, Enums.LookPastType lookPastType,
 			Enums.CaseType caseType, Enums.TypeOfThreshold[] typeOfThresholds, int[] userIDs,
 			double percentageInTraining, int lengthOfRecommendedSequence,
@@ -1767,7 +1767,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
 				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
 
-				// earlier version was using all possible vals fro PD but now using only those in training data.
+				// earlier version was using all possible vals for PD but now using only those in training data.
 				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
 
 				for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsers

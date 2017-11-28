@@ -815,9 +815,8 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance,
 			EditDistanceMemorizer editDistancesMemorizer)
 	{
-		// {CandID,Trace,EditDist}
-		LinkedHashMap<String, Pair<String, Double>> normalisedDistanceForCandTimelines = null;
-
+		LinkedHashMap<String, Pair<String, Double>> normalisedDistanceForCandTimelines;
+		normalisedDistanceForCandTimelines = null;
 		// {CandID, EndIndexOfLeastDistantSubsequene} //this is relevant for daywise as curr act can occur multiple
 		// times in same cand
 		LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;
@@ -840,7 +839,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		else if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		{
 			normalisedDistanceForCandTimelines = getNormalisedDistancesForCandidateTimelinesFullCand(candidateTimelines,
-					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), ("" + timeAtRecomm),
 					distanceUsed, hjEditDistance, featureWiseEditDistance, featureWiseWeightedEditDistance,
 					OTMDSAMEditDistance, editDistancesMemorizer);
 
@@ -850,7 +849,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1));
 
 			endIndexSubseqConsideredInCand = candidateTimelines.entrySet().stream()
-					.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1, (v1, v2) -> v1,
+					.collect(Collectors.toMap(e -> e.getKey(), λ -> λ.getValue().size() - 1, (v1, v2) -> v1,
 							LinkedHashMap<String, Integer>::new));
 		}
 		///
@@ -858,10 +857,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		{
 			LinkedHashMap<String, Pair<String, Double>> candEditDistances = new LinkedHashMap<>();
 			for (String candID : candidateTimelines.keySet())
-			{
-				candEditDistances.put(candID, new Pair<>("", Double.valueOf(0)));// assigning dist of 0 so, sim score
-																					// will be 1.
-			}
+				candEditDistances.put(candID, new Pair<>("", Double.valueOf(0)));
 			normalisedDistanceForCandTimelines = candEditDistances;
 
 			// for SeqNCount and SeqNHours approach, tne end point index considered in the candidate is the last
