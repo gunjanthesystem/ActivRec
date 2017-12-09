@@ -27,7 +27,6 @@ import org.activity.objects.Triple;
 import org.activity.spmf.SeqPredictor;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
-import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
@@ -157,6 +156,9 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param userAtRecomm
 	 * @param thresholdVal
 	 * @param typeOfThreshold
+	 * @param matchingUnitInCountsOrHours
+	 * @param caseType
+	 * @param lookPastType
 	 * @param dummy
 	 * @param actObjsToAddToCurrentTimeline
 	 * @param trainTestTimelinesForAllUsers
@@ -164,18 +166,17 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 */
 	public RecommendationMasterMar2017AltAlgoSeqNov2017(LinkedHashMap<Date, Timeline> trainingTimelines,
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
-			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold,
-			/*
-			 * double matchingUnitInCountsOrHours, *Enums.CaseType caseType
-			 */ Enums.LookPastType lookPastType, boolean dummy, ArrayList<ActivityObject> actObjsToAddToCurrentTimeline,
+			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold, double matchingUnitInCountsOrHours,
+			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
+			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
 	{
 		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
 		try
 		{
-			System.out.println(
-					"\n-----------Starting RecommendationMasterMar2017AltAlgoSeq " + lookPastType + "-------------");
+			System.out.println("\n-----------Starting RecommendationMasterMar2017AltAlgoSeqNov2017 " + lookPastType
+					+ "-------------");
 
 			String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 			long recommMasterT0 = System.currentTimeMillis();
@@ -185,14 +186,14 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			this.lookPastType = lookPastType;
 			// this.caseType = caseType;
 
-			// if (!lookPastType.equals(LookPastType.Daywise) && !lookPastType.equals(LookPastType.ClosestTime))
-			// {
-			// this.matchingUnitInCountsOrHours = matchingUnitInCountsOrHours;
-			// }
-			// else if (lookPastType.equals(LookPastType.NGram))
-			// {
-			// this.matchingUnitInCountsOrHours = 0;
-			// }
+			if (!lookPastType.equals(LookPastType.Daywise) && !lookPastType.equals(LookPastType.ClosestTime))
+			{
+				this.matchingUnitInCountsOrHours = matchingUnitInCountsOrHours;
+			}
+			else if (lookPastType.equals(LookPastType.NGram))
+			{
+				this.matchingUnitInCountsOrHours = 0;
+			}
 
 			errorExists = false;
 
@@ -254,10 +255,6 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				if (primaryDimensionValAtRecommPoint.equals(actObjsToAddToCurrentTimeline
 						.get(actObjsToAddToCurrentTimeline.size() - 1).getPrimaryDimensionVal()) == false)
 				{
-					// System.err.println("Error act name of actAtRecommPoint and last act in acts to add do not match:
-					// activityNameAtRecommPoint= " + activityNameAtRecommPoint + " last act in acts to add = "
-					// + actObjsToAddToCurrentTimeline.get(actObjsToAddToCurrentTimeline.size() - 1)
-					// .getActivityName());
 					System.err.println(
 							"Error primary dimension vals of actAtRecommPoint and last act in acts to add do not match: primaryDimensionValAtRecommPoint= "
 									+ primaryDimensionValAtRecommPoint + " last act in acts to add = "
@@ -266,24 +263,32 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				}
 			}
 			// sanity check end
-			// //////////////////////////
-			long recommMasterT1 = System.currentTimeMillis();
 
+			/////////////////////////////
+			long recommMasterT1 = System.currentTimeMillis();
+			// System.out.println("mu in master= " + matchingUnitInCountsOrHours);
 			this.candidateTimelines = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines, lookPastType,
 					this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm, matchingUnitInCountsOrHours,
 					this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers, trainTimelinesAllUsersContinuous);
 
 			// if (VerbosityConstants.verbose)
 			{
-				System.out.println("Inside recomm master :trainTestTimelinesForAllUsers.size()= "
+				String s1 = "Inside recomm master :trainTestTimelinesForAllUsers.size()= "
 						+ trainTestTimelinesForAllUsers.size() + " trainTimelinesAllUsersContinuous.size()="
-						+ trainTimelinesAllUsersContinuous.size() + "candidateTimelines.size()= "
-						+ candidateTimelines.size());
+						+ trainTimelinesAllUsersContinuous.size() + "candTimelines.size()= "
+						+ candidateTimelines.size();
+				System.out.println(s1);
 			}
 
-			long recommMasterT2 = System.currentTimeMillis();
-			long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
+			// if (true)
+			// {
+			// StringBuilder sb = new StringBuilder("Candidate timelines:\n");
+			// candidateTimelines.entrySet().stream()
+			// .forEachOrdered(e -> sb.append(e.getValue().getActivityObjectNamesInSequence() + "\n"));
+			// System.out.println("-----------");
+			// }
 
+			long recommMasterT2 = System.currentTimeMillis();
 			candUserIDs = extractCandUserIDs(candidateTimelines);
 			// ///////////////////////////
 			if (VerbosityConstants.verbose)
@@ -306,6 +311,13 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				// getActivityObjectNamesInSequence()));
 			}
 
+			// Start of curtain Dec 6
+			// int lengthOfLongestCand = candidateTimelines.entrySet().parallelStream().mapToInt(e ->
+			// e.getValue().size()) .max().getAsInt(); int maxLength = 0;
+			// for (Timeline t : candidateTimelines.values())
+			// { if (t.size() > maxLength) { maxLength = t.size(); } }
+			// End of curtain Dec 6
+
 			if (candidateTimelines.size() == 0)
 			{
 				System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
@@ -317,8 +329,32 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				this.thresholdPruningNoEffect = true;
 				return;
 			}
+			// Curtain Dec 6 start
+			// else if (lengthOfLongestCand < Constant.AKOMHighestOrder)
+			// {
+			// System.out.println(
+			// "Warning JUJU: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
+			// + " at time:" + timeAtRecomm + " because lengthOfLongestCand " + lengthOfLongestCand
+			// + "< Constant.AKOMHighestOrder" + Constant.AKOMHighestOrder + "\nmaxLength=" + maxLength
+			// + " matchingUnitInCountsOrHours =" + this.matchingUnitInCountsOrHours);
+			// // this.singleNextRecommendedActivity = null;
+			// for (Timeline t : candidateTimelines.values())
+			// {
+			// System.out.print("\tlength of cand = " + t.size());
+			//
+			// }
+			// // System.exit(0);
+			//
+			// this.hasCandidateTimelines = false;
+			// // this.topNextActivities =null;
+			// this.nextActivityObjectsFromCands = null;
+			// this.thresholdPruningNoEffect = true;
+			// return;
+			// }
+			// Curtain Dec 6 end
 			else
 			{
+				// System.out.println("Eureka");
 				this.hasCandidateTimelines = true;
 			}
 			// System.out.println("\nDebug note192_223: getActivityNamesGuidingRecommwithTimestamps() " +
@@ -330,8 +366,9 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			// was
 			// after thresholding (correct), here
 			// normalisation is before thresholding which should be changed
-			long recommMasterT3 = System.currentTimeMillis();
-			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes = null;
+			// long recommMasterT3 = System.currentTimeMillis();
+			// Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>
+			// normalisedDistFromCandsRes = null;
 			// Curtain not relevant 1 start
 			// = getNormalisedDistancesForCandidateTimelines(
 			// candidateTimelines, activitiesGuidingRecomm, caseType, this.userIDAtRecomm, this.dateAtRecomm,
@@ -341,13 +378,13 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			// Curtain not relevant 1 end
 			// editDistancesMemorizer.serialise(this.userIDAtRecomm);
 
-			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted = null;
+			// LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted = null;
 			// curtain not relevant: normalisedDistFromCandsRes.getFirst();
 			this.endPointIndicesConsideredInCands = null;// curtain not
 															// relevant:normalisedDistFromCandsRes.getSecond();
 
-			long recommMasterT4 = System.currentTimeMillis();
-			long timeTakenToComputeNormEditDistances = recommMasterT4 - recommMasterT3;
+			// long recommMasterT4 = System.currentTimeMillis();
+			// long timeTakenToComputeNormEditDistances = recommMasterT4 - recommMasterT3;
 
 			// System.out.println("\nDebug note192_229: getActivityNamesGuidingRecommwithTimestamps() " +
 			// getActivityNamesGuidingRecommwithTimestamps() +" size of current timeline=" +
@@ -614,27 +651,39 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 		LinkedHashMap<String, Double> res = new LinkedHashMap<>();
 
-		// System.out.println("Current timeline:");
-		// Convert current timeline to a seq of integers
-		ArrayList<Integer> currSeq = TimelineTransformers.timelineToSeqOfActIDs(activitiesGuidingRecomm, false);
-
-		// Convert cand timeline to a list of seq of integers
-		ArrayList<ArrayList<Integer>> candTimelinesAsSeq = new ArrayList<>();
-
-		// System.out.println("Cand timelines:");
-		for (Entry<String, Timeline> candT : candidateTimelines.entrySet())
+		if (lookPastType.equals(Enums.LookPastType.Daywise) || lookPastType.equals(Enums.LookPastType.NCount))
 		{
-			candTimelinesAsSeq.add(
-					TimelineTransformers.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
-		}
+			// System.out.println("Current timeline:");
+			// Convert current timeline to a seq of integers
+			ArrayList<Integer> currSeq = TimelineTransformers.timelineToSeqOfActIDs(activitiesGuidingRecomm, false);
 
-		// System.out.println("predictedNextSymbol = ");
-		// TimelineTransformers.timelineToSeqOfActIDs(timeline, delimiter)
-		if (lookPastType.equals(Enums.LookPastType.Daywise))
-		{
+			// if NCount mathching, then the next activity should be included in the training seq
+			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended = candidateTimelines;
 
-			SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, verbose);
-			int predSymbol = p.AKOMSeqPredictor(highestOrder, verbose);
+			// Start of Added on 3 Dec 2017
+			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+			{
+				TimelineWithNext t = (TimelineWithNext) candT.getValue();
+				t.appendAO(t.getNextActivityObject());
+			}
+			// End of Added on 3 Dec 2017
+
+			// Convert cand timeline to a list of seq of integers
+			ArrayList<ArrayList<Integer>> candTimelinesAsSeq = new ArrayList<>();
+
+			// System.out.println("Cand timelines:");
+
+			// System.out.println("predictedNextSymbol = ");
+			// TimelineTransformers.timelineToSeqOfActIDs(timeline, delimiter)
+
+			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+			{
+				candTimelinesAsSeq.add(TimelineTransformers
+						.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
+			}
+
+			SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, false);// verbose);
+			int predSymbol = p.AKOMSeqPredictor(highestOrder, false);// verbose);
 
 			// System.out.println("predictedNextSymbol = " +
 			// SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
@@ -645,23 +694,6 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			return res;
 			// return createRankedTopRecommendedActivityNamesClosestTime(distancesSortedMap);
 		}
-		// else if ((lookPastType.equals(Enums.LookPastType.Daywise)) ||
-		// (lookPastType.equals(Enums.LookPastType.NHours))
-		// || (lookPastType.equals(Enums.LookPastType.NCount)) || (lookPastType.equals(Enums.LookPastType.NGram)))
-		// {
-		// switch (caseType)
-		// {
-		// case SimpleV3:
-		// // createRankedTopRecommendedPDValsSimpleV3_3
-		// return createRankedTopRecommendedPDValsSimpleV3_3(nextActivityObjectsFromCands);
-		// case CaseBasedV1:
-		// return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
-		// similarityOfEndPointActObjCands);
-		// default:
-		// System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised case type = " + caseType));
-		// return null;
-		// }
-		// }
 		else
 		{
 			System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookpast type = " + lookPastType));
@@ -756,7 +788,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		{
 			// System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
 			// PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
-			if (!Constant.useThreshold)
+			if (!Constant.useiiWASThreshold)
 			{
 				System.err.println("Error: threshold pruning is happening.");// +msg);
 			}
@@ -943,8 +975,6 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	// }
 	// // return topRankedString;
 	// }
-
-	
 
 	// /////////////////////////////////////////////////////////////////////
 	// /**

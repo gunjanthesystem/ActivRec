@@ -5,6 +5,7 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -838,25 +839,21 @@ public class DistanceUtils
 		// // System.out.println(sbTemp1.toString());
 		// End Sanity check
 		System.out.println("before filter candEditDistances.size():" + candEditDistances.size());
-		if (Constant.filterTopCands > 0)
+		// System.out.println("Constant.typeOfCandThreshold= " + Constant.typeOfCandThreshold);
+		// System.out.println("Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour)= "
+		// + Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour));
+		if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour))
+		{// Constant.nearestNeighbourThreshold > 0)
+			candEditDistances = filterCandsNearestNeighbours(candEditDistances,
+					Constant.nearestNeighbourCandEDThreshold);
+		}
+		else if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.Percentile))
 		{
-			System.out.print("... filtering");
-			LinkedHashMap<String, Pair<String, Double>> candEditDistancesSorted = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
-					.sortByValueAscendingStrStrDoub(candEditDistances);
-
-			LinkedHashMap<String, Pair<String, Double>> candEditDistancesSortedFiltered = new LinkedHashMap<>();
-
-			int c = 0;
-			for (Entry<String, Pair<String, Double>> candEntry : candEditDistancesSorted.entrySet())
-			{
-				c++;
-				if (c > Constant.filterTopCands)
-				{
-					break;
-				}
-				candEditDistancesSortedFiltered.put(candEntry.getKey(), candEntry.getValue());
-			}
-			candEditDistances = candEditDistancesSortedFiltered;
+			// if (Constant.percentileCandEDThreshold != 100)// Not NO Threshold
+			candEditDistances = filterCandsPercentileED(candEditDistances, Constant.percentileCandEDThreshold);
+		}
+		else if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.None))
+		{
 		}
 
 		System.out.println("after filter candEditDistances.size():" + candEditDistances.size());
@@ -864,6 +861,79 @@ public class DistanceUtils
 				candEditDistances, userAtRecomm, dateAtRecomm, timeAtRecomm);
 
 		return normalisedCandEditDistances;
+	}
+
+	/**
+	 * Keep only the top nearestNeighbourThreshold number of candidates by lower edit distance
+	 * 
+	 * @param candEditDistances
+	 * @param nearestNeighbourThreshold
+	 * @return
+	 */
+	private static LinkedHashMap<String, Pair<String, Double>> filterCandsNearestNeighbours(
+			LinkedHashMap<String, Pair<String, Double>> candEditDistances, int nearestNeighbourThreshold)
+	{
+		System.out.print("... filtering CandsNearestNeighbours");
+		LinkedHashMap<String, Pair<String, Double>> candEditDistancesSorted = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
+				.sortByValueAscendingStrStrDoub(candEditDistances);
+
+		LinkedHashMap<String, Pair<String, Double>> candEditDistancesSortedFiltered = new LinkedHashMap<>();
+
+		int c = 0;
+		for (Entry<String, Pair<String, Double>> candEntry : candEditDistancesSorted.entrySet())
+		{
+			c++;
+			if (c > nearestNeighbourThreshold)
+			{
+				break;
+			}
+			String s1 = candEntry.getKey();
+			candEditDistancesSortedFiltered.put(s1, candEntry.getValue());
+		}
+		return candEditDistancesSortedFiltered;
+	}
+
+	/**
+	 * Keep only the top nearestNeighbourThreshold qualtil of candidates by lower edit distance
+	 * 
+	 * @param candEditDistances
+	 * @param percentileCandEDThreshold
+	 *            range 0-100
+	 * @return
+	 */
+	private static LinkedHashMap<String, Pair<String, Double>> filterCandsPercentileED(
+			LinkedHashMap<String, Pair<String, Double>> candEditDistances, double percentileCandEDThreshold)
+	{
+
+		LinkedHashMap<String, Pair<String, Double>> candEditDistancesFiltered = new LinkedHashMap<>();
+
+		List<Double> listOfEditDistances = candEditDistances.entrySet().stream().map(e -> e.getValue().getSecond())
+				.collect(Collectors.toList());
+
+		double percentileVal = StatsUtils.getPercentile(listOfEditDistances, percentileCandEDThreshold);
+
+		for (Entry<String, Pair<String, Double>> candEntry : candEditDistances.entrySet())
+		{
+			if (candEntry.getValue().getSecond() <= percentileVal)
+			{
+				candEditDistancesFiltered.put(candEntry.getKey(), candEntry.getValue());
+			}
+		}
+
+		if (VerbosityConstants.tempVerbose)
+		{
+			System.out.print("... filtering CandsPercentileED");
+			StringBuilder sb = new StringBuilder();
+			sb.append("\nlistOfEditDistances = " + listOfEditDistances + "\npercentileVal=" + percentileVal
+					+ "\nBefore Filter candEditDistances:\n");
+			candEditDistances.entrySet().stream().forEachOrdered(
+					e -> sb.append("\t" + e.getKey() + "-" + e.getValue().getSecond().toString() + "\n"));
+			sb.append("\n candEditDistancesFiltered:\n");
+			candEditDistancesFiltered.entrySet().stream().forEachOrdered(
+					e -> sb.append("\t" + e.getKey() + "-" + e.getValue().getSecond().toString() + "\n"));
+			System.out.println(sb.toString());
+		}
+		return candEditDistancesFiltered;
 	}
 
 	/**

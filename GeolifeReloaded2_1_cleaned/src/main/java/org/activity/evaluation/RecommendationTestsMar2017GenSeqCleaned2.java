@@ -1999,7 +1999,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		{
 			String dirToCreate;
-			if (Constant.useThreshold)
+			if (Constant.useiiWASThreshold)
 			{
 				dirToCreate = outputCoreResultsPath + thresholdVal + "/MatchingUnit" + String.valueOf(matchingUnit);
 				WritingToFile.createDirectory(outputCoreResultsPath + thresholdVal);

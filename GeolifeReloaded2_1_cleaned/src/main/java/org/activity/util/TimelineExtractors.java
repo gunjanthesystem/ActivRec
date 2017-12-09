@@ -466,6 +466,8 @@ public class TimelineExtractors
 	}
 
 	/**
+	 * TODO: check and safely supercede extractCandidateTimelines() with this. ONly change seems to be in Daywise
+	 * collaborative approach
 	 * 
 	 * @param trainingTimelineOrig
 	 * @param lookPastType
@@ -488,8 +490,9 @@ public class TimelineExtractors
 		LinkedHashMap<Date, Timeline> trainingTimelinesDaywise = trainingTimelineOrig;
 		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers = trainTestTimelinesForAllUsersOrig;
 
-		// System.out.println("Inside extractCandidateTimelines :trainTestTimelinesForAllUsers.size()= "
-		// + trainTestTimelinesForAllUsers.size());
+		// StringBuilder sb = new StringBuilder(
+		// "Inside extractCandidateTimelinesV2 :trainTestTimelinesForAllUsers.size()= "
+		// + trainTestTimelinesForAllUsers.size() + "\n");
 
 		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 		{
@@ -498,8 +501,7 @@ public class TimelineExtractors
 				trainingTimelinesDaywise = TimelineUtils.expungeInvalidsDayTimelines(trainingTimelineOrig);
 				trainTestTimelinesForAllUsers = TimelineUtils
 						.expungeInvalidsDayTimelinesAllUsers(trainTestTimelinesForAllUsersOrig);
-				// $$ System.out.println("Expunging invalids before recommendation process: expunging training
-				// timelines");
+				// sb.append("Expunging invalids before recommendation process: expunging training timelines");
 			}
 			else
 			{
@@ -511,8 +513,11 @@ public class TimelineExtractors
 		// //////////////////
 		if (lookPastType.equals(Enums.LookPastType.Daywise))
 		{
+
 			if (Constant.collaborativeCandidates)
 			{
+				// sb.append("For Daywise: collaborative\n");
+
 				LinkedHashMap<String, Timeline> dwCandidateTimelines = new LinkedHashMap<>();
 
 				for (Entry<String, List<LinkedHashMap<Date, Timeline>>> entryForAUser : trainTestTimelinesForAllUsers
@@ -565,24 +570,20 @@ public class TimelineExtractors
 										+ mostRecentNonFutureDateInCands.toString() + " dateAtRecomm= " + dateAtRecomm);
 							}
 
-							dwCandidateTimelines.put(mostRecentNonFutureDateInCands.toString(),
+							dwCandidateTimelines.put(mostRecentNonFutureDateInCands + "",
 									candidateTimelinesDate.get(mostRecentNonFutureDateInCands));
 						}
-						else if (Constant.numOfCandsFromEachCollUser > 0)
+						else if (Constant.numOfCandsFromEachCollUser > 0)// Daywise
 						{
-							int skipLength = 0;
-							if (candidateTimelinesDate.size() - Constant.numOfCandsFromEachCollUser > 0)
-							{
-								skipLength = candidateTimelinesDate.size() - Constant.numOfCandsFromEachCollUser;
-							}
-
 							// select only the most recent numOfCandsFromEachCollUser candidates.
 							List<Date> mostRecentReqDates = candidateTimelinesDate.keySet().stream().sorted()
-									.skip(skipLength).collect(Collectors.toList());
+									.skip(candidateTimelinesDate.size() - Constant.numOfCandsFromEachCollUser <= 0 ? 0
+											: candidateTimelinesDate.size() - Constant.numOfCandsFromEachCollUser)
+									.collect(Collectors.toList());
 
 							Map<String, Timeline> x = new LinkedHashMap<>();
 							mostRecentReqDates.stream()
-									.forEachOrdered(e -> x.put(e.toString(), candidateTimelinesDate.get(e)));
+									.forEachOrdered(λ -> x.put(λ + "", candidateTimelinesDate.get(λ)));
 
 							// Map<String, Timeline> x = (candidateTimelinesDate.entrySet().stream().sorted()
 							// .skip(candidateTimelinesDate.size() - Constant.numOfCandsFromEachCollUser)
@@ -602,7 +603,7 @@ public class TimelineExtractors
 										+ "\n");
 								x.entrySet().stream()
 										.forEachOrdered(e -> sb1.append(e.getKey() + "-" + e.getValue() + "\n"));
-								System.out.println(sb1.toString());
+								System.out.println(sb1 + "");
 							}
 							//
 							dwCandidateTimelines.putAll(x);
@@ -628,6 +629,7 @@ public class TimelineExtractors
 
 			else
 			{
+				// sb.append("For Daywise: Non collaborative\n");
 				// Obtain {Date,Timeline}
 				LinkedHashMap<Date, Timeline> candidateTimelinesDate = TimelineExtractors
 						.extractDaywiseCandidateTimelines(trainingTimelinesDaywise, dateAtRecomm,
@@ -697,12 +699,15 @@ public class TimelineExtractors
 
 			if (Constant.collaborativeCandidates)
 			{
+				// sb.append("For NCount NHours: collaborative\n");
+
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
 						trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType, activityAtRecommPoint,
 						userIDAtRecomm, trainTimelinesAllUsersContinuous);
 			}
 			else
 			{
+				// sb.append("For NCount NHours: Non collaborative\n");
 				// converting day timelines into continuous timelines suitable to be used for matching unit views
 				Timeline trainingTimeline = TimelineUtils.dayTimelinesToATimeline(trainingTimelinesDaywise, false,
 						true);
@@ -724,12 +729,14 @@ public class TimelineExtractors
 
 			if (Constant.collaborativeCandidates)
 			{
+				// sb.append("For NGram: collaborative\n");
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
 						trainTestTimelinesForAllUsers, 0, lookPastType, activityAtRecommPoint, userIDAtRecomm,
 						trainTimelinesAllUsersContinuous);
 			}
 			else
 			{
+				// sb.append("For NGram: Non collaborative\n");
 				PopUps.printTracedErrorMsgWithExit(
 						"Error: not implemented for this case here, instead look at the dedicated Recomm test for NGram.");
 			}
@@ -751,6 +758,11 @@ public class TimelineExtractors
 			System.out.println(PopUps.getCurrentStackTracedWarningMsg("Warning: candidate timeline is empty"));
 			// this.errorExists = true;
 		}
+
+		// if (VerbosityConstants.tempVerbose)
+		// {
+		// System.out.println(sb.toString());
+		// }
 		return candidateTimelines;
 	}
 
@@ -984,9 +996,9 @@ public class TimelineExtractors
 		// + ((t2 - tS) * 1.0) / numOfAOsCompared + "ns");
 
 		System.out.println("trainTimelinesAllUsersContinuous.size() = " + trainTimelinesAllUsersContinuous.size()
-				+ "\ncandidateTimelines.size() = " + candidateTimelines.size()
-				+ "\nnumUsersRejectedDueToNoValidCands = " + numUsersRejectedDueToNoValidCands
-				+ "\nnumCandsRejectedDueToNoValidNextActivity=" + numCandsRejectedDueToNoValidNextActivity);
+				+ "\tcandidateTimelines.size() = " + candidateTimelines.size()
+				+ "\tnumUsersRejectedDueToNoValidCands = " + numUsersRejectedDueToNoValidCands
+				+ "\tnumCandsRejectedDueToNoValidNextActivity=" + numCandsRejectedDueToNoValidNextActivity);
 
 		if (Constant.only1CandFromEachCollUser)
 		{
@@ -1121,7 +1133,7 @@ public class TimelineExtractors
 			}
 		}
 
-		if (VerbosityConstants.verbose || VerbosityConstants.tempVerbose)
+		if (VerbosityConstants.verbose)// || VerbosityConstants.tempVerbose)
 		{
 			System.out.println("Inside extractDaywiseCandidateTimelines:dayTimelinesForUser.size()="
 					+ dayTimelinesForUser.size() + " #cand timelines = " + count
@@ -1191,7 +1203,7 @@ public class TimelineExtractors
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
 	{
 		System.out.println("Inside extractCandidateTimelinesMUColl :trainTestTimelinesForAllUsers.size()= "
-				+ trainTestTimelinesForAllUsers.size());
+				+ trainTestTimelinesForAllUsers.size() + "mu=" + matchingUnit);
 
 		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NGram))// IgnoreCase("Count"))
 		{
@@ -1378,7 +1390,8 @@ public class TimelineExtractors
 		LinkedHashMap<String, TimelineWithNext> candidateTimelines = new LinkedHashMap<>();
 		// long tS = System.nanoTime();
 
-		// System.out.println("\nInside extractCandidateTimelinesMUCountColl(): userIDAtRecomm=" + userIDAtRecomm);//
+		System.out.println("\nInside extractCandidateTimelinesMUCountColl(): userIDAtRecomm=" + userIDAtRecomm + "mu = "
+				+ matchingUnitInCounts);//
 		// for creating timelines");
 		// System.out.println("Inside extractCandidateTimelinesMUCountColl :trainTestTimelinesForAllUsers.size()= "
 		// + trainTestTimelinesForAllUsers.size());
@@ -1409,9 +1422,8 @@ public class TimelineExtractors
 				// System.out.println("Num of activity objects in training timeline=" +
 				// activityObjectsInTraining.size());
 
-				// $$System.out.println("Current activity (activityAtRecommPoint)=" +
-				// this.activityAtRecommPoint.getActivityName());
-
+				// System.out
+				// .println("Current activity (activityAtRecommPoint)=" + activityAtRecommPoint.getActivityName());
 				// System.out.println("cand:" + trainingTimelineForThisUser.getPrimaryDimensionValsInSequence());
 
 				// long t1 = System.currentTimeMillis();
@@ -1448,18 +1460,20 @@ public class TimelineExtractors
 								? (newCandEndIndex - matchingUnitInCounts)
 								: 0;
 
-						// System.out.println("\n\tStart index of candidate timeline=" + newCandStartIndex);
-						// System.out.println("\tEnd index of candidate timeline=" + newCandEndIndex);
+						// $$System.out.println("\n\tStart index of candidate timeline=" + newCandStartIndex);
+						// $$System.out.println("\tEnd index of candidate timeline=" + newCandEndIndex);
+						// System.out.println("\tmatchingUnitInCounts=" + matchingUnitInCounts);
+						// System.out.println( "\tnewCandEndIndex - matchingUnitInCounts=" + (newCandEndIndex -
+						// matchingUnitInCounts));
 
 						ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimelineForThisUser
 								.getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandEndIndex + 1);
-						// getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp);
-						ActivityObject nextValidActivityForCandidate = trainingTimelineForThisUser
+						ActivityObject nextValidActivityForCandidate;
+						nextValidActivityForCandidate = trainingTimelineForThisUser
 								.getNextValidActivityAfterActivityAtThisPositionPD(newCandEndIndex);
-
 						if (nextValidActivityForCandidate == null)
 						{
-							numCandsRejectedDueToNoValidNextActivity += 1;
+							numCandsRejectedDueToNoValidNextActivity = numCandsRejectedDueToNoValidNextActivity + 1;
 							System.out.println("\tThis candidate rejected due to no next valid activity object;");
 							// if (i == 0)// this was first activity of the timeline
 							// { System.out.println("\tThis iser rejected due to no next valid cand");
@@ -1518,7 +1532,8 @@ public class TimelineExtractors
 					(candidateTimelines.size() + numUsersRejectedDueToNoValidCands),
 					"trainTestTimelinesForAllUsers.size()!= (candidateTimelines.size() + numUsersRejectedDueToNoValidCands)");
 		}
-		// System.out.println("\n Exiting extractCandidateTimelinesMUCountColl(): userIDAtRecomm=" + userIDAtRecomm);//
+		// $$System.out.println("\n Exiting extractCandidateTimelinesMUCountColl(): userIDAtRecomm=" +
+		// userIDAtRecomm);//
 		// for
 		return candidateTimelines;
 	}

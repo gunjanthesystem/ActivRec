@@ -422,7 +422,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			// ########Sanity check
 			if (distancesMapUnsorted.size() != candidateTimelines.size())
 			{
-				if (Constant.filterTopCands > 0) // not expected when filtering is to be done
+				if (Constant.nearestNeighbourCandEDThreshold > 0) // not expected when filtering is to be done
 				{
 					System.out.println("Alert: editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
 							+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")");
@@ -451,7 +451,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry
 			// for such candidate timelines from the distance scores map. // no pruning for baseline closest ST
-			if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == true)
+			if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useiiWASThreshold == true)
 			{// changed from "Constant.useThreshold ==false)" on May 10 but should not affect result since we were not
 				// doing thresholding anyway
 				Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
@@ -475,7 +475,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 
 			// Is this sorting necessary?
 			// Disabling on Aug 3
-			if (Constant.filterTopCands <= 0) // because otherwise already sorted while filtering
+			if (Constant.nearestNeighbourCandEDThreshold <= 0) // because otherwise already sorted while filtering
 			{
 				distancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
 						.sortByValueAscendingStrStrDoub(distancesMapUnsorted);
@@ -513,7 +513,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 				// this will not be true when thresholding
 				if (this.thresholdPruningNoEffect)
 				{
-					if (Constant.filterTopCands <= 0) // this sanity check is only valid when not filtering cands
+					if (Constant.nearestNeighbourCandEDThreshold <= 0) // this sanity check is only valid when not filtering cands
 					{
 						if (!Sanity.eq(distancesSortedMap.size(), this.candidateTimelines.size(),
 								"Error at Sanity 349 (RecommenderMaster: editDistancesSortedMapFullCand.size()== this.candidateTimelines.size()  not satisfied"))
@@ -722,7 +722,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		{
 			// System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
 			// PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
-			if (!Constant.useThreshold)
+			if (!Constant.useiiWASThreshold)
 			{
 				System.err.println("Error: threshold pruning is happening.");// +msg);
 			}
@@ -2862,7 +2862,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 		// // System.out.println(sbTemp1.toString());
 		// End Sanity check
 		System.out.println("before filter candEditDistances.size():" + candEditDistances.size());
-		if (Constant.filterTopCands > 0)
+		if (Constant.nearestNeighbourCandEDThreshold > 0)
 		{
 			System.out.print("... filtering");
 			LinkedHashMap<String, Pair<String, Double>> candEditDistancesSorted = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
@@ -2874,7 +2874,7 @@ public class RecommendationMasterMar2017GenSeq implements RecommendationMasterI/
 			for (Entry<String, Pair<String, Double>> candEntry : candEditDistancesSorted.entrySet())
 			{
 				c++;
-				if (c > Constant.filterTopCands)
+				if (c > Constant.nearestNeighbourCandEDThreshold)
 				{
 					break;
 				}

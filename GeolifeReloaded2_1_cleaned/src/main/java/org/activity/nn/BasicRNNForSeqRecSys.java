@@ -36,10 +36,10 @@ public class BasicRNNForSeqRecSys
 	// private static final char[] LEARNSTRING = "*Der Cottbuser Postkutscher putzt den Cottbuser Postkutschkasten."
 	// .toCharArray();
 
-	private char[] LEARNSTRING;
+	private char[] trainString;
 	private char[] testString;
 	// a list of all possible characters
-	private final List<Character> LEARNSTRING_CHARS_LIST = new ArrayList<>();
+	private final List<Character> trainStringCharsList = new ArrayList<>();
 
 	// RNN dimensions
 	private int HIDDEN_LAYER_WIDTH = 50;
@@ -83,7 +83,7 @@ public class BasicRNNForSeqRecSys
 	{
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sb2 = new StringBuilder();
-		INDArray testInit = prepareTestInitDataset(testString, LEARNSTRING_CHARS_LIST, verbose);
+		INDArray testInit = prepareTestInitDataset(testString, trainStringCharsList, verbose);
 
 		// clear current stance from the last example
 		net.rnnClearPreviousState();
@@ -101,11 +101,11 @@ public class BasicRNNForSeqRecSys
 		{
 			int sampledCharacterIdx = Nd4j.getExecutioner().exec(new IMax(output), 1).getInt(0);
 			// print the chosen output
-			sb.append("\n\n-- prediction@Step" + (i + 1) + "=" + LEARNSTRING_CHARS_LIST.get(sampledCharacterIdx));
-			sb2.append("\n\n-- prediction@Step" + (i + 1) + "=" + LEARNSTRING_CHARS_LIST.get(sampledCharacterIdx));
+			sb.append("\n\n-- prediction@Step" + (i + 1) + "=" + trainStringCharsList.get(sampledCharacterIdx));
+			sb2.append("\n\n-- prediction@Step" + (i + 1) + "=" + trainStringCharsList.get(sampledCharacterIdx));
 
 			// use the last output as input
-			INDArray nextInput = Nd4j.zeros(LEARNSTRING_CHARS_LIST.size());
+			INDArray nextInput = Nd4j.zeros(trainStringCharsList.size());
 			nextInput.putScalar(sampledCharacterIdx, 1);
 
 			output = net.rnnTimeStep(nextInput);
@@ -124,47 +124,50 @@ public class BasicRNNForSeqRecSys
 	}
 
 	/**
-	 *
+	 * Creates an instance and sets numOfNeuronsInHiddenLayer and numOfHiddenLayers
+	 * 
 	 * @param numOfNeuronsInHiddenLayer
 	 * @param numOfHiddenLayers
 	 */
 	public BasicRNNForSeqRecSys(int numOfNeuronsInHiddenLayer, int numOfHiddenLayers)
 	{
-		super();
-
 		HIDDEN_LAYER_WIDTH = numOfNeuronsInHiddenLayer;
 		HIDDEN_LAYER_CONT = numOfHiddenLayers;
 	}
 
 	/**
-	 *
+	 * Initialise trainString and list of letters in train
+	 * 
 	 * @param trainingString
 	 * @param verbose
 	 */
 	public void createTrainingString(char[] trainingString, boolean verbose)
 	{
-		LEARNSTRING = trainingString;
+		trainString = trainingString;
 
 		// create a dedicated list of possible chars in LEARNSTRING_CHARS_LIST
 		LinkedHashSet<Character> LEARNSTRING_CHARS = new LinkedHashSet<>();
-		for (char c : LEARNSTRING)
+		for (char c : trainString)
 		{
 			LEARNSTRING_CHARS.add(c);
 		}
-		LEARNSTRING_CHARS_LIST.addAll(LEARNSTRING_CHARS);
+		trainStringCharsList.addAll(LEARNSTRING_CHARS);
 
 		if (verbose)
 		{
-			System.out.println("Character List = " + LEARNSTRING_CHARS_LIST);
+			System.out.println("Character List = " + trainStringCharsList);
 		}
 	}
 
 	/**
-	 *
+	 * Initialise testString and lcheck if all letters in test and in list of letters in train
+	 * 
 	 * @param testString
 	 * @param verbose
+	 * @return -1 if there are chars in test which are not in train, otherwise return 0, i.e., the return value is just
+	 *         for check.
 	 */
-	public void createTestString(char[] testString, boolean verbose)
+	public int createTestString(char[] testString, boolean verbose)
 	{
 		this.testString = testString;
 
@@ -176,10 +179,12 @@ public class BasicRNNForSeqRecSys
 			testString_CHARS.add(c);
 		}
 
-		if ((LEARNSTRING_CHARS_LIST.containsAll(testString_CHARS)) == false)
+		if ((trainStringCharsList.containsAll(testString_CHARS)) == false)
 		{
 			System.err.println("\nNew chars in test string");
+			return -1;
 		}
+		return 0;
 
 	}
 
@@ -219,7 +224,7 @@ public class BasicRNNForSeqRecSys
 			GravesLSTM.Builder hiddenLayerBuilder = new GravesLSTM.Builder();
 
 			// num of neuron in first hidden layer is the number of alphabets
-			hiddenLayerBuilder.nIn(i == 0 ? LEARNSTRING_CHARS_LIST.size() : HIDDEN_LAYER_WIDTH);
+			hiddenLayerBuilder.nIn(i == 0 ? trainStringCharsList.size() : HIDDEN_LAYER_WIDTH);
 			hiddenLayerBuilder.nOut(HIDDEN_LAYER_WIDTH);
 			// adopted activation function from GravesLSTMCharModellingExample
 			// seems to work well with RNNs
@@ -234,7 +239,7 @@ public class BasicRNNForSeqRecSys
 		// this is required for our sampleFromDistribution-function
 		outputLayerBuilder.activation(Activation.SOFTMAX);
 		outputLayerBuilder.nIn(HIDDEN_LAYER_WIDTH);
-		outputLayerBuilder.nOut(LEARNSTRING_CHARS_LIST.size());
+		outputLayerBuilder.nOut(trainStringCharsList.size());
 		listBuilder.layer(HIDDEN_LAYER_CONT, outputLayerBuilder.build());
 
 		// finish builder
@@ -247,7 +252,7 @@ public class BasicRNNForSeqRecSys
 		net.init();
 		net.setListeners(new ScoreIterationListener(1));
 
-		DataSet trainingData = prepareDataset(LEARNSTRING, LEARNSTRING_CHARS_LIST, verbose);
+		DataSet trainingData = prepareDataset(trainString, trainStringCharsList, verbose);
 
 		// some epochs
 		for (int epoch = 0; epoch < numOfEpochs; epoch++)
@@ -264,8 +269,8 @@ public class BasicRNNForSeqRecSys
 			sb.append("cleared previous state");
 
 			// put the first character into the rrn as an initialisation
-			INDArray testInit = Nd4j.zeros(LEARNSTRING_CHARS_LIST.size());
-			testInit.putScalar(LEARNSTRING_CHARS_LIST.indexOf(LEARNSTRING[0]), 1);
+			INDArray testInit = Nd4j.zeros(trainStringCharsList.size());
+			testInit.putScalar(trainStringCharsList.indexOf(trainString[0]), 1);
 
 			sb.append("testInit = " + testInit);
 
@@ -276,7 +281,7 @@ public class BasicRNNForSeqRecSys
 			sb.append("output initial - " + output);
 
 			// now the net should guess LEARNSTRING.length more characters
-			for (char dummy : LEARNSTRING)
+			for (char dummy : trainString)
 			{
 				sb.append("\ndummy= " + dummy);
 				// first process the last output of the network to a concrete
@@ -285,10 +290,10 @@ public class BasicRNNForSeqRecSys
 				int sampledCharacterIdx = Nd4j.getExecutioner().exec(new IMax(output), 1).getInt(0);
 
 				// print the chosen output
-				sb.append("\nprediction=" + LEARNSTRING_CHARS_LIST.get(sampledCharacterIdx));
+				sb.append("\nprediction=" + trainStringCharsList.get(sampledCharacterIdx));
 
 				// use the last output as input
-				INDArray nextInput = Nd4j.zeros(LEARNSTRING_CHARS_LIST.size());
+				INDArray nextInput = Nd4j.zeros(trainStringCharsList.size());
 				nextInput.putScalar(sampledCharacterIdx, 1);
 
 				output = net.rnnTimeStep(nextInput);

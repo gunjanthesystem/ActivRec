@@ -41,6 +41,7 @@ import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
+ * Used as of Nov 29 2017
  * 
  * <p>
  * Fork of org.activity.recomm.RecommendationMasterMar2017GenSeq primarliy motivate by pulling all timeline extractors
@@ -419,9 +420,9 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			// currentTimeline.getActivityObjectsInTimeline().size());
 			// ########Sanity check
 			if (distancesMapUnsorted.size() != candidateTimelines.size())
-			{
-				if (Constant.filterTopCands > 0) // not expected when filtering is to be done
-				{
+			{// Constant.nearestNeighbourCandEDThreshold > 0) // not expected when filtering is to be done
+				if (Constant.typeOfCandThreshold != Enums.TypeOfCandThreshold.None)
+				{// some cands might have been removed due to thresholding
 					System.out.println("Alert: editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
 							+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")");
 				}
@@ -449,7 +450,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 			// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry
 			// for such candidate timelines from the distance scores map. // no pruning for baseline closest ST
-			if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useThreshold == true)
+			if (this.lookPastType.equals(Enums.LookPastType.ClosestTime) == false && Constant.useiiWASThreshold == true)
 			{// changed from "Constant.useThreshold ==false)" on May 10 but should not affect result since we were not
 				// doing thresholding anyway
 				Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
@@ -473,15 +474,17 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 			// Is this sorting necessary?
 			// Disabling on Aug 3
-			if (Constant.filterTopCands <= 0) // because otherwise already sorted while filtering
+			if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.NearestNeighbour
+					&& Constant.nearestNeighbourCandEDThreshold >= 1)
+			{ // because already sorted while filtering
+				distancesSortedMap = distancesMapUnsorted;
+			}
+			else
 			{
 				distancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
 						.sortByValueAscendingStrStrDoub(distancesMapUnsorted);
 			}
-			else
-			{// because already sorted while filtering
-				distancesSortedMap = distancesMapUnsorted;
-			}
+
 			if (caseType.equals(Enums.CaseType.CaseBasedV1))
 			{
 				System.out.println("this is CaseBasedV1");
@@ -510,8 +513,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 				// this will not be true when thresholding
 				if (this.thresholdPruningNoEffect)
-				{
-					if (Constant.filterTopCands <= 0) // this sanity check is only valid when not filtering cands
+				{// this sanity check is only valid when not filtering cands
+					if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.None)
 					{
 						if (!Sanity.eq(distancesSortedMap.size(), this.candidateTimelines.size(),
 								"Error at Sanity 349 (RecommenderMaster: editDistancesSortedMapFullCand.size()== this.candidateTimelines.size()  not satisfied"))
@@ -694,7 +697,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		{
 			// System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
 			// PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
-			if (!Constant.useThreshold)
+			if (!Constant.useiiWASThreshold)
 			{
 				System.err.println("Error: threshold pruning is happening.");// +msg);
 			}
@@ -702,21 +705,6 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		return new Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean>(distancesMapUnsorted,
 				thresholdAsDistance, thresholdPruningNoEffect);
 	}
-
-	/**
-	 * Take all training day timelines as candidate timelines, i.e., no filtering of candidate timelines for closest
-	 * time approach
-	 * 
-	 * @param userIDAtRecomm
-	 * @param trainTestTimelinesForAllUsers
-	 * @return Map{userID__DateAsString,cand timeline} where cand timelines are all the training day timelines from
-	 *         other users except current user
-	 */
-	// private static LinkedHashMap<String, Timeline> extractCandClosestTimeColl2(String userIDAtRecomm,
-	// LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers)
-	// {
-	//
-	// }
 
 	/**
 	 * 

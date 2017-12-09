@@ -16,34 +16,37 @@ public class SuperController
 
 	public static void main(String args[])
 	{
-		String[] commonPaths = { "./dataWritten/Nov26_RNN1/" };// {
-		// "./dataWritten/Nov16_AKOM3_916U_10cand/",
-		// "./dataWritten/Nov16_AKOM3_916U_50cand/",
-		// "./dataWritten/Nov16_AKOM3_916U_100cand/" };
-		// int[] numOfCandsPerUser = { 10, 50, 100 };
+
+		// Start
+		// String[] commonPaths = { "./dataWritten/Dec8_NCount_Bigram/" };// {
+		// // "./dataWritten/Nov16_AKOM3_916U_10cand/",
+		// // "./dataWritten/Nov16_AKOM3_916U_50cand/",
+		// // "./dataWritten/Nov16_AKOM3_916U_100cand/" };
+		// // int[] numOfCandsPerUser = { 10, 50, 100 };
+		// // {
+		// // "/dataWritten/Nov10_AKOM1_9k1cand/"
+		// // };
+		// // { "./dataWritten/Nov12_NCount916U916N1C1500T/", "./dataWritten/Nov12_NCount916U916N1C750T/",
+		// // "./dataWritten/Nov12_NCount916U916N1C500T/", "./dataWritten/Nov12_NCount916U916N1C250T/" };
+		//
+		// // for (int i = commonPaths.length - 1; i >= 0; i--)
+		// for (int i = 0; i <= commonPaths.length - 1; i++)
 		// {
-		// "/dataWritten/Nov10_AKOM1_9k1cand/"
-		// };
-		// { "./dataWritten/Nov12_NCount916U916N1C1500T/", "./dataWritten/Nov12_NCount916U916N1C750T/",
-		// "./dataWritten/Nov12_NCount916U916N1C500T/", "./dataWritten/Nov12_NCount916U916N1C250T/" };
-
-		// for (int i = commonPaths.length - 1; i >= 0; i--)
-		for (int i = 0; i <= commonPaths.length - 1; i++)
-		{
-			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			String commonPath = commonPaths[i];
-
-			runExperiments(commonPath, true, false, false);
-			System.out.println("finished for commonPath = " + commonPath);
-		}
-
-		System.out.println(" Exiting SuperController");
-		// cleanUpSpace();
+		// // Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
+		// String commonPath = commonPaths[i];
+		//
+		// runExperiments(commonPath, false, true, true);
+		// System.out.println("finished for commonPath = " + commonPath);
+		// }
+		//
+		// System.out.println(" Exiting SuperController");
+		// End
+		cleanUpSpace();
 	}
 
 	public static void cleanUpSpace()
 	{
-		String commonPath = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten_12May2017/";
+		String commonPath = "./dataWritten/Aug14Filter500/";
 
 		String s = ("cleanUpSpace called on commonPath=" + commonPath + "\n");
 		System.out.println(s);

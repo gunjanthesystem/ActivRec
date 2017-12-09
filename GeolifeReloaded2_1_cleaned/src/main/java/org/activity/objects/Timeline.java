@@ -38,6 +38,15 @@ public class Timeline implements Serializable
 	static int countTimelinesCreatedUntilNow = 0;
 
 	/**
+	 * 
+	 * @param aoToAppend
+	 */
+	public void appendAO(ActivityObject aoToAppend)
+	{
+		this.activityObjectsInTimeline.add(aoToAppend);
+	}
+
+	/**
 	 * Create Timeline from given Activity Objects
 	 * 
 	 * 

@@ -43,7 +43,7 @@ public class VerbosityConstants
 	 */
 	public static final boolean WriteEditDistancePerRtPerCand = false;// false;// true;// false;// false;// false; //
 	public static final boolean WriteCandInEditDistancePerRtPerCand = false;// false;// false;// false;
-	public static boolean WriteNumActsPerRTPerCand = false;// false; // this information is redundant as well
+	public static boolean WriteNumActsPerRTPerCand = false;// true;// false; // this information is redundant as well
 	public static final boolean WriteRedundant = false;
 	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;// true;// false;// false;//
 																						// false;
