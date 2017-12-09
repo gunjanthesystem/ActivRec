@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.PathConstants;
-import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned2;
+import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -455,8 +455,8 @@ public class ControllerWithoutServer
 			// Constant.percentageInTraining);
 			// // end of curtain may 4 2017
 
-			RecommendationTestsMar2017GenSeqCleaned2 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned2(
-					sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds,
+			RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
+					sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
 					Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
 
 			/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
@@ -517,8 +517,8 @@ public class ControllerWithoutServer
 		// Constant.percentageInTraining);
 		// // end of curtain may 4 2017
 
-		RecommendationTestsMar2017GenSeqCleaned2 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned2(
-				sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds,
+		RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
+				sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
 				Constant.getUserIDs(), Constant.percentageInTraining, 3, usersCleanedDayTimelines);
 
 		System.out.println("-- iteration end for groupLabel = " + groupLabel);

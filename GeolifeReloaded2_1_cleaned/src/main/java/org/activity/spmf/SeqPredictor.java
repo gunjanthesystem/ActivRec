@@ -39,19 +39,27 @@ public class SeqPredictor
 		// for (int i = 0; i < 25; i++)
 		{
 			ArrayList<ArrayList<Integer>> trainingSet = new ArrayList<>();
-			trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 9).boxed().collect(Collectors.toList()));
-			trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 6).boxed().collect(Collectors.toList()));
-			trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 9).boxed().collect(Collectors.toList()));
-			trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 1).boxed().collect(Collectors.toList()));
-			trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 7).boxed().collect(Collectors.toList()));
-			// trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 6).boxed().collect(Collectors.toList()));
-			// trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 6).boxed().collect(Collectors.toList()));
-			trainingSet.add((ArrayList<Integer>) IntStream.of(4, 3, 2, 5).boxed().collect(Collectors.toList()));
-			trainingSet.add((ArrayList<Integer>) IntStream.of(4, 3, 2, 5).boxed().collect(Collectors.toList()));
+
+			/*
+			 * trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 9).boxed().collect(Collectors.toList()));
+			 * trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 6).boxed().collect(Collectors.toList()));
+			 * trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 8, 7).boxed().collect(Collectors.toList()));
+			 * trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 8, 1).boxed().collect(Collectors.toList()));
+			 * trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 7).boxed().collect(Collectors.toList()));
+			 * // trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4,
+			 * 6).boxed().collect(Collectors.toList())); // trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3,
+			 * 4, 6).boxed().collect(Collectors.toList())); trainingSet.add((ArrayList<Integer>) IntStream.of(4, 3, 2,
+			 * 5).boxed().collect(Collectors.toList())); trainingSet.add((ArrayList<Integer>) IntStream.of(4, 3, 2,
+			 * 5).boxed().collect(Collectors.toList()));
+			 */
+			trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 18, 9, 1, 2, 3, 4, 6, 1, 2, 3, 8, 7, 1, 2, 3, 8,
+					1, 1, 2, 3, 4, 7, 4, 3, 2, 5, 4, 3, 2, 5).boxed().collect(Collectors.toList()));
+
+			// trainingSet.add((ArrayList<Integer>) IntStream.of(4, 3, 2, 5).boxed().collect(Collectors.toList()));
 			// trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 6).boxed().collect(Collectors.toList()));
 			// trainingSet.add((ArrayList<Integer>) IntStream.of(1, 2, 3, 4, 6).boxed().collect(Collectors.toList()));
 
-			ArrayList<Integer> curr = (ArrayList<Integer>) IntStream.of(2, 3, 4).boxed().collect(Collectors.toList());
+			ArrayList<Integer> curr = (ArrayList<Integer>) IntStream.of(2, 18).boxed().collect(Collectors.toList());
 
 			SeqPredictor p = new SeqPredictor(trainingSet, curr, true);
 			System.out.println("predictedNextSymbol = " + p.AKOMSeqPredictor(4, true));
@@ -63,6 +71,12 @@ public class SeqPredictor
 		return this.predictedNextSymbol;
 	}
 
+	/**
+	 * 
+	 * @param trainingTimelines
+	 * @param currentTimeline
+	 * @param verbose
+	 */
 	public SeqPredictor(ArrayList<ArrayList<Integer>> trainingTimelines, ArrayList<Integer> currentTimeline,
 			boolean verbose)
 	{

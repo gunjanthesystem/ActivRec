@@ -31,7 +31,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterI;
-import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeq;
+import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeqNov2017;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
 import org.activity.recomm.RecommendationMasterRNN1Nov2017;
@@ -46,15 +46,15 @@ import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
 
 /**
- * Used as of 8 June 2017
+ * Used as of 29 Nov 2017
  * </p>
- * Fork of org.activity.evaluation.RecommendationTestsMar2017GenSeq, extending it to recommending sequences Executes the
- * experiments for generating recommendations
+ * Fork of org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned2, extending it to a more cleaner version
+ * (recommending sequences). Executes the experiments for generating recommendations
  * 
  * @author gunjan
  *
  */
-public class RecommendationTestsMar2017GenSeqCleaned3
+public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 {
 	// String typeOfMatching; //"Daywise","
 	double percentageInTraining;// = 0.8;
@@ -117,7 +117,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3
 	 *            for collaborative approach, all neighbours
 	 */
 	@SuppressWarnings("unused")
-	public RecommendationTestsMar2017GenSeqCleaned3(
+	public RecommendationTestsMar2017GenSeqCleaned3Nov2017(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines, Enums.LookPastType lookPastType,
 			Enums.CaseType caseType, Enums.TypeOfThreshold[] typeOfThresholds, int[] userIDs,
 			double percentageInTraining, int lengthOfRecommendedSequence,
@@ -449,29 +449,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3
 							LinkedHashMap<Date, Timeline> userTrainingTimelines = trainTestTimelines.get(0);
 							LinkedHashMap<Date, Timeline> userTestTimelines = trainTestTimelines.get(1);
 
-							if (Constant.collaborativeCandidates)
-							{// start of sanity check
-								// make sure train test split for current user is same for both approaches
-								List<LinkedHashMap<Date, Timeline>> trainTestTimelinesCollForThisUser = trainTestTimelinesForAllUsersDW
-										.get(Integer.toString(userId));
-								// get the training test timelines for current user
-								LinkedHashMap<Date, Timeline> userTrainingTimelinesColl = trainTestTimelinesCollForThisUser
-										.get(0);
-								// LinkedHashMap<Date, Timeline> userTestTimelinesColl =
-								// trainTestTimelinesCollForThisUser.get(1);
-								if (!userTrainingTimelinesColl.equals(userTrainingTimelines))
-								{
-									System.err.println(
-											"Error: !userTrainingTimelinesColl.equals(userTrainingTimelines) for user:"
-													+ userId + " userTrainingTimelinesColl.size()="
-													+ userTrainingTimelinesColl.size() + "userTestTimelinesColl.size()="
-													+ trainTestTimelinesCollForThisUser.get(1).size());
-								}
-								else
-								{
-									System.out.println("Timesplit OK.");
-								}
-							} // end of sanity check
+							sanityCheckTrainTestSplitSameForCollNonColl(trainTestTimelinesForAllUsersDW, userId,
+									userTrainingTimelines);
 
 							////// START of build representative activity objects for this user.
 							// if (true)// representativeAOsNotComputed == false) //do this
@@ -816,19 +795,19 @@ public class RecommendationTestsMar2017GenSeqCleaned3
 													userTrainingTimelines, userTestTimelines, dateToRecomm,
 													recommTimesStrings[0], userId, repAOsFromPrevRecomms);
 										}
-										else if (this.lookPastType.equals(Enums.LookPastType.Daywise)
-												&& (Constant.altSeqPredictor == Enums.AltSeqPredictor.AKOM))
 										// Alternative algorithm
+										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.AKOM)
+										// && (this.lookPastType.equals(Enums.LookPastType.Daywise)
 										{
-											recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeq(
+											recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeqNov2017(
 													userTrainingTimelines, userTestTimelines, dateToRecomm,
 													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
-													this.lookPastType, false, repAOsFromPrevRecomms,
-													trainTestTimelinesForAllUsersDW, trainTimelinesAllUsersContinuous);
+													matchingUnit, caseType, this.lookPastType, false,
+													repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
+													trainTimelinesAllUsersContinuous);
 										}
 
-										else if (this.lookPastType.equals(Enums.LookPastType.Daywise)
-												&& (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1))
+										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1)
 										// Alternative algorithm
 										{
 											recommMasters[seqIndex] = new RecommendationMasterRNN1Nov2017(50, 2,
@@ -943,7 +922,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3
 										// issue here solved
 										if (recommMasters[seqIndex] == null)
 										{
-											PopUps.printTracedErrorMsgWithExit(("recommMasters[i] = null"));
+											PopUps.printTracedErrorMsgWithExit(("Error: recommMasters[i] = null"));
 										}
 
 										if (VerbosityConstants.verbose)
@@ -1767,7 +1746,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3
 				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
 				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
 
-				// earlier version was using all possible vals for PD but now using only those in training data.
+				// earlier version was using all possible vals fro PD but now using only those in training data.
 				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
 
 				for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsers
@@ -1999,7 +1978,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3
 		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		{
 			String dirToCreate;
-			if (Constant.useThreshold)
+			if (Constant.useiiWASThreshold)
 			{
 				dirToCreate = outputCoreResultsPath + thresholdVal + "/MatchingUnit" + String.valueOf(matchingUnit);
 				WritingToFile.createDirectory(outputCoreResultsPath + thresholdVal);
@@ -3657,6 +3636,39 @@ public class RecommendationTestsMar2017GenSeqCleaned3
 			e.printStackTrace();
 		}
 		return ts;
+	}
+
+	/**
+	 * Make sure train test split for current user is same for both approaches
+	 * 
+	 * @param trainTestTimelinesForAllUsersDW
+	 * @param userId
+	 * @param userTrainingTimelines
+	 */
+	private void sanityCheckTrainTestSplitSameForCollNonColl(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW, int userId,
+			LinkedHashMap<Date, Timeline> userTrainingTimelines)
+	{
+		if (Constant.collaborativeCandidates)
+		{// start of sanity check
+			// make sure train test split for current user is same for both approaches
+			List<LinkedHashMap<Date, Timeline>> trainTestTimelinesCollForThisUser = trainTestTimelinesForAllUsersDW
+					.get(Integer.toString(userId));
+			// get the training test timelines for current user
+			LinkedHashMap<Date, Timeline> userTrainingTimelinesColl = trainTestTimelinesCollForThisUser.get(0);
+			// LinkedHashMap<Date, Timeline> userTestTimelinesColl =
+			// trainTestTimelinesCollForThisUser.get(1);
+			if (!userTrainingTimelinesColl.equals(userTrainingTimelines))
+			{
+				System.err.println("Error: !userTrainingTimelinesColl.equals(userTrainingTimelines) for user:" + userId
+						+ " userTrainingTimelinesColl.size()=" + userTrainingTimelinesColl.size()
+						+ "userTestTimelinesColl.size()=" + trainTestTimelinesCollForThisUser.get(1).size());
+			}
+			else
+			{
+				System.out.println("Timesplit OK.");
+			}
+		} // end of sanity check
 	}
 
 }

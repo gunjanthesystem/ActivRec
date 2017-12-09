@@ -65,7 +65,7 @@ public class StringCode
 			charCodeMap.put(val, charCode);
 		}
 
-		if (VerbosityConstants.tempVerbose)
+		if (VerbosityConstants.verbose)
 		{
 			StringBuilder sb = new StringBuilder(
 					"\nInside org.activity.util.StringCode.getLocallyUniqueCharCodeMap():\n");

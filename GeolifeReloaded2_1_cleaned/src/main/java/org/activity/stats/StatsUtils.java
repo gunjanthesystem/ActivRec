@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.IntStream;
@@ -74,10 +75,27 @@ public class StatsUtils
 		return new DescriptiveStatistics(vals);
 	}
 
+	/**
+	 * 
+	 * @param vals
+	 * @param percentile
+	 *            range: 0 -100
+	 * @return
+	 */
+	public static double getPercentile(List<Double> valsReceived, double percentile)
+	{
+		double vals[] = new double[valsReceived.size()];
+		for (int i = 0; i < valsReceived.size(); i++)
+		{
+			vals[i] = valsReceived.get(i);
+		}
+		DescriptiveStatistics ds = new DescriptiveStatistics(vals);
+		return ds.getPercentile(percentile);
+	}
+
 	public static double getSD(double[] vals)
 	{
 		DescriptiveStatistics ds = new DescriptiveStatistics(vals);
-		double sd = ds.getStandardDeviation();
 		return ds.getStandardDeviation();
 	}
 
@@ -91,7 +109,6 @@ public class StatsUtils
 		}
 
 		DescriptiveStatistics ds = new DescriptiveStatistics(vals);
-		double sd = ds.getStandardDeviation();
 		return ds.getStandardDeviation();
 	}
 

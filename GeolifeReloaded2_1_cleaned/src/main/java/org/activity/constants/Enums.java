@@ -19,7 +19,7 @@ public class Enums
 
 	public enum AltSeqPredictor
 	{
-		AKOM, RNN1;
+		None, AKOM, RNN1;
 	}
 
 	/**
@@ -42,6 +42,11 @@ public class Enums
 	public enum TypeOfThreshold
 	{
 		Global, Percent;
+	}
+
+	public enum TypeOfCandThreshold
+	{
+		None, NearestNeighbour, Percentile
 	}
 	// typeOfThresholds[];// = { "Global" };// Global"};//"Percent"
 

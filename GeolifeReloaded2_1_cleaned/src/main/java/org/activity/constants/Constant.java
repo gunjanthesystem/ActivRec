@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.activity.constants.Enums.PrimaryDimension;
+import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.generator.DatabaseCreatorGowallaQuicker0;
 import org.activity.io.EditDistanceMemorizer;
@@ -116,13 +117,15 @@ public final class Constant
 	 * whether there threshold should be applied on candidate timelines based on edit distance
 	 */
 	// public static final boolean candidateThresholding = false; //
-	public static final Enums.TypeOfThreshold[] typeOfThresholds = { Enums.TypeOfThreshold.Global };
+	public static final Enums.TypeOfThreshold[] typeOfiiWASThresholds = { Enums.TypeOfThreshold.Global };
 	// String[] typeOfThresholds = { "Global" };// Global"};//"Percent", "None"
 
 	/**
-	 * Determines if thresholding is used to eliminate candidate timelines beyond the threshold distance
+	 * Determines if thresholding is used to eliminate candidate timelines beyond the threshold distance. Thresholding
+	 * as applied in iiWAS paper
+	 * 
 	 */
-	public static final boolean useThreshold = false;
+	public static final boolean useiiWASThreshold = false;
 
 	/**
 	 * Determines whether tolerance is used for comparing features when calculating edit distance
@@ -163,13 +166,12 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 
-	// AltSeqPredictor IS ONLY USED WHEN lookPastType IS Daywise
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.RNN1;// SWITCH_NOV10
-	public static final int AKOMHighestOrder = 3;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;// AKOM .RNN1;// SWITCH_NOV10
+	public static final int AKOMHighestOrder = 1;// SWITCH_NOV10
 
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
@@ -193,7 +195,8 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4, 6, 3, 8
+	public static final double matchingUnitAsPastCount[] = { 0, };// 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4,
+																	// 6, 3, 8
 	// };// 1,3,5,8,3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,};//14, 16,18 };{ 0, 1, 2, 3,// 4, 5, 6
 	// };//// , 7, 8,9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,26, 28, 30 };// , 32,// 34,
 	// 36, 38, 40,42 };
@@ -224,22 +227,36 @@ public final class Constant
 	 */
 	public static final int HierarchicalCatIDLevelForEditDistance = 1;// 2;// 1;// 2, -1 when not used
 
-	public static final boolean collaborativeCandidates = true;
-
 	public static final boolean buildRepAOJustInTime = false;
 	public static final boolean preBuildRepAOGenericUser = true; // TODO think about it
 
-	public static final boolean only1CandFromEachCollUser = false;// false;// true;// false;// false;//
-																	// true;//SWITCH_NOV10
-	public static int numOfCandsFromEachCollUser = 50;//// SWITCH_NOV10
+	// --------------------------------------------------------------------------//
+	// Start of parameters for Candidate timelines
+	public static final boolean collaborativeCandidates = true;
+	// Number of candidate timelines extracted from each user in collaborative approach
+	public static final boolean only1CandFromEachCollUser = true; // SWITCH_NOV10
+	public static int numOfCandsFromEachCollUser = 1;//// SWITCH_NOV10
 
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
+	// Filtering the candidate timeline
+	// SWITCH_NOV10
+	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.None;// NearestNeighbour,
+																									// None,Percentile
+	/**
+	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
+	 * 0-100
+	 */
+	public static final double percentileCandEDThreshold = 25;// 100;// 25;// SWITCH_NOV10
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int filterTopCands = 500;/// -1;// 100;// 1500;// 100;// -1 for no filter, //SWITCH_NOV10
+	public static final int nearestNeighbourCandEDThreshold = -1;// 500;/// -1;// 100;// 1500;// 100;// -1 for no
+																	// filter,
+	/// //SWITCH_NOV10
+	// End of parameters for Candidate timelines
+	// --------------------------------------------------------------------------//
 
 	static EditDistanceMemorizer editDistancesMemorizer;
 	final static int editDistancesMemorizerBufferSize = 1;// 000000;
@@ -1036,8 +1053,8 @@ public final class Constant
 
 		s.append("\nuseTolerance:" + useTolerance);
 
-		s.append("\ntypeOfThresholds:" + Arrays.asList(typeOfThresholds));
-		s.append("\nuseThreshold:" + useThreshold);
+		s.append("\ntypeOfThresholds:" + Arrays.asList(typeOfiiWASThresholds));
+		s.append("\nuseThreshold:" + useiiWASThreshold);
 		s.append("\nbreakTiesWithShuffle:" + breakTiesWithShuffle);
 		s.append("\nEXPUNGE_INVALIDS_B4_RECOMM_PROCESS:" + EXPUNGE_INVALIDS_B4_RECOMM_PROCESS);
 		s.append("\nBLACKLISTING:" + BLACKLISTING);
@@ -1066,14 +1083,18 @@ public final class Constant
 
 		s.append("\nuseHierarchicalDistance:" + useHierarchicalDistance);
 		s.append("\nHierarchicalLevelForEditDistance:" + HierarchicalCatIDLevelForEditDistance);
-		s.append("\ncollaborativeCandidates:" + collaborativeCandidates);
 		s.append("\nbuildRepAOJustInTime:" + buildRepAOJustInTime);
+		s.append("\npreBuildRepAOGenericUser:" + preBuildRepAOGenericUser);
+
+		//
+		s.append("\ncollaborativeCandidates:" + collaborativeCandidates);
 		s.append("\nonly1CandFromEachCollUser:" + only1CandFromEachCollUser);
 		s.append("\nnumOfCandsFromEachCollUser:" + numOfCandsFromEachCollUser);
-		s.append("\nnoFutureCandInColl:" + onlyPastFromRecommDateInCandInColl);
-
-		s.append("\nfilterTopCands:" + filterTopCands);
-		s.append("\npreBuildRepAOGenericUser:" + preBuildRepAOGenericUser);
+		s.append("\nonlyPastFromRecommDateInCandInColl:" + onlyPastFromRecommDateInCandInColl);
+		s.append("\ntypeOfCandThreshold:" + typeOfCandThreshold);
+		s.append("\npercentileCandEDThreshold:" + percentileCandEDThreshold);
+		s.append("\nnearestNeighbourCandEDThreshold:" + nearestNeighbourCandEDThreshold);
+		//
 
 		s.append("\neditDistancesMemorizerBufferSize:" + editDistancesMemorizerBufferSize);
 		s.append("\nmemorizeEditDistance:" + memorizeEditDistance);

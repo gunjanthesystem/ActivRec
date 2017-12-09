@@ -824,7 +824,7 @@ public class RecommendationMasterMar2017AltAlgoSeq implements RecommendationMast
 		{
 			// System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
 			// PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
-			if (!Constant.useThreshold)
+			if (!Constant.useiiWASThreshold)
 			{
 				System.err.println("Error: threshold pruning is happening.");// +msg);
 			}
@@ -2580,7 +2580,7 @@ public class RecommendationMasterMar2017AltAlgoSeq implements RecommendationMast
 		// // System.out.println(sbTemp1.toString());
 		// End Sanity check
 		System.out.println("before filter candEditDistances.size():" + candEditDistances.size());
-		if (Constant.filterTopCands > 0)
+		if (Constant.nearestNeighbourCandEDThreshold > 0)
 		{
 			System.out.print("... filtering");
 			LinkedHashMap<String, Pair<String, Double>> candEditDistancesSorted = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
@@ -2592,7 +2592,7 @@ public class RecommendationMasterMar2017AltAlgoSeq implements RecommendationMast
 			for (Entry<String, Pair<String, Double>> candEntry : candEditDistancesSorted.entrySet())
 			{
 				c++;
-				if (c > Constant.filterTopCands)
+				if (c > Constant.nearestNeighbourCandEDThreshold)
 				{
 					break;
 				}
