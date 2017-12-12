@@ -701,8 +701,8 @@ public class RecommendationMasterMar2017AltAlgoSeq implements RecommendationMast
 		if (lookPastType.equals(Enums.LookPastType.Daywise))
 		{
 
-			SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, verbose);
-			int predSymbol = p.AKOMSeqPredictor(highestOrder, verbose);
+			SeqPredictor p = null;// new AKOMSeqPredictor(candTimelinesAsSeq, currSeq, verbose);
+			int predSymbol = -1;// p.getAKOMPrediction(highestOrder, verbose);
 
 			// System.out.println("predictedNextSymbol = " +
 			// SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
@@ -3243,7 +3243,8 @@ public class RecommendationMasterMar2017AltAlgoSeq implements RecommendationMast
 		// have called this function");
 		// }
 
-		if (Constant.altSeqPredictor == Enums.AltSeqPredictor.AKOM)
+		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+				|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
 		{
 			return candidateTimelines.size();
 		}

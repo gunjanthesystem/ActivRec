@@ -24,7 +24,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
-import org.activity.spmf.SeqPredictor;
+import org.activity.spmf.AKOMSeqPredictor;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -190,7 +190,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			{
 				this.matchingUnitInCountsOrHours = matchingUnitInCountsOrHours;
 			}
-			else if (lookPastType.equals(LookPastType.NGram))
+			else if (lookPastType.equals(LookPastType.NGram)
+					|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
 			{
 				this.matchingUnitInCountsOrHours = 0;
 			}
@@ -267,10 +268,27 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			/////////////////////////////
 			long recommMasterT1 = System.currentTimeMillis();
 			// System.out.println("mu in master= " + matchingUnitInCountsOrHours);
-			this.candidateTimelines = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines, lookPastType,
-					this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm, matchingUnitInCountsOrHours,
-					this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers, trainTimelinesAllUsersContinuous);
+			// System.out.println("Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM) = "
+			// + Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM));
+			if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
+			{
+				System.out.println("NO CAND EXTRACTION!");
 
+				this.candidateTimelines = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
+				// Only removing the current user's data from candidate.
+				candidateTimelines.remove(userIDAtRecomm);
+				// trainTimelinesAllUsersContinuous;//
+
+			}
+			else
+
+			{
+				System.out.println("AJOOBA");
+				this.candidateTimelines = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines,
+						lookPastType, this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm,
+						matchingUnitInCountsOrHours, this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers,
+						trainTimelinesAllUsersContinuous);
+			}
 			// if (VerbosityConstants.verbose)
 			{
 				String s1 = "Inside recomm master :trainTestTimelinesForAllUsers.size()= "
@@ -552,7 +570,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 			this.recommendedActivityNamesWithRankscores = getTopPredictedAKOMActivityPDVals(
 					this.activitiesGuidingRecomm, this.caseType, this.lookPastType, this.candidateTimelines, 1, false,
-					Constant.AKOMHighestOrder);
+					Constant.AKOMHighestOrder, this.userIDAtRecomm);
 
 			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityPDvalsWithRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
@@ -641,12 +659,13 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param constantValScore
 	 * @param verbose
 	 * @param highestOrder
+	 * @param userID
 	 * @return
 	 */
 	private LinkedHashMap<String, Double> getTopPredictedAKOMActivityPDVals(
 			ArrayList<ActivityObject> activitiesGuidingRecomm, CaseType caseType, LookPastType lookPastType,
 			LinkedHashMap<String, Timeline> candidateTimelines, double constantValScore, boolean verbose,
-			int highestOrder)
+			int highestOrder, String userID)
 	{
 
 		LinkedHashMap<String, Double> res = new LinkedHashMap<>();
@@ -660,13 +679,17 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			// if NCount mathching, then the next activity should be included in the training seq
 			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended = candidateTimelines;
 
-			// Start of Added on 3 Dec 2017
-			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
-			{
-				TimelineWithNext t = (TimelineWithNext) candT.getValue();
-				t.appendAO(t.getNextActivityObject());
+			if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+					&& !Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
+			{// there is no Next act for pure AKOM
+				// Start of Added on 3 Dec 2017
+				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+				{
+					TimelineWithNext t = (TimelineWithNext) candT.getValue();
+					t.appendAO(t.getNextActivityObject());
+				}
+				// End of Added on 3 Dec 2017
 			}
-			// End of Added on 3 Dec 2017
 
 			// Convert cand timeline to a list of seq of integers
 			ArrayList<ArrayList<Integer>> candTimelinesAsSeq = new ArrayList<>();
@@ -675,15 +698,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 			// System.out.println("predictedNextSymbol = ");
 			// TimelineTransformers.timelineToSeqOfActIDs(timeline, delimiter)
-
-			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
-			{
-				candTimelinesAsSeq.add(TimelineTransformers
-						.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
-			}
-
-			SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, false);// verbose);
-			int predSymbol = p.AKOMSeqPredictor(highestOrder, false);// verbose);
+			int predSymbol = getAKOMPredictedSymbol(highestOrder, userID, currSeq, candidateTimelinesWithNextAppended,
+					candTimelinesAsSeq);
 
 			// System.out.println("predictedNextSymbol = " +
 			// SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
@@ -702,6 +718,81 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 	}
 
+	/**
+	 * 
+	 * @param highestOrder
+	 * @param userID
+	 * @param currSeq
+	 * @param candidateTimelinesWithNextAppended
+	 * @param candTimelinesAsSeq
+	 * @return
+	 */
+	private int getAKOMPredictedSymbol(int highestOrder, String userID, ArrayList<Integer> currSeq,
+			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended,
+			ArrayList<ArrayList<Integer>> candTimelinesAsSeq)
+	{
+		int predSymbol = -1;
+		AKOMSeqPredictor seqPredictor = null;
+		boolean savedReTrain = false;
+		AKOMSeqPredictor sanityCheckSeqPredictor = null;
+		if (Constant.sameAKOMForAllRTsOfAUser && Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
+		{
+			seqPredictor = AKOMSeqPredictor.getSeqPredictorsForEachUserStored(userID);
+			if (seqPredictor == null) // AKOM NOT already trained for this user
+			{
+				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+				{
+					candTimelinesAsSeq.add(TimelineTransformers
+							.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
+				}
+				seqPredictor = new AKOMSeqPredictor(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
+			}
+			else
+			{
+				savedReTrain = true;
+				System.out.println("Ajooba: already trained AKOM for this user:" + userID);
+			}
+		}
+		else
+		{
+			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+			{
+				candTimelinesAsSeq.add(TimelineTransformers
+						.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
+			}
+			seqPredictor = new AKOMSeqPredictor(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
+		}
+
+		predSymbol = seqPredictor.getAKOMPrediction(currSeq, false);// verbose);
+
+		// Start of Sanity CHeck
+		// if (savedReTrain)// PASSED
+		// {
+		// // training again and checking if predSYmbol same as fetched from pretrained model
+		// for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+		// {
+		// candTimelinesAsSeq.add(TimelineTransformers
+		// .timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
+		// }
+		// AKOMSeqPredictor sanityCheckseqPredictor = new AKOMSeqPredictor(candTimelinesAsSeq, highestOrder, false,
+		// userID);// verbose);
+		// int sanityCheckPredSymbol = seqPredictor.getAKOMPrediction(currSeq, false);// verbose);
+		//
+		// Sanity.eq(sanityCheckPredSymbol, predSymbol,
+		// "Sanity Error sanityCheckPredSymbol=" + sanityCheckPredSymbol + "!= predSymbol" + predSymbol);
+		// System.out.println(
+		// "SanityCHeck sanityCheckPredSymbol=" + sanityCheckPredSymbol + ", predSymbol=" + predSymbol);
+		// }
+		// End of Sanity check
+
+		return predSymbol;
+	}
+
+	/**
+	 * 
+	 * @param candidateTimelines
+	 * @return
+	 */
 	private static LinkedHashMap<String, String> extractCandUserIDs(LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		LinkedHashMap<String, String> candUserIDs = new LinkedHashMap<>();
@@ -1550,7 +1641,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		// have called this function");
 		// }
 
-		if (Constant.altSeqPredictor == Enums.AltSeqPredictor.AKOM)
+		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+				|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
 		{
 			return candidateTimelines.size();
 		}

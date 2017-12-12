@@ -166,13 +166,15 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NGram;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;// AKOM .RNN1;// SWITCH_NOV10
-	public static final int AKOMHighestOrder = 1;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// .PureAKOM;// AKOM .RNN1;//
+																							// SWITCH_NOV10
+	public static final int AKOMHighestOrder = 3;// SWITCH_NOV10
 
+	public static final boolean sameAKOMForAllRTsOfAUser = true;
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
 	 * restricting this baseline to day boundaries
@@ -195,7 +197,7 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, };// 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4,
+	public static final double matchingUnitAsPastCount[] = { 0 };// 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4,
 																	// 6, 3, 8
 	// };// 1,3,5,8,3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,};//14, 16,18 };{ 0, 1, 2, 3,// 4, 5, 6
 	// };//// , 7, 8,9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,26, 28, 30 };// , 32,// 34,
@@ -234,8 +236,11 @@ public final class Constant
 	// Start of parameters for Candidate timelines
 	public static final boolean collaborativeCandidates = true;
 	// Number of candidate timelines extracted from each user in collaborative approach
-	public static final boolean only1CandFromEachCollUser = true; // SWITCH_NOV10
-	public static int numOfCandsFromEachCollUser = 1;//// SWITCH_NOV10
+	public static final boolean only1CandFromEachCollUser = false; // SWITCH_NOV10
+	public static int numOfCandsFromEachCollUser = -1;//// SWITCH_NOV10
+
+	public static boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
+	public static int recentDaysInTrainingTimelines = 5;// SWITCH_NOV10
 
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
@@ -1041,6 +1046,7 @@ public final class Constant
 		s.append("\nlookPastType:" + lookPastType);
 		s.append("\naltSeqPredictor:" + altSeqPredictor);
 		s.append("\nAKOMHighestOrder:" + AKOMHighestOrder);
+		s.append("\nsameAKOMForAllRTsOfAUser:" + sameAKOMForAllRTsOfAUser);
 
 		s.append("\nDaywiseAllowSpillOverDaysOfCurr:" + DaywiseAllowSpillOverDaysOfCurr);
 		s.append("\nClosestTimeAllowSpillOverDays:" + ClosestTimeAllowSpillOverDays);
@@ -1090,6 +1096,10 @@ public final class Constant
 		s.append("\ncollaborativeCandidates:" + collaborativeCandidates);
 		s.append("\nonly1CandFromEachCollUser:" + only1CandFromEachCollUser);
 		s.append("\nnumOfCandsFromEachCollUser:" + numOfCandsFromEachCollUser);
+
+		s.append("\nfilterTrainingTimelinesByRecentDays:" + filterTrainingTimelinesByRecentDays);
+		s.append("\nrecentDaysInTrainingTimelines:" + recentDaysInTrainingTimelines);
+
 		s.append("\nonlyPastFromRecommDateInCandInColl:" + onlyPastFromRecommDateInCandInColl);
 		s.append("\ntypeOfCandThreshold:" + typeOfCandThreshold);
 		s.append("\npercentileCandEDThreshold:" + percentileCandEDThreshold);
