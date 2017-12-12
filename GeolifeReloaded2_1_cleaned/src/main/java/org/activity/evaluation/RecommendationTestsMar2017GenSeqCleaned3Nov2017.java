@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -321,6 +322,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						System.out.println(Constant.getAllGlobalConstants());
 						System.out.println(Constant.getCommonPath());
 
+						WritingToFile.writeToNewFile(Constant.getCommonPath() + "\n" + Constant.getAllGlobalConstants(),
+								commonPath + "Config.csv");
+
 						/** Can be used to select users above 10 RTs **/
 						LinkedHashMap<Integer, Integer> numOfValidRTs = new LinkedHashMap<Integer, Integer>();
 
@@ -355,9 +359,18 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						{
 							trainTestTimelinesForAllUsersDW = TimelineUtils
 									.splitAllUsersTestTrainingTimelines(allUsersTimelines, percentageInTraining);
-							// sampledUsersTimelines
-							trainTimelinesAllUsersContinuous = getContinousTrainingTimelines(
-									trainTestTimelinesForAllUsersDW);
+
+							if (Constant.filterTrainingTimelinesByRecentDays)
+							{
+								trainTimelinesAllUsersContinuous = getContinousTrainingTimelinesWithFilterByRecentDaysV2(
+										trainTestTimelinesForAllUsersDW, Constant.recentDaysInTrainingTimelines);
+							}
+							else
+							{
+								// sampledUsersTimelines
+								trainTimelinesAllUsersContinuous = getContinousTrainingTimelines(
+										trainTestTimelinesForAllUsersDW);
+							}
 						}
 						/// temp start
 						////// START of build representative activity objects for this user.
@@ -796,7 +809,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													recommTimesStrings[0], userId, repAOsFromPrevRecomms);
 										}
 										// Alternative algorithm
-										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.AKOM)
+										// else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.PureAKOM)
+										else if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
+												|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM))
 										// && (this.lookPastType.equals(Enums.LookPastType.Daywise)
 										{
 											recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeqNov2017(
@@ -1450,6 +1465,120 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					.dayTimelinesToATimeline(trainingTimelineForThisUserDate, false, true);
 			// convert datetime to continouse timeline
 			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), trainingTimelineForThisUser);
+		}
+
+		return trainTimelineForAllUsers;
+	}
+
+	/**
+	 * Take only recent numOfRecentDays days for each user
+	 * 
+	 * 
+	 * @param trainTestTimelinesForAllUsersDW
+	 * @param numOfRecentDays
+	 * @return
+	 */
+	private final static LinkedHashMap<String, Timeline> getContinousTrainingTimelinesWithFilterByRecentDays(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
+			int numOfRecentDays)
+	{
+		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
+
+		StringBuilder sb = new StringBuilder("Debug 10 Dec\t");
+
+		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsersDW
+				.entrySet())
+		{
+			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
+
+			TreeMap<Date, Timeline> trainingTimelineForThisUserDateDescByDate = new TreeMap<Date, Timeline>(
+					Collections.reverseOrder());
+
+			trainingTimelineForThisUserDateDescByDate.putAll(trainingTimelineForThisUserDate);
+
+			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDateDescByDate
+					.entrySet().stream().limit(numOfRecentDays)
+					.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
+
+			Timeline filteredTrainingTimelineForThisUser = TimelineUtils
+					.dayTimelinesToATimeline(filteredDayTrainingTimelineForThisUser, false, true);
+			// convert datetime to continouse timeline
+			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredTrainingTimelineForThisUser);
+
+			// start of debug print
+			sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. original day timelines:");
+			trainingTimelineForThisUserDate.entrySet().stream().forEachOrdered(e -> sb
+					.append("\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
+			sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. sorted day timelines:");
+			trainingTimelineForThisUserDateDescByDate.entrySet().stream().forEachOrdered(e -> sb
+					.append("\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
+			sb.append("\\n-->User =" + trainTestForAUser.getKey() + "\n. filtered day timelines:");
+			sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence());
+			System.out.println(sb.toString() + "\n--\n");
+			// end of debug print
+
+		}
+
+		return trainTimelineForAllUsers;
+	}
+
+	/**
+	 * Take only recent numOfRecentDays days for each user
+	 * 
+	 * <p>
+	 * Sanity checked
+	 * 
+	 * @param trainTestTimelinesForAllUsersDW
+	 * @param numOfRecentDays
+	 * @return
+	 */
+	private final static LinkedHashMap<String, Timeline> getContinousTrainingTimelinesWithFilterByRecentDaysV2(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
+			int numOfRecentDays)
+	{
+		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
+
+		StringBuilder sb = new StringBuilder("Debug 10 Dec\t");
+
+		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsersDW
+				.entrySet())
+		{
+			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
+
+			// Get most recent numOfRecentDays dates
+			List<Date> datesList = new ArrayList<>();
+			datesList.addAll(trainingTimelineForThisUserDate.keySet());
+			Collections.sort(datesList, Collections.reverseOrder());
+			Set<Date> setOfSelectedDatesForThisUser = datesList.stream().limit(numOfRecentDays)
+					.collect(Collectors.toSet());
+
+			// filter by date in setOfSelectedDatesForThisUser
+			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate
+					.entrySet().stream().filter(e -> setOfSelectedDatesForThisUser.contains(e.getKey()))
+					.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
+
+			// convert datetime to continouse timeline
+			Timeline filteredTrainingTimelineForThisUser = TimelineUtils
+					.dayTimelinesToATimeline(filteredDayTrainingTimelineForThisUser, false, true);
+
+			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredTrainingTimelineForThisUser);
+
+			// start of debug print
+			if (false)
+			{
+				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. original day timelines: size = "
+						+ trainingTimelineForThisUserDate.size());
+				trainingTimelineForThisUserDate.entrySet().stream().forEachOrdered(e -> sb.append(
+						"\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
+				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. selected dates:");
+				setOfSelectedDatesForThisUser.stream().forEachOrdered(e -> sb.append("\n" + e.toString() + "--"));
+				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. filtered day timelines: size= "
+						+ filteredTrainingTimelineForThisUser.size());
+				sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence());
+				System.out.println(sb.toString() + "\n--\n");
+			}
+			// end of debug print
+
 		}
 
 		return trainTimelineForAllUsers;
@@ -2541,7 +2670,17 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		{
 			this.matchingUnitArray = new double[] { -9999 };
 		}
+		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))// "Hrs"))
+		{
+			this.matchingUnitArray = new double[] { -9999 };
+		}
+
 		else if (lookPastType.equals(Enums.LookPastType.NGram))// "Hrs"))
+		{
+			this.matchingUnitArray = new double[] { 0 };
+		}
+
+		else if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
 		{
 			this.matchingUnitArray = new double[] { 0 };
 		}
