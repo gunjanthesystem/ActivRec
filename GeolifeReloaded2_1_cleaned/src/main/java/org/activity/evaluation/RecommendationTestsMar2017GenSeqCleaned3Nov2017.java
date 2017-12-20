@@ -183,7 +183,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						Constant.setCurrentMatchingUnit(matchingUnit); // used for sanity checks
 						System.out.println("Executing RecommendationTests for matching unit: " + matchingUnit);
 
-						commonPath = computeCommonPath(matchingUnit, lookPastType, Constant.outputCoreResultsPath,
+						commonPath = computeCommonPath(matchingUnit, lookPastType, Constant.getOutputCoreResultsPath(),
 								thresholdValue);
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());
@@ -819,7 +819,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
 													matchingUnit, caseType, this.lookPastType, false,
 													repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-													trainTimelinesAllUsersContinuous);
+													trainTimelinesAllUsersContinuous, Constant.altSeqPredictor);
 										}
 
 										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1)

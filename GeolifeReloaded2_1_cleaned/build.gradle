@@ -184,7 +184,7 @@ task fatJar(type: Jar) {
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = mainClassName
-  jvmArgs = ['-Xmx13g']
+  jvmArgs = ['-Xmx13g','-javaagent:libs/plumbr/plumbr.jar']
   //, '-XX:-UseGCOverheadLimit
   // arguments to pass to the application
 }

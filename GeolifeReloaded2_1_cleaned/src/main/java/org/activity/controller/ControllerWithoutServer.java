@@ -56,6 +56,7 @@ public class ControllerWithoutServer
 			LocalDateTime currentDateTime = LocalDateTime.now();
 			TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 			Constant.setDefaultTimeZone("UTC");
+
 			// String pathToLatestSerialisedJSONArray = "", pathForLatestSerialisedJSONArray = "",
 			// pathToLatestSerialisedTimelines = "", pathForLatestSerialisedTimelines = "", commonPath = "";
 			System.out.println("Running experiments for database: " + Constant.getDatabaseName());// .DATABASE_NAME);
@@ -205,7 +206,7 @@ public class ControllerWithoutServer
 			// good curtain 7 Feb 2017 end
 			// end of consecutive counts
 
-			String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
+			// String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 			// ,// "1001" };
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
@@ -246,7 +247,8 @@ public class ControllerWithoutServer
 			else
 			{
 				// Start of curtain Aug 11 2017
-				sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, groupsOf100UsersLabels, commonBasePath);
+				sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, DomainConstants.gowallaUserGroupsLabels,
+						commonBasePath);
 				// End of curtain Aug 11 2017
 			}
 			// // important curtain 1 end 10 Feb 2017
@@ -365,8 +367,9 @@ public class ControllerWithoutServer
 
 			int startUserIndex = Integer.valueOf(groupsOf100UsersLabel) - 1;// 100
 			int endUserIndex = startUserIndex + 99;// $$ should be 99;// 199;// 140; // 199
-			Constant.outputCoreResultsPath = commonBasePath + groupsOf100UsersLabel + "/";
-			Files.createDirectories(Paths.get(Constant.outputCoreResultsPath)); // added on 9th Feb 2017
+			Constant.setOutputCoreResultsPath(commonBasePath + groupsOf100UsersLabel + "/");
+
+			Files.createDirectories(Paths.get(Constant.getOutputCoreResultsPath())); // added on 9th Feb 2017
 			int indexOfSampleUser = 0;
 
 			/// sample users
@@ -485,8 +488,8 @@ public class ControllerWithoutServer
 		// important so as to wipe the previously assigned user ids
 		Constant.initialise(commonPath, Constant.getDatabaseName());
 
-		Constant.outputCoreResultsPath = commonBasePath + groupLabel + "/";
-		Files.createDirectories(Paths.get(Constant.outputCoreResultsPath)); // added on 9th Feb 2017
+		Constant.setOutputCoreResultsPath(commonBasePath + groupLabel + "/");
+		Files.createDirectories(Paths.get(Constant.getOutputCoreResultsPath())); // added on 9th Feb 2017
 
 		/// sample users
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsers = new LinkedHashMap<>(userIDsToSelect.size());
@@ -549,7 +552,7 @@ public class ControllerWithoutServer
 				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines"
 				// + currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
 				// + ".kryo";
-				commonPath = Constant.outputCoreResultsPath;
+				commonPath = Constant.getOutputCoreResultsPath();
 				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/";
 				// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
 				// run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//

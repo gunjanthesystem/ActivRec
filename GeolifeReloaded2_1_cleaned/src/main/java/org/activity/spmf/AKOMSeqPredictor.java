@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.activity.ui.PopUps;
+import org.activity.util.PerformanceAnalytics;
+
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.Item;
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.Sequence;
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.SequenceDatabase;
@@ -94,6 +97,9 @@ public class AKOMSeqPredictor
 			String userID)
 	{
 		long t1 = System.currentTimeMillis();
+
+		System.out.println("Instanting AKOMSeqPredictor: " + PerformanceAnalytics.getHeapInformation());
+
 		try
 		{
 
@@ -120,10 +126,18 @@ public class AKOMSeqPredictor
 
 			seqPredictorsForEachUserStored.put(userID, this);
 
+			System.out.println("After training in AKOMSeqPredictor: " + PerformanceAnalytics.getHeapInformation());
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			PopUps.printTracedErrorMsg("");
+		}
+		catch (Error e)
+		{
+			e.printStackTrace();
+			PopUps.printTracedErrorMsg("");
+			System.out.println("Error in AKOMSeqPredictor(): " + PerformanceAnalytics.getHeapInformation());
 		}
 		System.out.println("Trained AKOM for user " + userID + "  in " + (System.currentTimeMillis() - t1) + "ms");
 
@@ -176,7 +190,7 @@ public class AKOMSeqPredictor
 	 * @param trainingTimelines
 	 * @return
 	 */
-	private SequenceDatabase toSequenceDatabase(List<ArrayList<Integer>> trainingTimelines)
+	private SequenceDatabase toSequenceDatabase(List<ArrayList<Integer>> trainingTimelines) throws Exception, Error
 	{
 		SequenceDatabase trainingSet = new SequenceDatabase();
 
@@ -184,8 +198,22 @@ public class AKOMSeqPredictor
 		int trainingID = 1;
 		for (ArrayList<Integer> timelineAsSeqOfInt : trainingTimelines)
 		{
-			List<Item> items = timelineAsSeqOfInt.stream().map(i -> new Item(i)).collect(Collectors.toList());
-			listOfSeq.add(new Sequence(trainingID++, items));
+			// List<Item> items = timelineAsSeqOfInt.stream().map(i -> new Item(i)).collect(Collectors.toList());
+			// running out of memory GC overhead exception when all train data involved
+
+			// writing alternatively to do it sequentially
+			List<Item> timelineAsListOfItems = new ArrayList<>(timelineAsSeqOfInt.size());
+			for (int i : timelineAsSeqOfInt)
+			{
+				timelineAsListOfItems.add(new Item(i));
+			}
+			// start of sanity check PASSED OK
+			// if (items.equals(timelineAsListOfItems))
+			// {System.out.println("Sanity Check 15 Dec 2017 passed");}
+			// else
+			// {System.err.println("Sanity Check 15 Dec 2017 FAILED:");}
+			// end of sanity check
+			listOfSeq.add(new Sequence(trainingID++, timelineAsListOfItems));
 		}
 
 		trainingSet.setSequences(listOfSeq);

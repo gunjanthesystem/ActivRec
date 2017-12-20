@@ -301,11 +301,12 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 				if (writeToFile)
 				{
 					WritingToFile.writeMapOfMapOfMapOfList(nextMostFreqActsBasedOnNGrams,
-							Constant.outputCoreResultsPath + "nextMostFreqActsBasedOnNGrams.csv", "|", "__");
+							Constant.getOutputCoreResultsPath() + "nextMostFreqActsBasedOnNGrams.csv", "|", "__");
 					WritingToFile.writeMapOfMapOfMapOfListInt(nextMostFreqActsBasedOnNGramsActID,
-							Constant.outputCoreResultsPath + "nextMostFreqActsBasedOnNGramsActID.csv", "|", "__");
+							Constant.getOutputCoreResultsPath() + "nextMostFreqActsBasedOnNGramsActID.csv", "|", "__");
 					WritingToFile.writeMapOfMapOfMapOfListString(nextMostFreqActsBasedOnNGramsActName,
-							Constant.outputCoreResultsPath + "nextMostFreqActsBasedOnNGramsActName.csv", "|", "__");
+							Constant.getOutputCoreResultsPath() + "nextMostFreqActsBasedOnNGramsActName.csv", "|",
+							"__");
 				}
 			}
 			else
@@ -330,7 +331,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	{
 		freqDistr = (LinkedHashMap<String, Long>) ComparatorUtils.sortByValueDescNoShuffle(freqDistr);
 		WritingToFile.writeSimpleMapToFile(freqDistr,
-				Constant.outputCoreResultsPath + n + "gram" + userAtRecomm + "FreqDistTrain.csv", "subsequence",
+				Constant.getOutputCoreResultsPath() + n + "gram" + userAtRecomm + "FreqDistTrain.csv", "subsequence",
 				"count");
 
 		/// If there is a need to write n-grams as actname or act ids instead of char codes
@@ -343,12 +344,12 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 						(e1, e2) -> e1, LinkedHashMap::new));
 
 		WritingToFile.writeSimpleMapToFile(freqDistrWithActNames,
-				Constant.outputCoreResultsPath + n + "gram" + userAtRecomm + "FreqDistActNameTrain.csv", "subsequence",
-				"count");
+				Constant.getOutputCoreResultsPath() + n + "gram" + userAtRecomm + "FreqDistActNameTrain.csv",
+				"subsequence", "count");
 
 		WritingToFile.writeSimpleMapToFile(freqDistrWithActID,
-				Constant.outputCoreResultsPath + n + "gram" + userAtRecomm + "FreqDistActIDTrain.csv", "subsequence",
-				"count");
+				Constant.getOutputCoreResultsPath() + n + "gram" + userAtRecomm + "FreqDistActIDTrain.csv",
+				"subsequence", "count");
 
 		return freqDistr;
 	}

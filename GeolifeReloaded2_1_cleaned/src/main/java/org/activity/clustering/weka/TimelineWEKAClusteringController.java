@@ -127,8 +127,8 @@ public class TimelineWEKAClusteringController
 	final Pair<String, String> gowallaFroundTruthFirst2 = new Pair<String, String>("GowallaFirst2",
 			"/home/gunjan/RWorkspace/GowallaRWorks/allDataGrpByUserInToleranceFirst2Tolerance5.csv");
 
-	final Pair<String, String> gowallaFroundTruthFirst3 =
-			new Pair<String, String>("GowallaFirst3", "./dataToRead/userGroupsByFirst3_25June.csv");
+	final Pair<String, String> gowallaFroundTruthFirst3 = new Pair<String, String>("GowallaFirst3",
+			"./dataToRead/userGroupsByFirst3_25June.csv");
 	// "/home/gunjan/RWorkspace/GowallaRWorks/userGroupsByFirst3_25June.csv");
 	// "/home/gunjan/RWorkspace/GowallaRWorks/allDataGrpByUserInToleranceFirst3Tolerance5.csv");
 
@@ -209,7 +209,7 @@ public class TimelineWEKAClusteringController
 				String groundTruthLabel = gtEntry.getFirst();
 				String groundTruthFileName = gtEntry.getSecond();
 
-				String directoryToWrite = Constant.outputCoreResultsPath
+				String directoryToWrite = Constant.getOutputCoreResultsPath()
 						// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/WekaCLustering/"
 						// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/"//
 						// TimelinesClustering/"
@@ -218,8 +218,8 @@ public class TimelineWEKAClusteringController
 				new File(directoryToWrite).mkdir();
 				pathToWrite = directoryToWrite + "/";
 				// PopUps.showMessage("Path to write = " + pathToWrite);
-				PrintStream consoleLogStream =
-						WritingToFile.redirectConsoleOutput(pathToWrite + typeOfDataMining + "ConsoleLog.txt");
+				PrintStream consoleLogStream = WritingToFile
+						.redirectConsoleOutput(pathToWrite + typeOfDataMining + "ConsoleLog.txt");
 				// System.out.println();
 
 				if (trainingTestUsers == null)
@@ -282,8 +282,8 @@ public class TimelineWEKAClusteringController
 		Instances sampEn3 = WekaUtilityBelt.selectAttributesByRegex(originalDataInstances, Pattern.quote("^SampEn*3*"));
 		res.put("SampEn3", sampEn3);
 
-		Instances kGram =
-				WekaUtilityBelt.removeAttributesByRegex(originalDataInstances, Pattern.quote("^SampEn*|ManualClust*"));
+		Instances kGram = WekaUtilityBelt.removeAttributesByRegex(originalDataInstances,
+				Pattern.quote("^SampEn*|ManualClust*"));
 		res.put("KGram", kGram);
 
 		PopUps.showMessage("In spliting data" + " Num of sampen2 instances= " + res.get("SampEn2").size() + " atts = "
@@ -324,8 +324,8 @@ public class TimelineWEKAClusteringController
 		ArrayList<String> substringsToMatch22 = new ArrayList<String>();
 		substringsToMatch22.add("ManualClustering");
 
-		Instances n2 =
-				WekaUtilityBelt.selectAttributesBySubstrings(ins, substringsToMatch21, substringsToMatch22, true);
+		Instances n2 = WekaUtilityBelt.selectAttributesBySubstrings(ins, substringsToMatch21, substringsToMatch22,
+				true);
 		res.put("SampEn3", n2);
 		System.out.println(n2.size() + " " + n2.numAttributes());
 
@@ -337,8 +337,8 @@ public class TimelineWEKAClusteringController
 		ArrayList<String> substringsToMatch32 = new ArrayList<String>();
 		substringsToMatch32.add("NumOfValidDistinctActivities/LengthOfTimeline");
 
-		Instances n3 =
-				WekaUtilityBelt.selectAttributesBySubstrings(ins, substringsToMatch31, substringsToMatch32, true);
+		Instances n3 = WekaUtilityBelt.selectAttributesBySubstrings(ins, substringsToMatch31, substringsToMatch32,
+				true);
 		res.put("KGram", n3);
 		System.out.println(n3.size() + " " + n3.numAttributes());
 
@@ -365,8 +365,8 @@ public class TimelineWEKAClusteringController
 		{
 			if (trainingTestUsers == null) // doing cross-validation instead
 			{
-				dataInstances =
-						preSelectSetOfAttributes(outputArffFile, new ArrayList(), idForPreselectingSetOfAttributes);
+				dataInstances = preSelectSetOfAttributes(outputArffFile, new ArrayList(),
+						idForPreselectingSetOfAttributes);
 			}
 			else
 			{
@@ -375,8 +375,8 @@ public class TimelineWEKAClusteringController
 			}
 
 			// PopUps.showMessage("remains " + dataInstances.size() + " instance after splitting ");
-			classifiersUsed[0] =
-					buildClassifierAndCrossValidate(dataInstances, "1", idForPreselectingSetOfAttributes, true);
+			classifiersUsed[0] = buildClassifierAndCrossValidate(dataInstances, "1", idForPreselectingSetOfAttributes,
+					true);
 
 			this.usedClassifier = classifiersUsed[0];
 			Constant.setClassifier(usedClassifier);
@@ -430,8 +430,8 @@ public class TimelineWEKAClusteringController
 				{
 					System.out.println("insts == null for attGrps:" + attrGrp);
 				}
-				classifiersUsed[classifiersUsedCount] =
-						buildClassifierAndCrossValidate(insts, "1", idForPreselectingSetOfAttributes + attrGrp, false);
+				classifiersUsed[classifiersUsedCount] = buildClassifierAndCrossValidate(insts, "1",
+						idForPreselectingSetOfAttributes + attrGrp, false);
 				// Constant.setClassifier(usedClassifier);
 				// System.out.println(" Is constant classifier okay = " + Constant.getClassifierUsed().toString());
 
@@ -620,8 +620,8 @@ public class TimelineWEKAClusteringController
 			// dataInstances = WekaUtilityBelt.keepInstancesByRangeList(dataInstances,
 			// "1,2,3,4,5,6,7,8,9,10,11,12,13,14");
 			// PopUps.showMessage("Created " + dataInstances.size() + " instance --1 ");
-			dataInstances =
-					WekaUtilityBelt.removeInstancesByRangeList(dataInstances, userIDsToInstanceIDs(usersToRemove));
+			dataInstances = WekaUtilityBelt.removeInstancesByRangeList(dataInstances,
+					userIDsToInstanceIDs(usersToRemove));
 			// PopUps.showMessage("Have " + dataInstances.size() + " instances --2 ");
 
 			if (dataInstances.size() != initialNumOfInstances)
@@ -635,36 +635,36 @@ public class TimelineWEKAClusteringController
 
 			switch (idSetOfAttributes)
 			{
-			case "SetOf10":
-				dataInstances =
-						WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "4,6-8,10,12-21,23-35,38-43,46-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
-				break;
-			case "SetOf13":
-				dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances,
-						"4,6-8,10,12-13,15,17-19,21,23-35,38-43,46-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
-				break;
-			case "SetOf12":
-				dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "10,12-21,23-35,38-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
-				break;
-			case "SetOf13b":
-				dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "10,12-21,23-35,39-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
-				break;
-			case "SetOf14":
-				dataInstances =
-						WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "10,12-21,23-35,38-43,46-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
-				break;
-			case "SetOf25":
-				// Set of 25 to remove:10, 13,21,24-35, 39-43, 47-69
-				dataInstances =
-						WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "10,13,21,24-35, 39-43, 47-69");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
-				// PopUps.showMessage("Have " + dataInstances.size() + " instances --2.5 ");
-				break;
-			default:
-				// Set of 25 to remove:10, 13,21,24-35, 39-43, 47-69
-				dataInstances =
-						WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "10,13,21,24-35, 39-43, 47-69");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
-				PopUps.showMessage("Alert! Choosing default set of preselected attributes");
-				break;
+				case "SetOf10":
+					dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances,
+							"4,6-8,10,12-21,23-35,38-43,46-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
+					break;
+				case "SetOf13":
+					dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances,
+							"4,6-8,10,12-13,15,17-19,21,23-35,38-43,46-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
+					break;
+				case "SetOf12":
+					dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "10,12-21,23-35,38-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
+					break;
+				case "SetOf13b":
+					dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "10,12-21,23-35,39-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
+					break;
+				case "SetOf14":
+					dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances,
+							"10,12-21,23-35,38-43,46-51");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
+					break;
+				case "SetOf25":
+					// Set of 25 to remove:10, 13,21,24-35, 39-43, 47-69
+					dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances,
+							"10,13,21,24-35, 39-43, 47-69");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
+					// PopUps.showMessage("Have " + dataInstances.size() + " instances --2.5 ");
+					break;
+				default:
+					// Set of 25 to remove:10, 13,21,24-35, 39-43, 47-69
+					dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances,
+							"10,13,21,24-35, 39-43, 47-69");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
+					PopUps.showMessage("Alert! Choosing default set of preselected attributes");
+					break;
 			}
 
 			// adding id to track instance ..ids correspond to userid WRONG NOT YET
@@ -815,22 +815,22 @@ public class TimelineWEKAClusteringController
 		// User1
 		TreeMap<String, String> actualClass = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
 		TreeMap<String, String> predictedClassAll = new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassSampEn2 =
-				new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassSampEn3 =
-				new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassKGram =
-				new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassSampEn2 = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassSampEn3 = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassKGram = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
 
 		// distribution <first cluster, thirdcluster, secondcluster>
-		TreeMap<String, Triple<Double, Double, Double>> predictedClassAllDist =
-				new TreeMap<String, Triple<Double, Double, Double>>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, Triple<Double, Double, Double>> predictedClassSampEn2Dist =
-				new TreeMap<String, Triple<Double, Double, Double>>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, Triple<Double, Double, Double>> predictedClassSampEn3Dist =
-				new TreeMap<String, Triple<Double, Double, Double>>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, Triple<Double, Double, Double>> predictedClassKGramDist =
-				new TreeMap<String, Triple<Double, Double, Double>>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, Triple<Double, Double, Double>> predictedClassAllDist = new TreeMap<String, Triple<Double, Double, Double>>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, Triple<Double, Double, Double>> predictedClassSampEn2Dist = new TreeMap<String, Triple<Double, Double, Double>>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, Triple<Double, Double, Double>> predictedClassSampEn3Dist = new TreeMap<String, Triple<Double, Double, Double>>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, Triple<Double, Double, Double>> predictedClassKGramDist = new TreeMap<String, Triple<Double, Double, Double>>(
+				ComparatorUtils.getUserIDComparator());
 
 		System.out.println(">> Debug Marker: 679: " + colNumActualClassAll + "  " + colNumPredictedClassAll + "  "
 				+ colNumPredictedClassSampEn2 + "  " + colNumPredictedClassSampEn3 + "  " + colNumPredictedClassKGram
@@ -923,15 +923,15 @@ public class TimelineWEKAClusteringController
 		 * (UserID, (mean of sampen2 sampen3 kgram for cluster1, mean of sampen2 sampen3 kgram for cluster3, mean of
 		 * sampen2 sampen3 kgram for cluster2))
 		 */
-		TreeMap<String, Triple<Double, Double, Double>> meanEnsemble =
-				new TreeMap<String, Triple<Double, Double, Double>>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, Triple<Double, Double, Double>> meanEnsemble = new TreeMap<String, Triple<Double, Double, Double>>(
+				ComparatorUtils.getUserIDComparator());
 
 		/**
 		 * (UserID, (max of sampen2 sampen3 kgram for cluster1, max of sampen2 sampen3 kgram for cluster3, max of
 		 * sampen2 sampen3 kgram for cluster2))
 		 */
-		TreeMap<String, Triple<Double, Double, Double>> maxEnsemble =
-				new TreeMap<String, Triple<Double, Double, Double>>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, Triple<Double, Double, Double>> maxEnsemble = new TreeMap<String, Triple<Double, Double, Double>>(
+				ComparatorUtils.getUserIDComparator());
 
 		/**
 		 * (UserID, (max of sampen2 sampen3 kgram for cluster1, max of sampen2 sampen3 kgram for cluster3, max of
@@ -940,14 +940,14 @@ public class TimelineWEKAClusteringController
 		// TreeMap<String, Triple<Double, Double, Double>> modeEnsemble = new TreeMap<String, Triple<Double, Double,
 		// Double>>(getUserIDComparator());
 
-		TreeMap<String, String> predictedClassMaxEnsemble =
-				new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassMeanEnsemble =
-				new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassMajorityVoting =
-				new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
-		TreeMap<String, String> predictedClassWeightedMajorityVoting =
-				new TreeMap<String, String>(ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassMaxEnsemble = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassMeanEnsemble = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassMajorityVoting = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
+		TreeMap<String, String> predictedClassWeightedMajorityVoting = new TreeMap<String, String>(
+				ComparatorUtils.getUserIDComparator());
 		// TreeMap<String, String> predictedClassModeEnsemble = new TreeMap<String, String>(getUserIDComparator());
 
 		String fuseDistriFileToWrite = pathToWrite + "FusedDistributionFile.csv";
@@ -1031,25 +1031,25 @@ public class TimelineWEKAClusteringController
 			String fileNamePhrase, String titlePhrase)
 	{
 		// FIrst Cluster, ThirdCluster, SecondCluster
-		Triple<Double, Double, Double> classWiseTruePositives =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
-		Triple<Double, Double, Double> classWiseFalseNegatives =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
-		Triple<Double, Double, Double> classWiseFalsePositives =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
-		Triple<Double, Double, Double> classWiseTrueNegatives =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
+		Triple<Double, Double, Double> classWiseTruePositives = new Triple<Double, Double, Double>((double) 0,
+				(double) 0, (double) 0);
+		Triple<Double, Double, Double> classWiseFalseNegatives = new Triple<Double, Double, Double>((double) 0,
+				(double) 0, (double) 0);
+		Triple<Double, Double, Double> classWiseFalsePositives = new Triple<Double, Double, Double>((double) 0,
+				(double) 0, (double) 0);
+		Triple<Double, Double, Double> classWiseTrueNegatives = new Triple<Double, Double, Double>((double) 0,
+				(double) 0, (double) 0);
 
-		Triple<Double, Double, Double> classWiseRandAccuracy =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
-		Triple<Double, Double, Double> classWisePositives =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
-		Triple<Double, Double, Double> classWiseNegatives =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
-		Triple<Double, Double, Double> classWisePrecision =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
-		Triple<Double, Double, Double> classWiseRecall =
-				new Triple<Double, Double, Double>((double) 0, (double) 0, (double) 0);
+		Triple<Double, Double, Double> classWiseRandAccuracy = new Triple<Double, Double, Double>((double) 0,
+				(double) 0, (double) 0);
+		Triple<Double, Double, Double> classWisePositives = new Triple<Double, Double, Double>((double) 0, (double) 0,
+				(double) 0);
+		Triple<Double, Double, Double> classWiseNegatives = new Triple<Double, Double, Double>((double) 0, (double) 0,
+				(double) 0);
+		Triple<Double, Double, Double> classWisePrecision = new Triple<Double, Double, Double>((double) 0, (double) 0,
+				(double) 0);
+		Triple<Double, Double, Double> classWiseRecall = new Triple<Double, Double, Double>((double) 0, (double) 0,
+				(double) 0);
 
 		for (Entry<String, String> entryG : groundtruth.entrySet())
 		{
@@ -1372,52 +1372,52 @@ public class TimelineWEKAClusteringController
 		Double wtForSampEn2 = null;
 		switch (sampEn2Prediction)
 		{
-		case "FirstCluster":
-			wtForSampEn2 = cluster1Vals[0];
-			break;
-		case "SecondCluster":
-			wtForSampEn2 = cluster2Vals[0];
-			break;
-		case "ThirdCluster":
-			wtForSampEn2 = cluster3Vals[0];
-			break;
-		default:
-			String msg = "Error in getWeightedMajority: unrecgnised sampEn2Prediction: " + sampEn2Prediction;
-			PopUps.showError(msg);
+			case "FirstCluster":
+				wtForSampEn2 = cluster1Vals[0];
+				break;
+			case "SecondCluster":
+				wtForSampEn2 = cluster2Vals[0];
+				break;
+			case "ThirdCluster":
+				wtForSampEn2 = cluster3Vals[0];
+				break;
+			default:
+				String msg = "Error in getWeightedMajority: unrecgnised sampEn2Prediction: " + sampEn2Prediction;
+				PopUps.showError(msg);
 		}
 
 		Double wtForSampEn3 = null;
 		switch (sampEn3Prediction)
 		{
-		case "FirstCluster":
-			wtForSampEn3 = cluster1Vals[1];
-			break;
-		case "SecondCluster":
-			wtForSampEn3 = cluster2Vals[1];
-			break;
-		case "ThirdCluster":
-			wtForSampEn3 = cluster3Vals[1];
-			break;
-		default:
-			String msg = "Error in getWeightedMajority: unrecgnised sampEn3Prediction: " + sampEn3Prediction;
-			PopUps.showError(msg);
+			case "FirstCluster":
+				wtForSampEn3 = cluster1Vals[1];
+				break;
+			case "SecondCluster":
+				wtForSampEn3 = cluster2Vals[1];
+				break;
+			case "ThirdCluster":
+				wtForSampEn3 = cluster3Vals[1];
+				break;
+			default:
+				String msg = "Error in getWeightedMajority: unrecgnised sampEn3Prediction: " + sampEn3Prediction;
+				PopUps.showError(msg);
 		}
 
 		Double wtForKGram = null;
 		switch (kGramPrediction)
 		{
-		case "FirstCluster":
-			wtForKGram = cluster1Vals[2];
-			break;
-		case "SecondCluster":
-			wtForKGram = cluster2Vals[2];
-			break;
-		case "ThirdCluster":
-			wtForKGram = cluster3Vals[2];
-			break;
-		default:
-			String msg = "Error in getWeightedMajority: unrecgnised KGramPrediction: " + kGramPrediction;
-			PopUps.showError(msg);
+			case "FirstCluster":
+				wtForKGram = cluster1Vals[2];
+				break;
+			case "SecondCluster":
+				wtForKGram = cluster2Vals[2];
+				break;
+			case "ThirdCluster":
+				wtForKGram = cluster3Vals[2];
+				break;
+			default:
+				String msg = "Error in getWeightedMajority: unrecgnised KGramPrediction: " + kGramPrediction;
+				PopUps.showError(msg);
 		}
 
 		LinkedHashMap<String, Double> resultsOfWtdVoting = new LinkedHashMap<String, Double>();
@@ -1430,9 +1430,9 @@ public class TimelineWEKAClusteringController
 		resultsOfWtdVoting.put(sampEn3Prediction, resultsOfWtdVoting.get(sampEn3Prediction) + wtForSampEn3);
 		resultsOfWtdVoting.put(kGramPrediction, resultsOfWtdVoting.get(kGramPrediction) + wtForKGram);
 
-		Triple<Double, Double, Double> finalDistribution =
-				new Triple<Double, Double, Double>(resultsOfWtdVoting.get("FirstCluster"),
-						resultsOfWtdVoting.get("ThirdCluster"), resultsOfWtdVoting.get("SecondCluster"));
+		Triple<Double, Double, Double> finalDistribution = new Triple<Double, Double, Double>(
+				resultsOfWtdVoting.get("FirstCluster"), resultsOfWtdVoting.get("ThirdCluster"),
+				resultsOfWtdVoting.get("SecondCluster"));
 
 		return getPredClassWithHighestConfFromDistribution(finalDistribution);
 	}
@@ -1555,18 +1555,18 @@ public class TimelineWEKAClusteringController
 		{
 			switch (clusterClass)
 			{
-			case "FirstCluster": // note: MU in paper = MU here+1
-				expectedBestMU = 1;// current activty obj + 1 ( = MU=2 in paper) ; // old =1
-				break;
-			case "SecondCluster":
-				expectedBestMU = 3; // current activty obj + 1 ( = MU=4 in paper) ; // old =2
-				break;
-			case "ThirdCluster":
-				expectedBestMU = 5; // current activty obj + 1 ( = MU=10 in paper) ; // old =20
-				break;
-			default:
-				PopUps.showError(
-						"Error in classToExpectedBestMU: unknown cluster class: clusterClass read =" + clusterClass);
+				case "FirstCluster": // note: MU in paper = MU here+1
+					expectedBestMU = 1;// current activty obj + 1 ( = MU=2 in paper) ; // old =1
+					break;
+				case "SecondCluster":
+					expectedBestMU = 3; // current activty obj + 1 ( = MU=4 in paper) ; // old =2
+					break;
+				case "ThirdCluster":
+					expectedBestMU = 5; // current activty obj + 1 ( = MU=10 in paper) ; // old =20
+					break;
+				default:
+					PopUps.showError("Error in classToExpectedBestMU: unknown cluster class: clusterClass read ="
+							+ clusterClass);
 
 			}
 		}
@@ -1574,18 +1574,18 @@ public class TimelineWEKAClusteringController
 		{
 			switch (clusterClass)
 			{
-			case "FirstCluster": // note: MU in paper = MU here+1
-				expectedBestMU = 0;// current activty obj + 1 ( = MU=2 in paper) ; // old =1
-				break;
-			case "SecondCluster":
-				expectedBestMU = 2; // current activty obj + 1 ( = MU=4 in paper) ; // old =2
-				break;
-			case "ThirdCluster":
-				expectedBestMU = 5; // current activty obj + 1 ( = MU=10 in paper) ; // old =20
-				break;
-			default:
-				PopUps.showError(
-						"Error in classToExpectedBestMU: unknown cluster class: clusterClass read =" + clusterClass);
+				case "FirstCluster": // note: MU in paper = MU here+1
+					expectedBestMU = 0;// current activty obj + 1 ( = MU=2 in paper) ; // old =1
+					break;
+				case "SecondCluster":
+					expectedBestMU = 2; // current activty obj + 1 ( = MU=4 in paper) ; // old =2
+					break;
+				case "ThirdCluster":
+					expectedBestMU = 5; // current activty obj + 1 ( = MU=10 in paper) ; // old =20
+					break;
+				default:
+					PopUps.showError("Error in classToExpectedBestMU: unknown cluster class: clusterClass read ="
+							+ clusterClass);
 
 			}
 		}
@@ -1593,18 +1593,18 @@ public class TimelineWEKAClusteringController
 		{
 			switch (clusterClass)
 			{
-			case "FirstCluster": // note: MU in paper = MU here+1
-				expectedBestMU = 1;// current activty obj + 1 ( = MU=2 in paper) ; // old =1
-				break;
-			case "SecondCluster":
-				expectedBestMU = 3; // current activty obj + 1 ( = MU=4 in paper) ; // old =2
-				break;
-			case "ThirdCluster":
-				expectedBestMU = 5; // current activty obj + 1 ( = MU=10 in paper) ; // old =20
-				break;
-			default:
-				PopUps.showError(
-						"Error in classToExpectedBestMU: unknown cluster class: clusterClass read =" + clusterClass);
+				case "FirstCluster": // note: MU in paper = MU here+1
+					expectedBestMU = 1;// current activty obj + 1 ( = MU=2 in paper) ; // old =1
+					break;
+				case "SecondCluster":
+					expectedBestMU = 3; // current activty obj + 1 ( = MU=4 in paper) ; // old =2
+					break;
+				case "ThirdCluster":
+					expectedBestMU = 5; // current activty obj + 1 ( = MU=10 in paper) ; // old =20
+					break;
+				default:
+					PopUps.showError("Error in classToExpectedBestMU: unknown cluster class: clusterClass read ="
+							+ clusterClass);
 
 			}
 		}
@@ -1694,8 +1694,8 @@ public class TimelineWEKAClusteringController
 			Instances dataInstances = DataSource.read(inputAbsoluteFileName);
 			dataInstances.setClassIndex(dataInstances.numAttributes() - 1);
 
-			dataInstances =
-					WekaUtilityBelt.removeAttributesByRangeList(dataInstances, "3,5-7,9,11-20,22-34,37-42,45-50");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
+			dataInstances = WekaUtilityBelt.removeAttributesByRangeList(dataInstances,
+					"3,5-7,9,11-20,22-34,37-42,45-50");// 3,5-7,11-18,22-29,31-34,36-41,44-49");
 			WekaUtilityBelt.writeArffAbsolute(dataInstances, this.pathToWrite + "PrunedTimelineFeatureVectors.arff");
 
 			resultToWrite += ("\n--> Classification " + LocalDateTime.now().toString() + "\n");
@@ -1946,9 +1946,8 @@ public class TimelineWEKAClusteringController
 
 			resultToWrite += ("\n--> Classification " + LocalDateTime.now().toString() + "\n");
 			resultToWrite += ("idForPreselectingSetOfAttributes: " + idForPreselectingSetOfAttributesOrPhrase + "\n");
-			resultToWrite +=
-					("Num of attributes before algorithmic attribute selection: (inludes target attribute and instance id attribute)"
-							+ numOfAllAttributesRecieved + "\n");
+			resultToWrite += ("Num of attributes before algorithmic attribute selection: (inludes target attribute and instance id attribute)"
+					+ numOfAllAttributesRecieved + "\n");
 
 			resultToWrite += ("Index of Instance ID: " + indexOfInstanceID + "\n");
 			resultToWrite += dataInstances.toSummaryString();
@@ -2163,8 +2162,8 @@ public class TimelineWEKAClusteringController
 																								// indexOfTargetID;
 			// PopUps.showMessage("Index of Attributes to keep =" + selectedAttributesAsString);
 
-			dataWithSelectedAttributes =
-					WekaUtilityBelt.selectAttributesByRangeList(originalDataInstances, selectedAttributesAsString);
+			dataWithSelectedAttributes = WekaUtilityBelt.selectAttributesByRangeList(originalDataInstances,
+					selectedAttributesAsString);
 			WekaUtilityBelt.writeArffAbsolute(dataWithSelectedAttributes,
 					this.pathToWrite + "SelectedTimelineFVs.arff"); // FV : feature vector
 

@@ -167,14 +167,14 @@ public class RecommendationTestsMar2017GenSeqNGramBaseline
 						if (this.lookPastType.equals(Enums.LookPastType.NCount)
 								|| this.lookPastType.equals(Enums.LookPastType.NHours))
 						{
-							String dirToCreate = Constant.outputCoreResultsPath + "/MatchingUnit"
+							String dirToCreate = Constant.getOutputCoreResultsPath() + "/MatchingUnit"
 									+ String.valueOf(matchingUnit);
 							WritingToFile.createDirectory(dirToCreate);// Creating the directory for that matching unit
 							commonPath = dirToCreate + "/";
 						}
 						else // daywise
 						{
-							commonPath = Constant.outputCoreResultsPath;
+							commonPath = Constant.getOutputCoreResultsPath();
 						}
 
 						Constant.setCommonPath(commonPath);

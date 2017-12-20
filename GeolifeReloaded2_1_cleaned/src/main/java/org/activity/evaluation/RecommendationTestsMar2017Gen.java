@@ -154,74 +154,74 @@ public class RecommendationTestsMar2017Gen
 						if (this.lookPastType.equals(Enums.LookPastType.NCount)
 								|| this.lookPastType.equals(Enums.LookPastType.NHours))
 						{
-							String dirToCreate =
-									Constant.outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit);
+							String dirToCreate = Constant.getOutputCoreResultsPath() + "/MatchingUnit"
+									+ String.valueOf(matchingUnit);
 							WritingToFile.createDirectory(dirToCreate);// Creating the directory for that matching unit
 							commonPath = dirToCreate + "/";
 						}
 						else // daywise
 						{
-							commonPath = Constant.outputCoreResultsPath;
+							commonPath = Constant.getOutputCoreResultsPath();
 						}
 
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());
 
-						PrintStream consoleLogStream =
-								WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
+						PrintStream consoleLogStream = WritingToFile
+								.redirectConsoleOutput(commonPath + "consoleLog.txt");
 
 						BufferedWriter metaBufferWriter = WritingToFile.getBWForNewFile(commonPath + "meta.csv");
-						BufferedWriter actualBufferWriter =
-								WritingToFile.getBWForNewFile(commonPath + "dataActual.csv");
+						BufferedWriter actualBufferWriter = WritingToFile
+								.getBWForNewFile(commonPath + "dataActual.csv");
 
-						BufferedWriter topNextActsWithoutDistance =
-								WritingToFile.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
-						BufferedWriter topNextActsWithDistance =
-								WritingToFile.getBWForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
+						BufferedWriter topNextActsWithoutDistance = WritingToFile
+								.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
+						BufferedWriter topNextActsWithDistance = WritingToFile
+								.getBWForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
 						BufferedWriter rtsInvalidWriter = WritingToFile
 								.getBWForNewFile(commonPath + "recommPointsInvalidBecuzNoValidActivityAfterThis.csv");
-						BufferedWriter rtsWithNoCandsWriter =
-								WritingToFile.getBWForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
+						BufferedWriter rtsWithNoCandsWriter = WritingToFile
+								.getBWForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
 
-						BufferedWriter rtsRejWithNoDWButMUCandsCands =
-								WritingToFile.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
+						BufferedWriter rtsRejWithNoDWButMUCandsCands = WritingToFile
+								.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
 
-						BufferedWriter rankedRecommWithScoreWriter =
-								WritingToFile.getBWForNewFile(commonPath + "dataRankedRecommendationWithScores.csv");
-						BufferedWriter rankedRecommWithoutScoreWriter =
-								WritingToFile.getBWForNewFile(commonPath + "dataRankedRecommendationWithoutScores.csv");
+						BufferedWriter rankedRecommWithScoreWriter = WritingToFile
+								.getBWForNewFile(commonPath + "dataRankedRecommendationWithScores.csv");
+						BufferedWriter rankedRecommWithoutScoreWriter = WritingToFile
+								.getBWForNewFile(commonPath + "dataRankedRecommendationWithoutScores.csv");
 
-						BufferedWriter metaIfCurrentTargetSameWriter =
-								WritingToFile.getBWForNewFile(commonPath + "metaIfCurrentTargetSameWriter.csv");
+						BufferedWriter metaIfCurrentTargetSameWriter = WritingToFile
+								.getBWForNewFile(commonPath + "metaIfCurrentTargetSameWriter.csv");
 
-						BufferedWriter numOfCandidateTimelinesWriter =
-								WritingToFile.getBWForNewFile(commonPath + "numOfCandidateTimelines.csv");
+						BufferedWriter numOfCandidateTimelinesWriter = WritingToFile
+								.getBWForNewFile(commonPath + "numOfCandidateTimelines.csv");
 
 						/**
 						 * Contains list of activity names sorted by frequency of occurrence/duration. Num of unique
 						 * sorted lists = number of users, however, each list is repeated so as maintain structural
 						 * conformity with dataRankedRecommendationWithoutScores.csv
 						 */
-						BufferedWriter baseLineOccurrence =
-								WritingToFile.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
-						BufferedWriter baseLineDuration =
-								WritingToFile.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
+						BufferedWriter baseLineOccurrence = WritingToFile
+								.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
+						BufferedWriter baseLineDuration = WritingToFile
+								.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
 
 						BufferedWriter bwRaw = WritingToFile.getBWForNewFile(commonPath + "Raw.csv");
 
-						BufferedWriter bwNumOfWeekendsInTraining =
-								WritingToFile.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
-						BufferedWriter bwNumOfWeekendsInAll =
-								WritingToFile.getBWForNewFile(commonPath + "NumberOfWeekendsInAll.csv");
-						BufferedWriter bwCountTimeCategoryOfRecomm =
-								WritingToFile.getBWForNewFile(commonPath + "CountTimeCategoryOfRecommPoitns.csv");
-						BufferedWriter bwNextActInvalid =
-								WritingToFile.getBWForNewFile(commonPath + "NextActivityIsInvalid.csv");
-						BufferedWriter bwWriteNormalisationOfDistance =
-								WritingToFile.getBWForNewFile(commonPath + "NormalisationDistances.csv");
+						BufferedWriter bwNumOfWeekendsInTraining = WritingToFile
+								.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
+						BufferedWriter bwNumOfWeekendsInAll = WritingToFile
+								.getBWForNewFile(commonPath + "NumberOfWeekendsInAll.csv");
+						BufferedWriter bwCountTimeCategoryOfRecomm = WritingToFile
+								.getBWForNewFile(commonPath + "CountTimeCategoryOfRecommPoitns.csv");
+						BufferedWriter bwNextActInvalid = WritingToFile
+								.getBWForNewFile(commonPath + "NextActivityIsInvalid.csv");
+						BufferedWriter bwWriteNormalisationOfDistance = WritingToFile
+								.getBWForNewFile(commonPath + "NormalisationDistances.csv");
 
-						BufferedWriter bwNumOfValidAOsAfterRTInDay =
-								WritingToFile.getBWForNewFile(commonPath + "NumOfValidAOsAfterRTInDay.csv");
+						BufferedWriter bwNumOfValidAOsAfterRTInDay = WritingToFile
+								.getBWForNewFile(commonPath + "NumOfValidAOsAfterRTInDay.csv");
 
 						rtsInvalidWriter.write(
 								"User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity\n");
@@ -398,16 +398,14 @@ public class RecommendationTestsMar2017Gen
 								mapsForCountDurationBaselines = WritingToFile.writeBasicActivityStatsAndGetBaselineMaps(
 										userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
 
-								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays =
-										(LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-												.get("activityNameCountPairsOverAllTrainingDays");
+								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+										.get("activityNameCountPairsOverAllTrainingDays");
 								ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
 								actNamesCountsWithoutCountOverTrain = getActivityNameCountPairsWithoutCount(
 										activityNameCountPairsOverAllTrainingDays);
 
-								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays =
-										(LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-												.get("activityNameDurationPairsOverAllTrainingDays");
+								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+										.get("activityNameDurationPairsOverAllTrainingDays");
 								ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
 								actNamesDurationsWithoutDurationOverTrain = getActivityNameDurationPairsWithoutDuration(
 										activityNameDurationPairsOverAllTrainingDays);
@@ -425,14 +423,14 @@ public class RecommendationTestsMar2017Gen
 							 * ********************************
 							 */
 
-							int numberOfWeekendsInTraining =
-									TimelineUtils.getNumOfWeekendsInGivenDayTimelines(userTrainingTimelines);
+							int numberOfWeekendsInTraining = TimelineUtils
+									.getNumOfWeekendsInGivenDayTimelines(userTrainingTimelines);
 							int numberOfWeekdaysInTraining = userTrainingTimelines.size() - numberOfWeekendsInTraining;
 							bwNumOfWeekendsInTraining.write(userName + "," + numberOfWeekendsInTraining + ","
 									+ numberOfWeekdaysInTraining + "\n");
 
-							int numberOfWeekendsInAll =
-									TimelineUtils.getNumOfWeekendsInGivenDayTimelines(userAllDatesTimeslines);
+							int numberOfWeekendsInAll = TimelineUtils
+									.getNumOfWeekendsInGivenDayTimelines(userAllDatesTimeslines);
 							int numberOfWeekdaysInAll = userAllDatesTimeslines.size() - numberOfWeekendsInAll;
 							bwNumOfWeekendsInAll
 									.write(userName + "," + numberOfWeekendsInAll + "," + numberOfWeekdaysInAll + "\n");
@@ -457,8 +455,8 @@ public class RecommendationTestsMar2017Gen
 
 								String weekDay = DateTimeUtils.getWeekDayFromWeekDayInt(testDate.getDay());
 
-								ArrayList<ActivityObject> activityObjectsInTestDay =
-										testDayTimelineForUser.getActivityObjectsInDay();
+								ArrayList<ActivityObject> activityObjectsInTestDay = testDayTimelineForUser
+										.getActivityObjectsInDay();
 
 								////////// added to improve write speed
 								StringBuilder bwRawToWriteForThisUserDate = new StringBuilder();
@@ -480,8 +478,8 @@ public class RecommendationTestsMar2017Gen
 								for (int indexOfAOInDay = 0; indexOfAOInDay < activityObjectsInTestDay.size()
 										- 1; indexOfAOInDay++)
 								{
-									ActivityObject activityObjectInTestDay =
-											activityObjectsInTestDay.get(indexOfAOInDay);
+									ActivityObject activityObjectInTestDay = activityObjectsInTestDay
+											.get(indexOfAOInDay);
 									String activityNameInTestDay = activityObjectInTestDay.getActivityName();
 
 									System.out.println(
@@ -522,8 +520,8 @@ public class RecommendationTestsMar2017Gen
 									}
 
 									// Target Activity, actual next activity
-									ActivityObject nextValidActivityObjectAfterRecommPoint1 =
-											testDayTimelineForUser.getNextValidActivityAfterActivityAtThisTime(
+									ActivityObject nextValidActivityObjectAfterRecommPoint1 = testDayTimelineForUser
+											.getNextValidActivityAfterActivityAtThisTime(
 													new Timestamp(year - 1900, month - 1, date, endTimeStamp.getHours(),
 															endTimeStamp.getMinutes(), endTimeStamp.getSeconds(), 0));
 
@@ -562,10 +560,10 @@ public class RecommendationTestsMar2017Gen
 									long ta1 = System.currentTimeMillis();
 
 									// start of curtain April 7
-									RecommendationMasterI recommP1 =
-											new RecommendationMasterMar2017Gen(userTrainingTimelines, userTestTimelines,
-													dateToRecomm, endTimeString, userId, thresholdValue,
-													typeOfThreshold, matchingUnit, caseType, this.lookPastType, false);
+									RecommendationMasterI recommP1 = new RecommendationMasterMar2017Gen(
+											userTrainingTimelines, userTestTimelines, dateToRecomm, endTimeString,
+											userId, thresholdValue, typeOfThreshold, matchingUnit, caseType,
+											this.lookPastType, false);
 									// end of curtain April 7
 
 									System.out.println("time taken by recommMaster = "
@@ -731,10 +729,10 @@ public class RecommendationTestsMar2017Gen
 									String actAtRecommPoint = recommP1.getActivityObjectAtRecomm().getActivityName(); // current
 																														// activity
 
-									String rankedRecommWithScoreForThisRT =
-											recommP1.getRankedRecommendedActNamesWithRankScores(); // rankedRecommAtStartWithScore
-									String rankedRecommWithoutScoreForThisRT =
-											recommP1.getRankedRecommendedActNamesWithoutRankScores();
+									String rankedRecommWithScoreForThisRT = recommP1
+											.getRankedRecommendedActNamesWithRankScores(); // rankedRecommAtStartWithScore
+									String rankedRecommWithoutScoreForThisRT = recommP1
+											.getRankedRecommendedActNamesWithoutRankScores();
 
 									System.out.println("** Ranked Recommendation=" + rankedRecommWithoutScoreForThisRT
 											+ ", while actual was=" + actActualDone);
@@ -809,8 +807,8 @@ public class RecommendationTestsMar2017Gen
 									 * ***
 									 */
 
-									String[] splittedRecomm =
-											RegexUtils.patternDoubleUnderScore.split(rankedRecommWithoutScoreForThisRT);
+									String[] splittedRecomm = RegexUtils.patternDoubleUnderScore
+											.split(rankedRecommWithoutScoreForThisRT);
 									// rankedRecommWithoutScoreForThisRT.split(Pattern.quote("__"));
 
 									sbMaxNumOfDistinctRecommendations
@@ -1023,8 +1021,8 @@ public class RecommendationTestsMar2017Gen
 			// recommP1.getCandidateTimeslines() .get(candidateTimelineID);
 
 			int endPointIndexThisCandidate = candidateTimeline.getActivityObjectsInTimeline().size() - 1;
-			ActivityObject endPointActivityInCandidate =
-					candidateTimeline.getActivityObjectsInTimeline().get(endPointIndexThisCandidate);
+			ActivityObject endPointActivityInCandidate = candidateTimeline.getActivityObjectsInTimeline()
+					.get(endPointIndexThisCandidate);
 
 			// difference in start time of end point activity of candidate and start
 			// time of current activity
@@ -1090,8 +1088,8 @@ public class RecommendationTestsMar2017Gen
 		return result.toString();
 	}
 
-	public static String
-			getActivityNameDurationPairsWithoutDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
+	public static String getActivityNameDurationPairsWithoutDuration(
+			LinkedHashMap<String, Long> nameDurationPairsSorted)
 	{
 		// String result = "";
 		StringBuilder result = new StringBuilder();
@@ -1147,17 +1145,17 @@ public class RecommendationTestsMar2017Gen
 	{
 		switch (typeOfThreshold)
 		{
-		case Percent:// "Percent":
-			this.thresholdsArray = percentThresholds;
-			break;
-		case Global:// "Global":
-			this.thresholdsArray = globalThresholds;
-			break;
-		// case "None":
-		// this.thresholdsArray = new int[] { 10000000 };
-		// break;
-		default:
-			System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
+			case Percent:// "Percent":
+				this.thresholdsArray = percentThresholds;
+				break;
+			case Global:// "Global":
+				this.thresholdsArray = globalThresholds;
+				break;
+			// case "None":
+			// this.thresholdsArray = new int[] { 10000000 };
+			// break;
+			default:
+				System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
 		}
 	}
 }

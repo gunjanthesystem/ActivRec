@@ -141,26 +141,27 @@ public class BalancedStringTree
 	// return allStrings;
 	// }
 
-	public ArrayList<ArrayList<Character>> getAllStrings()
-	{
-		ArrayList<DefaultMutableTreeNode> allLeaves = this.getAllLeaves();
-		ArrayList<ArrayList<Character>> allStrings = new ArrayList<ArrayList<Character>>();
-		int strlen = root.getDepth();
-
-		for (DefaultMutableTreeNode leaf : allLeaves)
-		{
-			ArrayList word = new ArrayList<>(strlen);
-
-			Enumeration<DefaultMutableTreeNode> e = leaf.pathFromAncestorEnumeration(root);
-			while (e.hasMoreElements())
-			{
-				word.add(e.nextElement().toString());
-			}
-			allStrings.add(word);
-		}
-
-		return allStrings;
-	}
+	// $$ Temporarily Disabled on 16 Dec 2017 as it was causing gradle build issue
+	// public ArrayList<ArrayList<Character>> getAllStrings()
+	// {
+	// ArrayList<DefaultMutableTreeNode> allLeaves = this.getAllLeaves();
+	// ArrayList<ArrayList<Character>> allStrings = new ArrayList<ArrayList<Character>>();
+	// int strlen = root.getDepth();
+	//
+	// for (DefaultMutableTreeNode leaf : allLeaves)
+	// {
+	// ArrayList word = new ArrayList<>(strlen);
+	//
+	// Enumeration e = leaf.pathFromAncestorEnumeration(root);
+	// while (e.hasMoreElements())
+	// {
+	// word.add(e.nextElement().toString());
+	// }
+	// allStrings.add(word);
+	// }
+	//
+	// return allStrings;
+	// }
 
 	// /**
 	// *

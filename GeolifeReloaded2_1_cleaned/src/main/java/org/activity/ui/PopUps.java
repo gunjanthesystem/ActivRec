@@ -9,6 +9,9 @@ import java.util.Arrays;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.activity.constants.Constant;
+import org.activity.io.WritingToFile;
+
 /**
  * 
  * @author gunjan
@@ -36,6 +39,7 @@ public class PopUps
 		catch (HeadlessException e)
 		{
 			System.out.println("\n Headless: hence printing msg instead of PopUp.\n" + msg);
+			WritingToFile.appendLineToFileAbsolute(msg, Constant.getCommonPath() + Constant.messageFileName);
 		}
 	}
 
@@ -55,6 +59,7 @@ public class PopUps
 		catch (HeadlessException e)
 		{
 			System.err.println("\n Headless: hence printing error msg instead of PopUp.\n" + msg);
+			WritingToFile.appendLineToFileAbsolute(msg, Constant.getCommonPath() + Constant.errorFileName);
 		}
 	}
 
@@ -80,20 +85,8 @@ public class PopUps
 		catch (HeadlessException ex)
 		{
 			System.err.println("\n Headless: hence printing exeception msg instead of PopUp.\n" + exceptionMsg);
+			WritingToFile.appendLineToFileAbsolute(exceptionMsg, Constant.getCommonPath() + Constant.errorFileName);
 		}
-	}
-
-	/**
-	 * 
-	 * @param errorMsg
-	 * @return
-	 */
-	public static String getTracedErrorMsg(String errorMsg)
-	{
-		StringBuilder sb = new StringBuilder("\nError:" + errorMsg + "\n" + "--------- current stack -------\n");
-		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
-		sb.append("timestamp:" + new Timestamp(System.currentTimeMillis()));
-		return sb.append("--------- ------- ----- -------").toString();
 	}
 
 	/**
@@ -106,6 +99,7 @@ public class PopUps
 		// Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		// sb.append("timestamp:" + new Timestamp(System.currentTimeMillis()));
 		System.err.println(getTracedErrorMsg(errorMsg) + "------- ----- EXITWITH WITH NON ZERO STATUS----- -----");
+		WritingToFile.appendLineToFileAbsolute(errorMsg, Constant.getCommonPath() + Constant.errorFileName);
 		System.exit(-1);
 		// return sb.append("--------- ------- ----- -------").toString();
 	}
@@ -121,7 +115,22 @@ public class PopUps
 		// Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		// System.err.println(sb.toString() + "------------");
 		// return sb.append("--------- ------- ----- -------").toString();
+		WritingToFile.appendLineToFileAbsolute(errorMsg, Constant.getCommonPath() + Constant.errorFileName);
 	}
+
+	// /**
+	// *
+	// * @param errorMsg
+	// */
+	// public static void printTracedErrorMsgAndWriteToFile(String errorMsg, String errorFileName)
+	// {
+	// System.err.println(getTracedErrorMsg(errorMsg) + "\n------- ---------- -----");
+	// WritingToFile.appendLineToFileAbsolute(errorMsg, errorFileName);
+	// // StringBuilder sb = new StringBuilder("\nError:" + errorMsg + "\n" + "--------- current stack -------\n");
+	// // Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
+	// // System.err.println(sb.toString() + "------------");
+	// // return sb.append("--------- ------- ----- -------").toString();
+	// }
 
 	/**
 	 * 
@@ -134,6 +143,20 @@ public class PopUps
 		// Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		// System.err.println(sb.toString() + "------------");
 		// return sb.append("--------- ------- ----- -------").toString();
+		WritingToFile.appendLineToFileAbsolute(errorMsg, Constant.getCommonPath() + Constant.warningFileName);
+	}
+
+	/**
+	 * 
+	 * @param errorMsg
+	 * @return
+	 */
+	public static String getTracedErrorMsg(String errorMsg)
+	{
+		StringBuilder sb = new StringBuilder("\nError:" + errorMsg + "\n" + "--------- current stack -------\n");
+		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
+		sb.append("timestamp:" + new Timestamp(System.currentTimeMillis()));
+		return sb.append("--------- ------- ----- -------").toString();
 	}
 
 	/**

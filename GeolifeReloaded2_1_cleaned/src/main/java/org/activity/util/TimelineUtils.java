@@ -739,7 +739,7 @@ public class TimelineUtils
 		{// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
 			StringBuilder locInfo = new StringBuilder();
 			locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
-			WritingToFile.writeToNewFile(locInfo.toString(), Constant.outputCoreResultsPath + "LocationMap.csv");
+			WritingToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
 
 		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0,
@@ -864,7 +864,7 @@ public class TimelineUtils
 		WritingToFile.writeToNewFile(
 				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
 						.collect(Collectors.joining("\n")),
-				Constant.outputCoreResultsPath + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
+				Constant.getOutputCoreResultsPath() + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
 		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
 		return activityObjectsDatewise;
 
@@ -2590,7 +2590,8 @@ public class TimelineUtils
 	 * @param usersDayTimelines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Timeline> expungeInvalidsDayTimelines(LinkedHashMap<Date, Timeline> usersDayTimelines)
+	public static LinkedHashMap<Date, Timeline> expungeInvalidsDayTimelines(
+			LinkedHashMap<Date, Timeline> usersDayTimelines)
 	{
 		return usersDayTimelines.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(),
 				e -> TimelineUtils.expungeInvalids(e.getValue()), (v1, v2) -> v1, LinkedHashMap<Date, Timeline>::new));
@@ -3030,8 +3031,8 @@ public class TimelineUtils
 	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
 			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
 	{// ArrayList<ActivityObject> activitiesGuidingRecomm,*/
-		LinkedHashMap<Date, Timeline> candidateTimelines = TimelineExtractors.extractDaywiseCandidateTimelines(trainingTimelines,
-				dateAtRecomm, activityAtRecommPoint);
+		LinkedHashMap<Date, Timeline> candidateTimelines = TimelineExtractors
+				.extractDaywiseCandidateTimelines(trainingTimelines, dateAtRecomm, activityAtRecommPoint);
 		if (candidateTimelines.size() > 0)
 			return true;
 		else
@@ -4089,7 +4090,7 @@ public class TimelineUtils
 			if (writeToFile)
 			{
 				WritingToFile.writeToNewFile(sb.toString(),
-						Constant.outputCoreResultsPath + "NumOfUniquePDValPerUser.csv");
+						Constant.getOutputCoreResultsPath() + "NumOfUniquePDValPerUser.csv");
 			}
 		}
 		catch (Exception e)

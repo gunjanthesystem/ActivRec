@@ -6,13 +6,17 @@ import java.util.function.Function;
 import org.activity.objects.Pair;
 import org.activity.stats.StatsUtils;
 
+/**
+ * 
+ * @author gunjan
+ *
+ */
 public class PerformanceAnalytics
 {
 
 	public static void main(String[] args)
 	{
 		System.out.println(getHeapInformation());
-
 	}
 
 	/**
@@ -42,6 +46,11 @@ public class PerformanceAnalytics
 		return new Pair<R, Long>(res, timeDiff);
 	}
 
+	/**
+	 * 
+	 * @param fun
+	 * @param label
+	 */
 	public static void timeThisFunction(Runnable fun, String label)
 	{
 		System.out.println("~~~~~~~~~\nTiming function: " + label);
