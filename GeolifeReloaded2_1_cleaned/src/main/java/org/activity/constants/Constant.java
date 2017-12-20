@@ -59,8 +59,7 @@ public final class Constant
 										// dcu_data_2";// "geolife1";// "start_base_2";databaseName
 	public static String rankScoring = "";// "sum";// default product"; // "sum"
 	public static final Enums.CaseType caseType = Enums.CaseType.SimpleV3;// null;// String caseType CaseBasedV1";//
-																			// default "
-	// CaseBasedV1 " or SimpleV3
+																			// default// CaseBasedV1 " or SimpleV3
 
 	public static String howManyUsers = "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
 	static double currentMatchingUnit = -99; // stores the current matching unit at all times, used for some
@@ -76,8 +75,7 @@ public final class Constant
 
 	public static final double maxForNorm = 9999999; // assuming unnormalised edit distance is never greater than this
 	public static final double minForNorm = -9999999; // assuming unnormalised edit distance is never lower than this.
-														// note: in current form edit distance cannot
-														// be negative
+														// note: in current form edit distance cannot be negative
 
 	public static final double distanceTravelledAlert = 200; // kms
 	public static final double unknownDistanceTravelled = -9999;
@@ -93,7 +91,7 @@ public final class Constant
 	/**
 	 * Path to the folder were all the results will be stored
 	 */
-	public static String outputCoreResultsPath = "";
+	static String outputCoreResultsPath = "";
 
 	// ////************* PARAMETERS TO BE SET ********************//////
 	public static final boolean hasInvalidActivityNames = false;
@@ -166,13 +164,13 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NGram;// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// .PureAKOM;// AKOM .RNN1;//
-																							// SWITCH_NOV10
-	public static final int AKOMHighestOrder = 3;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10//AKOM
+
+	public static final int AKOMHighestOrder = -1;// 3;// SWITCH_NOV10
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;
 	/**
@@ -239,16 +237,16 @@ public final class Constant
 	public static final boolean only1CandFromEachCollUser = false; // SWITCH_NOV10
 	public static int numOfCandsFromEachCollUser = -1;//// SWITCH_NOV10
 
-	public static boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
-	public static int recentDaysInTrainingTimelines = 5;// SWITCH_NOV10
+	public static final boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
+	public static final int recentDaysInTrainingTimelines = 1;// SWITCH_NOV10
 
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
 	// Filtering the candidate timeline
 	// SWITCH_NOV10
-	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.None;// NearestNeighbour,
-																									// None,Percentile
+	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
+	// None,Percentile
 	/**
 	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
 	 * 0-100
@@ -257,7 +255,7 @@ public final class Constant
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int nearestNeighbourCandEDThreshold = -1;// 500;/// -1;// 100;// 1500;// 100;// -1 for no
+	public static final int nearestNeighbourCandEDThreshold = 500;// 500;/// -1;// 100;// 1500;// 100;// -1 for no
 																	// filter,
 	/// //SWITCH_NOV10
 	// End of parameters for Candidate timelines
@@ -273,7 +271,30 @@ public final class Constant
 
 	public static final double ClosestTimeDiffThresholdInSecs = 10800; // 3 hrs
 
-	public static final boolean NGramColl = true;
+	public static final boolean NGramColl = false;// SWITCH_NOV10
+
+	public static final String errorFileName = "ErrorExceptionLogFile.txt";
+	public static final String warningFileName = "WarniningLogFile.txt";
+	public static final String messageFileName = "MessageLogFile.txt";
+	public static final String configFileName = "ConfigLogFile.txt";
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static String getOutputCoreResultsPath()
+	{
+		return outputCoreResultsPath;
+	}
+
+	/**
+	 * 
+	 * @param outputCoreResultsPath
+	 */
+	public static void setOutputCoreResultsPath(String outputCoreResultsPath)
+	{
+		Constant.outputCoreResultsPath = outputCoreResultsPath;
+	}
 
 	/**
 	 * 

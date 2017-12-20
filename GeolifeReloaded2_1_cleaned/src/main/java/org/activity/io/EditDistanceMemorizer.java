@@ -72,7 +72,7 @@ public class EditDistanceMemorizer
 			StringBuilder sb = new StringBuilder();
 			editDistancesMemory.entrySet().stream().forEach(e -> sb.append(e.getKey() + "," + e.getValue() + "\n"));
 			WritingToFile.writeToNewFile(sb.toString(),
-					Constant.outputCoreResultsPath + "EditDistanceMemorised" + countOfSerialisedMaps + ".csv");
+					Constant.getOutputCoreResultsPath() + "EditDistanceMemorised" + countOfSerialisedMaps + ".csv");
 			// long t2 = System.nanoTime();
 
 			// System.out.println("Writing took:" + (t2 - t1) + " nsecs");
@@ -93,7 +93,7 @@ public class EditDistanceMemorizer
 
 		countOfSerialisedMaps += 1;
 		Serializer.kryoSerializeThis(editDistancesMemory,
-				Constant.outputCoreResultsPath + "EditDistanceMemorised" + countOfSerialisedMaps + ".kryo");
+				Constant.getOutputCoreResultsPath() + "EditDistanceMemorised" + countOfSerialisedMaps + ".kryo");
 
 		editDistancesMemory.clear();
 
@@ -108,8 +108,8 @@ public class EditDistanceMemorizer
 		// .forEachOrdered(e -> sb.append(e.getKey() + " : " + e.getValue() + "\n"));
 		// System.out.println(sb.toString());
 		countOfSerialisedMaps += 1;
-		Serializer.kryoSerializeThis(editDistancesMemory, Constant.outputCoreResultsPath + "EditDistanceMemorised_User"
-				+ userID + "_" + countOfSerialisedMaps + ".kryo");
+		Serializer.kryoSerializeThis(editDistancesMemory, Constant.getOutputCoreResultsPath()
+				+ "EditDistanceMemorised_User" + userID + "_" + countOfSerialisedMaps + ".kryo");
 
 		editDistancesMemory.clear();
 

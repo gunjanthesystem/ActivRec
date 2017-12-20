@@ -24,7 +24,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
-import org.activity.spmf.AKOMSeqPredictor;
+import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -163,6 +163,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param actObjsToAddToCurrentTimeline
 	 * @param trainTestTimelinesForAllUsers
 	 * @param trainTimelinesAllUsersContinuous
+	 * @param altSeqPredictor
 	 */
 	public RecommendationMasterMar2017AltAlgoSeqNov2017(LinkedHashMap<Date, Timeline> trainingTimelines,
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
@@ -170,7 +171,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
 			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor)
 	{
 		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
 		try
@@ -570,7 +571,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 			this.recommendedActivityNamesWithRankscores = getTopPredictedAKOMActivityPDVals(
 					this.activitiesGuidingRecomm, this.caseType, this.lookPastType, this.candidateTimelines, 1, false,
-					Constant.AKOMHighestOrder, this.userIDAtRecomm);
+					Constant.AKOMHighestOrder, this.userIDAtRecomm, altSeqPredictor);
 
 			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityPDvalsWithRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
@@ -639,12 +640,11 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			//////////////
 		}
 
-		catch (
-
-		Exception e)
+		catch (Exception e)
 		{
-			e.printStackTrace();
-			PopUps.getTracedErrorMsg("Exception in recommendation master");
+			// e.printStackTrace();
+			// PopUps.getTracedErrorMsg("Exception in recommendation master");
+			PopUps.printTracedErrorMsg("Exception in recommendation master");
 		}
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
@@ -660,14 +660,15 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param verbose
 	 * @param highestOrder
 	 * @param userID
+	 * @param alternateSeqPredictor
 	 * @return
+	 * @throws Exception
 	 */
 	private LinkedHashMap<String, Double> getTopPredictedAKOMActivityPDVals(
 			ArrayList<ActivityObject> activitiesGuidingRecomm, CaseType caseType, LookPastType lookPastType,
 			LinkedHashMap<String, Timeline> candidateTimelines, double constantValScore, boolean verbose,
-			int highestOrder, String userID)
+			int highestOrder, String userID, Enums.AltSeqPredictor alternateSeqPredictor) throws Exception
 	{
-
 		LinkedHashMap<String, Double> res = new LinkedHashMap<>();
 
 		if (lookPastType.equals(Enums.LookPastType.Daywise) || lookPastType.equals(Enums.LookPastType.NCount))
@@ -676,30 +677,32 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			// Convert current timeline to a seq of integers
 			ArrayList<Integer> currSeq = TimelineTransformers.timelineToSeqOfActIDs(activitiesGuidingRecomm, false);
 
-			// if NCount mathching, then the next activity should be included in the training seq
+			// if NCount matching, then the next activity should be included in the training seq.
 			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended = candidateTimelines;
 
-			if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
-					&& !Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
-			{// there is no Next act for pure AKOM
-				// Start of Added on 3 Dec 2017
+			// However, for Pure AKOM approach there is no Next act since the candidate timeline from each user is its
+			// entire trainining timeline (reduced or not reduced)
+			if (alternateSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+					&& !alternateSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
+			{
 				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
 				{
 					TimelineWithNext t = (TimelineWithNext) candT.getValue();
 					t.appendAO(t.getNextActivityObject());
 				}
-				// End of Added on 3 Dec 2017
 			}
 
 			// Convert cand timeline to a list of seq of integers
-			ArrayList<ArrayList<Integer>> candTimelinesAsSeq = new ArrayList<>();
+			// On 15 Dec 2017 removed candTimelinesAsSeq to be as internal to getAKOMPredictedSymbol()
+			// ArrayList<ArrayList<Integer>> candTimelinesAsSeq = new ArrayList<>();
 
 			// System.out.println("Cand timelines:");
 
 			// System.out.println("predictedNextSymbol = ");
 			// TimelineTransformers.timelineToSeqOfActIDs(timeline, delimiter)
 			int predSymbol = getAKOMPredictedSymbol(highestOrder, userID, currSeq, candidateTimelinesWithNextAppended,
-					candTimelinesAsSeq);
+					alternateSeqPredictor);
+			// candTimelinesAsSeq);
 
 			// System.out.println("predictedNextSymbol = " +
 			// SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
@@ -724,20 +727,25 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param userID
 	 * @param currSeq
 	 * @param candidateTimelinesWithNextAppended
-	 * @param candTimelinesAsSeq
+	 * @param alternateSeqPredictor
 	 * @return
+	 * @throws Exception
 	 */
 	private int getAKOMPredictedSymbol(int highestOrder, String userID, ArrayList<Integer> currSeq,
 			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended,
-			ArrayList<ArrayList<Integer>> candTimelinesAsSeq)
+			Enums.AltSeqPredictor alternateSeqPredictor) throws Exception// ArrayList<ArrayList<Integer>>
+	// candTimelinesAsSeq
 	{
+		ArrayList<ArrayList<Integer>> candTimelinesAsSeq = new ArrayList<>();
+
 		int predSymbol = -1;
-		AKOMSeqPredictor seqPredictor = null;
+		AKOMSeqPredictorLighter seqPredictor = null;
 		boolean savedReTrain = false;
-		AKOMSeqPredictor sanityCheckSeqPredictor = null;
-		if (Constant.sameAKOMForAllRTsOfAUser && Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
+		AKOMSeqPredictorLighter sanityCheckSeqPredictor = null;
+
+		if (Constant.sameAKOMForAllRTsOfAUser && alternateSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
 		{
-			seqPredictor = AKOMSeqPredictor.getSeqPredictorsForEachUserStored(userID);
+			seqPredictor = AKOMSeqPredictorLighter.getSeqPredictorsForEachUserStored(userID);
 			if (seqPredictor == null) // AKOM NOT already trained for this user
 			{
 				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
@@ -745,7 +753,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 					candTimelinesAsSeq.add(TimelineTransformers
 							.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
 				}
-				seqPredictor = new AKOMSeqPredictor(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
+				seqPredictor = new AKOMSeqPredictorLighter(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
 			}
 			else
 			{
@@ -760,7 +768,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				candTimelinesAsSeq.add(TimelineTransformers
 						.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
 			}
-			seqPredictor = new AKOMSeqPredictor(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
+			seqPredictor = new AKOMSeqPredictorLighter(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
 		}
 
 		predSymbol = seqPredictor.getAKOMPrediction(currSeq, false);// verbose);
@@ -794,6 +802,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @return
 	 */
 	private static LinkedHashMap<String, String> extractCandUserIDs(LinkedHashMap<String, Timeline> candidateTimelines)
+			throws Exception
 	{
 		LinkedHashMap<String, String> candUserIDs = new LinkedHashMap<>();
 		try
@@ -808,7 +817,6 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				{
 					PopUps.printTracedErrorMsgWithExit("Error: not taking care of this case");
 				}
-
 			}
 		}
 		catch (Exception e)

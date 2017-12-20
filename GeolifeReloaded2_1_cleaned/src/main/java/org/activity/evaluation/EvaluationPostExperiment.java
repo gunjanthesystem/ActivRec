@@ -50,13 +50,13 @@ public class EvaluationPostExperiment
 
 		for (String shead : s)
 		{
-			Constant.outputCoreResultsPath = path + shead + "/";
+			Constant.setOutputCoreResultsPath(path + shead + "/");
 			// PopUps.showMessage("Constant.outputCoreResultsPath=" + Constant.outputCoreResultsPath);
 			double[] matchingUnitArray = Constant.matchingUnitAsPastCount;
 
 			for (double mu : matchingUnitArray)
 			{
-				Constant.setCommonPath(Constant.outputCoreResultsPath + "MatchingUnit" + String.valueOf(mu) + "/");
+				Constant.setCommonPath(Constant.getOutputCoreResultsPath() + "MatchingUnit" + String.valueOf(mu) + "/");
 
 				for (String timeCategory : timeCategories)
 				{
@@ -70,7 +70,7 @@ public class EvaluationPostExperiment
 					// // writePerActivityMeanReciprocalRank("BaselineDuration", timeCategory);
 				}
 			}
-			Constant.setCommonPath(Constant.outputCoreResultsPath);
+			Constant.setCommonPath(Constant.getOutputCoreResultsPath());
 		}
 	}
 
@@ -323,20 +323,20 @@ public class EvaluationPostExperiment
 			// +
 			// features[j] + "/";
 
-			Constant.outputCoreResultsPath = path;// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June5/DCU/SimpleV3/";//
+			Constant.setOutputCoreResultsPath(path);// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June5/DCU/SimpleV3/";//
 													// /run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/May7_2015/DCU/Sum1/";//
 													// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/May19/Geolife/Sum1/";
 			System.out.println("path=" + path);
 			ConnectDatabase.initialise(Constant.getDatabaseName());// .DATABASE_NAME); // all method and variable in
 																	// this class are static
-			String commonPath = Constant.outputCoreResultsPath;
+			String commonPath = Constant.getOutputCoreResultsPath();
 			Constant.initialise("", Constant.getDatabaseName());// .DATABASE_NAME);
 
 			double[] matchingUnitArray = Constant.matchingUnitAsPastCount;
 			// Disabled as already written
 			for (double mu : matchingUnitArray)
 			{
-				Constant.setCommonPath(Constant.outputCoreResultsPath + "MatchingUnit" + String.valueOf(mu) + "/");
+				Constant.setCommonPath(Constant.getOutputCoreResultsPath() + "MatchingUnit" + String.valueOf(mu) + "/");
 
 				for (String timeCategory : timeCategories)
 				{
@@ -345,7 +345,7 @@ public class EvaluationPostExperiment
 					writePerActivityMeanReciprocalRank("BaselineDuration", timeCategory);
 				}
 			}
-			Constant.setCommonPath(Constant.outputCoreResultsPath);// + "MatchingUnit" + String.valueOf(mu) + "/");
+			Constant.setCommonPath(Constant.getOutputCoreResultsPath());// + "MatchingUnit" + String.valueOf(mu) + "/");
 
 			for (String timeCategory : timeCategories)
 			{
@@ -717,8 +717,8 @@ public class EvaluationPostExperiment
 
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile(
-					commonPath + fileNamePhrase + timeCategory + "PerActivityMeanReciprocalRank.csv");
+			BufferedWriter bw = WritingToFile
+					.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "PerActivityMeanReciprocalRank.csv");
 			BufferedWriter bwDistri = WritingToFile.getBWForNewFile(commonPath + "NumOfRTsPerAct.csv");
 			BufferedReader brRR = new BufferedReader(
 					new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));

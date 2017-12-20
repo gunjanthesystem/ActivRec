@@ -16,44 +16,44 @@ public class SuperController
 
 	public static void main(String args[])
 	{
+		// HERE
+		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Dec11NGRam/" };
-		// ./dataWritten/Dec11NGram/" };// {
-		// "./dataWritten/Nov16_AKOM3_916U_10cand/",
-		// "./dataWritten/Nov16_AKOM3_916U_50cand/",
-		// "./dataWritten/Nov16_AKOM3_916U_100cand/" };
-		// int[] numOfCandsPerUser = { 10, 50, 100 };
-		// {
-		// "/dataWritten/Nov10_AKOM1_9k1cand/"
-		// };
+		String[] commonPaths = { "./dataWritten/Dec20_NCount_AllCand1DayFilter/" };
+		// "./dataWritten/Dec16_PureAKOM_NoCandDayFIlter_Order3/" };
+		// "/run/media/gunjan/BufferVault/GowallaResults/Dec14_PureAKOM_NoCandDayFilter_Order1/" };
+		// ./dataWritten/Dec11NGram/" };// { "./dataWritten/Nov16_AKOM3_916U_10cand/",
+		// "./dataWritten/Nov16_AKOM3_916U_50cand/", "./dataWritten/Nov16_AKOM3_916U_100cand/" };
+		// int[] numOfCandsPerUser = { 10, 50, 100 }; { "/dataWritten/Nov10_AKOM1_9k1cand/"};
 		// { "./dataWritten/Nov12_NCount916U916N1C1500T/", "./dataWritten/Nov12_NCount916U916N1C750T/",
 		// "./dataWritten/Nov12_NCount916U916N1C500T/", "./dataWritten/Nov12_NCount916U916N1C250T/" };
 
-		// for (int i = commonPaths.length - 1; i >= 0; i--)
 		for (int i = 0; i <= commonPaths.length - 1; i++)
 		{
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
 			String commonPath = commonPaths[i];
 
-			runExperiments(commonPath, false, true, false);
+			runExperiments(commonPath, true, false, false);
 			System.out.println("finished for commonPath = " + commonPath);
 		}
 
 		System.out.println(" Exiting SuperController");
 		// End
-		// cleanUpSpace();
+		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
 	}
 
-	public static void cleanUpSpace()
+	/**
+	 * 
+	 **/
+	public static void cleanUpSpace(String commonPath, double ratioOfPercentageFilesToDelete)
 	{
-		String commonPath = "./dataWritten/Aug14Filter500/";
-
+		// String commonPath = "./dataWritten/Aug14Filter500/";
 		String s = ("cleanUpSpace called on commonPath=" + commonPath + "\n");
 		System.out.println(s);
 
 		String deleteConsoleLogs = Searcher.searchAndRandomDelete2(commonPath, "consoleLog",
-				Arrays.asList("rror", "xception"), 0.80);
+				Arrays.asList("rror", "xception"), ratioOfPercentageFilesToDelete);
 
 		System.out.println("result= " + deleteConsoleLogs);
 		// Timestamp
@@ -141,15 +141,15 @@ public class SuperController
 
 		Constant.setDatabaseName("gowalla1");// "");// ("dcu_data_2");// "geolife1";//gowalla1
 		// Constant.caseType = Enums.CaseType.SimpleV3;/// "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
-		Constant.outputCoreResultsPath = commonPathGowalla;// commonPathGeolife;// commonPathDCU + "SimpleV3/";//
-															// "/home/gunjan/DCU/SimpleV3/";//
+		Constant.setOutputCoreResultsPath(commonPathGowalla);// commonPathGeolife;// commonPathDCU + "SimpleV3/";//
+																// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
 
 		if (recommendation)
 		{
 			// //curtain may 19 2017 start
-			new ControllerWithoutServer();
+			ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer();
 			// //curtain may 19 2017 end
 		}
 

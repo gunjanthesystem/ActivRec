@@ -776,7 +776,7 @@ public class TimelineTransformers
 	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
 	 *         given delimiter
 	 */
-	public static ArrayList<Integer> timelineToSeqOfActIDs(ArrayList<ActivityObject> givenAOs, boolean verbose)
+	public static ArrayList<Integer> timelineToSeqOfActIDsV0(ArrayList<ActivityObject> givenAOs, boolean verbose)
 	{
 
 		ArrayList<Integer> res = (ArrayList<Integer>) givenAOs.stream().map(ao -> Integer.valueOf(ao.getActivityName()))
@@ -792,5 +792,44 @@ public class TimelineTransformers
 		}
 
 		return res;
+	}
+
+	/**
+	 * Convert list of activity objects to a list of activity IDs.
+	 * <p>
+	 * Created to use for each loop instead of streams as stream was running out memory.
+	 * 
+	 * @param givenAOs
+	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
+	 *         given delimiter
+	 * @since 15 Dec 2017
+	 */
+	public static ArrayList<Integer> timelineToSeqOfActIDs(ArrayList<ActivityObject> givenAOs, boolean verbose)
+	{
+		ArrayList<Integer> seqOfActIDs2 = new ArrayList<>(givenAOs.size());
+		// ArrayList<Integer> seqOfActIDs = new ArrayList<>(givenAOs.size());
+		// for (ActivityObject ao : givenAOs){ seqOfActIDs.add(Integer.valueOf(ao.getActivityName()));}
+
+		for (ActivityObject ao : givenAOs)
+		{
+			seqOfActIDs2.add(ao.getActivityID());
+		}
+
+		// start of sanity check Passed
+		// if (true){if (seqOfActIDs.equals(seqOfActIDs2)){
+		// System.out.println("Sanity check Dec 15_2 passed");
+		// }else{System.out.println("Sanity check Dec 15_2 failed");} }
+		// end of sanity check
+
+		if (verbose)
+		{
+			StringBuilder sb = new StringBuilder();
+			givenAOs.stream().forEachOrdered(ao -> sb.append(ao.getActivityID() + ">>"));
+			sb.append("\n");
+			seqOfActIDs2.stream().forEachOrdered(i -> sb.append(i + ">>"));
+			System.out.println("---timelineToSeqOfActIDs verbose-\n" + sb.toString() + "\n-----\n");
+		}
+
+		return seqOfActIDs2;
 	}
 }

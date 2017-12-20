@@ -162,12 +162,14 @@ public class BalancedIntegerTree
 				numOfLeavesTraversed += 1;
 				ArrayList<Integer> word = new ArrayList<>(strlen);
 
-				Enumeration<DefaultMutableTreeNode> e = leaf.pathFromAncestorEnumeration(root);
-				DefaultMutableTreeNode skipRoot = e.nextElement(); // skip the -1 root
+				// Enumeration<DefaultMutableTreeNode> e = leaf.pathFromAncestorEnumeration(root);
+				Enumeration e = leaf.pathFromAncestorEnumeration(root);
+
+				DefaultMutableTreeNode skipRoot = (DefaultMutableTreeNode) e.nextElement(); // skip the -1 root
 
 				while (e.hasMoreElements())
 				{
-					DefaultMutableTreeNode temp = e.nextElement();
+					DefaultMutableTreeNode temp = (DefaultMutableTreeNode) e.nextElement();
 					// System.out.print("\nDebug: temp.getUserObject().toString()" + temp.getUserObject().toString());
 					word.add((Integer) temp.getUserObject());// e.nextElement().toString()));// TODO can we improve
 				}

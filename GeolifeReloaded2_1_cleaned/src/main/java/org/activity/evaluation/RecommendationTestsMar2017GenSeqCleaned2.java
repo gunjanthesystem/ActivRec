@@ -182,7 +182,7 @@ public class RecommendationTestsMar2017GenSeqCleaned2
 						Constant.setCurrentMatchingUnit(matchingUnit); // used for sanity checks
 						System.out.println("Executing RecommendationTests for matching unit: " + matchingUnit);
 
-						commonPath = computeCommonPath(matchingUnit, lookPastType, Constant.outputCoreResultsPath,
+						commonPath = computeCommonPath(matchingUnit, lookPastType, Constant.getOutputCoreResultsPath(),
 								thresholdValue);
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());

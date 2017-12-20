@@ -95,9 +95,9 @@ public class TimelineStats
 	public static void timelineStatsController(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
-		Constant.setCommonPath(Constant.outputCoreResultsPath);
+		Constant.setCommonPath(Constant.getOutputCoreResultsPath());
 		// PopUps.showMessage("Inside timelineStats controller");
-		String directoryToWrite = Constant.outputCoreResultsPath + Constant.getDatabaseName() + "_"
+		String directoryToWrite = Constant.getOutputCoreResultsPath() + Constant.getDatabaseName() + "_"
 				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
 				+ typeOfAnalysis + "_" + Constant.howManyUsers;
 

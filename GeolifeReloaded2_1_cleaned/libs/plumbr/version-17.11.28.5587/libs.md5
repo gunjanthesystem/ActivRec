@@ -1,0 +1,7 @@
+#Mon Nov 27 15:40:05 EET 2017
+lib/win/64/plumbr.dll=4298c8d5526bf419b8bfc43a36ce0dc5
+lib/win/32/plumbr.dll=2ecfc044dbe8579c711265497fe0b70b
+lib/mac/32/libplumbr.jnilib=ca284046ad11dadb9d4b6f2055e1cdc5
+lib/linux/64/libplumbr.so=4225b876434c1faa39fe82fe97787b21
+lib/linux/32/libplumbr.so=19edef9b37fa431fd11650d16e944354
+lib/mac/64/libplumbr.jnilib=7b92e028ef2a7c7368a0851bb71c7e17

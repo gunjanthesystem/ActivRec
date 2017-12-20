@@ -78,19 +78,6 @@ public class DomainConstants
 			2045, 2046, 2133, 2214, 2224, 2232, 2444, 2479, 2616, 2643, 2691, 2702, 2723, 2732, 2755, 2825, 2839, 2900,
 			2962, 2980, 2999, 3006, 3014, 3028, 3050, 3099, 3129, 3186, 3396 };
 
-	public static boolean isGowallaUserIDsWithGT553MaxActsPerDay(int uid)
-	{
-		boolean found = false;
-		for (int i : gowallaUserIDsWithGT553MaxActsPerDay)
-		{
-			if (i == uid)
-			{
-				found = true;
-			}
-		}
-		return found;
-	}
-
 	public final static int numOfCatLevels = 3;
 
 	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
@@ -103,12 +90,47 @@ public class DomainConstants
 	public static TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap;
 	// public static final Integer hierarchyLevelForEditDistance = 1;// is in Constant class
 
+	/**
+	 * Labels for groups of 100 users. If label is "101" then users from 100 to 199 are included.
+	 */
 	public final static String[] gowallaUserGroupsLabels = { "1", "101", "201", "301", "401", "501", "601", "701",
 			"801", "901" };
 
 	// keeping it globally to avoid recomputing for each matching unit
 	// {UserID, {{PDVal,repAO},{PDVal,{precDuration,succDuration}}}
 	static LinkedHashMap<Integer, Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>> userIDRepAOResultMap;
+
+	/////////////////////////////////////////////////////////////
+
+	public static boolean isActNameTheActID()
+	{
+		if (Constant.getDatabaseName().equals("gowalla1"))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 * @param uid
+	 * @return
+	 */
+	public static boolean isGowallaUserIDsWithGT553MaxActsPerDay(int uid)
+	{
+		boolean found = false;
+		for (int i : gowallaUserIDsWithGT553MaxActsPerDay)
+		{
+			if (i == uid)
+			{
+				found = true;
+			}
+		}
+		return found;
+	}
 
 	public static void setUserIDRepAOResultMap(int userID)
 	{

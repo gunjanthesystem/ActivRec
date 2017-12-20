@@ -29,11 +29,11 @@ public class ActivityStats
 	 */
 	public static void getActivityStatsPerDay(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
-		Constant.setCommonPath(Constant.outputCoreResultsPath);
+		Constant.setCommonPath(Constant.getOutputCoreResultsPath());
 
 		String directoryToWrite;
 
-		directoryToWrite = Constant.outputCoreResultsPath + Constant.getDatabaseName()
+		directoryToWrite = Constant.getOutputCoreResultsPath() + Constant.getDatabaseName()
 				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
 				+ "ActivityPerDayStats";
 
@@ -52,14 +52,14 @@ public class ActivityStats
 	 * 
 	 * @param usersDayTimelinesAll
 	 */
-	public static void
-			writeDistinctActivities(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
+	public static void writeDistinctActivities(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
-		Constant.setCommonPath(Constant.outputCoreResultsPath);
+		Constant.setCommonPath(Constant.getOutputCoreResultsPath());
 
 		String directoryToWrite;
 
-		directoryToWrite = Constant.outputCoreResultsPath + Constant.getDatabaseName()
+		directoryToWrite = Constant.getOutputCoreResultsPath() + Constant.getDatabaseName()
 				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
 				+ "ActivityPerDayStats";
 

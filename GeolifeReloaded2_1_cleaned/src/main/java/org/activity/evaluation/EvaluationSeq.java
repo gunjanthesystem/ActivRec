@@ -173,7 +173,7 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount)
 	{
 		// commonPath = "./dataWritten/";
-		System.out.println("outputCoreResultsPath= " + Constant.outputCoreResultsPath);
+		System.out.println("outputCoreResultsPath= " + Constant.getOutputCoreResultsPath());
 		PathConstants.intialise(Constant.For9kUsers);
 		intialiseListOfFilenames(matchingUnitAsPastCount);
 		int totalNumOfUsersComputedFor = 0;
@@ -234,7 +234,7 @@ public class EvaluationSeq
 			}
 
 			WritingToFile.appendLineToFileAbsolute("Now will concatenate files: ",
-					Constant.outputCoreResultsPath + "Debug1.txt\n");
+					Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
 			System.out.println("Now will concatenate files: ");
 			// PopUps.showMessage("BREAKING");
 			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
@@ -251,7 +251,7 @@ public class EvaluationSeq
 					"AllNumDirectTopKAgreementsL1_", "AllPerDirectTopKAgreementsL1_" };
 
 			WritingToFile.appendLineToFileAbsolute("Now will write summary stats: ",
-					Constant.outputCoreResultsPath + "Debug1.txt\n");
+					Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
 			System.out.println("Now will write summary stats: ");
 			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
 
@@ -259,7 +259,7 @@ public class EvaluationSeq
 					"SummaryLog");
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
 					summaryStats, "SummaryTopKLog");
-			WritingToFile.appendLineToFileAbsolute("Finishing: ", Constant.outputCoreResultsPath + "Debug1.txt\n");
+			WritingToFile.appendLineToFileAbsolute("Finishing: ", Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
 		}
 		catch (Exception e)
 		{
