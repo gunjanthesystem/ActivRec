@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.activity.constants.Constant;
 import org.activity.ui.PopUps;
-import org.activity.util.PerformanceAnalytics;
 
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.Item;
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.Sequence;
@@ -40,6 +40,15 @@ public class AKOMSeqPredictorLighter
 	public static final AKOMSeqPredictorLighter getSeqPredictorsForEachUserStored(String userID)
 	{
 		return seqPredictorsForEachUserStored.get(userID);
+	}
+
+	/**
+	 * delete all stored AKOMSeqPredictorLighter because the stored users wont be involved anymore. This is because this
+	 * class was becoming too heavy and we need to make it light.
+	 */
+	public static final void clearSeqPredictorsForEachUserStored()
+	{
+		seqPredictorsForEachUserStored.clear();
 	}
 
 	public static void main(String args[])
@@ -122,8 +131,11 @@ public class AKOMSeqPredictorLighter
 			this.predictionModel = new MarkovAllKPredictor("AKOM", optionalParameters);
 			this.predictionModel.Train(trainingSet.getSequences());
 
-			seqPredictorsForEachUserStored.put(userID, this);
-
+			// be careful of storing this as this object can consume a lot of memory
+			if (Constant.sameAKOMForAllRTsOfAUser)
+			{
+				seqPredictorsForEachUserStored.put(userID, this);
+			}
 			// System.out.println("After training in AKOMSeqPredictor: " + PerformanceAnalytics.getHeapInformation());
 		}
 		catch (Exception e)
@@ -131,12 +143,14 @@ public class AKOMSeqPredictorLighter
 			e.printStackTrace();
 			PopUps.printTracedErrorMsg("");
 		}
-		catch (Error e)
-		{
-			e.printStackTrace();
-			PopUps.printTracedErrorMsg("");
-			System.out.println("Error in AKOMSeqPredictor(): " + PerformanceAnalytics.getHeapInformation());
-		}
+
+		// better to exit than to continue with error
+		// catch (Error e)
+		// {
+		// e.printStackTrace();
+		// PopUps.printTracedErrorMsg("");
+		// System.out.println("Error in AKOMSeqPredictor(): " + PerformanceAnalytics.getHeapInformation());
+		// }
 		System.out.println("Trained AKOM for user " + userID + "  in " + (System.currentTimeMillis() - t1) + "ms");
 	}
 

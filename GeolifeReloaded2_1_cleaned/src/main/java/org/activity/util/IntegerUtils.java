@@ -81,9 +81,10 @@ public class IntegerUtils
 	}
 
 	/**
-	 * Returns the num of digit in an int ref:
-	 * http://stackoverflow.com/questions/1306727/way-to-get-number-of-digits-in-an-int note: works for only until 10
-	 * digit after which it is out of int range
+	 * Returns the num of digit in an int
+	 * <p>
+	 * ref: http://stackoverflow.com/questions/1306727/way-to-get-number-of-digits-in-an-int note: works for only until
+	 * 10 digit after which it is out of int range
 	 * 
 	 * @param n
 	 * @return

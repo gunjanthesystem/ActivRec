@@ -235,7 +235,7 @@ public class ControllerWithoutServer
 
 			// $$TimelineStats.writeAllCitiesCounts(usersCleanedDayTimelines,
 			// $$ Constant.outputCoreResultsPath + "AllCitiesCount");
-			// // important curtain 1 start 10 Feb 2017
+			// // important curtain 1 start 21 Dec 2017 10 Feb 2017
 			if (Constant.For9kUsers)
 			{
 				// Start of curtain Aug 14 2017
@@ -251,7 +251,7 @@ public class ControllerWithoutServer
 						commonBasePath);
 				// End of curtain Aug 11 2017
 			}
-			// // important curtain 1 end 10 Feb 2017
+			// // important curtain 1 end 21 Dec 2017 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017
 			// TimelineStats.timelineStatsController(usersCleanedDayTimelines);
@@ -317,8 +317,9 @@ public class ControllerWithoutServer
 			// UtilityBelt.rearrangeDayTimelinesOrderForDataset(usersCleanedRearrangedDayTimelines);
 
 			/** CURRENT **/
-			// $TimelineWEKAClusteringController clustering =
-			// $ new TimelineWEKAClusteringController(usersCleanedDayTimelines, null);
+			// TimelineWEKAClusteringController clustering = new
+			// TimelineWEKAClusteringController(usersCleanedDayTimelines,
+			// null);
 			// usersCleanedRearrangedDayTimelines, null);
 
 			/** END OF CURRENT **/

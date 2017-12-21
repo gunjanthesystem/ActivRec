@@ -168,11 +168,11 @@ public final class Constant
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10//AKOM
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;// SWITCH_NOV10//AKOM
 
-	public static final int AKOMHighestOrder = -1;// 3;// SWITCH_NOV10
+	public static final int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
 
-	public static final boolean sameAKOMForAllRTsOfAUser = true;
+	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
 	 * restricting this baseline to day boundaries
@@ -195,8 +195,8 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0 };// 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4,
-																	// 6, 3, 8
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4,
+	// 6, 3, 8
 	// };// 1,3,5,8,3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,};//14, 16,18 };{ 0, 1, 2, 3,// 4, 5, 6
 	// };//// , 7, 8,9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,26, 28, 30 };// , 32,// 34,
 	// 36, 38, 40,42 };
@@ -234,28 +234,30 @@ public final class Constant
 	// Start of parameters for Candidate timelines
 	public static final boolean collaborativeCandidates = true;
 	// Number of candidate timelines extracted from each user in collaborative approach
-	public static final boolean only1CandFromEachCollUser = false; // SWITCH_NOV10
-	public static int numOfCandsFromEachCollUser = -1;//// SWITCH_NOV10
+	public static final boolean only1CandFromEachCollUser = true; // SWITCH_NOV10
+	public static int numOfCandsFromEachCollUser = 1;//// SWITCH_NOV10
 
-	public static final boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
-	public static final int recentDaysInTrainingTimelines = 1;// SWITCH_NOV10
+	public static final boolean filterTrainingTimelinesByRecentDays = false;// SWITCH_NOV10
+	public static final int recentDaysInTrainingTimelines = -1;// 5;// SWITCH_NOV10
 
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
 	// Filtering the candidate timeline
 	// SWITCH_NOV10
-	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
+	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.None;// NearestNeighbour,
 	// None,Percentile
 	/**
 	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
 	 * 0-100
 	 */
-	public static final double percentileCandEDThreshold = 25;// 100;// 25;// SWITCH_NOV10
+	public static final double percentileCandEDThreshold = -1;// 25;// 100;// 25;// SWITCH_NOV10
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int nearestNeighbourCandEDThreshold = 500;// 500;/// -1;// 100;// 1500;// 100;// -1 for no
+	public static final int nearestNeighbourCandEDThreshold = -1;// 750;// 500;// 500;/// -1;// 100;// 1500;// 100;// -1
+																	// for
+																	// no
 																	// filter,
 	/// //SWITCH_NOV10
 	// End of parameters for Candidate timelines
@@ -266,7 +268,7 @@ public final class Constant
 
 	public static final boolean memorizeEditDistance = false;
 
-	public static final boolean For9kUsers = false;// false; //SWITCH_NOV10
+	public static final boolean For9kUsers = false;// ;// false; //SWITCH_NOV10
 	////////////////////////////////////////////////////////////////////////
 
 	public static final double ClosestTimeDiffThresholdInSecs = 10800; // 3 hrs
@@ -319,6 +321,61 @@ public final class Constant
 		return timeZoneForExperiments;
 	}
 
+	////////////
+	public static double[] getMatchingUnitArray(Enums.LookPastType lookPastType)
+	{
+		double matchingUnitArray[] = new double[] { -99 };
+
+		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
+		{
+			matchingUnitArray = new double[] { 0 };
+			// System.out.println("Here set");
+			// PopUps.showError("Here Set");
+		}
+
+		else if (lookPastType.equals(Enums.LookPastType.NCount))// "Count"))
+		{
+			matchingUnitArray = Constant.matchingUnitAsPastCount;
+		}
+		else if (lookPastType.equals(Enums.LookPastType.NHours))// "Hrs"))
+		{
+			matchingUnitArray = Constant.matchingUnitHrsArray;
+		}
+		else if (lookPastType.equals(Enums.LookPastType.Daywise))// "Hrs"))
+		{
+			matchingUnitArray = new double[] { -9999 };
+		}
+		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))// "Hrs"))
+		{
+			matchingUnitArray = new double[] { -9999 };
+		}
+		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))// "Hrs"))
+		{
+			matchingUnitArray = new double[] { -9999 };
+		}
+
+		else if (lookPastType.equals(Enums.LookPastType.NGram))// "Hrs"))
+		{
+			matchingUnitArray = new double[] { 0 };
+		}
+
+		else if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
+		{
+			matchingUnitArray = new double[] { 0 };
+			System.out.println("Here set");
+			PopUps.showError("Here Set");
+		}
+		// else if
+		else
+		{
+			System.err.println(
+					"Error: unknown look past type in in setMatchingUnitArray() RecommendationTests():" + lookPastType);
+			System.exit(-1);
+		}
+		return matchingUnitArray;
+	}
+
+	/////////////
 	/**
 	 * Determines if the given matching unit array has any value in fractions. </br>
 	 * Useful to ensure no damage done if converting double to integer
