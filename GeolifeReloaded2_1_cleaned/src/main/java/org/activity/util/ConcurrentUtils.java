@@ -16,6 +16,11 @@ import org.apache.commons.lang3.RandomStringUtils;
  */
 public class ConcurrentUtils
 {
+	/**
+	 * 
+	 * @param num
+	 * @return
+	 */
 	public static ArrayList<Long> measureEDComputs(int num)
 	{
 		ArrayList<Long> time = new ArrayList<>();
@@ -28,6 +33,10 @@ public class ConcurrentUtils
 			if (i % 5 == 0)
 			{
 				words.put(Integer.toString(i), "ajoob");
+			}
+			else if (i % 2 == 0)
+			{
+				words.put(Integer.toString(i), "alob");
 			}
 			else
 			{
@@ -98,9 +107,16 @@ public class ConcurrentUtils
 		return time;
 	}
 
+	/**
+	 * Get edit distance between the given string S and the string "ajooba"
+	 * 
+	 * @param s
+	 * @return
+	 */
 	public static String getEditDist(String s)
 	{
 		Pair<String, Double> d = AlignmentBasedDistance.getMySimpleLevenshteinDistance(s, "ajooba", 1, 1, 2);
+		// System.out.println("Edit distance between item:" + s + " and item:ajooba = " + d.toString());
 		return d.toString();
 
 		// return s.substring(0, s.length() - 2);
@@ -108,13 +124,13 @@ public class ConcurrentUtils
 
 	public static void main(String args[])
 	{
-		int repeatTimes = 10;
+		int repeatTimes = 500;
 
 		ArrayList<Double> avgTime = new ArrayList<>(4);
 
 		for (int i = 0; i < repeatTimes; i++)
 		{
-			ArrayList<Long> timeCurrent = measureEDComputs(2000);// 0000);
+			ArrayList<Long> timeCurrent = measureEDComputs(5000);// 0000);
 
 			// if (timeCurrent.size() != avgTime.size())
 			// {

@@ -37,6 +37,7 @@ import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
 import org.activity.recomm.RecommendationMasterRNN1Nov2017;
 import org.activity.sanityChecks.Sanity;
+import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
@@ -160,7 +161,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		// { System.err.println("Warning with exit: results' directory not empty");
 		// System.exit(-1);}
 
-		setMatchingUnitArray(lookPastType);
+		// setMatchingUnitArray(lookPastType);
+		this.matchingUnitArray = Constant.getMatchingUnitArray(lookPastType);
 
 		// buildRepresentativeActivityObjectsForUsers()
 
@@ -397,6 +399,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
+
+							// Start of Added on 21 Dec 2017
+							AKOMSeqPredictorLighter.clearSeqPredictorsForEachUserStored();
+							// End of Added on 21 Dec 2017
+
 							System.out.println("\nUser id=" + userId);
 							// PopUps.showMessage("\nUser id=" + userId);
 							String userName = "";
@@ -1537,7 +1544,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			int numOfRecentDays)
 	{
 		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
-
+		System.out.println("Filtering by recent " + numOfRecentDays + " Days");
 		StringBuilder sb = new StringBuilder("Debug 10 Dec\t");
 
 		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsersDW
@@ -2650,48 +2657,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * 
 	 * @param lookPastType
 	 */
-	public void setMatchingUnitArray(Enums.LookPastType lookPastType)
-	{
-		if (lookPastType.equals(Enums.LookPastType.NCount))// "Count"))
-		{
-			this.matchingUnitArray = Constant.matchingUnitAsPastCount;// matchingUnitAsPastCount; //
-																		// PopUps.showMessage(matchingUnitArray.toString());
-		}
-		else if (lookPastType.equals(Enums.LookPastType.NHours))// "Hrs"))
-		{
-			this.matchingUnitArray = Constant.matchingUnitHrsArray;// matchingUnitHrsArray; //
-																	// PopUps.showMessage(matchingUnitArray.toString());
-		}
-		else if (lookPastType.equals(Enums.LookPastType.Daywise))// "Hrs"))
-		{
-			this.matchingUnitArray = new double[] { -9999 };
-		}
-		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))// "Hrs"))
-		{
-			this.matchingUnitArray = new double[] { -9999 };
-		}
-		else if (lookPastType.equals(Enums.LookPastType.ClosestTime))// "Hrs"))
-		{
-			this.matchingUnitArray = new double[] { -9999 };
-		}
-
-		else if (lookPastType.equals(Enums.LookPastType.NGram))// "Hrs"))
-		{
-			this.matchingUnitArray = new double[] { 0 };
-		}
-
-		else if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
-		{
-			this.matchingUnitArray = new double[] { 0 };
-		}
-		// else if
-		else
-		{
-			System.err.println(
-					"Error: unknown look past type in in setMatchingUnitArray() RecommendationTests():" + lookPastType);
-			System.exit(-1);
-		}
-	}
+	// public void setMatchingUnitArray(Enums.LookPastType lookPastType)
+	// {
+	// this.matchingUnitArray = Constant.getMatchingUnitArray(lookPastType);
+	// }
 
 	/**
 	 * Set the array of doubles containing threshold valyues to be used.

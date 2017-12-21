@@ -24,11 +24,12 @@ import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
+ * Fork of TimelinesAttributesExtraction to make it more coherent and clean
  * 
  * @author gunjan
  *
  */
-public class TimelinesAttributesExtraction
+public class TimelinesAttributesExtractionCleaned1
 {
 	String absoluteNameOfAttributesFile;
 	LinkedHashMap<String, ArrayList<String>> timelineAttributeVectors;
@@ -41,14 +42,6 @@ public class TimelinesAttributesExtraction
 	LinkedHashMap<String, String> groundTruth; // the map containg (raw user id, manual cluster)
 
 	private final int minEpochSampEn = 1, maxEpochSampEn = 3;// 4;
-
-	// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsFeb8/CountsForClusterLabelAccToMinMUHavMaxMRR.csv",
-	// 4, true);
-
-	// public LinkedHashMap<String, String> getUserIDClass()
-	// {
-	// return userIDActualClassMap;
-	// }
 
 	public LinkedHashMap<String, Integer> getUserIDInstanceID()
 	{
@@ -65,7 +58,7 @@ public class TimelinesAttributesExtraction
 	 *            (Absolute path to file containing ground truth, column in which ground truth is there, has column
 	 *            headers or not)
 	 */
-	public TimelinesAttributesExtraction(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
+	public TimelinesAttributesExtractionCleaned1(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
 			String pathToWrite, Triple<String, Integer, Boolean> groundTruthToRead)
 	{
 		// PopUps.showMessage("Num of user timelnes recieved inTimelinesFeatureExtraction= " +
@@ -98,61 +91,61 @@ public class TimelinesAttributesExtraction
 				"NumOfValidDistinctActivities/LengthOfTimeline");
 		//
 		//// curtian 1
-		// TimelineStats.transformAndWriteAsTimeseries((usersDayTimelines));//
-		// TimelineStats.performSampleEntropyVsMAnalysis2(usersDayTimelines, minEpochSampEn, maxEpochSampEn);//
-		// // UtilityBelt.reformatUserIDs
-		//
-		// System.out.println("Just after performSampleEntropyVsMAnalysis2");
-		// for (int m = minEpochSampEn; m <= maxEpochSampEn; m++)
-		// {
-		// System.out.println(" m = " + m);
-		// for (String featureName : Constant.getFeatureNames())
-		// {
-		// System.out.println("featureName = " + featureName);
-		// addDoubleAttributeToAttributeVectors(
-		// getFeatureSampleEntropyAfterExpungingInvalids((usersDayTimelines), featureName, m),
-		// "SampEn" + featureName + m);
-		// }
-		//
-		// addDoubleAttributeToAttributeVectors(
-		// getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Sum", m), "SampEn" + "Sum" + m);
-		// addDoubleAttributeToAttributeVectors(
-		// getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Avg", m), "SampEn" + "Avg" + m);
-		// addDoubleAttributeToAttributeVectors(
-		// getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "StdDev", m),
-		// "SampEn" + "StdDev" + m);
-		// addDoubleAttributeToAttributeVectors(
-		// getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Median", m),
-		// "SampEn" + "Median" + m);
-		// }
-		//
-		// LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> NGramFeatureVectors =
-		// getNGramAttributes(usersTimelinesInvalidsExpunged, 2, 3, pathToWrite);//
-		// writeNGramAttributes(NGramFeatureVectors, "NGramFeatures");
-		// addNGramAttributeVectorsToAttributeVectors(NGramFeatureVectors);
-		//
-		// // ///////////HJorth Paramaters//////////////////////////////////////////////////////
-		// TimelineStats.performHjorthParameterAnalysis(usersDayTimelines);
-		// for (String featureName : Constant.getFeatureNames())
-		// {
-		// if (featureName.equals("ActivityName")) // not a numerical feature, hence derivative based metric is not
-		// // suitable i think
-		// {
-		// continue;
-		// }
-		// else
-		// {
-		// addDoubleAttributeToAttributeVectors(
-		// getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 0),
-		// "" + featureName + "Activity");
-		// addDoubleAttributeToAttributeVectors(
-		// getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
-		// "" + featureName + "Mobility");
-		// addDoubleAttributeToAttributeVectors(
-		// getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
-		// "" + featureName + "Complexity");
-		// }
-		// }
+		TimelineStats.transformAndWriteAsTimeseries((usersDayTimelines));//
+		TimelineStats.performSampleEntropyVsMAnalysis2(usersDayTimelines, minEpochSampEn, maxEpochSampEn);//
+		// UtilityBelt.reformatUserIDs
+
+		System.out.println("Just after performSampleEntropyVsMAnalysis2");
+		for (int m = minEpochSampEn; m <= maxEpochSampEn; m++)
+		{
+			System.out.println(" m = " + m);
+			for (String featureName : Constant.getFeatureNames())
+			{
+				System.out.println("featureName = " + featureName);
+				addDoubleAttributeToAttributeVectors(
+						getFeatureSampleEntropyAfterExpungingInvalids((usersDayTimelines), featureName, m),
+						"SampEn" + featureName + m);
+			}
+
+			addDoubleAttributeToAttributeVectors(
+					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Sum", m), "SampEn" + "Sum" + m);
+			addDoubleAttributeToAttributeVectors(
+					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Avg", m), "SampEn" + "Avg" + m);
+			addDoubleAttributeToAttributeVectors(
+					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "StdDev", m),
+					"SampEn" + "StdDev" + m);
+			addDoubleAttributeToAttributeVectors(
+					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Median", m),
+					"SampEn" + "Median" + m);
+		}
+
+		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> NGramFeatureVectors = getNGramAttributes(
+				usersTimelinesInvalidsExpunged, 2, 3, pathToWrite);//
+		writeNGramAttributes(NGramFeatureVectors, "NGramFeatures");
+		addNGramAttributeVectorsToAttributeVectors(NGramFeatureVectors);
+
+		// ///////////HJorth Paramaters//////////////////////////////////////////////////////
+		TimelineStats.performHjorthParameterAnalysis(usersDayTimelines);
+		for (String featureName : Constant.getFeatureNames())
+		{
+			if (featureName.equals("ActivityName")) // not a numerical feature, hence derivative based metric is not
+			// suitable i think
+			{
+				continue;
+			}
+			else
+			{
+				addDoubleAttributeToAttributeVectors(
+						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 0),
+						"" + featureName + "Activity");
+				addDoubleAttributeToAttributeVectors(
+						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
+						"" + featureName + "Mobility");
+				addDoubleAttributeToAttributeVectors(
+						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
+						"" + featureName + "Complexity");
+			}
+		}
 		// // curtain1
 		// ///////////////////////////////////////////////////////////////////
 

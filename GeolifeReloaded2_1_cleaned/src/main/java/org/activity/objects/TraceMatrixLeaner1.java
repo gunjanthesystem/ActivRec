@@ -94,78 +94,6 @@ public class TraceMatrixLeaner1
 		// }
 	}
 
-	// /**
-	// *
-	// * @param rowIndex
-	// * @param colIndex
-	// * @param charArray
-	// * @param charsToAdd
-	// */
-	// public void addCharsToCell2(int rowIndex, int colIndex, char[] c1Array, char c2, char c3, char c4, int i5, char
-	// c6,
-	// int i7, char c8)
-	// {
-	// // System.out.println("--- entering addCharsToCell with (" + rowIndex + "," + colIndex + "), adding"
-	// // + String.valueOf(c1Array) + "," + c2 + "," + c3 + "," + c4 + "," + i5 + "," + c6 + "," + i7 + "," + c8
-	// // + "\n traceMatrix:\n" + this.toString());
-	// // int rowIndexEff = rowIndex * nCols;
-	// int effectiveIndex = rowIndex * nCols + colIndex;
-	// int currLengthOfThisCell = lengthOfCell[effectiveIndex];
-	//
-	// // System.out.println("currLengthOfThisCell at begin = " + currLengthOfThisCell);
-	// try
-	// {
-	// // if (c1Array != null) {
-	// for (char charToAdd : c1Array)
-	// {
-	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = charToAdd;
-	// }
-	// // System.out.println("currLengthOfThisCell after c1 = " + currLengthOfThisCell);// 63
-	//
-	// // }
-	//
-	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = c2;
-	// // 64
-	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = c3;
-	//
-	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = c4;
-	// // 66
-	// for (char charToAdd : IntegerUtils.intToCharArray(i5))// Integer.toString(i5).toCharArray())
-	// {
-	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = charToAdd;
-	// }
-	//
-	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = c6;
-	//
-	// for (char charToAdd : IntegerUtils.intToCharArray(i7))// Integer.toString(i7).toCharArray())
-	// {
-	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = charToAdd;
-	// }
-	//
-	// // System.out.println("currLengthOfThisCell at c8 = " + currLengthOfThisCell);
-	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell] = c8;
-	//
-	// // System.out.println("currEndPointOfThisCell = " + currEndPointOfThisCell);
-	// lengthOfCell[effectiveIndex] = currLengthOfThisCell + 1;
-	//
-	// // System.out.println(
-	// // "--- exiting addCharsToCell with" + String.valueOf(c1Array) + "," + c2 + "," + c3 + "," + c4 + ","
-	// // + i5 + "," + c6 + "," + i7 + "," + c8 + "\n traceMatrix:\n" + this.toStringActualLength());
-	//
-	// }
-	// catch (Exception e)
-	// {
-	// System.out.println("nRows= " + nRows + ", nCols= " + nCols);// + ", maxSizeOfCell = " + maxSizeOfCell);// );
-	// // System.out.println("traceMatrix:\n" + this.toString());
-	// // $$ System.err.println(("Error in org.activity.objects.TraceMatrix.addCharsToCell() , rowIndex=" +
-	// // rowIndex
-	// // + ", colIndex=" + colIndex + "\n traceMatrix:\n" + this.toStringActualLength()));
-	// e.printStackTrace();
-	// System.exit(-1);
-	// }
-	//
-	// }
-
 	/**
 	 * with indexed for loop for improved performance
 	 * 
@@ -317,6 +245,9 @@ public class TraceMatrixLeaner1
 		return res.toString();
 	}
 
+	/**
+	 * 
+	 */
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder(
@@ -335,6 +266,10 @@ public class TraceMatrixLeaner1
 		return sb.toString();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String toStringActualLength()
 	{
 		StringBuilder sb = new StringBuilder(
@@ -395,7 +330,79 @@ public class TraceMatrixLeaner1
 		if (!Arrays.deepEquals(threeDCharMatrix, other.threeDCharMatrix)) return false;
 		return true;
 	}
+	// Disabled below this
 
+	// /**
+	// *
+	// * @param rowIndex
+	// * @param colIndex
+	// * @param charArray
+	// * @param charsToAdd
+	// */
+	// public void addCharsToCell2(int rowIndex, int colIndex, char[] c1Array, char c2, char c3, char c4, int i5, char
+	// c6,
+	// int i7, char c8)
+	// {
+	// // System.out.println("--- entering addCharsToCell with (" + rowIndex + "," + colIndex + "), adding"
+	// // + String.valueOf(c1Array) + "," + c2 + "," + c3 + "," + c4 + "," + i5 + "," + c6 + "," + i7 + "," + c8
+	// // + "\n traceMatrix:\n" + this.toString());
+	// // int rowIndexEff = rowIndex * nCols;
+	// int effectiveIndex = rowIndex * nCols + colIndex;
+	// int currLengthOfThisCell = lengthOfCell[effectiveIndex];
+	//
+	// // System.out.println("currLengthOfThisCell at begin = " + currLengthOfThisCell);
+	// try
+	// {
+	// // if (c1Array != null) {
+	// for (char charToAdd : c1Array)
+	// {
+	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = charToAdd;
+	// }
+	// // System.out.println("currLengthOfThisCell after c1 = " + currLengthOfThisCell);// 63
+	//
+	// // }
+	//
+	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = c2;
+	// // 64
+	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = c3;
+	//
+	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = c4;
+	// // 66
+	// for (char charToAdd : IntegerUtils.intToCharArray(i5))// Integer.toString(i5).toCharArray())
+	// {
+	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = charToAdd;
+	// }
+	//
+	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = c6;
+	//
+	// for (char charToAdd : IntegerUtils.intToCharArray(i7))// Integer.toString(i7).toCharArray())
+	// {
+	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell++] = charToAdd;
+	// }
+	//
+	// // System.out.println("currLengthOfThisCell at c8 = " + currLengthOfThisCell);
+	// threeDCharMatrix[effectiveIndex][currLengthOfThisCell] = c8;
+	//
+	// // System.out.println("currEndPointOfThisCell = " + currEndPointOfThisCell);
+	// lengthOfCell[effectiveIndex] = currLengthOfThisCell + 1;
+	//
+	// // System.out.println(
+	// // "--- exiting addCharsToCell with" + String.valueOf(c1Array) + "," + c2 + "," + c3 + "," + c4 + ","
+	// // + i5 + "," + c6 + "," + i7 + "," + c8 + "\n traceMatrix:\n" + this.toStringActualLength());
+	//
+	// }
+	// catch (Exception e)
+	// {
+	// System.out.println("nRows= " + nRows + ", nCols= " + nCols);// + ", maxSizeOfCell = " + maxSizeOfCell);// );
+	// // System.out.println("traceMatrix:\n" + this.toString());
+	// // $$ System.err.println(("Error in org.activity.objects.TraceMatrix.addCharsToCell() , rowIndex=" +
+	// // rowIndex
+	// // + ", colIndex=" + colIndex + "\n traceMatrix:\n" + this.toStringActualLength()));
+	// e.printStackTrace();
+	// System.exit(-1);
+	// }
+	//
+	// }
 	// /**
 	// * Disabled as not used at the moment
 	// * @param rowIndex

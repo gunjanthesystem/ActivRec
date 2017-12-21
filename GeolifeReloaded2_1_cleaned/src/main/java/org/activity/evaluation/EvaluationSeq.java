@@ -98,7 +98,7 @@ public class EvaluationSeq
 				// PrintStream consoleLogStream =
 				// WritingToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
 
-				int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, true);
+				int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
 				totalNumOfUsersComputedFor += numOfUsersComputerFor;
 				System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
 				System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
@@ -198,9 +198,9 @@ public class EvaluationSeq
 					PrintStream consoleLogStream = WritingToFile
 							.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
-					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, true);
-					totalNumOfUsersComputedFor += numOfUsersComputerFor;
-					System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
+					int numOfUsersComputedFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
+					totalNumOfUsersComputedFor += numOfUsersComputedFor;
+					System.out.println("numOfUsersComputerFor = " + numOfUsersComputedFor);
 					System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
 
 					// PopUps.showMessage("FINISHED EVAL FOR mu = " + mu + " USERGROUP=" + groupsOf100UsersLabel);
@@ -301,7 +301,7 @@ public class EvaluationSeq
 					PrintStream consoleLogStream = WritingToFile
 							.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
-					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, true);
+					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
 					totalNumOfUsersComputedFor += numOfUsersComputerFor;
 					System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
 					System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
@@ -417,7 +417,8 @@ public class EvaluationSeq
 						// PrintStream consoleLogStream = WritingToFile
 						// .redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
-						int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, false);
+						int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath,
+								false);
 						totalNumOfUsersComputedFor += numOfUsersComputerFor;
 						System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
 						System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
@@ -873,9 +874,12 @@ public class EvaluationSeq
 	 * @param seqLength
 	 * @param pathToReadResults
 	 * @param pathToWrite
+	 * @param commonPath
+	 * @param verbose
 	 * @return
 	 */
-	public int doEvaluationSeq(int seqLength, String pathToReadResults, String pathToWrite, boolean verbose)
+	public int doEvaluationSeq(int seqLength, String pathToReadResults, String pathToWrite, String commonPath,
+			boolean verbose)
 	{
 		int numOfUsersComputedFor = Integer.MIN_VALUE;
 		System.out.println("Inside  doEvaluationSeq");
@@ -883,8 +887,9 @@ public class EvaluationSeq
 		{
 			// for (int i = 0; i < seqLength; i++)
 			// {
+			// Triple(arrayMeta, arrayActual, arrayTopK)
 			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArrays = readDataForSeqIndex(
-					seqLength, pathToReadResults, verbose);
+					seqLength, pathToReadResults, commonPath, verbose);
 
 			ArrayList<ArrayList<String>> arrayMeta = readArrays.getFirst();
 			ArrayList<ArrayList<String>> arrayRecommendedSequence = readArrays.getThird();
@@ -922,13 +927,14 @@ public class EvaluationSeq
 	 * 
 	 * @param seqIndex
 	 * @param pathToReadResults
+	 * @param commonPath
 	 * @param verbose
-	 * @return
+	 * @return Triple(arrayMeta, arrayActual, arrayTopK)
 	 */
 	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readDataForSeqIndex(
-			int seqIndex, String pathToReadResults, boolean verbose)
+			int seqIndex, String pathToReadResults, String commonPath, boolean verbose)
 	{
-		commonPath = Constant.getCommonPath();
+		// commonPath = Constant.getCommonPath();
 		System.out.println("Inside Evaluation: common path is:" + commonPath);
 
 		BufferedReader brMeta = null, brTopK = null, brActual = null;

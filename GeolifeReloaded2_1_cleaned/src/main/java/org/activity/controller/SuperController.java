@@ -20,7 +20,10 @@ public class SuperController
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "./dataWritten/Dec20_NCount_AllCand1DayFilter/" };
+		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Dec20_AKOM_1Cand_Order3/" };
+		// "./dataWritten/Ncount_100U_9kN_1C_ThreshNN-750/" };
+		// "./dataWrittenDec20_AKOM_1Cand_Order1/" };
+		// "./dataWritten/Dec20_NCount_AllCand5DayFilter/" };
 		// "./dataWritten/Dec16_PureAKOM_NoCandDayFIlter_Order3/" };
 		// "/run/media/gunjan/BufferVault/GowallaResults/Dec14_PureAKOM_NoCandDayFilter_Order1/" };
 		// ./dataWritten/Dec11NGram/" };// { "./dataWritten/Nov16_AKOM3_916U_10cand/",
@@ -34,7 +37,7 @@ public class SuperController
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
 			String commonPath = commonPaths[i];
 
-			runExperiments(commonPath, true, false, false);
+			runExperiments(commonPath, true, false, true);
 			System.out.println("finished for commonPath = " + commonPath);
 		}
 
@@ -157,8 +160,8 @@ public class SuperController
 		{// curtain may 26 2017 start
 			if (hasMUs)
 			{// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
-				new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount);// , new int[] { 30, 50, 60,
-				// 70, 90// });
+				new EvaluationSeq(3, commonPath, Constant.getMatchingUnitArray(Constant.lookPastType));
+				// , new int[] {30, 50, 60, 70, 90// });
 			}
 			else
 			{
