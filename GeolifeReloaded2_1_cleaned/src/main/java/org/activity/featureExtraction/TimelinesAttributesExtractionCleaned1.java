@@ -154,22 +154,24 @@ public class TimelinesAttributesExtractionCleaned1
 		// manualClustering = WekaUtilityBelt.getManualClustering(9, UtilityBelt.getListOfUsers(usersDayTimelines),
 		// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/ManualClustersUserAbove10RTs.csv", true);
 
-		if (Constant.getDatabaseName().equals("gowalla1"))
+		if (false)// Dsiabled on 21 Dec 2017
 		{
-			groundTruth = WekaUtilityBelt.getGroundTruthGowalla(3, 1, groundTruthToRead.getFirst(), true);
+			if (Constant.getDatabaseName().equals("gowalla1"))
+			{
+				groundTruth = WekaUtilityBelt.getGroundTruthGowalla(3, 1, groundTruthToRead.getFirst(), true);
 
-			// WekaUtilityBelt.getGroundTruthGowalla(0, 9, groundTruthToRead.getFirst(), true);
+				// WekaUtilityBelt.getGroundTruthGowalla(0, 9, groundTruthToRead.getFirst(), true);
+			}
+			else
+			{
+				groundTruth = WekaUtilityBelt.getGroundTruth(groundTruthToRead.getSecond(),
+						UtilityBelt.getListOfUsers(usersDayTimelines), groundTruthToRead.getFirst(),
+						groundTruthToRead.getThird());
+			}
+			// manualClustering = WekaUtilityBelt.getManualClustering(2, UtilityBelt.getListOfUsers(usersDayTimelines));
+
+			addStringAttributeToAttributeVectors(groundTruth, "ManualClustering2");
 		}
-		else
-		{
-			groundTruth = WekaUtilityBelt.getGroundTruth(groundTruthToRead.getSecond(),
-					UtilityBelt.getListOfUsers(usersDayTimelines), groundTruthToRead.getFirst(),
-					groundTruthToRead.getThird());
-		}
-		// manualClustering = WekaUtilityBelt.getManualClustering(2, UtilityBelt.getListOfUsers(usersDayTimelines));
-
-		addStringAttributeToAttributeVectors(groundTruth, "ManualClustering2");
-
 		// userIDActualClassMap = WekaUtilityBelt.getUserActualClusterMap(manualClustering);
 		// $$ addDoubleFeatureToFeatureVectors(getBestMU(3), "BestMU");
 

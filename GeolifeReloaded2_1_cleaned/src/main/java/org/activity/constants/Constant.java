@@ -164,13 +164,15 @@ public final class Constant
 
 	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
 
+	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
+
 	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
 	// "Daywise"
 
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;// SWITCH_NOV10//AKOM
 
-	public static final int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
+	public static final int AKOMHighestOrder = 5;// 1;// 3;// SWITCH_NOV10
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	/**
@@ -234,10 +236,10 @@ public final class Constant
 	// Start of parameters for Candidate timelines
 	public static final boolean collaborativeCandidates = true;
 	// Number of candidate timelines extracted from each user in collaborative approach
-	public static final boolean only1CandFromEachCollUser = true; // SWITCH_NOV10
+	public static final boolean only1CandFromEachCollUser = false; // SWITCH_NOV10
 	public static int numOfCandsFromEachCollUser = 1;//// SWITCH_NOV10
 
-	public static final boolean filterTrainingTimelinesByRecentDays = false;// SWITCH_NOV10
+	public static final boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
 	public static final int recentDaysInTrainingTimelines = -1;// 5;// SWITCH_NOV10
 
 	/** the dates for each cand from the neighbours must be < the current date **/
@@ -279,6 +281,8 @@ public final class Constant
 	public static final String warningFileName = "WarniningLogFile.txt";
 	public static final String messageFileName = "MessageLogFile.txt";
 	public static final String configFileName = "ConfigLogFile.txt";
+
+	////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 
@@ -1121,6 +1125,7 @@ public final class Constant
 		s.append("\npercentageInTraining:" + percentageInTraining);
 		s.append("\nactivityNames:" + Arrays.toString(activityNames));
 		s.append("\nPrimaryDimension:" + primaryDimension);
+		s.append("\ntypeOfExperiment:" + typeOfExperiment);
 		s.append("\nlookPastType:" + lookPastType);
 		s.append("\naltSeqPredictor:" + altSeqPredictor);
 		s.append("\nAKOMHighestOrder:" + AKOMHighestOrder);

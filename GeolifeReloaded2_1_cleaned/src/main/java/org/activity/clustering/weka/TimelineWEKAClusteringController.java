@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import org.activity.constants.Constant;
-import org.activity.featureExtraction.TimelinesAttributesExtraction;
+import org.activity.featureExtraction.TimelinesAttributesExtractionCleaned1;
 import org.activity.io.CSVUtils;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
@@ -65,7 +65,7 @@ public class TimelineWEKAClusteringController
 {
 	private String pathToWrite;
 	private Classifier usedClassifier;
-	private TimelinesAttributesExtraction attributeExtraction;
+	private TimelinesAttributesExtractionCleaned1 attributeExtraction;
 	// private Instances allInstances;
 	/**
 	 * (raw user id, predicted class)
@@ -233,7 +233,8 @@ public class TimelineWEKAClusteringController
 
 				Triple<String, Integer, Boolean> groundTruth = new Triple(groundTruthFileName, 4, true);
 
-				attributeExtraction = new TimelinesAttributesExtraction(usersDayTimelinesAll, pathToWrite, groundTruth);
+				attributeExtraction = new TimelinesAttributesExtractionCleaned1(usersDayTimelinesAll, pathToWrite,
+						groundTruth);
 				nameOfFeatureFile = attributeExtraction.getAttributeFilenameAbs();
 
 				DataLoader dl = new DataLoader(nameOfFeatureFile,

@@ -20,7 +20,8 @@ public class SuperController
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Dec20_AKOM_1Cand_Order3/" };
+		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };
+		// + "Dec20_AKOM_1Cand_Order1/" };
 		// "./dataWritten/Ncount_100U_9kN_1C_ThreshNN-750/" };
 		// "./dataWrittenDec20_AKOM_1Cand_Order1/" };
 		// "./dataWritten/Dec20_NCount_AllCand5DayFilter/" };
