@@ -6,6 +6,16 @@ public class Enums
 	{
 	}
 
+	public enum TypeOfExperiment
+	{
+		RecommendationTests, TimelineStats, TimelineClustering;
+	}
+
+	public enum UserSets
+	{
+		Users9k, User916;
+	}
+
 	/**
 	 * NCount, NHours, Daywise
 	 * 

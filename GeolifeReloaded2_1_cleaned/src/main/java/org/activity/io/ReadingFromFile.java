@@ -4,10 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.activity.objects.Pair;
 import org.activity.ui.PopUps;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -288,8 +291,7 @@ public class ReadingFromFile
 		}
 		else
 		{
-			String fileName =
-					"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Jan27Daywise/recommPointsWithNoCandidates.csv";
+			String fileName = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Jan27Daywise/recommPointsWithNoCandidates.csv";
 			res = twoColumnReaderString(fileName, ",", 0, 3, true);
 			System.out.println("The blacklisted RTs are: ");
 			res.stream().forEach(System.out::println);
@@ -325,6 +327,61 @@ public class ReadingFromFile
 		}
 		return res;
 
+	}
+
+	/**
+	 * 
+	 * @param filesContainingMatrix
+	 * @param nRows
+	 * @param nCols
+	 * @param hasColHeader
+	 * @param delimiter
+	 * @return
+	 */
+	public static String getMaxOverFilesForEachCell(ArrayList<String> filesContainingMatrix, int nRows, int nCols,
+			boolean hasColHeader, String delimiter)
+	{
+		StringBuilder sb = new StringBuilder();
+		try
+		{
+			// row,col, vals for that across mus
+			LinkedHashMap<Pair<Integer, Integer>, List<Double>> valsL = new LinkedHashMap<>();
+			// one list for each row col.
+			// List<List<Double>> vals = new ArrayList<>(nRows * nCols);
+
+			for (String fileName : filesContainingMatrix)
+			{
+				for (int row = 0; row < nRows; row++)
+				{
+					for (int col = 0; col < nCols; col++)
+					{
+						// vals.add(getValByRowCol(fileName, row, col, hasColHeader));
+						valsL.get(new Pair<>(row, col)).add(getValByRowCol(fileName, row, col, hasColHeader));
+						// valsL.put(new Pair<>(row, col), getValByRowCol(fileName, row, col, hasColHeader));
+					}
+				}
+			}
+
+			for (int row = 0; row < nRows; row++)
+			{
+				for (int col = 0; col < nCols; col++)
+				{
+					sb.append(Collections.max(valsL.get(new Pair<>(row, col))));
+					if (col != nCols - 1)
+					{
+						sb.append(delimiter);
+					}
+				}
+				sb.append("\n");
+			}
+
+		}
+		catch (Exception e)
+		{
+			PopUps.printTracedErrorMsg("Error");
+		}
+
+		return sb.toString();
 	}
 
 	/**

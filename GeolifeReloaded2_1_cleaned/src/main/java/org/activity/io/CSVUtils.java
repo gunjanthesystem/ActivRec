@@ -33,8 +33,7 @@ public class CSVUtils
 
 	public static void temp()
 	{
-		String commonPath =
-				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_MAY26NGramAnalysis_AllUsers/";
+		String commonPath = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_MAY26NGramAnalysis_AllUsers/";
 
 		List<String> userIDs = ReadingFromFile.oneColumnReaderString(
 				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_MAY26NGramAnalysis_AllUsers/gowalla1NumOfDaysInCleanedTimelines.csv",
@@ -47,8 +46,8 @@ public class CSVUtils
 				String fileNameToRead = commonPath + n + "gram" + u + "FreqDist.csv";
 				System.out.println(fileNameToRead);
 
-				ArrayList<String> vals =
-						(ArrayList<String>) ReadingFromFile.oneColumnReaderString(fileNameToRead, ",", 1, true);
+				ArrayList<String> vals = (ArrayList<String>) ReadingFromFile.oneColumnReaderString(fileNameToRead, ",",
+						1, true);
 
 			}
 		}
@@ -88,12 +87,9 @@ public class CSVUtils
 	public static void removeDuplicateRowsGowalla()
 	{
 		// curtain 1 start
-		String processedCheckInFileName =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/processedCheckIns.csv";
-		String noDupProcessedCheckinFileName =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/NoDuplicateprocessedCheckIns.csv";
-		String dupLinesCheckinFileName =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/DupLinesFromProcessedCheckins.csv";
+		String processedCheckInFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/processedCheckIns.csv";
+		String noDupProcessedCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/NoDuplicateprocessedCheckIns.csv";
+		String dupLinesCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/DupLinesFromProcessedCheckins.csv";
 
 		// $$ check again to make sure this method is not doing anything more than the cuckoo method is doing
 		// removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,
@@ -108,12 +104,9 @@ public class CSVUtils
 	public static void removeDuplicateRowsFromRawGowalla()
 	{
 		// curtain 1 start
-		String checkInFileName =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_checkins.csv";
-		String noDupCheckinFileName =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
-		String dupLinesCheckinFileName =
-				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/DupLines_gowalla_checkinsRaw.csv";
+		String checkInFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_checkins.csv";
+		String noDupCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
+		String dupLinesCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/DupLines_gowalla_checkinsRaw.csv";
 
 		// $$ check again to make sure this method is not doing anything more than the cuckoo method is doing
 		// removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,
@@ -147,10 +140,8 @@ public class CSVUtils
 			ArrayList<String> listOfAllMUsWithMaxMRRFiles = new ArrayList<String>();
 			ArrayList<String> listOfAllCountsForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
 			ArrayList<String> listOfAllCountsForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
-			ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles =
-					new ArrayList<String>();
-			ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles =
-					new ArrayList<String>();
+			ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMinMUHavMaxMRRFiles = new ArrayList<String>();
+			ArrayList<String> listOfAllModeDistributionForClusterLabelAccToMajorityMUsHavMaxMRRFiles = new ArrayList<String>();
 
 			ArrayList<String> listOfrrCOlFiles = new ArrayList<String>();
 			// ArrayList<String> listOfAllMRRFiles = new ArrayList<String>();
@@ -596,6 +587,7 @@ public class CSVUtils
 	 * @param listOfAbsFileNames
 	 * @param hasColumnHeader
 	 *            to make sure columnHeadersAreNotRepeated
+	 * @param absfileToWrite
 	 */
 	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
 			String absfileToWrite)
@@ -1226,9 +1218,9 @@ public class CSVUtils
 		System.out.println("Entering removeDuplicationRowsUsingCuckoo");
 
 		// create
-		CuckooFilter<CharSequence> allUniqueEntries =
-				new CuckooFilter.Builder<>(Funnels.stringFunnel(Charset.defaultCharset()), 37000000)
-						.withFalsePositiveRate(0.0000000000001).build();// 0.0000000000001
+		CuckooFilter<CharSequence> allUniqueEntries = new CuckooFilter.Builder<>(
+				Funnels.stringFunnel(Charset.defaultCharset()), 37000000).withFalsePositiveRate(0.0000000000001)
+						.build();// 0.0000000000001
 
 		// HashSet<String> allUniqueEntries = new HashSet<String>();
 		BufferedReader br = null;
@@ -1372,8 +1364,8 @@ public class CSVUtils
 					{ // check if there were no RTs
 						// int numOfRTs = 0;
 
-						String whetherThisCellPosIsValid =
-								getCellValueFromCSVFile(row, col, fileToReadForNullifyingZeros);
+						String whetherThisCellPosIsValid = getCellValueFromCSVFile(row, col,
+								fileToReadForNullifyingZeros);
 
 						// numOfRTs = Integer.valueOf(ReadingFromFile.getCellValueFromCSVFile(row, col,
 						// fileToReadForNullifyingZeros));
@@ -1446,10 +1438,8 @@ public class CSVUtils
 		int rowCount = 0;
 		int columnCount = 0;
 
-		String fileName1 =
-				"/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global 550/dataRankedRecommendationWithScores.csv";
-		String fileName2 =
-				"/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global 500/dataRankedRecommendationWithScores.csv";
+		String fileName1 = "/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global 550/dataRankedRecommendationWithScores.csv";
+		String fileName2 = "/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global 500/dataRankedRecommendationWithScores.csv";
 		String fileNameMeta = "/home/gunjan/MATLAB/bin/DCU data works/July20/Copy 1 aug global 500/meta.csv";
 
 		System.out.println("File 1 is:" + fileName1);

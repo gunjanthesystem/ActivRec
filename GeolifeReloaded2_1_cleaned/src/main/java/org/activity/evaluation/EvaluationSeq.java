@@ -843,6 +843,10 @@ public class EvaluationSeq
 
 	}
 
+	/// Start of added on 21 Dec
+
+	/// End of added on 21 Dec
+
 	/**
 	 * 
 	 * @param fileToRead
@@ -1213,7 +1217,7 @@ public class EvaluationSeq
 	}
 
 	/**
-	 * Agreementa at Top 1, top 2....top (seq length)
+	 * Agreements at Top 1, top 2....top (seq length)
 	 * 
 	 * @param fileNamePhrase
 	 * @param timeCategory
@@ -1321,8 +1325,10 @@ public class EvaluationSeq
 
 						if (splittedActualSequence.length != splittedRecommSequence.length)
 						{
-							System.err.println(PopUps.getTracedErrorMsg(
-									"splittedActualSequence.length != splittedRecommSequence.length"));
+							PopUps.printTracedErrorMsg(
+									"splittedActualSequence.length != splittedRecommSequence.length");
+							// System.err.println(PopUps.getTracedErrorMsg("splittedActualSequence.length !=
+							// splittedRecommSequence.length"));
 						}
 						ArrayList<Integer> directAgreement = new ArrayList<>();
 

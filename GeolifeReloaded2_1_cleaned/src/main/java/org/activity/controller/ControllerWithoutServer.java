@@ -251,7 +251,7 @@ public class ControllerWithoutServer
 						commonBasePath);
 				// End of curtain Aug 11 2017
 			}
-			// // important curtain 1 end 21 Dec 2017 10 Feb 2017
+			// $$// important curtain 1 end 21 Dec 2017 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017
 			// TimelineStats.timelineStatsController(usersCleanedDayTimelines);
@@ -317,9 +317,9 @@ public class ControllerWithoutServer
 			// UtilityBelt.rearrangeDayTimelinesOrderForDataset(usersCleanedRearrangedDayTimelines);
 
 			/** CURRENT **/
-			// TimelineWEKAClusteringController clustering = new
+			// $$TimelineWEKAClusteringController clustering = new
 			// TimelineWEKAClusteringController(usersCleanedDayTimelines,
-			// null);
+			// $$ null);
 			// usersCleanedRearrangedDayTimelines, null);
 
 			/** END OF CURRENT **/
