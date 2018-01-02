@@ -162,7 +162,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		// System.exit(-1);}
 
 		// setMatchingUnitArray(lookPastType);
-		this.matchingUnitArray = Constant.getMatchingUnitArray(lookPastType);
+		this.matchingUnitArray = Constant.getMatchingUnitArray(lookPastType, Constant.altSeqPredictor);
 
 		// buildRepresentativeActivityObjectsForUsers()
 

@@ -9,6 +9,7 @@ import java.util.LongSummaryStatistics;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.SanityConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -64,7 +65,7 @@ public class Timeline implements Serializable
 			System.err.println(PopUps.getTracedErrorMsg("Error in creating Timeline: Empty Activity Objects provided"));
 			System.exit(5);
 		}
-		if (Constant.checkIfTimelineCreatedIsChronological && !TimelineUtils.isChronological(activityObjects))
+		if (SanityConstants.checkIfTimelineCreatedIsChronological && !TimelineUtils.isChronological(activityObjects))
 		{
 			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: in Timeline(ArrayList<ActivityObject> activityObjects), CHRONOLOGY NOT PRESERVED"));

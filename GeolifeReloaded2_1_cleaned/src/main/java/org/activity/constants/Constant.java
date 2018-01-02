@@ -34,82 +34,8 @@ import weka.classifiers.Classifier;
  */
 public final class Constant
 {
-	static String commonPath; // ALWAYS UPADTE THE CURRENT PATH TO THE CURRENT WORKING PATH
-
-	// **** Parameters to set **** DO NOT CHANGE ****//
-	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = true, // false,
-			toSerializeTimelines = false, toDeSerializeTimelines = false;
-
-	public static String INVALID_ACTIVITY1 = "";// "Unknown";
-	public static String INVALID_ACTIVITY2 = "";// "Not Available";
-
-	// Added on 11 July 2017
-	public static final Integer INVALID_ACTIVITY1_ID = -997;// "Unknown";
-	public static final Integer INVALID_ACTIVITY2_ID = -998;// "Not Available";
-	// end of Added on 11 July 2017
-
-	public static final PrimaryDimension primaryDimension = PrimaryDimension.ActivityID;// LocationID;
-
-	static String[] activityNames;
-	static Set<Integer> uniqueActivityIDs;
-	static Set<Integer> uniqueLocationIDs;
-
-	public static ArrayList<String> activityNamesGowallaLabels;
-	static String DATABASE_NAME = "";// ;"geolife1";// default database name,
-										// dcu_data_2";// "geolife1";// "start_base_2";databaseName
-	public static String rankScoring = "";// "sum";// default product"; // "sum"
-	public static final Enums.CaseType caseType = Enums.CaseType.SimpleV3;// null;// String caseType CaseBasedV1";//
-																			// default// CaseBasedV1 " or SimpleV3
-
-	public static String howManyUsers = "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
-	static double currentMatchingUnit = -99; // stores the current matching unit at all times, used for some
-												// sanity checks
-	// Redudant since we have lookPastType/**
-	// * This variable is not used for anything currently but just to write to console the type of matching
-	// */
-	// static String typeOfTimelineMatching;// = "Daywise"; // N-count, N-hours
-	/**
-	 * ALPHA value for sum-based rank scoring
-	 */
-	public static double ALPHA = -99;// 0.25d;
-
-	public static final double maxForNorm = 9999999; // assuming unnormalised edit distance is never greater than this
-	public static final double minForNorm = -9999999; // assuming unnormalised edit distance is never lower than this.
-														// note: in current form edit distance cannot be negative
-
-	public static final double distanceTravelledAlert = 200; // kms
-	public static final double unknownDistanceTravelled = -9999;
-	/**
-	 * <p>
-	 * <font color="red">Num of decimal digits to be kept in latitude and longitude. Latitude and longitude HAVE to be
-	 * kept in database in decimal format and they HAVE to have atmost 6 decimal places.</font> This affects during
-	 * hilbert space filled curve index for linearisation of geo coordinates. <b>This limits the precision of hilbert
-	 * sace filling curve index</b>
-	 * </p>
-	 */
-	public static final int decimalPlacesInGeocordinatesForComputations = 100000;// 1000000;
-	/**
-	 * Path to the folder were all the results will be stored
-	 */
-	static String outputCoreResultsPath = "";
-
 	// ////************* PARAMETERS TO BE SET ********************//////
-	public static final boolean hasInvalidActivityNames = false;
 	public static final boolean removeCurrentActivityNameFromRecommendations = false;// true;
-
-	public static final boolean checkForDistanceTravelledAnomaly = false;
-	public static final boolean checkForHaversineAnomaly = true; // false;
-	public static final boolean checkArrayOfFeatures = false;
-	/**
-	 * Can be disabled for better performance for subsequent runs if previous run of experiments shows that timelines
-	 * created had no chronological anomaly
-	 */
-	public static final boolean checkIfTimelineCreatedIsChronological = false;// true;// false;
-
-	/**
-	 * Percentage/100 for training test split of dataset
-	 */
-	public static final double percentageInTraining = 0.8;// 0.8;
 
 	/**
 	 * whether there threshold should be applied on candidate timelines based on edit distance
@@ -141,10 +67,7 @@ public final class Constant
 	 * Determines whether the sorting of candiates is stable or unstable
 	 */
 	public static final boolean breakTiesWithShuffle = true;
-	/**
-	 * Determines if connection pooling is used for database connections
-	 */
-	public static final boolean USEPOOLED = true;
+
 	// public static boolean write = false; // public static boolean writeAllDayTimelinesPerUser = true;
 
 	/**
@@ -154,25 +77,14 @@ public final class Constant
 	// NOT NEEDED IN CASE OF GOWALLA //TODO check the places where this is involved so that it can safely be set to
 	// false
 
-	/**
-	 * to have the same RTs in daywise and MU, some RTs in MU have to be blacklisted as they did not had any cand
-	 * timeline in daywise
-	 */
-	public static final boolean BLACKLISTING = false;// true;// true;
-
-	public static final boolean blacklistingUsersWithLargeMaxActsPerDay = true;
-
-	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
-
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
 	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
-	// NCount;// ClosestTime;// .NGram;// .Daywise;//NCount;//Enums.LookPastType.NCount;"Count";// "Count";// "Hrs"//
-	// "Daywise"
+	// NCount;// ClosestTime;// .NGram;// .Daywise;
 
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;// SWITCH_NOV10//AKOM
 
-	public static final int AKOMHighestOrder = 5;// 1;// 3;// SWITCH_NOV10
+	public static final int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	/**
@@ -194,21 +106,6 @@ public final class Constant
 	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType = Enums.EditDistanceTimeDistanceType.NearerScaled;
 	// .FurtherScaled;
 
-	/**
-	 * Number of past activities to look excluding the current activity
-	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 5, 3, 8 };// 0, 1, 2, 4,
-	// 6, 3, 8
-	// };// 1,3,5,8,3, 0, 6, 4, 2, 8 };// , 2, 4, 6, 8, 1, 3, 10 /* , 12 */,};//14, 16,18 };{ 0, 1, 2, 3,// 4, 5, 6
-	// };//// , 7, 8,9,//// 10, 11, 12,// 13, 14, 15,// 16,// 17, 18, 19, 20, 21, 22, 23, 24,26, 28, 30 };// , 32,// 34,
-	// 36, 38, 40,42 };
-
-	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-			17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
-
-	public static final double matchingDummy[] = { -1 };
-	// public static final double matchingUnitHrsArray[] = { 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
-
 	public static String distanceUsed = "HJEditDistance"; // "FeatureWiseEditDistance",FeatureWiseEditDistance,
 															// OTMDSAMEditDistance
 
@@ -222,8 +119,6 @@ public final class Constant
 
 	public static final int RoundingPrecision = 4;
 
-	public static TraceMatrix reusableTraceMatrix;
-
 	/**
 	 * determines the hierarchical level of the activity name to be used in edit distance computation
 	 */
@@ -235,20 +130,20 @@ public final class Constant
 	// --------------------------------------------------------------------------//
 	// Start of parameters for Candidate timelines
 	public static final boolean collaborativeCandidates = true;
+
 	// Number of candidate timelines extracted from each user in collaborative approach
 	public static final boolean only1CandFromEachCollUser = false; // SWITCH_NOV10
-	public static int numOfCandsFromEachCollUser = 1;//// SWITCH_NOV10
-
-	public static final boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
-	public static final int recentDaysInTrainingTimelines = -1;// 5;// SWITCH_NOV10
+	public static int numOfCandsFromEachCollUser = -1;//// SWITCH_NOV10
 
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
+	public static final boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
+	public static final int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
+
 	// Filtering the candidate timeline
-	// SWITCH_NOV10
 	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.None;// NearestNeighbour,
-	// None,Percentile
+	// None,Percentile // SWITCH_NOV10
 	/**
 	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
 	 * 0-100
@@ -258,31 +153,155 @@ public final class Constant
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
 	public static final int nearestNeighbourCandEDThreshold = -1;// 750;// 500;// 500;/// -1;// 100;// 1500;// 100;// -1
-																	// for
-																	// no
-																	// filter,
-	/// //SWITCH_NOV10
+																	// for no filter//SWITCH_NOV10
+
 	// End of parameters for Candidate timelines
 	// --------------------------------------------------------------------------//
 
-	static EditDistanceMemorizer editDistancesMemorizer;
-	final static int editDistancesMemorizerBufferSize = 1;// 000000;
-
-	public static final boolean memorizeEditDistance = false;
-
-	public static final boolean For9kUsers = false;// ;// false; //SWITCH_NOV10
+	public static final boolean For9kUsers = true;// false;// ;// false; //SWITCH_NOV10
 	////////////////////////////////////////////////////////////////////////
 
 	public static final double ClosestTimeDiffThresholdInSecs = 10800; // 3 hrs
 
 	public static final boolean NGramColl = false;// SWITCH_NOV10
 
+	////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////// Start of parameters less likely to change //////////////////
+
+	// **** Parameters to set **** DO NOT CHANGE ****//
+	public static final PrimaryDimension primaryDimension = PrimaryDimension.ActivityID;// LocationID;
+	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = true, // false,
+			toSerializeTimelines = false, toDeSerializeTimelines = false;
+
+	public static final boolean hasInvalidActivityNames = false;
+
+	public static String INVALID_ACTIVITY1 = "";// "Unknown";
+	public static String INVALID_ACTIVITY2 = "";// "Not Available";
+
+	// Added on 11 July 2017
+	public static final Integer INVALID_ACTIVITY1_ID = -997;// "Unknown";
+	public static final Integer INVALID_ACTIVITY2_ID = -998;// "Not Available";
+	// end of Added on 11 July 2017
+
+	public static final double maxForNorm = 9999999; // assuming unnormalised edit distance is never greater than this
+	public static final double minForNorm = -9999999; // assuming unnormalised edit distance is never lower than this.
+	// note: in current form edit distance cannot be negative
+
+	public static final double distanceTravelledAlert = 200; // kms
+	public static final double unknownDistanceTravelled = -9999;
+
+	/**
+	 * <p>
+	 * <font color="red">Num of decimal digits to be kept in latitude and longitude. Latitude and longitude HAVE to be
+	 * kept in database in decimal format and they HAVE to have atmost 6 decimal places.</font> This affects during
+	 * hilbert space filled curve index for linearisation of geo coordinates. <b>This limits the precision of hilbert
+	 * sace filling curve index</b>
+	 * </p>
+	 */
+	public static final int decimalPlacesInGeocordinatesForComputations = 100000;// 1000000;
+
+	public static String howManyUsers = "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
+
 	public static final String errorFileName = "ErrorExceptionLogFile.txt";
 	public static final String warningFileName = "WarniningLogFile.txt";
 	public static final String messageFileName = "MessageLogFile.txt";
 	public static final String configFileName = "ConfigLogFile.txt";
 
-	////////////////////////////////////////////////////////////////////////
+	/**
+	 * Number of past activities to look excluding the current activity
+	 */
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// 2, 4, 6, 8, 1, 3, 10 11, 12, 13,
+	// 14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38, 40,42 };
+
+	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+			17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
+
+	public static final double matchingDummy[] = { -1 };
+	// public static final double matchingUnitHrsArray[] = { 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
+
+	/**
+	 * Percentage/100 for training test split of dataset
+	 */
+	public static final double percentageInTraining = 0.8;// 0.8;
+
+	/**
+	 * Determines if connection pooling is used for database connections
+	 */
+	public static final boolean USEPOOLED = true;
+
+	/**
+	 * Whether to consider all features while calculating feature wise edit distance
+	 */
+	public static boolean considerAllFeaturesForFeatureWiseEditDistance = false;// true;
+
+	/**
+	 * If all features are not to be used for feature wise edit distance, then choose which features are to be used.
+	 */
+	public static boolean considerActivityNameInFeatureWiseEditDistance = false,
+			considerStartTimeInFeatureWiseEditDistance = false, considerDurationInFeatureWiseEditDistance = false,
+			considerDistanceTravelledInFeatureWiseEditDistance = false,
+			considerStartGeoCoordinatesInFeatureWiseEditDistance = false,
+			considerEndGeoCoordinatesInFeatureWiseEditDistance = false,
+			considerAvgAltitudeInFeatureWiseEditDistance = false;
+
+	public static boolean UsingSQLDatabase;
+
+	static String DATABASE_NAME = "";// ;"geolife1";// default database name,
+	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
+	public static String rankScoring = "";// "sum";// default product"; // "sum"
+	public static final Enums.CaseType caseType = Enums.CaseType.SimpleV3;// null;// String caseType CaseBasedV1";//
+	// default// CaseBasedV1 " or SimpleV3
+
+	// Redudant since we have lookPastType/**
+	// * This variable is not used for anything currently but just to write to console the type of matching
+	// static String typeOfTimelineMatching;// = "Daywise"; // N-count, N-hours
+
+	/**
+	 * ALPHA value for sum-based rank scoring
+	 */
+	public static double ALPHA = -99;// 0.25d;
+
+	/**
+	 * to have the same RTs in daywise and MU, some RTs in MU have to be blacklisted as they did not had any cand
+	 * timeline in daywise
+	 */
+	public static final boolean BLACKLISTING = false;// true;// true;
+
+	public static final boolean blacklistingUsersWithLargeMaxActsPerDay = true;
+
+	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
+
+	///////////////////////////// End of parameters less likely to change ///////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////// Start of variable declarations //////////////////////////
+	static String commonPath; // ALWAYS UPADTE THE CURRENT PATH TO THE CURRENT WORKING PATH
+	/**
+	 * Path to the folder were all the results will be stored
+	 */
+	static String outputCoreResultsPath = "";
+
+	static String[] activityNames;
+	static Set<Integer> uniqueActivityIDs;
+	static Set<Integer> uniqueLocationIDs;
+	public static ArrayList<String> activityNamesGowallaLabels;
+
+	static double currentMatchingUnit = -99; // stores the current matching unit at all times, used for some
+	// sanity checks
+
+	public static TraceMatrix reusableTraceMatrix;
+	static EditDistanceMemorizer editDistancesMemorizer;
+	public static final boolean memorizeEditDistance = false;
+	final static int editDistancesMemorizerBufferSize = 1;// 000000;
+	/////////////////////////// End of variable declarations//////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 
@@ -326,11 +345,17 @@ public final class Constant
 	}
 
 	////////////
-	public static double[] getMatchingUnitArray(Enums.LookPastType lookPastType)
+	/**
+	 * 
+	 * @param lookPastType
+	 * @param altSeqPredictor
+	 * @return
+	 */
+	public static double[] getMatchingUnitArray(Enums.LookPastType lookPastType, Enums.AltSeqPredictor altSeqPredictor)
 	{
 		double matchingUnitArray[] = new double[] { -99 };
 
-		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
+		if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
 		{
 			matchingUnitArray = new double[] { 0 };
 			// System.out.println("Here set");
@@ -399,23 +424,6 @@ public final class Constant
 		}
 		return true;
 	}
-
-	/**
-	 * Whether to consider all features while calculating feature wise edit distance
-	 */
-	public static boolean considerAllFeaturesForFeatureWiseEditDistance = false;// true;
-
-	/**
-	 * If all features are not to be used for feature wise edit distance, then choose which features are to be used.
-	 */
-	public static boolean considerActivityNameInFeatureWiseEditDistance = false,
-			considerStartTimeInFeatureWiseEditDistance = false, considerDurationInFeatureWiseEditDistance = false,
-			considerDistanceTravelledInFeatureWiseEditDistance = false,
-			considerStartGeoCoordinatesInFeatureWiseEditDistance = false,
-			considerEndGeoCoordinatesInFeatureWiseEditDistance = false,
-			considerAvgAltitudeInFeatureWiseEditDistance = false;
-
-	public static boolean UsingSQLDatabase;
 
 	/**
 	 * Don't let anyone instantiate this class.
@@ -610,41 +618,6 @@ public final class Constant
 		}
 		// if(dname.trim().equals("HJEditDistance")
 	}
-
-	// /**
-	// * Set the type of timeline matching. The currently supported types of timeline matching are: Daywise, N-count and
-	// * N-hours
-	// *
-	// * @param name
-	// */
-	// public static void setTypeOfTimelineMatching(String name)
-	// {
-	// name = name.trim();
-	//
-	// if (name != "Daywise" && name != "N-count" && name != "N-hours")
-	// {
-	// String msg = "Error in org.activity.util.Constant.setTypeOfTimelineMatching(String): unknown type of time line
-	// matching:"
-	// + name;
-	// PopUps.showError(msg);
-	// System.err.println(msg);
-	//
-	// }
-	// else
-	// {
-	// typeOfTimelineMatching = name;
-	// }
-	// }
-
-	// /**
-	// * Returns the type of timeline matching
-	// *
-	// * @return
-	// */
-	// public static String getTypeOfTimelineMatching()
-	// {
-	// return typeOfTimelineMatching;
-	// }
 
 	public static String getDistanceUsed()
 	{
@@ -1059,9 +1032,15 @@ public final class Constant
 
 	}
 
+	/**
+	 * 
+	 * @param s
+	 * @param len
+	 * @return
+	 */
 	public static String addPreceedingZeros(String s, int len)
 	{
-		String r = null;
+		// String r = null;
 		int diff = len - s.length();
 		String preceeding = new String();
 		if (diff > 0)
@@ -1162,10 +1141,10 @@ public final class Constant
 		s.append("\nDoBaselineOccurrence:" + DoBaselineOccurrence);
 		s.append("\nDoBaselineNGramSeq:" + DoBaselineNGramSeq);
 
-		s.append("\ncheckIfTimelineCreatedIsChronological:" + checkIfTimelineCreatedIsChronological);
-		s.append("\ncheckArrayOfFeatures:" + checkArrayOfFeatures);
-		s.append("\ncheckForHaversineAnomaly:" + checkForHaversineAnomaly);
-		s.append("\ncheckForDistanceTravelledAnomaly:" + checkForDistanceTravelledAnomaly);
+		s.append("\ncheckIfTimelineCreatedIsChronological:" + SanityConstants.checkIfTimelineCreatedIsChronological);
+		s.append("\ncheckArrayOfFeatures:" + SanityConstants.checkArrayOfFeatures);
+		s.append("\ncheckForHaversineAnomaly:" + SanityConstants.checkForHaversineAnomaly);
+		s.append("\ncheckForDistanceTravelledAnomaly:" + SanityConstants.checkForDistanceTravelledAnomaly);
 
 		s.append("\nuseJarForMySimpleLevenshteinDistance:" + useJarForMySimpleLevenshteinDistance);
 		// useJarForMySimpleLevenshteinDistance
@@ -1249,29 +1228,67 @@ public final class Constant
 		}
 		return allSet;
 	}
-	// /**
-	// * note: all variables are static for this class
-	// *
-	// * @param givenCommonpath
-	// */
-	// public Constant(String givenCommonpath, String databaseName)
-	// {
-	// Constant.setDatabaseName(databaseName);
-	// Constant.setUserIDs();
-	// Constant.setInvalidNames();
-	// Constant.setActivityNames();
-	// Constant.setCommonPath(givenCommonpath);
-	// // Constant.setDistanceUsed("HJEditDistance");
-	// }
-	//
-	// public Constant(String givenCommonpath, String databaseName, String distUsed)
-	// {
-	// Constant.setDatabaseName(databaseName);
-	// Constant.setUserIDs();
-	// Constant.setInvalidNames();
-	// Constant.setActivityNames();
-	// Constant.setCommonPath(givenCommonpath);
-	// // Constant.setDistanceUsed(distUsed);
-	// }
 
 }
+
+// commented out below this
+
+/// **
+// * Set the type of timeline matching. The currently supported types of timeline matching are: Daywise, N-count and
+// * N-hours
+// *
+// * @param name
+// */
+// public static void setTypeOfTimelineMatching(String name)
+// {
+// name = name.trim();
+//
+// if (name != "Daywise" && name != "N-count" && name != "N-hours")
+// {
+// String msg = "Error in org.activity.util.Constant.setTypeOfTimelineMatching(String): unknown type of time line
+// matching:"
+// + name;
+// PopUps.showError(msg);
+// System.err.println(msg);
+//
+// }
+// else
+// {
+// typeOfTimelineMatching = name;
+// }
+// }
+
+// /**
+// * Returns the type of timeline matching
+// *
+// * @return
+// */
+// public static String getTypeOfTimelineMatching()
+// {
+// return typeOfTimelineMatching;
+// }
+
+/// **
+// * note: all variables are static for this class
+// *
+// * @param givenCommonpath
+// */
+// public Constant(String givenCommonpath, String databaseName)
+// {
+// Constant.setDatabaseName(databaseName);
+// Constant.setUserIDs();
+// Constant.setInvalidNames();
+// Constant.setActivityNames();
+// Constant.setCommonPath(givenCommonpath);
+// // Constant.setDistanceUsed("HJEditDistance");
+// }
+//
+// public Constant(String givenCommonpath, String databaseName, String distUsed)
+// {
+// Constant.setDatabaseName(databaseName);
+// Constant.setUserIDs();
+// Constant.setInvalidNames();
+// Constant.setActivityNames();
+// Constant.setCommonPath(givenCommonpath);
+// // Constant.setDistanceUsed(distUsed);
+// }
