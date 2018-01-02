@@ -16,11 +16,12 @@ public class SuperController
 
 	public static void main(String args[])
 	{
-		// HERE
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };
+		String[] commonPaths = { "./dataWritten/Jan2_Sampling/" };
+		// AKOM_916U_915N_5dayC_Order-3/" };//
+		// ""/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };
 		// + "Dec20_AKOM_1Cand_Order1/" };
 		// "./dataWritten/Ncount_100U_9kN_1C_ThreshNN-750/" };
 		// "./dataWrittenDec20_AKOM_1Cand_Order1/" };
@@ -36,35 +37,12 @@ public class SuperController
 		for (int i = 0; i <= commonPaths.length - 1; i++)
 		{
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			String commonPath = commonPaths[i];
-
-			runExperiments(commonPath, true, false, true);
-			System.out.println("finished for commonPath = " + commonPath);
+			runExperiments(commonPaths[i], true, false, true);
+			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
-
 		System.out.println(" Exiting SuperController");
 		// End
 		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
-	}
-
-	/**
-	 * 
-	 **/
-	public static void cleanUpSpace(String commonPath, double ratioOfPercentageFilesToDelete)
-	{
-		// String commonPath = "./dataWritten/Aug14Filter500/";
-		String s = ("cleanUpSpace called on commonPath=" + commonPath + "\n");
-		System.out.println(s);
-
-		String deleteConsoleLogs = Searcher.searchAndRandomDelete2(commonPath, "consoleLog",
-				Arrays.asList("rror", "xception"), ratioOfPercentageFilesToDelete);
-
-		System.out.println("result= " + deleteConsoleLogs);
-		// Timestamp
-
-		// .getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
-		WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "CleanUpSafelyRandomlyDeleteConsoleLogsForSpace"
-				+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".txt");
 	}
 
 	// All correct
@@ -72,19 +50,19 @@ public class SuperController
 	{
 		long at = System.currentTimeMillis();
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC"y)); // added on April 21, 2016
-
-		System.out.println("Beginning main:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
+		System.out.println("Beginning runExperiments:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
 		// String commonPath = "./dataWritten/Nov6_NCount916U916N100T/";// Aug17/";
 		// $$String commonPath = "./dataWritten/Nov12_NCount916U916N1C500T/";// Aug17/";
 		System.out.println("commonPath = " + commonPath);
+		String commonPathGowalla = commonPath;
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/CheckJavaSqlDuplicateDateIssue/";
-		String commonPathGowalla = commonPath;
+
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
 		// $$/ home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/";
@@ -143,7 +121,7 @@ public class SuperController
 		// new ControllerWithoutServer();
 		// $$ CURRENT END
 
-		Constant.setDatabaseName("gowalla1");// "");// ("dcu_data_2");// "geolife1";//gowalla1
+		Constant.setDatabaseName("gowalla1");// ("dcu_data_2");// "geolife1"
 		// Constant.caseType = Enums.CaseType.SimpleV3;/// "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
 		Constant.setOutputCoreResultsPath(commonPathGowalla);// commonPathGeolife;// commonPathDCU + "SimpleV3/";//
 																// "/home/gunjan/DCU/SimpleV3/";//
@@ -153,7 +131,7 @@ public class SuperController
 		if (recommendation)
 		{
 			// //curtain may 19 2017 start
-			ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer();
+			ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer(Constant.getDatabaseName());
 			// //curtain may 19 2017 end
 		}
 
@@ -161,7 +139,8 @@ public class SuperController
 		{// curtain may 26 2017 start
 			if (hasMUs)
 			{// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
-				new EvaluationSeq(3, commonPath, Constant.getMatchingUnitArray(Constant.lookPastType));
+				new EvaluationSeq(3, commonPath,
+						Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor));
 				// , new int[] {30, 50, 60, 70, 90// });
 			}
 			else
@@ -381,5 +360,25 @@ public class SuperController
 		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");
 		PopUps.showMessage("All done in " + ((bt - at) / 1000) + " seconds");
 
+	}
+
+	/**
+	 * 
+	 **/
+	public static void cleanUpSpace(String commonPath, double ratioOfPercentageFilesToDelete)
+	{
+		// String commonPath = "./dataWritten/Aug14Filter500/";
+		String s = ("cleanUpSpace called on commonPath=" + commonPath + "\n");
+		System.out.println(s);
+
+		String deleteConsoleLogs = Searcher.searchAndRandomDelete2(commonPath, "consoleLog",
+				Arrays.asList("rror", "xception"), ratioOfPercentageFilesToDelete);
+
+		System.out.println("result= " + deleteConsoleLogs);
+		// Timestamp
+
+		// .getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+		WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "CleanUpSafelyRandomlyDeleteConsoleLogsForSpace"
+				+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".txt");
 	}
 }

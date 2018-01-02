@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums.SummaryStat;
+import org.activity.constants.SanityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
@@ -234,7 +235,7 @@ public class StatsUtils
 		{
 			new Exception("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + ","
 					+ lon1s + "  " + lat2s + "," + lon2s);
-			if (Constant.checkForHaversineAnomaly)
+			if (SanityConstants.checkForHaversineAnomaly)
 			{
 				PopUps.showError("Possible Error in haversin: latitude and/or longitude outside range: provided "
 						+ lat1s + "," + lon1s + "  " + lat2s + "," + lon2s);
@@ -266,7 +267,8 @@ public class StatsUtils
 		double c = 2 * Math.asin(Math.sqrt(a)); // TODO: #performanceEater
 		// System.out.println("c = " + c);
 
-		if (Constant.checkForDistanceTravelledAnomaly && (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
+		if (SanityConstants.checkForDistanceTravelledAnomaly
+				&& (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
 		{
 			System.err.println("Probable Error: haversine():+ distance >200kms (=" + radiusOfEarthInKMs * c
 					+ " for latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + "  " + lat2s
@@ -366,7 +368,7 @@ public class StatsUtils
 		{
 			new Exception("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + ","
 					+ lon1s + "  " + lat2s + "," + lon2s);
-			if (Constant.checkForHaversineAnomaly)
+			if (SanityConstants.checkForHaversineAnomaly)
 			{
 				PopUps.showError("Possible Error in haversin: latitude and/or longitude outside range: provided "
 						+ lat1s + "," + lon1s + "  " + lat2s + "," + lon2s);
@@ -398,7 +400,8 @@ public class StatsUtils
 		double c = 2 * FastMath.asin(FastMath.sqrt(a)); // TODO: #performanceEater
 		// System.out.println("c = " + c);
 
-		if (Constant.checkForDistanceTravelledAnomaly && (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
+		if (SanityConstants.checkForDistanceTravelledAnomaly
+				&& (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
 		{
 			System.err.println("Probable Error: haversine():+ distance >200kms (=" + radiusOfEarthInKMs * c
 					+ " for latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + "  " + lat2s
@@ -558,7 +561,7 @@ public class StatsUtils
 			new Exception("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + ","
 					+ lon1s + "  " + lat2s + "," + lon2s);
 
-			if (Constant.checkForHaversineAnomaly)
+			if (SanityConstants.checkForHaversineAnomaly)
 			{
 				PopUps.showError("Possible Error in haversin: latitude and/or longitude outside range: provided "
 						+ lat1s + "," + lon1s + "  " + lat2s + "," + lon2s);
@@ -577,7 +580,8 @@ public class StatsUtils
 				+ Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
 		double c = 2 * Math.asin(Math.sqrt(a));
 
-		if (Constant.checkForDistanceTravelledAnomaly && (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
+		if (SanityConstants.checkForDistanceTravelledAnomaly
+				&& (radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
 		{
 			System.err.println("Probable Error: haversine():+ distance >200kms (=" + radiusOfEarthInKMs * c
 					+ " for latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + "  " + lat2s
@@ -839,10 +843,11 @@ public class StatsUtils
 	 * @param valsReceived
 	 * @param nameForValue
 	 * @param fileNameToWrite
+	 * @param writeToFile
 	 * @return
 	 */
 	public static DescriptiveStatistics getDescriptiveStatisticsDouble(ArrayList<Double> valsReceived,
-			String nameForValue, String fileNameToWrite)
+			String nameForValue, String fileNameToWrite, boolean writeToFile)
 	{
 
 		double values[] = new double[valsReceived.size()];
@@ -872,8 +877,11 @@ public class StatsUtils
 				+ "Sum = " + nf.format(dstats.getSum()) + "\n" + "-------------------------------\n";
 
 		message.append(m1);
-		WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
-		// TODO check if this works corrcetly System.out.println(m1);
+
+		if (writeToFile)
+		{
+			WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+		} // TODO check if this works corrcetly System.out.println(m1);
 
 		return dstats;
 	}

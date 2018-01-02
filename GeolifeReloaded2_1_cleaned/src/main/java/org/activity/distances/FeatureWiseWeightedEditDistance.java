@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.activity.constants.Constant;
+import org.activity.constants.SanityConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
@@ -62,7 +63,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 		{
 			arrd[i] = Double.valueOf(arr[i].toString());
 		}
-		if (Constant.checkArrayOfFeatures)
+		if (SanityConstants.checkArrayOfFeatures)
 		{
 			System.out.println("Inside getArrayOfFeatures for feature:" + featureName + " \nActivity Objects are:");
 			aos.stream().forEach(a -> System.out.print(a.toString() + " "));

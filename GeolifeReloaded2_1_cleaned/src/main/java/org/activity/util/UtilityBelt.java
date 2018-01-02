@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -45,6 +46,21 @@ public class UtilityBelt
 	private UtilityBelt()
 	{
 		throw new AssertionError();
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @return
+	 */
+	public static <K, V> ArrayList<K> getKeysAsOrderedList(LinkedHashMap<K, V> map)
+	{
+		ArrayList<K> keys = new ArrayList<>();
+		for (Entry<K, V> e : map.entrySet())
+		{
+			keys.add(e.getKey());
+		}
+		return keys;
 	}
 
 	/**
@@ -1652,9 +1668,23 @@ public class UtilityBelt
 	 * @param s2
 	 * @return
 	 */
-	public static Set<Integer> getIntersection(List<Integer> s1, List<Integer> s2)
+	public static Set<Integer> getIntersection(ArrayList<Integer> s1, ArrayList<Integer> s2)
 	{
 		Set<Integer> intersection = new HashSet<Integer>(s1);
+		intersection.retainAll(s2);
+		// System.out.println("Inside checkIntersection\ns1=" + s1 + "\ns2=" + s2 + "\nintersection=" + intersection);
+		return intersection;
+	}
+
+	/**
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static <T> Set<T> getIntersection2(ArrayList<T> s1, ArrayList<T> s2)
+	{
+		Set<T> intersection = new HashSet<>(s1);
 		intersection.retainAll(s2);
 		// System.out.println("Inside checkIntersection\ns1=" + s1 + "\ns2=" + s2 + "\nintersection=" + intersection);
 		return intersection;

@@ -17,6 +17,11 @@ public class PathConstants
 	public static String pathToSerialisedLevelWiseCatIDsDict;
 	public static String pathToSerialisedMergedCheckinData;
 
+	/**
+	 * Set paths to serialised datasets
+	 * 
+	 * @param For9kUsers
+	 */
 	public static final void intialise(boolean For9kUsers)
 	{
 		if (For9kUsers)

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.PrimaryDimension;
+import org.activity.constants.SanityConstants;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -674,7 +675,7 @@ public class ActivityObject implements Serializable
 
 			this.distanceTravelled = StatsUtils.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
 
-			if (distanceTravelled > Constant.distanceTravelledAlert && Constant.checkForDistanceTravelledAnomaly)
+			if (distanceTravelled > Constant.distanceTravelledAlert && SanityConstants.checkForDistanceTravelledAnomaly)
 			{
 				System.out.println("Notice: distance travelled (high) = " + distanceTravelled
 						+ " for transportation mode = " + activityName);

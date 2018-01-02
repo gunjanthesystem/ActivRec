@@ -16,6 +16,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.activity.clustering.weka.TimelineWEKAClusteringController;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.PathConstants;
@@ -29,10 +30,8 @@ import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
-import org.activity.probability.ProbabilityUtilityBelt;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
-import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
@@ -43,30 +42,26 @@ import org.activity.util.UtilityBelt;
  * 
  * @author gunjan
  */
-public class ControllerWithoutServer
+public class ControllerWithoutServer_backup31Jan
 {
 	String pathToLatestSerialisedJSONArray = "", pathForLatestSerialisedJSONArray = "",
 			pathToLatestSerialisedTimelines = "", pathForLatestSerialisedTimelines = "", commonPath = "";
 
-	/**
-	 * 
-	 * @param databaseName
-	 */
-	public ControllerWithoutServer(String databaseName)
+	public ControllerWithoutServer_backup31Jan()
 	{
 		try
 		{
 			System.out.println("Starting ControllerWithoutServer>>>>");
 			System.out.println(PerformanceAnalytics.getHeapInformation());
+			LocalDateTime currentDateTime = LocalDateTime.now();
 			TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 			Constant.setDefaultTimeZone("UTC");
-			System.out.println("currentDateTime: " + LocalDateTime.now());
 
 			// String pathToLatestSerialisedJSONArray = "", pathForLatestSerialisedJSONArray = "",
 			// pathToLatestSerialisedTimelines = "", pathForLatestSerialisedTimelines = "", commonPath = "";
-			System.out.println("Running experiments for database: " + databaseName);// .DATABASE_NAME);
+			System.out.println("Running experiments for database: " + Constant.getDatabaseName());// .DATABASE_NAME);
 
-			setPathsSerialisedJSONTimelines(databaseName);
+			setPaths(Constant.getDatabaseName());
 			// new ConnectDatabase(Constant.getDatabaseName()); // all method and variable in this class are static
 			// new Constant(commonPath, Constant.getDatabaseName());
 
@@ -78,19 +73,90 @@ public class ControllerWithoutServer
 			 */
 			// specific for Gowalla dataset
 			PathConstants.intialise(Constant.For9kUsers);
-			Constant.initialise(commonPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
+			Constant.initialise(commonPath, Constant.getDatabaseName(), PathConstants.pathToSerialisedCatIDsHierDist,
 					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects);
 
+			// ,// 550);
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 					+ PerformanceAnalytics.getHeapPercentageFree());
 
-			////////// ~~~~~~~~~~~~~~~~~`
 			long dt1 = System.currentTimeMillis();
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = createAllTimelines(
-					databaseName, Constant.toSerializeJSONArray, Constant.toDeSerializeJSONArray,
-					Constant.toCreateTimelines, Constant.toSerializeTimelines, Constant.toDeSerializeTimelines);
 
-			////////// ~~~~~~~~~~~~~~~~~`
+			if (Constant.toSerializeJSONArray)
+			{
+				fetchAndSerializeJSONArray(Constant.getDatabaseName());
+			}
+			// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			SerializableJSONArray jsonArrayD = null;
+			long dt2 = System.currentTimeMillis();
+			if (Constant.toDeSerializeJSONArray)
+			{
+				jsonArrayD = (SerializableJSONArray) Serializer.deSerializeThis(pathToLatestSerialisedJSONArray);// GeolifeJSONArrayDec24_2.obj");
+				System.out.println("Deserialized JSONArray");
+			}
+			// // System.out.println(jsonArray.getJSONArray().toString() == jsonArrayD.getJSONArray().toString());
+			// // System.out.println(jsonArray.getJSONArray().toString().length());
+			// // System.out.println("---------");
+			// // System.out.println(jsonArray.getJSONArray().toString().length());
+			//
+			// // System.out.println(StringUtils.difference(jsonArray.getJSONArray().toString(),
+			// jsonArrayD.getJSONArray().toString()));
+			// System.out.println("ajooba");1
+			// //System.out.println(jsonArray.toString());
+			//
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = null;
+			// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
+			System.out.println("Before createTimelines\n" + PerformanceAnalytics.getHeapInformation());
+			if (Constant.toCreateTimelines)
+			{
+				usersDayTimelinesOriginal = createTimelines(Constant.getDatabaseName(), jsonArrayD,
+						PathConstants.commonPathToGowallaPreProcessedData);
+			}
+			System.out.println("After createTimelines\n" + PerformanceAnalytics.getHeapInformation());
+
+			// //to improve repeat execution performance...serialising
+			if (Constant.toSerializeTimelines)
+			{
+				Serializer.serializeThis(usersDayTimelinesOriginal, pathForLatestSerialisedTimelines);
+				pathToLatestSerialisedTimelines = pathForLatestSerialisedTimelines;
+				System.out.println("Serialized Timelines");
+			}
+			//
+			// // /////////////////////////////////////
+			if (Constant.toDeSerializeTimelines)
+			{
+				if (Constant.getDatabaseName().equals("gowalla1"))
+				{
+					usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+							.kryoDeSerializeThis(pathToLatestSerialisedTimelines);
+				}
+				else
+				{
+					usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+							.deSerializeThis(pathToLatestSerialisedTimelines);
+				}
+				System.out.println("deserialised userTimelines.size()=" + usersDayTimelinesOriginal.size());
+				System.out.println("Deserialized Timelines");
+			}
+			long ct = System.currentTimeMillis();
+
+			if (!Constant.checkAllParametersSet())
+			{
+				System.err.println("All essential paramaters in Constant not set. Exiting");
+				PopUps.showError("All essential paramaters in Constant not set. Exiting");
+				System.exit(-162);
+			}
+
+			Pair<Boolean, String> hasDuplicateDates = TimelineUtils.hasDuplicateDates(usersDayTimelinesOriginal);
+			if (hasDuplicateDates.getFirst())
+			{
+				System.out.println(
+						"Alert!Alert! hasDuplicateDates.  for users:" + hasDuplicateDates.getSecond().toString());
+			}
+			else
+			{
+				System.out.println("Thank God, no duplicate dates.");
+			}
 			//////////// for Gowalla start
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
 			// false, false, false, "GowallaUserDayTimelines.csv");
@@ -100,14 +166,15 @@ public class ControllerWithoutServer
 			// For 9k users
 			if (Constant.For9kUsers)
 			{
-				usersCleanedDayTimelines = reduceAndCleanTimelines2(databaseName, usersDayTimelinesOriginal, true,
-						Constant.getCommonPath(), 10, 7, 500);
+				usersCleanedDayTimelines = ControllerWithoutServer_backup31Jan.reduceAndCleanTimelines2(Constant.getDatabaseName(),
+						usersDayTimelinesOriginal, true);
 			}
-			else // For 916 users
+			else
 			{
-				usersCleanedDayTimelines = reduceAndCleanTimelines(databaseName, usersDayTimelinesOriginal, true);
+				// For 916 users
+				usersCleanedDayTimelines = ControllerWithoutServer_backup31Jan.reduceAndCleanTimelines(Constant.getDatabaseName(),
+						usersDayTimelinesOriginal, true);
 			}
-
 			usersDayTimelinesOriginal = null; // null this out so as to be ready for garbage collection.
 			System.out.println("After reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
 			long dt3 = System.currentTimeMillis();
@@ -169,26 +236,21 @@ public class ControllerWithoutServer
 			// $$TimelineStats.writeAllCitiesCounts(usersCleanedDayTimelines,
 			// $$ Constant.outputCoreResultsPath + "AllCitiesCount");
 			// // important curtain 1 start 21 Dec 2017 10 Feb 2017
-			if (Constant.For9kUsers)
-			{
-				// Start of curtain Aug 14 2017
-				// $$selectGivenUsersExecuteRecommendationTests(usersCleanedDayTimelines, IntStream
-				// $$ .of(DomainConstants.gowallaUserIDInUserGroup1Users).boxed().collect(Collectors.toList()),
-				// $$commonBasePath, "1");
-				// End of curtain Aug 14 2017
-				// HERE
-				// ProbabilityUtilityBelt.funx(UtilityBelt.getKeysAsOrderedList(usersCleanedDayTimelines), 100);
-				randomlySampleUsers(usersCleanedDayTimelines, 9, 1000);
-
-				System.exit(0);
-			}
-			else
-			{
-				// Start of curtain Aug 11 2017
-				sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, DomainConstants.gowallaUserGroupsLabels,
-						commonBasePath);
-				// End of curtain Aug 11 2017
-			}
+			// $$ if (Constant.For9kUsers)
+			// {
+			// // Start of curtain Aug 14 2017
+			// selectGivenUsersExecuteRecommendationTests(usersCleanedDayTimelines, IntStream
+			// .of(DomainConstants.gowallaUserIDInUserGroup1Users).boxed().collect(Collectors.toList()),
+			// commonBasePath, "1");
+			// // End of curtain Aug 14 2017
+			// }
+			// else
+			// {
+			// // Start of curtain Aug 11 2017
+			// sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, DomainConstants.gowallaUserGroupsLabels,
+			// commonBasePath);
+			// // End of curtain Aug 11 2017
+			// }
 			// $$// important curtain 1 end 21 Dec 2017 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017
@@ -255,9 +317,8 @@ public class ControllerWithoutServer
 			// UtilityBelt.rearrangeDayTimelinesOrderForDataset(usersCleanedRearrangedDayTimelines);
 
 			/** CURRENT **/
-			// $$TimelineWEKAClusteringController clustering = new
-			// TimelineWEKAClusteringController(usersCleanedDayTimelines,
-			// $$ null);
+			TimelineWEKAClusteringController clustering = new TimelineWEKAClusteringController(usersCleanedDayTimelines,
+					null);
 			// usersCleanedRearrangedDayTimelines, null);
 
 			/** END OF CURRENT **/
@@ -275,7 +336,7 @@ public class ControllerWithoutServer
 			{
 				ConnectDatabase.destroyPooledConnection();
 			}
-			// $System.out.println("This experiment took " + ((et - ct) / 1000) + " seconds");
+			System.out.println("This experiment took " + ((et - ct) / 1000) + " seconds");
 
 		}
 		catch (Exception e)
@@ -283,142 +344,6 @@ public class ControllerWithoutServer
 			e.printStackTrace();
 		}
 
-	}
-
-	/**
-	 * 
-	 * @param usersCleanedDayTimelines
-	 * @param numOfSublists
-	 * @param sizeOfEachSublist
-	 * @return
-	 */
-	private ArrayList<ArrayList<String>> randomlySampleUsers(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, int numOfSublists,
-			int sizeOfEachSublist)
-	{
-		ArrayList<String> all9kUserIDs = UtilityBelt.getKeysAsOrderedList(usersCleanedDayTimelines);
-		ArrayList<ArrayList<String>> sublists = ProbabilityUtilityBelt.randomlySampleIntoSublists(all9kUserIDs,
-				numOfSublists, sizeOfEachSublist);
-		// System.out.println("sublists= \n" + sublists);
-
-		Pair<Integer, ArrayList<Double>> res = ProbabilityUtilityBelt.getIntersectionSizes(sublists);
-		int numOfUniqueElements = res.getFirst();
-		ArrayList<Double> intersectionSizes = res.getSecond();
-
-		Pair<Double, String> stats = ProbabilityUtilityBelt.getSamplingIntersectionStats(all9kUserIDs.size(),
-				numOfSublists, sizeOfEachSublist, numOfUniqueElements, intersectionSizes);
-		// coverage = stats.getFirst();
-
-		StringBuilder sampledUserIDsAsString = new StringBuilder("\nsampledUserIDsAsString:\n");
-		sublists.stream().forEachOrdered(e -> sampledUserIDsAsString.append(e.toString() + "\n"));
-		System.out.println(stats.getSecond());
-
-		WritingToFile.writeToNewFile(stats.getSecond() + sampledUserIDsAsString.toString(),
-				Constant.getCommonPath() + "randomlySampleUsers.txt");
-
-		return sublists;
-	}
-
-	// Constant.getDatabaseName()
-	// Constant.toSerializeJSONArray
-	// Constant.toDeSerializeJSONArray
-	// Constant.toCreateTimelines
-	// Constant.toSerializeTimelines
-	// Constant.toDeSerializeTimelines
-	/**
-	 * 
-	 * @param databaseName
-	 * @param toSerializeJSONArray
-	 * @param toDeSerializeJSONArray
-	 * @param toCreateTimelines
-	 * @param toSerializeTimelines
-	 * @param toDeSerializeTimelines
-	 * @return
-	 * @throws SQLException
-	 */
-	private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createAllTimelines(String databaseName,
-			boolean toSerializeJSONArray, boolean toDeSerializeJSONArray, boolean toCreateTimelines,
-			boolean toSerializeTimelines, boolean toDeSerializeTimelines) throws SQLException
-	{
-		long dt1 = System.currentTimeMillis();
-		if (toSerializeJSONArray)
-		{
-			fetchAndSerializeJSONArray(databaseName);
-		}
-
-		// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		SerializableJSONArray jsonArrayD = null;
-		long dt2 = System.currentTimeMillis();
-		if (toDeSerializeJSONArray)
-		{
-			jsonArrayD = (SerializableJSONArray) Serializer.deSerializeThis(pathToLatestSerialisedJSONArray);// GeolifeJSONArrayDec24_2.obj");
-			System.out.println("Deserialized JSONArray");
-		}
-		// // System.out.println(jsonArray.getJSONArray().toString() == jsonArrayD.getJSONArray().toString());
-		// // System.out.println(jsonArray.getJSONArray().toString().length());
-		// // System.out.println("---------");
-		// // System.out.println(jsonArray.getJSONArray().toString().length());
-		//
-		// // System.out.println(StringUtils.difference(jsonArray.getJSONArray().toString(),
-		// jsonArrayD.getJSONArray().toString()));
-		// System.out.println("ajooba");1
-		// //System.out.println(jsonArray.toString());
-		//
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = null;
-		// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
-		System.out.println("Before createTimelines\n" + PerformanceAnalytics.getHeapInformation());
-		if (toCreateTimelines)
-		{
-			usersDayTimelinesOriginal = createTimelines(databaseName, jsonArrayD,
-					PathConstants.commonPathToGowallaPreProcessedData);
-		}
-		System.out.println("After createTimelines\n" + PerformanceAnalytics.getHeapInformation());
-
-		// //to improve repeat execution performance...serialising
-		if (Constant.toSerializeTimelines)
-		{
-			Serializer.serializeThis(usersDayTimelinesOriginal, pathForLatestSerialisedTimelines);
-			pathToLatestSerialisedTimelines = pathForLatestSerialisedTimelines;
-			System.out.println("Serialized Timelines");
-		}
-		//
-		// // /////////////////////////////////////
-		if (toDeSerializeTimelines)
-		{
-			if (databaseName.equals("gowalla1"))
-			{
-				usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-						.kryoDeSerializeThis(pathToLatestSerialisedTimelines);
-			}
-			else
-			{
-				usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-						.deSerializeThis(pathToLatestSerialisedTimelines);
-			}
-			System.out.println("deserialised userTimelines.size()=" + usersDayTimelinesOriginal.size());
-			System.out.println("Deserialized Timelines");
-		}
-		long ct = System.currentTimeMillis();
-
-		if (!Constant.checkAllParametersSet())
-		{
-			System.err.println("All essential paramaters in Constant not set. Exiting");
-			PopUps.showError("All essential paramaters in Constant not set. Exiting");
-			System.exit(-162);
-		}
-
-		Pair<Boolean, String> hasDuplicateDates = TimelineUtils.hasDuplicateDates(usersDayTimelinesOriginal);
-		if (hasDuplicateDates.getFirst())
-		{
-			System.out
-					.println("Alert!Alert! hasDuplicateDates.  for users:" + hasDuplicateDates.getSecond().toString());
-		}
-		else
-		{
-			System.out.println("Thank God, no duplicate dates.");
-		}
-		System.out.println("createTimelines() took " + (ct - dt1) + " ms");
-		return usersDayTimelinesOriginal;
 	}
 
 	/**
@@ -445,26 +370,28 @@ public class ControllerWithoutServer
 			Constant.setOutputCoreResultsPath(commonBasePath + groupsOf100UsersLabel + "/");
 
 			Files.createDirectories(Paths.get(Constant.getOutputCoreResultsPath())); // added on 9th Feb 2017
+			int indexOfSampleUser = 0;
 
 			/// sample users
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsers = new LinkedHashMap<>(134);
 			// (ceil) 100/0.75
 
-			int indexOfSampleUser = 0;
 			int numOfUsersSkippedGT553MaxActsPerDay = 0;
 			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
-				System.out.print(" indexOfSampleUser = " + indexOfSampleUser + "\t");
+				System.out.println(" indexOfSampleUser = " + indexOfSampleUser);
 				// countOfSampleUsers += 1;
 				if (indexOfSampleUser < startUserIndex)
 				{
 					System.out.println(" " + indexOfSampleUser + "<" + startUserIndex + " hence skipping");
+
 					indexOfSampleUser += 1;
 					continue;
 				}
 				if (indexOfSampleUser > endUserIndex)
 				{
 					System.out.println(" " + indexOfSampleUser + ">" + startUserIndex + " hence breaking");
+
 					indexOfSampleUser += 1;
 					break;
 				}
@@ -482,10 +409,12 @@ public class ControllerWithoutServer
 				else
 				{
 					System.out.println(" choosing this ");
+
 					sampledUsers.put(userEntry.getKey(), userEntry.getValue());
 					indexOfSampleUser += 1;
 				}
 				// $$System.out.println("putting in user= " + userEntry.getKey());
+
 			}
 
 			// start of get timelines for all users for collaborative approach
@@ -563,21 +492,20 @@ public class ControllerWithoutServer
 		Files.createDirectories(Paths.get(Constant.getOutputCoreResultsPath())); // added on 9th Feb 2017
 
 		/// sample users
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines = new LinkedHashMap<>(
-				userIDsToSelect.size());
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsers = new LinkedHashMap<>(userIDsToSelect.size());
 		// (ceil) 100/0.75
 
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 		{
 			if (userIDsToSelect.contains(Integer.valueOf(userEntry.getKey())))
 			{
-				sampledUsersTimelines.put(userEntry.getKey(), userEntry.getValue());
+				sampledUsers.put(userEntry.getKey(), userEntry.getValue());
 			}
 			// $$System.out.println("putting in user= " + userEntry.getKey());
 		}
 
-		System.out.println("num of sampled users for this iteration = " + sampledUsersTimelines.size());
-		System.out.println(" -- Users = " + sampledUsersTimelines.keySet().toString());
+		System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
+		System.out.println(" -- Users = " + sampledUsers.keySet().toString());
 
 		// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
 		// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
@@ -593,19 +521,19 @@ public class ControllerWithoutServer
 		// // end of curtain may 4 2017
 
 		RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
-				sampledUsersTimelines, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
+				sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
 				Constant.getUserIDs(), Constant.percentageInTraining, 3, usersCleanedDayTimelines);
 
 		System.out.println("-- iteration end for groupLabel = " + groupLabel);
 	}
 
 	/**
-	 * Sets pathToLatestSerialisedJSONArray, pathForLatestSerialisedJSONArray, pathToLatestSerialisedTimelines,
-	 * pathForLatestSerialisedTimelines
+	 * Sets commonPath, pathToLatestSerialisedJSONArray, pathForLatestSerialisedJSONArray,
+	 * pathToLatestSerialisedTimelines, pathForLatestSerialisedTimelines
 	 * 
 	 * @param databaseName
 	 */
-	public void setPathsSerialisedJSONTimelines(String databaseName)
+	public void setPaths(String databaseName)
 	{
 		LocalDateTime currentDateTime = LocalDateTime.now();
 
@@ -613,7 +541,8 @@ public class ControllerWithoutServer
 		{
 			case "gowalla1":
 				pathToLatestSerialisedJSONArray = null;// "";
-				pathForLatestSerialisedJSONArray = "" + DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
+				pathForLatestSerialisedJSONArray = "" + currentDateTime.getMonth().toString().substring(0, 3)
+						+ currentDateTime.getDayOfMonth() + "obj";
 				pathToLatestSerialisedTimelines = null;
 				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelinesNOV30.kryo";
 				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines.kryo";
@@ -635,7 +564,8 @@ public class ControllerWithoutServer
 				// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayMAY27obj";
 				// GeolifeJSONArrayFeb13.obj";
 				pathForLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArray"
-						+ DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
+						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+						+ "obj";
 
 				// $$UMAP submission
 				// $$pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data
@@ -650,7 +580,8 @@ public class ControllerWithoutServer
 				pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
 
 				pathForLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelines"
-						+ DateTimeUtils.getShortDateLabel(currentDateTime) + ".lmap";
+						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+						+ ".lmap";
 				commonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";// version 3 based on rank score
 																					// function
 				break;
@@ -658,7 +589,8 @@ public class ControllerWithoutServer
 			case "dcu_data_2":
 				pathToLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArrayOct29.obj";
 				pathForLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArray"
-						+ DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
+						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+						+ "obj";
 
 				pathToLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
 				// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
@@ -666,7 +598,8 @@ public class ControllerWithoutServer
 				// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
 				// Works/WorkingSet7July/DCUUserTimelinesMAY7.lmap"; DCUUserTimelinesOct29.lmap";
 				pathForLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
-						+ DateTimeUtils.getShortDateLabel(currentDateTime) + ".lmap";
+						+ currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+						+ ".lmap";
 
 				commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
 				break;
@@ -775,7 +708,7 @@ public class ControllerWithoutServer
 	 * For Gowalla data:
 	 * <ol type="1">
 	 * <li>removes days with less than 10 acts per day</li>
-	 * <li>removes users with less than 7 days</li>
+	 * <li>removes users with less than 50 days</li>
 	 * </ol>
 	 * For all data, removes day timelines:
 	 * <ol type="1">
@@ -787,28 +720,18 @@ public class ControllerWithoutServer
 	 * <ol type="1">
 	 * <li>again removes users with less than 50 days (this is after cleaning)</li>
 	 * 
-	 * 
 	 * @param databaseName
 	 * @param usersDayTimelinesOriginal
 	 * @param writeToFile
-	 * @param commonPath
-	 * @param actsPerDayLowerLimit
-	 * @param numOfSuchDaysLowerLimit
-	 * @param actsPerDayUpperLimit
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceAndCleanTimelines2(String databaseName,
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile,
-			String commonPath, int actsPerDayLowerLimit, int numOfSuchDaysLowerLimit, int actsPerDayUpperLimit)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile)
 	{
-		// int actsPerDayLowerLimit = 10;
-		// int numOfSuchDaysLowerLimit = 7;
-		// int actsPerDayUpperLimit = 500;
-
 		if (databaseName.equals("gowalla1"))
 		{
-			usersDayTimelinesOriginal = reduceTimelinesByActDensity(databaseName, usersDayTimelinesOriginal, true,
-					false, actsPerDayLowerLimit, numOfSuchDaysLowerLimit, actsPerDayUpperLimit, commonPath);
+			usersDayTimelinesOriginal = reduceGowallaTimelines3(Constant.getDatabaseName(), usersDayTimelinesOriginal,
+					true, false, 10, 7, 500);
 		}
 
 		///// clean timelines
@@ -827,11 +750,16 @@ public class ControllerWithoutServer
 		System.out.println("Num of users cleaned = " + usersCleanedDayTimelines.size());
 		///
 
-		///// again remove users with less than 2 days (these are the clean days)
-		// if (false){// disabled
-		System.out.println("\n--again remove users with less than 2 day (these are the clean days)");
-		usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 2,
-				Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan2DaysLog.csv");
+		if (databaseName.equals("gowalla1"))
+		{
+			///// again remove users with less than 2 days (these are the clean days)
+			// if (false)// disabled
+			{
+				System.out.println("\n--again remove users with less than 2 day (these are the clean days)");
+				usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 2,
+						Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan2DaysLog.csv");
+			}
+		}
 
 		if (writeToFile)
 		{// Writing user day timelines. big file ~ 17.3GB
@@ -912,7 +840,7 @@ public class ControllerWithoutServer
 	{
 		if (databaseName.equals("gowalla1"))
 		{
-			usersDayTimelinesOriginal = reduceGowallaTimelinesByActDensity(databaseName, usersDayTimelinesOriginal,
+			usersDayTimelinesOriginal = reduceGowallaTimelines(Constant.getDatabaseName(), usersDayTimelinesOriginal,
 					true);
 		}
 
@@ -997,13 +925,12 @@ public class ControllerWithoutServer
 
 	//
 	/**
-	 * USED
+	 * removed days with less than actsPerDayLowerLimit acts per day
 	 * <p>
-	 * Removes days with less than actsPerDayLowerLimit acts per day
+	 * removed days with greater than actsPerDayUpperLimit acts per day
 	 * <p>
-	 * Removes days with greater than actsPerDayUpperLimit acts per day
-	 * <p>
-	 * Removes users with less than numOfSuchDaysLowerLimit days
+	 * removed users with less than numOfSuchDaysLowerLimit days
+	 * 
 	 * 
 	 * @param databaseName
 	 * @param usersDayTimelinesOriginal
@@ -1012,81 +939,243 @@ public class ControllerWithoutServer
 	 * @param actsPerDayLowerLimit
 	 * @param numOfSuchDaysLowerLimit
 	 * @param actsPerDayUpperLimit
-	 * @param commonPath
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceTimelinesByActDensity(String databaseName,
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelines4(String databaseName,
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile,
-			boolean writeLogs, int actsPerDayLowerLimit, int numOfSuchDaysLowerLimit, int actsPerDayUpperLimit,
-			String commonPath) // formerly reduceTimelines3
-	{// making it generic and not restricting to gowalla dataset on 2 Jan 2018
-		System.out.println("Inside reduceTimelinesByActivityDensity");
+			boolean writeLogs, int actsPerDayUpperLimit)
+	{
+		System.out.println("Inside reduceGowallaTimelines3");
 
-		// Originally received timelines
-		if (writeToFile)
+		if (databaseName.equals("gowalla1") == false)
 		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActs.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					commonPath + "NumOfDaysPerUser.csv");
+			String msg = PopUps.getTracedErrorMsg(
+					"Error in reduceGowallaTimelines2(): should not be called for databases other than gowalla1. Called for database: "
+							+ databaseName);
+			System.err.println(msg);
+			return null;
 		}
-		System.out.println("Num of users = " + usersDayTimelinesOriginal.size());
 
-		////////// remove days with less than actsPerDayLowerLimit acts per day
-		System.out.println("\n-- removing days with less than " + actsPerDayLowerLimit + " acts per day");
-		usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
-				actsPerDayLowerLimit,
-				commonPath + "removeDayTimelinesWithLessThan" + actsPerDayLowerLimit + "ActLog.csv", writeLogs);
-
-		if (writeToFile)
+		else
 		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					commonPath + "NumOfDaysPerUserReduced1.csv");
-			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+			// Originally received timelines
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActs.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUser.csv");
+			}
+			System.out.println("Num of users = " + usersDayTimelinesOriginal.size());
+
+			////////// removed days with greater than actsPerDayUpperLimit acts per day
+			System.out.println("\n-- removing days with greater than " + actsPerDayUpperLimit + " acts per day");
+			usersDayTimelinesOriginal = TimelineUtils
+					.removeDayTimelinesWithGreaterAct(
+							usersDayTimelinesOriginal, actsPerDayUpperLimit, Constant.getCommonPath()
+									+ "removeDayTimelinesWithGreaterThan" + actsPerDayUpperLimit + "ActLog.csv",
+							writeLogs);
+
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1_2.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUserReduced1_2.csv");
+				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
+				// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+			}
+			System.out.println("Num of users reduced1_2 = " + usersDayTimelinesOriginal.size());
+			//////////
+
+			return usersDayTimelinesOriginal;
 		}
-		System.out.println("Num of users reduced1 = " + usersDayTimelinesOriginal.size());
-		//////////
+	}
 
-		////////// removed days with greater than actsPerDayUpperLimit acts per day
-		System.out.println("\n-- removing days with greater than " + actsPerDayUpperLimit + " acts per day");
-		usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithGreaterAct(usersDayTimelinesOriginal,
-				actsPerDayUpperLimit,
-				commonPath + "removeDayTimelinesWithGreaterThan" + actsPerDayUpperLimit + "ActLog.csv", writeLogs);
+	//
+	/**
+	 * removed days with less than actsPerDayLowerLimit acts per day
+	 * <p>
+	 * removed days with greater than actsPerDayUpperLimit acts per day
+	 * <p>
+	 * removed users with less than numOfSuchDaysLowerLimit days
+	 * 
+	 * 
+	 * @param databaseName
+	 * @param usersDayTimelinesOriginal
+	 * @param writeToFile
+	 * @param writeLogs
+	 * @param actsPerDayLowerLimit
+	 * @param numOfSuchDaysLowerLimit
+	 * @param actsPerDayUpperLimit
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelines3(String databaseName,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile,
+			boolean writeLogs, int actsPerDayLowerLimit, int numOfSuchDaysLowerLimit, int actsPerDayUpperLimit)
+	{
+		System.out.println("Inside reduceGowallaTimelines3");
 
-		if (writeToFile)
+		if (databaseName.equals("gowalla1") == false)
 		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1_2.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					commonPath + "NumOfDaysPerUserReduced1_2.csv");
-			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+			String msg = PopUps.getTracedErrorMsg(
+					"Error in reduceGowallaTimelines2(): should not be called for databases other than gowalla1. Called for database: "
+							+ databaseName);
+			System.err.println(msg);
+			return null;
 		}
-		System.out.println("Num of users reduced1_2 = " + usersDayTimelinesOriginal.size());
-		//////////
 
-		////////// removed users with less than numOfSuchDaysLowerLimit days
-		System.out.println("\n-- removing users with less than " + numOfSuchDaysLowerLimit + " days");
-		usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal,
-				numOfSuchDaysLowerLimit,
-				commonPath + "removeDayTimelinesWithLessThan" + numOfSuchDaysLowerLimit + "DaysLog.csv");
-		if (writeToFile)
+		else
 		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced2.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					commonPath + "NumOfDaysPerUserReduced2.csv");
-			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			// false, false, false,"GowallaUserDayTimelinesReduced2.csv");// users
+			// Originally received timelines
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActs.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUser.csv");
+			}
+			System.out.println("Num of users = " + usersDayTimelinesOriginal.size());
+
+			////////// removed days with less than actsPerDayLowerLimit acts per day
+			System.out.println("\n-- removing days with less than " + actsPerDayLowerLimit + " acts per day");
+			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
+					actsPerDayLowerLimit,
+					Constant.getCommonPath() + "removeDayTimelinesWithLessThan" + actsPerDayLowerLimit + "ActLog.csv",
+					writeLogs);
+
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUserReduced1.csv");
+				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
+				// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+			}
+			System.out.println("Num of users reduced1 = " + usersDayTimelinesOriginal.size());
+			//////////
+
+			////////// removed days with greater than actsPerDayUpperLimit acts per day
+			System.out.println("\n-- removing days with greater than " + actsPerDayUpperLimit + " acts per day");
+			usersDayTimelinesOriginal = TimelineUtils
+					.removeDayTimelinesWithGreaterAct(
+							usersDayTimelinesOriginal, actsPerDayUpperLimit, Constant.getCommonPath()
+									+ "removeDayTimelinesWithGreaterThan" + actsPerDayUpperLimit + "ActLog.csv",
+							writeLogs);
+
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1_2.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUserReduced1_2.csv");
+				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
+				// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+			}
+			System.out.println("Num of users reduced1_2 = " + usersDayTimelinesOriginal.size());
+			//////////
+
+			////////// removed users with less than numOfSuchDaysLowerLimit days
+			System.out.println("\n-- removing users with less than " + numOfSuchDaysLowerLimit + " days");
+			usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal,
+					numOfSuchDaysLowerLimit, Constant.getCommonPath() + "removeDayTimelinesWithLessThan"
+							+ numOfSuchDaysLowerLimit + "DaysLog.csv");
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced2.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUserReduced2.csv");
+				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
+				// false, false, false,"GowallaUserDayTimelinesReduced2.csv");// users
+			}
+			System.out.println("Num of users reduced2 = " + usersDayTimelinesOriginal.size());
+			//////////
+
+			return usersDayTimelinesOriginal;
 		}
-		System.out.println("Num of users reduced2 = " + usersDayTimelinesOriginal.size());
-		//////////
+	}
 
-		return usersDayTimelinesOriginal;
+	//
+	/**
+	 * removed days with less than actsPerDayLowerLimit acts per day
+	 * <p>
+	 * removed users with less than numOfSuchDaysLowerLimit days
+	 * 
+	 * @param databaseName
+	 * @param usersDayTimelinesOriginal
+	 * @param writeToFile
+	 * @param writeLogs
+	 * @param actsPerDayLowerLimit
+	 * @param numOfSuchDaysLowerLimit
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelines2(String databaseName,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile,
+			boolean writeLogs, int actsPerDayLowerLimit, int numOfSuchDaysLowerLimit)
+	{
+		System.out.println("Inside reduceGowallaTimelines2");
 
+		if (databaseName.equals("gowalla1") == false)
+		{
+			String msg = PopUps.getTracedErrorMsg(
+					"Error in reduceGowallaTimelines2(): should not be called for databases other than gowalla1. Called for database: "
+							+ databaseName);
+			System.err.println(msg);
+			return null;
+		}
+
+		else
+		{
+			// Originally received timelines
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActs.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUser.csv");
+			}
+			System.out.println("Num of users = " + usersDayTimelinesOriginal.size());
+
+			////////// removed days with less than actsPerDayLowerLimit acts per day
+			System.out.println("\n-- removing days with less than " + actsPerDayLowerLimit + " acts per day");
+			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
+					actsPerDayLowerLimit,
+					Constant.getCommonPath() + "removeDayTimelinesWithLessThan" + actsPerDayLowerLimit + "ActLog.csv",
+					writeLogs);
+
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUserReduced1.csv");
+				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
+				// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+			}
+			System.out.println("Num of users reduced1 = " + usersDayTimelinesOriginal.size());
+			//////////
+
+			////////// removed users with less than numOfSuchDaysLowerLimit days
+			System.out.println("\n-- removing users with less than " + numOfSuchDaysLowerLimit + " days");
+			usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal,
+					numOfSuchDaysLowerLimit, Constant.getCommonPath() + "removeDayTimelinesWithLessThan"
+							+ numOfSuchDaysLowerLimit + "DaysLog.csv");
+			if (writeToFile)
+			{
+				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced2.csv");// us
+				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
+						Constant.getCommonPath() + "NumOfDaysPerUserReduced2.csv");
+				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
+				// false, false, false,"GowallaUserDayTimelinesReduced2.csv");// users
+			}
+			System.out.println("Num of users reduced2 = " + usersDayTimelinesOriginal.size());
+			//////////
+
+			return usersDayTimelinesOriginal;
+		}
 	}
 
 	//
@@ -1100,11 +1189,10 @@ public class ControllerWithoutServer
 	 * @param writeToFile
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelinesByActDensity(
-			String databaseName, LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal,
-			boolean writeToFile)
-	{// formerly reduceGowallaTimelines
-		System.out.println("Inside reduceGowallaTimelinesByActDensity");
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelines(String databaseName,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile)
+	{
+		System.out.println("Inside reduceGowallaTimelines");
 
 		if (databaseName.equals("gowalla1") == false)
 		{

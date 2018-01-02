@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activity.constants.Constant;
+import org.activity.constants.SanityConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.stats.StatsUtils;
 import org.activity.util.DateTimeUtils;
@@ -168,7 +169,7 @@ public class CopyOfActivityObject implements Serializable
 
 			this.distanceTravelled = StatsUtils.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
 
-			if (distanceTravelled > Constant.distanceTravelledAlert && Constant.checkForDistanceTravelledAnomaly)
+			if (distanceTravelled > Constant.distanceTravelledAlert && SanityConstants.checkForDistanceTravelledAnomaly)
 			{
 				System.out.println("Notice: distance travelled (high) = " + distanceTravelled
 						+ " for transportation mode = " + activityName);

@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -36,7 +37,19 @@ public class DateTimeUtils
 		System.out.println(ts);
 
 		System.out.println(getDate(ts));
+		System.out.println("getAbvDate= " + getShortDateLabel(LocalDateTime.now()));
 
+	}
+
+	/**
+	 * returns Month and day of month as 'JAN2'. Usually used to append to folder names,
+	 * 
+	 * @param currentDateTime
+	 * @return
+	 */
+	public static String getShortDateLabel(LocalDateTime currentDateTime)
+	{
+		return currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth();
 	}
 
 	public static void checkJavaSqlDate()
@@ -122,30 +135,30 @@ public class DateTimeUtils
 
 		switch (weekDayInt)
 		{
-		case 0:
-			weekDay = "Sunday";
-			break;
-		case 1:
-			weekDay = "Monday";
-			break;
-		case 2:
-			weekDay = "Tuesday";
-			break;
-		case 3:
-			weekDay = "Wednesday";
-			break;
-		case 4:
-			weekDay = "Thursday";
-			break;
-		case 5:
-			weekDay = "Friday";
-			break;
-		case 6:
-			weekDay = "Saturday";
-			break;
-		default:
-			weekDay = "not found";
-			break;
+			case 0:
+				weekDay = "Sunday";
+				break;
+			case 1:
+				weekDay = "Monday";
+				break;
+			case 2:
+				weekDay = "Tuesday";
+				break;
+			case 3:
+				weekDay = "Wednesday";
+				break;
+			case 4:
+				weekDay = "Thursday";
+				break;
+			case 5:
+				weekDay = "Friday";
+				break;
+			case 6:
+				weekDay = "Saturday";
+				break;
+			default:
+				weekDay = "not found";
+				break;
 
 		}
 

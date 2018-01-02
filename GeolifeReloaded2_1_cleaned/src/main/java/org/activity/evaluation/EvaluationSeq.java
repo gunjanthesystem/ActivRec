@@ -42,10 +42,9 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	static final String groupsOf100UsersLabels[] = { "1" };// , "101", "201", "301", "401", "501", "601", "701", "801",
-	// "901" };//
-	// static final String thresholds =
-	// "901" };
+	static final String groupsOf100UsersLabels[] = DomainConstants.gowallaUserGroupsLabels;// { "1", "101", "201",
+																							// "301", "401", "501",
+	// "601", "701", "801","901" };
 
 	// for each individual seq index
 	ArrayList<ArrayList<String>> listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
