@@ -4810,7 +4810,7 @@ public class WritingToFile
 	 * @param brs
 	 * @throws IOException
 	 */
-	public static void closeBufferedWriters(BufferedWriter br1, BufferedWriter... brs) throws IOException
+	public static void closeBWs(BufferedWriter br1, BufferedWriter... brs) throws IOException
 	{
 		br1.close();
 		for (BufferedWriter br : brs)

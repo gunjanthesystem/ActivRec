@@ -19,7 +19,7 @@ public class SuperController
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "./dataWritten/Jan2_Sampling/" };
+		String[] commonPaths = { "./dataWritten/Jan6_Sampling_Ncount5DayThreshold500/" };
 		// AKOM_916U_915N_5dayC_Order-3/" };//
 		// ""/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };
 		// + "Dec20_AKOM_1Cand_Order1/" };
@@ -46,6 +46,13 @@ public class SuperController
 	}
 
 	// All correct
+	/**
+	 * 
+	 * @param commonPath
+	 * @param recommendation
+	 * @param evaluation
+	 * @param hasMUs
+	 **/
 	public static void runExperiments(String commonPath, boolean recommendation, boolean evaluation, boolean hasMUs)
 	{
 		long at = System.currentTimeMillis();
@@ -359,10 +366,14 @@ public class SuperController
 		long bt = System.currentTimeMillis();
 		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");
 		PopUps.showMessage("All done in " + ((bt - at) / 1000) + " seconds");
-
 	}
 
 	/**
+	 * Delete a given % of files including "consoleLog" in their name and having no error and exception to save space.
+	 * 
+	 * @param commonPath
+	 * @param ratioOfPercentageFilesToDelete
+	 *            % of files including "consoleLog" in their name and having no error and exception to delete
 	 * 
 	 **/
 	public static void cleanUpSpace(String commonPath, double ratioOfPercentageFilesToDelete)
