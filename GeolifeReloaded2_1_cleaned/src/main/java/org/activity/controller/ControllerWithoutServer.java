@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.PathConstants;
+import org.activity.evaluation.EvaluationSeq;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
@@ -176,11 +177,23 @@ public class ControllerWithoutServer
 				// $$ .of(DomainConstants.gowallaUserIDInUserGroup1Users).boxed().collect(Collectors.toList()),
 				// $$commonBasePath, "1");
 				// End of curtain Aug 14 2017
-				// HERE
-				// ProbabilityUtilityBelt.funx(UtilityBelt.getKeysAsOrderedList(usersCleanedDayTimelines), 100);
-				randomlySampleUsers(usersCleanedDayTimelines, 9, 1000);
 
-				System.exit(0);
+				ArrayList<ArrayList<String>> listOfSampledUserIDs = randomlySampleUsersIDs(usersCleanedDayTimelines, 9,
+						1000);
+
+				for (int sampleID = 0; sampleID < listOfSampledUserIDs.size(); sampleID++)
+				{
+					LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUserCleanedDayTimelines = getDayTimelinesForUserIDsV2(
+							usersCleanedDayTimelines, listOfSampledUserIDs.get(sampleID));
+
+					sampleUsersExecuteRecommendationTests(sampledUserCleanedDayTimelines,
+							DomainConstants.gowallaUserGroupsLabels, commonBasePath + "Sample" + sampleID + "/");
+
+					new EvaluationSeq(3, commonBasePath + "Sample" + sampleID + "/",
+							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor));
+				}
+
+				// System.exit(0);
 			}
 			else
 			{
@@ -292,7 +305,7 @@ public class ControllerWithoutServer
 	 * @param sizeOfEachSublist
 	 * @return
 	 */
-	private ArrayList<ArrayList<String>> randomlySampleUsers(
+	private ArrayList<ArrayList<String>> randomlySampleUsersIDs(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, int numOfSublists,
 			int sizeOfEachSublist)
 	{
@@ -562,28 +575,15 @@ public class ControllerWithoutServer
 		Constant.setOutputCoreResultsPath(commonBasePath + groupLabel + "/");
 		Files.createDirectories(Paths.get(Constant.getOutputCoreResultsPath())); // added on 9th Feb 2017
 
-		/// sample users
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines = new LinkedHashMap<>(
-				userIDsToSelect.size());
-		// (ceil) 100/0.75
-
-		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
-		{
-			if (userIDsToSelect.contains(Integer.valueOf(userEntry.getKey())))
-			{
-				sampledUsersTimelines.put(userEntry.getKey(), userEntry.getValue());
-			}
-			// $$System.out.println("putting in user= " + userEntry.getKey());
-		}
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines = getDayTimelinesForUserIDs(
+				usersCleanedDayTimelines, userIDsToSelect);
 
 		System.out.println("num of sampled users for this iteration = " + sampledUsersTimelines.size());
 		System.out.println(" -- Users = " + sampledUsersTimelines.keySet().toString());
 
 		// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
-		// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
-		// $$RecommendationTestsBaseClosestTime recommendationsTest = new RecommendationTestsBaseClosestTime(
-		// $$ sampledUsers);
-
+		// $$RecommendationTestsBaseClosestTime recommendationsTest = new
+		// RecommendationTestsBaseClosestTime(sampledUsers);
 		System.out.println("Just Before recommendationsTest\n" + PerformanceAnalytics.getHeapInformation());
 
 		// // start of curtain may 4 2017
@@ -597,6 +597,57 @@ public class ControllerWithoutServer
 				Constant.getUserIDs(), Constant.percentageInTraining, 3, usersCleanedDayTimelines);
 
 		System.out.println("-- iteration end for groupLabel = " + groupLabel);
+	}
+
+	/**
+	 * Extract day timelines for given user ids
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param userIDsToSelect
+	 * @return
+	 */
+	public LinkedHashMap<String, LinkedHashMap<Date, Timeline>> getDayTimelinesForUserIDs(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
+			List<Integer> userIDsToSelect)
+	{
+		/// sample users
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines = new LinkedHashMap<>(
+				userIDsToSelect.size());// (ceil) 100/0.75
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+		{
+			if (userIDsToSelect.contains(Integer.valueOf(userEntry.getKey())))
+			{
+				sampledUsersTimelines.put(userEntry.getKey(), userEntry.getValue());
+			}
+			// $$System.out.println("putting in user= " + userEntry.getKey());
+		}
+		return sampledUsersTimelines;
+	}
+
+	/**
+	 * Extract day timelines for given user ids
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param userIDsToSelect
+	 * @return day timelines for given user ids
+	 */
+	public LinkedHashMap<String, LinkedHashMap<Date, Timeline>> getDayTimelinesForUserIDsV2(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
+			ArrayList<String> userIDsToSelect)
+	{
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines = new LinkedHashMap<>(
+				userIDsToSelect.size());// (ceil) 100/0.75
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+		{
+			if (userIDsToSelect.contains(userEntry.getKey()))
+			{
+				sampledUsersTimelines.put(userEntry.getKey(), userEntry.getValue());
+			}
+			// $$System.out.println("putting in user= " + userEntry.getKey());
+		}
+		return sampledUsersTimelines;
 	}
 
 	/**

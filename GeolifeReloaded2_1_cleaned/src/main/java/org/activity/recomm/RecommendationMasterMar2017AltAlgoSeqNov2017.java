@@ -284,7 +284,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			else
 
 			{
-				System.out.println("AJOOBA");
+				System.out.println("Extracting Candidates");
 				this.candidateTimelines = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines,
 						lookPastType, this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm,
 						matchingUnitInCountsOrHours, this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers,
@@ -573,6 +573,17 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 					this.activitiesGuidingRecomm, this.caseType, this.lookPastType, this.candidateTimelines, 1, false,
 					Constant.AKOMHighestOrder, this.userIDAtRecomm, altSeqPredictor);
 
+			// null when there is no AKOM prediction.Happens when the current activity is not in training timelines.
+			if (recommendedActivityNamesWithRankscores == null)
+			{
+				hasCandidateTimelines = false;
+				rankedRecommendedActNamesWithRankScoresStr = null;
+				nextActivityObjectsFromCands = null;
+				thresholdPruningNoEffect = true;
+				hasCandidateTimelinesBelowThreshold = false;
+				return;
+			}
+
 			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityPDvalsWithRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
 
@@ -708,6 +719,12 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			// SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
 			Integer predictedActID = Integer.valueOf(predSymbol);
 			System.out.println(" = " + predictedActID.toString());
+
+			if (predictedActID.equals(-1))
+			{
+				System.out.println("Return null, no predictions");
+				return null;
+			}
 
 			res.put(predictedActID.toString(), constantValScore);
 			return res;

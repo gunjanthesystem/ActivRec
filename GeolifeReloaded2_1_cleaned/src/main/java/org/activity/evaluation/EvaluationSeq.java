@@ -1823,7 +1823,7 @@ public class EvaluationSeq
 		{
 			try
 			{
-				WritingToFile.closeBufferedWriters(bwTopKPrecision, bwTopKRecall, bwTopKF,
+				WritingToFile.closeBWs(bwTopKPrecision, bwTopKRecall, bwTopKF,
 						bwNumberOfRecommendationTimes);
 				// bwAccuracy.close();
 			}

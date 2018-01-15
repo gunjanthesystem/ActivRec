@@ -447,7 +447,7 @@ public class StringUtils
 		StringBuilder result = new StringBuilder(expectedSize + 100);
 
 		result.append(givenSB);
-		givenSB = null;
+		// givenSB = null; Disable on 11 Jan 2018
 
 		for (String s : stringsToConcat)
 		{

@@ -419,33 +419,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			// getActivityNamesGuidingRecommwithTimestamps() +" size of current timeline=" +
 			// currentTimeline.getActivityObjectsInTimeline().size());
 			// ########Sanity check
-			if (distancesMapUnsorted.size() != candidateTimelines.size())
-			{// Constant.nearestNeighbourCandEDThreshold > 0) // not expected when filtering is to be done
-				if (Constant.typeOfCandThreshold != Enums.TypeOfCandThreshold.None)
-				{// some cands might have been removed due to thresholding
-					System.out.println("Alert: editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
-							+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")");
-				}
-				else
-				{
-					PopUps.printTracedErrorMsg("editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
-							+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")");
-					String distancesMapUnsortedAsString = distancesMapUnsorted.entrySet().stream()
-							.map(e -> e.getKey() + " - " + e.getValue().getFirst() + "_" + e.getValue().getSecond())
-							.collect(Collectors.joining("\n"));
-					String candidateTimelinesAsString = candidateTimelines.entrySet().stream().map(
-							e -> e.getKey() + " - " + e.getValue().getActivityObjectPDValsWithTimestampsInSequence())
-							// .getActivityObjectNamesWithTimestampsInSequence())
-							.collect(Collectors.joining("\n"));
-
-					WritingToFile.appendLineToFileAbsolute(
-							"User = " + this.userIDAtRecomm + "\ndistancesMapUnsortedAsString =\n"
-									+ distancesMapUnsortedAsString + "\n\n candidateTimelinesAsString =\n"
-									+ candidateTimelinesAsString,
-							Constant.getCommonPath() + "ErrorLog376distancesMapUnsorted.txt");
-					errorExists = true;
-				}
-			}
+			this.errorExists = sanityCheckCandsDistancesSize(distancesMapUnsorted, this.candidateTimelines,
+					this.userIDAtRecomm, Constant.getCommonPath());
 			// ##############
 
 			// /// REMOVE candidate timelines which are above the distance THRESHOLD. (actually here we remove the entry
@@ -635,6 +610,50 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		}
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
+	}
+
+	/**
+	 * Checks if distancesMapUnsorted.size() != candidateTimelines.size()
+	 * 
+	 * @param distancesMapUnsorted
+	 * @param candidateTimelines
+	 * @param userIDAtRecomm
+	 * @param commonPath
+	 * @return
+	 */
+	private static boolean sanityCheckCandsDistancesSize(
+			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted,
+			LinkedHashMap<String, Timeline> candidateTimelines, String userIDAtRecomm, String commonPath)
+	{
+		boolean errorExists = false;
+
+		if (distancesMapUnsorted.size() != candidateTimelines.size())
+		{// Constant.nearestNeighbourCandEDThreshold > 0) // not expected when filtering is to be done
+			if (Constant.typeOfCandThreshold != Enums.TypeOfCandThreshold.None)
+			{// some cands might have been removed due to thresholding
+				System.out.println("Alert: editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
+						+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")");
+			}
+			else
+			{
+				PopUps.printTracedErrorMsg("editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
+						+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")");
+				String distancesMapUnsortedAsString = distancesMapUnsorted.entrySet().stream()
+						.map(e -> e.getKey() + " - " + e.getValue().getFirst() + "_" + e.getValue().getSecond())
+						.collect(Collectors.joining("\n"));
+				String candidateTimelinesAsString = candidateTimelines.entrySet().stream()
+						.map(e -> e.getKey() + " - " + e.getValue().getActivityObjectPDValsWithTimestampsInSequence())
+						// .getActivityObjectNamesWithTimestampsInSequence())
+						.collect(Collectors.joining("\n"));
+
+				WritingToFile.appendLineToFileAbsolute(
+						"User = " + userIDAtRecomm + "\ndistancesMapUnsortedAsString =\n" + distancesMapUnsortedAsString
+								+ "\n\n candidateTimelinesAsString =\n" + candidateTimelinesAsString,
+						commonPath + "ErrorLog376distancesMapUnsorted.txt");
+				errorExists = true;
+			}
+		}
+		return errorExists;
 	}
 
 	/**

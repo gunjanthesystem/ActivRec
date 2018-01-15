@@ -1,8 +1,11 @@
 package org.activity.spmf;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,6 +34,7 @@ public class AKOMSeqPredictorLighter
 	// Sequence currentSeq;
 	MarkovAllKPredictor predictionModel;
 	int orderOfMarkovModel;
+	String trainingStats;
 	/**
 	 * <UserID, SeqPredictor> Used in case of PureAKOM when we do not need to retrain AKOM model for each RT of a user
 	 * separately.
@@ -114,14 +118,18 @@ public class AKOMSeqPredictorLighter
 			SequenceDatabase trainingSet = toSequenceDatabase(trainingTimelines);
 
 			// Print the training sequences to the console
+
+			StringBuilder sb = new StringBuilder();
+			sb.append("--- Training sequences ---\n");
+			trainingSet.getSequences().stream().forEachOrdered(seq -> sb.append(seq.toString() + "\n"));
+			sb.append("\n");
 			if (verbose)
 			{
-				System.out.println("--- Training sequences ---");
-				trainingSet.getSequences().stream().forEachOrdered(seq -> System.out.println(seq.toString()));
-				System.out.println();
-				// Print statistics about the training sequences
-				SequenceStatsGenerator.prinStats(trainingSet, " training sequences ");
-			}
+				System.out.println(sb.toString());
+			} // Print statistics about the training sequences
+			SequenceStatsGenerator.prinStats(trainingSet, " training sequences ");
+			sb.append(getStats(trainingSet, " training sequences "));
+			trainingStats = sb.toString();
 
 			// Here we set the order of the markov model to 5.
 			String optionalParameters = "order:" + orderOfMarkovModel;
@@ -175,8 +183,8 @@ public class AKOMSeqPredictorLighter
 
 			if (thePrediction.size() != 1)
 			{
-				System.err.println("Error in AKOMPredictor thePrediction.size()!=1, thePrediction.size()= "
-						+ thePrediction.size());
+				System.err.println("Warning in AKOMPredictor thePrediction.size()= " + thePrediction.size() + "\n--"
+						+ trainingStats + "---\n");
 			}
 			else
 			{
@@ -230,6 +238,115 @@ public class AKOMSeqPredictorLighter
 		trainingSet.setSequences(listOfSeq);
 
 		return trainingSet;
+	}
+
+	/////
+	/**
+	 * To replicate
+	 * ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.SequenceStatsGenerator.prinStats(SequenceDatabase,
+	 * String) to get stats as String instead of printing.
+	 * <p>
+	 * This method generates statistics for a sequence database (a file)
+	 * 
+	 * @param path
+	 *            the path to the file
+	 * @param name
+	 *            of the database
+	 * @throws IOException
+	 *             exception if there is a problem while reading the file.
+	 * @since 3 Jan 2017
+	 */
+	public static String getStats(SequenceDatabase database, String name) throws IOException
+	{
+
+		StringBuilder sb = new StringBuilder();
+		// We will calculate statistics on this sequence database.
+
+		sb.append("---" + name + "---\nNumber of sequences : \t" + database.size() + "\n");
+
+		int maxItem = 0;
+		// we initialize some variables that we will use to generate the statistics
+		java.util.Set<Integer> items = new java.util.HashSet<Integer>(); // the set of all items
+		List<Integer> sizes = new ArrayList<Integer>(); // the lengths of each sequence
+		List<Integer> differentitems = new ArrayList<Integer>(); // the number of different item for each sequence
+		List<Integer> appearXtimesbySequence = new ArrayList<Integer>(); // the average number of times that items
+																			// appearing in a sequence, appears in this
+																			// sequence.
+		// Loop on sequences from the database
+		for (Sequence sequence : database.getSequences())
+		{
+			// we add the size of this sequence to the list of sizes
+			sizes.add(sequence.size());
+
+			// this map is used to calculate the number of times that each item
+			// appear in this sequence.
+			// the key is an item
+			// the value is the number of occurences of the item until now for this sequence
+			HashMap<Integer, Integer> mapIntegers = new HashMap<Integer, Integer>();
+
+			// Loop on itemsets from this sequence
+			for (Item item : sequence.getItems())
+			{
+				// we add the size of this itemset to the list of itemset sizes
+				// If the item is not in the map already, we set count to 0
+				Integer count = mapIntegers.get(item.val);
+				if (count == null)
+				{
+					count = 0;
+				}
+				// otherwise we set the count to count +1
+				count = count + 1;
+				mapIntegers.put(item.val, count);
+				// finally, we add the item to the set of items
+				items.add(item.val);
+
+				if (item.val > maxItem)
+				{
+					maxItem = item.val;
+				}
+			}
+
+			// we add all items found in this sequence to the global list
+			// of different items for the database
+			differentitems.add(mapIntegers.entrySet().size());
+
+			// for each item appearing in this sequence,
+			// we put the number of times in a global list "appearXtimesbySequence"
+			// previously described.
+			for (Entry<Integer, Integer> entry : mapIntegers.entrySet())
+			{
+				appearXtimesbySequence.add(entry.getValue());
+			}
+		}
+
+		// we print the statistics
+		// System.out.println();
+		sb.append("Number of distinct items: \t" + items.size() + "\n");
+		sb.append("Largest item id: \t" + maxItem + "\n");
+		sb.append("Itemsets per sequence: \t" + calculateMean(sizes) + "\n");
+		sb.append("Distinct item per sequence: \t" + calculateMean(differentitems) + "\n");
+		sb.append("Occurences for each item: \t" + calculateMean(appearXtimesbySequence) + "\n");
+		sb.append("Size of the dataset in MB: \t"
+				+ ((database.size() * 4d) + (database.size() * calculateMean(sizes) * 4d) / (1000 * 1000)) + "\n");
+
+		return sb.toString();
+	}
+
+	/**
+	 * This method calculate the mean of a list of integers
+	 * 
+	 * @param list
+	 *            the list of integers
+	 * @return the mean
+	 */
+	private static double calculateMean(List<Integer> list)
+	{
+		double sum = 0;
+		for (Integer val : list)
+		{
+			sum += val;
+		}
+		return sum / list.size();
 	}
 
 }
