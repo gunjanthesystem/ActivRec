@@ -686,7 +686,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		{
 			// System.out.println("Current timeline:");
 			// Convert current timeline to a seq of integers
-			ArrayList<Integer> currSeq = TimelineTransformers.timelineToSeqOfActIDs(activitiesGuidingRecomm, false);
+			ArrayList<Integer> currSeq = TimelineTransformers.listOfActObjsToListOfActIDs(activitiesGuidingRecomm, false);
 
 			// if NCount matching, then the next activity should be included in the training seq.
 			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended = candidateTimelines;
@@ -768,7 +768,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
 				{
 					candTimelinesAsSeq.add(TimelineTransformers
-							.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
+							.listOfActObjsToListOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
 				}
 				seqPredictor = new AKOMSeqPredictorLighter(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
 			}
@@ -783,7 +783,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
 			{
 				candTimelinesAsSeq.add(TimelineTransformers
-						.timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
+						.listOfActObjsToListOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
 			}
 			seqPredictor = new AKOMSeqPredictorLighter(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
 		}

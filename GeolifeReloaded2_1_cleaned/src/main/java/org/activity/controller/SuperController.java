@@ -2,10 +2,13 @@ package org.activity.controller;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.activity.constants.Constant;
 import org.activity.evaluation.EvaluationSeq;
+import org.activity.io.CSVUtils;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
@@ -13,13 +16,40 @@ import org.activity.util.Searcher;
 
 public class SuperController
 {
+	public static void main2(String args[])
+	{
+		String[] files = { "MedianAllPerDirectTopKAgreementsL1_.csv", "MedianAllPerDirectTopKAgreements_.csv",
+				"MeanAllPerDirectTopKAgreementsL1_.csv", "MeanAllPerDirectTopKAgreements_.csv" };
+
+		for (String s : files)
+		{
+			ReadingFromFile.concat18Jan(s);
+		}
+	}
+
+	public static void concat18Jan(String filename)
+	{
+		String commonPath = "./dataWritten/Jan3_Sampling_AKOM1DayOrder1/";
+		ArrayList<String> fileNamesToConcactenate = new ArrayList<String>();
+		int sampleIDStart = 0;
+		int sampleIDEnd = 8;
+
+		for (int i = sampleIDStart; i <= sampleIDEnd; i++)
+		{
+			// String userID = String.format("%03d", i);
+			String fileName = commonPath + "Sample" + i + "/" + filename;
+			fileNamesToConcactenate.add(fileName);
+		}
+		CSVUtils.concatenateCSVFiles(fileNamesToConcactenate, true, commonPath + filename);
+	}
 
 	public static void main(String args[])
 	{
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "./dataWritten/Jan6_Sampling_Ncount5DayThreshold500/" };
+		String[] commonPaths = { "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1/" };
+		// Jan6_Sampling_Ncount5DayThreshold500
 		// AKOM_916U_915N_5dayC_Order-3/" };//
 		// ""/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };
 		// + "Dec20_AKOM_1Cand_Order1/" };

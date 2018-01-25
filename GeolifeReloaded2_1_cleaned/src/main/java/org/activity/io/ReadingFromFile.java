@@ -3,7 +3,10 @@ package org.activity.io;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -243,7 +246,7 @@ public class ReadingFromFile
 	 * 
 	 * @param args
 	 */
-	public static void main(String args[])
+	public static void main1(String args[])
 	{
 		// String fileName =
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Jan27Daywise/recommPointsWithNoCandidates.csv";
@@ -270,6 +273,99 @@ public class ReadingFromFile
 		}
 		CSVUtils.concatenateCSVFiles(fileNamesToConcactenate, true,
 				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/TrajectorySpace/June10ContactednateStayPoints/AllStayPoints.csv");
+	}
+
+	public static void concat18Jan_1(String filename)
+	{
+		String[] files = { "MedianAllPerDirectTopKAgreementsL1_.csv", "MedianAllPerDirectTopKAgreements_.csv",
+				"MeanAllPerDirectTopKAgreementsL1_.csv", "MeanAllPerDirectTopKAgreements_.csv" };
+
+		for (String s : files)
+		{
+			ReadingFromFile.concat18Jan(s);
+		}
+	}
+
+	public static void concat18Jan(String filename)
+	{
+		String commonPath = "./dataWritten/Jan3_Sampling_AKOM1DayOrder1/";
+		ArrayList<String> fileNamesToConcactenate = new ArrayList<String>();
+		int sampleIDStart = 0;
+		int sampleIDEnd = 8;
+
+		for (int i = sampleIDStart; i <= sampleIDEnd; i++)
+		{
+			// String userID = String.format("%03d", i);
+			String fileName = commonPath + "Sample" + i + "/" + filename;
+			fileNamesToConcactenate.add(fileName);
+		}
+		CSVUtils.concatenateCSVFiles(fileNamesToConcactenate, true, "./dataWritten/AllTogether" + filename + ".csv");
+	}
+
+	public static void main(String args[])
+	{
+		ArrayList<ArrayList<String>> sublists = readRandomSamplesIntoListOfLists(
+				"dataWritten/Jan16/randomlySampleUsers.txt", 13, 21, ",");
+
+		for (ArrayList<String> l : sublists)
+		{
+			System.out.println(l.toString());
+		}
+	}
+
+	/**
+	 * 
+	 * @param absFileName
+	 * @param startLineNum
+	 * @param endLineNum
+	 * @param delimiter
+	 * @return
+	 */
+	public static ArrayList<ArrayList<String>> readLinesIntoListOfLists(String absFileName, int startLineNum,
+			int endLineNum, String delimiter)
+	{
+		try
+		{
+			return Files.lines(Paths.get(absFileName)).skip(startLineNum - 1).limit(endLineNum)
+					.map(l -> new ArrayList<String>(Arrays.asList(l.split(delimiter))))
+					.collect(Collectors.toCollection(ArrayList::new));
+		}
+		catch (Exception e)
+		{
+			PopUps.printTracedErrorMsgWithExit("Exception: " + e.toString());
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * @param absFileName
+	 * @param startLineNum
+	 * @param endLineNum
+	 * @param delimiter
+	 * @return
+	 */
+	public static ArrayList<ArrayList<String>> readRandomSamplesIntoListOfLists(String absFileName, int startLineNum,
+			int endLineNum, String delimiter)
+	{
+		ArrayList<ArrayList<String>> newRes = new ArrayList<ArrayList<String>>();
+		try
+		{
+			ArrayList<ArrayList<String>> oldRes = readLinesIntoListOfLists(absFileName, startLineNum, endLineNum,
+					delimiter);
+
+			for (ArrayList<String> l : oldRes)
+			{// removing [ and ] from the strings
+				newRes.add(l.stream().map(s -> s.replace("]", "")).map(s -> s.replace("[", "")).map(s -> s.trim())
+						.collect(Collectors.toCollection(ArrayList::new)));
+			}
+		}
+		catch (Exception e)
+		{
+			PopUps.printTracedErrorMsgWithExit("Exception: " + e.toString());
+		}
+
+		return newRes;
 	}
 
 	/**

@@ -804,7 +804,7 @@ public class TimelineTransformers
 	 *         given delimiter
 	 * @since 15 Dec 2017
 	 */
-	public static ArrayList<Integer> timelineToSeqOfActIDs(ArrayList<ActivityObject> givenAOs, boolean verbose)
+	public static ArrayList<Integer> listOfActObjsToListOfActIDs(ArrayList<ActivityObject> givenAOs, boolean verbose)
 	{
 		ArrayList<Integer> seqOfActIDs2 = new ArrayList<>(givenAOs.size());
 		// ArrayList<Integer> seqOfActIDs = new ArrayList<>(givenAOs.size());
@@ -832,4 +832,42 @@ public class TimelineTransformers
 
 		return seqOfActIDs2;
 	}
+
+	/**
+	 * Convert list of activity objects to a list of activity IDs.
+	 * <p>
+	 * Created to use for each loop instead of streams as stream was running out memory.
+	 * 
+	 * @param givenAOs
+	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
+	 *         given delimiter
+	 * @since 15 Dec 2017
+	 */
+	// public static char[] listOfActObjsToArrayOfCodeChars(ArrayList<ActivityObject> givenAOs, boolean verbose)
+	// {
+	// char[] res = new char[givenAOs.size()];
+	//
+	// int i = 0;
+	// for (ActivityObject ao : givenAOs)
+	// {
+	// res[i++] = ao.getCharCode();
+	// }
+	//
+	// // start of sanity check Passed
+	// // if (true){if (seqOfActIDs.equals(seqOfActIDs2)){
+	// // System.out.println("Sanity check Dec 15_2 passed");
+	// // }else{System.out.println("Sanity check Dec 15_2 failed");} }
+	// // end of sanity check
+	//
+	// if (verbose)
+	// {
+	// StringBuilder sb = new StringBuilder();
+	// givenAOs.stream().forEachOrdered(ao -> sb.append(ao.getActivityID() + ">>"));
+	// sb.append("\n");
+	// new String(res).chars().mapToObj(i -> (char) i).forEachOrdered(i -> sb.append(i + ">>"));
+	// System.out.println("---listOfActObjsToArrayOfCodeChars verbose-\n" + sb.toString() + "\n-----\n");
+	// }
+	//
+	// return seqOfActIDs2;
+	// }
 }

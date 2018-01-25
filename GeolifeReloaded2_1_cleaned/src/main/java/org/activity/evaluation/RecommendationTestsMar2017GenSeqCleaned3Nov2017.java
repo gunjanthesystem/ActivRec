@@ -854,7 +854,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 															+ ","
 															+ recommMaster.getActivityObjectAtRecomm()
 																	.getPrimaryDimensionVal("/")
-															+ "," + seqIndex + ",\n");// $$+recommP1.totalNumberOfProbableCands+","+recommP1.numCandsRejectedDueToNoCurrentActivityAtNonLast+","+recommP1.numCandsRejectedDueToNoNextActivity);
+															+ "," + seqIndex + ",\n");
 											sbsNumOfCandTimelinesBelowThreshold.get(seqIndex)
 													.append(dateToRecomm + "," + recommendationTimes[seqIndex] + ","
 															+ weekDay + "," + thresholdAsDistance + "," + 0 + "\n");// bwNumOfCandTimelinesBelowThreshold.newLine();
@@ -1131,8 +1131,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									// $$ disabled becuase not essential at the moment
 									// char isCurrentTargetActSame; if (actAtRecommPoint.equals(actActualDone))
 									// isCurrentTargetActSame = 't'; else isCurrentTargetActSame = 'f';
-									// metaIfCurrentTargetSameToWriteForThisUserDate.append(isCurrentTargetActSame)
-									// .append(",");
+									// metaIfCurrentTargetSameToWriteForThisUserDate.append(isCurrentTargetActSame).append(",");
 									// end of curtain isCurrentTargetActSame 11 May
 
 									/*
@@ -1146,8 +1145,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									// String activityNameCountPairsOverAllTrainingDaysWithoutCount =
 									// getActivityNameCountPairsOverAllTrainingDaysWithoutCount(
 									// activityNameCountPairsOverAllTrainingDays);
-									// baseLineOccurrence
-									// .write(activityNameCountPairsOverAllTrainingDaysWithoutCount + ",");
+									// baseLineOccurrence.write(activityNameCountPairsOverAllTrainingDaysWithoutCount +
+									// ",");
 
 									if (Constant.DoBaselineOccurrence)
 									{

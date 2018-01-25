@@ -21,6 +21,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
@@ -178,14 +179,38 @@ public class ControllerWithoutServer
 				// $$commonBasePath, "1");
 				// End of curtain Aug 14 2017
 
-				ArrayList<ArrayList<String>> listOfSampledUserIDs = randomlySampleUsersIDs(usersCleanedDayTimelines, 9,
-						1000);
+				boolean useSampledUsersFromFile = true;
+				ArrayList<ArrayList<String>> listOfSampledUserIDs = null;
+				if (useSampledUsersFromFile)
+				{
+					String sampledUsersListFile = "dataToRead/Jan16/randomlySampleUsers.txt";
+					System.out.println("Reading Sampled users from " + sampledUsersListFile);
+					listOfSampledUserIDs = ReadingFromFile.readRandomSamplesIntoListOfLists(sampledUsersListFile, 13,
+							21, ",");
+
+					int listNum = 0;
+					for (ArrayList<String> l : listOfSampledUserIDs)
+					{
+						System.out.println("List num:" + (++listNum));
+						System.out.println(l.toString());
+					}
+				}
+				else
+				{
+					System.out.println("New Randomly Sampling users");
+					listOfSampledUserIDs = randomlySampleUsersIDs(usersCleanedDayTimelines, 9, 1000);
+				}
 
 				for (int sampleID = 0; sampleID < listOfSampledUserIDs.size(); sampleID++)
 				{
+					System.out.println(" listOfSampledUserIDs.get(sampleID)= " + listOfSampledUserIDs.get(sampleID));
+					System.out.println(
+							" listOfSampledUserIDs.get(sampleID).size= " + listOfSampledUserIDs.get(sampleID).size());
+
 					LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUserCleanedDayTimelines = getDayTimelinesForUserIDsV2(
 							usersCleanedDayTimelines, listOfSampledUserIDs.get(sampleID));
-
+					System.out
+							.println("sampledUserCleanedDayTimelines.size()=" + sampledUserCleanedDayTimelines.size());
 					sampleUsersExecuteRecommendationTests(sampledUserCleanedDayTimelines,
 							DomainConstants.gowallaUserGroupsLabels, commonBasePath + "Sample" + sampleID + "/");
 
@@ -446,6 +471,8 @@ public class ControllerWithoutServer
 			String[] groupsOf100UsersLabels, String commonBasePath) throws IOException
 	{
 		// LinkedHashMap<Integer, String> indexOfBlackListedUsers = new LinkedHashMap<>();
+		System.out.println("Inside sampleUsersExecuteRecommendationTests: usersCleanedDayTimelines received size="
+				+ usersCleanedDayTimelines.size());
 
 		for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
 		{
@@ -541,7 +568,7 @@ public class ControllerWithoutServer
 			// Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
 			// Constant.percentageInTraining);
 			// // end of curtain may 4 2017
-
+			// System.exit(0);
 			RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
 					sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
 					Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
@@ -638,15 +665,25 @@ public class ControllerWithoutServer
 	{
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines = new LinkedHashMap<>(
 				userIDsToSelect.size());// (ceil) 100/0.75
+		System.out.println("Inside getDayTimelinesForUserIDsV2: userIDsToSelect.size()= " + userIDsToSelect.size());
+		System.out.println("userIDsToSelect= " + userIDsToSelect);
+		System.out.println("usersCleanedDayTimelines.size()=" + usersCleanedDayTimelines.size());
 
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 		{
 			if (userIDsToSelect.contains(userEntry.getKey()))
 			{
 				sampledUsersTimelines.put(userEntry.getKey(), userEntry.getValue());
+				// System.out.println("putting in user= " + userEntry.getKey());
 			}
-			// $$System.out.println("putting in user= " + userEntry.getKey());
+			else
+			{
+				// System.out.println("not putting in user= " + userEntry.getKey());
+			}
+
 		}
+
+		System.out.println("sampledUsersTimelines.size()=" + sampledUsersTimelines.size());
 		return sampledUsersTimelines;
 	}
 
