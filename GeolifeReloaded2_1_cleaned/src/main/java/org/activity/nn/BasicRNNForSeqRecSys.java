@@ -26,7 +26,6 @@ import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
  * This example trains a RNN.WHen trained we only have to put the first character of LEARNSTRING to the RNN,and it will
  * recite the following chars.
  * 
- * @author Peter Grossmann
  */
 public class BasicRNNForSeqRecSys
 {
@@ -42,11 +41,15 @@ public class BasicRNNForSeqRecSys
 	private final List<Character> trainStringCharsList = new ArrayList<>();
 
 	// RNN dimensions
-	private int HIDDEN_LAYER_WIDTH = 50;
-	private int HIDDEN_LAYER_CONT = 2; // number of hidden layers
+	private int numOfNeuronsInHiddenLayers;// = 50;
+	private int numOfHiddenLayers;// = 2; // number of hidden layers
 	private final Random r = new Random(7894);
-	private int numOfEpochs = 10;
+	private int numOfEpochs;// = 100;
+	private int numOfIterations;// = 1;// set it to 10 in execution
 	private MultiLayerNetwork net;
+	private boolean verbose;// = true;
+	// private int numOfStepsToPredictAhead;//
+	private double learningRate;// = 0.001;
 
 	public static void main(String[] args)
 	{
@@ -63,24 +66,168 @@ public class BasicRNNForSeqRecSys
 				+ "Gunjan is going to city centre. Gunjan is running marathon. Gunjan is wearing a blue sweater";
 
 		String s = "Der Cottbuser Postkutscher putzt den Cottbuser Postkutschkasten.";
-		BasicRNNForSeqRecSys rnnA = new BasicRNNForSeqRecSys(50, 2);
-		rnnA.createTrainingString("hellohelo".toCharArray(), true);
-		// rnnA.createTrainingString(s.toCharArray(), true);
-		rnnA.configureAndTrainRNN(1, 0.001, 100, true);
-		rnnA.createTestString("he".toCharArray(), true);
 
-		rnnA.predictNextNValues(9, false);
+		int numOfNeuronsInHiddenLayers = 50;
+		int numOfHiddenLayers = 2; // number of hidden layers
+		int numOfEpochs = 100;
+		int numOfIterations = 1;// set it to 10 in execution
+		boolean verbose = false;
+
+		double learningRate = 0.001;
+
+		BasicRNNForSeqRecSys rnnA = new BasicRNNForSeqRecSys(numOfNeuronsInHiddenLayers, numOfHiddenLayers, numOfEpochs,
+				numOfIterations, learningRate, verbose);
+
+		rnnA.createTrainingString("hellohelohellohelohellohelohellohelo".toCharArray(), verbose);
+		// rnnA.createTrainingString(s.toCharArray(), true);
+		rnnA.configureAndTrainRNN(rnnA.numOfIterations, rnnA.learningRate, rnnA.numOfEpochs, verbose);
+		rnnA.createTestString("he".toCharArray(), verbose);
+
+		ArrayList<Character> predictedNextNValsInSeq = rnnA.predictNextNValues(9, verbose);
+
+		System.out.println("Train seq:" + new String(rnnA.trainString));
+		System.out.println("Test seq:" + new String(rnnA.testString));
+		System.out.println("predictedNextNValsInSeq= " + predictedNextNValsInSeq);
 		// System.exit(0);
 
+	}
+
+	/**
+	 * 
+	 * @param numOfNeuronsInHiddenLayers
+	 * @param numOfHiddenLayers
+	 * @param numOfEpochs
+	 * @param numOfIterations
+	 * @param verbose
+	 * @param learningRate
+	 */
+	public BasicRNNForSeqRecSys(int numOfNeuronsInHiddenLayers, int numOfHiddenLayers, int numOfEpochs,
+			int numOfIterations, double learningRate, boolean verbose)
+	{
+		super();
+		this.numOfNeuronsInHiddenLayers = numOfNeuronsInHiddenLayers;
+		this.numOfHiddenLayers = numOfHiddenLayers;
+		this.numOfEpochs = numOfEpochs;
+		this.numOfIterations = numOfIterations;
+		this.learningRate = learningRate;
+		this.verbose = verbose;
+
+	}
+
+	public char[] getTrainString()
+	{
+		return trainString;
+	}
+
+	public void setTrainString(char[] trainString)
+	{
+		this.trainString = trainString;
+	}
+
+	public char[] getTestString()
+	{
+		return testString;
+	}
+
+	public void setTestString(char[] testString)
+	{
+		this.testString = testString;
+	}
+
+	public int getNumOfNeuronsInHiddenLayers()
+	{
+		return numOfNeuronsInHiddenLayers;
+	}
+
+	public void setNumOfNeuronsInHiddenLayers(int numOfNeuronsInHiddenLayers)
+	{
+		this.numOfNeuronsInHiddenLayers = numOfNeuronsInHiddenLayers;
+	}
+
+	public int getNumOfHiddenLayers()
+	{
+		return numOfHiddenLayers;
+	}
+
+	public void setNumOfHiddenLayers(int numOfHiddenLayers)
+	{
+		this.numOfHiddenLayers = numOfHiddenLayers;
+	}
+
+	public int getNumOfEpochs()
+	{
+		return numOfEpochs;
+	}
+
+	public void setNumOfEpochs(int numOfEpochs)
+	{
+		this.numOfEpochs = numOfEpochs;
+	}
+
+	public int getNumOfIterations()
+	{
+		return numOfIterations;
+	}
+
+	public void setNumOfIterations(int numOfIterations)
+	{
+		this.numOfIterations = numOfIterations;
+	}
+
+	public MultiLayerNetwork getNet()
+	{
+		return net;
+	}
+
+	public boolean isVerbose()
+	{
+		return verbose;
+	}
+
+	public void setVerbose(boolean verbose)
+	{
+		this.verbose = verbose;
+	}
+
+	public double getLearningRate()
+	{
+		return learningRate;
+	}
+
+	public void setLearningRate(double learningRate)
+	{
+		this.learningRate = learningRate;
+	}
+
+	public void visualiseNN()
+	{
+		//
+		// // Initialize the user interface backend
+
+		//
+		// // Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in
+		// // memory.
+		// StatsStorage statsStorage = new InMemoryStatsStorage(); // Alternative: new FileStatsStorage(File), for
+		// saving
+		// // and loading later
+		//
+		// // Attach the StatsStorage instance to the UI: this allows the contents of the StatsStorage to be visualized
+		// uiServer.attach(statsStorage);
+		//
+		// // Then add the StatsListener to collect this information from the network, as it trains
+		// net.setListeners(new StatsListener(statsStorage));
 	}
 
 	/**
 	 *
 	 * @param N
 	 * @param verbose
+	 * @return
 	 */
-	private void predictNextNValues(int N, boolean verbose)
+	private ArrayList<Character> predictNextNValues(int N, boolean verbose)
 	{
+		ArrayList<Character> predictionsInSeq = new ArrayList<>();
+
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sb2 = new StringBuilder();
 		INDArray testInit = prepareTestInitDataset(testString, trainStringCharsList, verbose);
@@ -100,9 +247,13 @@ public class BasicRNNForSeqRecSys
 		for (int i = 0; i < N; i++)
 		{
 			int sampledCharacterIdx = Nd4j.getExecutioner().exec(new IMax(output), 1).getInt(0);
+
+			Character predictedChar = trainStringCharsList.get(sampledCharacterIdx);
+			predictionsInSeq.add(predictedChar);
+
 			// print the chosen output
-			sb.append("\n\n-- prediction@Step" + (i + 1) + "=" + trainStringCharsList.get(sampledCharacterIdx));
-			sb2.append("\n\n-- prediction@Step" + (i + 1) + "=" + trainStringCharsList.get(sampledCharacterIdx));
+			sb.append("\n\n-- prediction@Step" + (i + 1) + "=" + predictedChar);
+			sb2.append("\n\n-- prediction@Step" + (i + 1) + "=" + predictedChar);
 
 			// use the last output as input
 			INDArray nextInput = Nd4j.zeros(trainStringCharsList.size());
@@ -121,6 +272,8 @@ public class BasicRNNForSeqRecSys
 		{
 			System.out.print(sb2.toString() + "\n");
 		}
+
+		return predictionsInSeq;
 	}
 
 	/**
@@ -131,18 +284,19 @@ public class BasicRNNForSeqRecSys
 	 */
 	public BasicRNNForSeqRecSys(int numOfNeuronsInHiddenLayer, int numOfHiddenLayers)
 	{
-		HIDDEN_LAYER_WIDTH = numOfNeuronsInHiddenLayer;
-		HIDDEN_LAYER_CONT = numOfHiddenLayers;
+		this.numOfNeuronsInHiddenLayers = numOfNeuronsInHiddenLayer;
+		this.numOfHiddenLayers = numOfHiddenLayers;
 	}
 
 	/**
-	 * Initialise trainString and list of letters in train
+	 * Initialise trainString (a char array) and the list of letters in train
 	 * 
 	 * @param trainingString
 	 * @param verbose
 	 */
 	public void createTrainingString(char[] trainingString, boolean verbose)
 	{
+		System.out.println("----Entering createTrainingString()");
 		trainString = trainingString;
 
 		// create a dedicated list of possible chars in LEARNSTRING_CHARS_LIST
@@ -157,6 +311,7 @@ public class BasicRNNForSeqRecSys
 		{
 			System.out.println("Character List = " + trainStringCharsList);
 		}
+		System.out.println("----Exiting createTrainingString()");
 	}
 
 	/**
@@ -169,6 +324,7 @@ public class BasicRNNForSeqRecSys
 	 */
 	public int createTestString(char[] testString, boolean verbose)
 	{
+		System.out.println("----Entering createTestString()");
 		this.testString = testString;
 
 		// create a dedicated list of possible chars in LEARNSTRING_CHARS_LIST
@@ -184,6 +340,7 @@ public class BasicRNNForSeqRecSys
 			System.err.println("\nNew chars in test string");
 			return -1;
 		}
+		System.out.println("----Exiting createTestString()");
 		return 0;
 
 	}
@@ -197,7 +354,9 @@ public class BasicRNNForSeqRecSys
 	 */
 	public void configureAndTrainRNN(int iterations, double learningRate, int numOfEpochs, boolean verbose)
 	{
+		System.out.println("----Entering configureAndTrainRNN()");
 		StringBuilder sb = new StringBuilder();
+
 		this.numOfEpochs = numOfEpochs;
 		// some common parameters
 		NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
@@ -219,13 +378,13 @@ public class BasicRNNForSeqRecSys
 
 		// for rnns we need to use GravesLSTM.Builder
 		// Configure the hidden layers iteratively
-		for (int i = 0; i < HIDDEN_LAYER_CONT; i++)
+		for (int i = 0; i < numOfHiddenLayers; i++)
 		{
 			GravesLSTM.Builder hiddenLayerBuilder = new GravesLSTM.Builder();
 
 			// num of neuron in first hidden layer is the number of alphabets
-			hiddenLayerBuilder.nIn(i == 0 ? trainStringCharsList.size() : HIDDEN_LAYER_WIDTH);
-			hiddenLayerBuilder.nOut(HIDDEN_LAYER_WIDTH);
+			hiddenLayerBuilder.nIn(i == 0 ? trainStringCharsList.size() : numOfNeuronsInHiddenLayers);
+			hiddenLayerBuilder.nOut(numOfNeuronsInHiddenLayers);
 			// adopted activation function from GravesLSTMCharModellingExample
 			// seems to work well with RNNs
 			hiddenLayerBuilder.activation(Activation.TANH);
@@ -238,9 +397,9 @@ public class BasicRNNForSeqRecSys
 
 		// this is required for our sampleFromDistribution-function
 		outputLayerBuilder.activation(Activation.SOFTMAX);
-		outputLayerBuilder.nIn(HIDDEN_LAYER_WIDTH);
+		outputLayerBuilder.nIn(numOfNeuronsInHiddenLayers);
 		outputLayerBuilder.nOut(trainStringCharsList.size());
-		listBuilder.layer(HIDDEN_LAYER_CONT, outputLayerBuilder.build());
+		listBuilder.layer(numOfHiddenLayers, outputLayerBuilder.build());
 
 		// finish builder
 		listBuilder.pretrain(false);
@@ -308,6 +467,7 @@ public class BasicRNNForSeqRecSys
 		{
 			System.out.println(sb.toString() + "\n");
 		}
+		System.out.println("----Exiting configureAndTrainRNN()");
 	}
 
 	/**
@@ -319,6 +479,7 @@ public class BasicRNNForSeqRecSys
 	 */
 	private DataSet prepareDataset(char[] LEARNSTRING, List<Character> LEARNSTRING_CHARS_LIST, boolean verbose)
 	{
+		System.out.println("----Entering prepareDataset()");
 		/*
 		 * CREATE OUR TRAINING DATA
 		 */
@@ -358,6 +519,7 @@ public class BasicRNNForSeqRecSys
 		{
 			System.out.println(sb.toString());
 		}
+		System.out.println("----Exiting prepareDataset()");
 		return new DataSet(input, labels);
 	}
 

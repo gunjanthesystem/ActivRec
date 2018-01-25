@@ -82,9 +82,9 @@ public final class Constant
 	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10//AKOM
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;// SWITCH_NOV10//AKOM
 
-	public static final int AKOMHighestOrder = -1;// 1;// 3;// SWITCH_NOV10
+	public static final int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	/**
@@ -142,7 +142,7 @@ public final class Constant
 	public static final int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
 
 	// Filtering the candidate timeline
-	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
+	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.None;// NearestNeighbour,
 	// None,Percentile // SWITCH_NOV10
 	/**
 	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
@@ -152,7 +152,7 @@ public final class Constant
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int nearestNeighbourCandEDThreshold = 500;// 750;// 500;// 500;/// -1;// 100;// 1500;// 100;//
+	public static final int nearestNeighbourCandEDThreshold = -1;// 750;// 500;// 500;/// -1;// 100;// 1500;// 100;//
 																	// -1
 																	// for no filter//SWITCH_NOV10
 
@@ -160,6 +160,7 @@ public final class Constant
 	// --------------------------------------------------------------------------//
 
 	public static final boolean For9kUsers = true;// false;// ;// false; //SWITCH_NOV10
+
 	////////////////////////////////////////////////////////////////////////
 
 	public static final double ClosestTimeDiffThresholdInSecs = 10800; // 3 hrs
