@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 import org.activity.stats.StatsUtils;
 import org.activity.util.RegexUtils;
@@ -226,7 +227,16 @@ public class TestDummy1
 
 	public static void main(String args[])
 	{
-		compareToString();
+
+		List<Integer> items = IntStream.of(1, 2, 3, 4).boxed().collect(Collectors.toList());
+		int orders[] = { 1, 2, 3, 5, 8 };
+		System.out.println("items = " + items);
+		for (int order : orders)
+		{
+			List<Integer> newitems = items.subList(items.size() > order ? (items.size() - order) : 0, items.size());
+			System.out.println("order=" + order + "\nnewitems= " + newitems);
+		}
+		// compareToString();
 	}
 
 	public static void compareToString()

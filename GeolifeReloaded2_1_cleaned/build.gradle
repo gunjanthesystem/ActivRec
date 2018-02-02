@@ -111,6 +111,10 @@ dependencies
 
       compile "org.renjin:renjin-script-engine:0.8.2527"
       compile "org.moeaframework:moeaframework:2.12"
+      compile "com.jcraft:jsch:0.1.54"
+      compile "tech.tablesaw:tablesaw-parent:0.11.4"
+
+
       
     //compile fileTree(dir: 'libs', include: ['*.jar','*.zip'])
 	// Declare the dependency for your favourite test framework you want to use in your tests.

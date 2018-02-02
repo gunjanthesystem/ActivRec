@@ -81,10 +81,11 @@ public final class Constant
 
 	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
+	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;// SWITCH_NOV10//AKOM
 
-	public static final int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
+	private static int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	/**
@@ -139,7 +140,7 @@ public final class Constant
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
 	public static final boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
-	public static final int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
+	private static int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
 
 	// Filtering the candidate timeline
 	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.None;// NearestNeighbour,
@@ -159,7 +160,7 @@ public final class Constant
 	// End of parameters for Candidate timelines
 	// --------------------------------------------------------------------------//
 
-	public static final boolean For9kUsers = true;// false;// ;// false; //SWITCH_NOV10
+	public static final boolean For9kUsers = false;// false;// ;// false; //SWITCH_NOV10
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -309,6 +310,42 @@ public final class Constant
 	 * 
 	 * @return
 	 */
+	public static int getAKOMHighestOrder()
+	{
+		return AKOMHighestOrder;
+	}
+
+	/**
+	 * 
+	 * @param aKOMHighestOrder
+	 */
+	public static void setAKOMHighestOrder(int aKOMHighestOrder)
+	{
+		AKOMHighestOrder = aKOMHighestOrder;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static int getRecentDaysInTrainingTimelines()
+	{
+		return recentDaysInTrainingTimelines;
+	}
+
+	/**
+	 * 
+	 * @param recentDaysInTrainingTimelines
+	 */
+	public static void setRecentDaysInTrainingTimelines(int recentDaysInTrainingTimelines)
+	{
+		Constant.recentDaysInTrainingTimelines = recentDaysInTrainingTimelines;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public static String getOutputCoreResultsPath()
 	{
 		return outputCoreResultsPath;
@@ -348,6 +385,7 @@ public final class Constant
 
 	////////////
 	/**
+	 * Return matching unit array based on lookPastType and altSeqPredictor
 	 * 
 	 * @param lookPastType
 	 * @param altSeqPredictor
@@ -359,7 +397,8 @@ public final class Constant
 
 		if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
 		{
-			matchingUnitArray = new double[] { 0 };
+			// matchingUnitArray = new double[] { 0 }; // disabled on 31 Jan 2018
+			matchingUnitArray = new double[] { Constant.AKOMHighestOrder - 1 }; // added on 31 Jan 2018
 			// System.out.println("Here set");
 			// PopUps.showError("Here Set");
 		}
@@ -390,12 +429,12 @@ public final class Constant
 			matchingUnitArray = new double[] { 0 };
 		}
 
-		else if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
-		{
-			matchingUnitArray = new double[] { 0 };
-			System.out.println("Here set");
-			PopUps.showError("Here Set");
-		}
+		// else if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))// "Hrs"))
+		// {
+		// matchingUnitArray = new double[] { 0 };
+		// System.out.println("Here set");
+		// PopUps.showError("Here Set");
+		// }
 		// else if
 		else
 		{

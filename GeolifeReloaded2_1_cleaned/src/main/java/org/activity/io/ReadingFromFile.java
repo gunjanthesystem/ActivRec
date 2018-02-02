@@ -3,6 +3,8 @@ package org.activity.io;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -181,6 +183,85 @@ public class ReadingFromFile
 		catch (IOException e)
 		{
 			System.err.println("Exception reading file: " + fileNameToRead);
+			e.printStackTrace();
+		}
+		return raw;
+	}
+
+	public static List<Double> oneColumnReaderDouble(InputStream inputStream, String delimiter, int columnIndex,
+			boolean hasHeader)
+	{
+
+		List<Double> raw = new ArrayList<Double>();
+		String line = "";
+		BufferedReader br;
+		try
+		{
+			br = new BufferedReader(new InputStreamReader(inputStream));
+
+			int count;
+
+			if (hasHeader)
+			{
+				raw = br.lines().skip(1)
+						.map((String s) -> Double.parseDouble(s.split(Pattern.quote(delimiter))[columnIndex]))
+						.collect(Collectors.toList());
+			}
+			else
+			{
+				raw = br.lines().map((String s) -> Double.parseDouble(s.split(Pattern.quote(delimiter))[columnIndex]))
+						.collect(Collectors.toList());
+			}
+			// System.out.println("Size of raw =" + raw.size());
+			br.close();
+		}
+
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
+			e.printStackTrace();
+		}
+		return raw;
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @return
+	 */
+	public static List<List<Double>> nColumnReaderDouble(InputStream inputStream, String delimiter, boolean hasHeader)
+	{
+
+		List<List<Double>> raw = new ArrayList<>();
+		BufferedReader br;
+
+		try
+		{
+			br = new BufferedReader(new InputStreamReader(inputStream));
+			if (hasHeader)
+			{
+				raw = br.lines().skip(1)
+						.map((String s) -> Arrays.asList(s.split(Pattern.quote(delimiter))).stream()
+								.map(n -> Double.parseDouble(n)).collect(Collectors.toList()))
+						.collect(Collectors.toList());
+			}
+			else
+			{
+				raw = br.lines()
+						.map((String s) -> Arrays.asList(s.split(Pattern.quote(delimiter))).stream()
+								.map(n -> Double.parseDouble(n)).collect(Collectors.toList()))
+						.collect(Collectors.toList());
+
+			}
+			// System.out.println("Size of raw =" + raw.size());
+			br.close();
+		}
+
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
 			e.printStackTrace();
 		}
 		return raw;

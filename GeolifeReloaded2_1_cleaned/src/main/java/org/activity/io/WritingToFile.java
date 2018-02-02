@@ -74,11 +74,12 @@ public class WritingToFile
 	 *            file name to write for MRR for all user and all MUs result
 	 * @param whichAlgo
 	 *            "Algo", or "BaselineOccurrence", etc
-	 * 
+	 * @param lookPastType
 	 * @return number of users
 	 */
 
-	public static int writeMRRForAllUsersAllMUs(String rootPath, String absFileNameToWrite, String whichAlgo)
+	public static int writeMRRForAllUsersAllMUs(String rootPath, String absFileNameToWrite, String whichAlgo,
+			Enums.LookPastType lookPastType)
 	{
 		double[] matchingUnitArray = null;
 		int numberOfUsers = -1;
@@ -87,23 +88,23 @@ public class WritingToFile
 		{
 			WritingToFile.appendLineToFileAbsolute("MUs/Users\n", absFileNameToWrite);
 
-			if (Constant.lookPastType.equals(Enums.LookPastType.NCount))
+			if (lookPastType.equals(Enums.LookPastType.NCount))
 			{
 				matchingUnitArray = Constant.matchingUnitAsPastCount;// matchingUnitAsPastCount; //
 																		// PopUps.showMessage(matchingUnitArray.toString());
 			}
-			else if (Constant.lookPastType.equals(Enums.LookPastType.NHours))
+			else if (lookPastType.equals(Enums.LookPastType.NHours))
 			{
 				matchingUnitArray = Constant.matchingUnitHrsArray;// matchingUnitHrsArray; //
 																	// PopUps.showMessage(matchingUnitArray.toString());
 			}
 
-			else if (Constant.lookPastType.equals(Enums.LookPastType.Daywise))
+			else if (lookPastType.equals(Enums.LookPastType.Daywise))
 			{
 				matchingUnitArray = Constant.matchingDummy;
 			}
 
-			else if (Constant.lookPastType.equals(Enums.LookPastType.ClosestTime))
+			else if (lookPastType.equals(Enums.LookPastType.ClosestTime))
 			{
 				matchingUnitArray = Constant.matchingDummy;
 			}
@@ -350,7 +351,8 @@ public class WritingToFile
 		// writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv");
 		writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
-				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv", "Algo");
+				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv", "Algo",
+				Constant.lookPastType);
 
 		// /
 		//

@@ -44,6 +44,9 @@ public class RNNSeqPredictor extends BasicRNNForSeqRecSys
 
 			// Print the training sequences to the console
 
+			// convert list of training timelines to a single string.
+			String timelineString = toTimelineString(trainingTimelines);
+
 			if (Constant.sameAKOMForAllRTsOfAUser)
 			{
 				RNNPredictorsForEachUserStored.put(userID, this);
@@ -53,6 +56,25 @@ public class RNNSeqPredictor extends BasicRNNForSeqRecSys
 		{
 		}
 
+		System.out.println(
+				"Trained RNNSeqPredictor for user " + userID + "  in " + (System.currentTimeMillis() - t1) + "ms");
+	}
+
+	/**
+	 * Convert list of lists of integers to a single char string
+	 * 
+	 * @param trainingTimelines
+	 * @return
+	 */
+	private String toTimelineString(ArrayList<ArrayList<Integer>> trainingTimelines)
+	{
+		StringBuilder sb = new StringBuilder();
+
+		for (ArrayList<Integer> timelineAsSeqOfInt : trainingTimelines)
+		{
+		}
+
+		return null;
 	}
 
 }
