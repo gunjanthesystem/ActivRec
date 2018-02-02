@@ -167,7 +167,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 */
 	public RecommendationMasterMar2017AltAlgoSeqNov2017(LinkedHashMap<Date, Timeline> trainingTimelines,
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
-			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold, double matchingUnitInCountsOrHours,
+			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold, double matchingUnitInCountsOrHoursPassed,
 			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
 			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
@@ -187,16 +187,11 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			this.lookPastType = lookPastType;
 			// this.caseType = caseType;
 
-			if (!lookPastType.equals(LookPastType.Daywise) && !lookPastType.equals(LookPastType.ClosestTime))
-			{
-				this.matchingUnitInCountsOrHours = matchingUnitInCountsOrHours;
-			}
-			else if (lookPastType.equals(LookPastType.NGram)
-					|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
-			{
-				this.matchingUnitInCountsOrHours = 0;
-			}
-
+			// if (!lookPastType.equals(LookPastType.Daywise) && !lookPastType.equals(LookPastType.ClosestTime)){
+			this.matchingUnitInCountsOrHours = matchingUnitInCountsOrHoursPassed;
+			// }else if (lookPastType.equals(LookPastType.NGram)
+			// || Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
+			// {this.matchingUnitInCountsOrHours = 0;}
 			errorExists = false;
 
 			this.hasCandidateTimelines = true;
@@ -208,7 +203,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			this.userAtRecomm = Integer.toString(userAtRecomm);
 			this.userIDAtRecomm = Integer.toString(userAtRecomm);
 			System.out.println("	User at Recomm = " + this.userAtRecomm + "\tDate at Recomm = " + this.dateAtRecomm
-					+ "\tTime at Recomm = " + this.timeAtRecomm + "\n");// this.matchingUnitInCountsOrHours="
+					+ "\tTime at Recomm = " + this.timeAtRecomm + "\tmu=" + matchingUnitInCountsOrHours + "\n");// this.matchingUnitInCountsOrHours="
 			// + this.matchingUnitInCountsOrHours);/
 
 			//////
@@ -228,6 +223,9 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 			this.currentTimeline = extCurrTimelineRes.getFirst();
 			this.reductionInMatchingUnit = extCurrTimelineRes.getSecond();
+
+			System.out.println("Current timeline = " + this.currentTimeline.getActivityObjectNamesInSequence());
+			System.out.println("Current timelines.size() = " + this.currentTimeline.size());
 			//////
 
 			this.activitiesGuidingRecomm = currentTimeline.getActivityObjectsInTimeline(); // CURRENT TIMELINE
@@ -571,7 +569,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 			this.recommendedActivityNamesWithRankscores = getTopPredictedAKOMActivityPDVals(
 					this.activitiesGuidingRecomm, this.caseType, this.lookPastType, this.candidateTimelines, 1, false,
-					Constant.AKOMHighestOrder, this.userIDAtRecomm, altSeqPredictor);
+					Constant.getAKOMHighestOrder(), this.userIDAtRecomm, altSeqPredictor);
 
 			// null when there is no AKOM prediction.Happens when the current activity is not in training timelines.
 			if (recommendedActivityNamesWithRankscores == null)
@@ -653,7 +651,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 		catch (Exception e)
 		{
-			// e.printStackTrace();
+			e.printStackTrace();
 			// PopUps.getTracedErrorMsg("Exception in recommendation master");
 			PopUps.printTracedErrorMsg("Exception in recommendation master");
 		}
@@ -686,7 +684,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		{
 			// System.out.println("Current timeline:");
 			// Convert current timeline to a seq of integers
-			ArrayList<Integer> currSeq = TimelineTransformers.listOfActObjsToListOfActIDs(activitiesGuidingRecomm, false);
+			ArrayList<Integer> currSeq = TimelineTransformers.listOfActObjsToListOfActIDs(activitiesGuidingRecomm,
+					false);
 
 			// if NCount matching, then the next activity should be included in the training seq.
 			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended = candidateTimelines;

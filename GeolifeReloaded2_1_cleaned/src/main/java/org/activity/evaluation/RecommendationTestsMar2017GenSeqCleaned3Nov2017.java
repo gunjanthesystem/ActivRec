@@ -361,7 +361,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							if (Constant.filterTrainingTimelinesByRecentDays)
 							{
 								trainTimelinesAllUsersContinuous = getContinousTrainingTimelinesWithFilterByRecentDaysV2(
-										trainTestTimelinesForAllUsersDW, Constant.recentDaysInTrainingTimelines);
+										trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines());
 							}
 							else
 							{

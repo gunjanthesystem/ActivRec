@@ -45,10 +45,49 @@ public class SuperController
 
 	public static void main(String args[])
 	{
+		runAllAKOMExperiments();
+	}
+
+	/**
+	 * @since Feb 1, 2018
+	 */
+	public static void runAllAKOMExperiments()
+	{
+		System.out.println("Java Version:" + System.getProperty("java.version"));
+		int orders[] = { 5, 4, 3, 2, 1 };
+		int numOfDays[] = { 1, 5 };
+
+		String rootPath = "./dataWritten/Feb1_AKOM_";
+
+		for (int order : orders)
+		{
+			for (int numOfDay : numOfDays)
+			{
+				String commonPath = rootPath + numOfDay + "DayFilter_Order" + order;
+				WritingToFile.createDirectory(commonPath);
+				commonPath += "/";
+
+				Constant.setAKOMHighestOrder(order);
+				Constant.setRecentDaysInTrainingTimelines(numOfDay);
+
+				runExperiments(commonPath, true, true, true);
+				cleanUpSpace(commonPath, 0.80);
+				System.out.println("finished for commonPath = " + commonPath);
+			}
+		}
+
+		System.out.println(" Exiting SuperController");
+		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
+	}
+
+	public static void main31Jan(String args[])
+	{
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1/" };
+		String[] commonPaths = { "./dataWritten/Jan31_AKOM_5DayFilter_Order3/" };
+		// + "//Jan31_SameSamples_AKOM5DayOrder3Test/" };
+		// + "Jan23_SameSamples_AKOM5DayOrder1/" };
 		// Jan6_Sampling_Ncount5DayThreshold500
 		// AKOM_916U_915N_5dayC_Order-3/" };//
 		// ""/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };

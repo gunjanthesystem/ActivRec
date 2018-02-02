@@ -175,6 +175,15 @@ public class AKOMSeqPredictorLighter
 		{
 			// create the current sequence
 			List<Item> items = currentTimeline.stream().map(i -> new Item(i)).collect(Collectors.toList());
+
+			// Start of added on 1 Feb 2018
+			// take only last n items
+			items = items.subList(items.size() > orderOfMarkovModel ? (items.size() - orderOfMarkovModel) : 0,
+					items.size());
+			// Sanity.eq(items.size(), this.orderOfMarkovModel, "Error in getAKOMPrediction");
+			System.out.println("In getAKOMPrediction: items.size()=" + items.size());
+			// End of added on 1 Feb 2018
+
 			Sequence currentSeq = new Sequence(0, items);
 
 			// System.out.println("currentSeq = " + currentSeq);
