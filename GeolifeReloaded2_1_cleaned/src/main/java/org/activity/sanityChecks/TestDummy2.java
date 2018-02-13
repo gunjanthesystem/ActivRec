@@ -11,12 +11,16 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.activity.constants.Constant;
+import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.CheckinEntry;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
@@ -113,7 +117,11 @@ public class TestDummy2
 
 	public static void main(String args[])
 	{
-		mapCasts();
+		// mapCasts();
+		int numOfIterations = 1000;
+		checkEDCombinePerformance(numOfIterations);
+		checkEDCombinePerformance2(numOfIterations);
+		checkEDCombinePerformance3(numOfIterations);
 		// tryingOutTimelineIDs();
 		// checkIntersection();
 		// checkRegexUtils();
@@ -154,6 +162,171 @@ public class TestDummy2
 		// range.forEach(System.out::println);
 	}
 
+	public static void checkEDCombinePerformance(int numOfIterations)
+	{
+		Random r = new Random();
+
+		ArrayList<Double> timeTaken1 = new ArrayList<>(numOfIterations);
+
+		long tS = System.nanoTime();
+		for (int i = 0; i < numOfIterations; i++)
+		{
+			double dAct = 0 + r.nextDouble() * r.nextInt(10);
+			double dFeat = 0 + r.nextDouble() * r.nextInt(5);
+
+			int size1 = 5 + r.nextInt(7);
+			int size2 = 5 + r.nextInt(7);
+			long t1 = System.nanoTime();
+			combineActAndFeatLevelDistance(dAct, dFeat, size1, size2, 0.5);
+			long t2 = System.nanoTime();
+			long timeTaken = t2 - t1;
+			timeTaken1.add((double) (timeTaken / 1000));
+		}
+
+		System.out.println((System.nanoTime() - tS) + "ns");
+		System.out.println(timeTaken1.toString());
+		System.out.println(StatsUtils.getDescriptiveStatistics(timeTaken1).toString());
+	}
+
+	public static void checkEDCombinePerformance2(int numOfIterations)
+	{
+		Random r = new Random();
+
+		ArrayList<Double> timeTaken1 = new ArrayList<>(numOfIterations);
+
+		long tS = System.nanoTime();
+		for (int i = 0; i < numOfIterations; i++)
+		{
+			double dAct = 0 + r.nextDouble() * r.nextInt(10);
+			double dFeat = 0 + r.nextDouble() * r.nextInt(5);
+
+			int size1 = 5 + r.nextInt(7);
+			int size2 = 5 + r.nextInt(7);
+			long t1 = System.nanoTime();
+			combineActAndFeatLevelDistance2(dAct, dFeat, size1, size2, 0.5);
+			long t2 = System.nanoTime();
+			long timeTaken = t2 - t1;
+			timeTaken1.add((double) (timeTaken / 1000));
+		}
+
+		System.out.println((System.nanoTime() - tS) + "ns");
+		System.out.println(timeTaken1.toString());
+		System.out.println(StatsUtils.getDescriptiveStatistics(timeTaken1).toString());
+	}
+
+	public static void checkEDCombinePerformance3(int numOfIterations)
+	{
+		Random r = new Random();
+
+		ArrayList<Double> timeTaken1 = new ArrayList<>(numOfIterations);
+
+		long tS = System.nanoTime();
+		for (int i = 0; i < numOfIterations; i++)
+		{
+			double dAct = 0 + r.nextDouble() * r.nextInt(10);
+			double dFeat = 0 + r.nextDouble() * r.nextInt(5);
+
+			int size1 = 5 + r.nextInt(7);
+			int size2 = 5 + r.nextInt(7);
+			long t1 = System.nanoTime();
+			combineActAndFeatLevelDistance2(dAct, dFeat, size1, size2, 0.5);
+			long t2 = System.nanoTime();
+			long timeTaken = t2 - t1;
+			timeTaken1.add((double) (timeTaken / 1000));
+		}
+
+		System.out.println((System.nanoTime() - tS) + "ns");
+		System.out.println(timeTaken1.toString());
+		System.out.println(StatsUtils.getDescriptiveStatistics(timeTaken1).toString());
+	}
+
+	/**
+	 * 
+	 * @param dAct
+	 * @param dFeat
+	 * @param size1
+	 * @param size2
+	 * @param alpha
+	 * @return
+	 */
+	private static double combineActAndFeatLevelDistance(double dAct, double dFeat, int size1, int size2, double alpha)
+	{
+		double distanceTotal = -1;
+		double costReplaceActivityObject = 2, wtStartTime = 1, wtLocation = 1, wtLocPopularity = 1;
+		// (length of current timeline-1)*replaceWt*WtObj
+		double maxActLevelDistance = Math.max((Math.max(size1, size2) - 1), 1) * costReplaceActivityObject;
+		// = (length of current timeline)*(wtStartTime + wtLocation + wtLocPopularity)
+		double maxFeatLevelDistance = Math.max(size1, size2) * (wtStartTime + wtLocation + wtLocPopularity);
+
+		if (dAct > maxActLevelDistance || dFeat > maxFeatLevelDistance)
+		{
+			PopUps.printTracedErrorMsg("Error in combineActAndFeatLevelDistance : dAct" + dAct + " maxActLevelDistance="
+					+ maxActLevelDistance + " dFeat=" + dFeat + " maxFeatLevelDistance=" + maxFeatLevelDistance
+					+ " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha);
+			return -1;
+		}
+		distanceTotal = StatsUtils.round(
+				alpha * (dAct / maxActLevelDistance) + (1 - alpha) * (dFeat / maxFeatLevelDistance),
+				Constant.RoundingPrecision);
+
+		if (VerbosityConstants.verboseCombinedEDist)
+		{
+			// WritingToFile.appendLineToFileAbsolute(
+			// distanceTotal + "," + dAct + "," + dFeat + "," + size1 + "," + size2 + "\n",
+			// Constant.getCommonPath() + "DistanceTotalAlpha" + alpha + ".csv");
+		}
+
+		return distanceTotal;
+	}
+
+	private static double combineActAndFeatLevelDistance2(double dAct, double dFeat, int size1, int size2, double alpha)
+	{
+		double distanceTotal = -1;
+		double costReplaceActivityObject = 2, wtStartTime = 1, wtLocation = 1, wtLocPopularity = 1;
+		// (length of current timeline-1)*replaceWt*WtObj
+		double maxActLevelDistance = Math.max((Math.max(size1, size2) - 1), 1) * costReplaceActivityObject;
+		// = (length of current timeline)*(wtStartTime + wtLocation + wtLocPopularity)
+		double maxFeatLevelDistance = Math.max(size1, size2) * (wtStartTime + wtLocation + wtLocPopularity);
+
+		if (dAct > maxActLevelDistance || dFeat > maxFeatLevelDistance)
+		{
+			PopUps.printTracedErrorMsg("Error in combineActAndFeatLevelDistance : dAct" + dAct + " maxActLevelDistance="
+					+ maxActLevelDistance + " dFeat=" + dFeat + " maxFeatLevelDistance=" + maxFeatLevelDistance
+					+ " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha);
+			return -1;
+		}
+		distanceTotal = alpha * (dAct / maxActLevelDistance) + (1 - alpha) * (dFeat / maxFeatLevelDistance);
+
+		if (VerbosityConstants.verboseCombinedEDist)
+		{
+			// WritingToFile.appendLineToFileAbsolute(
+			// distanceTotal + "," + dAct + "," + dFeat + "," + size1 + "," + size2 + "\n",
+			// Constant.getCommonPath() + "DistanceTotalAlpha" + alpha + ".csv");
+		}
+
+		return distanceTotal;
+	}
+
+	private static double combineActAndFeatLevelDistance3(double dAct, double dFeat, int size1, int size2, double alpha)
+	{
+		double distanceTotal = -1;
+		double costReplaceActivityObject = 2, wtStartTime = 1, wtLocation = 1, wtLocPopularity = 1;
+		// (length of current timeline-1)*replaceWt*WtObj
+		double maxActLevelDistance = Math.max((Math.max(size1, size2) - 1), 1) * costReplaceActivityObject;
+		// = (length of current timeline)*(wtStartTime + wtLocation + wtLocPopularity)
+		double maxFeatLevelDistance = Math.max(size1, size2) * (wtStartTime + wtLocation + wtLocPopularity);
+
+		distanceTotal = alpha * (dAct / maxActLevelDistance) + (1 - alpha) * (dFeat / maxFeatLevelDistance);
+
+		if (VerbosityConstants.verboseCombinedEDist)
+		{
+			// WritingToFile.appendLineToFileAbsolute(
+			// distanceTotal + "," + dAct + "," + dFeat + "," + size1 + "," + size2 + "\n",
+			// Constant.getCommonPath() + "DistanceTotalAlpha" + alpha + ".csv");
+		}
+
+		return distanceTotal;
+	}
 	// public static void checkSQLDate(Timestamp t1, Timestamp t2)
 	// {
 	// System.out.println("---------getDateSafely------");

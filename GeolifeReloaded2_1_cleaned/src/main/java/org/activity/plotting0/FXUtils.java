@@ -71,6 +71,22 @@ public class FXUtils
 	}
 
 	/**
+	 * For single series
+	 * 
+	 * @param listOfListOfPairDataSingleton
+	 * @param seriesName
+	 * @return
+	 */
+	public static ObservableList<Series<Double, Double>> toObservableListOfSeriesOfPairData(
+			ArrayList<Pair<Double, Double>> listOfListOfPairDataSingleton, String seriesName)
+	{
+		ObservableList<XYChart.Series<Double, Double>> data = FXCollections.<XYChart.Series<Double, Double>>observableArrayList();
+		data.add(toSeriesOfPairData(listOfListOfPairDataSingleton, seriesName));
+		return data;
+
+	}
+
+	/**
 	 * 
 	 * @param numOfDataSeries
 	 * @param numOfDataPointsInEachSeries

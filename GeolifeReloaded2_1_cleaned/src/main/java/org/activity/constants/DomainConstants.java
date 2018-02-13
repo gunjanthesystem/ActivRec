@@ -93,8 +93,11 @@ public class DomainConstants
 	/**
 	 * Labels for groups of 100 users. If label is "101" then users from 100 to 199 are included.
 	 */
-	public final static String[] gowallaUserGroupsLabels = { "1", "101", "201", "301", "401", "501", "601", "701",
-			"801", "901" };
+	public final static String[] gowallaUserGroupsLabels = {
+			/*
+			 * "1" , "101,"
+			 */
+			"201", "301", "401", "501", "601", "701", "801", "901" };
 
 	// keeping it globally to avoid recomputing for each matching unit
 	// {UserID, {{PDVal,repAO},{PDVal,{precDuration,succDuration}}}

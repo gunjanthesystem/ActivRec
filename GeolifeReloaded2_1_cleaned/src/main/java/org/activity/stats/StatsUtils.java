@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
@@ -19,6 +21,7 @@ import org.activity.io.WritingToFile;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.UtilityBelt;
+import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
@@ -76,6 +79,26 @@ public class StatsUtils
 		return new DescriptiveStatistics(vals);
 	}
 
+	public static void main(String args[])
+	{
+		// compare percentile computation
+		List<Double> vals = new Random().doubles(20, 0, 100).boxed().collect(Collectors.toList());
+		System.out.println("vals = " + vals);
+
+		double quantile = 0.5;
+
+		long t3 = System.nanoTime();
+		System.out.println(getPercentileSlower(vals, quantile));
+		long t4 = System.nanoTime();
+
+		long t1 = System.nanoTime();
+		System.out.println(getPercentile(vals, quantile));
+		long t2 = System.nanoTime();
+
+		System.out.println("getPercentile: " + ((t2 - t1) * 1.0) / 1000000 + " ns");
+		System.out.println("getPercentileSlower:" + ((t4 - t3) * 1.0) / 1000000 + " ns");
+	}
+
 	/**
 	 * 
 	 * @param vals
@@ -92,6 +115,26 @@ public class StatsUtils
 		}
 		DescriptiveStatistics ds = new DescriptiveStatistics(vals);
 		return ds.getPercentile(percentile);
+	}
+
+	/**
+	 * 
+	 * Is Slower
+	 * 
+	 * @param vals
+	 * @param percentile
+	 *            range: 0 -100
+	 * @return
+	 */
+	public static double getPercentileSlower(List<Double> valsReceived, double percentile)
+	{
+		double vals[] = new double[valsReceived.size()];
+		for (int i = 0; i < valsReceived.size(); i++)
+		{
+			vals[i] = valsReceived.get(i);
+		}
+		Percentile ds = new Percentile(percentile);
+		return ds.evaluate(vals);
 	}
 
 	public static double getSD(double[] vals)
@@ -1012,6 +1055,7 @@ public class StatsUtils
 	 */
 	public static double round(double value, int places)
 	{
+		// long t1 = System.nanoTime();
 		if (Double.isInfinite(value))
 		{
 			return 99999;
@@ -1025,6 +1069,15 @@ public class StatsUtils
 
 		BigDecimal bd = BigDecimal.valueOf(value);// new BigDecimal(value); //change on 22 Nov 2016
 		bd = bd.setScale(places, RoundingMode.HALF_UP);
+
+		//// Start of added on 11 Feb 2018
+		// WritingToFile.appendLineToFileAbsolute(value + "," + bd.doubleValue() + "," + (System.nanoTime() - t1) +
+		// "\n",
+		// Constant.getOutputCoreResultsPath() + "RoundedValues.csv");
+		// WritingToFile.appendLineToFileAbsolute(PopUps.getCurrentStackTracedWarningMsg(""),
+		// Constant.getOutputCoreResultsPath() + "RoundedCalledBy.csv");
+		/// end of added on 11 Fenb 2018
+
 		return bd.doubleValue();
 	}
 

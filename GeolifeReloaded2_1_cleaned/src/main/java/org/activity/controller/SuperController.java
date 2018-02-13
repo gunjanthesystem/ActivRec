@@ -45,7 +45,27 @@ public class SuperController
 
 	public static void main(String args[])
 	{
-		runAllAKOMExperiments();
+		// cleanUpSpace("./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/", 0.9);
+		// runAllAKOMExperiments();
+		// cleanUpSpace("./dataWritten/Feb2NCount_5Day_ThresholdNN600", 0.9);
+		main0();
+		// cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
+		// "./dataWritten/Dec20_Ncount_100U_9kN_1C_ThreshNN-750", "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1",
+		// "./dataWritten/Jan23_SameSamples_AKOM5DayOrder3", "./dataWritten/Jan3_Sampling_AKOM1DayOrder1",
+		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors",
+		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_error6Jan",
+		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors_run2",
+		// "./dataWritten/Jan31_AKOM_5DayFilter_Order5", "./dataWritten/Jan31_AKOM_1DayFilter_Order5",
+		// "./dataWritten/Jan31_AKOM_5DayFilter_Order3", "./dataWritten/Jan31_AKOM_1DayFilter_Order3",
+		// "./dataWritten/Jan31_AKOM_1DayFilter_Order1", "./dataWritten/Jan31_AKOM_5DayFilter_Order1",
+		// "./dataWritten/Dec20_AKOM_5DayFilter_Order5", "./dataWritten/Dec26_AKOM_5DayFilter_Order3",
+		// "./dataWritten/Dec20_AKOM_1DayFilter_Order5_part1", "./dataWritten/Dec20_AKOM_1DayFilter_Order3",
+		// "./dataWritten/Dec20_AKOM_1DayFilter_Order5", "./dataWritten/Dec20_AKOM_5DayFilter_Order3_incomplete",
+		// "./dataWritten/Dec20_AKOM_5DayFilter_Order3_part1", "./dataWritten/Dec20_AKOM_AllDayFilter_Order1",
+		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part1",
+		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part2",
+		// "./dataWritten/Jan18_Sampling_Ncount10DayThreshold50",
+		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1", });
 	}
 
 	/**
@@ -80,12 +100,19 @@ public class SuperController
 		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
 	}
 
-	public static void main31Jan(String args[])
+	public static void main0()
 	{
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "./dataWritten/Jan31_AKOM_5DayFilter_Order3/" };
+		String[] commonPaths = { "./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
+		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime5hrs/" };
+		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
+		// + "//Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8_part1/" };
+		// Feb11NCount_5DayFilter_ThreshNN500MedianRepCinsHierED/" };
+		// + "Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/" };//
+		// + "Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
+		// Feb8NCount_5DayFilter_ThreshNN500EditDists/" };
 		// + "//Jan31_SameSamples_AKOM5DayOrder3Test/" };
 		// + "Jan23_SameSamples_AKOM5DayOrder1/" };
 		// Jan6_Sampling_Ncount5DayThreshold500
@@ -106,12 +133,22 @@ public class SuperController
 		for (int i = 0; i <= commonPaths.length - 1; i++)
 		{
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], true, false, true);
+			runExperiments(commonPaths[i], true, true, true);
+			cleanUpSpace(commonPaths[i], 0.85);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
+
 		System.out.println(" Exiting SuperController");
 		// End
 		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
+	}
+
+	public static void cleanUp(String[] pathsToClean)
+	{
+		for (String pathToClean : pathsToClean)
+		{
+			cleanUpSpace(pathToClean, 0.85);
+		}
 	}
 
 	// All correct

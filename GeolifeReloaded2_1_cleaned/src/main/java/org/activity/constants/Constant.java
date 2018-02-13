@@ -62,7 +62,7 @@ public final class Constant
 	 */
 	public static final boolean useTolerance = true;// false;
 
-	public static final boolean useHierarchicalDistance = false;// true;
+	public static final boolean useHierarchicalDistance = false;// true; // SWITCH_NOV10//
 	/**
 	 * Determines whether the sorting of candiates is stable or unstable
 	 */
@@ -83,9 +83,9 @@ public final class Constant
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;// SWITCH_NOV10//AKOM
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10//AKOM
 
-	private static int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
+	private static int AKOMHighestOrder = -1;// 1;// 3;// SWITCH_NOV10
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	/**
@@ -143,17 +143,20 @@ public final class Constant
 	private static int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
 
 	// Filtering the candidate timeline
-	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.None;// NearestNeighbour,
+	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
 	// None,Percentile // SWITCH_NOV10
+
+	public static final int filterCandByCurActTimeThreshInSecs = -1;// 18000;// 3600; // SWITCH_NOV10
+
 	/**
 	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
 	 * 0-100
 	 */
-	public static final double percentileCandEDThreshold = -1;// 25;// 100;// 25;// SWITCH_NOV10
+	public static final double percentileCandEDThreshold = -1;// 55;// 25;// 100;// 25;// SWITCH_NOV10
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int nearestNeighbourCandEDThreshold = -1;// 750;// 500;// 500;/// -1;// 100;// 1500;// 100;//
+	public static final int nearestNeighbourCandEDThreshold = 500;// 750;// 500;// 500;/// -1;// 100;// 1500;// 100;//
 																	// -1
 																	// for no filter//SWITCH_NOV10
 
@@ -167,6 +170,11 @@ public final class Constant
 	public static final double ClosestTimeDiffThresholdInSecs = 10800; // 3 hrs
 
 	public static final boolean NGramColl = false;// SWITCH_NOV10
+
+	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
+	public static final boolean checkEDSanity = true;// true;// SWITCH_NOV10
+	public static final double EDAlpha = 0.6;// 0.8;// 0.5;// SWITCH_NOV10
+	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -216,7 +224,10 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// 2, 4, 6, 8, 1, 3, 10 11, 12, 13,
+	public static final double matchingUnitAsPastCount[] = { 3, 2, 4, 0, 1, 6, 8 };// { 0, 1, 2, 3, 4, 6, 8 };//
+																					// 2, 4,
+																					// 6, 8, 1, 3, 10 11, 12,
+																					// 13,
 	// 14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38, 40,42 };
 
 	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
@@ -1205,6 +1216,8 @@ public final class Constant
 
 		s.append("\nonlyPastFromRecommDateInCandInColl:" + onlyPastFromRecommDateInCandInColl);
 		s.append("\ntypeOfCandThreshold:" + typeOfCandThreshold);
+		s.append("\nfilterCandByCurActTimeThreshInSecs:" + filterCandByCurActTimeThreshInSecs);
+
 		s.append("\npercentileCandEDThreshold:" + percentileCandEDThreshold);
 		s.append("\nnearestNeighbourCandEDThreshold:" + nearestNeighbourCandEDThreshold);
 		//
@@ -1212,6 +1225,11 @@ public final class Constant
 		s.append("\neditDistancesMemorizerBufferSize:" + editDistancesMemorizerBufferSize);
 		s.append("\nmemorizeEditDistance:" + memorizeEditDistance);
 		s.append("\nFor9kUsers:" + For9kUsers);
+
+		s.append("\nuseMedianCinsForRepesentationAO:" + useMedianCinsForRepesentationAO);
+		s.append("\ncheckEDSanity:" + checkEDSanity);
+		s.append("\nEDAlpha:" + EDAlpha);
+		s.append("\ndisableRoundingEDCompute:" + disableRoundingEDCompute);
 
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{

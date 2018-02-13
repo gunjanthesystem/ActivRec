@@ -3,6 +3,7 @@ package org.activity.recomm;
 //import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -182,7 +183,15 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		switch (dname)
 		{
 			case "HJEditDistance":
-				hjEditDistance = new HJEditDistance();
+				if (Constant.EDAlpha < 0)
+				{
+					hjEditDistance = new HJEditDistance();
+				}
+				else
+				{
+					hjEditDistance = new HJEditDistance(Constant.EDAlpha);
+				}
+
 				break;
 
 			case "FeatureWiseEditDistance":
@@ -350,6 +359,16 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			this.candidateTimelines = TimelineExtractors.extractCandidateTimelines(trainingTimelines, lookPastType,
 					this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm, matchingUnitInCountsOrHours,
 					this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers, trainTimelinesAllUsersContinuous);
+
+			// Start of added on Feb 12 2018
+			if (Constant.filterCandByCurActTimeThreshInSecs > 0)
+			{
+				this.candidateTimelines = removeCandsWithEndCurrActBeyondThresh(this.candidateTimelines,
+						Constant.filterCandByCurActTimeThreshInSecs, activityObjectAtRecommPoint,
+						VerbosityConstants.verboseCandFilter);
+
+			}
+			// End of added on Feb 12 2018
 
 			long recommMasterT2 = System.currentTimeMillis();
 			long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
@@ -610,6 +629,63 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		}
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
+	}
+
+	/**
+	 * 
+	 * @param candidateTimelines
+	 * @param filterCandByCurActTimeThreshInSecs
+	 * @param activityObjectAtRecommPoint
+	 * @return
+	 */
+	private static LinkedHashMap<String, Timeline> removeCandsWithEndCurrActBeyondThresh(
+			LinkedHashMap<String, Timeline> candidateTimelines, int filterCandByCurActTimeThreshInSecs,
+			ActivityObject activityObjectAtRecommPoint, boolean verbose)
+	{
+		LinkedHashMap<String, Timeline> filteredCands = new LinkedHashMap<>();
+		Timestamp tsOfAOAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
+		long timeInDayAOAtRecommPoint = DateTimeUtils.getTimeInDayInSeconds(tsOfAOAtRecommPoint);
+
+		StringBuilder sb = new StringBuilder(
+				"Debug12Feb Constant.filterCandByCurActTimeThreshInSecs=" + filterCandByCurActTimeThreshInSecs);
+		sb.append("\ntsOfAOAtRecommPoint:" + tsOfAOAtRecommPoint + "\ntimeInDayAOAtRecommPoint="
+				+ timeInDayAOAtRecommPoint);
+
+		for (Entry<String, Timeline> candEntry : candidateTimelines.entrySet())
+		{
+			ArrayList<ActivityObject> aosInCand = candEntry.getValue().getActivityObjectsInTimeline();
+			ActivityObject lastAO = aosInCand.get(aosInCand.size() - 1);
+			Timestamp tCurrInCand = lastAO.getStartTimestamp();
+			long timeInDayCurrInCand = DateTimeUtils.getTimeInDayInSeconds(tCurrInCand);
+
+			long absDiff = Math.abs(timeInDayCurrInCand - timeInDayAOAtRecommPoint);
+			sb.append("\ntCurrInCand:" + tCurrInCand + "\ntimeInDayCurrInCand=" + timeInDayCurrInCand + "\n\tabsDiff="
+					+ absDiff);
+
+			if (absDiff <= filterCandByCurActTimeThreshInSecs)
+			{
+				filteredCands.put(candEntry.getKey(), candEntry.getValue());
+				sb.append("-accepting");
+			}
+			else
+			{
+				sb.append("-Rejecting");
+			}
+		}
+
+		if (verbose)
+		{
+			System.out.println("\n" + sb.toString());
+		}
+
+		int sizeBeforeFiltering = candidateTimelines.size();
+		int sizeAfterFilering = filteredCands.size();
+
+		WritingToFile.appendLineToFileAbsolute(
+				sizeBeforeFiltering + "," + sizeAfterFilering + ","
+						+ ((100.0 * (sizeBeforeFiltering - sizeAfterFilering)) / sizeBeforeFiltering + "\n"),
+				Constant.getOutputCoreResultsPath() + "removeCandsWithEndCurrActBeyondThreshLog.csv");
+		return filteredCands;
 	}
 
 	/**

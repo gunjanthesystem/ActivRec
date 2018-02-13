@@ -551,6 +551,45 @@ public class ActivityObject implements Serializable
 				+ max_items_count + "__distNext=" + distanceInMFromNext + "__durNext=" + durationInSecondsFromNext;
 	}
 
+	/**
+	 * 
+	 * @param delimiter
+	 * @return
+	 */
+	public String toStringAllGowallaTSWithNameForHeaded(String delimiter)
+	{
+
+		String locationName = locationIDs.stream().map(lid -> DomainConstants.getLocationIDNameDictionary().get(lid))
+				.collect(Collectors.joining("-"));
+		// .getLocIDLocationObjectDictionary().get(lid).locationName)
+
+		return activityID + delimiter + this.getLocationIDs('-') + delimiter
+				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter + locationName + delimiter
+				+ workingLevelCatIDs + delimiter + Instant.ofEpochMilli(startTimestampInms).toString()
+				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
+				+ delimiter + startLatitude + delimiter + startLongitude
+				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
+				+ checkins_count + delimiter + users_count + delimiter + radius_meters + delimiter + highlights_count
+				+ delimiter + items_count + delimiter + max_items_count + delimiter + distanceInMFromNext + delimiter
+				+ durationInSecondsFromNext;
+	}
+
+	/**
+	 * Header for writing activity objc
+	 * 
+	 * @param delimiter
+	 * @return
+	 */
+	public static String getHeaderForStringAllGowallaTSWithNameForHeaded(String delimiter)
+	{
+
+		return "actID" + delimiter + "locID" + delimiter + "activityName" + delimiter + "locationName" + delimiter
+				+ "workLvlCat" + delimiter + "stTS" + delimiter + "stLat" + delimiter + "stLon" + delimiter + "uID"
+				+ delimiter + "photos_c" + delimiter + "cins_c" + delimiter + "users_c" + delimiter + "radius_m"
+				+ delimiter + "highlts_count" + delimiter + "items_c" + delimiter + "max_items_c" + delimiter
+				+ "distNext" + delimiter + "durNext";
+	}
+
 	public String toString()
 	{
 		if (Constant.getDatabaseName().equals("dcu_data_2"))// // ;"geolife1";// default database name, dcu_data_2";/
@@ -1161,6 +1200,12 @@ public class ActivityObject implements Serializable
 	 */
 	public int getCheckins_count()
 	{
+		// if (checkins_count <= 0)
+		// {
+		// System.out.println("Alert:for AO name:" + this.getActivityName() + "AO id:" + this.activityID
+		// + " checkins count= " + checkins_count + " AO=\n" + this.toStringAllGowallaTSWithName());
+		//
+		// }
 		return checkins_count;
 	}
 

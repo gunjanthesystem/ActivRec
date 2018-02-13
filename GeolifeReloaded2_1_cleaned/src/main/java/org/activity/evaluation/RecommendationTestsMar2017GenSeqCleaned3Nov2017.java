@@ -308,7 +308,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// writes the edit similarity calculations for this recommendation master
 						// WritingToFile.writeEditSimilarityCalculationsHeader();
 						WritingToFile.writeToNewFile(
-								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandidateTimelineID,EditDistance,ActLevelDistance,FeatLevelDistance,Trace, ActivityObjects1,ActivityObjects2\n",
+								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandidateTimelineID,EditDistance,ActLevelDistance,FeatLevelDistance,Trace, ActivityObjects1,ActivityObjects2,NumOfActivityObjects1,NumOfActivityObjects2\n",
 								commonPath + "EditSimilarityCalculations.csv");
 
 						// writes the header for EditDistancePerRtPerCand.csv//
@@ -1337,8 +1337,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						long recommTestsEndtime = System.currentTimeMillis();
 
 						System.out.println("Time taken for executing Recommendation Tests for this matching unit ="
-								+ (recommTestsEndtime - recommTestsStarttime) / 1000 + "seconds");
-
+								+ (recommTestsEndtime - ctmu1) / 1000 + "seconds");
+						WritingToFile.appendLineToFileAbsolute(
+								"MU=" + matchingUnit + ",time(s)=" + ((recommTestsEndtime - ctmu1) / 1000) + "\n",
+								Constant.getOutputCoreResultsPath() + "RecommendationTestsTimeTaken.csv");
 						// writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
 
 						consoleLogStream.close();
@@ -1407,8 +1409,28 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 		if (preBuildRepAOGenericUser)
 		{
-			repAOForTopRecommActName = getRepresentativeAOCollGeneric(Integer.valueOf(topRecommendedPrimarDimensionVal),
-					userId, recommendationTime, primaryDimension, repAOResultGenericUser);
+			// disabled on 9 Feb 2018 start
+			// repAOForTopRecommActName =
+			// getRepresentativeAOCollGeneric(Integer.valueOf(topRecommendedPrimarDimensionVal),
+			// userId, recommendationTime, primaryDimension, repAOResultGenericUser);
+			// disabled on 9 Feb 2018 end
+
+			repAOForTopRecommActName = getRepresentativeAOCollGenericV2(
+					Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTime, primaryDimension,
+					repAOResultGenericUser);
+
+			// Sanity check Feb8 Starts
+			if (false)
+			{
+				ActivityObject aoTemp = getRepresentativeAOCollGenericV2(
+						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTime, primaryDimension,
+						repAOResultGenericUser);
+				WritingToFile.appendLineToFileAbsolute(
+						repAOForTopRecommActName.toStringAllGowallaTS() + "\n" + aoTemp.toStringAllGowallaTS() + "\n\n",
+						this.commonPath + "getRepresentativeAOCollGenericV2SanityCheck.txt");
+				// SANITY CHECK PASSED on Feb 9 2018
+			}
+			// Sanity check Feb8 Ends
 		}
 		else
 		{
@@ -1932,7 +1954,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			{
 				LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal = new LinkedHashMap<>();
 				/**
-				 * Useful for deciding upon the start timestamp from representative AO
+				 * Could be useful for deciding upon the start timestamp from representative AO
 				 */
 				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
 				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
@@ -2562,6 +2584,83 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 		return repAOForThisActNameForThisUser;
 	}
+
+	/**
+	 * 
+	 * Created to create rep AO from repAOResultGenericUser which has been created using training timelines of all
+	 * users. (need to call only once for a test)
+	 * 
+	 * <p>
+	 * Fork of getRepresentativeAOCollGeneric. Instead of recreating a new ActivityObject, it just fetches the generic
+	 * rep AO for this PD Val and modifies the relevant features accordingly.
+	 * 
+	 * @param topPrimaryDimensionVal
+	 * @param userId
+	 * @param recommendationTime
+	 * @param primaryDimension
+	 * @param repAOResultGenericUser
+	 *            {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
+	 * @return
+	 * @since 8 Feb 2018
+	 */
+	private ActivityObject getRepresentativeAOCollGenericV2(Integer topPrimaryDimensionVal, int userId,
+			Timestamp recommendationTime, PrimaryDimension primaryDimension,
+			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser)
+	{
+		if (Constant.getDatabaseName().equals("gowalla1") == false)
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: not implemented this (getRepresentativeAOCollGenericV2() for besides gowalla1");
+		}
+		// StringBuilder verboseMsg = new StringBuilder();
+		// System.out.println("Inside getRepresentativeAOColl(): topPrimaryDimensionVal=" + topPrimaryDimensionVal +
+		// "\n");
+		// ArrayList<Long> durationPreceeding = new ArrayList<>();
+		// ArrayList<ActivityObject> aosWithSamePDVal = new ArrayList<>();
+
+		// StringBuilder sb = new StringBuilder();
+		// System.out.println("durationPreceeding= " + durationPreceeding.toString());
+		// System.out.println("aosWithSamePDVal= ");
+		// aosWithSamePDVal.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
+		// System.out.println(sb.toString());
+
+		double medianPreceedingDuration = repAOResultGenericUser.getSecond().get(topPrimaryDimensionVal).getFirst();
+
+		// double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
+		// int medianCinsCount = (int) StatsUtils
+		// .getDescriptiveStatistics(cinsCount, "cinsCount", userID + "__" + actName + "cinsCount.txt")
+		// .getPercentile(50);
+
+		// NOTE: we only need to take care of feature which are used for edit distance computation.
+		// Instantiate the representative activity object.
+
+		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+
+		ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+
+		repAOForThisActNameForThisUser.setStartTimestamp(newRecommTimestamp);
+		repAOForThisActNameForThisUser.setEndTimestamp(newRecommTimestamp);
+		repAOForThisActNameForThisUser.setUserID(String.valueOf(userId));
+
+		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+		{
+			System.out.print("Warning: recommendationTime = " + recommendationTime + " newRecommTimestamp= "
+					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDuration
+					+ " for topRecommActName =" + topPrimaryDimensionVal);
+		}
+		//
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Debug getRepresentativeAOCollGeneric: getRepresentativeAO: old recommendationTime="
+					+ recommendationTime.toLocalDateTime().toString() + "medianPreceedingDuration="
+					+ medianPreceedingDuration + " new recommendationTime="
+					+ newRecommTimestamp.toLocalDateTime().toString());
+		}
+		System.out.println("repAOV2=" + repAOForThisActNameForThisUser.toStringAllGowallaTS());
+
+		return repAOForThisActNameForThisUser;
+	}
+
 	//
 
 	/**
@@ -3444,6 +3543,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	}
 
 	/**
+	 * TODO: ALERT REALISEDO N 8 FEB 2018: NOTE: CHECKINS COUNT IS -1 IN HERE, PROBABLY BETTER TO TAKE MEDIAN INSTEAD.
 	 * 
 	 * @param userID
 	 * @param aosForEachActName
@@ -3633,6 +3733,26 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 	/**
 	 * 
+	 * @param aosForEachPDVal
+	 * @param PDVal
+	 * @return
+	 */
+	public Integer getMedianCheckinsCountForGivePDVal(LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal,
+			Integer PDVal)
+	{
+		int res = -1;
+		ArrayList<ActivityObject> aos = aosForEachPDVal.get(PDVal);
+
+		ArrayList<Double> cinCounts = (ArrayList<Double>) aos.stream().map(ao -> (double) ao.getCheckins_count())
+				.collect(Collectors.toList());
+
+		res = (int) StatsUtils.getDescriptiveStatistics(cinCounts).getPercentile(50);
+		System.out.println("Inside getMedianCheckinsCountForGivePDVal: median cin for PDVal:" + PDVal + " = " + res);
+		return res;
+	}
+
+	/**
+	 * 
 	 * @param userID
 	 * @param aosForEachPDVal
 	 * @param durationFromPrevForEachPDVal
@@ -3724,9 +3844,16 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				// radius_meters, int highlights_count, int items_count, int max_items_count, String workingLevelCatIDs,
 				// double distanceInMFromNext, long durationInSecsFromNext, String[] levelWiseCatIDs)
 
+				int cins_count = -1;
+
+				if (Constant.useMedianCinsForRepesentationAO)
+				{
+					cins_count = getMedianCheckinsCountForGivePDVal(aosForEachPDVal, pdVal);
+				}
+
 				ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs,
-						activityName, "", dummyMedianStartTS, "", "", "", "GenericUser", -1, -1, -1, -1, -1, -1, -1,
-						workingLevelCatIDs, -1, -1, new String[] { "" });
+						activityName, "", dummyMedianStartTS, "", "", "", "GenericUser", -1, cins_count, -1, -1, -1, -1,
+						-1, workingLevelCatIDs, -1, -1, new String[] { "" });
 
 				repAOs.put(pdVal, repAOForThisActNameForThisUser);
 				actMedPreSuccDuration.put(pdVal,

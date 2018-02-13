@@ -11,6 +11,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.stats.StatsUtils;
+import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
 
@@ -24,12 +25,22 @@ import org.activity.util.StringCode;
  */
 public class HJEditDistance extends AlignmentBasedDistance
 {
+	double EDAlpha;
+
 	/**
 	 * Sets the tolerance according the truth value of Constant.useTolerance
 	 */
 	public HJEditDistance()
 	{
 		super();
+		this.EDAlpha = -99999;
+	}
+
+	public HJEditDistance(double edAlpha)
+	{
+		super();
+		this.EDAlpha = edAlpha;
+		System.out.println("Setting EDAlpha=" + this.EDAlpha);
 	}
 
 	// //////////////
@@ -544,15 +555,75 @@ public class HJEditDistance extends AlignmentBasedDistance
 			}
 		}
 
-		dAct = StatsUtils.round(dAct, 4);
-		dFeat = StatsUtils.round(dFeat, 4);
+		if (!Constant.disableRoundingEDCompute)
+		{
+			dAct = StatsUtils.round(dAct, 4);
+			dFeat = StatsUtils.round(dFeat, 4);
+		}
 
 		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("HJ dist=" + dAct + " + " + dFeat);
 		}
 
-		distanceTotal = dAct + dFeat;
+		// Start of disabled on Feb 4 2018
+		// distanceTotal = dAct + dFeat;
+		// End of disabled on Feb 4 2018
+
+		// Start of added on Feb 4 2018
+		// double EDAlpha = 0.5;
+		if (this.EDAlpha > 0)
+		{
+			distanceTotal = /* dAct + dFeat; */
+					combineActAndFeatLevelDistance(dAct, dFeat, activityObjects1.size(), activityObjects2.size(),
+							EDAlpha);
+		}
+		else
+		{
+			distanceTotal = dAct + dFeat;
+		}
+		// System.out.println("EDAlpha = " + EDAlpha);
+		// Start of sanity check Feb 9
+		// End of sanity check Feb 9
+
+		if (Constant.checkEDSanity)
+		{
+			if (dFeat > 100)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("\ncalc HJeditDist between " + activityObjects1.size() + " & " + activityObjects2.size()
+						+ " objs\nAOs1:");
+				activityObjects1.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
+				sb.append("\nAOs2:");
+				activityObjects2.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
+
+				sb.append("\nTrace =" + levenshteinDistance.getFirst() + "  simpleLevenshteinDistance112="
+						+ levenshteinDistance.getSecond());
+				PopUps.printTracedErrorMsg("\nError:Feb5_1Bug: HJ dist=" + dAct + " + " + dFeat + "\n" + sb.toString());
+				WritingToFile.appendLineToFileAbsolute(sb.toString(),
+						Constant.getOutputCoreResultsPath() + "FeatEDInvestigationCountAllAnomaly.txt");
+
+			}
+			if (distanceTotal < 0)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("\ncalc HJeditDist between " + activityObjects1.size() + " & " + activityObjects2.size()
+						+ " objs\nAOs1:");
+				activityObjects1.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
+				sb.append("\nAOs2:");
+				activityObjects2.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
+
+				sb.append("\nTrace =" + levenshteinDistance.getFirst() + "  simpleLevenshteinDistance112="
+						+ levenshteinDistance.getSecond());
+				PopUps.printTracedErrorMsg("\nError: distanceTotal=" + distanceTotal + " \nHJ dist=" + dAct + " + "
+						+ dFeat + "\n" + sb.toString());
+				WritingToFile.appendLineToFileAbsolute(sb.toString(),
+						Constant.getOutputCoreResultsPath() + "CombinedEDInvestigationCountAllAnomaly.txt");
+
+			}
+
+		}
+		// End of added on Feb 4 2018
 
 		if (VerbosityConstants.WriteEditSimilarityCalculations)
 		{
@@ -568,6 +639,52 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// WritingToFile.writeEditSimilarityCalculation(activityObjects1,activityObjects2,levenshteinDistance);
 		// WritingToFile.writeEditDistance(levenshteinDistance);
 		return new Pair<String, Double>(levenshteinDistance.getFirst(), distanceTotal);
+	}
+
+	/**
+	 * 
+	 * @param dAct
+	 * @param dFeat
+	 * @param size1
+	 * @param size2
+	 * @param alpha
+	 * @return
+	 */
+	private double combineActAndFeatLevelDistance(double dAct, double dFeat, int size1, int size2, double alpha)
+	{
+		double distanceTotal = -1;
+		// (length of current timeline-1)*replaceWt*WtObj
+		double maxActLevelDistance = Math.max((Math.max(size1, size2) - 1), 1) * this.costReplaceActivityObject;
+		// = (length of current timeline)*(wtStartTime + wtLocation + wtLocPopularity)
+		double maxFeatLevelDistance = Math.max(size1, size2) * (wtStartTime + wtLocation + wtLocPopularity);
+
+		if (dAct > maxActLevelDistance || dFeat > maxFeatLevelDistance)
+		{
+			PopUps.printTracedErrorMsg("Error in combineActAndFeatLevelDistance : dAct" + dAct + " maxActLevelDistance="
+					+ maxActLevelDistance + " dFeat=" + dFeat + " maxFeatLevelDistance=" + maxFeatLevelDistance
+					+ " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha);
+			return -1;
+		}
+
+		if (Constant.disableRoundingEDCompute)
+		{
+			distanceTotal = alpha * (dAct / maxActLevelDistance) + (1 - alpha) * (dFeat / maxFeatLevelDistance);
+		}
+		else
+		{
+			distanceTotal = StatsUtils.round(
+					alpha * (dAct / maxActLevelDistance) + (1 - alpha) * (dFeat / maxFeatLevelDistance),
+					Constant.RoundingPrecision);
+		}
+
+		// if (VerbosityConstants.verboseCombinedEDist)
+		// {
+		// WritingToFile.appendLineToFileAbsolute(
+		// distanceTotal + "," + dAct + "," + dFeat + "," + size1 + "," + size2 + "\n",
+		// Constant.getCommonPath() + "DistanceTotalAlpha" + alpha + ".csv");
+		// }
+
+		return distanceTotal;
 	}
 
 	// public static final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject>

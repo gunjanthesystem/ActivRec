@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import org.activity.objects.Pair;
 import org.activity.ui.PopUps;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class ReadingFromFile
@@ -188,6 +190,43 @@ public class ReadingFromFile
 		return raw;
 	}
 
+	public static List<Double> oneColumnReaderDouble(String fileNameToRead, String delimiter, int columnIndex,
+			boolean hasHeader, long startRow, long endRow)
+	{
+
+		List<Double> raw = new ArrayList<Double>();
+		String line = "";
+		BufferedReader br;
+		try
+		{
+			br = new BufferedReader(new FileReader(fileNameToRead));// Constant.getCommonPath() +
+
+			int count;
+
+			if (hasHeader)
+			{
+				raw = br.lines().skip(1).skip(startRow).limit(endRow)
+						.map((String s) -> Double.parseDouble(s.split(Pattern.quote(delimiter))[columnIndex]))
+						.collect(Collectors.toList());
+			}
+			else
+			{
+				raw = br.lines().skip(startRow).limit(endRow)
+						.map((String s) -> Double.parseDouble(s.split(Pattern.quote(delimiter))[columnIndex]))
+						.collect(Collectors.toList());
+			}
+			// System.out.println("Size of raw =" + raw.size());
+			br.close();
+		}
+
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file: " + fileNameToRead);
+			e.printStackTrace();
+		}
+		return raw;
+	}
+
 	public static List<Double> oneColumnReaderDouble(InputStream inputStream, String delimiter, int columnIndex,
 			boolean hasHeader)
 	{
@@ -264,6 +303,377 @@ public class ReadingFromFile
 			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
 			e.printStackTrace();
 		}
+		return raw;
+	}
+
+	/**
+	 * 
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @return
+	 */
+	public static List<List<String>> nColumnReaderString(InputStream inputStream, String delimiter, boolean hasHeader)
+	{
+
+		List<List<String>> raw = new ArrayList<>();
+		BufferedReader br;
+
+		try
+		{
+			br = new BufferedReader(new InputStreamReader(inputStream));
+			if (hasHeader)
+			{
+				raw = br.lines().skip(1).map((String s) -> Arrays.asList(s.split(Pattern.quote(delimiter))).stream()
+						.collect(Collectors.toList())).collect(Collectors.toList());
+			}
+			else
+			{
+				raw = br.lines().map((String s) -> Arrays.asList(s.split(Pattern.quote(delimiter))).stream()
+						.collect(Collectors.toList())).collect(Collectors.toList());
+
+			}
+			// System.out.println("Size of raw =" + raw.size());
+			br.close();
+		}
+
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
+			e.printStackTrace();
+		}
+		return raw;
+	}
+
+	/**
+	 * ref: http://www.baeldung.com/java-read-lines-large-file
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @param verboseReading
+	 * @return
+	 */
+	public static List<List<String>> nColumnReaderStringLargeFile(InputStream inputStream, String delimiter,
+			boolean hasHeader, boolean verboseReading)
+	{
+
+		List<List<String>> raw = new ArrayList<>();
+		List<String> header = new ArrayList<>();
+
+		if (verboseReading)
+		{
+			System.out.println("nColumnReaderStringLargeFile --");
+		}
+		try
+		{
+			LineIterator it = IOUtils.lineIterator(inputStream, "UTF-8");
+			long countOfLinesRead = 0;
+
+			while (it.hasNext())
+			{
+				countOfLinesRead += 1;
+				String line = it.nextLine();
+				System.out.println("line=" + line);
+				if (hasHeader && countOfLinesRead == 1)
+				{
+					header = Arrays.asList(line.split(Pattern.quote(delimiter)));
+					raw.add(header);// header is treated in same way as all other data
+					continue;
+				}
+				raw.add(Arrays.asList(line.split(Pattern.quote(delimiter))));
+
+				if (verboseReading && (countOfLinesRead % 25000 == 0))
+				{
+					System.out.println("Lines read: " + countOfLinesRead);
+				}
+				// if (countOfLinesRead > 100)
+				// {
+				// break;
+				// }
+			}
+
+			System.out.println("Total Lines read: " + countOfLinesRead);
+			it.close();
+		}
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
+			e.printStackTrace();
+		}
+
+		// System.out.println("raw=\n" + raw);
+		return raw;
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @param verboseReading
+	 * @param columnIndicesToSelect
+	 * @return
+	 */
+	public static List<List<String>> nColumnReaderStringLargeFileSelectedColumns(InputStream inputStream,
+			String delimiter, boolean hasHeader, boolean verboseReading, int... columnIndicesToSelect)
+	{
+
+		long t1 = System.currentTimeMillis();
+		List<List<String>> raw = new ArrayList<>();
+		List<String> header = new ArrayList<>();
+		String splitLiteral = Pattern.quote(delimiter);
+		if (verboseReading)
+		{
+			System.out.println("nColumnReaderStringLargeFile --");
+		}
+		try
+		{
+			LineIterator it = IOUtils.lineIterator(inputStream, "UTF-8");
+			long countOfLinesRead = 0;
+
+			while (it.hasNext())
+			{
+				countOfLinesRead += 1;
+
+				String line = it.nextLine();
+				// System.out.println("line=" + line);
+				String[] splittedString = (line.split(splitLiteral));
+
+				if (hasHeader && countOfLinesRead == 1)
+				{
+					for (int indexToSelect : columnIndicesToSelect)
+					{
+						header.add(splittedString[indexToSelect]);
+					}
+					raw.add(header);// header is treated in same way as all other data
+					continue;
+				}
+
+				List<String> temp = new ArrayList<>();
+				for (int indexToSelect : columnIndicesToSelect)
+				{
+					temp.add(splittedString[indexToSelect]);
+				}
+				raw.add(temp);// header is treated in same way as all other data
+
+				if (verboseReading && (countOfLinesRead % 25000 == 0))
+				{
+					System.out.println("Lines read: " + countOfLinesRead);
+				}
+
+			}
+
+			System.out.println(
+					"Total Lines read: " + countOfLinesRead + " in " + (System.currentTimeMillis() - t1) + "ms");
+			it.close();
+		}
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
+			e.printStackTrace();
+		}
+
+		return raw;
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @param verboseReading
+	 * @param writeTheReadFile
+	 * @param absFileToWrite
+	 * @param columnIndicesToSelect
+	 */
+	public static void nColumnReaderStringLargeFileSelectedColumnsWithWrite(InputStream inputStream, String delimiter,
+			boolean hasHeader, boolean verboseReading, boolean writeTheReadFile, String absFileToWrite,
+			int... columnIndicesToSelect)
+	{
+
+		long t1 = System.currentTimeMillis();
+		List<List<String>> raw = new ArrayList<>();
+		List<String> header = new ArrayList<>();
+		String splitLiteral = Pattern.quote(delimiter);
+		if (verboseReading)
+		{
+			System.out.println("nColumnReaderStringLargeFile --");
+		}
+		try
+		{
+			LineIterator it = IOUtils.lineIterator(inputStream, "UTF-8");
+			long countOfLinesRead = 0;
+
+			while (it.hasNext())
+			{
+				countOfLinesRead += 1;
+
+				String line = it.nextLine();
+				// System.out.println("line=" + line);
+				String[] splittedString = (line.split(splitLiteral));
+
+				if (hasHeader && countOfLinesRead == 1)
+				{
+					for (int indexToSelect : columnIndicesToSelect)
+					{
+						header.add(splittedString[indexToSelect]);
+					}
+					raw.add(header);// header is treated in same way as all other data
+					continue;
+				}
+
+				List<String> temp = new ArrayList<>();
+				for (int indexToSelect : columnIndicesToSelect)
+				{
+					temp.add(splittedString[indexToSelect]);
+				}
+				raw.add(temp);// header is treated in same way as all other data
+
+				if (countOfLinesRead % 25000 == 0)
+				{
+					StringBuilder sb = new StringBuilder();
+					sb.append("\nLines read: " + countOfLinesRead);
+					sb.append("\nraw.size()=" + raw.size());
+
+					if (writeTheReadFile)
+					{
+						WritingToFile.writeListOfList(raw, absFileToWrite, "", ",", true);
+					}
+					raw.clear();
+
+					if (verboseReading)
+					{
+						System.out.println(sb.toString() + "\nraw.size()=" + raw.size() + "\n\n");
+					}
+				}
+
+			}
+
+			if (writeTheReadFile)
+			{
+				WritingToFile.writeListOfList(raw, absFileToWrite, "", ",", true);
+			}
+			System.out.println(
+					"Total Lines read: " + countOfLinesRead + " in " + (System.currentTimeMillis() - t1) + "ms");
+			it.close();
+		}
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @param verboseReading
+	 * @param chunkSize
+	 * @param columnIndicesToSelect
+	 * @return
+	 */
+	public static List<List<String>> nColumnReaderStringLargeFileSelectedColumnsInChunks(InputStream inputStream,
+			String delimiter, boolean hasHeader, boolean verboseReading, int chunkSize, int... columnIndicesToSelect)
+	{
+		List<List<String>> raw = new ArrayList<>();
+
+		int lineNumber = 0;
+		int chunkNumber = 1;
+		List<List<String>> resForThisChunk = null;
+
+		do
+		{
+			resForThisChunk = nColumnReaderStringLargeFileSelectedColumns(inputStream, delimiter, hasHeader,
+					verboseReading, lineNumber, lineNumber + chunkSize, columnIndicesToSelect);
+			raw.addAll(resForThisChunk);
+
+			System.out.println("Read from linenumber:" + lineNumber + " to " + (lineNumber + chunkSize));
+			System.out.println("resForThisChunk.size()=" + resForThisChunk.size());
+			lineNumber += (chunkSize + 1);
+		}
+		while (resForThisChunk.size() != 0);
+
+		return raw;
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @param verboseReading
+	 * @param startLineNum
+	 * @param endLineNum
+	 * @param columnIndicesToSelect
+	 * @return
+	 */
+	public static List<List<String>> nColumnReaderStringLargeFileSelectedColumns(InputStream inputStream,
+			String delimiter, boolean hasHeader, boolean verboseReading, long startLineNum, long endLineNum,
+			int... columnIndicesToSelect)
+	{
+
+		List<List<String>> raw = new ArrayList<>();
+
+		if (verboseReading)
+		{
+			System.out.println("\n\nnColumnReaderStringLargeFile --");
+			System.out.println("Will read lines from " + startLineNum + " to " + endLineNum);
+
+		}
+		try
+		{
+			LineIterator it = IOUtils.lineIterator(inputStream, "UTF-8");
+			long countOfLinesRead = 0;
+
+			while (it.hasNext())
+			{
+				countOfLinesRead += 1;
+
+				if (countOfLinesRead < startLineNum)
+				{
+					// System.out.println("continue");
+					continue;
+				}
+				else if (countOfLinesRead > endLineNum)
+				{
+					System.out.println("break : countOfLinesRead=" + countOfLinesRead + " endLineNum" + endLineNum);
+					break;
+				}
+
+				else
+				{
+					String line = it.nextLine();
+					// System.out.println("line=" + line);
+					String[] splittedString = (line.split(Pattern.quote(delimiter)));
+
+					List<String> temp = new ArrayList<>();
+					for (int indexToSelect : columnIndicesToSelect)
+					{
+						temp.add(splittedString[indexToSelect]);
+					}
+					raw.add(temp);
+
+					if (verboseReading && (countOfLinesRead % 25000 == 0))
+					{
+						System.out.println("Lines read: " + countOfLinesRead);
+					}
+				}
+			}
+
+			System.out.println("Total Lines read: " + countOfLinesRead);
+			it.close();
+		}
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
+			e.printStackTrace();
+		}
+
 		return raw;
 	}
 
@@ -410,6 +820,52 @@ public class ReadingFromFile
 			return Files.lines(Paths.get(absFileName)).skip(startLineNum - 1).limit(endLineNum)
 					.map(l -> new ArrayList<String>(Arrays.asList(l.split(delimiter))))
 					.collect(Collectors.toCollection(ArrayList::new));
+		}
+		catch (Exception e)
+		{
+			PopUps.printTracedErrorMsgWithExit("Exception: " + e.toString());
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * @param absFileName
+	 * @param startLineNum
+	 * @param endLineNum
+	 * @param delimiter
+	 * @return
+	 */
+	public static ArrayList<ArrayList<String>> readLinesIntoListOfLists(String absFileName, String delimiter)
+	{
+		try
+		{
+			return Files.lines(Paths.get(absFileName))
+					.map(l -> new ArrayList<String>(Arrays.asList(l.split(delimiter))))
+					.collect(Collectors.toCollection(ArrayList::new));
+		}
+		catch (Exception e)
+		{
+			PopUps.printTracedErrorMsgWithExit("Exception: " + e.toString());
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * @param absFileName
+	 * @param startLineNum
+	 * @param endLineNum
+	 * @param delimiter
+	 * @return
+	 */
+	public static List<String> getColHeaders(String absFileName, String delimiter)
+	{
+		try
+		{
+			List<List<String>> v = Files.lines(Paths.get(absFileName)).limit(1)
+					.map(l -> Arrays.asList(l.split(delimiter))).collect(Collectors.toList());
+			return v.get(0);
 		}
 		catch (Exception e)
 		{
@@ -595,7 +1051,39 @@ public class ReadingFromFile
 		for (int colIndex : columnIndicesToRead)
 		{
 			allVals.add(numOfColsRead++,
-					(ArrayList<Double>) oneColumnReaderDouble(fileToRead, delimiter, colIndex, false));
+					(ArrayList<Double>) oneColumnReaderDouble(fileToRead, delimiter, colIndex, hasHeader));
+		}
+
+		if (columnIndicesToRead.length != allVals.size())
+		{
+			System.err.println(PopUps.getTracedErrorMsg("Error: columnIndicesToRead.length" + columnIndicesToRead.length
+					+ " != allVals.size()" + allVals.size()));
+		}
+
+		return allVals;
+	}
+
+	/**
+	 * Reads the file columnwise
+	 * 
+	 * @param fileToRead
+	 * @param delimiter
+	 * @param columnIndicesToRead
+	 * @param hasHeader
+	 * @param startRow
+	 * @param endRow
+	 * @return arraylist(columns) of arraylist(values in the column)
+	 */
+	public static ArrayList<ArrayList<Double>> allColumnsReaderDouble(String fileToRead, String delimiter,
+			int[] columnIndicesToRead, boolean hasHeader, long startRow, long endRow)
+	{
+		ArrayList<ArrayList<Double>> allVals = new ArrayList<>();
+
+		int numOfColsRead = 0;
+		for (int colIndex : columnIndicesToRead)
+		{
+			allVals.add(numOfColsRead++, (ArrayList<Double>) oneColumnReaderDouble(fileToRead, delimiter, colIndex,
+					hasHeader, startRow, endRow));
 		}
 
 		if (columnIndicesToRead.length != allVals.size())

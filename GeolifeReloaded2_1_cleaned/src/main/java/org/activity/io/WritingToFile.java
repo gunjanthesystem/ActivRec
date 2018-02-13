@@ -587,6 +587,49 @@ public class WritingToFile
 	 * 
 	 * @param arrayArrayList
 	 * @param absFileNameToWrite
+	 * @param headerLine
+	 * @param delimiter
+	 * @param append
+	 */
+	public static <T> void writeListOfList(List<List<T>> arrayArrayList, String absFileNameToWrite, String headerLine,
+			String delimiter, boolean append)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			if (headerLine.length() > 0)
+			{
+				sb.append(headerLine + "\n");
+			}
+
+			for (List<T> outerList : arrayArrayList)
+			{
+				sb.append(outerList.stream().map(v -> v.toString()).collect(Collectors.joining(delimiter)));
+				sb.append("\n");
+			}
+
+			if (append)
+			{
+				WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+			}
+			else
+			{
+				WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+			}
+		}
+
+		catch (Exception e)
+		{
+			PopUps.showException(e, "org.activity.io.WritingToFile.writeArrayListOfArrayList()");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param arrayArrayList
+	 * @param absFileNameToWrite
 	 * @param delimiter
 	 * @param colNames
 	 * @param rowNames
@@ -2223,6 +2266,19 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * 
+	 * @param ActivityObjects1
+	 * @param ActivityObjects2
+	 * @param editDistance
+	 * @param trace
+	 * @param dAct
+	 * @param dFeat
+	 * @param userAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param candidateTimelineId
+	 */
 	public static void writeEditSimilarityCalculations(ArrayList<ActivityObject> ActivityObjects1,
 			ArrayList<ActivityObject> ActivityObjects2, double editDistance, String trace, double dAct, double dFeat,
 			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
@@ -2230,13 +2286,8 @@ public class WritingToFile
 		commonPath = Constant.getCommonPath();//
 		try
 		{
-			String fileName = commonPath + "EditSimilarityCalculations.csv";
-
-			FileWriter fw = new FileWriter(new File(fileName).getAbsoluteFile(), true);// appends
-			BufferedWriter bw = new BufferedWriter(fw);
-
-			bw.write(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candidateTimelineId + ","
-					+ editDistance + "," + dAct + "," + dFeat + "," + trace + ",");
+			StringBuilder msgToWrite = new StringBuilder(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + ","
+					+ candidateTimelineId + "," + editDistance + "," + dAct + "," + dFeat + "," + trace + ",");
 
 			// String activityObjects1String = "", activityObjects2String = "";
 
@@ -2267,10 +2318,11 @@ public class WritingToFile
 							+ +ActivityObjects2.get(i).getDurationInSeconds()));
 				}
 			}
+			msgToWrite.append(activityObjects1String.toString() + "," + activityObjects2String.toString() + ","
+					+ ActivityObjects1.size() + "," + ActivityObjects2.size() + "\n");
 
-			bw.write(activityObjects1String.toString() + "," + activityObjects2String.toString());
-			bw.newLine();
-			bw.close();
+			WritingToFile.appendLineToFileAbsolute(msgToWrite.toString(),
+					commonPath + "EditSimilarityCalculations.csv");
 		}
 		catch (Exception e)
 		{

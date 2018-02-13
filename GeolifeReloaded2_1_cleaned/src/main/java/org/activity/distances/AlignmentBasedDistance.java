@@ -441,6 +441,7 @@ public class AlignmentBasedDistance
 	public double getFeatureLevelDistanceGowallaPD(ActivityObject ao1, ActivityObject ao2)
 	{
 		double dfeat = 0;
+		StringBuilder sbLog = new StringBuilder();
 		// if(ao1.getStartTimestamp().getTime() != (ao2.getStartTimestamp().getTime()) )//is wrong since its comparing
 		// timestamps and not time of days...however, results for our
 		// experiments do not show any visible difference in results { dfeat+=costReplaceStartTime; }
@@ -453,6 +454,7 @@ public class AlignmentBasedDistance
 						startTimeToleranceInSeconds) == false) // if not same within 60mins then add wt to dfeat
 				{
 					dfeat += wtStartTime;
+					sbLog.append("\ndtime=" + wtStartTime);
 				}
 			}
 			// $$ curtain on 2 Mar 2017 end
@@ -466,10 +468,12 @@ public class AlignmentBasedDistance
 				{
 					double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
 					dfeat += (timeDistance * wtStartTime);
+					sbLog.append("\ndtime=" + (timeDistance * wtStartTime));
 				}
 				else // absTimeDiffInSeconds > startTimeToleranceInSeconds
 				{
 					dfeat += (1.0 * wtStartTime);
+					sbLog.append("\ndtime=" + (1.0 * wtStartTime));
 				}
 			}
 			// $$ added on 2nd march 2017 end
@@ -484,6 +488,7 @@ public class AlignmentBasedDistance
 				{
 					double timeDistance = absTimeDiffInSeconds / 10800;
 					dfeat += (timeDistance * wtStartTime);
+					sbLog.append("\ndtime=" + (timeDistance * wtStartTime));
 				}
 			}
 			// $$ added on 3rd march 2017 end
@@ -499,6 +504,7 @@ public class AlignmentBasedDistance
 				// ao1.getLocationIDs() != ao2.getLocationIDs()) // if no matching locationIDs then add wt to dfeat
 				{
 					dfeat += wtLocation;
+					sbLog.append("\ndLoc=" + (wtLocation));
 				}
 			}
 			else if (Constant.primaryDimension.equals(PrimaryDimension.LocationID))
@@ -506,6 +512,7 @@ public class AlignmentBasedDistance
 				if (ao1.getActivityID() == ao2.getActivityID())
 				{
 					dfeat += wtActivityName;
+					sbLog.append("\ndActName" + (wtActivityName));
 				}
 			}
 
@@ -516,11 +523,18 @@ public class AlignmentBasedDistance
 
 			// add more weight if they are more different, popDistance should be higher if they are more different
 			dfeat += popularityDistance * this.wtLocPopularity;
+			sbLog.append("\nao1.getCheckins_count()=" + c1 + "\nao2.getCheckins_count()=" + c2);
+			sbLog.append("\ndPop=" + (popularityDistance * this.wtLocPopularity));
 		}
 		else
 		{
 			PopUps.printTracedErrorMsgWithExit(
 					"Error: getFeatureLevelDistanceGowallaPD() called for database: " + Constant.getDatabaseName());
+		}
+
+		if (dfeat > 100)
+		{
+			System.out.println("Inside: dfeat= " + dfeat + " \nlog:\n" + sbLog.toString());
 		}
 
 		return dfeat;
@@ -2178,8 +2192,8 @@ public class AlignmentBasedDistance
 									PopUps.getTracedErrorMsg("Error in levenshtein distance: no hier dist found for: "
 											+ String.valueOf(c1) + String.valueOf(c2)) + " hierWt= " + hierWt);
 						}
-						replace = dist[i][j]
-								+ replaceWt * catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));
+						replace = dist[i][j] + replaceWt * hierWt;// catIDsHierarchicalDistance.get(String.valueOf(c1) +
+																	// String.valueOf(c2));
 					}
 
 					double delete = dist[i][j + 1] + deleteWt;// 1;//deletion --previous row, i.e, cell above
