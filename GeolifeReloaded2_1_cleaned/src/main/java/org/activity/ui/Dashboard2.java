@@ -1,20 +1,19 @@
 package org.activity.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.activity.plotting.ChartUtils;
 import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartApp2;
 import org.activity.plotting0.FXUtils;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -30,7 +29,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -125,64 +123,59 @@ public class Dashboard2 extends Application
 	 */
 	private TabPane createTabs()
 	{
-		Tab lineChartTab = new Tab("lineChart");
-
-		ObservableList<Series<Double, Double>> listOfSeries = FXUtils
-				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50));
-
-		LineChart lineChart = new LineChart(new NumberAxis(), new NumberAxis(), listOfSeries);
-
-		ObservableList<Series<Double, Double>> lineChartDataSeriess = lineChart.getData();
-
-		for (Series<Double, Double> dataSeries : lineChartDataSeriess)
-		{
-			ObservableList<Data<Double, Double>> dataForASeries = dataSeries.getData();
-
-			for (Data<Double, Double> d : dataForASeries)
-			{
-				Tooltip.install(d.getNode(),
-						new Tooltip("ajooba: \n" + d.getXValue().doubleValue() + "," + d.getYValue().doubleValue()));
-				// String.format("%2.1f ^ 2 = %2.1f", d.getXValue().doubleValue(), d.getYValue().doubleValue())));
-			}
-		}
-
-		// Tooltip t = new Tooltip("test");
-		// Tooltip.install(lineChart, t);
-
-		lineChartTab.setContent(lineChart);// new LineChart(new NumberAxis(), new NumberAxis(), listOfSeries));
-		lineChartTab.setClosable(true);
-		// Tab chooseSourcesTab = new Tab("Timelines");
-		// // chooseSourcesTab.setContent(createChooseSourcesTable());// createChooseSources());
-		// chooseSourcesTab.setClosable(true);
+		List<Tab> tabsToAdd = new ArrayList<>();
 
 		Tab timelineTab = new Tab("Historical Timelines");
 		TimelineChartApp2 tcA2 = new TimelineChartApp2();// DataGenerator.getData2(), true);
 		timelineTab.setContent(tcA2.createContent(DataGenerator.getData2(), true));// .createContent(DataGenerator.getData2()));
 		timelineTab.setClosable(false);
+		tabsToAdd.add(timelineTab);
+
+		Tab lineChartTab = new Tab("lineChart");
+		lineChartTab.setContent(ChartUtils.createLineChart(
+				FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50)), "title", "ajooba"));
+		lineChartTab.setClosable(true);
+		tabsToAdd.add(lineChartTab);
+
+		Tab scatterChartTab = new Tab("scatterChart");
+		scatterChartTab.setContent(ChartUtils.createScatterChart(
+				FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50)), "title", "ajooba"));
+		scatterChartTab.setClosable(true);
+		tabsToAdd.add(scatterChartTab);
+
+		// Tab chooseSourcesTab = new Tab("Timelines");
+		// // chooseSourcesTab.setContent(createChooseSourcesTable());// createChooseSources());
+		// chooseSourcesTab.setClosable(true);
 
 		Tab tableTab = new Tab("TableView");
 		tableTab.setContent(createTableDemoNode());
 		tableTab.setClosable(false);
+		tabsToAdd.add(tableTab);
 
 		Tab accordionTab = new Tab("Accordion/TitledPane");
 		accordionTab.setContent(createAccordionTitledDemoNode());
 		accordionTab.setClosable(false);
+		tabsToAdd.add(accordionTab);
 
 		Tab splitTab = new Tab("SplitPane/TreeView/ListView");
 		splitTab.setContent(createSplitTreeListDemoNode());
 		splitTab.setClosable(false);
+		tabsToAdd.add(splitTab);
 
 		Tab treeTableTab = new Tab("TreeTableView");
 		treeTableTab.setContent(createTreeTableDemoNode());
 		treeTableTab.setClosable(false);
+		tabsToAdd.add(treeTableTab);
 
 		Tab scrollTab = new Tab("ScrollPane/Miscellaneous");
 		scrollTab.setContent(createScrollMiscDemoNode());
 		scrollTab.setClosable(false);
+		tabsToAdd.add(scrollTab);
 
 		Tab htmlTab = new Tab("HTMLEditor");
 		htmlTab.setContent(createHtmlEditorDemoNode());
 		htmlTab.setClosable(false);
+		tabsToAdd.add(htmlTab);
 
 		final WebView webView = new WebView();
 		Tab webViewTab = new Tab("WebView");
@@ -197,9 +190,13 @@ public class Dashboard2 extends Application
 					System.out.println("WebView tab is selected, loading: " + randomWebSite);
 				}
 			});
+		tabsToAdd.add(webViewTab);
+
 		TabPane tabPane = new TabPane();
-		tabPane.getTabs().addAll(timelineTab, lineChartTab, tableTab, accordionTab, splitTab, treeTableTab, scrollTab,
-				htmlTab, webViewTab);
+		tabPane.getTabs().addAll(tabsToAdd);
+
+		// timelineTab, lineChartTab, scatterChartTab, tableTab, accordionTab, splitTab,
+		// treeTableTab, scrollTab, htmlTab, webViewTab);
 
 		return tabPane;
 	}

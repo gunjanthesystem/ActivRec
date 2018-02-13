@@ -23,25 +23,164 @@ import com.jcraft.jsch.Session;
  * @author gunjan
  *
  */
-public class DistributionEvaluation
+public class ResultsDistributionEvaluation
 {
-	static final String howitzerUsr = "gunjan";
-	static final String howitzerHost = "howitzer.ucd.ie";
-	static final String engineHost = "theengine2.ucd.ie";
-	static final String mortarHost = "mortar.ucd.ie";
 	static final int port = 22;
 	static final int firstToMax = 3;
 
-	public DistributionEvaluation()
+	public ResultsDistributionEvaluation()
 	{
 		// org.apache.commons.lang3.tuple.Triple;
 	}
 
 	public static void main(String args[])
 	{
-		runOneDay();
-		runFiveDays();
+		// runOneDay();
+		// runFiveDays();
+		// $runFeb2OneDayResults();//disabled on Feb 12 2018
+		// $runFeb2FiveDaysResults(); //disabled on Feb 12 2018
+		// $runFeb5FiveDaysResults();//disabled on Feb 12 2018
+		runFeb11FiveDaysResults();
 	}
+
+	/**
+	 * @since Feb 2 2018
+	 * @param args
+	 */
+	public static void runFeb2OneDayResults()
+	{
+
+		String pathToWrite = "./dataWritten/Feb2/OneDay/";
+		int numOfDay = 1;
+		int[] orders = { 5, 3, 4, 2, 1 };
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		double muArray[] = Constant.matchingUnitAsPastCount;
+		String pathToRead = "", resultsLabel = "";
+
+		// prepare AKOM results
+		for (int order : orders)
+		{
+			resultsLabel = "AKOM_916U_915N_" + numOfDay + "dayC_Order-" + order;
+			pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb1_AKOM_"
+					+ numOfDay + "DayFilter_Order" + order + "/";
+
+			for (String statFileName : statFileNames)
+			{
+				getResult(pathToWrite, resultsLabel, pathToRead, new double[] { order - 1 }, statFileName,
+						Utils.engineHost, firstToMax);
+			}
+		}
+		resultsLabel = "Ncount_916U_915N_1dayC_ThreshNN-500";
+		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_Ncount_AllCand1DayFilter_part1/";
+		for (String statFileName : statFileNames)
+		{
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax);
+		}
+
+		resultsLabel = "Ncount_916U_915N_1dayC_ThreshPer-50";
+		pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec26_NCount_AllCand1DayFilter_percentile50/";
+		for (String statFileName : statFileNames)
+		{
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax);
+		}
+
+	}
+
+	/**
+	 * @since Feb 2 2018
+	 * @param args
+	 */
+	public static void runFeb2FiveDaysResults()
+	{
+
+		String pathToWrite = "./dataWritten/Feb2/FiveDays/";
+		int numOfDay = 5;
+		int[] orders = { 5, 3, 4, 2, 1 };
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		double muArray[] = Constant.matchingUnitAsPastCount;
+		String pathToRead = "", resultsLabel = "";
+
+		// prepare AKOM results
+		for (int order : orders)
+		{
+			resultsLabel = "AKOM_916U_915N_" + numOfDay + "dayC_Order-" + order;
+			pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb1_AKOM_"
+					+ numOfDay + "DayFilter_Order" + order + "/";
+
+			for (String statFileName : statFileNames)
+			{
+				getResult(pathToWrite, resultsLabel, pathToRead, new double[] { order - 1 }, statFileName,
+						Utils.engineHost, firstToMax);
+			}
+		}
+
+		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500";
+		pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_NCount_AllCand5DayFilter/";
+		for (String statFileName : statFileNames)
+		{
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax);
+		}
+
+		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-50";
+		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan20Ncount5DayThreshold50/";
+		for (String statFileName : statFileNames)
+		{
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
+		}
+
+		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-100";
+		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan20Ncount5DayThreshold100/";
+		for (String statFileName : statFileNames)
+		{
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
+		}
+
+	}
+
+	/**
+	 * @since Feb 2 2018
+	 * @param args
+	 */
+	public static void runFeb5FiveDaysResults()
+	{
+
+		String pathToWrite = "./dataWritten/Feb5/FiveDays/";
+		int numOfDay = 5;
+		int[] orders = { 5, 3, 4, 2, 1 };
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		double muArray[] = Constant.matchingUnitAsPastCount;
+		String pathToRead = "", resultsLabel = "";
+
+		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-600";
+		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Feb2NCount_5Day_ThresholdNN600/";
+		for (String statFileName : statFileNames)
+		{
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax);
+		}
+	}
+
+	/**
+	 * @since Feb 2 2018
+	 * @param args
+	 */
+	public static void runFeb11FiveDaysResults()
+	{
+
+		String pathToWrite = "./dataWritten/Feb11/FiveDays/";
+		int numOfDay = 5;
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		double muArray[] = Constant.matchingUnitAsPastCount;
+		String pathToRead = "", resultsLabel = "";
+
+		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500_EDα0.5";
+		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/";
+		for (String statFileName : statFileNames)
+		{
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
+		}
+	}
+
+	//
 
 	/**
 	 * @since Jan 31 2018
@@ -70,7 +209,7 @@ public class DistributionEvaluation
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec11AKOMDayFilter1Order1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, howitzerHost,
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.howitzerHost,
 					firstToMax);
 		}
 
@@ -78,28 +217,31 @@ public class DistributionEvaluation
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan31_AKOM_1DayFilter_Order1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.engineHost,
+					firstToMax);
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-3";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan31_AKOM_1DayFilter_Order3/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 2 }, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 2 }, statFileName, Utils.engineHost,
+					firstToMax);
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-5";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan31_AKOM_1DayFilter_Order5/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, Utils.engineHost,
+					firstToMax);
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-5_run2";
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Jan31_AKOM_1DayFilter_Order5/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, howitzerHost,
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, Utils.howitzerHost,
 					firstToMax);
 		}
 
@@ -107,14 +249,14 @@ public class DistributionEvaluation
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_Ncount_AllCand1DayFilter_part1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, howitzerHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax);
 		}
 
 		resultsLabel = "Ncount_916U_915N_1dayC_ThreshPer-50";
 		pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec26_NCount_AllCand1DayFilter_percentile50/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, mortarHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax);
 		}
 
 	}
@@ -146,7 +288,7 @@ public class DistributionEvaluation
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec11AKOMDayFilter5Order1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, howitzerHost,
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.howitzerHost,
 					firstToMax);
 		}
 
@@ -154,7 +296,8 @@ public class DistributionEvaluation
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan31_AKOM_5DayFilter_Order1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.engineHost,
+					firstToMax);
 		}
 
 		////////////////////////
@@ -162,35 +305,37 @@ public class DistributionEvaluation
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan31_AKOM_5DayFilter_Order3/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 2 }, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 2 }, statFileName, Utils.engineHost,
+					firstToMax);
 		}
 
 		resultsLabel = "AKOM_916U_915N_5dayC_Order-5";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan31_AKOM_5DayFilter_Order5/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, Utils.engineHost,
+					firstToMax);
 		}
 
 		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500";
 		pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_NCount_AllCand5DayFilter/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, mortarHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax);
 		}
 
 		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-50";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan20Ncount5DayThreshold50/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
 		}
 
 		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-100";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan20Ncount5DayThreshold100/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
 		}
 
 	}
@@ -223,7 +368,7 @@ public class DistributionEvaluation
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec11AKOMDayFilter1Order1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, howitzerHost,
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.howitzerHost,
 					firstToMax);
 		}
 
@@ -231,21 +376,23 @@ public class DistributionEvaluation
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_AKOM_1DayFilter_Order3/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.engineHost,
+					firstToMax);
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-5";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_AKOM_1DayFilter_Order5/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.engineHost,
+					firstToMax);
 		}
 
 		resultsLabel = "Ncount_916U_915N_1dayC_ThreshNN-500";
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_Ncount_AllCand1DayFilter_part1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, howitzerHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax);
 		}
 
 	}
@@ -263,23 +410,7 @@ public class DistributionEvaluation
 	private static void getResult(String pathToWrite, String resultsLabel, String pathToRead, double[] muArray,
 			String statFileName, String host, int firstToMax)
 	{
-		String passwd = null;
-		switch (host)
-		{
-			case howitzerHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 0, false)
-						.get(0);
-				break;
-			case mortarHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 1, false)
-						.get(0);
-				break;
-			case engineHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 2, false)
-						.get(0);
-				break;
-
-		}
+		String passwd = Utils.getPassWordForHost(host);
 
 		// MU , <list for each user, <list of first1,2,3 for that user and mu>>
 		Map<Integer, List<List<Double>>> muKeyAllValsMap = new LinkedHashMap<>();
@@ -291,7 +422,7 @@ public class DistributionEvaluation
 			String fileToRead = pathToRead + statFileName + mu + ".csv";
 
 			Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port, fileToRead,
-					howitzerUsr, passwd);
+					Utils.howitzerUsr, passwd);
 
 			List<List<Double>> res = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",", false);
 
@@ -338,7 +469,7 @@ public class DistributionEvaluation
 					+ r.getValue().getSecond().get(1) + "," + r.getValue().getSecond().get(2) + "\n");
 		}
 		WritingToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName + ".csv");
-		WritingToFile.writeToNewFile(pathToRead,
+		WritingToFile.writeToNewFile(host + ":" + pathToRead,
 				pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe.txt");
 	}
 

@@ -4020,8 +4020,8 @@ public class TimelineUtils
 
 				}
 			}
-			System.out.println("Inside countNumOfMultipleLocationIDs: \nnumOfAOs=" + numOfAOs + "\nnumOfSingleLocID="
-					+ numOfSingleLocID + "\nnumOfMultipleLocIDs" + numOfMultipleLocIDs);
+			System.out.println("Inside countNumOfMultipleLocationIDs: \nnumOfAOs\t\t=" + numOfAOs
+					+ "\nnumOfSingleLocID\t=" + numOfSingleLocID + "\nnumOfMultipleLocIDs\t=" + numOfMultipleLocIDs);
 		}
 		catch (Exception e)
 		{
@@ -4098,6 +4098,41 @@ public class TimelineUtils
 			e.printStackTrace();
 		}
 		return uniquePDValsPerUser;
+	}
+
+	/**
+	 * Write all act objs with their features.
+	 * <p>
+	 * This method was created to investigate issue with feature level edit distance>100 because of issue with checkin
+	 * counts.
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param abFileNameToWrite
+	 * @since 7 Feb 2018
+	 */
+	public static void writeAllActObjs(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
+			String abFileNameToWrite)
+	{
+		String delimiter = ",";
+		WritingToFile.appendLineToFileAbsolute(
+				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+				abFileNameToWrite);
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userData : usersCleanedDayTimelines.entrySet())
+		{
+			String user = userData.getKey();
+
+			for (Entry<Date, Timeline> timeline : userData.getValue().entrySet())
+			{
+				StringBuilder sbForThisTimeline = new StringBuilder();
+				for (ActivityObject ao : timeline.getValue().getActivityObjectsInTimeline())
+				{
+					sbForThisTimeline
+							.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
+				}
+				WritingToFile.appendLineToFileAbsolute(sbForThisTimeline.toString(), abFileNameToWrite);
+			}
+		}
 	}
 
 }

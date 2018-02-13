@@ -1,5 +1,6 @@
 package org.activity.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -19,6 +20,55 @@ import org.activity.probability.ProbabilityUtilityBelt;
 
 public class Searcher
 {
+
+	/**
+	 * <p>
+	 * Specifically created for large files
+	 * <p>
+	 * Sanity checked
+	 * 
+	 * @param absFileNameToSearchIn
+	 * @param stringToSearch
+	 * @param ignoreCase
+	 * @return
+	 */
+	public static boolean fileContainsString(Path absFileNameToSearchIn, String stringToSearch, boolean ignoreCase)
+	{
+		boolean found = false;
+		long numLines = 0;
+		String line;
+		try
+		{
+			BufferedReader br = Files.newBufferedReader(absFileNameToSearchIn);
+			while ((line = br.readLine()) != null)
+			{
+				if (ignoreCase)
+				{
+					if (line.toLowerCase().contains(stringToSearch.toLowerCase()))
+					{
+						System.out.println("line=\n" + line);
+						return true;
+					}
+				}
+				else
+				{
+					if (line.contains(stringToSearch))
+					{
+						System.out.println("line=\n" + line);
+						return true;
+					}
+				}
+				numLines += 1;
+			}
+			br.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		//
+		return found;
+	}
 
 	/**
 	 * 
@@ -138,9 +188,12 @@ public class Searcher
 					continue;
 				}
 
-				if (Files.readAllLines(file).stream()// .peek(System.out::println)
-						.anyMatch(e -> e.contains(contentToMatch)))
-				// Files.lines(file).anyMatch(line -> line.contains(contentToMatch)))
+				// // Start of disabled on 12 Feb 2018 in order to read very large files
+				// if (Files.readAllLines(file).stream()// .peek(System.out::println)
+				// .anyMatch(e -> e.contains(contentToMatch)))
+				// // Files.lines(file).anyMatch(line -> line.contains(contentToMatch)))
+				// // End of disabled on 12 Feb 2018 in order to read very large files*/
+				if (fileContainsString(file, contentToMatch, true) == true)
 				{
 					pathsOfResultantFiles.add(file);
 				}
@@ -402,7 +455,12 @@ public class Searcher
 		return res.toString();
 	}
 
-	public static void main(String[] args)
+	public static void main(String args[])
+	{
+		System.out.println(fileContainsString(Paths.get("/home/gunjan/rcloneLogs.txt"), "ajooba", true));
+	}
+
+	public static void main0(String[] args)
 	{
 		System.out.println("Testing");
 		// String result = searchAndRandomDelete("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/Test/",

@@ -157,6 +157,12 @@ public class ControllerWithoutServer
 			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines));
 			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines));
 			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true);
+
+			// Curtain 8 Feb 2018 start
+			// $$TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
+			// $$System.exit(0);
+			// Curtain 8 Feb 2018 end
+
 			///////////////////
 			/*
 			 * TreeSet<Integer> uniqueLocIDs = getUniqueLocIDs(usersCleanedDayTimelines);

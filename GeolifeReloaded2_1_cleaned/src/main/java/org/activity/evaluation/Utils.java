@@ -9,6 +9,10 @@ import org.activity.io.WritingToFile;
 
 public class Utils
 {
+	static final String howitzerUsr = "gunjan";
+	static final String howitzerHost = "howitzer.ucd.ie";
+	static final String engineHost = "theengine2.ucd.ie";
+	static final String mortarHost = "mortar.ucd.ie";
 
 	public static void main(String args[])
 	{
@@ -34,8 +38,8 @@ public class Utils
 			{
 				String absfileNameToRead = commonPath + userGroup + "/" + fileNameToRead;
 
-				ArrayList<String> userIDs =
-						(ArrayList<String>) ReadingFromFile.oneColumnReaderString(absfileNameToRead, "_", 0, false);
+				ArrayList<String> userIDs = (ArrayList<String>) ReadingFromFile.oneColumnReaderString(absfileNameToRead,
+						"_", 0, false);
 
 				userIDs.stream().forEach(e -> sb.append(userGroup + "," + e + "\n"));
 				usersInGroups.put(userGroup, userIDs);
@@ -48,4 +52,32 @@ public class Utils
 		}
 
 	}
+
+	/**
+	 * 
+	 * @param host
+	 * @return
+	 */
+	protected static String getPassWordForHost(String host)
+	{
+		String passwd = null;
+		switch (host)
+		{
+			case Utils.howitzerHost:
+				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 0, false)
+						.get(0);
+				break;
+			case Utils.mortarHost:
+				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 1, false)
+						.get(0);
+				break;
+			case Utils.engineHost:
+				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 2, false)
+						.get(0);
+				break;
+
+		}
+		return passwd;
+	}
+
 }
