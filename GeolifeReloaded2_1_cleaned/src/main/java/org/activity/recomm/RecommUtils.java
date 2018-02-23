@@ -606,4 +606,18 @@ public class RecommUtils
 		return recommendedActivityNamesWithRankscores;
 	}
 
+	/**
+	 * 
+	 * @param wtscorerecommsbylocproximity
+	 * @param recommendedActivityNamesWithRankscores
+	 * @return
+	 * @since Feb 20 2018
+	 */
+	public static LinkedHashMap<String, Double> reScoreRecommsIncludingLocationProximity(
+			double wtscorerecommsbylocproximity, LinkedHashMap<String, Double> recommendedActivityNamesWithRankscores)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

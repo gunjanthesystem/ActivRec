@@ -601,6 +601,11 @@ public class TimelineStats
 		}
 	}
 
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @return
+	 */
 	public static LinkedHashMap<String, LinkedHashMap<Pair<String, String>, Double>> performTimeSeriesCorrelationAnalysis(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{

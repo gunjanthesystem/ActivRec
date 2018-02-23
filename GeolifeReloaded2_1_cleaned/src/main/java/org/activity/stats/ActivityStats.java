@@ -15,6 +15,7 @@ import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
+import org.activity.spatial.SpatialUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -152,7 +153,7 @@ public class ActivityStats
 					String startGeoLat2 = validTrajectoryEntries.get(j).getStartLat();
 					String startGeoLon2 = validTrajectoryEntries.get(j).getStartLon();
 
-					double startDiff = StatsUtils.haversine(startGeoLat1, startGeoLon1, startGeoLat2, startGeoLon2);
+					double startDiff = SpatialUtils.haversine(startGeoLat1, startGeoLon1, startGeoLat2, startGeoLon2);
 
 					WritingToFile.appendLineToFile(String.valueOf(StatsUtils.round(startDiff, 2)), user + "startDiff");
 
@@ -162,7 +163,7 @@ public class ActivityStats
 					String endGeoLat2 = validTrajectoryEntries.get(j).getEndLat();
 					String endGeoLon2 = validTrajectoryEntries.get(j).getEndLon();
 
-					double endDiff = StatsUtils.haversine(endGeoLat1, endGeoLon1, endGeoLat2, endGeoLon2);
+					double endDiff = SpatialUtils.haversine(endGeoLat1, endGeoLon1, endGeoLat2, endGeoLon2);
 
 					WritingToFile.appendLineToFile(String.valueOf(StatsUtils.round(endDiff, 2)), user + "endDiff");
 					// validTrajectoryEntries.get(i),validTrajectoryEntries.get(j)

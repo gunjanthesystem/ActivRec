@@ -17,7 +17,7 @@ apply plugin: 'application'
 ///////////////////////////////////////////////////
 sourceCompatibility = 1.8
 version = '1.0'
-
+def geoToolsVersion = "18.2"    
 ///////////////////////////////////////////////////
 
 
@@ -42,6 +42,12 @@ repositories
          
     }
 
+      maven { 
+         url "http://download.osgeo.org/webdav/geotools/"
+         url "https://repo.boundlessgeo.com/release"
+     }
+    
+
      //	 flatDir {
   //     dirs '/home/gunjan/Immovables/amidsttoolbox/'
        //'/home/gunjan/git/GeolifeReloaded2_1_cleaned/resources/'
@@ -62,7 +68,7 @@ dependencies
 	compile 'org.apache.commons:commons-math3:3.6.1'
 	compile 'de.ruedigermoeller:fst:2.48'
 	compile 'com.esotericsoftware:kryo:4.0.0'
-	compile 'org.mapdb:mapdb:3.0.2'
+	//compile 'org.mapdb:mapdb:3.0.2'
 	compile 'nz.ac.waikato.cms.weka:weka-stable:3.8.0'
 	
 	//compile '::  iqm'
@@ -109,12 +115,16 @@ dependencies
     compile "org.nd4j:nd4j-native-platform:0.9.1"
     compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
 
-    compile "org.renjin:renjin-script-engine:0.8.2527"
-    compile "org.moeaframework:moeaframework:2.12"
-    compile "com.jcraft:jsch:0.1.54"
-    compile "tech.tablesaw:tablesaw-parent:0.11.4"
-    compile "org.knowm.xchart:xchart:3.5.0"
+      compile "org.renjin:renjin-script-engine:0.8.2527"
+      compile "org.moeaframework:moeaframework:2.12"
+      compile "com.jcraft:jsch:0.1.54"
+      compile "tech.tablesaw:tablesaw-parent:0.11.4"
 
+    compile "org.geotools:gt-shapefile:${geoToolsVersion}"
+    compile "org.geotools:gt-swing:${geoToolsVersion}"
+    
+    compile 'com.google.maps:google-maps-services:0.2.6'
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
 
       
     //compile fileTree(dir: 'libs', include: ['*.jar','*.zip'])
@@ -124,6 +134,7 @@ dependencies
 	// 'test.useTestNG()' to your build script.
 	testCompile 'junit:junit:4.12'
 	
+    
 	
 	
    //compile project('../:SPMFExperiments')
@@ -175,13 +186,13 @@ task fatCapsule(type: FatCapsule) {
 }
 
 //////////////
-jar { //shadowJar
+/*jar { //shadowJar
 	 manifest {
         attributes	 'Implementation-Title': 'SuperController',
 					     'Main-Class': mainClassName,
 					     'Implementation-Version': version
     }
-}
+}*/
 /////////////
 
 task fatJar(type: Jar) {
@@ -198,7 +209,9 @@ task fatJar(type: Jar) {
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = mainClassName
-  jvmArgs = ['-Xmx13g','-javaagent:libs/plumbr/plumbr.jar']
+  jvmArgs = ['-Xmx12g']
+  //
+  //,'-javaagent:libs/plumbr/plumbr.jar']
   //, '-XX:-UseGCOverheadLimit
   // arguments to pass to the application
 }

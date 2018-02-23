@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.activity.io.WritingToFile;
 import org.activity.objects.Triple;
 import org.activity.probability.ProbabilityUtilityBelt;
 
@@ -68,6 +69,55 @@ public class Searcher
 		}
 		//
 		return found;
+	}
+
+	/**
+	 * Returns the list of lines in the file absFileNameToSearchIn which contains the string stringToSearch
+	 * <p>
+	 * Specifically created for large files
+	 * <p>
+	 * 
+	 * 
+	 * @param absFileNameToSearchIn
+	 * @param stringToSearch
+	 * @param ignoreCase
+	 * @return List{lines containing the stringToSearch}
+	 */
+	public static List<String> fileContainsString2(Path absFileNameToSearchIn, String stringToSearch,
+			boolean ignoreCase)
+	{
+		List<String> linesContainingTargetString = new ArrayList<>();
+		long numLines = 0;
+		String line;
+		try
+		{
+			BufferedReader br = Files.newBufferedReader(absFileNameToSearchIn);
+			while ((line = br.readLine()) != null)
+			{
+				if (ignoreCase)
+				{
+					if (line.toLowerCase().contains(stringToSearch.toLowerCase()))
+					{
+						linesContainingTargetString.add(line);
+					}
+				}
+				else
+				{
+					if (line.contains(stringToSearch))
+					{
+						linesContainingTargetString.add(line);
+					}
+				}
+				numLines += 1;
+			}
+			br.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		//
+		return linesContainingTargetString;
 	}
 
 	/**
@@ -149,11 +199,13 @@ public class Searcher
 	 * @param rootPathToSearch
 	 * @param fileNamePatternToSearch
 	 * @param contentToMatch
+	 * @param absFileNameOfMatchedLinesToWrite
+	 *            if non-empty, then write the matched lines to this file
 	 * @return ( Set of files whose name contain fileNamePatternToSearch, Set of files whose name contain
 	 *         fileNamePatternToSearch and content contains contentToMatch, Result log)
 	 */
 	public static Triple<Set<Path>, Set<Path>, String> search2(String rootPathToSearch, String fileNamePatternToSearch,
-			String contentToMatch)
+			String contentToMatch, String absFileNameOfMatchedLinesToWrite)
 	{
 		Set<Path> pathsOfFoundFiles = new TreeSet<>(); // filepaths matching the file name pattern
 		Set<Path> pathsOfResultantFiles = new TreeSet<>();// filepaths matching the file name pattern and contains
@@ -165,7 +217,7 @@ public class Searcher
 				"\n--- Inside search2\n---  Root folder: " + Paths.get(rootPathToSearch).toAbsolutePath().toString());
 		res.append("\n--- fileNamePatternToSearch: " + fileNamePatternToSearch);
 		res.append("\n--- content in file to search: " + contentToMatch);
-
+		res.append("\n absFileNameOfMatchedLinesToWrite: " + absFileNameOfMatchedLinesToWrite);
 		try
 		{
 			Stream<Path> allPaths = Files.walk(Paths.get(rootPathToSearch), FileVisitOption.FOLLOW_LINKS);
@@ -193,9 +245,28 @@ public class Searcher
 				// .anyMatch(e -> e.contains(contentToMatch)))
 				// // Files.lines(file).anyMatch(line -> line.contains(contentToMatch)))
 				// // End of disabled on 12 Feb 2018 in order to read very large files*/
-				if (fileContainsString(file, contentToMatch, true) == true)
-				{
-					pathsOfResultantFiles.add(file);
+
+				if (absFileNameOfMatchedLinesToWrite.length() < 1)
+				{// no need to write matched lines to file
+					if (fileContainsString(file, contentToMatch, true) == true)
+					{
+						pathsOfResultantFiles.add(file);
+					}
+				}
+				else
+				{// write matched lines to file
+					List<String> linesContainingMatchedString = fileContainsString2(file, contentToMatch, true);
+
+					// System.out.println("linesContainingMatchedString=\n" + linesContainingMatchedString);
+					String s = // "File: " + file + "\nLines containing " + contentToMatch + ":-\n"
+							"\n" + linesContainingMatchedString.stream().collect(Collectors.joining("\n"));
+					// System.out.println(
+					// "linesContainingMatchedString=\n" + linesContainingMatchedString + "\ns=" + s.toString());
+					if (linesContainingMatchedString.size() > 0)
+					{
+						WritingToFile.appendLineToFileAbsolute(s, absFileNameOfMatchedLinesToWrite);
+						pathsOfResultantFiles.add(file);
+					}
 				}
 			}
 
@@ -255,7 +326,7 @@ public class Searcher
 			for (String contentToMatch : listOfContentsToMatch)
 			{
 				Triple<Set<Path>, Set<Path>, String> result = search2(rootPathToSearch, fileNamePatternToSearch,
-						contentToMatch);
+						contentToMatch, "");
 				filesWithNameMatchOverAllContentsToMatch.addAll(result.getFirst());
 				filesWithNameAndContentMatchOverAllContentsToMatch.addAll(result.getSecond());
 
@@ -455,7 +526,7 @@ public class Searcher
 		return res.toString();
 	}
 
-	public static void main(String args[])
+	public static void main1(String args[])
 	{
 		System.out.println(fileContainsString(Paths.get("/home/gunjan/rcloneLogs.txt"), "ajooba", true));
 	}

@@ -5,9 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.io.Serializer;
@@ -15,8 +16,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
-import org.activity.sanityChecks.Sanity;
-import org.activity.stats.StatsUtils;
+import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
@@ -83,24 +83,40 @@ public class DomainConstants
 	public static HashMap<String, Double> catIDsHierarchicalDistance = null;
 	public static TreeMap<Integer, String> catIDNameDictionary = null;
 	static LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionary = null;
+	static LinkedHashMap<String, UserGowalla> userIDUserObjectDictionary = null;
+
 	static LinkedHashMap<Integer, String> locIDNameDictionary = null;
 	public static TreeMap<Integer, Character> catIDCharCodeMap = null;
 	public static TreeMap<Character, Integer> charCodeCatIDMap = null;
 
 	public static TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap;
+
+	/**
+	 * {Cat id, {list of location ids with support that cat (activity)}}
+	 */
+	static Map<Integer, List<Integer>> catIDSupportingLocIDsMap = null;
+
 	// public static final Integer hierarchyLevelForEditDistance = 1;// is in Constant class
 
 	/**
 	 * Labels for groups of 100 users. If label is "101" then users from 100 to 199 are included.
 	 */
-	public final static String[] gowallaUserGroupsLabels = {
-			/*
-			 * "1" , "101,"
-			 */
-			"201", "301", "401", "501", "601", "701", "801", "901" };
+	public final static String[] gowallaUserGroupsLabels = { "1", "101", "201", "301", "401", "501", "601", "701",
+			"801", "901" };//
 
-	// keeping it globally to avoid recomputing for each matching unit
-	// {UserID, {{PDVal,repAO},{PDVal,{precDuration,succDuration}}}
+	public final static String[] gowallaUserGroupsLabelsFixed = { "1", "101", "201", "301", "401", "501", "601", "701",
+			"801", "901" };//
+	// 601", "701", "801", "901", "401", "501", "1", "101",
+	// "201", "301", };
+	// "1", "101", "201" ,"301", "401", "501", "601", "701", "801", "901"
+
+	/**
+	 * keeping it globally to avoid recomputing for each matching unit
+	 * <P>
+	 * {UserID, {{PDVal,repAO},{PDVal,{precDuration,succDuration}}}
+	 * <P>
+	 * NOT USED AT THE MOMENT
+	 */
 	static LinkedHashMap<Integer, Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>> userIDRepAOResultMap;
 
 	/////////////////////////////////////////////////////////////
@@ -135,6 +151,11 @@ public class DomainConstants
 		return found;
 	}
 
+	/**
+	 * NOT USED AT THE MOMENT
+	 * 
+	 * @param userID
+	 */
 	public static void setUserIDRepAOResultMap(int userID)
 	{
 		if (userIDRepAOResultMap.containsKey(userID))
@@ -152,9 +173,6 @@ public class DomainConstants
 	{
 		// getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict, 1, true);
 
-		LinkedHashMap<Integer, LinkedHashMap<Integer, Double>> locIDsHaversineDists = computeHaversineDistanceBetweenAllLocIDs(
-				PathConstants.pathToSerialisedLocationObjects);
-
 		// StringBuilder sb = new StringBuilder();
 		// for (Entry<Integer, LinkedHashMap<Integer, Double>> e1 : locIDsHaversineDists.entrySet())
 		// {
@@ -167,162 +185,6 @@ public class DomainConstants
 		// WritingToFile.appendLineToFileAbsolute(sb.toString(),
 		// "./dataWritten/locationDistances/locationDistances.csv");
 	}
-
-	/**
-	 * 
-	 * @param pathToLocObjects
-	 * @return
-	 */
-	public static LinkedHashMap<Integer, LinkedHashMap<Integer, Double>> computeHaversineDistanceBetweenAllLocIDs(
-			String pathToLocObjects)
-	{
-		LinkedHashMap<Integer, LinkedHashMap<Integer, Double>> locIDsHaversineDists = new LinkedHashMap<>();
-		try
-		{
-			LinkedHashMap<Integer, LocationGowalla> locObjs = (LinkedHashMap<Integer, LocationGowalla>) Serializer
-					.kryoDeSerializeThis(PathConstants.pathToSerialisedLocationObjects);
-
-			// TreeSet<Integer> uniqueLocIDsInCleanedTimelines = (TreeSet<Integer>) Serializer
-			// .deSerializeThis(pathToSerialisedUniqueLocIDsInCleanedTimelines);
-
-			// TreeSet<Integer> uniqueLocIDsInCleanedTimelines = (TreeSet<Integer>) Serializer
-			// .deSerializeThis("./dataToRead/July12/UniqueLocIDsInCleanedTimeines.ser");
-			TreeSet<Integer> uniqueLocIDsInCleanedTimelines = (TreeSet<Integer>) Serializer
-					.kryoDeSerializeThis("./dataToRead/July12/UniqueLocIDsInCleanedTimeines.kryo");
-
-			System.out.println("Num of unique loc ids = " + uniqueLocIDsInCleanedTimelines.size());
-			long t1 = System.currentTimeMillis();
-			int count = 0, numOfComparisons = 0;
-
-			double sumOfTimeTakenByF1 = 0, sumOfTimeTakenByF2 = 0, sumOfTimeTakenByF3 = 0;
-			for (Integer locID1 : uniqueLocIDsInCleanedTimelines)
-			{
-				LocationGowalla loc1 = locObjs.get(locID1);
-				LinkedHashMap<Integer, Double> distMapForLocID1 = new LinkedHashMap<>(
-						uniqueLocIDsInCleanedTimelines.size());
-				System.out.println(count++ + "locID1 = " + locID1);
-				for (Integer locID2 : uniqueLocIDsInCleanedTimelines)
-				{
-					LocationGowalla loc2 = locObjs.get(locID2);
-					numOfComparisons++;
-
-					long pt1 = System.currentTimeMillis();
-					double haversineDist = StatsUtils.haversine(loc1.getLatitude(), loc1.getLongitude(),
-							loc2.getLatitude(), loc2.getLongitude());
-					long pt2 = System.currentTimeMillis();
-					sumOfTimeTakenByF1 += (pt2 - pt1);
-
-					double haversineDist2 = StatsUtils.haversineFasterV1(loc1.getLatitude(), loc1.getLongitude(),
-							loc2.getLatitude(), loc2.getLongitude());
-					long pt3 = System.currentTimeMillis();
-					sumOfTimeTakenByF2 += (pt3 - pt2);
-
-					double haversineDist3 = StatsUtils.haversineFastMathV2(loc1.getLatitude(), loc1.getLongitude(),
-							loc2.getLatitude(), loc2.getLongitude());
-					long pt4 = System.currentTimeMillis();
-					sumOfTimeTakenByF3 += (pt4 - pt3);
-
-					// System.out.println("\nhaversineDist=" + haversineDist + "\nhaversineDist2=" + haversineDist2
-					// + "\nhaversineDist3=" + haversineDist3);
-					Sanity.eq(haversineDist, haversineDist2, haversineDist3, "haverfunctions are giving diff results");
-
-					distMapForLocID1.put(locID2, haversineDist);
-				}
-				locIDsHaversineDists.put(locID1, distMapForLocID1);
-
-				if (count > 10)
-				{
-					break;
-				}
-			}
-			long t2 = System.currentTimeMillis();
-			System.out.println(
-					"#comparisons = " + (numOfComparisons) + "\nsumOfTimeTakenByF1= " + sumOfTimeTakenByF1 / 1000);
-			System.out.println("sumOfTimeTakenByF2= " + sumOfTimeTakenByF2 / 1000);
-			System.out.println("sumOfTimeTakenByF3= " + sumOfTimeTakenByF3 / 1000);
-			System.out
-					.println("computeHaversineDistanceBetweenAllLocIDs took: " + (((t2 - t1) * 1.0) / 1000) + " secs");
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return locIDsHaversineDists;
-	}
-
-	// /**
-	// *
-	// * @param pathToLocObjects
-	// * @return
-	// */
-	// public static LinkedHashMap<Set<Integer>, Double> computeHaversineDistanceBetweenAllLocIDsV2(
-	// String pathToLocObjects)
-	// {
-	// LinkedHashMap<Integer, LinkedHashMap<Integer, Double>> locIDsHaversineDists = new LinkedHashMap<>();
-	// try
-	// {
-	// LinkedHashMap<Integer, LocationGowalla> locObjs = (LinkedHashMap<Integer, LocationGowalla>) Serializer
-	// .kryoDeSerializeThis(pathToSerialisedLocationObjects);
-	//
-	// Set<Integer> setOfLocIDs = locObjs.keySet();
-	// System.out.println("Num of unique loc ids = " + setOfLocIDs.size());
-	// long t1 = System.currentTimeMillis();
-	// int count = 0, numOfComparisons = 0;
-	//
-	// double sumOfTimeTakenByF1 = 0, sumOfTimeTakenByF2 = 0, sumOfTimeTakenByF3 = 0;
-	// for (Integer locID1 : setOfLocIDs)
-	// {
-	// LocationGowalla loc1 = locObjs.get(locID1);
-	// LinkedHashMap<Integer, Double> distMapForLocID1 = new LinkedHashMap<>(setOfLocIDs.size());
-	// System.out.println(count++ + "locID1 = " + locID1);
-	// for (Integer locID2 : setOfLocIDs)
-	// {
-	// LocationGowalla loc2 = locObjs.get(locID2);
-	// numOfComparisons++;
-	//
-	// long pt1 = System.currentTimeMillis();
-	// double haversineDist = StatsUtils.haversine(loc1.getLatitude(), loc1.getLongitude(),
-	// loc2.getLatitude(), loc2.getLongitude());
-	// long pt2 = System.currentTimeMillis();
-	// sumOfTimeTakenByF1 += (pt2 - pt1);
-	//
-	// double haversineDist2 = StatsUtils.haversineFasterV1(loc1.getLatitude(), loc1.getLongitude(),
-	// loc2.getLatitude(), loc2.getLongitude());
-	// long pt3 = System.currentTimeMillis();
-	// sumOfTimeTakenByF2 += (pt3 - pt2);
-	//
-	// double haversineDist3 = StatsUtils.haversineFastMathV2(loc1.getLatitude(), loc1.getLongitude(),
-	// loc2.getLatitude(), loc2.getLongitude());
-	// long pt4 = System.currentTimeMillis();
-	// sumOfTimeTakenByF3 += (pt4 - pt3);
-	//
-	// // System.out.println("\nhaversineDist=" + haversineDist + "\nhaversineDist2=" + haversineDist2
-	// // + "\nhaversineDist3=" + haversineDist3);
-	// Sanity.eq(haversineDist, haversineDist2, haversineDist3, "haverfunctions are giving diff results");
-	//
-	// distMapForLocID1.put(locID2, haversineDist);
-	// }
-	// locIDsHaversineDists.put(locID1, distMapForLocID1);
-	//
-	// if (count > 2)
-	// {
-	// break;
-	// }
-	// }
-	// long t2 = System.currentTimeMillis();
-	// System.out.println(
-	// "#comparisons = " + (numOfComparisons) + "\nsumOfTimeTakenByF1= " + sumOfTimeTakenByF1 / 1000);
-	// System.out.println("sumOfTimeTakenByF2= " + sumOfTimeTakenByF2 / 1000);
-	// System.out.println("sumOfTimeTakenByF3= " + sumOfTimeTakenByF3 / 1000);
-	// System.out
-	// .println("computeHaversineDistanceBetweenAllLocIDs took: " + (((t2 - t1) * 1.0) / 1000) + " secs");
-	// }
-	// catch (Exception e)
-	// {
-	// e.printStackTrace();
-	// }
-	// return locIDsHaversineDists;
-	// }
 
 	/**
 	 * 
@@ -372,6 +234,28 @@ public class DomainConstants
 	 * 
 	 * @param pathToSerialisedLocationObjects
 	 */
+	public static void setUserIDUserObjectDictionary(String pathToSerialisedUserObjects)
+	{
+		try
+		{
+			userIDUserObjectDictionary = (LinkedHashMap<String, UserGowalla>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedUserObjects);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static LinkedHashMap<String, UserGowalla> getUserIDUserObjectDictionary()
+	{
+		return userIDUserObjectDictionary;
+	}
+
+	/**
+	 * 
+	 * @param pathToSerialisedLocationObjects
+	 */
 	public static void setLocIDLocationObjectDictionary(String pathToSerialisedLocationObjects)
 	{
 		try
@@ -394,6 +278,28 @@ public class DomainConstants
 
 			LinkedHashMap<Integer, String> locIDNameDict = new LinkedHashMap<>();
 			for (Entry<Integer, LocationGowalla> entry : locIDLocationObjectDictionaryTemp.entrySet())
+			{
+				locIDNameDict.put(entry.getKey(), entry.getValue().getLocationName());
+			}
+			locIDNameDictionary = locIDNameDict;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param locIDLocationObjectDictionary
+	 */
+	public static void setLocationIDNameDictionary(
+			LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionary)
+	{
+		try
+		{
+			LinkedHashMap<Integer, String> locIDNameDict = new LinkedHashMap<>();
+			for (Entry<Integer, LocationGowalla> entry : locIDLocationObjectDictionary.entrySet())
 			{
 				locIDNameDict.put(entry.getKey(), entry.getValue().getLocationName());
 			}

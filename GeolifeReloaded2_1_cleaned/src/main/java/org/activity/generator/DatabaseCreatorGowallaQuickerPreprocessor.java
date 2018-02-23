@@ -31,6 +31,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.LabelEntry;
 import org.activity.objects.Pair;
 import org.activity.objects.TrajectoryEntry;
+import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -549,7 +550,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 						// System.out.println("Computin/run/media/gunjan/BoX2/GowallaSpaceSpace/June16/g haversing for"
 						// + currentLat + " , " + currentLon + " --- " + prevLat + ","
 						// + prevLon);
-						distFromPrevInMeters = StatsUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
+						distFromPrevInMeters = SpatialUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
 
 						// System.out.println("returned dist in km = " + distFromPrevInMeters);
 						distFromPrevInMeters = distFromPrevInMeters * 1000;
@@ -716,7 +717,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 						// System.out.println("Computin/run/media/gunjan/BoX2/GowallaSpaceSpace/June16/g haversing for"
 						// + currentLat + " , " + currentLon + " --- " + prevLat + ","
 						// + prevLon);
-						distFromPrevInMeters = StatsUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
+						distFromPrevInMeters = SpatialUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
 
 						// System.out.println("returned dist in km = " + distFromPrevInMeters);
 						distFromPrevInMeters = distFromPrevInMeters * 1000;
@@ -910,7 +911,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 						// System.out.println("Computin/run/media/gunjan/BoX2/GowallaSpaceSpace/June16/g haversing for"
 						// + currentLat + " , " + currentLon + " --- " + prevLat + ","
 						// + prevLon);
-						distFromPrevInMeters = StatsUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
+						distFromPrevInMeters = SpatialUtils.haversine(currentLat, currentLon, prevLat, prevLon);//
 
 						// System.out.println("returned dist in km = " + distFromPrevInMeters);
 						distFromPrevInMeters = distFromPrevInMeters * 1000;
@@ -1128,7 +1129,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 					{
 						if (isPrevGeoCoordsValid && isCurrGeoCoordsValid)
 						{
-							distFromPrevInMeters = StatsUtils.haversineFastMath(currentLat, currentLon, prevLat,
+							distFromPrevInMeters = SpatialUtils.haversineFastMath(currentLat, currentLon, prevLat,
 									prevLon);//
 							distFromPrevInMeters *= 1000;
 							distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
@@ -2341,7 +2342,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 		long timeDiffInSecs = (nextTrajEntry.getTimestamp().getTime() - tsFirstEntryInPotentialStayPoint.getTime())
 				/ 1000;
-		double distDiffInKms = StatsUtils.haversine(latFirstEntryInPotentialStayPoint,
+		double distDiffInKms = SpatialUtils.haversine(latFirstEntryInPotentialStayPoint,
 				lonFirstEntryInPotentialStayPoint, latNextEntry, lonNextEntry);
 
 		if ((distDiffInKms * 1000) <= stayPointDistanceThresholdInMeters)

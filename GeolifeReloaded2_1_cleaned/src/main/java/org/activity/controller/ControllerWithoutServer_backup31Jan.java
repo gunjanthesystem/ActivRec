@@ -74,7 +74,8 @@ public class ControllerWithoutServer_backup31Jan
 			// specific for Gowalla dataset
 			PathConstants.intialise(Constant.For9kUsers);
 			Constant.initialise(commonPath, Constant.getDatabaseName(), PathConstants.pathToSerialisedCatIDsHierDist,
-					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects);
+					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
+					PathConstants.pathToSerialisedUserObjects);
 
 			// ,// 550);
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
@@ -166,14 +167,14 @@ public class ControllerWithoutServer_backup31Jan
 			// For 9k users
 			if (Constant.For9kUsers)
 			{
-				usersCleanedDayTimelines = ControllerWithoutServer_backup31Jan.reduceAndCleanTimelines2(Constant.getDatabaseName(),
-						usersDayTimelinesOriginal, true);
+				usersCleanedDayTimelines = ControllerWithoutServer_backup31Jan
+						.reduceAndCleanTimelines2(Constant.getDatabaseName(), usersDayTimelinesOriginal, true);
 			}
 			else
 			{
 				// For 916 users
-				usersCleanedDayTimelines = ControllerWithoutServer_backup31Jan.reduceAndCleanTimelines(Constant.getDatabaseName(),
-						usersDayTimelinesOriginal, true);
+				usersCleanedDayTimelines = ControllerWithoutServer_backup31Jan
+						.reduceAndCleanTimelines(Constant.getDatabaseName(), usersDayTimelinesOriginal, true);
 			}
 			usersDayTimelinesOriginal = null; // null this out so as to be ready for garbage collection.
 			System.out.println("After reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
@@ -219,9 +220,9 @@ public class ControllerWithoutServer_backup31Jan
 
 			///////////////////
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
-			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines));
-			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines));
-			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true);
+			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines, false));
+			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines, false));
+			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true, "UniquePDValPerUser.csv");
 			///////////////////
 			/*
 			 * TreeSet<Integer> uniqueLocIDs = getUniqueLocIDs(usersCleanedDayTimelines);

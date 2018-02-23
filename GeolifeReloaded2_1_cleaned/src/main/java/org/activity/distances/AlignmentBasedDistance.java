@@ -13,6 +13,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.TraceMatrixLeaner1;
+import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -594,7 +595,7 @@ public class AlignmentBasedDistance
 	{
 		double simComponentVal = 0;
 
-		double diffGeo = StatsUtils.haversine(lat1, lon1, lat2, lon2);
+		double diffGeo = SpatialUtils.haversine(lat1, lon1, lat2, lon2);
 
 		if (diffGeo <= tolerance)
 		{
@@ -897,7 +898,7 @@ public class AlignmentBasedDistance
 																			// distance
 		Pair<Double, Double> centroid1 = getCentroidGeoCoordinates(vals1);
 
-		double distBetweenCentroids = StatsUtils.haversine(centroid1.getFirst(), centroid1.getSecond(),
+		double distBetweenCentroids = SpatialUtils.haversine(centroid1.getFirst(), centroid1.getSecond(),
 				centroid2.getFirst(), centroid2.getSecond());
 
 		if (VerbosityConstants.verbose || VerbosityConstants.verboseLevenstein)
@@ -927,14 +928,14 @@ public class AlignmentBasedDistance
 
 		for (int i = 1; i <= len1; i++)
 		{
-			dp[i][0] = dp[i - 1][0] + StatsUtils.haversine(vals1[i - 1].getFirst(), vals1[i - 1].getSecond(),
+			dp[i][0] = dp[i - 1][0] + SpatialUtils.haversine(vals1[i - 1].getFirst(), vals1[i - 1].getSecond(),
 					centroid2.getFirst(), centroid2.getSecond());
 			traceMatrix[i][0].append(traceMatrix[i - 1][0] + "_D(" + (i) + "-" + "0)");
 		}
 
 		for (int j = 1; j <= len2; j++)
 		{
-			dp[0][j] = dp[0][j - 1] + StatsUtils.haversine(vals2[j - 1].getFirst(), vals2[j - 1].getSecond(),
+			dp[0][j] = dp[0][j - 1] + SpatialUtils.haversine(vals2[j - 1].getFirst(), vals2[j - 1].getSecond(),
 					centroid2.getFirst(), centroid2.getSecond());// j * distBetweenCentroids;
 			traceMatrix[0][j].append(traceMatrix[0][j - 1] + "_I(0" + "-" + j + ")");
 		}
@@ -967,15 +968,15 @@ public class AlignmentBasedDistance
 					// + UtilityBelt.haversine(vals1[i].getFirst(), vals1[i].getSecond(), vals2[j].getFirst(),
 					// vals2[j].getSecond()) + "kms");
 
-					double distBetweenPoints = StatsUtils.haversine(vals1[i].getFirst(), vals1[i].getSecond(),
+					double distBetweenPoints = SpatialUtils.haversine(vals1[i].getFirst(), vals1[i].getSecond(),
 							vals2[j].getFirst(), vals2[j].getSecond());
 					if (VerbosityConstants.verboseLevenstein)
 					{
 						System.out.println("Difference of vals = " + distBetweenPoints + "kms");
 					}
-					double distBetweenPoint1AndCentroid = StatsUtils.haversine(vals1[i].getFirst(),
+					double distBetweenPoint1AndCentroid = SpatialUtils.haversine(vals1[i].getFirst(),
 							vals1[i].getSecond(), centroid2.getFirst(), centroid2.getSecond());
-					double distBetweenPoint2AndCentroid = StatsUtils.haversine(vals2[j].getFirst(),
+					double distBetweenPoint2AndCentroid = SpatialUtils.haversine(vals2[j].getFirst(),
 							vals2[j].getSecond(), centroid2.getFirst(), centroid2.getSecond());
 
 					double replace = dp[i][j] + replaceWt * distBetweenPoints;

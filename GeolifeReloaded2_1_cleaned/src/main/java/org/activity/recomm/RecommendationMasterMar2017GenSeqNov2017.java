@@ -562,6 +562,14 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 					this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand,
 					this.lookPastType, this.distancesSortedMap);
 
+			// Start of added on 20 Feb 2018
+			if (Constant.scoreRecommsByLocProximity)
+			{
+				this.recommendedActivityNamesWithRankscores = RecommUtils.reScoreRecommsIncludingLocationProximity(
+						Constant.wtScoreRecommsByLocProximity, this.recommendedActivityNamesWithRankscores);
+			}
+			// End of added on 20 Feb 2018
+
 			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityPDvalsWithRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
 			this.rankedRecommendedActNamesWithoutRankScoresStr = getRankedRecommendedActivityPDValsithoutRankScoresString(

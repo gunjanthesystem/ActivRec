@@ -35,6 +35,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
+import org.activity.objects.UserGowalla;
 import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -1610,6 +1611,48 @@ public class TimelineUtils
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
 		// ="+datesToRemove.size());
 		return datesTimelinesPruned;
+	}
+
+	/**
+	 * @since Feb 13 2018
+	 * @param databaseName
+	 * @param usersDayTimelinesOriginal
+	 * @param absFileNameForLog
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> removeBlackListedUsers(String databaseName,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, String absFileNameForLog)
+	{
+		if (!databaseName.equals("gowalla1"))
+		{
+			PopUps.printTracedErrorMsgWithExit("removeBlackListedUsers(): Only implemented for Gowalla dataset");
+			return null;
+		}
+
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> timelinesForSelectedUser = new LinkedHashMap<>();
+		WritingToFile.writeToNewFile("IndexOfUser,userID\n", absFileNameForLog);
+		int indexOfUser = -1, numOfUsersSkippedGT553MaxActsPerDay = 0;
+		///// Remove timelines for blacklisted users
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
+		{
+			indexOfUser += 1;
+			if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+			{
+				System.out.println(" " + indexOfUser + " Removing user: " + userEntry.getKey()
+						+ " as in gowallaUserIDsWithGT553MaxActsPerDay");
+				WritingToFile.appendLineToFileAbsolute(indexOfUser + "," + userEntry.getKey() + "\n",
+						absFileNameForLog);
+				numOfUsersSkippedGT553MaxActsPerDay += 1;
+				continue;
+			}
+			else
+			{
+				timelinesForSelectedUser.put(userEntry.getKey(), userEntry.getValue());
+			}
+		}
+		System.out.println("numOfUsersSkippedGT553MaxActsPerDay= " + numOfUsersSkippedGT553MaxActsPerDay);
+
+		return timelinesForSelectedUser;
 	}
 
 	public static LinkedHashMap<String, Timeline> rearrangeTimelinesByGivenOrder(LinkedHashMap<String, Timeline> map,
@@ -3962,7 +4005,7 @@ public class TimelineUtils
 	 * @return
 	 */
 	public static TreeSet<Integer> getUniqueLocIDs(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
 	{
 		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
 		try
@@ -3976,6 +4019,10 @@ public class TimelineUtils
 				}
 			}
 			System.out.println("Inside getUniqueLocIDs: uniqueLocIDs.size()=" + uniqueLocIDs.size());
+			if (write)
+			{
+				WritingToFile.writeToNewFile(uniqueLocIDs.toString(), Constant.getCommonPath() + "UniqueLocIDs.csv");
+			}
 		}
 		catch (Exception e)
 		{
@@ -4034,10 +4081,11 @@ public class TimelineUtils
 	 * Extract unique activity IDs from the given timelines
 	 * 
 	 * @param usersCleanedDayTimelines
+	 * @param write
 	 * @return
 	 */
 	public static TreeSet<Integer> getUniqueActivityIDs(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
 	{
 		TreeSet<Integer> uniqueActIDs = new TreeSet<>();
 		try
@@ -4051,6 +4099,10 @@ public class TimelineUtils
 				}
 			}
 			System.out.println("Inside getUniqueActivityIDs: uniqueActIDs.size()=" + uniqueActIDs.size());
+			if (write)
+			{
+				WritingToFile.writeToNewFile(uniqueActIDs.toString(), Constant.getCommonPath() + "uniqueActIDs.csv");
+			}
 		}
 		catch (Exception e)
 		{
@@ -4060,13 +4112,16 @@ public class TimelineUtils
 	}
 
 	/**
-	 * Extract unique activity IDs from the given timelines
+	 * Extract unique PD Vals per user
 	 * 
 	 * @param usersCleanedDayTimelines
+	 * @param writeToFile
+	 * @param fileName
 	 * @return
 	 */
 	public static LinkedHashMap<String, TreeSet<Integer>> getUniquePDValPerUser(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile,
+			String fileName)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("User,#UniquePDVals\n");
@@ -4089,8 +4144,7 @@ public class TimelineUtils
 
 			if (writeToFile)
 			{
-				WritingToFile.writeToNewFile(sb.toString(),
-						Constant.getOutputCoreResultsPath() + "NumOfUniquePDValPerUser.csv");
+				WritingToFile.writeToNewFile(sb.toString(), Constant.getOutputCoreResultsPath() + fileName);// "NumOfUniquePDValPerUser.csv");
 			}
 		}
 		catch (Exception e)
@@ -4133,6 +4187,41 @@ public class TimelineUtils
 				WritingToFile.appendLineToFileAbsolute(sbForThisTimeline.toString(), abFileNameToWrite);
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param uniqueLocIDs
+	 * @param map
+	 * @param absFileNameToUse
+	 */
+	public static void writeLocationObjects(Set<Integer> uniqueLocIDs, LinkedHashMap<Integer, LocationGowalla> map,
+			String absFileNameToUse)
+	{
+		StringBuilder sb = new StringBuilder(LocationGowalla.toStringHeader() + "\n");
+		for (Integer id : uniqueLocIDs)
+		{
+			sb.append(map.get(id).toString() + "\n");
+		}
+
+		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+	}
+
+	/**
+	 * 
+	 * @param uniqueUserIDs
+	 * @param map
+	 * @param absFileNameToUse
+	 */
+	public static void writeUserObjects(Set<String> uniqueUserIDs, LinkedHashMap<String, UserGowalla> map,
+			String absFileNameToUse)
+	{
+		StringBuilder sb = new StringBuilder(UserGowalla.toStringHeader() + "\n");
+		for (String id : uniqueUserIDs)
+		{
+			sb.append(map.get(id).toString() + "\n");
+		}
+		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
 	}
 
 }

@@ -1,6 +1,10 @@
 package org.activity.evaluation;
 
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +17,7 @@ import org.activity.io.ReadingFromFile;
 import org.activity.io.SFTPFile;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
+import org.activity.ui.PopUps;
 
 import com.jcraft.jsch.Session;
 
@@ -40,7 +45,100 @@ public class ResultsDistributionEvaluation
 		// $runFeb2OneDayResults();//disabled on Feb 12 2018
 		// $runFeb2FiveDaysResults(); //disabled on Feb 12 2018
 		// $runFeb5FiveDaysResults();//disabled on Feb 12 2018
-		runFeb11FiveDaysResults();
+		// runFeb11FiveDaysResults();//disabled on feb 18 2018
+		runFeb17FiveDaysResults();
+	}
+
+	/**
+	 * @since Feb 2 2018
+	 * @param args
+	 */
+	public static void runFeb17FiveDaysResults()
+	{
+
+		String pathToWrite = "./dataWritten/Feb17/FiveDays/";
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultFeb16ToRead.csv";
+		int numOfDay = 5;
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		double muArray[] = Constant.matchingUnitAsPastCount;
+		String pathToRead = "", resultsLabel = "", host = "";
+
+		try
+		{
+			List<List<String>> resLabels = ReadingFromFile.nColumnReaderString(
+					Files.newInputStream(Paths.get(resultsLabelsPathFile), StandardOpenOption.READ), ",", false);
+
+			resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500";
+			pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_NCount_AllCand5DayFilter/";
+			resLabels.add(Arrays.asList(new String[] { "mortar", resultsLabel, pathToRead }));
+
+			resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-600";
+			pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Feb2NCount_5Day_ThresholdNN600/";
+			resLabels.add(Arrays.asList(new String[] { "howitzer", resultsLabel, pathToRead }));
+
+			for (List<String> resEntry : resLabels)
+			{
+				if (resEntry.size() > 0)
+				{
+					pathToRead = resEntry.get(2).trim();
+					resultsLabel = resEntry.get(1).trim();
+					host = getHostFromString(resEntry.get(0)).trim();
+
+					System.out.println(
+							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
+					getResults2(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host, firstToMax);
+				}
+			}
+
+		}
+		catch (
+
+		Exception e)
+		{
+			e.printStackTrace();
+		}
+		// resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500_EDα0.5";
+		// pathToRead =
+		// "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/";
+		// getResults2(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host, firstToMax);
+
+	}
+
+	public static void getResults2(String pathToWrite, String resultsLabel, String pathToRead, double[] muArray,
+			String[] statFileNames, String host, int firstToMax)
+	{
+		Map<Integer, Map<Integer, List<Double>>> res = null;
+		for (String statFileName : statFileNames)
+		{
+			res = getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax);
+		}
+		if (res.size() >= 100)
+		{
+			WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
+		}
+		if (res.size() == 916)
+		{
+			WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "E916UserLabels.csv");
+		}
+
+		if (res.size() < 916)
+		{
+			WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
+		}
+	}
+
+	public static String getHostFromString(String s)
+	{
+		if (s.trim().toLowerCase().contains("engine")) return Utils.engineHost;
+		if (s.trim().toLowerCase().contains("howitzer")) return Utils.howitzerHost;
+		if (s.trim().toLowerCase().contains("mortar")) return Utils.mortarHost;
+		if (s.trim().toLowerCase().contains("claritytrec"))
+			return Utils.clarityHost;
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit("Host not found for String:" + s);
+			return "unknownHost";
+		}
 	}
 
 	/**
@@ -406,11 +504,13 @@ public class ResultsDistributionEvaluation
 	 * @param statFileName
 	 * @param host
 	 * @param firstToMax
+	 * @return
 	 */
-	private static void getResult(String pathToWrite, String resultsLabel, String pathToRead, double[] muArray,
-			String statFileName, String host, int firstToMax)
+	private static Map<Integer, Map<Integer, List<Double>>> getResult(String pathToWrite, String resultsLabel,
+			String pathToRead, double[] muArray, String statFileName, String host, int firstToMax)
 	{
 		String passwd = Utils.getPassWordForHost(host);
+		String user = Utils.getUserForHost(host);
 
 		// MU , <list for each user, <list of first1,2,3 for that user and mu>>
 		Map<Integer, List<List<Double>>> muKeyAllValsMap = new LinkedHashMap<>();
@@ -422,7 +522,7 @@ public class ResultsDistributionEvaluation
 			String fileToRead = pathToRead + statFileName + mu + ".csv";
 
 			Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port, fileToRead,
-					Utils.howitzerUsr, passwd);
+					user, passwd);
 
 			List<List<Double>> res = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",", false);
 
@@ -469,8 +569,11 @@ public class ResultsDistributionEvaluation
 					+ r.getValue().getSecond().get(1) + "," + r.getValue().getSecond().get(2) + "\n");
 		}
 		WritingToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName + ".csv");
+
 		WritingToFile.writeToNewFile(host + ":" + pathToRead,
 				pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe.txt");
+
+		return (userMUKeyVals);
 	}
 
 	/**

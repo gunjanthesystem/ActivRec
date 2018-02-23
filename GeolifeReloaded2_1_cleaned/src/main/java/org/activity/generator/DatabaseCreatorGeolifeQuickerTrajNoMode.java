@@ -34,7 +34,7 @@ import org.activity.objects.LabelEntry;
 import org.activity.objects.Pair;
 import org.activity.objects.StayPointsAllDataContainer;
 import org.activity.objects.TrajectoryEntry;
-import org.activity.stats.StatsUtils;
+import org.activity.spatial.SpatialUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
@@ -1178,7 +1178,7 @@ public class DatabaseCreatorGeolifeQuickerTrajNoMode
 
 		long timeDiffInSecs = (nextTrajEntry.getTimestamp().getTime() - tsFirstEntryInPotentialStayPoint.getTime())
 				/ 1000;
-		double distDiffInKms = StatsUtils.haversine(latFirstEntryInPotentialStayPoint,
+		double distDiffInKms = SpatialUtils.haversine(latFirstEntryInPotentialStayPoint,
 				lonFirstEntryInPotentialStayPoint, latNextEntry, lonNextEntry);
 
 		if ((distDiffInKms * 1000) <= stayPointDistanceThresholdInMeters)
