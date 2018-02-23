@@ -106,13 +106,25 @@ public class LocationGowalla extends LocationObject implements Serializable
 		return max_items_count;
 	}
 
-	@Override
-	public String toString()
+	public String toString1()
 	{
 		return "LocationGowalla [locationID=" + locationID + ", photos_count=" + photos_count + ", checkins_count="
 				+ checkins_count + ", users_count=" + users_count + ", radius_meters=" + radius_meters
 				+ ", highlights_count=" + highlights_count + ", items_count=" + items_count + ", max_items_count="
 				+ max_items_count + "]";
+	}
+
+	@Override
+	public String toString()
+	{
+		return locationID + "," + photos_count + "," + checkins_count + "," + users_count + "," + radius_meters + ","
+				+ highlights_count + "," + items_count + "," + max_items_count + "," + locationId + "," + latitude + ","
+				+ longitude + "," + altitude + "," + locationName + "," + locationCategory;
+	}
+
+	public static String toStringHeader()
+	{
+		return "locationID , photos_count , checkins_count , users_count , radius_meters , highlights_count , items_count , max_items_count , locationId , latitude , longitude , altitude , locationName , locationCategory";
 	}
 
 	@Override

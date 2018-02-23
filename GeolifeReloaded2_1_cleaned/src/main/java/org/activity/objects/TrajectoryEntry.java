@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.util.StringUtils;
 
@@ -84,7 +85,7 @@ public class TrajectoryEntry implements Serializable
 			throw new Exception(
 					"Error in org.activity.util.TrajectoryEntry.getDistance(TrajectoryEntry, TrajectoryEntry): Trajectory entries are not single points but merged points");
 		}
-		res = StatsUtils.haversine(t1.getLatitude().get(0), t1.getLongitude().get(0), t2.getLatitude().get(0),
+		res = SpatialUtils.haversine(t1.getLatitude().get(0), t1.getLongitude().get(0), t2.getLatitude().get(0),
 				t2.getLongitude().get(0));
 		return res;
 	}
@@ -826,7 +827,7 @@ public class TrajectoryEntry implements Serializable
 
 		for (int i = 0; i < numOfLatsLons; i++)
 		{
-			res = res + StatsUtils.haversine(String.valueOf(centreLat), String.valueOf(centreLon), lat.get(i),
+			res = res + SpatialUtils.haversine(String.valueOf(centreLat), String.valueOf(centreLon), lat.get(i),
 					lon.get(i), false);
 		}
 

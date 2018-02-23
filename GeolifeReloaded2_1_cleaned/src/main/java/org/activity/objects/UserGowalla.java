@@ -75,6 +75,20 @@ public class UserGowalla extends UserObject implements Serializable
 		super();
 	}
 
+	@Override
+	public String toString()
+	{
+		return userID + "," + bookmarked_spots_count + ", " + challenge_pin_count + ", " + country_pin_count + ", "
+				+ highlights_count + ", " + items_count + ", " + photos_count + ", " + pins_count + ", "
+				+ province_pin_count + ", " + region_pin_count + ", " + state_pin_count + ", " + trips_count + ", "
+				+ friends_count + ", " + stamps_count + ", " + checkin_num + ", " + places_num;
+	}
+
+	public static String toStringHeader()
+	{
+		return "userID,bookmarked_spots_count , challenge_pin_count , country_pin_count , highlights_count, items_count , photos_count , pins_count , province_pin_count , region_pin_count , state_pin_count , trips_count , friends_count , stamps_count , checkin_num , places_num";
+	}
+
 	public int getBookmarked_spots_count()
 	{
 		return bookmarked_spots_count;

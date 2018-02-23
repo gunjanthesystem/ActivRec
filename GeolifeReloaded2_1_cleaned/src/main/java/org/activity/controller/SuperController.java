@@ -1,15 +1,18 @@
 package org.activity.controller;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
 import org.activity.constants.Constant;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
+import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.Searcher;
@@ -25,6 +28,28 @@ public class SuperController
 		{
 			ReadingFromFile.concat18Jan(s);
 		}
+	}
+
+	/**
+	 * Check is the files with specific string in names have lines containing the given string
+	 * 
+	 * @since 16 Feb 2018
+	 */
+	public static void searchContentInFile()
+	{
+		String rootPathToSearch = "./dataWritten/Feb15NCount_5Day_NN500MedRepCinsNormEDAlpha0.6FiltrdByCurrActTime1hr/";
+		String contentToMatch = "EDAlpha:";
+		String fileNamePatternToSearch = "Config.csv";
+		String absFileNameOfMatchedLinesToWrite = rootPathToSearch + "LinesContaining.txt";
+
+		System.out.println("absFileNameOfMatchedLinesToWrite = " + absFileNameOfMatchedLinesToWrite);
+
+		Triple<Set<Path>, Set<Path>, String> res = Searcher.search2(rootPathToSearch, fileNamePatternToSearch,
+				contentToMatch, absFileNameOfMatchedLinesToWrite);
+
+		System.out.println("Files with matching filenames:" + res.getFirst().toString());
+		System.out.println("Files with matching filenames and string in line:" + res.getSecond().toString());
+		System.out.println("log:" + res.getThird().toString());
 	}
 
 	public static void concat18Jan(String filename)
@@ -45,6 +70,7 @@ public class SuperController
 
 	public static void main(String args[])
 	{
+		// searchContentInFile();
 		// cleanUpSpace("./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/", 0.9);
 		// runAllAKOMExperiments();
 		// cleanUpSpace("./dataWritten/Feb2NCount_5Day_ThresholdNN600", 0.9);
@@ -105,7 +131,12 @@ public class SuperController
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
+		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Feb21/" };
+		// "./dataWritten/Feb11NCount_5DayFilter_ThreshNN500MedianRepCinsHierED/" };
+		// + "Feb18NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.4/" };
+		// + "/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
+		// + "/run/media/gunjan/BufferVault/GowallaResults/Feb13/" };
+		// "./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
 		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime5hrs/" };
 		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
 		// + "//Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8_part1/" };
@@ -133,8 +164,8 @@ public class SuperController
 		for (int i = 0; i <= commonPaths.length - 1; i++)
 		{
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], true, true, true);
-			cleanUpSpace(commonPaths[i], 0.85);
+			runExperiments(commonPaths[i], true, false, true);
+			// cleanUpSpace(commonPaths[i], 0.80);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
 

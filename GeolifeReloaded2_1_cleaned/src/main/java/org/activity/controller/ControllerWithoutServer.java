@@ -32,6 +32,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
 import org.activity.probability.ProbabilityUtilityBelt;
+import org.activity.spatial.SpatialUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
@@ -81,7 +82,8 @@ public class ControllerWithoutServer
 			// specific for Gowalla dataset
 			PathConstants.intialise(Constant.For9kUsers);
 			Constant.initialise(commonPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
-					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects);
+					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
+					PathConstants.pathToSerialisedUserObjects);
 
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 					+ PerformanceAnalytics.getHeapPercentageFree());
@@ -154,13 +156,29 @@ public class ControllerWithoutServer
 
 			///////////////////
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
-			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines));
-			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines));
-			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true);
+			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines, true));
+			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines, true));
+			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true, "NumOfUniquePDValPerUser.csv");
 
+			if (true)
+			{
+				TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
+
+				TimelineUtils.writeLocationObjects(Constant.getUniqueLocIDs(),
+						DomainConstants.getLocIDLocationObjectDictionary(),
+						Constant.getCommonPath() + "UniqueLocationObjects.csv");
+
+				SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
+
+				TimelineUtils.writeUserObjects(usersCleanedDayTimelines.keySet(),
+						DomainConstants.getUserIDUserObjectDictionary(),
+						Constant.getCommonPath() + "UniqueUserObjects.csv");
+
+				System.exit(0);
+			}
 			// Curtain 8 Feb 2018 start
 			// $$TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
-			// $$System.exit(0);
+
 			// Curtain 8 Feb 2018 end
 
 			///////////////////
@@ -898,6 +916,11 @@ public class ControllerWithoutServer
 		// int actsPerDayLowerLimit = 10;
 		// int numOfSuchDaysLowerLimit = 7;
 		// int actsPerDayUpperLimit = 500;
+		// Originally received timelines
+		if (writeToFile)
+		{
+			writeTimelineStats(usersDayTimelinesOriginal, false, true, true, true, "OriginalBeforeReduceClean");
+		}
 
 		if (databaseName.equals("gowalla1"))
 		{
@@ -911,14 +934,9 @@ public class ControllerWithoutServer
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = TimelineUtils
 				.cleanDayTimelines(usersDayTimelinesOriginal);
 		if (writeToFile)
-		{// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines, "usersCleanedDayTimelines", false,
-			// false, false,"GowallaUserDayTimelinesCleaned.csv");// users
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					"usersCleanedDayTimelines", "GowallaPerUserDayNumOfActsCleaned.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					Constant.getCommonPath() + "NumOfDaysPerUserCleaned.csv");
+		{
+			writeTimelineStats(usersCleanedDayTimelines, false, true, true, false, "Cleaned");
 		}
-		System.out.println("Num of users cleaned = " + usersCleanedDayTimelines.size());
 		///
 
 		///// again remove users with less than 2 days (these are the clean days)
@@ -928,54 +946,9 @@ public class ControllerWithoutServer
 				Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan2DaysLog.csv");
 
 		if (writeToFile)
-		{// Writing user day timelines. big file ~ 17.3GB
-			// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-			// "usersCleanedDayTimelinesReduced3",false, false, false, "GowallaUserDayTimelinesCleanedReduced3.csv");//
-
-			// write a subset of timelines
-			Map<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelinesSampled = usersCleanedDayTimelines
-					.entrySet().stream().limit(2).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-
-			WritingToFile.writeUsersDayTimelinesSameFile(
-					new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>(usersCleanedDayTimelinesSampled),
-					"usersCleanedDayTimelinesReduced3First2UsersOnly", false, false, false,
-					"GowallaUserDayTimelinesCleanedReduced3First2UsersOnly.csv");// users
-
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfActsCleanedReduced3.csv");// us
-
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					Constant.getCommonPath() + "NumOfDaysPerUserCleanedReduced3.csv");
-
-			WritingToFile.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfDistinctValidActsCleanedReduced3.csv");// us
-
-			System.out.println("Num of users cleaned reduced3  = " + usersCleanedDayTimelines.size());
+		{
+			writeTimelineStats(usersDayTimelinesOriginal, true, true, true, true, "cleaned reduced3");
 		}
-		/// temp Start
-		////////// removed
-		// System.out.println("\n-- removing users with GT553");
-		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> tempUsersCleanedDayTimelines = new LinkedHashMap<>();
-		// for (Entry<String, LinkedHashMap<Date, Timeline>> uEntry : usersCleanedDayTimelines.entrySet())
-		// {
-		// if (!DomainConstants.isGowallaUserIDsWithGT553MaxActsPerDay(Integer.valueOf(uEntry.getKey())))
-		// {
-		// tempUsersCleanedDayTimelines.put(uEntry.getKey(), uEntry.getValue());
-		// }
-		// }
-		//
-		// if (writeToFile)
-		// {
-		// WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(tempUsersCleanedDayTimelines,
-		// "usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced4.csv");// us
-		// WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(tempUsersCleanedDayTimelines,
-		// Constant.getCommonPath() + "NumOfDaysPerUserReduced4.csv");
-		// // WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-		// // false, false, false,"GowallaUserDayTimelinesReduced2.csv");// users
-		// }
-		// System.out.println("Num of users reduced4 = " + tempUsersCleanedDayTimelines.size());
-		//////////
-		// temp End
 
 		return usersCleanedDayTimelines;
 	}
@@ -1004,10 +977,16 @@ public class ControllerWithoutServer
 	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceAndCleanTimelines(String databaseName,
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile)
 	{
+		// Originally received timelines
+		if (writeToFile)
+		{
+			writeTimelineStats(usersDayTimelinesOriginal, false, true, true, true, "OriginalBeforeReduceClean");
+		}
+
 		if (databaseName.equals("gowalla1"))
 		{
 			usersDayTimelinesOriginal = reduceGowallaTimelinesByActDensity(databaseName, usersDayTimelinesOriginal,
-					true);
+					true, 10, 50);
 		}
 
 		///// clean timelines
@@ -1015,17 +994,11 @@ public class ControllerWithoutServer
 				"\n-- Removes day timelines with no valid activity, with <=1 distinct valid activity, and the weekend day timelines.");
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = TimelineUtils
 				.cleanDayTimelines(usersDayTimelinesOriginal);
-
 		if (writeToFile)
-		{// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines, "usersCleanedDayTimelines", false,
-			// false, false,"GowallaUserDayTimelinesCleaned.csv");// users
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					"usersCleanedDayTimelines", "GowallaPerUserDayNumOfActsCleaned.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					Constant.getCommonPath() + "NumOfDaysPerUserCleaned.csv");
+		{
+			writeTimelineStats(usersCleanedDayTimelines, false, true, true, false,
+					"RemovedLT10ActPerDayLT50DaysCleaned");
 		}
-		System.out.println("Num of users cleaned = " + usersCleanedDayTimelines.size());
-		///
 
 		if (databaseName.equals("gowalla1"))
 		{
@@ -1033,60 +1006,72 @@ public class ControllerWithoutServer
 			System.out.println("\n--again remove users with less than 50 days (these are the clean days)");
 			usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 50,
 					Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan50DaysLog.csv");
-		}
+			if (writeToFile)
+			{
+				writeTimelineStats(usersCleanedDayTimelines, false, true, true, false,
+						"RemovedLT10ActPerDayLT50DaysCleanedLT50Days");
+			}
 
-		if (writeToFile)
-		{// Writing user day timelines. big file ~ 17.3GB
-			// WritingToFile.writeUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-			// "usersCleanedDayTimelinesReduced3",false, false, false, "GowallaUserDayTimelinesCleanedReduced3.csv");//
+			/////////
 
-			// write a subset of timelines
-			Map<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelinesSampled = usersCleanedDayTimelines
-					.entrySet().stream().limit(2).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-
-			WritingToFile.writeUsersDayTimelinesSameFile(
-					new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>(usersCleanedDayTimelinesSampled),
-					"usersCleanedDayTimelinesReduced3First2UsersOnly", false, false, false,
-					"GowallaUserDayTimelinesCleanedReduced3First2UsersOnly.csv");// users
-
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfActsCleanedReduced3.csv");// us
-
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					Constant.getCommonPath() + "NumOfDaysPerUserCleanedReduced3.csv");
-
-			WritingToFile.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					"usersCleanedDayTimelinesReduced3", "GowallaPerUserDayNumOfDistinctValidActsCleanedReduced3.csv");// us
-
-			System.out.println("Num of users cleaned reduced3  = " + usersCleanedDayTimelines.size());
-
-			/// temp Start
-			////////// removed users with GT553 acts per day
-			// System.out.println("\n-- removing users with GT553");
-			// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> tempUsersCleanedDayTimelines = new
-			// LinkedHashMap<>();
-			// for (Entry<String, LinkedHashMap<Date, Timeline>> uEntry : usersCleanedDayTimelines.entrySet())
-			// {
-			// if (!DomainConstants.isGowallaUserIDsWithGT553MaxActsPerDay(Integer.valueOf(uEntry.getKey())))
-			// {
-			// tempUsersCleanedDayTimelines.put(uEntry.getKey(), uEntry.getValue());
-			// }
-			// }
-			//
-			// if (writeToFile)
-			// {
-			// WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(tempUsersCleanedDayTimelines,
-			// "usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced4.csv");// us
-			// WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(tempUsersCleanedDayTimelines,
-			// Constant.getCommonPath() + "NumOfDaysPerUserReduced4.csv");
-			// // WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			// // false, false, false,"GowallaUserDayTimelinesReduced2.csv");// users
-			// }
-			// System.out.println("Num of users reduced4 = " + tempUsersCleanedDayTimelines.size());
-			//////////
-			// temp End
+			///// again remove blacklisted user
+			System.out.println("\n--again remove blacklisted gowalla users");
+			usersCleanedDayTimelines = TimelineUtils.removeBlackListedUsers(databaseName, usersCleanedDayTimelines,
+					Constant.getCommonPath() + "BlackListedUsers.csv");
+			if (writeToFile)
+			{
+				writeTimelineStats(usersCleanedDayTimelines, true, true, true, true,
+						"RemovedLT10ActPerDayLT50DaysCleanedLT50DaysBlUsers");
+			}
 		}
 		return usersCleanedDayTimelines;
+	}
+
+	/**
+	 * 
+	 * @param timelines
+	 * @param writeSubsetOfTimelines
+	 * @param writeNumOfActsPerUsersDayTimelines
+	 * @param writeNumOfDaysPerUsersDayTimelines
+	 * @param writeNumOfDistinctValidActsPerUsersDayTimelines
+	 * @param labelEnd
+	 */
+	public static void writeTimelineStats(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> timelines,
+			boolean writeSubsetOfTimelines, boolean writeNumOfActsPerUsersDayTimelines,
+			boolean writeNumOfDaysPerUsersDayTimelines, boolean writeNumOfDistinctValidActsPerUsersDayTimelines,
+			String labelEnd)
+	{
+		// Writing user day timelines. big file ~ 17.3GB
+		// WritingToFile.writeUsersDayTimelinesSameFile(timelines,"usersCleanedDayTimelinesReduced"+labelEnd,false,
+		// false, false,"GowallaUserDayTimelinesCleanedReduced"+labelEnd+".csv");//
+
+		if (writeSubsetOfTimelines)
+		{
+			Map<String, LinkedHashMap<Date, Timeline>> timelinesSampled = timelines.entrySet().stream().limit(2)
+					.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+
+			WritingToFile.writeUsersDayTimelinesSameFile(
+					new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>(timelinesSampled),
+					"usersDayTimelines" + labelEnd + "First2UsersOnly", false, false, false,
+					"GowallaUserDayTimelines" + labelEnd + "First2UsersOnly.csv");// users
+		}
+		if (writeNumOfActsPerUsersDayTimelines)
+		{
+			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
+					"GowallaPerUserDayNumOfActs" + labelEnd + ".csv");
+		}
+		if (writeNumOfDaysPerUsersDayTimelines)
+		{
+			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(timelines,
+					Constant.getCommonPath() + "NumOfDaysPerUser" + labelEnd + ".csv");
+
+		}
+		if (writeNumOfDistinctValidActsPerUsersDayTimelines)
+		{
+			WritingToFile.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(timelines,
+					"usersDayTimelines" + labelEnd, "GowallaPerUserDayNumOfDistinctValidActs" + labelEnd + ".csv");
+		}
+		System.out.println(" Num of users" + labelEnd + "= " + timelines.size());
 	}
 
 	//
@@ -1115,68 +1100,54 @@ public class ControllerWithoutServer
 			String commonPath) // formerly reduceTimelines3
 	{// making it generic and not restricting to gowalla dataset on 2 Jan 2018
 		System.out.println("Inside reduceTimelinesByActivityDensity");
-
-		// Originally received timelines
-		if (writeToFile)
-		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActs.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					commonPath + "NumOfDaysPerUser.csv");
-		}
-		System.out.println("Num of users = " + usersDayTimelinesOriginal.size());
+		String labelEnd = "";
 
 		////////// remove days with less than actsPerDayLowerLimit acts per day
-		System.out.println("\n-- removing days with less than " + actsPerDayLowerLimit + " acts per day");
-		usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
-				actsPerDayLowerLimit,
-				commonPath + "removeDayTimelinesWithLessThan" + actsPerDayLowerLimit + "ActLog.csv", writeLogs);
 
-		if (writeToFile)
+		if (actsPerDayLowerLimit > -1)
 		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					commonPath + "NumOfDaysPerUserReduced1.csv");
-			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+			labelEnd = "RemovedDaysWithLT" + actsPerDayLowerLimit + "ActPerDay";
+			System.out.println("\n-- removing days with less than " + actsPerDayLowerLimit + " acts per day");
+			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
+					actsPerDayLowerLimit,
+					commonPath + "removeDayTimelinesWithLessThan" + actsPerDayLowerLimit + "ActLog.csv", writeLogs);
+			if (writeToFile)
+			{
+				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd);
+			}
 		}
-		System.out.println("Num of users reduced1 = " + usersDayTimelinesOriginal.size());
 		//////////
 
 		////////// removed days with greater than actsPerDayUpperLimit acts per day
-		System.out.println("\n-- removing days with greater than " + actsPerDayUpperLimit + " acts per day");
-		usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithGreaterAct(usersDayTimelinesOriginal,
-				actsPerDayUpperLimit,
-				commonPath + "removeDayTimelinesWithGreaterThan" + actsPerDayUpperLimit + "ActLog.csv", writeLogs);
-
-		if (writeToFile)
+		if (actsPerDayUpperLimit > -1)
 		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1_2.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					commonPath + "NumOfDaysPerUserReduced1_2.csv");
-			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+			labelEnd += "GT" + actsPerDayUpperLimit + "ActsPerDay";
+			System.out.println("\n-- removing days with greater than " + actsPerDayUpperLimit + " acts per day");
+			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithGreaterAct(usersDayTimelinesOriginal,
+					actsPerDayUpperLimit,
+					commonPath + "removeDayTimelinesWithGreaterThan" + actsPerDayUpperLimit + "ActLog.csv", writeLogs);
+
+			if (writeToFile)
+			{
+				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd);
+			}
 		}
-		System.out.println("Num of users reduced1_2 = " + usersDayTimelinesOriginal.size());
 		//////////
 
 		////////// removed users with less than numOfSuchDaysLowerLimit days
-		System.out.println("\n-- removing users with less than " + numOfSuchDaysLowerLimit + " days");
-		usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal,
-				numOfSuchDaysLowerLimit,
-				commonPath + "removeDayTimelinesWithLessThan" + numOfSuchDaysLowerLimit + "DaysLog.csv");
-		if (writeToFile)
+		if (numOfSuchDaysLowerLimit > -1)
 		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced2.csv");// us
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-					commonPath + "NumOfDaysPerUserReduced2.csv");
-			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-			// false, false, false,"GowallaUserDayTimelinesReduced2.csv");// users
+			labelEnd += "UsersWithLT" + numOfSuchDaysLowerLimit + "Days";
+			System.out.println("\n-- removing users with less than " + numOfSuchDaysLowerLimit + " days");
+			usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal,
+					numOfSuchDaysLowerLimit,
+					commonPath + "removeDayTimelinesWithLessThan" + numOfSuchDaysLowerLimit + "DaysLog.csv");
+			if (writeToFile)
+			{
+				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd);
+
+			}
 		}
-		System.out.println("Num of users reduced2 = " + usersDayTimelinesOriginal.size());
 		//////////
 
 		return usersDayTimelinesOriginal;
@@ -1185,18 +1156,20 @@ public class ControllerWithoutServer
 
 	//
 	/**
-	 * removed days with less than 10 acts per day
+	 * removed days with less than actsPerDayThreshold(10) acts per day
 	 * <p>
-	 * removed users with less than 50 days
+	 * removed users with less than suchDaysThreshold(50) days
 	 * 
 	 * @param databaseName
 	 * @param usersDayTimelinesOriginal
 	 * @param writeToFile
+	 * @param actsPerDayThreshold
+	 * @param suchDaysThreshold
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelinesByActDensity(
 			String databaseName, LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal,
-			boolean writeToFile)
+			boolean writeToFile, int actsPerDayThreshold, int suchDaysThreshold)
 	{// formerly reduceGowallaTimelines
 		System.out.println("Inside reduceGowallaTimelinesByActDensity");
 
@@ -1211,47 +1184,30 @@ public class ControllerWithoutServer
 
 		else
 		{
-			// Originally received timelines
-			if (writeToFile)
-			{
-				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActs.csv");// us
-				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-						Constant.getCommonPath() + "NumOfDaysPerUser.csv");
-			}
-			System.out.println("Num of users = " + usersDayTimelinesOriginal.size());
-
 			////////// removed days with less than 10 acts per day
-			System.out.println("\n-- removing days with less than 10 acts per day");
-			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal, 10,
-					Constant.getCommonPath() + "removeDayTimelinesWithLessThan10ActLog.csv", true);
+			System.out.println("\n-- removing days with less than " + actsPerDayThreshold + " acts per day");
+			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
+					actsPerDayThreshold,
+					Constant.getCommonPath() + "removeDayTimelinesWithLessThan" + actsPerDayThreshold + "ActLog.csv",
+					true);
 			if (writeToFile)
 			{
-				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced1.csv");// us
-				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-						Constant.getCommonPath() + "NumOfDaysPerUserReduced1.csv");
-				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-				// false, false, false, "GowallaUserDayTimelinesReduced1.csv");// users
+				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false,
+						"RemovedLT" + actsPerDayThreshold + "ActPerDay");
 			}
-			System.out.println("Num of users reduced1 = " + usersDayTimelinesOriginal.size());
+
 			//////////
 
 			////////// removed users with less than 50 days
-			System.out.println("\n-- removing users with less than 50 days");
-			usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal, 50,
-					Constant.getCommonPath() + "removeDayTimelinesWithLessThan50DaysLog.csv");
+			System.out.println("\n-- removing users with less than " + suchDaysThreshold + " days");
+			usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal,
+					suchDaysThreshold,
+					Constant.getCommonPath() + "removeDayTimelinesWithLessThan" + suchDaysThreshold + "DaysLog.csv");
 			if (writeToFile)
 			{
-				WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-						"usersDayTimelinesOriginal", "GowallaPerUserDayNumOfActsReduced2.csv");// us
-				WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersDayTimelinesOriginal,
-						Constant.getCommonPath() + "NumOfDaysPerUserReduced2.csv");
-				// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
-				// false, false, false,"GowallaUserDayTimelinesReduced2.csv");// users
+				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false,
+						"RemovedLT" + actsPerDayThreshold + "ActPerDayLT" + suchDaysThreshold + "Days");
 			}
-			System.out.println("Num of users reduced2 = " + usersDayTimelinesOriginal.size());
-			//////////
 
 			return usersDayTimelinesOriginal;
 		}

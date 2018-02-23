@@ -9,7 +9,7 @@ import java.util.Map;
 import org.activity.constants.Constant;
 import org.activity.constants.SanityConstants;
 import org.activity.constants.VerbosityConstants;
-import org.activity.stats.StatsUtils;
+import org.activity.spatial.SpatialUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
@@ -68,13 +68,13 @@ public class CopyOfActivityObject implements Serializable
 
 	public double getDifferenceStartingGeoCoordinates(CopyOfActivityObject ao2)
 	{
-		return StatsUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(), ao2.getStartLongitude());
+		return SpatialUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(), ao2.getStartLongitude());
 
 	}
 
 	public double getDifferenceEndingGeoCoordinates(CopyOfActivityObject ao2)
 	{
-		return StatsUtils.haversine(endLatitude, endLongitude, ao2.getEndLatitude(), ao2.getEndLongitude());
+		return SpatialUtils.haversine(endLatitude, endLongitude, ao2.getEndLatitude(), ao2.getEndLongitude());
 
 	}
 
@@ -167,7 +167,7 @@ public class CopyOfActivityObject implements Serializable
 
 			this.avgAltitude = getDimensionAttributeValue("Location_Dimension", "Avg_Altitude").toString();
 
-			this.distanceTravelled = StatsUtils.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
+			this.distanceTravelled = SpatialUtils.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
 
 			if (distanceTravelled > Constant.distanceTravelledAlert && SanityConstants.checkForDistanceTravelledAnomaly)
 			{

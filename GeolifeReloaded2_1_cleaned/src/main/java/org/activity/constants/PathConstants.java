@@ -9,13 +9,13 @@ package org.activity.constants;
 public class PathConstants
 {
 	public static String commonPathToGowallaPreProcessedData;
-
 	public static String pathToSerialisedCatIDNameDictionary;
 	public static String pathToSerialisedLocationObjects;
 	public static String pathToSerialisedUniqueLocIDsInCleanedTimelines;
 	public static String pathToSerialisedCatIDsHierDist;
 	public static String pathToSerialisedLevelWiseCatIDsDict;
 	public static String pathToSerialisedMergedCheckinData;
+	public static String pathToSerialisedUserObjects;
 
 	/**
 	 * Set paths to serialised datasets
@@ -46,6 +46,7 @@ public class PathConstants
 			// "./dataToRead/April7/mapCatIDsHierDist.kryo";"./dataToRead/April7/mapCatIDsHierDist.kryo"
 			pathToSerialisedMergedCheckinData = commonPathToGowallaPreProcessedData
 					+ "DatabaseCreatedMerged/mapForAllCheckinData.kryo";
+			pathToSerialisedUserObjects = commonPathToGowallaPreProcessedData + "mapForAllUserData.kryo";
 			/**
 			 * End of Gowalla path constants for Aug 11 experiments
 			 */
@@ -60,14 +61,18 @@ public class PathConstants
 
 			pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
 			pathToSerialisedLocationObjects = "./dataToRead/Mar30/DatabaseCreatedMerged/mapForAllLocationData.kryo";
-			pathToSerialisedUniqueLocIDsInCleanedTimelines = "./dataToRead/Mar30/DatabaseCreatedMerged/UniqueLocIDsInCleanedTimeines.ser";
+			// pathToSerialisedUniqueLocIDsInCleanedTimelines =
+			// "./dataToRead/Mar30/DatabaseCreatedMerged/UniqueLocIDsInCleanedTimeines.ser";
+			pathToSerialisedUniqueLocIDsInCleanedTimelines = "./dataToRead/July12/UniqueLocIDsInCleanedTimeines.kryo";
 
 			pathToSerialisedLevelWiseCatIDsDict = "./dataToRead/May17/mapCatIDLevelWiseCatIDsDict.kryo";
 			pathToSerialisedCatIDsHierDist = "./dataToRead/April7/mapCatIDsHierDist.kryo";
+			pathToSerialisedUserObjects = "./dataToRead/Mar30/DatabaseCreatedMerged/mapForAllUserData.kryo";
 			/**
 			 * End of Gowalla path constants for before Aug 11 experiments
 			 */
 		}
+
 	}
 	// public final static String pathToSerialisedCatIDsHierDist;
 

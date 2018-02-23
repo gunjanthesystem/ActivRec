@@ -10,6 +10,7 @@ import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -42,8 +43,8 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	static final String groupsOf100UsersLabels[] = DomainConstants.gowallaUserGroupsLabels;// { "1", "101", "201",
-																							// "301", "401", "501",
+	static final String groupsOf100UsersLabels[] = DomainConstants.gowallaUserGroupsLabelsFixed;// { "1", "101", "201",
+	// "301", "401", "501",
 	// "601", "701", "801","901" };
 
 	// for each individual seq index
@@ -65,6 +66,9 @@ public class EvaluationSeq
 	{
 		// commonPath = "./dataWritten/";
 		System.out.println("Inside EvaluationSeq for NO MU");
+		System.out.println("groupsOf100UsersLabels= " + Arrays.asList(groupsOf100UsersLabels).toString());
+		WritingToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
+				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
 
 		PathConstants.intialise(Constant.For9kUsers);
 		intialiseListOfFilenamesNoMU();
@@ -84,7 +88,7 @@ public class EvaluationSeq
 
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
-						PathConstants.pathToSerialisedLocationObjects);
+						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects);
 
 				// for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				// {
@@ -173,6 +177,10 @@ public class EvaluationSeq
 	{
 		// commonPath = "./dataWritten/";
 		System.out.println("outputCoreResultsPath= " + Constant.getOutputCoreResultsPath());
+		System.out.println("groupsOf100UsersLabels= " + Arrays.asList(groupsOf100UsersLabels).toString());
+		WritingToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
+				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
+
 		PathConstants.intialise(Constant.For9kUsers);
 		intialiseListOfFilenames(matchingUnitAsPastCount);
 		int totalNumOfUsersComputedFor = 0;
@@ -184,7 +192,7 @@ public class EvaluationSeq
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
-						PathConstants.pathToSerialisedLocationObjects);
+						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -287,7 +295,7 @@ public class EvaluationSeq
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
-						PathConstants.pathToSerialisedLocationObjects);
+						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -401,7 +409,7 @@ public class EvaluationSeq
 
 					Constant.initialise(pathT, Constant.getDatabaseName(), PathConstants.pathToSerialisedCatIDsHierDist,
 							PathConstants.pathToSerialisedCatIDNameDictionary,
-							PathConstants.pathToSerialisedLocationObjects);
+							PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects);
 					System.out.println("Constant.initialise done ---");
 					// outputCoreResultsPath = commonPathT;
 
@@ -1823,8 +1831,7 @@ public class EvaluationSeq
 		{
 			try
 			{
-				WritingToFile.closeBWs(bwTopKPrecision, bwTopKRecall, bwTopKF,
-						bwNumberOfRecommendationTimes);
+				WritingToFile.closeBWs(bwTopKPrecision, bwTopKRecall, bwTopKF, bwNumberOfRecommendationTimes);
 				// bwAccuracy.close();
 			}
 			catch (IOException ex)

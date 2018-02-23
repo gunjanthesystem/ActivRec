@@ -62,7 +62,7 @@ public final class Constant
 	 */
 	public static final boolean useTolerance = true;// false;
 
-	public static final boolean useHierarchicalDistance = false;// true; // SWITCH_NOV10//
+	public static final boolean useHierarchicalDistance = true;// true; // SWITCH_NOV10//
 	/**
 	 * Determines whether the sorting of candiates is stable or unstable
 	 */
@@ -146,7 +146,7 @@ public final class Constant
 	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
 	// None,Percentile // SWITCH_NOV10
 
-	public static final int filterCandByCurActTimeThreshInSecs = -1;// 18000;// 3600; // SWITCH_NOV10
+	public static final int filterCandByCurActTimeThreshInSecs = -1;// -1;18000; 3600; //SWITCH_NOV10
 
 	/**
 	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
@@ -172,9 +172,11 @@ public final class Constant
 	public static final boolean NGramColl = false;// SWITCH_NOV10
 
 	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
-	public static final boolean checkEDSanity = true;// true;// SWITCH_NOV10
-	public static final double EDAlpha = 0.6;// 0.8;// 0.5;// SWITCH_NOV10
+	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
+	public static final double EDAlpha = -1;// 0.8;// 0.5;// SWITCH_NOV10
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
+	public static final boolean scoreRecommsByLocProximity = false;// SWITCH_NOV10
+	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -224,11 +226,9 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 3, 2, 4, 0, 1, 6, 8 };// { 0, 1, 2, 3, 4, 6, 8 };//
-																					// 2, 4,
-																					// 6, 8, 1, 3, 10 11, 12,
-																					// 13,
-	// 14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38, 40,42 };
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 0, 1, 2, 3, 4, 6, 8 };//
+	// 2, 4,6, 8, 1, 3, 10 11, 12,13,14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38,
+	// 40,42 };
 
 	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 			17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
@@ -514,9 +514,12 @@ public final class Constant
 	 * @param databaseName
 	 * @param catIDsHierDistSerialisedFile
 	 * @param pathToSerialisedCatIDNameDictionary
+	 * @param pathToSerialisedLocationObjects
+	 * @param pathToSerialisedUserObjects
 	 */
 	public static void initialise(String givenCommonpath, String databaseName, String catIDsHierDistSerialisedFile,
-			String pathToSerialisedCatIDNameDictionary, String pathToSerialisedLocationObjects)
+			String pathToSerialisedCatIDNameDictionary, String pathToSerialisedLocationObjects,
+			String pathToSerialisedUserObjects)
 	{
 
 		Constant.setDatabaseName(databaseName);
@@ -529,13 +532,16 @@ public final class Constant
 		DomainConstants.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
 		// Disabled setLocIDLocationObjectDictionary as it was not essential, we only needed loc name and full objects
 		// were taking signficantmemory space.
-		// DomainConstants.setLocIDLocationObjectDictionary(pathToSerialisedLocationObjects);
-		DomainConstants.setLocationIDNameDictionary(pathToSerialisedLocationObjects);
+		DomainConstants.setLocIDLocationObjectDictionary(pathToSerialisedLocationObjects);
+		DomainConstants.setLocationIDNameDictionary(DomainConstants.getLocIDLocationObjectDictionary());// pathToSerialisedLocationObjects);
 		DomainConstants.setCatIDCharCodeMap();
 		DomainConstants.setCatIDGivenLevelCatIDMap();
+		DomainConstants.setUserIDUserObjectDictionary(pathToSerialisedUserObjects);
 
-		editDistancesMemorizer = new EditDistanceMemorizer(Constant.editDistancesMemorizerBufferSize);
-		// Constant.setDistanceUsed("HJEditDistance");
+		if (Constant.memorizeEditDistance)
+		{
+			editDistancesMemorizer = new EditDistanceMemorizer(Constant.editDistancesMemorizerBufferSize);
+		} // Constant.setDistanceUsed("HJEditDistance");
 	}
 
 	//
@@ -1230,7 +1236,8 @@ public final class Constant
 		s.append("\ncheckEDSanity:" + checkEDSanity);
 		s.append("\nEDAlpha:" + EDAlpha);
 		s.append("\ndisableRoundingEDCompute:" + disableRoundingEDCompute);
-
+		s.append("\nscoreRecommsByLocProximity:" + scoreRecommsByLocProximity);
+		s.append("\nwtScoreRecommsByLocProximity:" + wtScoreRecommsByLocProximity);
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{
 			s.append("\nConsider all features for feature wise edit distance:"

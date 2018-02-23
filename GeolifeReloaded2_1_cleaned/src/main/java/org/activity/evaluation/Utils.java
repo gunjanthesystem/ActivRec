@@ -9,10 +9,14 @@ import org.activity.io.WritingToFile;
 
 public class Utils
 {
-	static final String howitzerUsr = "gunjan";
+	static String mortarUsr;
+	static String engineUsr;
+	static final String howitzerUsr = engineUsr = mortarUsr = "gunjan";
+	static final String clarityUsr = "gunjankumar";
 	static final String howitzerHost = "howitzer.ucd.ie";
 	static final String engineHost = "theengine2.ucd.ie";
 	static final String mortarHost = "mortar.ucd.ie";
+	static final String clarityHost = "claritytrec.ucd.ie";
 
 	public static void main(String args[])
 	{
@@ -75,9 +79,35 @@ public class Utils
 				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 2, false)
 						.get(0);
 				break;
+			case Utils.clarityHost:
+				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 3, false)
+						.get(0);
+				break;
 
 		}
 		return passwd;
+	}
+
+	/**
+	 * 
+	 * @param host
+	 * @return
+	 */
+	protected static String getUserForHost(String host)
+	{
+		switch (host)
+		{
+			case Utils.clarityHost:
+				return Utils.clarityUsr;
+			case Utils.mortarHost:
+				return Utils.mortarUsr;
+			case Utils.engineHost:
+				return Utils.engineUsr;
+			case Utils.howitzerHost:
+				return Utils.howitzerUsr;
+
+		}
+		return host;
 	}
 
 }

@@ -14,6 +14,10 @@ import org.activity.stats.StatsUtils;
 public class PerformanceAnalytics
 {
 
+	// int processors = Runtime.getRuntime().availableProcessors();
+	// System.out.println(
+	// Integer.toString(processors) + " processor" + (processors != 1 ? "s are " : " is ") + "available");
+
 	public static void main(String[] args)
 	{
 		System.out.println(getHeapInformation());

@@ -20,6 +20,7 @@ org.activity.plotting0
 org.activity.probability
 org.activity.recomm
 org.activity.sanityChecks
+org.activity.spatial
 org.activity.spmf
 org.activity.stats
 org.activity.stats.entropy

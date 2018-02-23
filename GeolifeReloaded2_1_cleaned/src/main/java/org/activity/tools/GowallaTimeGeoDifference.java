@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import org.activity.io.WritingToFile;
+import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.util.DateTimeUtils;
 
@@ -77,7 +78,7 @@ public class GowallaTimeGeoDifference
 
 				if (prevUser.equals(currUser))
 				{
-					distFromPrevInMeters = StatsUtils.haversine(currentLat, currentLon, prevLat, prevLon);
+					distFromPrevInMeters = SpatialUtils.haversine(currentLat, currentLon, prevLat, prevLon);
 					distFromPrevInMeters = distFromPrevInMeters * 1000;
 					distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
 
