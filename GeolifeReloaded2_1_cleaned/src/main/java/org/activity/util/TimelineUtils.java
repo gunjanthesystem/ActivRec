@@ -4021,7 +4021,86 @@ public class TimelineUtils
 			System.out.println("Inside getUniqueLocIDs: uniqueLocIDs.size()=" + uniqueLocIDs.size());
 			if (write)
 			{
-				WritingToFile.writeToNewFile(uniqueLocIDs.toString(), Constant.getCommonPath() + "UniqueLocIDs.csv");
+				// WritingToFile.writeToNewFile(uniqueLocIDs.toString(), );
+				WritingToFile.writeToNewFile(
+						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
+						Constant.getCommonPath() + "UniqueLocIDs.csv");// );
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return uniqueLocIDs;
+	}
+
+	/**
+	 * Extract unique location IDs from the given timelines
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param write
+	 * @param filenamePhrase
+	 * @return
+	 * @since 22 Feb 2018
+	 */
+	public static Set<Integer> getUniqueLocIDs(Map<String, Timeline> usersCleanedDayTimelines, boolean write,
+			String absFileNameToWrite)
+	{
+		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
+		try
+		{
+			for (Entry<String, Timeline> e : usersCleanedDayTimelines.entrySet())
+			{
+
+				e.getValue().getActivityObjectsInTimeline().stream()
+						.forEach(ao -> uniqueLocIDs.addAll(ao.getLocationIDs()));
+			}
+			System.out.println("Inside getUniqueLocIDs: uniqueLocIDs.size()=" + uniqueLocIDs.size());
+			if (write)
+			{
+				// WritingToFile.writeToNewFile(uniqueLocIDs.toString(), absFileNameToWrite);// );
+				WritingToFile.writeToNewFile(
+						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
+						absFileNameToWrite);// );
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return uniqueLocIDs;
+	}
+
+	/**
+	 * 
+	 * @param trainTestTimelinesForAllUsersDW
+	 * @param write
+	 * @param absFileNameToWrite
+	 * @return
+	 * @since 22 Feb 2018
+	 */
+	public static Set<Integer> getUniqueLocIDsFromTestOnly(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW, boolean write,
+			String absFileNameToWrite)
+	{
+		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
+		try
+		{
+			for (Entry<String, List<LinkedHashMap<Date, Timeline>>> e : trainTestTimelinesForAllUsersDW.entrySet())
+			{
+				for (Entry<Date, Timeline> e2 : e.getValue().get(1).entrySet())
+				{
+					e2.getValue().getActivityObjectsInTimeline().stream()
+							.forEach(ao -> uniqueLocIDs.addAll(ao.getLocationIDs()));
+				}
+			}
+			System.out.println("Inside getUniqueLocIDs: uniqueLocIDs.size()=" + uniqueLocIDs.size());
+			if (write)
+			{
+				// /WritingToFile.writeToNewFile(uniqueLocIDs.toString(), absFileNameToWrite);
+				WritingToFile.writeToNewFile(
+						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
+						absFileNameToWrite);// );
 			}
 		}
 		catch (Exception e)
@@ -4177,6 +4256,71 @@ public class TimelineUtils
 			String user = userData.getKey();
 
 			for (Entry<Date, Timeline> timeline : userData.getValue().entrySet())
+			{
+				StringBuilder sbForThisTimeline = new StringBuilder();
+				for (ActivityObject ao : timeline.getValue().getActivityObjectsInTimeline())
+				{
+					sbForThisTimeline
+							.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
+				}
+				WritingToFile.appendLineToFileAbsolute(sbForThisTimeline.toString(), abFileNameToWrite);
+			}
+		}
+	}
+
+	/**
+	 * Write all act objs with their features.
+	 * <p>
+	 * This method was created to investigate issue with feature level edit distance>100 because of issue with checkin
+	 * counts.
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param abFileNameToWrite
+	 * @since 22 Feb 2018
+	 */
+	public static void writeAllActObjs(Map<String, Timeline> usersTimelines, String abFileNameToWrite)
+	{
+		String delimiter = ",";
+		WritingToFile.appendLineToFileAbsolute(
+				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+				abFileNameToWrite);
+
+		for (Entry<String, Timeline> userData : usersTimelines.entrySet())
+		{
+			String user = userData.getKey();
+
+			StringBuilder sbForThisTimeline = new StringBuilder();
+			for (ActivityObject ao : userData.getValue().getActivityObjectsInTimeline())
+			{
+				sbForThisTimeline.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
+			}
+			WritingToFile.appendLineToFileAbsolute(sbForThisTimeline.toString(), abFileNameToWrite);
+		}
+	}
+
+	/**
+	 * Write all act objs with their features from test timelines (second in list)
+	 * <p>
+	 * 
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param abFileNameToWrite
+	 * @since 22 Feb 2018
+	 */
+	public static void writeAllActObjsFromTestOnly(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
+			String abFileNameToWrite)
+	{
+		String delimiter = ",";
+		WritingToFile.appendLineToFileAbsolute(
+				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+				abFileNameToWrite);
+
+		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> userData : trainTestTimelinesForAllUsersDW.entrySet())
+		{
+			String user = userData.getKey();
+
+			for (Entry<Date, Timeline> timeline : userData.getValue().get(1).entrySet())
 			{
 				StringBuilder sbForThisTimeline = new StringBuilder();
 				for (ActivityObject ao : timeline.getValue().getActivityObjectsInTimeline())

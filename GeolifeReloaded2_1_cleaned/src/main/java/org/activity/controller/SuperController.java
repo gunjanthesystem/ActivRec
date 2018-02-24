@@ -131,7 +131,7 @@ public class SuperController
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Feb21/" };
+		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Feb22/" };
 		// "./dataWritten/Feb11NCount_5DayFilter_ThreshNN500MedianRepCinsHierED/" };
 		// + "Feb18NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.4/" };
 		// + "/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };

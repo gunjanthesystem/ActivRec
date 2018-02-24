@@ -1,16 +1,26 @@
 package org.activity.spatial;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.PathConstants;
 import org.activity.constants.SanityConstants;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
+import org.activity.io.WritingToFile;
 import org.activity.objects.LocationGowalla;
+import org.activity.objects.LocationSlim;
+import org.activity.objects.Pair;
 import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
+import org.activity.util.ComparatorUtils;
 import org.apache.commons.math3.util.FastMath;
 
 public final class SpatialUtils
@@ -20,7 +30,278 @@ public final class SpatialUtils
 	{
 	}
 
+	/**
+	 * 
+	 * @param pathToReadUniqueLocs
+	 * @param commonPath
+	 */
+	public static void spatialDistanceDatabaseController(String pathToReadUniqueLocs, String commonPath)
+	{
+
+		try
+		{
+			long tt1 = System.currentTimeMillis();
+			Pair<Map<Long, LocationSlim>, Map<Long, Map<Long, Double>>> res = createSpatialDistanceDatabase(
+					pathToReadUniqueLocs);
+			long tt2 = System.currentTimeMillis();
+			System.out.println("createSpatialDistanceDatabase took " + (1.0 * (tt2 - tt1)) / 1000 + " secs");
+
+			Map<Long, Map<Long, Double>> allLocDists = res.getSecond();
+			WritingToFile.writeMapOfMap(allLocDists, "loc1ID,loc2ID,DistInM\n", commonPath + "allLocDists.csv");
+
+			long tt3 = System.currentTimeMillis();
+
+			System.out.println("writing took " + (1.0 * (tt3 - tt2)) / 1000 + " secs");
+			Serializer.kryoSerializeThis(res.getFirst(), commonPath + "uniqLocs.kry");
+			Serializer.kryoSerializeThis(allLocDists, commonPath + "allLocDists.kry");
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param pathToReadUniqueLocs
+	 * @param commonPath
+	 */
+	public static void spatialDistanceDatabaseController2(String pathToReadUniqueLocs, String commonPath)
+	{
+
+		try
+		{
+			long tt1 = System.currentTimeMillis();
+			Pair<Map<Long, LocationSlim>, Map<Long, Map<Integer, Pair<Long, Double>>>> res = createSpatialDistanceDatabase2(
+					pathToReadUniqueLocs);
+			long tt2 = System.currentTimeMillis();
+			System.out.println("createSpatialDistanceDatabase took " + (1.0 * (tt2 - tt1)) / 1000 + " secs");
+
+			Map<Long, Map<Integer, Pair<Long, Double>>> allLocNearestForEachActIDDists = res.getSecond();
+			// write(allLocNearestForEachActIDDists, commonPath + "allLocNearestForEachActIDDists.csv");
+			WritingToFile.writeMapOfMap(allLocNearestForEachActIDDists,
+					"loc1ID,ActD,(NearestLoc2ID,NearestLoc2DistInM)\n",
+					commonPath + "allLocNearestForEachActIDDists.csv");
+
+			long tt3 = System.currentTimeMillis();
+
+			System.out.println("writing took " + (1.0 * (tt3 - tt2)) / 1000 + " secs");
+			Serializer.kryoSerializeThis(res.getFirst(), commonPath + "uniqLocs.kry");
+			Serializer.kryoSerializeThis(allLocNearestForEachActIDDists,
+					commonPath + "allLocNearestForEachActIDDists.kry");
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	// private static void write(Map<Long, Pair<Long, Double>[]> allLocNearestForEachActIDDists, String
+	// absFileNameToWrite)
+	// {
+	//
+	// try
+	// {
+	// WritingToFile.writeToNewFile("loc1ID,ActID,NearestLoc2ID,DistNearestLoc2ID\n", absFileNameToWrite);
+	//
+	// for (Entry<Long, Pair<Long, Double>[]> e : allLocNearestForEachActIDDists.entrySet())
+	// {
+	// StringBuilder sb = new StringBuilder();
+	// String loc1ID = e.getKey().toString();
+	//
+	// for(int i=0;i<
+	// {
+	//
+	// }
+	//
+	// }
+	//
+	// }
+	// catch (Exception e)
+	// {
+	// e.printStackTrace();
+	// }
+	//
+	// }
+
+	/**
+	 * 
+	 * @param pathToReadUniqueLocs
+	 * @return
+	 */
+	public static Pair<Map<Long, LocationSlim>, Map<Long, Map<Long, Double>>> createSpatialDistanceDatabase(
+			String pathToReadUniqueLocs)
+	{
+		Map<Long, Map<Long, Double>> allLocDists = new TreeMap<>();
+		Map<Long, LocationSlim> uniqLocs = new TreeMap<>();
+		long count = 0;
+		try
+		{
+			Set<LocationSlim> locsForDist = createLocationSlimObjects(pathToReadUniqueLocs);
+
+			locsForDist.stream().forEachOrdered(e -> uniqLocs.put(e.getLocID(), e));
+
+			System.out.println("locsForDist.size()=" + locsForDist.size());
+			System.out.println("uniqLocs.size()=" + uniqLocs.size());
+
+			for (LocationSlim loc1 : locsForDist)
+			{
+				Map<Long, Double> locDists = new TreeMap<>();
+				for (LocationSlim loc2 : locsForDist)
+				{
+					if (loc1.getLocID() != loc2.getLocID())
+					{
+						count++;
+						double dist = SpatialUtils.haversineFastMathV3NoRound(loc1.getLatitude(), loc1.getLongitude(),
+								loc2.getLatitude(), loc2.getLongitude());
+						locDists.put(loc2.getLocID(), dist);
+						if ((count % 50000) == 0)
+						{
+							System.out.println(
+									"count of haversines computed = " + count + " locDists.size=" + locDists.size());
+						}
+					}
+				}
+				allLocDists.put(loc1.getLocID(), ComparatorUtils.sortByValueAscending(locDists));
+				// if (true)// temporary
+				// {
+				// if ((count > 1000000))
+				// {
+				// break;
+				// }
+				// }
+				//
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return new Pair<>(uniqLocs, allLocDists);
+
+	}
+
+	/**
+	 * 
+	 * @param pathToReadUniqueLocs
+	 * @return
+	 * @return
+	 */
+	public static Pair<Map<Long, LocationSlim>, Map<Long, Map<Integer, Pair<Long, Double>>>> createSpatialDistanceDatabase2(
+			String pathToReadUniqueLocs)
+	{
+		// loc1, list of 134 one for each act { {nearestLocIDForAct1,distance},{nearestLocIDForAct2,distance}}
+		Map<Long, Map<Integer, Pair<Long, Double>>> allLocDists = new TreeMap<>();
+		Map<Long, LocationSlim> uniqLocs = new TreeMap<>();
+
+		Set<LocationSlim> locsForDist;
+		ArrayList<Integer> uniqActIDs;
+
+		long count = 0;
+
+		try
+		{
+			locsForDist = createLocationSlimObjects(pathToReadUniqueLocs);
+			uniqActIDs = locsForDist.stream().map(l -> (int) l.getActID())
+					.collect(Collectors.toCollection(ArrayList::new));
+
+			locsForDist.stream().forEachOrdered(e -> uniqLocs.put(e.getLocID(), e));
+
+			System.out.println("locsForDist.size()=" + locsForDist.size());
+			System.out.println("uniqLocs.size()=" + uniqLocs.size());
+			System.out.println("uniqActIDs.size()=" + uniqActIDs.size());
+
+			int loc1Count = 0;
+			for (LocationSlim loc1 : locsForDist)
+			{
+				Map<Integer, Pair<Long, Double>> nearestLocForEachActID = new TreeMap<>();
+				System.out.println("loc1Count=" + (++loc1Count));
+				// if (loc1Count > 100)
+				// {
+				// break;
+				// }
+
+				// Map<Long, Double> locDists = new TreeMap<>();
+				int actCount = 0;
+				for (Integer actID : uniqActIDs)
+				{
+					// if (++actCount > 10)
+					// {
+					// break;
+					// }
+					Pair<Long, Double> lowestDistLoc2 = new Pair<Long, Double>(new Long(-9999), Double.MAX_VALUE);
+
+					for (LocationSlim loc2 : locsForDist)
+					{
+						if ((loc2.getActID() == actID) && (loc1.getLocID() != loc2.getLocID()))
+						{
+							count++;
+							double dist = SpatialUtils.haversineFastMathV3NoRound(loc1.getLatitude(),
+									loc1.getLongitude(), loc2.getLatitude(), loc2.getLongitude());
+
+							if (dist < lowestDistLoc2.getSecond())
+							{
+								lowestDistLoc2 = new Pair<>(loc2.getLocID(), dist);
+							}
+							if ((count % 500000) == 0)
+							{
+								System.out.println("count of haversines computed = " + count);
+							}
+						}
+					}
+					nearestLocForEachActID.put(actID, lowestDistLoc2);
+				}
+				allLocDists.put(loc1.getLocID(), nearestLocForEachActID);
+			}
+		}
+		catch (
+
+		Exception e)
+		{
+			e.printStackTrace();
+		}
+		return new Pair<>(uniqLocs, allLocDists);
+
+	}
+
+	/**
+	 * 
+	 * @param pathToReadUniqueLocs
+	 * @return
+	 */
+	private static Set<LocationSlim> createLocationSlimObjects(String pathToReadUniqueLocs)
+	{
+		Set<LocationSlim> locsForDist = new TreeSet<>();
+		try
+		{
+			ArrayList<ArrayList<String>> allLines = ReadingFromFile.readLinesIntoListOfLists(pathToReadUniqueLocs, ",");
+			System.out.println(allLines.get(1));
+			locsForDist = allLines.stream().skip(1).map(l -> new LocationSlim(l.get(9), l.get(10), l.get(0), l.get(13)))
+					.collect(Collectors.toSet());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return locsForDist;
+	}
+
+	// spatialDistanceDatabaseController
 	public static void main(String args[])
+	{
+		// compareHaversines();
+		// spatialDistanceDatabaseController(
+		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/UniqueLocationObjects5DaysTrainTest.csv",
+		// "/run/media/gunjan/BufferVault/GowallaResults/Feb23/");
+
+		spatialDistanceDatabaseController2("./dataWritten/Feb22/UniqueLocationObjects5DaysTrainTest.csv",
+				"./dataWritten/Feb23/");
+	}
+
+	public static void compareHaversines()
 	{
 		// getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict, 1, true);
 		PathConstants.intialise(Constant.For9kUsers);

@@ -354,7 +354,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser = null;
 
 						if (Constant.collaborativeCandidates)
-						{
+						{// TODO 23 Feb 2018: probably we can take this out of MU loop
 							trainTestTimelinesForAllUsersDW = TimelineUtils
 									.splitAllUsersTestTrainingTimelines(allUsersTimelines, percentageInTraining);
 
@@ -1535,7 +1535,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * @param trainTestTimelinesForAllUsersDW
 	 * @return
 	 */
-	private final static LinkedHashMap<String, Timeline> getContinousTrainingTimelines(
+	public final static LinkedHashMap<String, Timeline> getContinousTrainingTimelines(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW)
 	{
 		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
@@ -1616,7 +1616,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * @param numOfRecentDays
 	 * @return
 	 */
-	private final static LinkedHashMap<String, Timeline> getContinousTrainingTimelinesWithFilterByRecentDaysV2(
+	public final static LinkedHashMap<String, Timeline> getContinousTrainingTimelinesWithFilterByRecentDaysV2(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
 			int numOfRecentDays)
 	{

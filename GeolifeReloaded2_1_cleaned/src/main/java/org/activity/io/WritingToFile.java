@@ -1438,6 +1438,41 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * 
+	 * @param mapOfMap
+	 * @param headerLine
+	 * @param absFileNameToUse
+	 */
+	public static <M, L, K> void writeMapOfMap(Map<K, Map<L, M>> mapOfMap, String headerLine, String absFileNameToUse)
+	{
+
+		try
+		{
+			WritingToFile.writeToNewFile(headerLine, absFileNameToUse);
+
+			for (Map.Entry<K, Map<L, M>> entryForFirstMap : mapOfMap.entrySet())
+			{
+
+				K k = entryForFirstMap.getKey();
+
+				StringBuilder sb = new StringBuilder();
+				for (Map.Entry<L, M> entryInside : entryForFirstMap.getValue().entrySet())
+				{
+
+					sb.append(k + "," + entryInside.getKey() + "," + entryInside.getValue() + "\n");
+				}
+				WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToUse);
+				sb.setLength(0);
+			}
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	// // primarily used for writing unknowns, might be better to use generics here K,V
 	public static void writeLinkedHashMapOfTreemap(LinkedHashMap<String, TreeMap<Timestamp, String>> mapOfMap,
 			String fileNameToUse, String headerLine)

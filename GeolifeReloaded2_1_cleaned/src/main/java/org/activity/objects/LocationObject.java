@@ -2,7 +2,7 @@ package org.activity.objects;
 
 public class LocationObject
 {
-	int locationId;
+	int locationId;// TODO remove locationID from LocationGowalla and replace with this
 	String latitude, longitude, altitude;
 	public String locationName, locationCategory, city, county, country, continent;
 
@@ -99,44 +99,44 @@ public class LocationObject
 		{
 			switch (seed % 4)
 			{
-			case (0):
-				locationObject.setAllLocationVariables(1, "50.87", "4.72", "KU Leuven", "Work Place", "Leuven",
-						"Flemish Brabant", "Belgium", "Europe");
-				break;
-			case (1):
-				locationObject.setAllLocationVariables(2, "50.87", "4.69", "Oude Markt", "Leisure Place", "Leuven",
-						"Flemish Brabant", "Belgium", "Europe");
-				break;
-			case (2):
-				locationObject.setAllLocationVariables(4, "50.88", "4.7", "Mathieu de Layensplein", "Home", "Leuven",
-						"Flemish Brabant", "Belgium", "Europe");
-				break;
-			default:
-				locationObject.setAllLocationVariables(5, "50.85", "4.35", "Brussels City Centre", "City Area",
-						"Brussels", "Brussels Capital", "Belgium", "Europe");
-				break;
+				case (0):
+					locationObject.setAllLocationVariables(1, "50.87", "4.72", "KU Leuven", "Work Place", "Leuven",
+							"Flemish Brabant", "Belgium", "Europe");
+					break;
+				case (1):
+					locationObject.setAllLocationVariables(2, "50.87", "4.69", "Oude Markt", "Leisure Place", "Leuven",
+							"Flemish Brabant", "Belgium", "Europe");
+					break;
+				case (2):
+					locationObject.setAllLocationVariables(4, "50.88", "4.7", "Mathieu de Layensplein", "Home",
+							"Leuven", "Flemish Brabant", "Belgium", "Europe");
+					break;
+				default:
+					locationObject.setAllLocationVariables(5, "50.85", "4.35", "Brussels City Centre", "City Area",
+							"Brussels", "Brussels Capital", "Belgium", "Europe");
+					break;
 			}
 		}
 		else if (userId == 1)
 		{
 			switch (seed % 4)
 			{
-			case (0):
-				locationObject.setAllLocationVariables(6, "53.43", "-2.96", "Liverpool Football Club", "Work Place",
-						"Liverpool", "Merseyside", "United Kingdom", "Europe");
-				break;
-			case (1):
-				locationObject.setAllLocationVariables(7, "53.40", "-2.99", "Thomas Rigbys", "Leisure Place",
-						"Liverpool", "Merseyside", "United Kingdom", "Europe");
-				break;
-			case (2):
-				locationObject.setAllLocationVariables(8, "53.41", "-2.98", "Limekiln Ln", "Home", "Liverpool",
-						"Merseyside", "United Kingdom", "Europe");
-				break;
-			default:
-				locationObject.setAllLocationVariables(9, "53.40", "-2.98", "Saint Johns Shopping Centre", "City Area",
-						"Liverpool", "Merseyside", "United Kingdom", "Europe");
-				break;
+				case (0):
+					locationObject.setAllLocationVariables(6, "53.43", "-2.96", "Liverpool Football Club", "Work Place",
+							"Liverpool", "Merseyside", "United Kingdom", "Europe");
+					break;
+				case (1):
+					locationObject.setAllLocationVariables(7, "53.40", "-2.99", "Thomas Rigbys", "Leisure Place",
+							"Liverpool", "Merseyside", "United Kingdom", "Europe");
+					break;
+				case (2):
+					locationObject.setAllLocationVariables(8, "53.41", "-2.98", "Limekiln Ln", "Home", "Liverpool",
+							"Merseyside", "United Kingdom", "Europe");
+					break;
+				default:
+					locationObject.setAllLocationVariables(9, "53.40", "-2.98", "Saint Johns Shopping Centre",
+							"City Area", "Liverpool", "Merseyside", "United Kingdom", "Europe");
+					break;
 			}
 		}
 
@@ -144,22 +144,22 @@ public class LocationObject
 		{
 			switch (seed % 4)
 			{
-			case (0):
-				locationObject.setAllLocationVariables(10, "28.66", "77.22", "Ernst and Young", "Work Place",
-						"New Delhi", "Captial Territory", "India", "Asia");
-				break;
-			case (1):
-				locationObject.setAllLocationVariables(11, "28.63", "77.21", "Connaught Place", "Leisure Place",
-						"New Delhi", "Captial Territory", "India", "Asia");
-				break;
-			case (2):
-				locationObject.setAllLocationVariables(12, "28.57", "77.16", "Vasant Vihar", "Home", "New Delhi",
-						"Captial Territory", "India", "Asia");
-				break;
-			default:
-				locationObject.setAllLocationVariables(13, "28.65", "77.22", "Chandni Chowk", "City Area", "New Delhi",
-						"Captial Territory", "India", "Asia");
-				break;
+				case (0):
+					locationObject.setAllLocationVariables(10, "28.66", "77.22", "Ernst and Young", "Work Place",
+							"New Delhi", "Captial Territory", "India", "Asia");
+					break;
+				case (1):
+					locationObject.setAllLocationVariables(11, "28.63", "77.21", "Connaught Place", "Leisure Place",
+							"New Delhi", "Captial Territory", "India", "Asia");
+					break;
+				case (2):
+					locationObject.setAllLocationVariables(12, "28.57", "77.16", "Vasant Vihar", "Home", "New Delhi",
+							"Captial Territory", "India", "Asia");
+					break;
+				default:
+					locationObject.setAllLocationVariables(13, "28.65", "77.22", "Chandni Chowk", "City Area",
+							"New Delhi", "Captial Territory", "India", "Asia");
+					break;
 			}
 		}
 
@@ -167,22 +167,22 @@ public class LocationObject
 		{
 			switch (seed % 4)
 			{
-			case (0):
-				locationObject.setAllLocationVariables(14, "51.89", "-8.49", "UCC", "Work Place", "Cork", "Cork",
-						"Ireland", "Europe");
-				break;
-			case (1):
-				locationObject.setAllLocationVariables(15, "51.9", "-8.48", "The Franciscan Well", "Leisure Place",
-						"Cork", "Cork", "Ireland", "Europe");
-				break;
-			case (2):
-				locationObject.setAllLocationVariables(16, "51.9", "-8.49", "Rathanny", "Home", "Cork", "Cork",
-						"Ireland", "Europe");
-				break;
-			default:
-				locationObject.setAllLocationVariables(17, "51.88", "-8.51", "Wilton Shopping Centre", "City Area",
-						"Cork", "Cork", "Ireland", "Europe");
-				break;
+				case (0):
+					locationObject.setAllLocationVariables(14, "51.89", "-8.49", "UCC", "Work Place", "Cork", "Cork",
+							"Ireland", "Europe");
+					break;
+				case (1):
+					locationObject.setAllLocationVariables(15, "51.9", "-8.48", "The Franciscan Well", "Leisure Place",
+							"Cork", "Cork", "Ireland", "Europe");
+					break;
+				case (2):
+					locationObject.setAllLocationVariables(16, "51.9", "-8.49", "Rathanny", "Home", "Cork", "Cork",
+							"Ireland", "Europe");
+					break;
+				default:
+					locationObject.setAllLocationVariables(17, "51.88", "-8.51", "Wilton Shopping Centre", "City Area",
+							"Cork", "Cork", "Ireland", "Europe");
+					break;
 			}
 		}
 
@@ -190,22 +190,22 @@ public class LocationObject
 		{
 			switch (seed % 4)
 			{
-			case (0):
-				locationObject.setAllLocationVariables(18, "53.3", "-6.2", "DCU", "Work", "Dublin", "Dublin", "Ireland",
-						"Europe");
-				break;
-			case (1):
-				locationObject.setAllLocationVariables(19, "53.34", "-6.26", "Temple Bar", "Party", "Dublin", "Dublin",
-						"Ireland", "Europe");
-				break;
-			case (2):
-				locationObject.setAllLocationVariables(20, "53.34", "-6.17", "Blackrock", "Home", "Dublin", "Dublin",
-						"Ireland", "Europe");
-				break;
-			default:
-				locationObject.setAllLocationVariables(21, "51.89", "-8.47", "Grafton Street", "Shopping", "Dublin",
-						"Dublin", "Ireland", "Europe");
-				break;
+				case (0):
+					locationObject.setAllLocationVariables(18, "53.3", "-6.2", "DCU", "Work", "Dublin", "Dublin",
+							"Ireland", "Europe");
+					break;
+				case (1):
+					locationObject.setAllLocationVariables(19, "53.34", "-6.26", "Temple Bar", "Party", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
+				case (2):
+					locationObject.setAllLocationVariables(20, "53.34", "-6.17", "Blackrock", "Home", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
+				default:
+					locationObject.setAllLocationVariables(21, "51.89", "-8.47", "Grafton Street", "Shopping", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
 			}
 		}
 
@@ -213,22 +213,22 @@ public class LocationObject
 		{
 			switch (seed % 4)
 			{
-			case (0):
-				locationObject.setAllLocationVariables(22, "53.3", "-6.2", "UCD", "Work", "Dublin", "Dublin", "Ireland",
-						"Europe");
-				break;
-			case (1):
-				locationObject.setAllLocationVariables(23, "53.34", "-6.26", "Temple Bar", "Party", "Dublin", "Dublin",
-						"Ireland", "Europe");
-				break;
-			case (2):
-				locationObject.setAllLocationVariables(24, "53.34", "-6.17", "Blackrock", "Home", "Dublin", "Dublin",
-						"Ireland", "Europe");
-				break;
-			default:
-				locationObject.setAllLocationVariables(25, "51.89", "-8.47", "Grafton Street", "Shopping", "Dublin",
-						"Dublin", "Ireland", "Europe");
-				break;
+				case (0):
+					locationObject.setAllLocationVariables(22, "53.3", "-6.2", "UCD", "Work", "Dublin", "Dublin",
+							"Ireland", "Europe");
+					break;
+				case (1):
+					locationObject.setAllLocationVariables(23, "53.34", "-6.26", "Temple Bar", "Party", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
+				case (2):
+					locationObject.setAllLocationVariables(24, "53.34", "-6.17", "Blackrock", "Home", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
+				default:
+					locationObject.setAllLocationVariables(25, "51.89", "-8.47", "Grafton Street", "Shopping", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
 			}
 		}
 
@@ -236,22 +236,22 @@ public class LocationObject
 		{
 			switch (seed % 4)
 			{
-			case (0):
-				locationObject.setAllLocationVariables(26, "53.3", "-6.2", "UCD", "Work", "Dublin", "Dublin", "Ireland",
-						"Europe");
-				break;
-			case (1):
-				locationObject.setAllLocationVariables(27, "53.34", "-6.26", "Temple Bar", "Party", "Dublin", "Dublin",
-						"Ireland", "Europe");
-				break;
-			case (2):
-				locationObject.setAllLocationVariables(28, "53.34", "-6.17", "Blackrock", "Home", "Dublin", "Dublin",
-						"Ireland", "Europe");
-				break;
-			default:
-				locationObject.setAllLocationVariables(29, "51.89", "-8.47", "Grafton Street", "Shopping", "Dublin",
-						"Dublin", "Ireland", "Europe");
-				break;
+				case (0):
+					locationObject.setAllLocationVariables(26, "53.3", "-6.2", "UCD", "Work", "Dublin", "Dublin",
+							"Ireland", "Europe");
+					break;
+				case (1):
+					locationObject.setAllLocationVariables(27, "53.34", "-6.26", "Temple Bar", "Party", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
+				case (2):
+					locationObject.setAllLocationVariables(28, "53.34", "-6.17", "Blackrock", "Home", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
+				default:
+					locationObject.setAllLocationVariables(29, "51.89", "-8.47", "Grafton Street", "Shopping", "Dublin",
+							"Dublin", "Ireland", "Europe");
+					break;
 			}
 		}
 		return locationObject;
