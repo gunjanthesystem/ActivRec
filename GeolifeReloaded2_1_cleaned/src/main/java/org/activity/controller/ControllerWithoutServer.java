@@ -12,8 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
@@ -32,7 +34,6 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
 import org.activity.probability.ProbabilityUtilityBelt;
-import org.activity.spatial.SpatialUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
@@ -160,20 +161,72 @@ public class ControllerWithoutServer
 			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines, true));
 			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true, "NumOfUniquePDValPerUser.csv");
 
-			if (true)
+			if (false)// temporary
 			{
 				TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
 
 				TimelineUtils.writeLocationObjects(Constant.getUniqueLocIDs(),
 						DomainConstants.getLocIDLocationObjectDictionary(),
 						Constant.getCommonPath() + "UniqueLocationObjects.csv");
-
-				SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
-
+				// SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
 				TimelineUtils.writeUserObjects(usersCleanedDayTimelines.keySet(),
 						DomainConstants.getUserIDUserObjectDictionary(),
 						Constant.getCommonPath() + "UniqueUserObjects.csv");
 
+				System.exit(0);
+			}
+
+			if (true)// temporary for 22 feb 2018,
+			{// temporary for 22 feb 2018, to find the unique locations in the training timelines (most recent five
+				// days) and test timelines, this chunk of code has been borrowed from
+				// RecommendationtestsMar2017GenSeq3Nov2017.java
+				LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
+				// training test timelines for all users continuous
+				LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous = null;
+
+				long tt1 = System.currentTimeMillis();
+				if (Constant.collaborativeCandidates)
+				{
+					trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(
+							usersCleanedDayTimelines, Constant.percentageInTraining);
+
+					if (Constant.filterTrainingTimelinesByRecentDays)
+					{
+						trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+								.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
+										Constant.getRecentDaysInTrainingTimelines());
+					}
+					else
+					{
+						// sampledUsersTimelines
+						trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+								.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
+					}
+				}
+				System.out.println("time take for timeline train test splitting which might be save in experiment ="
+						+ ((System.currentTimeMillis() - tt1) * 1.0) / 1000 + " secs");
+
+				Set<Integer> uniqueLocTrains = TimelineUtils.getUniqueLocIDs(trainTimelinesAllUsersContinuous, true,
+						Constant.getCommonPath() + "UniqueLocIDs5DaysTrain.csv");
+				Set<Integer> uniqueLocTests = TimelineUtils.getUniqueLocIDsFromTestOnly(trainTestTimelinesForAllUsersDW,
+						true, Constant.getCommonPath() + "UniqueLocIDsTest.csv");
+
+				Set<Integer> uniqueLocTrainsTests = new TreeSet<>();
+				uniqueLocTrainsTests.addAll(uniqueLocTrains);
+				uniqueLocTrainsTests.addAll(uniqueLocTests);
+				WritingToFile.writeToNewFile(uniqueLocTrainsTests.stream().map(e -> e.toString())
+						.collect(Collectors.joining("\n")).toString(),
+						Constant.getCommonPath() + "UniqueLocIDs5DaysTrainTest.csv");
+
+				TimelineUtils.writeLocationObjects(uniqueLocTrainsTests,
+						DomainConstants.getLocIDLocationObjectDictionary(),
+						Constant.getCommonPath() + "UniqueLocationObjects5DaysTrainTest.csv");
+
+				TimelineUtils.writeAllActObjs(trainTimelinesAllUsersContinuous,
+						Constant.getCommonPath() + "AllActObjs5DaysTrain.csv");
+				TimelineUtils.writeAllActObjsFromTestOnly(trainTestTimelinesForAllUsersDW,
+						Constant.getCommonPath() + "AllActObjsTest.csv");
+				// TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
 				System.exit(0);
 			}
 			// Curtain 8 Feb 2018 start
@@ -552,6 +605,7 @@ public class ControllerWithoutServer
 				// $$System.out.println("putting in user= " + userEntry.getKey());
 			}
 
+			// TODO likely the code segment below is not needed anymore as blacklisted users have already been removed.
 			// start of get timelines for all users for collaborative approach
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsers = new LinkedHashMap<>(1000);
 			int numOfAllUsersSkippedGT553MaxActsPerDay = 0;
