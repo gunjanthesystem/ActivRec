@@ -629,11 +629,19 @@ public class HJEditDistance extends AlignmentBasedDistance
 		{
 			// System.out.println("passing Activity Objects of sizes: " + activityObjects1.size() + " " +
 			// activityObjects2.size());
-
 			WritingToFile.writeEditSimilarityCalculations(activityObjects1, activityObjects2, distanceTotal,
 					levenshteinDistance.getFirst(), dAct, dFeat, userAtRecomm, dateAtRecomm, timeAtRecomm,
 					candidateTimelineId);
 		}
+
+		if (Constant.debugFeb24_2018)
+		{
+			WritingToFile.appendLineToFileAbsolute(
+					"\t" + userAtRecomm + "\t" + dateAtRecomm + "\t" + timeAtRecomm + distanceTotal + "\t"
+							+ levenshteinDistance.getFirst() + "\t" + dAct + "\t" + dFeat + "\n",
+					Constant.getCommonPath() + "FeatureLevelDistanceLog.csv");
+		}
+
 		// $ WritingToFile.writeOnlyTrace(levenshteinDistance.getFirst());
 
 		// WritingToFile.writeEditSimilarityCalculation(activityObjects1,activityObjects2,levenshteinDistance);
@@ -685,6 +693,12 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// }
 
 		return distanceTotal;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "HJEditDistance [EDAlpha=" + EDAlpha + "]" + "\n" + super.toString();
 	}
 
 	// public static final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject>

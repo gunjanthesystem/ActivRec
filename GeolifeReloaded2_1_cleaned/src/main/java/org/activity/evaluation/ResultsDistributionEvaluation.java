@@ -47,6 +47,7 @@ public class ResultsDistributionEvaluation
 		// $runFeb5FiveDaysResults();//disabled on Feb 12 2018
 		// runFeb11FiveDaysResults();//disabled on feb 18 2018
 		runFeb17FiveDaysResults();
+		SFTPFile.closeAllChannels();
 	}
 
 	/**
@@ -56,8 +57,8 @@ public class ResultsDistributionEvaluation
 	public static void runFeb17FiveDaysResults()
 	{
 
-		String pathToWrite = "./dataWritten/Feb23_2/FiveDays/";
-		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultFeb22ToRead.csv";
+		String pathToWrite = "./dataWritten/Feb26/FiveDays/";
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultFeb25ToRead.csv";
 		int numOfDay = 5;
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
 		double muArray[] = Constant.matchingUnitAsPastCount;
@@ -528,7 +529,7 @@ public class ResultsDistributionEvaluation
 
 			// System.out.println("mu= " + mu + " res=" + res);
 			muKeyAllValsMap.put(mu, res);
-			inputAndSession.getSecond().disconnect();
+			// inputAndSession.getSecond().disconnect();
 		}
 
 		// Convert to user wise result

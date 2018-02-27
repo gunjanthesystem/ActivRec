@@ -106,9 +106,6 @@ public class DomainConstants
 
 	public final static String[] gowallaUserGroupsLabelsFixed = { "1", "101", "201", "301", "401", "501", "601", "701",
 			"801", "901" };//
-	// 601", "701", "801", "901", "401", "501", "1", "101",
-	// "201", "301", };
-	// "1", "101", "201" ,"301", "401", "501", "601", "701", "801", "901"
 
 	/**
 	 * keeping it globally to avoid recomputing for each matching unit

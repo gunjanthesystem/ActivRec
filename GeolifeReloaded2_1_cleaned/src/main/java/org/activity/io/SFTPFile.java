@@ -1,7 +1,9 @@
 package org.activity.io;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.activity.objects.Pair;
 
@@ -15,6 +17,14 @@ public class SFTPFile
 	static final String howitzerUsr = "gunjan";
 	static final String howitzerHost = "howitzer.ucd.ie";
 	static final int port = 22;
+
+	static Map<String, ChannelSftp> pooledSFTPChannels;
+
+	public static final boolean closeAllChannels()
+	{
+		pooledSFTPChannels.entrySet().stream().forEach(e -> e.getValue().disconnect());
+		return true;
+	}
 
 	public static void main(String args[])
 	{
@@ -40,12 +50,65 @@ public class SFTPFile
 			List<List<Double>> res2 = ReadingFromFile.nColumnReaderDouble(out, ",", false);
 			System.out.println("res = " + res2);
 			inputAndSession.getSecond().disconnect();
+			// TODO CLOSE ALL SFTP CHANNELS
 
 		}
 		catch (Exception e)
 		{
 			System.err.print(e);
 		}
+	}
+
+	/**
+	 * PLEASE CLOSE THE CONNECTION
+	 * 
+	 * @param host
+	 * @param port
+	 * @param remoteFile
+	 * @param user
+	 * @param passwd
+	 * @return
+	 */
+	public static Pair<InputStream, Session> getInputStreamForSFTPFile(String host, int port, String remoteFile,
+			String user, String passwd)
+	{
+		InputStream out = null;
+		Session session = null;
+
+		try
+		{
+			if (pooledSFTPChannels == null)
+			{
+				pooledSFTPChannels = new HashMap<String, ChannelSftp>();
+			}
+			if (pooledSFTPChannels.containsKey(host) == false)
+			{
+				JSch jsch = new JSch();
+
+				session = jsch.getSession(user, host, port);
+				session.setPassword(passwd);
+
+				session.setConfig("StrictHostKeyChecking", "no");
+				System.out.println("Establishing Connection...");
+				session.connect();
+				System.out.println("Connection established.");
+				System.out.println("Creating SFTP Channel.");
+				ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
+				sftpChannel.connect();
+				System.out.println("SFTP Channel created.");
+
+				pooledSFTPChannels.put(host, sftpChannel);
+			}
+			out = pooledSFTPChannels.get(host).get(remoteFile);
+		}
+		catch (Exception e)
+		{
+			System.out.println("Exception to read: " + remoteFile);
+			System.out.println("user=" + user + " passwd=" + passwd + " host=" + host);
+			e.printStackTrace();
+		}
+
+		return new Pair<InputStream, Session>(out, session);
 	}
 
 	/**
@@ -57,7 +120,7 @@ public class SFTPFile
 	 * @param passwd
 	 * @return
 	 */
-	public static Pair<InputStream, Session> getInputStreamForSFTPFile(String host, int port, String remoteFile,
+	public static Pair<InputStream, Session> getInputStreamForSFTPFileV0(String host, int port, String remoteFile,
 			String user, String passwd)
 	{
 		InputStream out = null;

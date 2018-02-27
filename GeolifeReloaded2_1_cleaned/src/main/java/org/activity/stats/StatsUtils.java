@@ -853,8 +853,10 @@ public final class StatsUtils
 		}
 		else
 		{
-			System.err.println(("Warning: Alert!! val" + val + " = minMaxNorm: max(" + max + ")- min(" + min + ") <=0 ="
+			System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min + ") <=0 ="
 					+ (max - min)));
+			// Warning: Alert!! val0.25 = minMaxNorm: max(0.25)- min(0.25) <=0 =0.0
+			// val = 0.25, max = 0.25, min =0.25, max-min = 0;
 			return 0;
 		}
 

@@ -176,7 +176,7 @@ public class ControllerWithoutServer
 				System.exit(0);
 			}
 
-			if (true)// temporary for 22 feb 2018,
+			if (false)// temporary for 22 feb 2018,
 			{// temporary for 22 feb 2018, to find the unique locations in the training timelines (most recent five
 				// days) and test timelines, this chunk of code has been borrowed from
 				// RecommendationtestsMar2017GenSeq3Nov2017.java

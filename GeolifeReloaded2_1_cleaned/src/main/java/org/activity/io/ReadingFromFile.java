@@ -488,12 +488,13 @@ public class ReadingFromFile
 	 * @param absFileToWrite
 	 * @param columnIndicesToSelect
 	 */
-	public static void nColumnReaderStringLargeFileSelectedColumnsWithWrite(InputStream inputStream, String delimiter,
-			boolean hasHeader, boolean verboseReading, boolean writeTheReadFile, String absFileToWrite,
-			int... columnIndicesToSelect)
+	public static List<List<String>> nColumnReaderStringLargeFileSelectedColumnsWithWrite(InputStream inputStream,
+			String delimiter, boolean hasHeader, boolean verboseReading, boolean writeTheReadFile,
+			String absFileToWrite, int... columnIndicesToSelect)
 	{
 
 		long t1 = System.currentTimeMillis();
+		long countOfLinesRead = 0;
 		List<List<String>> raw = new ArrayList<>();
 		List<String> header = new ArrayList<>();
 		String splitLiteral = Pattern.quote(delimiter);
@@ -504,7 +505,6 @@ public class ReadingFromFile
 		try
 		{
 			LineIterator it = IOUtils.lineIterator(inputStream, "UTF-8");
-			long countOfLinesRead = 0;
 
 			while (it.hasNext())
 			{
@@ -564,7 +564,7 @@ public class ReadingFromFile
 			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
 			e.printStackTrace();
 		}
-
+		return raw;
 	}
 
 	/**
