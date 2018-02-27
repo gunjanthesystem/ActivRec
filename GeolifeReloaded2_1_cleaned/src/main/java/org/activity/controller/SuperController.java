@@ -131,8 +131,13 @@ public class SuperController
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = { "/run/media/gunjan/BufferVault/GowallaResults/Feb22/" };
-		// "./dataWritten/Feb11NCount_5DayFilter_ThreshNN500MedianRepCinsHierED/" };
+		String[] commonPaths = {
+				"./dataWritten/Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis/" };
+		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" }; //
+		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/"
+		// "/run/media/gunjan/BufferVault/GowallaResults/Feb25/" };
+		// "/run/media/gunjan/BufferVault/GowallaResults/Feb24/" };
+		// + "Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" };
 		// + "Feb18NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.4/" };
 		// + "/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
 		// + "/run/media/gunjan/BufferVault/GowallaResults/Feb13/" };
@@ -165,7 +170,7 @@ public class SuperController
 		{
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
 			runExperiments(commonPaths[i], true, false, true);
-			// cleanUpSpace(commonPaths[i], 0.80);
+			// cleanUpSpace(commonPaths[i], 0.90);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
 
@@ -489,13 +494,22 @@ public class SuperController
 
 		// ///////////////////////
 
-		String errors = Searcher.search(commonPath, "consoleLog", "rror");
-		String exceptions = Searcher.search(commonPath, "consoleLog", "xception");
-		WritingToFile.writeToNewFile(errors + "\n" + exceptions, commonPath + "ErrorsExceptions.txt");
+		/*
+		 * String errors = Searcher.search(commonPath, "consoleLog", "rror"); String exceptions =
+		 * Searcher.search(commonPath, "consoleLog", "xception"); WritingToFile.writeToNewFile(errors + "\n" +
+		 * exceptions, commonPath + "ErrorsExceptions.txt");
+		 */
 
-		errors = Searcher.search(commonPath, "Log", "rror");
-		exceptions = Searcher.search(commonPath, "Log", "xception");
-		WritingToFile.writeToNewFile(errors + "\n" + exceptions, commonPath + "ErrorsExceptions2.txt");
+		Triple<Set<Path>, Set<Path>, String> errors = Searcher.search2(commonPath, "Log", "rror", "");
+		Triple<Set<Path>, Set<Path>, String> exceptions = Searcher.search2(commonPath, "Log", "xception", "");
+		WritingToFile.writeToNewFile(errors.getThird() + "\n" + exceptions.getThird(),
+				commonPath + "ErrorsExceptions2.txt");
+
+		if (errors.getSecond().size() > 1 || exceptions.getSecond().size() > 1)
+		{
+			WritingToFile.writeToNewFile(errors.getSecond() + "\n" + exceptions.getSecond(),
+					commonPath + "HasErrorsExceptions2.txt");
+		}
 
 		// String deleteConsoleLogs = Searcher.searchAndRandomDelete(commonPath, "consoleLog", "rror", 0.65);
 		// WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "SafelyRandomlyDeleteConsoleLogsForSpace.txt");

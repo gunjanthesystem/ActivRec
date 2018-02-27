@@ -263,6 +263,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			long recommMasterT0 = System.currentTimeMillis();
 
 			initialiseDistancesUsed(Constant.getDistanceUsed());
+			System.out.println("hjED.toString=" + this.hjEditDistance.toString());
+
 			editDistancesMemorizer = new EditDistanceMemorizer();
 			this.lookPastType = lookPastType;
 			this.caseType = caseType;
@@ -565,8 +567,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			// Start of added on 20 Feb 2018
 			if (Constant.scoreRecommsByLocProximity)
 			{
-				this.recommendedActivityNamesWithRankscores = RecommUtils.reScoreRecommsIncludingLocationProximity(
-						Constant.wtScoreRecommsByLocProximity, this.recommendedActivityNamesWithRankscores);
+				// this.recommendedActivityNamesWithRankscores = RecommUtils.reScoreRecommsIncludingLocationProximity(
+				// Constant.wtScoreRecommsByLocProximity, this.recommendedActivityNamesWithRankscores);
 			}
 			// End of added on 20 Feb 2018
 

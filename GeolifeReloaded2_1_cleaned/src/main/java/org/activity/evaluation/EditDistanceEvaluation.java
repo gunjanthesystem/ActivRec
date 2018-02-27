@@ -29,6 +29,44 @@ public class EditDistanceEvaluation
 
 	public static void main(String args[])
 	{
+		// main0();
+		// plotActFeatLevelED();
+		EDAnalysis26Feb2018();
+	}
+
+	public static void EDAnalysis26Feb2018()
+	{
+		// String fileToRead =
+		// "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb4_NCount_5DayFilter_ThreshPer55EditDists/1/MatchingUnit3.0/EditSimilarityCalculations.csv";
+		String fileToRead2 = "/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis/1/MatchingUnit3.0/EditSimilarityCalculations.csv";
+		String host = Utils.clarityHost;
+		int port = 22;
+		Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port, fileToRead2,
+				Utils.getUserForHost(host), Utils.getPassWordForHost(host));
+
+		long t1 = System.currentTimeMillis();
+		List<List<String>> EDTraces = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumnsWithWrite(
+				inputAndSession.getFirst(), ",", true, true, true, "dataWritten/Feb26_EDAnalysis/OnlyEDTraces.csv",
+				new int[] { 7 });// 2000000, 8000000,
+
+		inputAndSession.getSecond().disconnect();
+		System.out.println("Num of lines read = " + EDTraces.size());
+		// = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumnsInChunks(inputAndSession.getFirst(), ",",
+		// true, true, 10000, new int[] { 0, 4, 5, 6, 7 });
+
+		long t2 = System.currentTimeMillis();
+
+		// System.out.println("Res=\n" + res.toString());
+
+		System.out.println("time taken to read " + fileToRead2 + " = \n\t" + (t2 - t1) + "ms");
+		// System.out.println("lines= " + res.size());
+		// inputAndSession.getSecond().disconnect();
+		//
+		// WritingToFile.writeListOfList(res, , "", ",");
+	}
+
+	public static void plotActFeatLevelED()
+	{
 
 		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
 		System.out.println(PerformanceAnalytics.getUsedMemoryInMB() + "\n\n");
@@ -113,7 +151,7 @@ public class EditDistanceEvaluation
 
 	}
 
-	public static void main0(String args[])
+	public static void main0()
 	{
 		String fileToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb4_NCount_5DayFilter_ThreshPer55EditDists/1/MatchingUnit3.0/EditSimilarityCalculations.csv";
 		String host = Utils.engineHost;
@@ -126,6 +164,8 @@ public class EditDistanceEvaluation
 		ReadingFromFile.nColumnReaderStringLargeFileSelectedColumnsWithWrite(inputAndSession.getFirst(), ",", true,
 				true, true, "dataWritten/Feb4/Res.csv", new int[] { 5, 6, 10, 11 });// 2000000, 8000000,
 
+		// inputAndSession.getFirst().close();
+		inputAndSession.getSecond().disconnect();
 		// = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumnsInChunks(inputAndSession.getFirst(), ",",
 		// true, true, 10000, new int[] { 0, 4, 5, 6, 7 });
 
@@ -139,4 +179,5 @@ public class EditDistanceEvaluation
 		//
 		// WritingToFile.writeListOfList(res, , "", ",");
 	}
+
 }
