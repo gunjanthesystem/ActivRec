@@ -41,6 +41,8 @@ import org.activity.util.PerformanceAnalytics;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 /**
  * This class is used for recommending without the web interface (no web server) Note: to run these experiments proper
  * parameters must be set in class org.activity.util.Constant and this class
@@ -84,7 +86,7 @@ public class ControllerWithoutServer
 			PathConstants.intialise(Constant.For9kUsers);
 			Constant.initialise(commonPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
-					PathConstants.pathToSerialisedUserObjects);
+					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap);
 
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 					+ PerformanceAnalytics.getHeapPercentageFree());
@@ -909,16 +911,21 @@ public class ControllerWithoutServer
 			LinkedHashMap<String, UserGowalla> mapForAllUserData = (LinkedHashMap<String, UserGowalla>) Serializer
 					.kryoDeSerializeThis(gowallaDataFolder + "mapForAllUserData.kryo");
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllUserData.kryo");
-			LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData = (LinkedHashMap<Integer, LocationGowalla>) Serializer
-					.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
+			// LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData = (LinkedHashMap<Integer, LocationGowalla>)
+			// Serializer
+			// .kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
+
+			Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData = toFasterIntObjectOpenHashMap(
+					(LinkedHashMap<Integer, LocationGowalla>) Serializer
+							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo"));
 
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
 
 			System.out.println("before creating timelines while having deserialised objects in memory\n"
 					+ PerformanceAnalytics.getHeapInformation());
 
-			usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromCheckinEntriesGowalla(mapForAllCheckinData,
-					mapForAllLocationData);
+			usersDayTimelinesOriginal = TimelineUtils
+					.createUserTimelinesFromCheckinEntriesGowallaFaster1(mapForAllCheckinData, mapForAllLocationData);
 
 		}
 		else
@@ -1265,6 +1272,36 @@ public class ControllerWithoutServer
 
 			return usersDayTimelinesOriginal;
 		}
+	}
+
+	/**
+	 * Faster and lighter hashmap
+	 * 
+	 * @since 27 Feb
+	 * @param map
+	 * @return
+	 */
+	public static <T> Int2ObjectOpenHashMap<T> toFasterIntObjectOpenHashMap(Map<Integer, T> map)
+	{
+		System.out.println("Inside toFasterIntObjectOpenHashMap");
+		double m2 = PerformanceAnalytics.getUsedMemoryInMB();
+		long t1 = System.currentTimeMillis();
+
+		Int2ObjectOpenHashMap<T> mapFASTHashMap = new Int2ObjectOpenHashMap<>(map.size());
+
+		map.entrySet().stream().forEach(e -> mapFASTHashMap.put(e.getKey().intValue(), e.getValue()));
+		long t2 = System.currentTimeMillis();
+
+		double m3 = PerformanceAnalytics.getUsedMemoryInMB();
+		System.out.println("---used mem:" + m3 + " MB");
+		System.out.println("****** change mem:" + (m3 - m2) + " MBS");
+
+		System.out.println("\n\nTime taken to created mapFASTHashMap= " + (t2 - t1) + "ms");
+		System.out.println("map.size()= " + map.size());
+		System.out.println("mapFASTHashMap.size()= " + mapFASTHashMap.size());
+		System.out.println(
+				"mapFASTHashMap.keySet().equals(map.keySet())= " + mapFASTHashMap.keySet().equals(map.keySet()));
+		return mapFASTHashMap;
 	}
 
 }

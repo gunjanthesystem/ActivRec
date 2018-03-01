@@ -3,7 +3,8 @@ package org.activity.recomm;
 //import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
-import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -645,41 +646,57 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	 * 
 	 * @param candidateTimelines
 	 * @param filterCandByCurActTimeThreshInSecs
-	 * @param activityObjectAtRecommPoint
+	 * @param actObjAtRecommPoint
 	 * @return
 	 */
 	private static LinkedHashMap<String, Timeline> removeCandsWithEndCurrActBeyondThresh(
 			LinkedHashMap<String, Timeline> candidateTimelines, int filterCandByCurActTimeThreshInSecs,
-			ActivityObject activityObjectAtRecommPoint, boolean verbose)
+			ActivityObject actObjAtRecommPoint, boolean verbose)
 	{
 		LinkedHashMap<String, Timeline> filteredCands = new LinkedHashMap<>();
-		Timestamp tsOfAOAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
-		long timeInDayAOAtRecommPoint = DateTimeUtils.getTimeInDayInSeconds(tsOfAOAtRecommPoint);
+		// Timestamp tsOfAOAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
+		long timeInDayAOAtRecommPoint = DateTimeUtils.getTimeInDayInSecondsZoned(
+				actObjAtRecommPoint.getStartTimestampInms(), actObjAtRecommPoint.getTimeZoneId());
 
 		StringBuilder sb = new StringBuilder(
 				"Debug12Feb Constant.filterCandByCurActTimeThreshInSecs=" + filterCandByCurActTimeThreshInSecs);
-		sb.append("\ntsOfAOAtRecommPoint:" + tsOfAOAtRecommPoint + "\ntimeInDayAOAtRecommPoint="
-				+ timeInDayAOAtRecommPoint);
+
+		if (verbose)
+		{
+			sb.append("\ntsOfAOAtRecommPoint:"
+					+ ZonedDateTime.ofInstant(Instant.ofEpochMilli(actObjAtRecommPoint.getStartTimestampInms()),
+							actObjAtRecommPoint.getTimeZoneId())
+					+ "\ntimeInDayAOAtRecommPoint=" + timeInDayAOAtRecommPoint);
+		}
 
 		for (Entry<String, Timeline> candEntry : candidateTimelines.entrySet())
 		{
 			ArrayList<ActivityObject> aosInCand = candEntry.getValue().getActivityObjectsInTimeline();
 			ActivityObject lastAO = aosInCand.get(aosInCand.size() - 1);
-			Timestamp tCurrInCand = lastAO.getStartTimestamp();
-			long timeInDayCurrInCand = DateTimeUtils.getTimeInDayInSeconds(tCurrInCand);
+			// Timestamp tCurrInCand = lastAO.getStartTimestamp();
+			// long timeInDayCurrInCand = DateTimeUtils.getTimeInDayInSeconds(tCurrInCand);
+			long timeInDayCurrInCand = DateTimeUtils.getTimeInDayInSecondsZoned(lastAO.getStartTimestampInms(),
+					lastAO.getTimeZoneId());
 
 			long absDiff = Math.abs(timeInDayCurrInCand - timeInDayAOAtRecommPoint);
-			sb.append("\ntCurrInCand:" + tCurrInCand + "\ntimeInDayCurrInCand=" + timeInDayCurrInCand + "\n\tabsDiff="
-					+ absDiff);
 
+			if (verbose)
+			{
+				// sb.append("\ntCurrInCand:" + tCurrInCand + "\ntimeInDayCurrInCand=" + timeInDayCurrInCand
+				// + "\n\tabsDiff=" + absDiff);
+				sb.append("\ntCurrInCand:"
+						+ ZonedDateTime.ofInstant(Instant.ofEpochMilli(lastAO.getStartTimestampInms()),
+								lastAO.getTimeZoneId())
+						+ "\ntimeInDayCurrInCand=" + timeInDayCurrInCand + "\n\tabsDiff=" + absDiff);
+			}
 			if (absDiff <= filterCandByCurActTimeThreshInSecs)
 			{
 				filteredCands.put(candEntry.getKey(), candEntry.getValue());
-				sb.append("-accepting");
+				// $$sb.append("-accepting");
 			}
 			else
 			{
-				sb.append("-Rejecting");
+				// $$sb.append("-Rejecting");
 			}
 		}
 
@@ -691,10 +708,15 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		int sizeBeforeFiltering = candidateTimelines.size();
 		int sizeAfterFilering = filteredCands.size();
 
-		WritingToFile.appendLineToFileAbsolute(
-				sizeBeforeFiltering + "," + sizeAfterFilering + ","
-						+ ((100.0 * (sizeBeforeFiltering - sizeAfterFilering)) / sizeBeforeFiltering + "\n"),
-				Constant.getOutputCoreResultsPath() + "removeCandsWithEndCurrActBeyondThreshLog.csv");
+		if (VerbosityConstants.WriteFilterCandByCurActTimeThreshInSecs)
+		{
+			WritingToFile
+					.appendLineToFileAbsolute(
+							sizeBeforeFiltering + "," + sizeAfterFilering + ","
+									+ ((100.0 * (sizeBeforeFiltering - sizeAfterFilering)) / sizeBeforeFiltering
+											+ "\n"),
+							Constant.getOutputCoreResultsPath() + "removeCandsWithEndCurrActBeyondThreshLog.csv");
+		}
 		return filteredCands;
 	}
 

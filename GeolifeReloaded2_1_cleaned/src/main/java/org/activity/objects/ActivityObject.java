@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,6 +96,26 @@ public class ActivityObject implements Serializable
 	int photos_count, checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count;// spot_categories;
 	double distanceInMFromNext;
 	long durationInSecondsFromNext;
+	ZoneId timeZoneId;
+
+	/**
+	 * Especially needed for representative recommended act objs.
+	 * 
+	 * @param timeZoneId
+	 */
+	public void setTimeZoneId(ZoneId timeZoneId)
+	{
+		this.timeZoneId = timeZoneId;
+	}
+
+	public ZoneId getTimeZoneId()
+	{
+		if (timeZoneId == null)
+		{
+			PopUps.printTracedErrorMsg("NULL timezone id");
+		}
+		return timeZoneId;
+	}
 
 	/**
 	 * if there is one primary dimension val, i.e., no merger then no delimitation
@@ -400,6 +421,68 @@ public class ActivityObject implements Serializable
 		this.distanceInMFromNext = distanceInMFromNext;
 		this.durationInSecondsFromNext = durationInSecsFromNext;
 
+	}
+
+	/**
+	 * Constructor for Gowalla
+	 * 
+	 * @param activityID
+	 * @param locationIDs
+	 *            list of locations id. this will >1 in case of mergers. note: we store the location id in the activity
+	 *            object as Set and not as List
+	 * @param activityName
+	 * @param locationName
+	 * @param startTimestamp
+	 * @param startLatitude
+	 * @param startLongitude
+	 * @param startAltitude
+	 * @param userID
+	 * @param photos_count
+	 * @param checkins_count
+	 * @param users_count
+	 * @param radius_meters
+	 * @param highlights_count
+	 * @param items_count
+	 * @param max_items_count
+	 * @param workingLevelCatIDs
+	 * @param distanceInMFromNext
+	 * @param durationInSecsFromNext
+	 * @param levelWiseCatIDs
+	 * @param timeZoneId
+	 */
+	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
+			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
+			long durationInSecsFromNext, String[] levelWiseCatIDs, ZoneId timeZoneId)
+	{
+		// this.activityID = activityID;
+		this.timeZoneId = timeZoneId;
+		String splittedwlci[] = RegexUtils.patternDoubleUnderScore.split(workingLevelCatIDs);// workingLevelCatIDs.split("__");
+		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
+															// considering one working level cat id
+		this.locationIDs = new ArrayList<>(locationIDs);
+
+		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
+		this.locationName = locationName;
+		this.startTimestampInms = startTimestamp.getTime();
+		this.endTimestampInms = startTimestamp.getTime();
+		this.startLatitude = startLatitude;
+		this.startLongitude = startLongitude;
+		this.startAltitude = startAltitude;
+		this.userID = userID;
+		this.photos_count = photos_count;
+		this.checkins_count = checkins_count;
+		this.users_count = users_count;
+		this.radius_meters = radius_meters;
+		this.highlights_count = highlights_count;
+		this.items_count = items_count;
+		this.max_items_count = max_items_count;
+		this.workingLevelCatIDs = workingLevelCatIDs;
+
+		this.distanceInMFromNext = distanceInMFromNext;
+		this.durationInSecondsFromNext = durationInSecsFromNext;
+		// this.levelWiseCatIDs = levelWiseCatIDs;
 	}
 
 	/**
@@ -1366,23 +1449,20 @@ public class ActivityObject implements Serializable
 		result = prime * result + ((startLatitude == null) ? 0 : startLatitude.hashCode());
 		result = prime * result + ((startLongitude == null) ? 0 : startLongitude.hashCode());
 		result = prime * result + (int) (startTimestampInms ^ (startTimestampInms >>> 32));
+		result = prime * result + ((timeZoneId == null) ? 0 : timeZoneId.hashCode());
 		result = prime * result + ((userID == null) ? 0 : userID.hashCode());
 		result = prime * result + users_count;
 		result = prime * result + ((workingLevelCatIDs == null) ? 0 : workingLevelCatIDs.hashCode());
 		return result;
 	}
 
-	/**
-	 * 
-	 * @param other
-	 * @return
-	 */
-	public boolean equals(ActivityObject other)
+	@Override
+	public boolean equals(Object obj)
 	{
-		if (this == other) return true;
-		if (other == null) return false;
-		if (getClass() != other.getClass()) return false;
-
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		ActivityObject other = (ActivityObject) obj;
 		if (activityID != other.activityID) return false;
 		if (activityName == null)
 		{
@@ -1468,6 +1548,11 @@ public class ActivityObject implements Serializable
 		}
 		else if (!startLongitude.equals(other.startLongitude)) return false;
 		if (startTimestampInms != other.startTimestampInms) return false;
+		if (timeZoneId == null)
+		{
+			if (other.timeZoneId != null) return false;
+		}
+		else if (!timeZoneId.equals(other.timeZoneId)) return false;
 		if (userID == null)
 		{
 			if (other.userID != null) return false;

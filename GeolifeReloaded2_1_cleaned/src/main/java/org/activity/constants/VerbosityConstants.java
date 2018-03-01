@@ -8,6 +8,7 @@ package org.activity.constants;
  */
 public class VerbosityConstants
 {
+	public static boolean alignmentDistanceStringPrintedOnce = false;
 	/**
 	 * Check sanity of implementations for primary dimension perspective, these sanity checks are for when pd is
 	 * activity id, since the earlier methods to compared with are for activity name and activity name and activity id
@@ -48,7 +49,7 @@ public class VerbosityConstants
 
 	public static final boolean WriteRedundant = false;
 	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;// false;// true;
-	public static final boolean WriteEditSimilarityCalculations = true;// true;//false;// false;// false;
+	public static final boolean WriteEditSimilarityCalculations = false;// true;//false;// false;// false;
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
@@ -65,6 +66,8 @@ public class VerbosityConstants
 	public static final boolean WriteNumOfValidsAfterAnRTInSameDay = false;
 	public static final boolean WriteNumberOfCandidateTimelinesBelow = false;
 	public static final boolean WriteMaxNumberOfDistinctRecommendation = false;
+
+	public static final boolean WriteFilterCandByCurActTimeThreshInSecs = false;
 
 	/**
 	 * to save writing non essential redudant stuffs

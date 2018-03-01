@@ -6,12 +6,15 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.activity.evaluation.Evaluation;
+import org.activity.ui.PopUps;
 
 /**
  * 
@@ -39,6 +42,23 @@ public class DateTimeUtils
 		System.out.println(getDate(ts));
 		System.out.println("getAbvDate= " + getShortDateLabel(LocalDateTime.now()));
 
+		for (int j = 0; j < 100; j++)
+		{
+			System.out.println("\n-------------");
+			long addition = j * 3600 + (j * 350000);
+			boolean v = DateTimeUtils.isSameTimeInToleranceZoned(ts.getTime(), ts.getTime() + addition,
+					ZoneId.of("Europe/Paris"), ZoneId.of("America/Chicago"), 3600);
+
+			if (v)
+			{
+				System.out.println("===========--> j = " + j + " Same in tolerance=" + v + "addition = "
+						+ (addition / 1000) + " secs tolerance in secs = " + 3600);
+			}
+			else
+			{
+				System.out.println("--> j = " + j + " Same in tolerance=" + v);
+			}
+		}
 	}
 
 	/**
@@ -76,6 +96,73 @@ public class DateTimeUtils
 		}
 		else
 			return true;
+	}
+
+	/**
+	 * 
+	 * @param ts1
+	 * @param ts2
+	 * @param zoneId1
+	 * @param zoneId2
+	 * @param toleranceInSeconds
+	 * @return
+	 * @since 27 Feb 2018 SANITY CHECKED OK
+	 */
+	public static boolean isSameTimeInToleranceZoned(long tsInms1, long tsInms2, ZoneId zoneId1, ZoneId zoneId2,
+			long toleranceInSeconds)
+	{
+		ZonedDateTime zonedDateTime1 = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tsInms1), zoneId1);
+		ZonedDateTime zonedDateTime2 = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tsInms2), zoneId2);
+
+		// System.out.println("zonedDateTime1 = " + zonedDateTime1);
+		// System.out.println("zonedDateTime2 = " + zonedDateTime2);
+
+		long time1 = zonedDateTime1.getHour() * 60 * 60 + zonedDateTime1.getMinute() * 60 + zonedDateTime1.getSecond();
+		long time2 = zonedDateTime2.getHour() * 60 * 60 + zonedDateTime2.getMinute() * 60 + zonedDateTime2.getSecond();
+		if (Math.abs(time1 - time2) > toleranceInSeconds)
+		{
+			return false;
+		}
+		else
+			return true;
+	}
+
+	/**
+	 * 
+	 * @param ts1
+	 * @param ts2
+	 * @return
+	 */
+	public static long getTimeDiffInSecondsZoned(long tsInms1, long tsInms2, ZoneId zoneId1, ZoneId zoneId2)
+	{
+		ZonedDateTime zonedDateTime1 = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tsInms1), zoneId1);
+		ZonedDateTime zonedDateTime2 = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tsInms2), zoneId2);
+
+		// System.out.println("zonedDateTime1 = " + zonedDateTime1);
+		// System.out.println("zonedDateTime2 = " + zonedDateTime2);
+
+		long time1 = zonedDateTime1.getHour() * 60 * 60 + zonedDateTime1.getMinute() * 60 + zonedDateTime1.getSecond();
+		long time2 = zonedDateTime2.getHour() * 60 * 60 + zonedDateTime2.getMinute() * 60 + zonedDateTime2.getSecond();
+
+		return Math.abs(time1 - time2);
+	}
+
+	/**
+	 * Returns the time in the day (as seconds past midnight) for the given timestamp.
+	 * 
+	 * @param tsInms1
+	 * @param zoneId1
+	 * @return
+	 */
+	public static long getTimeInDayInSecondsZoned(long tsInms1, ZoneId zoneId1)
+	{
+		if (zoneId1 == null)
+		{
+			PopUps.printTracedErrorMsg("Null zoneId1");
+		}
+		ZonedDateTime zonedDateTime1 = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tsInms1), zoneId1);
+		// return ts1.getHours() * 60 * 60 + ts1.getMinutes() * 60 + ts1.getSeconds();
+		return zonedDateTime1.getHour() * 60 * 60 + zonedDateTime1.getMinute() * 60 + zonedDateTime1.getSecond();
 	}
 
 	/**

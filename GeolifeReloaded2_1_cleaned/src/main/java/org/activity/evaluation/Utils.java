@@ -14,7 +14,7 @@ public class Utils
 	static final String howitzerUsr = engineUsr = mortarUsr = "gunjan";
 	static final String clarityUsr = "gunjankumar";
 	static final String howitzerHost = "howitzer.ucd.ie";
-	static final String engineHost = "theengine2.ucd.ie";
+	static final String engineHost = "theengine.ucd.ie";
 	static final String mortarHost = "mortar.ucd.ie";
 	static final String clarityHost = "claritytrec.ucd.ie";
 

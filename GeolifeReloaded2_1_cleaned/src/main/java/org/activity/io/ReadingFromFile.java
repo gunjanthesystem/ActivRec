@@ -375,7 +375,7 @@ public class ReadingFromFile
 			{
 				countOfLinesRead += 1;
 				String line = it.nextLine();
-				System.out.println("line=" + line);
+				// System.out.println("line=" + line);
 				if (hasHeader && countOfLinesRead == 1)
 				{
 					header = Arrays.asList(line.split(Pattern.quote(delimiter)));
@@ -452,10 +452,22 @@ public class ReadingFromFile
 				}
 
 				List<String> temp = new ArrayList<>();
-				for (int indexToSelect : columnIndicesToSelect)
+
+				try
 				{
-					temp.add(splittedString[indexToSelect]);
+					for (int indexToSelect : columnIndicesToSelect)
+					{
+						temp.add(splittedString[indexToSelect]);
+					}
 				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					System.out.println(
+							"line num:" + countOfLinesRead + " splittedString=" + Arrays.asList(splittedString));
+
+				}
+
 				raw.add(temp);// header is treated in same way as all other data
 
 				if (verboseReading && (countOfLinesRead % 25000 == 0))
@@ -836,7 +848,7 @@ public class ReadingFromFile
 	 * @param delimiter
 	 * @return
 	 */
-	public static ArrayList<ArrayList<String>> readLinesIntoListOfLists(String absFileName, String delimiter)
+	public static List<List<String>> readLinesIntoListOfLists(String absFileName, String delimiter)
 	{
 		try
 		{
