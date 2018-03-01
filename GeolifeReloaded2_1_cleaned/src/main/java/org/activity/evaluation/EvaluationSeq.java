@@ -88,7 +88,8 @@ public class EvaluationSeq
 
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
-						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects);
+						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
+						PathConstants.pathToSerialisedGowallaLocZoneIdMap);
 
 				// for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				// {
@@ -192,7 +193,8 @@ public class EvaluationSeq
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
-						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects);
+						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
+						PathConstants.pathToSerialisedGowallaLocZoneIdMap);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -295,7 +297,8 @@ public class EvaluationSeq
 				System.out.println("For groupsOf100UsersLabel: " + groupsOf100UsersLabel);
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
-						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects);
+						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
+						PathConstants.pathToSerialisedGowallaLocZoneIdMap);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -409,7 +412,8 @@ public class EvaluationSeq
 
 					Constant.initialise(pathT, Constant.getDatabaseName(), PathConstants.pathToSerialisedCatIDsHierDist,
 							PathConstants.pathToSerialisedCatIDNameDictionary,
-							PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects);
+							PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
+							PathConstants.pathToSerialisedGowallaLocZoneIdMap);
 					System.out.println("Constant.initialise done ---");
 					// outputCoreResultsPath = commonPathT;
 

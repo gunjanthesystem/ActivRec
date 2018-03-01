@@ -1,13 +1,16 @@
 package org.activity.constants;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -91,6 +94,8 @@ public class DomainConstants
 
 	public static TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap;
 
+	private static Map<Integer, ZoneId> gowallaLocZoneIdMap = null;
+
 	/**
 	 * {Cat id, {list of location ids with support that cat (activity)}}
 	 */
@@ -101,12 +106,19 @@ public class DomainConstants
 	/**
 	 * Labels for groups of 100 users. If label is "101" then users from 100 to 199 are included.
 	 */
-	public final static String[] gowallaUserGroupsLabels = { "1", "101", "201", "301", "401", "501", "601", "701",
-			"801", "901" };//
+	public final static String[] gowallaUserGroupsLabels = {
+			"1"/*
+				 * , "101", "201", "301", "401", "501", "601", "701", "801", "901"
+				 */ };//
+	// { "901", "801", "701", "601", "501", "401" /* "1", "101", "201", "301", */ };//
 
-	public final static String[] gowallaUserGroupsLabelsFixed = { "1", "101", "201", "301", "401", "501", "601", "701",
-			"801", "901" };//
+	public final static String[] gowallaUserGroupsLabelsFixed = {
+			"1"/*
+				 * , "101", "201", "301", "401", "501", "601", "701", "801", "901"
+				 */ };//
 
+	public final static Set<Integer> locIDsIn5DaysTrainTestDataWithNullTZ = new HashSet<>(
+			Arrays.asList(259769, 328496, 339529, 339618, 351286, 354613));
 	/**
 	 * keeping it globally to avoid recomputing for each matching unit
 	 * <P>
@@ -225,6 +237,56 @@ public class DomainConstants
 			e.printStackTrace();
 		}
 
+	}
+
+	// /**
+	// *
+	// * @return
+	// */
+	// public static Map<Integer, ZoneId> getGowallaLocZoneIdMap()
+	// {
+	// return gowallaLocZoneIdMap;
+	// }
+
+	// /**
+	// *
+	// * @return
+	// */
+	// public static ZoneId getGowallaLocZoneId(Integer locID)
+	// {
+	// return gowallaLocZoneIdMap.get(locID);
+	// }
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static ZoneId getGowallaLocZoneId(List<Integer> locIDs)
+	{
+		ZoneId id = null;
+
+		for (int i = 0; i < locIDs.size(); i++)
+		{
+			if (gowallaLocZoneIdMap.get(locIDs.get(i)) != null)
+			{
+				return gowallaLocZoneIdMap.get(locIDs.get(i));
+			}
+		}
+		return id;
+	}
+
+	public static void setGowallaLocZoneIdMap(String pathToSerialisedGowallaLocZoneIdMap)
+	{
+		DomainConstants.gowallaLocZoneIdMap = (LinkedHashMap<Integer, ZoneId>) Serializer
+				.kryoDeSerializeThis(pathToSerialisedGowallaLocZoneIdMap);
+	}
+
+	/**
+	 * Sets to null to save space
+	 */
+	public static void clearGowallaLocZoneIdMap()
+	{
+		DomainConstants.gowallaLocZoneIdMap = null;
 	}
 
 	/**

@@ -16,6 +16,9 @@ public class PathConstants
 	public static String pathToSerialisedLevelWiseCatIDsDict;
 	public static String pathToSerialisedMergedCheckinData;
 	public static String pathToSerialisedUserObjects;
+	public static String pathToLocationTimezoneInfo;
+	public static String pathToSerialisedGowallaLocZoneIdMap;
+	// ./dataToRead/Feb26/UniqueLocationObjects5DaysTrainTestWithTZUsingPy.csv
 
 	/**
 	 * Set paths to serialised datasets
@@ -24,6 +27,7 @@ public class PathConstants
 	 */
 	public static final void intialise(boolean For9kUsers)
 	{
+
 		if (For9kUsers)
 		{
 			/**
@@ -71,6 +75,9 @@ public class PathConstants
 			/**
 			 * End of Gowalla path constants for before Aug 11 experiments
 			 */
+
+			pathToLocationTimezoneInfo = "./dataToRead/Feb26/UniqueLocationObjects5DaysTrainTestWithTZUsingPy.csv";
+			pathToSerialisedGowallaLocZoneIdMap = "./dataToRead/Feb26/UniqueLocationObjects5DaysTrainTestWithTZUsingPy.kryo";
 		}
 
 	}

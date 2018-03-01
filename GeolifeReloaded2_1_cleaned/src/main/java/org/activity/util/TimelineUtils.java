@@ -5,6 +5,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +42,11 @@ import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.json.JSONArray;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
+
+//import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 /**
  */
 public class TimelineUtils
@@ -367,6 +373,77 @@ public class TimelineUtils
 		return daywiseMap;
 	}
 
+	// /**
+	// * Creates user day timelines from the given list of Activity Objects.
+	// *
+	// * Activity events ---> day timelines (later, not here)---> user timelines
+	// * <p>
+	// * <font color = red>make sure that the timezone is set appropriately</font>
+	// * </p>
+	// *
+	// * @param allActivityEvents
+	// * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
+	// */
+	// public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createUserTimelinesFromCheckinEntriesGowalla(
+	// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> checkinEntries,
+	// LinkedHashMap<Integer, LocationGowalla> locationObjects)
+	// {
+	// long ct1 = System.currentTimeMillis();
+	//
+	// System.out.println("starting createUserTimelinesFromCheckinEntriesGowalla");
+	// LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise =
+	// convertTimewiseMapToDatewiseMap2(
+	// checkinEntries, Constant.getTimeZone());
+	//
+	// // Start of added on Aug 10 2017
+	// // // Filter out days which have more than 500 checkins
+	// // StringBuilder sb = new StringBuilder();
+	// // checkinEntriesDatewise.entrySet().stream().forEachOrdered(e->sb.append(str));
+	// // End of added on Aug 10 2017
+	//
+	// LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise =
+	// convertCheckinEntriesToActivityObjectsGowalla(
+	// checkinEntriesDatewise, locationObjects);
+	//
+	// int optimalSizeWrtUsers = (int) (Math.ceil(activityObjectsDatewise.size() / 0.75));
+	// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines = new LinkedHashMap<>(
+	// optimalSizeWrtUsers);
+	//
+	// // StringBuilder sbNumOfActsPerDayPerUser;
+	// // WritingToFile.appendLineToFileAbsolute("User,Date,NumOfActsInDay\n", "NumOfActsPerUserPerDay.csv");
+	//
+	// for (Entry<String, TreeMap<Date, ArrayList<ActivityObject>>> userEntry : activityObjectsDatewise.entrySet())
+	// {
+	// String userID = userEntry.getKey();
+	// LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>(
+	// (int) (Math.ceil(userEntry.getValue().size() / 0.75)));
+	//
+	// // sbNumOfActsPerDayPerUser = new StringBuilder();// "User,Day,NumOfActs\n");
+	// for (Entry<Date, ArrayList<ActivityObject>> dateEntry : userEntry.getValue().entrySet())
+	// {
+	// Date date = dateEntry.getKey();
+	// ArrayList<ActivityObject> activityObjectsInDay = dateEntry.getValue();
+	// // String dateID = date.toString();
+	// // String dayName = DateTimeUtils.getWeekDayFromWeekDayInt(date.getDay());//
+	// // DateTimeUtils.getWeekDayFromWeekDayInt(date.getDayOfWeek().getValue());
+	// dayTimelines.put(date, new Timeline(activityObjectsInDay, true, true));
+	// // sbNumOfActsPerDayPerUser.append(userID).append(',').append(date.toString()).append(',')
+	// // .append(activityObjectsInDay.size()).append("\n");
+	// }
+	// // WritingToFile.appendLineToFileAbsolute(sbNumOfActsPerDayPerUser.toString(),
+	// // "NumOfActsPerUserPerDay.csv");
+	// userDaytimelines.put(userID, dayTimelines);
+	// }
+	//
+	// long ct4 = System.currentTimeMillis();
+	// System.out.println(
+	// "created timelines for" + userDaytimelines.size() + " users in " + ((ct4 - ct1) / 1000) + " seconds");
+	//
+	// System.out.println("exiting createUserTimelinesFromCheckinEntriesGowalla");
+	// // System.exit(0);
+	// return userDaytimelines;
+	// }
+
 	/**
 	 * Creates user day timelines from the given list of Activity Objects.
 	 * 
@@ -378,9 +455,9 @@ public class TimelineUtils
 	 * @param allActivityEvents
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createUserTimelinesFromCheckinEntriesGowalla(
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createUserTimelinesFromCheckinEntriesGowallaFaster1(
 			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> checkinEntries,
-			LinkedHashMap<Integer, LocationGowalla> locationObjects)
+			Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData)
 	{
 		long ct1 = System.currentTimeMillis();
 
@@ -395,7 +472,7 @@ public class TimelineUtils
 		// End of added on Aug 10 2017
 
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = convertCheckinEntriesToActivityObjectsGowalla(
-				checkinEntriesDatewise, locationObjects);
+				checkinEntriesDatewise, mapForAllLocationData);
 
 		int optimalSizeWrtUsers = (int) (Math.ceil(activityObjectsDatewise.size() / 0.75));
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines = new LinkedHashMap<>(
@@ -728,7 +805,8 @@ public class TimelineUtils
 	 */
 	private static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> convertCheckinEntriesToActivityObjectsGowalla(
 			LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise,
-			LinkedHashMap<Integer, LocationGowalla> locationObjects)
+			/* LinkedHashMap<Integer, LocationGowalla> locationObjects) */
+			Int2ObjectOpenHashMap<LocationGowalla> locationObjects)
 	{
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
@@ -739,18 +817,27 @@ public class TimelineUtils
 		if (VerbosityConstants.WriteLocationMap)
 		{// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
 			StringBuilder locInfo = new StringBuilder();
-			locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
+
+			// locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
+			locationObjects.values().forEach(e -> locInfo.append(e.toString() + "\n"));
+
 			WritingToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
 
 		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0,
 				numOfCInsWithMultipleWorkingLevelCatIDs = 0, numOfCIns = 0;
 		HashMap<String, String> actsOfCinsWithMultipleWorkLevelCatIDs = new HashMap<>();
+		IntSortedSet locIDsWithNoTZ = new IntRBTreeSet();
+		IntSortedSet locIDsWithNoFallbackTZ = new IntRBTreeSet();
+		int numOfCinsWithNullZoneIDs = 0, numOfCinsWithEvenFallbackNullZoneIds = 0;
 		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
 
 		// convert checkinentries to activity objects
 		for (Entry<String, TreeMap<Date, ArrayList<CheckinEntry>>> userEntry : checkinEntriesDatewise.entrySet())
 		{// over users
+			ZoneId fallbackZoneId = null;
+			int numOfCinsForThisUser = 0;
+
 			String userID = userEntry.getKey();
 			TreeMap<Date, ArrayList<ActivityObject>> dayWiseForThisUser = new TreeMap<>();
 			// System.out.print("\nuser: " + userID);
@@ -767,6 +854,8 @@ public class TimelineUtils
 				for (CheckinEntry cin : dateEntry.getValue())// over checkins
 				{
 					numOfCIns += 1;
+					numOfCinsForThisUser += 1;
+
 					int activityID = Integer.valueOf(cin.getActivityID());
 					String activityName = String.valueOf(cin.getActivityID());// "";
 
@@ -802,8 +891,8 @@ public class TimelineUtils
 					// (merged) checkin entry
 					for (Integer locationID : locIDs)
 					{
-						LocationGowalla loc = locationObjects.get((locationID));
-
+						// LocationGowalla loc = locationObjects.get((locationID));
+						LocationGowalla loc = locationObjects.get((int) locationID);
 						if (loc == null)
 						{
 							System.err.println(
@@ -844,18 +933,64 @@ public class TimelineUtils
 					// int highlights_count = loc.getHighlights_count();
 					// int items_count = loc.getItems_count();
 					// int max_items_count = loc.getMax_items_count();
+					ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
+					if (currentZoneId == null)
+					{
+						numOfCinsWithNullZoneIDs += 1;
+						locIDsWithNoTZ.addAll(locIDs);
+						currentZoneId = fallbackZoneId;
+						// WritingToFile.appendLineToFileAbsolute(userID + "," + locIDs + "," + startTimestamp + "\n",
+						// Constant.getOutputCoreResultsPath() + "NullZoneIDs.csv");
+						if (fallbackZoneId == null)
+						{
+							locIDsWithNoFallbackTZ.addAll(locIDs);
+							numOfCinsWithEvenFallbackNullZoneIds += 1;
+							// WritingToFile.appendLineToFileAbsolute(userID + "," + locIDs + "," + startTimestamp + ","
+							// + numOfCinsForThisUser + "\n",Constant.getOutputCoreResultsPath() +
+							// "FallbackNullZoneIDs.csv");
+						}
+					}
 
 					ActivityObject ao = new ActivityObject(activityID, locIDs, activityName, locationName,
 							startTimestamp, startLatitude, startLongitude, startAltitude, userID, photos_count,
 							checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count,
-							cin.getWorkingLevelCatIDs(), distaneInMFromPrev, durationInSecFromPrev, levelWiseCatIDs);
+							cin.getWorkingLevelCatIDs(), distaneInMFromPrev, durationInSecFromPrev, levelWiseCatIDs,
+							currentZoneId);
 					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
+
+					fallbackZoneId = currentZoneId;
 				}
 				dayWiseForThisUser.put(dateEntry.getKey(), activityObjectsForThisUserThisDate);
 			}
 			activityObjectsDatewise.put(userID, dayWiseForThisUser);
 		}
+
+		System.out.println("locIDsWithNoTZ.size()= " + locIDsWithNoTZ.size());
+		System.out.println("locIDsWithNoFallbackTZ.size()= " + locIDsWithNoFallbackTZ.size());
+
+		WritingToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoTZ.csv");
+
+		WritingToFile.writeToNewFile(
+				locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoFallbackTZ.csv");
+
+		// find loc ids in gowalla 5 days train test data which is known to have no TZ is found to have no fallback tz
+		// as well.
+		locIDsWithNoFallbackTZ.retainAll(DomainConstants.locIDsIn5DaysTrainTestDataWithNullTZ);
+		WritingToFile.writeToNewFile(
+				locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoFallbackTZIn5DaysTrainTestNoTZ.csv");
+
+		System.out.println(
+				"\n loc ids in Gowalla5daysTrainTest data which is known to have no TZ is found to have no fallback tz as well="
+						+ locIDsWithNoFallbackTZ.toString());
+
+		System.out.println(" numOfCinsWithNullZoneIDs= " + numOfCinsWithNullZoneIDs + "  "
+				+ ((numOfCinsWithNullZoneIDs * 1.0) / numOfCIns) + "% of total cins");
+		System.out.println(" numOfCinsWithEvenFallbackNullZoneIds= " + numOfCinsWithEvenFallbackNullZoneIds + "  "
+				+ ((numOfCinsWithEvenFallbackNullZoneIds * 1.0) / numOfCIns) + "% of total cins");
 		System.out.println(" numOfCIns = " + numOfCIns);
 		System.out.println(" numOfCInsWithMultipleLocIDs = " + numOfCInsWithMultipleLocIDs);
 		System.out.println(" numOfCInsWithMultipleDistinctLocIDs = " + numOfCInsWithMultipleDistinctLocIDs);

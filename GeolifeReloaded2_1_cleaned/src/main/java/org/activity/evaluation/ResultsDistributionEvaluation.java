@@ -57,8 +57,8 @@ public class ResultsDistributionEvaluation
 	public static void runFeb17FiveDaysResults()
 	{
 
-		String pathToWrite = "./dataWritten/Feb26/FiveDays/";
-		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultFeb25ToRead.csv";
+		String pathToWrite = "./dataWritten/Mar1/FiveDays/";
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultMar1ToRead.csv";
 		int numOfDay = 5;
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
 		double muArray[] = Constant.matchingUnitAsPastCount;

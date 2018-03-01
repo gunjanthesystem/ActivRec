@@ -1,5 +1,6 @@
 package org.activity.controller;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -116,8 +117,8 @@ public class SuperController
 				Constant.setAKOMHighestOrder(order);
 				Constant.setRecentDaysInTrainingTimelines(numOfDay);
 
-				runExperiments(commonPath, true, true, true);
-				cleanUpSpace(commonPath, 0.80);
+				runExperiments(commonPath, false, true, true);
+				// cleanUpSpace(commonPath, 0.80);
 				System.out.println("finished for commonPath = " + commonPath);
 			}
 		}
@@ -131,8 +132,12 @@ public class SuperController
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
 		// Start
-		String[] commonPaths = {
-				"./dataWritten/Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis/" };
+		String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar1ED" + Constant.EDAlpha
+				+ "DurFPDistFPStFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
+
+		// "/run/media/gunjan/Buffer/Vault/GowallaResults/March1/" };
+		//
+		// Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis
 		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" }; //
 		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/"
 		// "/run/media/gunjan/BufferVault/GowallaResults/Feb25/" };
@@ -168,8 +173,15 @@ public class SuperController
 
 		for (int i = 0; i <= commonPaths.length - 1; i++)
 		{
+			File directory = new File(commonPaths[i]);
+			if (!directory.exists())
+			{
+				directory.mkdir();
+				// If you require it to make the entire directory path including parents,
+				// use directory.mkdirs(); here instead.
+			}
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], true, false, true);
+			runExperiments(commonPaths[i], true, true, true);
 			// cleanUpSpace(commonPaths[i], 0.90);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}

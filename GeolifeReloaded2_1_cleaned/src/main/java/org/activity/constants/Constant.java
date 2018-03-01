@@ -146,7 +146,7 @@ public final class Constant
 	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
 	// None,Percentile // SWITCH_NOV10
 
-	public static final int filterCandByCurActTimeThreshInSecs = -1;// -1;18000; 3600; //SWITCH_NOV10
+	public static final int filterCandByCurActTimeThreshInSecs = 18000;// -1; 18000; 3600 7200; //SWITCH_NOV10
 
 	/**
 	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
@@ -179,12 +179,13 @@ public final class Constant
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
 
 	public static final boolean useActivityNameInFED = false;
-	public static final boolean useStartTimeInFED = false;// SWITCH_NOV10
+	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
 	public static final boolean useLocationInFED = false;// SWITCH_NOV10
 	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
-	public static boolean debugFeb24_2018 = true;// SWITCH_NOV10
+	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
+	public static final boolean useDecayInFeatureLevelED = false;// SWITCH_NOV10
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +234,8 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 3, 0, 1, 2, /* 3, */4, 6, 8 };// { 0, 1, 2, 3, 4, 6, 8 };//
+	public static final double matchingUnitAsPastCount[] = { 3, 0, 1, 2, /* 3, */ 4, 6, 8 };// { 0, 1, 2, 3, 4, 6, 8
+																							// };//
 	// 2, 4,6, 8, 1, 3, 10 11, 12,13,14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38,
 	// 40,42 };
 
@@ -320,6 +322,8 @@ public final class Constant
 	static EditDistanceMemorizer editDistancesMemorizer;
 	public static final boolean memorizeEditDistance = false;
 	final static int editDistancesMemorizerBufferSize = 1;// 000000;
+
+	public static final boolean needsToPruneFirstUnknown = false;
 	/////////////////////////// End of variable declarations//////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -517,16 +521,19 @@ public final class Constant
 
 	/**
 	 * 
+	 * /**
+	 * 
 	 * @param givenCommonpath
 	 * @param databaseName
 	 * @param catIDsHierDistSerialisedFile
 	 * @param pathToSerialisedCatIDNameDictionary
 	 * @param pathToSerialisedLocationObjects
 	 * @param pathToSerialisedUserObjects
+	 * @param pathToSerialisedGowallaLocZoneIdMap
 	 */
 	public static void initialise(String givenCommonpath, String databaseName, String catIDsHierDistSerialisedFile,
 			String pathToSerialisedCatIDNameDictionary, String pathToSerialisedLocationObjects,
-			String pathToSerialisedUserObjects)
+			String pathToSerialisedUserObjects, String pathToSerialisedGowallaLocZoneIdMap)
 	{
 
 		Constant.setDatabaseName(databaseName);
@@ -544,6 +551,7 @@ public final class Constant
 		DomainConstants.setCatIDCharCodeMap();
 		DomainConstants.setCatIDGivenLevelCatIDMap();
 		DomainConstants.setUserIDUserObjectDictionary(pathToSerialisedUserObjects);
+		DomainConstants.setGowallaLocZoneIdMap(pathToSerialisedGowallaLocZoneIdMap);
 
 		if (Constant.memorizeEditDistance)
 		{
@@ -1237,6 +1245,7 @@ public final class Constant
 
 		s.append("\neditDistancesMemorizerBufferSize:" + editDistancesMemorizerBufferSize);
 		s.append("\nmemorizeEditDistance:" + memorizeEditDistance);
+		s.append("\nneedsToPruneFirstUnknown:" + needsToPruneFirstUnknown);
 		s.append("\nFor9kUsers:" + For9kUsers);
 
 		s.append("\nuseMedianCinsForRepesentationAO:" + useMedianCinsForRepesentationAO);
@@ -1252,6 +1261,7 @@ public final class Constant
 		s.append("\nusePopularityInFED:" + usePopularityInFED);
 		s.append("\nuseDistFromPrevInFED:" + useDistFromPrevInFED);
 		s.append("\nuseDurationFromPrevInFED:" + useDurationFromPrevInFED);
+		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFeatureLevelED);
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))

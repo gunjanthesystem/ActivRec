@@ -1,6 +1,7 @@
 package org.activity.distances;
 
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -104,8 +105,9 @@ public class AlignmentBasedDistance
 	 */
 	public AlignmentBasedDistance()
 	{
-		setWeightsAndCosts(); // VERY IMPORTANT
 		setFeaturesToUseInDistance();
+		setWeightsAndCosts(); // VERY IMPORTANT
+
 		if (!Constant.useTolerance)// == false)
 		{
 			setTolerancesToZero();
@@ -165,9 +167,37 @@ public class AlignmentBasedDistance
 				// Switch_23Feb TODO
 				// $$wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtLocation +
 				// wtLocPopularity, 4);
-				wtFullActivityObject = StatsUtils.round(wtActivityName
-						/* + wtStartTime + wtLocation + wtLocPopularity */ + wtDistanceFromPrev + wtDurationFromPrev,
-						4);
+				wtFullActivityObject = 0;
+				if (this.useActivityNameInFED)
+				{
+					wtFullActivityObject += wtActivityName;
+				}
+				if (this.useStartTimeInFED)
+				{
+					wtFullActivityObject += wtStartTime;
+				}
+				if (this.useLocationInFED)
+				{
+					wtFullActivityObject += wtLocation;
+				}
+
+				if (this.usePopularityInFED)
+				{
+					wtFullActivityObject += wtLocPopularity;
+				}
+
+				if (this.useDistFromPrevInFED)
+				{
+					wtFullActivityObject += wtDistanceFromPrev;
+				}
+
+				if (this.useDurationFromPrevInFED)
+				{
+					wtFullActivityObject += wtDurationFromPrev;
+				}
+				wtFullActivityObject = StatsUtils.round(wtFullActivityObject, 4);
+				// wtActivityName/* + wtStartTime + wtLocation + wtLocPopularity */ + wtDistanceFromPrev +
+				// wtDurationFromPrev,4);
 				break;
 
 			default:
@@ -196,8 +226,11 @@ public class AlignmentBasedDistance
 		String allWts = "\nWt of Activity Name:" + wtActivityName + "\nWt of Start Time:" + wtStartTime
 				+ "\nWt of Duration:" + wtDuration + "\nWt of Distance Travelled:" + wtDistanceTravelled
 				+ "\nWt of Start Geo Location:" + wtStartGeo + "\nWt of End Geo Location:" + wtEndGeo
-				+ "\nWt of Avg Altitude:" + wtAvgAltitude + "\nwtDistanceFromPrev" + wtDistanceFromPrev
-				+ "\nwtDurationFromPrev:" + wtDurationFromPrev + "\nWt of full Activity Object:" + wtFullActivityObject;
+				+ "\nWt of Avg Altitude:" + wtAvgAltitude + "\nWt of Location:" + wtLocation + "\nWt of Popularity:"
+				+ wtLocPopularity + "\nwtDistanceFromPrev" + wtDistanceFromPrev + "\nwtDurationFromPrev:"
+				+ wtDurationFromPrev + "\nWt of full Activity Object:" + wtFullActivityObject
+				+ "\ncostInsertActivityObject:" + costInsertActivityObject + "\ncostDeleteActivityObject:"
+				+ costDeleteActivityObject + "\ncostReplaceActivityObject:" + costReplaceActivityObject;
 		return allWts;
 	}
 
@@ -765,6 +798,68 @@ public class AlignmentBasedDistance
 		}
 
 		return dfeat;
+	}
+
+	/**
+	 * 
+	 * @param ao1STInms
+	 * @param ao2STInms
+	 * @param zone1
+	 * @param zone2
+	 * @param editDistTimeDistType
+	 * @param startTimeToleranceInSeconds
+	 * @param wtStartTime
+	 * @return
+	 * @since 27 Feb 2018 extracted from the method getFeatureLevelDistanceGowallaPD23Feb2018()
+	 */
+	public static Pair<Double, String> getStartTimeDistanceZoned(long ao1STInms, long ao2STInms, ZoneId zone1,
+			ZoneId zone2, Enums.EditDistanceTimeDistanceType editDistTimeDistType, long startTimeToleranceInSeconds,
+			double wtStartTime)
+	{
+		if (zone1 == null || zone1 == null)
+		{
+			return new Pair<>(wtStartTime, "Nullzone dtime=" + wtStartTime);
+		}
+
+		if (editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.BinaryThreshold))
+		{
+			// if not same within 60mins then add wt to dfeat
+			if (DateTimeUtils.isSameTimeInToleranceZoned(ao1STInms, ao2STInms, zone1, zone2,
+					startTimeToleranceInSeconds) == false)
+			{
+				return new Pair<>(wtStartTime, "\ndtime=" + wtStartTime);
+			}
+		}
+		// $$ curtain on 2 Mar 2017 end
+
+		// $$ added on 2nd march 2017 start: nearerScaledTimeDistance
+		else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.NearerScaled))
+		{
+			long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSecondsZoned(ao1STInms, ao2STInms, zone1, zone2);
+			if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
+			{
+				double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
+				return new Pair<>((timeDistance * wtStartTime), "\ndtime=" + (timeDistance * wtStartTime));
+			}
+			else // absTimeDiffInSeconds > startTimeToleranceInSeconds
+			{
+				return new Pair<>(1.0 * wtStartTime, "\ndtime=" + (1.0 * wtStartTime));
+			}
+		}
+		// $$ added on 2nd march 2017 end
+
+		// $$ added on 3rd march 2017 start: furtherScaledTimeDistance
+		// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
+		else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.FurtherScaled))
+		{
+			long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSecondsZoned(ao1STInms, ao2STInms, zone1, zone2);
+			if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
+			{
+				double timeDistance = absTimeDiffInSeconds / 10800;
+				return new Pair<>((timeDistance * wtStartTime), "\ndtime=" + (timeDistance * wtStartTime));
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -2779,23 +2874,31 @@ public class AlignmentBasedDistance
 	@Override
 	public String toString()
 	{
-		return "AlignmentBasedDistance [wtActivityName=" + wtActivityName + ", wtStartTime=" + wtStartTime
-				+ ", wtDuration=" + wtDuration + ", wtDistanceTravelled=" + wtDistanceTravelled + ", wtStartGeo="
-				+ wtStartGeo + ", wtEndGeo=" + wtEndGeo + ", wtAvgAltitude=" + wtAvgAltitude + ", wtLocation="
-				+ wtLocation + ", wtLocPopularity=" + wtLocPopularity + ", wtDistanceFromPrev=" + wtDistanceFromPrev
-				+ ", wtDurationFromPrev=" + wtDurationFromPrev + ", wtFullActivityObject=" + wtFullActivityObject
-				+ ", costInsertActivityObject=" + costInsertActivityObject + ", costDeleteActivityObject="
-				+ costDeleteActivityObject + ", costReplaceActivityObject=" + costReplaceActivityObject
-				+ ", distMatrix=" + Arrays.toString(distMatrix) + ", defaultCostInsert=" + defaultCostInsert
-				+ ", defaultCostDelete=" + defaultCostDelete + ", defaultCostReplace=" + defaultCostReplace
-				+ ", startTimeToleranceInSeconds=" + startTimeToleranceInSeconds + ", durationToleranceInSeconds="
-				+ durationToleranceInSeconds + ", distanceTravelledTolerance=" + distanceTravelledTolerance
-				+ ", startGeoTolerance=" + startGeoTolerance + ", endGeoTolerance=" + endGeoTolerance
-				+ ", avgAltTolerance=" + avgAltTolerance + ", locationPopularityTolerance="
-				+ locationPopularityTolerance + ", durationFromPrevTolerance=" + durationFromPrevTolerance
-				+ ", distanceFromPrevTolerance=" + distanceFromPrevTolerance + ", numberOfInsertions="
-				+ numberOfInsertions + ", numberOfDeletions=" + numberOfDeletions + ", numberOfReplacements="
-				+ numberOfReplacements + "]";
+		if (VerbosityConstants.alignmentDistanceStringPrintedOnce == false)
+		{
+			VerbosityConstants.alignmentDistanceStringPrintedOnce = true;
+			return "AlignmentBasedDistance [wtActivityName=" + wtActivityName + ", wtStartTime=" + wtStartTime
+					+ ", wtDuration=" + wtDuration + ", wtDistanceTravelled=" + wtDistanceTravelled + ", wtStartGeo="
+					+ wtStartGeo + ", wtEndGeo=" + wtEndGeo + ", wtAvgAltitude=" + wtAvgAltitude + ", wtLocation="
+					+ wtLocation + ", wtLocPopularity=" + wtLocPopularity + ", wtDistanceFromPrev=" + wtDistanceFromPrev
+					+ ", wtDurationFromPrev=" + wtDurationFromPrev + ", wtFullActivityObject=" + wtFullActivityObject
+					+ ", costInsertActivityObject=" + costInsertActivityObject + ", costDeleteActivityObject="
+					+ costDeleteActivityObject + ", costReplaceActivityObject=" + costReplaceActivityObject
+					+ ", distMatrix=" + Arrays.toString(distMatrix) + ", defaultCostInsert=" + defaultCostInsert
+					+ ", defaultCostDelete=" + defaultCostDelete + ", defaultCostReplace=" + defaultCostReplace
+					+ ", startTimeToleranceInSeconds=" + startTimeToleranceInSeconds + ", durationToleranceInSeconds="
+					+ durationToleranceInSeconds + ", distanceTravelledTolerance=" + distanceTravelledTolerance
+					+ ", startGeoTolerance=" + startGeoTolerance + ", endGeoTolerance=" + endGeoTolerance
+					+ ", avgAltTolerance=" + avgAltTolerance + ", locationPopularityTolerance="
+					+ locationPopularityTolerance + ", durationFromPrevTolerance=" + durationFromPrevTolerance
+					+ ", distanceFromPrevTolerance=" + distanceFromPrevTolerance + ", numberOfInsertions="
+					+ numberOfInsertions + ", numberOfDeletions=" + numberOfDeletions + ", numberOfReplacements="
+					+ numberOfReplacements + "]";
+		}
+		else
+		{
+			return "";
+		}
 	}
 
 	/**
@@ -2821,8 +2924,22 @@ public class AlignmentBasedDistance
 		{
 			if (useStartTimeInFED)
 			{
-				Pair<Double, String> stDistRes = getStartTimeDistance(ao1.getStartTimestamp(), ao2.getStartTimestamp(),
+				// Pair<Double, String> stDistRes = getStartTimeDistance(ao1.getStartTimestamp(),
+				// ao2.getStartTimestamp(),
+				// Constant.editDistTimeDistType, startTimeToleranceInSeconds, wtStartTime);
+				Pair<Double, String> stDistRes = getStartTimeDistanceZoned(ao1.getStartTimestampInms(),
+						ao2.getStartTimestampInms(), ao1.getTimeZoneId(), ao2.getTimeZoneId(),
 						Constant.editDistTimeDistType, startTimeToleranceInSeconds, wtStartTime);
+
+				if (stDistRes.getSecond().length() <= 15)// null timezone
+				{
+					WritingToFile
+							.appendLineToFileAbsolute(
+									"Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+											+ ao2.getLocationIDs(',') + "\n",
+									Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+				}
+
 				dStartTime = stDistRes.getFirst();
 				sbLog.append("\ndST=" + stDistRes.getSecond());
 			}

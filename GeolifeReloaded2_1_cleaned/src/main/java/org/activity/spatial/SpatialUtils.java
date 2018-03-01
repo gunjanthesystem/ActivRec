@@ -2,6 +2,7 @@ package org.activity.spatial;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -277,7 +278,7 @@ public final class SpatialUtils
 		Set<LocationSlim> locsForDist = new TreeSet<>();
 		try
 		{
-			ArrayList<ArrayList<String>> allLines = ReadingFromFile.readLinesIntoListOfLists(pathToReadUniqueLocs, ",");
+			List<List<String>> allLines = ReadingFromFile.readLinesIntoListOfLists(pathToReadUniqueLocs, ",");
 			System.out.println(allLines.get(1));
 			locsForDist = allLines.stream().skip(1).map(l -> new LocationSlim(l.get(9), l.get(10), l.get(0), l.get(13)))
 					.collect(Collectors.toSet());

@@ -2,6 +2,7 @@ package org.activity.io;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -54,9 +55,77 @@ public class CSVUtils
 
 	}
 
+	public static void splitCSVRowise(String originCSVFile, String delimiter, boolean hasHeader, int numOfSplittedFiles,
+			String pathToWrite, String fileNamePhraseToWrite)
+	{
+		// List<CSVRecord> allLines = CSVUtils.getCSVRecords(originCSVFile, delimiter);
+		// CSVRecord header = null; // = allLines.get(0);
+		List<List<String>> allLines = null;
+		List<String> header = null;
+		try
+		{
+			allLines = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(new FileInputStream(originCSVFile),
+					delimiter, hasHeader, false, new int[] { 0, 2, 3 });
+			int numOfAdditionalLinesForNewHeaders = 0;
+			if (hasHeader)
+			{
+				header = allLines.get(0);
+
+				System.out.println("Header = " + header.toString());
+				numOfAdditionalLinesForNewHeaders = numOfSplittedFiles - 1;
+				allLines.remove(0);
+			}
+
+			int numOfLinesForEachFile = (int) (allLines.size() + numOfAdditionalLinesForNewHeaders)
+					/ numOfSplittedFiles;
+
+			int lineNum = 0, fileNum = 0;
+			String absFileNameToWrite = "";
+			StringBuilder sb = new StringBuilder();
+			for (List<String> line : allLines)
+			{
+
+				lineNum += 1;
+				// System.out.println("lineNum=" + lineNum + " fileNum=" + fileNum);
+				// start of line
+				if (lineNum == 1 || (lineNum % (numOfLinesForEachFile + 1) == 0))
+				{
+					fileNum += 1;
+					absFileNameToWrite = pathToWrite + fileNamePhraseToWrite + fileNum + ".csv";
+
+					if (hasHeader)
+					{
+						WritingToFile.writeToNewFile(String.join(",", header) + "\n", absFileNameToWrite);
+					}
+					// continue;
+				}
+				sb.append(String.join(",", line) + "\n");
+
+				// end of line
+				if (lineNum % (numOfLinesForEachFile) == 0)
+				{
+					WritingToFile.appendLineToFileAbsolute(sb.toString() + "\n", absFileNameToWrite);
+					System.out.println("Wrote file: " + fileNum);
+					sb.setLength(0);
+				}
+			}
+			if (sb.length() != 0)
+			{
+				WritingToFile.appendLineToFileAbsolute(sb.toString() + "\n", absFileNameToWrite);
+				System.out.println("Wrote file: " + fileNum);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String[] args)
 	{
-		temp();
+		splitCSVRowise("/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv", ",", true, 10,
+				"/home/gunjan/JupyterWorkspace/data/", "gowalla_spots_subset1_fromRaw28Feb2018smallerFile");
+		// temp();
 		// testSideConcat();
 		// removeDuplicateRowsGowalla();
 		// $$removeDuplicateRowsFromRawGowalla();
