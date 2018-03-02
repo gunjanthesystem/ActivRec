@@ -115,7 +115,8 @@ public class PopUps
 		// Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		// System.err.println(sb.toString() + "------------");
 		// return sb.append("--------- ------- ----- -------").toString();
-		WritingToFile.appendLineToFileAbsolute(errorMsg, Constant.getCommonPath() + Constant.errorFileName);
+		WritingToFile.appendLineToFileAbsolute(getTracedErrorMsg(errorMsg) + "--\n",
+				Constant.getCommonPath() + Constant.errorFileName);
 	}
 
 	// /**

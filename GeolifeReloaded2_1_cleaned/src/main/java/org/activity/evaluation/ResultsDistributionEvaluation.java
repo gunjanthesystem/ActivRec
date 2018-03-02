@@ -57,8 +57,8 @@ public class ResultsDistributionEvaluation
 	public static void runFeb17FiveDaysResults()
 	{
 
-		String pathToWrite = "./dataWritten/Mar1/FiveDays/";
-		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultMar1ToRead.csv";
+		String pathToWrite = "./dataWritten/Mar2/FiveDays/";
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultMar2ToReadClarity.csv";
 		int numOfDay = 5;
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
 		double muArray[] = Constant.matchingUnitAsPastCount;
@@ -73,9 +73,10 @@ public class ResultsDistributionEvaluation
 			pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_NCount_AllCand5DayFilter/";
 			resLabels.add(Arrays.asList(new String[] { "mortar", resultsLabel, pathToRead }));
 
-			resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-600";
-			pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Feb2NCount_5Day_ThresholdNN600/";
-			resLabels.add(Arrays.asList(new String[] { "howitzer", resultsLabel, pathToRead }));
+			// resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-600";
+			// pathToRead =
+			// "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Feb2NCount_5Day_ThresholdNN600/";
+			// resLabels.add(Arrays.asList(new String[] { "howitzer", resultsLabel, pathToRead }));
 
 			for (List<String> resEntry : resLabels)
 			{

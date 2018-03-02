@@ -732,7 +732,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 		// double levenshteinDistance =StringUtils.getLevenshteinDistance(stringCodeForActivityObjects1,
 		// stringCodeForActivityObjects2);
-		Pair<String, Double> levenshteinDistance = getMySimpleLevenshteinDistance(stringCodeForActivityObjects1,
+		Pair<String, Double> levenshteinDistance = getMySimpleLevenshteinDistancePair(stringCodeForActivityObjects1,
 				stringCodeForActivityObjects2, 1, 1, 1);
 
 		// $$WritingToFile.writeEditSimilarityCalculation(activityObjects1, activityObjects2,
@@ -741,7 +741,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 		// WritingToFile.writeEditSimilarityCalculation(activityObjects1,activityObjects2,levenshteinDistance);
 		// WritingToFile.writeEditDistance(levenshteinDistance);
-		return levenshteinDistance;
+		return new Pair<String, Double>(levenshteinDistance.getFirst(), levenshteinDistance.getSecond());
 	}
 
 }

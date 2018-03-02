@@ -158,6 +158,11 @@ public class ControllerWithoutServer
 			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
 
 			///////////////////
+			// TimelineUtils.writeNumOfNullTZCinsPerUserPerLocID(usersCleanedDayTimelines,
+			// "NOTZForCleanedSubsettedData");
+			TimelineUtils.writeNumOfNullTZCinsPerUserPerLocIDTrainTestDataOnly(usersCleanedDayTimelines,
+					"NOTZForCleanedSubsettedTraintestData");
+
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
 			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines, true));
 			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines, true));
@@ -250,8 +255,11 @@ public class ControllerWithoutServer
 			// $$TimelineStats.writeAllCitiesCounts(usersCleanedDayTimelines,
 			// $$ Constant.outputCoreResultsPath + "AllCitiesCount");
 			// // important curtain 1 start 21 Dec 2017 10 Feb 2017
+			DomainConstants.clearGowallaLocZoneIdMap();// to save memory
+
 			if (Constant.For9kUsers)
 			{
+
 				// Start of curtain Aug 14 2017
 				// $$selectGivenUsersExecuteRecommendationTests(usersCleanedDayTimelines, IntStream
 				// $$ .of(DomainConstants.gowallaUserIDInUserGroup1Users).boxed().collect(Collectors.toList()),
@@ -262,7 +270,7 @@ public class ControllerWithoutServer
 				ArrayList<ArrayList<String>> listOfSampledUserIDs = null;
 				if (useSampledUsersFromFile)
 				{
-					String sampledUsersListFile = "dataToRead/Jan16/randomlySampleUsers.txt";
+					String sampledUsersListFile = "./dataToRead/Jan16/randomlySampleUsers.txt";
 					System.out.println("Reading Sampled users from " + sampledUsersListFile);
 					listOfSampledUserIDs = ReadingFromFile.readRandomSamplesIntoListOfLists(sampledUsersListFile, 13,
 							21, ",");
@@ -301,9 +309,23 @@ public class ControllerWithoutServer
 			}
 			else
 			{
-				// Start of curtain Aug 11 2017
-				sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, DomainConstants.gowallaUserGroupsLabels,
-						commonBasePath);
+
+				if (Constant.randomLySample100Users)
+				{
+					List<String> sampledUserIndicesStr = ReadingFromFile
+							.oneColumnReaderString("./dataToRead/RandomlySample100UsersMar1_2018.csv", ",", 0, false);
+					List<Integer> sampledUserIndices = sampledUserIndicesStr.stream().map(i -> Integer.valueOf(i))
+							.collect(Collectors.toList());
+					sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines,
+							DomainConstants.gowalla100RandomUsersLabel, sampledUserIndices, commonBasePath);
+				}
+				else
+				{
+					// Start of curtain Aug 11 2017
+					sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines,
+							DomainConstants.gowallaUserGroupsLabels, commonBasePath);
+
+				}
 				// End of curtain Aug 11 2017
 			}
 			// $$// important curtain 1 end 21 Dec 2017 10 Feb 2017
@@ -665,6 +687,122 @@ public class ControllerWithoutServer
 	/**
 	 * 
 	 * @param usersCleanedDayTimelines
+	 * @param groupsOf100UsersLabel
+	 * @param userIndicesToSelect
+	 * @param commonBasePath
+	 * @throws IOException
+	 * @since Mar 2 2018
+	 */
+	private void sampleUsersByIndicesExecuteRecommendationTests(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String groupOf100UsersLabel,
+			List<Integer> userIndicesToSelect, String commonBasePath) throws IOException
+	{
+		// LinkedHashMap<Integer, String> indexOfBlackListedUsers = new LinkedHashMap<>();
+		System.out.println(
+				"Inside sampleUsersByIndicesExecuteRecommendationTests: usersCleanedDayTimelines received size="
+						+ usersCleanedDayTimelines.size());
+
+		System.out.println("-- iteration start for groupOf100UsersLabel = " + groupOf100UsersLabel);
+		// important so as to wipe the previously assigned user ids
+		Constant.initialise(commonPath, Constant.getDatabaseName());
+		Constant.setOutputCoreResultsPath(commonBasePath + groupOf100UsersLabel + "/");
+		Files.createDirectories(Paths.get(Constant.getOutputCoreResultsPath())); // added on 9th Feb 2017
+
+		/// sample users
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsers = new LinkedHashMap<>(134);
+		// (ceil) 100/0.75
+
+		int indexOfSampleUser = 0;
+		int numOfUsersSkippedGT553MaxActsPerDay = 0;
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+		{
+			System.out.print(" indexOfSampleUser = " + indexOfSampleUser + "\t");
+			// countOfSampleUsers += 1;
+			if (userIndicesToSelect.contains(indexOfSampleUser) == false)
+			{
+				System.out.println(" " + indexOfSampleUser + " hence skipping");
+				indexOfSampleUser += 1;
+				continue;
+			}
+			if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+			{
+				System.out.println(" ALERT ALERT ALERT !! NOT EXPECTED" + indexOfSampleUser + " Skipping user: "
+						+ userEntry.getKey() + " as in gowallaUserIDsWithGT553MaxActsPerDay");
+				WritingToFile.appendLineToFileAbsolute(indexOfSampleUser + "," + userEntry.getKey() + "\n",
+						"IndexOfBlacklistedUsers.csv");
+				numOfUsersSkippedGT553MaxActsPerDay += 1;
+				indexOfSampleUser += 1;
+				continue;
+			}
+			else
+			{
+				System.out.println(" choosing this ");
+				sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+				indexOfSampleUser += 1;
+			}
+			// $$System.out.println("putting in user= " + userEntry.getKey());
+		}
+
+		// TODO likely the code segment below is not needed anymore as blacklisted users have already been removed.
+		// start of get timelines for all users for collaborative approach
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsers = new LinkedHashMap<>(1000);
+		int numOfAllUsersSkippedGT553MaxActsPerDay = 0;
+		if (Constant.collaborativeCandidates)
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+				{
+					numOfAllUsersSkippedGT553MaxActsPerDay += 1;
+					continue;
+				}
+				else
+				{
+					allUsers.put(userEntry.getKey(), userEntry.getValue());
+				}
+			}
+			System.out.println("got timelines for all users for coll cand: allUsers.size()= " + allUsers.size());
+			// Sanity.eq(numOfUsersSkippedGT553MaxActsPerDay, numOfAllUsersSkippedGT553MaxActsPerDay,
+			System.out.println("numOfUsersSkippedGT553MaxActsPerDay=" + numOfUsersSkippedGT553MaxActsPerDay
+					+ " numOfAllUsersSkippedGT553MaxActsPerDay=" + numOfAllUsersSkippedGT553MaxActsPerDay);
+
+		}
+		// end of get timelines for all users for collaborative approach
+
+		System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
+		System.out.println("num of allUsers users for this iteration = " + allUsers.size());
+		System.out.println(" -- Users = " + sampledUsers.keySet().toString());
+		System.out.println(" -- All Users for collaboration = " + allUsers.keySet().toString());
+
+		// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+		// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+		// $$RecommendationTestsBaseClosestTime recommendationsTest = new RecommendationTestsBaseClosestTime(
+		// $$ sampledUsers);
+
+		System.out.println("Just Before recommendationsTest\n" + PerformanceAnalytics.getHeapInformation());
+
+		// // start of curtain may 4 2017
+		// RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
+		// Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
+		// Constant.percentageInTraining);
+		// // end of curtain may 4 2017
+		// System.exit(0);
+		RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
+				sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
+				Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
+
+		/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
+
+		// RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new
+		// RecommendationTestsDayWise2FasterJan2016(sampledUsers);
+
+		System.out.println("-- iteration end for groupOf100UsersLabel = " + groupOf100UsersLabel);
+
+	}
+
+	/**
+	 * 
+	 * @param usersCleanedDayTimelines
 	 * @param userIDsToSelect
 	 * @param commonBasePath
 	 * @param groupLabel
@@ -714,6 +852,31 @@ public class ControllerWithoutServer
 	 * @return
 	 */
 	public LinkedHashMap<String, LinkedHashMap<Date, Timeline>> getDayTimelinesForUserIDs(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
+			List<Integer> userIDsToSelect)
+	{
+		/// sample users
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines = new LinkedHashMap<>(
+				userIDsToSelect.size());// (ceil) 100/0.75
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+		{
+			if (userIDsToSelect.contains(Integer.valueOf(userEntry.getKey())))
+			{
+				sampledUsersTimelines.put(userEntry.getKey(), userEntry.getValue());
+			}
+			// $$System.out.println("putting in user= " + userEntry.getKey());
+		}
+		return sampledUsersTimelines;
+	}
+
+	/**
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param userIDsToSelect
+	 * @return
+	 */
+	public LinkedHashMap<String, LinkedHashMap<Date, Timeline>> getDayTimelinesForUserIndices(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
 			List<Integer> userIDsToSelect)
 	{

@@ -847,14 +847,25 @@ public final class StatsUtils
 	 */
 	public static double minMaxNorm(double val, double max, double min)
 	{
-		if ((max - min) > 0)
+		// if ((max - min) > 0.0000000000000000)
+		if ((max - min) > 0.0000000000000000000000000001)
 		{
 			return round(((val - min) / (max - min)), 4);
 		}
+		else if ((min - max) > 0.0000000000000000000000000001)
+		{
+			PopUps.printTracedErrorMsgWithExit(("Error: Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max
+					+ ")- min(" + min + ") <=0 =" + (max - min)));
+			return 0;
+		}
+
 		else
 		{
-			System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min + ") <=0 ="
-					+ (max - min)));
+			if (Math.abs(max - min) > 1e-10)
+			{
+				System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min
+						+ ") <=0 =" + (max - min)));
+			}
 			// Warning: Alert!! val0.25 = minMaxNorm: max(0.25)- min(0.25) <=0 =0.0
 			// val = 0.25, max = 0.25, min =0.25, max-min = 0;
 			return 0;

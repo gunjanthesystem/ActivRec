@@ -106,16 +106,14 @@ public class DomainConstants
 	/**
 	 * Labels for groups of 100 users. If label is "101" then users from 100 to 199 are included.
 	 */
-	public final static String[] gowallaUserGroupsLabels = {
-			"1"/*
-				 * , "101", "201", "301", "401", "501", "601", "701", "801", "901"
-				 */ };//
+	public final static String[] gowallaUserGroupsLabels = { "1", "101", "201", "301", "401", "501", "601", "701",
+			"801", "901" };//
 	// { "901", "801", "701", "601", "501", "401" /* "1", "101", "201", "301", */ };//
 
-	public final static String[] gowallaUserGroupsLabelsFixed = {
-			"1"/*
-				 * , "101", "201", "301", "401", "501", "601", "701", "801", "901"
-				 */ };//
+	public final static String[] gowallaUserGroupsLabelsFixed = { "1", "101", "201", "301", "401", "501", "601", "701",
+			"801", "901" };//
+
+	public final static String gowalla100RandomUsersLabel = "100R";
 
 	public final static Set<Integer> locIDsIn5DaysTrainTestDataWithNullTZ = new HashSet<>(
 			Arrays.asList(259769, 328496, 339529, 339618, 351286, 354613));
