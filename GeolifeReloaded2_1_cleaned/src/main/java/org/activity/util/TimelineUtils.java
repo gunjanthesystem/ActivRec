@@ -26,6 +26,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.HJEditDistance;
+import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
@@ -808,6 +809,9 @@ public class TimelineUtils
 			/* LinkedHashMap<Integer, LocationGowalla> locationObjects) */
 			Int2ObjectOpenHashMap<LocationGowalla> locationObjects)
 	{
+		System.out.println(
+				"Inside convertCheckinEntriesToActivityObjectsGowalla(): Alert: Constant.assignFallbackZoneIdWhenConvertCinsToAO="
+						+ Constant.assignFallbackZoneIdWhenConvertCinsToAO);
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
 
@@ -830,6 +834,9 @@ public class TimelineUtils
 		IntSortedSet locIDsWithNoTZ = new IntRBTreeSet();
 		IntSortedSet locIDsWithNoFallbackTZ = new IntRBTreeSet();
 		int numOfCinsWithNullZoneIDs = 0, numOfCinsWithEvenFallbackNullZoneIds = 0;
+
+		// {userid, locids, num of null zone ids for this user id locid}
+		Map<String, Map<List<Integer>, Long>> userIdLocIdNumOfNullZoneCInsMap = new LinkedHashMap<>();
 		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
 
 		// convert checkinentries to activity objects
@@ -935,12 +942,37 @@ public class TimelineUtils
 					// int max_items_count = loc.getMax_items_count();
 					ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
 					if (currentZoneId == null)
-					{
+					{ /////
+						Map<List<Integer>, Long> mapForUserNTZ = userIdLocIdNumOfNullZoneCInsMap.get(userID);
+						if (mapForUserNTZ != null)
+						{
+							Long numOfNZCinsForThisUserLocID = mapForUserNTZ.get(locIDs);
+							if (numOfNZCinsForThisUserLocID != null)
+							{
+								mapForUserNTZ.put(locIDs, numOfNZCinsForThisUserLocID + 1);
+							}
+							else
+							{
+								mapForUserNTZ.put(locIDs, (long) 1);
+							}
+						}
+						else
+						{
+							mapForUserNTZ = new LinkedHashMap<List<Integer>, Long>();
+							mapForUserNTZ.put(locIDs, (long) 1);
+							userIdLocIdNumOfNullZoneCInsMap.put(userID, mapForUserNTZ);
+						}
+						/////
 						numOfCinsWithNullZoneIDs += 1;
 						locIDsWithNoTZ.addAll(locIDs);
-						currentZoneId = fallbackZoneId;
-						// WritingToFile.appendLineToFileAbsolute(userID + "," + locIDs + "," + startTimestamp + "\n",
-						// Constant.getOutputCoreResultsPath() + "NullZoneIDs.csv");
+
+						if (Constant.assignFallbackZoneIdWhenConvertCinsToAO)
+						{
+							currentZoneId = fallbackZoneId;
+							// WritingToFile.appendLineToFileAbsolute(userID + "," + locIDs + "," + startTimestamp +
+							// "\n",
+							// Constant.getOutputCoreResultsPath() + "NullZoneIDs.csv");
+						}
 						if (fallbackZoneId == null)
 						{
 							locIDsWithNoFallbackTZ.addAll(locIDs);
@@ -1001,6 +1033,10 @@ public class TimelineUtils
 				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
 						.collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
+
+		WritingToFile.writeMapOfMap(userIdLocIdNumOfNullZoneCInsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
+				Constant.getOutputCoreResultsPath() + "userIdLocIdNumOfNullZoneCInsMap.csv");
+
 		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
 		return activityObjectsDatewise;
 
@@ -4501,6 +4537,316 @@ public class TimelineUtils
 			sb.append(map.get(id).toString() + "\n");
 		}
 		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+	}
+
+	/**
+	 * For getting not timezone occurrence in cleaned susbsetted timelines
+	 * <p>
+	 * Not assigning fallback zoneid but just logging the count
+	 * 
+	 * @since Mar 1 2018
+	 * 
+	 * 
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param fileNamePhrase
+	 */
+	public static void writeNumOfNullTZCinsPerUserPerLocIDContinuousTimelines(
+			LinkedHashMap<String, Timeline> usersCleanedDayTimelines, String fileNamePhrase)
+	{
+		System.out.println("Inside writeNumOfNullTZCinsPerUserPerLocID():");
+		// {userid, locids, num of null zone ids for this user id locid}
+		Map<String, Map<List<Integer>, Long>> userIdLocIdNumOfNullZoneAOsMap = new LinkedHashMap<>();
+		IntSortedSet locIDsWithNoTZ = new IntRBTreeSet();
+		IntSortedSet locIDsWithNoFallbackTZ = new IntRBTreeSet();
+		HashMap<String, String> AOsWithMultipleWorkLevelCatIDs = new HashMap<>();
+
+		long numOfAOsWithNullZoneIDs = 0, numOfAOsWithEvenFallbackNullZoneIds = 0, numOfAOs = 0,
+				numOfAOsWithMultipleLocIDs = 0, numOfAOsWithMultipleDistinctLocIDs = 0,
+				numOfAOsWithMultipleWorkingLevelCatIDs = 0;
+
+		try
+		{
+			for (Entry<String, Timeline> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				String userID = userEntry.getKey();
+				ZoneId fallbackZoneId = null;
+
+				for (ActivityObject ao : userEntry.getValue().getActivityObjectsInTimeline())
+				{
+					numOfAOs += 1;
+
+					ArrayList<Integer> locIDs = ao.getLocationIDs();
+
+					if (locIDs.size() > 1)
+					{
+						numOfAOsWithMultipleLocIDs += 1;
+					}
+					if (new HashSet<Integer>(locIDs).size() > 1) // if more than 1 distinct locations
+					{
+						numOfAOsWithMultipleDistinctLocIDs += 1;
+					}
+					if (RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs()).length > 1)
+					{
+						numOfAOsWithMultipleWorkingLevelCatIDs += 1;
+						AOsWithMultipleWorkLevelCatIDs.put(ao.getActivityName(), ao.getWorkingLevelCatIDs());
+					}
+
+					ZoneId currentZoneId = ao.getTimeZoneId();
+
+					if (currentZoneId == null)
+					{
+						numOfAOsWithNullZoneIDs += 1;
+						locIDsWithNoTZ.addAll(locIDs);
+
+						Map<List<Integer>, Long> mapForUserNTZ = userIdLocIdNumOfNullZoneAOsMap.get(userID);
+						if (mapForUserNTZ != null)
+						{
+							Long numOfNZCinsForThisUserLocID = mapForUserNTZ.get(locIDs);
+							if (numOfNZCinsForThisUserLocID != null)
+							{
+								mapForUserNTZ.put(locIDs, numOfNZCinsForThisUserLocID + 1);
+							}
+							else
+							{
+								mapForUserNTZ.put(locIDs, (long) 1);
+							}
+						}
+						else
+						{
+							mapForUserNTZ = new LinkedHashMap<List<Integer>, Long>();
+							mapForUserNTZ.put(locIDs, (long) 1);
+							userIdLocIdNumOfNullZoneAOsMap.put(userID, mapForUserNTZ);
+						}
+
+						currentZoneId = fallbackZoneId;
+						// WritingToFile.appendLineToFileAbsolute(userID + "," + locIDs + "," + startTimestamp +
+						// "\n",
+						// Constant.getOutputCoreResultsPath() + "NullZoneIDs.csv");
+						if (fallbackZoneId == null)
+						{
+							locIDsWithNoFallbackTZ.addAll(locIDs);
+							numOfAOsWithEvenFallbackNullZoneIds += 1;
+							// WritingToFile.appendLineToFileAbsolute(userID + "," + locIDs + "," + startTimestamp +
+							// ","
+							// + numOfCinsForThisUser + "\n",Constant.getOutputCoreResultsPath() +
+							// "FallbackNullZoneIDs.csv");
+						}
+					}
+					fallbackZoneId = currentZoneId;
+				}
+
+			}
+
+			System.out.println("locIDsWithNoTZ.size()= " + locIDsWithNoTZ.size());
+			System.out.println("locIDsWithNoFallbackTZ.size()= " + locIDsWithNoFallbackTZ.size());
+			WritingToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+					Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoTZIn" + fileNamePhrase + ".csv");
+			WritingToFile.writeToNewFile(
+					locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+					Constant.getOutputCoreResultsPath() + "locIDsWithNoFallbackTZ" + fileNamePhrase + ".csv");
+
+			System.out.println(" numOfAOsWithNullZoneIDs= " + numOfAOsWithNullZoneIDs + "  "
+					+ ((numOfAOsWithNullZoneIDs * 100.0) / numOfAOs) + "% of total AOs");
+			System.out.println(" numOfAOsWithEvenFallbackNullZoneIds= " + numOfAOsWithEvenFallbackNullZoneIds + "  "
+					+ ((numOfAOsWithEvenFallbackNullZoneIds * 1.0) / numOfAOs) + "% of total AOs");
+			System.out.println(" numOfAOs = " + numOfAOs);
+			System.out.println(" numOfAOsWithMultipleLocIDs = " + numOfAOsWithMultipleLocIDs);
+			System.out.println(" numOfAOsWithMultipleDistinctLocIDs = " + numOfAOsWithMultipleDistinctLocIDs);
+			System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfAOsWithMultipleWorkingLevelCatIDs
+					+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
+
+			WritingToFile.writeToNewFile(
+					AOsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
+							.collect(Collectors.joining("\n")),
+					Constant.getOutputCoreResultsPath() + "AOsWithMultipleWorkLevelCatIDs" + fileNamePhrase + ".csv");
+
+			WritingToFile.writeMapOfMap(userIdLocIdNumOfNullZoneAOsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
+					Constant.getOutputCoreResultsPath() + "userIdLocIdNumOfNullZoneAOsMap" + fileNamePhrase + ".csv");
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * For getting not timezone occurrence in cleaned susbsetted timelines
+	 * <p>
+	 * Not assigning fallback zoneid but just logging the count
+	 * 
+	 * @since Mar 1 2018
+	 * 
+	 * 
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param fileNamePhrase
+	 */
+	public static void writeNumOfNullTZCinsPerUserPerLocIDTrainTestDataOnly(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String fileNamePhrase)
+	{
+		if (Constant.collaborativeCandidates)
+		{
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = TimelineUtils
+					.splitAllUsersTestTrainingTimelines(usersCleanedDayTimelines, Constant.percentageInTraining);
+
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous;
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> testTimelinesAllUsers = new LinkedHashMap<>();
+			if (Constant.filterTrainingTimelinesByRecentDays)
+			{
+				trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
+								Constant.getRecentDaysInTrainingTimelines());
+			}
+			else
+			{
+				// sampledUsersTimelines
+				trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+						.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
+			}
+
+			for (Entry<String, List<LinkedHashMap<Date, Timeline>>> userEntry : trainTestTimelinesForAllUsersDW
+					.entrySet())
+			{
+				testTimelinesAllUsers.put(userEntry.getKey(), userEntry.getValue().get(1));
+			}
+
+			writeNumOfNullTZCinsPerUserPerLocIDContinuousTimelines(trainTimelinesAllUsersContinuous,
+					fileNamePhrase + "TrainRecentDaysOnly");
+			writeNumOfNullTZCinsPerUserPerLocID(testTimelinesAllUsers, fileNamePhrase + "TestOnly");
+		}
+	}
+
+	/**
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param fileNamePhrase
+	 * @since March 1 2018
+	 */
+	public static void writeNumOfNullTZCinsPerUserPerLocID(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String fileNamePhrase)
+	{
+
+		System.out.println("Inside writeNumOfNullTZCinsPerUserPerLocID():");
+		// {userid, locids, num of null zone ids for this user id locid}
+		Map<String, Map<List<Integer>, Long>> userIdLocIdNumOfNullZoneAOsMap = new LinkedHashMap<>();
+		IntSortedSet locIDsWithNoTZ = new IntRBTreeSet();
+		IntSortedSet locIDsWithNoFallbackTZ = new IntRBTreeSet();
+		HashMap<String, String> AOsWithMultipleWorkLevelCatIDs = new HashMap<>();
+
+		long numOfAOsWithNullZoneIDs = 0, numOfAOsWithEvenFallbackNullZoneIds = 0, numOfAOs = 0,
+				numOfAOsWithMultipleLocIDs = 0, numOfAOsWithMultipleDistinctLocIDs = 0,
+				numOfAOsWithMultipleWorkingLevelCatIDs = 0;
+
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				String userID = userEntry.getKey();
+				ZoneId fallbackZoneId = null;
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+				{
+					for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+					{
+						numOfAOs += 1;
+
+						ArrayList<Integer> locIDs = ao.getLocationIDs();
+
+						if (locIDs.size() > 1)
+						{
+							numOfAOsWithMultipleLocIDs += 1;
+						}
+						if (new HashSet<Integer>(locIDs).size() > 1) // if more than 1 distinct locations
+						{
+							numOfAOsWithMultipleDistinctLocIDs += 1;
+						}
+						if (RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs()).length > 1)
+						{
+							numOfAOsWithMultipleWorkingLevelCatIDs += 1;
+							AOsWithMultipleWorkLevelCatIDs.put(ao.getActivityName(), ao.getWorkingLevelCatIDs());
+						}
+
+						ZoneId currentZoneId = ao.getTimeZoneId();
+
+						if (currentZoneId == null)
+						{
+							numOfAOsWithNullZoneIDs += 1;
+							locIDsWithNoTZ.addAll(locIDs);
+
+							Map<List<Integer>, Long> mapForUserNTZ = userIdLocIdNumOfNullZoneAOsMap.get(userID);
+							if (mapForUserNTZ != null)
+							{
+								Long numOfNZCinsForThisUserLocID = mapForUserNTZ.get(locIDs);
+								if (numOfNZCinsForThisUserLocID != null)
+								{
+									mapForUserNTZ.put(locIDs, numOfNZCinsForThisUserLocID + 1);
+								}
+								else
+								{
+									mapForUserNTZ.put(locIDs, (long) 1);
+								}
+							}
+							else
+							{
+								mapForUserNTZ = new LinkedHashMap<List<Integer>, Long>();
+								mapForUserNTZ.put(locIDs, (long) 1);
+								userIdLocIdNumOfNullZoneAOsMap.put(userID, mapForUserNTZ);
+							}
+
+							currentZoneId = fallbackZoneId;
+							// WritingToFile.appendLineToFileAbsolute(userID + "," + locIDs + "," + startTimestamp +
+							// "\n",
+							// Constant.getOutputCoreResultsPath() + "NullZoneIDs.csv");
+							if (fallbackZoneId == null)
+							{
+								locIDsWithNoFallbackTZ.addAll(locIDs);
+								numOfAOsWithEvenFallbackNullZoneIds += 1;
+								// WritingToFile.appendLineToFileAbsolute(userID + "," + locIDs + "," + startTimestamp +
+								// ","
+								// + numOfCinsForThisUser + "\n",Constant.getOutputCoreResultsPath() +
+								// "FallbackNullZoneIDs.csv");
+							}
+						}
+						fallbackZoneId = currentZoneId;
+					}
+
+				}
+			}
+
+			System.out.println("locIDsWithNoTZ.size()= " + locIDsWithNoTZ.size());
+			System.out.println("locIDsWithNoFallbackTZ.size()= " + locIDsWithNoFallbackTZ.size());
+			WritingToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+					Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoTZIn" + fileNamePhrase + ".csv");
+			WritingToFile.writeToNewFile(
+					locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+					Constant.getOutputCoreResultsPath() + "locIDsWithNoFallbackTZ" + fileNamePhrase + ".csv");
+
+			System.out.println(" numOfAOsWithNullZoneIDs= " + numOfAOsWithNullZoneIDs + "  "
+					+ ((numOfAOsWithNullZoneIDs * 100.0) / numOfAOs) + "% of total AOs");
+			System.out.println(" numOfAOsWithEvenFallbackNullZoneIds= " + numOfAOsWithEvenFallbackNullZoneIds + "  "
+					+ ((numOfAOsWithEvenFallbackNullZoneIds * 1.0) / numOfAOs) + "% of total AOs");
+			System.out.println(" numOfAOs = " + numOfAOs);
+			System.out.println(" numOfAOsWithMultipleLocIDs = " + numOfAOsWithMultipleLocIDs);
+			System.out.println(" numOfAOsWithMultipleDistinctLocIDs = " + numOfAOsWithMultipleDistinctLocIDs);
+			System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfAOsWithMultipleWorkingLevelCatIDs
+					+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
+
+			WritingToFile.writeToNewFile(
+					AOsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
+							.collect(Collectors.joining("\n")),
+					Constant.getOutputCoreResultsPath() + "AOsWithMultipleWorkLevelCatIDs" + fileNamePhrase + ".csv");
+
+			WritingToFile.writeMapOfMap(userIdLocIdNumOfNullZoneAOsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
+					Constant.getOutputCoreResultsPath() + "userIdLocIdNumOfNullZoneAOsMap" + fileNamePhrase + ".csv");
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 }

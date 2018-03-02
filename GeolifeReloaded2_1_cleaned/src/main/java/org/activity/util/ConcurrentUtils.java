@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.activity.distances.AlignmentBasedDistance;
-import org.activity.objects.Pair;
+import org.activity.objects.Triple;
 import org.apache.commons.lang3.RandomStringUtils;
 
 /**
@@ -115,7 +115,8 @@ public class ConcurrentUtils
 	 */
 	public static String getEditDist(String s)
 	{
-		Pair<String, Double> d = AlignmentBasedDistance.getMySimpleLevenshteinDistance(s, "ajooba", 1, 1, 2);
+		Triple<String, Double, Triple<char[], int[], int[]>> d = AlignmentBasedDistance
+				.getMySimpleLevenshteinDistance(s, "ajooba", 1, 1, 2);
 		// System.out.println("Edit distance between item:" + s + " and item:ajooba = " + d.toString());
 		return d.toString();
 

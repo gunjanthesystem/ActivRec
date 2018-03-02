@@ -12,6 +12,7 @@ import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.io.ReadingFromFile;
 import org.activity.objects.Pair;
+import org.activity.objects.Triple;
 import org.activity.stats.HjorthParameters;
 import org.activity.stats.entropy.EntropyUtilityBelt;
 import org.activity.stats.entropy.MultiscaleEntropy;
@@ -540,7 +541,8 @@ public class TestExperiments
 
 		System.out.println("\n >> Executing getMySimpleLevenshteinDistance");
 		long t5 = System.nanoTime();
-		Pair<String, Double> r3 = AlignmentBasedDistance.getMySimpleLevenshteinDistance(s1, s2, 1, 1, 2);
+		Triple<String, Double, Triple<char[], int[], int[]>> r3 = AlignmentBasedDistance
+				.getMySimpleLevenshteinDistance(s1, s2, 1, 1, 2);
 		System.out.println(r3.toString());
 		long t6 = System.nanoTime();
 		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
@@ -561,14 +563,14 @@ public class TestExperiments
 		System.out.println("Used memory (MB):" + PerformanceAnalytics.getUsedMemoryInMB());
 
 		System.out.println("Creating strings:");
-		String s1 = "gunjankumarmanaligaurgunjan", s2 = "manaligaurgunjanmanaligaurgunjan";
-		// String s1 = "g", s2 = "manaliiiiii";
+		// String s1 = "gunjankumarmanaligaurgunjan", s2 = "manaligaurgunjanmanaligaurgunjan";
+		String s1 = "gunjan", s2 = "gujaz";
 		System.out.println("\ns1 = " + s1 + "\ns2 = " + s2);
-		for (int i = 0; i < 4; i++)
-		{
-			s1 += s1;
-			s2 += s2;
-		}
+		// for (int i = 0; i < 4; i++)
+		// {
+		// s1 += s1;
+		// s2 += s2;
+		// }
 		// String s1 = "g", s2 = "ma";
 		System.out.println("s1.length=" + s1.length() + " s2.length=" + s2.length());
 		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
@@ -582,9 +584,33 @@ public class TestExperiments
 
 		System.out.println("\n >> Executing getMySimpleLevenshteinDistanceV3");
 		long t1 = System.nanoTime();
-		Pair<String, Double> r1 = AlignmentBasedDistance.getMySimpleLevenshteinDistance(s1, s2, 1, 1, 2);
-		System.out.println(r1.toString());
+		Triple<String, Double, Triple<char[], int[], int[]>> levenshteinDistance = AlignmentBasedDistance
+				.getMySimpleLevenshteinDistance(s1, s2, 1, 1, 2);
+		// $$System.out.println(levenshteinDistance.toString());
 		long t2 = System.nanoTime();
+
+		System.out.println("here");
+		///////
+		StringBuilder sbTemp1 = new StringBuilder();
+		// sbTemp1.append("Debug 1Mar2018:
+		// newLevenshteinDistance.getFirst().equals(levenshteinDistance.getFirst())="
+		// + levenshteinDistance.getFirst().equals(levenshteinDistance.getFirst())
+		// + "\nnewLevenshteinDistance.getSecond().equals(levenshteinDistance.getSecond())="
+		// + newLevenshteinDistance.getSecond().equals(levenshteinDistance.getSecond()) + "\n");
+		sbTemp1.append("levenshteinDistance=" + levenshteinDistance.toString() + "\n");
+		sbTemp1.append("first=" + levenshteinDistance.getFirst().toString() + " second="
+				+ levenshteinDistance.getSecond().toString() + " third_first="
+				+ new String(levenshteinDistance.getThird().getFirst()));
+
+		sbTemp1.append("\n third_second=" + Arrays.toString(levenshteinDistance.getThird().getSecond()));
+		sbTemp1.append("\n third_second.len=" + (levenshteinDistance.getThird().getSecond().length));
+		sbTemp1.append("\n third_third=" + Arrays.toString(levenshteinDistance.getThird().getThird()));
+		sbTemp1.append("\n third_third.len=" + (levenshteinDistance.getThird().getThird().length));
+		sbTemp1.append("\n---\n");
+		System.out.println("\n" + sbTemp1.toString());
+
+		///////
+
 		System.out.println(PerformanceAnalytics.getHeapPercentageFree());
 		System.out.println(PerformanceAnalytics.getHeapInformation());
 		System.out.println("\n >> getMySimpleLevenshteinDistanceV3     =" + (t2 - t1) / 1000000 + " ms");

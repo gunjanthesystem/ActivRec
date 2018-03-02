@@ -830,9 +830,9 @@ public class WritingToFile
 	/**
 	 * Writes the given string to a new file with given filename
 	 * 
+	 * 
 	 * @param msg
 	 * @param absFileNameToUse
-	 * @param headerLin
 	 */
 	public static void writeToNewFile(String msg, String absFileNameToUse)
 	{
@@ -1461,6 +1461,42 @@ public class WritingToFile
 				{
 
 					sb.append(k + "," + entryInside.getKey() + "," + entryInside.getValue() + "\n");
+				}
+				WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToUse);
+				sb.setLength(0);
+			}
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param mapOfMap
+	 * @param headerLine
+	 * @param absFileNameToUse
+	 */
+	public static <M, L, K> void writeMapOfMap(Map<K, Map<L, M>> mapOfMap, String headerLine, String delimiter,
+			String absFileNameToUse)
+	{
+
+		try
+		{
+			WritingToFile.writeToNewFile(headerLine, absFileNameToUse);
+
+			for (Map.Entry<K, Map<L, M>> entryForFirstMap : mapOfMap.entrySet())
+			{
+
+				K k = entryForFirstMap.getKey();
+
+				StringBuilder sb = new StringBuilder();
+				for (Map.Entry<L, M> entryInside : entryForFirstMap.getValue().entrySet())
+				{
+
+					sb.append(k + delimiter + entryInside.getKey() + delimiter + entryInside.getValue() + "\n");
 				}
 				WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToUse);
 				sb.setLength(0);

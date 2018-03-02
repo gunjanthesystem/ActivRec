@@ -43,7 +43,7 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	static final String groupsOf100UsersLabels[] = DomainConstants.gowallaUserGroupsLabelsFixed;// { "1", "101", "201",
+	static String groupsOf100UsersLabels[] = DomainConstants.gowallaUserGroupsLabelsFixed;// { "1", "101", "201",
 	// "301", "401", "501",
 	// "601", "701", "801","901" };
 
@@ -177,6 +177,10 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount)
 	{
 		// commonPath = "./dataWritten/";
+		if (Constant.randomLySample100Users)
+		{
+			groupsOf100UsersLabels = new String[] { DomainConstants.gowalla100RandomUsersLabel };
+		}
 		System.out.println("outputCoreResultsPath= " + Constant.getOutputCoreResultsPath());
 		System.out.println("groupsOf100UsersLabels= " + Arrays.asList(groupsOf100UsersLabels).toString());
 		WritingToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),

@@ -5,6 +5,10 @@ import java.util.Arrays;
 import org.activity.ui.PopUps;
 import org.activity.util.IntegerUtils;
 
+import it.unimi.dsi.fastutil.chars.CharArrayList;
+import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+
 /**
  * Inspired by optimisation suggested
  * in:http://www.javaworld.com/article/2077496/testing-debugging/java-tip-130--do-you-know-your-data-size-.html?page=2
@@ -208,6 +212,230 @@ public class TraceMatrixLeaner1
 		// System.out.println("cellword=[" + String.valueOf(cellWord) + "]");
 		// System.out.println("Exiting getCellAtIndex");
 		return cellWord;
+	}
+
+	/**
+	 * Only 'D' 'I' 'N' 'S' chars to avoid string splitting later which is is performance degrader.
+	 * 
+	 * @param rowIndex
+	 * @param colIndex
+	 * @return
+	 * @since 1 March 2018
+	 */
+	public char[] getCellAtIndexOnlyDISN(int rowIndex, int colIndex)
+	{
+		// System.out.println("Inside getCellAtIndex, rowIndex:" + rowIndex + " colIndex:" + colIndex);
+		CharOpenHashSet disn = new CharOpenHashSet(Arrays.asList('D', 'I', 'N', 'S'));
+
+		int effectiveIndex = rowIndex * nCols + colIndex;
+		int lengthOfCellValue = lengthOfCell[effectiveIndex];
+		char[] cellWordDISN = null;
+		CharArrayList res = new CharArrayList();
+		// $$ char[] allWithGarbage = null;
+		try
+		{
+			cellWordDISN = new char[lengthOfCellValue];
+			for (int k = 0; k < lengthOfCellValue; k++)
+			{
+				char cVal = threeDCharMatrix[effectiveIndex][k];
+				if (disn.contains(cVal))
+				{
+					cellWordDISN[k] = threeDCharMatrix[effectiveIndex][k];
+					res.add(threeDCharMatrix[effectiveIndex][k]);
+				}
+			}
+			// $$ allWithGarbage = threeDCharMatrix[effectiveIndex];
+		}
+		catch (Exception e)
+		{
+			System.out.println("traceMatrix:\n" + this.toString());
+			System.out.println("rowIndex=" + rowIndex + ",colIndex=" + colIndex);
+			e.printStackTrace();
+		}
+		// System.out.println("getCellAtIndex, rowIndex:" + rowIndex + " colIndex:" + colIndex + "cellword=["
+		// + String.valueOf(cellWord) + "]" + " allWithGarbage.length:" + allWithGarbage.length);
+
+		// System.out.println("cellword=[" + String.valueOf(cellWord) + "]");
+		// System.out.println("Exiting getCellAtIndex");
+		// System.out.println("res= " + res.to);
+		return res.toCharArray();
+	}
+
+	public Pair<int[], int[]> getCellAtIndexOnlyCoordinates(int rowIndex, int colIndex)
+	{
+		int effectiveIndex = rowIndex * nCols + colIndex;
+		int lengthOfCellValue = lengthOfCell[effectiveIndex];
+		IntArrayList cellWordCoord1 = new IntArrayList();
+		IntArrayList cellWordCoord2 = new IntArrayList();
+		// int coord1Index = 0, coord2Index = 0;
+		// $$ char[] allWithGarbage = null;
+		try
+		{
+			// System.out.println("lengthOfCellValue=" + lengthOfCellValue);
+			// char currentChar = 'z', prevChar = 'c', nextChar = 'z';
+			// StringBuilder int1 = new StringBuilder();
+			// StringBuilder int2 = new StringBuilder();
+			for (int k = 0; k < lengthOfCellValue - 1; k++)
+			{
+				// currentChar = threeDCharMatrix[effectiveIndex][k];
+				// prevChar = threeDCharMatrix[effectiveIndex][k - 1];
+				// nextChar = threeDCharMatrix[effectiveIndex][k + 1];
+				// // System.out.println("cval= " + String.valueOf(cVal));
+				// // System.out.println("is digit= " + Character.isDigit(cVal));
+				//
+				// if (prevChar == '(')
+				// {
+				// int1.append(currentChar);
+				// continue;
+				// }
+				// if (nextChar == '-')
+				// {
+				// int1.append(currentChar);
+				// continue;
+				// }
+				char cVal = threeDCharMatrix[effectiveIndex][k];
+				// System.out.println("k=" + k);
+				// System.out.println("cVal=" + cVal);
+
+				if (cVal == '(')
+				{
+					// System.out.println("prev (");
+					StringBuilder int1 = new StringBuilder();
+					while (threeDCharMatrix[effectiveIndex][++k] != '-')
+					{
+						int1.append(threeDCharMatrix[effectiveIndex][k]);
+					}
+					int v = Integer.valueOf(int1.toString());
+					cellWordCoord1.add(v);
+					// System.out.println("-- v=" + v);
+					k -= 1;
+					continue;
+				}
+				if (cVal == '-')
+				{
+					// System.out.println("prev (");
+					StringBuilder int2 = new StringBuilder();
+					while (threeDCharMatrix[effectiveIndex][++k] != ')')
+					{
+						int2.append(threeDCharMatrix[effectiveIndex][k]);
+					}
+					int v = Integer.valueOf(int2.toString());
+					cellWordCoord2.add(v);
+					// System.out.println("-- v2=" + v);
+				}
+
+				// if (threeDCharMatrix[effectiveIndex][k - 1] == '-')
+				// {
+				// System.out.println("prev -");
+				// StringBuilder int2;
+				// do
+				// {
+				// int2 = new StringBuilder(threeDCharMatrix[effectiveIndex][k]);
+				// k++;
+				// }
+				// while (threeDCharMatrix[effectiveIndex][k + 1] != ')');
+				// int v = Integer.valueOf(int2.toString());
+				// cellWordCoord2[coord2Index++] = v;
+				// System.out.println("-- v=" + v);
+				// }
+				// if (threeDCharMatrix[effectiveIndex][k + 1] == '-')
+				// {
+				// System.out.println("next -");
+				// }
+
+			}
+			// $$ allWithGarbage = threeDCharMatrix[effectiveIndex];
+		}
+		catch (Exception e)
+		{
+			System.out.println("traceMatrix:\n" + this.toString());
+			System.out.println("rowIndex=" + rowIndex + ",colIndex=" + colIndex);
+			e.printStackTrace();
+		}
+		// System.out.println("getCellAtIndex, rowIndex:" + rowIndex + " colIndex:" + colIndex + "cellword=["
+		// + String.valueOf(cellWord) + "]" + " allWithGarbage.length:" + allWithGarbage.length);
+
+		// System.out.println("cellword=[" + String.valueOf(cellWord) + "]");
+		// System.out.println("Exiting getCellAtIndex");
+		return new Pair<>(cellWordCoord1.toIntArray(), cellWordCoord2.toIntArray());
+
+	}
+
+	/**
+	 * coordinates
+	 * 
+	 * @param rowIndex
+	 * @param colIndex
+	 * @return {array of first pos coords, array of second pos coords}
+	 * @since 1 March 2018
+	 * 
+	 */
+	public Pair<int[], int[]> getCellAtIndexOnlyCoordinates0(int rowIndex, int colIndex)
+	{
+		// System.out.println("Inside getCellAtIndex, rowIndex:" + rowIndex + " colIndex:" + colIndex);
+		// CharOpenHashSet disn = new CharOpenHashSet(Arrays.asList('D', 'I', 'N', 'S'));
+
+		int effectiveIndex = rowIndex * nCols + colIndex;
+		int lengthOfCellValue = lengthOfCell[effectiveIndex];
+		int[] cellWordCoord1 = null;
+		int[] cellWordCoord2 = null;
+		// $$ char[] allWithGarbage = null;
+		try
+		{
+			cellWordCoord1 = new int[lengthOfCellValue];
+			cellWordCoord2 = new int[lengthOfCellValue];
+			// char preceedingChar = 'z';
+			System.out.println("lengthOfCellValue" + lengthOfCellValue);
+
+			for (int k = 1; k < (lengthOfCellValue - 1); k++)// not starting form 0
+			{
+				// char cVal = threeDCharMatrix[effectiveIndex][k];
+				System.out.println("k=" + k);
+				System.out.println("threeDCharMatrix[effectiveIndex][k]=" + threeDCharMatrix[effectiveIndex][k]);
+
+				if (threeDCharMatrix[effectiveIndex][k - 1] == '(')// disn.contains(cVal))
+				{
+					System.out.println("matched opening prev");
+					StringBuilder newInt = new StringBuilder();
+					while (threeDCharMatrix[effectiveIndex][k + 1] != '-')
+					{
+						// if(Character.isDigit(threeDCharMatrix[effectiveIndex][k])
+						newInt.append(threeDCharMatrix[effectiveIndex][k]);
+						System.out.println("building coord 1" + newInt.toString());
+						k++;
+					}
+					cellWordCoord1[k] = Integer.valueOf(newInt.toString());
+				}
+
+				if (threeDCharMatrix[effectiveIndex][k - 1] == '-')// disn.contains(cVal))
+				{
+					StringBuilder newInt = new StringBuilder();
+					System.out.println("matched - prev");
+					while (threeDCharMatrix[effectiveIndex][k + 1] != ')')
+					{
+						// if(Character.isDigit(threeDCharMatrix[effectiveIndex][k])
+						newInt.append(threeDCharMatrix[effectiveIndex][k]);
+						System.out.println("building coord 2" + newInt.toString());
+						k++;
+					}
+					cellWordCoord2[k] = Integer.valueOf(newInt.toString());
+				}
+
+			}
+			// $$ allWithGarbage = threeDCharMatrix[effectiveIndex];
+		}
+		catch (Exception e)
+		{
+			System.out.println("traceMatrix:\n" + this.toString());
+			System.out.println("rowIndex=" + rowIndex + ",colIndex=" + colIndex);
+			e.printStackTrace();
+		}
+		// System.out.println("getCellAtIndex, rowIndex:" + rowIndex + " colIndex:" + colIndex + "cellword=["
+		// + String.valueOf(cellWord) + "]" + " allWithGarbage.length:" + allWithGarbage.length);
+
+		// System.out.println("cellword=[" + String.valueOf(cellWord) + "]");
+		// System.out.println("Exiting getCellAtIndex");
+		return new Pair<>(cellWordCoord1, cellWordCoord2);
 	}
 
 	/**

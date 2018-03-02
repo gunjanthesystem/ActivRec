@@ -131,10 +131,42 @@ public class SuperController
 	{
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
-		// Start
-		String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar1ED" + Constant.EDAlpha
-				+ "DurFPDistFPStFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
+		String featuresUsedLabel = "";
+		// if (Constant.useActivityNameInFED)
+		// {
+		// featuresUsedLabel += "ActName";
+		// }
+		if (Constant.useStartTimeInFED)
+		{
+			featuresUsedLabel += "STime";
+		}
+		if (Constant.useLocationInFED)
+		{
+			featuresUsedLabel += "Loc";
+		}
 
+		if (Constant.usePopularityInFED)
+		{
+			featuresUsedLabel += "Pop";
+		}
+
+		if (Constant.useDistFromPrevInFED)
+		{
+			featuresUsedLabel += "DistPrev";
+		}
+
+		if (Constant.useDurationFromPrevInFED)
+		{
+			featuresUsedLabel += "DurPrev";
+		}
+
+		// Start
+		String[] commonPaths = { "./dataWritten/Mar2ED" + Constant.EDAlpha + featuresUsedLabel + "StFilter"
+				+ (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
+
+		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
+		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
+		/// run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar1ED
 		// "/run/media/gunjan/Buffer/Vault/GowallaResults/March1/" };
 		//
 		// Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis

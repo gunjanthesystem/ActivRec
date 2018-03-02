@@ -15,6 +15,7 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.TraceMatrixLeaner1;
+import org.activity.objects.Triple;
 import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -2470,8 +2471,8 @@ public class AlignmentBasedDistance
 	 * @param replaceWt
 	 * @return Pair{Levenshtein distance,trace of operations}
 	 */
-	public static Pair<String, Double> getMySimpleLevenshteinDistance(String word1, String word2, int insertWt,
-			int deleteWt, int replaceWt)// , TraceMatrix traceMatrix)
+	public static Pair<String, Double> getMySimpleLevenshteinDistanceBeforeMar1_2018(String word1, String word2,
+			int insertWt, int deleteWt, int replaceWt)// , TraceMatrix traceMatrix)
 	{
 		// TraceMatrix traceMatrix = Constant.reusableTraceMatrix;
 		// traceMatrix.resetLengthOfCells();
@@ -2670,9 +2671,41 @@ public class AlignmentBasedDistance
 	///// end of faster v3
 
 	/**
-	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
+	 * Created as a glue for older code in the process of refactoring to v4 of getMySimpleLevenshteinDistance
 	 * 
-	 * @since May 19, 2017
+	 * @since Mar 1 2018
+	 * @param word1
+	 * @param word2
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @return
+	 */
+	public static Pair<String, Double> getMySimpleLevenshteinDistancePair(String word1, String word2, int insertWt,
+			int deleteWt, int replaceWt)// , TraceMatrix traceMatrix)
+	{
+		Triple<String, Double, Triple<char[], int[], int[]>> res = getMySimpleLevenshteinDistance(word1, word2,
+				insertWt, deleteWt, replaceWt);
+		return new Pair<>(res.getFirst(), res.getSecond());
+	}
+
+	///// start of faster v4
+	/**
+	 * faster v4: minimising splits to improve performance
+	 * <p>
+	 * Fork of org.activity.distances.AlignmentBasedDistance.getMySimpleLevenshteinDistance(String, String, int, int,
+	 * int) for faster performance by optimising string concatenation. ref:
+	 * http://stackoverflow.com/questions/10078912/best-practices-performance-mixing-stringbuilder-append-with-string-concat
+	 * <p>
+	 * Computes Levenshtein distance between the given strings.</br>
+	 * 
+	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br>
+	 * Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
+	 * Weight of replacement = replaceWt * abs(diff(replaceVal - original))
+	 * 
+	 * right to left: insertion? top to down: deletion
+	 * 
+	 * @since Mar 1, 2018
 	 * @param word1
 	 * @param word2
 	 * @param insertWt
@@ -2680,7 +2713,222 @@ public class AlignmentBasedDistance
 	 * @param replaceWt
 	 * @return Pair{Levenshtein distance,trace of operations}
 	 */
-	public static Pair<String, Double> getLowestMySimpleLevenshteinDistance(ArrayList<String> word1s,
+	public static Triple<String, Double, Triple<char[], int[], int[]>> getMySimpleLevenshteinDistance(String word1,
+			String word2, int insertWt, int deleteWt, int replaceWt)// , TraceMatrix traceMatrix)
+	{
+		// TraceMatrix traceMatrix = Constant.reusableTraceMatrix;
+		// traceMatrix.resetLengthOfCells();
+		boolean useHierarchicalDistance = Constant.useHierarchicalDistance;
+		HashMap<String, Double> catIDsHierarchicalDistance = null;
+		if (useHierarchicalDistance)
+		{
+			catIDsHierarchicalDistance = DomainConstants.catIDsHierarchicalDistance;
+		}
+
+		TraceMatrixLeaner1 traceMatrix = new TraceMatrixLeaner1(word1.length(), word2.length());
+
+		// long performanceTime1 = System.currentTimeMillis();
+		if (VerbosityConstants.verboseLevenstein)// Constant.verbose ||
+		{
+			System.out.println("inside getMySimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2
+					+ " with insertWt=" + insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt);
+		}
+		int len1 = word1.length();
+		int len2 = word2.length();
+
+		// len1+1, len2+1, because finally return dp[len1][len2]
+		double[][] dist = new double[len1 + 1][len2 + 1];
+		// StringBuilder[][] traceMatrix = new StringBuilder[len1 + 1][len2 + 1];
+
+		traceMatrix.resetLengthOfCells();
+		// for (int i = 0; i <= len1; i++)
+		// {
+		// for (int j = 0; j <= len2; j++)
+		// {
+		// traceMatrix[i][j] = new StringBuilder();
+		// }
+		// }
+
+		dist[0][0] = 0;
+
+		for (int i = 1; i <= len1; i++)
+		{
+			dist[i][0] = i;
+			// traceMatrix.addCharsToCell(i, 0, traceMatrix.getCellAtIndex(i - 1, 0), '_', 'D', '(', (char) (i + '0'),
+			// '-', '0', ')');
+			// (char)(i+'0') converts i to char i safely and not disturbed by ascii value;
+			traceMatrix.addCharsToCell(i, 0, traceMatrix.getCellAtIndex(i - 1, 0), '_', 'D', '(', i, '-', 0, ')');
+			// traceMatrix[i][0].append(traceMatrix[i - 1][0] + "_D(" + (i) + "-" + "0)");
+		}
+
+		for (int j = 1; j <= len2; j++)
+		{
+			dist[0][j] = j;
+			// traceMatrix.addCharsToCell(0, j, traceMatrix.getCellAtIndex(0, j - 1), '_', 'I', '(', '0', '-',
+			// (char) (j + '0'), ')');
+			traceMatrix.addCharsToCell(0, j, traceMatrix.getCellAtIndex(0, j - 1), '_', 'I', '(', 0, '-', j, ')');
+			// traceMatrix[0][j].append(traceMatrix[0][j - 1] + "_I(0" + "-" + j + ")");
+		}
+
+		// iterate though, and check last char
+		for (int i = 0; i < len1; i++)
+		{
+			char c1 = word1.charAt(i);
+			for (int j = 0; j < len2; j++)
+			{
+				char c2 = word2.charAt(j);
+
+				// System.out.println("\nComparing " + c1 + " and " + c2);
+				// if last two chars equal
+				if (c1 == c2)
+				{
+					// update dp value for +1 length
+					dist[i + 1][j + 1] = dist[i][j];
+
+					traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j), '_', 'N', '(', i + 1,
+							'-', j + 1, ')');
+					// traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j), '_', 'N', '(',
+					// (char) (i + 1 + '0'), '-', (char) (j + 1 + '0'), ')');
+					// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_N(" + (i + 1) + "-" + (j + 1) + ")");
+					// System.out.println("Equal" + " Trace " + traceMatrix[i + 1][j + 1]);// "_N(" + (i + 1) + "-" + (j
+					// + 1) + ")");
+				}
+				else
+				{
+					double replace = dist[i][j] + replaceWt;// 2; //diagonally previous, see slides from STANFORD NLP
+					// on // min edit distance
+					if (useHierarchicalDistance)
+					{
+						// Double hierWt = catIDsHierarchicalDistance.get(String.valueOf(c1) + String.valueOf(c2));
+						// TODO: check if it is actually using the hierwt, we change to StringBuilder after prv verified
+						// version
+						Double hierWt = catIDsHierarchicalDistance
+								.get(new StringBuilder(2).append(c1).append(c2).toString());
+
+						if (hierWt == null)
+						{
+							System.err.println(
+									PopUps.getTracedErrorMsg("Error in levenshtein distance: no hier dist found for: "
+											+ String.valueOf(c1) + String.valueOf(c2)) + " hierWt= " + hierWt);
+						}
+						replace = dist[i][j] + replaceWt * hierWt;// catIDsHierarchicalDistance.get(String.valueOf(c1) +
+																	// String.valueOf(c2));
+					}
+
+					double delete = dist[i][j + 1] + deleteWt;// 1;//deletion --previous row, i.e, cell above
+					double insert = dist[i + 1][j] + insertWt;// 1;// insertion --previous column, i.e, cell on left
+					// System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
+					// int min = replace > insert ? insert : replace;
+					// min = delete > min ? min : delete;
+					//
+					double min = -9999;
+
+					if (isMinimum(delete, delete, insert, replace))
+					{
+						traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j + 1), '_', 'D', '(',
+								i + 1, '-', j + 1, ')');
+						// traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j + 1), '_', 'D', '(',
+						// (char) (i + 1 + '0'), '-', (char) (j + 1 + '0'), ')');
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j + 1] + "_D(" + (i + 1) + "-" + (j + 1) +
+						// ")");
+						min = delete;
+						// System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_D(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+
+					else if (isMinimum(insert, delete, insert, replace))
+					{
+						traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i + 1, j), '_', 'I', '(',
+								i + 1, '-', j + 1, ')');
+						// traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i + 1, j), '_', 'I', '(',
+						// (char) (i + 1 + '0'), '-', (char) (j + 1 + '0'), ')');
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j] + "_I(" + (i + 1) + "-" + (j + 1) +
+						// ")");
+						min = insert;
+						// System.out.println("Insert is min:" + insert + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_I(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+					else if (isMinimum(replace, delete, insert, replace))
+					{
+						traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j), '_', 'S', '(', i + 1,
+								'-', j + 1, ')');
+						// traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j), '_', 'S', '(',
+						// (char) (i + 1 + '0'), '-', (char) (j + 1 + '0'), ')');
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_S(" + (i + 1) + "-" + (j + 1) + ")");
+						min = replace;
+						// System.out.println("replace is min:" + replace + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_S(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+
+					if (min == -9999)
+					{
+						System.out.println(PopUps.getTracedErrorMsg("Error in minDistance"));
+					}
+
+					dist[i + 1][j + 1] = min;
+				}
+			}
+		}
+
+		String resultantTrace = String.valueOf(traceMatrix.getCellAtIndex(len1, len2));
+		char[] DISNTrace = traceMatrix.getCellAtIndexOnlyDISN(len1, len2);
+		Pair<int[], int[]> coordTraces = traceMatrix.getCellAtIndexOnlyCoordinates(len1, len2);
+
+		Double resultantDistance = Double.valueOf(dist[len1][len2]);
+
+		if (VerbosityConstants.verboseLevenstein)
+		// iterate though, and check last char
+		{
+			System.out.println(" Trace Matrix here--: \n" + traceMatrix.toString());
+			// for (int i = 0; i <= len1; i++)
+			// {
+			// for (int j = 0; j <= len2; j++)
+			// {
+			// System.out.print(traceMatrix[i][j] + "|");
+			// }
+			// System.out.println();
+			// }
+
+			System.out.println("  Distance Matrix: ");
+			for (int i = 0; i <= len1; i++)
+			{
+				for (int j = 0; j <= len2; j++)
+				{
+					System.out.print(dist[i][j] + "|");
+				}
+				System.out.println();
+			}
+
+			System.out.println("Resultant Distance = " + resultantDistance);// new Double(dist[len1][len2]));
+			System.out.println("Resultant Trace = " + resultantTrace);// traceMatrix[len1][len2].toString());
+			System.out.println(" -------- ");
+		}
+
+		// long performanceTime2 = System.currentTimeMillis();
+		// WritingToFile.appendLineToFileAbsolute(
+		// Integer.toString(word1.length()) + "," + Integer.toString(word2.length()) + ","
+		// + Long.toString(performanceTime2 - performanceTime1) + "\n",
+		// Constant.getCommonPath() + "MySimpleLevenshteinDistanceTimeTakenInms.csv");
+		return new Triple<>(resultantTrace, resultantDistance,
+				new Triple<char[], int[], int[]>(DISNTrace, coordTraces.getFirst(), coordTraces.getSecond()));
+	}
+	///// end of faster
+
+	///// end of faster v4
+
+	/**
+	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
+	 * 
+	 * @since May 19, 2017
+	 * @until Mar 1, 2018
+	 * @param word1
+	 * @param word2
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @return Pair{Levenshtein distance,trace of operations}
+	 */
+	public static Pair<String, Double> getLowestMySimpleLevenshteinDistancePair(ArrayList<String> word1s,
 			ArrayList<String> word2s, int insertWt, int deleteWt, int replaceWt)// , TraceMatrix traceMatrix)
 	{
 		Pair<String, Double> lowestRes = new Pair<>();
@@ -2691,12 +2939,63 @@ public class AlignmentBasedDistance
 		{
 			for (String word2 : word2s)
 			{
-				levenshteinDists.add(getMySimpleLevenshteinDistance(word1, word2, insertWt, deleteWt, replaceWt));
+				levenshteinDists.add(getMySimpleLevenshteinDistancePair(word1, word2, insertWt, deleteWt, replaceWt));
 			}
 		}
 
 		double min = Double.MAX_VALUE;
 		for (Pair<String, Double> p : levenshteinDists)
+		{
+			double val = p.getSecond();
+			if (val < min)
+			{
+				lowestRes = p;
+				min = val;
+			}
+		}
+
+		if (VerbosityConstants.verboseLevenstein)
+		{
+			System.out.println("Word1s: " + word1s.toString() + "  Word2s:" + word2s.toString());
+			if (word1s.size() > 1 || word2s.size() > 1)
+			{
+				System.out.println("more than one word!");
+			}
+			System.out.println("levenshteinDists = " + levenshteinDists);
+			System.out.println("lowestRes = " + lowestRes.toString());
+		}
+
+		return lowestRes;
+	}
+
+	/**
+	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
+	 * 
+	 * @since Mar 1, 2018
+	 * @param word1
+	 * @param word2
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @return Triple{Levenshtein distance,trace of operations, trace of ops only DNIS}
+	 */
+	public static Triple<String, Double, Triple<char[], int[], int[]>> getLowestMySimpleLevenshteinDistance(
+			ArrayList<String> word1s, ArrayList<String> word2s, int insertWt, int deleteWt, int replaceWt)
+	{
+		Triple<String, Double, Triple<char[], int[], int[]>> lowestRes = new Triple<>();
+
+		ArrayList<Triple<String, Double, Triple<char[], int[], int[]>>> levenshteinDists = new ArrayList<>();
+
+		for (String word1 : word1s)
+		{
+			for (String word2 : word2s)
+			{
+				levenshteinDists.add(getMySimpleLevenshteinDistance(word1, word2, insertWt, deleteWt, replaceWt));
+			}
+		}
+
+		double min = Double.MAX_VALUE;
+		for (Triple<String, Double, Triple<char[], int[], int[]>> p : levenshteinDists)
 		{
 			double val = p.getSecond();
 			if (val < min)

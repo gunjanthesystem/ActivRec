@@ -110,10 +110,10 @@ public class ActivityObject implements Serializable
 
 	public ZoneId getTimeZoneId()
 	{
-		if (timeZoneId == null)
-		{
-			PopUps.printTracedErrorMsg("NULL timezone id");
-		}
+		// if (timeZoneId == null)
+		// {
+		// PopUps.printTracedErrorMsg("NULL timezone id");
+		// }
 		return timeZoneId;
 	}
 

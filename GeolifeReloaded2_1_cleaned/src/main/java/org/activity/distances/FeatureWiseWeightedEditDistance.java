@@ -40,23 +40,23 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 		double arrd[] = new double[aos.size()];
 		switch (featureName)
 		{
-		case "StartTime":
-			arr = aos.stream().map(ao -> DateTimeUtils.getTimeInDayInSeconds(ao.getStartTimestamp())).toArray();
-			break;
-		case "Duration":
-			arr = aos.stream().map(ao -> ao.getDurationInSeconds()).toArray();
-			break;
-		case "DistanceTravelled":
-			arr = aos.stream().map(ao -> ao.getDistanceTravelled()).toArray();
-			break;
-		case "AvgAltitude":
-			arr = aos.stream().map(ao -> ao.getAvgAltitude()).toArray();
-			break;
-		default:
-			System.err.println(
-					"Error in org.activity.distances.FeatureWiseWeightedEditDistance.getArrayOfFeatures(ArrayList<ActivityObject>, String): unsuitable feature name: "
-							+ featureName);
-			break;
+			case "StartTime":
+				arr = aos.stream().map(ao -> DateTimeUtils.getTimeInDayInSeconds(ao.getStartTimestamp())).toArray();
+				break;
+			case "Duration":
+				arr = aos.stream().map(ao -> ao.getDurationInSeconds()).toArray();
+				break;
+			case "DistanceTravelled":
+				arr = aos.stream().map(ao -> ao.getDistanceTravelled()).toArray();
+				break;
+			case "AvgAltitude":
+				arr = aos.stream().map(ao -> ao.getAvgAltitude()).toArray();
+				break;
+			default:
+				System.err.println(
+						"Error in org.activity.distances.FeatureWiseWeightedEditDistance.getArrayOfFeatures(ArrayList<ActivityObject>, String): unsuitable feature name: "
+								+ featureName);
+				break;
 		}
 
 		for (int i = 0; i < arr.length; i++)
@@ -85,19 +85,19 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 		Pair<Double, Double> coordinatesd[] = new Pair[aos.size()];
 		switch (featureName)
 		{
-		case "StartGeoCoordinates":
-			coordinates = aos.stream().map(ao -> new Pair<Double, Double>(Double.valueOf(ao.getStartLatitude()),
-					Double.valueOf(ao.getStartLongitude()))).toArray();
-			break;
-		case "EndGeoCoordinates":
-			coordinates = aos.stream().map(ao -> new Pair<Double, Double>(Double.valueOf(ao.getEndLatitude()),
-					Double.valueOf(ao.getEndLongitude()))).toArray();
-			break;
-		default:
-			System.err.println(
-					"Error in org.activity.distances.FeatureWiseWeightedEditDistance.getArrayOfGeocordinates(ArrayList<ActivityObject>, String): unsuitable feature name: "
-							+ featureName);
-			break;
+			case "StartGeoCoordinates":
+				coordinates = aos.stream().map(ao -> new Pair<Double, Double>(Double.valueOf(ao.getStartLatitude()),
+						Double.valueOf(ao.getStartLongitude()))).toArray();
+				break;
+			case "EndGeoCoordinates":
+				coordinates = aos.stream().map(ao -> new Pair<Double, Double>(Double.valueOf(ao.getEndLatitude()),
+						Double.valueOf(ao.getEndLongitude()))).toArray();
+				break;
+			default:
+				System.err.println(
+						"Error in org.activity.distances.FeatureWiseWeightedEditDistance.getArrayOfGeocordinates(ArrayList<ActivityObject>, String): unsuitable feature name: "
+								+ featureName);
+				break;
 		}
 
 		for (int i = 0; i < coordinates.length; i++)
@@ -197,8 +197,12 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 		String stringCodeForActivityNames1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
 		String stringCodeForActivityNames2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
 
-		Pair<String, Double> levenshteinActivityName = getMySimpleLevenshteinDistance(stringCodeForActivityNames1,
-				stringCodeForActivityNames2, 1, 1, 2);
+		Pair<String, Double> levenshteinActivityNameTripe = getMySimpleLevenshteinDistancePair(
+				stringCodeForActivityNames1, stringCodeForActivityNames2, 1, 1, 2);
+
+		Pair<String, Double> levenshteinActivityName = new Pair<>(levenshteinActivityNameTripe.getFirst(),
+				levenshteinActivityNameTripe.getSecond());
+
 		mapOfDistances.put("ActivityName", levenshteinActivityName);
 
 		mapOfDistances.put("StartTime",

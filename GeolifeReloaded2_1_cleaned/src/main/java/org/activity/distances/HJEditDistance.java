@@ -1,6 +1,7 @@
 package org.activity.distances;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -10,6 +11,7 @@ import org.activity.constants.VerbosityConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
+import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
@@ -195,7 +197,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		Pair<String, Double> levenshteinDistance = null;
 		long t1 = System.nanoTime();
 
-		levenshteinDistance = getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1,
+		levenshteinDistance = getLowestMySimpleLevenshteinDistancePair(stringCodesForActivityObjects1,
 				stringCodesForActivityObjects2, 1, 1, 2);// getMySimpleLevenshteinDistance
 
 		// { levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
@@ -341,7 +343,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		Pair<String, Double> levenshteinDistance = null;
 		long t1 = System.nanoTime();
 
-		levenshteinDistance = getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1,
+		levenshteinDistance = getLowestMySimpleLevenshteinDistancePair(stringCodesForActivityObjects1,
 				stringCodesForActivityObjects2, 1, 1, 2);// getMySimpleLevenshteinDistance
 
 		// { levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
@@ -506,8 +508,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 		levenshteinDistance =
 
-				getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1, stringCodesForActivityObjects2, 1,
-						1, 2);// getMySimpleLevenshteinDistance
+				getLowestMySimpleLevenshteinDistancePair(stringCodesForActivityObjects1, stringCodesForActivityObjects2,
+						1, 1, 2);// getMySimpleLevenshteinDistance
 
 		// { levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
 		// stringCodeForActivityObjects2, Integer.toString(1), Integer.toString(1), Integer.toString(2));
@@ -745,46 +747,73 @@ public class HJEditDistance extends AlignmentBasedDistance
 				uniqueCharCodes, VerbosityConstants.verbose);
 		// }
 
-		Pair<String, Double> levenshteinDistance = null;
+		Triple<String, Double, Triple<char[], int[], int[]>> levenshteinDistance = null;
 		long t1 = System.nanoTime();
 
 		levenshteinDistance = getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1,
 				stringCodesForActivityObjects2, 1, 1, 2);// getMySimpleLevenshteinDistance
 
+		if (false)// sanity checking new getLowestMySimpleLevenshteinDistance and getMySimpleLevenshteinDistance()
+		{
+			// Triple<String, Double, char[]> newLevenshteinDistance = getLowestMySimpleLevenshteinDistance(
+			// stringCodesForActivityObjects1, stringCodesForActivityObjects2, 1, 1, 2);//
+			// getMySimpleLevenshteinDistance
+			StringBuilder sbTemp1 = new StringBuilder();
+			// sbTemp1.append("Debug 1Mar2018:
+			// newLevenshteinDistance.getFirst().equals(levenshteinDistance.getFirst())="
+			// + levenshteinDistance.getFirst().equals(levenshteinDistance.getFirst())
+			// + "\nnewLevenshteinDistance.getSecond().equals(levenshteinDistance.getSecond())="
+			// + newLevenshteinDistance.getSecond().equals(levenshteinDistance.getSecond()) + "\n");
+			sbTemp1.append("levenshteinDistance=" + levenshteinDistance.toString() + "\n");
+			sbTemp1.append("first=" + levenshteinDistance.getFirst().toString() + " second="
+					+ levenshteinDistance.getSecond().toString() + " third_first="
+					+ new String(levenshteinDistance.getThird().getFirst()));
+
+			sbTemp1.append("\n third_second=" + Arrays.toString(levenshteinDistance.getThird().getSecond()));
+			sbTemp1.append("\n third_second.len=" + (levenshteinDistance.getThird().getSecond().length));
+			sbTemp1.append("\n third_third=" + Arrays.toString(levenshteinDistance.getThird().getThird()));
+			sbTemp1.append("\n third_third.len=" + (levenshteinDistance.getThird().getThird().length));
+			sbTemp1.append("\n---\n");
+			WritingToFile.appendLineToFileAbsolute(sbTemp1.toString(),
+					Constant.getCommonPath() + "Debug1Mar2018newLevenshteinDistance.csv");
+		}
 		// { levenshteinDistance = ProcessUtils.executeProcessEditDistance(stringCodeForActivityObjects1,
 		// stringCodeForActivityObjects2, Integer.toString(1), Integer.toString(1), Integer.toString(2));
 		// System.out.println("getMySimpleLevenshteinProcesse took " + (System.nanoTime() - t1) + " ns");}
-
-		String[] splitted = RegexUtils.patternUnderScore.split(levenshteinDistance.getFirst());
+		// String[] splitted = RegexUtils.patternUnderScore.split(levenshteinDistance.getFirst());
 		// $$ levenshteinDistance.getFirst().split("_");// "_D(1-0)_D(2-0)_D(3-0)_D(4-0)_N(5-1)_N(6-2)";
 
 		if (VerbosityConstants.verboseDistance)
 		{
-			System.out.println("Trace =" + levenshteinDistance.getFirst() + "  simpleLevenshteinDistance112="
+			System.out.println("Trace =" + levenshteinDistance.getFirst() + " DINSTrace="
+					+ new String(levenshteinDistance.getThird().getFirst()) + "\n third_second="
+					+ Arrays.toString(levenshteinDistance.getThird().getSecond()) + "\n third_third="
+					+ Arrays.toString(levenshteinDistance.getThird().getThird()) + "  simpleLevenshteinDistance112="
 					+ levenshteinDistance.getSecond());
 			System.out.println("getMySimpleLevenshteinDistance took " + (System.nanoTime() - t1) + " ns");
 		}
 
-		for (int i = 1; i < splitted.length; i++)
+		char[] DINSTrace = levenshteinDistance.getThird().getFirst();
+		int[] coord1Trace = levenshteinDistance.getThird().getSecond();
+		int[] coord2Trace = levenshteinDistance.getThird().getThird();
+		for (int i = 0; i < DINSTrace.length; i++)
 		{
-			String op = splitted[i]; // D(1-0)
-			String[] splitOps = RegexUtils.patternOpeningRoundBrace.split(op);// $$op.split("\\("); // D and 1-0)
-
+			char operationChar = DINSTrace[i];
+			// String op = splitted[i]; // D(1-0)
+			// String[] splitOps = RegexUtils.patternOpeningRoundBrace.split(op);// $$op.split("\\("); // D and 1-0)
 			// System.out.println(splitted[i]); //D(1-0)
-
 			// String operation = splitOps[0]; // D//Sanity checked ok for String -> char on Mar 1 2018
-			char operationChar = splitOps[0].charAt(0); // D
-
+			// char operationChar = splitOps[0].charAt(0); // D
 			// $$System.out.println("operation=" + operation + " operationCHar=" + operationChar);
-
-			String splitCo[] = RegexUtils.patternHyphen.split(splitOps[1]);
+			// String splitCo[] = RegexUtils.patternHyphen.split(splitOps[1]);
 			// $$splitOps[1].split("-"); // 1 and 0)
-			String splitCoAgain[] = RegexUtils.patternClosingRoundBrace.split(splitCo[1]);
+			// String splitCoAgain[] = RegexUtils.patternClosingRoundBrace.split(splitCo[1]);
 			// $$splitCo[1].split("\\)"); // 0 and nothing
 
-			int coordOfAO1 = Integer.parseInt(splitCo[0]) - 1;// 1 minus 1
-
-			int coordOfAO2 = Integer.parseInt(splitCoAgain[0]) - 1; // 0 minus 1
+			// int coordOfAO1 = Integer.parseInt(splitCo[0]) - 1;// 1 minus 1
+			int coordOfAO1 = coord1Trace[i] - 1;// 1 minus 1
+			// int coordOfAO2 = Integer.parseInt(splitCoAgain[0]) - 1; // 0 minus 1
+			int coordOfAO2 = coord2Trace[i] - 1; // 0 minus 1
 
 			// int coordOfAO1= Character.getNumericValue(splitOps[1].charAt(0))-1;//1
 			// int coordOfAO2=Character.getNumericValue(splitOps[1].charAt(2))-1;//0
@@ -794,25 +823,29 @@ public class HJEditDistance extends AlignmentBasedDistance
 			{
 				// System.out.println("D matched");
 				dAct += costDeleteActivityObject; // 1d*costReplaceFullActivityObject;
+				// System.out.println("dAct=" + dAct);
 			}
 
 			else if (operationChar == 'I')
 			{
 				// System.out.println("I matched");
 				dAct += costInsertActivityObject; // 1d*costReplaceFullActivityObject;
+				// System.out.println("dAct=" + dAct);
 			}
 
 			else if (operationChar == 'S')
 			{
 				// System.out.println("S matched");
 				dAct += costReplaceActivityObject; // 2d*costReplaceFullActivityObject;
+				// System.out.println("dAct=" + dAct);
 			}
 
 			else if (operationChar == 'N')
 			{
+				// System.out.println("dAct=" + dAct);
 				double decayWt = 1;
 				// System.out.println("N matched");
-				if (Constant.useDecayInFeatureLevelED && (i == (splitted.length - 1)))
+				if (Constant.useDecayInFeatureLevelED && (i == (DINSTrace.length - 1)))
 				{
 					decayWt = 3;
 				}
@@ -830,11 +863,6 @@ public class HJEditDistance extends AlignmentBasedDistance
 			dFeat = StatsUtils.round(dFeat, 4);
 		}
 
-		if (VerbosityConstants.verboseDistance)
-		{
-			System.out.println("HJ dist=" + dAct + " + " + dFeat);
-		}
-
 		// Start of disabled on Feb 4 2018
 		// distanceTotal = dAct + dFeat;
 		// End of disabled on Feb 4 2018
@@ -850,6 +878,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		else
 		{
 			distanceTotal = dAct + dFeat;
+			// System.out.println("distanceTotal = dAct + dFeat = " + distanceTotal + "=" + dAct + "+" + dFeat);
 		}
 		// System.out.println("EDAlpha = " + EDAlpha);
 		// Start of sanity check Feb 9
@@ -909,6 +938,12 @@ public class HJEditDistance extends AlignmentBasedDistance
 					"\t" + userAtRecomm + "\t" + dateAtRecomm + "\t" + timeAtRecomm + distanceTotal + "\t"
 							+ levenshteinDistance.getFirst() + "\t" + dAct + "\t" + dFeat + "\n",
 					Constant.getCommonPath() + "FeatureLevelDistanceLog.csv");
+		}
+
+		if (VerbosityConstants.verboseDistance)
+		{
+			System.out.println("HJ dist=" + dAct + " + " + dFeat + "\n returning(" + levenshteinDistance.getFirst()
+					+ distanceTotal + ")");
 		}
 
 		// $ WritingToFile.writeOnlyTrace(levenshteinDistance.getFirst());

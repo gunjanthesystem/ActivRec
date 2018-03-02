@@ -418,9 +418,31 @@ public class DistanceUtils
 			case SimpleV3:// "SimpleV3":
 				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 				{
+					long t1 = System.nanoTime();
 					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
 							candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
 							dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+					long t2 = System.nanoTime();
+
+					if (false)
+					{
+
+						long t3 = System.nanoTime();
+						Pair<String, Double> editDistanceForThisCandidateDUmmy = hjEditDistance
+								.getHJEditDistanceWithTraceBefore1Mar2018(candTimeline.getActivityObjectsInTimeline(),
+										activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+										candTimeline.getTimelineID());
+						long t4 = System.nanoTime();
+						// StringBuilder sb = new StringBuilder((t2 - t1) + "," + (t4 - t3) + "\n");
+						// Sanity checked OK
+						// sb.append("editDistanceForThisCandidateDUmmy.equals(editDistanceForThisCandidate) = "
+						// + editDistanceForThisCandidateDUmmy.equals(editDistanceForThisCandidate) + "\n");
+						// sb.append("editDistanceForThisCandidateDUmmy=" + editDistanceForThisCandidateDUmmy.toString()
+						// + "\neditDistanceForThisCandidate=" + editDistanceForThisCandidate.toString() + "\n");
+						WritingToFile.appendLineToFileAbsolute((t2 - t1) + "," + (t4 - t3) + "\n",
+								Constant.getCommonPath() + "Mar2_DebugED.txt");
+					}
+
 				}
 				else
 				{

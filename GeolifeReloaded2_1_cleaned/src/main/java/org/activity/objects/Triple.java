@@ -14,10 +14,10 @@ public class Triple<A, B, C> // implements Comparable
 		this.third = third;
 	}
 
-	// public Triple()
-	// {
-	//
-	// }
+	public Triple()
+	{
+
+	}
 
 	public int hashCode() // not sure
 	{

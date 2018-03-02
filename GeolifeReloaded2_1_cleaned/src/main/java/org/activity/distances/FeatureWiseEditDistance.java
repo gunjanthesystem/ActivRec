@@ -104,8 +104,8 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 		{
 			String stringCodeForActivityNames1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
 			String stringCodeForActivityNames2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
-			Pair<String, Double> levenshteinActivityName = getMySimpleLevenshteinDistance(stringCodeForActivityNames1,
-					stringCodeForActivityNames2, 1, 1, 2);
+			Pair<String, Double> levenshteinActivityName = getMySimpleLevenshteinDistancePair(
+					stringCodeForActivityNames1, stringCodeForActivityNames2, 1, 1, 2);
 			mapOfDistances.put("ActivityName", levenshteinActivityName);
 		}
 		// String stringCodeForStartTime1 = StringCode.getStringCodeForStartTime(activityObjects1);
@@ -119,7 +119,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 			String stringCodeForStartTimes[] = StringCode.getStringCodesForStartTime(activityObjects1,
 					activityObjects2);
 			// String stringCodeForStartTime2 = StringCode.getStringCodeForStartTime(activityObjects2);
-			Pair<String, Double> levenshteinStartTime = getMySimpleLevenshteinDistance(stringCodeForStartTimes[0],
+			Pair<String, Double> levenshteinStartTime = getMySimpleLevenshteinDistancePair(stringCodeForStartTimes[0],
 					stringCodeForStartTimes[1], 1, 1, 2);
 			mapOfDistances.put("StartTime", levenshteinStartTime);
 		}
@@ -129,7 +129,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 		{
 			String stringCodeForDurations[] = StringCode.getStringCodesForDuration(activityObjects1, activityObjects2);
 			// String stringCodeForDuration2 = StringCode.getStringCodeForDuration(activityObjects2);
-			Pair<String, Double> levenshteinDuration = getMySimpleLevenshteinDistance(stringCodeForDurations[0],
+			Pair<String, Double> levenshteinDuration = getMySimpleLevenshteinDistancePair(stringCodeForDurations[0],
 					stringCodeForDurations[1], 1, 1, 2);
 			mapOfDistances.put("Duration", levenshteinDuration);
 		}
@@ -143,7 +143,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 				// StringCode.getStringCodeForDistanceTravelled(activityObjects1);
 				String stringCodesForDistanceTravelled[] = StringCode
 						.getStringCodesForDistanceTravelled(activityObjects1, activityObjects2);
-				Pair<String, Double> levenshteinDistanceTravelled = getMySimpleLevenshteinDistance(
+				Pair<String, Double> levenshteinDistanceTravelled = getMySimpleLevenshteinDistancePair(
 						stringCodesForDistanceTravelled[0], stringCodesForDistanceTravelled[1], 1, 1, 2);
 				mapOfDistances.put("DistanceTravelled", levenshteinDistanceTravelled);
 			}
@@ -161,7 +161,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 			{
 				String stringCodesForStartGeoCoordinates[] = StringCode
 						.getStringCodesForStartGeoCoordinates(activityObjects1, activityObjects2);
-				Pair<String, Double> levenshteinStartGeoCordinates = getMySimpleLevenshteinDistance(
+				Pair<String, Double> levenshteinStartGeoCordinates = getMySimpleLevenshteinDistancePair(
 						stringCodesForStartGeoCoordinates[0], stringCodesForStartGeoCoordinates[1], 1, 1, 2);
 				mapOfDistances.put("StartGeoCordinates", levenshteinStartGeoCordinates);
 			}
@@ -171,7 +171,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 			{
 				String stringCodesForEndGeoCoordinates[] = StringCode
 						.getStringCodesForEndGeoCoordinates(activityObjects1, activityObjects2);
-				Pair<String, Double> levenshteinEndGeoCordinates = getMySimpleLevenshteinDistance(
+				Pair<String, Double> levenshteinEndGeoCordinates = getMySimpleLevenshteinDistancePair(
 						stringCodesForEndGeoCoordinates[0], stringCodesForEndGeoCoordinates[1], 1, 1, 2);
 				mapOfDistances.put("EndGeoCordinates", levenshteinEndGeoCordinates);
 			}
@@ -182,7 +182,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 				// String stringCodeForAvgAltitude1 = StringCode.getStringCodeForAvgAltitudes(activityObjects1);
 				String stringCodesForAvgAltitude[] = StringCode.getStringCodesForAvgAltitudes(activityObjects1,
 						activityObjects2);
-				Pair<String, Double> levenshteinAvgAltitude = getMySimpleLevenshteinDistance(
+				Pair<String, Double> levenshteinAvgAltitude = getMySimpleLevenshteinDistancePair(
 						stringCodesForAvgAltitude[0], stringCodesForAvgAltitude[1], 1, 1, 2);
 				mapOfDistances.put("AvgAltitude", levenshteinAvgAltitude);
 			}
