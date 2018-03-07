@@ -1,5 +1,6 @@
 package org.activity.ui;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,7 +18,11 @@ import org.activity.io.WritingToFile;
 import org.activity.tools.JSONProcessingGowallaCatHierachy;
 import org.activity.util.RegexUtils;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.util.Duration;
 
 /**
  * 
@@ -321,11 +326,11 @@ public class UIUtilityBox
 										else
 										{
 
-											System.err.println(PopUps.getTracedErrorMsg(
-													"Error: levelOfGrandChild= " + levelOfGrandChild
-															+ " Not expected more than three levels. foundnode.getLevel() = "
-															+ foundnode.getLevel() + ", while level to look for is: "
-															+ level + " cat to look for: " + catIDToSearh));
+											System.err.println(PopUps.getTracedErrorMsg("Error: levelOfGrandChild= "
+													+ levelOfGrandChild
+													+ " Not expected more than three levels. foundnode.getLevel() = "
+													+ foundnode.getLevel() + ", while level to look for is: " + level
+													+ " cat to look for: " + catIDToSearh));
 										}
 									}
 								}
@@ -869,6 +874,35 @@ public class UIUtilityBox
 		}
 
 		return str.toString();// + "\najooba DefaultMutableTreeNode";
+	}
+
+	/**
+	 * <p>
+	 * ref:https://stackoverflow.com/questions/26854301/how-to-control-the-javafx-tooltips-delay/36916925
+	 * 
+	 * @since Mar 3 2018
+	 * @param tooltip
+	 * 
+	 */
+	public static void hackTooltipStartTiming(Tooltip tooltip)
+	{
+		try
+		{
+			Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
+			fieldBehavior.setAccessible(true);
+			Object objBehavior = fieldBehavior.get(tooltip);
+
+			Field fieldTimer = objBehavior.getClass().getDeclaredField("activationTimer");
+			fieldTimer.setAccessible(true);
+			Timeline objTimer = (Timeline) fieldTimer.get(objBehavior);
+
+			objTimer.getKeyFrames().clear();
+			objTimer.getKeyFrames().add(new KeyFrame(new Duration(250)));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	///

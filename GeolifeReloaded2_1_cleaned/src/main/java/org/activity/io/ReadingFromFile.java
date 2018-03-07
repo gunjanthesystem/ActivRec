@@ -843,8 +843,6 @@ public class ReadingFromFile
 	/**
 	 * 
 	 * @param absFileName
-	 * @param startLineNum
-	 * @param endLineNum
 	 * @param delimiter
 	 * @return
 	 */
@@ -854,6 +852,28 @@ public class ReadingFromFile
 		{
 			return Files.lines(Paths.get(absFileName))
 					.map(l -> new ArrayList<String>(Arrays.asList(l.split(delimiter))))
+					.collect(Collectors.toCollection(ArrayList::new));
+		}
+		catch (Exception e)
+		{
+			PopUps.printTracedErrorMsgWithExit("Exception: " + e.toString());
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * @param absFileName
+	 * @param delimiter
+	 * @return
+	 */
+	public static List<List<String>> readLinesIntoListOfListsPrecompiledSplit(String absFileName, String delimiter)
+	{
+		Pattern splitPattern = Pattern.compile("|");
+		try
+		{
+			return Files.lines(Paths.get(absFileName))
+					.map(l -> new ArrayList<String>(Arrays.asList(splitPattern.split(l))))
 					.collect(Collectors.toCollection(ArrayList::new));
 		}
 		catch (Exception e)

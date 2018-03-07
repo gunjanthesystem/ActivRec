@@ -2,6 +2,8 @@ package org.activity.plotting;
 
 import java.util.Arrays;
 
+import org.activity.ui.UIUtilityBox;
+
 //javafx.geometry.Insets
 //import javafx.geometry.Insets;
 import javafx.geometry.Insets;
@@ -52,6 +54,7 @@ public class ActivityBox2 extends Group
 		this.dataStyleClass = dataStyleClass;
 		// updateStyleClasses();// disabled for performance
 		tooltip.setGraphic(new GTooltipContent(Arrays.asList("EndTime:", "ActivityName:", "ActivityID:", "Location:")));
+		UIUtilityBox.hackTooltipStartTiming(tooltip);
 		Tooltip.install(regionBar, tooltip);
 		// regionBar.setShape(new Circle());
 

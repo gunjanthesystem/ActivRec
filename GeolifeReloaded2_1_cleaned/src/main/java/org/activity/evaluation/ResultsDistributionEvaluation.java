@@ -57,8 +57,8 @@ public class ResultsDistributionEvaluation
 	public static void runFeb17FiveDaysResults()
 	{
 
-		String pathToWrite = "./dataWritten/Mar2/FiveDays/";
-		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultMar2ToReadClarity.csv";
+		String pathToWrite = "./dataWritten/Mar5/FiveDays/";
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultMar5ToReadFormatted.csv";
 		int numOfDay = 5;
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
 		double muArray[] = Constant.matchingUnitAsPastCount;
@@ -80,7 +80,7 @@ public class ResultsDistributionEvaluation
 
 			for (List<String> resEntry : resLabels)
 			{
-				if (resEntry.size() > 0)
+				if (resEntry.size() > 1)
 				{
 					pathToRead = resEntry.get(2).trim();
 					resultsLabel = resEntry.get(1).trim();
@@ -88,7 +88,12 @@ public class ResultsDistributionEvaluation
 
 					System.out.println(
 							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
-					getResults2(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host, firstToMax);
+					int resSize = getResults2(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host,
+							firstToMax);
+					if (resSize < 0)
+					{
+						continue;
+					}
 				}
 			}
 
@@ -106,14 +111,32 @@ public class ResultsDistributionEvaluation
 
 	}
 
-	public static void getResults2(String pathToWrite, String resultsLabel, String pathToRead, double[] muArray,
-			String[] statFileNames, String host, int firstToMax)
+	/**
+	 * 
+	 * @param pathToWrite
+	 * @param resultsLabel
+	 * @param pathToRead
+	 * @param muArray
+	 * @param statFileNames
+	 * @param host
+	 * @param firstToMax
+	 * @return
+	 * @throws Exception
+	 */
+	public static int getResults2(String pathToWrite, String resultsLabel, String pathToRead, double[] muArray,
+			String[] statFileNames, String host, int firstToMax) throws Exception
 	{
 		Map<Integer, Map<Integer, List<Double>>> res = null;
 		for (String statFileName : statFileNames)
 		{
 			res = getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax);
 		}
+
+		if (res == null)
+		{
+			return -1;
+		}
+
 		if (res.size() >= 100)
 		{
 			WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
@@ -127,6 +150,7 @@ public class ResultsDistributionEvaluation
 		{
 			WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
 		}
+		return res.size();
 	}
 
 	public static String getHostFromString(String s)
@@ -517,64 +541,77 @@ public class ResultsDistributionEvaluation
 		// MU , <list for each user, <list of first1,2,3 for that user and mu>>
 		Map<Integer, List<List<Double>>> muKeyAllValsMap = new LinkedHashMap<>();
 
-		for (double muD : muArray)
-		{
-			int mu = (int) muD;
-
-			String fileToRead = pathToRead + statFileName + mu + ".csv";
-
-			Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port, fileToRead,
-					user, passwd);
-
-			List<List<Double>> res = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",", false);
-
-			// System.out.println("mu= " + mu + " res=" + res);
-			muKeyAllValsMap.put(mu, res);
-			// inputAndSession.getSecond().disconnect();
-		}
-
 		// Convert to user wise result
 		// userIndex , <MU, <list of first1,2,3 for that user and mu>>
-		Map<Integer, Map<Integer, List<Double>>> userMUKeyVals = transformToUserWise(muArray, muKeyAllValsMap);
+		Map<Integer, Map<Integer, List<Double>>> userMUKeyVals = null;
 
-		// user, min mu with highest first 3, first3 for this mu and user
-		Map<Integer, Pair<Integer, List<Double>>> firstsWithHighF3ResultForEachUserOverMUs = new LinkedHashMap<>();
-
-		for (Entry<Integer, Map<Integer, List<Double>>> userVals : userMUKeyVals.entrySet())
+		try
 		{
-			int userIndex = userVals.getKey();
-			// MU, list of first 1,2,3 for that mu for current user
-			Map<Integer, List<Double>> valsForAllMUs = userVals.getValue();
+			for (double muD : muArray)
+			{
+				int mu = (int) muD;
 
-			// find max first 3 over all MUs
-			double maxFirst3OverAllMUS = valsForAllMUs.entrySet().stream()
-					.mapToDouble(e -> e.getValue().get(firstToMax - 1)).max().getAsDouble();
+				String fileToRead = pathToRead + statFileName + mu + ".csv";
 
-			// find MUs having Max first 3 found just above.
-			Set<Integer> musHavingTheMax = valsForAllMUs.entrySet().stream()
-					.filter(e -> e.getValue().get(firstToMax - 1).equals(maxFirst3OverAllMUS)).map(e -> e.getKey())
-					.collect(Collectors.toSet());
+				Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port, fileToRead,
+						user, passwd);
 
-			// find min MU having max first 3
-			int minMUHavingMaxFirst3ForThisUser = musHavingTheMax.stream().mapToInt(e -> e).min().getAsInt();
+				List<List<Double>> res = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",", false);
 
-			firstsWithHighF3ResultForEachUserOverMUs.put(userIndex, new Pair<Integer, List<Double>>(
-					minMUHavingMaxFirst3ForThisUser, valsForAllMUs.get(minMUHavingMaxFirst3ForThisUser)));
+				// System.out.println("mu= " + mu + " res=" + res);
+				muKeyAllValsMap.put(mu, res);
+				// inputAndSession.getSecond().disconnect();
+			}
 
+			// Convert to user wise result
+			// userIndex , <MU, <list of first1,2,3 for that user and mu>>
+			userMUKeyVals = transformToUserWise(muArray, muKeyAllValsMap);
+
+			// user, min mu with highest first 3, first3 for this mu and user
+			Map<Integer, Pair<Integer, List<Double>>> firstsWithHighF3ResultForEachUserOverMUs = new LinkedHashMap<>();
+
+			for (Entry<Integer, Map<Integer, List<Double>>> userVals : userMUKeyVals.entrySet())
+			{
+				int userIndex = userVals.getKey();
+				// MU, list of first 1,2,3 for that mu for current user
+				Map<Integer, List<Double>> valsForAllMUs = userVals.getValue();
+
+				// find max first 3 over all MUs
+				double maxFirst3OverAllMUS = valsForAllMUs.entrySet().stream()
+						.mapToDouble(e -> e.getValue().get(firstToMax - 1)).max().getAsDouble();
+
+				// find MUs having Max first 3 found just above.
+				Set<Integer> musHavingTheMax = valsForAllMUs.entrySet().stream()
+						.filter(e -> e.getValue().get(firstToMax - 1).equals(maxFirst3OverAllMUS)).map(e -> e.getKey())
+						.collect(Collectors.toSet());
+
+				// find min MU having max first 3
+				int minMUHavingMaxFirst3ForThisUser = musHavingTheMax.stream().mapToInt(e -> e).min().getAsInt();
+
+				firstsWithHighF3ResultForEachUserOverMUs.put(userIndex, new Pair<Integer, List<Double>>(
+						minMUHavingMaxFirst3ForThisUser, valsForAllMUs.get(minMUHavingMaxFirst3ForThisUser)));
+
+			}
+
+			StringBuilder sb = new StringBuilder("userIndex,minMuWithMaxFirst3,First1,First2,First3\n");
+			//// user, min mu with highest first 3, first3 for this mu and user
+			for (Entry<Integer, Pair<Integer, List<Double>>> r : firstsWithHighF3ResultForEachUserOverMUs.entrySet())
+			{
+				sb.append(r.getKey() + "," + r.getValue().getFirst() + "," + r.getValue().getSecond().get(0) + ","
+						+ r.getValue().getSecond().get(1) + "," + r.getValue().getSecond().get(2) + "\n");
+			}
+			WritingToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName + ".csv");
+
+			WritingToFile.writeToNewFile(host + ":" + pathToRead,
+					pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe.txt");
 		}
-
-		StringBuilder sb = new StringBuilder("userIndex,minMuWithMaxFirst3,First1,First2,First3\n");
-		//// user, min mu with highest first 3, first3 for this mu and user
-		for (Entry<Integer, Pair<Integer, List<Double>>> r : firstsWithHighF3ResultForEachUserOverMUs.entrySet())
+		catch (NullPointerException e)
 		{
-			sb.append(r.getKey() + "," + r.getValue().getFirst() + "," + r.getValue().getSecond().get(0) + ","
-					+ r.getValue().getSecond().get(1) + "," + r.getValue().getSecond().get(2) + "\n");
+			WritingToFile.appendLineToFileAbsolute(
+					PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n"),
+					pathToWrite + "ExceptionsEncountered.csv");
+			return null;
 		}
-		WritingToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName + ".csv");
-
-		WritingToFile.writeToNewFile(host + ":" + pathToRead,
-				pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe.txt");
-
 		return (userMUKeyVals);
 	}
 

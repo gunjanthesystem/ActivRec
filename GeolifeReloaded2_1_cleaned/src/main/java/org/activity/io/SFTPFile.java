@@ -90,7 +90,8 @@ public class SFTPFile
 
 				session.setConfig("StrictHostKeyChecking", "no");
 				System.out.println("Establishing Connection...");
-				session.connect();
+				// session.connect();
+				session.connect(5000);// ref:http://www.jcraft.com/jsch/examples/Shell.java.html
 				System.out.println("Connection established.");
 				System.out.println("Creating SFTP Channel.");
 				ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
@@ -106,6 +107,8 @@ public class SFTPFile
 			System.out.println("Exception to read: " + remoteFile);
 			System.out.println("user=" + user + " passwd=" + passwd + " host=" + host);
 			e.printStackTrace();
+
+			return null;
 		}
 
 		return new Pair<InputStream, Session>(out, session);
