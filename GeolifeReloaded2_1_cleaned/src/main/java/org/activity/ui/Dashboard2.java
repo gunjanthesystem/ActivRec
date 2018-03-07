@@ -59,6 +59,7 @@ public class Dashboard2 extends Application
 	public void start(Stage stage)
 	{
 		ScreenDetails.printScreensDetails();
+
 		// final Stage stageRef = stage;
 		// StageStyle stageStyle = StageStyle.DECORATED;
 		/////////////////////////////////////////////

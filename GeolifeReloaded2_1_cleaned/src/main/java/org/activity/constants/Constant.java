@@ -146,7 +146,7 @@ public final class Constant
 	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
 	// None,Percentile // SWITCH_NOV10
 
-	public static final int filterCandByCurActTimeThreshInSecs = 10800;// -1; 18000; 3600 7200; //SWITCH_NOV10
+	public static final int filterCandByCurActTimeThreshInSecs = -1;// 10800;// -1; 18000; 3600 7200; //SWITCH_NOV10
 
 	/**
 	 * Keep only the n perecentile of candidates for each RT based on the lowest (unnormalised) edit distance, Scale:
@@ -179,11 +179,11 @@ public final class Constant
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
-	public static final boolean useStartTimeInFED = false;// SWITCH_NOV10
-	public static final boolean useLocationInFED = false;// SWITCH_NOV10
-	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
-	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
-	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
+	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
+	public static final boolean useLocationInFED = true;// SWITCH_NOV10
+	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
+	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
+	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
 	public static final boolean useDecayInFeatureLevelED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = true;//// SWITCH_NOV10

@@ -74,7 +74,17 @@ public class SuperController
 		// searchContentInFile();
 		// cleanUpSpace("./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/", 0.9);
 		// runAllAKOMExperiments();
-		// cleanUpSpace("./dataWritten/Feb2NCount_5Day_ThresholdNN600", 0.9);
+		// $ cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaseline/", 0.9);
+		// $cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaselineForUserNumInvestigation/",0.9);
+		// cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenClosestTimeBaseline/", 0.9);
+		// cleanUp(new String[] { "/dataWritten/Aug3_Only1CandPU/", "/dataWritten/Aug3_Only1CandPU2/",
+		// "/dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_1/",
+		// "/dataWritten/Feb25NCount_5Day_NN500MedRepCinsNormEDAlpha0.75DistDurOnlyFeature/",
+		// "/dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime",
+		// "/dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs/", "/dataWritten/Mar1ED0.25DurFPDistFPStFilter3hrs/",
+		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
+
+		//
 		main0();
 		// cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
 		// "./dataWritten/Dec20_Ncount_100U_9kN_1C_ThreshNN-750", "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1",
@@ -161,7 +171,8 @@ public class SuperController
 		}
 
 		// Start
-		String[] commonPaths = { "./dataWritten/Mar2ED" + Constant.EDAlpha + featuresUsedLabel + "StFilter"
+		String[] commonPaths = { "./dataWritten/Mar" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+				+ LocalDateTime.now().getDayOfMonth() + "ED" + Constant.EDAlpha + featuresUsedLabel + "StFilter"
 				+ (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
@@ -227,7 +238,7 @@ public class SuperController
 	{
 		for (String pathToClean : pathsToClean)
 		{
-			cleanUpSpace(pathToClean, 0.85);
+			cleanUpSpace(pathToClean, 0.90);
 		}
 	}
 
