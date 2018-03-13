@@ -94,7 +94,7 @@ dependencies
 
 
     // material design for javafx
-     compile 'com.jfoenix:jfoenix:1.4.0'
+    compile 'com.jfoenix:jfoenix:8.0.1'
 	
 	//for amidst toolkit
 	//compile 'eu.amidst:module-all:0.6.1'

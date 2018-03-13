@@ -10,6 +10,7 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 //import javafx.geometry.Insets;
 //import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
@@ -64,6 +65,11 @@ public class TimelineChartApp2 extends Pane
 		return vbox;
 	}
 
+	/**
+	 * 
+	 * @param axis
+	 * @return
+	 */
 	public BorderPane createXAxisRangeSlider(NumberAxis axis)
 	{
 		BorderPane pane = new BorderPane();
@@ -74,6 +80,7 @@ public class TimelineChartApp2 extends Pane
 		final RangeSlider hSlider = new RangeSlider(this.minXAxis, this.maxXAxis, this.minXAxis, this.maxXAxis);
 		// axis.getLowerBound(), axis.getUpperBound(), axis.getLowerBound(),
 		// axis.getUpperBound());/
+		System.out.println("hSlider.getStyleClass() =" + hSlider.getStyleClass());
 
 		hSlider.setSnapToTicks(true);
 
@@ -87,6 +94,7 @@ public class TimelineChartApp2 extends Pane
 		hSlider.setShowTickLabels(true);
 
 		final Label caption = new Label("Select Time Range");
+		caption.setStyle("-fx-font-weight: bold");
 		// caption.setAl
 		final TextField minValue = new TextField(Double.toString(hSlider.getMin()));
 		minValue.setPrefWidth(120);
@@ -108,6 +116,9 @@ public class TimelineChartApp2 extends Pane
 		// // Curtain A1 end
 
 		Button updateButton = new Button("Apply");
+		// JFXButton updateButton = new JFXButton("Apply");
+		// updateButton.getStyleClass().add("button-raised");
+
 		updateButton.setOnAction(e ->
 			{
 				axis.setAutoRanging(false);
@@ -139,6 +150,8 @@ public class TimelineChartApp2 extends Pane
 		BorderPane.setMargin(hSlider, new Insets(0, 20, 0, 20));
 		BorderPane.setMargin(minValue, new Insets(0, 2, 0, 10));
 		BorderPane.setMargin(maxValue, new Insets(0, 10, 0, 2));
+		BorderPane.setAlignment(updateButton, Pos.CENTER);
+		BorderPane.setAlignment(caption, Pos.CENTER);
 		// BorderPane.setMargin(caption, new Insets(0, 00, 0, 500));
 
 		// pane.setPadding(new Insets(12, 12, 12, 12));
@@ -163,11 +176,12 @@ public class TimelineChartApp2 extends Pane
 		// StringConverter<LocalDateTime> converter = new LocalDateTimeStringConverter(formatter, null);
 		// // assertEquals("12 January 1985, 12:34:56", converter.toString(VALID_LDT_WITH_SECONDS));
 		// LocalDateTime date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
-		StringConverter converter2 = new EpochStringConverter();
-
-		xAxis.setTickLabelFormatter(converter2);
-		// (new NumberAxis.DefaultFormatter(xAxis, "$", "*"));
-		// (new NumberAxis.DefaultFormatter(yAxis, "$ ", null));
+		if (false)// for date formatted axis
+		{
+			StringConverter converter2 = new EpochStringConverter();
+			xAxis.setTickLabelFormatter(converter2);
+		} // (new NumberAxis.DefaultFormatter(xAxis, "$", "*"));
+			// (new NumberAxis.DefaultFormatter(yAxis, "$ ", null));
 
 		// xAxis.setMinorTickCount(0);
 		yAxis = new CategoryAxis();

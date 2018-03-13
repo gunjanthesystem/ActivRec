@@ -1114,7 +1114,21 @@ public class ActivityObject implements Serializable
 	 */
 	public char getCharCode()
 	{
+		// PopUps.printTracedWarningMsg("DebugMar9: look who is calling\n");
 		return StringCode.getCharCodeFromActivityID(this.activityID);
+	}
+
+	/**
+	 * Returns the 1-character string code from the ActivityID and hence is guaranteed to be unique for at least 400
+	 * activities.
+	 * 
+	 * @since 9 March 2018
+	 * @return
+	 */
+	public char getCharCodeV2()
+	{
+		return Constant.getActIDCharCodeMap().get(this.activityID);
+		// return DomainConstants.getCatIDCharCodeMap()(this.activityID);
 	}
 
 	public long getDurationInSeconds()

@@ -22,8 +22,11 @@ import org.activity.objects.Pair;
 import org.activity.objects.TraceMatrix;
 import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
+import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
 
+import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
 import weka.classifiers.Classifier;
 
 /**
@@ -315,6 +318,12 @@ public final class Constant
 	static String[] activityNames;
 	static Set<Integer> uniqueActivityIDs;
 	static Set<Integer> uniqueLocationIDs;
+
+	// public static TreeMap<Integer, Character> catIDCharCodeMap = null;
+	// public static TreeMap<Character, Integer> charCodeCatIDMap = null;
+	static Int2CharOpenHashMap actIDCharCodeMap = null;
+	public static Char2IntOpenHashMap charCodeActIDMap = null;
+
 	public static ArrayList<String> activityNamesGowallaLabels;
 
 	static double currentMatchingUnit = -99; // stores the current matching unit at all times, used for some
@@ -326,6 +335,7 @@ public final class Constant
 	final static int editDistancesMemorizerBufferSize = 1;// 000000;
 
 	public static final boolean needsToPruneFirstUnknown = false;
+
 	/////////////////////////// End of variable declarations//////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -550,7 +560,7 @@ public final class Constant
 		// were taking signficantmemory space.
 		DomainConstants.setLocIDLocationObjectDictionary(pathToSerialisedLocationObjects);
 		DomainConstants.setLocationIDNameDictionary(DomainConstants.getLocIDLocationObjectDictionary());// pathToSerialisedLocationObjects);
-		DomainConstants.setCatIDCharCodeMap();
+		Constant.setActIDCharCodeMap(DomainConstants.catIDNameDictionary);
 		DomainConstants.setCatIDGivenLevelCatIDMap();
 		DomainConstants.setUserIDUserObjectDictionary(pathToSerialisedUserObjects);
 		DomainConstants.setGowallaLocZoneIdMap(pathToSerialisedGowallaLocZoneIdMap);
@@ -955,6 +965,30 @@ public final class Constant
 		}
 	}
 
+	// public static void setActIdCharCodeMap(Set<Integer> activityIDs)
+	// {
+	// actIdCharCodeMap = new Int2CharOpenHashMap(activityIDs.size());
+	// try
+	// {
+	// if (activityIDs != null)
+	// {
+	// for (int actID : activityIDs)
+	// {
+	// actIdCharCodeMap.put(actID, StringCode.getC)
+	// }
+	// }
+	// else
+	// {
+	// PopUps.printTracedErrorMsgWithExit(
+	// "Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
+	// }
+	// }
+	// catch (Exception e)
+	// {
+	// e.printStackTrace();
+	// }
+	// }
+
 	public static int getNumberOfFeatures()
 	{
 
@@ -1323,6 +1357,43 @@ public final class Constant
 			allSet = false;
 		}
 		return allSet;
+	}
+
+	/**
+	 * @param catIDNameDictionary
+	 */
+	public static void setActIDCharCodeMap(Map<Integer, String> catIDNameDictionary)
+	{
+		try
+		{
+			if (catIDNameDictionary == null)
+			{
+				PopUps.getTracedErrorMsg("catIDNameDictionary is null");
+				System.exit(-2);
+			}
+
+			int size = catIDNameDictionary.size();
+			actIDCharCodeMap = new Int2CharOpenHashMap(size);// HashBiMap.create(catIDNameDictionary.size());
+			charCodeActIDMap = new Char2IntOpenHashMap(size);
+			// new HashBiMap<Integer, Character>();
+			for (Integer actID : catIDNameDictionary.keySet())
+			{
+				char charCode = StringCode.getCharCodeFromActivityID(actID);
+				int actId = actID.intValue();
+				actIDCharCodeMap.put(actId, charCode);
+				charCodeActIDMap.put(charCode, actId);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	public static Int2CharOpenHashMap getActIDCharCodeMap()
+	{
+		return actIDCharCodeMap;
 	}
 
 }

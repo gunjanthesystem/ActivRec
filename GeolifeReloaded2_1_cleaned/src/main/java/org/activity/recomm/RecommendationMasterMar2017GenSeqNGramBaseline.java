@@ -418,10 +418,10 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 							.getKeysWithMaxValues(curSubNGramEntry.getValue());
 
 					ArrayList<Integer> nextActsWithMaxCountActID = (ArrayList<Integer>) nextActsWithMaxCount.stream()
-							.map(c -> DomainConstants.charCodeCatIDMap.get(c)).collect(Collectors.toList());
+							.map(c -> Constant.charCodeActIDMap.get(c)).collect(Collectors.toList());
 
 					String curSubNGramEntryKeyAsActIDs = curSubNGramEntry.getKey().chars().mapToObj(i -> (char) i)
-							.map(c -> String.valueOf(DomainConstants.charCodeCatIDMap.get(c)))
+							.map(c -> String.valueOf(Constant.charCodeActIDMap.get(c)))
 							.collect(Collectors.joining(actIDDelimiter));
 
 					nextActsForEachCurrentSubNGram.put(curSubNGramEntryKeyAsActIDs, nextActsWithMaxCountActID);
@@ -465,11 +465,11 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 							.getKeysWithMaxValues(curSubNGramEntry.getValue());
 
 					ArrayList<String> nextActsWithMaxCountActID = (ArrayList<String>) nextActsWithMaxCount.stream()
-							.map(c -> DomainConstants.catIDNameDictionary.get(DomainConstants.charCodeCatIDMap.get(c)))
+							.map(c -> DomainConstants.catIDNameDictionary.get(Constant.charCodeActIDMap.get(c)))
 							.collect(Collectors.toList());
 
 					String curSubNGramEntryKeyAsActNames = curSubNGramEntry.getKey().chars().mapToObj(i -> (char) i)
-							.map(c -> DomainConstants.catIDNameDictionary.get(DomainConstants.charCodeCatIDMap.get(c)))
+							.map(c -> DomainConstants.catIDNameDictionary.get(Constant.charCodeActIDMap.get(c)))
 							.collect(Collectors.joining(actNameDelimter));
 
 					nextActsForEachCurrentSubNGram.put(curSubNGramEntryKeyAsActNames, nextActsWithMaxCountActID);
@@ -642,8 +642,12 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 				.get(nGram);
 
 		// is of length 1 as we are working with 2grams now.
-		Character currentSubNGramChar = DomainConstants.catIDCharCodeMap
-				.get(Integer.valueOf(activityNameAtRecommPoint));
+		// Character currentSubNGramChar = DomainConstants.catIDCharCodeMap
+		// .get(Integer.valueOf(activityNameAtRecommPoint));
+
+		Character currentSubNGramChar = Constant.getActIDCharCodeMap()
+				.get(Integer.valueOf(activityNameAtRecommPoint).intValue());
+
 		String currentSubNGram = currentSubNGramChar.toString();
 
 		ArrayList<Character> listOfActsIDsWithMaxCountAsCharCode = nextMostFreqActsForThisUserN.get(currentSubNGram);
@@ -658,7 +662,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 		for (Character c : listOfActsIDsWithMaxCountAsCharCode)
 		{
-			recommendedActivityNamesRankscorePairs.put(String.valueOf(DomainConstants.charCodeCatIDMap.get(c)), 1.0);
+			recommendedActivityNamesRankscorePairs.put(String.valueOf(Constant.charCodeActIDMap.get(c)), 1.0);
 		}
 
 		return recommendedActivityNamesRankscorePairs;

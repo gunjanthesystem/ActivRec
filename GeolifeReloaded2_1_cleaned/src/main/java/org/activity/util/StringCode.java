@@ -16,6 +16,11 @@ import org.activity.stats.HilbertCurveUtils;
 import org.activity.ui.PopUps;
 import org.apache.commons.lang3.ArrayUtils;
 
+import it.unimi.dsi.fastutil.ints.Int2CharMap;
+import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+
 //import com.google.uzaygezen.core.GunjanUtils;
 
 public class StringCode
@@ -61,6 +66,73 @@ public class StringCode
 		for (int i = 0; i < uniquePrimaryDimensionValsList.size(); i++)
 		{
 			Integer val = uniquePrimaryDimensionValsList.get(i);
+			char charCode = getCharCodeForInt(val);
+			charCodeMap.put(val, charCode);
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			StringBuilder sb = new StringBuilder(
+					"\nInside org.activity.util.StringCode.getLocallyUniqueCharCodeMap():\n");
+			sb.append("\naos1 = \n");
+			activityObjects1.stream().forEach(ao -> sb.append(">>" + ao.getPrimaryDimensionVal("/")));// toStringAllGowallaTS()));
+			sb.append("\naos2 = \n");
+			activityObjects2.stream().forEach(ao -> sb.append(">>" + ao.getPrimaryDimensionVal("/")));// (ao.toStringAllGowallaTS()));
+			sb.append("\nuniquePrimaryDimensionVals = \n" + uniquePrimaryDimensionVals.toString() + "\n");
+			sb.append("Char code map:\n");
+			charCodeMap.entrySet().stream()
+					.forEachOrdered(e -> sb.append(">>" + e.getKey() + "--" + e.getValue() + "\n"));
+			System.out.println(sb.toString());
+		}
+
+		return charCodeMap;
+	}
+
+	/**
+	 * Fork of getLocallyUniqueCharCodeMap using FastUtil collection For all unique primary dimension vals in the two
+	 * given list of aos, generate unique char codes
+	 * <p>
+	 * OBSERVATION: THIS DID NOT RESULT IN CONSISTENT PERFORMANCE IMPROVEMENT
+	 * <p>
+	 * can i generate string code specific for a particular edit distance computation, dynamically, i,e, it has to be
+	 * unique not for all unique location ids in the dataset but not only the total number of unique location ids in the
+	 * two timelines amongst whom the edit distance is being computed. Note: one activity object can also have multiple
+	 * loc ids when it is actually a merged activity object.
+	 * 
+	 * @param activityObjects1
+	 * @param activityObjects2
+	 * @return map of {primary dimension value, char code}
+	 */
+	public static Int2CharOpenHashMap getLocallyUniqueCharCodeMapFU(ArrayList<ActivityObject> activityObjects1,
+			ArrayList<ActivityObject> activityObjects2, PrimaryDimension primaryDimension)
+	{
+		IntOpenHashSet uniquePrimaryDimensionVals = new IntOpenHashSet();
+
+		for (ActivityObject ao : activityObjects1)
+		{
+			uniquePrimaryDimensionVals.addAll(ao.getPrimaryDimensionVal());
+		}
+
+		for (ActivityObject ao : activityObjects2)
+		{
+			uniquePrimaryDimensionVals.addAll(ao.getPrimaryDimensionVal());
+		}
+
+		int numOfUniqueVals = uniquePrimaryDimensionVals.size();
+
+		if (numOfUniqueVals > 400)
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: numOfUniqueVals = " + numOfUniqueVals + " >400, beyond implementation range");
+		}
+
+		IntArrayList uniquePrimaryDimensionValsList = new IntArrayList(uniquePrimaryDimensionVals);
+		Int2CharOpenHashMap charCodeMap = new Int2CharOpenHashMap(numOfUniqueVals);
+
+		for (int i = 0; i < uniquePrimaryDimensionValsList.size(); i++)
+		{
+			int val = uniquePrimaryDimensionValsList.getInt(i);
+			// int val = uniquePrimaryDimensionValsList.get(i);
 			char charCode = getCharCodeForInt(val);
 			charCodeMap.put(val, charCode);
 		}
@@ -962,11 +1034,31 @@ public class StringCode
 	public static String getStringCodeForActivityObjects(ArrayList<ActivityObject> activityObjects)
 	{
 		StringBuilder code = new StringBuilder();
-
+		// long t1, t2, t3, t4;
+		// t1 = t2 = t3 = t4 = Long.MIN_VALUE;
 		for (ActivityObject ao : activityObjects)
 		{
+			// t1 = System.nanoTime();
 			code.append(ao.getCharCode());
+			// t2 = System.nanoTime();
 		}
+
+		// if (false)// sanity check
+		// {
+		// StringBuilder codeDUmmy = new StringBuilder();
+		//
+		// for (ActivityObject ao : activityObjects)
+		// {
+		// t3 = System.nanoTime();
+		// codeDUmmy.append(ao.getCharCode());
+		// t4 = System.nanoTime();
+		// }
+		// WritingToFile.appendLineToFileAbsolute(
+		// code.toString().equals(codeDUmmy.toString()) + "," + code.toString() + "," + codeDUmmy.toString()
+		// + "," + (t2 - t1) + "," + (t4 - t3) + "\n",
+		// Constant.getOutputCoreResultsPath() + "Mar9SanityCheck.csv");
+		// }
+
 		// activityObjects.stream().forEach(ao -> code.append(ao.getStringCode()));
 		String codeS = code.toString();
 
@@ -1069,6 +1161,95 @@ public class StringCode
 			for (Integer v : seqOfPDVals)
 			{
 				Character code = uniqueCharCodes.get(v);
+				if (code == null)
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: char code for primary dimension " + primaryDimension
+							+ " val = " + v + " not found in uniqueCharCodes =" + uniqueCharCodes.toString());
+				}
+				sb.append(code);
+			}
+			stringCodeforAOs.add(sb.toString());
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append("\tInside getStringCodeForActivityObjects:\n Act Names:");
+			activityObjects.stream().forEachOrdered(ao -> sb.append(">>" + ao.getActivityName()));
+			sb.append("\nPrimary dimension vals:");
+			activityObjects.stream().forEachOrdered(ao -> sb.append(">>" + ao.getPrimaryDimensionVal("/")));
+			sb.append("\npossibleSequencesOfPrimaryDimensionVals:");
+			possibleSequencesOfPrimaryDimensionVals.stream().forEachOrdered(p -> sb.append(p.toString() + "  "));
+			sb.append("\ncorresponding string codes:");
+			stringCodeforAOs.stream().forEachOrdered(s -> sb.append(s.toString() + "  "));
+			System.out.println(sb.toString());
+		}
+		return stringCodeforAOs;
+	}
+
+	/**
+	 * Fork of getStringCodesForActivityObjects using FastUtil Collection
+	 * <p>
+	 * Returns the 1-character string code to be used for the Activity Name. This code is derived from the ActivityID
+	 * and hence is guaranteed to be unique for at least 400 activities.
+	 * 
+	 * @param activityObjects
+	 * @return
+	 * @since 9 March 2018
+	 */
+	public static ArrayList<String> getStringCodesForActivityObjectsFU(ArrayList<ActivityObject> activityObjects,
+			PrimaryDimension primaryDimension, Int2CharMap uniqueCharCodes, boolean verbose)
+	{
+
+		ArrayList<String> stringCodeforAOs = new ArrayList<>();
+		// for given seq of aos, extract all possible sequence of val. if all aos had single value for primary dimension
+		// (such as in no merger), then we will get only one ArrayList, otherwis multiple arraylist, one for each
+		// possible sequence.
+		// such as if primary vals for AOs: 1,2/3,5,6 (here the second element is merger of 2 and 3) then we will get
+		// seq: 1,2,5,6 and 1,3,5,6 .
+		ArrayList<ArrayList<Integer>> possibleSequencesOfPrimaryDimensionVals = new ArrayList<>();
+		// multiValSeqTo1ValSeqs(activityObjects,primaryDimension, verbose);
+
+		if (primaryDimension.equals(PrimaryDimension.ActivityID)) // each ao has single act id
+		{
+			ArrayList<Integer> listOfActIDs = new ArrayList<>();
+			for (ActivityObject ao : activityObjects)
+			{
+				listOfActIDs.add(ao.getActivityID());
+			}
+			possibleSequencesOfPrimaryDimensionVals.add(listOfActIDs);
+
+			// sanity check start
+			if (VerbosityConstants.checkSanityPDImplementn)
+			{
+				ArrayList<ArrayList<Integer>> dummyPossibleSequencesOfPrimaryDimensionVals = multiValSeqTo1ValSeqs(
+						activityObjects, primaryDimension, verbose);
+
+				System.out.println("Debug: dummyPossibleSequencesOfPrimaryDimensionVals= "
+						+ dummyPossibleSequencesOfPrimaryDimensionVals.toString());
+
+				System.out.println("Debug: possibleSequencesOfPrimaryDimensionVals= "
+						+ possibleSequencesOfPrimaryDimensionVals.toString());
+
+				if (!dummyPossibleSequencesOfPrimaryDimensionVals.equals(possibleSequencesOfPrimaryDimensionVals))
+				{
+					PopUps.printTracedErrorMsg(
+							"dummyPossibleSequencesOfPrimaryDimensionVals.equals(possibleSequencesOfPrimaryDimensionVals");
+				}
+			} // sanity check end
+		}
+		else
+		{
+			possibleSequencesOfPrimaryDimensionVals = multiValSeqTo1ValSeqs(activityObjects, primaryDimension, verbose);
+		}
+
+		for (ArrayList<Integer> seqOfPDVals : possibleSequencesOfPrimaryDimensionVals)
+		{
+			StringBuilder sb = new StringBuilder();
+			for (Integer v : seqOfPDVals)
+			{
+				Character code = uniqueCharCodes.get(v.intValue());
+				// Character code = uniqueCharCodes.get(v);
 				if (code == null)
 				{
 					PopUps.printTracedErrorMsgWithExit("Error: char code for primary dimension " + primaryDimension

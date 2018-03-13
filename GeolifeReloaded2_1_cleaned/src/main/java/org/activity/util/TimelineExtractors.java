@@ -1388,7 +1388,7 @@ public class TimelineExtractors
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
 	{
 		LinkedHashMap<String, TimelineWithNext> candidateTimelines = new LinkedHashMap<>();
-		// long tS = System.nanoTime();
+		long tS = System.nanoTime();
 
 		System.out.println("\nInside extractCandidateTimelinesMUCountColl(): userIDAtRecomm=" + userIDAtRecomm + "mu = "
 				+ matchingUnitInCounts);//
