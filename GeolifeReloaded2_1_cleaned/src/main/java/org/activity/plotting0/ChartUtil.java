@@ -3,6 +3,11 @@ package org.activity.plotting0;
 public class ChartUtil
 {
 
+	/**
+	 * 
+	 * @param number
+	 * @return
+	 */
 	public static Integer calculateFloorPowerOfTen(Integer number)
 	{
 		Integer powerOfTen = 0;
@@ -21,12 +26,24 @@ public class ChartUtil
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param upperbound
+	 * @param tickUnit
+	 * @return
+	 */
 	public static Float calculateUpperbound(Float upperbound, Integer tickUnit)
 	{
 		float temp = upperbound / tickUnit;
 		return new Float(Math.ceil(new Float(temp).doubleValue()) * tickUnit);
 	}
 
+	/**
+	 * 
+	 * @param upperbound
+	 * @param tickUnit
+	 * @return
+	 */
 	public static Float calculateLowerbound(Float upperbound, Integer tickUnit)
 	{
 		float temp = upperbound / tickUnit;

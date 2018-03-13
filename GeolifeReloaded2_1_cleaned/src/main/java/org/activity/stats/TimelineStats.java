@@ -1711,7 +1711,7 @@ public class TimelineStats
 		for (int i = 0; i < nGram.length(); i++)
 		{
 			char c = nGram.charAt(i);
-			Integer actID = DomainConstants.charCodeCatIDMap.get(c);
+			Integer actID = Constant.charCodeActIDMap.get(c);
 			String actName = DomainConstants.catIDNameDictionary.get(actID);
 			// System.out.println("Debug: actID:" + actID + " actName:" + actName);
 			sb.append(actName);
@@ -1737,7 +1737,7 @@ public class TimelineStats
 		for (int i = 0; i < nGram.length(); i++)
 		{
 			char c = nGram.charAt(i);
-			Integer actID = DomainConstants.charCodeCatIDMap.get(c);
+			Integer actID = Constant.charCodeActIDMap.get(c);
 			sb.append(actID.toString());
 			if (i != (nGram.length() - 1))
 			{

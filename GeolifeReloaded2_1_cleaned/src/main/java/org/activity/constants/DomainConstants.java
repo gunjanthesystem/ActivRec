@@ -22,7 +22,6 @@ import org.activity.objects.Pair;
 import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
-import org.activity.util.StringCode;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -89,8 +88,6 @@ public class DomainConstants
 	static LinkedHashMap<String, UserGowalla> userIDUserObjectDictionary = null;
 
 	static LinkedHashMap<Integer, String> locIDNameDictionary = null;
-	public static TreeMap<Integer, Character> catIDCharCodeMap = null;
-	public static TreeMap<Character, Integer> charCodeCatIDMap = null;
 
 	public static TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap;
 
@@ -191,35 +188,6 @@ public class DomainConstants
 		// }
 		// WritingToFile.appendLineToFileAbsolute(sb.toString(),
 		// "./dataWritten/locationDistances/locationDistances.csv");
-	}
-
-	/**
-	 * 
-	 */
-	public static void setCatIDCharCodeMap()
-	{
-		try
-		{
-			if (catIDNameDictionary == null)
-			{
-				PopUps.getTracedErrorMsg("catIDNameDictionary is null");
-				System.exit(-2);
-			}
-
-			catIDCharCodeMap = new TreeMap<>();// HashBiMap.create(catIDNameDictionary.size());
-			charCodeCatIDMap = new TreeMap<>();
-			// new HashBiMap<Integer, Character>();
-			for (Integer actID : catIDNameDictionary.keySet())
-			{
-				catIDCharCodeMap.put(actID, StringCode.getCharCodeFromActivityID(actID));
-				charCodeCatIDMap.put(StringCode.getCharCodeFromActivityID(actID), actID);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
 	}
 
 	public static void setCatIDNameDictionary(String pathToSerialisedCatIDNameDictionary)

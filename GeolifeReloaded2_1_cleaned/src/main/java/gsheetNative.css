@@ -11,8 +11,19 @@
 .button{
     -fx-padding:10pt;
     -fx-alignment: center;
-    -fx-margin: 20pt
+    -fx-margin: 20pt;
+    -fx-background-color: rgb(128,184,200);
 }
+
+
+.button-raised{
+    -fx-padding:10pt;
+    -fx-alignment: center;
+    -fx-margin: 20pt;
+    -fx-background-color: rgb(77,102,204);
+    -fx-text-fill: WHITE;
+}
+
 .vbox{
     -fx-alignment: right;
     -fx-spacing: 20pt;

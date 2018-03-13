@@ -722,9 +722,15 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 		double dAct = 0, dFeat = 0, distanceTotal = 0;
 
+		// long t0, t2, t3, t4, t5, t6;
+		// t0 = t2 = t3 = t4 = t5 = t6 = Long.MIN_VALUE;
+		// t0 = System.nanoTime();
 		HashMap<Integer, Character> uniqueCharCodes = StringCode.getLocallyUniqueCharCodeMap(activityObjects1,
 				activityObjects2, primaryDimension);
-
+		// t2 = System.nanoTime();
+		// Int2CharOpenHashMap uniqueCharCodesFU = StringCode.getLocallyUniqueCharCodeMapFU(activityObjects1,
+		// activityObjects2, primaryDimension);
+		// t3 = System.nanoTime();
 		// multiple string codes when an AO in the list has act name which at desired level can have multiple ids. For
 		// example Vineyards is under Community as well as Food
 		ArrayList<String> stringCodesForActivityObjects1, stringCodesForActivityObjects2;
@@ -741,10 +747,28 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// else
 		// {
 		// //end of curtain 17 July 2017
+		// t4 = System.nanoTime();
 		stringCodesForActivityObjects1 = StringCode.getStringCodesForActivityObjects(activityObjects1, primaryDimension,
 				uniqueCharCodes, VerbosityConstants.verbose);
 		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects(activityObjects2, primaryDimension,
 				uniqueCharCodes, VerbosityConstants.verbose);
+		// t5 = System.nanoTime();
+		//// temp start
+		// ArrayList<String> stringCodesForActivityObjects1FU = StringCode.getStringCodesForActivityObjectsFU(
+		// activityObjects1, primaryDimension, uniqueCharCodesFU, VerbosityConstants.verbose);
+		// ArrayList<String> stringCodesForActivityObjects2FU = StringCode.getStringCodesForActivityObjectsFU(
+		// activityObjects2, primaryDimension, uniqueCharCodesFU, VerbosityConstants.verbose);
+		// t6 = System.nanoTime();
+
+		// String debug9Mar = (t2 - t0) + "," + (t3 - t2) + "," + (t5 - t4) + "," + (t6 - t5) + ","
+		// + stringCodesForActivityObjects1.equals(stringCodesForActivityObjects1FU) + ","
+		// + stringCodesForActivityObjects2.equals(stringCodesForActivityObjects2FU) + ","
+		// + stringCodesForActivityObjects1 + "," + (stringCodesForActivityObjects1FU) + ","
+		// + stringCodesForActivityObjects2 + "," + (stringCodesForActivityObjects2FU) + "\n";
+		// WritingToFile.appendLineToFileAbsolute(debug9Mar.toString(),
+		// Constant.getOutputCoreResultsPath() + "DebugMar9_2018.csv");
+		/// temp end
+
 		// }
 
 		Triple<String, Double, Triple<char[], int[], int[]>> levenshteinDistance = null;

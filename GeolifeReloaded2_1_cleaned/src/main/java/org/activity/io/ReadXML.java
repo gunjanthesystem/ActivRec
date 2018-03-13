@@ -1,20 +1,26 @@
 package org.activity.io;
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class ReadXML
 {
 
-	public static Document loadXMLFromString(String xml) throws Exception
+	public Document loadXMLFromString(String xml) throws Exception
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -33,45 +39,109 @@ public class ReadXML
 			// DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			// DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			// Document doc = dBuilder.parse(s);
+			System.out.println(prettyPrint(s));
 
-			Document doc = loadXMLFromString(s);
+			ReadXML readXML = new ReadXML();
+			Document doc = readXML.loadXMLFromString(s);
 			// optional, but recommended
 			// read this -
 			// http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
 			doc.getDocumentElement().normalize();
-
 			System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-
-			NodeList nList = doc.getElementsByTagName("staff");
-
-			System.out.println("----------------------------");
-
-			for (int temp = 0; temp < nList.getLength(); temp++)
+			String[] listOfTags = { "house_number", "road", "city", "county", "state", "postcode", "country",
+					"country_code" };
+			Map<String, String> allVals = new LinkedHashMap<>();
+			for (String tagName : listOfTags)
 			{
-
-				Node nNode = nList.item(temp);
-
-				System.out.println("\nCurrent Element :" + nNode.getNodeName());
-
-				if (nNode.getNodeType() == Node.ELEMENT_NODE)
-				{
-
-					Element eElement = (Element) nNode;
-
-					System.out.println("Staff id : " + eElement.getAttribute("id"));
-					System.out.println("lat : " + eElement.getElementsByTagName("lat").item(0).getTextContent());
-					System.out.println(
-							"Last Name : " + eElement.getElementsByTagName("lastname").item(0).getTextContent());
-					System.out.println(
-							"Nick Name : " + eElement.getElementsByTagName("nickname").item(0).getTextContent());
-					System.out.println("Salary : " + eElement.getElementsByTagName("salary").item(0).getTextContent());
-
-				}
+				allVals.put(tagName, doc.getElementsByTagName(tagName).item(0).getTextContent());
 			}
+			// NodeList nList = doc.getElementsByTagName("house_number");
+			StringBuilder sb = new StringBuilder();
+			allVals.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey() + "-" + e.getValue() + "\n"));
+			System.out.println(sb.toString() + "\n----------------------------");
+			//
+			// for (int temp = 0; temp < nList.getLength(); temp++)
+			// {
+			//
+			// Node nNode = nList.item(temp);
+			//
+			// System.out.println("\nCurrent Element :" + nNode.getNodeName());
+			//
+			// // if (nNode.getNodeType() == Node.ELEMENT_NODE)
+			// // {
+			// //
+			// // Element eElement = (Element) nNode;
+			// //
+			// // System.out.println("Staff id : " + eElement.getAttribute("id"));
+			// // System.out.println("lat : " + eElement.getElementsByTagName("lat").item(0).getTextContent());
+			// // System.out.println(
+			// // "Last Name : " + eElement.getElementsByTagName("lastname").item(0).getTextContent());
+			// // System.out.println(
+			// // "Nick Name : " + eElement.getElementsByTagName("nickname").item(0).getTextContent());
+			// // System.out.println("Salary : " + eElement.getElementsByTagName("salary").item(0).getTextContent());
+			// //
+			// // }
+			// }
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * ref: https://stackoverflow.com/questions/139076/how-to-pretty-print-xml-from-java
+	 * 
+	 * @param unformattedXml
+	 * @return
+	 */
+	public static String prettyPrint(String unformattedXml)
+	{
+		try
+		{
+			Document document = parseXmlFile(unformattedXml);
+
+			OutputFormat format = new OutputFormat(document);
+			format.setLineWidth(65);
+			format.setIndenting(true);
+			format.setIndent(2);
+			Writer out = new StringWriter();
+			XMLSerializer serializer = new XMLSerializer(out, format);
+			serializer.serialize(document);
+			return out.toString();
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * ref: https://stackoverflow.com/questions/139076/how-to-pretty-print-xml-from-java
+	 * 
+	 * @param in
+	 * @return
+	 */
+	private static Document parseXmlFile(String in)
+	{
+		try
+		{
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			InputSource is = new InputSource(new StringReader(in));
+			return db.parse(is);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
 		}
 	}
 

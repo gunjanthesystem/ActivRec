@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class DataGenerator
 {
@@ -84,6 +85,100 @@ public class DataGenerator
 			}
 		}
 
+		return data;
+	}
+
+	/**
+	 * 
+	 * @param numOfUsers
+	 * @param numOfActsPerUser
+	 * @param numOfUniqueActs
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	public static List<List<String>> getData2(int numOfUsers, int numOfActsPerUser, int numOfUniqueActs, int startTime,
+			int endTime, int minDuration, int maxDuration)
+	{
+
+		List<List<String>> data = new ArrayList<>();
+
+		Random rd = new Random();
+
+		for (int u = 0; u < numOfUsers; u++)
+		{
+			String user = "User" + u;
+			int st = startTime, et = -99;
+
+			for (int a = 0; a < numOfActsPerUser; a++)
+			{
+				et = st + minDuration + rd.nextInt(maxDuration);
+				// et = st + 1;
+				int actID = rd.nextInt(6);
+
+				List<String> actData = new ArrayList<>();
+				actData.add(user);
+				actData.add(String.valueOf(st));
+				actData.add(String.valueOf(et));
+				actData.add(String.valueOf(""));// location name
+				actData.add(String.valueOf(actID));// location name
+				actData.add(String.valueOf(actID));// location name
+
+				data.add(actData);
+				st = et + 1;
+			}
+		}
+
+		StringBuilder sb = new StringBuilder();
+		data.stream().forEachOrdered(d -> sb.append(d.stream().collect(Collectors.joining(",")) + "\n"));
+		System.out.println("data=\n" + sb.toString());
+		return data;
+	}
+
+	/**
+	 * 
+	 * @param numOfUsers
+	 * @param numOfActsPerUser
+	 * @param numOfUniqueActs
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	public static List<List<String>> getData2ForAUser(int userID, int numOfActsPerUser, int numOfUniqueActs,
+			int startTime, int endTime)
+	{
+
+		List<List<String>> data = new ArrayList<>();
+
+		Random rd = new Random();
+
+		// for (int u = 0; u < numOfUsers; u++)
+		{
+			String user = "User" + userID;
+			int st = startTime, et = -99;
+
+			for (int a = 0; a < numOfActsPerUser; a++)
+			{
+				// et = st + 20 + rd.nextInt(70);
+				et = st + 1;
+				int actID = rd.nextInt(6);
+
+				List<String> actData = new ArrayList<>();
+				actData.add(user);
+				actData.add(String.valueOf(st));
+				actData.add(String.valueOf(et));
+				actData.add(String.valueOf(""));// location name
+				actData.add(String.valueOf(actID));// location name
+				actData.add(String.valueOf(actID));// location name
+
+				data.add(actData);
+				st = et + 1;
+			}
+		}
+
+		StringBuilder sb = new StringBuilder();
+		data.stream().forEachOrdered(d -> sb.append(d.stream().collect(Collectors.joining(",")) + "\n"));
+		System.out.println("data=\n" + sb.toString());
 		return data;
 	}
 

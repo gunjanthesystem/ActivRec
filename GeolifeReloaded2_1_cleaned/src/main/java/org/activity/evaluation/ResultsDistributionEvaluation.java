@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,8 @@ public class ResultsDistributionEvaluation
 		// $runFeb2FiveDaysResults(); //disabled on Feb 12 2018
 		// $runFeb5FiveDaysResults();//disabled on Feb 12 2018
 		// runFeb11FiveDaysResults();//disabled on feb 18 2018
-		runFeb17FiveDaysResults();
+		// runFeb17FiveDaysResults();
+		runMar9FiveDaysResults();
 		SFTPFile.closeAllChannels();
 	}
 
@@ -54,11 +54,11 @@ public class ResultsDistributionEvaluation
 	 * @since Feb 2 2018
 	 * @param args
 	 */
-	public static void runFeb17FiveDaysResults()
+	public static void runMar9FiveDaysResults()
 	{
 
-		String pathToWrite = "./dataWritten/Mar5/FiveDays/";
-		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultMar5ToReadFormatted.csv";
+		String pathToWrite = "./dataWritten/Mar9/FiveDays/";
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultMar9ToReadFormatted.csv";
 		int numOfDay = 5;
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
 		double muArray[] = Constant.matchingUnitAsPastCount;
@@ -71,7 +71,78 @@ public class ResultsDistributionEvaluation
 
 			resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500";
 			pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_NCount_AllCand5DayFilter/";
-			resLabels.add(Arrays.asList(new String[] { "mortar", resultsLabel, pathToRead }));
+			// resLabels.add(Arrays.asList(new String[] { "mortar", resultsLabel, pathToRead }));
+
+			// resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-600";
+			// pathToRead =
+			// "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Feb2NCount_5Day_ThresholdNN600/";
+			// resLabels.add(Arrays.asList(new String[] { "howitzer", resultsLabel, pathToRead }));
+
+			for (List<String> resEntry : resLabels)
+			{
+				if (resEntry.size() > 1)
+				{
+					pathToRead = resEntry.get(2).trim();
+					String splitted[] = pathToRead.split("/");
+					resultsLabel = splitted[splitted.length - 1];
+					host = getHostFromString(resEntry.get(1)).trim();
+
+					if (resEntry.get(0).equals("100R"))
+					{
+						WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "100RUserLabels.csv");
+					}
+					if (resEntry.get(0).equals("916"))
+					{
+						WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "916UserLabels.csv");
+					}
+
+					System.out.println(
+							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
+					int resSize = getResults2(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host,
+							firstToMax);
+					if (resSize < 0)
+					{
+						continue;
+					}
+				}
+			}
+
+		}
+		catch (
+
+		Exception e)
+		{
+			e.printStackTrace();
+		}
+		// resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500_EDα0.5";
+		// pathToRead =
+		// "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/";
+		// getResults2(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host, firstToMax);
+
+	}
+
+	/**
+	 * @since Feb 2 2018
+	 * @param args
+	 */
+	public static void runFeb17FiveDaysResults()
+	{
+
+		String pathToWrite = "./dataWritten/Mar5/FiveDays/";
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultMar5ToReadFormatted2.csv";
+		int numOfDay = 5;
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		double muArray[] = Constant.matchingUnitAsPastCount;
+		String pathToRead = "", resultsLabel = "", host = "";
+
+		try
+		{
+			List<List<String>> resLabels = ReadingFromFile.nColumnReaderString(
+					Files.newInputStream(Paths.get(resultsLabelsPathFile), StandardOpenOption.READ), ",", false);
+
+			resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500";
+			pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_NCount_AllCand5DayFilter/";
+			// resLabels.add(Arrays.asList(new String[] { "mortar", resultsLabel, pathToRead }));
 
 			// resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-600";
 			// pathToRead =

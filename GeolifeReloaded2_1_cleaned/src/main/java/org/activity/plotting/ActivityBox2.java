@@ -16,21 +16,18 @@ import javafx.scene.layout.BackgroundFill;
 //import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 
 /** Candle node used for drawing a candle */
 public class ActivityBox2 extends Group
 {
 	// private Line highLowLine = new Line();
 	private Region regionBar = new Region();
-
 	// private Rectangle regionBar = new Rectangle();
 
 	private String seriesStyleClass;
 	private String dataStyleClass;
 	// private boolean openAboveClose = true;
 	private Tooltip tooltip = new Tooltip();
-
 	private static int height = 30;
 
 	/**
@@ -70,13 +67,17 @@ public class ActivityBox2 extends Group
 		// .otherwise(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY))));
 		// regionBar.setBackground(
 		// new Background(new BackgroundFill(Color.PALEVIOLETRED, new CornerRadii(2), new Insets(0, 0.25, 0, 0))));
-		Color color1 = ColorPalette.getGoldFishColor(3);
+		// Color color1 = ColorPalette.getGoldFishColor(3);
 
-		regionBar.setBackground(
-				new Background(new BackgroundFill(ColorPalette.getGoldFishColor(actExtraVals.getActivityID() % 5),
-						new CornerRadii(12)/* 2.5) */, new Insets(0, 0.25, 0, 0))));
+		// $$regionBar.setBackground(new Background(
+		// new BackgroundFill(ColorPalette.getInsightSecondaryColor(actExtraVals.getActivityID() % 11),
+		// new CornerRadii(12)/* 2.5) */, new Insets(0, 0.25, 0, 0))));
 
-		// regionBar
+		BackgroundFill bgFill = new BackgroundFill(
+				ColorPalette.getInsightSecondaryColor(actExtraVals.getActivityID() % 11), new CornerRadii(12),
+				new Insets(0, 0.25, 0, 0));
+		regionBar.setBackground(new Background(bgFill));
+		// regionBar.setShape(new Circle(10));
 		// regionBar.getBackground().getFills()
 		// .add(new BackgroundFill(Color.PALEVIOLETRED, CornerRadii.EMPTY, Insets.EMPTY));
 		// regionBar.getBackground().getFills().add(e)
@@ -117,10 +118,14 @@ public class ActivityBox2 extends Group
 	/**
 	 * 
 	 * @param x1
+	 *            xAxisDisplayPosititionWRTStartTime
 	 * @param x2
+	 *            AxisDisplayPosititionWRTEndTime
 	 */
 	public void update(double x1, double x2)// closeOffset, double highOffset, double lowOffset, double width)
 	{
+		// System.out.println("ActivityBox2 update called with x1=" + x1 + " x2=" + x2);
+		// PopUps.printTracedWarningMsg("\n---\n");
 		// $$ Disabled for performance.
 		// $$updateStyleClasses();
 
@@ -138,7 +143,9 @@ public class ActivityBox2 extends Group
 		// {
 		// $$System.out.println("Inside ActivityBox2.update(): x1=" + x1 + " x2=" + x2);
 		regionBar.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width / 2, 0, width,
-																	// closeOffset);
+		// closeOffset);
+
+		// $$regionBar.resizeRelocate(0, -(height / 2), 10, height);// x2 - x1, x2 - x1);// -width / 2, 0, width,
 		// y coordinate = -(height / 2), to vertically align the activity bos
 
 		// }
