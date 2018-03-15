@@ -28,15 +28,21 @@ public class ActivityBox2 extends Group
 	private String dataStyleClass;
 	// private boolean openAboveClose = true;
 	private Tooltip tooltip = new Tooltip();
-	private static int height = 30;
+	// private static int height = 30;
 
 	/**
 	 * 
 	 * @param seriesStyleClass
 	 * @param dataStyleClass
+	 * @param actExtraVals
+	 * @param height
 	 */
 	ActivityBox2(String seriesStyleClass, String dataStyleClass, ActivityBoxExtraValues actExtraVals)
 	{
+		// if (height != -1)
+		// {
+		// this.height = height;
+		// }
 		// System.out.println("ActivityBox2() created");
 		setAutoSizeChildren(false);
 
@@ -110,10 +116,10 @@ public class ActivityBox2 extends Group
 		updateStyleClasses();
 	}
 
-	public void setHeight(int numOfUsers)
-	{
-		height = (int) (Math.pow(1.02, (-numOfUsers)) * 50);
-	}
+	// public void setHeight(int numOfUsers)
+	// {
+	// height = (int) (Math.pow(1.02, (-numOfUsers)) * 50);
+	// }
 
 	/**
 	 * 
@@ -122,7 +128,8 @@ public class ActivityBox2 extends Group
 	 * @param x2
 	 *            AxisDisplayPosititionWRTEndTime
 	 */
-	public void update(double x1, double x2)// closeOffset, double highOffset, double lowOffset, double width)
+	public void update(double x1, double x2, double height)// closeOffset, double highOffset, double lowOffset, double
+															// width)
 	{
 		// System.out.println("ActivityBox2 update called with x1=" + x1 + " x2=" + x2);
 		// PopUps.printTracedWarningMsg("\n---\n");

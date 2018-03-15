@@ -1,10 +1,17 @@
 package org.activity.objects;
 
-public class OpenStreetAddress
+import java.io.Serializable;
+
+public class OpenStreetAddress implements Serializable
 {
-	// cityOrTownOrVillageOrHamlet in order, i.e. if not city, then town and so on.
-	String /* house_number, */ roadOrPedestrian, cityOrTownOrVillageOrHamlet, county, stateOrRegion, postcode, country,
-			country_code;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	// cityOrTownOrVillageOrHamlet in order, i.e. if not city, then town, then village, then hamlet then locality then
+	// city_districy then city-named-county then suburb
+	String /* house_number, */ roadOrPedestrian, cityTownVillHamLocaCityDisCityNamedCountySuburb, county, stateOrRegion,
+			postcode, country, country_code;
 
 	/**
 	 * 
@@ -22,7 +29,7 @@ public class OpenStreetAddress
 		super();
 		// this.house_number = house_number;
 		this.roadOrPedestrian = road;
-		this.cityOrTownOrVillageOrHamlet = city;
+		this.cityTownVillHamLocaCityDisCityNamedCountySuburb = city;
 		this.county = county;
 		this.stateOrRegion = state;
 		this.postcode = postcode;
@@ -32,21 +39,21 @@ public class OpenStreetAddress
 
 	public boolean isEmptyAddress()
 	{
-		return (new String(roadOrPedestrian + cityOrTownOrVillageOrHamlet + county + stateOrRegion + postcode + country
-				+ country_code).trim().length() == 0);
+		return (new String(roadOrPedestrian + cityTownVillHamLocaCityDisCityNamedCountySuburb + county + stateOrRegion
+				+ postcode + country + country_code).trim().length() == 0);
 	}
 
 	@Override
 	public String toString()
 	{
-		return roadOrPedestrian + ", " + cityOrTownOrVillageOrHamlet + ", " + county + ", " + stateOrRegion + ", "
-				+ postcode + ", " + country + ", " + country_code;
+		return roadOrPedestrian + ", " + cityTownVillHamLocaCityDisCityNamedCountySuburb + ", " + county + ", "
+				+ stateOrRegion + ", " + postcode + ", " + country + ", " + country_code;
 	}
 
 	public String toString(char delim)
 	{
-		return roadOrPedestrian + delim + cityOrTownOrVillageOrHamlet + delim + county + delim + stateOrRegion + delim
-				+ postcode + delim + country + delim + country_code;
+		return roadOrPedestrian + delim + cityTownVillHamLocaCityDisCityNamedCountySuburb + delim + county + delim
+				+ stateOrRegion + delim + postcode + delim + country + delim + country_code;
 	}
 
 	public String getRoad()
@@ -56,7 +63,7 @@ public class OpenStreetAddress
 
 	public String getCity()
 	{
-		return cityOrTownOrVillageOrHamlet;
+		return cityTownVillHamLocaCityDisCityNamedCountySuburb;
 	}
 
 	public String getCounty()

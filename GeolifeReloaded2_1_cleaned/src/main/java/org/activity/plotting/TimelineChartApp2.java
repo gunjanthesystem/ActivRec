@@ -44,7 +44,7 @@ public class TimelineChartApp2 extends Pane
 	/// ActName, Val1, Val2, Val3,
 	static List<Pair<String, List<Double>>> allData;
 	private VBox vbox = new VBox();
-	private TimelineChart2 chart;
+	private TimelineChart2 timelineChart;
 	private NumberAxis xAxis;
 	private CategoryAxis yAxis;
 	long maxXAxis, minXAxis;
@@ -57,6 +57,19 @@ public class TimelineChartApp2 extends Pane
 		vbox = new VBox();
 
 		XYChart<Number, String> timelineChart = createTimelineContent(dataReceived);
+		vbox.getChildren().add(timelineChart);
+		vbox.getChildren().add(createXAxisRangeSlider((NumberAxis) timelineChart.getXAxis()));
+
+		VBox.setVgrow(timelineChart, Priority.ALWAYS);
+
+		return vbox;
+	}
+
+	public Pane createContentV2(List<List<List<String>>> dataReceived, boolean hasXAxisRangeSlider)
+	{
+		vbox = new VBox();
+
+		XYChart<Number, String> timelineChart = createTimelineContentV2(dataReceived);
 		vbox.getChildren().add(timelineChart);
 		vbox.getChildren().add(createXAxisRangeSlider((NumberAxis) timelineChart.getXAxis()));
 
@@ -80,7 +93,7 @@ public class TimelineChartApp2 extends Pane
 		final RangeSlider hSlider = new RangeSlider(this.minXAxis, this.maxXAxis, this.minXAxis, this.maxXAxis);
 		// axis.getLowerBound(), axis.getUpperBound(), axis.getLowerBound(),
 		// axis.getUpperBound());/
-		System.out.println("hSlider.getStyleClass() =" + hSlider.getStyleClass());
+		// System.out.println("hSlider.getStyleClass() =" + hSlider.getStyleClass());
 
 		hSlider.setSnapToTicks(true);
 
@@ -169,7 +182,7 @@ public class TimelineChartApp2 extends Pane
 		System.out.println("createContent() called");
 
 		xAxis = new NumberAxis();
-		long millis = 100;
+		// long millis = 100;
 
 		// String pattern = "dd MMMM yyyy, HH:mm:ss";
 		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
@@ -185,7 +198,7 @@ public class TimelineChartApp2 extends Pane
 
 		// xAxis.setMinorTickCount(0);
 		yAxis = new CategoryAxis();
-		chart = new TimelineChart2(xAxis, yAxis);
+		timelineChart = new TimelineChart2(xAxis, yAxis);
 
 		// chart.setStyle("");
 		// setup chart
@@ -202,14 +215,21 @@ public class TimelineChartApp2 extends Pane
 
 		for (List<String> d : dataReceived)
 		{
+			String userID = d.get(0);
+			double startTS = Double.valueOf(d.get(1));
+			double endTS = Double.valueOf(d.get(2));
+			String locName = d.get(3);
+			String actName = d.get(4);
+			Integer actID = Integer.valueOf(d.get(5));
+			double startLat = 0;
+
 			// end timestamp
-			final ActivityBoxExtraValues extras = new ActivityBoxExtraValues(Double.valueOf(d.get(2)), (d.get(4)),
-					Integer.valueOf(d.get(2)), Double.valueOf(d.get(2)));// end ts
+			final ActivityBoxExtraValues extras = new ActivityBoxExtraValues(endTS, actName, actID, startLat);// end ts
 
 			// start timeestamp, username, {end timestamp, actname, }
-			series.getData().add(new XYChart.Data<Number, String>(Double.valueOf(d.get(1)), d.get(0), extras));
+			series.getData().add(new XYChart.Data<Number, String>(startTS, userID, extras));
 
-			long xVal = Integer.valueOf(d.get(1));
+			long xVal = (long) (startTS);
 			if (maxXAxis < xVal)
 			{
 				maxXAxis = xVal;
@@ -221,26 +241,26 @@ public class TimelineChartApp2 extends Pane
 			}
 		}
 
-		this.maxXAxis = (long) (Math.ceil(maxXAxis / 100d) * 100);// upper bound is maxXAxis rounded to ceiling multiple
-																	// of
-																	// 10
-		this.minXAxis = (long) (Math.floor(minXAxis / 100d) * 100);// upper bound is maxXAxis rounded to ceiling
-																	// multiple of
-																	// 10
+		// upper bound is maxXAxis rounded to ceiling multiple of 10
+		this.maxXAxis = (long) (Math.ceil(maxXAxis / 100d) * 100);
+		// upper bound is maxXAxis rounded to ceiling multiple of 10
+		this.minXAxis = (long) (Math.floor(minXAxis / 100d) * 100);
 
-		//
-		ObservableList<XYChart.Series<Number, String>> data = chart.getData();
+		ObservableList<XYChart.Series<Number, String>> data = timelineChart.getData();
 
 		if (data == null)
 		{
 			data = FXCollections.observableArrayList(series);
-			chart.setData(data);
+			timelineChart.setData(data);
 		}
 		else
 		{
-			chart.getData().add(series);
+			timelineChart.getData().add(series);
 		}
 
+		System.out.println("dataReceived.size()=" + dataReceived.size());
+		System.out.println("series.getData().size()=" + series.getData().size());
+		System.out.println("chart.getData().size()=" + timelineChart.getData().size());
 		System.out.println("Inside chart: xAxis.getLowerBound()=" + xAxis.getLowerBound());
 		System.out.println("Inside chart: xAxis.getUpperBound()=" + xAxis.getUpperBound());
 		// System.out.println("Inside chart: xAxis.getUpperBound()=" + chart.updateAxisRange());
@@ -252,7 +272,120 @@ public class TimelineChartApp2 extends Pane
 		// xAxis.setTickUnit((maxXAxis - minXAxis) / 800);
 		xAxis.setMinorTickVisible(false);
 
-		return chart;
+		return timelineChart;
+	}
+
+	/**
+	 * Fork of createTimelineContent, one series for each users
+	 * <p>
+	 * 
+	 * @since 14 Mar 2018
+	 * @param dataReceived
+	 * @return
+	 */
+	public XYChart<Number, String> createTimelineContentV2(List<List<List<String>>> dataReceived)
+	{
+		System.out.println("createContent() called");
+
+		xAxis = new NumberAxis();
+		// long millis = 100;
+
+		// String pattern = "dd MMMM yyyy, HH:mm:ss";
+		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+		// StringConverter<LocalDateTime> converter = new LocalDateTimeStringConverter(formatter, null);
+		// // assertEquals("12 January 1985, 12:34:56", converter.toString(VALID_LDT_WITH_SECONDS));
+		// LocalDateTime date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
+		if (false)// for date formatted axis
+		{
+			StringConverter converter2 = new EpochStringConverter();
+			xAxis.setTickLabelFormatter(converter2);
+		} // (new NumberAxis.DefaultFormatter(xAxis, "$", "*"));
+			// (new NumberAxis.DefaultFormatter(yAxis, "$ ", null));
+
+		// xAxis.setMinorTickCount(0);
+		yAxis = new CategoryAxis();
+		timelineChart = new TimelineChart2(xAxis, yAxis);
+
+		// chart.setStyle("");
+		// setup chart
+		xAxis.setLabel("Timestamp");
+		yAxis.setLabel("Timelines");
+
+		// xAxis.setStyle(value);
+		// add starting data
+
+		// List<List<String>> dataReceived = DataGenerator.getData2();
+
+		long maxXAxis = 0, minXAxis = Long.MAX_VALUE;
+
+		ObservableList<XYChart.Series<Number, String>> seriesForAllUsers = FXCollections.observableArrayList();
+
+		for (List<List<String>> eachUserData : dataReceived)
+		{
+			XYChart.Series<Number, String> seriesForAUser = new XYChart.Series<Number, String>();
+
+			for (List<String> d : eachUserData)
+			{
+				String userID = d.get(0);
+				double startTS = Double.valueOf(d.get(1));
+				double endTS = Double.valueOf(d.get(2));
+				String locName = d.get(3);
+				String actName = d.get(4);
+				Integer actID = Integer.valueOf(d.get(5));
+				double startLat = 0;
+
+				// end timestamp
+				final ActivityBoxExtraValues extras = new ActivityBoxExtraValues(endTS, actName, actID, startLat);// end
+																													// ts
+
+				// start timeestamp, username, {end timestamp, actname, }
+				seriesForAUser.getData().add(new XYChart.Data<Number, String>(startTS, userID, extras));
+
+				long xVal = (long) (startTS);
+				if (maxXAxis < xVal)
+				{
+					maxXAxis = xVal;
+				}
+
+				if (minXAxis > xVal)
+				{
+					minXAxis = xVal;
+				}
+			}
+			seriesForAllUsers.add(seriesForAUser);
+		}
+
+		// upper bound is maxXAxis rounded to ceiling multiple of 10
+		this.maxXAxis = (long) (Math.ceil(maxXAxis / 100d) * 100);
+		// upper bound is maxXAxis rounded to ceiling multiple of 10
+		this.minXAxis = (long) (Math.floor(minXAxis / 100d) * 100);
+
+		ObservableList<XYChart.Series<Number, String>> data = timelineChart.getData();
+
+		if (data == null)
+		{
+			timelineChart.setData(seriesForAllUsers);
+		}
+		else
+		{
+			timelineChart.getData().addAll(seriesForAllUsers);
+		}
+
+		System.out.println("dataReceived.size()=" + dataReceived.size());
+		System.out.println("seriesForAllUsers.getData().size()=" + seriesForAllUsers.size());
+		System.out.println("chart.getData().size()=" + timelineChart.getData().size());
+		System.out.println("Inside chart: xAxis.getLowerBound()=" + xAxis.getLowerBound());
+		System.out.println("Inside chart: xAxis.getUpperBound()=" + xAxis.getUpperBound());
+		// System.out.println("Inside chart: xAxis.getUpperBound()=" + chart.updateAxisRange());
+
+		xAxis.setAutoRanging(false);
+		xAxis.setUpperBound(this.maxXAxis);
+		xAxis.setLowerBound(this.minXAxis);
+		xAxis.setTickUnit((this.maxXAxis - this.minXAxis) / 20);
+		// xAxis.setTickUnit((maxXAxis - minXAxis) / 800);
+		xAxis.setMinorTickVisible(false);
+
+		return timelineChart;
 	}
 
 	// @Override

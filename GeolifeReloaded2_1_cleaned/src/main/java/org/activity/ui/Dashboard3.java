@@ -3,10 +3,8 @@ package org.activity.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activity.plotting.ChartUtils;
 import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartApp2;
-import org.activity.plotting0.FXUtils;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -32,13 +30,13 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.web.HTMLEditor;
-import javafx.scene.web.WebView;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
@@ -65,6 +63,7 @@ public class Dashboard3 extends Application
 
 	public void start(Stage stage)
 	{
+		long t0 = System.currentTimeMillis();
 		ScreenDetails.printScreensDetails();
 
 		// final Stage stageRef = stage;
@@ -108,13 +107,15 @@ public class Dashboard3 extends Application
 		Scene scene = new Scene(borderPane);// createTabs());// createContent(DataGenerator.getData2()));// , 270, 370);
 
 		scene.setFill(Color.TRANSPARENT);
-		scene.getStylesheets().add("./jfxtras/styles/jmetro8/JMetroLightTheme.css");// gsheetNative.css");
+		scene.getStylesheets().add("./jfxtras/styles/jmetro8/GJMetroLightTheme.css");// gsheetNative.css");
 
 		// scene.getStylesheets().add(getClass().getResource("gsheet1.css").toExternalForm());
 		stage.setScene(scene);
 		stage.setTitle("Dashboard");
 		// stage.initStyle(stageStyle);
 		stage.show();
+		long tn = System.currentTimeMillis();
+		System.out.println("tn-t1=" + (tn - t0) + " ms");
 		// stage.setFullScreen(true);
 		//
 		// Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -131,108 +132,140 @@ public class Dashboard3 extends Application
 	 */
 	private TabPane createTabs()
 	{
-		List<Tab> tabsToAdd = new ArrayList<>();
-
-		Tab timelineTabOneForEachUser = new Tab("Historical Timelines One For Each User");
-		VBox timelinesVBox = new VBox();
-		TimelineChartApp2 tcA2 = new TimelineChartApp2();// DataGenerator.getData2(), true);
-		// timelineTab.setContent(tcA2.createContent(DataGenerator.getData2(), true));//
-		// .createContent(DataGenerator.getData2()));
-		TimelineChartApp2 tcA2_2 = new TimelineChartApp2();// DataGenerator.getData2(), true);//TEMP
-		// timelineTab.setContent(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100), true));//
-		// .createContent(DataGenerator.getData2()));
-		// timelineTab.setContent(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100), true));//
-		// .createContent(DataGenerator.getData2()));
-		timelinesVBox.getChildren().add(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100), true));// .createContent(DataGenerator.getData2()));
-		timelinesVBox.getChildren().add(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100), true));// .createContent(DataGenerator.getData2()));
-		timelineTabOneForEachUser.setContent(timelinesVBox);
-		timelineTabOneForEachUser.setClosable(false);
-		tabsToAdd.add(timelineTabOneForEachUser);
-
-		///
-		Tab timelineTab = new Tab("Historical Timelines All Users");
-		VBox timelinesVBox2 = new VBox();
-		TimelineChartApp2 tcA = new TimelineChartApp2();// DataGenerator.getData2(), true);
-		// timelineTab.setContent(tcA2.createContent(DataGenerator.getData2(), true));//
-		// .createContent(DataGenerator.getData2()));
-		// timelineTab.setContent(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100), true));//
-		// .createContent(DataGenerator.getData2()));
-		// timelineTab.setContent(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100), true));//
-		// .createContent(DataGenerator.getData2()));
-		timelinesVBox2.getChildren().add(tcA.createContent(DataGenerator.getData2(5, 20, 5, 5, 200, 2, 10), true));// .createContent(DataGenerator.getData2()));
-		timelineTab.setContent(timelinesVBox2);
-		timelineTab.setClosable(false);
-		tabsToAdd.add(timelineTab);
-
-		///
-
-		Tab lineChartTab = new Tab("lineChart");
-		lineChartTab.setContent(ChartUtils.createLineChart(
-				FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50)), "title", "ajooba"));
-		lineChartTab.setClosable(true);
-		tabsToAdd.add(lineChartTab);
-
-		Tab scatterChartTab = new Tab("scatterChart");
-		scatterChartTab.setContent(ChartUtils.createScatterChart(
-				FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50)), "title", "ajooba"));
-		scatterChartTab.setClosable(true);
-		tabsToAdd.add(scatterChartTab);
-
-		// Tab chooseSourcesTab = new Tab("Timelines");
-		// // chooseSourcesTab.setContent(createChooseSourcesTable());// createChooseSources());
-		// chooseSourcesTab.setClosable(true);
-
-		Tab tableTab = new Tab("TableView");
-		tableTab.setContent(createTableDemoNode());
-		tableTab.setClosable(false);
-		tabsToAdd.add(tableTab);
-
-		Tab accordionTab = new Tab("Accordion/TitledPane");
-		accordionTab.setContent(createAccordionTitledDemoNode());
-		accordionTab.setClosable(false);
-		tabsToAdd.add(accordionTab);
-
-		Tab splitTab = new Tab("SplitPane/TreeView/ListView");
-		splitTab.setContent(createSplitTreeListDemoNode());
-		splitTab.setClosable(false);
-		tabsToAdd.add(splitTab);
-
-		Tab treeTableTab = new Tab("TreeTableView");
-		treeTableTab.setContent(createTreeTableDemoNode());
-		treeTableTab.setClosable(false);
-		tabsToAdd.add(treeTableTab);
-
-		Tab scrollTab = new Tab("ScrollPane/Miscellaneous");
-		scrollTab.setContent(createScrollMiscDemoNode());
-		scrollTab.setClosable(false);
-		tabsToAdd.add(scrollTab);
-
-		Tab htmlTab = new Tab("HTMLEditor");
-		htmlTab.setContent(createHtmlEditorDemoNode());
-		htmlTab.setClosable(false);
-		tabsToAdd.add(htmlTab);
-
-		final WebView webView = new WebView();
-		Tab webViewTab = new Tab("WebView");
-		webViewTab.setContent(webView);
-		webViewTab.setClosable(false);
-		webViewTab.setOnSelectionChanged(e ->
-			{
-				String randomWebSite = "https://www.google.com";
-				if (webViewTab.isSelected())
-				{
-					webView.getEngine().load(randomWebSite);
-					System.out.println("WebView tab is selected, loading: " + randomWebSite);
-				}
-			});
-		tabsToAdd.add(webViewTab);
-
 		TabPane tabPane = new TabPane();
-		tabPane.getTabs().addAll(tabsToAdd);
+		List<Tab> tabsToAdd = new ArrayList<>();
+		try
+		{
+			///
+			Tab timelineTab = new Tab("Historical Timelines All Users");
+			// VBox timelinesVBox2 = new VBox();
+			TimelineChartApp2 tcA = new TimelineChartApp2();// DataGenerator.getData2(), true);
+			// timelineTab.setContent(tcA2.createContent(DataGenerator.getData2(), true));//
+			// .createContent(DataGenerator.getData2()));
+			// timelineTab.setContent(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100), true));//
+			// .createContent(DataGenerator.getData2()));
+			// timelineTab.setContent(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100), true));//
+			// .createContent(DataGenerator.getData2()));
+			// timelinesVBox2.getChildren().add(tcA.createContent(DataGenerator.getData2(10, 20, 5, 5, 200, 2, 10),
+			// true));// .createContent(DataGenerator.getData2()));
+			Pane p = (tcA.createContentV2(DataGenerator.getData3(10, 20, 12, 5, 200, 2, 10), true));// .createContent(DataGenerator.getData2()));
+			timelineTab.setContent(p);// timelinesVBox2);
+			timelineTab.setClosable(false);
+			tabsToAdd.add(timelineTab);
 
-		// timelineTab, lineChartTab, scatterChartTab, tableTab, accordionTab, splitTab,
-		// treeTableTab, scrollTab, htmlTab, webViewTab);
+			///
 
+			/*
+			 * Tab timelineTabOneForEachUser = new Tab("Historical Timelines One For Each User"); VBox timelinesVBox =
+			 * new VBox(); TimelineChartApp2 tcA2 = new TimelineChartApp2();// DataGenerator.getData2(), true); //
+			 * timelineTab.setContent(tcA2.createContent(DataGenerator.getData2(), true));// //
+			 * .createContent(DataGenerator.getData2())); TimelineChartApp2 tcA2_2 = new TimelineChartApp2();//
+			 * DataGenerator.getData2(), true);//TEMP //
+			 * timelineTab.setContent(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100), true));// //
+			 * .createContent(DataGenerator.getData2())); //
+			 * timelineTab.setContent(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100), true));//
+			 * // .createContent(DataGenerator.getData2()));
+			 * timelinesVBox.getChildren().add(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100),
+			 * true));// .createContent(DataGenerator.getData2()));
+			 * timelinesVBox.getChildren().add(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100),
+			 * true));// .createContent(DataGenerator.getData2())); timelineTabOneForEachUser.setContent(timelinesVBox);
+			 * timelineTabOneForEachUser.setClosable(false); tabsToAdd.add(timelineTabOneForEachUser);
+			 */
+
+			/*
+			 * Tab lineChartTab = new Tab("lineChart"); lineChartTab.setContent(ChartUtils.createLineChart(
+			 * FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50)), "title", "ajooba"));
+			 * lineChartTab.setClosable(true); tabsToAdd.add(lineChartTab);
+			 */
+
+			/*
+			 * Tab scatterChartTab = new Tab("scatterChart"); scatterChartTab.setContent(ChartUtils.createScatterChart(
+			 * FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50)), "title", "ajooba"));
+			 * scatterChartTab.setClosable(true); tabsToAdd.add(scatterChartTab);
+			 */
+			// Tab chooseSourcesTab = new Tab("Timelines");
+			// // chooseSourcesTab.setContent(createChooseSourcesTable());// createChooseSources());
+			// chooseSourcesTab.setClosable(true);
+
+			/***********************************************/
+			long ttGmap1 = System.currentTimeMillis();
+			Tab mapTab = new Tab("Locations Google Map");
+			GoogleMapApp mapPane = new GoogleMapApp();
+
+			String absFileNameForLatLonToReadAsMarker = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
+			String delimiter = ",";
+			int latColIndex = 3, lonColIndex = 2, labelColIndex = 1;
+			BorderPane bp = mapPane.getMapPane(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex,
+					labelColIndex, false);
+			mapTab.setContent(bp);
+			mapTab.setClosable(false);
+			tabsToAdd.add(mapTab);
+			long ttGmap2 = System.currentTimeMillis();
+			System.out.println("google map = " + (ttGmap2 - ttGmap1));
+			/***********************************************/
+
+			/***********************************************/
+			long ttOSMmap1 = System.currentTimeMillis();
+			Tab osmMapTab = new Tab("Locations OSM Map");
+			GluonOSMMap osmapPane = new GluonOSMMap();
+
+			String absFileNameForLatLonToReadAsMarker2 = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
+			String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
+			String delimiter2 = ",";
+			int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
+			BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerAll, delimiter2, latColIndex2,
+					lonColIndex2, labelColIndex3);
+			osmMapTab.setContent(bp2);
+			osmMapTab.setClosable(false);
+			tabsToAdd.add(osmMapTab);
+			long ttOSMmap2 = System.currentTimeMillis();
+			System.out.println("osm map = " + (ttOSMmap2 - ttOSMmap1));
+			/***********************************************/
+
+			/*
+			 * Tab tableTab = new Tab("TableView"); tableTab.setContent(createTableDemoNode());
+			 * tableTab.setClosable(false); tabsToAdd.add(tableTab);
+			 */
+			// Tab accordionTab = new Tab("Accordion/TitledPane");
+			// accordionTab.setContent(createAccordionTitledDemoNode());
+			// accordionTab.setClosable(false);
+			// tabsToAdd.add(accordionTab);
+
+			/*
+			 * Tab splitTab = new Tab("SplitPane/TreeView/ListView");
+			 * splitTab.setContent(createSplitTreeListDemoNode()); splitTab.setClosable(false); tabsToAdd.add(splitTab);
+			 */
+
+			/*
+			 * Tab treeTableTab = new Tab("TreeTableView"); treeTableTab.setContent(createTreeTableDemoNode());
+			 * treeTableTab.setClosable(false); tabsToAdd.add(treeTableTab);
+			 */
+			/*
+			 * Tab scrollTab = new Tab("ScrollPane/Miscellaneous"); scrollTab.setContent(createScrollMiscDemoNode());
+			 * scrollTab.setClosable(false); tabsToAdd.add(scrollTab);
+			 */
+			/*
+			 * Tab htmlTab = new Tab("HTMLEditor"); htmlTab.setContent(createHtmlEditorDemoNode());
+			 * htmlTab.setClosable(false); tabsToAdd.add(htmlTab);
+			 */
+
+			/*
+			 * final WebView webView = new WebView(); Tab webViewTab = new Tab("WebView");
+			 * webViewTab.setContent(webView); webViewTab.setClosable(false); webViewTab.setOnSelectionChanged(e -> {
+			 * String randomWebSite = "https://www.google.com"; if (webViewTab.isSelected()) {
+			 * webView.getEngine().load(randomWebSite); System.out.println("WebView tab is selected, loading: " +
+			 * randomWebSite); } }); tabsToAdd.add(webViewTab);
+			 */
+
+			tabPane.getTabs().addAll(tabsToAdd);
+
+			// timelineTab, lineChartTab, scatterChartTab, tableTab, accordionTab, splitTab,
+			// treeTableTab, scrollTab, htmlTab, webViewTab);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 		return tabPane;
 	}
 

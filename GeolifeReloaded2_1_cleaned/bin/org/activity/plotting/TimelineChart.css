@@ -1,9 +1,26 @@
 .activity-tooltip-label 
 {
+    /* Disabled my previous CSS*/
     -fx-font-size: 0.75em;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
+    /*-fx-text-fill: red;*/
     -fx-padding: 2 5 2 0;
+    /*-fx-background-color: blue;
+    */
+    /*New CSS from JMetro*/
+    /*-fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0 0 0 0;
+    -fx-font-size: 0.75em;
+    -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em;  /*4 8 4 8 */
+
+    -fx-font-family: "Segoe UI Semilight", "Segoe UI Light", "Segoe UI", Helvetica, Arial, sans-serif;
+   /* -fx-text-fill: rgba(0, 0, 0, 0.6);*/
+
+/*    -fx-border-color: #808080;
+    -fx-border-width: 2px;
+    -fx-effect: null;
+*/
 }
 
 .activitybox-box 
@@ -12,6 +29,6 @@
 }
 
 .chart-horizontal-grid-lines {
-    -fx-stroke: rgba(0,0,0,0.3);
-    -fx-stroke-width: 5;
+    -fx-stroke: #c0c0c0;
+    -fx-stroke-width: 3;
 }

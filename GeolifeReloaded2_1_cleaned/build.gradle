@@ -28,7 +28,7 @@ repositories
 	// Use 'jcenter' for resolving your dependencies.
 	// You can declare any Maven/Ivy/file repository here.
 	jcenter()
-	
+	maven { url "https://jitpack.io" }
 	maven{
                 url "https://raw.github.com/amidst/toolbox/mvn-repo/"
     }
@@ -119,9 +119,14 @@ dependencies
       compile "org.moeaframework:moeaframework:2.12"
       compile "com.jcraft:jsch:0.1.54"
       compile "tech.tablesaw:tablesaw-parent:0.11.4"
+    compile group: 'xerces', name: 'xercesImpl', version: '2.11.0'
 
-    compile "org.geotools:gt-shapefile:${geoToolsVersion}"
-    compile "org.geotools:gt-swing:${geoToolsVersion}"
+    //compile group: 'com.lynden', name: 'GMapsFX', version: '2.12.0'
+     //compile 'com.github.Username:Reponame:Tag
+    compile 'com.github.rterp:GMapsFX:d4f4765'
+    compile 'com.github.gluonhq:maps:21f09e8'
+   // compile "org.geotools:gt-shapefile:${geoToolsVersion}"
+   // compile "org.geotools:gt-swing:${geoToolsVersion}"
     
     compile 'com.google.maps:google-maps-services:0.2.6'
     compile 'com.squareup.okhttp3:okhttp:3.9.1'
@@ -179,7 +184,7 @@ apply plugin: "us.kirchmeier.capsule"
 /////////////////////////////////////////////////////////////////////////////
 
 //  to run 
-mainClassName = 'org.activity.controller.SuperController'
+mainClassName = 'org.activity.generator.GowallaPreProcessorUtils'
 
 task fatCapsule(type: FatCapsule) {
   applicationClass 'org.activity.controller.SuperController'
