@@ -30,8 +30,8 @@ public class GTooltipContent extends GridPane
 			setConstraints(l, 1, i);
 			setConstraints(lh, 0, i);
 
-			l.getStyleClass().add("activity-tooltip-label");
-			lh.getStyleClass().add("activity-tooltip-label");
+			// l.getStyleClass().add("activity-tooltip-label");
+			// lh.getStyleClass().add("activity-tooltip-label");
 
 			labels.add(l);
 			labelHeaders.add(lh);

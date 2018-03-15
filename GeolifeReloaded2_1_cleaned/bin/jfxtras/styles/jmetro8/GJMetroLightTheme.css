@@ -1,16 +1,14 @@
 /*
-    Document   : JMetroLightTheme
-    Created on : Oct 16, 2012, 6:28:59 PM
-    Author     : Pedro Duque Vieira
+    Document   : GJMetroLightTheme
     Description:
-        Light Metro style sheet for use in JavaFX applications
+        -Slightly modified Pedro Duque Vieira's JMetroLightThemeLight-
+        -Metro style sheet for use in JavaFX applications
 */
 
 
 .root{
     -fx-font-size: 18pt;
 }
-
 
 
 .background{
@@ -51,7 +49,9 @@
 }
 
 .button:hover{
-    -fx-background-color: #d8d8d8;
+    /*-fx-background-color: #d8d8d8;*/
+    -fx-background-color: #008287;
+    -fx-text-fill: #ffffff;
 }
 
 .button:pressed, .button:default:hover:pressed
@@ -314,6 +314,7 @@
  *                                                                             *
  ******************************************************************************/
 
+ /*
 .tooltip {
     -fx-background-color: white;
     -fx-background-insets: 0;
@@ -321,7 +322,7 @@
 
     -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em;  /*4 8 4 8 */
 
-    -fx-font-family: "Segoe UI Semilight", "Segoe UI Light", "Segoe UI", Helvetica, Arial, sans-serif;
+   /* -fx-font-family: "Segoe UI Semilight", "Segoe UI Light", "Segoe UI", Helvetica, Arial, sans-serif;
     -fx-text-fill: rgba(0, 0, 0, 0.6);
 
     -fx-border-color: #808080;
@@ -329,7 +330,7 @@
 
     -fx-effect: null;
 }
-
+*/
 
 /*******************************************************************************
  *                                                                             *

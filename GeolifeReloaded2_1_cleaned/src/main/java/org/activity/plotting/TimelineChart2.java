@@ -12,12 +12,15 @@ import javafx.scene.chart.XYChart;
 import javafx.util.Duration;
 
 /**
+ * TODO: make it scrollable if smaller screen height causes overlapping of activity boxes.
  * 
  * @author gunjan
  *
  */
 public class TimelineChart2 extends XYChart<Number, String>
 {
+
+	// double heightOfActivityBox;
 
 	/**
 	 * Construct a new TimelineChart with the given axis.
@@ -31,11 +34,12 @@ public class TimelineChart2 extends XYChart<Number, String>
 	{
 		super(xAxis, yAxis);
 		final String timelineChartCss = getClass().getResource("TimelineChart.css").toExternalForm();
-		getStylesheets().add(timelineChartCss);
+		getStylesheets().add(timelineChartCss); // disabled on 13 March 2018
 		setAnimated(true);
 		xAxis.setAnimated(true);
 		yAxis.setAnimated(true);
 		this.setCache(true);
+
 	}
 
 	/**
@@ -62,28 +66,46 @@ public class TimelineChart2 extends XYChart<Number, String>
 	@Override
 	protected void layoutPlotChildren()
 	{
-		System.out.println("layoutPlotChildren() called");
+		System.out.println("\nTimelineChart2.layoutPlotChildren() called");
 
 		// we have nothing to layout if no data is present
 		if (getData() == null)
 		{
 			return;
 		}
+
+		int numOfSeries = getData().size();
+		// $ System.out.println("getData().size()= " + );
 		// update activity box positions
 		for (int index = 0; index < getData().size(); index++)
 		{
 			Series<Number, String> series = getData().get(index);
 			Iterator<XYChart.Data<Number, String>> iter = getDisplayedDataIterator(series);
+			// $ System.out.println("series.getData().size()= " + series.getData().size());
 
 			while (iter.hasNext())
 			{
-				// Axis<String> yAxis = getYAxis();
+				Axis<String> yAxis = getYAxis();
 				Axis<Number> xAxis = getXAxis();
+
 				XYChart.Data<Number, String> item = iter.next();
 				Number displayedXVal = getCurrentDisplayedXValue(item);
 				String displayedYVal = getCurrentDisplayedYValue(item);
-				double xDispPosition = getXAxis().getDisplayPosition(displayedXVal);
-				double yDispPosition = getYAxis().getDisplayPosition(displayedYVal);
+				double xDispPosition = xAxis.getDisplayPosition(displayedXVal);
+				double yDispPosition = yAxis.getDisplayPosition(displayedYVal);
+
+				// to find best height start
+				// System.out.println("--> yAxis.getMaxHeight() =" + yAxis.getMaxHeight());
+				// System.out.println("--> yAxis.getMinHeight() =" + yAxis.getMinHeight());
+				// System.out.println("--> yAxis.getPrefHeight() =" + yAxis.getPrefHeight());
+				// System.out.println("--> yAxis.autoRangingProperty() =" + yAxis.autoRangingProperty());//true
+				// $$ System.out.println("--> this.height() =" + this.getHeight());
+				double heightOfActBox = this.getHeight() / (numOfSeries * 1.5);
+				heightOfActBox = Math.min(Math.max(heightOfActBox, 5), 30);// bound between 5 and 30
+				// $$ System.out.println("--> heightOfActBox = " + heightOfActBox);
+				// heightOfActBox+emptySpaceAboveActBox+emptySpaceBelowActBox = (heightOfChart/numOfUsers)
+				// heightOfActBox+0.25*heightOfActBox+0.25*heightOfActBox = (heightOfChart/numOfUsers)
+				// to find best height end
 
 				// $$System.out.println("displayedXVal=" + displayedXVal + " displayedXVal=" + displayedYVal);
 				// $$System.out.println("xDispPosition=" + xDispPosition + " yDispPosition=" + yDispPosition);
@@ -101,8 +123,8 @@ public class TimelineChart2 extends XYChart<Number, String>
 
 					// update activity box
 					ActivityBox2 activityBox = (ActivityBox2) itemNode;
-					activityBox.update(xDispPosition, endTS);// extra.getClose());// , 0, 0);// close - y, high - y, low
-					// - y,activityBoxWidth);
+					activityBox.update(xDispPosition, endTS, heightOfActBox);
+					// extra.getClose());// , 0, 0);// // close - y, high - y, low - y,activityBoxWidth);
 
 					// moved to series added to improve performance by reducing calls to updateTooltip
 					// $$activityBox.updateTooltip(String.valueOf(extra.getEndTimestamp()),
@@ -129,7 +151,7 @@ public class TimelineChart2 extends XYChart<Number, String>
 	{
 		System.out.println("dataItemAdded() called");
 
-		Node actBox = createActivityBox(getData().indexOf(series), item, itemIndex);
+		Node actBox = createActivityBox(getData().indexOf(series), item, itemIndex, -1);
 		if (shouldAnimate())
 		{
 			actBox.setOpacity(0.2);
@@ -176,11 +198,16 @@ public class TimelineChart2 extends XYChart<Number, String>
 	protected void seriesAdded(Series<Number, String> series, int seriesIndex)
 	{
 		// handle any data already in series
-		System.out.println("seriesAdded() called");
+		System.out.println("seriesAdded() called for seriesIndex= " + seriesIndex);
+		// PopUps.printTracedWarningMsg("who calls me:");
+
+		int numOfSeriesAlreadyAdded = this.getData().size();
+		// System.out.println("numOfSeriesAlreadyAdded = " + numOfSeriesAlreadyAdded);
+
 		for (int j = 0; j < series.getData().size(); j++)
 		{
 			XYChart.Data item = series.getData().get(j);
-			Node actBox = createActivityBox(seriesIndex, item, j);
+			Node actBox = createActivityBox(seriesIndex, item, j, -1);
 
 			/// Start
 			// moving update tooltip from update layout to here so tooltips are not updated (updateTooltip()) everytime
@@ -242,9 +269,10 @@ public class TimelineChart2 extends XYChart<Number, String>
 	 *            The data item to create node for
 	 * @param itemIndex
 	 *            The index of the data item in the series
+	 * @param heightOfActivityBox
 	 * @return New ActivityBox node to represent the give data item
 	 */
-	private Node createActivityBox(int seriesIndex, final XYChart.Data item, int itemIndex)
+	private Node createActivityBox(int seriesIndex, final XYChart.Data item, int itemIndex, int heightOfActivityBox)
 	{
 		// System.out.println("createActivityBox() called");
 		Node actBox = item.getNode();

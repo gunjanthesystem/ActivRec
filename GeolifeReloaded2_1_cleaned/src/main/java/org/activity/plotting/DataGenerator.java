@@ -107,22 +107,22 @@ public class DataGenerator
 
 		for (int u = 0; u < numOfUsers; u++)
 		{
-			String user = "User" + u;
+			String user = "U" + u;
 			int st = startTime, et = -99;
 
 			for (int a = 0; a < numOfActsPerUser; a++)
 			{
 				et = st + minDuration + rd.nextInt(maxDuration);
 				// et = st + 1;
-				int actID = rd.nextInt(6);
+				int actID = rd.nextInt(numOfUniqueActs);
 
 				List<String> actData = new ArrayList<>();
-				actData.add(user);
-				actData.add(String.valueOf(st));
-				actData.add(String.valueOf(et));
+				actData.add(user);// UserID
+				actData.add(String.valueOf(st));// start ts
+				actData.add(String.valueOf(et));// end ts
 				actData.add(String.valueOf(""));// location name
-				actData.add(String.valueOf(actID));// location name
-				actData.add(String.valueOf(actID));// location name
+				actData.add(String.valueOf(actID));// act name
+				actData.add(String.valueOf(actID));// act ID
 
 				data.add(actData);
 				st = et + 1;
@@ -133,6 +133,60 @@ public class DataGenerator
 		data.stream().forEachOrdered(d -> sb.append(d.stream().collect(Collectors.joining(",")) + "\n"));
 		System.out.println("data=\n" + sb.toString());
 		return data;
+	}
+
+	/**
+	 * 
+	 * @param numOfUsers
+	 * @param numOfActsPerUser
+	 * @param numOfUniqueActs
+	 * @param startTime
+	 * @param endTime
+	 * @return {user,{list of acts for each users{ list vals for each act}}}
+	 */
+	public static List<List<List<String>>> getData3(int numOfUsers, int numOfActsPerUser, int numOfUniqueActs,
+			int startTime, int endTime, int minDuration, int maxDuration)
+	{
+
+		List<List<List<String>>> dataForAllUsers = new ArrayList<>();
+
+		Random rd = new Random();
+
+		for (int u = 0; u < numOfUsers; u++)
+		{
+			String user = "U" + u;
+			int st = startTime, et = -99;
+			List<List<String>> dataForAUser = new ArrayList<>();
+
+			for (int a = 0; a < numOfActsPerUser; a++)
+			{
+				et = st + minDuration + rd.nextInt(maxDuration);
+				// et = st + 1;
+				int actID = rd.nextInt(numOfUniqueActs);
+
+				List<String> actData = new ArrayList<>();
+				actData.add(user);// UserID
+				actData.add(String.valueOf(st));// start ts
+				actData.add(String.valueOf(et));// end ts
+				actData.add(String.valueOf(""));// location name
+				actData.add(String.valueOf(actID));// act name
+				actData.add(String.valueOf(actID));// act ID
+
+				dataForAUser.add(actData);
+				st = et + 1;
+			}
+			dataForAllUsers.add(dataForAUser);
+		}
+
+		// StringBuilder sb = new StringBuilder();
+		//
+		// for (List<List<String>> data : dataForAllUsers)
+		// {
+		// data.stream().forEachOrdered(d -> sb.append(d.stream().collect(Collectors.joining(",")) + "\n"));
+		// }
+		//
+		// System.out.println("data=\n" + sb.toString());
+		return dataForAllUsers;
 	}
 
 	/**
@@ -176,9 +230,9 @@ public class DataGenerator
 			}
 		}
 
-		StringBuilder sb = new StringBuilder();
-		data.stream().forEachOrdered(d -> sb.append(d.stream().collect(Collectors.joining(",")) + "\n"));
-		System.out.println("data=\n" + sb.toString());
+		// StringBuilder sb = new StringBuilder();
+		// data.stream().forEachOrdered(d -> sb.append(d.stream().collect(Collectors.joining(",")) + "\n"));
+		// System.out.println("data=\n" + sb.toString());
 		return data;
 	}
 
