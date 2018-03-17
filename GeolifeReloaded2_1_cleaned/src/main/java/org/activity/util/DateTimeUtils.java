@@ -30,7 +30,7 @@ public class DateTimeUtils
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args)
+	public static void main0(String[] args)
 	{
 		// the current date
 		Instant i = Instant.now();
@@ -59,6 +59,66 @@ public class DateTimeUtils
 				System.out.println("--> j = " + j + " Same in tolerance=" + v);
 			}
 		}
+	}
+
+	public static void main(String[] args)
+	{
+		String timestampString = "2011-06-23T02:24:22Z";
+
+		// Instant instant = Instant.parse(timestampString);
+		// System.out.println("instant = \t\t" + instant);
+		TimeZone tz1 = TimeZone.getTimeZone("America/Los_Angeles");
+		// ZonedDateTime zonedDataTime = ZonedDateTime.ofInstant(instant, tz1.toZoneId());
+
+		LocalDateTime zonedLocalDataTime = zuluToTimeZonedLocalDateTime(timestampString, tz1.toZoneId());
+		// System.out.println("zonedDataTime = \t" + zonedDataTime);
+		System.out.println("localzonedTS  = \t" + zonedLocalDataTime);
+		System.out.println("localzonedDate  = \t" + zonedLocalDataTime.toLocalDate());
+
+		LocalDateTime now1 = LocalDateTime.now();
+		LocalDateTime now2 = LocalDateTime.now();
+
+		System.out.println("diff =" + getZonedTimeDiffInSecs(now1, ZoneId.systemDefault(), now1, tz1.toZoneId()));
+	}
+
+	/**
+	 * SANITY CHECKED OK
+	 * 
+	 * @param localdatetime
+	 *            ldt1 in time zone tzForldt1
+	 * @param tzForldt1
+	 * @param localdatetime
+	 *            ldt2 in time zone tzForldt1
+	 * @param tzForldt2
+	 * @return
+	 */
+	public static long getZonedTimeDiffInSecs(LocalDateTime ldt1, ZoneId tzForldt1, LocalDateTime ldt2,
+			ZoneId tzForldt2)
+	{
+		// System.out.println("ldt1= " + ldt1 + " zoneID1= " + tzForldt1 + "\nldt2= " + ldt2 + " zoneID2= " +
+		// tzForldt2);
+
+		Instant instant1 = ldt1.atZone(tzForldt1).toInstant();
+		Instant instant2 = ldt2.atZone(tzForldt2).toInstant();
+
+		return ((instant2.toEpochMilli() - instant1.toEpochMilli()) / 1000);
+	}
+
+	/**
+	 * SANITY CHECKED OK
+	 * 
+	 * @param zuluTimeStampString
+	 * @param zoneId
+	 * @return
+	 */
+	public static LocalDateTime zuluToTimeZonedLocalDateTime(String zuluTimeStampString, ZoneId zoneId)
+	{
+		Instant instant = Instant.parse(zuluTimeStampString);
+		ZonedDateTime zonedDataTime = ZonedDateTime.ofInstant(instant, zoneId);
+
+		// System.out.println("instant = \t\t" + instant);
+		// System.out.println("zonedDataTime = \t" + zonedDataTime);
+		return zonedDataTime.toLocalDateTime();
 	}
 
 	/**

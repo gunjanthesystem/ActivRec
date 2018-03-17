@@ -88,9 +88,10 @@ public class GluonOSMMap extends Application
 
 		view.addLayer(positionLayerV2(listOfLocs));
 		view.setZoom(4);
-		Scene scene;
+		// Scene scene;
 		BorderPane bp = new BorderPane();
 		bp.setCenter(view);
+		listOfLocs.clear();
 		// final Label label = new Label("Gluon Maps Demo");
 		// label.setAlignment(Pos.CENTER);
 		// label.setMaxWidth(Double.MAX_VALUE);
@@ -109,39 +110,39 @@ public class GluonOSMMap extends Application
 	// return answer;
 	// }
 
-	private MapLayer positionLayer()
-	{
-		return Services.get(PositionService.class).map(positionService ->
-			{
-				ReadOnlyObjectProperty<Position> positionProperty = positionService.positionProperty();
-				Position position = positionProperty.get();
-				if (position == null)
-				{
-					position = new Position(50., 4.);
-				}
-				mapPoint = new MapPoint(position.getLatitude(), position.getLongitude());
-				// LOGGER.log(Level.INFO, "Initial Position: " + position.getLatitude() + ", " +
-				// position.getLongitude());
-
-				PoiLayer answer = new PoiLayer();
-				answer.addPoint(mapPoint, new Circle(7, Color.RED));
-
-				positionProperty.addListener(e ->
-					{
-						Position pos = positionProperty.get();
-						// LOGGER.log(Level.INFO, "New Position: " + pos.getLatitude() + ", " + pos.getLongitude());
-						mapPoint.update(pos.getLatitude(), pos.getLongitude());
-					});
-				return answer;
-			}).orElseGet(() ->
-				{
-					System.out.println("Position Service not available");
-					PoiLayer answer = new PoiLayer();
-					mapPoint = new MapPoint(50., 4.);
-					answer.addPoint(mapPoint, new Circle(7, Color.RED));
-					return answer;
-				});
-	}
+	// private MapLayer positionLayer()
+	// {
+	// return Services.get(PositionService.class).map(positionService ->
+	// {
+	// ReadOnlyObjectProperty<Position> positionProperty = positionService.positionProperty();
+	// Position position = positionProperty.get();
+	// if (position == null)
+	// {
+	// position = new Position(50., 4.);
+	// }
+	// mapPoint = new MapPoint(position.getLatitude(), position.getLongitude());
+	// // LOGGER.log(Level.INFO, "Initial Position: " + position.getLatitude() + ", " +
+	// // position.getLongitude());
+	//
+	// PoiLayer answer = new PoiLayer();
+	// answer.addPoint(mapPoint, new Circle(7, Color.RED));
+	//
+	// positionProperty.addListener(e ->
+	// {
+	// Position pos = positionProperty.get();
+	// // LOGGER.log(Level.INFO, "New Position: " + pos.getLatitude() + ", " + pos.getLongitude());
+	// mapPoint.update(pos.getLatitude(), pos.getLongitude());
+	// });
+	// return answer;
+	// }).orElseGet(() ->
+	// {
+	// System.out.println("Position Service not available");
+	// PoiLayer answer = new PoiLayer();
+	// mapPoint = new MapPoint(50., 4.);
+	// answer.addPoint(mapPoint, new Circle(7, Color.RED));
+	// return answer;
+	// });
+	// }
 
 	private MapLayer positionLayerV2(List<Triple<Double, Double, String>> listOfLocs)
 	{
@@ -168,7 +169,14 @@ public class GluonOSMMap extends Application
 				PoiLayer answer = new PoiLayer();
 				// answer.addPoint(mapPoint, new Circle(7, Color.RED));
 				// Circle c = new Circle(5,new Paint)
-				mapPoints.stream().forEach(mp -> answer.addPoint(mp, new Circle(5, Color.rgb(0, 105, 106, 0.65))));
+				// Circle c = new Circle(5, Color.rgb(193, 49, 34, 0.65));
+				for (MapPoint mp : mapPoints)
+				{
+					Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+					// c.setStroke(Color.BLACK);
+					answer.addPoint(mp, c);
+				}
+				// $mapPoints.stream().forEach(mp -> answer.addPoint(mp, new Circle(5, Color.rgb(0, 105, 106, 0.65))));
 				positionProperty.addListener(e ->
 					{
 						Position pos = positionProperty.get();
@@ -182,65 +190,74 @@ public class GluonOSMMap extends Application
 					PoiLayer answer = new PoiLayer();
 					// mapPoint = new MapPoint(50., 4.);
 					// answer.addPoint(mapPoint, new Circle(7, Color.RED));
-					mapPoints.stream().forEach(mp -> answer.addPoint(mp, new Circle(5, Color.rgb(193, 49, 34, 0.65))));
+					// Circle c = new Circle(5, Color.rgb(193, 49, 34, 0.65));
+					for (MapPoint mp : mapPoints)
+					{
+						Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+						// c.setStroke(Color.BLACK);
+						answer.addPoint(mp, c);
+					}
+
+					// $$mapPoints.stream().forEach(mp -> answer.addPoint(mp, new Circle(5, Color.rgb(193, 49, 34,
+					// 0.65))));
 					return answer;
 				});
 	}
 
-	/**
-	 * 
-	 * @param absFileNameForLatLong
-	 * @param delimiter
-	 * @param latColIndex
-	 * @param lonColIndex
-	 * @param labelColIndex
-	 */
-	public static List<Triple<Double, Double, String>> readListOfLocations(String absFileNameForLatLong,
-			String delimiter, int latColIndex, int lonColIndex, int labelColIndex)
-	{
-		// String absFileNameForLatLong = ;
-
-		List<List<String>> lines = ReadingFromFile.readLinesIntoListOfLists(absFileNameForLatLong, ",");
-		// System.out.println("lines.size()=" + lines.size());
-		List<Triple<Double, Double, String>> listOfLocations = new ArrayList<>();
-		int count = 0;
-
-		for (List<String> line : lines)
-		{
-			count += 1;
-
-			if (count == 1)
-			{
-				continue;
-			}
-			// if (++count > 20000)
-			// {
-			// break;
-			// }
-			// System.out.println("line= " + line);
-			// System.out.println("here 1");
-
-			Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(latColIndex)),
-					Double.valueOf(line.get(lonColIndex)), "id=" + line.get(labelColIndex));
-
-			// LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
-			// // Double.valueOf(line.get(2).substring(0, 4)));
-			// // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),
-			// // Double.valueOf(line.get(2).substring(0, 4)));
-			// System.out.println("LatLong= " + markerLatLong2.toString());
-			// markerOptions2.position(markerLatLong2).title(line.get(1)).visible(true);
-			// System.out.println("here2");
-			// myMarker2 = new Marker(markerOptions2);
-			// System.out.println("here3");
-			listOfLocations.add(val);
-		}
-
-		// StringBuilder sb = new StringBuilder();
-		// listOfMarkers.stream().forEachOrdered(e -> sb.append(e.toString() + "\n"));
-		// System.out.println("List of markers= " + sb.toString());
-		// System.out.println("listOfLocations.size()=" + listOfLocations.size());
-		return listOfLocations;
-	}
+	// /**
+	// *
+	// * @param absFileNameForLatLong
+	// * @param delimiter
+	// * @param latColIndex
+	// * @param lonColIndex
+	// * @param labelColIndex
+	// */
+	// public static List<Triple<Double, Double, String>> readListOfLocations(String absFileNameForLatLong,
+	// String delimiter, int latColIndex, int lonColIndex, int labelColIndex)
+	// {
+	// // String absFileNameForLatLong = ;
+	//
+	// List<List<String>> lines = ReadingFromFile.readLinesIntoListOfLists(absFileNameForLatLong, ",");
+	// // System.out.println("lines.size()=" + lines.size());
+	// List<Triple<Double, Double, String>> listOfLocations = new ArrayList<>();
+	// int count = 0;
+	//
+	// for (List<String> line : lines)
+	// {
+	// count += 1;
+	//
+	// if (count == 1)
+	// {
+	// continue;
+	// }
+	// if (++count > 1000000)
+	// {
+	// break;
+	// }
+	// // System.out.println("line= " + line);
+	// // System.out.println("here 1");
+	//
+	// Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(latColIndex)),
+	// Double.valueOf(line.get(lonColIndex)), "id=" + line.get(labelColIndex));
+	//
+	// // LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
+	// // // Double.valueOf(line.get(2).substring(0, 4)));
+	// // // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),
+	// // // Double.valueOf(line.get(2).substring(0, 4)));
+	// // System.out.println("LatLong= " + markerLatLong2.toString());
+	// // markerOptions2.position(markerLatLong2).title(line.get(1)).visible(true);
+	// // System.out.println("here2");
+	// // myMarker2 = new Marker(markerOptions2);
+	// // System.out.println("here3");
+	// listOfLocations.add(val);
+	// }
+	//
+	// // StringBuilder sb = new StringBuilder();
+	// // listOfMarkers.stream().forEachOrdered(e -> sb.append(e.toString() + "\n"));
+	// // System.out.println("List of markers= " + sb.toString());
+	// // System.out.println("listOfLocations.size()=" + listOfLocations.size());
+	// return listOfLocations;
+	// }
 
 	/**
 	 * 
@@ -259,6 +276,7 @@ public class GluonOSMMap extends Application
 			List<List<String>> lines = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
 					new FileInputStream(new File(absFileNameForLatLong)), ",", true, false,
 					new int[] { latColIndex, lonColIndex, labelColIndex });
+
 			System.out.println("lines.size()=" + lines.size());
 
 			int count = 0;
@@ -271,10 +289,10 @@ public class GluonOSMMap extends Application
 				{
 					continue;
 				}
-				// if (++count > 20000)
-				// {
-				// break;
-				// }
+				if (++count > 20000)
+				{
+					break;
+				}
 				// System.out.println("line= " + line);
 				// System.out.println("here 1");
 

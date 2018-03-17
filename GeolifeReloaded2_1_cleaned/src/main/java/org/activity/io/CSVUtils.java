@@ -123,12 +123,13 @@ public class CSVUtils
 
 	public static void main(String[] args)
 	{
-		splitCSVRowise("/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv", ",", true, 10,
-				"/home/gunjan/JupyterWorkspace/data/", "gowalla_spots_subset1_fromRaw28Feb2018smallerFile");
+		concatenateFetchedTimezones();
+		// splitCSVRowise("/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv", ",", true,
+		// 10, "/home/gunjan/JupyterWorkspace/data/", "gowalla_spots_subset1_fromRaw28Feb2018smallerFile");
 		// temp();
 		// testSideConcat();
 		// removeDuplicateRowsGowalla();
-		// $$removeDuplicateRowsFromRawGowalla();
+		// $$removeDuplicateRowsFromRawGowalla();// IMPORTANT
 		// //$$removeDuplicationRowsUsingCuckoo(
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/sbAllDistanceInM.csv",
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/NoDupsbAllDistanceInM.csv",
@@ -140,6 +141,24 @@ public class CSVUtils
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/ConsecutiveDiffAnalysis/RemoveDups/SAllDupssbAllDistanceInM.csv");
 
 		// gowallaMain();// gowallaMain2();//
+	}
+
+	private static void concatenateFetchedTimezones()
+	{
+		ArrayList<String> fileNamesToConcatentate = new ArrayList<>();
+		try
+		{
+			String commonPath = "/home/gunjan/JupyterWorkspace/data/d10/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ";
+			for (int i = 1; i <= 10; i++)
+			{
+				fileNamesToConcatentate.add(commonPath + i + ".csv");
+			}
+			CSVUtils.concatenateCSVFiles(fileNamesToConcatentate, true, commonPath + "AllConcatenated.csv", ',');
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public static void testSideConcat()
@@ -174,8 +193,13 @@ public class CSVUtils
 	{
 		// curtain 1 start
 		String checkInFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_checkins.csv";
-		String noDupCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
-		String dupLinesCheckinFileName = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/DupLines_gowalla_checkinsRaw.csv";
+		// Disabled on Mar15_2018 String noDupCheckinFileName =
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
+		// Disabled on Mar15_2018 String dupLinesCheckinFileName =
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/DupLines_gowalla_checkinsRaw.csv";
+
+		String noDupCheckinFileName = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
+		String dupLinesCheckinFileName = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/RemovingDuplicatesFromRawData/DupLines_gowalla_checkinsRaw.csv";
 
 		// $$ check again to make sure this method is not doing anything more than the cuckoo method is doing
 		// removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,

@@ -202,10 +202,10 @@ public class GoogleMapApp extends Application implements MapComponentInitialized
 			{
 				continue;
 			}
-			if (++count > 20000)
-			{
-				break;
-			}
+			// if (++count > 20000)
+			// {
+			// break;
+			// }
 			// System.out.println("line= " + line);
 			// System.out.println("here 1");
 
