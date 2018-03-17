@@ -2,13 +2,17 @@ package org.activity.generator;
 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.activity.io.CSVUtils;
@@ -20,6 +24,8 @@ import org.activity.objects.OpenStreetAddress;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.util.HTTPUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -47,7 +53,148 @@ public class GowallaPreProcessorUtils
 
 	public static void main(String[] args)
 	{
-		getGeoAddressForLocations();
+		// $getGeoAddressForLocations();
+		// getLocTimezoneMap();
+		slimProcessedData();
+	}
+
+	/**
+	 * @since 16 Mar 2018
+	 */
+	public static void slimProcessedData()
+	{
+		boolean verboseReading = true;
+		String fileToRead = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/DataGeneration/processedCheckIns.csv";
+		String fileToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/DataGeneration/processedCheckInsSlimmedForR.csv";
+		int[] columnIndicesToSelect = new int[] { 0, 1, 4, 7, 11 };
+		// Files.newInputStream(fileToRead);
+		// List<List<String>> raw = new ArrayList<>();
+		StringBuilder sbToWrite = new StringBuilder();
+		String splitLiteral = Pattern.quote(",");
+		BufferedWriter bwToWrite = WritingToFile.getBWForNewFile(fileToWrite);
+
+		if (verboseReading)
+		{
+			System.out.println("nColumnReaderStringLargeFile --");
+		}
+		try
+		{
+			LineIterator it = IOUtils.lineIterator(new FileInputStream(fileToRead), "UTF-8");
+			long countOfLinesRead = 0;
+
+			while (it.hasNext())
+			{
+				countOfLinesRead += 1;
+				String line = it.nextLine();
+				String[] splittedString = (line.split(splitLiteral));
+				// int indexToSelect : columnIndicesToSelect)
+				for (int i = 0; i < (columnIndicesToSelect.length - 1); i++)
+				{
+					sbToWrite.append(splittedString[columnIndicesToSelect[i]]).append(",");
+				}
+
+				sbToWrite.append(splittedString[columnIndicesToSelect[columnIndicesToSelect.length - 1]]).append("\n");
+
+				if (verboseReading && (countOfLinesRead % 25000 == 0))
+				{
+					System.out.println("Lines read: " + countOfLinesRead);
+				}
+
+				if (countOfLinesRead % 70870 == 0)// 48260 == 0) // 24130 find divisors of 36001960 using
+				{
+					bwToWrite.write(sbToWrite.toString());
+					sbToWrite.setLength(0);
+				}
+			}
+
+			if (sbToWrite.length() > 0)
+			{
+				System.out.println("Writing leftovers ... ");
+				bwToWrite.write(sbToWrite.toString());
+				sbToWrite.setLength(0);
+				// bw2.write(toWriteInBatch2.toString());
+				// toWriteInBatch2.setLength(0);
+			}
+
+			System.out.println("Total Lines read: " + countOfLinesRead);
+			it.close();
+			bwToWrite.close();
+		}
+		catch (IOException e)
+		{
+			System.err.println("Exception reading file from : " + fileToRead);
+			e.printStackTrace();
+		}
+
+		// System.out.println("raw=\n" + raw);
+		// return raw;
+	}
+
+	public static Map<Long, TimeZone> getLocTimezoneMap()
+	{
+		String commonPath = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/";
+		// Path fileToRead = Paths.get(commonPath,
+		// "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZAllConcatenated.csv");// seagate
+		String fileToRead = commonPath
+				+ "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZAllConcatenated.csv";// seagate
+
+		Map<Long, TimeZone> locIDTimezoneMap = new HashMap<>();
+		List<Long> locIDsWithNoTimezone = new ArrayList<>();
+		List<String> locIDsWithNoTimezoneWithLatLon = new ArrayList<>();
+		try
+		{
+			List<List<String>> linesRead = ReadingFromFile.readLinesIntoListOfLists(fileToRead, ",");
+			// ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
+			// Files.newInputStream(fileToRead), ",", true, false, new int[] { 1, 4 });
+			System.out.println("locations read = " + linesRead.size());
+
+			int count = 0;
+			for (List<String> line : linesRead)
+			{
+				if (++count == 1)
+				{
+					continue;// skipe header
+				}
+				Long locID = Long.valueOf(line.get(1));
+				if (line.size() < 5)
+				{
+					locIDsWithNoTimezoneWithLatLon.add(line.get(1) + "," + line.get(2) + "," + line.get(3));
+					locIDsWithNoTimezone.add(locID);
+				}
+				else
+				{
+					locIDTimezoneMap.put(locID, TimeZone.getTimeZone(line.get(4)));
+				}
+			}
+
+			// linesRead.stream().skip(1)
+			// .forEachOrdered(l -> locIDTimezoneMap.put(Long.valueOf(l.get(0)), TimeZone.getTimeZone(l.get(1))));
+
+			System.out.println("locIDTimezoneMap.size=" + locIDTimezoneMap.size());
+			System.out.println("locIDsWithNoTimezone.size=" + locIDsWithNoTimezone.size());
+			WritingToFile.writeToNewFile(locIDsWithNoTimezoneWithLatLon.stream().collect(Collectors.joining("\n")),
+					commonPath + "locIDsWithNoTimezone.csv");
+
+			Serializer.kryoSerializeThis(locIDTimezoneMap, commonPath + "locIDTimezoneMap.kryo");
+			Serializer.kryoSerializeThis(locIDsWithNoTimezone, commonPath + "locIDsWithNoTimezone.kryo");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return locIDTimezoneMap;
+	}
+
+	public static void addTimezoneToSpotsSubset1RawData()
+	{
+		try
+		{
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	// https://maps.google.com/maps/api/geocode/xml?address=Malvern+City+of+Stonnington

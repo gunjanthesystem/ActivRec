@@ -13,8 +13,8 @@ import java.io.PrintStream;
 //import java.math.String;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.activity.constants.Constant;
+import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.LabelEntry;
 import org.activity.objects.Pair;
@@ -141,14 +142,15 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	public static void main(String args[])
 	{
 		System.out.println("Running starts");
-		commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DataGeneration/";
+		// commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DataGeneration/";//Disable on
+		// Mar15 2018
+		commonPath = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/DataGeneration/";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June28_2/"; //last past on XPS
 		// June2_finalSameTraj/";// June2_2016_SameTraj/";
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/TrajectorySpace/May17_2016_newDataStruct/" //
 		// May17_2016_good2/";
-		// String userNames={""
-		// LinkedHashMap<String, String> userMap = new LinkedHashMap<String, String>();
+		// String userNames={"" LinkedHashMap<String, String> userMap = new LinkedHashMap<String, String>();
 		// userMap.put("Stefan", "C:\\Users\\gunjan\\Documents\\Lifelog working dataset\\Data_Set_Stefan\\Data Set");
 		try
 		{
@@ -195,16 +197,33 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 			HashMap<Long, ArrayList<String>> spots1 = readSpotSubset(spotsSubset1FileName, 3, 2);
 			System.out.println("spots1 size =" + spots1.size());
-			HashMap<Long, ArrayList<String>> spots2 = readSpotSubset(spotsSubset2FileName, 1, 2);
-			System.out.println("spots2 size =" + spots2.size());
 
+			if (false)// disabled on Mar15 2018
+			{
+				HashMap<Long, ArrayList<String>> spots2 = readSpotSubset(spotsSubset2FileName, 1, 2);
+				System.out.println("spots2 size =" + spots2.size());
+			}
 			// $$ preprocessCheckInWithDate(checkInFileName, spots1, spots2, commonPath + "checkInPreProcessingLog.txt",
 			// $$ commonPath + "processedCheckIns.csv");
 			// reversed because the original file was in descending order of timestamps, now its ascending order of ts
-			String checkInFileNameNoDups = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRawReversed.csv";
-			preprocessCheckInWithDateCategoryOnlySpots1Faster(checkInFileNameNoDups/* checkInFileName */, spots1,
-					spots2, commonPath + "checkInPreProcessingLog.txt", commonPath + "processedCheckIns.csv");
+
+			// $$Start of disabled on Mar15 2018 for new data generation
+			// $$String checkInFileNameNoDups =
+			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRawReversed.csv";
+			// $$preprocessCheckInWithDateCategoryOnlySpots1Faster(checkInFileNameNoDups/* checkInFileName */, spots1,
+			// $$spots2, commonPath + "checkInPreProcessingLog.txt", commonPath + "processedCheckIns.csv");
+			// $$ End of disabled on Mar15 2018 for new data generation
+
 			// $userIDsOriginal = identifyUsers();// identifyOnlyTargetUsers();//
+
+			// Start of added on Mar15 2018
+			String checkInFileNameNoDups = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
+			Map<Long, TimeZone> locIDTimeZoneMap = (Map<Long, TimeZone>) Serializer.kryoDeSerializeThis(
+					"/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/locIDTimezoneMap.kryo");
+			preprocessCheckInWithDateCategoryOnlySpots1FasterWithTimeZone(checkInFileNameNoDups, spots1,
+					commonPath + "checkInPreProcessingLog.txt", commonPath + "processedCheckIns.csv", locIDTimeZoneMap,
+					commonPath);
+			// End of added on Mar15 2018
 
 			// // start of curtain 1
 			// int stepSize = 5;
@@ -1225,6 +1244,222 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 	//////////////
 	/**
+	 * Fork of preprocessCheckInWithDateCategoryOnlySpots1Faster. Primary intention is to convert all timestamps to
+	 * correct localtimestamp for this timezone.
+	 * <p>
+	 * To generate data with category information (note: category information is only available for data point for spots
+	 * 1 places.)
+	 * 
+	 * @param checkinFileName
+	 * @param spots1
+	 * @param logfile
+	 * @param preprocessedFileName
+	 * @param locTimeZoneMap
+	 * @param commonPathToWrite
+	 */
+	private static void preprocessCheckInWithDateCategoryOnlySpots1FasterWithTimeZone(String checkinFileName,
+			HashMap<Long, ArrayList<String>> spots1, String logfile, String preprocessedFileName,
+			Map<Long, TimeZone> locTimeZoneMap, String commonPathToWrite)
+	{
+		long countOfSpots1 = 0, countRejNotFoundInSpots1 = 0, countRejWrongGeoCoords = 0,
+				countRejCheckinsWithPlaceWithNoTZ = 0;
+		Map<String, Long> userZoneHoppingCount = new LinkedHashMap<>();
+		// countWithWrongGeoCoords: num of checkins in placees which have incorrect geocoordinates
+
+		Pattern dlimPatrn = Pattern.compile(",");
+		System.out
+				.println("preprocessCheckInWithDateCategoryOnlySpots1FasterWithTimeZone called with checkinfilename = "
+						+ checkinFileName);
+		try
+		{
+			int lineCount = 0;
+			BufferedReader br = new BufferedReader(new FileReader(checkinFileName));
+			BufferedWriter bw = WritingToFile.getBWForNewFile(preprocessedFileName);
+			// BufferedWriter bw2 = WritingToFile.getBWForNewFile(preprocessedFile + "slim");
+
+			bw.write(
+					"UserID,PlaceID,ZuluTS,TimeZonedToCorrectLocalTS,TimeZonedToCorrectLocalDate,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs,TZ\n");
+			// bw2.write("UserID,Date,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
+
+			StringBuilder toWriteInBatch = new StringBuilder();
+			// StringBuffer toWriteInBatch2 = new StringBuffer();
+			// StringBuffer sequenceOfSpotsFound = new StringBuffer();
+			// boolean isCurrGeoCoordsValid = false;
+			// boolean isPrevGeoCoordsValid = false;
+
+			String currentLineRead;
+			String currUser = "", prevUser = "";
+			LocalDateTime currentTime = null, prevTime = null;
+			String currentLat = "", prevLat = "";
+			String currentLon = "", prevLon = "";
+			// to find time diff and users and instances of timezonehopping
+			ZoneId currentZoneId = null, prevZoneId = null;
+
+			String spotCatID = "";
+			String spotCatName = "";
+
+			while ((currentLineRead = br.readLine()) != null)
+			{
+				// clearing current variables
+				currUser = "";
+				currentTime = null;
+				currentLat = "";
+				currentLon = "";
+				currentZoneId = null;
+
+				spotCatID = "NA";
+				spotCatName = "NA";
+
+				double distFromPrevInMeters = -999;
+				long durationFromPrevInSeconds = -999;
+
+				lineCount++;
+
+				if (lineCount == 1)
+				{
+					System.out.println("Skipping first line");
+					continue;
+				}
+				else if (lineCount % 10000 == 0)
+				{
+					System.out.println("Lines read = " + lineCount);
+				}
+
+				String[] splittedString = dlimPatrn.split(currentLineRead);// currentLineRead.split(",");// dlimPatrn);
+				long placeID = Long.valueOf(splittedString[1]);
+				// System.out.println("place id to search for " + placeID);
+
+				// Ignore checkins into places with no timezone
+				if (locTimeZoneMap.containsKey(placeID) == false)
+				{
+					countRejCheckinsWithPlaceWithNoTZ += 1;
+					continue;
+				}
+				else
+				{
+					currentZoneId = locTimeZoneMap.get(placeID).toZoneId();
+					currentTime = DateTimeUtils.zuluToTimeZonedLocalDateTime(splittedString[2], currentZoneId);
+				}
+
+				ArrayList<String> vals1 = spots1.get(placeID);
+				// Ignore checkin into places into in spots subset1
+				if (vals1 == null)
+				{
+					countRejNotFoundInSpots1 += 1;
+					currentLat = "-777"; // not found
+					currentLon = "-777"; // not found
+					continue;
+				}
+				else
+				{
+					countOfSpots1++;
+
+					currentLat = vals1.get(2);
+					currentLon = vals1.get(1);
+					Pair<String, String> spotCatIDName = getSpotCatIDCatName(vals1);
+					spotCatID = spotCatIDName.getFirst();
+					spotCatName = spotCatIDName.getSecond();
+				}
+
+				// Ignore checkin into places into with incorrect lat lon
+				if (Math.abs(Double.valueOf(currentLat)) > 90 || Math.abs(Double.valueOf(currentLon)) > 180)
+				{
+					// System.out.println("Invalid geo coordinate becauce. lat ="+currentLat+" long="+currentLat);
+					countRejWrongGeoCoords += 1;
+					continue;
+				}
+
+				// if reached here then VALID CHECKIN
+
+				currUser = splittedString[0];
+
+				// if same user, compute distance & duration from next (note: lines are in decreasing order by time)
+				if (prevUser.equals(currUser))
+				{
+					distFromPrevInMeters = SpatialUtils.haversineFastMath(currentLat, currentLon, prevLat, prevLon);//
+					distFromPrevInMeters *= 1000;
+					distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
+
+					// - removed as data has been reversed so that now it is in ascending order of timestamp
+					durationFromPrevInSeconds = DateTimeUtils.getZonedTimeDiffInSecs(currentTime, currentZoneId,
+							prevTime, prevZoneId);// (currentTime.toEpochSecond(curr) - prevTime.getTime()) / 1000;
+
+					// find time zone hoppings.
+					// if (currentZoneId != prevZoneId)
+					if (currentZoneId.equals(prevZoneId))
+					{
+						long prevHoppingsCount = 0;
+						if (userZoneHoppingCount.containsKey(currUser))
+						{
+							prevHoppingsCount = userZoneHoppingCount.get(currUser);
+						}
+						userZoneHoppingCount.put(currUser, prevHoppingsCount + 1);
+					}
+				}
+
+				else
+				{
+					distFromPrevInMeters = -99;// 0;
+					durationFromPrevInSeconds = -99;// 0;
+				}
+
+				prevUser = currUser;
+				prevTime = currentTime;
+				prevLat = currentLat;
+				prevLon = currentLon;
+				prevZoneId = currentZoneId;
+
+				toWriteInBatch
+						.append(currentLineRead + "," + currentTime + "," + currentTime.toLocalDate() + "," + currentLat
+								+ "," + currentLon + "," + spotCatID + "," + spotCatName + "," + distFromPrevInMeters
+								+ "," + durationFromPrevInSeconds + "," + currentZoneId.toString() + "\n");
+
+				// http://www.javascripter.net/math/calculators/divisorscalculator.htm
+				if (lineCount % 70870 == 0)// 48260 == 0) // 24130 find divisors of 36001960 using
+				{
+					bw.write(toWriteInBatch.toString());
+					toWriteInBatch.setLength(0);
+					// bw2.write(toWriteInBatch2.toString());
+					// toWriteInBatch2.setLength(0);
+				}
+				// $$bw.write(towrite);
+			} // end of while over lines
+
+			// should also write leftover, which will happen if not using exact divisors
+			if (toWriteInBatch.length() > 0)
+			{
+				System.out.println("Writing leftovers ... ");
+				bw.write(toWriteInBatch.toString());
+				toWriteInBatch.setLength(0);
+				// bw2.write(toWriteInBatch2.toString());
+				// toWriteInBatch2.setLength(0);
+			}
+
+			System.out.println("Num of checkins lines read = " + lineCount);
+			System.out.println("Count of checkins in spots1 = " + countOfSpots1);
+			System.out.println("Rejected checkins checking for rejection condition in following order");
+			System.out.println("countRejCheckinsWithPlaceWithNoTZ = " + countRejCheckinsWithPlaceWithNoTZ);
+			System.out.println("countRejNotFoundInSpots1 = " + countRejNotFoundInSpots1);
+			System.out.println("countRejWrongGeoCoords = " + countRejWrongGeoCoords);
+
+			System.out.println("userZoneHoppingCount sum = "
+					+ userZoneHoppingCount.entrySet().stream().mapToLong(e -> e.getValue()).sum());
+			WritingToFile.writeSimpleMapToFile(userZoneHoppingCount, commonPathToWrite + "userZoneHoppingCount.csv",
+					"User", "TimezoneHoppingCount");
+
+			br.close();
+			bw.close();
+			// bw2.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	//////////////
+	/**
 	 * Replace all double and double double quotes in json values with single quote
 	 * 
 	 * @param vals
@@ -1310,13 +1545,13 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			String[] urlSplitted = RegexUtils.patternForwardSlash.split(jObj.get("url").toString());
 			// String[] urlSplittedOld = jObj.get("url").toString().split("/");
 
-//			if (!Arrays.asList(urlSplitted).equals(Arrays.asList(urlSplittedOld)))
-//			{
-//				System.out.println("Error: !urlSplitted.equals(urlSplittedOld)");
-//			}
-//
-//			System.out.println("Arrays.asList(urlSplitted)= " + Arrays.asList(urlSplitted));
-//			System.out.println("Arrays.asList(urlSplittedOld)= " + Arrays.asList(urlSplittedOld));
+			// if (!Arrays.asList(urlSplitted).equals(Arrays.asList(urlSplittedOld)))
+			// {
+			// System.out.println("Error: !urlSplitted.equals(urlSplittedOld)");
+			// }
+			//
+			// System.out.println("Arrays.asList(urlSplitted)= " + Arrays.asList(urlSplitted));
+			// System.out.println("Arrays.asList(urlSplittedOld)= " + Arrays.asList(urlSplittedOld));
 
 			String catID = urlSplitted[urlSplitted.length - 1];
 

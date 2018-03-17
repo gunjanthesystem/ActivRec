@@ -188,13 +188,15 @@ public class Dashboard3 extends Application
 			// chooseSourcesTab.setClosable(true);
 
 			/***********************************************/
+			/* Disabled temporarily on Mar 15 2018 */
 			long ttGmap1 = System.currentTimeMillis();
-			Tab mapTab = new Tab("Locations Google Map");
+			Tab mapTab = new Tab("Google Map: Locations with No TZ");
 			GoogleMapApp mapPane = new GoogleMapApp();
 
-			String absFileNameForLatLonToReadAsMarker = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
+			String absFileNameForLatLonToReadAsMarker = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/locIDsWithNoTimezone.csv";
+			// "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
 			String delimiter = ",";
-			int latColIndex = 3, lonColIndex = 2, labelColIndex = 1;
+			int latColIndex = 2, lonColIndex = 1, labelColIndex = 0;
 			BorderPane bp = mapPane.getMapPane(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex,
 					labelColIndex, false);
 			mapTab.setContent(bp);
@@ -202,6 +204,7 @@ public class Dashboard3 extends Application
 			tabsToAdd.add(mapTab);
 			long ttGmap2 = System.currentTimeMillis();
 			System.out.println("google map = " + (ttGmap2 - ttGmap1));
+
 			/***********************************************/
 
 			/***********************************************/
