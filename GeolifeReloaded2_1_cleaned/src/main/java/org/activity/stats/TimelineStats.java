@@ -2909,4 +2909,193 @@ public class TimelineStats
 		// counted.entrySet().stream().forEach(e -> s.append(e.getKey() + "||" + e.getValue() + "\n"));
 		// WritingToFile.writeToNewFile(s.toString(), absFileNamePhrase);
 	}
+
+	// /**
+	// * Fork of
+	// * org.activity.generator.DatabaseCreatorGowallaQuicker0.countConsecutiveSimilarActivities2(LinkedHashMap<String,
+	// * TreeMap<Timestamp, CheckinEntry>>, String, String).
+	// *
+	// * @param mapForAllCheckinData
+	// * @param commonPathToWrite
+	// * @param absPathToCatIDDictionary
+	// * @return
+	// */
+	// private static LinkedHashMap<String, ArrayList<Integer>> countConsecutiveSimilarActivities3(
+	// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userTimelines, String commonPathToWrite,
+	// String absPathToCatIDDictionary, Function<CheckinEntry, String> lambdaForConsecSameAttribute)
+	// {
+	// // LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
+	// Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 = TimelineUtils
+	// .getEmptyMapOfCatIDs(absPathToCatIDDictionary);
+	//
+	// // <catid,catname>
+	// TreeMap<Integer, String> catIDNameDictionary = r1.getSecond();
+	//
+	// // <catid, [1,1,2,4,1,1,1,6]>
+	// LinkedHashMap<String, ArrayList<Integer>> catIDLengthConsecs = r1.getFirst();
+	// System.out.println("catIDLengthConsecutives.size = " + catIDLengthConsecs.size());
+	//
+	// // <placeid, [1,1,2,4,1,1,1,6]>
+	// LinkedHashMap<String, ArrayList<Integer>> comparedAttribLengthConsecs = new LinkedHashMap<>();
+	//
+	// // <userID, [1,1,2,4,1,1,1,6]>
+	// LinkedHashMap<String, ArrayList<Integer>> userLengthConsecs = new LinkedHashMap<>();
+	//
+	// StringBuilder sbEnumerateAllCheckins = new StringBuilder();// write all checkins sequentially userwise
+	// StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
+	// // changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
+	// // StringBuilder sbAllDurationFromNext = new StringBuilder();
+	// WritingToFile.appendLineToFileAbsolute("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
+	// commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
+	//
+	// long checkinsCount = 0, checkinsWithInvalidGeocoords = 0;
+	// // /* Uncomment to view the category ids in the map */
+	// // catIDLengthConsecs.entrySet().stream().forEach(e -> System.out.print(" " + e.getKey().toString() + "-" +
+	// // e.getValue()));
+	//
+	// try
+	// {
+	// for (Entry<String, TreeMap<Timestamp, CheckinEntry>> userE : mapForAllCheckinData.entrySet())
+	// {
+	// String user = userE.getKey();
+	//
+	// // can initiate here, since entries for each user is together, can't do same for cat and compared attrib
+	// ArrayList<Integer> userLengthConsecsVals = new ArrayList<Integer>();
+	//
+	// String prevValOfComparisonAttribute = "", prevActivityID = "";// activityID or placeID
+	//
+	// int numOfConsecutives = 1;
+	//
+	// StringBuilder distanceDurationFromNextSeq = new StringBuilder(); // only writes >1 consecs
+	//
+	// for (Entry<Timestamp, CheckinEntry> dateE : userE.getValue().entrySet())
+	// {
+	// CheckinEntry ce = dateE.getValue();
+	// checkinsCount += 1;
+	//
+	// if (!StatsUtils.isValidGeoCoordinate(ce.getStartLatitude(), ce.getStartLongitude()))
+	// {
+	// checkinsWithInvalidGeocoords += 1;
+	// }
+	//
+	// String currValOfComparisonAttribute = lambdaForConsecSameAttribute.apply(ce);
+	// String activityID = String.valueOf(ce.getActivityID());
+	// double distNext = ce.getDistanceInMetersFromPrev();
+	// long durationNext = ce.getDurationInSecsFromPrev();
+	// String ts = ce.getTimestamp().toString();
+	// String actCatName = catIDNameDictionary.get(Integer.valueOf(activityID));
+	//
+	// sbEnumerateAllCheckins.append(user + "," + ts + "," + currValOfComparisonAttribute + ","
+	// + activityID + "," + actCatName + "," + distNext + "," + durationNext + "\n");
+	//
+	// // if curr is same as prev for compared attrib,
+	// // keep on accumulating the consecutives & append entry for writing to file
+	// if (currValOfComparisonAttribute.equals(prevValOfComparisonAttribute))
+	// {
+	// // $$ System.out.println(" act name:" + activityName + " = prevActName = " + prevActivityName
+	// // $$ + " \n Hence append");
+	// numOfConsecutives += 1;
+	// distanceDurationFromNextSeq.append(user + "," + ts + "," + currValOfComparisonAttribute + ","
+	// + activityID + "," + actCatName + "," + String.valueOf(distNext) + ","
+	// + String.valueOf(durationNext) + "\n");
+	// continue;
+	// }
+	// // if current val is not equal to prev value, write the prev accumulated consecutives
+	// else
+	// {
+	// if (prevValOfComparisonAttribute.length() == 0)
+	// {
+	// // skip the first entry for this user.
+	// }
+	// else
+	// {
+	// // $$System.out.println(" act name:" + activityName + " != prevActName = " +
+	// // prevActivityName);
+	// // consec vals for this cat id. note: preassigned empty arraylist for each catid beforehand
+	// ArrayList<Integer> consecValsCat = catIDLengthConsecs.get(prevActivityID);
+	//
+	// // consec vals for this compared attibute (say place id)
+	// // ArrayList<Integer> consecValsCompAttrib;
+	// // if (comparedAttribLengthConsecs.containsKey(prevValOfComparisonAttribute))
+	// // {
+	// // consecValsCompAttrib = comparedAttribLengthConsecs.get(prevValOfComparisonAttribute);
+	// // }
+	// //
+	// // else
+	// // {
+	// // consecValsCompAttrib = new ArrayList<>();
+	// // }
+	// ArrayList<Integer> consecValsCompAttrib = comparedAttribLengthConsecs
+	// .get(prevValOfComparisonAttribute);
+	//
+	// if (consecValsCompAttrib == null)
+	// {
+	// consecValsCompAttrib = new ArrayList<>();
+	// }
+	//
+	// // $$System.out.println(" currently numOfConsecutives= " + numOfConsecutives);
+	// consecValsCat.add(numOfConsecutives); // append this consec value
+	// consecValsCompAttrib.add(numOfConsecutives); // append this consec value
+	// userLengthConsecsVals.add(numOfConsecutives); // append this consec value
+	//
+	// catIDLengthConsecs.put(prevActivityID, consecValsCat);
+	// comparedAttribLengthConsecs.put(prevValOfComparisonAttribute, consecValsCompAttrib);
+	//
+	// if (numOfConsecutives > 1)
+	// {
+	// sbAllDistanceInMDurationInSec.append(distanceDurationFromNextSeq.toString());
+	// // $$System.out.println("appending to dista, duration");
+	// }
+	// distanceDurationFromNextSeq.setLength(0); // resetting
+	// numOfConsecutives = 1;// resetting
+	// }
+	// }
+	// prevValOfComparisonAttribute = currValOfComparisonAttribute;
+	// prevActivityID = activityID; // not for comparison but for consecValsCat
+	//
+	// if (checkinsCount % 20000 == 0)
+	// {
+	// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+	// commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
+	// sbEnumerateAllCheckins.setLength(0);
+	//
+	// WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+	// commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
+	// sbAllDistanceInMDurationInSec.setLength(0);
+	// }
+	// } // end of loop over days
+	// userLengthConsecs.put(user, userLengthConsecsVals);
+	// } // end of loop over users
+	//
+	// // write remaining in buffer
+	// if (sbEnumerateAllCheckins.length() != 0)
+	// {
+	// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+	// commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
+	// sbEnumerateAllCheckins.setLength(0);
+	//
+	// WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+	// commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
+	// sbAllDistanceInMDurationInSec.setLength(0);
+	// }
+	//
+	// System.out.println("Num of checkins read = " + checkinsCount);
+	// System.out.println("checkinsWithInvalidGeocoords read = " + checkinsWithInvalidGeocoords);
+	//
+	// WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
+	// commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
+	// WritingToFile.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
+	// commonPathToWrite + "ComparedAtributewiseConsecCounts.csv", false, false);
+	// WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
+	// commonPathToWrite + "UserwiseConsecCounts.csv", false, false);
+	//
+	// // WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+	// // commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv");
+	// }
+	// catch (Exception e)
+	// {
+	// e.printStackTrace();
+	// }
+	// return catIDLengthConsecs;
+	// }
 }

@@ -347,6 +347,8 @@ public class ReadingFromFile
 	}
 
 	/**
+	 * header is treated in same way as all other data
+	 * <p>
 	 * ref: http://www.baeldung.com/java-read-lines-large-file
 	 * 
 	 * @param inputStream
@@ -408,6 +410,7 @@ public class ReadingFromFile
 	}
 
 	/**
+	 * Note: header is treated in same way as all other data
 	 * 
 	 * @param inputStream
 	 * @param delimiter

@@ -74,7 +74,12 @@ public class TimelineChart2 extends XYChart<Number, String>
 			return;
 		}
 
-		int numOfSeries = getData().size();
+		double heightOfActBox = this.getHeight() / (getData().size() * 1.5);
+		heightOfActBox = Math.min(Math.max(heightOfActBox, 5), 30);// bound between 5 and 30
+
+		Axis<String> yAxis = getYAxis();
+		Axis<Number> xAxis = getXAxis();
+
 		// $ System.out.println("getData().size()= " + );
 		// update activity box positions
 		for (int index = 0; index < getData().size(); index++)
@@ -85,9 +90,6 @@ public class TimelineChart2 extends XYChart<Number, String>
 
 			while (iter.hasNext())
 			{
-				Axis<String> yAxis = getYAxis();
-				Axis<Number> xAxis = getXAxis();
-
 				XYChart.Data<Number, String> item = iter.next();
 				Number displayedXVal = getCurrentDisplayedXValue(item);
 				String displayedYVal = getCurrentDisplayedYValue(item);
@@ -100,8 +102,6 @@ public class TimelineChart2 extends XYChart<Number, String>
 				// System.out.println("--> yAxis.getPrefHeight() =" + yAxis.getPrefHeight());
 				// System.out.println("--> yAxis.autoRangingProperty() =" + yAxis.autoRangingProperty());//true
 				// $$ System.out.println("--> this.height() =" + this.getHeight());
-				double heightOfActBox = this.getHeight() / (numOfSeries * 1.5);
-				heightOfActBox = Math.min(Math.max(heightOfActBox, 5), 30);// bound between 5 and 30
 				// $$ System.out.println("--> heightOfActBox = " + heightOfActBox);
 				// heightOfActBox+emptySpaceAboveActBox+emptySpaceBelowActBox = (heightOfChart/numOfUsers)
 				// heightOfActBox+0.25*heightOfActBox+0.25*heightOfActBox = (heightOfChart/numOfUsers)
@@ -134,6 +134,11 @@ public class TimelineChart2 extends XYChart<Number, String>
 					// position the activity box
 					activityBox.setLayoutX(xDispPosition);
 					activityBox.setLayoutY(yDispPosition);
+
+					// System.out.println("\nxDispPosition= " + xDispPosition);
+					// System.out.println("endTS= " + endTS);
+					// System.out.println("displayedXVal= " + displayedXVal);
+					// System.out.println("displayedYVal= " + displayedYVal);
 				}
 
 			}

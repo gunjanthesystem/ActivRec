@@ -72,7 +72,8 @@ public class SuperController
 	public static void main(String args[])
 	{
 		// searchContentInFile();
-		// cleanUpSpace("./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/", 0.9);
+		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
+		// cleanUpSpace("./dataWritten/Mar5ED0.0STimeStFilter0hrs/", 0.9);
 		// runAllAKOMExperiments();
 		// $ cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaseline/", 0.9);
 		// $cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaselineForUserNumInvestigation/",0.9);
@@ -170,10 +171,16 @@ public class SuperController
 			featuresUsedLabel += "DurPrev";
 		}
 
+		if (Constant.useFeatureDistancesOfAllActs)
+		{
+			featuresUsedLabel += "AllActsFD";
+		}
+
 		// Start
-		String[] commonPaths = { "./dataWritten/Mar" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-				+ LocalDateTime.now().getDayOfMonth() + "ED" + Constant.EDAlpha + featuresUsedLabel + "StFilter"
-				+ (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
+		String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth() + "ED"
+				+ Constant.EDAlpha + featuresUsedLabel + "StFilter"
+				+ (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrsDebug1/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };

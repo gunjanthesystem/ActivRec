@@ -2,7 +2,6 @@ package org.activity.plotting;
 
 import java.util.List;
 
-import org.activity.objects.Pair;
 import org.activity.ui.EpochStringConverter;
 import org.controlsfx.control.RangeSlider;
 
@@ -42,7 +41,7 @@ public class TimelineChartApp2 extends Pane
 {
 
 	/// ActName, Val1, Val2, Val3,
-	static List<Pair<String, List<Double>>> allData;
+	// static List<Pair<String, List<Double>>> allData;
 	private VBox vbox = new VBox();
 	private TimelineChart2 timelineChart;
 	private NumberAxis xAxis;
@@ -68,13 +67,10 @@ public class TimelineChartApp2 extends Pane
 	public Pane createContentV2(List<List<List<String>>> dataReceived, boolean hasXAxisRangeSlider)
 	{
 		vbox = new VBox();
-
 		XYChart<Number, String> timelineChart = createTimelineContentV2(dataReceived);
 		vbox.getChildren().add(timelineChart);
 		vbox.getChildren().add(createXAxisRangeSlider((NumberAxis) timelineChart.getXAxis()));
-
 		VBox.setVgrow(timelineChart, Priority.ALWAYS);
-
 		return vbox;
 	}
 
@@ -179,7 +175,7 @@ public class TimelineChartApp2 extends Pane
 
 	public XYChart<Number, String> createTimelineContent(List<List<String>> dataReceived)
 	{
-		System.out.println("createContent() called");
+		System.out.println("createTimelineContent() called");
 
 		xAxis = new NumberAxis();
 		// long millis = 100;
@@ -285,7 +281,7 @@ public class TimelineChartApp2 extends Pane
 	 */
 	public XYChart<Number, String> createTimelineContentV2(List<List<List<String>>> dataReceived)
 	{
-		System.out.println("createContent() called");
+		System.out.println("createTimelineContent() called");
 
 		xAxis = new NumberAxis();
 		// long millis = 100;
@@ -384,6 +380,10 @@ public class TimelineChartApp2 extends Pane
 		xAxis.setTickUnit((this.maxXAxis - this.minXAxis) / 20);
 		// xAxis.setTickUnit((maxXAxis - minXAxis) / 800);
 		xAxis.setMinorTickVisible(false);
+
+		// // save memory and clear reference
+		// dataReceived.clear();
+		// dataReceived = null;
 
 		return timelineChart;
 	}

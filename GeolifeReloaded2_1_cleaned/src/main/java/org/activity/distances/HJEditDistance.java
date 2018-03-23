@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
@@ -753,6 +754,13 @@ public class HJEditDistance extends AlignmentBasedDistance
 		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects(activityObjects2, primaryDimension,
 				uniqueCharCodes, VerbosityConstants.verbose);
 		// t5 = System.nanoTime();
+
+		// Start of added on 17 Mar 2018
+		if (Constant.useFeatureDistancesOfAllActs)
+		{
+			dFeat = getFeatureLevelEditDistanceAllActsV2(activityObjects1, activityObjects2);
+		}
+		// End of added on 17 Mar 2018
 		//// temp start
 		// ArrayList<String> stringCodesForActivityObjects1FU = StringCode.getStringCodesForActivityObjectsFU(
 		// activityObjects1, primaryDimension, uniqueCharCodesFU, VerbosityConstants.verbose);
@@ -866,22 +874,24 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 			else if (operationChar == 'N')
 			{
-				// System.out.println("dAct=" + dAct);
-				double decayWt = 1;
-				// System.out.println("N matched");
-				if (Constant.useDecayInFeatureLevelED && (i == (DINSTrace.length - 1)))
-				{
-					decayWt = 3;
+				if (Constant.useFeatureDistancesOfAllActs == false)
+				{// i.e., feature distance of only N (matched) act objs
+					// System.out.println("dAct=" + dAct);
+					double decayWt = 1;
+					// System.out.println("N matched");
+					if (Constant.useDecayInFeatureLevelED && (i == (DINSTrace.length - 1)))
+					{
+						decayWt = 3;
+					}
+					// System.out.println("Decay wt=" + decayWt);
+					// System.out.println("coordOfAO1="+coordOfAO1+" coordOfAO2="+coordOfAO2);
+					dFeat += (decayWt * getFeatureLevelDistance(activityObjects1.get(coordOfAO1),
+							activityObjects2.get(coordOfAO2)));
 				}
-				// System.out.println("Decay wt=" + decayWt);
-				// System.out.println("coordOfAO1="+coordOfAO1+" coordOfAO2="+coordOfAO2);
-				dFeat += (decayWt
-						* getFeatureLevelDistance(activityObjects1.get(coordOfAO1), activityObjects2.get(coordOfAO2)));
 			}
 		}
 
 		if (!Constant.disableRoundingEDCompute)
-
 		{
 			dAct = StatsUtils.round(dAct, 4);
 			dFeat = StatsUtils.round(dFeat, 4);
@@ -975,6 +985,148 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// WritingToFile.writeEditSimilarityCalculation(activityObjects1,activityObjects2,levenshteinDistance);
 		// WritingToFile.writeEditDistance(levenshteinDistance);
 		return new Pair<String, Double>(levenshteinDistance.getFirst(), distanceTotal);
+	}
+
+	/**
+	 * @since Mar 17 2018
+	 * @param activityObjects1
+	 * @param activityObjects2
+	 * @return
+	 */
+	public double getFeatureLevelEditDistanceAllActs(ArrayList<ActivityObject> activityObjects1,
+			ArrayList<ActivityObject> activityObjects2)
+	{
+		double dFeat = 0;
+		int ao1Size = activityObjects1.size();
+		int ao2Size = activityObjects2.size();
+
+		List<ActivityObject> aos1ToCompare = activityObjects1;
+		List<ActivityObject> aos2ToCompare = activityObjects2;
+
+		StringBuilder sbtt1 = new StringBuilder();
+		if (true)// debug Mar17 2018 //Sanity Checked ok
+		{
+			sbtt1.append("\n\nactivityObjects1=:1" + "" + getActIDsAsString(activityObjects1) + "\nactivityObjects2="
+					+ getActIDsAsString(activityObjects2));
+			sbtt1.append("\nao1Size=" + ao1Size + "\nao2Size=" + ao2Size + "  equalSize=" + (ao1Size == ao2Size));
+
+		}
+
+		if (ao1Size > ao2Size)
+		{
+			// aos1ToCompare = activityObjects1.subList(ao2Size - 2, ao1Size);
+			sbtt1.append("\nao1Size > ao2Size\n");
+			aos1ToCompare = activityObjects1.subList(ao2Size - ao1Size, ao1Size);
+		}
+		else if (ao1Size < ao2Size)
+		{
+			sbtt1.append("\nao1Size < ao2Size\n");
+			aos2ToCompare = activityObjects2.subList(ao1Size - ao2Size, ao2Size);// SHOWING INDEX OUT
+		}
+
+		for (int i = aos1ToCompare.size() - 1; i >= 0; i--)
+		{
+			double decayWt = 1;
+			// System.out.println("N matched");
+			// if (Constant.useDecayInFeatureLevelED)
+			// {
+			// decayWt = 3;
+			// }
+			// System.out.println("Decay wt=" + decayWt);
+			// System.out.println("coordOfAO1="+coordOfAO1+" coordOfAO2="+coordOfAO2);
+			dFeat += (decayWt * getFeatureLevelDistance(activityObjects1.get(i), activityObjects2.get(i)));
+		}
+
+		// if (dFeat == 0)
+		// {
+		// StringBuilder sb = new StringBuilder();
+		// sb.append("\naos1ToCompare=" + aos1ToCompare + "\naos2ToCompare=" + aos2ToCompare);
+		// WritingToFile.appendLineToFileAbsolute(sb.toString(),
+		// Constant.getOutputCoreResultsPath() + "DebugMar17_2018EDWhyFEDIS0.csv");
+		//
+		// }
+
+		if (true)// debug Mar17 2018 //Sanity Checked ok
+		{
+			// StringBuilder sbtt1 = new StringBuilder();
+			// sbtt1.append("\n\nactivityObjects1=:1" + "" + getActIDsAsString(activityObjects1) + "\nactivityObjects2="
+			// + getActIDsAsString(activityObjects2));
+			// sbtt1.append("\nao1Size=" + ao1Size + "\nao2Size=" + ao2Size);
+			sbtt1.append("\naos1ToCompare=" + getActIDsAsString(aos1ToCompare) + "\naos2ToCompare="
+					+ getActIDsAsString(aos2ToCompare));
+			WritingToFile.appendLineToFileAbsolute(sbtt1.toString(),
+					Constant.getOutputCoreResultsPath() + "DebugMar17_2018EDFeatureLevel.csv");
+		}
+		return dFeat;
+	}
+
+	/**
+	 * No sublisting required
+	 * 
+	 * @since Mar 22 2018
+	 * @param activityObjects1
+	 * @param activityObjects2
+	 * @return
+	 */
+	public double getFeatureLevelEditDistanceAllActsV2(ArrayList<ActivityObject> activityObjects1,
+			ArrayList<ActivityObject> activityObjects2)
+	{
+		double dFeat = 0;
+		int ao1Size = activityObjects1.size();
+		int ao2Size = activityObjects2.size();
+
+		List<ActivityObject> aos1ToCompare = activityObjects1;
+		List<ActivityObject> aos2ToCompare = activityObjects2;
+
+		StringBuilder sbtt1 = new StringBuilder();
+		if (false)// debug Mar17 2018 //Sanity Checked ok
+		{
+			sbtt1.append("\n\nactivityObjects1=" + "" + getActIDsAsString(activityObjects1) + "\nactivityObjects2="
+					+ getActIDsAsString(activityObjects2));
+			sbtt1.append("\nao1Size=" + ao1Size + "\nao2Size=" + ao2Size + "  equalSize=" + (ao1Size == ao2Size));
+		}
+
+		int minSize = Math.min(ao1Size, ao2Size);
+		sbtt1.append("\nminSize=" + minSize + "\n");
+
+		for (int minIter = 0; minIter < minSize; minIter++)
+		{
+			double decayWt = 1;
+			// System.out.println("N matched");
+			// if (Constant.useDecayInFeatureLevelED)
+			// {
+			// decayWt = 3;
+			// }
+			// System.out.println("Decay wt=" + decayWt);
+			// System.out.println("coordOfAO1="+coordOfAO1+" coordOfAO2="+coordOfAO2);
+			ActivityObject ao1ToCompare = activityObjects1.get(ao1Size - 1 - minIter);
+			ActivityObject ao2ToCompare = activityObjects2.get(ao2Size - 1 - minIter);
+			// $sbtt1.append(ao1ToCompare.getActivityID() + "--" + ao2ToCompare.getActivityID() + "\n");
+
+			dFeat += (decayWt * getFeatureLevelDistance(ao1ToCompare, ao2ToCompare));
+		}
+
+		// if (dFeat == 0)
+		// {
+		// StringBuilder sb = new StringBuilder();
+		// sb.append("\naos1ToCompare=" + aos1ToCompare + "\naos2ToCompare=" + aos2ToCompare);
+		// WritingToFile.appendLineToFileAbsolute(sb.toString(),
+		// Constant.getOutputCoreResultsPath() + "DebugMar17_2018EDWhyFEDIS0.csv");
+		// }
+
+		// if (true)// debug Mar22 2018 //Sanity Checked ok
+		// {
+		// WritingToFile.appendLineToFileAbsolute(sbtt1.toString(),
+		// Constant.getOutputCoreResultsPath() + "DebugMar22_2018EDFeatureLevel.csv");
+		// }
+		return dFeat;
+	}
+
+	public static String getActIDsAsString(List<ActivityObject> aos)
+	{
+		StringBuilder sb = new StringBuilder();
+		aos.stream().forEachOrdered(ao -> sb.append(">" + ao.getActivityID()));
+		return sb.toString();
 	}
 
 	/**

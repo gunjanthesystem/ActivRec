@@ -184,7 +184,8 @@ apply plugin: "us.kirchmeier.capsule"
 /////////////////////////////////////////////////////////////////////////////
 
 //  to run 
-mainClassName = 'org.activity.generator.GowallaPreProcessorUtils'
+mainClassName = 'org.activity.controller.SuperController'
+//'org.activity.generator.GowallaPreProcessorUtils'
 
 task fatCapsule(type: FatCapsule) {
   applicationClass 'org.activity.controller.SuperController'
@@ -214,7 +215,7 @@ task fatJar(type: Jar) {
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = mainClassName
-  jvmArgs = ['-Xmx12g']
+  jvmArgs = ['-Xmx35g']
   //
   //,'-javaagent:libs/plumbr/plumbr.jar']
   //, '-XX:-UseGCOverheadLimit
