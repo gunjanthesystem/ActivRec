@@ -1,3 +1,4 @@
+package jfxtras.styles.jmetro8;
 // package jfxtras.styles.jmetro8;
 //
 // import org.controlsfx.control.RangeSlider;

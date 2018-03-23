@@ -49,7 +49,7 @@ public class VerbosityConstants
 
 	public static final boolean WriteRedundant = false;
 	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;// false;// true;
-	public static final boolean WriteEditSimilarityCalculations = false;// true;//false;// false;// false;
+	public static final boolean WriteEditSimilarityCalculations = false;// true;// true;//false;// false;// false;
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;

@@ -83,6 +83,8 @@ public class GluonOSMMap extends Application
 	{
 		MapView view = new MapView();
 
+		view.setCenter(42.472309, 6.897996);
+		view.setZoom(12);
 		List<Triple<Double, Double, String>> listOfLocs = readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
 				delimiter, latColIndex, lonColIndex, labelColIndex);
 
@@ -158,7 +160,7 @@ public class GluonOSMMap extends Application
 		return Services.get(PositionService.class).map(positionService ->
 			{
 				ReadOnlyObjectProperty<Position> positionProperty = positionService.positionProperty();
-				Position position = positionProperty.get();
+				// Position position = positionProperty.get();
 
 				// if (position == null)
 				// {

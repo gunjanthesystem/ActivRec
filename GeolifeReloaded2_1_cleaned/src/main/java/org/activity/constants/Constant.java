@@ -176,21 +176,27 @@ public final class Constant
 
 	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
 	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
-	public static final double EDAlpha = 1;// 0.8;// 0.5;// SWITCH_NOV10
+	public static final double EDAlpha = 0.5;// 0.8;// 0.5;// SWITCH_NOV10
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
 	public static final boolean scoreRecommsByLocProximity = false;// SWITCH_NOV10
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
-	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
-	public static final boolean useLocationInFED = true;// SWITCH_NOV10
-	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
+	public static final boolean useStartTimeInFED = false;// SWITCH_NOV10
+	public static final boolean useLocationInFED = false;// SWITCH_NOV10
+	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
-	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
+	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
 	public static final boolean useDecayInFeatureLevelED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = true;//// SWITCH_NOV10
 	public static final boolean randomLySample100Users = true;// SWITCH_NOV10
+
+	/**
+	 * If enabled, in Edit distance, instead of computing feature level edit distance just for activity objects which
+	 * matchin act name across the compared timelines, computed feature level edit distance over all act objs
+	 */
+	public static final boolean useFeatureDistancesOfAllActs = true;// SWITCH_NOV10
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -1300,6 +1306,7 @@ public final class Constant
 		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFeatureLevelED);
 		s.append("\nassignFallbackZoneId:" + assignFallbackZoneIdWhenConvertCinsToAO);
 		s.append("\nrandomLySample100Users:" + randomLySample100Users);
+		s.append("\nuseFeatureDistancesOfAllActs:" + useFeatureDistancesOfAllActs);
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))

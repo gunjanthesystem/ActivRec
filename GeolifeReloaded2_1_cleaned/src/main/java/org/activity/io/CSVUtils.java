@@ -64,8 +64,13 @@ public class CSVUtils
 		List<String> header = null;
 		try
 		{
-			allLines = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(new FileInputStream(originCSVFile),
-					delimiter, hasHeader, false, new int[] { 0, 2, 3 });
+			// allLines = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(new
+			// FileInputStream(originCSVFile),
+			// delimiter, hasHeader, false, new int[] { 0,1, 2, 3 });
+
+			allLines = ReadingFromFile.nColumnReaderStringLargeFile(new FileInputStream(originCSVFile), delimiter,
+					hasHeader, false);
+
 			int numOfAdditionalLinesForNewHeaders = 0;
 			if (hasHeader)
 			{

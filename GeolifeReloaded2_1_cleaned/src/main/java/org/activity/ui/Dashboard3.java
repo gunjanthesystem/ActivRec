@@ -137,6 +137,7 @@ public class Dashboard3 extends Application
 		try
 		{
 			///
+			long tTimeline0 = System.currentTimeMillis();
 			Tab timelineTab = new Tab("Historical Timelines All Users");
 			// VBox timelinesVBox2 = new VBox();
 			TimelineChartApp2 tcA = new TimelineChartApp2();// DataGenerator.getData2(), true);
@@ -148,11 +149,13 @@ public class Dashboard3 extends Application
 			// .createContent(DataGenerator.getData2()));
 			// timelinesVBox2.getChildren().add(tcA.createContent(DataGenerator.getData2(10, 20, 5, 5, 200, 2, 10),
 			// true));// .createContent(DataGenerator.getData2()));
-			Pane p = (tcA.createContentV2(DataGenerator.getData3(10, 20, 12, 5, 200, 2, 10), true));// .createContent(DataGenerator.getData2()));
+			Pane p = (tcA.createContentV2(DataGenerator.getData3(10, 200, 12, 5, 200, 2, 10), true));// .createContent(DataGenerator.getData2()));
+
 			timelineTab.setContent(p);// timelinesVBox2);
 			timelineTab.setClosable(false);
 			tabsToAdd.add(timelineTab);
-
+			long tTimelinen = System.currentTimeMillis();
+			System.out.println("Timeto create timelines chart = " + (tTimelinen - tTimeline0) + " ms");
 			///
 
 			/*
@@ -171,58 +174,70 @@ public class Dashboard3 extends Application
 			 * true));// .createContent(DataGenerator.getData2())); timelineTabOneForEachUser.setContent(timelinesVBox);
 			 * timelineTabOneForEachUser.setClosable(false); tabsToAdd.add(timelineTabOneForEachUser);
 			 */
+			// long tLine0 = System.currentTimeMillis();
+			// Tab lineChartTab = new Tab("lineChart");
+			// lineChartTab.setContent(ChartUtils.createLineChart(
+			// FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(10, 5000)), "title", "ajooba"));
+			// lineChartTab.setClosable(true);
+			// tabsToAdd.add(lineChartTab);
+			// long tLineN = System.currentTimeMillis();
+			// System.out.println("Time to create lines chart = " + (tLineN - tLine0) + " ms");
+			//
+			// long tScatter0 = System.currentTimeMillis();
+			// Tab scatterChartTab = new Tab("scatterChart");
+			// scatterChartTab.setContent(ChartUtils.createScatterChart(
+			// FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(10, 5000)), "title", "ajooba"));
+			// scatterChartTab.setClosable(true);
+			// tabsToAdd.add(scatterChartTab);
+			// long tScatterN = System.currentTimeMillis();
+			// System.out.println("Time to create scatter chart = " + (tScatterN - tScatter0) + " ms");
 
-			/*
-			 * Tab lineChartTab = new Tab("lineChart"); lineChartTab.setContent(ChartUtils.createLineChart(
-			 * FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50)), "title", "ajooba"));
-			 * lineChartTab.setClosable(true); tabsToAdd.add(lineChartTab);
-			 */
-
-			/*
-			 * Tab scatterChartTab = new Tab("scatterChart"); scatterChartTab.setContent(ChartUtils.createScatterChart(
-			 * FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(50, 50)), "title", "ajooba"));
-			 * scatterChartTab.setClosable(true); tabsToAdd.add(scatterChartTab);
-			 */
 			// Tab chooseSourcesTab = new Tab("Timelines");
 			// // chooseSourcesTab.setContent(createChooseSourcesTable());// createChooseSources());
 			// chooseSourcesTab.setClosable(true);
 
 			/***********************************************/
 			/* Disabled temporarily on Mar 15 2018 */
-			long ttGmap1 = System.currentTimeMillis();
-			Tab mapTab = new Tab("Google Map: Locations with No TZ");
-			GoogleMapApp mapPane = new GoogleMapApp();
+			// long ttGmap1 = System.currentTimeMillis();
+			// Tab mapTab = new Tab("Google Map: Locations with No TZ");
+			// GoogleMapApp mapPane = new GoogleMapApp();
+			//
+			// String absFileNameForLatLonToReadAsMarker =
+			// "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/locIDsWithNoTimezone.csv";
+			// // "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
+			// String delimiter = ",";
+			// int latColIndex = 2, lonColIndex = 1, labelColIndex = 0;
+			// BorderPane bp = mapPane.getMapPane(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex,
+			// lonColIndex,
+			// labelColIndex, false);
+			// mapTab.setContent(bp);
+			// mapTab.setClosable(false);
+			// tabsToAdd.add(mapTab);
+			// long ttGmap2 = System.currentTimeMillis();
+			// System.out.println("google map = " + (ttGmap2 - ttGmap1));
 
-			String absFileNameForLatLonToReadAsMarker = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/locIDsWithNoTimezone.csv";
+			/***********************************************/
+
+			/***********************************************/
+			// $$ Start of disabled on Mar 17 2018
+			// long ttOSMmap1 = System.currentTimeMillis();
+			// Tab osmMapTab = new Tab("Locations OSM Map");
+			// GluonOSMMap osmapPane = new GluonOSMMap();
+			//
+			// String absFileNameForLatLonToReadAsMarker2 =
 			// "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
-			String delimiter = ",";
-			int latColIndex = 2, lonColIndex = 1, labelColIndex = 0;
-			BorderPane bp = mapPane.getMapPane(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex,
-					labelColIndex, false);
-			mapTab.setContent(bp);
-			mapTab.setClosable(false);
-			tabsToAdd.add(mapTab);
-			long ttGmap2 = System.currentTimeMillis();
-			System.out.println("google map = " + (ttGmap2 - ttGmap1));
-
-			/***********************************************/
-
-			/***********************************************/
-			long ttOSMmap1 = System.currentTimeMillis();
-			Tab osmMapTab = new Tab("Locations OSM Map");
-			GluonOSMMap osmapPane = new GluonOSMMap();
-
-			String absFileNameForLatLonToReadAsMarker2 = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
-			String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
-			String delimiter2 = ",";
-			int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
-			BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerAll, delimiter2, latColIndex2,
-					lonColIndex2, labelColIndex3);
-			osmMapTab.setContent(bp2);
-			osmMapTab.setClosable(false);
-			tabsToAdd.add(osmMapTab);
-			long ttOSMmap2 = System.currentTimeMillis();
-			System.out.println("osm map = " + (ttOSMmap2 - ttOSMmap1));
+			// String absFileNameForLatLonToReadAsMarkerAll =
+			// "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
+			// String delimiter2 = ",";
+			// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
+			// BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerAll, delimiter2, latColIndex2,
+			// lonColIndex2, labelColIndex3);
+			// osmMapTab.setContent(bp2);
+			// osmMapTab.setClosable(false);
+			// tabsToAdd.add(osmMapTab);
+			// long ttOSMmap2 = System.currentTimeMillis();
+			// System.out.println("osm map = " + (ttOSMmap2 - ttOSMmap1));
+			// $$ End of disabled on Mar 17 2018
 			/***********************************************/
 
 			/*

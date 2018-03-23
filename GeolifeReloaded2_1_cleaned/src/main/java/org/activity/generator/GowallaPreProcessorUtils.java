@@ -3,17 +3,25 @@ package org.activity.generator;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadXML;
@@ -37,7 +45,7 @@ public class GowallaPreProcessorUtils
 		// TODO Auto-generated constructor stub
 	}
 
-	public static void main1(String[] args)
+	public static void splitRawSpots1LocFile()
 	{
 		// Split files needed for fetching timezone for lats, longs in the datase:
 		// include all locs in raw spots subset 1
@@ -48,14 +56,149 @@ public class GowallaPreProcessorUtils
 				.getNumOfLines("/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv");
 
 		System.out.println("num of lines = " + numOfLines);
+	}
 
+	/**
+	 * These are the locations for which OSM address has not been fetched yet
+	 */
+	public static void splitFilesWithRemainingLocsForFetchingOSMAddress()
+	{
+		String fileToRead = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/OSMAddressesCollected/targetLocsForWhichOSMAddressesNotCollectedWithTZ.csv";
+		CSVUtils.splitCSVRowise(fileToRead, ",", true, 10,
+				"/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/OSMAddressesCollected/targetLocsForWhichOSMAddressesNotCollectedWithTZSplitted/",
+				"targetLocsForWhichOSMAddressesNotCollectedWithTZsmallerFile");
+
+		long numOfLines = ReadingFromFile.getNumOfLines(fileToRead);
+
+		System.out.println("num of lines = " + numOfLines);
+	}
+
+	/**
+	 * Concatenate timezone collected in smaller files
+	 * 
+	 * @since Mar 20 2018
+	 */
+	public static void concatenateRawSpots1LocFileWithCollectedTZ()
+	{
+		// Split files needed for fetching timezone for lats, longs in the datase:
+		// include all locs in raw spots subset 1
+
+		// concatenate back the split files.
+		String commonPath = "/home/gunjan/JupyterWorkspace/data/d10/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ";
+		ArrayList<String> fileNamesToConcatenate = (ArrayList<String>) IntStream.rangeClosed(1, 10)
+				.mapToObj(i -> commonPath + i + ".csv").collect(Collectors.toList());
+		System.out.println("Files to concatenate:\n" + fileNamesToConcatenate.toString());
+		CSVUtils.concatenateCSVFiles(fileNamesToConcatenate, true,
+				"/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018TZAll.csv", ',');
+		////
 	}
 
 	public static void main(String[] args)
 	{
-		// $getGeoAddressForLocations();
+		getGeoAddressForLocations();
 		// getLocTimezoneMap();
-		slimProcessedData();
+		// $$slimProcessedData();//added earlier and then disabled on Mar 20 2018
+
+		// $$ consolidateAllFetchedOSMAddresses(); // added, used and disabled on Mar 20 2018
+		// $$concatenateRawSpots1LocFileWithCollectedTZ();//
+		// %% splitFilesWithRemainingLocsForFetchingOSMAddress();
+	}
+
+	/**
+	 * Consolidate OSM address fetched in multiple files (from multiple servers)
+	 * 
+	 * 
+	 * @since Mar 20 2018
+	 */
+	public static void consolidateAllFetchedOSMAddresses()
+	{
+		String commonPathToRead = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/OSMAddressesCollected/";
+		Set<Path> pathsOfFoundFiles = new TreeSet<>(); // filepaths matching the file name pattern
+		StringBuilder res = new StringBuilder();
+		String fileNamePatternToSearch = "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZAddress";
+		Set<List<String>> allUniqueCompleteOSMAddressesRead = new LinkedHashSet<>();
+		List<String> commonHeaderString = null;
+		boolean headerAssigned = false;
+
+		int totalLinesRead = 0, numOfLastIncompleteLinesRemoved = 0;
+		Set<List<String>> incorrectLengthStrings = new LinkedHashSet<>();
+		try
+		{
+			Stream<Path> allPaths = Files.walk(Paths.get(commonPathToRead), FileVisitOption.FOLLOW_LINKS);
+			res.append("\n\n---   found files with names matching '" + fileNamePatternToSearch + "':\n ");
+			// find filepaths matching the file name pattern
+			pathsOfFoundFiles = allPaths.filter(e -> Files.isRegularFile(e))
+					.filter(e -> e.toString().contains(fileNamePatternToSearch))
+					.peek(e -> res.append("\t-" + e.toString() + "\n")).collect(Collectors.toSet());
+			res.append("---   num of files matching " + fileNamePatternToSearch + " = " + pathsOfFoundFiles.size()
+					+ " regular files.");
+
+			System.out.println(res.toString());
+
+			for (Path p : pathsOfFoundFiles)
+			{
+				List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFile(Files.newInputStream(p),
+						"|", true, true);
+				totalLinesRead += linesRead.size();
+
+				if (!headerAssigned)
+				{
+					commonHeaderString = linesRead.get(0);
+				}
+
+				// if last line is incomplete then remove it
+				if (linesRead.get(linesRead.size() - 1).size() != commonHeaderString.size())
+				{
+					numOfLastIncompleteLinesRemoved += 1;
+					linesRead.remove(linesRead.size() - 1);// remove last element which is usually incomplete
+				}
+
+				linesRead.remove(0);// remove header
+
+				for (List<String> line : linesRead)
+				{
+					if (line.size() != commonHeaderString.size())
+					{
+						incorrectLengthStrings.add(line);
+					}
+					else
+					{
+						allUniqueCompleteOSMAddressesRead.add(line);
+					}
+				}
+				// allUniqueCompleteOSMAddressesRead.addAll(linesRead);
+			}
+
+			System.out.println("totalLinesRead = " + totalLinesRead);
+
+			System.out.println("numOfLastIncompleteLinesRemoved = " + numOfLastIncompleteLinesRemoved);
+			System.out.println("incorrectLengthStrings.size() = " + incorrectLengthStrings.size());
+
+			System.out.println("allUniqueCompleteOSMAddressesRead = " + allUniqueCompleteOSMAddressesRead.size());
+
+			int forSanityCheck = allUniqueCompleteOSMAddressesRead.size() + pathsOfFoundFiles.size()
+					+ numOfLastIncompleteLinesRemoved + incorrectLengthStrings.size();
+			System.out.println("addressesStored+numOfHeaders+numOfLastLinesRemoved+numOfIncorrectLengthStrings= "
+					+ forSanityCheck + " Sanity check pass: " + (forSanityCheck == totalLinesRead));
+
+			StringBuilder sbt1 = new StringBuilder("Incorrect length strings: \n");
+			incorrectLengthStrings.stream().forEach(s -> sbt1.append(s.toString() + "\n"));
+			System.out.println(sbt1.toString());
+
+			StringBuilder sbToWrite = new StringBuilder();
+			sbToWrite.append(commonHeaderString.stream().collect(Collectors.joining("|")) + "\n");
+			for (List<String> osmAddress : allUniqueCompleteOSMAddressesRead)
+			{
+				sbToWrite.append(osmAddress.stream().collect(Collectors.joining("|")) + "\n");
+			}
+			WritingToFile.writeToNewFile(sbToWrite.toString(), commonPathToRead + "ConsolidatedOSMAddress.csv");
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -201,7 +344,7 @@ public class GowallaPreProcessorUtils
 	public static void getGeoAddressForLocations()
 	{
 		Map<Integer, OpenStreetAddress> locIDAllAddressMap = new LinkedHashMap<>();
-		String commonPathToRead = "./dataToRead/Mar12/";
+		String commonPathToRead = "./dataToRead/Mar19/targetLocsForWhichOSMAddressesNotCollectedWithTZSplitted/";// "./dataToRead/Mar12/";
 		// String commonPathToWrite = commonPathToRead;
 		long totalNumOfEmptyAddresses = 0, totalNumOfNeitherCityTownOrVillage = 0;
 
@@ -210,18 +353,24 @@ public class GowallaPreProcessorUtils
 
 		try
 		{
-			for (int iteratorID = 5; iteratorID <= 6; iteratorID++)
+			for (int iteratorID = 1; iteratorID <= 2; iteratorID++)
 			{
-				String fileNameToReadPhrase = "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ"
-						+ iteratorID + ".csv";
-				String fileNameToWritePhrase = "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZAddress"
+				// String fileNameToReadPhrase = "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ"
+				// + iteratorID + ".csv";
+				// String fileNameToWritePhrase =
+				// "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZAddress"
+				// + iteratorID + ".csv";
+
+				String fileNameToReadPhrase = "targetLocsForWhichOSMAddressesNotCollectedWithTZsmallerFile" + iteratorID
+						+ ".csv";
+				String fileNameToWritePhrase = "targetLocsForWhichOSMAddressesNowCollectedWithTZsmallerFileAddress"
 						+ iteratorID + ".csv";
 
 				Triple<Map<Integer, OpenStreetAddress>, Long, Map<String, Long>> locIDAddressMapRes = getAddressesForLatLonForRawFile(
 						commonPathToRead, fileNameToReadPhrase, fileNameToWritePhrase);
 
 				Map<Integer, OpenStreetAddress> locIDAddressMap = locIDAddressMapRes.getFirst();
-				Serializer.kryoSerializeThis(locIDAddressMap, fileNameToWritePhrase + ".kryo");
+				// Serializer.kryoSerializeThis(locIDAddressMap, fileNameToWritePhrase + ".kryo");
 
 				long numOfNeitherCityTownOrVillage = locIDAddressMapRes.getSecond();
 
@@ -289,10 +438,13 @@ public class GowallaPreProcessorUtils
 
 		try
 		{
-			BufferedWriter bwToWrite = WritingToFile.getBWForNewFile(commonPathToRead + fileNameToWritePhrase);
+			// BufferedWriter bwToWrite = WritingToFile.getBWForNewFile(commonPathToRead + fileNameToWritePhrase);
 			BufferedWriter bwToWriteDebugSampleOSMAddress = WritingToFile
 					.getBufferedWriterForExistingFile(commonPathToRead + "SampleOSMNeitherCityTownOrVillage.xml");
-			bwToWrite.write("id|lng|lat|TZ|road|cityOrTownOrVillage|county|state|postcode|country|country_code\n");
+			// bwToWrite.write("id|lng|lat|TZ|road|cityOrTownOrVillage|county|state|postcode|country|country_code\n");
+			WritingToFile.writeToNewFile(
+					"id|lng|lat|TZ|road|cityOrTownOrVillage|county|state|postcode|country|country_code\n",
+					commonPathToRead + fileNameToWritePhrase);
 
 			List<List<String>> allLines = ReadingFromFile.nColumnReaderStringLargeFile(
 					new FileInputStream(commonPathToRead + fileNameToReadPhrase), ",", true, false);
@@ -310,9 +462,14 @@ public class GowallaPreProcessorUtils
 				}
 				if (count % 1000 == 0)
 				{
-					Thread.sleep(1000 * 60);
+					Thread.sleep(1000 * 2);
 					// break;
 				}
+
+				// if (count > 5)
+				// {
+				// break;
+				// }
 				// String lat = "40.774269";
 				// String lon = "-89.603806";
 				// int id = 1;
@@ -366,10 +523,12 @@ public class GowallaPreProcessorUtils
 				sb2.append(line.stream().skip(1).collect(Collectors.joining(String.valueOf(delimiter))).toString()
 						+ delimiter);
 				sb2.append(address.toString(delimiter) + "\n");
-				bwToWrite.append(sb2.toString());
+				// bwToWrite.append(sb2.toString());
+				WritingToFile.appendLineToFileAbsolute(sb2.toString(), commonPathToRead + fileNameToWritePhrase);
+
 			}
 
-			bwToWrite.close();
+			// bwToWrite.close();
 			bwToWriteDebugSampleOSMAddress.close();
 
 		}

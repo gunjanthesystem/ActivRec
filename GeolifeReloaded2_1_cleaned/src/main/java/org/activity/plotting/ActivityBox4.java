@@ -8,7 +8,6 @@ import org.activity.ui.UIUtilityBox;
 //import javafx.geometry.Insets;
 import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
-import javafx.scene.Group;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 //import javafx.scene.layout.Background;
@@ -18,16 +17,15 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 
 /** Candle node used for drawing a candle */
-public class ActivityBox2 extends Group
+public class ActivityBox4 extends Region
 {
 	// private Line highLowLine = new Line();
-	private Region regionBar = new Region();
 	// private Rectangle regionBar = new Rectangle();
 	private int actID;
 	private String seriesStyleClass;
 	private String dataStyleClass;
 	// private boolean openAboveClose = true;
-	private Tooltip tooltip = new Tooltip();
+	private Tooltip tooltip;// = new Tooltip();
 	// private static int height = 30;
 
 	/**
@@ -37,29 +35,30 @@ public class ActivityBox2 extends Group
 	 * @param actExtraVals
 	 * @param height
 	 */
-	ActivityBox2(String seriesStyleClass, String dataStyleClass, ActivityBoxExtraValues actExtraVals)
+	ActivityBox4(String seriesStyleClass, String dataStyleClass, ActivityBoxExtraValues actExtraVals)
 	{
+		tooltip = new Tooltip();
 		// if (height != -1)
 		// {
 		// this.height = height;
 		// }
 		// System.out.println("ActivityBox2() created");
-		setAutoSizeChildren(false);
+		// this.setAutoSizeChildren(false);
 		// System.out.println("this.isResizable()=" + this.isResizable());
 
 		this.setCache(true);
 		this.setCacheHint(CacheHint.SPEED);
 
-		regionBar.setCache(true);
-		regionBar.setCacheHint(CacheHint.SPEED);
+		this.setCache(true);
+		this.setCacheHint(CacheHint.SPEED);
 
-		getChildren().addAll(/* highLowLine, */regionBar);
+		// getChildren().addAll(/* highLowLine, */regionBar);
 		this.seriesStyleClass = seriesStyleClass;
 		this.dataStyleClass = dataStyleClass;
 		// updateStyleClasses();// disabled for performance
 		tooltip.setGraphic(new GTooltipContent(Arrays.asList("EndTime:", "ActivityName:", "ActivityID:", "Location:")));
 		UIUtilityBox.hackTooltipStartTiming(tooltip);
-		Tooltip.install(regionBar, tooltip);
+		Tooltip.install(this, tooltip);
 		// regionBar.setShape(new Circle());
 
 		/// Start of moved from updateStyleClasses() to avoid repeated calls
@@ -97,7 +96,7 @@ public class ActivityBox2 extends Group
 	{
 		// BackgroundFill bgFill = new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
 		// new CornerRadii(12), new Insets(0, 0.25, 0, 0));
-		regionBar.setBackground(new Background(new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
+		this.setBackground(new Background(new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
 				new CornerRadii(12), new Insets(0, 0.25, 0, 0))));
 	}
 
@@ -161,7 +160,7 @@ public class ActivityBox2 extends Group
 		// if (openAboveClose)
 		// {
 		// $$System.out.println("Inside ActivityBox2.update(): x1=" + x1 + " x2=" + x2);
-		regionBar.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width /
+		this.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width /
 		// 2, 0, width,
 		// regionBar.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width / 2, 0, width,
 		// closeOffset);

@@ -1,33 +1,30 @@
 package org.activity.plotting;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.activity.ui.UIUtilityBox;
 
-//javafx.geometry.Insets
-//import javafx.geometry.Insets;
-import javafx.geometry.Insets;
-import javafx.scene.CacheHint;
-import javafx.scene.Group;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Background;
-//import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-//import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 
 /** Candle node used for drawing a candle */
-public class ActivityBox2 extends Group
+public class ActivityBox3 extends Canvas
 {
 	// private Line highLowLine = new Line();
-	private Region regionBar = new Region();
+	// private Canvas regionBar = new Canvas();
 	// private Rectangle regionBar = new Rectangle();
+
+	double x, y, width, height;
+
 	private int actID;
-	private String seriesStyleClass;
-	private String dataStyleClass;
+	// private String seriesStyleClass;
+	// private String dataStyleClass;
 	// private boolean openAboveClose = true;
-	private Tooltip tooltip = new Tooltip();
+	private Tooltip tooltip;// = new Tooltip();
+	Color bgColor;
 	// private static int height = 30;
 
 	/**
@@ -37,33 +34,25 @@ public class ActivityBox2 extends Group
 	 * @param actExtraVals
 	 * @param height
 	 */
-	ActivityBox2(String seriesStyleClass, String dataStyleClass, ActivityBoxExtraValues actExtraVals)
+	ActivityBox3(String seriesStyleClass, String dataStyleClass, ActivityBoxExtraValues actExtraVals, Color bgColor)
 	{
-		// if (height != -1)
-		// {
-		// this.height = height;
-		// }
-		// System.out.println("ActivityBox2() created");
-		setAutoSizeChildren(false);
-		// System.out.println("this.isResizable()=" + this.isResizable());
 
-		this.setCache(true);
-		this.setCacheHint(CacheHint.SPEED);
+		this.bgColor = bgColor;
+		/*
+		 * Make sure the canvas draws its content again when its size changes.
+		 */
+		widthProperty().addListener(it -> draw());
+		heightProperty().addListener(it -> draw());
 
-		regionBar.setCache(true);
-		regionBar.setCacheHint(CacheHint.SPEED);
-
-		getChildren().addAll(/* highLowLine, */regionBar);
-		this.seriesStyleClass = seriesStyleClass;
-		this.dataStyleClass = dataStyleClass;
 		// updateStyleClasses();// disabled for performance
+		tooltip = new Tooltip();
 		tooltip.setGraphic(new GTooltipContent(Arrays.asList("EndTime:", "ActivityName:", "ActivityID:", "Location:")));
 		UIUtilityBox.hackTooltipStartTiming(tooltip);
-		Tooltip.install(regionBar, tooltip);
+		Tooltip.install(this, tooltip);
 		// regionBar.setShape(new Circle());
 
 		/// Start of moved from updateStyleClasses() to avoid repeated calls
-		getStyleClass().setAll("activitybox-box", seriesStyleClass, dataStyleClass);
+		// getStyleClass().setAll("activitybox-box", seriesStyleClass, dataStyleClass);
 		// highLowLine.getStyleClass().setAll("candlestick-line", seriesStyleClass, dataStyleClass, aboveClose);
 		// $$regionBar.getStyleClass().setAll("candlestick-bar", seriesStyleClass, dataStyleClass);// , aboveClose);
 		/// End of moved from updateStyleClasses() to avoid repeated calls
@@ -90,16 +79,52 @@ public class ActivityBox2 extends Group
 		// .add(new BackgroundFill(Color.PALEVIOLETRED, CornerRadii.EMPTY, Insets.EMPTY));
 		// regionBar.getBackground().getFills().add(e)
 		actID = actExtraVals.getActivityID();
-		setBackGround();
+		// draw();
 	}
 
-	private void setBackGround()
+	@Override
+	public boolean isResizable()
 	{
-		// BackgroundFill bgFill = new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
-		// new CornerRadii(12), new Insets(0, 0.25, 0, 0));
-		regionBar.setBackground(new Background(new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
-				new CornerRadii(12), new Insets(0, 0.25, 0, 0))));
+		return true;
 	}
+
+	@Override
+	public double prefWidth(double height)
+	{
+		return getWidth();
+	}
+
+	@Override
+	public double prefHeight(double width)
+	{
+		return getHeight();
+	}
+
+	public void setData(List<Double> data)
+	{
+		// this.data = data;
+	}
+
+	/*
+	 * Draw a chart based on the data provided by the model.
+	 */
+	void draw()
+	{
+		GraphicsContext gc = getGraphicsContext2D();
+		gc.clearRect(0, 0, getWidth(), getHeight());
+
+		// Stop[] stops = new Stop[] { new Stop(0, Color.SKYBLUE), new Stop(1, Color.SKYBLUE.darker().darker()) };
+		// LinearGradient gradient = new LinearGradient(0, 0, 0, 300, false, CycleMethod.NO_CYCLE, stops);
+		gc.setFill(this.bgColor);
+	}
+
+	// private void setBackGround()
+	// {
+	// // BackgroundFill bgFill = new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
+	// // new CornerRadii(12), new Insets(0, 0.25, 0, 0));
+	// regionBar.setBackground(new Background(new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
+	// new CornerRadii(12), new Insets(0, 0.25, 0, 0))));
+	// }
 
 	/**
 	 * 
@@ -114,24 +139,6 @@ public class ActivityBox2 extends Group
 		GTooltipContent tooltipContent = (GTooltipContent) tooltip.getGraphic();
 		tooltipContent.update(endTimestamp, actName, high, low);
 	}
-
-	/**
-	 * 
-	 * @param seriesStyleClass
-	 * @param dataStyleClass
-	 */
-	public void setSeriesAndDataStyleClasses(String seriesStyleClass, String dataStyleClass)
-	{
-		// System.out.println("setSeriesAndDataStyleClasses() called");
-		this.seriesStyleClass = seriesStyleClass;
-		this.dataStyleClass = dataStyleClass;
-		updateStyleClasses();
-	}
-
-	// public void setHeight(int numOfUsers)
-	// {
-	// height = (int) (Math.pow(1.02, (-numOfUsers)) * 50);
-	// }
 
 	/**
 	 * 
@@ -161,7 +168,7 @@ public class ActivityBox2 extends Group
 		// if (openAboveClose)
 		// {
 		// $$System.out.println("Inside ActivityBox2.update(): x1=" + x1 + " x2=" + x2);
-		regionBar.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width /
+		this.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width /
 		// 2, 0, width,
 		// regionBar.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width / 2, 0, width,
 		// closeOffset);
@@ -174,19 +181,7 @@ public class ActivityBox2 extends Group
 		// {
 		// regionBar.resizeRelocate(-width / 2, closeOffset, width, -closeOffset);
 		// }
-		setBackGround();// this might slow down as
+		draw();// this might slow down as
 	}
 
-	/**
-	 * 
-	 */
-	private void updateStyleClasses()
-	{
-		// $$ Moved from here to ActivityBox2() constructor to avoid repeated calls for performance
-		// System.out.println("updateStyleClasses() called");
-		// // final String aboveClose = openAboveClose ? "open-above-close" : "close-above-open";
-		// getStyleClass().setAll("candlestick-candle", seriesStyleClass, dataStyleClass);
-		// // highLowLine.getStyleClass().setAll("candlestick-line", seriesStyleClass, dataStyleClass, aboveClose);
-		// regionBar.getStyleClass().setAll("candlestick-bar", seriesStyleClass, dataStyleClass);// , aboveClose);
-	}
 }
