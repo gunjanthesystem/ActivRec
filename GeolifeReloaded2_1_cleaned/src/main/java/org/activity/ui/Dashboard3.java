@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activity.plotting.DataGenerator;
-import org.activity.plotting.TimelineChartApp2;
+import org.activity.plotting.TimelineChartAppCanvas;
+import org.activity.plotting.TimelineChartAppGeneric;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,7 +31,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -112,6 +112,10 @@ public class Dashboard3 extends Application
 		// scene.getStylesheets().add(getClass().getResource("gsheet1.css").toExternalForm());
 		stage.setScene(scene);
 		stage.setTitle("Dashboard");
+		stage.setWidth(600);
+		stage.setMinHeight(200);
+		stage.setMinWidth(200);
+		stage.setHeight(600);
 		// stage.initStyle(stageStyle);
 		stage.show();
 		long tn = System.currentTimeMillis();
@@ -136,26 +140,99 @@ public class Dashboard3 extends Application
 		List<Tab> tabsToAdd = new ArrayList<>();
 		try
 		{
-			///
-			long tTimeline0 = System.currentTimeMillis();
-			Tab timelineTab = new Tab("Historical Timelines All Users");
-			// VBox timelinesVBox2 = new VBox();
-			TimelineChartApp2 tcA = new TimelineChartApp2();// DataGenerator.getData2(), true);
-			// timelineTab.setContent(tcA2.createContent(DataGenerator.getData2(), true));//
-			// .createContent(DataGenerator.getData2()));
-			// timelineTab.setContent(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100), true));//
-			// .createContent(DataGenerator.getData2()));
-			// timelineTab.setContent(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100), true));//
-			// .createContent(DataGenerator.getData2()));
-			// timelinesVBox2.getChildren().add(tcA.createContent(DataGenerator.getData2(10, 20, 5, 5, 200, 2, 10),
-			// true));// .createContent(DataGenerator.getData2()));
-			Pane p = (tcA.createContentV2(DataGenerator.getData3(10, 200, 12, 5, 200, 2, 10), true));// .createContent(DataGenerator.getData2()));
 
-			timelineTab.setContent(p);// timelinesVBox2);
-			timelineTab.setClosable(false);
-			tabsToAdd.add(timelineTab);
+			///
+
+			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
+
+			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 100, 12, 5, 864000, 60 * 20, 10800);
+
+			long tTimeline0 = System.currentTimeMillis();
+			Tab timelineTabCircle = new Tab("timelineTabCircle Historical Timelines All Users");
+			TimelineChartAppGeneric tcC = new TimelineChartAppGeneric(timelineData, true, "ActivityCircle");
+			timelineTabCircle.setContent(tcC.getVbox());// timelinesVBox2);
+			timelineTabCircle.setClosable(true);
+			tabsToAdd.add(timelineTabCircle);
 			long tTimelinen = System.currentTimeMillis();
-			System.out.println("Timeto create timelines chart = " + (tTimelinen - tTimeline0) + " ms");
+			System.out.println("Time taken TimelineChartAppGeneric = " + (tTimelinen - tTimeline0) + " ms");
+
+			long tTimelineCanvas0 = System.currentTimeMillis();
+			Tab timelineTabCanvas = new Tab("timelineTabCanvas Historical Timelines All Users");
+			TimelineChartAppCanvas tcCanvas = new TimelineChartAppCanvas(timelineData, false);
+			timelineTabCanvas.setContent(tcCanvas.getVbox());// timelinesVBox2);
+			timelineTabCanvas.setClosable(true);
+			tabsToAdd.add(timelineTabCanvas);
+			long tTimelineCanvasn = System.currentTimeMillis();
+			System.out.println("Time taken TimelineChartAppCanvas = " + (tTimelineCanvasn - tTimelineCanvas0) + " ms");
+
+			if (false)
+			{
+
+				Tab timelineTabD = new Tab("timelineTabD Historical Timelines All Users");
+				TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(timelineData, true, "ActivityBox");
+				// TODO: Issue: not scaling correctly with range change.
+				timelineTabD.setContent(tcD.getVbox());// timelinesVBox2);
+				timelineTabD.setClosable(true);
+				tabsToAdd.add(timelineTabD);
+
+				Tab timelineTabE = new Tab("timelineTabE Historical Timelines All Users");
+				TimelineChartAppGeneric tcE = new TimelineChartAppGeneric(timelineData, true, "LineChart");
+				timelineTabE.setContent(tcE.getVbox());// timelinesVBox2);
+				timelineTabE.setClosable(true);
+				tabsToAdd.add(timelineTabE);
+
+				Tab timelineTabScattter = new Tab("timelineTabScattter Historical Timelines All Users");
+				TimelineChartAppGeneric tcScattter = new TimelineChartAppGeneric(timelineData, true, "ScatterChart");
+				timelineTabScattter.setContent(tcScattter.getVbox());// timelinesVBox2);
+				timelineTabScattter.setClosable(true);
+				tabsToAdd.add(timelineTabScattter);
+			}
+			///
+			// long tTimeline0 = System.currentTimeMillis();
+			// Tab timelineTab = new Tab("Historical Timelines All Users");
+			// // VBox timelinesVBox2 = new VBox();
+			// TimelineChartApp2 tcA = new TimelineChartApp2();// DataGenerator.getData2(), true);
+			// // timelineTab.setContent(tcA2.createContent(DataGenerator.getData2(), true));//
+			// // .createContent(DataGenerator.getData2()));
+			// // timelineTab.setContent(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100), true));//
+			// // .createContent(DataGenerator.getData2()));
+			// // timelineTab.setContent(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100),true));//
+			// // .createContent(DataGenerator.getData2()));
+			// // timelinesVBox2.getChildren().add(tcA.createContent(DataGenerator.getData2(10, 20, 5, 5, 200, 2, 10),
+			// // true));// .createContent(DataGenerator.getData2()));
+			// Pane p = (tcA.createContentV2(DataGenerator.getData3(10, 20, 12, 5, 200, 2, 10), true));//
+			// .createContent(DataGenerator.getData2()));
+			// // TODO: Issue: not scaling correctly with range change.
+			// timelineTab.setContent(p);// timelinesVBox2);
+			// timelineTab.setClosable(false);
+			// tabsToAdd.add(timelineTab);
+			// long tTimelinen = System.currentTimeMillis();
+			// System.out.println("Timeto create timelines chart = " + (tTimelinen - tTimeline0) + " ms");
+			///
+
+			///
+			// long tTimeline1_0 = System.currentTimeMillis();
+			// Tab timelineTabB = new Tab("Historical Timelines All Users");
+			// // VBox timelinesVBox2 = new VBox();
+			// TimelineChartAppCircle tcB = new TimelineChartAppCircle();// DataGenerator.getData2(), true);
+			// // TODO: Issue: circle positions
+			// // timelineTab.setContent(tcA2.createContent(DataGenerator.getData2(), true));//
+			// // .createContent(DataGenerator.getData2()));
+			// // timelineTab.setContent(tcA2.createContent(DataGenerator.getData2ForAUser(1, 10, 5, 5, 100), true));//
+			// // .createContent(DataGenerator.getData2()));
+			// // timelineTab.setContent(tcA2_2.createContent(DataGenerator.getData2ForAUser(2, 10, 5, 5, 100),
+			// true));//
+			// // .createContent(DataGenerator.getData2()));
+			// // timelinesVBox2.getChildren().add(tcA.createContent(DataGenerator.getData2(10, 20, 5, 5, 200, 2, 10),
+			// // true));// .createContent(DataGenerator.getData2()));
+			// Pane pB = (tcB.createContentV2(DataGenerator.getData3(1, 1, 12, 5, 200, 2, 10), true));//
+			// .createContent(DataGenerator.getData2()));
+			//
+			// timelineTabB.setContent(pB);// timelinesVBox2);
+			// timelineTabB.setClosable(false);
+			// tabsToAdd.add(timelineTabB);
+			// long tTimeline1_n = System.currentTimeMillis();
+			// System.out.println("Timeto create timelines chart = " + (tTimeline1_n - tTimeline1_0) + " ms");
 			///
 
 			/*
@@ -177,11 +254,28 @@ public class Dashboard3 extends Application
 			// long tLine0 = System.currentTimeMillis();
 			// Tab lineChartTab = new Tab("lineChart");
 			// lineChartTab.setContent(ChartUtils.createLineChart(
-			// FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(10, 5000)), "title", "ajooba"));
+			// FXUtils.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(10, 500)), "title", "ajooba"));
 			// lineChartTab.setClosable(true);
 			// tabsToAdd.add(lineChartTab);
 			// long tLineN = System.currentTimeMillis();
 			// System.out.println("Time to create lines chart = " + (tLineN - tLine0) + " ms");
+
+			// long tLine1_0 = System.currentTimeMillis();
+			// // Tab lineChartTabB = new Tab("lineChart");
+			// // lineChartTabB.setContent(
+			// // ChartUtils.createLineChart2(DataGenerator.getData3(10, 50, 12, 5, 200, 2, 10), "title", "ajooba"));
+			// // lineChartTabB.setClosable(true);
+			// // tabsToAdd.add(lineChartTabB);
+			// Tab timelineTabC = new Tab("Historical Timelines All Users");
+			// TimelineChartAppLineChart tcC = new TimelineChartAppLineChart();// DataGenerator.getData2(), true);
+			// Pane pC = (tcC.createContentV2(DataGenerator.getData3(10, 50, 12, 5, 200, 2, 10), true));//
+			// .createContent(DataGenerator.getData2()));
+			// timelineTabC.setContent(pC);// timelinesVBox2);
+			// timelineTabC.setClosable(false);
+			// tabsToAdd.add(timelineTabC);
+			//
+			// long tLine1_N = System.currentTimeMillis();
+			// System.out.println("Time to create lines chart = " + (tLine1_N - tLine1_0) + " ms");
 			//
 			// long tScatter0 = System.currentTimeMillis();
 			// Tab scatterChartTab = new Tab("scatterChart");

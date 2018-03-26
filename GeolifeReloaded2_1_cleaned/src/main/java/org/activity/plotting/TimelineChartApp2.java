@@ -120,8 +120,8 @@ public class TimelineChartApp2 extends Pane
 
 		// Works but slow response.
 		// // Curtain A1 start
-		// Bindings.bindBidirectional(hSlider.lowValueProperty(), axis.lowerBoundProperty());
-		// Bindings.bindBidirectional(hSlider.highValueProperty(), axis.upperBoundProperty());
+		Bindings.bindBidirectional(hSlider.lowValueProperty(), axis.lowerBoundProperty());
+		Bindings.bindBidirectional(hSlider.highValueProperty(), axis.upperBoundProperty());
 		// // Curtain A1 end
 
 		Button updateButton = new Button("Apply");
@@ -134,6 +134,7 @@ public class TimelineChartApp2 extends Pane
 				axis.setLowerBound(hSlider.getLowValue());
 				axis.setUpperBound(hSlider.getHighValue());
 			});
+
 		// minValue.textProperty().bindBidirectional(hSlider.lowValueProperty(), new DoubleStringConverter());
 
 		// hSlider.lowValueProperty().addListener(new ChangeListener<Number>()
@@ -225,17 +226,27 @@ public class TimelineChartApp2 extends Pane
 			// start timeestamp, username, {end timestamp, actname, }
 			series.getData().add(new XYChart.Data<Number, String>(startTS, userID, extras));
 
-			long xVal = (long) (startTS);
-			if (maxXAxis < xVal)
+			long xValST = (long) (startTS);
+			long xValET = (long) (endTS);
+
+			if (maxXAxis < xValET)
 			{
-				maxXAxis = xVal;
+				maxXAxis = xValET;
 			}
 
-			if (minXAxis > xVal)
+			if (minXAxis > xValST)
 			{
-				minXAxis = xVal;
+				minXAxis = xValST;
 			}
 		}
+
+		// DoubleSummaryStatistics startTSSummary = dataReceived.parallelStream()
+		// .collect(Collectors.summarizingDouble(d -> Double.parseDouble(d.get(1))));
+		//
+		// DoubleSummaryStatistics endTSSummary = dataReceived.parallelStream()
+		// .collect(Collectors.summarizingDouble(d -> Double.parseDouble(d.get(2))));
+
+		//
 
 		// upper bound is maxXAxis rounded to ceiling multiple of 10
 		this.maxXAxis = (long) (Math.ceil(maxXAxis / 100d) * 100);
@@ -261,14 +272,20 @@ public class TimelineChartApp2 extends Pane
 		System.out.println("Inside chart: xAxis.getUpperBound()=" + xAxis.getUpperBound());
 		// System.out.println("Inside chart: xAxis.getUpperBound()=" + chart.updateAxisRange());
 
-		xAxis.setAutoRanging(false);
-		xAxis.setUpperBound(this.maxXAxis);
-		xAxis.setLowerBound(this.minXAxis);
-		xAxis.setTickUnit((this.maxXAxis - this.minXAxis) / 20);
-		// xAxis.setTickUnit((maxXAxis - minXAxis) / 800);
-		xAxis.setMinorTickVisible(false);
-
+		setXAxis(this.maxXAxis, this.minXAxis);
 		return timelineChart;
+	}
+
+	public void setXAxis(long maxX, long minX)
+	{
+		xAxis.setAutoRanging(false);
+		xAxis.setUpperBound(maxX);
+		xAxis.setLowerBound(minX);
+		xAxis.setTickUnit((maxX - minX) / 50);
+		// xAxis.setTickUnit((maxXAxis - minXAxis) / 800);
+		xAxis.setMinorTickVisible(true);
+		xAxis.setMinorTickCount(10);
+		xAxis.setMinorTickLength(20);
 	}
 
 	/**

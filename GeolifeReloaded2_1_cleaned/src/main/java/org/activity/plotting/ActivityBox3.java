@@ -10,7 +10,14 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 
-/** Candle node used for drawing a candle */
+/**
+ * NOT USED AT THE MOMENT
+ * <p>
+ * primarily created to improve performance by using Canvas instead of a Node
+ * 
+ * @author gunjan
+ *
+ */
 public class ActivityBox3 extends Canvas
 {
 	// private Line highLowLine = new Line();
