@@ -872,7 +872,7 @@ public class TimelineUtils
 					String startAltitude = "";//
 					String userIDInside = cin.getUserID();
 					double distaneInMFromPrev = cin.getDistanceInMetersFromPrev();// of first cin if its a merged one
-					long durationInSecFromPrev = cin.getDurationInSecsFromPrev();// of first cin if its a merged one
+					long durationInSecFromPrev = cin.getDurationInSecsFromPrev();//getDurInSecsFromNext();// of first cin if its a merged one
 
 					String[] levelWiseCatIDs = cin.getLevelWiseCatIDs();
 					// int locationID = Integer.valueOf(e.getLocationID());

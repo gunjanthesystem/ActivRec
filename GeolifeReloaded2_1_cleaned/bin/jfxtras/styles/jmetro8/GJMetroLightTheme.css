@@ -11,6 +11,11 @@
 }
 
 
+.chart-symbol{ 
+    -fx-background-radius: 25px;
+    -fx-padding: 25px;
+}
+
 .background{
     -fx-background-color: white;
 }

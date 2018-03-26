@@ -1,4 +1,6 @@
-package org.activity.ui.temp;
+package org.activity.plotting;
+
+import java.util.List;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -7,7 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
-public class CanvasApp extends Application
+public class CanvasAppG1 extends Application
 {
 
 	@Override
@@ -18,21 +20,21 @@ public class CanvasApp extends Application
 		/*
 		 * Create some random data for my life span.
 		 */
-		ObservableList<YearEntry> data = FXCollections.observableArrayList();
+		ObservableList<TimelineEntry> observableData = FXCollections.observableArrayList();
 
-		// for (int year = 1969; year <= 2015; year++)
-		for (int year = 1; year <= 100; year++)
+		List<List<List<String>>> dataReceived = DataGenerator.getData3(10, 50, 12, 5, 864000, 60 * 20, 10800);
+
+		// Fill up the obervable data by creating TimelineEntries from the dataReceived
+		for (List<List<String>> eachUserData : dataReceived)
 		{
-			YearEntry entry = new YearEntry(year);
-			for (int day = 0; day < 50000; day++)
-			{
-				entry.getValues().add(Math.random() * 100);
-			}
-			data.add(entry);
+			// XYChart.Series<Number, String> seriesForAUser = new XYChart.Series<Number, String>();
+			TimelineEntry entry = new TimelineEntry(eachUserData.get(0).get(0));
+			entry.setValues(eachUserData);
+			observableData.add(entry);
 		}
 
-		ListView<YearEntry> listView = new ListView<>(data);
-		listView.setCellFactory(param -> new CanvasCell());
+		ListView<TimelineEntry> listView = new ListView<>(observableData);
+		listView.setCellFactory(param -> new CanvasCellG2());
 		listView.setFixedCellSize(200);
 		// listView.setOrientation(Orientation.HORIZONTAL);
 

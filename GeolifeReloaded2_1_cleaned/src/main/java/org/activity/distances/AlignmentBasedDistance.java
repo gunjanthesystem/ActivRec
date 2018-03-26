@@ -291,8 +291,13 @@ public class AlignmentBasedDistance
 			// durationFromPrevTolerance = 130;// sec
 			// End of disabled on Mar 222 2018
 
-			distanceFromPrevTolerance = 200;// meters as data in that unit.
-			durationFromPrevTolerance = 130;// sec
+			// Disabled on Mar 25 2018
+			// distanceFromPrevTolerance = 200;// meters as data in that unit.
+			// durationFromPrevTolerance = 130;// sec
+
+			// added on Mar 25 2018
+			distanceFromPrevTolerance = 0;// 200;// meters as data in that unit.
+			durationFromPrevTolerance = 0;// 130;// sec
 		}
 	}
 

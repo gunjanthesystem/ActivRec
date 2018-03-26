@@ -45,7 +45,8 @@ public class ActivityBox2 extends Group
 		// }
 		// System.out.println("ActivityBox2() created");
 		setAutoSizeChildren(false);
-		// System.out.println("this.isResizable()=" + this.isResizable());
+
+		System.out.println("this.isResizable()=" + this.isResizable());
 
 		this.setCache(true);
 		this.setCacheHint(CacheHint.SPEED);
@@ -98,7 +99,7 @@ public class ActivityBox2 extends Group
 		// BackgroundFill bgFill = new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
 		// new CornerRadii(12), new Insets(0, 0.25, 0, 0));
 		regionBar.setBackground(new Background(new BackgroundFill(ColorPalette.getInsightSecondaryColor(actID % 11),
-				new CornerRadii(12), new Insets(0, 0.25, 0, 0))));
+				new CornerRadii(0), new Insets(0, 0.25, 0, 0))));
 	}
 
 	/**
@@ -161,7 +162,17 @@ public class ActivityBox2 extends Group
 		// if (openAboveClose)
 		// {
 		// $$System.out.println("Inside ActivityBox2.update(): x1=" + x1 + " x2=" + x2);
-		regionBar.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width /
+		// $$ regionBar.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width
+		double width = x2 - x1;
+		// regionBar.resizeRelocate(0, -(height / 2), width, height);// x2 - x1, x2 - x1);// -width /
+		// regionBar.setX
+		regionBar.resize(width, height);
+		regionBar.relocate(0, -(height / 2));
+		System.out.println("\nwidth (x2-x1)= " + width);
+		System.out.println("\nregionBar.getWidth()= " + regionBar.getWidth());
+		System.out.println("\nregionBar.getLayoutX()= " + regionBar.getLayoutX());
+		System.out.println(
+				"\nregionBar.getLayoutX() + regionBar.getWidth()= " + (regionBar.getLayoutX() + regionBar.getWidth()));
 		// 2, 0, width,
 		// regionBar.resizeRelocate(0, -(height / 2), x2 - x1, height);// x2 - x1, x2 - x1);// -width / 2, 0, width,
 		// closeOffset);

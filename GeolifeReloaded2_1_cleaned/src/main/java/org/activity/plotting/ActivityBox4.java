@@ -16,7 +16,12 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 
-/** Candle node used for drawing a candle */
+/**
+ * NOT USED AT THE MOMENT
+ * 
+ * @author gunjan
+ *
+ */
 public class ActivityBox4 extends Region
 {
 	// private Line highLowLine = new Line();
