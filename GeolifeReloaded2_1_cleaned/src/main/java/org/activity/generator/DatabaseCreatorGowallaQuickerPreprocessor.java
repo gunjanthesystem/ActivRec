@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 //import java.math.String;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -102,14 +103,14 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 																			// ";//"mapForAllDataMergedPlusDuration18May2015_2.map";
 	static String nameForMapToBeSerialisedStayPoints = "mapForAllStayPoints17May.map";// ";//"mapForAllDataMergedPlusDuration18May2015_2.map";
 	// static final String[] userNames= {"Stefan", "Tengqi","Cathal", "Zaher","Rami"};
-	public static final int continuityThresholdInSeconds = 5 * 60; // changed from 30 min in DCU dataset...., if two
-																	// timestamps are separated by less than equal to
-																	// this value
+
+	// changed from 30 min in DCU dataset...., if two timestamps are separated by less than equal to this value
+	public static final int continuityThresholdInSeconds = 5 * 60;
 
 	// have same mode name,
 	// then they are assumed to be continuos
-	public static final int assumeContinuesBeforeNextInSecs = 2 * 60; // changed from 30 min in DCU dataset we assume
-																		// that
+	// changed from 30 min in DCU dataset we assume that
+	public static final int assumeContinuesBeforeNextInSecs = 2 * 60;
 	// if two activities have a start time gap of more than 'assumeContinuesBeforeNextInSecs' seconds ,
 	// then the first activity continues for 'assumeContinuesBeforeNextInSecs' seconds before the next activity starts.
 	public static final int thresholdForMergingNotAvailables = 5 * 60;
@@ -144,7 +145,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 		System.out.println("Running starts");
 		// commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DataGeneration/";//Disable on
 		// Mar15 2018
-		commonPath = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/DataGeneration/";
+		commonPath = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar27/DataGeneration/";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/June28_2/"; //last past on XPS
 		// June2_finalSameTraj/";// June2_2016_SameTraj/";
@@ -220,9 +221,12 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			String checkInFileNameNoDups = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
 			Map<Long, TimeZone> locIDTimeZoneMap = (Map<Long, TimeZone>) Serializer.kryoDeSerializeThis(
 					"/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/locIDTimezoneMap.kryo");
-			preprocessCheckInWithDateCategoryOnlySpots1FasterWithTimeZone(checkInFileNameNoDups, spots1,
-					commonPath + "checkInPreProcessingLog.txt", commonPath + "processedCheckIns.csv", locIDTimeZoneMap,
-					commonPath);
+			String fileNameWritten = preprocessCheckInWithDateCategoryOnlySpots1FasterWithTimeZone(
+					checkInFileNameNoDups, spots1, commonPath + "checkInPreProcessingLog.txt",
+					commonPath + "processedCheckIns.csv", locIDTimeZoneMap, commonPath);
+			// added on Mar 27 2018
+			preprocessCheckInsAgainToAppendDistDurFromNextLine(fileNameWritten,
+					commonPath + "checkInPreProcessingLog.txt", commonPath + "processedCheckIns2.csv", commonPath);
 			// End of added on Mar15 2018
 
 			// // start of curtain 1
@@ -1256,14 +1260,16 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	 * @param preprocessedFileName
 	 * @param locTimeZoneMap
 	 * @param commonPathToWrite
+	 * @return absFileName of preprocessed file written
 	 */
-	private static void preprocessCheckInWithDateCategoryOnlySpots1FasterWithTimeZone(String checkinFileName,
+	private static String preprocessCheckInWithDateCategoryOnlySpots1FasterWithTimeZone(String checkinFileName,
 			HashMap<Long, ArrayList<String>> spots1, String logfile, String preprocessedFileName,
 			Map<Long, TimeZone> locTimeZoneMap, String commonPathToWrite)
 	{
 		long countOfSpots1 = 0, countRejNotFoundInSpots1 = 0, countRejWrongGeoCoords = 0,
 				countRejCheckinsWithPlaceWithNoTZ = 0;
 		Map<String, Long> userZoneHoppingCount = new LinkedHashMap<>();
+		Map<String, Long> userCheckinsCount = new LinkedHashMap<>();
 		// countWithWrongGeoCoords: num of checkins in placees which have incorrect geocoordinates
 
 		Pattern dlimPatrn = Pattern.compile(",");
@@ -1273,12 +1279,18 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 		try
 		{
 			int lineCount = 0;
-			BufferedReader br = new BufferedReader(new FileReader(checkinFileName));
+			BufferedReader brCurrent = new BufferedReader(new FileReader(checkinFileName));
+
+			// to read the next line, i.e., prev timestamp (read file is reversed order by ts) so as to get dist/dur
+			// from prev
+			// BufferedReader brNextLine = new BufferedReader(new FileReader(checkinFileName));
+			// brNext line is intended to stay one line ahead of brCurrent
+
 			BufferedWriter bw = WritingToFile.getBWForNewFile(preprocessedFileName);
 			// BufferedWriter bw2 = WritingToFile.getBWForNewFile(preprocessedFile + "slim");
 
 			bw.write(
-					"UserID,PlaceID,ZuluTS,TimeZonedToCorrectLocalTS,TimeZonedToCorrectLocalDate,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs,TZ\n");
+					"UserID,PlaceID,ZuluTS,TimeZonedToCorrectLocalTS,TimeZonedToCorrectLocalDate,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInMFromPrevLine,DurationInSecsFromPrevLine,TZ\n");
 			// bw2.write("UserID,Date,SpotCategoryID,SpotCategoryIDName,DistInM,DurationInSecs\n");
 
 			StringBuilder toWriteInBatch = new StringBuilder();
@@ -1287,22 +1299,39 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			// boolean isCurrGeoCoordsValid = false;
 			// boolean isPrevGeoCoordsValid = false;
 
-			String currentLineRead;
-			String currUser = "", prevUser = "";
-			LocalDateTime currentTime = null, prevTime = null;
-			String currentLat = "", prevLat = "";
-			String currentLon = "", prevLon = "";
+			String currentLineRead;// , nextLineRead;
+			String currUser = "", prevLineUser = "";// , nextLineUser = "";
+			Instant currentInstant = null, prevLineInstant = null; // Instant is to be from Zulu timestamp.
+			LocalDateTime currentLocalTime = null, prevLineLocalTime = null;// , nextLineTime = null;
+			String currentLat = "", prevLineLat = "";// , nextLineLat = "";
+			String currentLon = "", prevLineLon = "";// , nextLineLon = "";
 			// to find time diff and users and instances of timezonehopping
-			ZoneId currentZoneId = null, prevZoneId = null;
+			ZoneId currentZoneId = null, prevLineZoneId = null;// , nextLineZoneId = null;
 
 			String spotCatID = "";
 			String spotCatName = "";
 
-			while ((currentLineRead = br.readLine()) != null)
+			long numOfValidCheckinsForPrevUser = 0;
+			while ((currentLineRead = brCurrent.readLine()) != null)
 			{
+				lineCount++;
+
+				if (lineCount == 1)
+				{
+					System.out.println("Skipping first line of brCurrent ");
+					continue;
+				}
+				else if (lineCount % 10000 == 0)
+				{
+					System.out.println("Lines read = " + lineCount);
+				}
+
 				// clearing current variables
 				currUser = "";
-				currentTime = null;
+
+				currentInstant = null;
+				currentLocalTime = null;
+
 				currentLat = "";
 				currentLon = "";
 				currentZoneId = null;
@@ -1310,20 +1339,8 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				spotCatID = "NA";
 				spotCatName = "NA";
 
-				double distFromPrevInMeters = -999;
-				long durationFromPrevInSeconds = -999;
-
-				lineCount++;
-
-				if (lineCount == 1)
-				{
-					System.out.println("Skipping first line");
-					continue;
-				}
-				else if (lineCount % 10000 == 0)
-				{
-					System.out.println("Lines read = " + lineCount);
-				}
+				double distFromPrevLineInMeters = -999;
+				long durFromPrevLineInSecs = -999;
 
 				String[] splittedString = dlimPatrn.split(currentLineRead);// currentLineRead.split(",");// dlimPatrn);
 				long placeID = Long.valueOf(splittedString[1]);
@@ -1338,7 +1355,9 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				else
 				{
 					currentZoneId = locTimeZoneMap.get(placeID).toZoneId();
-					currentTime = DateTimeUtils.zuluToTimeZonedLocalDateTime(splittedString[2], currentZoneId);
+					currentInstant = Instant.parse(splittedString[2]);//
+					currentLocalTime = DateTimeUtils.instantToTimeZonedLocalDateTime(currentInstant, currentZoneId);
+					// .zuluToTimeZonedLocalDateTime(splittedString[2], currentZoneId);
 				}
 
 				ArrayList<String> vals1 = spots1.get(placeID);
@@ -1370,23 +1389,26 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 				}
 
 				// if reached here then VALID CHECKIN
-
 				currUser = splittedString[0];
 
-				// if same user, compute distance & duration from next (note: lines are in decreasing order by time)
-				if (prevUser.equals(currUser))
+				// if same user, compute distance & duration from next (∵ read lines are in decreasing order by time)
+				if (prevLineUser.equals(currUser))
 				{
-					distFromPrevInMeters = SpatialUtils.haversineFastMath(currentLat, currentLon, prevLat, prevLon);//
-					distFromPrevInMeters *= 1000;
-					distFromPrevInMeters = StatsUtils.round(distFromPrevInMeters, 2);
+					distFromPrevLineInMeters = SpatialUtils.haversineFastMath(currentLat, currentLon, prevLineLat,
+							prevLineLon);//
+					distFromPrevLineInMeters *= 1000;
+					distFromPrevLineInMeters = StatsUtils.round(distFromPrevLineInMeters, 2);
 
-					// - removed as data has been reversed so that now it is in ascending order of timestamp
-					durationFromPrevInSeconds = DateTimeUtils.getZonedTimeDiffInSecs(currentTime, currentZoneId,
-							prevTime, prevZoneId);// (currentTime.toEpochSecond(curr) - prevTime.getTime()) / 1000;
+					// removed as Instant bypasses the need to do timezone based computation which might be
+					// computationally more expensive
+					// durFromPrevLineInSecs = DateTimeUtils.getZonedTimeDiffInSecs(currentLocalTime, currentZoneId,
+					// prevLineLocalTime, prevLineZoneId);// (currentTime.toEpochSecond(curr) - prevTime.getTime())
+					// / 1000;
+					durFromPrevLineInSecs = prevLineInstant.getEpochSecond() - currentInstant.getEpochSecond();
 
 					// find time zone hoppings.
-					// if (currentZoneId != prevZoneId)
-					if (currentZoneId.equals(prevZoneId))
+					// if (currentZoneId != prevZoneId)if (currentZoneId.equals(prevLineZoneId))
+					if (currentZoneId.getId().equals(prevLineZoneId.getId()) == false)
 					{
 						long prevHoppingsCount = 0;
 						if (userZoneHoppingCount.containsKey(currUser))
@@ -1395,24 +1417,36 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 						}
 						userZoneHoppingCount.put(currUser, prevHoppingsCount + 1);
 					}
+
 				}
 
 				else
 				{
-					distFromPrevInMeters = -99;// 0;
-					durationFromPrevInSeconds = -99;// 0;
+					distFromPrevLineInMeters = -99;// 0;
+					durFromPrevLineInSecs = -99;// 0;
+
+					// expecting read file to be sorted by users
+					if (userCheckinsCount.containsKey(prevLineUser))
+					{
+						PopUps.showError("userCheckinsCount already contains user:" + prevLineUser
+								+ "- Seems read file was not sorted by user id");
+					}
+					userCheckinsCount.put(prevLineUser, numOfValidCheckinsForPrevUser);
+					numOfValidCheckinsForPrevUser = 0;
 				}
 
-				prevUser = currUser;
-				prevTime = currentTime;
-				prevLat = currentLat;
-				prevLon = currentLon;
-				prevZoneId = currentZoneId;
+				prevLineUser = currUser;
+				prevLineInstant = currentInstant;
+				prevLineLocalTime = currentLocalTime;
+				prevLineLat = currentLat;
+				prevLineLon = currentLon;
+				prevLineZoneId = currentZoneId;
+				numOfValidCheckinsForPrevUser += 1;
 
-				toWriteInBatch
-						.append(currentLineRead + "," + currentTime + "," + currentTime.toLocalDate() + "," + currentLat
-								+ "," + currentLon + "," + spotCatID + "," + spotCatName + "," + distFromPrevInMeters
-								+ "," + durationFromPrevInSeconds + "," + currentZoneId.toString() + "\n");
+				toWriteInBatch.append(currentLineRead + "," + currentLocalTime + "," + currentLocalTime.toLocalDate()
+						+ "," + currentLat + "," + currentLon + "," + spotCatID + "," + spotCatName + ","
+						+ distFromPrevLineInMeters + "," + durFromPrevLineInSecs + "," + currentZoneId.toString()
+						+ "\n");
 
 				// http://www.javascripter.net/math/calculators/divisorscalculator.htm
 				if (lineCount % 70870 == 0)// 48260 == 0) // 24130 find divisors of 36001960 using
@@ -1421,9 +1455,12 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 					toWriteInBatch.setLength(0);
 					// bw2.write(toWriteInBatch2.toString());
 					// toWriteInBatch2.setLength(0);
+					break;// JUST FOR SANITY CHECK. REMOVE LATER
 				}
 				// $$bw.write(towrite);
 			} // end of while over lines
+
+			userCheckinsCount.put(prevLineUser, numOfValidCheckinsForPrevUser);// since its writing for prev user
 
 			// should also write leftover, which will happen if not using exact divisors
 			if (toWriteInBatch.length() > 0)
@@ -1446,8 +1483,171 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 					+ userZoneHoppingCount.entrySet().stream().mapToLong(e -> e.getValue()).sum());
 			WritingToFile.writeSimpleMapToFile(userZoneHoppingCount, commonPathToWrite + "userZoneHoppingCount.csv",
 					"User", "TimezoneHoppingCount");
+			WritingToFile.writeSimpleMapToFile(userCheckinsCount, commonPathToWrite + "userCheckinsCount.csv", "User",
+					"TimezoneHoppingCount");
 
-			br.close();
+			brCurrent.close();
+			// brNextLine.close();
+			bw.close();
+			// bw2.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return preprocessedFileName;
+	}
+
+	//////////////
+
+	/**
+	 * To append dist duration from next line, i.e., dist/duration difference from prev checkin as the checkin file is
+	 * assumed to be reverse ordered by timestamp
+	 * <p>
+	 * Note: next line is previous timestamp
+	 * 
+	 * @param checkinFileName
+	 * @param logfile
+	 * @param preprocessedFileName
+	 * @param commonPathToWrite
+	 * @since Mar 27 2018
+	 */
+	private static void preprocessCheckInsAgainToAppendDistDurFromNextLine(String checkinFileName, String logfile,
+			String preprocessedFileName, String commonPathToWrite)
+	{
+		Map<String, Long> userZoneHoppingCount = new LinkedHashMap<>();
+		// countWithWrongGeoCoords: num of checkins in placees which have incorrect geocoordinates
+		Pattern dlimPatrn = Pattern.compile(",");
+		System.out.println(
+				"preprocessCheckInsAgainToAppendDistDurFromNextLine called with checkinfilename = " + checkinFileName);
+		try
+		{
+			int lineCount = 0;
+			BufferedReader brCurrent = new BufferedReader(new FileReader(checkinFileName));
+			BufferedWriter bw = WritingToFile.getBWForNewFile(preprocessedFileName);
+			bw.write(
+					"UserID,PlaceID,ZuluTS,TimeZonedToCorrectLocalTS,TimeZonedToCorrectLocalDate,Lat,Lon,SpotCategoryID,SpotCategoryIDName,DistInMFromPrevLine,DurationInSecsFromPrevLine,TZ,DistInMFromNextLine,DurInSecFromNextLine\n");
+			// will write prev line since they need to be compared with the next line.
+			StringBuilder toWriteInBatch = new StringBuilder();
+
+			String currentLineRead = "", prevLineRead = "";// , nextLineRead;
+			String currUser = "", prevLineUser = "";// , nextLineUser = "";
+			Instant currentInstant = null, prevLineInstant = null;
+			String currentLat = "", prevLineLat = "";// , nextLineLat = "";
+			String currentLon = "", prevLineLon = "";// , nextLineLon = "";
+			// to find time diff and users and instances of timezonehopping
+			ZoneId currentZoneId = null, prevLineZoneId = null;// , nextLineZoneId = null;
+			double distCurrFromPrevLineInMeters = -999;
+			long durCurrFromPrevLineInSecs = -999;
+
+			while ((currentLineRead = brCurrent.readLine()) != null)
+			{
+				lineCount++;
+				if (lineCount == 1)
+				{
+					System.out.println("Skipping first line of brCurrent ");
+					continue;
+				}
+				else if (lineCount % 10000 == 0)
+				{
+					System.out.println("Lines read = " + lineCount);
+				}
+
+				// clearing current variables
+
+				distCurrFromPrevLineInMeters = -999;
+				durCurrFromPrevLineInSecs = -999;
+
+				String[] splittedString = dlimPatrn.split(currentLineRead);// currentLineRead.split(",");// dlimPatrn);
+				currUser = splittedString[0];
+				currentInstant = Instant.parse(splittedString[2]);// parse Zulu timestamp
+				currentLat = splittedString[5];
+				currentLon = splittedString[6];
+				currentZoneId = ZoneId.of(splittedString[11]);
+
+				// if reached here then VALID CHECKIN
+
+				currUser = splittedString[0];
+
+				// if same user, compute distance & duration from next (∵ read lines are in decreasing order by time)
+				if (prevLineUser.equals(currUser))
+				{
+					distCurrFromPrevLineInMeters = SpatialUtils.haversineFastMath(currentLat, currentLon, prevLineLat,
+							prevLineLon);//
+					distCurrFromPrevLineInMeters *= 1000;
+					distCurrFromPrevLineInMeters = StatsUtils.round(distCurrFromPrevLineInMeters, 2);
+
+					durCurrFromPrevLineInSecs = prevLineInstant.getEpochSecond() - currentInstant.getEpochSecond();
+
+					// find time zone hoppings.
+					// if (currentZoneId != prevZoneId)
+					if (currentZoneId.getId().equals(prevLineZoneId.getId()) == false)
+					{
+						long prevHoppingsCount = 0;
+						if (userZoneHoppingCount.containsKey(currUser))
+						{
+							prevHoppingsCount = userZoneHoppingCount.get(currUser);
+						}
+						userZoneHoppingCount.put(currUser, prevHoppingsCount + 1);
+					}
+				}
+
+				else
+				{
+					distCurrFromPrevLineInMeters = -99;// 0;
+					durCurrFromPrevLineInSecs = -99;// 0;
+				}
+
+				// Writing prevLines, hence distCurrFromPrevLineInMeters and durCurrFromPrevLineInSecs are actually
+				// difference from next line for the prev line.
+				// When current line read is 2 (first data line after header), the prev line read is empty, hence skip
+				// writing prev line in that case.
+				if (lineCount != 2)
+				{
+					toWriteInBatch.append(
+							prevLineRead + "," + distCurrFromPrevLineInMeters + "," + durCurrFromPrevLineInSecs + "\n");
+				}
+				// http://www.javascripter.net/math/calculators/divisorscalculator.htm
+				if (lineCount % 70870 == 0)// 48260 == 0) // 24130 find divisors of 36001960 using
+				{
+					bw.write(toWriteInBatch.toString());
+					toWriteInBatch.setLength(0);
+					// bw2.write(toWriteInBatch2.toString());
+					// toWriteInBatch2.setLength(0);
+				}
+
+				prevLineUser = currUser;
+				prevLineInstant = currentInstant;
+				prevLineLat = currentLat;
+				prevLineLon = currentLon;
+				prevLineZoneId = currentZoneId;
+				prevLineRead = currentLineRead;
+				// $$bw.write(towrite);
+			} // end of while over lines
+
+			// writing the last previous line, since we are writing prev line and not currently read line.
+			toWriteInBatch
+					.append(prevLineRead + "," + distCurrFromPrevLineInMeters + "," + durCurrFromPrevLineInSecs + "\n");
+
+			// should also write leftover, which will happen if not using exact divisors
+			if (toWriteInBatch.length() > 0)
+			{
+				System.out.println("Writing leftovers ... ");
+				bw.write(toWriteInBatch.toString());
+				toWriteInBatch.setLength(0);
+				// bw2.write(toWriteInBatch2.toString());
+				// toWriteInBatch2.setLength(0);
+			}
+
+			System.out.println("Num of checkins lines read = " + lineCount);
+
+			System.out.println("userZoneHoppingCount sum = "
+					+ userZoneHoppingCount.entrySet().stream().mapToLong(e -> e.getValue()).sum());
+			WritingToFile.writeSimpleMapToFile(userZoneHoppingCount, commonPathToWrite + "userZoneHoppingCount2.csv",
+					"User", "TimezoneHoppingCount");
+
+			brCurrent.close();
+			// brNextLine.close();
 			bw.close();
 			// bw2.close();
 		}
