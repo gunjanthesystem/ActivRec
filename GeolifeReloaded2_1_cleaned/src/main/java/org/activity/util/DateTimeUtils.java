@@ -78,7 +78,9 @@ public class DateTimeUtils
 		LocalDateTime now1 = LocalDateTime.now();
 		LocalDateTime now2 = LocalDateTime.now();
 
-		System.out.println("diff =" + getZonedTimeDiffInSecs(now1, ZoneId.systemDefault(), now1, tz1.toZoneId()));
+		System.out.println("diff =" + getZonedTimeDiffInSecs(now1, ZoneId.of("Z"), now1, tz1.toZoneId()) + " secs");
+		System.out.println(
+				"diff =" + getZonedTimeDiffInSecs(now1, ZoneId.of("Z"), now1, tz1.toZoneId()) / (60 * 60.0) + " hrs");
 	}
 
 	/**
@@ -113,11 +115,19 @@ public class DateTimeUtils
 	 */
 	public static LocalDateTime zuluToTimeZonedLocalDateTime(String zuluTimeStampString, ZoneId zoneId)
 	{
-		Instant instant = Instant.parse(zuluTimeStampString);
-		ZonedDateTime zonedDataTime = ZonedDateTime.ofInstant(instant, zoneId);
+		return instantToTimeZonedLocalDateTime(Instant.parse(zuluTimeStampString), zoneId);
+	}
 
-		// System.out.println("instant = \t\t" + instant);
-		// System.out.println("zonedDataTime = \t" + zonedDataTime);
+	/**
+	 * SANITY CHECKED OK
+	 * 
+	 * @param zuluTimeStampString
+	 * @param zoneId
+	 * @return
+	 */
+	public static LocalDateTime instantToTimeZonedLocalDateTime(Instant instant, ZoneId zoneId)
+	{
+		ZonedDateTime zonedDataTime = ZonedDateTime.ofInstant(instant, zoneId);
 		return zonedDataTime.toLocalDateTime();
 	}
 
