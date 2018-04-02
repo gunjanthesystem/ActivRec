@@ -145,7 +145,7 @@ public class Dashboard3 extends Application
 
 			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
 
-			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 100, 12, 5, 864000, 60 * 20, 10800);
+			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 50, 12, 5, 864000, 60 * 20, 10800);
 
 			long tTimeline0 = System.currentTimeMillis();
 			Tab timelineTabCircle = new Tab("timelineTabCircle Historical Timelines All Users");
@@ -314,23 +314,37 @@ public class Dashboard3 extends Application
 
 			/***********************************************/
 			// $$ Start of disabled on Mar 17 2018
-			// long ttOSMmap1 = System.currentTimeMillis();
-			// Tab osmMapTab = new Tab("Locations OSM Map");
-			// GluonOSMMap osmapPane = new GluonOSMMap();
-			//
-			// String absFileNameForLatLonToReadAsMarker2 =
-			// "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
-			// String absFileNameForLatLonToReadAsMarkerAll =
-			// "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
-			// String delimiter2 = ",";
+			long ttOSMmap1 = System.currentTimeMillis();
+			Tab osmMapTab = new Tab("Locations OSM Map");
+			GluonOSMMap osmapPane = new GluonOSMMap();
+
+			String absFileNameForLatLonToReadAsMarker2 = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
+			String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
+			String absFileNameForLatLonToReadAsMarkerTargetLocs = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicNWLA_ByPids_Mar31.csv";
+			// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
+
+			// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_SlimmedForMap.csv";//
+			// gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
+
+			// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago.csv";
+
+			String delimiter2 = ",";
+
 			// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
-			// BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerAll, delimiter2, latColIndex2,
-			// lonColIndex2, labelColIndex3);
-			// osmMapTab.setContent(bp2);
-			// osmMapTab.setClosable(false);
-			// tabsToAdd.add(osmMapTab);
-			// long ttOSMmap2 = System.currentTimeMillis();
-			// System.out.println("osm map = " + (ttOSMmap2 - ttOSMmap1));
+			int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
+			BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
+					latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.3), false);// Color.rgb(193,
+																										// 49,
+			// 34, 0.3));
+
+			// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
+			// latColIndex2, lonColIndex2, labelColIndex2, fillIndex, 6);// , Color.rgb(0, 105, 106, 0.3));
+
+			osmMapTab.setContent(bp2);
+			osmMapTab.setClosable(false);
+			tabsToAdd.add(osmMapTab);
+			long ttOSMmap2 = System.currentTimeMillis();
+			System.out.println("osm map = " + (ttOSMmap2 - ttOSMmap1));
 			// $$ End of disabled on Mar 17 2018
 			/***********************************************/
 

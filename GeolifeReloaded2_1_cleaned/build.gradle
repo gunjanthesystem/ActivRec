@@ -17,38 +17,29 @@ apply plugin: 'application'
 ///////////////////////////////////////////////////
 sourceCompatibility = 1.8
 version = '1.0'
-def geoToolsVersion = "18.2"    
+//def geoToolsVersion = "18.2"    
 ///////////////////////////////////////////////////
 
 
 // In this section you declare where to find the dependencies of your project
-repositories 
-{
-	mavenCentral()
+repositories {
+    
+    maven { url "http://maven.geotoolkit.org/" }
+    maven { url "http://download.osgeo.org/webdav/geotools/" }
+    maven { url "https://repo.boundlessgeo.com/release" }
+    maven { url "https://jitpack.io" }
+	maven { url "https://raw.github.com/amidst/toolbox/mvn-repo/"}
+    maven { url "https://plugins.gradle.org/m2/"}
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots"}
+    maven { url "https://nexus.bedatadriven.com/content/groups/public"} //for renjin}
+        jcenter()
+    mavenCentral()
+
 	// Use 'jcenter' for resolving your dependencies.
 	// You can declare any Maven/Ivy/file repository here.
-	jcenter()
-	maven { url "https://jitpack.io" }
-	maven{
-                url "https://raw.github.com/amidst/toolbox/mvn-repo/"
-    }
-    maven{
-                url "https://plugins.gradle.org/m2/"
-                url "https://oss.sonatype.org/content/repositories/snapshots" 
-	}
-    
-     maven { 
-         url "https://nexus.bedatadriven.com/content/groups/public" //for renjin
-         
-    }
-
-      maven { 
-         url "http://download.osgeo.org/webdav/geotools/"
-         url "https://repo.boundlessgeo.com/release"
-     }
-    
-
-     //	 flatDir {
+	
+   
+   //	 flatDir {
   //     dirs '/home/gunjan/Immovables/amidsttoolbox/'
        //'/home/gunjan/git/GeolifeReloaded2_1_cleaned/resources/'
   // }
@@ -61,7 +52,9 @@ dependencies
 {
 	// The production code uses the SLF4J logging API at compile time
 	//group:name:version   https://docs.gradle.org/current/userguide/artifact_dependencies_tutorial.html
-	compile 'org.slf4j:slf4j-api:1.7.21'
+	compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'org.slf4j:slf4j-api:1.7.21'
 	compile 'org.apache.commons:commons-csv:1.4'
 	compile 'org.apache.commons:commons-exec:1.3'
 	compile 'org.apache.commons:commons-lang3:3.5'
@@ -88,13 +81,12 @@ dependencies
 	compile group:'com.zaxxer',name:'nuprocess',version:'1.1.0'
 	compile group:'org.zeroturnaround',name:'zt-exec',version:'1.9'
 
-   //JavaFX UI controls
-    compile 'org.controlsfx:controlsfx:8.40.13'
-// compile 'org.controlsfx:controlsfx-samples:8.40.13'
+	//JavaFX UI controls
+   	compile 'org.controlsfx:controlsfx:8.40.13'
+	// compile 'org.controlsfx:controlsfx-samples:8.40.13'
 
-
-    // material design for javafx
-    compile 'com.jfoenix:jfoenix:8.0.1'
+	// material design for javafx
+    //compile 'com.jfoenix:jfoenix:8.0.1'
 	
 	//for amidst toolkit
 	//compile 'eu.amidst:module-all:0.6.1'
@@ -108,26 +100,28 @@ dependencies
 	
 	//compile name: 'spmf'
 	
-	compile fileTree(dir: 'libs', include: ['*.jar'])
-
     
     compile "org.deeplearning4j:deeplearning4j-core:0.9.1"//0.8.0
-    compile "org.nd4j:nd4j-native-platform:0.9.1"
+	compile "org.nd4j:nd4j-native-platform:0.9.1"
     compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
 
-      compile "org.renjin:renjin-script-engine:0.8.2527"
-      compile "org.moeaframework:moeaframework:2.12"
-      compile "com.jcraft:jsch:0.1.54"
-      compile "tech.tablesaw:tablesaw-parent:0.11.4"
+    compile "org.renjin:renjin-script-engine:0.8.2527"
+    compile "org.moeaframework:moeaframework:2.12"
+    compile "com.jcraft:jsch:0.1.54"
+    compile "tech.tablesaw:tablesaw-parent:0.11.4"
     compile group: 'xerces', name: 'xercesImpl', version: '2.11.0'
 
     //compile group: 'com.lynden', name: 'GMapsFX', version: '2.12.0'
-     //compile 'com.github.Username:Reponame:Tag
+    //compile 'com.github.Username:Reponame:Tag
     compile 'com.github.rterp:GMapsFX:d4f4765'
     compile 'com.github.gluonhq:maps:21f09e8'
-   // compile "org.geotools:gt-shapefile:${geoToolsVersion}"
-   // compile "org.geotools:gt-swing:${geoToolsVersion}"
-    
+   	// compile "org.geotools:gt-shapefile:${geoToolsVersion}"
+   	// compile "org.geotools:gt-swing:${geoToolsVersion}"
+    compile group: 'org.geotools', name: 'gt-brewer', version: '19.0'
+    //For geotoolss
+    //compile group: 'javax.media', name: 'jai_core', version: '1.1.3'
+
+ 
     compile 'com.google.maps:google-maps-services:0.2.6'
     compile 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'it.unimi.dsi:fastutil:8.1.1'
@@ -138,12 +132,7 @@ dependencies
 	// testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
 	// 'test.useTestNG()' to your build script.
 	testCompile 'junit:junit:4.12'
-	
-    
-	
-	
-   //compile project('../:SPMFExperiments')
-
+   	//compile project('../:SPMFExperiments')
 	//compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
 }
 

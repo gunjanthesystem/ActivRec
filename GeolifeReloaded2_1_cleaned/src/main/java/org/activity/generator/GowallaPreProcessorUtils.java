@@ -31,6 +31,9 @@ import org.activity.io.WritingToFile;
 import org.activity.objects.OpenStreetAddress;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
+import org.activity.spatial.SpatialUtils;
+import org.activity.stats.StatsUtils;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.HTTPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
@@ -95,13 +98,69 @@ public class GowallaPreProcessorUtils
 
 	public static void main(String[] args)
 	{
-		getGeoAddressForLocations();
+		// $$getGeoAddressForLocations();
 		// getLocTimezoneMap();
 		// $$slimProcessedData();//added earlier and then disabled on Mar 20 2018
 
-		// $$ consolidateAllFetchedOSMAddresses(); // added, used and disabled on Mar 20 2018
+		// $$consolidateAllFetchedOSMAddresses(); // added, used and disabled on Mar 20 2018
 		// $$concatenateRawSpots1LocFileWithCollectedTZ();//
 		// %% splitFilesWithRemainingLocsForFetchingOSMAddress();
+		// 41.85003,-87.65005
+		Triple<String, Double, Double> geoCoordinatesOfChicago = new Triple<>("Chicago", 41.836944, -87.684722);
+		// ref:https://tools.wmflabs.org/geohack/geohack.php?pagename=Chicago&params=41_50_13_N_87_41_05_W_region:US-IL_type:city(2695598)
+		computeDistanceOfGeoCoordFromGivenGeoCoordinates(geoCoordinatesOfChicago,
+				"/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29.csv",
+				"/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago_4_SortWithShuffle.csv");
+
+	}
+
+	private static Map<Triple<Long, Double, Double>, Double> computeDistanceOfGeoCoordFromGivenGeoCoordinates(
+			Triple<String, Double, Double> geoCoordinatesOfCity, String fileToReadGeoCoordinates,
+			String absFileNameToWrite)
+	{
+		Map<Triple<Long, Double, Double>, Double> res = new LinkedHashMap<>();
+		StringBuilder sb = new StringBuilder("PlaceID,Lat,Lon,DistFrom" + geoCoordinatesOfCity.getFirst() + " in KM\n");
+		try
+		{
+			List<List<String>> allLinesRead = ReadingFromFile.readLinesIntoListOfLists(fileToReadGeoCoordinates, ",");
+			allLinesRead.remove(0);// remove header
+			System.out.println("Num of lat lons read = " + allLinesRead.size());
+
+			int lineCount = 0;
+			for (List<String> lineRead : allLinesRead)
+			{
+				lineCount++;
+				long placeID = Long.valueOf(lineRead.get(0));
+				double latToCompare = Double.valueOf(lineRead.get(1));
+				double lonToCompare = Double.valueOf(lineRead.get(2));
+
+				Double distInKMs = StatsUtils
+						.round(SpatialUtils.haversineFastMathV3NoRound(geoCoordinatesOfCity.getSecond(),
+								geoCoordinatesOfCity.getThird(), latToCompare, lonToCompare), 7);
+
+				res.put(new Triple<>(placeID, latToCompare, lonToCompare), distInKMs);
+				sb.append(placeID + "," + latToCompare + "," + lonToCompare + "," + distInKMs + "\n");
+
+				// if (lineCount % 5000 == 0)
+				// {
+				// WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+				// sb.setLength(0);
+				// }
+			}
+			// WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+
+			// res = ComparatorUtils.sortByValueDescNoShuffle(res);// TODO: WHY THIS IS NOT SORTING CORRECTLY.
+			res = ComparatorUtils.sortByValueDesc(res);
+			res.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey().getFirst() + "," + e.getKey().getSecond()
+					+ "," + e.getKey().getThird() + "," + e.getValue() + "\n"));
+			WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -115,7 +174,8 @@ public class GowallaPreProcessorUtils
 		String commonPathToRead = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/OSMAddressesCollected/";
 		Set<Path> pathsOfFoundFiles = new TreeSet<>(); // filepaths matching the file name pattern
 		StringBuilder res = new StringBuilder();
-		String fileNamePatternToSearch = "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZAddress";
+		String fileNamePatternToSearch = "targetLocsForWhichOSMAddressesNowCollectedWithTZsmallerFileAddress";
+		// "gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZAddress";
 		Set<List<String>> allUniqueCompleteOSMAddressesRead = new LinkedHashSet<>();
 		List<String> commonHeaderString = null;
 		boolean headerAssigned = false;
@@ -139,6 +199,12 @@ public class GowallaPreProcessorUtils
 			{
 				List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFile(Files.newInputStream(p),
 						"|", true, true);
+
+				if (linesRead.size() == 0)
+				{
+					System.out.println("Empty file: " + p.toString());
+				}
+
 				totalLinesRead += linesRead.size();
 
 				if (!headerAssigned)
@@ -181,6 +247,7 @@ public class GowallaPreProcessorUtils
 			System.out.println("addressesStored+numOfHeaders+numOfLastLinesRemoved+numOfIncorrectLengthStrings= "
 					+ forSanityCheck + " Sanity check pass: " + (forSanityCheck == totalLinesRead));
 
+			System.out.println("num of incorrect length string = " + incorrectLengthStrings.size());
 			StringBuilder sbt1 = new StringBuilder("Incorrect length strings: \n");
 			incorrectLengthStrings.stream().forEach(s -> sbt1.append(s.toString() + "\n"));
 			System.out.println(sbt1.toString());
@@ -191,7 +258,7 @@ public class GowallaPreProcessorUtils
 			{
 				sbToWrite.append(osmAddress.stream().collect(Collectors.joining("|")) + "\n");
 			}
-			WritingToFile.writeToNewFile(sbToWrite.toString(), commonPathToRead + "ConsolidatedOSMAddress.csv");
+			WritingToFile.writeToNewFile(sbToWrite.toString(), commonPathToRead + "ConsolidatedOSMAddress29March.csv");
 
 		}
 		catch (Exception e)

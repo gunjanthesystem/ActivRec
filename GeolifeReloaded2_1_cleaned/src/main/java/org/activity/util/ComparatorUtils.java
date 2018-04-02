@@ -89,6 +89,8 @@ public class ComparatorUtils
 	 * Sorts a map in decreasing order of value
 	 * 
 	 * It is an unstable sort (forced by shuffle) to randomly break ties
+	 * <p>
+	 * Sanity checkked OK
 	 * 
 	 * @param map
 	 * @return
@@ -119,6 +121,13 @@ public class ComparatorUtils
 		return result;
 	}
 
+	/**
+	 * <p>
+	 * Sanity checked okay
+	 * 
+	 * @param map
+	 * @return
+	 */
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValueDescNoShuffle(Map<K, V> map)
 	{
 		List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
@@ -748,12 +757,58 @@ public class ComparatorUtils
 		map.put("d", Long.valueOf(1));
 		map.put("f", Long.valueOf(12));
 		map.put("g", Long.valueOf(10));
+		map.put("h", Long.valueOf(5));
 
 		List<String> keyWithMaxValue = (List<String>) getKeysWithMaxValues(map);
 		System.out.println("keyWithMaxValue = " + keyWithMaxValue);
 
 		Collections.sort(new ArrayList<String>(map.keySet()), Collections.reverseOrder());
 		System.out.println(map);
+
+	}
+
+	public static void checkSanityOfSort()
+	{
+		Map<String, Long> map = new LinkedHashMap<>();
+
+		map.put("a", Long.valueOf(12));
+		map.put("b", Long.valueOf(12));
+		map.put("c", Long.valueOf(2));
+		map.put("d", Long.valueOf(1));
+		map.put("f", Long.valueOf(12));
+		map.put("g", Long.valueOf(10));
+		map.put("h", Long.valueOf(5));
+
+		Map<Pair<String, String>, Long> map2 = new LinkedHashMap<>();
+		map2.put(new Pair<>("$", "a"), Long.valueOf(12));
+		map2.put(new Pair<>("$", "b"), Long.valueOf(12));
+		map2.put(new Pair<>("$", "c"), Long.valueOf(2));
+		map2.put(new Pair<>("$", "d"), Long.valueOf(1));
+		map2.put(new Pair<>("$", "f"), Long.valueOf(12));
+		map2.put(new Pair<>("$", "g"), Long.valueOf(10));
+		map2.put(new Pair<>("$", "h"), Long.valueOf(5));
+
+		Map<Triple<String, String, String>, Long> map3 = new LinkedHashMap<>();
+		map3.put(new Triple<>("#", "$", "a"), Long.valueOf(12));
+		map3.put(new Triple<>("#", "$", "b"), Long.valueOf(12));
+		map3.put(new Triple<>("#", "$", "c"), Long.valueOf(2));
+		map3.put(new Triple<>("#", "$", "d"), Long.valueOf(1));
+		map3.put(new Triple<>("#", "$", "f"), Long.valueOf(12));
+		map3.put(new Triple<>("#", "$", "g"), Long.valueOf(10));
+		map3.put(new Triple<>("#", "$", "h"), Long.valueOf(5));
+
+		System.out.println(ComparatorUtils.sortByValueDesc(map));
+		System.out.println((map));
+		System.out.println(ComparatorUtils.sortByValueDescNoShuffle(map));
+		System.out.println("\n\n\n");
+		System.out.println(ComparatorUtils.sortByValueDesc(map2));
+		System.out.println((map2));
+		System.out.println(ComparatorUtils.sortByValueDescNoShuffle(map2));
+
+		System.out.println("\n\n\n");
+		System.out.println(ComparatorUtils.sortByValueDesc(map3));
+		System.out.println((map3));
+		System.out.println(ComparatorUtils.sortByValueDescNoShuffle(map3));
 
 	}
 	/////////////////
