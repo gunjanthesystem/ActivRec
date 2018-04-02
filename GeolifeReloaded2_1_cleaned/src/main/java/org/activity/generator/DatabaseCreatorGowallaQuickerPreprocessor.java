@@ -1431,7 +1431,12 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 						PopUps.showError("userCheckinsCount already contains user:" + prevLineUser
 								+ "- Seems read file was not sorted by user id");
 					}
-					userCheckinsCount.put(prevLineUser, numOfValidCheckinsForPrevUser);
+
+					if (prevLineUser.length() > 0)// not empty, to disard the first empty previous use
+					{
+						userCheckinsCount.put(prevLineUser, numOfValidCheckinsForPrevUser);
+					}
+
 					numOfValidCheckinsForPrevUser = 0;
 				}
 
@@ -1455,7 +1460,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 					toWriteInBatch.setLength(0);
 					// bw2.write(toWriteInBatch2.toString());
 					// toWriteInBatch2.setLength(0);
-					break;// JUST FOR SANITY CHECK. REMOVE LATER
+					// break;// JUST FOR SANITY CHECK. REMOVE LATER
 				}
 				// $$bw.write(towrite);
 			} // end of while over lines
@@ -1484,7 +1489,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			WritingToFile.writeSimpleMapToFile(userZoneHoppingCount, commonPathToWrite + "userZoneHoppingCount.csv",
 					"User", "TimezoneHoppingCount");
 			WritingToFile.writeSimpleMapToFile(userCheckinsCount, commonPathToWrite + "userCheckinsCount.csv", "User",
-					"TimezoneHoppingCount");
+					"CheckinsCount");
 
 			brCurrent.close();
 			// brNextLine.close();
@@ -1515,7 +1520,8 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	private static void preprocessCheckInsAgainToAppendDistDurFromNextLine(String checkinFileName, String logfile,
 			String preprocessedFileName, String commonPathToWrite)
 	{
-		Map<String, Long> userZoneHoppingCount = new LinkedHashMap<>();
+		// $ Map<String, Long> userZoneHoppingCount = new LinkedHashMap<>();//Disabled as already done in previously
+		// called method preprocessCheckInWithDateCategoryOnlySpots1FasterWithTimeZone
 		// countWithWrongGeoCoords: num of checkins in placees which have incorrect geocoordinates
 		Pattern dlimPatrn = Pattern.compile(",");
 		System.out.println(
@@ -1581,15 +1587,15 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 					// find time zone hoppings.
 					// if (currentZoneId != prevZoneId)
-					if (currentZoneId.getId().equals(prevLineZoneId.getId()) == false)
-					{
-						long prevHoppingsCount = 0;
-						if (userZoneHoppingCount.containsKey(currUser))
-						{
-							prevHoppingsCount = userZoneHoppingCount.get(currUser);
-						}
-						userZoneHoppingCount.put(currUser, prevHoppingsCount + 1);
-					}
+					// if (currentZoneId.getId().equals(prevLineZoneId.getId()) == false)
+					// {
+					// long prevHoppingsCount = 0;
+					// if (userZoneHoppingCount.containsKey(currUser))
+					// {
+					// prevHoppingsCount = userZoneHoppingCount.get(currUser);
+					// }
+					// userZoneHoppingCount.put(currUser, prevHoppingsCount + 1);
+					// }
 				}
 
 				else
@@ -1641,10 +1647,10 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 			System.out.println("Num of checkins lines read = " + lineCount);
 
-			System.out.println("userZoneHoppingCount sum = "
-					+ userZoneHoppingCount.entrySet().stream().mapToLong(e -> e.getValue()).sum());
-			WritingToFile.writeSimpleMapToFile(userZoneHoppingCount, commonPathToWrite + "userZoneHoppingCount2.csv",
-					"User", "TimezoneHoppingCount");
+			// System.out.println("userZoneHoppingCount sum = "
+			// + userZoneHoppingCount.entrySet().stream().mapToLong(e -> e.getValue()).sum());
+			// WritingToFile.writeSimpleMapToFile(userZoneHoppingCount, commonPathToWrite + "userZoneHoppingCount2.csv",
+			// "User", "TimezoneHoppingCount");
 
 			brCurrent.close();
 			// brNextLine.close();

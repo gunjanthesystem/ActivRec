@@ -2,12 +2,16 @@ package org.activity.ui;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.activity.io.ReadingFromFile;
+import org.activity.objects.Pair;
 import org.activity.objects.Triple;
+import org.activity.stats.StatsUtils;
 
 import com.gluonhq.charm.down.ServiceFactory;
 import com.gluonhq.charm.down.Services;
@@ -18,7 +22,9 @@ import com.gluonhq.maps.MapLayer;
 import com.gluonhq.maps.MapPoint;
 import com.gluonhq.maps.MapView;
 import com.gluonhq.maps.demo.PoiLayer;
+import com.gluonhq.maps.demo.PoiLayer2Faster;
 
+import jViridis.ColorMap;
 import javafx.application.Application;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Rectangle2D;
@@ -51,6 +57,12 @@ public class GluonOSMMap extends Application
 
 	private MapPoint mapPoint;
 
+	public static void main(String[] args)
+	{
+		// System.setProperty("prism.allowhidpi", "true");
+		Application.launch(args);
+	}
+
 	public GluonOSMMap()
 	{
 		setCacheStorage();
@@ -66,7 +78,7 @@ public class GluonOSMMap extends Application
 		int latColIndex = 3, lonColIndex = 2, labelColIndex = 1;
 
 		BorderPane bp = getMapPane(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex,
-				labelColIndex);
+				labelColIndex, 3, Color.rgb(193, 49, 34, 0.65), false);
 
 		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
 		Scene scene = new Scene(bp, bounds.getWidth(), bounds.getHeight());
@@ -76,24 +88,49 @@ public class GluonOSMMap extends Application
 		// view.flyTo(1., mapPoint, 2.);
 	}
 
+	/**
+	 * 
+	 * @param absFileNameForLatLonToReadAsMarker
+	 * @param delimiter
+	 * @param latColIndex
+	 * @param lonColIndex
+	 * @param labelColIndex
+	 * @param sizeOfIcon
+	 * @param colorOfIcon
+	 * @param colorByLabel
+	 * @return
+	 */
 	public BorderPane getMapPane(String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
-			int lonColIndex, int labelColIndex)
+			int lonColIndex, int labelColIndex, int sizeOfIcon, Color colorOfIcon, boolean colorByLabel)
 	// String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
 	// int lonColIndex, int labelColIndex, boolean useCustomMarker) throws Exception
 	{
 		MapView view = new MapView();
 
+		// view.
 		view.setCenter(42.472309, 6.897996);
-		view.setZoom(12);
+		view.setZoom(4);
+
 		List<Triple<Double, Double, String>> listOfLocs = readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
 				delimiter, latColIndex, lonColIndex, labelColIndex);
 
-		view.addLayer(positionLayerV2(listOfLocs));
-		view.setZoom(4);
+		System.out.println("listOfLocs.size() = " + listOfLocs.size());
+		// view.addLayer(positionLayerV2(listOfLocs, sizeOfIcon, colorOfIcon));
+		if (colorByLabel)
+		{
+			view.addLayer(positionLayerV3_colorByLabelScaled(listOfLocs, sizeOfIcon));
+
+		}
+		else
+		{
+			view.addLayer(positionLayerV3(listOfLocs, sizeOfIcon, colorOfIcon));
+		}
+		listOfLocs.clear();
+		// view.setZoom(4);
 		// Scene scene;
 		BorderPane bp = new BorderPane();
 		bp.setCenter(view);
-		listOfLocs.clear();
+
 		// final Label label = new Label("Gluon Maps Demo");
 		// label.setAlignment(Pos.CENTER);
 		// label.setMaxWidth(Double.MAX_VALUE);
@@ -103,6 +140,97 @@ public class GluonOSMMap extends Application
 		return bp;
 	}
 
+	/**
+	 * 
+	 * @param absFileNameForLatLonToReadAsMarker
+	 * @param delimiter
+	 * @param latColIndex
+	 * @param lonColIndex
+	 * @param labelColIndex
+	 * @param sizeOfIcon
+	 * @param colorOfIcon
+	 * @return
+	 */
+	public BorderPane getMapPane2(String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
+			int lonColIndex, int labelColIndex, int sizeOfIcon, Color colorOfIcon)
+	// String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
+	// int lonColIndex, int labelColIndex, boolean useCustomMarker) throws Exception
+	{
+		MapView view = new MapView();
+
+		// view.
+		view.setCenter(42.472309, 6.897996);
+		view.setZoom(4);
+
+		List<Triple<Double, Double, String>> listOfLocs = readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
+				delimiter, latColIndex, lonColIndex, labelColIndex);
+
+		System.out.println("listOfLocs.size() = " + listOfLocs.size());
+		// view.addLayer(positionLayerV2(listOfLocs, sizeOfIcon, colorOfIcon));
+		view.addLayer(positionLayerV3(listOfLocs, sizeOfIcon, colorOfIcon));
+		listOfLocs.clear();
+		// view.setZoom(4);
+		// Scene scene;
+		BorderPane bp = new BorderPane();
+		bp.setCenter(view);
+
+		// final Label label = new Label("Gluon Maps Demo");
+		// label.setAlignment(Pos.CENTER);
+		// label.setMaxWidth(Double.MAX_VALUE);
+		// label.setStyle("-fx-background-color: dimgrey; -fx-text-fill: white;");
+		// bp.setTop(label);
+
+		return bp;
+	}
+
+	/**
+	 * 
+	 * @param absFileNameForLatLonToReadAsMarker
+	 * @param delimiter
+	 * @param latColIndex
+	 * @param lonColIndex
+	 * @param labelColIndex
+	 * @param fillValColIndex
+	 * @param sizeOfIcon
+	 * @return
+	 */
+	public BorderPane getMapPane2(String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
+			int lonColIndex, int labelColIndex, int fillValColIndex, int sizeOfIcon)
+	// String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
+	// int lonColIndex, int labelColIndex, boolean useCustomMarker) throws Exception
+	{
+		BorderPane bp = new BorderPane();
+		try
+		{
+			MapView view = new MapView();
+
+			view.setCenter(42.472309, 6.897996);
+			view.setZoom(4);
+
+			List<List<String>> lines = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
+					new FileInputStream(new File(absFileNameForLatLonToReadAsMarker)), ",", true, false,
+					new int[] { latColIndex, lonColIndex, labelColIndex, fillValColIndex });
+
+			lines.remove(0);// remove headers
+
+			lines = lines.stream().skip((int) Math.floor(lines.size() * 0.75)).collect(Collectors.toList());
+
+			System.out.println("lines.size()=" + lines.size());
+
+			// view.addLayer(positionLayerV2(listOfLocs, sizeOfIcon, colorOfIcon));
+			MapLayer layer1 = positionLayerV3(lines, sizeOfIcon, 0, 1, 2, 3);
+			System.out.println("layer1.toString()= " + layer1.toString());
+			view.addLayer(layer1);
+			// lines.clear();
+			// view.setZoom(4);
+			bp.setCenter(view);
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		return bp;
+	}
 	// private MapLayer myDemoLayer () {
 	// PoiLayer answer = new PoiLayer();
 	// Node icon1 = new Circle(7, Color.BLUE);
@@ -146,9 +274,17 @@ public class GluonOSMMap extends Application
 	// });
 	// }
 
-	private MapLayer positionLayerV2(List<Triple<Double, Double, String>> listOfLocs)
+	/**
+	 * 
+	 * @param listOfLocs
+	 * @param sizeOfIcon
+	 * @param colorOfIcon
+	 * @return
+	 */
+	private MapLayer positionLayerV2(List<Triple<Double, Double, String>> listOfLocs, int sizeOfIcon, Color colorOfIcon)
 	{
 		List<MapPoint> mapPoints = new ArrayList<>();
+
 		for (Triple<Double, Double, String> locEntry : listOfLocs)
 		{
 			mapPoints.add(new MapPoint(locEntry.getFirst(), locEntry.getSecond()));
@@ -174,8 +310,9 @@ public class GluonOSMMap extends Application
 				// Circle c = new Circle(5, Color.rgb(193, 49, 34, 0.65));
 				for (MapPoint mp : mapPoints)
 				{
-					Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
-					// c.setStroke(Color.BLACK);
+					// Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+					Circle c = new Circle(sizeOfIcon, colorOfIcon);
+					c.setStroke(Color.BLACK);
 					answer.addPoint(mp, c);
 				}
 				// $mapPoints.stream().forEach(mp -> answer.addPoint(mp, new Circle(5, Color.rgb(0, 105, 106, 0.65))));
@@ -188,6 +325,7 @@ public class GluonOSMMap extends Application
 				return answer;
 			}).orElseGet(() ->
 				{
+					System.out.println("Position Service not available");
 					// LOGGER.log(Level.WARNING, "Position Service not available");
 					PoiLayer answer = new PoiLayer();
 					// mapPoint = new MapPoint(50., 4.);
@@ -195,8 +333,9 @@ public class GluonOSMMap extends Application
 					// Circle c = new Circle(5, Color.rgb(193, 49, 34, 0.65));
 					for (MapPoint mp : mapPoints)
 					{
-						Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
-						// c.setStroke(Color.BLACK);
+						// Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+						Circle c = new Circle(sizeOfIcon, colorOfIcon);
+						c.setStroke(Color.BLACK);
 						answer.addPoint(mp, c);
 					}
 
@@ -206,6 +345,180 @@ public class GluonOSMMap extends Application
 				});
 	}
 
+	private MapLayer positionLayerV3(List<Triple<Double, Double, String>> listOfLocs, int sizeOfIcon, Color colorOfIcon)
+	{
+		List<MapPoint> mapPoints = new ArrayList<>();
+
+		for (Triple<Double, Double, String> locEntry : listOfLocs)
+		{
+			mapPoints.add(new MapPoint(locEntry.getFirst(), locEntry.getSecond()));
+		}
+		// System.out.println(listOfLocs.toString());
+		// System.out.println("listOfLocs.size()=" + listOfLocs.size());
+		// System.out.println("mapPoints.size()=" + mapPoints.size());
+		// LOGGER.log(Level.WARNING, "Position Service not available");
+		PoiLayer2Faster answer = new PoiLayer2Faster(mapPoints.size());
+		// mapPoint = new MapPoint(50., 4.);
+		// answer.addPoint(mapPoint, new Circle(7, Color.RED));
+		// Circle c = new Circle(5, Color.rgb(193, 49, 34, 0.65));
+		for (MapPoint mp : mapPoints)
+		{
+			// Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+			Circle c = new Circle(sizeOfIcon, colorOfIcon);
+			// c.setStroke(Color.BLACK);
+			answer.addPoint(mp, c);
+		}
+
+		// $$mapPoints.stream().forEach(mp -> answer.addPoint(mp, new Circle(5, Color.rgb(193, 49, 34,
+		// 0.65))));
+		return answer;
+
+	}
+
+	private MapLayer positionLayerV3_colorByLabelScaled(List<Triple<Double, Double, String>> listOfLocs, int sizeOfIcon)
+	{
+		PoiLayer2Faster answer = new PoiLayer2Faster(listOfLocs.size());
+
+		List<Double> listOfValsForScaledColourFill = new ArrayList<>();
+
+		for (Triple<Double, Double, String> locEntry : listOfLocs)
+		{
+			listOfValsForScaledColourFill.add(Double.valueOf(locEntry.getThird()));
+		}
+
+		//////////////////
+		int numOfBins = 10;
+		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
+				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
+		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst();
+		Color[] colors = awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
+		System.out.println("color.length=" + colors.length);
+
+		/////////////////
+		for (int i = 0; i < listOfLocs.size(); i++)// MapPoint mp : mapPoints)
+		{
+			Triple<Double, Double, String> locEntry = listOfLocs.get(i);
+			// Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+
+			Pair<Double, Integer> valBinIndex = valBinIndexList.get(i);
+			Double fillValFromLocEntry = Double.valueOf(locEntry.getThird());
+
+			if (valBinIndex.getFirst().equals(fillValFromLocEntry) == false)
+			{
+				PopUps.printTracedErrorMsg("Error: valBinIndex.getFirst().equals(fillValFromLocEntry)==false");
+			}
+
+			int binIndex = valBinIndex.getSecond();// valBinIndexMap.get(Double.valueOf(locEntry.getThird()));
+
+			Color fillColor = colors[binIndex];
+			// System.out.println("binIndex= " + binIndex + " Color= " + fillColor + " red " + fillColor.getRed());
+
+			Circle c = new Circle(sizeOfIcon, fillColor);
+			// c.setStroke(Color.BLACK);
+			answer.addPoint(new MapPoint(locEntry.getFirst(), locEntry.getSecond()), c);
+		}
+
+		return answer;
+
+	}
+
+	/**
+	 * 
+	 * @param listOfLocs
+	 * @param sizeOfIcon
+	 * @param indexOfLat
+	 * @param indexOfLon
+	 * @param indexOfLabel
+	 * @param indexOfFillVal
+	 * @return
+	 */
+	private MapLayer positionLayerV3(List<List<String>> listOfLocs, int sizeOfIcon, int indexOfLat, int indexOfLon,
+			int indexOfLabel, int indexOfFillVal)
+	{
+		// {MapPoint, valueToDecideForFill}
+		// List<Pair<MapPoint, Double>> mapPointsWithFillVal = new ArrayList<>();
+
+		List<MapPoint> mapPoints = new ArrayList<>();
+		List<Double> listOfValsForScaledColourFill = new ArrayList<>();
+		List<String> listOfLabels = new ArrayList<>();
+
+		for (List<String> locEntry : listOfLocs)
+		{
+			System.out.println("locEntry=" + locEntry);
+			mapPoints.add(
+					new MapPoint(Double.valueOf(locEntry.get(indexOfLon)), Double.valueOf(locEntry.get(indexOfLon))));
+			listOfValsForScaledColourFill.add(Double.valueOf(locEntry.get(indexOfFillVal)));
+			listOfLabels.add(locEntry.get(indexOfLabel));
+		}
+
+		// double maxVal = listOfValsForScaledColourFill.stream().mapToDouble(e ->
+		// Double.valueOf(e)).max().getAsDouble();
+		// double minVal = listOfValsForScaledColourFill.stream().mapToDouble(e ->
+		// Double.valueOf(e)).min().getAsDouble();
+		// int numOfSteps = 10;
+		// double stepSize = (maxVal - minVal) / numOfSteps;
+
+		// double maxHue = 1.0;
+		// double minHue = 0.0;
+		//
+		// Color maxColor = Color.hsb(270, 1.0, 1.0); // hue = 270, saturation & value = 1.0. inplicit alpha of 1.0
+		// Color colorOfIcon = maxColor;
+
+		// ColorBrewer.
+
+		int numOfBins = 10;
+		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
+				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
+		List<Pair<Double, Integer>> valBinIndexMap = binningRes.getFirst();
+
+		Color[] colors = awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
+		System.out.println("color.length=" + colors.length);
+		// System.out.println(listOfLocs.toString());
+		// System.out.println("listOfLocs.size()=" + listOfLocs.size());
+		// System.out.println("mapPoints.size()=" + mapPoints.size());
+		// LOGGER.log(Level.WARNING, "Position Service not available");
+		System.out.println("mapPoints.size= " + mapPoints.size());
+		PoiLayer2Faster answer = new PoiLayer2Faster(mapPoints.size());
+		// mapPoint = new MapPoint(50., 4.);
+		// answer.addPoint(mapPoint, new Circle(7, Color.RED));
+		// Circle c = new Circle(5, Color.rgb(193, 49, 34, 0.65));
+		for (int i = 0; i < mapPoints.size(); i++)
+		{
+			// Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+			// $$int binIndexForFillVal = valBinIndexMap.get(listOfValsForScaledColourFill.get(i));
+			// $$ Color colorOfIcon = colors[binIndexForFillVal];
+
+			Circle c = new Circle(5, Color.DARKCYAN);
+			// c.setStroke(Color.BLACK);
+			MapPoint p = mapPoints.get(i);
+			// System.out.println(
+			// "MapPoint= " + p.getLatitude() + " Color = " + colorOfIcon.toString() + colorOfIcon.getRed());
+			answer.addPoint(mapPoints.get(i), c);
+		}
+
+		// $$mapPoints.stream().forEach(mp -> answer.addPoint(mp, new Circle(5, Color.rgb(193, 49, 34,
+		// 0.65))));
+		return answer;
+
+	}
+
+	public static Color awtColorToJavaFXColor(java.awt.Color awtColor)
+	{
+		return javafx.scene.paint.Color.rgb(awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(),
+				(awtColor.getAlpha() / 255.0));
+	}
+
+	public static Color[] awtColorToJavaFXColor(java.awt.Color[] awtColor)
+	{
+		Color[] res = new Color[awtColor.length];
+
+		for (int i = 0; i < awtColor.length; i++)
+		{
+			res[i] = awtColorToJavaFXColor(awtColor[i]);
+		}
+		return res;
+
+	}
 	// /**
 	// *
 	// * @param absFileNameForLatLong
@@ -291,15 +604,15 @@ public class GluonOSMMap extends Application
 				{
 					continue;
 				}
-				if (++count > 20000)
-				{
-					break;
-				}
+				// if (count > 50000)
+				// {
+				// break;
+				// }
 				// System.out.println("line= " + line);
 				// System.out.println("here 1");
 
 				Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(0)),
-						Double.valueOf(line.get(1)), "id=" + line.get(2));
+						Double.valueOf(line.get(1)), line.get(2));
 
 				// LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
 				// // Double.valueOf(line.get(2).substring(0, 4)));
@@ -322,6 +635,73 @@ public class GluonOSMMap extends Application
 		// System.out.println("List of markers= " + sb.toString());
 		// System.out.println("listOfLocations.size()=" + listOfLocations.size());
 		return listOfLocations;
+	}
+
+	/**
+	 * 
+	 * @param absFileNameForLatLong
+	 * @param delimiter
+	 * @param latColIndex
+	 * @param lonColIndex
+	 * @param labelColIndex
+	 */
+	public static Pair<List<Triple<Double, Double, String>>, Double> readListOfLocationsV3(String absFileNameForLatLong,
+			String delimiter, int latColIndex, int lonColIndex, int labelColIndex, int fillValColIndex)
+	{
+		List<Triple<Double, Double, String>> listOfLocations = new ArrayList<>();
+		List<Double> fillVal = new ArrayList();
+
+		try
+		{
+			List<List<String>> lines = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
+					new FileInputStream(new File(absFileNameForLatLong)), ",", true, false,
+					new int[] { latColIndex, lonColIndex, labelColIndex, fillValColIndex });
+
+			System.out.println("lines.size()=" + lines.size());
+
+			int count = 0;
+
+			for (List<String> line : lines)
+			{
+				count += 1;
+
+				if (count == 1)
+				{
+					continue;
+				}
+				if (++count > 20000)
+				{
+					break;
+				}
+				// System.out.println("line= " + line);
+				// System.out.println("here 1");
+
+				Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(0)),
+						Double.valueOf(line.get(1)), "id=" + line.get(2));
+
+				fillVal.add(Double.valueOf(line.get(3)));
+
+				// LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
+				// // Double.valueOf(line.get(2).substring(0, 4)));
+				// // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),
+				// // Double.valueOf(line.get(2).substring(0, 4)));
+				// System.out.println("LatLong= " + markerLatLong2.toString());
+				// markerOptions2.position(markerLatLong2).title(line.get(1)).visible(true);
+				// System.out.println("here2");
+				// myMarker2 = new Marker(markerOptions2);
+				// System.out.println("here3");
+				listOfLocations.add(val);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		// StringBuilder sb = new StringBuilder();
+		// listOfMarkers.stream().forEachOrdered(e -> sb.append(e.toString() + "\n"));
+		// System.out.println("List of markers= " + sb.toString());
+		// System.out.println("listOfLocations.size()=" + listOfLocations.size());
+		return null;// new Pair<List<Triple<Double, Double, String>>, Double>(listOfLocations, fillVal);
 	}
 
 	/**

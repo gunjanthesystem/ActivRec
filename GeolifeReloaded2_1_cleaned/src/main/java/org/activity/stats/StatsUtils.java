@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,9 +18,12 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums.SummaryStat;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WritingToFile;
+import org.activity.objects.Pair;
+import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.UtilityBelt;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
@@ -36,6 +40,211 @@ public final class StatsUtils
 	private StatsUtils()
 	{
 
+	}
+
+	// 5, 15,20, 50, 100, 55, 70,101,-1 . max = 100, min = 0, binSize =10
+	// maxVal is maxValExcluding
+	// bins: [0,10),[10,20), ....... ,[90,100)
+	// num of bins:= 10 = 0, 1,......9
+	// num of bins = (max-min)/binSize
+	// floor((5-min)/binsize) = 5/10 = 0.5 --> 0 = bin 0
+	// floor((0-min)/binsize) = 0/10 = 0 --> 0 = bin 0
+	// floor((10-min)/binsize) = 10/10 = 1 --> 1 = bin 1
+	// floor((9.99-min)/binsize) = 0.99/10 = 0.99 --> 0 = bin 0
+	// floor(-1-0)/binsize = -1/10 = -0.1--> -1 error
+	// floor(100-0)/binsize = 100/10 = 10--> 10 --> bin 10 // rror
+	// floor(101-0)/binsize = 101/10 = 10.1--> 10 --> bin 10 // error
+
+	/**
+	 * Assign each val to a bin
+	 * 
+	 * @param vals
+	 * @param binSize
+	 * @param verbose
+	 * @return {Pair{val,binIndex} map, numOfBins}
+	 * @since 1 April 2018
+	 */
+	public static Pair<List<Pair<Double, Integer>>, Integer> binValuesByBinSize(List<Double> vals, double binSize,
+			boolean verbose)
+	{
+		// 100, 101, 100.5,100.99
+		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
+		double minVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).min().getAsDouble();
+		double maxValExcluding = Math.floor(maxVal) + 1; // 101, 102, 101
+		int numOfBins = (int) Math.ceil((maxValExcluding - minVal) / binSize);
+
+		Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> res = binVals(
+				vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose);
+		List<Pair<Double, Integer>> valToBinIndex = res.getFirst();
+		return new Pair<List<Pair<Double, Integer>>, Integer>(valToBinIndex, numOfBins);
+	}
+
+	/**
+	 * Assign each val to a bin
+	 * 
+	 * @param vals
+	 * @param binSize
+	 * @param verbose
+	 * @return Triple{valToBinIndex, binIndexBoundary, binIndexListOfVals}
+	 */
+	public static Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> binValuesByBinSize2(
+			List<Double> vals, double binSize, boolean verbose)
+	{
+		// 100, 101, 100.5,100.99
+		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
+		double minVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).min().getAsDouble();
+		double maxValExcluding = Math.floor(maxVal) + 1; // 101, 102, 101
+		int numOfBins = (int) Math.ceil((maxValExcluding - minVal) / binSize);
+
+		return binVals(vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose);
+	}
+
+	// 5, 15,20, 50, 100, 55, 70,101,-1 . max = 100, min = 0, binSize =10
+	// maxVal is maxValExcluding
+	// bins: [0,10),[10,20), ....... ,[90,100)
+	// num of bins:= 10 = 0, 1,......9
+	// num of bins = (max-min)/binSize
+	// floor((5-min)/binsize) = 5/10 = 0.5 --> 0 = bin 0
+	// floor((0-min)/binsize) = 0/10 = 0 --> 0 = bin 0
+	// floor((10-min)/binsize) = 10/10 = 1 --> 1 = bin 1
+	// floor((9.99-min)/binsize) = 0.99/10 = 0.99 --> 0 = bin 0
+	// floor(-1-0)/binsize = -1/10 = -0.1--> -1 error
+	// floor(100-0)/binsize = 100/10 = 10--> 10 --> bin 10 // rror
+	// floor(101-0)/binsize = 101/10 = 10.1--> 10 --> bin 10 // error
+
+	/**
+	 * Assign each val to a bin
+	 * 
+	 * @param vals
+	 * @param numOfBins
+	 * @param verbose
+	 * @return {Pair{val,binIndex} map, binSize}
+	 * @since 1 April 2018
+	 */
+	public static Pair<List<Pair<Double, Integer>>, Double> binValuesByNumOfBins(List<Double> vals, int numOfBins,
+			boolean verbose)
+	{
+
+		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
+		double minVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).min().getAsDouble();
+		double maxValExcluding = Math.floor(maxVal) + 1; // 101, 102, 101
+		double binSize = (int) Math.ceil((maxValExcluding - minVal) / numOfBins);
+
+		Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> res = binVals(
+				vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose);
+		List<Pair<Double, Integer>> valToBinIndex = res.getFirst();
+		return new Pair<List<Pair<Double, Integer>>, Double>(valToBinIndex, binSize);
+	}
+
+	/**
+	 * Assign each val to a bin
+	 * 
+	 * @param vals
+	 * @param numOfBins
+	 * @param verbose
+	 * @return Triple{valToBinIndex, binIndexBoundary, binIndexListOfVals}
+	 * @since 1 April 2018
+	 */
+	public static Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> binValuesByNumOfBins2(
+			List<Double> vals, int numOfBins, boolean verbose)
+	{
+
+		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
+		double minVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).min().getAsDouble();
+		double maxValExcluding = Math.floor(maxVal) + 1; // 101, 102, 101
+		double binSize = (int) Math.ceil((maxValExcluding - minVal) / numOfBins);
+
+		return (binVals(vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose));
+
+	}
+
+	/**
+	 * 
+	 * @param vals
+	 * @param numOfBins
+	 * @param binSize
+	 * @param maxVal
+	 * @param minVal
+	 * @param maxValExcluding
+	 * @param verbose
+	 * @return
+	 */
+	private static Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> binVals(
+			List<Double> vals, int numOfBins, double binSize, double maxVal, double minVal, double maxValExcluding,
+			boolean verbose)
+	{
+		List<Pair<Double, Integer>> valToBinIndex = new ArrayList<>();
+		Map<Integer, Pair<Double, Double>> binIndexBoundary = new TreeMap<>();
+		Map<Integer, List<Double>> binIndexListOfVals = new TreeMap<>();
+
+		int index = 0;
+		for (double d = minVal; d < maxValExcluding;)
+		{
+			binIndexBoundary.put(index, new Pair<>(d, d + binSize));
+			d += binSize;
+			index += 1;
+		}
+
+		// initialise with empty list of vals for each bin index
+		binIndexBoundary.keySet().forEach(e -> binIndexListOfVals.put(e, new ArrayList<>()));
+
+		for (double v : vals)
+		{
+			int binIndex = (int) (Math.floor(v - minVal) / binSize);
+
+			if (binIndex < 0)
+			{
+				PopUps.printTracedWarningMsg("val:" + v + " is < min:" + minVal);
+			}
+			else if (binIndex > numOfBins)
+			{
+				PopUps.printTracedWarningMsg("val:" + v + " is > maxValExcluding:" + maxValExcluding);
+			}
+			else
+			{
+				valToBinIndex.add(new Pair(v, binIndex));
+			}
+		}
+
+		// Get number of values in each bin for histogram
+		for (Pair<Double, Integer> e : valToBinIndex)
+		{
+			binIndexListOfVals.get(e.getSecond()).add(e.getFirst());
+		}
+		//
+
+		if (verbose)
+		{
+			System.out.println("\nnumOfVals=" + vals.size() + "\nnumOfBins=" + numOfBins + "\nmaxVal=" + maxVal
+					+ "\nmaxValExcluding=" + maxValExcluding + "\nminVal=" + minVal + "\nbinSize=" + binSize);
+
+			StringBuilder sbT1 = new StringBuilder();
+
+			sbT1.append("\nBin boundaries are:\n");
+			binIndexBoundary.entrySet().stream().forEachOrdered(
+					e -> sbT1.append("[" + e.getValue().getFirst() + "," + e.getValue().getSecond() + "),\t"));
+
+			if (false)
+			{
+				sbT1.append("\nBinned fill vals:\n\tval - binIndex\n");
+				valToBinIndex.stream()
+						.forEachOrdered(e -> sbT1.append("\t" + e.getFirst() + " - " + e.getSecond() + " : " + "\n"));
+
+				sbT1.append("\nVals in each bin are:\n\tbinIndex - Vals\n");
+				binIndexListOfVals.entrySet().stream()
+						.forEachOrdered(e -> sbT1.append("\t" + e.getKey() + " - " + e.getValue() + " : " + "\n"));
+			}
+			sbT1.append("\nNumOfVals in each bin are:\n\tbinIndex - NumOfVals\n");
+			binIndexListOfVals.entrySet().stream()
+					.forEachOrdered(e -> sbT1.append("\t" + e.getKey() + " - " + e.getValue().size() + " : " + "\n"));
+
+			sbT1.append("\nSum of vals= "
+					+ binIndexListOfVals.entrySet().stream().mapToInt(e -> e.getValue().size()).sum() + "\n");
+
+			System.out.println(sbT1.toString());
+
+		}
+		return new Triple<>(valToBinIndex, binIndexBoundary, binIndexListOfVals);
 	}
 
 	// public static NumberFormat getDecimalFormat(int numOfDecimalPlaces)
@@ -82,7 +291,7 @@ public final class StatsUtils
 		return new DescriptiveStatistics(vals);
 	}
 
-	public static void main(String args[])
+	public static void main0(String args[])
 	{
 		// compare percentile computation
 		List<Double> vals = new Random().doubles(20, 0, 100).boxed().collect(Collectors.toList());
@@ -100,6 +309,36 @@ public final class StatsUtils
 
 		System.out.println("getPercentile: " + ((t2 - t1) * 1.0) / 1000000 + " ns");
 		System.out.println("getPercentileSlower:" + ((t4 - t3) * 1.0) / 1000000 + " ns");
+	}
+
+	public static void main(String args[])
+	{
+		checkBinnning();
+	}
+
+	private static void checkBinnning()
+	{
+
+		double[] intArr = new double[] { 5, 10, 15, 20, 50, 100, 55, 70, 98 };// , 101, -1 };
+
+		Double[] doubleArray = ArrayUtils.toObject(intArr);
+		List<Double> doubleList = Arrays.asList(doubleArray);
+		Pair<List<Pair<Double, Integer>>, Double> res = binValuesByNumOfBins(doubleList, 10, true);
+		Pair<List<Pair<Double, Integer>>, Integer> res2 = binValuesByBinSize(doubleList, 10, true);
+
+		// 5, 15,20, 50, 100, 55, 70,101,-1 . max = 100, min = 0, binSize =10
+		// maxVal is maxValExcluding
+		// bins: [0,10),[10,20), ....... ,[90,100)
+		// num of bins:= 10 = 0, 1,......9
+		// num of bins = (max-min)/binSize
+		// floor((5-min)/binsize) = 5/10 = 0.5 --> 0 = bin 0
+		// floor((0-min)/binsize) = 0/10 = 0 --> 0 = bin 0
+		// floor((10-min)/binsize) = 10/10 = 1 --> 1 = bin 1
+		// floor((9.99-min)/binsize) = 0.99/10 = 0.99 --> 0 = bin 0
+		// floor(-1-0)/binsize = -1/10 = -0.1--> -1 error
+		// floor(100-0)/binsize = 100/10 = 10--> 10 --> bin 10 // rror
+		// floor(101-0)/binsize = 101/10 = 10.1--> 10 --> bin 10 // error
+
 	}
 
 	/**

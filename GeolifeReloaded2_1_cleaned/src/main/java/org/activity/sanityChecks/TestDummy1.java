@@ -19,6 +19,8 @@ import com.esotericsoftware.kryo.serializers.DefaultSerializers.StringSerializer
 //import com.esotericsoftware.kryo.serializers.MapSerializer.BindMap;
 import com.esotericsoftware.kryo.serializers.MapSerializer.BindMap;
 
+import jViridis.ColorMap;
+
 /**
  * Class for testing or confirming experimental code snippets
  * 
@@ -225,7 +227,21 @@ public class TestDummy1
 
 	}
 
+	public static void colorPalleteTests()
+	{
+		ColorMap v = ColorMap.getInstance(ColorMap.VIRIDIS);// .show(this, 50, 30);
+		System.out.println("v.getColorMapLength()= " + v.getColorMapLength());
+		StringBuilder sb = new StringBuilder();
+		Arrays.asList(v.getColorPalette(50)).stream().forEachOrdered(e -> sb.append(e.toString() + "\n"));
+		System.out.println(sb.toString());
+	}
+
 	public static void main(String args[])
+	{
+		colorPalleteTests();
+	}
+
+	public static void main_(String args[])
 	{
 
 		List<Integer> items = IntStream.of(1, 2, 3, 4).boxed().collect(Collectors.toList());
