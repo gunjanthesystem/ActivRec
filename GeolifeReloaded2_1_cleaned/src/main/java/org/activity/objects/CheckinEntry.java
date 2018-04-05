@@ -46,8 +46,8 @@ public class CheckinEntry extends DataEntry implements Serializable
 	 */
 	private String[] levelWiseCatIDs;
 
-	private double distanceInMetersFromPrev;
-	private long durationInSecsFromPrev;
+	private double distanceInMetersFromPrevCheckin;
+	private long durationInSecsFromPrevCheckin;
 
 	// private int numOfCheckins; // num of checkins this checkin is composed of, this is relevant when multiple
 	// checkins
@@ -96,11 +96,12 @@ public class CheckinEntry extends DataEntry implements Serializable
 	 * @param longitude
 	 * @param catID
 	 * @param workingLevelCatIDs
-	 * @param distanceInMetersFromNext
-	 * @param durationInSecsFromNext
+	 * @param distanceInMetersFromPrevCheckin
+	 * @param durationInSecsFromPrevCheckin
 	 */
 	public CheckinEntry(String userID, Integer locationID, Timestamp ts, String latitude, String longitude,
-			Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext)
+			Integer catID, String workingLevelCatIDs, double distanceInMetersFromPrevCheckin,
+			long durationInSecsFromPrevCheckin)
 	{
 		this.userID = userID;
 		this.locationIDs = new ArrayList<Integer>();
@@ -116,12 +117,14 @@ public class CheckinEntry extends DataEntry implements Serializable
 		this.activityID = catID;
 		this.setWorkingLevelCatIDs(workingLevelCatIDs);
 
-		this.distanceInMetersFromPrev = distanceInMetersFromNext;
-		this.durationInSecsFromPrev = durationInSecsFromNext;
+		this.distanceInMetersFromPrevCheckin = distanceInMetersFromPrevCheckin;
+		this.durationInSecsFromPrevCheckin = durationInSecsFromPrevCheckin;
 	}
 
 	/**
 	 * <font color = green>Most useful constructor</font>
+	 * <p>
+	 * Currently used March 2018
 	 * 
 	 * @param userID
 	 * @param locationID
@@ -130,12 +133,12 @@ public class CheckinEntry extends DataEntry implements Serializable
 	 * @param longitude
 	 * @param catID
 	 * @param workingLevelCatIDs
-	 * @param distanceInMetersFromNext
-	 * @param durationInSecsFromNext
+	 * @param distanceInMetersFromPrevCheckin
+	 * @param durationInSecsFromPrevCheckin
 	 */
 	public CheckinEntry(String userID, Integer locationID, Timestamp ts, String latitude, String longitude,
-			Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext,
-			String[] levelWiseCatIDs)
+			Integer catID, String workingLevelCatIDs, double distanceInMetersFromPrevCheckin,
+			long durationInSecsFromPrevCheckin, String[] levelWiseCatIDs)
 	{
 		this.userID = userID;
 		this.locationIDs = new ArrayList<Integer>();
@@ -151,8 +154,8 @@ public class CheckinEntry extends DataEntry implements Serializable
 		this.activityID = catID;
 		this.setWorkingLevelCatIDs(workingLevelCatIDs);
 
-		this.distanceInMetersFromPrev = distanceInMetersFromNext;
-		this.durationInSecsFromPrev = durationInSecsFromNext;
+		this.distanceInMetersFromPrevCheckin = distanceInMetersFromPrevCheckin;
+		this.durationInSecsFromPrevCheckin = durationInSecsFromPrevCheckin;
 
 		this.levelWiseCatIDs = levelWiseCatIDs;
 	}
@@ -186,12 +189,14 @@ public class CheckinEntry extends DataEntry implements Serializable
 		this.activityID = catID;
 		this.setWorkingLevelCatIDs(workingLevelCatIDs);
 
-		this.distanceInMetersFromPrev = distanceInMetersFromPrev;
-		this.durationInSecsFromPrev = durationInSecsFromPrev;
+		this.distanceInMetersFromPrevCheckin = distanceInMetersFromPrev;
+		this.durationInSecsFromPrevCheckin = durationInSecsFromPrev;
 	}
 
 	/**
 	 * <font color = green>Most useful constructor</font> Used to created merged checkin entry
+	 * <p>
+	 * Used as of April 4 2018
 	 * 
 	 * @param userID
 	 * @param locationID
@@ -217,8 +222,8 @@ public class CheckinEntry extends DataEntry implements Serializable
 		this.activityID = catID;
 		this.setWorkingLevelCatIDs(workingLevelCatIDs);
 
-		this.distanceInMetersFromPrev = distanceInMetersFromPrev;
-		this.durationInSecsFromPrev = durationInSecsFromPrev;
+		this.distanceInMetersFromPrevCheckin = distanceInMetersFromPrev;
+		this.durationInSecsFromPrevCheckin = durationInSecsFromPrev;
 
 		this.levelWiseCatIDs = levelWiseCatIDs;
 	}
@@ -305,8 +310,8 @@ public class CheckinEntry extends DataEntry implements Serializable
 	{
 		return "CheckinEntry [userID=" + userID + ", workingLevelCatIDs=" + workingLevelCatIDs + ", locationIDs="
 				+ locationIDs + ", startLats=" + startLats + ", startLons=" + startLons + ", activityID=" + activityID
-				+ ", distanceInMetersFromPrev=" + distanceInMetersFromPrev + ", durationInSecsFromPrev="
-				+ durationInSecsFromPrev + "]";
+				+ ", distanceInMetersFromPrev=" + distanceInMetersFromPrevCheckin + ", durationInSecsFromPrev="
+				+ durationInSecsFromPrevCheckin + "]";
 	}
 
 	@Override
@@ -334,7 +339,7 @@ public class CheckinEntry extends DataEntry implements Serializable
 	public String toStringWithoutHeaders()
 	{
 		return this.userID + "," + this.timestamp + "," + this.activityID + "," + this.getLocationIDs('_') + ","
-				+ this.distanceInMetersFromPrev + "," + this.durationInSecsFromPrev;
+				+ this.distanceInMetersFromPrevCheckin + "," + this.durationInSecsFromPrevCheckin;
 	}
 
 	/**
@@ -377,22 +382,22 @@ public class CheckinEntry extends DataEntry implements Serializable
 
 	public double getDistanceInMetersFromPrev()
 	{
-		return distanceInMetersFromPrev;
+		return distanceInMetersFromPrevCheckin;
 	}
 
 	public void setDistanceInMetersFromPrev(double distanceInMetersFromNext)
 	{
-		this.distanceInMetersFromPrev = distanceInMetersFromNext;
+		this.distanceInMetersFromPrevCheckin = distanceInMetersFromNext;
 	}
 
 	public long getDurationInSecsFromPrev()
 	{
-		return durationInSecsFromPrev;
+		return durationInSecsFromPrevCheckin;
 	}
 
 	public void setDurationInSecsFromPrev(long durationInSecsFromNext)
 	{
-		this.durationInSecsFromPrev = durationInSecsFromNext;
+		this.durationInSecsFromPrevCheckin = durationInSecsFromNext;
 	}
 
 	public String getWorkingLevelCatIDs()
@@ -449,9 +454,9 @@ public class CheckinEntry extends DataEntry implements Serializable
 		int result = 1;
 		result = prime * result + activityID;
 		long temp;
-		temp = Double.doubleToLongBits(distanceInMetersFromPrev);
+		temp = Double.doubleToLongBits(distanceInMetersFromPrevCheckin);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + (int) (durationInSecsFromPrev ^ (durationInSecsFromPrev >>> 32));
+		result = prime * result + (int) (durationInSecsFromPrevCheckin ^ (durationInSecsFromPrevCheckin >>> 32));
 		result = prime * result + ((locationIDs == null) ? 0 : locationIDs.hashCode());
 		result = prime * result + ((startLats == null) ? 0 : startLats.hashCode());
 		result = prime * result + ((startLons == null) ? 0 : startLons.hashCode());
@@ -468,10 +473,10 @@ public class CheckinEntry extends DataEntry implements Serializable
 		if (getClass() != obj.getClass()) return false;
 		CheckinEntry other = (CheckinEntry) obj;
 		if (activityID != other.activityID) return false;
-		if (Double.doubleToLongBits(distanceInMetersFromPrev) != Double
-				.doubleToLongBits(other.distanceInMetersFromPrev))
+		if (Double.doubleToLongBits(distanceInMetersFromPrevCheckin) != Double
+				.doubleToLongBits(other.distanceInMetersFromPrevCheckin))
 			return false;
-		if (durationInSecsFromPrev != other.durationInSecsFromPrev) return false;
+		if (durationInSecsFromPrevCheckin != other.durationInSecsFromPrevCheckin) return false;
 		if (locationIDs == null)
 		{
 			if (other.locationIDs != null) return false;

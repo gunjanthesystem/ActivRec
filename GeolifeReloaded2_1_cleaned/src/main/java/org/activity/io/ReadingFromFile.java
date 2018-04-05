@@ -363,6 +363,7 @@ public class ReadingFromFile
 
 		List<List<String>> raw = new ArrayList<>();
 		List<String> header = new ArrayList<>();
+		String delimiterPattern = Pattern.quote(delimiter);
 
 		if (verboseReading)
 		{
@@ -380,11 +381,11 @@ public class ReadingFromFile
 				// System.out.println("line=" + line);
 				if (hasHeader && countOfLinesRead == 1)
 				{
-					header = Arrays.asList(line.split(Pattern.quote(delimiter)));
+					header = Arrays.asList(line.split(delimiterPattern));
 					raw.add(header);// header is treated in same way as all other data
 					continue;
 				}
-				raw.add(Arrays.asList(line.split(Pattern.quote(delimiter))));
+				raw.add(Arrays.asList(line.split(delimiterPattern)));
 
 				if (verboseReading && (countOfLinesRead % 25000 == 0))
 				{

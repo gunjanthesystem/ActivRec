@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import org.activity.constants.VerbosityConstants;
 import org.activity.loader.GeolifeDataLoader;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
+import org.activity.objects.CheckinEntryV2;
 import org.activity.objects.DataEntry;
 import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.Pair;
@@ -1196,35 +1198,42 @@ public class WritingToFile
 		}
 	}
 
-	public static void writeLinkedHashMap(LinkedHashMap<String, String> ts, String fileNameToUse)// , String userName)
+	/**
+	 * 
+	 * @param map
+	 * @param headerLine
+	 *            without newline
+	 * @param delimiter
+	 * @param absFileNameToWrite
+	 */
+	public static <K, V> void writeMapToNewFile(Map<K, V> map, String headerLine, String delimiter,
+			String absFileNameToWrite)
 	{
-		commonPath = Constant.getCommonPath();//
-		try
+		StringBuilder sb = new StringBuilder(headerLine + "\n");
+		for (Map.Entry<K, V> entry : map.entrySet())
 		{
-			String fileName = commonPath + fileNameToUse + ".csv";
-
-			File file = new File(fileName);
-
-			file.delete();
-			if (!file.exists())
-			{
-				file.createNewFile();
-			}
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-			BufferedWriter bw = new BufferedWriter(fw);
-
-			for (Map.Entry<String, String> entry : ts.entrySet())
-			{
-				bw.write(entry.getKey() + "," + entry.getValue() + "\n");
-			}
-			bw.close();
+			sb.append(entry.getKey() + delimiter + entry.getValue().toString() + "\n");
 		}
+		WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+	}
 
-		catch (Exception e)
+	/**
+	 * 
+	 * @param map
+	 * @param headerLine
+	 *            without newline
+	 * @param delimiter
+	 * @param absFileNameToWrite
+	 */
+	public static <K, V> void writeMapOfArrayValsToNewFile(Map<K, V> map, String headerLine, String delimiter,
+			String absFileNameToWrite)
+	{
+		StringBuilder sb = new StringBuilder(headerLine + "\n");
+		for (Map.Entry<K, V> entry : map.entrySet())
 		{
-			e.printStackTrace();
+			sb.append(entry.getKey() + delimiter + Arrays.asList(entry.getValue()).toString() + "\n");
 		}
+		WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
 	}
 
 	public static void writeLinkedHashMapStrInt(LinkedHashMap<String, Integer> ts, String absFileNameToUse)// , String
@@ -1576,6 +1585,140 @@ public class WritingToFile
 				{
 					count += 1;
 					sbToWrite.append(entryInside.getValue().toStringWithoutHeaders() + "\n");
+
+					if (count % 100000 == 0) // write in chunks
+					{
+						bw.write(sbToWrite.toString());
+						sbToWrite.setLength(0);
+					}
+				}
+			}
+
+			// write the remaining
+			bw.write(sbToWrite.toString());
+			sbToWrite.setLength(0);
+			bw.close();
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	// /**
+	// *
+	// * @param mapOfMap
+	// * @param absfileNameToUse
+	// * @param headerLine
+	// */
+	// public static void writeLinkedHashMapOfTreemapCheckinEntryV2(
+	// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapOfMap, String absfileNameToUse)
+	// {
+	// try
+	// {
+	// BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
+	// StringBuilder sbToWrite = new StringBuilder();
+	// sbToWrite.append(CheckinEntryV2.getHeaderToWrite() + "\n");
+	//
+	// int count = 0;
+	// for (Entry<String, TreeMap<Timestamp, CheckinEntryV2>> entryForUser : mapOfMap.entrySet())
+	// {
+	// TreeMap<Timestamp, CheckinEntryV2> mapForEachUser = entryForUser.getValue();
+	// for (Map.Entry<Timestamp, CheckinEntryV2> entryInside : mapForEachUser.entrySet())
+	// {
+	// count += 1;
+	// sbToWrite.append(entryInside.getValue().toStringWithoutHeaders() + "\n");
+	//
+	// if (count % 100000 == 0) // write in chunks
+	// {
+	// bw.write(sbToWrite.toString());
+	// sbToWrite.setLength(0);
+	// }
+	// }
+	// }
+	//
+	// // write the remaining
+	// bw.write(sbToWrite.toString());
+	// sbToWrite.setLength(0);
+	// bw.close();
+	// }
+	//
+	// catch (Exception e)
+	// {
+	// e.printStackTrace();
+	// }
+	// }
+
+	/**
+	 * 
+	 * @param mapOfMap
+	 * @param absfileNameToUse
+	 * @param headerLine
+	 */
+	public static void writeLinkedHashMapOfTreemapCheckinEntryV2(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapOfMap, String absfileNameToUse)
+	{
+		try
+		{
+			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
+			StringBuilder sbToWrite = new StringBuilder();
+			sbToWrite.append(CheckinEntryV2.getHeaderToWrite() + "\n");
+
+			int count = 0;
+			for (Entry<String, TreeMap<Timestamp, CheckinEntryV2>> entryForUser : mapOfMap.entrySet())
+			{
+				TreeMap<Timestamp, CheckinEntryV2> mapForEachUser = entryForUser.getValue();
+				for (Map.Entry<Timestamp, CheckinEntryV2> entryInside : mapForEachUser.entrySet())
+				{
+					count += 1;
+					sbToWrite.append(entryInside.getValue().toStringWithoutHeaders() + "\n");
+
+					if (count % 100000 == 0) // write in chunks
+					{
+						bw.write(sbToWrite.toString());
+						sbToWrite.setLength(0);
+					}
+				}
+			}
+
+			// write the remaining
+			bw.write(sbToWrite.toString());
+			sbToWrite.setLength(0);
+			bw.close();
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param mapOfMap
+	 * @param absfileNameToUse
+	 * @param catIDNameDictionary
+	 */
+	public static void writeLinkedHashMapOfTreemapCheckinEntryV2(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapOfMap, String absfileNameToUse,
+			TreeMap<Integer, String> catIDNameDictionary)
+	{
+		try
+		{
+			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
+			StringBuilder sbToWrite = new StringBuilder();
+			sbToWrite.append(CheckinEntryV2.getHeaderToWrite() + ",CatName" + "\n");
+
+			int count = 0;
+			for (Entry<String, TreeMap<Timestamp, CheckinEntryV2>> entryForUser : mapOfMap.entrySet())
+			{
+				TreeMap<Timestamp, CheckinEntryV2> mapForEachUser = entryForUser.getValue();
+				for (Map.Entry<Timestamp, CheckinEntryV2> entryInside : mapForEachUser.entrySet())
+				{
+					count += 1;
+					sbToWrite.append(entryInside.getValue().toStringWithoutHeaders() + ","
+							+ catIDNameDictionary.get(entryInside.getValue().getActivityID()) + "\n");
 
 					if (count % 100000 == 0) // write in chunks
 					{

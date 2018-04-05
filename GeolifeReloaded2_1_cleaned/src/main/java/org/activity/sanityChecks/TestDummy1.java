@@ -238,7 +238,20 @@ public class TestDummy1
 
 	public static void main(String args[])
 	{
-		colorPalleteTests();
+		// colorPalleteTests();
+		bafflingBooleanTest();
+	}
+
+	public static void bafflingBooleanTest()
+	{
+		boolean val1 = false;
+
+		for (int i = 0; i < 10; i++)
+		{
+			val1 = (i == 5) ? true : false;
+
+		}
+		System.out.println("val1 = " + val1);
 	}
 
 	public static void main_(String args[])
