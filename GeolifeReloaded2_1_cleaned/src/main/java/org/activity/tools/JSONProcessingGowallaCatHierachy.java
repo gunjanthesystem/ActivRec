@@ -20,6 +20,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.activity.constants.DomainConstants;
 import org.activity.io.WritingToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
@@ -96,6 +97,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 	}
 
 	/**
+	 * Includes all catIDs in dataset, level 1, level 2, level 3 and those in none of the levels of json hierarchy
 	 * 
 	 * @return
 	 */
@@ -162,15 +164,20 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 		// getCategoryMapsFromJSON2();
 		// writeCatLevelInfo3();// getCategoryMapsFromJSON2());
 		// writeDiffFromNextDay();
-		new JSONProcessingGowallaCatHierachy();
+		String commonPathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/April1_2018/";
+		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnlyMar29.csv";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+		new JSONProcessingGowallaCatHierachy(commonPathToWrite, checkinFileNameToRead);
 	}
 
-	public JSONProcessingGowallaCatHierachy()
-	{
-		String checkinFileNameToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
-		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
-		new JSONProcessingGowallaCatHierachy(commonPath, checkinFileNameToRead);
-	}
+	// public JSONProcessingGowallaCatHierachy()
+	// {
+	// String checkinFileNameToRead =
+	// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/RSubsettedData/gw2CheckinsSpots1TargetUsersDatesOnly2Feb2017.csv";
+	// //
+	// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/gw2CheckinsSpots1TargetUsersDatesOnlyNoDup.csv";
+	// new JSONProcessingGowallaCatHierachy(commonPath, checkinFileNameToRead);
+	// }
 
 	/**
 	 * Get three separate catid name maps for each of the three level from the provided json hierarchy file
@@ -241,14 +248,16 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 			/** create the cat id name dictionary **/
 			setCatIDNameDictionary(catIDNamesFor3Levels, noneLevelCatIDNames);
 
-			writeCheckInDistributionOverCatIDs(checkinCountResultsTogether.get("level1CheckinCountMap"),
+			writeCheckInDistributionOverCatIDs(catIDNameDictionary,
+					checkinCountResultsTogether.get("level1CheckinCountMap"),
 					checkinCountResultsTogether.get("level2CheckinCountMap"),
 					checkinCountResultsTogether.get("level3CheckinCountMap"),
 					checkinCountResultsTogether.get("noneLevelCheckinCountMap"),
 					checkinCountResultsTogether.get("level1OverallDistribution"), fileNameToWriteCatLevelDistro);
 
 			System.out.print("catIDNameDictionary.size:" + catIDNameDictionary.size() + "\n");
-			System.out.println(toStringCatIDNameDictionary());
+			System.out.println(toStringCatIDNameDictionary()
+					+ "\nnote: ** means not in any of the levels of the original provided json hierarhcy tree.\n");
 			System.out.println("Exiting JSONProcessingGowallaTryingNonStatic()");
 		}
 		catch (Exception e)
@@ -513,6 +522,10 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 			String checkinFileNameToWrite)// earlier called writeCatLevelInfo3()
 	{
 
+		System.out.println("checkinFileNameToRead= " + checkinFileNameToRead);
+		int indexOfCatIDInCheckinFile = 7;
+		int indexOfCatNameInCheckinFile = 8;
+
 		////////////////////////////////
 		TreeMap<Integer, Long> level1CheckinCountMap = new TreeMap<Integer, Long>();// key: checkin cat id in level 1,
 																					// value: num of checkins
@@ -570,7 +583,8 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 					continue;
 				}
 
-				Integer catID = Integer.valueOf(splittedLine[7].replaceAll("\"", ""));
+				// Integer catID = Integer.valueOf(splittedLine[7].replaceAll("\"", ""));//disabled on April 1 2018
+				Integer catID = Integer.valueOf(splittedLine[indexOfCatIDInCheckinFile].replaceAll("\"", ""));
 
 				if (level1Map.containsKey(catID))
 				{
@@ -600,7 +614,8 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 					catIDsNotFoundInAnyLevel.add(catID);
 					notFoundInAnyLevelCount++;
 					noneLevelCheckinCountMap.put(catID, noneLevelCheckinCountMap.getOrDefault(catID, new Long(0)) + 1);
-					String catName = String.valueOf(splittedLine[8].replaceAll("\"", ""));
+					// String catName = String.valueOf(splittedLine[8].replaceAll("\"", ""));//disabled on April 1 2018
+					String catName = String.valueOf(splittedLine[indexOfCatNameInCheckinFile].replaceAll("\"", ""));
 					noneLevelCatIDNameMap.put(catID, catName + "**");
 				}
 
@@ -680,12 +695,8 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 
 			br.close();
 			bw.close();
-		} // end
-			// of
-			// try
-		catch (
-
-		Exception e)
+		} // end of try
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -865,8 +876,10 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 			consoleLogStream.close();
 		}
 
-		writeCheckInDistributionOverCatIDs(level1CheckinCountMap, level2CheckinCountMap, level3CheckinCountMap,
-				noneLevelCheckinCountMap, level1OverallDistribution, fileNameToWriteCatLevelDistro);
+		writeCheckInDistributionOverCatIDs(DomainConstants.catIDNameDictionary, level1CheckinCountMap,
+				level2CheckinCountMap, level3CheckinCountMap, noneLevelCheckinCountMap, level1OverallDistribution,
+				fileNameToWriteCatLevelDistro);// make sure DomainConstants is set, added the catIDNameDict argument
+												// later on April 2, 2018
 
 	}
 
@@ -997,6 +1010,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 
 	/**
 	 * 
+	 * @param catIDNameDictionary
 	 * @param level1CkeckinCountMap
 	 * @param level2CkeckinCountMap
 	 * @param level3CkeckinCountMap
@@ -1004,10 +1018,10 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 	 * @param level1OverallDistribution
 	 * @param absFileNameToUse
 	 */
-	public static void writeCheckInDistributionOverCatIDs(TreeMap<Integer, Long> level1CkeckinCountMap,
-			TreeMap<Integer, Long> level2CkeckinCountMap, TreeMap<Integer, Long> level3CkeckinCountMap,
-			TreeMap<Integer, Long> noneLevelCkeckinCountMap, TreeMap<Integer, Long> level1OverallDistribution,
-			String absFileNameToUse)// , String userName)
+	public static void writeCheckInDistributionOverCatIDs(TreeMap<Integer, String> catIDNameDictionary,
+			TreeMap<Integer, Long> level1CkeckinCountMap, TreeMap<Integer, Long> level2CkeckinCountMap,
+			TreeMap<Integer, Long> level3CkeckinCountMap, TreeMap<Integer, Long> noneLevelCkeckinCountMap,
+			TreeMap<Integer, Long> level1OverallDistribution, String absFileNameToUse)// , String userName)
 	{
 		try
 		{
@@ -1015,8 +1029,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 			BufferedWriter bwL2 = WritingToFile.getBWForNewFile(absFileNameToUse + "L2.csv");
 			BufferedWriter bwL3 = WritingToFile.getBWForNewFile(absFileNameToUse + "L3.csv");
 			BufferedWriter bwNone = WritingToFile.getBWForNewFile(absFileNameToUse + "None.csv");
-			BufferedWriter overallLevel1 = WritingToFile
-					.getBWForNewFile(absFileNameToUse + "OverallLevel1.csv");
+			BufferedWriter overallLevel1 = WritingToFile.getBWForNewFile(absFileNameToUse + "OverallLevel1.csv");
 
 			ArrayList<BufferedWriter> allBWToWrite = new ArrayList<BufferedWriter>();
 			allBWToWrite.add(bwL1);
@@ -1025,7 +1038,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 			allBWToWrite.add(bwNone);
 			allBWToWrite.add(overallLevel1);
 
-			String header = "CatID, NumOfCheckIns\n";
+			String header = "CatID, CatName, NumOfCheckIns\n";
 
 			for (BufferedWriter bw : allBWToWrite)
 			{
@@ -1034,24 +1047,29 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 
 			for (Entry<Integer, Long> entry : level1CkeckinCountMap.entrySet())
 			{
-				bwL1.write(entry.getKey() + "," + entry.getValue() + "\n");
+				bwL1.write(
+						entry.getKey() + "," + catIDNameDictionary.get(entry.getKey()) + "," + entry.getValue() + "\n");
 			}
 			for (Entry<Integer, Long> entry : level2CkeckinCountMap.entrySet())
 			{
-				bwL2.write(entry.getKey() + "," + entry.getValue() + "\n");
+				bwL2.write(
+						entry.getKey() + "," + catIDNameDictionary.get(entry.getKey()) + "," + entry.getValue() + "\n");
 			}
 			for (Entry<Integer, Long> entry : level3CkeckinCountMap.entrySet())
 			{
-				bwL3.write(entry.getKey() + "," + entry.getValue() + "\n");
+				bwL3.write(
+						entry.getKey() + "," + catIDNameDictionary.get(entry.getKey()) + "," + entry.getValue() + "\n");
 			}
 			for (Entry<Integer, Long> entry : noneLevelCkeckinCountMap.entrySet())
 			{
-				bwNone.write(entry.getKey() + "," + entry.getValue() + "\n");
+				bwNone.write(
+						entry.getKey() + "," + catIDNameDictionary.get(entry.getKey()) + "," + entry.getValue() + "\n");
 			}
 
 			for (Entry<Integer, Long> entry : level1OverallDistribution.entrySet())
 			{
-				overallLevel1.write(entry.getKey() + "," + entry.getValue() + "\n");
+				overallLevel1.write(
+						entry.getKey() + "," + catIDNameDictionary.get(entry.getKey()) + "," + entry.getValue() + "\n");
 			}
 
 			// for (Map.Entry<String, Integer> entry : ts.entrySet())

@@ -44,19 +44,20 @@ import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
- * Reads USED AS OF 26 APRIL 2017
+ * Forked from DatabaseCreatorGowallaQuicker0,primarily because it uses CheckinEntryV2 which is an extension of
+ * CheckingEntry. Reads USED AS OF 26 APRIL 2017
  * 
  * @author gunjan
- *
+ * @since 3 April 2018
  */
-public class DatabaseCreatorGowallaQuicker0
+public class DatabaseCreatorGowallaQuicker1
 {
 
 	static ArrayList<String> modeNames;
 
 	// static LinkedHashMap<String, TreeMap<Timestamp,String>> mapForAllData;
 	static LinkedHashMap<String, ArrayList<LabelEntry>> mapForLabelEntries;
-	static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData;
+	static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllCheckinData;
 	static LinkedHashMap<String, UserGowalla> mapForAllUserData;
 	static LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData;
 
@@ -125,7 +126,7 @@ public class DatabaseCreatorGowallaQuicker0
 	public static final int continuityThresholdInSeconds = gowallaContinuityThresholdInSecs;// = Integer.MAX_VALUE;//
 	public static final int continuityThresholdInMeters = 600;// = Integer.MAX_VALUE;//
 
-	static final boolean merge = false;// false;// true;// false;
+	static final boolean merge = true;// false;// false;// true;// false;
 	// * 60; // changed from 30 min in DCU dataset...., if two timestamps are separated by less than equal
 	// to this value and have same mode name, then they are assumed to be continuos
 	// public static final int assumeContinuesBeforeNextInSecs = 600; // changed from 30 min in DCU dataset we assume
@@ -142,7 +143,7 @@ public class DatabaseCreatorGowallaQuicker0
 	// public static final int sandwichFillerDurationInSecs = 10 * 60;
 
 	// ******************END OF PARAMETERS TO SET*****************************//
-	final static boolean disableExpensiveWriting = true;
+	final static boolean disableExpensiveWriting = false;// true;
 
 	public static void main(String args[])
 	{
@@ -234,9 +235,10 @@ public class DatabaseCreatorGowallaQuicker0
 			// checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict,
 			// catIDsFoundNodesMap, workingCatLevel, catIDLevelWiseCatIDsDict);
 
-			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> unmergedCheckinResult = createCheckinEntries23Mar2018(
-					checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict,
-					catIDsFoundNodesMap, workingCatLevel, catIDLevelWiseCatIDsDict);
+			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>, Set<String>> unmergedCheckinResult = // createCheckinEntries23Mar2018
+					createCheckinEntries3April2018(checkinDataFileName, commonPath, rootOfCategoryTree,
+							catIDWorkingLevelCatIDsDict, catIDsFoundNodesMap, workingCatLevel,
+							catIDLevelWiseCatIDsDict);
 
 			mapForAllCheckinData = unmergedCheckinResult.getFirst();
 
@@ -246,36 +248,36 @@ public class DatabaseCreatorGowallaQuicker0
 
 			////// consecutive same analysis
 			// countConsecutiveSimilarActivities2(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName);
-			Function<CheckinEntry, String> consecCompareDirectCatID = ce -> String.valueOf(ce.getActivityID());
-			// $$Function<CheckinEntry, String> consecCompareLocationID = ce -> String.valueOf(ce.getFirstLocationID());
-			countConsecutiveSimilarActivities3_28Mar2018(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName,
-					consecCompareDirectCatID);// consecCompareDirectCatID);
+			// $$Function<CheckinEntryV2, String> consecCompareDirectCatID = ce -> String.valueOf(ce.getActivityID());
+			Function<CheckinEntryV2, String> consecCompareLocationID = ce -> String.valueOf(ce.getLocationIDs().get(0));// String.valueOf(ce.getFirstLocationID());
+			countConsecutiveSimilarActivities3_3April2018(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName,
+					consecCompareLocationID);// consecCompareDirectCatID);
 
-			System.exit(0);
+			// System.exit(0);
 			/////
 			System.out.println("ALERT! merge = " + merge);
 			if (merge)
 			{
 				if (!disableExpensiveWriting) // skipping writing on Aug 10 for performance.
 				{
-					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
-							commonPath + "mapForAllCheckinDataBeforeMerged.csv");
+					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+							commonPath + "mapForAllCheckinDataBeforeMerged.csv", catIDNameDictionary);
 				} /////
 					// merge
 					// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged
-				mapForAllCheckinData = DatageneratorUtils.mergeContinuousGowallaWithoutBOD4(mapForAllCheckinData,
-						commonPath, continuityThresholdInSeconds, continuityThresholdInMeters);
+				mapForAllCheckinData = DatageneratorUtils.mergeContinuousGowallaWithoutBOD4_3April2018(
+						mapForAllCheckinData, commonPath, continuityThresholdInSeconds, continuityThresholdInMeters);
 
 				if (!disableExpensiveWriting)// skipping writing on Aug 10 for performance.
 				{
-					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
-							commonPath + "mapForAllCheckinDataAfterMerged.csv");
+					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+							commonPath + "mapForAllCheckinDataAfterMerged.csv", catIDNameDictionary);
 				}
 			}
 			else
 			{
-				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntry(mapForAllCheckinData,
-						commonPath + "mapForAllCheckinNoMerging.csv");
+				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+						commonPath + "mapForAllCheckinNoMerging.csv", catIDNameDictionary);
 			}
 
 			userIDsInCheckinData = mapForAllCheckinData.keySet();
@@ -701,7 +703,7 @@ public class DatabaseCreatorGowallaQuicker0
 	}
 
 	/**
-	 * Fork of org.activity.generator.DatabaseCreatorGowallaQuicker0.countConsecutiveSimilarActivities3().
+	 * Fork of org.activity.generator.DatabaseCreatorGowallaQuicker0.countConsecutiveSimilarActivities3_28Mar2018().
 	 * 
 	 * @param mapForAllCheckinData
 	 * @param commonPathToWrite
@@ -709,8 +711,8 @@ public class DatabaseCreatorGowallaQuicker0
 	 * @return
 	 */
 	private static LinkedHashMap<String, ArrayList<Integer>> countConsecutiveSimilarActivities3_3April2018(
-			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData, String commonPathToWrite,
-			String absPathToCatIDDictionary, Function<CheckinEntry, String> lambdaForConsecSameAttribute)
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllCheckinData, String commonPathToWrite,
+			String absPathToCatIDDictionary, Function<CheckinEntryV2, String> lambdaForConsecSameAttribute)
 	{
 		// LinkedHashMap<String, ArrayList<Long>> catIDTimeDifferencesOfConsecutives = new LinkedHashMap<>();
 		Pair<LinkedHashMap<String, ArrayList<Integer>>, TreeMap<Integer, String>> r1 = TimelineUtils
@@ -731,7 +733,7 @@ public class DatabaseCreatorGowallaQuicker0
 
 		// write all checkins sequentially userwise
 		StringBuilder sbEnumerateAllCheckins = new StringBuilder(
-				"user,currTSString,currValOfComparisonAttribute,activityID,actCatName,distNext,durationNext,currLat,currLon,currLocID,distPrev,durPrev\n");
+				"user,currTSString,activityID,actCatName,distFromPrevCheckin,durationFromPrevCheckin,currLat,currLon,currLocID,tz,workingLevelCatID\n");
 		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
 		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
 		// StringBuilder sbAllDurationFromNext = new StringBuilder();
@@ -746,7 +748,7 @@ public class DatabaseCreatorGowallaQuicker0
 
 		try
 		{
-			for (Entry<String, TreeMap<Timestamp, CheckinEntry>> userE : mapForAllCheckinData.entrySet())
+			for (Entry<String, TreeMap<Timestamp, CheckinEntryV2>> userE : mapForAllCheckinData.entrySet())
 			{
 				String user = userE.getKey();
 
@@ -762,9 +764,9 @@ public class DatabaseCreatorGowallaQuicker0
 
 				StringBuilder distanceDurationFromNextSeq = new StringBuilder(); // only writes >1 consecs
 
-				for (Entry<Timestamp, CheckinEntry> timeEntry : userE.getValue().entrySet())
+				for (Entry<Timestamp, CheckinEntryV2> timeEntry : userE.getValue().entrySet())
 				{
-					CheckinEntry ce = timeEntry.getValue();
+					CheckinEntryV2 ce = timeEntry.getValue();
 					checkinsCount += 1;
 
 					if (!StatsUtils.isValidGeoCoordinate(ce.getStartLatitude(), ce.getStartLongitude()))
@@ -775,7 +777,7 @@ public class DatabaseCreatorGowallaQuicker0
 					String currValOfComparisonAttribute = lambdaForConsecSameAttribute.apply(ce);
 					String activityID = String.valueOf(ce.getActivityID());
 					int currLocID = ce.getLocationIDs().get(0);
-					double distFromPrevCheckin = ce.getDistanceInMetersFromPrev();// .getDistInMetersFromNext();
+					double distFromPrevCheckin = ce.getDistanceInMetersFromPrev();
 					long durationFromPrevCheckin = ce.getDurationInSecsFromPrev();
 
 					Timestamp currTS = ce.getTimestamp();
@@ -787,9 +789,10 @@ public class DatabaseCreatorGowallaQuicker0
 					// double distPrev = ce.getDistInMetersFromPrev();
 					// long durPrev = ce.getDurInSecsFromPrev();
 
-					sbEnumerateAllCheckins.append(user + "," + currTSString + "," + currValOfComparisonAttribute + ","
-							+ activityID + "," + actCatName + "," + distFromPrevCheckin + "," + durationFromPrevCheckin
-							+ "," + currLat + "," + currLon + "," + currLocID /* + "," + distPrev + "," + durPrev */
+					sbEnumerateAllCheckins.append(user
+							+ "," + currTSString + "," + activityID + "," + actCatName + "," + distFromPrevCheckin + ","
+							+ durationFromPrevCheckin + "," + currLat + "," + currLon + "," + currLocID + ","
+							+ ce.getTz() + "," + ce.getWorkingLevelCatIDs() /* + "," + distPrev + "," + durPrev */
 							+ "\n");
 
 					// if curr is same as prev for compared attrib,
@@ -2060,7 +2063,7 @@ public class DatabaseCreatorGowallaQuicker0
 					continue; // skip the header line
 				}
 
-				if (countOfLines % 200000/* 200000 */ == 0)
+				if (countOfLines % 100000/* 200000 */ == 0)
 				{
 					System.out.println(" #lines read = " + countOfLines);
 					// System.exit(0);

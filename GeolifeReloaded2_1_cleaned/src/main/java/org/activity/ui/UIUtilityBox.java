@@ -15,6 +15,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
+import org.activity.objects.Triple;
 import org.activity.tools.JSONProcessingGowallaCatHierachy;
 import org.activity.util.RegexUtils;
 
@@ -112,7 +113,8 @@ public class UIUtilityBox
 	 */
 	public static void checkTreeSearch_1()
 	{
-		final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb20/TreeSanity/";
+		final String commonPath = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/April1_2018/TreeSanityCheck";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb20/TreeSanity/";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/TreeSanity/";//
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15CatTree/";
 		DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
@@ -121,11 +123,13 @@ public class UIUtilityBox
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep9_2/RootOfCategoryTree9Sep2016.DMTreeNode");
 
 		String serialisableTreeAsString = treeToString(0, rootOfCategoryTree, new StringBuffer());
-
 		String serialisableTreeAsStringNoTabs = serialisableTreeAsString.replaceAll("\t", "");
+		List<Triple<Integer, String, String>> listOfCatIDsInTree = treeToListOfCatIDs(0, rootOfCategoryTree,
+				new ArrayList<Triple<Integer, String, String>>());
 
 		WritingToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
 		WritingToFile.writeToNewFile(serialisableTreeAsStringNoTabs, commonPath + "TreeOfTreeNodesAsStringNoTabs.txt");
+		WritingToFile.writeToNewFile(listOfCatIDsInTree.toString(), commonPath + "listOfCatIDsInTree.txt");
 
 		// recursiveDfs(rootOfCategoryTree, "195:Terrain Park", 0);
 		// $$recursiveDfsMultipleOccurences(rootOfCategoryTree, "912:Snow Cones");
@@ -829,6 +833,52 @@ public class UIUtilityBox
 		}
 
 		return null;
+	}
+
+	/**
+	 * Return list of cat in the tree of DefaultMutableTreeNode nodes as list of Triples{depth,catID,catName}
+	 * 
+	 * @param depth
+	 * @param node
+	 * @param listOfCatIDs
+	 * @return a list of Triples{depth,catID,catName}
+	 */
+	public static List<Triple<Integer, String, String>> treeToListOfCatIDs(int depth, DefaultMutableTreeNode node,
+			List<Triple<Integer, String, String>> listOfCatIDs)
+	{
+		// System.out.println("Inside treeToString");
+		if (node == null)
+		{
+			new Exception("Inside treeToListOfCatIDs: the received node is null");
+			return null;
+		}
+
+		else
+		{
+			// $$ System.out.println("node has " + node.getChildCount() + " children");
+		}
+
+		String[] splittedNodeVal = node.toString().split(":");
+		String catID = splittedNodeVal[0];
+		String catName = splittedNodeVal[1];
+		Triple<Integer, String, String> v = new Triple<>(depth, catID, catName);
+		listOfCatIDs.add(v);
+		// str.append("depth" + depth + ":" + node.toString() + "\n");
+
+		if (node.isLeaf())
+		{
+			return listOfCatIDs;// str.toString();
+		}
+
+		depth += 1;// going down one level
+		for (int i = 0; i < node.getChildCount(); i++)// DefaultMutableTreeNode child : node.getChildren())
+		// for (DefaultMutableTreeNode child : node.getChildren())
+		{
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+			treeToListOfCatIDs(depth, child, listOfCatIDs);
+		}
+
+		return listOfCatIDs;// + "\najooba DefaultMutableTreeNode";
 	}
 
 	/**

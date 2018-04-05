@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.activity.objects.CheckinEntry;
+import org.activity.objects.CheckinEntryV2;
 
 /***
  * Contains some utilities method which could be reused.**
@@ -149,6 +150,138 @@ public class DatageneratorUtils
 	}
 
 	/**
+	 * Fork of mergeContinuousGowallaWithoutBOD4, to allow for CheckinEntryV2 instead of CheckinEntry
+	 * <p>
+	 * 
+	 * Merge checkins based on the given thresholds
+	 * <p>
+	 * <font color = orange>Note: distanceFromPrev and durationFromPrev for the merged checkin is considered to be the
+	 * corresponding values for the first checkin.
+	 * <p>
+	 * This results in following: if a checkin which is a merger of 3 checkins is followed by a single unmerged checkin.
+	 * Then the distanceFromPrev and durationFromPrev for the merged checkin is the corresponding values for the first
+	 * merged checkin while distanceFromPrev and durationFromPrev for the following unmerged checkin is the values
+	 * corresponding to the distance and difference of this unmerged checking from the last (3rd) of the merged checkin.
+	 * </font>
+	 * 
+	 * 
+	 * @param mapForAllData
+	 * @param pathToWrite
+	 * @param assumeContinuousThresholdInSeconds
+	 * @param assumeContinuousThresholdInMeters
+	 * @return
+	 * @since 4 April 2018
+	 */
+	public static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mergeContinuousGowallaWithoutBOD4_3April2018(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllData, String pathToWrite,
+			int assumeContinuousThresholdInSeconds, int assumeContinuousThresholdInMeters)
+	{
+		String commonPath = pathToWrite;
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForDataMerged = new LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>();
+
+		System.out.println(
+				"mergeContinuousGowallaWithoutBOD4_3April2018 called with assumeContinuousThresholdInSeconds = "
+						+ assumeContinuousThresholdInSeconds + " and assumeContinuousThresholdInMeters = "
+						+ assumeContinuousThresholdInMeters);
+
+		long numOfConsecActNameSame = 0, numOfConsecActNameSameMerged = 0;
+		// StringBuilder sbMergerCaseLogs = new StringBuilder();
+		// BufferedWriter bwMergerCaseLogs = WritingToFile
+		// .getBufferedWriterForNewFile(commonPath + userID + "MergerCasesLog.csv");
+
+		/*
+		 * Note: using TreeMap is IMPORTANT here, because TreeMap will automatically sort by the timestamp, so we do not
+		 * need to be concerned about whether we add the activities in correct order or not, if the timestamps are
+		 * right, it will be stored correctly
+		 */
+		System.out.println("Merging continuous without BOD");
+		try
+		{
+			// sbMergerCaseLogs.append("User,Case,ActName,CurrentTS, NextTS,Comment\n");
+			for (Map.Entry<String, TreeMap<Timestamp, CheckinEntryV2>> entryForUser : mapForAllData.entrySet())
+			{
+				String userID = entryForUser.getKey();
+				// $$System.out.println("\nUser =" + userID);
+
+				// int numOfTrajCaseA = 0, numOfTrajCaseB = 0, numOfTrajCaseC = 0, numOfLastTrajEntries = 0;
+				// int numOfPlaceIDMerger
+				int countOfContinuousMerged = 1;
+
+				TreeMap<Timestamp, CheckinEntryV2> continuousMergedForThisUser = new TreeMap<>();
+
+				CheckinEntryV2 previousCheckinEntry = null; // should be null before starting for each user
+				ArrayList<CheckinEntryV2> checkinsToMerge = new ArrayList<>(); // accumulated checkins to
+																				// merge into one
+
+				int countOfCheckins = 0;
+				for (Entry<Timestamp, CheckinEntryV2> checkinEntries : entryForUser.getValue().entrySet())
+				{
+					countOfCheckins += 1;
+					CheckinEntryV2 currentCheckinEntry = checkinEntries.getValue();
+					// $$System.out.println(
+					// $$ "Reading checkin " + countOfCheckins + " " + currentCheckinEntry.toStringWithoutHeaders());
+
+					if (countOfCheckins == 1)
+					{
+						previousCheckinEntry = checkinEntries.getValue();
+						checkinsToMerge.add(previousCheckinEntry);
+						// $$System.out.println(
+						// $$ "first checkin: continuing, checkinsToMerge.size() = " + checkinsToMerge.size());
+						continue;
+					}
+					else
+					{
+						if (currentCheckinEntry.getActivityID() == previousCheckinEntry.getActivityID())
+						{
+							numOfConsecActNameSame += 1;
+						}
+
+						// CheckinEntry currentCheckinEntry = checkinEntries.getValue();
+
+						// should this be merged with previous checkin
+						if (currentCheckinEntry.getDurationInSecsFromPrev() <= assumeContinuousThresholdInSeconds
+								&& currentCheckinEntry
+										.getDistanceInMetersFromPrev() <= assumeContinuousThresholdInMeters
+								&& (currentCheckinEntry.getActivityID() == previousCheckinEntry.getActivityID()))
+						{
+							// merge
+							numOfConsecActNameSameMerged += 1;
+							checkinsToMerge.add(currentCheckinEntry);
+							// $$System.out.println("add to merge, checkinsToMerge.size() = " + checkinsToMerge.size());
+						}
+						else
+						{
+							// $$System.out.println("not same, checkinsToMerge.size() = " + checkinsToMerge.size());
+							// $$System.out.println("merge previous ones and add curr to merge = " +
+							// checkinsToMerge.size());
+
+							// merge the previously accumulated checkins, put in result map
+							CheckinEntryV2 mergedCheckinEntry = mergeCheckins_3April2018(checkinsToMerge);
+							continuousMergedForThisUser.put(mergedCheckinEntry.getTimestamp(), mergedCheckinEntry);
+							checkinsToMerge.clear();
+							// add current checkin to merge
+							checkinsToMerge.add(currentCheckinEntry);
+							// $$System.out.println("checkinsToMerge.size() = " + checkinsToMerge.size());
+						}
+						previousCheckinEntry = currentCheckinEntry;
+					}
+				} // end of loop over checkins for this user
+				mapForDataMerged.put(userID, continuousMergedForThisUser);
+			} // end of loop over checkins for all users
+		}
+		catch (Exception e)
+		{
+			System.err.println("Exception in mergeContinuousGowallaWithoutBOD4_3April2018");
+			e.printStackTrace();
+			// PopUps.showException(e, "mergeContinuousGowallaWithoutBOD4()");
+		}
+		System.out.println("numOfConsecActNameSame = " + numOfConsecActNameSame + " " + "numOfConsecActNameSameMerged ="
+				+ numOfConsecActNameSameMerged + " percentage of consecs merged = "
+				+ (numOfConsecActNameSameMerged * 100.0 / numOfConsecActNameSame * 1.0));
+		return mapForDataMerged;
+	}
+
+	/**
 	 * <font color = orange>Assuming merged checking have same activityID(catID)
 	 * <p>
 	 * Note: distanceFromPrev and durationFromPrev for the merged checkin is considered to be the corresponding values
@@ -195,6 +328,70 @@ public class DatageneratorUtils
 
 		CheckinEntry mergedCheckin = new CheckinEntry(userID, locationIDs, ts, lats, lons, catID, workingLevelCatIDs,
 				distanceInMFromPrev, durationInSecsFromPrev, levelWiseCatIDs);
+
+		return mergedCheckin;
+	}
+
+	/**
+	 * Fork of mergeCheckins, to allow for CheckinEntryV2 instead of CheckingEntry <font color = orange>Assuming merged
+	 * checking have same activityID(catID)
+	 * <p>
+	 * Note: distanceFromPrev and durationFromPrev for the merged checkin is considered to be the corresponding values
+	 * for the first checkin.
+	 * <p>
+	 * Similarly, distanceFromNextCheckin and durationFromNextCheckin for the merged checkin is considered to be the
+	 * corresponding values for the last checkin (added on April 4 2018) TODO: or should i add these two for the merged
+	 * checkins. Need to think about this later.
+	 * <p>
+	 * This results in following: if a checkin which is a merger of 3 checkins is followed by a single unmerged checkin.
+	 * Then the distanceFromPrev and durationFromPrev for the merged checkin is the corresponding values for the first
+	 * merged checkin while distanceFromPrev and durationFromPrev for the following unmerged checkin is the values
+	 * corresponding to the distance and difference of this unmerged checking from the last (3rd) of the merged checkin.
+	 * </font>
+	 * 
+	 * @param checkinsToMerge
+	 * @return
+	 * @since April 4 4018
+	 */
+	private static CheckinEntryV2 mergeCheckins_3April2018(ArrayList<CheckinEntryV2> checkinsToMerge)
+	{
+		CheckinEntryV2 firstCheckIn = checkinsToMerge.get(0);
+		if (checkinsToMerge.size() == 1)
+		{
+			return firstCheckIn;// checkinsToMerge.get(0);
+		}
+
+		CheckinEntryV2 lastCheckIn = checkinsToMerge.get(checkinsToMerge.size() - 1);
+		// CheckinEntry(String userID, Integer locationID, Timestamp ts, String latitude, String longitude,
+		// Integer catID, String workingLevelCatIDs, double distanceInMetersFromNext, long durationInSecsFromNext)
+
+		String userID = firstCheckIn.getUserID();
+		Timestamp ts = firstCheckIn.getTimestamp();
+		Integer catID = firstCheckIn.getActivityID();
+		String workingLevelCatIDs = firstCheckIn.getWorkingLevelCatIDs();
+		double distanceInMFromPrev = firstCheckIn.getDistanceInMetersFromPrev();
+		long durationInSecsFromPrev = firstCheckIn.getDurationInSecsFromPrev();
+		String[] levelWiseCatIDs = firstCheckIn.getLevelWiseCatIDs();
+
+		double distanceInMFromNextCheckin = lastCheckIn.getDistanceInMeterFromNextCheckin();
+		long durationInSecFromNextCheckin = lastCheckIn.getDurationInSecsFromNextCheckin();
+
+		String tz = firstCheckIn.getTz();
+
+		ArrayList<Integer> locationIDs = new ArrayList<>(checkinsToMerge.size());
+		ArrayList<String> lats = new ArrayList<>(checkinsToMerge.size());
+		ArrayList<String> lons = new ArrayList<>(checkinsToMerge.size());
+
+		for (CheckinEntryV2 ce : checkinsToMerge)
+		{
+			locationIDs.addAll(ce.getLocationIDs());
+			lats.addAll(ce.getStartLats());
+			lons.addAll(ce.getStartLons());
+		}
+
+		CheckinEntryV2 mergedCheckin = new CheckinEntryV2(userID, locationIDs, ts, lats, lons, catID,
+				workingLevelCatIDs, distanceInMFromPrev, durationInSecsFromPrev, levelWiseCatIDs,
+				distanceInMFromNextCheckin, durationInSecFromNextCheckin, tz);
 
 		return mergedCheckin;
 	}
