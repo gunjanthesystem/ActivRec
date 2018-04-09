@@ -15,12 +15,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -30,10 +32,10 @@ import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
-import org.activity.objects.LabelEntry;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.UserGowalla;
+import org.activity.sanityChecks.Sanity;
 import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -53,22 +55,12 @@ import org.activity.util.UtilityBelt;
 public class DatabaseCreatorGowallaQuicker1
 {
 
-	static ArrayList<String> modeNames;
-
-	// static LinkedHashMap<String, TreeMap<Timestamp,String>> mapForAllData;
-	static LinkedHashMap<String, ArrayList<LabelEntry>> mapForLabelEntries;
-	static LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllCheckinData;
-	static LinkedHashMap<String, UserGowalla> mapForAllUserData;
-	static LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData;
-
-	static Set<String> userIDsInCheckinData, locationIDsInCheckinData;
+	// static ArrayList<String> modeNames;
+	// static Set<String> userIDsInCheckinData, locationIDsInCheckinData;
 	// static LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataTimeDifference;
 	// static LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataMergedContinuousWithDuration;
 	// static LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataMergedSandwichedWithDuration;
-
-	// static List<String> userIDsOriginal;
-	// static List<String> userIDs;
-	// static String dataSplitLabel;
+	// static List<String> userIDsOriginal;static List<String> userIDs;static String dataSplitLabel;
 
 	// ******************PARAMETERS TO SET*****************************//
 	// commented out on March 23 2018
@@ -148,8 +140,47 @@ public class DatabaseCreatorGowallaQuicker1
 	public static void main(String args[])
 	{
 		System.out.println("Running starts:  " + LocalDateTime.now());
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 12, 2016
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));// added on April 12, 2016
 
+		// $$dataCreator1(); useful
+
+		String commonPathApril8 = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April8DataBeforeJavaExperiments/";
+		String checkinDataFileNameApril8 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_GTE90Chicago200Users_April8.csv";
+		dataCreator3_April8(commonPathApril8, checkinDataFileNameApril8, userDataFileName, userLocationFileName,
+				catIDNameDictionaryFileName, categoryHierarchyTreeFileName, DomainConstants.gowallaWorkingCatLevel);
+
+		// Start of 8 April 2018
+		// TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
+		// .kryoDeSerializeThis(catIDNameDictionaryFileName);
+		// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllCheckinData = mapForAllCheckinData =
+		// (LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>) Serializer
+		// .kryoDeSerializeThis(commonPath + "mapForAllCheckinData.kryo");
+		// WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2_ForRecreating(mapForAllCheckinData,
+		// commonPath + "mapForAllCheckinDataAfterMerged_8April.csv", catIDNameDictionary);
+		// End of 8 April 2018
+
+		System.out.println("End of program");
+		PopUps.showMessage("End of data creation");
+		System.exit(0);
+	}
+
+	private static void createCheckinEntries()
+
+	{
+
+	}
+
+	/**
+	 * Note: before 8 April 2018, this was the main method.
+	 */
+	public static void dataCreator1()
+	{
+		System.out.println("Running starts:  " + LocalDateTime.now());
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 12, 2016
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllCheckinData;
+		LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData;
+		LinkedHashMap<String, UserGowalla> mapForAllUserData;
+		Set<String> userIDsInCheckinData, locationIDsInCheckinData;
 		try
 		{
 			long ct1 = System.currentTimeMillis();
@@ -257,6 +288,386 @@ public class DatabaseCreatorGowallaQuicker1
 			/////
 			System.out.println("ALERT! merge = " + merge);
 			if (merge)
+			{
+				if (!disableExpensiveWriting) // skipping writing on Aug 10 for performance.
+				{
+					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+							commonPath + "mapForAllCheckinDataBeforeMerged.csv", catIDNameDictionary);
+				} /////
+					// merge
+					// LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinDataMerged
+				mapForAllCheckinData = DatageneratorUtils.mergeContinuousGowallaWithoutBOD4_3April2018(
+						mapForAllCheckinData, commonPath, continuityThresholdInSeconds, continuityThresholdInMeters);
+
+				if (!disableExpensiveWriting)// skipping writing on Aug 10 for performance.
+				{
+					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+							commonPath + "mapForAllCheckinDataAfterMerged.csv", catIDNameDictionary);
+
+					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2_ForRecreating(mapForAllCheckinData,
+							commonPath + "mapForAllCheckinDataAfterMerged_8April.csv", catIDNameDictionary);
+
+				}
+			}
+			else
+			{
+				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+						commonPath + "mapForAllCheckinNoMerging.csv", catIDNameDictionary);
+			}
+
+			userIDsInCheckinData = mapForAllCheckinData.keySet();
+			locationIDsInCheckinData = unmergedCheckinResult.getSecond();
+			//
+			System.out.println("userIDsInCheckinData.size()=" + userIDsInCheckinData.size());
+			System.out.println("locationIDsInCheckinData.size()=" + locationIDsInCheckinData.size());
+
+			mapForAllUserData = createUserGowalla(userDataFileName, userIDsInCheckinData, commonPath);
+			mapForAllLocationData = createLocationGowalla0(userLocationFileName, locationIDsInCheckinData, commonPath);
+
+			// Triple<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, LinkedHashMap<String, UserGowalla>,
+			// LinkedHashMap<String, LocationGowalla>> allData =
+			// new Triple<>(mapForAllCheckinData, mapForAllUserData, mapForAllLocationData);
+
+			// Serializer.serializeThis(allData, commonPath + "GowallaAllData13Sep2016.obj");
+			// Serializer.fstSerializeThis2(allData, commonPath + "GowallaAllData13Sep2016.obj");
+			Serializer.kryoSerializeThis(mapForAllCheckinData, commonPath + "mapForAllCheckinData.kryo");
+			Serializer.kryoSerializeThis(mapForAllUserData, commonPath + "mapForAllUserData.kryo");
+			Serializer.kryoSerializeThis(mapForAllLocationData, commonPath + "mapForAllLocationData.kryo");
+			Serializer.kryoSerializeThis(mapCatIDsHierDist, commonPath + "mapCatIDsHierDist.kryo");
+			Serializer.kryoSerializeThis(catIDLevelWiseCatIDsDict, commonPath + "mapCatIDLevelWiseCatIDsDict.kryo");
+			// catIDsHierDistDict
+			// $Serializer.kryoSerializeThis(allData, commonPath + "GowallaAllData13Sep2016.kryo");
+			//// end of curtian1
+
+			//
+			// // start of curtain deserialisation1
+			// Triple<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, LinkedHashMap<String, UserGowalla>,
+			// LinkedHashMap<String, LocationGowalla>> allData2 =
+			// (Triple<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, LinkedHashMap<String, UserGowalla>,
+			// LinkedHashMap<String, LocationGowalla>>) Serializer
+			// .kryoDeSerializeThis(commonPath + "GowallaAllData13Sep2016.kryo");
+			// // Object test2 = Serializer.fstDeSerializeThis2(commonPath + "GowallaAllData13Sep2016.obj");
+			//
+			// // Object test2 = Serializer.deSerializeThis(commonPath + "GowallaAllData13Sep2016.obj");
+			// // Object test1 = Serializer.fstDeSerializeThis2(commonPath + "GowallaAllData13Sep2016.obj");
+			// //
+			// // Triple<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, LinkedHashMap<String, UserGowalla>,
+			// LinkedHashMap<String, LocationGowalla>> allData2 =
+			// // (Triple<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, LinkedHashMap<String, UserGowalla>,
+			// LinkedHashMap<String, LocationGowalla>>) Serializer
+			// // .fstDeSerializeThis2(commonPath + "GowallaAllData13Sep2016.obj");
+			// //
+			// // if (allData.getFirst() == allData2.getFirst() && allData.getSecond() == allData2.getSecond()
+			// // && allData.getThird() == allData2.getThird())
+			// // {
+			// // System.out.println("Serilsation deserliation check 1 okay");
+			// // }
+			// // else
+			// // {
+			// // System.out.println("Serilsation deserliation check 1 NOT okay");
+			// // }
+			//
+			// if (allData.getFirst().keySet().size() == allData2.getFirst().keySet().size()
+			// && allData.getSecond().keySet().size() == allData2.getSecond().keySet().size()
+			// && allData.getThird().keySet().size() == allData2.getThird().keySet().size())
+			// {
+			// System.out.println("Serilsation deserliation check 2 okay");
+			// }
+			// else
+			// {
+			// System.out.println("Serilsation deserliation check 2 NOT okay");
+			// }
+			// // end of curtain deserialisation1
+
+			// $$ LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> userDayTimelines =
+			// $$ TimelineUtilities.createUserTimelinesFromCheckinEntriesGowalla(mapForAllCheckinData,
+			// mapForAllLocationData);
+
+			// $$Serializer.kryoSerializeThis(userDayTimelines, commonPath + "GowallaUserDayTimelines13Sep2016.kryo");
+
+			consoleLogStream.close();
+
+			long ct4 = System.currentTimeMillis();
+			PopUps.showMessage("All data creation done in " + ((ct4 - ct1) / 1000) + " seconds since start");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		// System.out.println("End of program");
+		// PopUps.showMessage("End of data creation");
+		// System.exit(0);
+	}
+
+	/**
+	 * 
+	 * @param commonPathP
+	 * @param checkinDataFileNameP
+	 * @param userDataFileNameP
+	 * @param userLocationFileNameP
+	 * @param catIDNameDictionaryFileNameP
+	 * @param categoryHierarchyTreeFileNameP
+	 * @param workingCatLevelP
+	 * @since April 8 2018
+	 */
+	public static void dataCreator3_April8(String commonPathP, String checkinDataFileNameP, String userDataFileNameP,
+			String userLocationFileNameP, String catIDNameDictionaryFileNameP, String categoryHierarchyTreeFileNameP,
+			int workingCatLevelP)
+	{
+		System.out.println("Running starts:  " + LocalDateTime.now());
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 12, 2016
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllCheckinData;
+		LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData;
+		LinkedHashMap<String, UserGowalla> mapForAllUserData;
+		Set<String> userIDsInCheckinData, locationIDsInCheckinData;
+
+		try
+		{
+			long ct1 = System.currentTimeMillis();
+			Constant.setCommonPath(commonPathP);
+			// commonPath = Constant.getCommonPath();
+			// Redirecting the console output
+			PrintStream consoleLogStream = new PrintStream(
+					new File(commonPathP + "consoleLogDatabaseCreatorGowalla.txt"));
+			// System.setOut(new PrintStream(new FileOutputStream('/dev/stdout')));
+			System.setOut(new PrintStream(consoleLogStream));
+			System.setErr(consoleLogStream);
+			System.out.println("Default timezone = " + TimeZone.getDefault());
+
+			DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
+					.deSerializeThis(categoryHierarchyTreeFileNameP);
+			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
+					.kryoDeSerializeThis(catIDNameDictionaryFileNameP);
+			WritingToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
+					commonPathP + "catIDNameDictionary.csv");
+			// int workingCatLevel = DomainConstants.gowallaWorkingCatLevel;
+
+			Pair<TreeMap<Integer, String>, LinkedHashSet<Integer>> catIDWorkingLevelCatIDsDictResult = getWorkingLevelCatIDsForAllCatIDs(
+					catIDNameDictionary, workingCatLevelP, rootOfCategoryTree);
+
+			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = catIDWorkingLevelCatIDsDictResult.getFirst();
+			WritingToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
+					commonPathP + "catIDWorkingLevelCatIDsDict.csv");
+
+			LinkedHashSet<Integer> catIDsInHierarchy = catIDWorkingLevelCatIDsDictResult.getSecond();
+			WritingToFile.writeToNewFile(catIDsInHierarchy.toString(), commonPathP + "UniqueCatIDsInHierarchy.csv");
+
+			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = getLevelWiseCatIDsForAllCatIDs(catIDNameDictionary,
+					rootOfCategoryTree, DomainConstants.numOfCatLevels);
+			WritingToFile.writeMapOfArrayValsToNewFile(catIDLevelWiseCatIDsDict, "catID,LevelWiseCatIDs", ",",
+					commonPathP + "catIDLevelWiseCatIDsDict.csv");
+
+			HashMap<String, Double> mapCatIDsHierDist = null;
+			// disabled temporarily createCatIDsHierarchicalDistMap(catIDLevelWiseCatIDsDict,
+			// catIDNameDictionary, catIDsInHierarchy);
+
+			// used in create checkin entries to determine if a cat id is acceptable
+			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap = UIUtilityBox
+					.getCatIDsFoundNodesMap(rootOfCategoryTree, catIDNameDictionary);
+
+			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>, Set<String>> checkinResult = createCheckinEntries8April2018(
+					checkinDataFileNameP, commonPathP, rootOfCategoryTree, catIDWorkingLevelCatIDsDict,
+					catIDsFoundNodesMap, workingCatLevelP, catIDLevelWiseCatIDsDict);
+
+			mapForAllCheckinData = checkinResult.getFirst();
+			long numOfCheckins = mapForAllCheckinData.entrySet().stream().mapToLong(e -> e.getValue().size()).sum();
+			System.out.println("num of checkins = " + numOfCheckins); // 6276222
+			// PopUps.showMessage("num of checkins = " + numOfCheckins);
+
+			////// consecutive same analysis
+			// countConsecutiveSimilarActivities2(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName);
+			// $$Function<CheckinEntryV2, String> consecCompareDirectCatID = ce -> String.valueOf(ce.getActivityID());
+			Function<CheckinEntryV2, String> consecCompareLocationID = ce -> String.valueOf(ce.getLocationIDs().get(0));// String.valueOf(ce.getFirstLocationID());
+			countConsecutiveSimilarActivities3_3April2018(mapForAllCheckinData, commonPathP,
+					catIDNameDictionaryFileNameP, consecCompareLocationID);// consecCompareDirectCatID);
+
+			// WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+			// commonPathP + "mapForAllCheckinData.csv", catIDNameDictionary);
+			// compare this filr to the dataset read to ensure that the read dataset and the Checkin objcts created are
+			// equivalent
+			WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2_ForRecreating(mapForAllCheckinData,
+					commonPathP + "mapForAllCheckinDataAfterMerged_8AprilSanityCheck.csv", catIDNameDictionary);
+
+			userIDsInCheckinData = mapForAllCheckinData.keySet();
+			locationIDsInCheckinData = checkinResult.getSecond();
+			System.out.println("userIDsInCheckinData.size()=" + userIDsInCheckinData.size());
+			System.out.println("locationIDsInCheckinData.size()=" + locationIDsInCheckinData.size());
+
+			mapForAllUserData = createUserGowalla(userDataFileNameP, userIDsInCheckinData, commonPathP);
+			mapForAllLocationData = createLocationGowalla0(userLocationFileNameP, locationIDsInCheckinData,
+					commonPathP);
+
+			// Triple<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, LinkedHashMap<String, UserGowalla>,
+			// LinkedHashMap<String, LocationGowalla>> allData =
+			// new Triple<>(mapForAllCheckinData, mapForAllUserData, mapForAllLocationData);
+
+			// Serializer.serializeThis(allData, commonPath + "GowallaAllData13Sep2016.obj");
+			// Serializer.fstSerializeThis2(allData, commonPath + "GowallaAllData13Sep2016.obj");
+			Serializer.kryoSerializeThis(mapForAllCheckinData, commonPathP + "mapForAllCheckinData.kryo");
+			Serializer.kryoSerializeThis(mapForAllUserData, commonPathP + "mapForAllUserData.kryo");
+			Serializer.kryoSerializeThis(mapForAllLocationData, commonPathP + "mapForAllLocationData.kryo");
+			Serializer.kryoSerializeThis(mapCatIDsHierDist, commonPathP + "mapCatIDsHierDist.kryo");
+			Serializer.kryoSerializeThis(catIDLevelWiseCatIDsDict, commonPathP + "mapCatIDLevelWiseCatIDsDict.kryo");
+			// catIDsHierDistDict
+			// $Serializer.kryoSerializeThis(allData, commonPath + "GowallaAllData13Sep2016.kryo");
+			//// end of curtian1
+
+			consoleLogStream.close();
+
+			long ct4 = System.currentTimeMillis();
+			PopUps.showMessage("All data creation done in " + ((ct4 - ct1) / 1000) + " seconds since start");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Fork of dataCreator1. dataCreator1() was to convert R susbetted dataset into CheckinEntries and then merge the
+	 * data.
+	 * <p>
+	 * Not used as of 8 April 2018, instead of calling this method, i will deserialised the previously created merged
+	 * checkinentries and then write them again.
+	 * 
+	 * <p>
+	 * dataCreator2() is improved dataCreator1() to convert final R subsetted data into CheckinEntries ready for java
+	 * experiments. I believe it can replace dataCreator1() but needs to be checked thoroughly for that.
+	 * <p>
+	 * Trying to pass parameters inetad of using global (class) variables.
+	 * 
+	 * @param commonPath
+	 * @param doMerge
+	 * @param disableExpensiveWriting
+	 * @param continuityThresholdInSeconds
+	 * @param continuityThresholdInMeters
+	 * @param categoryHierarchyTreeFileName
+	 * @param catIDNameDictionaryFileName
+	 * @param workingCatLevel
+	 * @param numOfCatLevels
+	 * @param checkinDataFileName
+	 * @param userDataFileName
+	 * @param userLocationFileName
+	 * @since April 8 2018
+	 * 
+	 *        Note: before 8 April 2018, this was the main method.
+	 */
+	protected static void dataCreator2(String commonPath, boolean doMerge, boolean disableExpensiveWriting,
+			int continuityThresholdInSeconds, int continuityThresholdInMeters, String categoryHierarchyTreeFileName,
+			String catIDNameDictionaryFileName, int workingCatLevel, int numOfCatLevels, String checkinDataFileName,
+			String userDataFileName, String userLocationFileName)
+	{
+		long ct1 = System.currentTimeMillis();
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllCheckinData;
+		LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData;
+		LinkedHashMap<String, UserGowalla> mapForAllUserData;
+		Set<String> userIDsInCheckinData, locationIDsInCheckinData;
+
+		try
+		{
+			Constant.setCommonPath(commonPath);// commonPath = Constant.getCommonPath();
+			// Redirecting the console output
+			PrintStream consoleLogStream = new PrintStream(
+					new File(commonPath + "consoleLogDatabaseCreatorGowalla.txt"));
+			// System.setOut(new PrintStream(new FileOutputStream('/dev/stdout')));
+			System.setOut(new PrintStream(consoleLogStream));
+			System.setErr(consoleLogStream);
+			// ConnectDatabaseV1.getTimestamp("B00000028_21I5H1_20140216_170559E.JPG,");
+			System.out.println("Default timezone = " + TimeZone.getDefault());
+			System.out.println("\ncontinuityThresholdInSeconds=" + continuityThresholdInSeconds
+					+ " continuityThresholdInMeters" + continuityThresholdInMeters);
+
+			//// start of curtian1
+			// get root of the category hierarchy tree
+			DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
+					.deSerializeThis(categoryHierarchyTreeFileName);
+			//
+			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
+					.kryoDeSerializeThis(catIDNameDictionaryFileName);
+			WritingToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
+					commonPath + "catIDNameDictionary.csv");
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
+			// commonPath + "CatIDNameDictionary.kryo");
+
+			// $$int workingCatLevel = DomainConstants.gowallaWorkingCatLevel;
+
+			Pair<TreeMap<Integer, String>, LinkedHashSet<Integer>> catIDWorkingLevelCatIDsDictResult = getWorkingLevelCatIDsForAllCatIDs(
+					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
+
+			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = catIDWorkingLevelCatIDsDictResult.getFirst();
+			WritingToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
+					commonPath + "catIDWorkingLevelCatIDsDict.csv");
+
+			LinkedHashSet<Integer> catIDsInHierarchy = catIDWorkingLevelCatIDsDictResult.getSecond();
+			WritingToFile.writeToNewFile(catIDsInHierarchy.toString(), commonPath + "UniqueCatIDsInHierarchy.csv");
+
+			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = getLevelWiseCatIDsForAllCatIDs(catIDNameDictionary,
+					rootOfCategoryTree, numOfCatLevels);
+			WritingToFile.writeMapOfArrayValsToNewFile(catIDLevelWiseCatIDsDict, "catID,LevelWiseCatIDs", ",",
+					commonPath + "catIDLevelWiseCatIDsDict.csv");
+
+			HashMap<String, Double> mapCatIDsHierDist = null;
+			// disabled temporarily createCatIDsHierarchicalDistMap(catIDLevelWiseCatIDsDict,
+			// catIDNameDictionary, catIDsInHierarchy);
+
+			///////////////////////// Start of sanity check
+			// sanity check to verify if no cat id has empty working lvel cat ids
+			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length > 0");
+			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() > 0)
+					.forEach(e -> System.out.println(e.getKey() + "-" + e.getValue()));
+
+			System.out.println("num of catIDWorkingLevelCatIDsDict with val length > 1="
+					+ catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() > 1).count());
+			// .forEach(e -> System.out.println(e.getKey() + "--" + e.getValue()));
+
+			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length = 0");
+			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() == 0)
+					.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue()));
+
+			System.out.println("Sanity Check: printing all catIDWorkingLevelCatIDsDict with val length > 3");
+			catIDWorkingLevelCatIDsDict.entrySet().stream().filter(e -> e.getValue().length() > 3)
+					.forEach(e -> System.out.println(e.getKey() + "-" + e.getValue()));
+
+			System.out.println("Sanity Check: printing all catIDLevelWiseCatIDsDict");
+			catIDLevelWiseCatIDsDict.entrySet().stream()
+					.forEach(e -> System.out.println(e.getKey() + "-" + Arrays.toString(e.getValue())));
+			///////////////////////// END of sanity check
+
+			////
+			// used in create checkin entries to determine if a cat id is acceptable
+			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap = UIUtilityBox
+					.getCatIDsFoundNodesMap(rootOfCategoryTree, catIDNameDictionary);
+
+			////
+			// Disabled on Mar 23 2018
+			// Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>> unmergedCheckinResult =
+			// createCheckinEntries(
+			// checkinDataFileName, commonPath, rootOfCategoryTree, catIDWorkingLevelCatIDsDict,
+			// catIDsFoundNodesMap, workingCatLevel, catIDLevelWiseCatIDsDict);
+
+			Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>, Set<String>> unmergedCheckinResult = // createCheckinEntries23Mar2018
+					createCheckinEntries3April2018(checkinDataFileName, commonPath, rootOfCategoryTree,
+							catIDWorkingLevelCatIDsDict, catIDsFoundNodesMap, workingCatLevel,
+							catIDLevelWiseCatIDsDict);
+
+			mapForAllCheckinData = unmergedCheckinResult.getFirst();
+
+			long numOfCheckins = mapForAllCheckinData.entrySet().stream().mapToLong(e -> e.getValue().size()).sum();
+			System.out.println("num of checkins = " + numOfCheckins); // 6276222
+			// PopUps.showMessage("num of checkins = " + numOfCheckins);
+
+			////// consecutive same analysis
+			// countConsecutiveSimilarActivities2(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName);
+			// $$Function<CheckinEntryV2, String> consecCompareDirectCatID = ce -> String.valueOf(ce.getActivityID());
+			Function<CheckinEntryV2, String> consecCompareLocationID = ce -> String.valueOf(ce.getLocationIDs().get(0));// String.valueOf(ce.getFirstLocationID());
+			countConsecutiveSimilarActivities3_3April2018(mapForAllCheckinData, commonPath, catIDNameDictionaryFileName,
+					consecCompareLocationID);// consecCompareDirectCatID);
+
+			// System.exit(0);
+			/////
+			System.out.println("ALERT! merge = " + doMerge);
+			if (doMerge)
 			{
 				if (!disableExpensiveWriting) // skipping writing on Aug 10 for performance.
 				{
@@ -2134,6 +2545,238 @@ public class DatabaseCreatorGowallaQuicker1
 						workingLevelCatIDs, distFromPrevCheckinInM, durationFromPrevCheckinInM,
 						catIDLevelWiseCatIDsDict.get(catIDDirect), distFromNextCheckinInM, durationFromNextCheckinInM,
 						timeZone);// , distanceFromPrevInM, durationFromPrevInSec);
+
+				countOfCheckinEntryObjects += 1;
+
+				TreeMap<Timestamp, CheckinEntryV2> mapForThisUser = null;
+				mapForThisUser = result.get(userID); // if userid already in map
+
+				if (mapForThisUser == null) // else create new map for this userid
+				{
+					mapForThisUser = new TreeMap<Timestamp, CheckinEntryV2>();
+				}
+
+				if (mapForThisUser.containsKey(ts))
+				{
+					System.err.println("Error: duplicate ts: map for this user (userID=" + userID
+							+ ") already contains ts =" + ts.toString());
+					numOfDuplicateTimestamps += 1;
+				}
+
+				mapForThisUser.put(ts, cobj);
+				result.put(userID, mapForThisUser);
+
+			}
+
+			System.out.println("num of users = " + result.size());
+			System.out.println("num of lines read = " + countOfLines);
+
+			System.out.println("num of lines NotInHierarchy = " + countOfRejectedCheckinNotInHierarchy);
+			System.out.println("num of lines LevelNotAcceptable = " + countOfRejectedCHeckinBelowLevel2);
+			System.out.println("num of lines NotInCatIDNameDict = " + countOfRejectedCheckinNotInCatIDNameDict);
+			System.out.println(
+					"num of CheckinEntry objects created = countOfCheckinEntryObjects =" + countOfCheckinEntryObjects);
+			System.out.println("num of duplicate timestamps = " + numOfDuplicateTimestamps);
+			System.out.println("actual num of CheckinEntry objects created returned ="
+					+ result.entrySet().stream().mapToLong(e -> e.getValue().size()).sum());
+
+			System.out.println("countOfCinWithMultipleWorkingLevelCatIDs =" + countOfCinWithMultipleWorkingLevelCatIDs);
+			// numOfDuplicateTimestamps
+
+			br.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.err.println("lineRead=\n" + lineRead);
+		}
+
+		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
+
+		System.out.println("----Exiting createCheckinEntries----------------");
+		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>, Set<String>>(result,
+				locationIDsInCheckinData);
+
+	}
+
+	/**
+	 * 
+	 * @param s
+	 * @param delimiter
+	 * @return
+	 */
+	public static ArrayList<String> splitAsStringList(String s, Pattern delimiter)
+	{
+		ArrayList<String> res = new ArrayList();
+		List<String> resTemp = Arrays.asList(delimiter.split(s));
+		res.addAll(resTemp);
+		return res;
+	}
+
+	/**
+	 * 
+	 * @param s
+	 * @param delimiter
+	 * @return
+	 */
+	public static ArrayList<Integer> splitAsIntegerList(String s, Pattern delimiter)
+	{
+		List<String> resTemp = Arrays.asList(delimiter.split(s));
+		ArrayList<Integer> res = (ArrayList<Integer>) resTemp.stream().map(i -> Integer.valueOf(i))
+				.collect(Collectors.toList());
+		return res;
+	}
+
+	/**
+	 * Fork of createCheckinEntries3April2018() primarily since the file being read has a slightly different format to
+	 * parse now.
+	 * <p>
+	 * Read the checkin file and create checkin entry objects
+	 * </p>
+	 * <font color = orange>#CheckinsReadFromData = #checkinNotInHierarchy + #checkinsLevelNotAcceptable +
+	 * #checkinsCreated + #checkinsDuplicateTimestampUser</font>
+	 * <p>
+	 * <font color = orange>Note: Gowalla checkin data read: there exists 281 instances where same user checkins at
+	 * different locations for the same timestamp. Currently, i am only considering the most recent location for that
+	 * timestamp.</font>
+	 * </p>
+	 * 
+	 * @param checkinFileNameToRead
+	 * @param commonPath
+	 * @param rootOfCategoryTree
+	 * @param catIDWorkingLevelCatIDsDict
+	 * @param catIDsFoundNodesMap
+	 * @param workingCatLevel
+	 * @param catIDLevelWiseCatIDsDict
+	 * 
+	 * @param catIDsFoundNodesMap
+	 *            (cat id, list of nodes in hierarchy tree at which this cat id is found)
+	 * @return
+	 * @since 9 April 2018
+	 */
+	private static Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>, Set<String>> createCheckinEntries8April2018(
+			String checkinFileNameToRead, String commonPath, DefaultMutableTreeNode rootOfCategoryTree,
+			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict,
+			LinkedHashMap<String, ArrayList<DefaultMutableTreeNode>> catIDsFoundNodesMap, int workingCatLevel,
+			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict)
+	{
+		int countOfCheckinEntryObjects = 0;
+		int numOfDuplicateTimestamps = 0;
+		LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> result = new LinkedHashMap<>();
+
+		Set<String> locationIDsInCheckinData = new HashSet<>();
+
+		int countOfLines = 0;
+
+		String lineRead = "";
+
+		ArrayList<Integer> notFoundInFlatMap = new ArrayList<Integer>();
+		ArrayList<Integer> catIDsNotFoundInAnyLevel = new ArrayList<Integer>();
+
+		StringBuilder logRejectedCheckins = new StringBuilder("LineNumOfCheckin,Reason,DirectCatID\n");
+		long countOfRejectedCheckinNotInHierarchy = 0, countOfRejectedCHeckinBelowLevel2 = 0,
+				countOfCinWithMultipleWorkingLevelCatIDs = 0, countOfRejectedCheckinNotInCatIDNameDict = 0;
+		System.out.println("----Inside createCheckinEntries----------------");
+		Pattern underScore = RegexUtils.patternUnderScore;
+		try
+		{
+			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
+
+			while ((lineRead = br.readLine()) != null)
+			{
+				// Start of temp limiter
+				// if (countOfLines > 5000000)
+				// {
+				// break;
+				// }
+				// end of temp limiter
+
+				countOfLines += 1;
+				if (countOfLines == 1)
+				{
+					continue; // skip the header line
+				}
+
+				if (countOfLines % 100000/* 200000 */ == 0)
+				{
+					System.out.println(" #lines read = " + countOfLines);
+					// System.exit(0);
+				}
+
+				String splittedLine[] = RegexUtils.patternComma.split(lineRead);
+				// lineRead.split(",");
+				// System.out.println("splittedLine[]=" + Arrays.asList(splittedLine).toString());
+
+				String userID = splittedLine[0];
+				ArrayList<Integer> locationIDs = splitAsIntegerList(splittedLine[1], underScore);
+				// Integer locationID = Integer.valueOf(splittedLine[1]);// .replaceAll("\"", ""));
+				locationIDsInCheckinData
+						.addAll(locationIDs.stream().map(i -> String.valueOf(i)).collect(Collectors.toList()));
+				// Timestamp ts = Timestamp.from(Instant.parse(splittedLine[3].replaceAll("\"", "")));
+
+				// 2009-03-16T21:08:46
+				// LocalDateTime ldtTS = LocalDateTime.parse(splittedLine[2], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+				Timestamp ts = java.sql.Timestamp.valueOf(splittedLine[2]);
+				// System.out.println("\nts\nread =" + splittedLine[2] + "\nstored=" + ts.toString());// SANITY CHECK
+				// OK
+
+				ArrayList<String> latitudes = splitAsStringList(splittedLine[3], underScore);
+				ArrayList<String> longitudes = splitAsStringList(splittedLine[4], underScore);
+
+				Integer catIDDirect = Integer.valueOf(splittedLine[5]);
+				String workingLevelCatIDs = splittedLine[6];
+
+				// Note in the dataset being read: from prev line --> from next checkin and from next line--> from prev
+				// checkin, since the data read in R for the creating was that dataset was in reverse order by time.
+				Double distanceInMetersFromPrev = Double.valueOf(splittedLine[7]);
+				Long durationInSecsFromPrev = Long.valueOf(splittedLine[8]);
+				String[] levelWiseCatIDs = underScore.split(splittedLine[9]);
+				Double distanceInMeterFromNextCheckin = Double.valueOf(splittedLine[10]);
+				Long durationInSecsFromNextCheckin = Long.valueOf(splittedLine[11]);
+				String tz = new String(splittedLine[12]);
+
+				// a direct catid is acceptable only if it is present in cat hierarchy tree at one of more nodes and
+				// atleast one of those nodes have direct level >= workingLevel (2).. in other words, ignore catid
+				// at level 1
+				Pair<Boolean, String> isAcceptableDirectCatID = isAcceptableDirectCatIDFaster(catIDDirect,
+						catIDsFoundNodesMap, workingCatLevel);
+
+				if (isAcceptableDirectCatID.getFirst() == false)
+				{
+					String reason = isAcceptableDirectCatID.getSecond();
+					// maintaining a log of rejected checkins with the reason for rejection
+					logRejectedCheckins.append(countOfLines).append("-").append(reason).append("-").append(catIDDirect)
+							.append("\n");
+					if (reason.equals("NotInHierarchy"))
+					{
+						countOfRejectedCheckinNotInHierarchy += 1;
+					}
+					else if (reason.equals("LevelNotAcceptable"))
+					{
+						countOfRejectedCHeckinBelowLevel2 += 1;
+					}
+					else if (reason.equals("NotInCatIDNameDict"))
+					{
+						countOfRejectedCheckinNotInCatIDNameDict += 1;
+					}
+					continue;
+				}
+
+				String workingLevelCatIDsAgain = catIDWorkingLevelCatIDsDict.get(catIDDirect);
+				Sanity.eq(workingLevelCatIDs, workingLevelCatIDsAgain, "Error  in workingLevelCatIDs");
+				if (RegexUtils.patternDoubleUnderScore.split(workingLevelCatIDs).length > 1)
+				{
+					countOfCinWithMultipleWorkingLevelCatIDs += 1;
+				}
+
+				CheckinEntryV2 cobj = new CheckinEntryV2(userID, locationIDs, ts, latitudes, longitudes, catIDDirect,
+						workingLevelCatIDs, distanceInMetersFromPrev, durationInSecsFromPrev, levelWiseCatIDs,
+						distanceInMeterFromNextCheckin, durationInSecsFromNextCheckin, tz);
+
+				// (userID, locationID, ts, latitude, longitude, catIDDirect,
+				// workingLevelCatIDs, distFromPrevCheckinInM, durationFromPrevCheckinInM,
+				// catIDLevelWiseCatIDsDict.get(catIDDirect), distFromNextCheckinInM, durationFromNextCheckinInM,
+				// timeZone);// , distanceFromPrevInM, durationFromPrevInSec);
 
 				countOfCheckinEntryObjects += 1;
 

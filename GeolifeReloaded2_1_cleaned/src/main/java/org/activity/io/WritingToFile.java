@@ -1740,6 +1740,62 @@ public class WritingToFile
 		}
 	}
 
+	/**
+	 * 
+	 * @param mapOfMap
+	 * @param absfileNameToUse
+	 * @param catIDNameDictionary
+	 */
+	public static void writeLinkedHashMapOfTreemapCheckinEntryV2_ForRecreating(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapOfMap, String absfileNameToUse,
+			TreeMap<Integer, String> catIDNameDictionary)
+	{
+
+		try
+		{
+			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
+			StringBuilder sbToWrite = new StringBuilder();
+			sbToWrite.append(CheckinEntryV2.headerForRecreating() + ",CatName" + "\n");
+
+			int count = 0;
+			for (Entry<String, TreeMap<Timestamp, CheckinEntryV2>> entryForUser : mapOfMap.entrySet())
+			{
+				TreeMap<Timestamp, CheckinEntryV2> mapForEachUser = entryForUser.getValue();
+				for (Map.Entry<Timestamp, CheckinEntryV2> entryInside : mapForEachUser.entrySet())
+				{
+					count += 1;
+					CheckinEntryV2 c = entryInside.getValue();
+					String toWrite = c.toStringForRecreating();
+					// c.getUserID() + "," + c.getLocationIDs('_') + "," + c.getTimestamp() + ','
+					// + String.join("_", c.getStartLats()) + "," + String.join("_", c.getStartLons()) + ","
+					// + c.getActivityID() + "," + c.getWorkingLevelCatIDs() + ","
+					// + c.getDistanceInMetersFromPrev() + "," + c.getDurationInSecsFromPrev() + ","
+					// + c.getLevelWiseCatIDs() + "," + c.getDistanceInMeterFromNextCheckin() + ","
+					// + c.getDurationInSecsFromNextCheckin() + "," + c.getTz();
+
+					sbToWrite.append(
+							toWrite + "," + catIDNameDictionary.get(entryInside.getValue().getActivityID()) + "\n");
+
+					if (count % 100000 == 0) // write in chunks
+					{
+						bw.write(sbToWrite.toString());
+						sbToWrite.setLength(0);
+					}
+				}
+			}
+
+			// write the remaining
+			bw.write(sbToWrite.toString());
+			sbToWrite.setLength(0);
+			bw.close();
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public static void writeLinkedHashMapOfTreemapTrajEntry(
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapOfMap, String fileNameToUse,
 			String headerLine)

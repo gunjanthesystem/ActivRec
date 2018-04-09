@@ -190,7 +190,7 @@ public class GoogleMapApp extends Application implements MapComponentInitialized
 	{
 		// String absFileNameForLatLong = ;
 
-		List<List<String>> lines = ReadingFromFile.readLinesIntoListOfLists(absFileNameForLatLong, ",");
+		List<List<String>> lines = ReadingFromFile.readLinesIntoListOfLists(absFileNameForLatLong, delimiter);
 		listOfMarkers = new ArrayList<>();
 		int count = 0;
 

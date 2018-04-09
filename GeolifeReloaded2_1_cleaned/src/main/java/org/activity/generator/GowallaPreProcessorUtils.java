@@ -108,10 +108,77 @@ public class GowallaPreProcessorUtils
 		// 41.85003,-87.65005
 		Triple<String, Double, Double> geoCoordinatesOfChicago = new Triple<>("Chicago", 41.836944, -87.684722);
 		// ref:https://tools.wmflabs.org/geohack/geohack.php?pagename=Chicago&params=41_50_13_N_87_41_05_W_region:US-IL_type:city(2695598)
-		computeDistanceOfGeoCoordFromGivenGeoCoordinates(geoCoordinatesOfChicago,
-				"/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29.csv",
-				"/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago_4_SortWithShuffle.csv");
+		// computeDistanceOfGeoCoordFromGivenGeoCoordinates(geoCoordinatesOfChicago,
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29.csv",
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago_4_SortWithShuffle.csv");
 
+		String fileToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6.csv";
+		String fileToWrite = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
+		int colIndexOfLat = 1, colIndexOfLon = 2;
+		computeDistanceOfGeoCoordFromGivenGeoCoordinates(geoCoordinatesOfChicago, fileToRead, fileToWrite,
+				colIndexOfLat, colIndexOfLon);
+
+	}
+
+	/**
+	 * 
+	 * @param geoCoordinatesOfCity
+	 * @param fileToReadGeoCoordinates
+	 * @param absFileNameToWrite
+	 * @param colIndexOfLat
+	 * @param colIndexOfLon
+	 * @return
+	 */
+	private static void computeDistanceOfGeoCoordFromGivenGeoCoordinates(
+			Triple<String, Double, Double> geoCoordinatesOfCity, String fileToReadGeoCoordinates,
+			String absFileNameToWrite, int colIndexOfLat, int colIndexOfLon)
+	{
+		// Map<Triple<Long, Double, Double>, Double> res = new LinkedHashMap<>();
+		StringBuilder sb = new StringBuilder();
+
+		try
+		{
+			List<List<String>> allLinesRead = ReadingFromFile.readLinesIntoListOfLists(fileToReadGeoCoordinates, ",");
+			String header = (allLinesRead.get(0).stream().collect(Collectors.joining(","))) + ","
+					+ geoCoordinatesOfCity.getFirst() + " in KM\n";
+			sb.append(header);
+			allLinesRead.remove(0);// remove header
+			System.out.println("Num of lat lons read = " + allLinesRead.size());
+
+			int lineCount = 0;
+			for (List<String> lineRead : allLinesRead)
+			{
+				lineCount++;
+				double latToCompare = Double.valueOf(lineRead.get(colIndexOfLat));
+				double lonToCompare = Double.valueOf(lineRead.get(colIndexOfLon));
+
+				Double distInKMs = StatsUtils
+						.round(SpatialUtils.haversineFastMathV3NoRound(geoCoordinatesOfCity.getSecond(),
+								geoCoordinatesOfCity.getThird(), latToCompare, lonToCompare), 7);
+
+				// res.put(new Triple<>(placeID, latToCompare, lonToCompare), distInKMs);
+				sb.append(lineRead.stream().collect(Collectors.joining(",")) + "," + distInKMs + "\n");
+				// if (lineCount % 5000 == 0)
+				// {
+				// WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+				// sb.setLength(0);
+				// }
+			}
+			// WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+
+			// res = ComparatorUtils.sortByValueDescNoShuffle(res);// TODO: WHY THIS IS NOT SORTING CORRECTLY.
+			// res = ComparatorUtils.sortByValueDesc(res);
+			// res.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey().getFirst() + "," +
+			// e.getKey().getSecond()
+			// + "," + e.getKey().getThird() + "," + e.getValue() + "\n"));
+			WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		// return null;
 	}
 
 	private static Map<Triple<Long, Double, Double>, Double> computeDistanceOfGeoCoordFromGivenGeoCoordinates(

@@ -36,6 +36,7 @@ public class CheckinEntry extends DataEntry implements Serializable
 
 	ArrayList<Integer> locationIDs; // needed for merged checkin entries
 	ArrayList<String> startLats, startLons; // needed for merged checkin entries
+
 	/**
 	 * Category ID (direct)
 	 */
@@ -300,6 +301,11 @@ public class CheckinEntry extends DataEntry implements Serializable
 		return this.startLons.get(0);
 	}
 
+	/**
+	 * Category ID (direct)
+	 * 
+	 * @return
+	 */
 	public int getActivityID()
 	{
 		return activityID;
