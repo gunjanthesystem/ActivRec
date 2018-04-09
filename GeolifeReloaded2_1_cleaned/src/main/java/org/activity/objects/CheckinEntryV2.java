@@ -2,6 +2,7 @@ package org.activity.objects;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TimeZone;
 
 import org.activity.util.DateTimeUtils;
@@ -15,6 +16,50 @@ public class CheckinEntryV2 extends CheckinEntry
 
 	private long durationInSecsFromNextCheckin;
 	String tz;
+
+	public CheckinEntryV2()
+	{
+		super();
+	}
+
+	/**
+	 * For recreating CheckinEntryV2 Object, and cols to conform (but with more cols) to the previous Mar2018 merged
+	 * data so that the same R subsetting code is valid while still having complete information to recreate the object.
+	 * 
+	 * @since April 8 2018
+	 * @return
+	 */
+	public String toStringForRecreating()
+	{
+		return (this.getUserID() + "," + this.getLocationIDs('_') + "," + this.getTimestamp() + ','
+				+ String.join("_", this.getStartLats()) + "," + String.join("_", this.getStartLons()) + ","
+				+ this.getActivityID() + "," + this.getWorkingLevelCatIDs() + "," + this.getDistanceInMetersFromPrev()
+				+ "," + this.getDurationInSecsFromPrev() + ","
+				+ String.join("_", Arrays.asList(this.getLevelWiseCatIDs())) + ","
+				+ this.getDistanceInMeterFromNextCheckin() + "," + this.getDurationInSecsFromNextCheckin() + ","
+				+ this.getTz() + "," + this.locationIDs.get(0) + "," + this.getStartLatitude() + ","
+				+ this.getStartLongitude() + ","
+				+ DateTimeUtils.getLocalDate(this.getTimestamp(), TimeZone.getTimeZone("UTC")));
+	}
+
+	/**
+	 * For recreating CheckinEntryV2 Object, and cols to conform (but with more cols) to the previous Mar2018 merged
+	 * data so that the same R subsetting code is valid.
+	 * 
+	 * @since April 8 2018
+	 * 
+	 * @return
+	 */
+	public static String headerForRecreating()
+	{
+		// return
+		// "userID,LocationIDs,ts,Lats,Lons,ActID,WorkingLevelCatID,DistInMFromPrev,DurInSecFromPrev,levelWiseCatID,DistInMFromNextCheckin"
+		// + "DurInSecFromNextCheckin,TZ";
+		return "userID,placeID,timestamp,Lats,Lons,activityID,workingLevelCatID,distanceInMetersFromPrev,"
+				+ "durationInSecsFromPrev,levelWiseCatID,distanceInMeterFromNextCheckin,"
+				+ "durationInSecsFromNextCheckin,tz,firstLocID,firstLat,firstLon,Date";
+
+	}
 
 	/**
 	 * Most useful, used

@@ -52,6 +52,17 @@ public class MapView extends Region
 {
 
 	private final BaseMap baseMap;
+
+	/**
+	 * Added by Gunjan on April 7 2018
+	 * 
+	 * @return
+	 */
+	public BaseMap getBaseMap()
+	{
+		return baseMap;
+	}
+
 	private Timeline timeline;
 	private final List<MapLayer> layers = new LinkedList<>();
 	private final Rectangle clip;

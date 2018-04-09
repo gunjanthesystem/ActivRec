@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -815,6 +816,11 @@ public class TimelineUtils
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
 
+		Set<Integer> uniqueActIDs = new LinkedHashSet<>();// added on April 6 2018
+		Set<String> uniqueWorkingLevelActIDs = new LinkedHashSet<>();// added on April 6 2018
+		List<Integer> actIDs = new ArrayList<>();// added on April 6 2018
+		List<String> workingLevelActIDs = new ArrayList<>();// added on April 6 2018
+
 		System.out.println("starting convertCheckinEntriesToActivityObjectsGowalla");
 		System.out.println("Num of locationObjects received = " + locationObjects.size() + " with keys as follows");
 
@@ -872,7 +878,8 @@ public class TimelineUtils
 					String startAltitude = "";//
 					String userIDInside = cin.getUserID();
 					double distaneInMFromPrev = cin.getDistanceInMetersFromPrev();// of first cin if its a merged one
-					long durationInSecFromPrev = cin.getDurationInSecsFromPrev();//getDurInSecsFromNext();// of first cin if its a merged one
+					long durationInSecFromPrev = cin.getDurationInSecsFromPrev();// getDurInSecsFromNext();// of first
+																					// cin if its a merged one
 
 					String[] levelWiseCatIDs = cin.getLevelWiseCatIDs();
 					// int locationID = Integer.valueOf(e.getLocationID());
@@ -988,6 +995,15 @@ public class TimelineUtils
 							checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count,
 							cin.getWorkingLevelCatIDs(), distaneInMFromPrev, durationInSecFromPrev, levelWiseCatIDs,
 							currentZoneId);
+
+					// Start of April 6
+					uniqueActIDs.add(ao.getActivityID());
+					actIDs.add(ao.getActivityID());
+					uniqueWorkingLevelActIDs.addAll(
+							Arrays.asList(RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs())));
+					workingLevelActIDs.add(ao.getWorkingLevelCatIDs());
+					// End of April 6
+
 					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
 
@@ -1028,6 +1044,21 @@ public class TimelineUtils
 		System.out.println(" numOfCInsWithMultipleDistinctLocIDs = " + numOfCInsWithMultipleDistinctLocIDs);
 		System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfCInsWithMultipleWorkingLevelCatIDs
 				+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
+
+		// Start of added on April 6 2018
+		System.out.println(" num of unique actIDs = " + uniqueActIDs.size());
+		System.out.println(" num of unique uniqueWorkingLevelActIDs = " + uniqueWorkingLevelActIDs.size());
+		WritingToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "ZZuniqueActIDs.csv");
+		WritingToFile.writeToNewFile(
+				uniqueWorkingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "ZZuniqueWorkingLevelActIDs.csv");
+		WritingToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "ZZactIDs.csv");
+		WritingToFile.writeToNewFile(
+				workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "ZZworkingLevelActIDs.csv");
+		// End of added on April 6 2018
 
 		WritingToFile.writeToNewFile(
 				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())

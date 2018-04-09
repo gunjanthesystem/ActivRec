@@ -296,11 +296,15 @@ public class Dashboard3 extends Application
 			// Tab mapTab = new Tab("Google Map: Locations with No TZ");
 			// GoogleMapApp mapPane = new GoogleMapApp();
 			//
+			// // String absFileNameForLatLonToReadAsMarker =
+			// // "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/locIDsWithNoTimezone.csv";
 			// String absFileNameForLatLonToReadAsMarker =
-			// "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/locIDsWithNoTimezone.csv";
+			// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
+			//
 			// // "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
 			// String delimiter = ",";
-			// int latColIndex = 2, lonColIndex = 1, labelColIndex = 0;
+			// // int latColIndex = 2, lonColIndex = 1, labelColIndex = 0;
+			// int latColIndex = 1, lonColIndex = 2, labelColIndex = 5;
 			// BorderPane bp = mapPane.getMapPane(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex,
 			// lonColIndex,
 			// labelColIndex, false);
@@ -321,6 +325,7 @@ public class Dashboard3 extends Application
 			String absFileNameForLatLonToReadAsMarker2 = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
 			String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
 			String absFileNameForLatLonToReadAsMarkerTargetLocs = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicNWLA_ByPids_Mar31.csv";
+			String absFileNameForLatLonToReadAsMarkerTargetLocsApril6 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
 			// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
 
 			// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_SlimmedForMap.csv";//
@@ -331,10 +336,11 @@ public class Dashboard3 extends Application
 			String delimiter2 = ",";
 
 			// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
-			int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
-			BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
-					latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.3), false);// Color.rgb(193,
-																										// 49,
+			// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
+			int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
+			BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerTargetLocsApril6, delimiter2,
+					latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 1), false, false);// Color.rgb(193,
+																											// 49,
 			// 34, 0.3));
 
 			// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,

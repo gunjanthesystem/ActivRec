@@ -84,7 +84,8 @@ public class BaseMap extends Group
 	private final Rectangle area;
 	private final ReadOnlyDoubleWrapper centerLon = new ReadOnlyDoubleWrapper();
 	private final ReadOnlyDoubleWrapper centerLat = new ReadOnlyDoubleWrapper();
-	private final ReadOnlyDoubleWrapper zoom = new ReadOnlyDoubleWrapper();
+	// private final ReadOnlyDoubleWrapper zoom = new ReadOnlyDoubleWrapper();
+	private final DoubleProperty zoom = new SimpleDoubleProperty();// changed on April 8 2018
 
 	private final DoubleProperty prefCenterLon = new SimpleDoubleProperty();
 	private final DoubleProperty prefCenterLat = new SimpleDoubleProperty();
@@ -398,9 +399,14 @@ public class BaseMap extends Group
 		return centerLat.getReadOnlyProperty();
 	}
 
-	public ReadOnlyDoubleProperty zoom()
+	// public ReadOnlyDoubleProperty zoom()
+	// {
+	// return zoom.getReadOnlyProperty();
+	// }
+
+	public DoubleProperty zoom()
 	{
-		return zoom.getReadOnlyProperty();
+		return zoom;
 	}
 
 	public DoubleProperty prefCenterLon()

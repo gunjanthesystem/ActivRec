@@ -193,6 +193,60 @@ public class DataGenerator
 	 * @param numOfUsers
 	 * @param numOfActsPerUser
 	 * @param numOfUniqueActs
+	 * @param startTimeInEpochSecs
+	 * @param endTimeInEpochSecs
+	 * @return {user,{list of acts for each users{ list vals for each act}}}
+	 */
+	public static List<List<List<String>>> getDataFromFileApril5(String fileNameToRead, int userIDColIndex,
+			int timeColIndex, int distColIndex, int durColIndex, int actIDColIndex, int actNameColIndex)
+	{
+
+		// List<List<List<String>>> dataForAllUsers = new ArrayList<>();
+		//
+		// Random rd = new Random();
+		//
+		// for (int u = 0; u < numOfUsers; u++)
+		// {
+		// String user = "U" + u;
+		// int st = startTimeInEpochSecs, et = -99;
+		// List<List<String>> dataForAUser = new ArrayList<>();
+		//
+		// for (int a = 0; a < numOfActsPerUser; a++)
+		// {
+		// et = st + minDurationInSecs + rd.nextInt(maxDurationInSecs);// 20;//
+		// // et = st + 1;
+		// int actID = rd.nextInt(numOfUniqueActs);
+		//
+		// List<String> actData = new ArrayList<>();
+		// actData.add(user);// UserID
+		// actData.add(String.valueOf(st));// start ts
+		// actData.add(String.valueOf(et));// end ts
+		// actData.add(String.valueOf(""));// location name
+		// actData.add(String.valueOf(actID));// act name
+		// actData.add(String.valueOf(actID));// act ID
+		//
+		// dataForAUser.add(actData);
+		// st = et + 1 + rd.nextInt((int) (maxDurationInSecs * 0.75));// gaps
+		// }
+		// dataForAllUsers.add(dataForAUser);
+		// }
+		//
+		// // StringBuilder sb = new StringBuilder();
+		// // for (List<List<String>> data : dataForAllUsers)
+		// // {
+		// // data.stream().forEachOrdered(d -> sb.append(d.stream().collect(Collectors.joining(",")) + "\n"));
+		// // }
+		// //
+		// // System.out.println("data=\n" + sb.toString());
+		// return dataForAllUsers;
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param numOfUsers
+	 * @param numOfActsPerUser
+	 * @param numOfUniqueActs
 	 * @param startTime
 	 * @param endTime
 	 * @return

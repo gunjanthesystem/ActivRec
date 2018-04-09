@@ -18,6 +18,8 @@ import com.gluonhq.charm.down.Services;
 import com.gluonhq.charm.down.plugins.Position;
 import com.gluonhq.charm.down.plugins.PositionService;
 import com.gluonhq.charm.down.plugins.StorageService;
+import com.gluonhq.impl.maps.BaseMap;
+import com.gluonhq.impl.maps.ImageRetriever;
 import com.gluonhq.maps.MapLayer;
 import com.gluonhq.maps.MapPoint;
 import com.gluonhq.maps.MapView;
@@ -26,9 +28,12 @@ import com.gluonhq.maps.demo.PoiLayer2Faster;
 
 import jViridis.ColorMap;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -78,7 +83,7 @@ public class GluonOSMMap extends Application
 		int latColIndex = 3, lonColIndex = 2, labelColIndex = 1;
 
 		BorderPane bp = getMapPane(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex,
-				labelColIndex, 3, Color.rgb(193, 49, 34, 0.65), false);
+				labelColIndex, 3, Color.rgb(193, 49, 34, 0.65), false, false);
 
 		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
 		Scene scene = new Scene(bp, bounds.getWidth(), bounds.getHeight());
@@ -98,16 +103,21 @@ public class GluonOSMMap extends Application
 	 * @param sizeOfIcon
 	 * @param colorOfIcon
 	 * @param colorByLabel
+	 * @param clearMapCache
 	 * @return
 	 */
 	public BorderPane getMapPane(String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
-			int lonColIndex, int labelColIndex, int sizeOfIcon, Color colorOfIcon, boolean colorByLabel)
+			int lonColIndex, int labelColIndex, int sizeOfIcon, Color colorOfIcon, boolean colorByLabel,
+			boolean clearMapCache)
 	// String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
 	// int lonColIndex, int labelColIndex, boolean useCustomMarker) throws Exception
 	{
 		MapView view = new MapView();
 
-		// view.
+		if (clearMapCache)
+		{
+			ImageRetriever.clearCachedImages();
+		}
 		view.setCenter(42.472309, 6.897996);
 		view.setZoom(4);
 
@@ -128,9 +138,41 @@ public class GluonOSMMap extends Application
 		listOfLocs.clear();
 		// view.setZoom(4);
 		// Scene scene;
+
+		// Start of April 8 2018
+		// Pane
+
+		BorderPane toolPane = new BorderPane();
+
+		Slider slider = new Slider(1, BaseMap.MAX_ZOOM, 1);
+		slider.setOrientation(Orientation.VERTICAL);
+		slider.setShowTickMarks(true);
+		slider.setShowTickLabels(true);
+		slider.setMajorTickUnit(1f);
+		slider.setBlockIncrement(1f);
+		// slider.setMino
+		Bindings.bindBidirectional(slider.valueProperty(), view.getBaseMap().zoom());
+		// slider.setPrefWidth(200);
+		// slider.setPrefHeight(700);
+		toolPane.setCenter(slider);
+		toolPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.0);");
+
+		// defines a viewport into the source image (achieving a "zoom" effect) and
+		// displays it rotated
+		// ImageView iv3 = new ImageView();
+		// iv3.setImage(new Image(
+		// "https://www.fiftyflowers.com/site_files/FiftyFlowers/Image/Product/salmon-dahlia-flower-350_5ae0c998.jpg"));
+		// Rectangle2D viewportRect = new Rectangle2D(40, 35, 110, 110);
+		// iv3.setViewport(viewportRect);
+		// iv3.setRotate(90);
+		// toolPane.setBottom(iv3);
+
+		// End of April 8 2018
+
 		BorderPane bp = new BorderPane();
 		bp.setCenter(view);
-
+		bp.setRight(toolPane);
+		toolPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.0);");
 		// final Label label = new Label("Gluon Maps Demo");
 		// label.setAlignment(Pos.CENTER);
 		// label.setMaxWidth(Double.MAX_VALUE);
@@ -387,7 +429,7 @@ public class GluonOSMMap extends Application
 		}
 
 		//////////////////
-		int numOfBins = 10;
+		int numOfBins = 100;
 		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
 				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
 		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst();
@@ -410,7 +452,8 @@ public class GluonOSMMap extends Application
 
 			int binIndex = valBinIndex.getSecond();// valBinIndexMap.get(Double.valueOf(locEntry.getThird()));
 
-			Color fillColor = colors[binIndex];
+			// Color fillColor = colors[binIndex];
+			Color fillColor = colors[colors.length - 1 - binIndex];// reversing colors
 			// System.out.println("binIndex= " + binIndex + " Color= " + fillColor + " red " + fillColor.getRed());
 
 			Circle c = new Circle(sizeOfIcon, fillColor);
