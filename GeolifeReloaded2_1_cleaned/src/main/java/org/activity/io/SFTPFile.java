@@ -22,7 +22,16 @@ public class SFTPFile
 
 	public static final boolean closeAllChannels()
 	{
-		pooledSFTPChannels.entrySet().stream().forEach(e -> e.getValue().disconnect());
+
+		if (pooledSFTPChannels == null || pooledSFTPChannels.size() == 0)
+		{
+			return true;
+		}
+		else if (pooledSFTPChannels.size() > 0)
+		{
+
+			pooledSFTPChannels.entrySet().stream().forEach(e -> e.getValue().disconnect());
+		}
 		return true;
 	}
 

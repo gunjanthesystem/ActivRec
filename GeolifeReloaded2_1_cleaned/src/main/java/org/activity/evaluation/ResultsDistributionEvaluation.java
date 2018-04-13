@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,69 @@ public class ResultsDistributionEvaluation
 		// $runFeb5FiveDaysResults();//disabled on Feb 12 2018
 		// runFeb11FiveDaysResults();//disabled on feb 18 2018
 		// runFeb17FiveDaysResults();
-		runMar9FiveDaysResults();
+		// $$runMar9FiveDaysResults();
+		runApril10Results();
 		SFTPFile.closeAllChannels();
+	}
+
+	/**
+	 * @since Feb 2 2018
+	 * @param args
+	 */
+	public static void runApril10Results()
+	{
+
+		String pathToWrite = "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+				+ LocalDateTime.now().getDayOfMonth() + "ResultsDistribution/FiveDays/";// "./dataWritten/Mar9/FiveDays/";
+		WritingToFile.createDirectoryIfNotExists(pathToWrite);
+		WritingToFile.createDirectoryIfNotExists(pathToWrite + "ReadMe/");
+
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril10ToRead.csv";
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		double muArray[] = Constant.matchingUnitAsPastCount;
+		String pathToRead = "", resultsLabel = "", host = "";
+
+		try
+		{
+			List<List<String>> resLabels = ReadingFromFile.nColumnReaderString(
+					Files.newInputStream(Paths.get(resultsLabelsPathFile), StandardOpenOption.READ), ",", false);
+
+			for (List<String> resEntry : resLabels)
+			{
+				if (resEntry.size() > 1)
+				{
+					pathToRead = resEntry.get(2).trim();
+					String splitted[] = pathToRead.split("/");
+					resultsLabel = splitted[splitted.length - 1];
+
+					host = getHostFromString(resEntry.get(1)).trim();
+
+					WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n",
+							pathToWrite + resultsLabel + "UserLabels.csv");
+
+					System.out.println(
+							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
+					int resSize = getResults2(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host,
+							firstToMax);
+					if (resSize < 0)
+					{
+						continue;
+					}
+				}
+			}
+
+		}
+		catch (
+
+		Exception e)
+		{
+			e.printStackTrace();
+		}
+		// resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500_EDα0.5";
+		// pathToRead =
+		// "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/";
+		// getResults2(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host, firstToMax);
+
 	}
 
 	/**
@@ -198,6 +260,7 @@ public class ResultsDistributionEvaluation
 			String[] statFileNames, String host, int firstToMax) throws Exception
 	{
 		Map<Integer, Map<Integer, List<Double>>> res = null;
+
 		for (String statFileName : statFileNames)
 		{
 			res = getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax);
@@ -224,18 +287,22 @@ public class ResultsDistributionEvaluation
 		return res.size();
 	}
 
+	/**
+	 * 
+	 * @param s
+	 * @return
+	 */
 	public static String getHostFromString(String s)
 	{
 		if (s.trim().toLowerCase().contains("engine")) return Utils.engineHost;
 		if (s.trim().toLowerCase().contains("howitzer")) return Utils.howitzerHost;
 		if (s.trim().toLowerCase().contains("mortar")) return Utils.mortarHost;
-		if (s.trim().toLowerCase().contains("claritytrec"))
-			return Utils.clarityHost;
-		else
-		{
-			PopUps.printTracedErrorMsgWithExit("Host not found for String:" + s);
-			return "unknownHost";
-		}
+		if (s.trim().toLowerCase().contains("claritytrec")) return Utils.clarityHost;
+		if (s.trim().toLowerCase().contains("local")) return Utils.localHost;
+
+		PopUps.printTracedErrorMsgWithExit("Host not found for String:" + s);
+		return "unknownHost";
+
 	}
 
 	/**
@@ -621,14 +688,20 @@ public class ResultsDistributionEvaluation
 			for (double muD : muArray)
 			{
 				int mu = (int) muD;
+				List<List<Double>> res = null;
 
 				String fileToRead = pathToRead + statFileName + mu + ".csv";
 
-				Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port, fileToRead,
-						user, passwd);
-
-				List<List<Double>> res = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",", false);
-
+				if (host.contains("local"))
+				{
+					res = ReadingFromFile.nColumnReaderDouble(fileToRead, ",", false);
+				}
+				else
+				{
+					Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port,
+							fileToRead, user, passwd);
+					res = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",", false);
+				}
 				// System.out.println("mu= " + mu + " res=" + res);
 				muKeyAllValsMap.put(mu, res);
 				// inputAndSession.getSecond().disconnect();
@@ -697,18 +770,24 @@ public class ResultsDistributionEvaluation
 	public static Map<Integer, Map<Integer, List<Double>>> transformToUserWise(double[] muArray,
 			Map<Integer, List<List<Double>>> muKeyAllValsMap)
 	{
+		System.out.println("Inside transformToUserWise: muArray.length= " + muArray.length + " muKeyAllValsMap.size()="
+				+ muKeyAllValsMap.size());
+
 		// userIndex , <MU, <list of first1,2,3 for that user and mu>>
 		Map<Integer, Map<Integer, List<Double>>> userMUKeyVals = new LinkedHashMap<>();
 
 		// assuming all MU results have same number of users which should be true;
 		int numOfUsers = muKeyAllValsMap.get((int) muArray[0]).size();
 		System.out.println("Num of users = " + numOfUsers);
+
 		for (int u = 0; u < numOfUsers; u++)// for each user
 		{
 			Map<Integer, List<Double>> valsForThisUserAllMUs = new LinkedHashMap<>();
 			for (double muD : muArray)
 			{
 				List<List<Double>> muResForAllUsersThisMU = muKeyAllValsMap.get((int) muD);
+				System.out.println("Num of users for muD=" + muD + " =" + muResForAllUsersThisMU.size());
+
 				valsForThisUserAllMUs.put((int) muD, muResForAllUsersThisMU.get(u));
 			}
 			userMUKeyVals.put(u, valsForThisUserAllMUs);

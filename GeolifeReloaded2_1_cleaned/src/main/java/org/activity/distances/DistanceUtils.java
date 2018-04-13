@@ -878,7 +878,7 @@ public class DistanceUtils
 		{
 		}
 
-		System.out.println("after filter candEditDistances.size():" + candEditDistances.size());
+		System.out.println("\nafter filter candEditDistances.size():" + candEditDistances.size());
 		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = normalisedDistancesOverTheSet(
 				candEditDistances, userAtRecomm, dateAtRecomm, timeAtRecomm);
 

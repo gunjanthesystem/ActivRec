@@ -17,6 +17,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
@@ -29,11 +30,13 @@ import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
+import org.activity.objects.CheckinEntryV2;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
 import org.activity.probability.ProbabilityUtilityBelt;
+import org.activity.sanityChecks.ResultsSanityChecks;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
@@ -104,15 +107,23 @@ public class ControllerWithoutServer
 			System.out.println("Before reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
 
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = null;
-			// For 9k users
-			if (Constant.For9kUsers)
+
+			if (Constant.reduceAndCleanTimelinesBeforeRecomm)
 			{
-				usersCleanedDayTimelines = reduceAndCleanTimelines2(databaseName, usersDayTimelinesOriginal, true,
-						Constant.getCommonPath(), 10, 7, 500);
+				// For 9k users
+				if (Constant.For9kUsers)
+				{
+					usersCleanedDayTimelines = reduceAndCleanTimelines2(databaseName, usersDayTimelinesOriginal, true,
+							Constant.getCommonPath(), 10, 7, 500);
+				}
+				else // For 916 users
+				{
+					usersCleanedDayTimelines = reduceAndCleanTimelines(databaseName, usersDayTimelinesOriginal, true);
+				}
 			}
-			else // For 916 users
+			else// in this case, we are expecting the data is already subsetting and cleaned
 			{
-				usersCleanedDayTimelines = reduceAndCleanTimelines(databaseName, usersDayTimelinesOriginal, true);
+				usersCleanedDayTimelines = usersDayTimelinesOriginal;
 			}
 
 			usersDayTimelinesOriginal = null; // null this out so as to be ready for garbage collection.
@@ -319,9 +330,33 @@ public class ControllerWithoutServer
 					sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines,
 							DomainConstants.gowalla100RandomUsersLabel, sampledUserIndices, commonBasePath);
 				}
+				else if (Constant.runForAllUsersAtOnce)
+				{
+					if (true)
+					{
+						int numOfUsers = usersCleanedDayTimelines.size();
+						List<Integer> allUserIndices = IntStream.range(0, numOfUsers).boxed()
+								.collect(Collectors.toList());
+						sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines, "All", allUserIndices,
+								commonBasePath);
+						ResultsSanityChecks.assertSameNumOfRTsAcrossAllMUsForUsers(commonBasePath, false);
+					}
+					if (false)// temporary sanity check
+					{
+						List<String> sampledUserIDsStr = ReadingFromFile.oneColumnReaderString(
+								"/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/APR11ED1.0AllActsFDStFilter0hrs_debugging/All/MatchingUnit3.0/UsersWithNoValidRTs.csv",
+								",", 0, false);
+
+						sampleUsersByIDsExecuteRecommendationTests(usersCleanedDayTimelines, "All", sampledUserIDsStr,
+								commonBasePath);
+
+					}
+
+				}
 				else
 				{
 					// Start of curtain Aug 11 2017
+
 					sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines,
 							DomainConstants.gowallaUserGroupsLabels, commonBasePath);
 
@@ -417,7 +452,9 @@ public class ControllerWithoutServer
 			// $System.out.println("This experiment took " + ((et - ct) / 1000) + " seconds");
 
 		}
-		catch (Exception e)
+		catch (
+
+		Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -801,6 +838,119 @@ public class ControllerWithoutServer
 	}
 
 	/**
+	 * Fork of sampleUsersByIndicesExecuteRecommendationTests to sample by userID.
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param groupsOf100UsersLabel
+	 * @param userIndicesToSelect
+	 * @param commonBasePath
+	 * @throws IOException
+	 * @since April 11 2018
+	 */
+	private void sampleUsersByIDsExecuteRecommendationTests(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String groupOf100UsersLabel,
+			List<String> userIndicesToSelect, String commonBasePath) throws IOException
+	{
+		// LinkedHashMap<Integer, String> indexOfBlackListedUsers = new LinkedHashMap<>();
+		System.out.println("Inside sampleUsersByIDsExecuteRecommendationTests: usersCleanedDayTimelines received size="
+				+ usersCleanedDayTimelines.size());
+
+		System.out.println("-- iteration start for groupOf100UsersLabel = " + groupOf100UsersLabel);
+		// important so as to wipe the previously assigned user ids
+		Constant.initialise(commonPath, Constant.getDatabaseName());
+		Constant.setOutputCoreResultsPath(commonBasePath + groupOf100UsersLabel + "/");
+		Files.createDirectories(Paths.get(Constant.getOutputCoreResultsPath())); // added on 9th Feb 2017
+
+		/// sample users
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsers = new LinkedHashMap<>(134);
+		// (ceil) 100/0.75
+
+		int numOfUsersSkippedGT553MaxActsPerDay = 0;
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+		{
+			String userID = userEntry.getKey();
+			System.out.print(" userID = " + userID + "\t");
+			// countOfSampleUsers += 1;
+			if (userIndicesToSelect.contains(userID) == false)
+			{
+				System.out.println(userID + "is not in selection hence skipping");
+				continue;
+			}
+			if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+			{
+				System.out.println(" ALERT ALERT ALERT !! NOT EXPECTED userID" + userID + " Skipping user: "
+						+ userEntry.getKey() + " as in gowallaUserIDsWithGT553MaxActsPerDay");
+				WritingToFile.appendLineToFileAbsolute(userEntry.getKey() + "\n",
+						Constant.getCommonPath() + "BlacklistedUsersSkipped.csv");
+				numOfUsersSkippedGT553MaxActsPerDay += 1;
+				continue;
+			}
+			else
+			{
+				System.out.println(" choosing this ");
+				sampledUsers.put(userEntry.getKey(), userEntry.getValue());
+			}
+			// $$System.out.println("putting in user= " + userEntry.getKey());
+		}
+
+		// TODO likely the code segment below is not needed anymore as blacklisted users have already been removed.
+		// start of get timelines for all users for collaborative approach
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsers = new LinkedHashMap<>(1000);
+		int numOfAllUsersSkippedGT553MaxActsPerDay = 0;
+		if (Constant.collaborativeCandidates)
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+				{
+					numOfAllUsersSkippedGT553MaxActsPerDay += 1;
+					continue;
+				}
+				else
+				{
+					allUsers.put(userEntry.getKey(), userEntry.getValue());
+				}
+			}
+			System.out.println("got timelines for all users for coll cand: allUsers.size()= " + allUsers.size());
+			// Sanity.eq(numOfUsersSkippedGT553MaxActsPerDay, numOfAllUsersSkippedGT553MaxActsPerDay,
+			System.out.println("numOfUsersSkippedGT553MaxActsPerDay=" + numOfUsersSkippedGT553MaxActsPerDay
+					+ " numOfAllUsersSkippedGT553MaxActsPerDay=" + numOfAllUsersSkippedGT553MaxActsPerDay);
+
+		}
+		// end of get timelines for all users for collaborative approach
+
+		System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
+		System.out.println("num of allUsers users for this iteration = " + allUsers.size());
+		System.out.println(" -- Users = " + sampledUsers.keySet().toString());
+		System.out.println(" -- All Users for collaboration = " + allUsers.keySet().toString());
+
+		// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+		// $$RecommendationTestsMasterMU2 recommendationsTest = new RecommendationTestsMasterMU2(sampledUsers);
+		// $$RecommendationTestsBaseClosestTime recommendationsTest = new RecommendationTestsBaseClosestTime(
+		// $$ sampledUsers);
+
+		System.out.println("Just Before recommendationsTest\n" + PerformanceAnalytics.getHeapInformation());
+
+		// // start of curtain may 4 2017
+		// RecommendationTestsMar2017Gen recommendationsTest = new RecommendationTestsMar2017Gen(sampledUsers,
+		// Constant.lookPastType, Constant.caseType, Constant.typeOfThresholds, Constant.getUserIDs(),
+		// Constant.percentageInTraining);
+		// // end of curtain may 4 2017
+		// System.exit(0);
+		RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
+				sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
+				Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
+
+		/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
+
+		// RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new
+		// RecommendationTestsDayWise2FasterJan2016(sampledUsers);
+
+		System.out.println("-- iteration end for groupOf100UsersLabel = " + groupOf100UsersLabel);
+
+	}
+
+	/**
 	 * 
 	 * @param usersCleanedDayTimelines
 	 * @param userIDsToSelect
@@ -1066,32 +1216,44 @@ public class ControllerWithoutServer
 			// $$String gowallaDataFolder = "./dataToRead/Feb23/DatabaseCreatedMerged/";// DatabaseCreatedMerged/";//
 			// Feb2/DatabaseCreated/";
 			System.out.println("gowallaDataFolder = " + gowallaDataFolder);
-			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
-			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/DatabaseCreation/";
-			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData = (LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>) Serializer
-					.kryoDeSerializeThis(gowallaDataFolder + "mapForAllCheckinData.kryo");
-			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllCheckinData.kryo");
+
 			LinkedHashMap<String, UserGowalla> mapForAllUserData = (LinkedHashMap<String, UserGowalla>) Serializer
 					.kryoDeSerializeThis(gowallaDataFolder + "mapForAllUserData.kryo");
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllUserData.kryo");
-			// LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData = (LinkedHashMap<Integer, LocationGowalla>)
-			// Serializer
-			// .kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
-
+			// LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData = (LinkedHashMap<Integer,
+			// LocationGowalla>)//Serializer.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
 			Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData = toFasterIntObjectOpenHashMap(
 					(LinkedHashMap<Integer, LocationGowalla>) Serializer
 							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo"));
-
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
 
-			System.out.println("before creating timelines while having deserialised objects in memory\n"
-					+ PerformanceAnalytics.getHeapInformation());
+			if (Constant.useCheckinEntryV2)
+			{
+				LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> mapForAllCheckinData = (LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>) Serializer
+						.kryoDeSerializeThis(gowallaDataFolder + "mapForAllCheckinData.kryo");
 
-			usersDayTimelinesOriginal = TimelineUtils
-					.createUserTimelinesFromCheckinEntriesGowallaFaster1(mapForAllCheckinData, mapForAllLocationData);
+				System.out.println("before creating timelines while having deserialised objects in memory\n"
+						+ PerformanceAnalytics.getHeapInformation());
 
+				usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromCheckinEntriesGowallaFaster1_V2(
+						mapForAllCheckinData, mapForAllLocationData);
+			}
+			else
+			{
+				// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/DatabaseCreated/";
+				// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov29/DatabaseCreation/";
+				LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>> mapForAllCheckinData = (LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>) Serializer
+						.kryoDeSerializeThis(gowallaDataFolder + "mapForAllCheckinData.kryo");
+				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllCheckinData.kryo");
+
+				System.out.println("before creating timelines while having deserialised objects in memory\n"
+						+ PerformanceAnalytics.getHeapInformation());
+
+				usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromCheckinEntriesGowallaFaster1(
+						mapForAllCheckinData, mapForAllLocationData);
+			}
 		}
-		else
+		else // When databaseName is not gowalla1
 		{
 			ArrayList<ActivityObject> allActivityEvents = UtilityBelt
 					.createActivityObjectsFromJsonArray(jsonArrayD.getJSONArray());

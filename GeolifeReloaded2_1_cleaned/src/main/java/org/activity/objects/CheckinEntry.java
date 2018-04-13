@@ -386,6 +386,10 @@ public class CheckinEntry extends DataEntry implements Serializable
 		return null;
 	}
 
+	/**
+	 * 
+	 * @return distanceInMetersFromPrevCheckin
+	 */
 	public double getDistanceInMetersFromPrev()
 	{
 		return distanceInMetersFromPrevCheckin;
@@ -396,6 +400,10 @@ public class CheckinEntry extends DataEntry implements Serializable
 		this.distanceInMetersFromPrevCheckin = distanceInMetersFromNext;
 	}
 
+	/**
+	 * 
+	 * @return durationInSecsFromPrevCheckin
+	 */
 	public long getDurationInSecsFromPrev()
 	{
 		return durationInSecsFromPrevCheckin;

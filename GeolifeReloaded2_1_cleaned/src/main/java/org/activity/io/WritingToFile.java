@@ -4852,6 +4852,19 @@ public class WritingToFile
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param pathToCreate
+	 */
+	public static void createDirectoryIfNotExists(String pathToCreate)
+	{
+		File directory = new File(pathToCreate);
+		if (!directory.exists())
+		{
+			directory.mkdirs();
+		}
+	}
+
 	public static boolean isDirectoryEmpty(String path)
 	{
 		boolean isEmpty = false;

@@ -293,7 +293,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			this.userAtRecomm = Integer.toString(userAtRecomm);
 			this.userIDAtRecomm = Integer.toString(userAtRecomm);
 			System.out.println("	User at Recomm = " + this.userAtRecomm + "\tDate at Recomm = " + this.dateAtRecomm
-					+ "\tTime at Recomm = " + this.timeAtRecomm + "\nthis.matchingUnitInCountsOrHours="
+					+ "\tTime at Recomm = " + this.timeAtRecomm + "\tthis.matchingUnitInCountsOrHours="
 					+ this.matchingUnitInCountsOrHours);
 
 			//////
@@ -366,6 +366,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			// Start of added on Feb 12 2018
 			if (Constant.filterCandByCurActTimeThreshInSecs > 0)
 			{
+				System.out.println(
+						"filtering CandByCurActTimeThreshInSecs= " + Constant.filterCandByCurActTimeThreshInSecs);
 				this.candidateTimelines = removeCandsWithEndCurrActBeyondThresh(this.candidateTimelines,
 						Constant.filterCandByCurActTimeThreshInSecs, activityObjectAtRecommPoint,
 						VerbosityConstants.verboseCandFilter);
@@ -419,9 +421,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			// + currentTimeline.getActivityObjectsInTimeline().size());
 			// /////////////////////
 			// TODO CHECK: HOW THE EFFECT OF THIS DIFFERS FROM THE EXPERIMENTS DONE FOR IIWAS: in iiWAS normalisation
-			// was
-			// after thresholding (correct), here
-			// normalisation is before thresholding which should be changed
+			// was after thresholding (correct), here normalisation is before thresholding which should be changed
 			long recommMasterT3 = System.currentTimeMillis();
 			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes = DistanceUtils
 					.getNormalisedDistancesForCandidateTimelines(candidateTimelines, activitiesGuidingRecomm, caseType,
@@ -1526,10 +1526,16 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		// threshold while there is no candidate below threshold, u shouldnt
 		// have called this function");
 		// }
-		/*
-		 * Assuming that threshold has already been applied
-		 */
-		return this.distancesSortedMap.size();
+		if (this.hasCandidateTimelinesBelowThreshold)
+		{/*
+			 * Assuming that threshold has already been applied
+			 */
+			return this.distancesSortedMap.size();
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	/**

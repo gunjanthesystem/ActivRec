@@ -1,12 +1,15 @@
 package org.activity.generator;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,6 +38,7 @@ import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.HTTPUtils;
+import org.activity.util.RegexUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.w3c.dom.Document;
@@ -96,7 +100,7 @@ public class GowallaPreProcessorUtils
 		////
 	}
 
-	public static void main(String[] args)
+	public static void main0(String[] args)
 	{
 		// $$getGeoAddressForLocations();
 		// getLocTimezoneMap();
@@ -118,6 +122,152 @@ public class GowallaPreProcessorUtils
 		computeDistanceOfGeoCoordFromGivenGeoCoordinates(geoCoordinatesOfChicago, fileToRead, fileToWrite,
 				colIndexOfLat, colIndexOfLon);
 
+	}
+
+	public static void main(String[] args)
+	{
+		// findNumVeryFrequentEpisodesForEachUserApril8();
+		findNumVeryFrequentEpisodesForEachUserApril8_2();
+	}
+
+	/**
+	 * 
+	 * @param fileToRead
+	 * @param userIDColIndex
+	 * @param tsColIndex
+	 */
+	public static void findNumVeryFrequentEpisodesForEachUserApril8_2()
+	{
+		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
+
+		List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
+				checkinFileNameToRead, ",", true, false, new int[] { 0, 2 });
+
+		Map<String, Integer> userNumOfVertFreqEpisodesCount = new LinkedHashMap<>();
+		int windowSize = 10;
+		int windowDurationDifThresholdInSecs = 5 * 60 * 60;
+
+		try
+		{
+			System.out.println("here");
+			linesRead.remove(0);
+			System.out.println("linesRead.size()= " + linesRead.size());
+			for (List<String> line : linesRead)
+			{
+				System.out.println("here2");
+				String userID = line.get(0);
+				Timestamp ts = java.sql.Timestamp.valueOf(line.get(1));
+				System.out.println("UserID=" + userID + " ts=" + ts.toString());
+			}
+		}
+		catch (
+
+		Exception e)
+		{
+
+		}
+	}
+
+	//
+	/**
+	 * 
+	 * @param fileToRead
+	 * @param userIDColIndex
+	 * @param tsColIndex
+	 */
+	public static void findNumVeryFrequentEpisodesForEachUserApril8()
+	{
+		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
+		// try{List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(fileToRead,
+		// delimiter, hasHeader, false, new int[] { userIDColIndex, tsColIndex });
+		// for (List<String> line : linesRead){} }
+		Map<String, Integer> userNumOfVertFreqEpisodesCount = new LinkedHashMap<>();
+		int windowSize = 10;
+		int windowDurationDifThresholdInSecs = 5 * 60 * 60;
+
+		try
+		{
+			String previousUserID = "", currUserID = "";
+			int countOfLines = 0;
+			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
+			String lineRead = "";
+			Timestamp windowStartTS = null, windowEndTS = null;
+
+			int stepInsideWindow = 0;
+			while ((lineRead = br.readLine()) != null)
+			{
+				countOfLines += 1;
+				if (countOfLines == 1)
+				{
+					continue; // skip the header line
+				}
+
+				// temp start
+				if (countOfLines > 10000)
+				{
+					break;
+				}
+				// temp end
+
+				stepInsideWindow += 1;
+
+				String splittedLine[] = RegexUtils.patternComma.split(lineRead);
+				currUserID = splittedLine[0];
+				Timestamp ts = java.sql.Timestamp.valueOf(splittedLine[2]);
+				System.out.println("stepInsideWindow=" + stepInsideWindow + "\tUserID = " + currUserID + "\tts= " + ts);
+				if (stepInsideWindow == 1)
+				{
+					windowStartTS = ts;
+					System.out.println("---------- Window Starts---------------");
+				}
+				else if ((currUserID.equals(previousUserID) == false) && previousUserID.trim().length() > 0)
+				{
+					stepInsideWindow = 1;
+					System.out.println("currUserID= " + currUserID + " previousUserID= " + previousUserID);
+					System.out.println("---------- Window Ends- Different User--------------");
+				}
+				else if (stepInsideWindow == windowSize)
+				{
+					windowEndTS = ts;
+
+					if (stepInsideWindow == windowSize)
+					{
+						long timeDurationOfWindowInSecs = (windowEndTS.getTime() - windowStartTS.getTime()) / 1000;
+
+						System.out.print("stepInsideWindow == windowSize ");
+						System.out.println("\t timeDurationOfWindowIn min= " + timeDurationOfWindowInSecs / 60);
+
+						if (timeDurationOfWindowInSecs < windowDurationDifThresholdInSecs)
+						{
+							System.out.println("******> VFE as timeDurationOfWindowInSecs= "
+									+ timeDurationOfWindowInSecs + " in mis =" + timeDurationOfWindowInSecs / 60);
+							// Encountered a window which is a very frequent episode.
+							int countOfVFEForThisUser = 0;
+							if (userNumOfVertFreqEpisodesCount.containsKey(currUserID))
+							{
+								countOfVFEForThisUser = userNumOfVertFreqEpisodesCount.get(currUserID);
+							}
+							userNumOfVertFreqEpisodesCount.put(currUserID, countOfVFEForThisUser + 1);
+						}
+					}
+					stepInsideWindow = 0;
+					System.out.println("---------- Window Ends---------------");
+				}
+
+				previousUserID = currUserID;
+
+			}
+			System.out.println("countOfLines=" + countOfLines);
+			br.close();
+
+			WritingToFile.writeMapToNewFile(userNumOfVertFreqEpisodesCount, "User,VFECount", ",",
+					"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/April11/");
+		}
+
+		catch (Exception e)
+		{
+
+		}
 	}
 
 	/**

@@ -205,26 +205,8 @@ public class DomainConstants
 
 	}
 
-	// /**
-	// *
-	// * @return
-	// */
-	// public static Map<Integer, ZoneId> getGowallaLocZoneIdMap()
-	// {
-	// return gowallaLocZoneIdMap;
-	// }
-
-	// /**
-	// *
-	// * @return
-	// */
-	// public static ZoneId getGowallaLocZoneId(Integer locID)
-	// {
-	// return gowallaLocZoneIdMap.get(locID);
-	// }
-
 	/**
-	 * 
+	 * @deprecated
 	 * @return
 	 */
 	public static ZoneId getGowallaLocZoneId(List<Integer> locIDs)
@@ -243,8 +225,16 @@ public class DomainConstants
 
 	public static void setGowallaLocZoneIdMap(String pathToSerialisedGowallaLocZoneIdMap)
 	{
-		DomainConstants.gowallaLocZoneIdMap = (LinkedHashMap<Integer, ZoneId>) Serializer
-				.kryoDeSerializeThis(pathToSerialisedGowallaLocZoneIdMap);
+		if (pathToSerialisedGowallaLocZoneIdMap.trim().length() == 0)
+		{
+			System.out.println("ALERT! pathToSerialisedGowallaLocZoneIdMap is empty = "
+					+ pathToSerialisedGowallaLocZoneIdMap + "\nNOT SETTING gowallaLocZoneIdMap");
+		}
+		else
+		{
+			DomainConstants.gowallaLocZoneIdMap = (LinkedHashMap<Integer, ZoneId>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedGowallaLocZoneIdMap);
+		}
 	}
 
 	/**

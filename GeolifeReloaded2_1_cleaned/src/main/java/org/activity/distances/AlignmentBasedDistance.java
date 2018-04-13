@@ -41,6 +41,8 @@ public class AlignmentBasedDistance
 	// double costReplaceDuration = 1;//0.2d;
 	// double costReplaceActivityName = 2;
 
+	private final PrimaryDimension primaryDimension;
+	private boolean shouldComputeFeatureLevelDistance;
 	double wtActivityName;// = 3d;
 	double wtStartTime;// = 1d;// 0.6d;
 	double wtDuration;// = 0.5d;// 0.2d;
@@ -54,6 +56,9 @@ public class AlignmentBasedDistance
 	//
 	double wtDistanceFromPrev;
 	double wtDurationFromPrev;
+
+	double wtDistanceFromNext;
+	double wtDurationFromNext;
 
 	double wtFullActivityObject;// = wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled + wtStartGeo +
 								// wtEndGeo + +wtAvgAltitude;
@@ -79,9 +84,9 @@ public class AlignmentBasedDistance
 	double durationFromPrevTolerance;
 	double distanceFromPrevTolerance;
 
-	// features to use in feature level of edit distance
+	// Gowalla features to use in feature level of edit distance
 	boolean useActivityNameInFED, useStartTimeInFED, useLocationInFED, usePopularityInFED, useDistFromPrevInFED,
-			useDurationFromPrevInFED;
+			useDurationFromPrevInFED, useDistFromNextInFED, useDurationFromNextInFED;
 
 	int numberOfInsertions = 0;
 	int numberOfDeletions = 0;
@@ -106,9 +111,10 @@ public class AlignmentBasedDistance
 	 */
 	public AlignmentBasedDistance()
 	{
-		setFeaturesToUseInDistance();
+		setGowallaFeaturesToUseInDistance();
 		setWeightsAndCosts(); // VERY IMPORTANT
-
+		primaryDimension = Constant.primaryDimension;
+		setShouldComputeFeatureLevelDistance();
 		if (!Constant.useTolerance)// == false)
 		{
 			setTolerancesToZero();
@@ -120,9 +126,37 @@ public class AlignmentBasedDistance
 	}
 
 	/**
+	 * @since 10 April 2018
+	 */
+	private void setShouldComputeFeatureLevelDistance()
+	{
+		shouldComputeFeatureLevelDistance = true;
+		if ((1 - Constant.EDAlpha) == 0)
+		{
+			shouldComputeFeatureLevelDistance = false;
+		}
+		if (getSumOfWeightOfFeaturesExceptPrimaryDimension() == 0)
+		{
+			System.err
+					.println("Warning: -- Since no features are being used it is suggested to set Constant.EDAlpha=0.\n"
+							+ "so that the computed values for dAct are not multiplied by EDAlpha and reduced.");
+			shouldComputeFeatureLevelDistance = false;
+		}
+		System.out.println("shouldComputeFeatureLevelDistance= " + shouldComputeFeatureLevelDistance);
+	}
+
+	/**
+	 * @since 10 April 2018
+	 */
+	public boolean getShouldComputeFeatureLevelDistance()
+	{
+		return shouldComputeFeatureLevelDistance;
+	}
+
+	/**
 	 * Uses static values from Constant class
 	 */
-	private void setFeaturesToUseInDistance()
+	private void setGowallaFeaturesToUseInDistance()
 	{
 		useActivityNameInFED = Constant.useActivityNameInFED;
 		useStartTimeInFED = Constant.useStartTimeInFED;
@@ -130,6 +164,8 @@ public class AlignmentBasedDistance
 		usePopularityInFED = Constant.usePopularityInFED;
 		useDistFromPrevInFED = Constant.useDistFromPrevInFED;
 		useDurationFromPrevInFED = Constant.useDurationFromPrevInFED;
+		useDistFromNextInFED = Constant.useDistFromNextInFED;
+		useDurationFromNextInFED = Constant.useDurationFromNextInFED;
 	}
 
 	/**
@@ -153,6 +189,9 @@ public class AlignmentBasedDistance
 
 		wtDistanceFromPrev = 1d;
 		wtDurationFromPrev = 1d;
+
+		wtDistanceFromNext = 1d;
+		wtDurationFromNext = 1d;
 
 		switch (Constant.getDatabaseName())
 		{
@@ -196,6 +235,16 @@ public class AlignmentBasedDistance
 				{
 					wtFullActivityObject += wtDurationFromPrev;
 				}
+
+				if (this.useDistFromNextInFED)
+				{
+					wtFullActivityObject += wtDistanceFromNext;
+				}
+
+				if (this.useDurationFromNextInFED)
+				{
+					wtFullActivityObject += wtDurationFromNext;
+				}
 				wtFullActivityObject = StatsUtils.round(wtFullActivityObject, 4);
 				// wtActivityName/* + wtStartTime + wtLocation + wtLocPopularity */ + wtDistanceFromPrev +
 				// wtDurationFromPrev,4);
@@ -215,7 +264,30 @@ public class AlignmentBasedDistance
 		costInsertActivityObject = defaultCostInsert * wtFullActivityObject; // 1 cost of insert operation 4.5
 		costDeleteActivityObject = defaultCostDelete * wtFullActivityObject; // 1 cost of delete operation 4.5
 		costReplaceActivityObject = defaultCostReplace * wtFullActivityObject; // 2 cost of replace operation 9
+	}
 
+	/**
+	 * Note that wtFullActivityObject will vary according to which features are used (set to be used by
+	 * use_FeatureX_InFED). Hence the return value is regulated by which features are set to be used.
+	 * 
+	 * @return
+	 * @since April 10 2018
+	 */
+	public double getSumOfWeightOfFeaturesExceptPrimaryDimension()
+	{
+		if (primaryDimension.equals(PrimaryDimension.ActivityID))
+		{
+			return wtFullActivityObject - wtActivityName;
+		}
+		else if (primaryDimension.equals(PrimaryDimension.LocationID))
+		{
+			return wtFullActivityObject - wtLocation;
+		}
+		else
+		{
+			PopUps.showError("Error: unrecognised primary dimension =" + primaryDimension);
+			return -1;
+		}
 	}
 
 	/**
@@ -229,7 +301,8 @@ public class AlignmentBasedDistance
 				+ "\nWt of Start Geo Location:" + wtStartGeo + "\nWt of End Geo Location:" + wtEndGeo
 				+ "\nWt of Avg Altitude:" + wtAvgAltitude + "\nWt of Location:" + wtLocation + "\nWt of Popularity:"
 				+ wtLocPopularity + "\nwtDistanceFromPrev" + wtDistanceFromPrev + "\nwtDurationFromPrev:"
-				+ wtDurationFromPrev + "\nWt of full Activity Object:" + wtFullActivityObject
+				+ wtDurationFromPrev + "\nwtDistanceFromNext" + wtDistanceFromNext + "\nwtDurationFromNext:"
+				+ wtDurationFromNext + "\nWt of full Activity Object:" + wtFullActivityObject
 				+ "\ncostInsertActivityObject:" + costInsertActivityObject + "\ncostDeleteActivityObject:"
 				+ costDeleteActivityObject + "\ncostReplaceActivityObject:" + costReplaceActivityObject;
 		return allWts;
@@ -591,7 +664,7 @@ public class AlignmentBasedDistance
 			// System.out.println("@@ UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size() = "
 			// + UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size());
 
-			if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+			if (primaryDimension.equals(PrimaryDimension.ActivityID))
 			{
 				if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
 				// ao1.getLocationIDs() != ao2.getLocationIDs()) // if no matching locationIDs then add wt to dfeat
@@ -600,7 +673,7 @@ public class AlignmentBasedDistance
 					sbLog.append("\ndLoc=" + (wtLocation));
 				}
 			}
-			else if (Constant.primaryDimension.equals(PrimaryDimension.LocationID))
+			else if (primaryDimension.equals(PrimaryDimension.LocationID))
 			{
 				if (ao1.getActivityID() == ao2.getActivityID())
 				{
@@ -656,7 +729,7 @@ public class AlignmentBasedDistance
 		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
 		{
 			{
-				double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromNext() - ao2.getDistanceInMFromNext());
+				double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() - ao2.getDistanceInMFromPrev());
 				if (diffOfDistFromPrev > 46754)
 				{
 					dfeat += this.wtDistanceFromPrev;
@@ -669,7 +742,7 @@ public class AlignmentBasedDistance
 			}
 			{
 				double diffOfDurFromPrev = FastMath
-						.abs(ao1.getDurationInSecondsFromNext() - ao2.getDurationInSecondsFromNext());
+						.abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
 				if (diffOfDurFromPrev > 63092)
 				{
 					dfeat += this.wtDurationFromPrev;
@@ -731,7 +804,7 @@ public class AlignmentBasedDistance
 				// = "
 				// + UtilityBelt.getIntersection(ao1.getLocationIDs(), ao2.getLocationIDs()).size());
 
-				if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+				if (primaryDimension.equals(PrimaryDimension.ActivityID))
 				{
 					if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
 					// ao1.getLocationIDs() != ao2.getLocationIDs()) // if no matching locationIDs then add wt to dfeat
@@ -740,7 +813,7 @@ public class AlignmentBasedDistance
 						sbLog.append("\ndLoc=" + (wtLocation));
 					}
 				}
-				else if (Constant.primaryDimension.equals(PrimaryDimension.LocationID))
+				else if (primaryDimension.equals(PrimaryDimension.LocationID))
 				{
 					if (ao1.getActivityID() == ao2.getActivityID())
 					{
@@ -760,7 +833,7 @@ public class AlignmentBasedDistance
 				sbLog.append("\ndPop=" + (popularityDistance * this.wtLocPopularity));
 			}
 
-			double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromNext() - ao2.getDistanceInMFromNext());
+			double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() - ao2.getDistanceInMFromPrev());
 			if (diffOfDistFromPrev > 46754)
 			{
 				dDistanceFromPrev = this.wtDistanceFromPrev;
@@ -774,7 +847,7 @@ public class AlignmentBasedDistance
 			}
 
 			double diffOfDurFromPrev = FastMath
-					.abs(ao1.getDurationInSecondsFromNext() - ao2.getDurationInSecondsFromNext());
+					.abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
 			if (diffOfDurFromPrev > 63092)
 			{
 				dDurationFromPrev = this.wtDurationFromPrev;
@@ -830,6 +903,7 @@ public class AlignmentBasedDistance
 	{
 		if (zone1 == null || zone1 == null)
 		{
+			PopUps.showError("Null zoneID " + zone1 + " or " + zone2);
 			return new Pair<>(wtStartTime, "Nullzone dtime=" + wtStartTime);
 		}
 
@@ -2723,6 +2797,15 @@ public class AlignmentBasedDistance
 	 * @param deleteWt
 	 * @param replaceWt
 	 * @return Pair{Levenshtein distance,trace of operations}
+	 *         <p>
+	 *         Triple{resultantTrace, resultantDistance, Triple{DISNTrace,coordTraces.getFirst(),
+	 *         coordTraces.getSecond()}}
+	 *         <p>
+	 *         Trace =_I(0-1)_I(0-2)_I(0-3)_D(1-3)_D(2-3)_D(3-3)_N(4-4) <br/>
+	 *         simpleLevenshteinDistance112=6.0<br/>
+	 *         DINSTrace=IIIDDDN <br/>
+	 *         third_second=[0, 0, 0, 1, 2, 3, 4] <br/>
+	 *         third_third=[1, 2, 3, 3, 3, 3, 4]
 	 */
 	public static Triple<String, Double, Triple<char[], int[], int[]>> getMySimpleLevenshteinDistance(String word1,
 			String word2, int insertWt, int deleteWt, int replaceWt)// , TraceMatrix traceMatrix)
@@ -3191,7 +3274,8 @@ public class AlignmentBasedDistance
 					+ ", wtDuration=" + wtDuration + ", wtDistanceTravelled=" + wtDistanceTravelled + ", wtStartGeo="
 					+ wtStartGeo + ", wtEndGeo=" + wtEndGeo + ", wtAvgAltitude=" + wtAvgAltitude + ", wtLocation="
 					+ wtLocation + ", wtLocPopularity=" + wtLocPopularity + ", wtDistanceFromPrev=" + wtDistanceFromPrev
-					+ ", wtDurationFromPrev=" + wtDurationFromPrev + ", wtFullActivityObject=" + wtFullActivityObject
+					+ ", wtDurationFromPrev=" + wtDurationFromPrev + ", wtDistanceFromNext=" + wtDistanceFromNext
+					+ ", wtDurationFromNext=" + wtDurationFromNext + ", wtFullActivityObject=" + wtFullActivityObject
 					+ ", costInsertActivityObject=" + costInsertActivityObject + ", costDeleteActivityObject="
 					+ costDeleteActivityObject + ", costReplaceActivityObject=" + costReplaceActivityObject
 					+ ", distMatrix=" + Arrays.toString(distMatrix) + ", defaultCostInsert=" + defaultCostInsert
@@ -3245,7 +3329,8 @@ public class AlignmentBasedDistance
 						Constant.editDistTimeDistType, startTimeToleranceInSeconds, wtStartTime);
 
 				sbLog.append("useStartTimeInFED: stDistRes=" + stDistRes + "\n");
-				if (stDistRes.getSecond().length() <= 15)// null timezone
+				if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
+				// stDistRes.getSecond().length() <=15)// null timezone
 				{
 					WritingToFile
 							.appendLineToFileAbsolute(
@@ -3262,7 +3347,7 @@ public class AlignmentBasedDistance
 			{
 				// if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
 				// probably better implementation
-				if (Constant.primaryDimension.equals(PrimaryDimension.LocationID) == false)
+				if (primaryDimension.equals(PrimaryDimension.LocationID) == false)
 				{
 					sbLog.append("useLocationInFED:\n");
 					if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
@@ -3274,10 +3359,9 @@ public class AlignmentBasedDistance
 			}
 			if (useActivityNameInFED)
 			{
-
 				// if (Constant.primaryDimension.equals(PrimaryDimension.LocationID))
 				// probably a better/more generic approach
-				if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+				if (primaryDimension.equals(PrimaryDimension.ActivityID) == false)
 				{
 					sbLog.append("useActivityNameInFED:\n");
 					// changed on 21 Mar 2018, was incorrect earlier, but did not affect our published results since we
@@ -3307,7 +3391,7 @@ public class AlignmentBasedDistance
 
 			if (useDistFromPrevInFED)
 			{
-				double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromNext() - ao2.getDistanceInMFromNext());
+				double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() - ao2.getDistanceInMFromPrev());
 				sbLog.append("useDistFromPrevInFED: diffOfDistFromPrev=" + diffOfDistFromPrev + "\n");
 				if (diffOfDistFromPrev > 46754)
 				{
@@ -3320,14 +3404,14 @@ public class AlignmentBasedDistance
 					dDistanceFromPrev = val;
 					sbLog.append("\tdDistanceFromPrev (log scaled):" + dDistanceFromPrev);
 				}
-				sbLogTemp1.append(ao1.getDistanceInMFromNext() + "," + ao2.getDistanceInMFromNext() + ","
+				sbLogTemp1.append(ao1.getDistanceInMFromPrev() + "," + ao2.getDistanceInMFromPrev() + ","
 						+ diffOfDistFromPrev + "," + dDistanceFromPrev + ",");
 			}
 
 			if (useDurationFromPrevInFED)
 			{
 				double diffOfDurFromPrev = FastMath
-						.abs(ao1.getDurationInSecondsFromNext() - ao2.getDurationInSecondsFromNext());
+						.abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
 				sbLog.append("useDurationFromPrevInFED: diffOfDurFromPrev=" + diffOfDurFromPrev + "\n");
 				if (diffOfDurFromPrev > 63092)
 				{
@@ -3340,7 +3424,7 @@ public class AlignmentBasedDistance
 					dDurationFromPrev = val;
 					sbLog.append("\tdDurationFromPrev (log scaled):" + dDurationFromPrev);
 				}
-				sbLogTemp1.append(ao1.getDurationInSecondsFromNext() + "," + ao2.getDurationInSecondsFromNext() + ","
+				sbLogTemp1.append(ao1.getDurationInSecondsFromPrev() + "," + ao2.getDurationInSecondsFromPrev() + ","
 						+ diffOfDurFromPrev + "," + dDurationFromPrev);
 			}
 			dfeat = dActivityName + dStartTime + dLocation + dPopularity + dDistanceFromPrev + dDurationFromPrev;
