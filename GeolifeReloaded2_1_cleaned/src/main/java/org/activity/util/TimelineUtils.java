@@ -32,6 +32,7 @@ import org.activity.io.Serializer;
 import org.activity.io.WritingToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
+import org.activity.objects.CheckinEntryV2;
 import org.activity.objects.Dimension;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
@@ -516,6 +517,77 @@ public class TimelineUtils
 	}
 
 	/**
+	 * Fork of createUserTimelinesFromCheckinEntriesGowallaFaster1() primarily to allow for CheckinEntryV2 instead of
+	 * CheckinEntry Creates user day timelines from the given list of Activity Objects.
+	 * 
+	 * Activity events ---> day timelines (later, not here)---> user timelines
+	 * <p>
+	 * <font color = red>make sure that the timezone is set appropriately</font>
+	 * </p>
+	 * 
+	 * @param allActivityEvents
+	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
+	 * @since April 9 2018
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createUserTimelinesFromCheckinEntriesGowallaFaster1_V2(
+			LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>> checkinEntries,
+			Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData)
+	{
+		long ct1 = System.currentTimeMillis();
+
+		System.out.println("starting createUserTimelinesFromCheckinEntriesGowalla");
+		LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntryV2>>> checkinEntriesDatewise = convertTimewiseMapToDatewiseMap2(
+				checkinEntries, Constant.getTimeZone());
+
+		// Start of added on Aug 10 2017
+		// // Filter out days which have more than 500 checkins
+		// StringBuilder sb = new StringBuilder();
+		// checkinEntriesDatewise.entrySet().stream().forEachOrdered(e->sb.append(str));
+		// End of added on Aug 10 2017
+
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = convertCheckinEntriesToActivityObjectsGowallaV2(
+				checkinEntriesDatewise, mapForAllLocationData);
+
+		int optimalSizeWrtUsers = (int) (Math.ceil(activityObjectsDatewise.size() / 0.75));
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelines = new LinkedHashMap<>(
+				optimalSizeWrtUsers);
+
+		// StringBuilder sbNumOfActsPerDayPerUser;
+		// WritingToFile.appendLineToFileAbsolute("User,Date,NumOfActsInDay\n", "NumOfActsPerUserPerDay.csv");
+
+		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject>>> userEntry : activityObjectsDatewise.entrySet())
+		{
+			String userID = userEntry.getKey();
+			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>(
+					(int) (Math.ceil(userEntry.getValue().size() / 0.75)));
+
+			// sbNumOfActsPerDayPerUser = new StringBuilder();// "User,Day,NumOfActs\n");
+			for (Entry<Date, ArrayList<ActivityObject>> dateEntry : userEntry.getValue().entrySet())
+			{
+				Date date = dateEntry.getKey();
+				ArrayList<ActivityObject> activityObjectsInDay = dateEntry.getValue();
+				// String dateID = date.toString();
+				// String dayName = DateTimeUtils.getWeekDayFromWeekDayInt(date.getDay());//
+				// DateTimeUtils.getWeekDayFromWeekDayInt(date.getDayOfWeek().getValue());
+				dayTimelines.put(date, new Timeline(activityObjectsInDay, true, true));
+				// sbNumOfActsPerDayPerUser.append(userID).append(',').append(date.toString()).append(',')
+				// .append(activityObjectsInDay.size()).append("\n");
+			}
+			// WritingToFile.appendLineToFileAbsolute(sbNumOfActsPerDayPerUser.toString(),
+			// "NumOfActsPerUserPerDay.csv");
+			userDaytimelines.put(userID, dayTimelines);
+		}
+
+		long ct4 = System.currentTimeMillis();
+		System.out.println(
+				"created timelines for" + userDaytimelines.size() + " users in " + ((ct4 - ct1) / 1000) + " seconds");
+
+		System.out.println("exiting createUserTimelinesFromCheckinEntriesGowalla");
+		// System.exit(0);
+		return userDaytimelines;
+	}
+
+	/**
 	 * INCOMPLETE
 	 * 
 	 * @deprecated INCOMPLETE
@@ -592,6 +664,9 @@ public class TimelineUtils
 
 	/**
 	 * Count the length of consecutive occurrence of same activity names
+	 * <p>
+	 * TODO: (note: April 9 2018) may need to check if distNext whcih has now become actually distFromPrev because of
+	 * change in Class ActivityObject is still okay for this method or does it needs to be change
 	 * 
 	 * @param usersDayTimelines
 	 * @param commonPathToWrite
@@ -645,8 +720,8 @@ public class TimelineUtils
 						aoCount += 1;
 
 						String activityName = aos.getActivityName();
-						double distNext = aos.getDistanceInMFromNext();
-						long durationNext = aos.getDurationInSecondsFromNext();
+						double distNext = aos.getDistanceInMFromPrev();
+						long durationNext = aos.getDurationInSecondsFromPrev();
 						String ts = aos.getStartTimestamp().toString();
 						String actCatName = catIDNameDictionary.get(Integer.valueOf(activityName));
 
@@ -1074,6 +1149,219 @@ public class TimelineUtils
 	}
 
 	/**
+	 * Fork of convertCheckinEntriesToActivityObjectsGowalla() primarily:
+	 * <ul>
+	 * <li>to allow for CheckinEntryV2 instead of CheckinEntry</li>
+	 * <li>no need to timezone as timestamps have been normalised to local time in their respective locations</li>
+	 * </ul>
+	 * <p>
+	 * convert checkinentries to activity objects
+	 * 
+	 * @param checkinEntriesDatewise
+	 * @param locationObjects
+	 * @return
+	 * @since April 9 2018
+	 */
+	public static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> convertCheckinEntriesToActivityObjectsGowallaV2(
+			LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntryV2>>> checkinEntriesDatewise,
+			/* LinkedHashMap<Integer, LocationGowalla> locationObjects) */
+			Int2ObjectOpenHashMap<LocationGowalla> locationObjects)
+	{
+		System.out.println("Inside convertCheckinEntriesToActivityObjectsGowallaV2():");
+
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
+				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
+
+		Set<Integer> uniqueActIDs = new LinkedHashSet<>();// added on April 6 2018
+		Set<String> uniqueWorkingLevelActIDs = new LinkedHashSet<>();// added on April 6 2018
+		List<Integer> actIDs = new ArrayList<>();// added on April 6 2018
+		List<String> workingLevelActIDs = new ArrayList<>();// added on April 6 2018
+		Set<ZoneId> uniqueZoneIDs = new HashSet<>();
+
+		System.out.println("starting convertCheckinEntriesToActivityObjectsGowalla");
+		System.out.println("Num of locationObjects received = " + locationObjects.size() + " with keys as follows");
+
+		if (VerbosityConstants.WriteLocationMap)
+		{// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
+			StringBuilder locInfo = new StringBuilder();
+
+			// locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
+			locationObjects.values().forEach(e -> locInfo.append(e.toString() + "\n"));
+
+			WritingToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
+		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
+
+		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0,
+				numOfCInsWithMultipleWorkingLevelCatIDs = 0, numOfCIns = 0;
+		HashMap<String, String> actsOfCinsWithMultipleWorkLevelCatIDs = new HashMap<>();
+		// IntSortedSet locIDsWithNoTZ = new IntRBTreeSet();
+		// IntSortedSet locIDsWithNoFallbackTZ = new IntRBTreeSet();
+		// int numOfCinsWithNullZoneIDs = 0, numOfCinsWithEvenFallbackNullZoneIds = 0;
+		// {userid, locids, num of null zone ids for this user id locid}
+		// Map<String, Map<List<Integer>, Long>> userIdLocIdNumOfNullZoneCInsMap = new LinkedHashMap<>();
+		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
+
+		// convert checkinentries to activity objects
+		for (Entry<String, TreeMap<Date, ArrayList<CheckinEntryV2>>> userEntry : checkinEntriesDatewise.entrySet())
+		{// over users
+			// ZoneId fallbackZoneId = null;
+			int numOfCinsForThisUser = 0;
+
+			String userID = userEntry.getKey();
+			TreeMap<Date, ArrayList<ActivityObject>> dayWiseForThisUser = new TreeMap<>();
+			// System.out.print("\nuser: " + userID);
+			for (Entry<Date, ArrayList<CheckinEntryV2>> dateEntry : userEntry.getValue().entrySet()) // over dates
+			{
+				// Date date = dateEntry.getKey();
+				ArrayList<ActivityObject> activityObjectsForThisUserThisDate = new ArrayList<>(
+						dateEntry.getValue().size());
+
+				// System.out.println( "--* user:" + userID + " date:" + date.toString() + " has " +
+				// dateEntry.getValue().size() + "checkinentries");
+
+				for (CheckinEntryV2 cin : dateEntry.getValue())// over checkins
+				{
+					numOfCIns += 1;
+					numOfCinsForThisUser += 1;
+
+					int activityID = Integer.valueOf(cin.getActivityID());
+					String activityName = String.valueOf(cin.getActivityID());// "";
+
+					Timestamp startTimestamp = cin.getTimestamp(); // timestamp of first cin with its a merged one
+					String startLatitude = cin.getStartLatitude(); // of first cin if its a merged one
+					String startLongitude = cin.getStartLongitude();// of first cin if its a merged one
+					String startAltitude = "";//
+					String userIDInside = cin.getUserID();
+					double distaneInMFromPrev = cin.getDistanceInMetersFromPrev();// of first cin if its a merged one
+					long durationInSecFromPrev = cin.getDurationInSecsFromPrev();// getDurInSecsFromNext();// of first
+																					// cin if its a merged one
+
+					double distanceInMFromNext = cin.getDistanceInMeterFromNextCheckin();// added on April 8 2018
+					long durationInSecFromNext = cin.getDurationInSecsFromNextCheckin();// added on April 8 2018
+					// ZoneId currentZoneId = ZoneId.of(cin.getTz());// added on April 8 2018
+
+					// All actObject assigned a dummy UTC timezone, as timestamps have been normalised to local
+					// timstamps in respective timezones,
+					ZoneId currentZoneId = ZoneId.of("UTC");// added on April 8 2018
+
+					String[] levelWiseCatIDs = cin.getLevelWiseCatIDs();// NOT USED in ActivityObject
+					// int locationID = Integer.valueOf(e.getLocationID());
+					ArrayList<Integer> locIDs = cin.getLocationIDs();// e.getLocationIDs());
+					String locationName = "";//
+					if (RegexUtils.patternDoubleUnderScore.split(cin.getWorkingLevelCatIDs()).length > 1)
+					{
+						numOfCInsWithMultipleWorkingLevelCatIDs += 1;
+						actsOfCinsWithMultipleWorkLevelCatIDs.put(activityName, cin.getWorkingLevelCatIDs());
+					}
+					// sanity check start
+					if (userIDInside.equals(userID) == false)
+					{
+						System.err.println(
+								"Error: sanity check failed in createUserTimelinesFromCheckinEntriesGowalla()");
+					}
+					// sanity check end
+
+					int numOfLocIDs = locIDs.size();
+					int photos_count = 0, checkins_count = 0, users_count = 0, radius_meters = 0, highlights_count = 0,
+							items_count = 0, max_items_count = 0;
+					// we need to compute the average of these atributes in case there are more than one place id for a
+					// (merged) checkin entry
+					for (Integer locationID : locIDs)
+					{
+						// LocationGowalla loc = locationObjects.get((locationID));
+						LocationGowalla loc = locationObjects.get((int) locationID);
+						if (loc == null)
+						{
+							System.err.println(
+									"Error in convertCheckinEntriesToActivityObjectsGowalla: No LocationGowalla object found for locationID="
+											+ String.valueOf(locationID));
+						}
+
+						photos_count += loc.getPhotos_count();
+						checkins_count += loc.getCheckins_count();
+						users_count += loc.getUsers_count();
+						radius_meters += loc.getRadius_meters();
+						highlights_count = loc.getHighlights_count();
+						items_count += loc.getItems_count();
+						max_items_count += loc.getMax_items_count();
+					}
+
+					if (numOfLocIDs > 1)
+					{
+						numOfCInsWithMultipleLocIDs += 1;
+						photos_count = photos_count / numOfLocIDs;
+						checkins_count = checkins_count / numOfLocIDs;
+						users_count = users_count / numOfLocIDs;
+						radius_meters = radius_meters / numOfLocIDs;
+						highlights_count = highlights_count / numOfLocIDs;
+						items_count = items_count / numOfLocIDs;
+						max_items_count = max_items_count / numOfLocIDs;
+					}
+
+					if (new HashSet<Integer>(locIDs).size() > 1) // if more than 1 distinct locations
+					{
+						numOfCInsWithMultipleDistinctLocIDs += 1;
+					}
+
+					// ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
+					ActivityObject ao = new ActivityObject(
+							activityID, locIDs, activityName, locationName, startTimestamp, startLatitude,
+							startLongitude, startAltitude, userID, photos_count, checkins_count, users_count,
+							radius_meters, highlights_count, items_count, max_items_count, cin.getWorkingLevelCatIDs(),
+							distaneInMFromPrev, durationInSecFromPrev, /* levelWiseCatIDs, */
+							currentZoneId, distanceInMFromNext, durationInSecFromNext);
+
+					// Start of sanity check of April 6
+					uniqueActIDs.add(ao.getActivityID());
+					actIDs.add(ao.getActivityID());
+					uniqueWorkingLevelActIDs.addAll(
+							Arrays.asList(RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs())));
+					workingLevelActIDs.add(ao.getWorkingLevelCatIDs());
+					uniqueZoneIDs.add(ao.getTimeZoneId());
+					// End of sanity check of April 6
+
+					// setOfCatIDsofAOs.add(ao.getActivityID());
+					activityObjectsForThisUserThisDate.add(ao);
+					// fallbackZoneId = currentZoneId;
+				}
+				dayWiseForThisUser.put(dateEntry.getKey(), activityObjectsForThisUserThisDate);
+			}
+			activityObjectsDatewise.put(userID, dayWiseForThisUser);
+		}
+
+		System.out.println(" numOfCIns = " + numOfCIns);
+		System.out.println(" numOfCInsWithMultipleLocIDs = " + numOfCInsWithMultipleLocIDs);
+		System.out.println(" numOfCInsWithMultipleDistinctLocIDs = " + numOfCInsWithMultipleDistinctLocIDs);
+		System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfCInsWithMultipleWorkingLevelCatIDs
+				+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
+
+		// Start of added on April 6 2018
+		System.out.println(" num of unique zoneIDs = " + uniqueZoneIDs.size());
+		System.out.println(" num of unique actIDs = " + uniqueActIDs.size());
+		System.out.println(" num of unique uniqueWorkingLevelActIDs = " + uniqueWorkingLevelActIDs.size());
+		WritingToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "ZZuniqueActIDs.csv");
+		WritingToFile.writeToNewFile(
+				uniqueWorkingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "ZZuniqueWorkingLevelActIDs.csv");
+		WritingToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "ZZactIDs.csv");
+		WritingToFile.writeToNewFile(
+				workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "ZZworkingLevelActIDs.csv");
+		// End of added on April 6 2018
+
+		WritingToFile.writeToNewFile(
+				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
+						.collect(Collectors.joining("\n")),
+				Constant.getOutputCoreResultsPath() + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
+
+		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
+		return activityObjectsDatewise;
+
+	}
+
+	/**
 	 * Creates user day timelines from the given list of Activity Objects.
 	 * 
 	 * Activity events ---> day timelines (later, not here)---> user timelines
@@ -1243,7 +1531,7 @@ public class TimelineUtils
 	 * training test split for all users simulatneously.
 	 * <p>
 	 * Earlier we are doing train test split for each user’s timeline iteratively, for collaborative approach we need
-	 * training timelines for all users simulatneously, hence need to do training test split simulatneously.
+	 * training timelines for all users simulatneously, hence need to do training test split simulataneously.
 	 * 
 	 * @param allUsersAllDatesTimeslines
 	 * @param percentageInTraining
@@ -2933,7 +3221,7 @@ public class TimelineUtils
 		{
 			reductionInMU = matchingUnitInCounts - indexOfCurrentEnd;
 			System.out.println("Warning: reducing mu since not enough past,indexOfCurrentEnd=" + indexOfCurrentEnd
-					+ ", muInCounts=" + matchingUnitInCounts + "), new MU=" + indexOfCurrentEnd);
+					+ ", muInCounts=" + matchingUnitInCounts + ", new MU=" + indexOfCurrentEnd);
 			matchingUnitInCounts = indexOfCurrentEnd;
 		}
 
@@ -3271,17 +3559,40 @@ public class TimelineUtils
 	 * @param trainingTimelines
 	 * @param dateAtRecomm
 	 * @param activityAtRecommPoint
+	 * @param collaborativeCandidates
+	 * @param userIDAtRecomm
+	 * @param trainTestTimelinesForAllUsers
 	 * @return
 	 */
 	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
-			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
-	{// ArrayList<ActivityObject> activitiesGuidingRecomm,*/
-		LinkedHashMap<Date, Timeline> candidateTimelines = TimelineExtractors
-				.extractDaywiseCandidateTimelines(trainingTimelines, dateAtRecomm, activityAtRecommPoint);
-		if (candidateTimelines.size() > 0)
-			return true;
+			Date dateAtRecomm, ActivityObject activityAtRecommPoint, boolean collaborativeCandidates,
+			String userIDAtRecomm,
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers)
+	{
+		boolean hasDayWiseCands = false;
+
+		if (collaborativeCandidates)
+		{
+			LinkedHashMap<String, Timeline> candidateTimelines = TimelineExtractors
+					.extractDaywiseCandidateTimelinesColl(dateAtRecomm, userIDAtRecomm, activityAtRecommPoint,
+							trainTestTimelinesForAllUsers, Constant.only1CandFromEachCollUser,
+							Constant.onlyPastFromRecommDateInCandInColl);
+			if (candidateTimelines.size() > 0)
+			{
+				hasDayWiseCands = true;
+			}
+		}
 		else
-			return false;
+		{
+			LinkedHashMap<Date, Timeline> candidateTimelines = TimelineExtractors
+					.extractDaywiseCandidateTimelines(trainingTimelines, dateAtRecomm, activityAtRecommPoint);
+			if (candidateTimelines.size() > 0)
+			{
+				hasDayWiseCands = true;
+			}
+		}
+
+		return hasDayWiseCands;
 	}
 
 	/**

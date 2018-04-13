@@ -186,17 +186,28 @@ public final class Constant
 	public static final boolean useLocationInFED = false;// SWITCH_NOV10
 	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
-	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
-	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useDecayInFeatureLevelED = false;// SWITCH_NOV10
-	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = true;//// SWITCH_NOV10
-	public static final boolean randomLySample100Users = true;// SWITCH_NOV10
+	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
+	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
+	// reduced.
 
+	// need to implement it in AlignmentBasedDistance.getFeatureLevelDistanceGowallaPD25Feb2018() before turning true
+	public static final boolean useDistFromNextInFED = false;
+	public static final boolean useDurationFromNextInFED = false;// SWITCH_NOV10
+
+	public static final boolean useDecayInFED = false;// SWITCH_NOV10
+	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
+	public static final boolean randomLySample100Users = false;// true;// SWITCH_NOV10
+	public static final boolean runForAllUsersAtOnce = true;// SWITCH_April8
+	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
+	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
 	/**
 	 * If enabled, in Edit distance, instead of computing feature level edit distance just for activity objects which
 	 * matchin act name across the compared timelines, computed feature level edit distance over all act objs
 	 */
 	public static final boolean useFeatureDistancesOfAllActs = true;// SWITCH_NOV10
+
+	public static final boolean cleanTimelinesAgainInsideRecommendationTests = false;// SWITCH_April11
+	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -1303,10 +1314,14 @@ public final class Constant
 		s.append("\nusePopularityInFED:" + usePopularityInFED);
 		s.append("\nuseDistFromPrevInFED:" + useDistFromPrevInFED);
 		s.append("\nuseDurationFromPrevInFED:" + useDurationFromPrevInFED);
-		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFeatureLevelED);
+		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFED);
 		s.append("\nassignFallbackZoneId:" + assignFallbackZoneIdWhenConvertCinsToAO);
 		s.append("\nrandomLySample100Users:" + randomLySample100Users);
+		s.append("\nuseCheckinEntryV2:" + useCheckinEntryV2);
+		s.append("\nrunForAllUsersAtOnce:" + runForAllUsersAtOnce);
+		s.append("\nreduceAndCleanTimelinesBeforeRecomm:" + reduceAndCleanTimelinesBeforeRecomm);
 		s.append("\nuseFeatureDistancesOfAllActs:" + useFeatureDistancesOfAllActs);
+		s.append("\ncleanTimelinesAgainInsideRecommendationTests:" + cleanTimelinesAgainInsideRecommendationTests);
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))

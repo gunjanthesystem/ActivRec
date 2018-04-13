@@ -48,7 +48,7 @@ import org.activity.util.StringUtils;
 import org.activity.util.TimelineUtils;
 
 /**
- * 
+ * <b>NOT USED AS OF 10 APRIL 2018</b>
  * </p>
  * Fork of org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018, refactoring it so as to be
  * able to run experiments for multiple matching units in parallel to maximally utilise computing resources.
@@ -428,6 +428,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 			/// temp end
 		}
 
+		System.out.println("Will now loop over users in RecommTests: num of userIDs.length= " + userIDs.length
+				+ " trainTimelinesAllUsersContinuous.size()=" + trainTimelinesAllUsersContinuous.size());
 		for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 		{ // int numberOfValidRTs = 0;// userCount += 1;
 
@@ -893,7 +895,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 						// check if all seq recomms for this RT will have daywise candidate timelines
 						boolean hasDayWiseCandidateTimelines = TimelineUtils.hasDaywiseCandidateTimelines(
 								userTrainingTimelines, recommMaster.getDateAtRecomm(),
-								recommMaster.getActivityObjectAtRecomm());
+								recommMaster.getActivityObjectAtRecomm(), Constant.collaborativeCandidates,
+								String.valueOf(userId), trainTestTimelinesForAllUsersDW);
 
 						if (hasDayWiseCandidateTimelines == false)
 						{

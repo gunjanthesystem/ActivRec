@@ -1,6 +1,9 @@
 package org.activity.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -270,6 +273,28 @@ public class ReadingFromFile
 	 * @param hasHeader
 	 * @return
 	 */
+	public static List<List<Double>> nColumnReaderDouble(String absFileNameToRead, String delimiter, boolean hasHeader)
+	{
+		List<List<Double>> res = null;
+		try
+		{
+			res = ReadingFromFile.nColumnReaderDouble(new BufferedInputStream(new FileInputStream(absFileNameToRead)),
+					delimiter, hasHeader);
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @return
+	 */
 	public static List<List<Double>> nColumnReaderDouble(InputStream inputStream, String delimiter, boolean hasHeader)
 	{
 
@@ -298,7 +323,7 @@ public class ReadingFromFile
 			br.close();
 		}
 
-		catch (IOException e)
+		catch (Exception e)
 		{
 			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
 			e.printStackTrace();
@@ -408,6 +433,32 @@ public class ReadingFromFile
 
 		// System.out.println("raw=\n" + raw);
 		return raw;
+	}
+
+	/**
+	 * Note: header is treated in same way as all other data
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @param verboseReading
+	 * @param columnIndicesToSelect
+	 * @return
+	 */
+	public static List<List<String>> nColumnReaderStringLargeFileSelectedColumns(String absFileName, String delimiter,
+			boolean hasHeader, boolean verboseReading, int... columnIndicesToSelect)
+	{
+		BufferedInputStream inputStream = null;
+		try
+		{
+			inputStream = new BufferedInputStream(new FileInputStream(absFileName));
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		return nColumnReaderStringLargeFileSelectedColumns(inputStream, delimiter, hasHeader, verboseReading,
+				columnIndicesToSelect);
 	}
 
 	/**

@@ -177,8 +177,9 @@ public class SuperController
 		}
 
 		// Start
-		String[] commonPaths = { "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-				+ LocalDateTime.now().getDayOfMonth() + "ED" + Constant.EDAlpha + featuresUsedLabel + "StFilter"
+		String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth() + "ED"
+				+ Constant.EDAlpha + featuresUsedLabel + "StFilter"
 				+ (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha

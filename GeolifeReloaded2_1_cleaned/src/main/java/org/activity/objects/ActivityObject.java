@@ -94,9 +94,28 @@ public class ActivityObject implements Serializable
 	 */
 	String userID;
 	int photos_count, checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count;// spot_categories;
-	double distanceInMFromNext;
-	long durationInSecondsFromNext;
+	double distInMFromPrev, distInMFromNext;
+
+	long durInSecFromPrev, durInSecFromNext;
 	ZoneId timeZoneId;
+
+	/**
+	 * @since April 9 2018
+	 * @return
+	 */
+	public double getDistInMFromNext()
+	{
+		return distInMFromNext;
+	}
+
+	/**
+	 * @since April 9 2018
+	 * @return
+	 */
+	public long getDurInSecFromNext()
+	{
+		return durInSecFromNext;
+	}
 
 	/**
 	 * Especially needed for representative recommended act objs.
@@ -321,14 +340,14 @@ public class ActivityObject implements Serializable
 	 * @param items_count
 	 * @param max_items_count
 	 * @param workingLevelCatIDs
-	 * @param distanceInMFromNext
-	 * @param durationInSecsFromNext
+	 * @param distanceInMFromPrev
+	 * @param durationInSecsFromPrev
 	 */
 	public ActivityObject(int activityID, int locationID, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
-			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
-			long durationInSecsFromNext)
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
+			long durationInSecsFromPrev)
 	{
 
 		// this.activityID = activityID;
@@ -357,8 +376,8 @@ public class ActivityObject implements Serializable
 		this.max_items_count = max_items_count;
 		this.workingLevelCatIDs = workingLevelCatIDs;
 
-		this.distanceInMFromNext = distanceInMFromNext;
-		this.durationInSecondsFromNext = durationInSecsFromNext;
+		this.distInMFromPrev = distanceInMFromPrev;
+		this.durInSecFromPrev = durationInSecsFromPrev;
 
 	}
 
@@ -383,14 +402,14 @@ public class ActivityObject implements Serializable
 	 * @param items_count
 	 * @param max_items_count
 	 * @param workingLevelCatIDs
-	 * @param distanceInMFromNext
-	 * @param durationInSecsFromNext
+	 * @param distanceInMFromPrev
+	 * @param durationInSecsFromPrev
 	 */
 	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
-			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
-			long durationInSecsFromNext)
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
+			long durationInSecsFromPrev)
 	{
 
 		// this.activityID = activityID;
@@ -418,8 +437,8 @@ public class ActivityObject implements Serializable
 		this.max_items_count = max_items_count;
 		this.workingLevelCatIDs = workingLevelCatIDs;
 
-		this.distanceInMFromNext = distanceInMFromNext;
-		this.durationInSecondsFromNext = durationInSecsFromNext;
+		this.distInMFromPrev = distanceInMFromPrev;
+		this.durInSecFromPrev = durationInSecsFromPrev;
 
 	}
 
@@ -445,16 +464,16 @@ public class ActivityObject implements Serializable
 	 * @param items_count
 	 * @param max_items_count
 	 * @param workingLevelCatIDs
-	 * @param distanceInMFromNext
-	 * @param durationInSecsFromNext
+	 * @param distanceInMFromPrev
+	 * @param durationInSecsFromPrev
 	 * @param levelWiseCatIDs
 	 * @param timeZoneId
 	 */
 	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
-			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
-			long durationInSecsFromNext, String[] levelWiseCatIDs, ZoneId timeZoneId)
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
+			long durationInSecsFromPrev, String[] levelWiseCatIDs, ZoneId timeZoneId)
 	{
 		// this.activityID = activityID;
 		this.timeZoneId = timeZoneId;
@@ -480,9 +499,72 @@ public class ActivityObject implements Serializable
 		this.max_items_count = max_items_count;
 		this.workingLevelCatIDs = workingLevelCatIDs;
 
-		this.distanceInMFromNext = distanceInMFromNext;
-		this.durationInSecondsFromNext = durationInSecsFromNext;
+		this.distInMFromPrev = distanceInMFromPrev;
+		this.durInSecFromPrev = durationInSecsFromPrev;
 		// this.levelWiseCatIDs = levelWiseCatIDs;
+	}
+
+	/**
+	 * 
+	 * @param activityID
+	 * @param locationIDs
+	 * @param activityName
+	 * @param locationName
+	 * @param startTimestamp
+	 * @param startLatitude
+	 * @param startLongitude
+	 * @param startAltitude
+	 * @param userID
+	 * @param photos_count
+	 * @param checkins_count
+	 * @param users_count
+	 * @param radius_meters
+	 * @param highlights_count
+	 * @param items_count
+	 * @param max_items_count
+	 * @param workingLevelCatIDs
+	 * @param distanceInMFromPrev
+	 * @param durationInSecsFromPrev
+	 * @param timeZoneId
+	 * @param distanceInMFromNext
+	 * @param durationInSecFromNext
+	 */
+	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
+			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
+			long durationInSecsFromPrev, ZoneId timeZoneId, double distanceInMFromNext, long durationInSecFromNext)
+	{// this.activityID = activityID;
+		this.timeZoneId = timeZoneId;
+		String splittedwlci[] = RegexUtils.patternDoubleUnderScore.split(workingLevelCatIDs);// workingLevelCatIDs.split("__");
+		this.activityID = Integer.valueOf(splittedwlci[0]); // working directly with working level category id, only
+															// considering one working level cat id
+		this.locationIDs = new ArrayList<>(locationIDs);
+
+		this.activityName = splittedwlci[0];// String.valueOf(activityID);// activityName;
+		this.locationName = locationName;
+		this.startTimestampInms = startTimestamp.getTime();
+		this.endTimestampInms = startTimestamp.getTime();
+		this.startLatitude = startLatitude;
+		this.startLongitude = startLongitude;
+		this.startAltitude = startAltitude;
+		this.userID = userID;
+		this.photos_count = photos_count;
+		this.checkins_count = checkins_count;
+		this.users_count = users_count;
+		this.radius_meters = radius_meters;
+		this.highlights_count = highlights_count;
+		this.items_count = items_count;
+		this.max_items_count = max_items_count;
+		this.workingLevelCatIDs = workingLevelCatIDs;
+
+		this.distInMFromPrev = distanceInMFromPrev;
+		this.durInSecFromPrev = durationInSecsFromPrev;
+		// this.levelWiseCatIDs = levelWiseCatIDs;
+
+		this.distInMFromNext = distanceInMFromNext;
+		this.durInSecFromNext = durationInSecFromNext;
+
 	}
 
 	/**
@@ -507,15 +589,15 @@ public class ActivityObject implements Serializable
 	 * @param items_count
 	 * @param max_items_count
 	 * @param workingLevelCatIDs
-	 * @param distanceInMFromNext
-	 * @param durationInSecsFromNext
+	 * @param distanceInMFromPrev
+	 * @param durationInSecsFromPrev
 	 * @param levelWiseCatIDs
 	 */
 	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
-			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromNext,
-			long durationInSecsFromNext, String[] levelWiseCatIDs)
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
+			long durationInSecsFromPrev, String[] levelWiseCatIDs)
 	{
 		// this.activityID = activityID;
 		String splittedwlci[] = RegexUtils.patternDoubleUnderScore.split(workingLevelCatIDs);// workingLevelCatIDs.split("__");
@@ -540,29 +622,29 @@ public class ActivityObject implements Serializable
 		this.max_items_count = max_items_count;
 		this.workingLevelCatIDs = workingLevelCatIDs;
 
-		this.distanceInMFromNext = distanceInMFromNext;
-		this.durationInSecondsFromNext = durationInSecsFromNext;
+		this.distInMFromPrev = distanceInMFromPrev;
+		this.durInSecFromPrev = durationInSecsFromPrev;
 		// this.levelWiseCatIDs = levelWiseCatIDs;
 	}
 
-	public double getDistanceInMFromNext()
+	public double getDistanceInMFromPrev()
 	{
-		return distanceInMFromNext;
+		return distInMFromPrev;
 	}
 
-	public void setDistanceInMFromNext(double distanceInMFromNext)
+	public void setDistanceInMFromPrev(double distanceInMFromPrev)
 	{
-		this.distanceInMFromNext = distanceInMFromNext;
+		this.distInMFromPrev = distanceInMFromPrev;
 	}
 
-	public long getDurationInSecondsFromNext()
+	public long getDurationInSecondsFromPrev()
 	{
-		return durationInSecondsFromNext;
+		return durInSecFromPrev;
 	}
 
-	public void setDurationInSecondsFromNext(long durationInSecondsFromNext)
+	public void setDurationInSecondsFromPrev(long durationInSecondsFromPrev)
 	{
-		this.durationInSecondsFromNext = durationInSecondsFromNext;
+		this.durInSecFromPrev = durationInSecondsFromPrev;
 	}
 
 	public String toStringAll()
@@ -592,7 +674,7 @@ public class ActivityObject implements Serializable
 									 */ + "__userID=" + userID + "__photos_count=" + photos_count + "__cins_count="
 				+ checkins_count + "__users_count=" + users_count + "__radius_m=" + radius_meters + "__highlts_count="
 				+ highlights_count + "__items_count=" + items_count + "__max_items_count=" + max_items_count
-				+ "__distNext=" + distanceInMFromNext + "__durNext=" + durationInSecondsFromNext;
+				+ "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev;
 	}
 
 	public String toStringAllGowallaTS()
@@ -608,7 +690,7 @@ public class ActivityObject implements Serializable
 																			 */ + "__uID=" + userID + "__photos_c="
 				+ photos_count + "__cins_c=" + checkins_count + "__users_c=" + users_count + "__radius_m="
 				+ radius_meters + "__highlts_count=" + highlights_count + "__items_c=" + items_count + "__max_items_c="
-				+ max_items_count + "__distNext=" + distanceInMFromNext + "__durNext=" + durationInSecondsFromNext;
+				+ max_items_count + "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev;
 	}
 
 	public String toStringAllGowallaTSWithName()
@@ -631,7 +713,7 @@ public class ActivityObject implements Serializable
 																			 */ + "__uID=" + userID + "__photos_c="
 				+ photos_count + "__cins_c=" + checkins_count + "__users_c=" + users_count + "__radius_m="
 				+ radius_meters + "__highlts_count=" + highlights_count + "__items_c=" + items_count + "__max_items_c="
-				+ max_items_count + "__distNext=" + distanceInMFromNext + "__durNext=" + durationInSecondsFromNext;
+				+ max_items_count + "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev;
 	}
 
 	/**
@@ -653,8 +735,8 @@ public class ActivityObject implements Serializable
 				+ delimiter + startLatitude + delimiter + startLongitude
 				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
 				+ checkins_count + delimiter + users_count + delimiter + radius_meters + delimiter + highlights_count
-				+ delimiter + items_count + delimiter + max_items_count + delimiter + distanceInMFromNext + delimiter
-				+ durationInSecondsFromNext;
+				+ delimiter + items_count + delimiter + max_items_count + delimiter + distInMFromPrev + delimiter
+				+ durInSecFromPrev;
 	}
 
 	/**
@@ -670,7 +752,7 @@ public class ActivityObject implements Serializable
 				+ "workLvlCat" + delimiter + "stTS" + delimiter + "stLat" + delimiter + "stLon" + delimiter + "uID"
 				+ delimiter + "photos_c" + delimiter + "cins_c" + delimiter + "users_c" + delimiter + "radius_m"
 				+ delimiter + "highlts_count" + delimiter + "items_c" + delimiter + "max_items_c" + delimiter
-				+ "distNext" + delimiter + "durNext";
+				+ "distPrev" + delimiter + "durPrev";
 	}
 
 	public String toString()
@@ -1440,12 +1522,12 @@ public class ActivityObject implements Serializable
 		result = prime * result + ((dimensionIDNameValues == null) ? 0 : dimensionIDNameValues.hashCode());
 		result = prime * result + ((dimensions == null) ? 0 : dimensions.hashCode());
 		long temp;
-		temp = Double.doubleToLongBits(distanceInMFromNext);
+		temp = Double.doubleToLongBits(distInMFromPrev);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(distanceTravelled);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + (int) (durationInSeconds ^ (durationInSeconds >>> 32));
-		result = prime * result + (int) (durationInSecondsFromNext ^ (durationInSecondsFromNext >>> 32));
+		result = prime * result + (int) (durInSecFromPrev ^ (durInSecFromPrev >>> 32));
 		result = prime * result + ((endAltitude == null) ? 0 : endAltitude.hashCode());
 		result = prime * result + ((endLatitude == null) ? 0 : endLatitude.hashCode());
 		result = prime * result + ((endLongitude == null) ? 0 : endLongitude.hashCode());
@@ -1499,12 +1581,11 @@ public class ActivityObject implements Serializable
 			if (other.dimensions != null) return false;
 		}
 		else if (!dimensions.equals(other.dimensions)) return false;
-		if (Double.doubleToLongBits(distanceInMFromNext) != Double.doubleToLongBits(other.distanceInMFromNext))
-			return false;
+		if (Double.doubleToLongBits(distInMFromPrev) != Double.doubleToLongBits(other.distInMFromPrev)) return false;
 		if (Double.doubleToLongBits(distanceTravelled) != Double.doubleToLongBits(other.distanceTravelled))
 			return false;
 		if (durationInSeconds != other.durationInSeconds) return false;
-		if (durationInSecondsFromNext != other.durationInSecondsFromNext) return false;
+		if (durInSecFromPrev != other.durInSecFromPrev) return false;
 		if (endAltitude == null)
 		{
 			if (other.endAltitude != null) return false;

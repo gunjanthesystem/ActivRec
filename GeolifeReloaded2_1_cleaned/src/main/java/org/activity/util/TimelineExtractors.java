@@ -384,30 +384,33 @@ public class TimelineExtractors
 	 * @param trainTestTimelinesForAllUsers
 	 * @param only1CandFromEachCollUser
 	 * @param onlyPastFromRecommDateInCandInColl
-	 * @return
+	 * @return {UserID_Date, CandTimeline}
+	 *         <p>
+	 *         <b> key as UserID_Date instead of Date since we should allow cands from different users but same date
+	 *         </b> (Changed on April 11 2018).
 	 */
-	private static LinkedHashMap<String, Timeline> extractDaywiseCandidateTimelinesColl(Date dateAtRecomm,
+	public static LinkedHashMap<String, Timeline> extractDaywiseCandidateTimelinesColl(Date dateAtRecomm,
 			String userIDAtRecomm, ActivityObject activityAtRecommPoint,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			boolean only1CandFromEachCollUser, boolean onlyPastFromRecommDateInCandInColl)
 	{
-		LinkedHashMap<String, Timeline> candidateTimelines;
 		LinkedHashMap<String, Timeline> dwCandidateTimelines = new LinkedHashMap<>();
 
 		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> entryForAUser : trainTestTimelinesForAllUsers
 				.entrySet())// go over all users
 		{
 			String userID = entryForAUser.getKey();
+
 			if (userIDAtRecomm != userID)// skip current user
 			{
 				// get training timeline
 				LinkedHashMap<Date, Timeline> dwTrainingTimelinesForThisUser = entryForAUser.getValue().get(0);
 
 				// Extract candidate timelines for this user as {Date,Timeline}
-				Map<Date, Timeline> candidateTimelinesDate = TimelineExtractors.extractDaywiseCandidateTimelines(
+				Map<Date, Timeline> candTimelinesFromThisUser = TimelineExtractors.extractDaywiseCandidateTimelines(
 						dwTrainingTimelinesForThisUser, dateAtRecomm, activityAtRecommPoint);
 
-				if (candidateTimelinesDate.size() == 0)
+				if (candTimelinesFromThisUser.size() == 0)
 				{
 					continue;
 				}
@@ -425,44 +428,42 @@ public class TimelineExtractors
 					{
 						do
 						{
-							mostRecentNonFutureDateInCands = Collections.max(candidateTimelinesDate.keySet());
+							mostRecentNonFutureDateInCands = Collections.max(candTimelinesFromThisUser.keySet());
 						}
 						while (mostRecentNonFutureDateInCands.after(dateAtRecomm)
 								|| mostRecentNonFutureDateInCands.equals(dateAtRecomm));
 					}
 					else
 					{
-						mostRecentNonFutureDateInCands = Collections.max(candidateTimelinesDate.keySet());
+						mostRecentNonFutureDateInCands = Collections.max(candTimelinesFromThisUser.keySet());
 					}
 
 					if (VerbosityConstants.verbose)
 					{
 						System.out.println("Sanity check 1 Nov:\n all dates= "
-								+ candidateTimelinesDate.keySet().toString() + "\n\nmostRecentNonFutureDateInCands="
+								+ candTimelinesFromThisUser.keySet().toString() + "\n\nmostRecentNonFutureDateInCands="
 								+ mostRecentNonFutureDateInCands.toString() + " dateAtRecomm= " + dateAtRecomm);
 					}
 
-					dwCandidateTimelines.put(mostRecentNonFutureDateInCands.toString(),
-							candidateTimelinesDate.get(mostRecentNonFutureDateInCands));
+					dwCandidateTimelines.put(userIDAtRecomm + "_" + mostRecentNonFutureDateInCands.toString(),
+							candTimelinesFromThisUser.get(mostRecentNonFutureDateInCands));
 				}
 				else
-				{
-					// convert to {Date as String, Timeline} to (LinkedHashMap<String, Timeline>) and put in the
+				{ // convert to {Date as String, Timeline} to (LinkedHashMap<String, Timeline>) and put in the
 					// the map collecting cands from all users
-					// dwCandidateTimelines.putAll(candidateTimelinesDate.entrySet().stream()
-					// .collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue(),
-					// (v1, v2) -> v1, LinkedHashMap<String, Timeline>::new)));
-
-					Map<String, Timeline> x = (candidateTimelinesDate.entrySet().stream()
-							.collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue(), (v1, v2) -> v1,
-									LinkedHashMap<String, Timeline>::new)));
-					dwCandidateTimelines.putAll(x); // doing it in two steps, because gradle gave compilation
-													// error in one step.
+					for (Entry<Date, Timeline> e : candTimelinesFromThisUser.entrySet())
+					{
+						dwCandidateTimelines.put(userIDAtRecomm + "_" + e.getKey(), e.getValue());
+					}
+					// Disabling the stream version as it seems difficult to read
+					// $$ Map<String, Timeline> x = (candidateTimelinesDate.entrySet().stream()
+					// $$ .collect(Collectors.toMap(e -> userIDAtRecomm + "_" + e.getKey().toString(),
+					// $$ e -> e.getValue(), (v1, v2) -> v1, LinkedHashMap<String, Timeline>::new)));
+					// $$dwCandidateTimelines.putAll(x);
 				}
 			}
 		} // end of loop over users
-		candidateTimelines = dwCandidateTimelines;
-		return candidateTimelines;
+		return dwCandidateTimelines;
 	}
 
 	/**
@@ -1203,7 +1204,7 @@ public class TimelineExtractors
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
 	{
 		System.out.println("Inside extractCandidateTimelinesMUColl :trainTestTimelinesForAllUsers.size()= "
-				+ trainTestTimelinesForAllUsers.size() + "mu=" + matchingUnit);
+				+ trainTestTimelinesForAllUsers.size() + " mu=" + matchingUnit);
 
 		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NGram))// IgnoreCase("Count"))
 		{

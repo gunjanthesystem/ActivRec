@@ -567,7 +567,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 			{
 				double decayWt = 1;
 
-				if (Constant.useDecayInFeatureLevelED && (i == (splitted.length - 1)))
+				if (Constant.useDecayInFED && (i == (splitted.length - 1)))
 				{
 					decayWt = 3;
 				}
@@ -708,7 +708,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// PrimaryDimension primaryDimension = Constant.primaryDimension;//moved to constructor
 		if (VerbosityConstants.verboseDistance)
 		{
-			System.out.println("calc HJeditDist between " + activityObjects1Original.size() + " & "
+			System.out.println("\n---calc HJeditDist between " + activityObjects1Original.size() + " & "
 					+ activityObjects2Original.size() + " objs");
 		}
 
@@ -828,6 +828,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		char[] DINSTrace = levenshteinDistance.getThird().getFirst();
 		int[] coord1Trace = levenshteinDistance.getThird().getSecond();
 		int[] coord2Trace = levenshteinDistance.getThird().getThird();
+
 		for (int i = 0; i < DINSTrace.length; i++)
 		{
 			char operationChar = DINSTrace[i];
@@ -879,7 +880,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 					// System.out.println("dAct=" + dAct);
 					double decayWt = 1;
 					// System.out.println("N matched");
-					if (Constant.useDecayInFeatureLevelED && (i == (DINSTrace.length - 1)))
+					if (Constant.useDecayInFED && (i == (DINSTrace.length - 1)))
 					{
 						decayWt = 3;
 					}
@@ -889,7 +890,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 							activityObjects2.get(coordOfAO2)));
 				}
 			}
-		}
+		} // end of for over DINS trace
 
 		if (!Constant.disableRoundingEDCompute)
 		{
@@ -905,10 +906,15 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// double EDAlpha = 0.5;
 		if (this.EDAlpha > 0)
 		{
+			if (this.getShouldComputeFeatureLevelDistance() == false)
+			{
+				dFeat = 0;
+			}
 			distanceTotal = /* dAct + dFeat; */
 					combineActAndFeatLevelDistance(dAct, dFeat, activityObjects1.size(), activityObjects2.size(),
 							EDAlpha);
 		}
+
 		else
 		{
 			distanceTotal = dAct + dFeat;
@@ -977,7 +983,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("HJ dist=" + dAct + " + " + dFeat + "\n returning(" + levenshteinDistance.getFirst()
-					+ distanceTotal + ")");
+					+ "," + distanceTotal + ")");
 		}
 
 		// $ WritingToFile.writeOnlyTrace(levenshteinDistance.getFirst());
@@ -1140,11 +1146,24 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 */
 	private double combineActAndFeatLevelDistance(double dAct, double dFeat, int size1, int size2, double alpha)
 	{
-		double distanceTotal = -1;
+		double distanceTotal = -9999, normalisedDACt = -9999, normalisedDFeat = -9999;
 		// (length of current timeline-1)*replaceWt*WtObj
-		double maxActLevelDistance = Math.max((Math.max(size1, size2) - 1), 1) * this.costReplaceActivityObject;
+		double maxActLevelDistance = Math.max((Math.max(size1, size2) - 1), 1) * costReplaceActivityObject;
 		// = (length of current timeline)*(wtStartTime + wtLocation + wtLocPopularity)
-		double maxFeatLevelDistance = Math.max(size1, size2) * (wtStartTime + wtLocation + wtLocPopularity);
+
+		// Disabled on April 10 2018 as this is not regulated by which features to use:
+		// double maxFeatLevelDistance = Math.max(size1, size2) * (wtStartTime + wtLocation + wtLocPopularity);
+
+		// added on April 10 2018
+		double maxFeatLevelDistance = Math.max(size1, size2) * this.getSumOfWeightOfFeaturesExceptPrimaryDimension();
+
+		// Sanity check start: Okay as of April 10 2018
+		// System.out.println("\ndAct" + dAct + " maxActLevelDistance=" + maxActLevelDistance + " dFeat=" + dFeat
+		// + " maxFeatLevelDistance=" + maxFeatLevelDistance + " size1=" + size1 + " size2=" + size2 + " alpha="
+		// + alpha + "\ncostReplaceActivityObject=" + costReplaceActivityObject
+		// + "\tgetSumOfWeightOfFeaturesExceptPrimaryDimension="
+		// + getSumOfWeightOfFeaturesExceptPrimaryDimension());
+		// Sanity check end
 
 		if (dAct > maxActLevelDistance || dFeat > maxFeatLevelDistance)
 		{
@@ -1154,23 +1173,33 @@ public class HJEditDistance extends AlignmentBasedDistance
 			return -1;
 		}
 
-		if (Constant.disableRoundingEDCompute)
-		{
-			distanceTotal = alpha * (dAct / maxActLevelDistance) + (1 - alpha) * (dFeat / maxFeatLevelDistance);
-		}
-		else
-		{
-			distanceTotal = StatsUtils.round(
-					alpha * (dAct / maxActLevelDistance) + (1 - alpha) * (dFeat / maxFeatLevelDistance),
-					Constant.RoundingPrecision);
-		}
+		normalisedDACt = (dAct / maxActLevelDistance);
+		// when FED should not be computed,dFeat is made 0 . Also in that case
+		// getSumOfWeightOfFeaturesExceptPrimaryDimension()=0, hence we need to take care to avoid division by zero
+		normalisedDFeat = (dFeat == 0) ? 0 : (dFeat / maxFeatLevelDistance);
 
-		// if (VerbosityConstants.verboseCombinedEDist)
-		// {
-		// WritingToFile.appendLineToFileAbsolute(
-		// distanceTotal + "," + dAct + "," + dFeat + "," + size1 + "," + size2 + "\n",
-		// Constant.getCommonPath() + "DistanceTotalAlpha" + alpha + ".csv");
-		// }
+		distanceTotal = alpha * normalisedDACt + (1 - alpha) * normalisedDFeat;
+
+		if (!Constant.disableRoundingEDCompute)
+		{
+			distanceTotal = StatsUtils.round(distanceTotal, Constant.RoundingPrecision);
+		}
+		if (VerbosityConstants.verboseCombinedEDist)
+		{
+			WritingToFile.appendLineToFileAbsolute(
+					distanceTotal + "," + dAct + "," + dFeat + "," + size1 + "," + size2 + "," + normalisedDACt + ","
+							+ normalisedDFeat + "," + distanceTotal + "\n",
+					Constant.getCommonPath() + "DistanceTotalAlpha" + alpha + ".csv");
+		}
+		if (VerbosityConstants.verboseDistance)
+		{
+			System.out.println("dAct=" + dAct + ",dFeat=" + dFeat + ",maxActLevelDistance=" + maxActLevelDistance
+					+ ",maxFeatLevelDistance=" + maxFeatLevelDistance + ",size1=" + size1 + ",size2=" + size2
+					+ ",costReplaceActivityObject=" + costReplaceActivityObject
+					+ ",getSumOfWeightOfFeaturesExceptPrimaryDimension()="
+					+ getSumOfWeightOfFeaturesExceptPrimaryDimension() + ",normalisedDACt=" + normalisedDACt
+					+ ",normalisedDFeat=" + normalisedDFeat + "," + distanceTotal);
+		}
 
 		return distanceTotal;
 	}

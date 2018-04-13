@@ -181,6 +181,11 @@ public class EvaluationSeq
 		{
 			groupsOf100UsersLabels = new String[] { DomainConstants.gowalla100RandomUsersLabel };
 		}
+		if (Constant.runForAllUsersAtOnce)
+		{
+			groupsOf100UsersLabels = new String[] { "All" };
+		}
+
 		System.out.println("outputCoreResultsPath= " + Constant.getOutputCoreResultsPath());
 		System.out.println("groupsOf100UsersLabels= " + Arrays.asList(groupsOf100UsersLabels).toString());
 		WritingToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),

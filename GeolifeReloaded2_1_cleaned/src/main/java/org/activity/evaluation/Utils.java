@@ -17,6 +17,7 @@ public class Utils
 	static final String engineHost = "theengine.ucd.ie";
 	static final String mortarHost = "mortar.ucd.ie";
 	static final String clarityHost = "claritytrec.ucd.ie";
+	static final String localHost = "local";
 
 	public static void main(String args[])
 	{
