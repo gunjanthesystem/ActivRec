@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.activity.constants.Constant;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Timeline;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -394,7 +394,7 @@ public class KCentroidsTimelines
 		}
 		s.append(getAvgOfIntraClusterVariances() + "," + getAvgOfIntraClusterStandardDeviations() + ","
 				+ getInterClusterVariance() + "," + getInterClusterStandardDeviation() + "," + this.numOfUpdates);
-		WritingToFile.appendLineToFile(s.toString() + "\n", filename);
+		WToFile.appendLineToFile(s.toString() + "\n", filename);
 	}
 
 	public void printDataPoints()
@@ -440,12 +440,12 @@ public class KCentroidsTimelines
 		}
 		s.append(
 				"AvgIntraClusterVariance, AvgIntraClusterStandardDeviation, InterClusterVariance,InterClusterStandardDeviation,NumberOfTimesAsResult,NumberOfUpdates");
-		WritingToFile.appendLineToFile(s.toString() + "\n", filename);
+		WToFile.appendLineToFile(s.toString() + "\n", filename);
 	}
 
 	public static void writeToResultsFile(String msg, String filename)
 	{
-		WritingToFile.appendLineToFile(msg, filename);
+		WToFile.appendLineToFile(msg, filename);
 	}
 
 	public double getAvgOfIntraClusterVariances()

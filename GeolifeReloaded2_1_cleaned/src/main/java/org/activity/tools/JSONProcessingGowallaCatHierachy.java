@@ -21,7 +21,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.constants.DomainConstants;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.util.DateTimeUtils;
@@ -334,7 +334,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(checkinFileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(checkinFileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -565,7 +565,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(checkinFileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(checkinFileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -725,7 +725,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 	 */
 	public static void writeCatLevelInfo2(String commonPath)
 	{
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
 		Triple catLevelMaps = getCatIDNamesForEachLevelFromJSON(catHierarchyFileNameToRead);
@@ -916,7 +916,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -991,7 +991,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 			System.out.println("Num of level3 in checkins: " + l3Count);
 			System.out.println("Num of checkins with catID in no levelMap: " + notFoundInAnyLevel);
 
-			WritingToFile.appendLineToFileAbsolute(StringUtils.join(catIDsNotFoundInAnyLevel.toArray(), ","),
+			WToFile.appendLineToFileAbs(StringUtils.join(catIDsNotFoundInAnyLevel.toArray(), ","),
 					"/run/media/gunjan/BoX2/GowallaSpaceSpace/June30/CatsInNoMaps.csv");
 
 			// writeCheckInDistributionOverCatIDs(level1CkeckinCountMap, level2CkeckinCountMap, level3CkeckinCountMap,
@@ -1025,11 +1025,11 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 	{
 		try
 		{
-			BufferedWriter bwL1 = WritingToFile.getBWForNewFile(absFileNameToUse + "L1.csv");
-			BufferedWriter bwL2 = WritingToFile.getBWForNewFile(absFileNameToUse + "L2.csv");
-			BufferedWriter bwL3 = WritingToFile.getBWForNewFile(absFileNameToUse + "L3.csv");
-			BufferedWriter bwNone = WritingToFile.getBWForNewFile(absFileNameToUse + "None.csv");
-			BufferedWriter overallLevel1 = WritingToFile.getBWForNewFile(absFileNameToUse + "OverallLevel1.csv");
+			BufferedWriter bwL1 = WToFile.getBWForNewFile(absFileNameToUse + "L1.csv");
+			BufferedWriter bwL2 = WToFile.getBWForNewFile(absFileNameToUse + "L2.csv");
+			BufferedWriter bwL3 = WToFile.getBWForNewFile(absFileNameToUse + "L3.csv");
+			BufferedWriter bwNone = WToFile.getBWForNewFile(absFileNameToUse + "None.csv");
+			BufferedWriter overallLevel1 = WToFile.getBWForNewFile(absFileNameToUse + "OverallLevel1.csv");
 
 			ArrayList<BufferedWriter> allBWToWrite = new ArrayList<BufferedWriter>();
 			allBWToWrite.add(bwL1);
@@ -1977,7 +1977,7 @@ public class JSONProcessingGowallaCatHierachy implements Serializable
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{

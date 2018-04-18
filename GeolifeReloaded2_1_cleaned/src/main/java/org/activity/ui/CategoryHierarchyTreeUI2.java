@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
 import org.activity.tools.JSONProcessingGowallaCatHierachy;
@@ -135,7 +135,7 @@ public class CategoryHierarchyTreeUI2 extends Application
 			StringBuilder sbt2 = new StringBuilder("Depth,CatID,CatName\n");
 			listOfCatIDsInTree.stream()
 					.forEachOrdered(e -> sbt2.append(e.getFirst() + "," + e.getSecond() + "," + e.getThird() + "\n"));
-			WritingToFile.writeToNewFile(sbt2.toString(), commonPath + "CatIDsInNov2016HierarchyTree.csv");
+			WToFile.writeToNewFile(sbt2.toString(), commonPath + "CatIDsInNov2016HierarchyTree.csv");
 
 			TreeMap<Integer, Long> catIDInCinsButNotInAnyLevelOfJSONOrNov2016Hierarchy = new TreeMap<>();
 			List<Integer> catIDsInNewCatHierarchyButNotInJSONHierarchy = new ArrayList<>();
@@ -185,7 +185,7 @@ public class CategoryHierarchyTreeUI2 extends Application
 				StringBuilder sb1 = new StringBuilder("CatIDNotInJSONButAddedInNewHierarchy,CatName\n");
 				catIDsInNewCatHierarchyButNotInJSONHierarchy.stream()
 						.forEachOrdered(e -> sb1.append(e.toString() + "," + dict.get(e) + "\n"));
-				WritingToFile.writeToNewFile(sb1.toString(), commonPath + "CatIDNotInJSONButAddedInNewHierarchy.csv");
+				WToFile.writeToNewFile(sb1.toString(), commonPath + "CatIDNotInJSONButAddedInNewHierarchy.csv");
 			}
 
 			//////////// End of added on April 2 2018
@@ -497,7 +497,7 @@ public class CategoryHierarchyTreeUI2 extends Application
 			// System.out.println("after: adding btn-" + count);
 		}
 
-		WritingToFile.writeToNewFile(sb1.toString(),
+		WToFile.writeToNewFile(sb1.toString(),
 				commonPath + "catIDInCinsButNotInAnyLevelOfJSONOrNov2016Hierarchy.csv");
 
 		listForCatIDsToAdd = new ListView<>(listOfStringsForCatIDsToAdd);// <Button>();
@@ -640,8 +640,8 @@ public class CategoryHierarchyTreeUI2 extends Application
 		String treeAsString = UIUtilityBox.treeToString(0, rootNoteT, new StringBuffer());
 		String serialisableTreeAsString = UIUtilityBox.treeToString(0, serializableRoot, new StringBuffer());
 
-		WritingToFile.writeToNewFile(treeAsString, commonPath + "TreeOfTreeItemsAsString.txt");
-		WritingToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
+		WToFile.writeToNewFile(treeAsString, commonPath + "TreeOfTreeItemsAsString.txt");
+		WToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
 
 		Serializer.serializeThis(serializableRoot, commonPath + serializedCatTreeFileNamePhrase);
 

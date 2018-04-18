@@ -6,6 +6,16 @@ public class Enums
 	{
 	}
 
+	/**
+	 * 
+	 * @author gunjan
+	 * @since April 14 2018
+	 */
+	public enum GowallaFeatures
+	{
+		ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF;
+	}
+
 	public enum TypeOfExperiment
 	{
 		RecommendationTests, TimelineStats, TimelineClustering;

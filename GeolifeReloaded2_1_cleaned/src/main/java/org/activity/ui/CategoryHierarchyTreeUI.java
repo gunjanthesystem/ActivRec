@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.tools.JSONProcessingGowallaCatHierachy;
 import org.activity.util.ComparatorUtils;
 
@@ -431,8 +431,8 @@ public class CategoryHierarchyTreeUI extends Application
 		String treeAsString = UIUtilityBox.treeToString(0, rootNoteT, new StringBuffer());
 		String serialisableTreeAsString = UIUtilityBox.treeToString(0, serializableRoot, new StringBuffer());
 
-		WritingToFile.writeToNewFile(treeAsString, commonPath + "TreeOfTreeItemsAsString.txt");
-		WritingToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
+		WToFile.writeToNewFile(treeAsString, commonPath + "TreeOfTreeItemsAsString.txt");
+		WToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
 
 		Serializer.serializeThis(serializableRoot, commonPath + serializedCatTreeFileNamePhrase);
 

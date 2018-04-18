@@ -15,7 +15,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Triple;
 import org.activity.probability.ProbabilityUtilityBelt;
 
@@ -264,7 +264,7 @@ public class Searcher
 					// "linesContainingMatchedString=\n" + linesContainingMatchedString + "\ns=" + s.toString());
 					if (linesContainingMatchedString.size() > 0)
 					{
-						WritingToFile.appendLineToFileAbsolute(s, absFileNameOfMatchedLinesToWrite);
+						WToFile.appendLineToFileAbs(s, absFileNameOfMatchedLinesToWrite);
 						pathsOfResultantFiles.add(file);
 					}
 				}

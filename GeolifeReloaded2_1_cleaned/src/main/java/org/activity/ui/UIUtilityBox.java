@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Triple;
 import org.activity.tools.JSONProcessingGowallaCatHierachy;
 import org.activity.util.RegexUtils;
@@ -127,9 +127,9 @@ public class UIUtilityBox
 		List<Triple<Integer, String, String>> listOfCatIDsInTree = treeToListOfCatIDs(0, rootOfCategoryTree,
 				new ArrayList<Triple<Integer, String, String>>());
 
-		WritingToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
-		WritingToFile.writeToNewFile(serialisableTreeAsStringNoTabs, commonPath + "TreeOfTreeNodesAsStringNoTabs.txt");
-		WritingToFile.writeToNewFile(listOfCatIDsInTree.toString(), commonPath + "listOfCatIDsInTree.txt");
+		WToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
+		WToFile.writeToNewFile(serialisableTreeAsStringNoTabs, commonPath + "TreeOfTreeNodesAsStringNoTabs.txt");
+		WToFile.writeToNewFile(listOfCatIDsInTree.toString(), commonPath + "listOfCatIDsInTree.txt");
 
 		// recursiveDfs(rootOfCategoryTree, "195:Terrain Park", 0);
 		// $$recursiveDfsMultipleOccurences(rootOfCategoryTree, "912:Snow Cones");
@@ -414,8 +414,8 @@ public class UIUtilityBox
 			String treeAsString = treeToString(0, rootOfTree, new StringBuffer());
 			String serialisableTreeAsString = treeToString(0, rootOfSerializableTree, new StringBuffer());
 
-			WritingToFile.writeToNewFile(treeAsString, commonPath + "TreeOfTreeItemsAsString.txt");
-			WritingToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
+			WToFile.writeToNewFile(treeAsString, commonPath + "TreeOfTreeItemsAsString.txt");
+			WToFile.writeToNewFile(serialisableTreeAsString, commonPath + "TreeOfTreeNodesAsString.txt");
 		}
 		catch (Exception e)
 		{

@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 
 import org.activity.constants.DomainConstants;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 public class Utils
 {
@@ -49,7 +49,7 @@ public class Utils
 				userIDs.stream().forEach(e -> sb.append(userGroup + "," + e + "\n"));
 				usersInGroups.put(userGroup, userIDs);
 			}
-			WritingToFile.writeToNewFile(sb.toString(), fileNameToWrite);
+			WToFile.writeToNewFile(sb.toString(), fileNameToWrite);
 		}
 		catch (Exception e)
 		{

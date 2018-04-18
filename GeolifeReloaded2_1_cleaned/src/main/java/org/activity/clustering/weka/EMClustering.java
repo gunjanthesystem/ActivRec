@@ -2,7 +2,7 @@ package org.activity.clustering.weka;
 
 import java.time.LocalDateTime;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.EM;
@@ -43,7 +43,7 @@ public class EMClustering
 			clusterEvaluation = new ClusterEvaluation();
 			clusterEvaluation.setClusterer(EMClusterer);
 			clusterEvaluation.evaluateClusterer(new Instances(dataInstances));
-			WritingToFile.appendLineToFileAbsolute(clusterEvaluation.clusterResultsToString(), outputAbsoluteFileName);
+			WToFile.appendLineToFileAbs(clusterEvaluation.clusterResultsToString(), outputAbsoluteFileName);
 
 		}
 

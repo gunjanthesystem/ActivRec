@@ -71,7 +71,7 @@ public class EditDistanceMemorizer
 			// long t1 = System.nanoTime();
 			StringBuilder sb = new StringBuilder();
 			editDistancesMemory.entrySet().stream().forEach(e -> sb.append(e.getKey() + "," + e.getValue() + "\n"));
-			WritingToFile.writeToNewFile(sb.toString(),
+			WToFile.writeToNewFile(sb.toString(),
 					Constant.getOutputCoreResultsPath() + "EditDistanceMemorised" + countOfSerialisedMaps + ".csv");
 			// long t2 = System.nanoTime();
 

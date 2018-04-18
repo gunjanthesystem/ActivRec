@@ -26,7 +26,7 @@ import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
@@ -240,39 +240,39 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		Constant.setCommonPath(commonPath);
 		System.out.println("Common path=" + Constant.getCommonPath());
 
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 
-		BufferedWriter metaBw = WritingToFile.getBWForNewFile(commonPath + "meta.csv");
+		BufferedWriter metaBw = WToFile.getBWForNewFile(commonPath + "meta.csv");
 
-		BufferedWriter recommSeqWithoutScoreBw = WritingToFile.getBWForNewFile(commonPath + "dataRecommSequence.csv");// **
+		BufferedWriter recommSeqWithoutScoreBw = WToFile.getBWForNewFile(commonPath + "dataRecommSequence.csv");// **
 
-		BufferedWriter recommSeqWithScoreBw = WritingToFile
+		BufferedWriter recommSeqWithScoreBw = WToFile
 				.getBWForNewFile(commonPath + "dataRecommSequenceWithScore.csv");// **
 
-		BufferedWriter actualSeqBw = WritingToFile.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
+		BufferedWriter actualSeqBw = WToFile.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
 
 		ArrayList<BufferedWriter> bwsDataActual = new ArrayList<>(this.recommSeqLength);
 
-		BufferedWriter topNextActsWithoutDistance = WritingToFile
+		BufferedWriter topNextActsWithoutDistance = WToFile
 				.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
-		BufferedWriter topNextActsWithDistance = WritingToFile
+		BufferedWriter topNextActsWithDistance = WToFile
 				.getBWForNewFile(commonPath + "topNextActivitiesWithDistance.csv");
 
-		BufferedWriter rtsRejNoValidActAfterWriter = WritingToFile
+		BufferedWriter rtsRejNoValidActAfterWriter = WToFile
 				.getBWForNewFile(commonPath + "recommPointsInvalidBecuzNoValidActivityAfterThis.csv");
-		BufferedWriter rtsRejWithNoCandsWriter = WritingToFile
+		BufferedWriter rtsRejWithNoCandsWriter = WToFile
 				.getBWForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
-		BufferedWriter rtsRejWithNoCandsBelowThreshWriter = WritingToFile
+		BufferedWriter rtsRejWithNoCandsBelowThreshWriter = WToFile
 				.getBWForNewFile(commonPath + "recommPointsWithNoCandidatesBelowThresh.csv");
-		BufferedWriter rtsRejBlackListedWriter = WritingToFile
+		BufferedWriter rtsRejBlackListedWriter = WToFile
 				.getBWForNewFile(commonPath + "recommPointsRejBlacklisted.csv");
-		BufferedWriter rtsRejWithNoDWButMUCandsCands = WritingToFile
+		BufferedWriter rtsRejWithNoDWButMUCandsCands = WToFile
 				.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
 
 		ArrayList<BufferedWriter> bwsRankedRecommWithScore = new ArrayList<>(this.recommSeqLength);
 		ArrayList<BufferedWriter> bwRankedRecommWithoutScore = new ArrayList<>(this.recommSeqLength);
 
-		BufferedWriter metaIfCurrentTargetSameWriter = WritingToFile
+		BufferedWriter metaIfCurrentTargetSameWriter = WToFile
 				.getBWForNewFile(commonPath + "metaIfCurrentTargetSameWriter.csv");
 
 		ArrayList<BufferedWriter> numOfCandidateTimelinesWriter = new ArrayList<>(this.recommSeqLength);
@@ -281,17 +281,17 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		for (int i = 0; i < this.recommSeqLength; i++)
 		{
 			numOfCandidateTimelinesWriter.add(i,
-					WritingToFile.getBWForNewFile(commonPath + "numOfCandidateTimelines" + i + ".csv"));
-			bwsRaw.add(i, WritingToFile.getBWForNewFile(commonPath + "Raw" + i + ".csv"));
+					WToFile.getBWForNewFile(commonPath + "numOfCandidateTimelines" + i + ".csv"));
+			bwsRaw.add(i, WToFile.getBWForNewFile(commonPath + "Raw" + i + ".csv"));
 			bwsRaw.get(i).write(
 					"User,DateOfRecomm,TimeOfRecomm,TimeCategoryOfRecomm,CurrentTimeline, CurrentActivity(ActivityAtRecommPoint),NumberOfValidActivities_in_Current_Timeline,NumberOfActivities_in_Current_Timeline,NumOfCandidateTimelinesBelowThresh, WeekDayOfRecomm,Target(ActualActivity), RecommendedActivities, NumOfDistinctRecomms, PearsonCorrOfCandSimsAndEndCaseSims, AvgRestSimilarity, StdDevRestSimilarity, AvgEndSimilarity, StdDevEndSimilarity,IsCurrentActTargetActSame\n");// LastActivityOnRecommDay");//,ActivitiesOnRecommDayUntiRecomm");
 
 			bwsRankedRecommWithScore.add(i,
-					WritingToFile.getBWForNewFile(commonPath + "dataRankedRecommendationWithScores" + i + ".csv"));
+					WToFile.getBWForNewFile(commonPath + "dataRankedRecommendationWithScores" + i + ".csv"));
 			bwRankedRecommWithoutScore.add(i,
-					WritingToFile.getBWForNewFile(commonPath + "dataRankedRecommendationWithoutScores" + i + ".csv"));
+					WToFile.getBWForNewFile(commonPath + "dataRankedRecommendationWithoutScores" + i + ".csv"));
 
-			bwsDataActual.add(i, WritingToFile.getBWForNewFile(commonPath + "dataActual" + i + ".csv"));
+			bwsDataActual.add(i, WToFile.getBWForNewFile(commonPath + "dataActual" + i + ".csv"));
 		}
 
 		/**
@@ -299,19 +299,19 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		 * number of users, however, each list is repeated so as maintain structural conformity with
 		 * dataRankedRecommendationWithoutScores.csv
 		 */
-		BufferedWriter baseLineOccurrence = WritingToFile.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
-		BufferedWriter baseLineDuration = WritingToFile.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
+		BufferedWriter baseLineOccurrence = WToFile.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
+		BufferedWriter baseLineDuration = WToFile.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
 
-		BufferedWriter bwNumOfWeekendsInTraining = WritingToFile
+		BufferedWriter bwNumOfWeekendsInTraining = WToFile
 				.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
-		BufferedWriter bwNumOfWeekendsInAll = WritingToFile.getBWForNewFile(commonPath + "NumberOfWeekendsInAll.csv");
-		BufferedWriter bwCountTimeCategoryOfRecomm = WritingToFile
+		BufferedWriter bwNumOfWeekendsInAll = WToFile.getBWForNewFile(commonPath + "NumberOfWeekendsInAll.csv");
+		BufferedWriter bwCountTimeCategoryOfRecomm = WToFile
 				.getBWForNewFile(commonPath + "CountTimeCategoryOfRecommPoitns.csv");
-		BufferedWriter bwNextActInvalid = WritingToFile.getBWForNewFile(commonPath + "NextActivityIsInvalid.csv");
-		BufferedWriter bwWriteNormalisationOfDistance = WritingToFile
+		BufferedWriter bwNextActInvalid = WToFile.getBWForNewFile(commonPath + "NextActivityIsInvalid.csv");
+		BufferedWriter bwWriteNormalisationOfDistance = WToFile
 				.getBWForNewFile(commonPath + "NormalisationDistances.csv");
 
-		BufferedWriter bwNumOfValidAOsAfterRTInDay = WritingToFile
+		BufferedWriter bwNumOfValidAOsAfterRTInDay = WToFile
 				.getBWForNewFile(commonPath + "NumOfValidAOsAfterRTInDay.csv");
 
 		rtsRejNoValidActAfterWriter.write(
@@ -322,7 +322,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 				"User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity,TotalNumOfPossibleCands, NumCandsRejectedDueToNoCurrentActivityAtNonLast,NumCandsRejectedDueToNoNextActivity\n");
 		rtsRejBlackListedWriter.write("User_ID,End_Timestamp\n");
 
-		WritingToFile.writeToNewFile("User,Num_of_Mornings,Num_of_Afternoons,Number_of_Evenings,TotalRTs\n",
+		WToFile.writeToNewFile("User,Num_of_Mornings,Num_of_Afternoons,Number_of_Evenings,TotalRTs\n",
 				commonPath + "UsersWithNoValidRTs.csv");
 
 		bwCountTimeCategoryOfRecomm.write("User,Num_of_Mornings,Num_of_Afternoons,Number_of_Evenings,TotalRTs\n");
@@ -334,7 +334,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 		// bwCountInActivitiesGuidingRecomm.write("User,RecommendationTime,TimeCategory,NumberOfValidActivities_in_Current_Timeline,NumberOfActivities_in_Current_Timeline\n");
 
-		BufferedWriter numActsInEachCandbw = WritingToFile.getBWForNewFile(commonPath + "NumActs.csv");
+		BufferedWriter numActsInEachCandbw = WToFile.getBWForNewFile(commonPath + "NumActs.csv");
 		// commonPath + "NumActsmatchingUnit" + String.valueOf(matchingUnit) + ".csv");
 		numActsInEachCandbw.write("NumOfActObjsInCand-1,candTimelineID,UserId, DateAtRT, TimeAtRT, ActObjsInCand\n");
 
@@ -344,7 +344,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 		// writes the edit similarity calculations for this recommendation master
 		// WritingToFile.writeEditSimilarityCalculationsHeader();
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandidateTimelineID,EditDistance,ActLevelDistance,FeatLevelDistance,Trace, ActivityObjects1,ActivityObjects2,NumOfActivityObjects1,NumOfActivityObjects2\n",
 				commonPath + "EditSimilarityCalculations.csv");
 
@@ -352,12 +352,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		// WritingToFile.writeDistanceScoresSortedMapHeader();
 		// for org.activity.io.WritingToFile.writeEditDistancesPerRtPerCand() which is called in recomm
 		// master
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline\n",
 				commonPath + "EditDistancePerRtPerCand.csv");
 
 		System.out.println(Constant.getCommonPath() + "\n" + Constant.getAllGlobalConstants());
-		WritingToFile.writeToNewFile(Constant.getCommonPath() + "\n" + Constant.getAllGlobalConstants(),
+		WToFile.writeToNewFile(Constant.getCommonPath() + "\n" + Constant.getAllGlobalConstants(),
 				commonPath + "Config.csv");
 
 		/** Can be used to select users above 10 RTs **/
@@ -488,7 +488,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 			// ////////////////////////////////////////////////////////////////////////////////
 			if (this.writeDayTimelinesOnce)
 			{// if (matchingUnitIterator == 0) // write the given day timelines only once
-				WritingToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", true, true, true);
+				WToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", true, true, true);
 				this.writeDayTimelinesOnce = false;
 			}
 
@@ -541,7 +541,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 					System.out.println("Warning: Skipping this user " + userId
 							+ " as it has 1 training user: trainTimelinesAllUsersContinuous.size()="
 							+ trainTimelinesAllUsersContinuous.size());
-					WritingToFile.appendLineToFileAbsolute("User " + userId + ",",
+					WToFile.appendLineToFileAbs("User " + userId + ",",
 							commonPath + "UserWithNoTrainingDay.csv");
 					numOfValidRTs.put(userId, 0);
 					continue;
@@ -552,7 +552,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 				if (userTrainingTimelines.size() == 0)
 				{
 					System.out.println("Warning: Skipping this user " + userId + " as it has 0 training days");
-					WritingToFile.appendLineToFileAbsolute("User " + userId + ",",
+					WToFile.appendLineToFileAbs("User " + userId + ",",
 							commonPath + "UserWithNoTrainingDay.csv");
 					numOfValidRTs.put(userId, 0);
 					continue;
@@ -1217,8 +1217,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 			int totalNumOfRTs = (numberOfMorningRTs + numberOfAfternoonRTs + numberOfEveningRTs);
 			if (totalNumOfRTs <= 0)
 			{
-				WritingToFile
-						.appendLineToFileAbsolute(
+				WToFile
+						.appendLineToFileAbs(
 								userName + "," + numberOfMorningRTs + "," + numberOfAfternoonRTs + ","
 										+ numberOfEveningRTs + "," + totalNumOfRTs + "\n",
 								commonPath + "UsersWithNoValidRTs.csv");
@@ -1254,14 +1254,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 			if (VerbosityConstants.WriteMaxNumberOfDistinctRecommendation)
 			{
-				WritingToFile.writeToNewFile(sbsMaxNumOfDistinctRecommendations.toString(),
+				WToFile.writeToNewFile(sbsMaxNumOfDistinctRecommendations.toString(),
 						commonPath + userName + "MaxNumberOfDistinctRecommendation.csv");
 				// bwMaxNumOfDistinctRecommendations.close();
 			}
 
 			if (VerbosityConstants.WriteRecommendationTimesWithEditDistance)
 			{
-				WritingToFile.writeToNewFile(sbsRecommTimesWithEditDistances.toString(),
+				WToFile.writeToNewFile(sbsRecommTimesWithEditDistances.toString(),
 						commonPath + userName + "RecommTimesWithEditDistance.csv");
 				// bwRecommTimesWithEditDistances.close();
 			}
@@ -1271,7 +1271,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 			{// write it only for one mu since it will remain same over
 				// mus and is only for stat purpose
-				WritingToFile.writeToNewFile(sbsNumOfCandTimelinesBelowThreshold.toString(), commonPath + userName
+				WToFile.writeToNewFile(sbsNumOfCandTimelinesBelowThreshold.toString(), commonPath + userName
 						+ "numberOfCandidateTimelinesBelow" + typeOfThreshold + thresholdValue + ".csv");
 			}
 			// bwNumOfCandTimelinesBelowThreshold.close();
@@ -1314,7 +1314,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 		System.out.println("Time taken for executing Recommendation Tests for this matching unit ="
 				+ (recommTestsEndtime - ctmu1) / 1000 + "seconds");
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"MU=" + matchingUnit + ",time(s)=" + ((recommTestsEndtime - ctmu1) / 1000) + "\n",
 				Constant.getOutputCoreResultsPath() + "RecommendationTestsTimeTaken.csv");
 		// writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
@@ -1381,7 +1381,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 				ActivityObject aoTemp = getRepresentativeAOCollGenericV2(
 						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTime, primaryDimension,
 						repAOResultGenericUser);
-				WritingToFile.appendLineToFileAbsolute(
+				WToFile.appendLineToFileAbs(
 						repAOForTopRecommActName.toStringAllGowallaTS() + "\n" + aoTemp.toStringAllGowallaTS() + "\n\n",
 						commonPath + "getRepresentativeAOCollGenericV2SanityCheck.txt");
 				// SANITY CHECK PASSED on Feb 9 2018
@@ -2123,7 +2123,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		{
 			String dirToCreate = outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit);
-			WritingToFile.createDirectory(dirToCreate);// Creating the directory for that matching unit
+			WToFile.createDirectory(dirToCreate);// Creating the directory for that matching unit
 			commonPath = dirToCreate + "/";
 		}
 		else // daywise //baseline closest time
@@ -2150,14 +2150,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 			if (Constant.useiiWASThreshold)
 			{
 				dirToCreate = outputCoreResultsPath + thresholdVal + "/MatchingUnit" + String.valueOf(matchingUnit);
-				WritingToFile.createDirectory(outputCoreResultsPath + thresholdVal);
-				WritingToFile.createDirectory(
+				WToFile.createDirectory(outputCoreResultsPath + thresholdVal);
+				WToFile.createDirectory(
 						outputCoreResultsPath + thresholdVal + "/MatchingUnit" + String.valueOf(matchingUnit));
 			}
 			else
 			{
 				dirToCreate = outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit);
-				WritingToFile.createDirectory(outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit));
+				WToFile.createDirectory(outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit));
 
 			}
 
@@ -2631,7 +2631,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 		StringBuilder sbTemp = new StringBuilder();
 
-		WritingToFile.appendLineToFileAbsolute("UserID,ActID,RepAO\n", commonPath + "RepAO.txt");
+		WToFile.appendLineToFileAbs("UserID,ActID,RepAO\n", commonPath + "RepAO.txt");
 
 		for (Entry<Integer, LinkedHashMap<String, ActivityObject>> uEntry : mapOfRepAOs.entrySet())
 		{
@@ -2639,10 +2639,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 			uEntry.getValue().entrySet().stream().forEachOrdered(e -> sbTemp
 					.append(uEntry.getKey() + "," + e.getKey() + "," + e.getValue().toStringAllGowallaTS() + "\n"));
 		}
-		WritingToFile.appendLineToFileAbsolute(sbTemp.toString(), commonPath + "RepAO.txt");
+		WToFile.appendLineToFileAbs(sbTemp.toString(), commonPath + "RepAO.txt");
 
 		StringBuilder sbTemp2 = new StringBuilder();
-		WritingToFile.appendLineToFileAbsolute("UserID,ActID,PreceedingMedian,SuceedingMedian",
+		WToFile.appendLineToFileAbs("UserID,ActID,PreceedingMedian,SuceedingMedian",
 				commonPath + "PreSucMedianDuration.txt");
 		for (Entry<Integer, LinkedHashMap<String, Pair<Double, Double>>> uEntry : mapOfMedianPreSuccDuration.entrySet())
 		{
@@ -2651,7 +2651,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 					+ "," + e.getValue().getFirst() + "," + e.getValue().getSecond() + "\n"));
 
 		}
-		WritingToFile.appendLineToFileAbsolute(sbTemp2.toString(), commonPath + "PreSucMedianDuration.txt");
+		WToFile.appendLineToFileAbs(sbTemp2.toString(), commonPath + "PreSucMedianDuration.txt");
 
 	}
 
@@ -3402,7 +3402,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		actNamesNotInTraining.removeAll(distinctActNamesEncounteredInTraining);
 
 		String actNameNotInTrainingSB = actNamesNotInTraining.stream().collect(Collectors.joining("__"));
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"U:" + userId + "," + numOfActNamesNotInTraining + "," + actNameNotInTrainingSB.toString() + "\n",
 				fileNameToWrite);
 
@@ -3419,7 +3419,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		String actNamesInTestButNotInTrainingS = actNamesInTestButNotInTraining.stream()
 				.collect(Collectors.joining("__"));
 
-		WritingToFile.appendLineToFileAbsolute("U:" + userId + "," + actNamesInTestButNotInTraining.size() + ","
+		WToFile.appendLineToFileAbs("U:" + userId + "," + actNamesInTestButNotInTraining.size() + ","
 				+ actNamesInTestButNotInTrainingS + "\n", fileNameToWrite2);
 
 	}

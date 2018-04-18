@@ -14,7 +14,7 @@ import org.activity.constants.PathConstants;
 import org.activity.constants.SanityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.LocationSlim;
 import org.activity.objects.Pair;
@@ -48,7 +48,7 @@ public final class SpatialUtils
 			System.out.println("createSpatialDistanceDatabase took " + (1.0 * (tt2 - tt1)) / 1000 + " secs");
 
 			Map<Long, Map<Long, Double>> allLocDists = res.getSecond();
-			WritingToFile.writeMapOfMap(allLocDists, "loc1ID,loc2ID,DistInM\n", commonPath + "allLocDists.csv");
+			WToFile.writeMapOfMap(allLocDists, "loc1ID,loc2ID,DistInM\n", commonPath + "allLocDists.csv");
 
 			long tt3 = System.currentTimeMillis();
 
@@ -81,7 +81,7 @@ public final class SpatialUtils
 
 			Map<Long, Map<Integer, Pair<Long, Double>>> allLocNearestForEachActIDDists = res.getSecond();
 			// write(allLocNearestForEachActIDDists, commonPath + "allLocNearestForEachActIDDists.csv");
-			WritingToFile.writeMapOfMap(allLocNearestForEachActIDDists,
+			WToFile.writeMapOfMap(allLocNearestForEachActIDDists,
 					"loc1ID,ActD,(NearestLoc2ID,NearestLoc2DistInM)\n",
 					commonPath + "allLocNearestForEachActIDDists.csv");
 

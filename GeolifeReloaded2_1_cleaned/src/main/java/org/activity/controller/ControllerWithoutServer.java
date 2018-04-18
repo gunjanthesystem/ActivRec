@@ -27,7 +27,7 @@ import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
@@ -161,7 +161,7 @@ public class ControllerWithoutServer
 			// ,// "1001" };
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
+			WToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 					Constant.getCommonPath() + "NumOfActsPerUserPerDate.csv");
 
 			String commonBasePath = Constant.getCommonPath();
@@ -232,7 +232,7 @@ public class ControllerWithoutServer
 				Set<Integer> uniqueLocTrainsTests = new TreeSet<>();
 				uniqueLocTrainsTests.addAll(uniqueLocTrains);
 				uniqueLocTrainsTests.addAll(uniqueLocTests);
-				WritingToFile.writeToNewFile(uniqueLocTrainsTests.stream().map(e -> e.toString())
+				WToFile.writeToNewFile(uniqueLocTrainsTests.stream().map(e -> e.toString())
 						.collect(Collectors.joining("\n")).toString(),
 						Constant.getCommonPath() + "UniqueLocIDs5DaysTrainTest.csv");
 
@@ -489,7 +489,7 @@ public class ControllerWithoutServer
 		sublists.stream().forEachOrdered(e -> sampledUserIDsAsString.append(e.toString() + "\n"));
 		System.out.println(stats.getSecond());
 
-		WritingToFile.writeToNewFile(stats.getSecond() + sampledUserIDsAsString.toString(),
+		WToFile.writeToNewFile(stats.getSecond() + sampledUserIDsAsString.toString(),
 				Constant.getCommonPath() + "randomlySampleUsers.txt");
 
 		return sublists;
@@ -651,7 +651,7 @@ public class ControllerWithoutServer
 				{
 					System.out.println(" " + indexOfSampleUser + " Skipping user: " + userEntry.getKey()
 							+ " as in gowallaUserIDsWithGT553MaxActsPerDay");
-					WritingToFile.appendLineToFileAbsolute(indexOfSampleUser + "," + userEntry.getKey() + "\n",
+					WToFile.appendLineToFileAbs(indexOfSampleUser + "," + userEntry.getKey() + "\n",
 							"IndexOfBlacklistedUsers.csv");
 					numOfUsersSkippedGT553MaxActsPerDay += 1;
 					indexOfSampleUser += 1;
@@ -765,7 +765,7 @@ public class ControllerWithoutServer
 			{
 				System.out.println(" ALERT ALERT ALERT !! NOT EXPECTED" + indexOfSampleUser + " Skipping user: "
 						+ userEntry.getKey() + " as in gowallaUserIDsWithGT553MaxActsPerDay");
-				WritingToFile.appendLineToFileAbsolute(indexOfSampleUser + "," + userEntry.getKey() + "\n",
+				WToFile.appendLineToFileAbs(indexOfSampleUser + "," + userEntry.getKey() + "\n",
 						"IndexOfBlacklistedUsers.csv");
 				numOfUsersSkippedGT553MaxActsPerDay += 1;
 				indexOfSampleUser += 1;
@@ -880,7 +880,7 @@ public class ControllerWithoutServer
 			{
 				System.out.println(" ALERT ALERT ALERT !! NOT EXPECTED userID" + userID + " Skipping user: "
 						+ userEntry.getKey() + " as in gowallaUserIDsWithGT553MaxActsPerDay");
-				WritingToFile.appendLineToFileAbsolute(userEntry.getKey() + "\n",
+				WToFile.appendLineToFileAbs(userEntry.getKey() + "\n",
 						Constant.getCommonPath() + "BlacklistedUsersSkipped.csv");
 				numOfUsersSkippedGT553MaxActsPerDay += 1;
 				continue;
@@ -1191,7 +1191,7 @@ public class ControllerWithoutServer
 		SerializableJSONArray jsonArray = new SerializableJSONArray(
 				ConnectDatabase.getJSONArrayOfDataTable(selectedAttributes, whereQueryString, orderByString));
 
-		WritingToFile.writeToNewFile(jsonArray.toString(), Constant.getCommonPath() + "JSONArray.csv");
+		WToFile.writeToNewFile(jsonArray.toString(), Constant.getCommonPath() + "JSONArray.csv");
 		// System.out.println(jsonArray.toString());
 		Serializer.serializeThis(jsonArray, pathForLatestSerialisedJSONArray);
 		pathToLatestSerialisedJSONArray = pathForLatestSerialisedJSONArray;
@@ -1436,25 +1436,25 @@ public class ControllerWithoutServer
 			Map<String, LinkedHashMap<Date, Timeline>> timelinesSampled = timelines.entrySet().stream().limit(2)
 					.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 
-			WritingToFile.writeUsersDayTimelinesSameFile(
+			WToFile.writeUsersDayTimelinesSameFile(
 					new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>(timelinesSampled),
 					"usersDayTimelines" + labelEnd + "First2UsersOnly", false, false, false,
 					"GowallaUserDayTimelines" + labelEnd + "First2UsersOnly.csv");// users
 		}
 		if (writeNumOfActsPerUsersDayTimelines)
 		{
-			WritingToFile.writeNumOfActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
+			WToFile.writeNumOfActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
 					"GowallaPerUserDayNumOfActs" + labelEnd + ".csv");
 		}
 		if (writeNumOfDaysPerUsersDayTimelines)
 		{
-			WritingToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(timelines,
+			WToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(timelines,
 					Constant.getCommonPath() + "NumOfDaysPerUser" + labelEnd + ".csv");
 
 		}
 		if (writeNumOfDistinctValidActsPerUsersDayTimelines)
 		{
-			WritingToFile.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(timelines,
+			WToFile.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(timelines,
 					"usersDayTimelines" + labelEnd, "GowallaPerUserDayNumOfDistinctValidActs" + labelEnd + ".csv");
 		}
 		System.out.println(" Num of users" + labelEnd + "= " + timelines.size());

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -105,7 +105,7 @@ public class JSONProcessing
 				res.append("\n");
 		}
 
-		WritingToFile.writeToNewFile(res.toString(), fileNameToWrite);
+		WToFile.writeToNewFile(res.toString(), fileNameToWrite);
 
 	}
 
@@ -231,7 +231,7 @@ public class JSONProcessing
 
 			// System.out.println(jObj.toString());
 			System.out.println("---------");
-			WritingToFile.writeToNewFile(result.toString(), fileNameToWrite);// commonPath +
+			WToFile.writeToNewFile(result.toString(), fileNameToWrite);// commonPath +
 																				// "CurrentlyForDifferentFetchTime.json");
 		}
 
@@ -349,7 +349,7 @@ public class JSONProcessing
 			System.out.println("]");
 			result.append("\n]");
 			System.out.println("---------");
-			WritingToFile.writeToNewFile(result.toString(), fileNameToWrite);// commonPath +
+			WToFile.writeToNewFile(result.toString(), fileNameToWrite);// commonPath +
 																				// "HourlyForDifferentFetchTime.json");
 		}
 
@@ -478,7 +478,7 @@ public class JSONProcessing
 			System.out.println("]");
 			result.append("\n]");
 			System.out.println("---------");
-			WritingToFile.writeToNewFile(result.toString(), fileNameToWrite);// commonPath +
+			WToFile.writeToNewFile(result.toString(), fileNameToWrite);// commonPath +
 																				// "HourlyForDifferentFetchTime.json");
 		}
 

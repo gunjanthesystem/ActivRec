@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.util.ConnectDatabase;
 
 public class CandDistCorrelation
@@ -111,7 +111,7 @@ public class CandDistCorrelation
 					String fileName = entryUserLevel.getKey() + "__" + entryRTLevel.getKey() + "__"
 							+ entryMULevel.getKey() + ".csv";
 					fileName = fileName.replace('/', '-');
-					WritingToFile.writeArrayListAbsolute(entryMULevel.getValue(), commonPath1 + fileName, "");
+					WToFile.writeArrayListAbsolute(entryMULevel.getValue(), commonPath1 + fileName, "");
 
 					double correlationForPrevAndCurrentMUValues = -9999;
 
@@ -139,7 +139,7 @@ public class CandDistCorrelation
 	public static void traverseDoubleMapWriteCorrelations(
 			LinkedHashMap<Integer, LinkedHashMap<String, ArrayList<Double>>> allCorrelationsMUPairwise)
 	{
-		WritingToFile.appendLineToFile("User,RecommDate,RecommTime," + correlationType + "Correlations",
+		WToFile.appendLineToFile("User,RecommDate,RecommTime," + correlationType + "Correlations",
 				correlationType + "CorrelationsMUs");
 		for (Entry<Integer, LinkedHashMap<String, ArrayList<Double>>> entryUserLevel : allCorrelationsMUPairwise
 				.entrySet())
@@ -165,7 +165,7 @@ public class CandDistCorrelation
 				lineToWrite.append("nothing");
 				Constant.setCommonPath(commonPath1);// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link
 													// to Geolife Data Works/stats/ConsoleLogs/");
-				WritingToFile.appendLineToFile(lineToWrite.toString(), correlationType + "CorrelationsMUs");
+				WToFile.appendLineToFile(lineToWrite.toString(), correlationType + "CorrelationsMUs");
 			}
 		}
 	}

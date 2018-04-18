@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.DoubleSummaryStatistics;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +15,16 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
+import org.activity.constants.Enums.GowallaFeatures;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.EditDistanceMemorizer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
+import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -315,29 +320,37 @@ public class DistanceUtils
 
 	/// Start of added on 9 Aug 2017
 	// ////////
-	/*
-	 * Fork of getHJEditDistancesForCandidateTimelinesFullCand() <p> Added: Aug 9, 2017: for better performance
-	 * (parallel) and memorising edit distance computations<p>
+	/**
+	 * Fork of getHJEditDistancesForCandidateTimelinesFullCand()
+	 * <p>
+	 * Added: Aug 9, 2017: for better performance (parallel) and memorising edit distance computations
+	 * <p>
 	 * 
-	 * IMPORTANT POINT: THE CANDIDATE TIMELINE IS THE DIRECT CANDIDATE TIMELINE AND NOT THE LEAST DISTANT
-	 * SUBCANDIDATE.<p> Returns a map where each entry corresponds to a candidate timeline. The value of an entry is the
-	 * edit distance of that candidate timeline with the current timeline.
+	 * IMPORTANT POINT: THE CANDIDATE TIMELINE IS THE DIRECT CANDIDATE TIMELINE AND NOT THE LEAST DISTANT SUBCANDIDATE.
+	 * <p>
+	 * Returns a map where each entry corresponds to a candidate timeline. The value of an entry is the edit distance of
+	 * that candidate timeline with the current timeline.
 	 * 
 	 * @param candidateTimelines
 	 * 
 	 * @param activitiesGuidingRecomm
 	 * 
-	 * @param caseType can be 'SimpleV3' or 'CaseBasedV1'
+	 * @param caseType
+	 *            can be 'SimpleV3' or 'CaseBasedV1'
 	 * 
-	 * @param userAtRecomm used only for writing to file
+	 * @param userAtRecomm
+	 *            used only for writing to file
 	 * 
-	 * @param dateAtRecomm used only for writing to file
+	 * @param dateAtRecomm
+	 *            used only for writing to file
 	 * 
-	 * @param timeAtRecomm used only for writing to file
+	 * @param timeAtRecomm
+	 *            used only for writing to file
 	 * 
 	 * @param hjEditDistance
 	 * 
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 * @since Aug 9, 2017
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistsForCandsFullCandParallelWithMemory(
 			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
@@ -373,6 +386,247 @@ public class DistanceUtils
 		// System.out.println("Iter: " + (t2 - t1));
 		// System.out.println("Stre: " + (t3 - t2));
 		return candEditDistances;
+	}
+
+	/**
+	 * Fork of getHJEditDistsForCandsFullCandParallelWithMemory()
+	 * <p>
+	 * 
+	 * IMPORTANT POINT: THE CANDIDATE TIMELINE IS THE DIRECT CANDIDATE TIMELINE AND NOT THE LEAST DISTANT SUBCANDIDATE.
+	 * <p>
+	 * Returns a map where each entry corresponds to a candidate timeline. The value of an entry is the edit distance of
+	 * that candidate timeline with the current timeline.
+	 * 
+	 * @param candidateTimelines
+	 * 
+	 * @param activitiesGuidingRecomm
+	 * 
+	 * @param caseType
+	 *            can be 'SimpleV3' or 'CaseBasedV1'
+	 * 
+	 * @param userAtRecomm
+	 *            used only for writing to file
+	 * 
+	 * @param dateAtRecomm
+	 *            used only for writing to file
+	 * 
+	 * @param timeAtRecomm
+	 *            used only for writing to file
+	 * 
+	 * @param hjEditDistance
+	 * 
+	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 * @since April 13 2018
+	 */
+	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018(
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
+	{
+		if (Constant.memorizeEditDistance)
+		{
+			PopUps.showError("Error: memorizeEditDistance not implemented here");
+		}
+
+		// <CandidateTimeline ID, Edit distance>
+		LinkedHashMap<String, Pair<String, Double>> candEditDistances = new LinkedHashMap<>();
+
+		// CandTimelineID,{EDTrace,ActED, list of differences of Gowalla feature for each ActObj in this cand timeline}
+		// CandTimelineID,Triple{TraceAsString,ActLevelEditDistance,List of EnumMap of {GowallaFeatures,
+		// DiffForThatFeature} one for each correspnding AO comparison}}
+		LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs = new LinkedHashMap<>(
+				candidateTimelines.size());
+
+		// Start of code to be parallelised
+		// for (Entry<String, Timeline> e : candidateTimelines.entrySet())
+		// {// loop over candidates
+		// Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> res = getActEditDistancesFeatDiffs(
+		// e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
+		// caseType, hjEditDistance, editDistancesMemorizer);
+		// candAEDFeatDiffs.put(e.getKey(), res);
+		// }
+		// Alternatively
+		candAEDFeatDiffs = candidateTimelines.entrySet().parallelStream().collect(Collectors.toMap(
+				e -> (String) e.getKey(),
+				e -> getActEditDistancesFeatDiffs(e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm,
+						timeAtRecomm, e.getKey(), caseType, hjEditDistance, editDistancesMemorizer),
+				(oldValue, newValue) -> newValue, LinkedHashMap::new));
+		// end of code to be parallelised
+
+		/////////////////// Start of finding min max
+		// loop over all res to find max and min for normalisation
+		// For each candidate, finding max feature diff for each gowalla feature over all the activity objects in that
+		// candidate timeline. (horizontal aggregations)
+		List<EnumMap<GowallaFeatures, DoubleSummaryStatistics>> summaryStatForEachCand = candAEDFeatDiffs.entrySet()
+				.stream().map(e -> HJEditDistance.getSummaryStatsForEachFeatureDiffOverList(e.getValue().getThird()))
+				.collect(Collectors.toList());
+
+		// Aggregation (across candidate timelines) of aggregation (across activity objects in each cand
+		// timeline:summaryStatForEachCand)
+		EnumMap<GowallaFeatures, Double> minOfMinOfDiffs = HJEditDistance
+				.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 0);
+		EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs = HJEditDistance
+				.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 1);
+		/////////////////// End of finding min max
+
+		getRTVerseMinMaxNormalisedEditDistances(candAEDFeatDiffs, minOfMinOfDiffs, maxOfMaxOfDiffs, hjEditDistance);
+
+		// iterating over cands
+		for (Entry<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> e : candAEDFeatDiffs
+				.entrySet())
+		{
+			List<EnumMap<GowallaFeatures, Double>> featDiffsForThisCand = e.getValue().getThird();
+
+			// iterating (horizontally) over AOs in this cand
+			for (EnumMap<GowallaFeatures, Double> f : featDiffsForThisCand)
+			{
+				// iterating over feature diff of this AO with the corresponding in current timeline
+				for (Entry<GowallaFeatures, Double> g : f.entrySet())
+				{
+
+				}
+
+			}
+		}
+
+		// System.out.println("Iter: " + (t2 - t1));
+		// System.out.println("Stre: " + (t3 - t2));
+		return candEditDistances;
+	}
+
+	/**
+	 * Min-max normalise each feature difference to obtain feature level distance, where min/max for each featureDiff is
+	 * the min/max feature diff over all (compared to current) activity objects of all (compared) candidates.
+	 * <p>
+	 * TODO: need to be SANITY CHECKED
+	 * </p>
+	 * 
+	 * @param candAEDFeatDiffs
+	 * @param minOfMinOfDiffs
+	 * @param maxOfMaxOfDiffs
+	 * @param hjEditDistance
+	 * @since April 17 2018
+	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 */
+	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistances(
+			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs,
+			EnumMap<GowallaFeatures, Double> minOfMinOfDiffs, EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs,
+			HJEditDistance hjEditDistance)
+	{
+
+		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
+
+		EnumMap<GowallaFeatures, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
+
+		double EDAlpha = Constant.EDAlpha;
+		double EDBeta = 1 - EDAlpha;
+		double EDGamma;
+		double sumOfWtOfFeaturesUsedExceptPD = hjEditDistance.getSumOfWeightOfFeaturesExceptPrimaryDimension();
+
+		// Start of Get max of ActED over all cand
+		double maxActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
+				.max().getAsDouble();
+		double minActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
+				.min().getAsDouble();
+		// End of Get max of ActED over all cand
+
+		// Start of logging
+		StringBuilder log = new StringBuilder();
+		log.append("EDAlpha=" + EDAlpha + " EDBeta=" + EDBeta + " sumOfWtOfFeaturesUsedExceptPD="
+				+ sumOfWtOfFeaturesUsedExceptPD + " maxActEDOverAllCands" + maxActEDOverAllCands
+				+ " minActEDOverAllCands=" + minActEDOverAllCands + '\n');
+		featureWeightMap.entrySet().stream()
+				.forEachOrdered(e -> log.append(e.getKey().toString() + "-" + e.getValue()));
+		// end of logging
+
+		// Loop over cands
+		for (Entry<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candEntry : candAEDFeatDiffs
+				.entrySet())
+		{
+			String candID = candEntry.getKey();
+			double featureDistForThisCand = 0;
+
+			String AEDTraceForThisCand = candEntry.getValue().getFirst();
+			double ActDistanceForThisCand = candEntry.getValue().getSecond();
+
+			/////////
+			log.append("\ncandID=" + candID + " featureDistForThisCand=" + featureDistForThisCand
+					+ " AEDTraceForThisCand=" + AEDTraceForThisCand + " ActDistForThisCand=" + ActDistanceForThisCand
+					+ " will now loop over list of AOs for this cand:");
+			////////////
+
+			List<EnumMap<GowallaFeatures, Double>> listOfDiffsForThisCand = candEntry.getValue().getThird();
+			// note: list in in intial order, i.e., least recent AO to most recent AO by time.
+
+			int countOfAOForThisCand = 0;
+			// loop over the list for this cand
+			for (EnumMap<GowallaFeatures, Double> mapOfFeatureDiffForAnAO : listOfDiffsForThisCand)
+			{
+				countOfAOForThisCand += 1;
+				double featureDistForThisAOForThisCand = 0;
+				double sanityCheckFeatureWtSum = 0;
+
+				///
+				log.append("\ncountOfAOForThisCand=" + countOfAOForThisCand + " now loop over features for this AO");
+				///
+
+				// loop over each of the Gowalla Feature
+				for (Entry<GowallaFeatures, Double> diffEntry : mapOfFeatureDiffForAnAO.entrySet())
+				{
+					GowallaFeatures featureID = diffEntry.getKey();
+					double normalisedFeatureDiffVal = StatsUtils.minMaxNormWORound(diffEntry.getValue(),
+							maxOfMaxOfDiffs.get(featureID), minOfMinOfDiffs.get(featureID));
+
+					double wtForThisFeature = featureWeightMap.get(featureID);
+					featureDistForThisAOForThisCand += (wtForThisFeature * normalisedFeatureDiffVal);
+
+					///
+					log.append("\nfeatureID=" + featureID + " featDiff=" + diffEntry.getValue()
+							+ " normalisedFeatureDiffVal=" + normalisedFeatureDiffVal + " wtForThisFeature="
+							+ wtForThisFeature + " featureDistForThisAOForThisCand=" + featureDistForThisAOForThisCand
+							+ " maxOfMaxOfDiffs=" + maxOfMaxOfDiffs.get(featureID) + " minOfMinOfDiffs="
+							+ minOfMinOfDiffs.get(featureID));
+					///
+
+					//
+					sanityCheckFeatureWtSum += wtForThisFeature;
+				}
+
+				log.append("\nfeatureDistForThisAOForThisCand=" + featureDistForThisAOForThisCand);
+
+				// For SanityCheck sanityCheckFeatureWtSum
+				if (true)
+				{
+					Sanity.eq(sanityCheckFeatureWtSum, sumOfWtOfFeaturesUsedExceptPD,
+							"Error:sanityCheckFeatureWtSum=" + sanityCheckFeatureWtSum
+									+ " sumOfWtOfFeaturesUsedExceptPD=" + sumOfWtOfFeaturesUsedExceptPD);
+				}
+				featureDistForThisCand += featureDistForThisAOForThisCand;
+
+			} // end of loop over the list for this cand
+
+			double normActDistForThisCand = StatsUtils.minMaxNormWORound(ActDistanceForThisCand, maxActEDOverAllCands,
+					minActEDOverAllCands);
+			double normFeatureDistForThisCand = featureDistForThisCand / sumOfWtOfFeaturesUsedExceptPD;
+
+			double resultantEditDist = (EDAlpha) * normActDistForThisCand + (EDBeta) * normFeatureDistForThisCand;
+
+			res.put(candEntry.getKey(), new Pair<>(AEDTraceForThisCand, resultantEditDist));
+
+			///
+			log.append("\nfeatureDistForThisCand=" + featureDistForThisCand + " normActDistForThisCand="
+					+ normActDistForThisCand + " normFeatureDistForThisCand=" + normFeatureDistForThisCand
+					+ "\n-->resultantEditDist=" + resultantEditDist);
+			///
+		} // end of loop over cands
+
+		if (true)// logging
+		{
+			WToFile.appendLineToFileAbs(log.toString() + "\n",
+					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances.txt");
+		}
+
+		return res;
 	}
 
 	/**
@@ -439,7 +693,7 @@ public class DistanceUtils
 						// + editDistanceForThisCandidateDUmmy.equals(editDistanceForThisCandidate) + "\n");
 						// sb.append("editDistanceForThisCandidateDUmmy=" + editDistanceForThisCandidateDUmmy.toString()
 						// + "\neditDistanceForThisCandidate=" + editDistanceForThisCandidate.toString() + "\n");
-						WritingToFile.appendLineToFileAbsolute((t2 - t1) + "," + (t4 - t3) + "\n",
+						WToFile.appendLineToFileAbs((t2 - t1) + "," + (t4 - t3) + "\n",
 								Constant.getCommonPath() + "Mar2_DebugED.txt");
 					}
 
@@ -465,6 +719,60 @@ public class DistanceUtils
 		// editDistanceForThisCandidate);
 
 		return editDistanceForThisCandidate;
+	}
+
+	//
+	/**
+	 * Select the correct Edit Dist, Feature difference method for the given case type
+	 * 
+	 * @param candTimeline
+	 * @param activitiesGuidingRecomm
+	 * @param userAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param candTimelineID
+	 * @param caseType
+	 * @param hjEditDistance
+	 * @param editDistancesMemorizer
+	 * @return Triple{TraceAsString,ActLevelEditDistance,List of EnumMap of {GowallaFeatures, DiffForThatFeature} one
+	 *         for each correspnding AO comparison}}
+	 * @since April 14 2018
+	 */
+	public static Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> getActEditDistancesFeatDiffs(
+			Timeline candTimeline, ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm,
+			String dateAtRecomm, String timeAtRecomm, String candTimelineID, CaseType caseType,
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
+	{
+		Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> actEDFeatDiffsForThisCandidate = null;
+
+		switch (caseType)
+		{
+			case SimpleV3:// "SimpleV3":
+				long t1 = System.nanoTime();
+				// editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
+				// candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+				// dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+				actEDFeatDiffsForThisCandidate = hjEditDistance.getActEditDistWithTrace_FeatDiffs_13April2018(
+						candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+						dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+				// getActEditDistWithTrace_FeatDiffs_13April2018
+				long t2 = System.nanoTime();
+				break;
+
+			default:
+				System.err
+						.println(PopUps.getTracedErrorMsg("Error in getEditDistances_FeatDiffs: unidentified case type"
+								+ caseType + "\nNOTE: this method has not been implemented yet for all case types"));
+				break;
+		}
+
+		// editDistancesMemorizer.addToMemory(candTimelineID, Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm),
+		// editDistanceForThisCandidate);
+
+		// Constant.addToEditDistanceMemorizer(candTimelineID, Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm),
+		// editDistanceForThisCandidate);
+
+		return actEDFeatDiffsForThisCandidate;
 	}
 
 	/**
@@ -795,7 +1103,9 @@ public class DistanceUtils
 	/**
 	 * Returns a map where each entry corresponds to a candidate timeline. The value of an entry is the edit distance of
 	 * that candidate timeline with the current timeline.
-	 * 
+	 * <p>
+	 * <b>Normalised over all candidates for this RT</b>
+	 * <p>
 	 * DOING THE NORMALISATION HERE ITSELF AND SEE IF IT GIVES DIFFERENT RESULT THAN DOING NORMALISATION WHILE
 	 * CALCULATING SCORE. CHECKED: SAME RESULTS, NORMALISATION CORRECT
 	 * 
@@ -1255,7 +1565,7 @@ public class DistanceUtils
 			Collections.sort(editDistancesLogList);
 			String toWrite = userAtRecomm + "||" + dateAtRecomm + "||" + timeAtRecomm + "||" + editDistancesLogList
 					+ "||" + normalisedEditDistancesLogList + "\n";
-			WritingToFile.appendLineToFileAbsolute(toWrite, Constant.getCommonPath() + "NormalisationDistances.csv");
+			WToFile.appendLineToFileAbs(toWrite, Constant.getCommonPath() + "NormalisationDistances.csv");
 		}
 
 		if (VerbosityConstants.WriteNormalisationsSeparateLines)
@@ -1267,8 +1577,7 @@ public class DistanceUtils
 			{
 				String toWrite = userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + raw + ","
 						+ normalisedEditDistancesLogList.get(j) + "\n";
-				WritingToFile.appendLineToFileAbsolute(toWrite,
-						Constant.getCommonPath() + "NormalisationDistances.csv");
+				WToFile.appendLineToFileAbs(toWrite, Constant.getCommonPath() + "NormalisationDistances.csv");
 				j++;
 			}
 

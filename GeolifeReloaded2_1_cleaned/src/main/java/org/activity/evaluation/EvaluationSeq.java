@@ -22,7 +22,7 @@ import org.activity.constants.PathConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
@@ -67,7 +67,7 @@ public class EvaluationSeq
 		// commonPath = "./dataWritten/";
 		System.out.println("Inside EvaluationSeq for NO MU");
 		System.out.println("groupsOf100UsersLabels= " + Arrays.asList(groupsOf100UsersLabels).toString());
-		WritingToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
+		WToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
 				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
 
 		PathConstants.intialise(Constant.For9kUsers);
@@ -75,7 +75,7 @@ public class EvaluationSeq
 		int totalNumOfUsersComputedFor = 0;
 		try
 		{
-			PrintStream consoleLogStream = WritingToFile
+			PrintStream consoleLogStream = WToFile
 					.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
 
 			for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
@@ -188,7 +188,7 @@ public class EvaluationSeq
 
 		System.out.println("outputCoreResultsPath= " + Constant.getOutputCoreResultsPath());
 		System.out.println("groupsOf100UsersLabels= " + Arrays.asList(groupsOf100UsersLabels).toString());
-		WritingToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
+		WToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
 				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
 
 		PathConstants.intialise(Constant.For9kUsers);
@@ -213,7 +213,7 @@ public class EvaluationSeq
 					Constant.setCommonPath(commonPath);
 					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
 
-					PrintStream consoleLogStream = WritingToFile
+					PrintStream consoleLogStream = WToFile
 							.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
 					int numOfUsersComputedFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
@@ -251,7 +251,7 @@ public class EvaluationSeq
 
 			}
 
-			WritingToFile.appendLineToFileAbsolute("Now will concatenate files: ",
+			WToFile.appendLineToFileAbs("Now will concatenate files: ",
 					Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
 			System.out.println("Now will concatenate files: ");
 			// PopUps.showMessage("BREAKING");
@@ -268,7 +268,7 @@ public class EvaluationSeq
 			String[] fileNamePhrasesTopK = { "AllNumDirectTopKAgreements_", "AllPerDirectTopKAgreements_",
 					"AllNumDirectTopKAgreementsL1_", "AllPerDirectTopKAgreementsL1_" };
 
-			WritingToFile.appendLineToFileAbsolute("Now will write summary stats: ",
+			WToFile.appendLineToFileAbs("Now will write summary stats: ",
 					Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
 			System.out.println("Now will write summary stats: ");
 			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
@@ -277,7 +277,7 @@ public class EvaluationSeq
 					"SummaryLog");
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
 					summaryStats, "SummaryTopKLog");
-			WritingToFile.appendLineToFileAbsolute("Finishing: ", Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
+			WToFile.appendLineToFileAbs("Finishing: ", Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
 		}
 		catch (Exception e)
 		{
@@ -317,7 +317,7 @@ public class EvaluationSeq
 					Constant.setCommonPath(commonPath);
 					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
 
-					PrintStream consoleLogStream = WritingToFile
+					PrintStream consoleLogStream = WToFile
 							.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
 					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
@@ -395,7 +395,7 @@ public class EvaluationSeq
 			int thresholdsArray[])
 	{
 		// commonPath = "./dataWritten/";
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
 		int totalNumOfUsersComputedFor = 0;
 		try
 		{
@@ -639,7 +639,7 @@ public class EvaluationSeq
 				ArrayList<ArrayList<Double>> summaryPerMUPerSeqIndex = getSummaryPerMUPerSeqIndex(seqLength,
 						pathToWrite, matchingUnitAsPastCount, fileNamePhraseToRead, stat);
 
-				WritingToFile.writeArrayListOfArrayList(summaryPerMUPerSeqIndex,
+				WToFile.writeArrayListOfArrayList(summaryPerMUPerSeqIndex,
 						pathToWrite + stat + fileNamePhraseToRead + ".csv", ",", colNames, rowNames);
 			}
 		}
@@ -655,7 +655,7 @@ public class EvaluationSeq
 	private static void summariseResultsV0(int seqLength, String pathToWrite, double[] matchingUnitAsPastCount)
 	{
 		{
-			PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "Summarise.txt");
+			PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "Summarise.txt");
 
 			StringBuilder sbQ1 = new StringBuilder();
 			StringBuilder sbQ11 = new StringBuilder();
@@ -748,17 +748,17 @@ public class EvaluationSeq
 				}
 			}
 
-			WritingToFile.writeToNewFile(sbQ1.toString(), pathToWrite + "NumAgreementMean.csv");
-			WritingToFile.writeToNewFile(sbQ11.toString(), pathToWrite + "NumAgreementMedian.csv");
+			WToFile.writeToNewFile(sbQ1.toString(), pathToWrite + "NumAgreementMean.csv");
+			WToFile.writeToNewFile(sbQ11.toString(), pathToWrite + "NumAgreementMedian.csv");
 
-			WritingToFile.writeToNewFile(sbQ2.toString(), pathToWrite + "PerAgreementMean.csv");
-			WritingToFile.writeToNewFile(sbQ22.toString(), pathToWrite + "PerAgreementMedian.csv");
+			WToFile.writeToNewFile(sbQ2.toString(), pathToWrite + "PerAgreementMean.csv");
+			WToFile.writeToNewFile(sbQ22.toString(), pathToWrite + "PerAgreementMedian.csv");
 
-			WritingToFile.writeToNewFile(sbQ3.toString(), pathToWrite + "NumAgreementMeanL1.csv");
-			WritingToFile.writeToNewFile(sbQ33.toString(), pathToWrite + "NumAgreementMedianL1.csv");
+			WToFile.writeToNewFile(sbQ3.toString(), pathToWrite + "NumAgreementMeanL1.csv");
+			WToFile.writeToNewFile(sbQ33.toString(), pathToWrite + "NumAgreementMedianL1.csv");
 
-			WritingToFile.writeToNewFile(sbQ4.toString(), pathToWrite + "PerAgreementMeanL1.csv");
-			WritingToFile.writeToNewFile(sbQ44.toString(), pathToWrite + "PerAgreementMedianL1.csv");
+			WToFile.writeToNewFile(sbQ4.toString(), pathToWrite + "PerAgreementMeanL1.csv");
+			WToFile.writeToNewFile(sbQ44.toString(), pathToWrite + "PerAgreementMedianL1.csv");
 			consoleLogStream.close();
 		}
 	}
@@ -1168,9 +1168,9 @@ public class EvaluationSeq
 				}
 			}
 
-			WritingToFile.writeToNewFile(sb.toString(),
+			WToFile.writeToNewFile(sb.toString(),
 					pathToWrite + fileNamePhrase + timeCategory + "NumDirectAgreements.csv");
-			WritingToFile.writeToNewFile(sbPercentage.toString(),
+			WToFile.writeToNewFile(sbPercentage.toString(),
 					pathToWrite + fileNamePhrase + timeCategory + "PercentageDirectAgreements.csv");
 		}
 		catch (Exception e)
@@ -1225,7 +1225,7 @@ public class EvaluationSeq
 				}
 			}
 
-			WritingToFile.writeToNewFile(sb.toString(),
+			WToFile.writeToNewFile(sb.toString(),
 					pathToWrite + fileNamePhrase + timeCategory + "DirectAgreements.csv");
 
 		}
@@ -1288,9 +1288,9 @@ public class EvaluationSeq
 				}
 			}
 
-			WritingToFile.writeToNewFile(sb.toString(),
+			WToFile.writeToNewFile(sb.toString(),
 					pathToWrite + fileNamePhrase + timeCategory + "NumDirectTopKAgreements.csv");
-			WritingToFile.writeToNewFile(sbPercentage.toString(),
+			WToFile.writeToNewFile(sbPercentage.toString(),
 					pathToWrite + fileNamePhrase + timeCategory + "PercentageDirectTopKAgreements.csv");
 		}
 		catch (Exception e)
@@ -1566,7 +1566,7 @@ public class EvaluationSeq
 		try
 		{
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine;
-			bwRR = WritingToFile.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
+			bwRR = WToFile.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
 			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
 					+ "   size of actual array=" + arrayActual.size());
 
@@ -1844,7 +1844,7 @@ public class EvaluationSeq
 		{
 			try
 			{
-				WritingToFile.closeBWs(bwTopKPrecision, bwTopKRecall, bwTopKF, bwNumberOfRecommendationTimes);
+				WToFile.closeBWs(bwTopKPrecision, bwTopKRecall, bwTopKF, bwNumberOfRecommendationTimes);
 				// bwAccuracy.close();
 			}
 			catch (IOException ex)
@@ -1866,7 +1866,7 @@ public class EvaluationSeq
 		String commonPath = Constant.getCommonPath();
 		try
 		{
-			BufferedWriter bw = WritingToFile
+			BufferedWriter bw = WToFile
 					.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "MeanReciprocalRank.csv");
 			bw.write(",MRR\n");
 

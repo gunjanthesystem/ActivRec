@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.CheckinEntry;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -44,9 +44,9 @@ public class TestDummy2
 		String separator = File.separator;
 		System.out.println(currentPath + separator);
 
-		WritingToFile.appendLineToFileAbsolute("test", currentPath + separator + "DeleteMe.txt");
+		WToFile.appendLineToFileAbs("test", currentPath + separator + "DeleteMe.txt");
 
-		WritingToFile.appendLineToFileAbsolute("test", "DeleteMe2.txt");
+		WToFile.appendLineToFileAbs("test", "DeleteMe2.txt");
 		// String str = " 112:Music^^ || 12600__2.1891152325934935%";
 		//
 		// String splitted[] = str.split("\\|\\|");
@@ -407,7 +407,7 @@ public class TestDummy2
 
 	public static void testDirectoryDeletion()
 	{
-		WritingToFile.deleteNonEmptyDirectory(Paths.get("/home/gunjan/Downloads/test/"));
+		WToFile.deleteNonEmptyDirectory(Paths.get("/home/gunjan/Downloads/test/"));
 	}
 
 	public static void sets()
@@ -546,7 +546,7 @@ public class TestDummy2
 		String msg = "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn";
 		try
 		{
-			BufferedWriter bwSimple = WritingToFile.getBufferedWriterForNewFile(fileName, 3072);
+			BufferedWriter bwSimple = WToFile.getBufferedWriterForNewFile(fileName, 3072);
 
 			for (int i = 0; i < maxIteration; i++)
 			{

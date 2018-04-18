@@ -27,7 +27,7 @@
  */
 package com.gluonhq.maps.demo;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 import com.gluonhq.maps.MapLayer;
 import com.gluonhq.maps.MapPoint;
@@ -90,7 +90,7 @@ public class PoiLayer extends MapLayer
 		sb.append(tPart1 + "," + tPart2 + "," + tPart3 + "," + tPart1 / numofPoint + "," + tPart2 / numofPoint + ","
 				+ tPart3 / numofPoint + "\n");
 		System.out.println(sb.toString());
-		WritingToFile.appendLineToFileAbsolute(sb.toString(), "mapPerformance1April.csv");
+		WToFile.appendLineToFileAbs(sb.toString(), "mapPerformance1April.csv");
 
 	}
 

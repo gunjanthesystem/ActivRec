@@ -10,7 +10,7 @@ import java.util.Map;
 import org.activity.clustering.weka.WekaUtilityBelt;
 import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
@@ -254,7 +254,7 @@ public class TimelinesAttributesExtraction
 	 */
 	private String writeTimelineAttributeVectors(String fileNamePhrase)
 	{
-		WritingToFile.appendLineToFile("UserID", fileNamePhrase); // first column wil be user name
+		WToFile.appendLineToFile("UserID", fileNamePhrase); // first column wil be user name
 		String separator = "\t";
 
 		StringBuilder sb = new StringBuilder();
@@ -298,7 +298,7 @@ public class TimelinesAttributesExtraction
 			// WritingToFile.appendLineToFile("\n", fileNamePhrase);
 		}
 
-		WritingToFile.writeToNewFile(sb.toString(), fileNamePhrase);
+		WToFile.writeToNewFile(sb.toString(), fileNamePhrase);
 		return Constant.getCommonPath() + fileNamePhrase;
 	}
 
@@ -315,12 +315,12 @@ public class TimelinesAttributesExtraction
 		{
 			count += 1;
 			if (count == 0)
-				WritingToFile.appendLineToFile(label, fileNamePhrase);
+				WToFile.appendLineToFile(label, fileNamePhrase);
 			else
-				WritingToFile.appendLineToFile(separator + label, fileNamePhrase);
+				WToFile.appendLineToFile(separator + label, fileNamePhrase);
 		}
 
-		WritingToFile.appendLineToFile("\n", fileNamePhrase);
+		WToFile.appendLineToFile("\n", fileNamePhrase);
 
 		for (Map.Entry<String, ArrayList<String>> entry : timelineAttributeVectors.entrySet()) // iterating over users
 		{
@@ -333,18 +333,18 @@ public class TimelinesAttributesExtraction
 			{
 				count += 1;
 				if (count == 0)
-					WritingToFile.appendLineToFile(featureValue, fileNamePhrase);
+					WToFile.appendLineToFile(featureValue, fileNamePhrase);
 				else
 				{
 					if (featureValue.trim().length() == 0)
 					{
 						featureValue = "NULL";
 					}
-					WritingToFile.appendLineToFile(separator + featureValue, fileNamePhrase);
+					WToFile.appendLineToFile(separator + featureValue, fileNamePhrase);
 				}
 
 			}
-			WritingToFile.appendLineToFile("\n", fileNamePhrase);
+			WToFile.appendLineToFile("\n", fileNamePhrase);
 		}
 
 		return Constant.getCommonPath() + fileNamePhrase;
@@ -442,7 +442,7 @@ public class TimelinesAttributesExtraction
 
 				featuresForThisUser.put(new Integer(n), featuresForThisGram);
 
-				WritingToFile.writeSimpleMapToFile(freqDistr, pathForResultFiles + n + "gram" + userID + "FreqDist.csv",
+				WToFile.writeSimpleMapToFile(freqDistr, pathForResultFiles + n + "gram" + userID + "FreqDist.csv",
 						"subsequence", "count");
 			}
 
@@ -461,16 +461,16 @@ public class TimelinesAttributesExtraction
 																													// over
 																													// users
 		{
-			WritingToFile.appendLineToFile("User: " + entryUser.getKey() + "\n", fileNamePhrase);
+			WToFile.appendLineToFile("User: " + entryUser.getKey() + "\n", fileNamePhrase);
 
 			for (Map.Entry<Integer, LinkedHashMap<String, Double>> entryNGram : entryUser.getValue().entrySet())
 			{
-				WritingToFile.appendLineToFile("\tfor " + entryNGram.getKey() + "-Gram: " + "\n", fileNamePhrase);// +
+				WToFile.appendLineToFile("\tfor " + entryNGram.getKey() + "-Gram: " + "\n", fileNamePhrase);// +
 																													// entryUser.getKey());
-				WritingToFile.appendLineToFile("  features are:" + "\n", fileNamePhrase);
+				WToFile.appendLineToFile("  features are:" + "\n", fileNamePhrase);
 				for (Map.Entry<String, Double> entryF : entryNGram.getValue().entrySet())
 				{
-					WritingToFile.appendLineToFile("\t\t" + entryF.getKey() + ": " + entryF.getValue() + "\n",
+					WToFile.appendLineToFile("\t\t" + entryF.getKey() + ": " + entryF.getValue() + "\n",
 							fileNamePhrase);
 				}
 			}

@@ -181,15 +181,7 @@ public class DateTimeUtils
 	public static boolean isSameTimeInToleranceZoned(long tsInms1, long tsInms2, ZoneId zoneId1, ZoneId zoneId2,
 			long toleranceInSeconds)
 	{
-		ZonedDateTime zonedDateTime1 = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tsInms1), zoneId1);
-		ZonedDateTime zonedDateTime2 = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tsInms2), zoneId2);
-
-		// System.out.println("zonedDateTime1 = " + zonedDateTime1);
-		// System.out.println("zonedDateTime2 = " + zonedDateTime2);
-
-		long time1 = zonedDateTime1.getHour() * 60 * 60 + zonedDateTime1.getMinute() * 60 + zonedDateTime1.getSecond();
-		long time2 = zonedDateTime2.getHour() * 60 * 60 + zonedDateTime2.getMinute() * 60 + zonedDateTime2.getSecond();
-		if (Math.abs(time1 - time2) > toleranceInSeconds)
+		if (getTimeDiffInSecondsZoned(tsInms1, tsInms2, zoneId1, zoneId2) > toleranceInSeconds)
 		{
 			return false;
 		}

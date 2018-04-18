@@ -26,7 +26,7 @@ import org.activity.distances.HJEditDistance;
 import org.activity.distances.OTMDSAMEditDistance;
 import org.activity.evaluation.Evaluation;
 import org.activity.io.EditDistanceMemorizer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
@@ -552,7 +552,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 			if (VerbosityConstants.WriteEditDistancePerRtPerCand)
 			{
-				WritingToFile.writeEditDistancesPerRtPerCand(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm,
+				WToFile.writeEditDistancesPerRtPerCand(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm,
 						this.distancesSortedMap, this.candidateTimelines, this.nextActivityObjectsFromCands,
 						this.activitiesGuidingRecomm, activityObjectAtRecommPoint,
 						VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
@@ -710,8 +710,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 		if (VerbosityConstants.WriteFilterCandByCurActTimeThreshInSecs)
 		{
-			WritingToFile
-					.appendLineToFileAbsolute(
+			WToFile
+					.appendLineToFileAbs(
 							sizeBeforeFiltering + "," + sizeAfterFilering + ","
 									+ ((100.0 * (sizeBeforeFiltering - sizeAfterFilering)) / sizeBeforeFiltering
 											+ "\n"),
@@ -754,7 +754,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 						// .getActivityObjectNamesWithTimestampsInSequence())
 						.collect(Collectors.joining("\n"));
 
-				WritingToFile.appendLineToFileAbsolute(
+				WToFile.appendLineToFileAbs(
 						"User = " + userIDAtRecomm + "\ndistancesMapUnsortedAsString =\n" + distancesMapUnsortedAsString
 								+ "\n\n candidateTimelinesAsString =\n" + candidateTimelinesAsString,
 						commonPath + "ErrorLog376distancesMapUnsorted.txt");

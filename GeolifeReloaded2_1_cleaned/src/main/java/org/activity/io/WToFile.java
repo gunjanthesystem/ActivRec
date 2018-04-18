@@ -56,7 +56,7 @@ import org.apache.commons.math3.complex.Complex;
  * @author gunjan
  *
  */
-public class WritingToFile
+public class WToFile
 {
 	static String commonPath;// = Constant.getCommonPath();//
 								// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
@@ -88,7 +88,7 @@ public class WritingToFile
 
 		if (rootPath != null)
 		{
-			WritingToFile.appendLineToFileAbsolute("MUs/Users\n", absFileNameToWrite);
+			WToFile.appendLineToFileAbs("MUs/Users\n", absFileNameToWrite);
 
 			if (lookPastType.equals(Enums.LookPastType.NCount))
 			{
@@ -132,7 +132,7 @@ public class WritingToFile
 												// times, overwriting the same value.
 				String mrrValsString = mrrVals.stream().map(Object::toString).collect(Collectors.joining(","));
 
-				WritingToFile.appendLineToFileAbsolute("" + mu + "," + mrrValsString + "\n", absFileNameToWrite);
+				WToFile.appendLineToFileAbs("" + mu + "," + mrrValsString + "\n", absFileNameToWrite);
 			}
 
 			// writeMaxOfColumns(absFileNameToWrite, absFileNameToWrite + "MaxOfCols.csv", 1, 18, matchingUnitArray);
@@ -183,7 +183,7 @@ public class WritingToFile
 			}
 		}
 
-		WritingToFile.appendLineToFileAbsolute("User" + ",MU, MRR\n", absFileNameToWrite);
+		WToFile.appendLineToFileAbs("User" + ",MU, MRR\n", absFileNameToWrite);
 		LinkedHashMap<String, String> userCluster = new LinkedHashMap<String, String>();
 
 		for (int colInd = startColIndx; colInd <= lastColIndx; colInd++) // each column is for a user
@@ -214,10 +214,10 @@ public class WritingToFile
 				{
 					MUsHavingMaxMRR.add(entry.getKey());// adding the corresponding MU
 				}
-				WritingToFile.appendLineToFileAbsolute(
-						"User " + colInd + "," + entry.getKey() + "," + entry.getValue() + "\n", absFileNameToWrite);
+				WToFile.appendLineToFileAbs("User " + colInd + "," + entry.getKey() + "," + entry.getValue() + "\n",
+						absFileNameToWrite);
 			}
-			WritingToFile.appendLineToFileAbsolute("\n", absFileNameToWrite);
+			WToFile.appendLineToFileAbs("\n", absFileNameToWrite);
 
 			Collections.sort(MUsHavingMaxMRR); // MUs with have the max MRR are sorted in ascending order of their MU
 												// value, just for convenience of reading
@@ -251,7 +251,7 @@ public class WritingToFile
 		// {
 		// startColInd = 1;
 		// }
-		WritingToFile.appendLineToFileAbsolute("User" + ",MU, MRR\n", absFileNameToWrite);
+		WToFile.appendLineToFileAbs("User" + ",MU, MRR\n", absFileNameToWrite);
 
 		LinkedHashMap<String, String> userCluster = new LinkedHashMap<String, String>();
 
@@ -280,13 +280,13 @@ public class WritingToFile
 				{
 					maxMUMRR = new Pair(entry.getKey(), entry.getValue());
 				}
-				WritingToFile.appendLineToFileAbsolute(
-						"User " + colInd + "," + entry.getKey() + "," + entry.getValue() + "\n", absFileNameToWrite);
+				WToFile.appendLineToFileAbs("User " + colInd + "," + entry.getKey() + "," + entry.getValue() + "\n",
+						absFileNameToWrite);
 			}
 
-			WritingToFile.appendLineToFileAbsolute("\n", absFileNameToWrite);
+			WToFile.appendLineToFileAbs("\n", absFileNameToWrite);
 
-			WritingToFile.appendLineToFileAbsolute(
+			WToFile.appendLineToFileAbs(
 					"User " + colInd + "," + maxMUMRR.getFirst() + "," + maxMUMRR.getSecond() + ","
 							+ WekaUtilityBelt.getClusterLabelClustering0(Double.valueOf(maxMUMRR.getFirst())) + "\n",
 					absFileNameToWrite + "Cluster.csv");
@@ -573,7 +573,7 @@ public class WritingToFile
 				sb.append("\n");
 			}
 
-			WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+			WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
 
 		}
 
@@ -604,19 +604,112 @@ public class WritingToFile
 				sb.append(headerLine + "\n");
 			}
 
-			for (List<T> outerList : arrayArrayList)
+			for (List<T> eachInnerList : arrayArrayList)
 			{
-				sb.append(outerList.stream().map(v -> v.toString()).collect(Collectors.joining(delimiter)));
+				sb.append(eachInnerList.stream().map(v -> v.toString()).collect(Collectors.joining(delimiter)));
 				sb.append("\n");
 			}
 
 			if (append)
 			{
-				WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+				WToFile.appendLineToFileAbs(sb.toString(), absFileNameToWrite);
 			}
 			else
 			{
-				WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+				WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+			}
+		}
+
+		catch (Exception e)
+		{
+			PopUps.showException(e, "org.activity.io.WritingToFile.writeArrayListOfArrayList()");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param <V>
+	 * @param <V>
+	 * @param arrayArrayList
+	 * @param absFileNameToWrite
+	 * @param headerLine
+	 * @param delimiter
+	 * @param append
+	 */
+	public static <K, V> void writeListOfMap(List<Map<K, V>> arrayArrayList, String absFileNameToWrite,
+			String headerLine, String delimiter, String mapKVDelimiter, boolean append)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			if (headerLine.length() > 0)
+			{
+				sb.append(headerLine + "\n");
+			}
+
+			for (Map<K, V> eachInnerMap : arrayArrayList)
+			{
+				sb.append(eachInnerMap.entrySet().stream().map(v -> v.getKey() + mapKVDelimiter + v.getValue())
+						.collect(Collectors.joining(delimiter)));
+				sb.append("\n");
+			}
+
+			if (append)
+			{
+				WToFile.appendLineToFileAbs(sb.toString(), absFileNameToWrite);
+			}
+			else
+			{
+				WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+			}
+		}
+
+		catch (Exception e)
+		{
+			PopUps.showException(e, "org.activity.io.WritingToFile.writeArrayListOfArrayList()");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param <V>
+	 * @param <V>
+	 * @param arrayArrayList
+	 * @param absFileNameToWrite
+	 * @param headerLine
+	 * @param delimiter
+	 * @param append
+	 */
+	public static <K, V> void writeListOfMap2(List<? extends Map<K, V>> arrayArrayList, String absFileNameToWrite,
+			String headerLine, String delimiter, String mapKVDelimiter, boolean append)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			if (headerLine.length() > 0)
+			{
+				sb.append(headerLine + "\n");
+			}
+
+			for (Map<K, V> eachInnerMap : arrayArrayList)
+			{
+				sb.append(eachInnerMap.entrySet().stream()
+						.map(v -> v.getKey().toString() + mapKVDelimiter + v.getValue().toString())
+						.collect(Collectors.joining(delimiter)));
+				sb.append("\n");
+			}
+
+			if (append)
+			{
+				WToFile.appendLineToFileAbs(sb.toString(), absFileNameToWrite);
+			}
+			else
+			{
+				WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
 			}
 		}
 
@@ -654,7 +747,7 @@ public class WritingToFile
 				sb.append("\n");
 			}
 
-			WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+			WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
 
 		}
 
@@ -925,7 +1018,7 @@ public class WritingToFile
 	 * @param fullPathfileNameToUse
 	 *            with file extension
 	 */
-	public static void appendLineToFileAbsolute(String msg, String fullPathfileNameToUse)
+	public static void appendLineToFileAbs(String msg, String fullPathfileNameToUse)
 	{
 		String fileName = null;
 		try
@@ -1031,7 +1124,7 @@ public class WritingToFile
 				sb.append(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");
 				// also removes the last nano seconds precision
 			}
-			WritingToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
+			WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
 		}
 
 		catch (Exception e)
@@ -1058,7 +1151,7 @@ public class WritingToFile
 				sb.append(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");
 				// also removes the last nano seconds precision
 			}
-			WritingToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
+			WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
 		}
 
 		catch (Exception e)
@@ -1085,7 +1178,7 @@ public class WritingToFile
 				sb.append(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");// bw.write
 				// also removes the last nano seconds precision
 			}
-			WritingToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
+			WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + userName + fileNameToUse + ".csv");
 			// bw.close();
 		}
 		catch (Exception e)
@@ -1214,10 +1307,56 @@ public class WritingToFile
 		{
 			sb.append(entry.getKey() + delimiter + entry.getValue().toString() + "\n");
 		}
-		WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+		WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
 	}
 
 	/**
+	 * 
+	 * @param map
+	 * @param headerLine
+	 * @param mapDelimiter
+	 * @param listDelimiter
+	 * @param absFileNameToWrite
+	 */
+	public static <K, V> void writeMapOfListToNewFileWideFormat(Map<K, List<V>> map, String headerLine,
+			String mapDelimiter, String listDelimiter, String absFileNameToWrite)
+	{
+		StringBuilder sb = new StringBuilder(headerLine + "\n");
+		for (Entry<K, List<V>> entry : map.entrySet())
+		{
+			String valueListAsString = entry.getValue().stream().map(e -> e.toString())
+					.collect(Collectors.joining("listDelimiter"));
+			sb.append(entry.getKey() + mapDelimiter + valueListAsString + "\n");
+		}
+		WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @param headerLine
+	 * @param mapDelimiter
+	 * @param listDelimiter
+	 * @param absFileNameToWrite
+	 */
+	public static <K, V> void writeMapOfListToNewFileLongFormat(Map<K, List<V>> map, String headerLine,
+			String mapDelimiter, String absFileNameToWrite)
+	{
+		StringBuilder sb = new StringBuilder(headerLine + "\n");
+		for (Entry<K, List<V>> entry : map.entrySet())
+		{
+			String key = entry.getKey().toString();
+			for (V v : entry.getValue())
+			{
+				sb.append(key + mapDelimiter + v.toString() + "\n");
+			}
+		}
+		WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+	}
+
+	/**
+	 * 
+	 * /**
 	 * 
 	 * @param map
 	 * @param headerLine
@@ -1233,7 +1372,7 @@ public class WritingToFile
 		{
 			sb.append(entry.getKey() + delimiter + Arrays.asList(entry.getValue()).toString() + "\n");
 		}
-		WritingToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+		WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
 	}
 
 	public static void writeLinkedHashMapStrInt(LinkedHashMap<String, Integer> ts, String absFileNameToUse)// , String
@@ -1458,7 +1597,7 @@ public class WritingToFile
 
 		try
 		{
-			WritingToFile.writeToNewFile(headerLine, absFileNameToUse);
+			WToFile.writeToNewFile(headerLine, absFileNameToUse);
 
 			for (Map.Entry<K, Map<L, M>> entryForFirstMap : mapOfMap.entrySet())
 			{
@@ -1471,7 +1610,7 @@ public class WritingToFile
 
 					sb.append(k + "," + entryInside.getKey() + "," + entryInside.getValue() + "\n");
 				}
-				WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToUse);
+				WToFile.appendLineToFileAbs(sb.toString(), absFileNameToUse);
 				sb.setLength(0);
 			}
 		}
@@ -1494,7 +1633,7 @@ public class WritingToFile
 
 		try
 		{
-			WritingToFile.writeToNewFile(headerLine, absFileNameToUse);
+			WToFile.writeToNewFile(headerLine, absFileNameToUse);
 
 			for (Map.Entry<K, Map<L, M>> entryForFirstMap : mapOfMap.entrySet())
 			{
@@ -1507,7 +1646,7 @@ public class WritingToFile
 
 					sb.append(k + delimiter + entryInside.getKey() + delimiter + entryInside.getValue() + "\n");
 				}
-				WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToUse);
+				WToFile.appendLineToFileAbs(sb.toString(), absFileNameToUse);
 				sb.setLength(0);
 			}
 		}
@@ -1573,7 +1712,7 @@ public class WritingToFile
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
+			BufferedWriter bw = WToFile.getBWForNewFile(absfileNameToUse);
 			StringBuilder sbToWrite = new StringBuilder();
 			sbToWrite.append(CheckinEntry.getHeaderToWrite() + "\n");
 
@@ -1661,7 +1800,7 @@ public class WritingToFile
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
+			BufferedWriter bw = WToFile.getBWForNewFile(absfileNameToUse);
 			StringBuilder sbToWrite = new StringBuilder();
 			sbToWrite.append(CheckinEntryV2.getHeaderToWrite() + "\n");
 
@@ -1706,7 +1845,7 @@ public class WritingToFile
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
+			BufferedWriter bw = WToFile.getBWForNewFile(absfileNameToUse);
 			StringBuilder sbToWrite = new StringBuilder();
 			sbToWrite.append(CheckinEntryV2.getHeaderToWrite() + ",CatName" + "\n");
 
@@ -1753,7 +1892,7 @@ public class WritingToFile
 
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile(absfileNameToUse);
+			BufferedWriter bw = WToFile.getBWForNewFile(absfileNameToUse);
 			StringBuilder sbToWrite = new StringBuilder();
 			sbToWrite.append(CheckinEntryV2.headerForRecreating() + ",CatName" + "\n");
 
@@ -2591,8 +2730,7 @@ public class WritingToFile
 			msgToWrite.append(activityObjects1String.toString() + "," + activityObjects2String.toString() + ","
 					+ ActivityObjects1.size() + "," + ActivityObjects2.size() + "\n");
 
-			WritingToFile.appendLineToFileAbsolute(msgToWrite.toString(),
-					commonPath + "EditSimilarityCalculations.csv");
+			WToFile.appendLineToFileAbs(msgToWrite.toString(), commonPath + "EditSimilarityCalculations.csv");
 		}
 		catch (Exception e)
 		{
@@ -2661,7 +2799,7 @@ public class WritingToFile
 						+ entry.getValue().getSecond() + "\n");
 			}
 			sbToWrite.append("\n");
-			WritingToFile.appendLineToFileAbsolute(sbToWrite.toString(),
+			WToFile.appendLineToFileAbs(sbToWrite.toString(),
 					Constant.getCommonPath() + "EditDistancesForAllEndPoints.csv");
 		}
 		catch (Exception e)
@@ -2790,8 +2928,7 @@ public class WritingToFile
 						+ "," + getStringActivityObjArray(currentTimeline) + "\n");
 				// bw.newLine();
 			}
-			WritingToFile.appendLineToFileAbsolute(toWrite.toString(),
-					Constant.getCommonPath() + "EditDistancePerRtPerCand.csv");
+			WToFile.appendLineToFileAbs(toWrite.toString(), Constant.getCommonPath() + "EditDistancePerRtPerCand.csv");
 			// bw.close();
 		}
 		catch (Exception e)
@@ -3076,7 +3213,7 @@ public class WritingToFile
 				// + countOfL1Ops + "," + countOfL2Ops + "," + topNextAOName + "," + candidateTimelineAsString + "," +
 				// ",'"); }
 			}
-			WritingToFile.appendLineToFileAbsolute(sbToWrite.toString(), commonPath + "EditDistancePerRtPerCand.csv");
+			WToFile.appendLineToFileAbs(sbToWrite.toString(), commonPath + "EditDistancePerRtPerCand.csv");
 		}
 		catch (Exception e)
 		{
@@ -3190,7 +3327,7 @@ public class WritingToFile
 				// + countOfL1Ops + "," + countOfL2Ops + "," + topNextAOName + "," + candidateTimelineAsString + "," +
 				// ",'"); }
 			}
-			WritingToFile.appendLineToFileAbsolute(sbToWrite.toString(), commonPath + "EditDistancePerRtPerCand.csv");
+			WToFile.appendLineToFileAbs(sbToWrite.toString(), commonPath + "EditDistancePerRtPerCand.csv");
 		}
 		catch (Exception e)
 		{
@@ -3471,7 +3608,7 @@ public class WritingToFile
 			System.exit(-5);
 		}
 
-		WritingToFile.writeToNewFile(msg.toString(), absFileName);
+		WToFile.writeToNewFile(msg.toString(), absFileName);
 		System.out.println("Exiting writeNumOfDaysPerUsersDayTimelinesSameFile()");
 	}
 
@@ -3557,7 +3694,7 @@ public class WritingToFile
 				// bw.write
 				toWrite.append("\n");
 			}
-			WritingToFile.writeToNewFile(toWrite.toString(), fileName);
+			WToFile.writeToNewFile(toWrite.toString(), fileName);
 			// bw.close();
 		}
 		catch (Exception e)
@@ -3640,7 +3777,7 @@ public class WritingToFile
 			}
 
 			// bw.close();
-			WritingToFile.appendLineToFileAbsolute(toWrite, fileName);
+			WToFile.appendLineToFileAbs(toWrite, fileName);
 		}
 		catch (Exception e)
 		{
@@ -3712,7 +3849,7 @@ public class WritingToFile
 				}
 				toWrite.append("\n");
 			}
-			WritingToFile.appendLineToFileAbsolute(toWrite.toString(), fileName);
+			WToFile.appendLineToFileAbs(toWrite.toString(), fileName);
 		}
 		catch (Exception e)
 		{
@@ -3742,7 +3879,7 @@ public class WritingToFile
 						userName + "," + entry.getKey() + "," + entry.getValue().getActivityObjectsInDay().size());
 				toWrite.append("\n");
 			}
-			WritingToFile.appendLineToFileAbsolute(toWrite.toString(), fileName);
+			WToFile.appendLineToFileAbs(toWrite.toString(), fileName);
 		}
 		catch (Exception e)
 		{
@@ -3772,7 +3909,7 @@ public class WritingToFile
 				toWrite.append(userName + "," + entry.getKey() + ","
 						+ entry.getValue().countNumberOfValidDistinctActivities() + "\n");
 			}
-			WritingToFile.appendLineToFileAbsolute(toWrite.toString(), fileName);
+			WToFile.appendLineToFileAbs(toWrite.toString(), fileName);
 		}
 		catch (Exception e)
 		{
@@ -3883,7 +4020,7 @@ public class WritingToFile
 			// file.delete();
 			// FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
 			// BufferedWriter bw = new BufferedWriter(fw);
-			WritingToFile.writeToNewFile(toWrite.toString(), fileName);
+			WToFile.writeToNewFile(toWrite.toString(), fileName);
 			// bw.close();
 		}
 		catch (Exception e)
@@ -4026,7 +4163,7 @@ public class WritingToFile
 				bwString.append("\n");
 				// bw.newLine();
 			}
-			WritingToFile.writeToNewFile(bwString.toString(), fileName);
+			WToFile.writeToNewFile(bwString.toString(), fileName);
 			// bw.write(bwString.toString());
 			// bw.close();
 		}
@@ -4154,7 +4291,7 @@ public class WritingToFile
 			// file.delete();
 			// FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
 			// BufferedWriter bw = new BufferedWriter(fw);
-			WritingToFile.writeToNewFile(toWrite.toString(), fileName);
+			WToFile.writeToNewFile(toWrite.toString(), fileName);
 			// bw.close();
 		}
 
@@ -4510,7 +4647,7 @@ public class WritingToFile
 				// bw.write(entry.getKey() + "," + entry.getValue());bw.newLine();
 				sb.append(entry.getKey() + "," + entry.getValue() + "\n");
 			}
-			WritingToFile.writeToNewFile(sb.toString(), absFileName);
+			WToFile.writeToNewFile(sb.toString(), absFileName);
 			// bw.close();
 		}
 		catch (Exception e)
@@ -4549,7 +4686,7 @@ public class WritingToFile
 				sb.append(entry.getKey() + "," + entry.getValue().toString() + "\n");
 			}
 
-			WritingToFile.writeToNewFile(sb.toString(), absFileName);
+			WToFile.writeToNewFile(sb.toString(), absFileName);
 			// bw.close();
 		}
 		catch (Exception e)
@@ -4662,31 +4799,31 @@ public class WritingToFile
 
 			if (timelinesSet.equals("TrainingTimelines"))
 			{
-				activityNameCountPairsOverAllTrainingDays = WritingToFile
-						.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
+				activityNameCountPairsOverAllTrainingDays = WToFile.writeActivityCountsInGivenDayTimelines(userName,
+						timelinesCursor, timelinesSet);
 				activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 						.sortByValueDesc(activityNameCountPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameCountPairsOverAllTrainingDays",
 						activityNameCountPairsOverAllTrainingDays);
 
-				activityNameDurationPairsOverAllTrainingDays = WritingToFile
+				activityNameDurationPairsOverAllTrainingDays = WToFile
 						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
 				activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 						.sortByValueDesc(activityNameDurationPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameDurationPairsOverAllTrainingDays",
 						activityNameDurationPairsOverAllTrainingDays);
 
-				activityNameOccPercentageOverAllTrainingDays = WritingToFile
-						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet);
+				activityNameOccPercentageOverAllTrainingDays = WToFile.writeActivityOccPercentageOfTimelines(userName,
+						timelinesCursor, timelinesSet);
 			}
 
 			else
 			{
-				LinkedHashMap<String, Long> actCountRes1 = WritingToFile
-						.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
-				LinkedHashMap<String, Long> actDurationRes1 = WritingToFile
-						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
-				LinkedHashMap<String, Double> actOccPercentageRes1 = WritingToFile
+				LinkedHashMap<String, Long> actCountRes1 = WToFile.writeActivityCountsInGivenDayTimelines(userName,
+						timelinesCursor, timelinesSet);
+				LinkedHashMap<String, Long> actDurationRes1 = WToFile.writeActivityDurationInGivenDayTimelines(userName,
+						timelinesCursor, timelinesSet);
+				LinkedHashMap<String, Double> actOccPercentageRes1 = WToFile
 						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet);
 
 				writeSimpleLinkedHashMapToFileAppend(actCountRes1,
@@ -4700,8 +4837,7 @@ public class WritingToFile
 				// writeSimpleLinkedHashMapToFile(LinkedHashMap<String, ?> map, String absFileName, String headerKey,
 				// String headerValue)
 			}
-			WritingToFile.writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(userName, timelinesCursor,
-					timelinesSet);
+			WToFile.writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
 		}
 
 		return resultsToReturn;
@@ -4716,7 +4852,7 @@ public class WritingToFile
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fullPath);
+			BufferedWriter bw = WToFile.getBWForNewFile(fullPath);
 			bw.append("User,TimestampOfRT,NumOfValidsAfterIt");
 			bw.newLine();
 
@@ -5186,7 +5322,7 @@ public class WritingToFile
 				}
 			}
 		}
-		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+		WToFile.writeToNewFile(sb.toString(), absFileNameToUse);
 	}
 
 	/**
@@ -5224,7 +5360,7 @@ public class WritingToFile
 				}
 			}
 		}
-		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+		WToFile.writeToNewFile(sb.toString(), absFileNameToUse);
 
 	}
 
@@ -5264,7 +5400,7 @@ public class WritingToFile
 				}
 			}
 		}
-		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+		WToFile.writeToNewFile(sb.toString(), absFileNameToUse);
 
 	}
 
@@ -5304,7 +5440,7 @@ public class WritingToFile
 				}
 			}
 		}
-		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+		WToFile.writeToNewFile(sb.toString(), absFileNameToUse);
 
 	}
 

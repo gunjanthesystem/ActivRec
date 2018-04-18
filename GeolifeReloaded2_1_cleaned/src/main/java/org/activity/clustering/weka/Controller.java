@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.ui.PopUps;
 
 /**
@@ -36,7 +36,7 @@ public class Controller
 		PrintStream consoleLogStream;
 		try
 		{
-			consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + typeOfClustering + "ConsoleLog.txt");
+			consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + typeOfClustering + "ConsoleLog.txt");
 			switch (typeOfClustering)
 			{
 			case "KMeans":

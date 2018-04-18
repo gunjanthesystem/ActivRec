@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 import org.activity.constants.Constant;
 import org.activity.constants.Enums.SummaryStat;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
@@ -697,8 +697,8 @@ public final class StatsUtils
 
 		fd = ComparatorUtils.sortByValueDesc(fd);
 
-		WritingToFile.writeSimpleMapToFile(fd, Descriptive.commonPath + "TimeDifference_Frequency distribution.csv",
-				"Value", "Frequency Count");
+		WToFile.writeSimpleMapToFile(fd, Descriptive.commonPath + "TimeDifference_Frequency distribution.csv", "Value",
+				"Frequency Count");
 
 		return (LinkedHashMap<String, Long>) fd;
 
@@ -740,7 +740,7 @@ public final class StatsUtils
 
 		if (writeStatsToFile)
 		{
-			WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+			WToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
 		} // TODO check if this works corrcetly System.out.println(m1);
 
 		return dstats;
@@ -788,7 +788,7 @@ public final class StatsUtils
 
 		if (writeToFile)
 		{
-			WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+			WToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
 		} // TODO check if this works corrcetly System.out.println(m1);
 
 		return dstats;
@@ -835,7 +835,7 @@ public final class StatsUtils
 					+ nf.format(dstats.getSum()) + "\n" + "-------------------------------\n";
 			message.append(m1);
 
-			WritingToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
+			WToFile.writeToNewFile(message.toString(), Constant.getCommonPath() + "Stats_" + fileNameToWrite);
 		} // TODO check if this works corrcetly System.out.println(m1);
 
 		return dstats;
@@ -1090,6 +1090,43 @@ public final class StatsUtils
 		if ((max - min) > 0.0000000000000000000000000001)
 		{
 			return round(((val - min) / (max - min)), 4);
+		}
+		else if ((min - max) > 0.0000000000000000000000000001)
+		{
+			PopUps.printTracedErrorMsgWithExit(("Error: Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max
+					+ ")- min(" + min + ") <=0 =" + (max - min)));
+			return 0;
+		}
+
+		else
+		{
+			if (Math.abs(max - min) > 1e-10)
+			{
+				System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min
+						+ ") <=0 =" + (max - min)));
+			}
+			// Warning: Alert!! val0.25 = minMaxNorm: max(0.25)- min(0.25) <=0 =0.0
+			// val = 0.25, max = 0.25, min =0.25, max-min = 0;
+			return 0;
+		}
+
+	}
+
+	/**
+	 * Returns min max norm if max - min >0 else return 0 (as distance) ...leading to 1 as similarity (rounded off to 4
+	 * decimal places)
+	 * 
+	 * @param val
+	 * @param max
+	 * @param min
+	 * @return
+	 */
+	public static double minMaxNormWORound(double val, double max, double min)
+	{
+		// if ((max - min) > 0.0000000000000000)
+		if ((max - min) > 0.0000000000000000000000000001)
+		{
+			return ((val - min) / (max - min));
 		}
 		else if ((min - max) > 0.0000000000000000000000000001)
 		{

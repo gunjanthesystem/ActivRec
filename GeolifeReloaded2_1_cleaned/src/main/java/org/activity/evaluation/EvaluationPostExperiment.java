@@ -13,7 +13,7 @@ import java.util.Map;
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.CSVUtils;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
@@ -98,7 +98,7 @@ public class EvaluationPostExperiment
 
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-			BufferedWriter allTogetherForAnalysis = WritingToFile.getBufferedWriterForExistingFile(
+			BufferedWriter allTogetherForAnalysis = WToFile.getBufferedWriterForExistingFile(
 					"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/MRRCurrTargetSameAllUsersAllMUs.csv");
 
 			bw.write("User,MRRCurrTargetSame,MRRCurrTargetDiff,AllMRR\n");
@@ -356,7 +356,7 @@ public class EvaluationPostExperiment
 				String RRForEachRTForOptimalMUFile = writePerRTRRForOptimalMUForEachUser("Algo", timeCategory);// s
 				LinkedHashMap<String, ArrayList<Double>> actRRsMap = getPerActivityEachRTKaRR("Algo", timeCategory,
 						RRForEachRTForOptimalMUFile);
-				WritingToFile.writeLinkedHashMapOfArrayList(actRRsMap, commonPath + "ActsRRMap.csv");
+				WToFile.writeLinkedHashMapOfArrayList(actRRsMap, commonPath + "ActsRRMap.csv");
 				writePerActivityBestMeanReciprocalRankOverMUs("BaselineOccurrence", timeCategory);
 				writePerActivityBestMeanReciprocalRankOverMUs("BaselineDuration", timeCategory);
 			}
@@ -654,7 +654,7 @@ public class EvaluationPostExperiment
 		try
 		{
 			LinkedHashMap<Integer, Integer> mapOfUserOptimalMU = getObservedOptimalMUForUserNum();
-			BufferedWriter MRRAtOptimalMUForRTsFile = WritingToFile
+			BufferedWriter MRRAtOptimalMUForRTsFile = WToFile
 					.getBWForNewFile(commonPath + "RRAtOptimalMUForRTsFile.csv");
 
 			for (int user = 1; user <= 18; user++)
@@ -717,9 +717,9 @@ public class EvaluationPostExperiment
 
 		try
 		{
-			BufferedWriter bw = WritingToFile
+			BufferedWriter bw = WToFile
 					.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "PerActivityMeanReciprocalRank.csv");
-			BufferedWriter bwDistri = WritingToFile.getBWForNewFile(commonPath + "NumOfRTsPerAct.csv");
+			BufferedWriter bwDistri = WToFile.getBWForNewFile(commonPath + "NumOfRTsPerAct.csv");
 			BufferedReader brRR = new BufferedReader(
 					new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
 			BufferedReader brDataActual = new BufferedReader(new FileReader(commonPath + "dataActual.csv"));

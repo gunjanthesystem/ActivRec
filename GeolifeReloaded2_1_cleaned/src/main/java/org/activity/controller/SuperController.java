@@ -12,7 +12,7 @@ import org.activity.constants.Constant;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
@@ -122,7 +122,7 @@ public class SuperController
 			for (int numOfDay : numOfDays)
 			{
 				String commonPath = rootPath + numOfDay + "DayFilter_Order" + order;
-				WritingToFile.createDirectory(commonPath);
+				WToFile.createDirectory(commonPath);
 				commonPath += "/";
 
 				Constant.setAKOMHighestOrder(order);
@@ -566,12 +566,12 @@ public class SuperController
 
 		Triple<Set<Path>, Set<Path>, String> errors = Searcher.search2(commonPath, "Log", "rror", "");
 		Triple<Set<Path>, Set<Path>, String> exceptions = Searcher.search2(commonPath, "Log", "xception", "");
-		WritingToFile.writeToNewFile(errors.getThird() + "\n" + exceptions.getThird(),
+		WToFile.writeToNewFile(errors.getThird() + "\n" + exceptions.getThird(),
 				commonPath + "ErrorsExceptions2.txt");
 
 		if (errors.getSecond().size() > 1 || exceptions.getSecond().size() > 1)
 		{
-			WritingToFile.writeToNewFile(errors.getSecond() + "\n" + exceptions.getSecond(),
+			WToFile.writeToNewFile(errors.getSecond() + "\n" + exceptions.getSecond(),
 					commonPath + "HasErrorsExceptions2.txt");
 		}
 
@@ -604,7 +604,7 @@ public class SuperController
 		// Timestamp
 
 		// .getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
-		WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "CleanUpSafelyRandomlyDeleteConsoleLogsForSpace"
+		WToFile.writeToNewFile(deleteConsoleLogs, commonPath + "CleanUpSafelyRandomlyDeleteConsoleLogsForSpace"
 				+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".txt");
 	}
 }
