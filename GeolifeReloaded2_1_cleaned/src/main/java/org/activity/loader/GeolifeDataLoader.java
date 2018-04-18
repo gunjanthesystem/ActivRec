@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 import org.activity.constants.Constant;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.stats.StatsUtils;
@@ -82,7 +82,7 @@ public class GeolifeDataLoader
 
 			modeNames = new HashMap<String, Integer>();
 
-			PrintStream loadLogStream = WritingToFile
+			PrintStream loadLogStream = WToFile
 					.redirectConsoleOutput(Constant.getCommonPath() + dataLoadingLogFilename);
 
 			// deserialiser for one map data
@@ -436,7 +436,7 @@ public class GeolifeDataLoader
 			ConnectDatabase.insertIntoTimeDimension(toInsertInTimeDimension);
 			ConnectDatabase.insertIntoActivityFact(toInsertInActivityFact);
 
-			WritingToFile.writeArrayListFlatActivityLogEntry(listOfActivityEntries, "FlatActivityLogEntries",
+			WToFile.writeArrayListFlatActivityLogEntry(listOfActivityEntries, "FlatActivityLogEntries",
 					"User_ID,Activity_ID,Date_ID,Time_ID,Location_ID,User_Name,Activity_Name,Start_Time,End_Time,Start_Date,End_Date,Duration,Start_Latitude,Start_Longitude,Start_Altitude,End_Latitude,End_Longitude,End_Altitude,Avg_Altitude");
 
 			// Serializer.serializeAllLogEntries(listOfActivityEntries, "flatFile");

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.activity.constants.Constant;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.DataEntry;
 import org.activity.objects.Pair;
 import org.activity.objects.TrackListenEntry;
@@ -58,7 +58,7 @@ public abstract class DatabaseCreator
 		long numOfLinesOfData = 0;
 		try
 		{
-			BufferedWriter bwAllUsers = WritingToFile
+			BufferedWriter bwAllUsers = WToFile
 					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
@@ -73,7 +73,7 @@ public abstract class DatabaseCreator
 				{
 					String userName = entryForUser.getKey();
 					// System.out.println("\nUser =" + entryForUser.getKey());
-					BufferedWriter bw = WritingToFile.getBWForNewFile(
+					BufferedWriter bw = WToFile.getBWForNewFile(
 							Constant.getCommonPath() + userName + filenameEndPhrase + ".csv");
 
 					TreeMap<Timestamp, String> mapForEachUser = new TreeMap<Timestamp, String>();
@@ -125,7 +125,7 @@ public abstract class DatabaseCreator
 		long numOfLinesOfData = 0;
 		try
 		{
-			BufferedWriter bwAllUsers = WritingToFile
+			BufferedWriter bwAllUsers = WToFile
 					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
@@ -140,7 +140,7 @@ public abstract class DatabaseCreator
 				{
 					String userName = entryForUser.getKey();
 					// System.out.println("\nUser =" + entryForUser.getKey());
-					BufferedWriter bw = WritingToFile.getBWForNewFile(
+					BufferedWriter bw = WToFile.getBWForNewFile(
 							Constant.getCommonPath() + userName + filenameEndPhrase + ".csv");
 
 					TreeMap<Timestamp, String> mapForEachUser = new TreeMap<Timestamp, String>();
@@ -243,7 +243,7 @@ public abstract class DatabaseCreator
 			System.out.println("put, User:" + userID + ", #DataEntries:" + mapContinuousNotMerged.size());
 		}
 
-		WritingToFile.writeArrayList2(timeDifferencesBetweenDataPointAllUsers, "TimeDifferenceAll",
+		WToFile.writeArrayList2(timeDifferencesBetweenDataPointAllUsers, "TimeDifferenceAll",
 				"UserID,TimeDifferenceWithNextInSeconds");
 		System.out.println("exiting getTrajectoryEntriesWithTimeDifferenceWithNext");
 
@@ -312,7 +312,7 @@ public abstract class DatabaseCreator
 			System.out.println("put, User:" + userID + ", #DataEntries:" + mapContinuousNotMerged.size());
 		}
 
-		WritingToFile.writeArrayList2(timeDifferencesBetweenDataPointAllUsers, "TimeDifferenceAll",
+		WToFile.writeArrayList2(timeDifferencesBetweenDataPointAllUsers, "TimeDifferenceAll",
 				"UserID,TimeDifferenceWithNextInSeconds");
 		System.out.println("exiting getTrajectoryEntriesWithTimeDifferenceWithNext");
 
@@ -603,7 +603,7 @@ public abstract class DatabaseCreator
 		long numOfLinesOfData = 0;
 		try
 		{
-			BufferedWriter bwAllUsers = WritingToFile
+			BufferedWriter bwAllUsers = WToFile
 					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
@@ -618,7 +618,7 @@ public abstract class DatabaseCreator
 				{
 					String userName = entryForUser.getKey();
 					// System.out.println("\nUser =" + entryForUser.getKey());
-					BufferedWriter bw = WritingToFile.getBWForNewFile(
+					BufferedWriter bw = WToFile.getBWForNewFile(
 							Constant.getCommonPath() + userName + filenameEndPhrase + ".csv");
 
 					TreeMap<Timestamp, String> mapForEachUser = new TreeMap<Timestamp, String>();
@@ -661,7 +661,7 @@ public abstract class DatabaseCreator
 		long numOfLinesOfData = 0;
 		try
 		{
-			BufferedWriter bwAllUsers = WritingToFile
+			BufferedWriter bwAllUsers = WToFile
 					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
@@ -719,7 +719,7 @@ public abstract class DatabaseCreator
 		long numOfLinesOfData = 0;
 		try
 		{
-			BufferedWriter bw = WritingToFile
+			BufferedWriter bw = WToFile
 					.getBWForNewFile(Constant.getCommonPath() + splitID + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
@@ -755,7 +755,7 @@ public abstract class DatabaseCreator
 		long numOfLinesOfData = 0;
 		try
 		{
-			BufferedWriter bwAllUsers = WritingToFile
+			BufferedWriter bwAllUsers = WToFile
 					.getBWForNewFile(Constant.getCommonPath() + "AllUsers" + filenameEndPhrase + ".csv");
 
 			if (printHeaders)
@@ -813,7 +813,7 @@ public abstract class DatabaseCreator
 		long numOfLinesOfData = 0;
 		try
 		{
-			BufferedWriter bw = WritingToFile
+			BufferedWriter bw = WToFile
 					.getBWForNewFile(Constant.getCommonPath() + splitID + filenameEndPhrase + ".csv");
 			try
 			{

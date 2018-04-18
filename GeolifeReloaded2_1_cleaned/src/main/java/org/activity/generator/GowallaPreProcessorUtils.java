@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,7 +31,7 @@ import org.activity.io.CSVUtils;
 import org.activity.io.ReadXML;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.OpenStreetAddress;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
@@ -127,7 +128,7 @@ public class GowallaPreProcessorUtils
 	public static void main(String[] args)
 	{
 		// findNumVeryFrequentEpisodesForEachUserApril8();
-		findNumVeryFrequentEpisodesForEachUserApril8_2();
+		findNumVeryFrequentEpisodesForEachUserSlidingWindow8April();
 	}
 
 	/**
@@ -136,33 +137,123 @@ public class GowallaPreProcessorUtils
 	 * @param userIDColIndex
 	 * @param tsColIndex
 	 */
-	public static void findNumVeryFrequentEpisodesForEachUserApril8_2()
+	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8April()
 	{
 		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
+		String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April13VFAnalysis/";
 
 		List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
 				checkinFileNameToRead, ",", true, false, new int[] { 0, 2 });
 
 		Map<String, Integer> userNumOfVertFreqEpisodesCount = new LinkedHashMap<>();
-		int windowSize = 10;
-		int windowDurationDifThresholdInSecs = 5 * 60 * 60;
+		Map<String, Integer> userNumOfIgnoredWindowsCount = new LinkedHashMap<>();
+		Map<String, Integer> userTotalWindowsCount = new LinkedHashMap<>();
+		Map<String, List<Integer>> userWindowTimeDiffInMins = new LinkedHashMap();
 
+		int windowSize = 5;
+		int windowDurationDifThresholdInSecs = 5 * 60;
+		System.out.println("Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8April:\nwindowSize=" + windowSize
+				+ "\nwindowDurationDifThresholdInSecs=" + windowDurationDifThresholdInSecs + " ("
+				+ windowDurationDifThresholdInSecs / 60 + " mins)");
+
+		int numOfWindows = 0;
 		try
 		{
 			System.out.println("here");
 			linesRead.remove(0);
-			System.out.println("linesRead.size()= " + linesRead.size());
-			for (List<String> line : linesRead)
-			{
-				System.out.println("here2");
-				String userID = line.get(0);
-				Timestamp ts = java.sql.Timestamp.valueOf(line.get(1));
-				System.out.println("UserID=" + userID + " ts=" + ts.toString());
-			}
-		}
-		catch (
 
-		Exception e)
+			// temp start
+			// linesRead = linesRead.subList(0, 5000);
+			// temp end
+
+			System.out.println("linesRead.size()= " + linesRead.size());
+			String windowEndUserID = "", windowStartUserID = "";
+
+			for (int windowStartIndex = 0; windowStartIndex < (linesRead.size() - windowSize); windowStartIndex++)
+			{
+				numOfWindows++;
+				// System.out.println("Num of windows = " + numOfWindows);
+				int windowEndIndex = windowStartIndex + windowSize;
+
+				List<String> startWindowLine = linesRead.get(windowStartIndex);
+				windowStartUserID = startWindowLine.get(0);
+				Timestamp windowStartTS = java.sql.Timestamp.valueOf(startWindowLine.get(1));
+				// $$System.out.println(
+				// $$ "\nwindowStartUserID=" + windowStartUserID + " windowStartTS=" + windowStartTS.toString());
+
+				List<String> endWindowLine = linesRead.get(windowEndIndex);
+				windowEndUserID = endWindowLine.get(0);
+				Timestamp windowEndTS = java.sql.Timestamp.valueOf(endWindowLine.get(1));
+				// $$ System.out.println("windowEndUserID=" + windowEndUserID + " windowEndTS=" +
+				// windowEndTS.toString());
+
+				if (windowStartUserID.equals(windowEndUserID))
+				{
+					long timeDurationOfWindowInSecs = (windowEndTS.getTime() - windowStartTS.getTime()) / 1000;
+					// $$System.out.println("\t timeDurationOfWindowIn min= " + timeDurationOfWindowInSecs / 60);
+
+					if (userWindowTimeDiffInMins.containsKey(windowStartUserID) == false)
+					{
+						userWindowTimeDiffInMins.put(windowStartUserID, new ArrayList<Integer>());
+					}
+					userWindowTimeDiffInMins.get(windowStartUserID).add((int) timeDurationOfWindowInSecs / 60);
+
+					int windowsCount = 1;
+					if (userTotalWindowsCount.containsKey(windowStartUserID))
+					{
+						windowsCount = userTotalWindowsCount.get(windowStartUserID) + 1;
+					}
+					userTotalWindowsCount.put(windowStartUserID, windowsCount);
+
+					if (timeDurationOfWindowInSecs < windowDurationDifThresholdInSecs)
+					{
+						// $$System.out.println("******> VFE as timeDurationOfWindowInSecs= " +
+						// timeDurationOfWindowInSecs
+						// $$ + " in mins =" + timeDurationOfWindowInSecs / 60);
+						// Encountered a window which is a very frequent episode.
+						int countOfVFEForThisUser = 0;
+						if (userNumOfVertFreqEpisodesCount.containsKey(windowStartUserID))
+						{
+							countOfVFEForThisUser = userNumOfVertFreqEpisodesCount.get(windowStartUserID);
+						}
+						userNumOfVertFreqEpisodesCount.put(windowStartUserID, countOfVFEForThisUser + 1);
+					}
+				}
+				else
+				{
+					int numOfIgnoredWindowsForThisUser = 0;
+					if (userNumOfIgnoredWindowsCount.containsKey(windowStartUserID))
+					{
+						numOfIgnoredWindowsForThisUser = userNumOfIgnoredWindowsCount.get(windowStartUserID);
+					}
+					userNumOfIgnoredWindowsCount.put(windowStartUserID, numOfIgnoredWindowsForThisUser + 1);
+					// System.out.println("Ignoring window different users at end");
+				}
+			}
+
+			System.out.println("Num of windows = " + numOfWindows);
+			WToFile.writeMapToNewFile(userNumOfVertFreqEpisodesCount, "User,NumOfVFEpisodes", ",",
+					pathToWrite + "userNumOfVertFreqEpisodesCount.csv");
+			WToFile.writeMapToNewFile(userNumOfIgnoredWindowsCount, "User,NumOfIgnoredWindows", ",",
+					pathToWrite + "userNumOfIgnoredWindowsCount.csv");
+			WToFile.writeMapToNewFile(userTotalWindowsCount, "User,TotalNumOfWindows", ",",
+					pathToWrite + "userTotalWindowsCount.csv");
+			WToFile.writeMapOfListToNewFileLongFormat(userWindowTimeDiffInMins, "User,TimeDiffInMins", ",",
+					pathToWrite + "userWindowTimeDiff.csv");
+
+			StringBuilder consoleLog = new StringBuilder();
+			consoleLog.append("Ran at:" + LocalDateTime.now() + "\n");
+			consoleLog.append("checkinFileNameToRead=" + checkinFileNameToRead + "\n");
+			consoleLog.append("pathToWrite=" + pathToWrite + "\n");
+			consoleLog.append("Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8April:\nwindowSize="
+					+ windowSize + "\nwindowDurationDifThresholdInSecs=" + windowDurationDifThresholdInSecs + " ("
+					+ windowDurationDifThresholdInSecs / 60 + " mins)" + "\n");
+
+			WToFile.writeToNewFile(consoleLog.toString(), pathToWrite + "consoleLog.csv");
+			// .writeMapOfArrayListToNewFile(userWindowTimeDiff, "User", "TimeDiff", ",", ",",
+			// pathToWrite + "userWindowTimeDiff.csv");
+		}
+		catch (Exception e)
 		{
 
 		}
@@ -175,7 +266,7 @@ public class GowallaPreProcessorUtils
 	 * @param userIDColIndex
 	 * @param tsColIndex
 	 */
-	public static void findNumVeryFrequentEpisodesForEachUserApril8()
+	public static void findNumVeryFrequentEpisodesForEachUserJumpingWindow8April()
 	{
 		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
 		// try{List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(fileToRead,
@@ -260,7 +351,7 @@ public class GowallaPreProcessorUtils
 			System.out.println("countOfLines=" + countOfLines);
 			br.close();
 
-			WritingToFile.writeMapToNewFile(userNumOfVertFreqEpisodesCount, "User,VFECount", ",",
+			WToFile.writeMapToNewFile(userNumOfVertFreqEpisodesCount, "User,VFECount", ",",
 					"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/April11/");
 		}
 
@@ -321,7 +412,7 @@ public class GowallaPreProcessorUtils
 			// res.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey().getFirst() + "," +
 			// e.getKey().getSecond()
 			// + "," + e.getKey().getThird() + "," + e.getValue() + "\n"));
-			WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+			WToFile.appendLineToFileAbs(sb.toString(), absFileNameToWrite);
 
 		}
 		catch (Exception e)
@@ -370,7 +461,7 @@ public class GowallaPreProcessorUtils
 			res = ComparatorUtils.sortByValueDesc(res);
 			res.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey().getFirst() + "," + e.getKey().getSecond()
 					+ "," + e.getKey().getThird() + "," + e.getValue() + "\n"));
-			WritingToFile.appendLineToFileAbsolute(sb.toString(), absFileNameToWrite);
+			WToFile.appendLineToFileAbs(sb.toString(), absFileNameToWrite);
 
 		}
 		catch (Exception e)
@@ -475,7 +566,7 @@ public class GowallaPreProcessorUtils
 			{
 				sbToWrite.append(osmAddress.stream().collect(Collectors.joining("|")) + "\n");
 			}
-			WritingToFile.writeToNewFile(sbToWrite.toString(), commonPathToRead + "ConsolidatedOSMAddress29March.csv");
+			WToFile.writeToNewFile(sbToWrite.toString(), commonPathToRead + "ConsolidatedOSMAddress29March.csv");
 
 		}
 		catch (Exception e)
@@ -498,7 +589,7 @@ public class GowallaPreProcessorUtils
 		// List<List<String>> raw = new ArrayList<>();
 		StringBuilder sbToWrite = new StringBuilder();
 		String splitLiteral = Pattern.quote(",");
-		BufferedWriter bwToWrite = WritingToFile.getBWForNewFile(fileToWrite);
+		BufferedWriter bwToWrite = WToFile.getBWForNewFile(fileToWrite);
 
 		if (verboseReading)
 		{
@@ -599,7 +690,7 @@ public class GowallaPreProcessorUtils
 
 			System.out.println("locIDTimezoneMap.size=" + locIDTimezoneMap.size());
 			System.out.println("locIDsWithNoTimezone.size=" + locIDsWithNoTimezone.size());
-			WritingToFile.writeToNewFile(locIDsWithNoTimezoneWithLatLon.stream().collect(Collectors.joining("\n")),
+			WToFile.writeToNewFile(locIDsWithNoTimezoneWithLatLon.stream().collect(Collectors.joining("\n")),
 					commonPath + "locIDsWithNoTimezone.csv");
 
 			Serializer.kryoSerializeThis(locIDTimezoneMap, commonPath + "locIDTimezoneMap.kryo");
@@ -632,7 +723,7 @@ public class GowallaPreProcessorUtils
 		// String commonPathToWrite = commonPathToRead;
 		long totalNumOfEmptyAddresses = 0, totalNumOfNeitherCityTownOrVillage = 0;
 
-		WritingToFile.writeToNewFile("", commonPathToRead + "SampleOSMNeitherCityTownOrVillage.xml");
+		WToFile.writeToNewFile("", commonPathToRead + "SampleOSMNeitherCityTownOrVillage.xml");
 		Map<String, Long> allTagsCount = new LinkedHashMap<>();
 
 		try
@@ -690,7 +781,7 @@ public class GowallaPreProcessorUtils
 
 			StringBuilder sb3 = new StringBuilder();
 			allTagsCount.entrySet().stream().forEachOrdered(e -> sb3.append(e.getKey() + "," + e.getValue() + "\n"));
-			WritingToFile.writeToNewFile(sb3.toString(), commonPathToRead + "allAddressTagCount.csv");
+			WToFile.writeToNewFile(sb3.toString(), commonPathToRead + "allAddressTagCount.csv");
 			System.out.println("totalNumOfEmptyAddresses = " + totalNumOfEmptyAddresses);
 
 			System.out.println("totalNumOfNeitherCityTownOrVillage = " + totalNumOfNeitherCityTownOrVillage);
@@ -723,10 +814,10 @@ public class GowallaPreProcessorUtils
 		try
 		{
 			// BufferedWriter bwToWrite = WritingToFile.getBWForNewFile(commonPathToRead + fileNameToWritePhrase);
-			BufferedWriter bwToWriteDebugSampleOSMAddress = WritingToFile
+			BufferedWriter bwToWriteDebugSampleOSMAddress = WToFile
 					.getBufferedWriterForExistingFile(commonPathToRead + "SampleOSMNeitherCityTownOrVillage.xml");
 			// bwToWrite.write("id|lng|lat|TZ|road|cityOrTownOrVillage|county|state|postcode|country|country_code\n");
-			WritingToFile.writeToNewFile(
+			WToFile.writeToNewFile(
 					"id|lng|lat|TZ|road|cityOrTownOrVillage|county|state|postcode|country|country_code\n",
 					commonPathToRead + fileNameToWritePhrase);
 
@@ -808,7 +899,7 @@ public class GowallaPreProcessorUtils
 						+ delimiter);
 				sb2.append(address.toString(delimiter) + "\n");
 				// bwToWrite.append(sb2.toString());
-				WritingToFile.appendLineToFileAbsolute(sb2.toString(), commonPathToRead + fileNameToWritePhrase);
+				WToFile.appendLineToFileAbs(sb2.toString(), commonPathToRead + fileNameToWritePhrase);
 
 			}
 

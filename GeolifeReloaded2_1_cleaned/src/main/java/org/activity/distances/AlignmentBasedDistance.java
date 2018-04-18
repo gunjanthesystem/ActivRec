@@ -4,14 +4,16 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
+import org.activity.constants.Enums.GowallaFeatures;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.TraceMatrixLeaner1;
@@ -20,6 +22,7 @@ import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.StringCode;
 import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math.util.FastMath;
@@ -40,6 +43,8 @@ public class AlignmentBasedDistance
 	// double costReplaceStartTime =1;// 0.6d;
 	// double costReplaceDuration = 1;//0.2d;
 	// double costReplaceActivityName = 2;
+
+	EnumMap<GowallaFeatures, Double> featureWeightMap;// added on April 17 2018
 
 	private final PrimaryDimension primaryDimension;
 	private boolean shouldComputeFeatureLevelDistance;
@@ -126,6 +131,15 @@ public class AlignmentBasedDistance
 	}
 
 	/**
+	 * 
+	 * @return
+	 */
+	public EnumMap<GowallaFeatures, Double> getFeatureWeightMap()
+	{
+		return featureWeightMap;
+	}
+
+	/**
 	 * @since 10 April 2018
 	 */
 	private void setShouldComputeFeatureLevelDistance()
@@ -166,6 +180,7 @@ public class AlignmentBasedDistance
 		useDurationFromPrevInFED = Constant.useDurationFromPrevInFED;
 		useDistFromNextInFED = Constant.useDistFromNextInFED;
 		useDurationFromNextInFED = Constant.useDurationFromNextInFED;
+
 	}
 
 	/**
@@ -208,32 +223,40 @@ public class AlignmentBasedDistance
 				// $$wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtLocation +
 				// wtLocPopularity, 4);
 				wtFullActivityObject = 0;
+				EnumMap<GowallaFeatures, Double> featureWeightMap = new EnumMap<>(GowallaFeatures.class);
+
 				if (this.useActivityNameInFED)
 				{
 					wtFullActivityObject += wtActivityName;
+					featureWeightMap.put(GowallaFeatures.ActNameF, wtActivityName);
 				}
 				if (this.useStartTimeInFED)
 				{
 					wtFullActivityObject += wtStartTime;
+					featureWeightMap.put(GowallaFeatures.StartTimeF, wtStartTime);
 				}
 				if (this.useLocationInFED)
 				{
 					wtFullActivityObject += wtLocation;
+					featureWeightMap.put(GowallaFeatures.LocationF, wtLocation);
 				}
 
 				if (this.usePopularityInFED)
 				{
 					wtFullActivityObject += wtLocPopularity;
+					featureWeightMap.put(GowallaFeatures.PopularityF, wtLocPopularity);
 				}
 
 				if (this.useDistFromPrevInFED)
 				{
 					wtFullActivityObject += wtDistanceFromPrev;
+					featureWeightMap.put(GowallaFeatures.DistFromPrevF, wtDistanceFromPrev);
 				}
 
 				if (this.useDurationFromPrevInFED)
 				{
 					wtFullActivityObject += wtDurationFromPrev;
+					featureWeightMap.put(GowallaFeatures.DurationFromPrevF, wtDurationFromPrev);
 				}
 
 				if (this.useDistFromNextInFED)
@@ -248,6 +271,8 @@ public class AlignmentBasedDistance
 				wtFullActivityObject = StatsUtils.round(wtFullActivityObject, 4);
 				// wtActivityName/* + wtStartTime + wtLocation + wtLocPopularity */ + wtDistanceFromPrev +
 				// wtDurationFromPrev,4);
+				this.featureWeightMap = featureWeightMap;
+
 				break;
 
 			default:
@@ -598,6 +623,50 @@ public class AlignmentBasedDistance
 	}
 
 	/**
+	 * Selects the right feature level difference method to call for the current database.
+	 * <p>
+	 * Return the feature level differences between the two given Activity Objects. (note: this is NOT case-based)
+	 * (note: DCU data has only two features while Geolife Data has 4 additional features. Alert: this method needs to
+	 * be modified for different datasets.
+	 * <p>
+	 * TODO To make it generic, store the feature names in a data structure at the start of experiments.) NOT GENERIC
+	 * 
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @return EnumMap{GowallaFeatures, Double}, map of Gowalla features and corresonding feature's difference between
+	 *         the two compared act objs ao1 and ao2
+	 * @since April 14 2018
+	 */
+	public EnumMap<GowallaFeatures, Double> getFeatureLevelDifference(ActivityObject ao1, ActivityObject ao2)
+	{
+		double dfeat = 0;
+		EnumMap<GowallaFeatures, Double> featureDiffs = null;
+		// if(ao1.getStartTimestamp().getTime() != (ao2.getStartTimestamp().getTime()) )//is wrong since its comparing
+		// timestamps and not time of days...however, results for our
+		// experiments do not show any visible difference in results { dfeat+=costReplaceStartTime; }
+		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
+		{
+			// $$dfeat = getFeatureLevelDistanceGowallaPD(ao1, ao2);//disabled on Feb 23 2018
+			// dfeat = getFeatureLevelDistanceGowallaPD25Feb2018(ao1, ao2);
+			featureDiffs = getFeatureLevelDifferenceGowallaPD13Apr2018(ao1, ao2);
+			//// Sanity Checked pass OK 26 Feb 2018 Start
+			// double dfeatTest = getFeatureLevelDistanceGowallaPD23Feb2018(ao1, ao2);
+			// boolean sanityCheckPassed = Sanity.eq(dfeat, dfeatTest,
+			// "Sanity Check Failed Error:'ndfeat= " + dfeat + " dfeatTest=" + dfeatTest);
+			// WritingToFile.appendLineToFileAbsolute(sanityCheckPassed + "\n",
+			// Constant.getCommonPath() + "SanityCheck25FebgetFeatureLevelDistanceGowallaPD25Feb2018.txt");
+			// Sanity Checked pass OK 26 Feb 2018 End
+		}
+		else
+		{
+			PopUps.showError("Error: AlignmentBasedDistance.getFeatureLevelDifference() NOT IMPLEMENTED for database: "
+					+ Constant.getDatabaseName());
+		}
+		return featureDiffs;
+	}
+
+	/**
 	 * Used until Feb 23 2018
 	 * 
 	 * @param ao1
@@ -877,7 +946,7 @@ public class AlignmentBasedDistance
 			System.out.println("In dfeat: " + dfeat + " \tlog:\t" + sbLog.toString());
 			// WritingToFile.appendLineToFileAbsolute("\ndfeat:" + dfeat + " \tlog:\t" + sbLog.toString(),
 			// Constant.getCommonPath() + "FeatureLevelDistanceLog.csv");
-			WritingToFile.appendLineToFileAbsolute(dfeat + "," + dDistanceFromPrev + "," + dDurationFromPrev,
+			WToFile.appendLineToFileAbs(dfeat + "," + dDistanceFromPrev + "," + dDurationFromPrev,
 					Constant.getCommonPath() + "FeatureLevelDistanceLog.csv");
 
 		}
@@ -906,14 +975,20 @@ public class AlignmentBasedDistance
 			PopUps.showError("Null zoneID " + zone1 + " or " + zone2);
 			return new Pair<>(wtStartTime, "Nullzone dtime=" + wtStartTime);
 		}
+		long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSecondsZoned(ao1STInms, ao2STInms, zone1, zone2);
 
 		if (editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.BinaryThreshold))
 		{
 			// if not same within 60mins then add wt to dfeat
-			if (DateTimeUtils.isSameTimeInToleranceZoned(ao1STInms, ao2STInms, zone1, zone2,
-					startTimeToleranceInSeconds) == false)
+			// if (DateTimeUtils.isSameTimeInToleranceZoned(ao1STInms, ao2STInms, zone1, zone2,
+			// startTimeToleranceInSeconds) == false)
+			if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
 			{
-				return new Pair<>(wtStartTime, "\ndtime=" + wtStartTime);
+				return new Pair<>(1.0 * wtStartTime, "\ndtime=" + wtStartTime);
+			}
+			else
+			{
+				return new Pair<>(0.0, "\ndtime=0");
 			}
 		}
 		// $$ curtain on 2 Mar 2017 end
@@ -921,7 +996,6 @@ public class AlignmentBasedDistance
 		// $$ added on 2nd march 2017 start: nearerScaledTimeDistance
 		else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.NearerScaled))
 		{
-			long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSecondsZoned(ao1STInms, ao2STInms, zone1, zone2);
 			if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
 			{
 				double timeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
@@ -938,7 +1012,6 @@ public class AlignmentBasedDistance
 		// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
 		else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.FurtherScaled))
 		{
-			long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSecondsZoned(ao1STInms, ao2STInms, zone1, zone2);
 			if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
 			{
 				double timeDistance = absTimeDiffInSeconds / 10800;
@@ -946,6 +1019,73 @@ public class AlignmentBasedDistance
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Fork of getStartTimeDistanceZoned()-- improved code
+	 * 
+	 * @param ao1STInms
+	 * @param ao2STInms
+	 * @param zone1
+	 * @param zone2
+	 * @param editDistTimeDistType
+	 * @param startTimeToleranceInSeconds
+	 * @param wtStartTime
+	 * @return Pair{StartTime_Distance,Log}
+	 * @since 13 April 2018 extracted from the method getFeatureLevelDistanceGowallaPD23Feb2018()
+	 */
+	public static Pair<Double, String> getStartTimeDistanceZoned13Apr2018(long ao1STInms, long ao2STInms, ZoneId zone1,
+			ZoneId zone2, Enums.EditDistanceTimeDistanceType editDistTimeDistType, long startTimeToleranceInSeconds,
+			double wtStartTime)
+	{
+		if (zone1 == null || zone1 == null)
+		{
+			PopUps.showError("Error Null zoneID " + zone1 + " or " + zone2);
+			return new Pair<>(wtStartTime, "Nullzone dtime=" + wtStartTime);
+		}
+
+		long absTimeDiffInSeconds = DateTimeUtils.getTimeDiffInSecondsZoned(ao1STInms, ao2STInms, zone1, zone2);
+		double startTimeDistance = -9999;
+
+		if (editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.BinaryThreshold))
+		{ // if not same within 60mins then add wt to dfeat
+			if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
+			{
+				startTimeDistance = 1.0;
+			}
+			else
+			{
+				startTimeDistance = 0.0;
+			}
+		}
+
+		else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.NearerScaled))
+		{
+			if (absTimeDiffInSeconds <= startTimeToleranceInSeconds)
+			{
+				startTimeDistance = absTimeDiffInSeconds / startTimeToleranceInSeconds;
+			}
+			else // absTimeDiffInSeconds > startTimeToleranceInSeconds
+			{
+				startTimeDistance = 1.0;
+			}
+		}
+
+		// cost = 0 if diff <=1hr , cost (0,1) if diff in (1,3) hrs and cost =1 if diff >=3hrs
+		else if (Constant.editDistTimeDistType.equals(Enums.EditDistanceTimeDistanceType.FurtherScaled))
+		{
+			if (absTimeDiffInSeconds > startTimeToleranceInSeconds)
+			{
+				startTimeDistance = absTimeDiffInSeconds / 10800;
+			}
+		}
+
+		// startTimeDistance should not be negative
+		if (startTimeDistance < 0)
+		{
+			PopUps.showError("startTimeDistance (<0)=" + startTimeDistance);
+		}
+		return new Pair<>((startTimeDistance * wtStartTime), "\ndtime=" + (startTimeDistance * wtStartTime));
 	}
 
 	/**
@@ -2118,7 +2258,7 @@ public class AlignmentBasedDistance
 		}
 		long performanceTime2 = System.currentTimeMillis();
 
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				Integer.toString(word1.length()) + "," + Integer.toString(word2.length()) + ","
 						+ Long.toString(performanceTime2 - performanceTime1) + "\n",
 				Constant.getCommonPath() + "MySimpleLevenshteinDistanceTimeTakenInms.csv");
@@ -2796,9 +2936,7 @@ public class AlignmentBasedDistance
 	 * @param insertWt
 	 * @param deleteWt
 	 * @param replaceWt
-	 * @return Pair{Levenshtein distance,trace of operations}
-	 *         <p>
-	 *         Triple{resultantTrace, resultantDistance, Triple{DISNTrace,coordTraces.getFirst(),
+	 * @return Triple{resultantTrace, resultantDistance, Triple{DISNTrace,coordTraces.getFirst(),
 	 *         coordTraces.getSecond()}}
 	 *         <p>
 	 *         Trace =_I(0-1)_I(0-2)_I(0-3)_D(1-3)_D(2-3)_D(3-3)_N(4-4) <br/>
@@ -3064,6 +3202,86 @@ public class AlignmentBasedDistance
 
 	/**
 	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
+	 * <p>
+	 * uses getLocallyUniqueCharCodeMap()
+	 * <p>
+	 * (This method abstracted some code from the method
+	 * HJEditDistance.getHJEditDistanceWithTrace_CleanedApril13_2018())
+	 * 
+	 * @param activityObjects1
+	 * @param activityObjects2
+	 * @param primaryDimension
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @return Triple{resultantTrace, resultantDistance, Triple{DISNTrace,coordTraces.getFirst(),
+	 *         coordTraces.getSecond()}}
+	 *         <p>
+	 *         Trace =_I(0-1)_I(0-2)_I(0-3)_D(1-3)_D(2-3)_D(3-3)_N(4-4) <br/>
+	 *         simpleLevenshteinDistance112=6.0<br/>
+	 *         DINSTrace=IIIDDDN <br/>
+	 *         third_second=[0, 0, 0, 1, 2, 3, 4] <br/>
+	 *         third_third=[1, 2, 3, 3, 3, 3, 4]
+	 * 
+	 * @since April 14, 2018
+	 */
+	public static Triple<String, Double, Triple<char[], int[], int[]>> getLowestMySimpleLevenshteinDistance(
+			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2,
+			PrimaryDimension primaryDimension, int insertWt, int deleteWt, int replaceWt)
+	{
+		// long t0, t2, t3, t4, t5, t6;t0 = t2 = t3 = t4 = t5 = t6 = Long.MIN_VALUE;t0 = System.nanoTime();
+		HashMap<Integer, Character> uniqueCharCodes = StringCode.getLocallyUniqueCharCodeMap(activityObjects1,
+				activityObjects2, primaryDimension);
+		// t2 = System.nanoTime();
+		// Int2CharOpenHashMap uniqueCharCodesFU = StringCode.getLocallyUniqueCharCodeMapFU(activityObjects1,
+		// activityObjects2, primaryDimension);
+		// t3 = System.nanoTime();
+		// multiple string codes when an AO in the list has act name which at desired level can have multiple ids. For
+		// example Vineyards is under Community as well as Food
+		ArrayList<String> stringCodesForActivityObjects1, stringCodesForActivityObjects2;
+
+		// //start of curtain 17 July 2017
+		// if (Constant.HierarchicalCatIDLevelForEditDistance > 0)
+		// {// TODO: need to implement this for multi dimensional case, e.g., recommending location
+		// // PopUps.printTracedErrorMsgWithExit("Constant.HierarchicalLevelForEditDistance > 0) not implemented yet");
+		// stringCodesForActivityObjects1 = StringCode.getStringCodeForActivityObjectsV2(activityObjects1,
+		// Constant.HierarchicalCatIDLevelForEditDistance, false);
+		// stringCodesForActivityObjects2 = StringCode.getStringCodeForActivityObjectsV2(activityObjects2,
+		// Constant.HierarchicalCatIDLevelForEditDistance, false);
+		// }
+		// else
+		// {
+		// //end of curtain 17 July 2017
+		// t4 = System.nanoTime();
+		//// temp start
+		// ArrayList<String> stringCodesForActivityObjects1FU = StringCode.getStringCodesForActivityObjectsFU(
+		// activityObjects1, primaryDimension, uniqueCharCodesFU, VerbosityConstants.verbose);
+		// ArrayList<String> stringCodesForActivityObjects2FU = StringCode.getStringCodesForActivityObjectsFU(
+		// activityObjects2, primaryDimension, uniqueCharCodesFU, VerbosityConstants.verbose);
+		// t6 = System.nanoTime();
+
+		// String debug9Mar = (t2 - t0) + "," + (t3 - t2) + "," + (t5 - t4) + "," + (t6 - t5) + ","
+		// + stringCodesForActivityObjects1.equals(stringCodesForActivityObjects1FU) + ","
+		// + stringCodesForActivityObjects2.equals(stringCodesForActivityObjects2FU) + ","
+		// + stringCodesForActivityObjects1 + "," + (stringCodesForActivityObjects1FU) + ","
+		// + stringCodesForActivityObjects2 + "," + (stringCodesForActivityObjects2FU) + "\n";
+		// WritingToFile.appendLineToFileAbsolute(debug9Mar.toString(),
+		// Constant.getOutputCoreResultsPath() + "DebugMar9_2018.csv");
+		/// temp end
+		// }
+		stringCodesForActivityObjects1 = StringCode.getStringCodesForActivityObjects(activityObjects1, primaryDimension,
+				uniqueCharCodes, VerbosityConstants.verbose);
+		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects(activityObjects2, primaryDimension,
+				uniqueCharCodes, VerbosityConstants.verbose);
+		// t5 = System.nanoTime();
+
+		return getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1, stringCodesForActivityObjects2,
+				insertWt, deleteWt, replaceWt);
+		// getMySimpleLevenshteinDistance
+	}
+
+	/**
+	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
 	 * 
 	 * @since Mar 1, 2018
 	 * @param word1
@@ -3071,7 +3289,14 @@ public class AlignmentBasedDistance
 	 * @param insertWt
 	 * @param deleteWt
 	 * @param replaceWt
-	 * @return Triple{Levenshtein distance,trace of operations, trace of ops only DNIS}
+	 * @return Triple{resultantTrace, resultantDistance, Triple{DISNTrace,coordTraces.getFirst(),
+	 *         coordTraces.getSecond()}}
+	 *         <p>
+	 *         Trace =_I(0-1)_I(0-2)_I(0-3)_D(1-3)_D(2-3)_D(3-3)_N(4-4) <br/>
+	 *         simpleLevenshteinDistance112=6.0<br/>
+	 *         DINSTrace=IIIDDDN <br/>
+	 *         third_second=[0, 0, 0, 1, 2, 3, 4] <br/>
+	 *         third_third=[1, 2, 3, 3, 3, 3, 4]
 	 */
 	public static Triple<String, Double, Triple<char[], int[], int[]>> getLowestMySimpleLevenshteinDistance(
 			ArrayList<String> word1s, ArrayList<String> word2s, int insertWt, int deleteWt, int replaceWt)
@@ -3296,6 +3521,277 @@ public class AlignmentBasedDistance
 	}
 
 	/**
+	 * Fork of getFeatureLevelDistanceGowallaPD13Apr2018().
+	 * <p>
+	 * Store differences of each features (instead of normalised computed distances from differences), normalise it
+	 * later when we values for all cands for a given RT
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @return map of differences of Gowalla features
+	 *         <p>
+	 *         EnumMap{GowallaFeatures, Double}, map of Gowalla features and corresonding feature's difference between
+	 *         the two compared act objs ao1 and ao2
+	 * @since April 13 2018
+	 */
+	public EnumMap<GowallaFeatures, Double> getFeatureLevelDifferenceGowallaPD13Apr2018(ActivityObject ao1,
+			ActivityObject ao2)
+	{
+		EnumMap<GowallaFeatures, Double> featureDiffMap = new EnumMap<>(GowallaFeatures.class);
+		// StringBuilder sbLog = new StringBuilder();
+
+		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
+		{
+			if (useStartTimeInFED)
+			{
+				featureDiffMap.put(GowallaFeatures.StartTimeF,
+						(double) DateTimeUtils.getTimeDiffInSecondsZoned(ao1.getStartTimestampInms(),
+								ao2.getStartTimestampInms(), ao1.getTimeZoneId(), ao2.getTimeZoneId()));
+
+				if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
+				{
+					WToFile.appendLineToFileAbs("Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+							+ ao2.getLocationIDs(',') + "\n",
+							Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+				}
+			}
+
+			if (useLocationInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.LocationID) == false)
+				{
+					double diffLoc;
+					if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
+					{ // if no matching locationIDs then add wt to dfeat
+						diffLoc = 1;
+					}
+					else
+					{
+						diffLoc = 0;// even if one location matches, location distance is 0
+					}
+					featureDiffMap.put(GowallaFeatures.LocationF, diffLoc);
+				}
+			}
+			if (useActivityNameInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+				{
+					double diffActID;
+					if (ao1.getActivityID() != ao2.getActivityID())// incorrect version before Mar 21 2018
+					{
+						diffActID = 1;
+					}
+					else
+					{
+						diffActID = 0;
+					}
+					featureDiffMap.put(GowallaFeatures.ActNameF, diffActID);
+				}
+			}
+
+			if (usePopularityInFED)
+			{
+				featureDiffMap.put(GowallaFeatures.PopularityF,
+						(double) Math.abs(ao1.getCheckins_count() - ao2.getCheckins_count()));
+			}
+
+			if (useDistFromPrevInFED)
+			{
+				double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() - ao2.getDistanceInMFromPrev());
+				featureDiffMap.put(GowallaFeatures.DistFromPrevF, diffOfDistFromPrev);
+			}
+
+			if (useDurationFromPrevInFED)
+			{
+				double diffOfDurFromPrev = FastMath
+						.abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
+				featureDiffMap.put(GowallaFeatures.DurationFromPrevF, diffOfDurFromPrev);
+			}
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: getFeatureLevelDistanceGowallaPD() called for database: " + Constant.getDatabaseName());
+		}
+
+		return featureDiffMap;
+	}
+
+	/**
+	 * Fork of getFeatureLevelDistanceGowallaPD25Feb2018(). Cleaned and improved code
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @return
+	 * @since April 13 2018
+	 */
+	public double getFeatureLevelDistanceGowallaPD13Apr2018(ActivityObject ao1, ActivityObject ao2)
+	{
+		double dfeat = 0, dActivityName = 0, dStartTime = 0, dLocation = 0, dPopularity = 0;
+		double dDistanceFromPrev = 0, dDurationFromPrev = 0;
+
+		StringBuilder sbLogTemp1 = new StringBuilder();
+		StringBuilder sbLog = new StringBuilder();
+
+		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
+		{
+			if (useStartTimeInFED)
+			{
+				Pair<Double, String> stDistRes = getStartTimeDistanceZoned13Apr2018(ao1.getStartTimestampInms(),
+						ao2.getStartTimestampInms(), ao1.getTimeZoneId(), ao2.getTimeZoneId(),
+						Constant.editDistTimeDistType, startTimeToleranceInSeconds, wtStartTime);
+
+				sbLog.append("useStartTimeInFED: stDistRes=" + stDistRes + "\n");
+				if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
+				{
+					WToFile.appendLineToFileAbs("Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+							+ ao2.getLocationIDs(',') + "\n",
+							Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+				}
+
+				dStartTime = stDistRes.getFirst();
+				sbLog.append("\ndST=" + stDistRes.getSecond());
+			}
+
+			if (useLocationInFED)
+			{ // if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
+				// probably better implementation
+				if (primaryDimension.equals(PrimaryDimension.LocationID) == false)
+				{
+					sbLog.append("useLocationInFED:\n");
+					if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
+					{ // if no matching locationIDs then add wt to dfeat
+						dLocation = wtLocation;
+					}
+					else
+					{
+						dLocation = 0;// even if one location matches, location distance is 0
+					}
+					sbLog.append("\ndLoc=" + (dLocation));
+				}
+			}
+			if (useActivityNameInFED)
+			{
+				// if (Constant.primaryDimension.equals(PrimaryDimension.LocationID))
+				// probably a better/more generic approach
+				if (primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+				{
+					sbLog.append("useActivityNameInFED:\n");
+					// changed on 21 Mar 2018, was incorrect earlier, but did not affect our published results since we
+					// have not used this in any of our publications
+					// if (ao1.getActivityID() == ao2.getActivityID())//incorrect version before Mar 21 2018
+					if (ao1.getActivityID() != ao2.getActivityID())// incorrect version before Mar 21 2018
+					{
+						dActivityName = wtActivityName;
+					}
+					else
+					{
+						dActivityName = 0;
+					}
+					sbLog.append("\ndActName" + (dActivityName));
+				}
+			}
+
+			if (usePopularityInFED)
+			{
+				double c1 = ao1.getCheckins_count();
+				double c2 = ao2.getCheckins_count();
+				double popularityDistance = (Math.abs(c1 - c2) / Math.max(c1, c2));
+
+				sbLog.append("usePopularityInFED: popularityDistanceRaw=" + popularityDistance + "\n");
+				/// 1 - (Math.abs(c1 - c2) / Math.max(c1, c2));
+				// add more weight if they are more different, popDistance should be higher if they are more different
+				dPopularity = popularityDistance * this.wtLocPopularity;
+				sbLog.append("\nao1.getCheckins_count()=" + c1 + "\nao2.getCheckins_count()=" + c2);
+				sbLog.append("\ndPop=" + dPopularity);
+			}
+
+			if (useDistFromPrevInFED)
+			{
+				double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() - ao2.getDistanceInMFromPrev());
+				sbLog.append("useDistFromPrevInFED: diffOfDistFromPrev=" + diffOfDistFromPrev + "\n");
+				if (diffOfDistFromPrev > 46754)
+				{
+					dDistanceFromPrev = this.wtDistanceFromPrev;
+					sbLog.append("\tdDistanceFromPrev (more than thresh):" + (dDistanceFromPrev));
+				}
+				else if (diffOfDistFromPrev > this.distanceFromPrevTolerance)
+				{
+					double val = fastLogOfBase(diffOfDistFromPrev, 46754) * this.wtDistanceFromPrev;
+					dDistanceFromPrev = val;
+					sbLog.append("\tdDistanceFromPrev (log scaled):" + dDistanceFromPrev);
+				}
+				sbLogTemp1.append(ao1.getDistanceInMFromPrev() + "," + ao2.getDistanceInMFromPrev() + ","
+						+ diffOfDistFromPrev + "," + dDistanceFromPrev + ",");
+			}
+
+			if (useDurationFromPrevInFED)
+			{
+				double diffOfDurFromPrev = FastMath
+						.abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
+				sbLog.append("useDurationFromPrevInFED: diffOfDurFromPrev=" + diffOfDurFromPrev + "\n");
+				if (diffOfDurFromPrev > 63092)
+				{
+					dDurationFromPrev = this.wtDurationFromPrev;
+					sbLog.append("\tdDurationFromPrev (more than thresh):" + (dDurationFromPrev));
+				}
+				else if (diffOfDurFromPrev > this.durationFromPrevTolerance)
+				{
+					double val = fastLogOfBase(diffOfDurFromPrev, 63092) * this.wtDurationFromPrev;
+					dDurationFromPrev = val;
+					sbLog.append("\tdDurationFromPrev (log scaled):" + dDurationFromPrev);
+				}
+				sbLogTemp1.append(ao1.getDurationInSecondsFromPrev() + "," + ao2.getDurationInSecondsFromPrev() + ","
+						+ diffOfDurFromPrev + "," + dDurationFromPrev);
+			}
+			dfeat = dActivityName + dStartTime + dLocation + dPopularity + dDistanceFromPrev + dDurationFromPrev;
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: getFeatureLevelDistanceGowallaPD() called for database: " + Constant.getDatabaseName());
+		}
+
+		if (dfeat > 100)
+		{
+			System.out.println("Inside: dfeat= " + dfeat + " \nlog:\n" + sbLog.toString());
+		}
+
+		// if (Constant.debugFeb24_2018)
+		// {
+		// System.out.println("In dfeat: " + dfeat + " \tlog:\t" + sbLog.toString());
+		// // WritingToFile.appendLineToFileAbsolute("\ndfeat:" + dfeat + " \tlog:\t" + sbLog.toString(),
+		// // Constant.getCommonPath() + "FeatureLevelDistanceLog.csv");
+		// WritingToFile.appendLineToFileAbsolute(
+		// dfeat + "," + dActivityName + "," + dStartTime + "," + dLocation + "," + dPopularity + ","
+		// + dDistanceFromPrev + "," + dDurationFromPrev,
+		// Constant.getCommonPath() + "FeatureLevelDistanceLog.csv");
+		// }
+
+		// if (false)// TEMP FOR DEBUGGING
+		// {
+		// if (dfeat == 0)
+		// {
+		// // System.out.println("In dfeat: " + dfeat + " \tlog:\t" + );
+		// // WritingToFile.appendLineToFileAbsolute("\ndfeat:" + dfeat + " \tlog:\t" + sbLog.toString(),
+		// // Constant.getCommonPath() + "FeatureLevelDistanceLog.csv");
+		// WritingToFile.appendLineToFileAbsolute(
+		// "ao1= " + ao1.toString() + "\n" + "ao2= " + ao2.toString() + "\n" + dfeat + "," + dActivityName
+		// + "," + dStartTime + "," + dLocation + "," + dPopularity + "," + dDistanceFromPrev + ","
+		// + dDurationFromPrev + "\n" + sbLog.toString() + "\n\n",
+		// Constant.getCommonPath() + "FeatureLevelDistanceWhyZeroLog.csv");
+		// }
+		// }
+		// if (true)// TEMP FOR DEBUGGING
+		// {
+		// WritingToFile.appendLineToFileAbsolute(sbLogTemp1.toString() + "\n",
+		// Constant.getCommonPath() + "FeatureLevelDistanceDistDurLog.csv");
+		// }
+
+		return dfeat;
+	}
+
+	/**
 	 * 
 	 * @param ao1
 	 * @param ao2
@@ -3332,11 +3828,9 @@ public class AlignmentBasedDistance
 				if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
 				// stDistRes.getSecond().length() <=15)// null timezone
 				{
-					WritingToFile
-							.appendLineToFileAbsolute(
-									"Null timezone for locid" + ao1.getLocationIDs(',') + " or "
-											+ ao2.getLocationIDs(',') + "\n",
-									Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+					WToFile.appendLineToFileAbs("Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+							+ ao2.getLocationIDs(',') + "\n",
+							Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
 				}
 
 				dStartTime = stDistRes.getFirst();

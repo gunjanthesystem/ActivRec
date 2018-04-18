@@ -1,7 +1,7 @@
 package org.activity.featureExtraction;
 
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 /**
  * 
@@ -122,7 +122,7 @@ public class FeatureExtractionUtils
 						// userIDSampEnMap.put(key, value);
 						sbUserIDSampEn.append("U" + userID + "," + sampEnVal + "\n");
 					}
-					WritingToFile.writeToNewFile(sbUserIDSampEn.toString(),
+					WToFile.writeToNewFile(sbUserIDSampEn.toString(),
 							pathToWrite + "AllUsers" + featureName + "m" + m + "SampEn.csv");
 				}
 

@@ -387,6 +387,13 @@ public class GluonOSMMap extends Application
 				});
 	}
 
+	/**
+	 * 
+	 * @param listOfLocs
+	 * @param sizeOfIcon
+	 * @param colorOfIcon
+	 * @return
+	 */
 	private MapLayer positionLayerV3(List<Triple<Double, Double, String>> listOfLocs, int sizeOfIcon, Color colorOfIcon)
 	{
 		List<MapPoint> mapPoints = new ArrayList<>();
@@ -417,6 +424,12 @@ public class GluonOSMMap extends Application
 
 	}
 
+	/**
+	 * 
+	 * @param listOfLocs
+	 * @param sizeOfIcon
+	 * @return
+	 */
 	private MapLayer positionLayerV3_colorByLabelScaled(List<Triple<Double, Double, String>> listOfLocs, int sizeOfIcon)
 	{
 		PoiLayer2Faster answer = new PoiLayer2Faster(listOfLocs.size());

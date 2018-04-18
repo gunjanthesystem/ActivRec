@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 import org.activity.constants.Constant;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.spatial.SpatialUtils;
@@ -41,7 +41,7 @@ public class ActivityStats
 		new File(directoryToWrite).mkdir();
 		pathToWrite = directoryToWrite + "/";
 		Constant.setCommonPath(pathToWrite);
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
 		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
@@ -67,7 +67,7 @@ public class ActivityStats
 		new File(directoryToWrite).mkdir();
 		pathToWrite = directoryToWrite + "/";
 		Constant.setCommonPath(pathToWrite);
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
 		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
@@ -155,7 +155,7 @@ public class ActivityStats
 
 					double startDiff = SpatialUtils.haversine(startGeoLat1, startGeoLon1, startGeoLat2, startGeoLon2);
 
-					WritingToFile.appendLineToFile(String.valueOf(StatsUtils.round(startDiff, 2)), user + "startDiff");
+					WToFile.appendLineToFile(String.valueOf(StatsUtils.round(startDiff, 2)), user + "startDiff");
 
 					String endGeoLat1 = validTrajectoryEntries.get(i).getEndLat();
 					String endGeoLon1 = validTrajectoryEntries.get(i).getEndLon();
@@ -165,7 +165,7 @@ public class ActivityStats
 
 					double endDiff = SpatialUtils.haversine(endGeoLat1, endGeoLon1, endGeoLat2, endGeoLon2);
 
-					WritingToFile.appendLineToFile(String.valueOf(StatsUtils.round(endDiff, 2)), user + "endDiff");
+					WToFile.appendLineToFile(String.valueOf(StatsUtils.round(endDiff, 2)), user + "endDiff");
 					// validTrajectoryEntries.get(i),validTrajectoryEntries.get(j)
 				}
 			}

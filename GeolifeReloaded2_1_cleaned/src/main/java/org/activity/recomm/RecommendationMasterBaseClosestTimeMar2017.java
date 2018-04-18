@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.VerbosityConstants;
 import org.activity.evaluation.Evaluation;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
@@ -198,7 +198,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 
 		createRankedTopRecommendedActivityNames(startTimeDistanceSortedMap);
 
-		WritingToFile.writeStartTimeDistancesSorted(this.startTimeDistanceSortedMap);
+		WToFile.writeStartTimeDistancesSorted(this.startTimeDistanceSortedMap);
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting RecommendationMasterBaseClosestTime");
 	}
 

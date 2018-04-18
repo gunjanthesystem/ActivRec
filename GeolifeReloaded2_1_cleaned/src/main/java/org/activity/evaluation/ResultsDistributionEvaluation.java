@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.SFTPFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.ui.PopUps;
 
@@ -61,8 +61,8 @@ public class ResultsDistributionEvaluation
 
 		String pathToWrite = "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
 				+ LocalDateTime.now().getDayOfMonth() + "ResultsDistribution/FiveDays/";// "./dataWritten/Mar9/FiveDays/";
-		WritingToFile.createDirectoryIfNotExists(pathToWrite);
-		WritingToFile.createDirectoryIfNotExists(pathToWrite + "ReadMe/");
+		WToFile.createDirectoryIfNotExists(pathToWrite);
+		WToFile.createDirectoryIfNotExists(pathToWrite + "ReadMe/");
 
 		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril10ToRead.csv";
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
@@ -84,7 +84,7 @@ public class ResultsDistributionEvaluation
 
 					host = getHostFromString(resEntry.get(1)).trim();
 
-					WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n",
+					WToFile.appendLineToFileAbs(resultsLabel + "\n",
 							pathToWrite + resultsLabel + "UserLabels.csv");
 
 					System.out.println(
@@ -151,11 +151,11 @@ public class ResultsDistributionEvaluation
 
 					if (resEntry.get(0).equals("100R"))
 					{
-						WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "100RUserLabels.csv");
+						WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "100RUserLabels.csv");
 					}
 					if (resEntry.get(0).equals("916"))
 					{
-						WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "916UserLabels.csv");
+						WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "916UserLabels.csv");
 					}
 
 					System.out.println(
@@ -273,16 +273,16 @@ public class ResultsDistributionEvaluation
 
 		if (res.size() >= 100)
 		{
-			WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
+			WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
 		}
 		if (res.size() == 916)
 		{
-			WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "E916UserLabels.csv");
+			WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "E916UserLabels.csv");
 		}
 
 		if (res.size() < 916)
 		{
-			WritingToFile.appendLineToFileAbsolute(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
+			WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
 		}
 		return res.size();
 	}
@@ -744,14 +744,14 @@ public class ResultsDistributionEvaluation
 				sb.append(r.getKey() + "," + r.getValue().getFirst() + "," + r.getValue().getSecond().get(0) + ","
 						+ r.getValue().getSecond().get(1) + "," + r.getValue().getSecond().get(2) + "\n");
 			}
-			WritingToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName + ".csv");
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName + ".csv");
 
-			WritingToFile.writeToNewFile(host + ":" + pathToRead,
+			WToFile.writeToNewFile(host + ":" + pathToRead,
 					pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe.txt");
 		}
 		catch (NullPointerException e)
 		{
-			WritingToFile.appendLineToFileAbsolute(
+			WToFile.appendLineToFileAbs(
 					PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n"),
 					pathToWrite + "ExceptionsEncountered.csv");
 			return null;

@@ -20,7 +20,7 @@ import org.activity.constants.Enums;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.VerbosityConstants;
 import org.activity.evaluation.Evaluation;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
@@ -300,11 +300,11 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 				nextMostFreqActsBasedOnNGramsActName.put(userAtRecomm, nextActsBasedOnNGramActName);
 				if (writeToFile)
 				{
-					WritingToFile.writeMapOfMapOfMapOfList(nextMostFreqActsBasedOnNGrams,
+					WToFile.writeMapOfMapOfMapOfList(nextMostFreqActsBasedOnNGrams,
 							Constant.getOutputCoreResultsPath() + "nextMostFreqActsBasedOnNGrams.csv", "|", "__");
-					WritingToFile.writeMapOfMapOfMapOfListInt(nextMostFreqActsBasedOnNGramsActID,
+					WToFile.writeMapOfMapOfMapOfListInt(nextMostFreqActsBasedOnNGramsActID,
 							Constant.getOutputCoreResultsPath() + "nextMostFreqActsBasedOnNGramsActID.csv", "|", "__");
-					WritingToFile.writeMapOfMapOfMapOfListString(nextMostFreqActsBasedOnNGramsActName,
+					WToFile.writeMapOfMapOfMapOfListString(nextMostFreqActsBasedOnNGramsActName,
 							Constant.getOutputCoreResultsPath() + "nextMostFreqActsBasedOnNGramsActName.csv", "|",
 							"__");
 				}
@@ -330,7 +330,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	private static HashMap<String, Long> writeFreqDistr(int userAtRecomm, int n, HashMap<String, Long> freqDistr)
 	{
 		freqDistr = (LinkedHashMap<String, Long>) ComparatorUtils.sortByValueDescNoShuffle(freqDistr);
-		WritingToFile.writeSimpleMapToFile(freqDistr,
+		WToFile.writeSimpleMapToFile(freqDistr,
 				Constant.getOutputCoreResultsPath() + n + "gram" + userAtRecomm + "FreqDistTrain.csv", "subsequence",
 				"count");
 
@@ -343,11 +343,11 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 				.collect(Collectors.toMap(e -> TimelineStats.getNGramAsActID(e.getKey(), "--"), e -> e.getValue(),
 						(e1, e2) -> e1, LinkedHashMap::new));
 
-		WritingToFile.writeSimpleMapToFile(freqDistrWithActNames,
+		WToFile.writeSimpleMapToFile(freqDistrWithActNames,
 				Constant.getOutputCoreResultsPath() + n + "gram" + userAtRecomm + "FreqDistActNameTrain.csv",
 				"subsequence", "count");
 
-		WritingToFile.writeSimpleMapToFile(freqDistrWithActID,
+		WToFile.writeSimpleMapToFile(freqDistrWithActID,
 				Constant.getOutputCoreResultsPath() + n + "gram" + userAtRecomm + "FreqDistActIDTrain.csv",
 				"subsequence", "count");
 

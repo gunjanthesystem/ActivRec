@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 import org.activity.constants.Constant;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.LabelEntry;
 import org.activity.objects.Pair;
 import org.activity.objects.TrajectoryEntry;
@@ -190,9 +190,9 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 						true);// "trajID,timestamp,
 								// endt,mode,latitude,longitude,timedifferenceWithNextInSeconds,durationInSeconds,breakOverDaysCount",
 
-				WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedContinuousWithDuration,
+				WToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedContinuousWithDuration,
 						"Not Available", "MergedContinuous" + dataSplitLabel, true);
-				WritingToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedContinuousWithDuration, "Unknown",
+				WToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedContinuousWithDuration, "Unknown",
 						"MergedContinuous" + dataSplitLabel, true);
 
 				// mapForAllDataMergedContinuousWithDuration =
@@ -303,7 +303,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 				stringToWrite.append(user + "," + le.toStringRaw() + "\n");
 			}
 		}
-		WritingToFile.appendLineToFileAbsolute(stringToWrite.toString(), commonPath + "LabelEntriesMap.csv");
+		WToFile.appendLineToFileAbs(stringToWrite.toString(), commonPath + "LabelEntriesMap.csv");
 	}
 
 	public static ArrayList<String> identifyOnlyTargetUsers()
@@ -419,7 +419,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile
+				BufferedWriter bwMergerCaseLogs = WToFile
 						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
@@ -640,7 +640,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -1335,9 +1335,9 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			mapForAllUnknownsBrokenOverDays.put(entryForUser.getKey(), unknownsInsertedBrokenOverDays);
 		}
 
-		WritingToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+		WToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 				"User,Timestamp,DurationInSecs");
-		WritingToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsBrokenOverDays, "Unknown_BrokenOverDays_Inserted",
+		WToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsBrokenOverDays, "Unknown_BrokenOverDays_Inserted",
 				"User,Timestamp,DurationInSecs");
 
 		return mapForAllDataMergedPlusDuration;
@@ -1526,7 +1526,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			}
 
 			numberOfSandwichesFound.put(userName, numberOfSandwichesForThisUser);
-			WritingToFile.writeSimpleLinkedHashMapToFile(numberOfSandwichesFound, commonPath + "sandwichesPerUser_"
+			WToFile.writeSimpleLinkedHashMapToFile(numberOfSandwichesFound, commonPath + "sandwichesPerUser_"
 					+ activityNameToMerge + thresholdForMergingNotAvailables + "secs.csv", "User",
 					"number_of_sandwiches");
 
@@ -1872,7 +1872,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			System.out.println("put, User:" + userID + ", #TrajectoryEntries:" + mapContinuousNotMerged.size());
 		}
 
-		WritingToFile.writeArrayList(timeDifferencesBetweenDataPointAllUsers, "TimeDifferenceAll",
+		WToFile.writeArrayList(timeDifferencesBetweenDataPointAllUsers, "TimeDifferenceAll",
 				"UserID,TimeDifferenceWithNextInSeconds");
 		System.out.println("exiting getTrajectoryEntriesWithTimeDifferenceWithNext");
 
@@ -2080,7 +2080,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 
 		try
 		{
-			WritingToFile.writeNegativeZeroInvalidsLatLonAltHeader("CountOfNegativeZeroUnknownAltLatLon");
+			WToFile.writeNegativeZeroInvalidsLatLonAltHeader("CountOfNegativeZeroUnknownAltLatLon");
 
 			for (String userID : userIDs)
 			{
@@ -2171,16 +2171,16 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 
 				modesForAllTrajectoryFilesAllUsers.put(userID, modesForAllTrajectoryFilesPerUser);
 
-				WritingToFile.writeNegativeZeroInvalidsLatLonAlt(userID, "CountOfNegativeZeroUnknownAltLatLon");
+				WToFile.writeNegativeZeroInvalidsLatLonAlt(userID, "CountOfNegativeZeroUnknownAltLatLon");
 
 				mapForAllData.put(userID, mapEachUser);
 				// System.out.println("putting maps of user:" + userID + " of size:" + mapEachUser.size());
 				System.out.println("put, User:" + userID + ",#TrajectoryEntries:" + mapEachUser.size());
 			} // end of loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemapAllString(modesForAllTrajectoryFilesAllUsers,
+			WToFile.writeLinkedHashMapOfTreemapAllString(modesForAllTrajectoryFilesAllUsers,
 					"ModesPerTrajectoryFiles", "UserID,TrajectoryFile, NumberOfModes,Modes");
-			WritingToFile.writeNegativeZeroInvalidsLatLonAltFooter("CountOfNegativeZeroUnknownAltLatLon");
+			WToFile.writeNegativeZeroInvalidsLatLonAltFooter("CountOfNegativeZeroUnknownAltLatLon");
 			// WritingToFile.writeLinkedHashMapOfTreemapPureTrajectoryEntries(mapForAllData,
 			// "AllDataWithAnnotation","UserID,Timestamp,Mode,Latitude,Longitude,Altitude,DifferenceWithNextInSeconds,DurationInSeconds,BreakOverDaysCount");
 
@@ -2879,7 +2879,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 	public static void checkConsecutiveSameActivityNameTrajSensitive(
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, String absfilename)
 	{
-		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBWForNewFile(absfilename);
+		BufferedWriter bwConsecutiveSimilar = WToFile.getBWForNewFile(absfilename);
 		String toWrite = "User,TrajID,TimestampWhichIsSimilarToPrev,Mode\n";
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : data.entrySet())
 		{
@@ -2946,7 +2946,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, int sandwichFillerDurationInSecs,
 			String absfilename)
 	{
-		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBWForNewFile(absfilename);
+		BufferedWriter bwConsecutiveSimilar = WToFile.getBWForNewFile(absfilename);
 		String toWrite = "User,TrajID,StartTime,Mode,Duration,SanwichIndexIndex\n";
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : data.entrySet())
 		{
@@ -3092,7 +3092,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 
 					if (entry.getValue().getNumberOfDistinctTrajectoryIDs() > 1)
 					{
-						WritingToFile.appendLineToFileAbsolute("User:" + userName + "," + msg + "\n",
+						WToFile.appendLineToFileAbs("User:" + userName + "," + msg + "\n",
 								commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
 					}
 					// return "t:" + timestamp + ",mod:" + mode + " ,endt:" + endTimestamp + ", timeDiffWithNextInSecs:"
@@ -3159,8 +3159,8 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 
 					if (entry.getValue().getNumberOfDistinctTrajectoryIDs() > 1)
 					{
-						WritingToFile
-								.appendLineToFileAbsolute(
+						WToFile
+								.appendLineToFileAbs(
 										"User:" + userName + ","
 												+ entry.getValue().toStringWithTrajIDWithTrajPurityCheck() + "\n",
 										commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
@@ -3346,7 +3346,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile
+				BufferedWriter bwMergerCaseLogs = WToFile
 						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("TrajId,Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
@@ -3570,7 +3570,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -3607,7 +3607,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile
+				BufferedWriter bwMergerCaseLogs = WToFile
 						.getBWForNewFile(commonPath + userID + "MergerCleanNotAvailableCasesLog.csv");
 				bwMergerCaseLogs
 						.write("TrajId,Case,CurrentMode,NextMode,NextDurationInSecs,CurrentTS, NextTS,Comment\n");
@@ -3872,7 +3872,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile.getBWForNewFile(
+				BufferedWriter bwMergerCaseLogs = WToFile.getBWForNewFile(
 						commonPath + userID + activityNameToMerge + "MergerSandwichesLog.csv");
 				bwMergerCaseLogs.write(
 						"TrajId,CurrentMode,NextMode,NextToNextMode,CurrentTS, NextTS,NextToNextTS,DurationOfNext,TimestampDifferenceForDuration\n");

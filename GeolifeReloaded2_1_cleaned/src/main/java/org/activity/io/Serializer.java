@@ -678,7 +678,7 @@ public class Serializer
 		String fileName = "flatFile";
 		ArrayList<FlatActivityLogEntry> listOfActivityEntries = getAllLogEntries(fileName);
 
-		WritingToFile.writeArrayListFlatActivityLogEntry(listOfActivityEntries, "FlatActivityLogEntries",
+		WToFile.writeArrayListFlatActivityLogEntry(listOfActivityEntries, "FlatActivityLogEntries",
 				"User_ID,Activity_ID,Date_ID,Time_ID,Location_ID,User_Name,Activity_Name,Start_Time,End_Time,Start_Date,End_Date,Duration,Start_Latitude,Start_Longitude,Start_Altitude,End_Latitude,End_Longitude,End_Altitude,Avg_Altitude");
 		// int count=0;
 		// for(FlatActivityLogEntry entry: listOfActivityEntries)

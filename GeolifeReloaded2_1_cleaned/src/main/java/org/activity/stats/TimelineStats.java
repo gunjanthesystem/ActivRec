@@ -27,7 +27,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
@@ -131,7 +131,7 @@ public class TimelineStats
 		pathToWrite = directoryToWrite + "/";
 		Constant.setCommonPath(pathToWrite);
 		PopUps.showMessage("path to write: " + pathToWrite);
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 		// /////////////////////
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>();
 		if (!Constant.getDatabaseName().equals("gowalla1"))
@@ -149,7 +149,7 @@ public class TimelineStats
 			usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
 			usersDayTimelines = TimelineUtils.rearrangeDayTimelinesOrderForDataset(usersDayTimelines);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
 
-			WritingToFile.writeUsersDayTimelines(usersDayTimelines, "users", true, true, true);// users
+			WToFile.writeUsersDayTimelines(usersDayTimelines, "users", true, true, true);// users
 		}
 		else
 		{
@@ -258,7 +258,7 @@ public class TimelineStats
 					userTimelines = TimelineUtils.expungeInvalids(userTimelines);
 				}
 
-				WritingToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
+				WToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
 						pathToWrite + "UserNumOfActivityObjects.csv", "UserID", "NumOfActivityObjects");
 
 				performNGramAnalysis(userTimelines, 1, 5/* 20 */, (pathToWrite));
@@ -392,7 +392,7 @@ public class TimelineStats
 
 					String toWrite = m + "," + sampleEntropy + "\n";
 					String fileNameToUse = userIDN + featureName + "SampEn";
-					WritingToFile.appendLineToFile(toWrite, fileNameToUse);
+					WToFile.appendLineToFile(toWrite, fileNameToUse);
 				}
 				// String toWriteS = m + "," + sampleEntropySum + "\n";
 				// WritingToFile.appendLineToFile(toWriteS, fileNameToUseForSum);
@@ -511,7 +511,7 @@ public class TimelineStats
 
 					String toWrite = m + "," + sampleEntropy + "\n";
 					String fileNameToUse = userIDN + featureEntry.getKey() + "SampEn";
-					WritingToFile.appendLineToFile(toWrite, fileNameToUse);
+					WToFile.appendLineToFile(toWrite, fileNameToUse);
 				}
 				// String toWriteS = m + "," + sampleEntropySum + "\n";
 				// WritingToFile.appendLineToFile(toWriteS, fileNameToUseForSum);
@@ -554,7 +554,7 @@ public class TimelineStats
 			{
 				Integer m = mEntry.getKey();
 
-				WritingToFile.appendLineToFile(m + ",", fileNameToUseForApache);
+				WToFile.appendLineToFile(m + ",", fileNameToUseForApache);
 
 				double sampleEntropySum = 0, sampleEntropyMedian = 0, sampleEntropyStdDev = 0;
 				double countValid = 0;
@@ -566,7 +566,7 @@ public class TimelineStats
 				{
 					Double sampleEntropy = featureEntry.getValue();
 					// sampleEntropyVals[i] = sampleEntropy;
-					WritingToFile.appendLineToFile(sampleEntropy + ",", fileNameToUseForApache);
+					WToFile.appendLineToFile(sampleEntropy + ",", fileNameToUseForApache);
 
 					if ((sampleEntropy.isNaN() || sampleEntropy.isInfinite()) == true)
 					{
@@ -584,19 +584,19 @@ public class TimelineStats
 				DescriptiveStatisticsG ds = new DescriptiveStatisticsG(sampleEntropyVals);
 
 				String toWriteS = m + "," + sampleEntropySum + "\n";
-				WritingToFile.appendLineToFile(toWriteS, fileNameToUseForSum);
+				WToFile.appendLineToFile(toWriteS, fileNameToUseForSum);
 
 				String toWriteAvg = m + "," + sampleEntropySum / countValid + "\n";
-				WritingToFile.appendLineToFile(toWriteAvg, fileNameToUseForAvg);
+				WToFile.appendLineToFile(toWriteAvg, fileNameToUseForAvg);
 
-				WritingToFile.appendLineToFile(m + "," + ds.getStandardDeviation() + "\n", fileNameToUseForStdDev);
-				WritingToFile.appendLineToFile(m + "," + ds.getPercentile(50) + "\n", fileNameToUseForMedian);
+				WToFile.appendLineToFile(m + "," + ds.getStandardDeviation() + "\n", fileNameToUseForStdDev);
+				WToFile.appendLineToFile(m + "," + ds.getPercentile(50) + "\n", fileNameToUseForMedian);
 
-				WritingToFile.appendLineToFile(ds.getSum() + ",", fileNameToUseForApache);
-				WritingToFile.appendLineToFile(ds.getMean() + ",", fileNameToUseForApache);
-				WritingToFile.appendLineToFile(ds.getStandardDeviation() + ",", fileNameToUseForApache);
-				WritingToFile.appendLineToFile(ds.getPercentile(50) + ",", fileNameToUseForApache);
-				WritingToFile.appendLineToFile("\n", fileNameToUseForApache);
+				WToFile.appendLineToFile(ds.getSum() + ",", fileNameToUseForApache);
+				WToFile.appendLineToFile(ds.getMean() + ",", fileNameToUseForApache);
+				WToFile.appendLineToFile(ds.getStandardDeviation() + ",", fileNameToUseForApache);
+				WToFile.appendLineToFile(ds.getPercentile(50) + ",", fileNameToUseForApache);
+				WToFile.appendLineToFile("\n", fileNameToUseForApache);
 			}
 		}
 	}
@@ -652,26 +652,26 @@ public class TimelineStats
 		String fileNameToUse = "TimeSeriesFeatureCorrelation";
 		String[] featureNames = Constant.getFeatureNames();
 
-		WritingToFile.appendLineToFile("User", fileNameToUse);
+		WToFile.appendLineToFile("User", fileNameToUse);
 		for (int i = 0; i < featureNames.length; i++)
 		{
 			for (int j = i + 1; j < featureNames.length; j++)
 			{
 				String msg = "," + featureNames[i] + "-" + featureNames[j];
-				WritingToFile.appendLineToFile(msg, fileNameToUse);
+				WToFile.appendLineToFile(msg, fileNameToUse);
 			}
 		}
-		WritingToFile.appendLineToFile("\n", fileNameToUse);
+		WToFile.appendLineToFile("\n", fileNameToUse);
 
 		for (Map.Entry<String, LinkedHashMap<Pair<String, String>, Double>> entry : featSeriesCorr.entrySet())
 		{
 			String userIDN = entry.getKey();
-			WritingToFile.appendLineToFile(userIDN, fileNameToUse);
+			WToFile.appendLineToFile(userIDN, fileNameToUse);
 			for (Map.Entry<Pair<String, String>, Double> entryUserLevel : entry.getValue().entrySet())
 			{
-				WritingToFile.appendLineToFile("," + entryUserLevel.getValue(), fileNameToUse);
+				WToFile.appendLineToFile("," + entryUserLevel.getValue(), fileNameToUse);
 			}
-			WritingToFile.appendLineToFile("\n", fileNameToUse);
+			WToFile.appendLineToFile("\n", fileNameToUse);
 		}
 	}
 
@@ -754,36 +754,36 @@ public class TimelineStats
 		// WritingToFile.writeAllTimeSeriesInt(timeSeriesIntInvalidsExpunged, "Time" + intervalInSecs +
 		// "SeriesIntInvalidsExpunged");
 
-		WritingToFile.writeAllTimestampedActivityObjects(sequenceAll, "Sequence");
-		WritingToFile.writeAllTimeSeriesInt(sequenceInt, "SequenceInt");
+		WToFile.writeAllTimestampedActivityObjects(sequenceAll, "Sequence");
+		WToFile.writeAllTimeSeriesInt(sequenceInt, "SequenceInt");
 
 		if (Constant.hasInvalidActivityNames)
 		{
-			WritingToFile.writeAllTimeSeriesInt(sequenceIntZeroValuedInvalids, "SequenceIntZeroValuedInvalids ");
-			WritingToFile.writeAllTimeSeriesInt(sequenceIntInvalidsExpunged, "SequenceIntInvalidsExpunged");
+			WToFile.writeAllTimeSeriesInt(sequenceIntZeroValuedInvalids, "SequenceIntZeroValuedInvalids ");
+			WToFile.writeAllTimeSeriesInt(sequenceIntInvalidsExpunged, "SequenceIntInvalidsExpunged");
 		}
 
-		WritingToFile.writeAllTimeSeriesInt(activityNameSequenceIntInvalidsExpungedDummyTime,
+		WToFile.writeAllTimeSeriesInt(activityNameSequenceIntInvalidsExpungedDummyTime,
 				"ActivityNameSequenceIntInvalidsExpungedDummyTime");
 
-		WritingToFile.writeAllTimeSeriesLong(startTimesSequenceIntInvalidsExpungedDummyTime,
+		WToFile.writeAllTimeSeriesLong(startTimesSequenceIntInvalidsExpungedDummyTime,
 				"StartTimeSequenceIntInvalidsExpungedDummyTime");
 
 		if (Constant.getDatabaseName().equals("geolife1"))
 		{
-			WritingToFile.writeAllTimeSeriesLong(durationSequenceIntInvalidsExpungedDummyTime,
+			WToFile.writeAllTimeSeriesLong(durationSequenceIntInvalidsExpungedDummyTime,
 					"DurationSequenceIntInvalidsExpungedDummyTime");
-			WritingToFile.writeAllTimeSeriesLong(startGeoSequenceIntInvalidsExpungedDummyTime,
+			WToFile.writeAllTimeSeriesLong(startGeoSequenceIntInvalidsExpungedDummyTime,
 					"StartGeoCoordinatesSequenceIntInvalidsExpungedDummyTime");
-			WritingToFile.writeAllTimeSeriesLong(endGeoSequenceIntInvalidsExpungedDummyTime,
+			WToFile.writeAllTimeSeriesLong(endGeoSequenceIntInvalidsExpungedDummyTime,
 					"EndGeoCoordinatesSequenceIntInvalidsExpungedDummyTime");
-			WritingToFile.writeAllTimeSeriesDouble(distanceTravelledIntInvalidsExpungedDummyTime,
+			WToFile.writeAllTimeSeriesDouble(distanceTravelledIntInvalidsExpungedDummyTime,
 					"DistanceTravelledSequenceIntInvalidsExpungedDummyTime");
-			WritingToFile.writeAllTimeSeriesDouble(startAltitudeIntInvalidsExpungedDummyTime,
+			WToFile.writeAllTimeSeriesDouble(startAltitudeIntInvalidsExpungedDummyTime,
 					"StartAltitudeSequenceIntInvalidsExpungedDummyTime");
-			WritingToFile.writeAllTimeSeriesDouble(endAltitudeIntInvalidsExpungedDummyTime,
+			WToFile.writeAllTimeSeriesDouble(endAltitudeIntInvalidsExpungedDummyTime,
 					"EndAltitudeSequenceIntInvalidsExpungedDummyTime");
-			WritingToFile.writeAllTimeSeriesDouble(avgAltitudeIntInvalidsExpungedDummyTime,
+			WToFile.writeAllTimeSeriesDouble(avgAltitudeIntInvalidsExpungedDummyTime,
 					"AvgAltitudeSequenceIntInvalidsExpungedDummyTime");
 
 		}
@@ -821,20 +821,20 @@ public class TimelineStats
 				.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
 		LinkedHashMap<String, Double> seqEntropy = getShannonEntropy(sequenceCharInvalidsExpungedNoTS);
 
-		WritingToFile.writeAllTimestampedActivityObjects(timeSeries, "Time" + intervalInSecs + "Series");
+		WToFile.writeAllTimestampedActivityObjects(timeSeries, "Time" + intervalInSecs + "Series");
 
 		// WritingToFile.writeAllTimeSeriesInt(timeSeriesInt, "Time" + intervalInSecs + "SeriesInt");
-		WritingToFile.writeAllTimeSeriesChar(timeSeriesCharInvalidsExpunged,
+		WToFile.writeAllTimeSeriesChar(timeSeriesCharInvalidsExpunged,
 				"Time" + intervalInSecs + "SeriesCharInvalidsExpunged");
 		// WritingToFile.writeAllTimeSeriesInt(timeSeriesIntInvalidsExpunged, "Time" + intervalInSecs +
 		// "SeriesIntInvalidsExpunged");
 
 		// WritingToFile.writeAllTimeSeriesChar(sequenceChar, "SequenceChar");
 		// WritingToFile.writeAllTimeSeriesChar(sequenceCharZeroValuedInvalids, "SequenceCharZeroValuedInvalids ");
-		WritingToFile.writeAllTimeSeriesChar(sequenceCharInvalidsExpunged, "SequenceCharInvalidsExpunged");
+		WToFile.writeAllTimeSeriesChar(sequenceCharInvalidsExpunged, "SequenceCharInvalidsExpunged");
 
-		WritingToFile.writeShannonEntropy(tsEntropy, "TSShannonEntropy");
-		WritingToFile.writeShannonEntropy(seqEntropy, "SeqShannonEntropy");
+		WToFile.writeShannonEntropy(tsEntropy, "TSShannonEntropy");
+		WToFile.writeShannonEntropy(seqEntropy, "SeqShannonEntropy");
 		// traverse(transformToEqualIntervalTimeSeries(userTimelines, 1));
 
 	}
@@ -941,7 +941,7 @@ public class TimelineStats
 			int user = Constant.getIndexOfUserID(Integer.valueOf(userEntry.getKey())) + 1;
 
 			LinkedHashMap<String, TreeMap<Double, Double>> activitiesMap = userEntry.getValue();
-			WritingToFile.appendLineToFile(
+			WToFile.appendLineToFile(
 					"ActivityName" + "," + "MU" + ","
 							+ "AvgPairwiseEditDistanceOfSegments,AvgPairwiseEditDistanceOfSegments/MU" + "\n",
 					user + fileNamePhrase);
@@ -962,7 +962,7 @@ public class TimelineStats
 					}
 					else
 						upon = (avgPairwiseEditDistanceOfSegments / mu);
-					WritingToFile.appendLineToFile(
+					WToFile.appendLineToFile(
 							activityName + "," + mu + "," + avgPairwiseEditDistanceOfSegments + "," + upon + "\n",
 							user + fileNamePhrase);
 				}
@@ -1500,7 +1500,7 @@ public class TimelineStats
 			stringToWrite.append(info.getSecond() + "," + info.getFirst() + "\n"); // number of updates as string
 																					// 1_2_1_0 and number of times this
 																					// clustering happens in result
-			WritingToFile.appendLineToFile(stringToWrite.toString(), fileNameForWrite);
+			WToFile.appendLineToFile(stringToWrite.toString(), fileNameForWrite);
 			// for (Map.Entry<LinkedHashSet<Cluster>, Pair<String, Integer>> entry : clusters..entrySet())
 		}
 	}
@@ -1620,7 +1620,7 @@ public class TimelineStats
 				ActivityObject ao = entryInn.getValue();
 
 				String s = entryInn.getKey().toString() + "," + ao.getActivityName();
-				WritingToFile.appendLineToFile(s + "\n", userID + "TimeSeries");
+				WToFile.appendLineToFile(s + "\n", userID + "TimeSeries");
 			}
 		}
 	}
@@ -1675,7 +1675,7 @@ public class TimelineStats
 
 				freqDistr = (LinkedHashMap<String, Long>) ComparatorUtils.sortByValueDescNoShuffle(freqDistr);
 
-				WritingToFile.writeSimpleMapToFile(freqDistr, pathForResultFiles + n + "gram" + userID + "FreqDist.csv",
+				WToFile.writeSimpleMapToFile(freqDistr, pathForResultFiles + n + "gram" + userID + "FreqDist.csv",
 						"subsequence", "count");
 
 				/// If there is a need to write n-grams as actname or act ids instead of char codes
@@ -1686,10 +1686,10 @@ public class TimelineStats
 				LinkedHashMap<String, Long> freqDistrWithActID = freqDistr.entrySet().stream().collect(Collectors.toMap(
 						e -> getNGramAsActID(e.getKey(), "--"), e -> e.getValue(), (e1, e2) -> e1, LinkedHashMap::new));
 
-				WritingToFile.writeSimpleMapToFile(freqDistrWithActNames,
+				WToFile.writeSimpleMapToFile(freqDistrWithActNames,
 						pathForResultFiles + n + "gram" + userID + "FreqDistActName.csv", "subsequence", "count");
 
-				WritingToFile.writeSimpleMapToFile(freqDistrWithActID,
+				WToFile.writeSimpleMapToFile(freqDistrWithActID,
 						pathForResultFiles + n + "gram" + userID + "FreqDistActID.csv", "subsequence", "count");
 				///
 			}
@@ -2329,17 +2329,17 @@ public class TimelineStats
 				count++;
 
 				String activityName = ao.getActivityName();
-				WritingToFile.appendLineToFile(activityName + "\n", userID + "activityName");
+				WToFile.appendLineToFile(activityName + "\n", userID + "activityName");
 
 				Timestamp startTimestamp = ao.getStartTimestamp();
-				WritingToFile.appendLineToFile((startTimestamp) + "\n", userID + "startTimestamp");
+				WToFile.appendLineToFile((startTimestamp) + "\n", userID + "startTimestamp");
 
 				Timestamp endTimestamp = ao.getEndTimestamp();
-				WritingToFile.appendLineToFile((endTimestamp) + "\n", userID + "endTimestamp");
+				WToFile.appendLineToFile((endTimestamp) + "\n", userID + "endTimestamp");
 
 				Long duration = ao.getDurationInSeconds();
-				WritingToFile.appendLineToFile(duration.toString() + "\n", userID + "duration");
-				WritingToFile.appendLineToFile(duration.toString() + "\n", "AllUsersduration");
+				WToFile.appendLineToFile(duration.toString() + "\n", userID + "duration");
+				WToFile.appendLineToFile(duration.toString() + "\n", "AllUsersduration");
 
 				durationsForAll.add((double) duration);
 				if (duration == 1)
@@ -2355,28 +2355,28 @@ public class TimelineStats
 				if (Constant.getDatabaseName().equals("Geolife1"))
 				{
 					String startLatitude = ao.getStartLatitude();
-					WritingToFile.appendLineToFile(startLatitude + "\n", userID + "startLatitude");
+					WToFile.appendLineToFile(startLatitude + "\n", userID + "startLatitude");
 
 					String endLatitude = ao.getEndAltitude();
-					WritingToFile.appendLineToFile(endLatitude + "\n", userID + "endLatitude");
+					WToFile.appendLineToFile(endLatitude + "\n", userID + "endLatitude");
 
 					String startLongitude = ao.getStartLongitude();
-					WritingToFile.appendLineToFile(startLongitude + "\n", userID + "startLongitude");
+					WToFile.appendLineToFile(startLongitude + "\n", userID + "startLongitude");
 
 					String endLongitude = ao.getEndLongitude();
-					WritingToFile.appendLineToFile(endLongitude + "\n", userID + "endLongitude");
+					WToFile.appendLineToFile(endLongitude + "\n", userID + "endLongitude");
 
 					String startAltitude = ao.getStartAltitude();
-					WritingToFile.appendLineToFile(startAltitude + "\n", userID + "startAltitude");
+					WToFile.appendLineToFile(startAltitude + "\n", userID + "startAltitude");
 
 					String endAltitude = ao.getStartAltitude();
-					WritingToFile.appendLineToFile(endAltitude + "\n", userID + "endAltitude");
+					WToFile.appendLineToFile(endAltitude + "\n", userID + "endAltitude");
 
 					String avgAltitude = ao.getAvgAltitude();
-					WritingToFile.appendLineToFile(avgAltitude + "\n", userID + "avgAltitude");
+					WToFile.appendLineToFile(avgAltitude + "\n", userID + "avgAltitude");
 
 					double distanceTravelled = ao.getDistanceTravelled();
-					WritingToFile.appendLineToFile(String.valueOf(distanceTravelled) + "\n",
+					WToFile.appendLineToFile(String.valueOf(distanceTravelled) + "\n",
 							userID + "distanceTravelled");
 				}
 			}
@@ -2413,7 +2413,7 @@ public class TimelineStats
 					+ "," + entry.getValue().size());
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	/**
@@ -2434,7 +2434,7 @@ public class TimelineStats
 					+ "," + entry.getValue().size());
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	/**
@@ -2450,13 +2450,13 @@ public class TimelineStats
 		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userName = entry.getKey();
-			WritingToFile.writeActivityCountsInGivenDayTimelines(userName, entry.getValue(), "AllTimelines");
+			WToFile.writeActivityCountsInGivenDayTimelines(userName, entry.getValue(), "AllTimelines");
 
 			if (!Constant.getDatabaseName().equals("gowalla1"))
 			{// since gowalla data does not have duration
-				WritingToFile.writeActivityDurationInGivenDayTimelines(userName, entry.getValue(), "AllTimelines");
+				WToFile.writeActivityDurationInGivenDayTimelines(userName, entry.getValue(), "AllTimelines");
 			}
-			WritingToFile.writeActivityOccPercentageOfTimelines(userName, entry.getValue(), "AllTimelines");
+			WToFile.writeActivityOccPercentageOfTimelines(userName, entry.getValue(), "AllTimelines");
 		}
 	}
 
@@ -2481,7 +2481,7 @@ public class TimelineStats
 					+ "," + numOfTotalValidActs);
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	/**
@@ -2517,7 +2517,7 @@ public class TimelineStats
 					+ "," + entry.getValue().size() + "," + numOfWeekDays + "," + numOfWeekends + "," + percentage);
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	public static void writeStatsNumOfDistinctActsPerDayInTimelines(
@@ -2550,7 +2550,7 @@ public class TimelineStats
 					+ ds.getSum() + "," + TimelineUtils.countNumberOfDistinctActivities(allActObjs));
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	public static void writeAllNumOfDistinctActsPerDayInTimelines(
@@ -2570,7 +2570,7 @@ public class TimelineStats
 			s.append(numOfDistinctActsPerDay.substring(0, numOfDistinctActsPerDay.length() - 1) + "\n");
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	/**
@@ -2603,7 +2603,7 @@ public class TimelineStats
 					+ StatsUtils.iqrOfArrayListInt(numOfDistinctActsPerDay, 2));
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	/**
@@ -2640,7 +2640,7 @@ public class TimelineStats
 					+ ds.getSum() + "," + totalNumOfActsOverAllTimelines);
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	//
@@ -2660,7 +2660,7 @@ public class TimelineStats
 			s.append(numOfTotalActsPerDay.substring(0, numOfTotalActsPerDay.length() - 1) + "\n");
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	/**
@@ -2693,7 +2693,7 @@ public class TimelineStats
 					+ StatsUtils.iqrOfArrayListInt(numOfTotalActsPerDay, 2));
 		}
 
-		WritingToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
+		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
 	public static LinkedHashMap<String, Complex[]> getFTInt(LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> ts)// ,
@@ -2869,7 +2869,7 @@ public class TimelineStats
 				String toWrite = "activity," + hjorthParams.getFirst() + "\n" + "mobility," + hjorthParams.getSecond()
 						+ "\n" + "complexity," + hjorthParams.getThird() + "\n";
 				String fileNameToUse = userIDN + featureEntry.getKey() + "HjorthParams";
-				WritingToFile.appendLineToFile(toWrite, fileNameToUse);
+				WToFile.appendLineToFile(toWrite, fileNameToUse);
 			}
 		}
 	}

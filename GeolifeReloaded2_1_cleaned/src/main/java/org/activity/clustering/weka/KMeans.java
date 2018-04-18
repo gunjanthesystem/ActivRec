@@ -2,7 +2,7 @@ package org.activity.clustering.weka;
 
 import java.time.LocalDateTime;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.SimpleKMeans;
@@ -49,8 +49,8 @@ public class KMeans
 			clusterEvaluation.evaluateClusterer(new Instances(dataInstances));
 			// System.out.println("using distance function: " + kmeans.getDistanceFunction().toString() + "\n");
 
-			WritingToFile.appendLineToFileAbsolute(kmeans.globalInfo() + "\n", outputAbsoluteFileName);
-			WritingToFile.appendLineToFileAbsolute(clusterEvaluation.clusterResultsToString() + "\n",
+			WToFile.appendLineToFileAbs(kmeans.globalInfo() + "\n", outputAbsoluteFileName);
+			WToFile.appendLineToFileAbs(clusterEvaluation.clusterResultsToString() + "\n",
 					outputAbsoluteFileName);
 
 			int[] assignments = kmeans.getAssignments();
@@ -58,7 +58,7 @@ public class KMeans
 			int i = 0;
 			for (int clusterNum : assignments)
 			{
-				WritingToFile.appendLineToFileAbsolute(
+				WToFile.appendLineToFileAbs(
 						"Instance " + i + ":  User " + (i + 1) + " assigned to Cluster " + clusterNum + " \n",
 						outputAbsoluteFileName);
 				i++;

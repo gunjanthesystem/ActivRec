@@ -2,7 +2,7 @@ package org.activity.loader;
 
 import java.io.PrintStream;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 public class StayPointsLoader
 {
@@ -21,7 +21,7 @@ public class StayPointsLoader
 		{
 			databaseName = "StayPoints";
 			commonPath = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/TrajectorySpace/Jun13/";
-			PrintStream loadLogStream = WritingToFile.redirectConsoleOutput(commonPath + "LoadingStayPointsLog.txt");
+			PrintStream loadLogStream = WToFile.redirectConsoleOutput(commonPath + "LoadingStayPointsLog.txt");
 
 		}
 

@@ -2,7 +2,7 @@ package org.activity.distances;
 
 import java.util.ArrayList;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.util.StringCode;
@@ -68,7 +68,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 		// $$WritingToFile.writeEditSimilarityCalculation(activityObjects1, activityObjects2, result.getSecond(),
 		// result.getFirst());
-		WritingToFile.writeOnlyTrace(result.getFirst());
+		WToFile.writeOnlyTrace(result.getFirst());
 
 		return result;
 	}
@@ -359,7 +359,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 		// countNumberOfInsertionDeletions(activityObjects1, activityObjects2) ;
 
-		WritingToFile.writeEditSimilarityCalculation(activityObjects1, activityObjects2, editDistance);
+		WToFile.writeEditSimilarityCalculation(activityObjects1, activityObjects2, editDistance);
 		// WritingToFile.writeEditDistance(editDistance);
 
 		return editDistance;// similarity;
@@ -709,7 +709,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 		// countNumberOfInsertionDeletions(activityObjects1, activityObjects2) ;
 
 		// $$WritingToFile.writeEditSimilarityCalculation(activityObjects1, activityObjects2, editDistance, trace);
-		WritingToFile.writeOnlyTrace(trace);
+		WToFile.writeOnlyTrace(trace);
 		// WritingToFile.writeEditDistance(editDistance);
 
 		return new Pair<String, Double>(trace, editDistance);// similarity;
@@ -737,7 +737,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 		// $$WritingToFile.writeEditSimilarityCalculation(activityObjects1, activityObjects2,
 		// levenshteinDistance.getSecond(), levenshteinDistance.getFirst());
-		WritingToFile.writeOnlyTrace(levenshteinDistance.getFirst());
+		WToFile.writeOnlyTrace(levenshteinDistance.getFirst());
 
 		// WritingToFile.writeEditSimilarityCalculation(activityObjects1,activityObjects2,levenshteinDistance);
 		// WritingToFile.writeEditDistance(levenshteinDistance);

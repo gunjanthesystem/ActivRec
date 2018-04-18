@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Triple;
 import org.activity.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +56,7 @@ public class JSONProcessingAOTM
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(fileNameToWrite);
 			String lineRead;
 			StringBuffer jsonStringBuf = new StringBuffer();
 			StringBuffer toWriteMsg = new StringBuffer();
@@ -180,7 +180,7 @@ public class JSONProcessingAOTM
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -286,7 +286,7 @@ public class JSONProcessingAOTM
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -357,7 +357,7 @@ public class JSONProcessingAOTM
 			System.out.println("Num of level3 in checkins: " + l3Count);
 			System.out.println("Num of checkins with catID in no levelMap: " + notFoundInAnyLevel);
 
-			WritingToFile.appendLineToFileAbsolute(StringUtils.join(catIDsNotFoundInAnyLevel.toArray(), ","),
+			WToFile.appendLineToFileAbs(StringUtils.join(catIDsNotFoundInAnyLevel.toArray(), ","),
 					"/run/media/gunjan/BoX2/GowallaSpaceSpace/June30/CatsInNoMaps.csv");
 
 			// catIDsNotFoundInAnyLevel

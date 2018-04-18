@@ -29,7 +29,7 @@ import org.activity.constants.VerbosityConstants;
 import org.activity.distances.HJEditDistance;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
@@ -691,7 +691,7 @@ public class TimelineUtils
 		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
 		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
 		// StringBuilder sbAllDurationFromNext = new StringBuilder();
-		WritingToFile.appendLineToFileAbsolute("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
+		WToFile.appendLineToFileAbs("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
 				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
 
 		StringBuilder sbEnumerateAllCats = new StringBuilder();// write all catid sequentially userwise
@@ -797,12 +797,12 @@ public class TimelineUtils
 
 						if (aoCount % 20000 == 0)
 						{
-							WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+							WToFile.appendLineToFileAbs(sbEnumerateAllCats.toString(),
 									commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv");
 							sbEnumerateAllCats.setLength(0);
 
 							/////////////////
-							WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+							WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 									commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 							sbAllDistanceInMDurationInSec.setLength(0);
 
@@ -822,12 +822,12 @@ public class TimelineUtils
 			// write remaining in buffer
 			if (sbEnumerateAllCats.length() != 0)
 			{
-				WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+				WToFile.appendLineToFileAbs(sbEnumerateAllCats.toString(),
 						commonPathToWrite + "ActualOccurrenceOfCatsSeq.csv");
 				sbEnumerateAllCats.setLength(0);
 
 				/////////////////
-				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+				WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 						commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 				sbAllDistanceInMDurationInSec.setLength(0);
 
@@ -839,9 +839,9 @@ public class TimelineUtils
 			}
 
 			System.out.println("Num of aos read = " + aoCount);
-			WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-			WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
 					commonPathToWrite + "UserwiseConsecCountsEqualLength.csv", false, false);
 
 			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
@@ -906,7 +906,7 @@ public class TimelineUtils
 			// locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
 			locationObjects.values().forEach(e -> locInfo.append(e.toString() + "\n"));
 
-			WritingToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
+			WToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
 
 		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0,
@@ -1092,17 +1092,17 @@ public class TimelineUtils
 		System.out.println("locIDsWithNoTZ.size()= " + locIDsWithNoTZ.size());
 		System.out.println("locIDsWithNoFallbackTZ.size()= " + locIDsWithNoFallbackTZ.size());
 
-		WritingToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoTZ.csv");
 
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoFallbackTZ.csv");
 
 		// find loc ids in gowalla 5 days train test data which is known to have no TZ is found to have no fallback tz
 		// as well.
 		locIDsWithNoFallbackTZ.retainAll(DomainConstants.locIDsIn5DaysTrainTestDataWithNullTZ);
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoFallbackTZIn5DaysTrainTestNoTZ.csv");
 
@@ -1123,24 +1123,24 @@ public class TimelineUtils
 		// Start of added on April 6 2018
 		System.out.println(" num of unique actIDs = " + uniqueActIDs.size());
 		System.out.println(" num of unique uniqueWorkingLevelActIDs = " + uniqueWorkingLevelActIDs.size());
-		WritingToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZuniqueActIDs.csv");
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				uniqueWorkingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZuniqueWorkingLevelActIDs.csv");
-		WritingToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZactIDs.csv");
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZworkingLevelActIDs.csv");
 		// End of added on April 6 2018
 
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
 						.collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
 
-		WritingToFile.writeMapOfMap(userIdLocIdNumOfNullZoneCInsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
+		WToFile.writeMapOfMap(userIdLocIdNumOfNullZoneCInsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
 				Constant.getOutputCoreResultsPath() + "userIdLocIdNumOfNullZoneCInsMap.csv");
 
 		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
@@ -1188,7 +1188,7 @@ public class TimelineUtils
 			// locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
 			locationObjects.values().forEach(e -> locInfo.append(e.toString() + "\n"));
 
-			WritingToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
+			WToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
 
 		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0,
@@ -1339,19 +1339,19 @@ public class TimelineUtils
 		System.out.println(" num of unique zoneIDs = " + uniqueZoneIDs.size());
 		System.out.println(" num of unique actIDs = " + uniqueActIDs.size());
 		System.out.println(" num of unique uniqueWorkingLevelActIDs = " + uniqueWorkingLevelActIDs.size());
-		WritingToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZuniqueActIDs.csv");
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				uniqueWorkingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZuniqueWorkingLevelActIDs.csv");
-		WritingToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZactIDs.csv");
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZworkingLevelActIDs.csv");
 		// End of added on April 6 2018
 
-		WritingToFile.writeToNewFile(
+		WToFile.writeToNewFile(
 				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
 						.collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
@@ -1867,7 +1867,7 @@ public class TimelineUtils
 		// System.out.println("Count of weekends removed ="+datesToRemove.size()); //THERE IS SOME BUG, THE ARRAY HAS
 		// DUPLICATE ENTRIES, UNCOMMENT TO SEE, HOWEVER IT DOES NOT
 		// AFFECT OUR PURPORSE // probably this has been resolved by using set but not verified
-		WritingToFile.appendLineToFileAbsolute(log.toString(), logFileName);
+		WToFile.appendLineToFileAbs(log.toString(), logFileName);
 		return datesTimelinesPruned;
 	}
 
@@ -1979,7 +1979,7 @@ public class TimelineUtils
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
 		// ="+datesToRemove.size());//THERE IS SOME BUG, THE ARRAY HAS
 
-		WritingToFile.appendLineToFileAbsolute(log.toString(), logFileName);
+		WToFile.appendLineToFileAbs(log.toString(), logFileName);
 		return datesTimelinesPruned;
 	}
 
@@ -2062,7 +2062,7 @@ public class TimelineUtils
 		}
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
 		// ="+datesToRemove.size());
-		WritingToFile.appendLineToFileAbsolute(log.toString(), logFileName);
+		WToFile.appendLineToFileAbs(log.toString(), logFileName);
 		return datesTimelinesPruned;
 	}
 
@@ -2120,7 +2120,7 @@ public class TimelineUtils
 		}
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> timelinesForSelectedUser = new LinkedHashMap<>();
-		WritingToFile.writeToNewFile("IndexOfUser,userID\n", absFileNameForLog);
+		WToFile.writeToNewFile("IndexOfUser,userID\n", absFileNameForLog);
 		int indexOfUser = -1, numOfUsersSkippedGT553MaxActsPerDay = 0;
 		///// Remove timelines for blacklisted users
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
@@ -2130,7 +2130,7 @@ public class TimelineUtils
 			{
 				System.out.println(" " + indexOfUser + " Removing user: " + userEntry.getKey()
 						+ " as in gowallaUserIDsWithGT553MaxActsPerDay");
-				WritingToFile.appendLineToFileAbsolute(indexOfUser + "," + userEntry.getKey() + "\n",
+				WToFile.appendLineToFileAbs(indexOfUser + "," + userEntry.getKey() + "\n",
 						absFileNameForLog);
 				numOfUsersSkippedGT553MaxActsPerDay += 1;
 				continue;
@@ -2332,7 +2332,7 @@ public class TimelineUtils
 			}
 		}
 
-		WritingToFile.writeToNewFile(log.toString(), fileNameForLog);
+		WToFile.writeToNewFile(log.toString(), fileNameForLog);
 		System.out.println("Exiting removeDayTimelinesWithGreaterAct");
 		return result;
 	}
@@ -2395,7 +2395,7 @@ public class TimelineUtils
 			}
 		}
 
-		WritingToFile.writeToNewFile(log.toString(), fileNameForLog);
+		WToFile.writeToNewFile(log.toString(), fileNameForLog);
 		System.out.println("Exiting removeDayTimelinesWithLessValidAct");
 		return result;
 	}
@@ -2430,7 +2430,7 @@ public class TimelineUtils
 			}
 		}
 
-		WritingToFile.writeToNewFile(log.toString(), fileNameForLog);
+		WToFile.writeToNewFile(log.toString(), fileNameForLog);
 		System.out.println("Exiting removeUsersWithLessDays");
 		return result;
 	}
@@ -3776,7 +3776,7 @@ public class TimelineUtils
 		}
 		if (VerbosityConstants.WriteEditDistancesOfAllEndPoints)
 		{
-			WritingToFile.writeEditDistancesOfAllEndPoints(activitiesGuidingRecomm, candidateDayTimeline,
+			WToFile.writeEditDistancesOfAllEndPoints(activitiesGuidingRecomm, candidateDayTimeline,
 					distanceScoresForEachSubsequence);
 
 		}
@@ -4535,7 +4535,7 @@ public class TimelineUtils
 			if (write)
 			{
 				// WritingToFile.writeToNewFile(uniqueLocIDs.toString(), );
-				WritingToFile.writeToNewFile(
+				WToFile.writeToNewFile(
 						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
 						Constant.getCommonPath() + "UniqueLocIDs.csv");// );
 			}
@@ -4572,7 +4572,7 @@ public class TimelineUtils
 			if (write)
 			{
 				// WritingToFile.writeToNewFile(uniqueLocIDs.toString(), absFileNameToWrite);// );
-				WritingToFile.writeToNewFile(
+				WToFile.writeToNewFile(
 						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
 						absFileNameToWrite);// );
 			}
@@ -4611,7 +4611,7 @@ public class TimelineUtils
 			if (write)
 			{
 				// /WritingToFile.writeToNewFile(uniqueLocIDs.toString(), absFileNameToWrite);
-				WritingToFile.writeToNewFile(
+				WToFile.writeToNewFile(
 						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
 						absFileNameToWrite);// );
 			}
@@ -4693,7 +4693,7 @@ public class TimelineUtils
 			System.out.println("Inside getUniqueActivityIDs: uniqueActIDs.size()=" + uniqueActIDs.size());
 			if (write)
 			{
-				WritingToFile.writeToNewFile(uniqueActIDs.toString(), Constant.getCommonPath() + "uniqueActIDs.csv");
+				WToFile.writeToNewFile(uniqueActIDs.toString(), Constant.getCommonPath() + "uniqueActIDs.csv");
 			}
 		}
 		catch (Exception e)
@@ -4736,7 +4736,7 @@ public class TimelineUtils
 
 			if (writeToFile)
 			{
-				WritingToFile.writeToNewFile(sb.toString(), Constant.getOutputCoreResultsPath() + fileName);// "NumOfUniquePDValPerUser.csv");
+				WToFile.writeToNewFile(sb.toString(), Constant.getOutputCoreResultsPath() + fileName);// "NumOfUniquePDValPerUser.csv");
 			}
 		}
 		catch (Exception e)
@@ -4760,7 +4760,7 @@ public class TimelineUtils
 			String abFileNameToWrite)
 	{
 		String delimiter = ",";
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
 				abFileNameToWrite);
 
@@ -4776,7 +4776,7 @@ public class TimelineUtils
 					sbForThisTimeline
 							.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
 				}
-				WritingToFile.appendLineToFileAbsolute(sbForThisTimeline.toString(), abFileNameToWrite);
+				WToFile.appendLineToFileAbs(sbForThisTimeline.toString(), abFileNameToWrite);
 			}
 		}
 	}
@@ -4794,7 +4794,7 @@ public class TimelineUtils
 	public static void writeAllActObjs(Map<String, Timeline> usersTimelines, String abFileNameToWrite)
 	{
 		String delimiter = ",";
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
 				abFileNameToWrite);
 
@@ -4807,7 +4807,7 @@ public class TimelineUtils
 			{
 				sbForThisTimeline.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
 			}
-			WritingToFile.appendLineToFileAbsolute(sbForThisTimeline.toString(), abFileNameToWrite);
+			WToFile.appendLineToFileAbs(sbForThisTimeline.toString(), abFileNameToWrite);
 		}
 	}
 
@@ -4825,7 +4825,7 @@ public class TimelineUtils
 			String abFileNameToWrite)
 	{
 		String delimiter = ",";
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
 				abFileNameToWrite);
 
@@ -4841,7 +4841,7 @@ public class TimelineUtils
 					sbForThisTimeline
 							.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
 				}
-				WritingToFile.appendLineToFileAbsolute(sbForThisTimeline.toString(), abFileNameToWrite);
+				WToFile.appendLineToFileAbs(sbForThisTimeline.toString(), abFileNameToWrite);
 			}
 		}
 	}
@@ -4861,7 +4861,7 @@ public class TimelineUtils
 			sb.append(map.get(id).toString() + "\n");
 		}
 
-		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+		WToFile.writeToNewFile(sb.toString(), absFileNameToUse);
 	}
 
 	/**
@@ -4878,7 +4878,7 @@ public class TimelineUtils
 		{
 			sb.append(map.get(id).toString() + "\n");
 		}
-		WritingToFile.writeToNewFile(sb.toString(), absFileNameToUse);
+		WToFile.writeToNewFile(sb.toString(), absFileNameToUse);
 	}
 
 	/**
@@ -4982,9 +4982,9 @@ public class TimelineUtils
 
 			System.out.println("locIDsWithNoTZ.size()= " + locIDsWithNoTZ.size());
 			System.out.println("locIDsWithNoFallbackTZ.size()= " + locIDsWithNoFallbackTZ.size());
-			WritingToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+			WToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 					Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoTZIn" + fileNamePhrase + ".csv");
-			WritingToFile.writeToNewFile(
+			WToFile.writeToNewFile(
 					locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 					Constant.getOutputCoreResultsPath() + "locIDsWithNoFallbackTZ" + fileNamePhrase + ".csv");
 
@@ -4998,12 +4998,12 @@ public class TimelineUtils
 			System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfAOsWithMultipleWorkingLevelCatIDs
 					+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
 
-			WritingToFile.writeToNewFile(
+			WToFile.writeToNewFile(
 					AOsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
 							.collect(Collectors.joining("\n")),
 					Constant.getOutputCoreResultsPath() + "AOsWithMultipleWorkLevelCatIDs" + fileNamePhrase + ".csv");
 
-			WritingToFile.writeMapOfMap(userIdLocIdNumOfNullZoneAOsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
+			WToFile.writeMapOfMap(userIdLocIdNumOfNullZoneAOsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
 					Constant.getOutputCoreResultsPath() + "userIdLocIdNumOfNullZoneAOsMap" + fileNamePhrase + ".csv");
 
 		}
@@ -5159,9 +5159,9 @@ public class TimelineUtils
 
 			System.out.println("locIDsWithNoTZ.size()= " + locIDsWithNoTZ.size());
 			System.out.println("locIDsWithNoFallbackTZ.size()= " + locIDsWithNoFallbackTZ.size());
-			WritingToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+			WToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 					Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoTZIn" + fileNamePhrase + ".csv");
-			WritingToFile.writeToNewFile(
+			WToFile.writeToNewFile(
 					locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 					Constant.getOutputCoreResultsPath() + "locIDsWithNoFallbackTZ" + fileNamePhrase + ".csv");
 
@@ -5175,12 +5175,12 @@ public class TimelineUtils
 			System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfAOsWithMultipleWorkingLevelCatIDs
 					+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
 
-			WritingToFile.writeToNewFile(
+			WToFile.writeToNewFile(
 					AOsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
 							.collect(Collectors.joining("\n")),
 					Constant.getOutputCoreResultsPath() + "AOsWithMultipleWorkLevelCatIDs" + fileNamePhrase + ".csv");
 
-			WritingToFile.writeMapOfMap(userIdLocIdNumOfNullZoneAOsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
+			WToFile.writeMapOfMap(userIdLocIdNumOfNullZoneAOsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
 					Constant.getOutputCoreResultsPath() + "userIdLocIdNumOfNullZoneAOsMap" + fileNamePhrase + ".csv");
 
 		}

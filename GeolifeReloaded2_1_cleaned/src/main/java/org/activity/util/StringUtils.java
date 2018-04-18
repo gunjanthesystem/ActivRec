@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 
 /**
@@ -511,7 +511,7 @@ public class StringUtils
 	{
 		try
 		{
-			BufferedWriter bw = WritingToFile.getBWForNewFile("dummyTest.csv");
+			BufferedWriter bw = WToFile.getBWForNewFile("dummyTest.csv");
 			for (String s : arrayOfStrings)
 			{
 				bw.write(s);

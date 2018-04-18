@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.DataEntry;
 import org.activity.objects.LabelEntry;
 import org.activity.objects.Pair;
@@ -271,7 +271,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 				stringToWrite.append(user + "," + le.toStringRaw() + "\n");
 			}
 		}
-		WritingToFile.appendLineToFileAbsolute(stringToWrite.toString(), commonPath + "LabelEntriesMap.csv");
+		WToFile.appendLineToFileAbs(stringToWrite.toString(), commonPath + "LabelEntriesMap.csv");
 	}
 
 	public static ArrayList<String> identifyOnlyTargetUsers()
@@ -509,9 +509,9 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 
 			} // end of for loop over users
 
-			WritingToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
+			WToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
 
-			WritingToFile.writeLinkedHashMapOfTreemapDataEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapDataEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -733,9 +733,9 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 
 			} // end of for loop over users
 
-			WritingToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
+			WToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
 
-			WritingToFile.writeLinkedHashMapOfTreemapTLE(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapTLE(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -941,9 +941,9 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 
 			} // end of for loop over users
 
-			WritingToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
+			WToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
 
-			WritingToFile.writeLinkedHashMapOfTreemapTLE(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapTLE(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -1128,7 +1128,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			System.out.println(splitID + ": numOfTrajCaseA = " + numOfMergerCaseA + ",numOfTrajCaseB = "
 					+ numOfMergerCaseB + ",numOfTrajCaseC = " + numOfMergerCaseC + " ,numOfLastTrajEntries = "
 					+ numOfLastTrajEntries + "\n");
-			WritingToFile.appendLineToFileAbsolute(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
+			WToFile.appendLineToFileAbs(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
 
 			// WritingToFile.writeLinkedHashMapOfTreemapTLE(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 			// "User,Timestamp,DurationInSecs");
@@ -1320,9 +1320,9 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 
 			} // end of for loop over users
 
-			WritingToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
+			WToFile.writeToNewFile(bwMergerCaseLogs.toString(), commonPath + "MergerCasesLog.csv");
 
-			WritingToFile.writeLinkedHashMapOfTreemapDataEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapDataEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -2271,9 +2271,9 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			mapForAllUnknownsBrokenOverDays.put(entryForUser.getKey(), unknownsInsertedBrokenOverDays);
 		}
 
-		WritingToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+		WToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 				"User,Timestamp,DurationInSecs");
-		WritingToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsBrokenOverDays, "Unknown_BrokenOverDays_Inserted",
+		WToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsBrokenOverDays, "Unknown_BrokenOverDays_Inserted",
 				"User,Timestamp,DurationInSecs");
 
 		return mapForAllDataMergedPlusDuration;
@@ -2462,7 +2462,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			}
 
 			numberOfSandwichesFound.put(userName, numberOfSandwichesForThisUser);
-			WritingToFile.writeSimpleLinkedHashMapToFile(numberOfSandwichesFound, commonPath + "sandwichesPerUser_"
+			WToFile.writeSimpleLinkedHashMapToFile(numberOfSandwichesFound, commonPath + "sandwichesPerUser_"
 					+ activityNameToMerge + thresholdForMergingNotAvailables + "secs.csv", "User",
 					"number_of_sandwiches");
 
@@ -3072,7 +3072,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			e.printStackTrace();
 		}
 
-		WritingToFile.appendLineToFileAbsolute(warningLog.toString(), commonPath + "WarningLogs.txt");
+		WToFile.appendLineToFileAbs(warningLog.toString(), commonPath + "WarningLogs.txt");
 
 		return (new Pair(countLines, mapForAllData));
 	}
@@ -3175,7 +3175,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			e.printStackTrace();
 		}
 
-		WritingToFile.appendLineToFileAbsolute(warningLog.toString(), commonPath + "WarningLogs.txt");
+		WToFile.appendLineToFileAbs(warningLog.toString(), commonPath + "WarningLogs.txt");
 
 		return mapForThisUser;
 	}
@@ -3957,7 +3957,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 	public static void checkConsecutiveSameActivityNameTrajSensitive(
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, String absfilename)
 	{
-		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBWForNewFile(absfilename);
+		BufferedWriter bwConsecutiveSimilar = WToFile.getBWForNewFile(absfilename);
 		String toWrite = "User,TrajID,TimestampWhichIsSimilarToPrev,Mode\n";
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : data.entrySet())
 		{
@@ -4024,7 +4024,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, int sandwichFillerDurationInSecs,
 			String absfilename)
 	{
-		BufferedWriter bwConsecutiveSimilar = WritingToFile.getBWForNewFile(absfilename);
+		BufferedWriter bwConsecutiveSimilar = WToFile.getBWForNewFile(absfilename);
 		String toWrite = "User,TrajID,StartTime,Mode,Duration,SanwichIndexIndex\n";
 		for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : data.entrySet())
 		{
@@ -4170,7 +4170,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 
 					if (entry.getValue().getNumberOfDistinctTrajectoryIDs() > 1)
 					{
-						WritingToFile.appendLineToFileAbsolute("User:" + userName + "," + msg + "\n",
+						WToFile.appendLineToFileAbs("User:" + userName + "," + msg + "\n",
 								commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
 					}
 					// return "t:" + timestamp + ",mod:" + mode + " ,endt:" + endTimestamp + ", timeDiffWithNextInSecs:"
@@ -4237,8 +4237,8 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 
 					if (entry.getValue().getNumberOfDistinctTrajectoryIDs() > 1)
 					{
-						WritingToFile
-								.appendLineToFileAbsolute(
+						WToFile
+								.appendLineToFileAbs(
 										"User:" + userName + ","
 												+ entry.getValue().toStringWithTrajIDWithTrajPurityCheck() + "\n",
 										commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
@@ -4368,7 +4368,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile
+				BufferedWriter bwMergerCaseLogs = WToFile
 						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("TrajId,Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
@@ -4592,7 +4592,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -4629,7 +4629,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile
+				BufferedWriter bwMergerCaseLogs = WToFile
 						.getBWForNewFile(commonPath + userID + "MergerCleanNotAvailableCasesLog.csv");
 				bwMergerCaseLogs
 						.write("TrajId,Case,CurrentMode,NextMode,NextDurationInSecs,CurrentTS, NextTS,Comment\n");
@@ -4894,7 +4894,7 @@ public class DatabaseCreatorLastFM2Quicker2ByUser extends DatabaseCreator
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile.getBWForNewFile(
+				BufferedWriter bwMergerCaseLogs = WToFile.getBWForNewFile(
 						commonPath + userID + activityNameToMerge + "MergerSandwichesLog.csv");
 				bwMergerCaseLogs.write(
 						"TrajId,CurrentMode,NextMode,NextToNextMode,CurrentTS, NextTS,NextToNextTS,DurationOfNext,TimestampDifferenceForDuration\n");

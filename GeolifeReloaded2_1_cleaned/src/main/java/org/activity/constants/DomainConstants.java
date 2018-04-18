@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
@@ -447,11 +447,11 @@ public class DomainConstants
 			StringBuilder sb1 = new StringBuilder();
 			catIDGivenLevelCatIDMap.entrySet().stream()
 					.forEach(e -> sb1.append(e.getKey()).append("-").append(e.getValue()).append("\n"));
-			WritingToFile.writeToNewFile(sb1.toString(), "catIDGivenLevelCatIDMap.csv");
+			WToFile.writeToNewFile(sb1.toString(), "catIDGivenLevelCatIDMap.csv");
 
 			StringBuilder sb2 = new StringBuilder();
 			catIDsWithNoGivenLevelCatID.stream().forEach(e -> sb2.append(String.valueOf(e)).append("\n"));
-			WritingToFile.writeToNewFile(sb2.toString(), "catIDsWithNoGivenLevelCatID.csv");
+			WToFile.writeToNewFile(sb2.toString(), "catIDsWithNoGivenLevelCatID.csv");
 		}
 
 		return catIDGivenLevelCatIDMap;

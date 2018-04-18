@@ -29,7 +29,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
 import org.activity.objects.LocationGowalla;
@@ -205,7 +205,7 @@ public class DatabaseCreatorGowallaQuicker1
 			//
 			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
 					.kryoDeSerializeThis(catIDNameDictionaryFileName);
-			WritingToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
+			WToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
 					commonPath + "catIDNameDictionary.csv");
 			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
 			// commonPath + "CatIDNameDictionary.kryo");
@@ -216,15 +216,15 @@ public class DatabaseCreatorGowallaQuicker1
 					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
 
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = catIDWorkingLevelCatIDsDictResult.getFirst();
-			WritingToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
+			WToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
 					commonPath + "catIDWorkingLevelCatIDsDict.csv");
 
 			LinkedHashSet<Integer> catIDsInHierarchy = catIDWorkingLevelCatIDsDictResult.getSecond();
-			WritingToFile.writeToNewFile(catIDsInHierarchy.toString(), commonPath + "UniqueCatIDsInHierarchy.csv");
+			WToFile.writeToNewFile(catIDsInHierarchy.toString(), commonPath + "UniqueCatIDsInHierarchy.csv");
 
 			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = getLevelWiseCatIDsForAllCatIDs(catIDNameDictionary,
 					rootOfCategoryTree, DomainConstants.numOfCatLevels);
-			WritingToFile.writeMapOfArrayValsToNewFile(catIDLevelWiseCatIDsDict, "catID,LevelWiseCatIDs", ",",
+			WToFile.writeMapOfArrayValsToNewFile(catIDLevelWiseCatIDsDict, "catID,LevelWiseCatIDs", ",",
 					commonPath + "catIDLevelWiseCatIDsDict.csv");
 
 			HashMap<String, Double> mapCatIDsHierDist = null;
@@ -291,7 +291,7 @@ public class DatabaseCreatorGowallaQuicker1
 			{
 				if (!disableExpensiveWriting) // skipping writing on Aug 10 for performance.
 				{
-					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+					WToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
 							commonPath + "mapForAllCheckinDataBeforeMerged.csv", catIDNameDictionary);
 				} /////
 					// merge
@@ -301,17 +301,17 @@ public class DatabaseCreatorGowallaQuicker1
 
 				if (!disableExpensiveWriting)// skipping writing on Aug 10 for performance.
 				{
-					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+					WToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
 							commonPath + "mapForAllCheckinDataAfterMerged.csv", catIDNameDictionary);
 
-					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2_ForRecreating(mapForAllCheckinData,
+					WToFile.writeLinkedHashMapOfTreemapCheckinEntryV2_ForRecreating(mapForAllCheckinData,
 							commonPath + "mapForAllCheckinDataAfterMerged_8April.csv", catIDNameDictionary);
 
 				}
 			}
 			else
 			{
-				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+				WToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
 						commonPath + "mapForAllCheckinNoMerging.csv", catIDNameDictionary);
 			}
 
@@ -438,7 +438,7 @@ public class DatabaseCreatorGowallaQuicker1
 					.deSerializeThis(categoryHierarchyTreeFileNameP);
 			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
 					.kryoDeSerializeThis(catIDNameDictionaryFileNameP);
-			WritingToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
+			WToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
 					commonPathP + "catIDNameDictionary.csv");
 			// int workingCatLevel = DomainConstants.gowallaWorkingCatLevel;
 
@@ -446,15 +446,15 @@ public class DatabaseCreatorGowallaQuicker1
 					catIDNameDictionary, workingCatLevelP, rootOfCategoryTree);
 
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = catIDWorkingLevelCatIDsDictResult.getFirst();
-			WritingToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
+			WToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
 					commonPathP + "catIDWorkingLevelCatIDsDict.csv");
 
 			LinkedHashSet<Integer> catIDsInHierarchy = catIDWorkingLevelCatIDsDictResult.getSecond();
-			WritingToFile.writeToNewFile(catIDsInHierarchy.toString(), commonPathP + "UniqueCatIDsInHierarchy.csv");
+			WToFile.writeToNewFile(catIDsInHierarchy.toString(), commonPathP + "UniqueCatIDsInHierarchy.csv");
 
 			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = getLevelWiseCatIDsForAllCatIDs(catIDNameDictionary,
 					rootOfCategoryTree, DomainConstants.numOfCatLevels);
-			WritingToFile.writeMapOfArrayValsToNewFile(catIDLevelWiseCatIDsDict, "catID,LevelWiseCatIDs", ",",
+			WToFile.writeMapOfArrayValsToNewFile(catIDLevelWiseCatIDsDict, "catID,LevelWiseCatIDs", ",",
 					commonPathP + "catIDLevelWiseCatIDsDict.csv");
 
 			HashMap<String, Double> mapCatIDsHierDist = null;
@@ -485,7 +485,7 @@ public class DatabaseCreatorGowallaQuicker1
 			// commonPathP + "mapForAllCheckinData.csv", catIDNameDictionary);
 			// compare this filr to the dataset read to ensure that the read dataset and the Checkin objcts created are
 			// equivalent
-			WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2_ForRecreating(mapForAllCheckinData,
+			WToFile.writeLinkedHashMapOfTreemapCheckinEntryV2_ForRecreating(mapForAllCheckinData,
 					commonPathP + "mapForAllCheckinDataAfterMerged_8AprilSanityCheck.csv", catIDNameDictionary);
 
 			userIDsInCheckinData = mapForAllCheckinData.keySet();
@@ -585,7 +585,7 @@ public class DatabaseCreatorGowallaQuicker1
 			//
 			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
 					.kryoDeSerializeThis(catIDNameDictionaryFileName);
-			WritingToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
+			WToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
 					commonPath + "catIDNameDictionary.csv");
 			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
 			// commonPath + "CatIDNameDictionary.kryo");
@@ -596,15 +596,15 @@ public class DatabaseCreatorGowallaQuicker1
 					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
 
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = catIDWorkingLevelCatIDsDictResult.getFirst();
-			WritingToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
+			WToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
 					commonPath + "catIDWorkingLevelCatIDsDict.csv");
 
 			LinkedHashSet<Integer> catIDsInHierarchy = catIDWorkingLevelCatIDsDictResult.getSecond();
-			WritingToFile.writeToNewFile(catIDsInHierarchy.toString(), commonPath + "UniqueCatIDsInHierarchy.csv");
+			WToFile.writeToNewFile(catIDsInHierarchy.toString(), commonPath + "UniqueCatIDsInHierarchy.csv");
 
 			TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = getLevelWiseCatIDsForAllCatIDs(catIDNameDictionary,
 					rootOfCategoryTree, numOfCatLevels);
-			WritingToFile.writeMapOfArrayValsToNewFile(catIDLevelWiseCatIDsDict, "catID,LevelWiseCatIDs", ",",
+			WToFile.writeMapOfArrayValsToNewFile(catIDLevelWiseCatIDsDict, "catID,LevelWiseCatIDs", ",",
 					commonPath + "catIDLevelWiseCatIDsDict.csv");
 
 			HashMap<String, Double> mapCatIDsHierDist = null;
@@ -671,7 +671,7 @@ public class DatabaseCreatorGowallaQuicker1
 			{
 				if (!disableExpensiveWriting) // skipping writing on Aug 10 for performance.
 				{
-					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+					WToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
 							commonPath + "mapForAllCheckinDataBeforeMerged.csv", catIDNameDictionary);
 				} /////
 					// merge
@@ -681,13 +681,13 @@ public class DatabaseCreatorGowallaQuicker1
 
 				if (!disableExpensiveWriting)// skipping writing on Aug 10 for performance.
 				{
-					WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+					WToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
 							commonPath + "mapForAllCheckinDataAfterMerged.csv", catIDNameDictionary);
 				}
 			}
 			else
 			{
-				WritingToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
+				WToFile.writeLinkedHashMapOfTreemapCheckinEntryV2(mapForAllCheckinData,
 						commonPath + "mapForAllCheckinNoMerging.csv", catIDNameDictionary);
 			}
 
@@ -795,7 +795,7 @@ public class DatabaseCreatorGowallaQuicker1
 			sbCatIDStringCodeLog.append(catID).append(",").append(StringCode.getCharCodeFromActivityID(catID))
 					.append("\n");
 		}
-		WritingToFile.writeToNewFile(sbCatIDStringCodeLog.toString(),
+		WToFile.writeToNewFile(sbCatIDStringCodeLog.toString(),
 				Constant.getCommonPath() + "CatIDCharCodeMap.csv");
 
 		for (Integer catID1 : catIDsInHierarchy)
@@ -875,7 +875,7 @@ public class DatabaseCreatorGowallaQuicker1
 			sbResult.append(e.getKey()).append(',').append(e.getValue()).append("\n");
 		}
 
-		WritingToFile.writeToNewFile(sbResult.toString(), Constant.getCommonPath() + "CatIDDistDict.csv");
+		WToFile.writeToNewFile(sbResult.toString(), Constant.getCommonPath() + "CatIDDistDict.csv");
 		return result;
 	}
 
@@ -914,7 +914,7 @@ public class DatabaseCreatorGowallaQuicker1
 		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
 		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
 		// StringBuilder sbAllDurationFromNext = new StringBuilder();
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"User,Timestamp,CatID,CatName,DistFromNext,DurFromNext,DistFromPrev,DurFromPrev,prevPlaceIDSame\n",
 				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
 
@@ -1069,11 +1069,11 @@ public class DatabaseCreatorGowallaQuicker1
 
 					if (checkinsCount % 20000 == 0)
 					{
-						WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+						WToFile.appendLineToFileAbs(sbEnumerateAllCheckins.toString(),
 								commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
 						sbEnumerateAllCheckins.setLength(0);
 
-						WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+						WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 								commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 						sbAllDistanceInMDurationInSec.setLength(0);
 					}
@@ -1084,11 +1084,11 @@ public class DatabaseCreatorGowallaQuicker1
 			// write remaining in buffer
 			if (sbEnumerateAllCheckins.length() != 0)
 			{
-				WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+				WToFile.appendLineToFileAbs(sbEnumerateAllCheckins.toString(),
 						commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
 				sbEnumerateAllCheckins.setLength(0);
 
-				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+				WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 						commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 				sbAllDistanceInMDurationInSec.setLength(0);
 			}
@@ -1096,11 +1096,11 @@ public class DatabaseCreatorGowallaQuicker1
 			System.out.println("Num of checkins read = " + checkinsCount);
 			System.out.println("checkinsWithInvalidGeocoords read = " + checkinsWithInvalidGeocoords);
 
-			WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-			WritingToFile.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "ComparedAtributewiseConsecCounts.csv", false, false);
-			WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "UserwiseConsecCounts.csv", false, false);
 
 			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
@@ -1148,7 +1148,7 @@ public class DatabaseCreatorGowallaQuicker1
 		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
 		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
 		// StringBuilder sbAllDurationFromNext = new StringBuilder();
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"User,Timestamp,CatID,CatName,DistFromNext,DurFromNext,DistFromPrev,DurFromPrev,prevPlaceIDSame\n",
 				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
 
@@ -1306,11 +1306,11 @@ public class DatabaseCreatorGowallaQuicker1
 
 					if (checkinsCount % 20000 == 0)
 					{
-						WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+						WToFile.appendLineToFileAbs(sbEnumerateAllCheckins.toString(),
 								commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
 						sbEnumerateAllCheckins.setLength(0);
 
-						WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+						WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 								commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 						sbAllDistanceInMDurationInSec.setLength(0);
 					}
@@ -1321,11 +1321,11 @@ public class DatabaseCreatorGowallaQuicker1
 			// write remaining in buffer
 			if (sbEnumerateAllCheckins.length() != 0)
 			{
-				WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+				WToFile.appendLineToFileAbs(sbEnumerateAllCheckins.toString(),
 						commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
 				sbEnumerateAllCheckins.setLength(0);
 
-				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+				WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 						commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 				sbAllDistanceInMDurationInSec.setLength(0);
 			}
@@ -1333,11 +1333,11 @@ public class DatabaseCreatorGowallaQuicker1
 			System.out.println("Num of checkins read = " + checkinsCount);
 			System.out.println("checkinsWithInvalidGeocoords read = " + checkinsWithInvalidGeocoords);
 
-			WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-			WritingToFile.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "ComparedAtributewiseConsecCounts.csv", false, false);
-			WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "UserwiseConsecCounts.csv", false, false);
 
 			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
@@ -1388,7 +1388,7 @@ public class DatabaseCreatorGowallaQuicker1
 		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
 		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
 		// StringBuilder sbAllDurationFromNext = new StringBuilder();
-		WritingToFile.appendLineToFileAbsolute("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
+		WToFile.appendLineToFileAbs("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
 				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
 
 		long checkinsCount = 0, checkinsWithInvalidGeocoords = 0;
@@ -1498,11 +1498,11 @@ public class DatabaseCreatorGowallaQuicker1
 
 					if (checkinsCount % 20000 == 0)
 					{
-						WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+						WToFile.appendLineToFileAbs(sbEnumerateAllCheckins.toString(),
 								commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
 						sbEnumerateAllCheckins.setLength(0);
 
-						WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+						WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 								commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 						sbAllDistanceInMDurationInSec.setLength(0);
 					}
@@ -1513,11 +1513,11 @@ public class DatabaseCreatorGowallaQuicker1
 			// write remaining in buffer
 			if (sbEnumerateAllCheckins.length() != 0)
 			{
-				WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCheckins.toString(),
+				WToFile.appendLineToFileAbs(sbEnumerateAllCheckins.toString(),
 						commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
 				sbEnumerateAllCheckins.setLength(0);
 
-				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+				WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 						commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 				sbAllDistanceInMDurationInSec.setLength(0);
 			}
@@ -1525,11 +1525,11 @@ public class DatabaseCreatorGowallaQuicker1
 			System.out.println("Num of checkins read = " + checkinsCount);
 			System.out.println("checkinsWithInvalidGeocoords read = " + checkinsWithInvalidGeocoords);
 
-			WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(catIDLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-			WritingToFile.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(comparedAttribLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "ComparedAtributewiseConsecCounts.csv", false, false);
-			WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(userLengthConsecs, catIDNameDictionary,
 					commonPathToWrite + "UserwiseConsecCounts.csv", false, false);
 
 			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
@@ -1579,7 +1579,7 @@ public class DatabaseCreatorGowallaQuicker1
 		StringBuilder sbAllDistanceInMDurationInSec = new StringBuilder();
 		// changed to write dist and duration diff in same lin so in R analysis i can filter by both at the same time.
 		// StringBuilder sbAllDurationFromNext = new StringBuilder();
-		WritingToFile.appendLineToFileAbsolute("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
+		WToFile.appendLineToFileAbs("User,Timestamp,CatID,CatName,DistDiff,DurationDiff\n",
 				commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv"); // writing header
 
 		StringBuilder sbEnumerateAllCats = new StringBuilder();// write all catid sequentially userwise
@@ -1684,12 +1684,12 @@ public class DatabaseCreatorGowallaQuicker1
 
 					if (checkinsCount % 20000 == 0)
 					{
-						WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+						WToFile.appendLineToFileAbs(sbEnumerateAllCats.toString(),
 								commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
 						sbEnumerateAllCats.setLength(0);
 
 						/////////////////
-						WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+						WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 								commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 						sbAllDistanceInMDurationInSec.setLength(0);
 
@@ -1709,12 +1709,12 @@ public class DatabaseCreatorGowallaQuicker1
 			// write remaining in buffer
 			if (sbEnumerateAllCats.length() != 0)
 			{
-				WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
+				WToFile.appendLineToFileAbs(sbEnumerateAllCats.toString(),
 						commonPathToWrite + "ActualOccurrenceOfCheckinsSeq.csv");
 				sbEnumerateAllCats.setLength(0);
 
 				/////////////////
-				WritingToFile.appendLineToFileAbsolute(sbAllDistanceInMDurationInSec.toString(),
+				WToFile.appendLineToFileAbs(sbAllDistanceInMDurationInSec.toString(),
 						commonPathToWrite + "DistDurDiffBetweenConsecSimilars.csv");
 				sbAllDistanceInMDurationInSec.setLength(0);
 
@@ -1726,9 +1726,9 @@ public class DatabaseCreatorGowallaQuicker1
 			}
 
 			System.out.println("Num of aos read = " + checkinsCount);
-			WritingToFile.writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(catIDLengthConsecutives, catIDNameDictionary,
 					commonPathToWrite + "CatwiseConsecCountsEqualLength.csv", true, true);
-			WritingToFile.writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
+			WToFile.writeConsectiveCountsEqualLength(userLengthConsecutives, catIDNameDictionary,
 					commonPathToWrite + "UserwiseConsecCountsEqualLength.csv", false, false);
 
 			// WritingToFile.appendLineToFileAbsolute(sbEnumerateAllCats.toString(),
@@ -1789,13 +1789,13 @@ public class DatabaseCreatorGowallaQuicker1
 			sb.append(cat.getKey() + "," + workingLevelCatIDs + "\n");
 		}
 		//
-		WritingToFile.writeToNewFile(sb.toString(), commonPath + "MapWorkingLevelCatIDsForAllCatIDs.csv");
+		WToFile.writeToNewFile(sb.toString(), commonPath + "MapWorkingLevelCatIDsForAllCatIDs.csv");
 
 		String s = "numOfCatsWithMultipleWorkingLevelCats = " + numOfCatsWithMultipleWorkingLevelCats
 				+ "\nnumOfCatsNotInHierarchyTree = " + numOfCatsNotInHierarchyTree + "\nnumOfCatsInHierarchyTree = "
 				+ numOfCatsInHierarchyTree;
 
-		WritingToFile.appendLineToFileAbsolute(s, commonPath + "MapWorkingLevelCatIDsForAllCatIDs.csv");
+		WToFile.appendLineToFileAbs(s, commonPath + "MapWorkingLevelCatIDsForAllCatIDs.csv");
 
 		return new Pair<>(res, catIDsInHierarchy);
 	}
@@ -1847,11 +1847,11 @@ public class DatabaseCreatorGowallaQuicker1
 			sb.append(cat.getKey() + "," + Arrays.toString(levelWiseCatIDsForThisCatID) + "\n");
 		}
 		//
-		WritingToFile.writeToNewFile(sb.toString(), commonPath + "MapLevelWiseCatIDsForAllCatIDs.csv");
+		WToFile.writeToNewFile(sb.toString(), commonPath + "MapLevelWiseCatIDsForAllCatIDs.csv");
 		String s = "numOfCatsWithMultipleWorkingLevelCats = " + numOfCatsWithMultipleWorkingLevelCats
 				+ "\nnumOfCatsNotInHierarchyTree = " + numOfCatsNotInHierarchyTree + "\nnumOfCatsInHierarchyTree = "
 				+ numOfCatsInHierarchyTree;
-		WritingToFile.appendLineToFileAbsolute(s, commonPath + "MapLevelWiseCatIDsForAllCatIDs.csv");
+		WToFile.appendLineToFileAbs(s, commonPath + "MapLevelWiseCatIDsForAllCatIDs.csv");
 
 		return res;
 	}
@@ -2014,7 +2014,7 @@ public class DatabaseCreatorGowallaQuicker1
 			e.printStackTrace();
 		}
 
-		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
+		WToFile.appendLineToFileAbs(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
 
 		System.out.println("----Exiting createCheckinEntries----------------");
 		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>>(result,
@@ -2186,7 +2186,7 @@ public class DatabaseCreatorGowallaQuicker1
 			System.err.println("lineRead=\n" + lineRead);
 		}
 
-		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
+		WToFile.appendLineToFileAbs(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
 
 		System.out.println("----Exiting createCheckinEntries----------------");
 		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>>(result,
@@ -2396,7 +2396,7 @@ public class DatabaseCreatorGowallaQuicker1
 			System.err.println("lineRead=\n" + lineRead);
 		}
 
-		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
+		WToFile.appendLineToFileAbs(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
 
 		System.out.println("----Exiting createCheckinEntries----------------");
 		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntry>>, Set<String>>(result,
@@ -2591,7 +2591,7 @@ public class DatabaseCreatorGowallaQuicker1
 			System.err.println("lineRead=\n" + lineRead);
 		}
 
-		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
+		WToFile.appendLineToFileAbs(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
 
 		System.out.println("----Exiting createCheckinEntries----------------");
 		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>, Set<String>>(result,
@@ -2823,7 +2823,7 @@ public class DatabaseCreatorGowallaQuicker1
 			System.err.println("lineRead=\n" + lineRead);
 		}
 
-		WritingToFile.appendLineToFileAbsolute(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
+		WToFile.appendLineToFileAbs(logRejectedCheckins.toString(), commonPath + "RejectedCheckinsLog.txt");
 
 		System.out.println("----Exiting createCheckinEntries----------------");
 		return new Pair<LinkedHashMap<String, TreeMap<Timestamp, CheckinEntryV2>>, Set<String>>(result,

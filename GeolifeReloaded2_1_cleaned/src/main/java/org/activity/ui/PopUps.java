@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.activity.constants.Constant;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 /**
  * 
@@ -39,7 +39,7 @@ public class PopUps
 		catch (HeadlessException e)
 		{
 			System.out.println("\n Headless: hence printing msg instead of PopUp.\n" + msg);
-			WritingToFile.appendLineToFileAbsolute(msg, Constant.getCommonPath() + Constant.messageFileName);
+			WToFile.appendLineToFileAbs(msg, Constant.getCommonPath() + Constant.messageFileName);
 		}
 	}
 
@@ -59,7 +59,7 @@ public class PopUps
 		catch (HeadlessException e)
 		{
 			System.err.println("\n Headless: hence printing error msg instead of PopUp.\n" + msg);
-			WritingToFile.appendLineToFileAbsolute(msg, Constant.getCommonPath() + Constant.errorFileName);
+			WToFile.appendLineToFileAbs(msg, Constant.getCommonPath() + Constant.errorFileName);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class PopUps
 		catch (HeadlessException ex)
 		{
 			System.err.println("\n Headless: hence printing exeception msg instead of PopUp.\n" + exceptionMsg);
-			WritingToFile.appendLineToFileAbsolute(exceptionMsg, Constant.getCommonPath() + Constant.errorFileName);
+			WToFile.appendLineToFileAbs(exceptionMsg, Constant.getCommonPath() + Constant.errorFileName);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class PopUps
 		// Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		// sb.append("timestamp:" + new Timestamp(System.currentTimeMillis()));
 		System.err.println(getTracedErrorMsg(errorMsg) + "------- ----- EXITWITH WITH NON ZERO STATUS----- -----");
-		WritingToFile.appendLineToFileAbsolute(errorMsg, Constant.getCommonPath() + Constant.errorFileName);
+		WToFile.appendLineToFileAbs(errorMsg, Constant.getCommonPath() + Constant.errorFileName);
 		System.exit(-1);
 		// return sb.append("--------- ------- ----- -------").toString();
 	}
@@ -115,7 +115,7 @@ public class PopUps
 		// Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		// System.err.println(sb.toString() + "------------");
 		// return sb.append("--------- ------- ----- -------").toString();
-		WritingToFile.appendLineToFileAbsolute(getTracedErrorMsg(errorMsg) + "--\n",
+		WToFile.appendLineToFileAbs(getTracedErrorMsg(errorMsg) + "--\n",
 				Constant.getCommonPath() + Constant.errorFileName);
 	}
 
@@ -144,7 +144,7 @@ public class PopUps
 		// Arrays.stream(Thread.currentThread().getStackTrace()).forEach(e -> sb.append(e.toString() + "\n"));
 		// System.err.println(sb.toString() + "------------");
 		// return sb.append("--------- ------- ----- -------").toString();
-		WritingToFile.appendLineToFileAbsolute(errorMsg, Constant.getCommonPath() + Constant.warningFileName);
+		WToFile.appendLineToFileAbs(errorMsg, Constant.getCommonPath() + Constant.warningFileName);
 	}
 
 	/**

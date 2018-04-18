@@ -20,7 +20,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.util.DateTimeUtils;
@@ -68,7 +68,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 
 	public static void preProcessGowalla()
 	{
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
 		String catHierarchyFileNameToRead = "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/Gowalla/link to Gowalla dataset/another source/gowalla/gowalla_category_structure.json";
@@ -178,7 +178,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(checkinFileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(checkinFileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(checkinFileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -337,7 +337,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 	 */
 	public static void writeCatLevelInfo2()
 	{
-		PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
 		Triple catLevelMaps = getCategoryLevelsMapsFromJSON();
@@ -523,7 +523,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{
@@ -598,7 +598,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 			System.out.println("Num of level3 in checkins: " + l3Count);
 			System.out.println("Num of checkins with catID in no levelMap: " + notFoundInAnyLevel);
 
-			WritingToFile.appendLineToFileAbsolute(StringUtils.join(catIDsNotFoundInAnyLevel.toArray(), ","),
+			WToFile.appendLineToFileAbs(StringUtils.join(catIDsNotFoundInAnyLevel.toArray(), ","),
 					"/run/media/gunjan/BoX2/GowallaSpaceSpace/June30/CatsInNoMaps.csv");
 
 			// writeCheckInDistributionOverCatIDs(level1CkeckinCountMap, level2CkeckinCountMap, level3CkeckinCountMap,
@@ -622,11 +622,11 @@ public class JSONProcessingGowalla2backup24Aug8pm
 	{
 		try
 		{
-			BufferedWriter bwL1 = WritingToFile.getBWForNewFile(absFileNameToUse + "L1.csv");
-			BufferedWriter bwL2 = WritingToFile.getBWForNewFile(absFileNameToUse + "L2.csv");
-			BufferedWriter bwL3 = WritingToFile.getBWForNewFile(absFileNameToUse + "L3.csv");
-			BufferedWriter bwNone = WritingToFile.getBWForNewFile(absFileNameToUse + "None.csv");
-			BufferedWriter overallLevel1 = WritingToFile
+			BufferedWriter bwL1 = WToFile.getBWForNewFile(absFileNameToUse + "L1.csv");
+			BufferedWriter bwL2 = WToFile.getBWForNewFile(absFileNameToUse + "L2.csv");
+			BufferedWriter bwL3 = WToFile.getBWForNewFile(absFileNameToUse + "L3.csv");
+			BufferedWriter bwNone = WToFile.getBWForNewFile(absFileNameToUse + "None.csv");
+			BufferedWriter overallLevel1 = WToFile
 					.getBWForNewFile(absFileNameToUse + "OverallLevel1.csv");
 
 			ArrayList<BufferedWriter> allBWToWrite = new ArrayList<BufferedWriter>();
@@ -1573,7 +1573,7 @@ public class JSONProcessingGowalla2backup24Aug8pm
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(fileNameToRead));
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(fileNameToWrite);
 
 			while ((lineRead = br.readLine()) != null)
 			{

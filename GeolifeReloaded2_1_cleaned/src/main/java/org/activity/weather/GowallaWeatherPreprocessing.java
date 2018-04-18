@@ -23,7 +23,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.stats.StatsUtils;
@@ -206,7 +206,7 @@ public class GowallaWeatherPreprocessing
 	 */
 	public static void updateStartIndexToReadFile(int index)
 	{
-		WritingToFile.writeToNewFile(index + newline, startIndexToReadFileName);
+		WToFile.writeToNewFile(index + newline, startIndexToReadFileName);
 		// PopUps.showMessage("index to read next = " + index);
 	}
 
@@ -259,7 +259,7 @@ public class GowallaWeatherPreprocessing
 						// startIndexToReadNext += 1;
 
 						// write whatever is in buffer
-						WritingToFile.appendLineToFileAbsolute(toWrite.toString(), absolutePathForResult);
+						WToFile.appendLineToFileAbs(toWrite.toString(), absolutePathForResult);
 						toWrite.setLength(0);
 
 						break;
@@ -277,7 +277,7 @@ public class GowallaWeatherPreprocessing
 
 					if (countOfLinesToWrite % 20 == 0)
 					{
-						WritingToFile.appendLineToFileAbsolute(toWrite.toString(), absolutePathForResult);
+						WToFile.appendLineToFileAbs(toWrite.toString(), absolutePathForResult);
 						toWrite.setLength(0);
 						updateStartIndexToReadFile(startIndexToReadNext);
 					}
@@ -346,7 +346,7 @@ public class GowallaWeatherPreprocessing
 				}
 			}
 			br.close();
-			WritingToFile.writeToNewFile(allResult.toString(), absolutePathForResult);
+			WToFile.writeToNewFile(allResult.toString(), absolutePathForResult);
 		}
 
 		catch (Exception e)
@@ -395,7 +395,7 @@ public class GowallaWeatherPreprocessing
 				allResult.append(countOfLinesRead + "-" + lineRead + "," + obtainedResultString);// index-LatLonTS,{jsonResult}
 			}
 			br.close();
-			WritingToFile.writeToNewFile(allResult.toString(), absolutePathForResult);
+			WToFile.writeToNewFile(allResult.toString(), absolutePathForResult);
 		}
 
 		catch (Exception e)
@@ -734,7 +734,7 @@ public class GowallaWeatherPreprocessing
 			System.out.println("size of latLongDate = " + latLongDate.size());
 			System.out.println("num of aos over all users = " + numOfActivityObjectsOverAllUsers);
 
-			BufferedWriter bw = WritingToFile.getBWForNewFile(fileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(fileNameToWrite);
 
 			// StringBuilder sb = new StringBuilder();
 			for (String st : latLongDate)

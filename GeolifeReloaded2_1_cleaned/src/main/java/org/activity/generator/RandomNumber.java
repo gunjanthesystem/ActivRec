@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 public class RandomNumber
 {
@@ -43,7 +43,7 @@ public class RandomNumber
 		StringBuilder sb = new StringBuilder();
 		listOfSelectedIndices.stream().forEachOrdered(e -> sb.append(e + "\n"));
 		System.out.println(listOfSelectedIndices.toString());
-		WritingToFile.writeToNewFile(sb.toString(), "./dataToRead/RandomlySample100UsersMar1_2018.csv");
+		WToFile.writeToNewFile(sb.toString(), "./dataToRead/RandomlySample100UsersMar1_2018.csv");
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class RandomNumber
 			StringBuilder sb = new StringBuilder();
 			listOfSelectedIndices.stream().forEachOrdered(e -> sb.append(e + "\n"));
 			System.out.println(listOfSelectedIndices.toString());
-			WritingToFile.writeToNewFile(sb.toString(), absFileNameToWriteSelectedIndices);
+			WToFile.writeToNewFile(sb.toString(), absFileNameToWriteSelectedIndices);
 		}
 		return listOfSelectedIndices;
 	}

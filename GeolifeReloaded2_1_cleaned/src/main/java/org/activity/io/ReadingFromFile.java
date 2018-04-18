@@ -606,7 +606,7 @@ public class ReadingFromFile
 
 					if (writeTheReadFile)
 					{
-						WritingToFile.writeListOfList(raw, absFileToWrite, "", ",", true);
+						WToFile.writeListOfList(raw, absFileToWrite, "", ",", true);
 					}
 					raw.clear();
 
@@ -620,7 +620,7 @@ public class ReadingFromFile
 
 			if (writeTheReadFile)
 			{
-				WritingToFile.writeListOfList(raw, absFileToWrite, "", ",", true);
+				WToFile.writeListOfList(raw, absFileToWrite, "", ",", true);
 			}
 			System.out.println(
 					"Total Lines read: " + countOfLinesRead + " in " + (System.currentTimeMillis() - t1) + "ms");

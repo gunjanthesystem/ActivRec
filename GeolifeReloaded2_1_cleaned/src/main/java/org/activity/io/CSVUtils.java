@@ -100,7 +100,7 @@ public class CSVUtils
 
 					if (hasHeader)
 					{
-						WritingToFile.writeToNewFile(String.join(",", header) + "\n", absFileNameToWrite);
+						WToFile.writeToNewFile(String.join(",", header) + "\n", absFileNameToWrite);
 					}
 					// continue;
 				}
@@ -109,14 +109,14 @@ public class CSVUtils
 				// end of line
 				if (lineNum % (numOfLinesForEachFile) == 0)
 				{
-					WritingToFile.appendLineToFileAbsolute(sb.toString() + "\n", absFileNameToWrite);
+					WToFile.appendLineToFileAbs(sb.toString() + "\n", absFileNameToWrite);
 					System.out.println("Wrote file: " + fileNum);
 					sb.setLength(0);
 				}
 			}
 			if (sb.length() != 0)
 			{
-				WritingToFile.appendLineToFileAbsolute(sb.toString() + "\n", absFileNameToWrite);
+				WToFile.appendLineToFileAbs(sb.toString() + "\n", absFileNameToWrite);
 				System.out.println("Wrote file: " + fileNum);
 			}
 		}
@@ -354,7 +354,7 @@ public class CSVUtils
 		HashSet<CharSequence> allUniqueEntries = new HashSet<CharSequence>();
 		BufferedReader br = null;
 		// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
-		BufferedWriter bwDup = WritingToFile.getBWForNewFile(duplicateLinesFileName);
+		BufferedWriter bwDup = WToFile.getBWForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
 
 		long t1 = System.currentTimeMillis();
@@ -397,7 +397,7 @@ public class CSVUtils
 
 					// System.out.println("read- " + allLinesCount);
 					// System.out.println("free memory: " + Runtime.getRuntime().freeMemory() + " bytes");
-					WritingToFile.appendLineToFileAbsolute(uniqueLines.toString(), outputFileName);
+					WToFile.appendLineToFileAbs(uniqueLines.toString(), outputFileName);
 					// bw.write(uniqueLines.toString());
 					uniqueLines.setLength(0);
 				}
@@ -408,7 +408,7 @@ public class CSVUtils
 				}
 			}
 
-			WritingToFile.appendLineToFileAbsolute(uniqueLines.toString(), outputFileName);
+			WToFile.appendLineToFileAbs(uniqueLines.toString(), outputFileName);
 			// bw.write(uniqueLines.toString());
 			uniqueLines.setLength(0);
 
@@ -451,8 +451,8 @@ public class CSVUtils
 
 		THashSet<String> allUniqueEntries = new THashSet<String>();
 		BufferedReader br = null;
-		BufferedWriter bw = WritingToFile.getBWForNewFile(outputFileName);
-		BufferedWriter bwDup = WritingToFile.getBWForNewFile(duplicateLinesFileName);
+		BufferedWriter bw = WToFile.getBWForNewFile(outputFileName);
+		BufferedWriter bwDup = WToFile.getBWForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
 
 		long t1 = System.currentTimeMillis();
@@ -545,7 +545,7 @@ public class CSVUtils
 		ArrayList<String> allUniqueEntries = new ArrayList<String>();
 		BufferedReader br = null;
 		// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(outputFileName);
-		BufferedWriter bwDup = WritingToFile.getBWForNewFile(duplicateLinesFileName);
+		BufferedWriter bwDup = WToFile.getBWForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
 
 		long t1 = System.currentTimeMillis();
@@ -588,7 +588,7 @@ public class CSVUtils
 
 					// System.out.println("read- " + allLinesCount);
 					// System.out.println("free memory: " + Runtime.getRuntime().freeMemory() + " bytes");
-					WritingToFile.appendLineToFileAbsolute(uniqueLines.toString(), outputFileName);
+					WToFile.appendLineToFileAbs(uniqueLines.toString(), outputFileName);
 					// bw.write(uniqueLines.toString());
 					uniqueLines.setLength(0);
 				}
@@ -599,7 +599,7 @@ public class CSVUtils
 				}
 			}
 
-			WritingToFile.appendLineToFileAbsolute(uniqueLines.toString(), outputFileName);
+			WToFile.appendLineToFileAbs(uniqueLines.toString(), outputFileName);
 			// bw.write(uniqueLines.toString());
 			uniqueLines.setLength(0);
 
@@ -646,7 +646,7 @@ public class CSVUtils
 
 				// System.out.println("read records from " + fileToRead + " are :");
 
-				BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
+				BufferedWriter bw = WToFile.getBufferedWriterForExistingFile(absfileToWrite);
 				CSVPrinter printer = new CSVPrinter(bw, CSVFormat.DEFAULT);
 
 				int countOfLines = 0;
@@ -700,7 +700,7 @@ public class CSVUtils
 
 				// System.out.println("read records from " + fileToRead + " are :");
 
-				BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
+				BufferedWriter bw = WToFile.getBufferedWriterForExistingFile(absfileToWrite);
 				CSVPrinter printer = new CSVPrinter(bw, CSVFormat.DEFAULT);
 
 				int countOfLines = 0;
@@ -793,7 +793,7 @@ public class CSVUtils
 				br.close();
 			}
 
-			BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
+			BufferedWriter bw = WToFile.getBufferedWriterForExistingFile(absfileToWrite);
 			for (Entry<Integer, String> l : finalLines.entrySet())
 			{
 				bw.write(l.getValue().toString() + "\n");
@@ -869,7 +869,7 @@ public class CSVUtils
 
 				// System.out.println("read records from " + fileToRead + " are :");
 
-				BufferedWriter bw = WritingToFile.getBufferedWriterForExistingFile(absfileToWrite);
+				BufferedWriter bw = WToFile.getBufferedWriterForExistingFile(absfileToWrite);
 				CSVPrinter printer = new CSVPrinter(bw, CSVFormat.DEFAULT.withDelimiter(delimiter).withQuote(null));
 
 				int countOfLines = 0;
@@ -946,7 +946,7 @@ public class CSVUtils
 				else if (countOfLines == countOfTotalLines)
 				{
 					System.out.println("else-->");
-					bw = WritingToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
+					bw = WToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
 					// System.out.println(" jjj ");
 					// System.out.println(" kkk" + stringBuffer.toString());
 					printer.printRecord(rec);
@@ -960,7 +960,7 @@ public class CSVUtils
 				else
 				{
 					System.out.println("else-->");
-					bw = WritingToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
+					bw = WToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
 					// System.out.println(" jjj ");
 					// System.out.println(" kkk" + stringBuffer.toString());
 					bw.write(stringBuffer.toString());
@@ -1056,7 +1056,7 @@ public class CSVUtils
 				else if (countOfLines == countOfTotalLines)
 				{
 					// System.out.println("else-->");
-					bw = WritingToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
+					bw = WToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
 					// System.out.println(" jjj ");
 					// System.out.println(" kkk" + stringBuffer.toString());
 					stringBuffer.append(lineRead + "\n");
@@ -1070,7 +1070,7 @@ public class CSVUtils
 				else
 				{
 					// System.out.println("else-->");
-					bw = WritingToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
+					bw = WToFile.getBWForNewFile(pathToWrite + "Split" + splitID + ".csv");
 					// System.out.println(" jjj ");
 					// System.out.println(" kkk" + stringBuffer.toString());
 					bw.write(stringBuffer.toString());
@@ -1322,8 +1322,8 @@ public class CSVUtils
 
 		// HashSet<String> allUniqueEntries = new HashSet<String>();
 		BufferedReader br = null;
-		BufferedWriter bw = WritingToFile.getBWForNewFile(outputFileName);
-		BufferedWriter bwDup = WritingToFile.getBWForNewFile(duplicateLinesFileName);
+		BufferedWriter bw = WToFile.getBWForNewFile(outputFileName);
+		BufferedWriter bwDup = WToFile.getBWForNewFile(duplicateLinesFileName);
 		StringBuilder uniqueLines = new StringBuilder();
 
 		long t1 = System.currentTimeMillis();
@@ -1422,8 +1422,8 @@ public class CSVUtils
 			int endRow, int beginCol, int endCol, String fileToReadForNullifyingZeros)
 	{
 		int numOfFiles = absCSVFileNamesToRead.length;
-		BufferedWriter bw = WritingToFile.getBWForNewFile(absFileNameToWrite);
-		BufferedWriter bwMU = WritingToFile
+		BufferedWriter bw = WToFile.getBWForNewFile(absFileNameToWrite);
+		BufferedWriter bwMU = WToFile
 				.getBWForNewFile(absFileNameToWrite.substring(0, absFileNameToWrite.length() - 4) + "MU.csv");// stores
 																												// the
 																												// value

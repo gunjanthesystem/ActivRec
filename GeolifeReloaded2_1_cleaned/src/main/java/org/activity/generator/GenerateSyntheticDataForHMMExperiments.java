@@ -3,7 +3,7 @@ package org.activity.generator;
 import java.util.Random;
 
 import org.activity.io.CSV2Arff;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.stats.StatsUtils;
 
 public class GenerateSyntheticDataForHMMExperiments
@@ -42,7 +42,7 @@ public class GenerateSyntheticDataForHMMExperiments
 		}
 
 		String nameLabel = "SynthDataBias70E";
-		WritingToFile.writeToNewFile(sb.toString(),
+		WToFile.writeToNewFile(sb.toString(),
 				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".csv");// Jan26HMM
 
 		CSV2Arff csv2arff = new CSV2Arff(
@@ -89,7 +89,7 @@ public class GenerateSyntheticDataForHMMExperiments
 		}
 
 		String nameLabel = "SynthDataTrivial2";
-		WritingToFile.writeToNewFile(sb.toString(),
+		WToFile.writeToNewFile(sb.toString(),
 				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".csv");// Jan26HMM
 
 		CSV2Arff csv2arff = new CSV2Arff(
@@ -126,7 +126,7 @@ public class GenerateSyntheticDataForHMMExperiments
 		}
 
 		String nameLabel = "SynthDataRBias70";
-		WritingToFile.writeToNewFile(header.toString(),
+		WToFile.writeToNewFile(header.toString(),
 				"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Mar29HMM/" + nameLabel + ".csv");// Jan26HMM
 
 		// CSV2Arff csv2arff = new CSV2Arff(

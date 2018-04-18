@@ -1,5 +1,6 @@
 package org.activity.plotting;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.activity.objects.Triple;
@@ -230,6 +231,8 @@ public class TimelineChartAppGeneric extends Pane
 		// this.maxXAxis = res.getSecond();
 		// this.minXAxis = res.getThird();
 		ObservableList<XYChart.Series<Number, String>> data = timelineChart.getData();
+		// Reverse List to User0 is at top (further from 0,0)
+		Collections.reverse(seriesForAllUsers);
 		// timelineChart = new TimelineChart2(xAxis, yAxis);
 		if (data == null)
 		{

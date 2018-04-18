@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 
@@ -362,7 +362,7 @@ public class Evaluation
 			// fileRR.createNewFile();
 			// }
 			// bwRR = new BufferedWriter(new FileWriter(fileRR.getAbsoluteFile()));
-			bwRR = WritingToFile.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
+			bwRR = WToFile.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
 
 			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
 					+ "   size of actual array=" + arrayActual.size());

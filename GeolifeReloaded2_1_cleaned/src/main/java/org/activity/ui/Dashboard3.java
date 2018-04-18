@@ -165,16 +165,14 @@ public class Dashboard3 extends Application
 			long tTimelineCanvasn = System.currentTimeMillis();
 			System.out.println("Time taken TimelineChartAppCanvas = " + (tTimelineCanvasn - tTimelineCanvas0) + " ms");
 
+			Tab timelineTabD = new Tab("timelineTabD Historical Timelines All Users");
+			TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(timelineData, true, "ActivityBox");
+			// TODO: Issue: not scaling correctly with range change.
+			timelineTabD.setContent(tcD.getVbox());// timelinesVBox2);
+			timelineTabD.setClosable(true);
+			tabsToAdd.add(timelineTabD);
 			if (false)
 			{
-
-				Tab timelineTabD = new Tab("timelineTabD Historical Timelines All Users");
-				TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(timelineData, true, "ActivityBox");
-				// TODO: Issue: not scaling correctly with range change.
-				timelineTabD.setContent(tcD.getVbox());// timelinesVBox2);
-				timelineTabD.setClosable(true);
-				tabsToAdd.add(timelineTabD);
-
 				Tab timelineTabE = new Tab("timelineTabE Historical Timelines All Users");
 				TimelineChartAppGeneric tcE = new TimelineChartAppGeneric(timelineData, true, "LineChart");
 				timelineTabE.setContent(tcE.getVbox());// timelinesVBox2);

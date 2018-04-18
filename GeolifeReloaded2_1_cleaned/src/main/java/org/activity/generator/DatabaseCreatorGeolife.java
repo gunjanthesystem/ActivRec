@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import org.activity.constants.Constant;
 import org.activity.io.Serializer;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.LabelEntry;
 import org.activity.objects.Pair;
 import org.activity.objects.TrajectoryEntry;
@@ -347,7 +347,7 @@ public class DatabaseCreatorGeolife
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile
+				BufferedWriter bwMergerCaseLogs = WToFile
 						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
@@ -568,7 +568,7 @@ public class DatabaseCreatorGeolife
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)
@@ -1263,9 +1263,9 @@ public class DatabaseCreatorGeolife
 			mapForAllUnknownsBrokenOverDays.put(entryForUser.getKey(), unknownsInsertedBrokenOverDays);
 		}
 
-		WritingToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+		WToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 				"User,Timestamp,DurationInSecs");
-		WritingToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsBrokenOverDays, "Unknown_BrokenOverDays_Inserted",
+		WToFile.writeLinkedHashMapOfTreemap(mapForAllUnknownsBrokenOverDays, "Unknown_BrokenOverDays_Inserted",
 				"User,Timestamp,DurationInSecs");
 
 		return mapForAllDataMergedPlusDuration;
@@ -1454,7 +1454,7 @@ public class DatabaseCreatorGeolife
 			}
 
 			numberOfSandwichesFound.put(userName, numberOfSandwichesForThisUser);
-			WritingToFile.writeSimpleLinkedHashMapToFile(numberOfSandwichesFound, commonPath + "sandwichesPerUser_"
+			WToFile.writeSimpleLinkedHashMapToFile(numberOfSandwichesFound, commonPath + "sandwichesPerUser_"
 					+ activityNameToMerge + thresholdForMergingNotAvailables + "secs.csv", "User",
 					"number_of_sandwiches");
 
@@ -1727,7 +1727,7 @@ public class DatabaseCreatorGeolife
 			System.out.println("put, User:" + userID + ", #TrajectoryEntries:" + mapContinuousNotMerged.size());
 		}
 
-		WritingToFile.writeArrayList(timeDifferencesBetweenDataPointAllUsers, "TimeDifferenceAll",
+		WToFile.writeArrayList(timeDifferencesBetweenDataPointAllUsers, "TimeDifferenceAll",
 				"UserID,TimeDifferenceWithNextInSeconds");
 		System.out.println("exiting getTrajectoryEntriesWithTimeDifferenceWithNext");
 
@@ -1934,7 +1934,7 @@ public class DatabaseCreatorGeolife
 
 		try
 		{
-			WritingToFile.writeNegativeZeroInvalidsLatLonAltHeader("CountOfNegativeZeroUnknownAltLatLon");
+			WToFile.writeNegativeZeroInvalidsLatLonAltHeader("CountOfNegativeZeroUnknownAltLatLon");
 
 			for (String userID : userIDs)
 			{
@@ -1998,16 +1998,16 @@ public class DatabaseCreatorGeolife
 
 				modesForAllTrajectoryFilesAllUsers.put(userID, modesForAllTrajectoryFilesPerUser);
 
-				WritingToFile.writeNegativeZeroInvalidsLatLonAlt(userID, "CountOfNegativeZeroUnknownAltLatLon");
+				WToFile.writeNegativeZeroInvalidsLatLonAlt(userID, "CountOfNegativeZeroUnknownAltLatLon");
 
 				mapForAllData.put(userID, mapEachUser);
 				// System.out.println("putting maps of user:" + userID + " of size:" + mapEachUser.size());
 				System.out.println("put, User:" + userID + ",#TrajectoryEntries:" + mapEachUser.size());
 			} // end of loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemapAllString(modesForAllTrajectoryFilesAllUsers,
+			WToFile.writeLinkedHashMapOfTreemapAllString(modesForAllTrajectoryFilesAllUsers,
 					"ModesPerTrajectoryFiles", "UserID,TrajectoryFile, NumberOfModes,Modes");
-			WritingToFile.writeNegativeZeroInvalidsLatLonAltFooter("CountOfNegativeZeroUnknownAltLatLon");
+			WToFile.writeNegativeZeroInvalidsLatLonAltFooter("CountOfNegativeZeroUnknownAltLatLon");
 			// WritingToFile.writeLinkedHashMapOfTreemapPureTrajectoryEntries(mapForAllData,
 			// "AllDataWithAnnotation","UserID,Timestamp,Mode,Latitude,Longitude,Altitude,DifferenceWithNextInSeconds,DurationInSeconds,BreakOverDaysCount");
 
@@ -2721,7 +2721,7 @@ public class DatabaseCreatorGeolife
 
 					if (entry.getValue().getNumberOfDistinctTrajectoryIDs() > 1)
 					{
-						WritingToFile.appendLineToFileAbsolute("User:" + userName + "," + msg + "\n",
+						WToFile.appendLineToFileAbs("User:" + userName + "," + msg + "\n",
 								commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
 					}
 					// return "t:" + timestamp + ",mod:" + mode + " ,endt:" + endTimestamp + ", timeDiffWithNextInSecs:"
@@ -2788,8 +2788,8 @@ public class DatabaseCreatorGeolife
 
 					if (entry.getValue().getNumberOfDistinctTrajectoryIDs() > 1)
 					{
-						WritingToFile
-								.appendLineToFileAbsolute(
+						WToFile
+								.appendLineToFileAbs(
 										"User:" + userName + ","
 												+ entry.getValue().toStringWithTrajIDWithTrajPurityCheck() + "\n",
 										commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
@@ -2975,7 +2975,7 @@ public class DatabaseCreatorGeolife
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WritingToFile
+				BufferedWriter bwMergerCaseLogs = WToFile
 						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
@@ -3197,7 +3197,7 @@ public class DatabaseCreatorGeolife
 				bwMergerCaseLogs.close();
 			} // end of for loop over users
 
-			WritingToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
+			WToFile.writeLinkedHashMapOfTreemapTrajEntry(mapForAllUnknownsWholes, "Unknown_Wholes_Inserted",
 					"User,Timestamp,DurationInSecs");
 		}
 		catch (Exception e)

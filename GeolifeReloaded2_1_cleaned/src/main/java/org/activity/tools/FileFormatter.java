@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 
 public class FileFormatter
 {
@@ -25,7 +25,7 @@ public class FileFormatter
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(absFileNameToRead));// Constant.getCommonPath() +
-			BufferedWriter bw = WritingToFile.getBWForNewFile(absFileNameToWrite);
+			BufferedWriter bw = WToFile.getBWForNewFile(absFileNameToWrite);
 			String lineRead = "";
 			int countOfLines = 0;
 			while ((lineRead = br.readLine()) != null)

@@ -26,7 +26,7 @@ import javax.imageio.ImageIO;
 import org.activity.constants.Constant;
 import org.activity.featureExtraction.TimelinesAttributesExtractionCleaned1;
 import org.activity.io.CSVUtils;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
@@ -218,7 +218,7 @@ public class TimelineWEKAClusteringController
 				new File(directoryToWrite).mkdir();
 				pathToWrite = directoryToWrite + "/";
 				// PopUps.showMessage("Path to write = " + pathToWrite);
-				PrintStream consoleLogStream = WritingToFile
+				PrintStream consoleLogStream = WToFile
 						.redirectConsoleOutput(pathToWrite + typeOfDataMining + "ConsoleLog.txt");
 				// System.out.println();
 
@@ -576,9 +576,9 @@ public class TimelineWEKAClusteringController
 
 			resultToWrite += "\n" + predictionResults.toString() + "\n";
 
-			WritingToFile.appendLineToFileAbsolute(resultToWrite,
+			WToFile.appendLineToFileAbs(resultToWrite,
 					this.pathToWrite + metaNamePhrase + "EnsembleClassificationEvaluation.txt");
-			WritingToFile.appendLineToFileAbsolute(predictionResults.toString(),
+			WToFile.appendLineToFileAbs(predictionResults.toString(),
 					this.pathToWrite + metaNamePhrase + "EnsemblePredictedClasses.csv");
 		}
 
@@ -704,7 +704,7 @@ public class TimelineWEKAClusteringController
 	{
 		// PopUps.showMessage("Inside writing predicted classes: " + userSerialNumPredictedClass.size() + " " +
 		// userIDPredictedClass.size());
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"UserSerialNum,UserID,PredictedClass,PredictedBestMU, MRRForPredictedBestMU\n",
 				this.pathToWrite + fileNamePhrase + "UserSerialNumPredictedClass.csv");
 
@@ -725,7 +725,7 @@ public class TimelineWEKAClusteringController
 			String msg = "User_" + e.getKey() + "," + instanceIDToUserID(e.getKey()) + ", " + e.getValue() + ","
 					+ predictedBestMU + "," + mrrForPredictedBestMRR + "\n";
 
-			WritingToFile.appendLineToFileAbsolute(msg,
+			WToFile.appendLineToFileAbs(msg,
 					this.pathToWrite + fileNamePhrase + "UserSerialNumPredictedClass.csv");
 
 			// Sanity CHeck start //NOT useful as it doesnt address the issue and morover not needed
@@ -880,7 +880,7 @@ public class TimelineWEKAClusteringController
 
 		}
 
-		WritingToFile.appendLineToFileAbsolute("User ID, SampEn2D,,,SampEn3D,,,KGramD,,\n", ensembleFileName);
+		WToFile.appendLineToFileAbs("User ID, SampEn2D,,,SampEn3D,,,KGramD,,\n", ensembleFileName);
 
 		for (Entry<String, Triple<Double, Double, Double>> entrySampEn2 : predictedClassSampEn2Dist.entrySet())
 		{
@@ -889,7 +889,7 @@ public class TimelineWEKAClusteringController
 			String msg = userID + "," + entrySampEn2.getValue().toStringCSV() + ","
 					+ predictedClassSampEn3Dist.get(userID).toStringCSV() + ","
 					+ predictedClassKGramDist.get(userID).toStringCSV();
-			WritingToFile.appendLineToFileAbsolute(msg + "\n", ensembleFileName);// .appendLineToFileAbs(msg, path);
+			WToFile.appendLineToFileAbs(msg + "\n", ensembleFileName);// .appendLineToFileAbs(msg, path);
 		}
 
 		fuse(predictedClassSampEn2Dist, predictedClassSampEn3Dist, predictedClassKGramDist, actualClass,
@@ -954,8 +954,8 @@ public class TimelineWEKAClusteringController
 		String fuseDistriFileToWrite = pathToWrite + "FusedDistributionFile.csv";
 		String fusePredicFileToWrite = pathToWrite + "FusedPredictionFile.csv";
 
-		WritingToFile.appendLineToFileAbsolute("UserID, MaxEnsemble,,,MeanEnsemble,,\n", fuseDistriFileToWrite);
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs("UserID, MaxEnsemble,,,MeanEnsemble,,\n", fuseDistriFileToWrite);
+		WToFile.appendLineToFileAbs(
 				"UserID, MaxEnsemblePredictedC,MeanEnsemblePredictedC,MajVotingPredictedC,WtdMajorityPredictC, actualClass, EarlyFusionPrediction\n",
 				fusePredicFileToWrite);
 
@@ -1013,8 +1013,8 @@ public class TimelineWEKAClusteringController
 					+ predictedClassWeightedMajorityVoting.get(userID) + "," + actualClass.get(userID) + ","
 					+ predictedClassAll.get(userID) + "\n";
 
-			WritingToFile.appendLineToFileAbsolute(msg1, fuseDistriFileToWrite);
-			WritingToFile.appendLineToFileAbsolute(msg2, fusePredicFileToWrite);
+			WToFile.appendLineToFileAbs(msg1, fuseDistriFileToWrite);
+			WToFile.appendLineToFileAbs(msg2, fusePredicFileToWrite);
 		}
 
 		// evaluateFusion(actualClass, predictedClassMaxEnsemble, "EvalMaxEnsemble.csv");
@@ -1201,43 +1201,43 @@ public class TimelineWEKAClusteringController
 		int[][] cm = getConfusionMatrix(groundtruth, prediction);
 
 		System.out.println(msg1);
-		WritingToFile.appendLineToFileAbsolute("Evaluation: " + titlePhrase + "\n", pathToWrite + fileNamePhrase);
+		WToFile.appendLineToFileAbs("Evaluation: " + titlePhrase + "\n", pathToWrite + fileNamePhrase);
 
-		WritingToFile.appendLineToFileAbsolute(confusionMatrixToString(cm) + "\n", pathToWrite + fileNamePhrase);
+		WToFile.appendLineToFileAbs(confusionMatrixToString(cm) + "\n", pathToWrite + fileNamePhrase);
 		// WritingToFile.appendLineToFileAbsolute(",FirstCluster, ThirdCluster,SecondCluster\n", pathToWrite +
 		// fileNamePhrase);
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"classWiseTruePositives , " + classWiseTruePositives.toStringCSV() + "\n",
 				pathToWrite + fileNamePhrase);
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"classWiseFalseNegatives , " + classWiseFalseNegatives.toStringCSV() + "\n",
 				pathToWrite + fileNamePhrase);
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"classWiseTrueNegatives , " + classWiseTrueNegatives.toStringCSV() + "\n",
 				pathToWrite + fileNamePhrase);
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"classWiseFalsePositives , " + classWiseFalsePositives.toStringCSV() + "\n",
 				pathToWrite + fileNamePhrase);
 
-		WritingToFile.appendLineToFileAbsolute("classWiseAccuracy , " + firstClusterAccuracy + ","
+		WToFile.appendLineToFileAbs("classWiseAccuracy , " + firstClusterAccuracy + ","
 				+ thirdClusterAccuracy + "," + secondClusterAccuracy + "\n", pathToWrite + fileNamePhrase);
 
-		WritingToFile.appendLineToFileAbsolute("OverAllAccuracy , " + overallAccuracy + "\n",
+		WToFile.appendLineToFileAbs("OverAllAccuracy , " + overallAccuracy + "\n",
 				pathToWrite + fileNamePhrase);
 
-		WritingToFile.appendLineToFileAbsolute("classWisePrecision , " + firstClusterPrecision + ","
+		WToFile.appendLineToFileAbs("classWisePrecision , " + firstClusterPrecision + ","
 				+ thirdClusterPrecision + "," + secondClusterPrecision + "\n", pathToWrite + fileNamePhrase);
 
-		WritingToFile.appendLineToFileAbsolute("OverAllPrecision , " + overallPrecision + "\n",
+		WToFile.appendLineToFileAbs("OverAllPrecision , " + overallPrecision + "\n",
 				pathToWrite + fileNamePhrase);
 
-		WritingToFile.appendLineToFileAbsolute(
+		WToFile.appendLineToFileAbs(
 				"classWiseRecall , " + firstClusterRecall + "," + thirdClusterRecall + "," + secondClusterRecall + "\n",
 				pathToWrite + fileNamePhrase);
 
-		WritingToFile.appendLineToFileAbsolute("OverAllRecall , " + overallRecall + "\n", pathToWrite + fileNamePhrase);
-		WritingToFile.appendLineToFileAbsolute("--,--,--,--\n", pathToWrite + fileNamePhrase);
-		WritingToFile.appendLineToFileAbsolute("\n", pathToWrite + fileNamePhrase);
+		WToFile.appendLineToFileAbs("OverAllRecall , " + overallRecall + "\n", pathToWrite + fileNamePhrase);
+		WToFile.appendLineToFileAbs("--,--,--,--\n", pathToWrite + fileNamePhrase);
+		WToFile.appendLineToFileAbs("\n", pathToWrite + fileNamePhrase);
 	}
 
 	private String confusionMatrixToString(int[][] cm)
@@ -1724,7 +1724,7 @@ public class TimelineWEKAClusteringController
 			resultToWrite += "\n---------- Stratified 10-fold Cross-validation-------------------\n";
 			resultToWrite += WekaUtilityBelt.getRelevantEvaluationMetricsAsString(eval);
 			resultToWrite += eval.toSummaryString();
-			WritingToFile.appendLineToFileAbsolute(resultToWrite, this.pathToWrite + "ClassificationEvaluation.txt");
+			WToFile.appendLineToFileAbs(resultToWrite, this.pathToWrite + "ClassificationEvaluation.txt");
 
 		}
 		catch (Exception e)
@@ -2027,9 +2027,9 @@ public class TimelineWEKAClusteringController
 
 			resultToWrite += "\n" + predictionResults.toString() + "\n";
 
-			WritingToFile.appendLineToFileAbsolute(resultToWrite,
+			WToFile.appendLineToFileAbs(resultToWrite,
 					this.pathToWrite + idForPreselectingSetOfAttributesOrPhrase + "ClassificationEvaluation.txt");
-			WritingToFile.appendLineToFileAbsolute(predictionResults.toString(),
+			WToFile.appendLineToFileAbs(predictionResults.toString(),
 					this.pathToWrite + idForPreselectingSetOfAttributesOrPhrase + "PredictedClasses.csv");
 		}
 
@@ -2141,7 +2141,7 @@ public class TimelineWEKAClusteringController
 
 			// /////////////////////////////////////////////
 			int[] indices = performWrapperJ48EvalGreedyStepwiseAttributeSelection(data);// performCfsSubsetGreedyStepwiseAttributeSelection(data);//
-			WritingToFile.appendLineToFileAbsolute("all data together " + "," + Arrays.toString(indices) + "\n",
+			WToFile.appendLineToFileAbs("all data together " + "," + Arrays.toString(indices) + "\n",
 					pathToWrite + "CheckAttributeSelectionIsSameForFullAndLeaveOneOut.csv");
 			// ////////////////////////////////////////////
 			// ALERT ALERT ALERT ALERT
@@ -2302,7 +2302,7 @@ public class TimelineWEKAClusteringController
 
 		for (int i = 0; i < indicesSelected.size(); i++)
 		{
-			WritingToFile.appendLineToFileAbsolute("fold " + i + "," + Arrays.toString(indicesSelected.get(i)) + "\n",
+			WToFile.appendLineToFileAbs("fold " + i + "," + Arrays.toString(indicesSelected.get(i)) + "\n",
 					pathToWrite + "CheckAttributeSelectionIsSameForFullAndLeaveOneOut.csv");
 			for (int j = i; j < indicesSelected.size(); j++)
 			{

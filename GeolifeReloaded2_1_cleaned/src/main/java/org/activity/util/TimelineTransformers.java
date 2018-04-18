@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
-import org.activity.io.WritingToFile;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.stats.HilbertCurveUtils;
@@ -671,7 +671,7 @@ public class TimelineTransformers
 		userTrainingTimelines.entrySet().stream()
 				.forEachOrdered(tl -> sbTraining.append(tl.getValue().getActivityObjectsAsStringCode(",")));
 		sbTraining.append("\n");
-		WritingToFile.appendLineToFileAbsolute(sbTraining.toString(),
+		WToFile.appendLineToFileAbs(sbTraining.toString(),
 				Constant.getCommonPath() + "TrainingTimelinesAsSeqOfCodes.csv");
 	}
 
@@ -690,7 +690,7 @@ public class TimelineTransformers
 				.forEachOrdered(tl -> sbTraining.append(timelineToSeqOfActNames(tl.getValue(), ",")));
 
 		sbTraining.append("\n");
-		WritingToFile.appendLineToFileAbsolute(sbTraining.toString(),
+		WToFile.appendLineToFileAbs(sbTraining.toString(),
 				Constant.getCommonPath() + "TrainingTimelinesAsSeqOfCodes.csv");
 	}
 
