@@ -182,9 +182,9 @@ public final class Constant
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
-	public static final boolean useStartTimeInFED = false;// SWITCH_NOV10
-	public static final boolean useLocationInFED = false;// SWITCH_NOV10
-	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
+	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
+	public static final boolean useLocationInFED = true;// SWITCH_NOV10
+	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
@@ -208,6 +208,7 @@ public final class Constant
 
 	public static final boolean cleanTimelinesAgainInsideRecommendationTests = false;// SWITCH_April11
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
+	public static boolean useRTVerseNormalisationForED = true;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -1322,6 +1323,7 @@ public final class Constant
 		s.append("\nreduceAndCleanTimelinesBeforeRecomm:" + reduceAndCleanTimelinesBeforeRecomm);
 		s.append("\nuseFeatureDistancesOfAllActs:" + useFeatureDistancesOfAllActs);
 		s.append("\ncleanTimelinesAgainInsideRecommendationTests:" + cleanTimelinesAgainInsideRecommendationTests);
+		s.append("\nuseRTVerseNormalisationForED:" + useRTVerseNormalisationForED);
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
