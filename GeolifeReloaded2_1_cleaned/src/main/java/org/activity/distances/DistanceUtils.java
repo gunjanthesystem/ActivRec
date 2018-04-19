@@ -428,8 +428,8 @@ public class DistanceUtils
 			PopUps.showError("Error: memorizeEditDistance not implemented here");
 		}
 
-		// <CandidateTimeline ID, Edit distance>
-		LinkedHashMap<String, Pair<String, Double>> candEditDistances = new LinkedHashMap<>();
+		// // <CandidateTimeline ID, Edit distance>
+		// LinkedHashMap<String, Pair<String, Double>> candEditDistances = new LinkedHashMap<>();
 
 		// CandTimelineID,{EDTrace,ActED, list of differences of Gowalla feature for each ActObj in this cand timeline}
 		// CandTimelineID,Triple{TraceAsString,ActLevelEditDistance,List of EnumMap of {GowallaFeatures,
@@ -442,9 +442,7 @@ public class DistanceUtils
 		// {// loop over candidates
 		// Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> res = getActEditDistancesFeatDiffs(
 		// e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
-		// caseType, hjEditDistance, editDistancesMemorizer);
-		// candAEDFeatDiffs.put(e.getKey(), res);
-		// }
+		// caseType, hjEditDistance, editDistancesMemorizer);//candAEDFeatDiffs.put(e.getKey(), res);}
 		// Alternatively
 		candAEDFeatDiffs = candidateTimelines.entrySet().parallelStream().collect(Collectors.toMap(
 				e -> (String) e.getKey(),
@@ -469,28 +467,10 @@ public class DistanceUtils
 				.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 1);
 		/////////////////// End of finding min max
 
-		getRTVerseMinMaxNormalisedEditDistances(candAEDFeatDiffs, minOfMinOfDiffs, maxOfMaxOfDiffs, hjEditDistance);
+		// <CandidateTimeline ID, Edit distance>
+		LinkedHashMap<String, Pair<String, Double>> candEditDistances = getRTVerseMinMaxNormalisedEditDistances(
+				candAEDFeatDiffs, minOfMinOfDiffs, maxOfMaxOfDiffs, hjEditDistance);
 
-		// iterating over cands
-		for (Entry<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> e : candAEDFeatDiffs
-				.entrySet())
-		{
-			List<EnumMap<GowallaFeatures, Double>> featDiffsForThisCand = e.getValue().getThird();
-
-			// iterating (horizontally) over AOs in this cand
-			for (EnumMap<GowallaFeatures, Double> f : featDiffsForThisCand)
-			{
-				// iterating over feature diff of this AO with the corresponding in current timeline
-				for (Entry<GowallaFeatures, Double> g : f.entrySet())
-				{
-
-				}
-
-			}
-		}
-
-		// System.out.println("Iter: " + (t2 - t1));
-		// System.out.println("Stre: " + (t3 - t2));
 		return candEditDistances;
 	}
 
@@ -513,7 +493,6 @@ public class DistanceUtils
 			EnumMap<GowallaFeatures, Double> minOfMinOfDiffs, EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs,
 			HJEditDistance hjEditDistance)
 	{
-
 		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
 
 		EnumMap<GowallaFeatures, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
@@ -531,12 +510,16 @@ public class DistanceUtils
 		// End of Get max of ActED over all cand
 
 		// Start of logging
-		StringBuilder log = new StringBuilder();
-		log.append("EDAlpha=" + EDAlpha + " EDBeta=" + EDBeta + " sumOfWtOfFeaturesUsedExceptPD="
-				+ sumOfWtOfFeaturesUsedExceptPD + " maxActEDOverAllCands" + maxActEDOverAllCands
-				+ " minActEDOverAllCands=" + minActEDOverAllCands + '\n');
+		StringBuilder log = new StringBuilder(
+				"\n--------- START OF getRTVerseMinMaxNormalisedEditDistances() with EDAlpha=" + EDAlpha + " EDBeta="
+						+ EDBeta + " sumOfWtOfFeaturesUsedExceptPD=" + sumOfWtOfFeaturesUsedExceptPD
+						+ " maxActEDOverAllCands" + maxActEDOverAllCands + " minActEDOverAllCands="
+						+ minActEDOverAllCands + '\n');
 		featureWeightMap.entrySet().stream()
-				.forEachOrdered(e -> log.append(e.getKey().toString() + "-" + e.getValue()));
+				.forEachOrdered(e -> log.append(" " + e.getKey().toString() + "-" + e.getValue()));
+		StringBuilder logCsv1 = new StringBuilder();// one for each cand
+		// candID,AEDTraceForThisCand,ActDistForThisCand,countOfAOForThisCand,featDiff,featDiff,featDiff,featDiff,featDiff,featDiff,featDiff,featureDistForThisAOForThisCand,featureDistForThisCand,normActDistForThisCand,resultantEditDist
+		StringBuilder logCsv2 = new StringBuilder();// one for each AO of each cand
 		// end of logging
 
 		// Loop over cands
@@ -550,25 +533,28 @@ public class DistanceUtils
 			double ActDistanceForThisCand = candEntry.getValue().getSecond();
 
 			/////////
-			log.append("\ncandID=" + candID + " featureDistForThisCand=" + featureDistForThisCand
+			log.append("\n\tcandID=" + candID + " featureDistForThisCand=" + featureDistForThisCand
 					+ " AEDTraceForThisCand=" + AEDTraceForThisCand + " ActDistForThisCand=" + ActDistanceForThisCand
 					+ " will now loop over list of AOs for this cand:");
 			////////////
 
-			List<EnumMap<GowallaFeatures, Double>> listOfDiffsForThisCand = candEntry.getValue().getThird();
+			List<EnumMap<GowallaFeatures, Double>> listOfAOsForThisCand = candEntry.getValue().getThird();
 			// note: list in in intial order, i.e., least recent AO to most recent AO by time.
 
 			int countOfAOForThisCand = 0;
 			// loop over the list for this cand
-			for (EnumMap<GowallaFeatures, Double> mapOfFeatureDiffForAnAO : listOfDiffsForThisCand)
+			for (EnumMap<GowallaFeatures, Double> mapOfFeatureDiffForAnAO : listOfAOsForThisCand)
 			{
 				countOfAOForThisCand += 1;
 				double featureDistForThisAOForThisCand = 0;
 				double sanityCheckFeatureWtSum = 0;
 
-				///
-				log.append("\ncountOfAOForThisCand=" + countOfAOForThisCand + " now loop over features for this AO");
-				///
+				///////
+				log.append(
+						"\n\t\tcountOfAOForThisCand=" + countOfAOForThisCand + " now loop over features for this AO");
+				logCsv2.append(candID + "," + AEDTraceForThisCand + "," + ActDistanceForThisCand + ","
+						+ countOfAOForThisCand + ",");
+				////////
 
 				// loop over each of the Gowalla Feature
 				for (Entry<GowallaFeatures, Double> diffEntry : mapOfFeatureDiffForAnAO.entrySet())
@@ -580,20 +566,20 @@ public class DistanceUtils
 					double wtForThisFeature = featureWeightMap.get(featureID);
 					featureDistForThisAOForThisCand += (wtForThisFeature * normalisedFeatureDiffVal);
 
-					///
-					log.append("\nfeatureID=" + featureID + " featDiff=" + diffEntry.getValue()
+					//////
+					log.append("\n\t\t\tfeatureID=" + featureID + " featDiff=" + diffEntry.getValue()
 							+ " normalisedFeatureDiffVal=" + normalisedFeatureDiffVal + " wtForThisFeature="
 							+ wtForThisFeature + " featureDistForThisAOForThisCand=" + featureDistForThisAOForThisCand
 							+ " maxOfMaxOfDiffs=" + maxOfMaxOfDiffs.get(featureID) + " minOfMinOfDiffs="
 							+ minOfMinOfDiffs.get(featureID));
-					///
-
-					//
+					logCsv2.append(diffEntry.getValue() + "," + normalisedFeatureDiffVal + ",");
+					//////
 					sanityCheckFeatureWtSum += wtForThisFeature;
 				}
-
-				log.append("\nfeatureDistForThisAOForThisCand=" + featureDistForThisAOForThisCand);
-
+				/////////
+				log.append("\n\t\tfeatureDistForThisAOForThisCand=" + featureDistForThisAOForThisCand);
+				logCsv2.append("|" + "," + featureDistForThisAOForThisCand + "\n");
+				////////
 				// For SanityCheck sanityCheckFeatureWtSum
 				if (true)
 				{
@@ -603,29 +589,37 @@ public class DistanceUtils
 				}
 				featureDistForThisCand += featureDistForThisAOForThisCand;
 
-			} // end of loop over the list for this cand
+			} // end of loop over the list of AOs for this cand
 
 			double normActDistForThisCand = StatsUtils.minMaxNormWORound(ActDistanceForThisCand, maxActEDOverAllCands,
 					minActEDOverAllCands);
 			double normFeatureDistForThisCand = featureDistForThisCand / sumOfWtOfFeaturesUsedExceptPD;
-
+			// IMPORTANT
 			double resultantEditDist = (EDAlpha) * normActDistForThisCand + (EDBeta) * normFeatureDistForThisCand;
 
 			res.put(candEntry.getKey(), new Pair<>(AEDTraceForThisCand, resultantEditDist));
 
-			///
-			log.append("\nfeatureDistForThisCand=" + featureDistForThisCand + " normActDistForThisCand="
+			/////////
+			log.append("\n\tfeatureDistForThisCand=" + featureDistForThisCand + " normActDistForThisCand="
 					+ normActDistForThisCand + " normFeatureDistForThisCand=" + normFeatureDistForThisCand
-					+ "\n-->resultantEditDist=" + resultantEditDist);
-			///
+					+ "\n\t-->resultantEditDist=" + resultantEditDist);
+			logCsv1.append(ActDistanceForThisCand + "," + normActDistForThisCand + "," + featureDistForThisCand + ","
+					+ normFeatureDistForThisCand + "," + resultantEditDist + "\n");
+			logCsv2.append(featureDistForThisCand + "," + normActDistForThisCand + "," + resultantEditDist + "\n");
+			/////////
 		} // end of loop over cands
 
 		if (true)// logging
 		{
 			WToFile.appendLineToFileAbs(log.toString() + "\n",
 					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances.txt");
+			WToFile.appendLineToFileAbs(logCsv1.toString() + "\n\n",
+					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances2.csv");
+			WToFile.appendLineToFileAbs(logCsv2.toString() + "\n",
+					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances3.csv");
 		}
 
+		log.append("\n---------End  getRTVerseMinMaxNormalisedEditDistances()\n");
 		return res;
 	}
 
@@ -1141,9 +1135,19 @@ public class DistanceUtils
 		//// CurtainA end
 
 		// long t3 = System.currentTimeMillis();
-		LinkedHashMap<String, Pair<String, Double>> candEditDistances/* Parallel */ = getHJEditDistsForCandsFullCandParallelWithMemory(
-				candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
-				hjEditDistance, editDistancesMemorizer);
+		LinkedHashMap<String, Pair<String, Double>> candEditDistances;
+		if (Constant.useRTVerseNormalisationForED == false)
+		{ /* Parallel */
+			candEditDistances = getHJEditDistsForCandsFullCandParallelWithMemory(candidateTimelines,
+					activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance,
+					editDistancesMemorizer);
+		}
+		else
+		{ /* Parallel */
+			candEditDistances = getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018(candidateTimelines,
+					activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance,
+					editDistancesMemorizer);
+		}
 		// long t4 = System.currentTimeMillis();
 
 		// Start Sanity check
