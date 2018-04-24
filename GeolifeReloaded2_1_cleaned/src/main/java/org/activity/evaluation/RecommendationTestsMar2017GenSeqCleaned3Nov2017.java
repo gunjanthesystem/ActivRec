@@ -191,8 +191,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());
 
-						PrintStream consoleLogStream = WToFile
-								.redirectConsoleOutput(commonPath + "consoleLog.txt");
+						PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "consoleLog.txt");
 
 						BufferedWriter metaBw = WToFile.getBWForNewFile(commonPath + "meta.csv");
 
@@ -202,8 +201,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						BufferedWriter recommSeqWithScoreBw = WToFile
 								.getBWForNewFile(commonPath + "dataRecommSequenceWithScore.csv");// **
 
-						BufferedWriter actualSeqBw = WToFile
-								.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
+						BufferedWriter actualSeqBw = WToFile.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
 
 						ArrayList<BufferedWriter> bwsDataActual = new ArrayList<>(this.recommSeqLength);
 
@@ -285,8 +283,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 								"User_ID,Date,Index_of_Activity Object,Start_Timestamp,Week_Day,Time_Category,Current_Activity,TotalNumOfPossibleCands, NumCandsRejectedDueToNoCurrentActivityAtNonLast,NumCandsRejectedDueToNoNextActivity\n");
 						rtsRejBlackListedWriter.write("User_ID,End_Timestamp\n");
 
-						WToFile.writeToNewFile(
-								"User,Num_of_Mornings,Num_of_Afternoons,Number_of_Evenings,TotalRTs\n",
+						WToFile.writeToNewFile("User,Num_of_Mornings,Num_of_Afternoons,Number_of_Evenings,TotalRTs\n",
 								commonPath + "UsersWithNoValidRTs.csv");
 
 						bwCountTimeCategoryOfRecomm
@@ -361,8 +358,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// Split timelines into training-test for each user to be used collaboratively
 						if (Constant.collaborativeCandidates)
 						{// TODO 23 Feb 2018: probably we can take this out of MU loop
-							trainTestTimelinesForAllUsersDW = TimelineUtils
-									.splitAllUsersTestTrainingTimelines(allUsersTimelines, percentageInTraining);
+							trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(
+									allUsersTimelines, percentageInTraining,
+									Constant.cleanTimelinesAgainInsideTrainTestSplit);
 
 							if (Constant.filterTrainingTimelinesByRecentDays)
 							{
@@ -464,8 +462,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							// ////////////////////////////////////////////////////////////////////////////////
 							if (this.writeDayTimelinesOnce)
 							{// if (matchingUnitIterator == 0) // write the given day timelines only once
-								WToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", true,
-										true, true);
+								WToFile.writeGivenDayTimelines(userName, userAllDatesTimeslines, "All", true, true,
+										true);
 								this.writeDayTimelinesOnce = false;
 							}
 
@@ -1648,7 +1646,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			int numOfRecentDays)
 	{
 		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
-		System.out.println("Filtering by recent " + numOfRecentDays + " Days");
+		System.out.println("----- Filtering by recent " + numOfRecentDays + " Days");
 		StringBuilder sb = new StringBuilder("Debug 10 Dec\t");
 
 		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsersDW
@@ -1657,11 +1655,18 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
 
 			// Get most recent numOfRecentDays dates
-			List<Date> datesList = new ArrayList<>();
-			datesList.addAll(trainingTimelineForThisUserDate.keySet());
-			Collections.sort(datesList, Collections.reverseOrder());
-			Set<Date> setOfSelectedDatesForThisUser = datesList.stream().limit(numOfRecentDays)
+			List<Date> trainingDatesForThisUserList = new ArrayList<>();
+			trainingDatesForThisUserList.addAll(trainingTimelineForThisUserDate.keySet());
+			Collections.sort(trainingDatesForThisUserList, Collections.reverseOrder());
+
+			Set<Date> setOfSelectedDatesForThisUser = trainingDatesForThisUserList.stream().limit(numOfRecentDays)
 					.collect(Collectors.toSet());
+
+			System.out.println(
+					"UserID=" + trainTestForAUser.getKey() + " numOfTrainingDays=" + trainingDatesForThisUserList.size()
+							+ "\ttrainingDatesForThisUserList= \n" + trainingDatesForThisUserList);
+			System.out.println("numOfSelectedTrainingDays= " + setOfSelectedDatesForThisUser.size()
+					+ "\t\tsetOfSelectedDatesForThisUser= \n" + setOfSelectedDatesForThisUser);
 
 			// filter by date in setOfSelectedDatesForThisUser
 			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate

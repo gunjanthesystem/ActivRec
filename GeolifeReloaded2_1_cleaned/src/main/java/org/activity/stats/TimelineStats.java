@@ -146,8 +146,9 @@ public class TimelineStats
 			writeAvgNumOfTotalActsPerDayInTimelines(usersDayTimelinesAll, "AvgNumOfTotalActsInUncleanedTimelines");
 			// //////////////////
 
-			usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
+			usersDayTimelines = TimelineUtils.cleanUsersDayTimelines(usersDayTimelinesAll);
 			usersDayTimelines = TimelineUtils.rearrangeDayTimelinesOrderForDataset(usersDayTimelines);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
+			System.out.println("ALERT: CLEANING AND REARRANGING USERS DAY TIMELINES !!");
 
 			WToFile.writeUsersDayTimelines(usersDayTimelines, "users", true, true, true);// users
 		}
@@ -2376,8 +2377,7 @@ public class TimelineStats
 					WToFile.appendLineToFile(avgAltitude + "\n", userID + "avgAltitude");
 
 					double distanceTravelled = ao.getDistanceTravelled();
-					WToFile.appendLineToFile(String.valueOf(distanceTravelled) + "\n",
-							userID + "distanceTravelled");
+					WToFile.appendLineToFile(String.valueOf(distanceTravelled) + "\n", userID + "distanceTravelled");
 				}
 			}
 		}

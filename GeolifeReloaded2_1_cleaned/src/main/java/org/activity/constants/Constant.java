@@ -196,8 +196,8 @@ public final class Constant
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean randomLySample100Users = false;// true;// SWITCH_NOV10
-	public static final boolean runForAllUsersAtOnce = true;// SWITCH_April8
+	public static final boolean useRandomlySampled100Users = true;// false;// true;// SWITCH_NOV10
+	public static final boolean runForAllUsersAtOnce = false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
 	/**
@@ -207,6 +207,8 @@ public final class Constant
 	public static final boolean useFeatureDistancesOfAllActs = true;// SWITCH_NOV10
 
 	public static final boolean cleanTimelinesAgainInsideRecommendationTests = false;// SWITCH_April11
+	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
+
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
 	public static boolean useRTVerseNormalisationForED = true;
 	////////////////////////////////////////////////////////////////////////
@@ -1317,12 +1319,13 @@ public final class Constant
 		s.append("\nuseDurationFromPrevInFED:" + useDurationFromPrevInFED);
 		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFED);
 		s.append("\nassignFallbackZoneId:" + assignFallbackZoneIdWhenConvertCinsToAO);
-		s.append("\nrandomLySample100Users:" + randomLySample100Users);
+		s.append("\nrandomLySample100Users:" + useRandomlySampled100Users);
 		s.append("\nuseCheckinEntryV2:" + useCheckinEntryV2);
 		s.append("\nrunForAllUsersAtOnce:" + runForAllUsersAtOnce);
 		s.append("\nreduceAndCleanTimelinesBeforeRecomm:" + reduceAndCleanTimelinesBeforeRecomm);
 		s.append("\nuseFeatureDistancesOfAllActs:" + useFeatureDistancesOfAllActs);
 		s.append("\ncleanTimelinesAgainInsideRecommendationTests:" + cleanTimelinesAgainInsideRecommendationTests);
+		s.append("\ncleanTimelinesAgainInsideTrainTestSplit:" + cleanTimelinesAgainInsideTrainTestSplit);
 		s.append("\nuseRTVerseNormalisationForED:" + useRTVerseNormalisationForED);
 
 		// s.append("\n:" + );

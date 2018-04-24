@@ -947,6 +947,42 @@ public final class StatsUtils
 	}
 
 	/**
+	 * <font color = blue> Note: using the preferred way to convert double to BigDecimal</font>
+	 * 
+	 * @param value
+	 * @param places
+	 * @return
+	 */
+	public static String roundAsString(double value, int places)
+	{
+
+		// long t1 = System.nanoTime();
+		if (Double.isInfinite(value))
+		{
+			return "99999";
+		}
+		if (Double.isNaN(value))
+		{
+			return "0";
+		}
+
+		if (places < 0) throw new IllegalArgumentException();
+
+		BigDecimal bd = BigDecimal.valueOf(value);// new BigDecimal(value); //change on 22 Nov 2016
+		bd = bd.setScale(places, RoundingMode.HALF_UP);
+
+		//// Start of added on 11 Feb 2018
+		// WritingToFile.appendLineToFileAbsolute(value + "," + bd.doubleValue() + "," + (System.nanoTime() - t1) +
+		// "\n",
+		// Constant.getOutputCoreResultsPath() + "RoundedValues.csv");
+		// WritingToFile.appendLineToFileAbsolute(PopUps.getCurrentStackTracedWarningMsg(""),
+		// Constant.getOutputCoreResultsPath() + "RoundedCalledBy.csv");
+		/// end of added on 11 Fenb 2018
+
+		return bd.toPlainString();
+	}
+
+	/**
 	 * 
 	 * @param value
 	 * @param places

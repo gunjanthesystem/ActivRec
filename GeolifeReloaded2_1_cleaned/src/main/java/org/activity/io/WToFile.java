@@ -1307,7 +1307,7 @@ public class WToFile
 		{
 			sb.append(entry.getKey() + delimiter + entry.getValue().toString() + "\n");
 		}
-		WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+		WToFile.appendLineToFileAbs(sb.toString(), absFileNameToWrite);
 	}
 
 	/**

@@ -272,15 +272,12 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
 			{
 				System.out.println("NO CAND EXTRACTION!");
-
 				this.candidateTimelines = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
 				// Only removing the current user's data from candidate.
 				candidateTimelines.remove(userIDAtRecomm);
 				// trainTimelinesAllUsersContinuous;//
-
 			}
 			else
-
 			{
 				System.out.println("Extracting Candidates");
 				this.candidateTimelines = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines,

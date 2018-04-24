@@ -61,7 +61,9 @@ public class PathConstants
 			/**
 			 * Start of Gowalla path constants for April 8 2018 experiments: 143 users
 			 */
-			commonPathToGowallaPreProcessedData = "./dataToRead/April8_2018/";
+			// commonPathToGowallaPreProcessedData = "./dataToRead/April8_2018/";
+			commonPathToGowallaPreProcessedData = "./dataToRead/April23_2018/";
+			System.out.println("commonPathToGowallaPreProcessedData= " + commonPathToGowallaPreProcessedData);
 
 			pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
 			pathToSerialisedLocationObjects = commonPathToGowallaPreProcessedData + "mapForAllLocationData.kryo";

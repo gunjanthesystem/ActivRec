@@ -146,7 +146,11 @@ public class DatabaseCreatorGowallaQuicker1
 
 		String commonPathApril8 = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April8DataBeforeJavaExperiments/";
 		String checkinDataFileNameApril8 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_GTE90Chicago200Users_April8.csv";
-		dataCreator3_April8(commonPathApril8, checkinDataFileNameApril8, userDataFileName, userLocationFileName,
+
+		String commonPathApril23 = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April23DataBeforeJavaExperiments/";
+		String checkinDataFileNameApril23 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8_5_5VFELT1.csv";
+
+		dataCreator3_April8(commonPathApril23, checkinDataFileNameApril23, userDataFileName, userLocationFileName,
 				catIDNameDictionaryFileName, categoryHierarchyTreeFileName, DomainConstants.gowallaWorkingCatLevel);
 
 		// Start of 8 April 2018
@@ -795,8 +799,7 @@ public class DatabaseCreatorGowallaQuicker1
 			sbCatIDStringCodeLog.append(catID).append(",").append(StringCode.getCharCodeFromActivityID(catID))
 					.append("\n");
 		}
-		WToFile.writeToNewFile(sbCatIDStringCodeLog.toString(),
-				Constant.getCommonPath() + "CatIDCharCodeMap.csv");
+		WToFile.writeToNewFile(sbCatIDStringCodeLog.toString(), Constant.getCommonPath() + "CatIDCharCodeMap.csv");
 
 		for (Integer catID1 : catIDsInHierarchy)
 		{

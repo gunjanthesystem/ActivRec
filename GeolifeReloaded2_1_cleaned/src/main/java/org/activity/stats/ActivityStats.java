@@ -16,7 +16,6 @@ import org.activity.io.WToFile;
 import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.spatial.SpatialUtils;
-import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 public class ActivityStats
@@ -43,8 +42,9 @@ public class ActivityStats
 		Constant.setCommonPath(pathToWrite);
 		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
-		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
+		// Disabled on April 24 2018, should abstract the writing stats and cleaning parts separately
+		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
+		// usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
 
 	}
 
@@ -69,8 +69,9 @@ public class ActivityStats
 		Constant.setCommonPath(pathToWrite);
 		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
-		usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
+		// Disabled on 24 April 2018, better to abstract away writing part from cleaning part.
+		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
+		// usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
 
 	}
 
