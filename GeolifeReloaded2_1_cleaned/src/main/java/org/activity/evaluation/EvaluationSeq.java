@@ -177,7 +177,7 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount)
 	{
 		// commonPath = "./dataWritten/";
-		if (Constant.randomLySample100Users)
+		if (Constant.useRandomlySampled100Users)
 		{
 			groupsOf100UsersLabels = new String[] { DomainConstants.gowalla100RandomUsersLabel };
 		}

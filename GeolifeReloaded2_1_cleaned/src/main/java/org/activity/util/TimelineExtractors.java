@@ -490,10 +490,8 @@ public class TimelineExtractors
 		LinkedHashMap<String, Timeline> candidateTimelines = null;
 		LinkedHashMap<Date, Timeline> trainingTimelinesDaywise = trainingTimelineOrig;
 		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers = trainTestTimelinesForAllUsersOrig;
-
-		// StringBuilder sb = new StringBuilder(
-		// "Inside extractCandidateTimelinesV2 :trainTestTimelinesForAllUsers.size()= "
-		// + trainTestTimelinesForAllUsers.size() + "\n");
+		// StringBuilder sb = new StringBuilder("Inside extractCandidateTimelinesV2
+		// :trainTestTimelinesForAllUsers.size()= "+ trainTestTimelinesForAllUsers.size() + "\n");
 
 		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 		{
@@ -514,11 +512,9 @@ public class TimelineExtractors
 		// //////////////////
 		if (lookPastType.equals(Enums.LookPastType.Daywise))
 		{
-
 			if (Constant.collaborativeCandidates)
 			{
 				// sb.append("For Daywise: collaborative\n");
-
 				LinkedHashMap<String, Timeline> dwCandidateTimelines = new LinkedHashMap<>();
 
 				for (Entry<String, List<LinkedHashMap<Date, Timeline>>> entryForAUser : trainTestTimelinesForAllUsers
@@ -645,15 +641,12 @@ public class TimelineExtractors
 
 		/// aaaaaaa
 		else if (lookPastType.equals(Enums.LookPastType.ClosestTime) && Constant.ClosestTimeFilterCandidates)
-
 		{
 			if (Constant.collaborativeCandidates)
 			{
 				candidateTimelines = extractCandidateTimelinesClosestTimeColl(activityAtRecommPoint, userIDAtRecomm,
 						trainTimelinesAllUsersContinuous, 24);
-
 				// extractCandClosestTimeColl2(userIDAtRecomm, trainTestTimelinesForAllUsers);
-				//
 				// candidateTimeline = extractCandidateTimelinesMUColl(/* trainingTimeline, */
 				// trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType2,
 				// activityAtRecommPoint, userIDAtRecomm, trainTimelinesAllUsersContinuous);
@@ -695,13 +688,11 @@ public class TimelineExtractors
 		}
 		else if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		{
-
 			LinkedHashMap<String, TimelineWithNext> candidateTimelinesWithNext = null;
 
 			if (Constant.collaborativeCandidates)
 			{
 				// sb.append("For NCount NHours: collaborative\n");
-
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
 						trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType, activityAtRecommPoint,
 						userIDAtRecomm, trainTimelinesAllUsersContinuous);

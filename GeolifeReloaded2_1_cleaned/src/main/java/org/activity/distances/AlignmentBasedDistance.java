@@ -190,8 +190,8 @@ public class AlignmentBasedDistance
 	public void setWeightsAndCosts()
 	{
 		System.out.println("setWeightsAndCosts()");
-		wtActivityName = 2d;// 3d;
-		wtStartTime = 1d;// 0.8d;// 0.6d;
+		wtActivityName = 2d;// 3d;//gowalla
+		wtStartTime = 1d;// 0.8d;// 0.6d;//gowalla
 
 		wtDuration = 0.5d;// 0.2d;
 		wtDistanceTravelled = 3d;// //1d;
@@ -199,11 +199,11 @@ public class AlignmentBasedDistance
 		wtEndGeo = 0.3d;
 		wtAvgAltitude = 0.2d;
 
-		wtLocation = 1d;
-		wtLocPopularity = 1d;
+		wtLocation = 1d;// gowalla
+		wtLocPopularity = 1d;// gowalla
 
-		wtDistanceFromPrev = 1d;
-		wtDurationFromPrev = 1d;
+		wtDistanceFromPrev = 1d;// gowalla
+		wtDurationFromPrev = 1d;// gowalla
 
 		wtDistanceFromNext = 1d;
 		wtDurationFromNext = 1d;

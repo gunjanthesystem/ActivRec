@@ -1095,15 +1095,13 @@ public class TimelineUtils
 		WToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoTZ.csv");
 
-		WToFile.writeToNewFile(
-				locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoFallbackTZ.csv");
 
 		// find loc ids in gowalla 5 days train test data which is known to have no TZ is found to have no fallback tz
 		// as well.
 		locIDsWithNoFallbackTZ.retainAll(DomainConstants.locIDsIn5DaysTrainTestDataWithNullTZ);
-		WToFile.writeToNewFile(
-				locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoFallbackTZIn5DaysTrainTestNoTZ.csv");
 
 		System.out.println(
@@ -1130,8 +1128,7 @@ public class TimelineUtils
 				Constant.getOutputCoreResultsPath() + "ZZuniqueWorkingLevelActIDs.csv");
 		WToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZactIDs.csv");
-		WToFile.writeToNewFile(
-				workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZworkingLevelActIDs.csv");
 		// End of added on April 6 2018
 
@@ -1346,8 +1343,7 @@ public class TimelineUtils
 				Constant.getOutputCoreResultsPath() + "ZZuniqueWorkingLevelActIDs.csv");
 		WToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZactIDs.csv");
-		WToFile.writeToNewFile(
-				workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
+		WToFile.writeToNewFile(workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZworkingLevelActIDs.csv");
 		// End of added on April 6 2018
 
@@ -1446,7 +1442,7 @@ public class TimelineUtils
 	 * @param usersTimelines
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> cleanDayTimelines(
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> cleanUsersDayTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersTimelines)
 	{
 		System.out.println("Inside cleanDayTimelines(): total num of users before cleaning = " + usersTimelines.size());
@@ -1455,7 +1451,6 @@ public class TimelineUtils
 
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
-
 			LinkedHashMap<Date, Timeline> cleanedDayTimelines = TimelineUtils.cleanUserDayTimelines(
 					usersTimelinesEntry.getValue(), Constant.getCommonPath() + "LogCleanedDayTimelines_",
 					usersTimelinesEntry.getKey());
@@ -1518,7 +1513,6 @@ public class TimelineUtils
 
 		userDayTimelines = TimelineUtils.removeDayTimelinesWithNoValidAct(userDayTimelines,
 				removeDayTimelinesWithNoValidActLog, user);
-
 		userDayTimelines = TimelineUtils.removeDayTimelinesWithOneOrLessDistinctValidAct(userDayTimelines,
 				logFileNamePhrase + "RemoveDayTimelinesWithOneOrLessDistinctValidAct.csv", user);
 		userDayTimelines = TimelineUtils.removeWeekendDayTimelines(userDayTimelines,
@@ -1535,12 +1529,13 @@ public class TimelineUtils
 	 * 
 	 * @param allUsersAllDatesTimeslines
 	 * @param percentageInTraining
+	 * @param cleanHereUserDayTimelines
 	 * @return
 	 * @since 25 July 2017
 	 */
 	public static LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> splitAllUsersTestTrainingTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersAllDatesTimeslines,
-			double percentageInTraining)
+			double percentageInTraining, boolean cleanHereUserDayTimelines)
 	{
 		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> res = new LinkedHashMap<>();
 
@@ -1554,8 +1549,11 @@ public class TimelineUtils
 				LinkedHashMap<Date, Timeline> oneUserAllDatesTimelines = oneUserAllDatesTimelinesEntry.getValue();
 
 				// //////////////////REMOVING SELECTED TIMELINES FROM DATASET////////////////////
-				oneUserAllDatesTimelines = TimelineUtils.cleanUserDayTimelines(oneUserAllDatesTimelines,
-						Constant.getCommonPath() + "InsideSplitAllUsersTestTrainingTimelines", userID);
+				if (cleanHereUserDayTimelines)
+				{
+					oneUserAllDatesTimelines = TimelineUtils.cleanUserDayTimelines(oneUserAllDatesTimelines,
+							Constant.getCommonPath() + "InsideSplitAllUsersTestTrainingTimelines", userID);
+				}
 				// ////////////////////////////////////////////////////////////////////////////////
 
 				// Splitting the set of timelines into training set and test set.
@@ -2130,8 +2128,7 @@ public class TimelineUtils
 			{
 				System.out.println(" " + indexOfUser + " Removing user: " + userEntry.getKey()
 						+ " as in gowallaUserIDsWithGT553MaxActsPerDay");
-				WToFile.appendLineToFileAbs(indexOfUser + "," + userEntry.getKey() + "\n",
-						absFileNameForLog);
+				WToFile.appendLineToFileAbs(indexOfUser + "," + userEntry.getKey() + "\n", absFileNameForLog);
 				numOfUsersSkippedGT553MaxActsPerDay += 1;
 				continue;
 			}
@@ -5032,7 +5029,7 @@ public class TimelineUtils
 		if (Constant.collaborativeCandidates)
 		{
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = TimelineUtils
-					.splitAllUsersTestTrainingTimelines(usersCleanedDayTimelines, Constant.percentageInTraining);
+					.splitAllUsersTestTrainingTimelines(usersCleanedDayTimelines, Constant.percentageInTraining, false);
 
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous;
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> testTimelinesAllUsers = new LinkedHashMap<>();

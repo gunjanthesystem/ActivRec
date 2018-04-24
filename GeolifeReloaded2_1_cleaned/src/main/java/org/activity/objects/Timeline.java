@@ -359,6 +359,12 @@ public class Timeline implements Serializable
 		return sb.toString();
 	}
 
+	// public String getActivityObjectNamesInSequence(String delimiter)
+	// {
+	// return activityObjectsInTimeline.stream().map(ao -> ao.getActivityName())
+	// .collect(Collectors.joining(delimiter));
+	// }
+
 	/**
 	 * 
 	 * @return

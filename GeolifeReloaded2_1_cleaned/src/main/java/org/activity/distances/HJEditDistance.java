@@ -1363,7 +1363,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		}
 
 		// Start of sanity check
-		if (true)
+		if (false)// Sanity Checked Okay on 22 April 2018
 		{
 			String debugFileName = Constant.getCommonPath()
 					+ "DebugApril16_getSummaryStatsForEachFeatureDiffOverList.csv";
@@ -1429,10 +1429,10 @@ public class HJEditDistance extends AlignmentBasedDistance
 		}
 
 		// Start of sanity check
-		if (true)
+		if (false)// Sanity checked Okay on 22 April 2018 by quick visual inspection
 		{
 			String debugFileName = Constant.getCommonPath()
-					+ "DebugApril17_getSummaryStatOfSummaryStatForEachFeatureDiffOverList.csv";
+					+ "DebugApril17_getSummaryStatOfSummaryStatForEachFeatureDiffOverList" + minOrMax + ".csv";
 			WToFile.appendLineToFileAbs("\n--------minOrMax=" + minOrMax + "--\n", debugFileName);
 			WToFile.writeListOfMap2(featureDifferencesList, debugFileName, "FeatureDiffsListKey-Value", ",", "-", true);
 			WToFile.appendLineToFileAbs("\n", debugFileName);

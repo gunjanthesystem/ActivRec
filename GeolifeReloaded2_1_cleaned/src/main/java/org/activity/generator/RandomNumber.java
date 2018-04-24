@@ -15,6 +15,11 @@ public class RandomNumber
 	{
 	}
 
+	public static void main(String args[])
+	{
+		randomlySelect100Users(1672);
+	}
+
 	/**
 	 * To sample random users
 	 * <p>
@@ -23,7 +28,7 @@ public class RandomNumber
 	 * @since Mar 1 2018
 	 * @param args
 	 */
-	public static void main(String args[])
+	public static void main1(String args[])
 	{
 		int numOfUsersToSelect = 100;
 
@@ -44,6 +49,36 @@ public class RandomNumber
 		listOfSelectedIndices.stream().forEachOrdered(e -> sb.append(e + "\n"));
 		System.out.println(listOfSelectedIndices.toString());
 		WToFile.writeToNewFile(sb.toString(), "./dataToRead/RandomlySample100UsersMar1_2018.csv");
+	}
+
+	/**
+	 * To sample random users
+	 * <p>
+	 * 
+	 * @since April 23 2018
+	 * @param args
+	 */
+	public static void randomlySelect100Users(int totalNumOfUsers)
+	{
+		int numOfUsersToSelect = 100;
+
+		List<Integer> allUserIndices = IntStream.rangeClosed(1, totalNumOfUsers).boxed().collect(Collectors.toList());
+		System.out.println(allUserIndices.toString());
+		Random r = new Random();
+		int numOfSHuffles = 100 + r.nextInt(100) + r.nextInt(100);
+		for (int i = 0; i < numOfSHuffles; i++)
+		{
+			Collections.shuffle(allUserIndices);
+		}
+		System.out.println(allUserIndices.toString());
+
+		List<Integer> listOfSelectedIndices = allUserIndices.stream().limit(numOfUsersToSelect)
+				.collect(Collectors.toList());
+
+		StringBuilder sb = new StringBuilder();
+		listOfSelectedIndices.stream().forEachOrdered(e -> sb.append(e + "\n"));
+		System.out.println(listOfSelectedIndices.toString());
+		WToFile.writeToNewFile(sb.toString(), "./dataToRead/RandomlySample100UsersApril23_2018.csv");
 	}
 
 	/**
