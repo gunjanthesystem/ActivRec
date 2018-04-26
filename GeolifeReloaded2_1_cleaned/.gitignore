@@ -1,6 +1,7 @@
 /.gradle/
 /build/
 /dataToRead*/
+/dataToPRead*/
 /dataWritten*/
 /DD*/
 /Error/

@@ -149,10 +149,10 @@ public class AlignmentBasedDistance
 		{
 			shouldComputeFeatureLevelDistance = false;
 		}
-		if (getSumOfWeightOfFeaturesExceptPrimaryDimension() == 0)
+		else if (getSumOfWeightOfFeaturesExceptPrimaryDimension() == 0)
 		{
 			System.err
-					.println("Warning: -- Since no features are being used it is suggested to set Constant.EDAlpha=0.\n"
+					.println("Warning: -- Since no features are being used it is suggested to set Constant.EDAlpha=1.\n"
 							+ "so that the computed values for dAct are not multiplied by EDAlpha and reduced.");
 			shouldComputeFeatureLevelDistance = false;
 		}

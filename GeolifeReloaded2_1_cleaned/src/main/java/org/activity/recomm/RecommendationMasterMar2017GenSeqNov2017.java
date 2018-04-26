@@ -710,12 +710,10 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 		if (VerbosityConstants.WriteFilterCandByCurActTimeThreshInSecs)
 		{
-			WToFile
-					.appendLineToFileAbs(
-							sizeBeforeFiltering + "," + sizeAfterFilering + ","
-									+ ((100.0 * (sizeBeforeFiltering - sizeAfterFilering)) / sizeBeforeFiltering
-											+ "\n"),
-							Constant.getOutputCoreResultsPath() + "removeCandsWithEndCurrActBeyondThreshLog.csv");
+			WToFile.appendLineToFileAbs(
+					sizeBeforeFiltering + "," + sizeAfterFilering + ","
+							+ ((100.0 * (sizeBeforeFiltering - sizeAfterFilering)) / sizeBeforeFiltering + "\n"),
+					Constant.getOutputCoreResultsPath() + "removeCandsWithEndCurrActBeyondThreshLog.csv");
 		}
 		return filteredCands;
 	}
@@ -740,7 +738,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			if (Constant.typeOfCandThreshold != Enums.TypeOfCandThreshold.None)
 			{// some cands might have been removed due to thresholding
 				System.out.println("Alert: editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
-						+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ")");
+						+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ") , typeOfCandThreshold="
+						+ Constant.typeOfCandThreshold);
 			}
 			else
 			{

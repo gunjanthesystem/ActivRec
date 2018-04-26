@@ -239,7 +239,14 @@ public class TestDummy1
 	public static void main(String args[])
 	{
 		// colorPalleteTests();
-		bafflingBooleanTest();
+		// bafflingBooleanTest();
+		nanTest();
+	}
+
+	private static void nanTest()
+	{
+		System.out.println(1 * 123 + 0 * Double.NaN);
+
 	}
 
 	public static void bafflingBooleanTest()

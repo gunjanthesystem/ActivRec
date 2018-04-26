@@ -64,7 +64,9 @@ public class ResultsDistributionEvaluation
 		WToFile.createDirectoryIfNotExists(pathToWrite);
 		WToFile.createDirectoryIfNotExists(pathToWrite + "ReadMe/");
 
-		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril10ToRead.csv";
+		// String resultsLabelsPathFile =
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril10ToRead.csv";
+		String resultsLabelsPathFile = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril26ToRead_1.csv";
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
 		double muArray[] = Constant.matchingUnitAsPastCount;
 		String pathToRead = "", resultsLabel = "", host = "";
@@ -84,8 +86,7 @@ public class ResultsDistributionEvaluation
 
 					host = getHostFromString(resEntry.get(1)).trim();
 
-					WToFile.appendLineToFileAbs(resultsLabel + "\n",
-							pathToWrite + resultsLabel + "UserLabels.csv");
+					WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + resultsLabel + "UserLabels.csv");
 
 					System.out.println(
 							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
@@ -751,8 +752,7 @@ public class ResultsDistributionEvaluation
 		}
 		catch (NullPointerException e)
 		{
-			WToFile.appendLineToFileAbs(
-					PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n"),
+			WToFile.appendLineToFileAbs(PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n"),
 					pathToWrite + "ExceptionsEncountered.csv");
 			return null;
 		}
