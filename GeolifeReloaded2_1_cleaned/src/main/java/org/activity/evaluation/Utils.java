@@ -69,19 +69,19 @@ public class Utils
 		switch (host)
 		{
 			case Utils.howitzerHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 0, false)
+				passwd = ReadingFromFile.oneColumnReaderString("./dataToPRead/Jan26/serverInfo.kry", ",", 0, false)
 						.get(0);
 				break;
 			case Utils.mortarHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 1, false)
+				passwd = ReadingFromFile.oneColumnReaderString("./dataToPRead/Jan26/serverInfo.kry", ",", 1, false)
 						.get(0);
 				break;
 			case Utils.engineHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 2, false)
+				passwd = ReadingFromFile.oneColumnReaderString("./dataToPRead/Jan26/serverInfo.kry", ",", 2, false)
 						.get(0);
 				break;
 			case Utils.clarityHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToRead/Jan26/serverInfo.kry", ",", 3, false)
+				passwd = ReadingFromFile.oneColumnReaderString("./dataToPRead/Jan26/serverInfo.kry", ",", 3, false)
 						.get(0);
 				break;
 

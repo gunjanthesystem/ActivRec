@@ -1570,7 +1570,30 @@ public class TimelineUtils
 			e.printStackTrace();
 
 		}
+
+		if (VerbosityConstants.writeTrainTestTimelinesAOsPerUser)
+		{
+			writeTrainTestTimlinesAOsPerUser(res);
+		}
 		return res;
+	}
+
+	private static void writeTrainTestTimlinesAOsPerUser(LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> res)
+	{
+		StringBuilder sb = new StringBuilder("User,#DaysInTrain,#AOsInTrain,#DaysInTest,#AOsInTest\n");
+
+		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> e : res.entrySet())
+		{
+			LinkedHashMap<Date, Timeline> trainDayTimelines = e.getValue().get(0);
+			LinkedHashMap<Date, Timeline> testDayTimelines = e.getValue().get(0);
+			long numOfAOsInTrainDayTimelines = trainDayTimelines.entrySet().stream().mapToLong(t -> t.getValue().size())
+					.sum();
+			long numOfAOsInTestDayTimelines = testDayTimelines.entrySet().stream().mapToLong(t -> t.getValue().size())
+					.sum();
+			sb.append(e.getKey() + "," + trainDayTimelines.size() + "," + numOfAOsInTrainDayTimelines + ","
+					+ testDayTimelines.size() + "," + numOfAOsInTestDayTimelines + "\n");
+		}
+		WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + "TrainTestSplitAOsDaysPerUser.csv");
 	}
 
 	/**

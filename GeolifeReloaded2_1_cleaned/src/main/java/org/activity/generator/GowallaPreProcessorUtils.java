@@ -139,8 +139,11 @@ public class GowallaPreProcessorUtils
 	 */
 	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8April()
 	{
-		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
-		String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April13VFAnalysis/";
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
+		// String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April13VFAnalysis/";
+		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24.csv";
+		String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April24VFAnalysis/min5_5/";
 
 		List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
 				checkinFileNameToRead, ",", true, false, new int[] { 0, 2 });

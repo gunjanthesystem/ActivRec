@@ -142,7 +142,7 @@ public class SuperController
 	{
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
-		String featuresUsedLabel = "";
+		String featuresUsedLabel = "", distNormalisationLabel = "";
 		// if (Constant.useActivityNameInFED)
 		// {
 		// featuresUsedLabel += "ActName";
@@ -176,11 +176,17 @@ public class SuperController
 			featuresUsedLabel += "AllActsFD";
 		}
 
+		if (Constant.useRTVerseNormalisationForED)
+		{
+			distNormalisationLabel = "RTV";
+		}
+
 		// Start
-		String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth() + "ED"
-				+ Constant.EDAlpha + featuresUsedLabel + "StFilter"
-				+ (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
+		String[] commonPaths = // { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+						+ LocalDateTime.now().getDayOfMonth() + "ED" + Constant.EDAlpha + featuresUsedLabel + "StFilter"
+						+ (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs" + distNormalisationLabel
+						+ "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
@@ -566,8 +572,7 @@ public class SuperController
 
 		Triple<Set<Path>, Set<Path>, String> errors = Searcher.search2(commonPath, "Log", "rror", "");
 		Triple<Set<Path>, Set<Path>, String> exceptions = Searcher.search2(commonPath, "Log", "xception", "");
-		WToFile.writeToNewFile(errors.getThird() + "\n" + exceptions.getThird(),
-				commonPath + "ErrorsExceptions2.txt");
+		WToFile.writeToNewFile(errors.getThird() + "\n" + exceptions.getThird(), commonPath + "ErrorsExceptions2.txt");
 
 		if (errors.getSecond().size() > 1 || exceptions.getSecond().size() > 1)
 		{

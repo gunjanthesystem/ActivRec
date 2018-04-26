@@ -246,8 +246,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 		BufferedWriter recommSeqWithoutScoreBw = WToFile.getBWForNewFile(commonPath + "dataRecommSequence.csv");// **
 
-		BufferedWriter recommSeqWithScoreBw = WToFile
-				.getBWForNewFile(commonPath + "dataRecommSequenceWithScore.csv");// **
+		BufferedWriter recommSeqWithScoreBw = WToFile.getBWForNewFile(commonPath + "dataRecommSequenceWithScore.csv");// **
 
 		BufferedWriter actualSeqBw = WToFile.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
 
@@ -264,8 +263,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 				.getBWForNewFile(commonPath + "recommPointsWithNoCandidates.csv");
 		BufferedWriter rtsRejWithNoCandsBelowThreshWriter = WToFile
 				.getBWForNewFile(commonPath + "recommPointsWithNoCandidatesBelowThresh.csv");
-		BufferedWriter rtsRejBlackListedWriter = WToFile
-				.getBWForNewFile(commonPath + "recommPointsRejBlacklisted.csv");
+		BufferedWriter rtsRejBlackListedWriter = WToFile.getBWForNewFile(commonPath + "recommPointsRejBlacklisted.csv");
 		BufferedWriter rtsRejWithNoDWButMUCandsCands = WToFile
 				.getBWForNewFile(commonPath + "recommPointsWithNoDWButMUCandidates.csv");
 
@@ -393,7 +391,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		if (Constant.collaborativeCandidates)
 		{
 			trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(allUsersTimelines,
-					percentageInTraining);
+					percentageInTraining, Constant.cleanTimelinesAgainInsideTrainTestSplit);
 
 			if (Constant.filterTrainingTimelinesByRecentDays)
 			{
@@ -541,8 +539,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 					System.out.println("Warning: Skipping this user " + userId
 							+ " as it has 1 training user: trainTimelinesAllUsersContinuous.size()="
 							+ trainTimelinesAllUsersContinuous.size());
-					WToFile.appendLineToFileAbs("User " + userId + ",",
-							commonPath + "UserWithNoTrainingDay.csv");
+					WToFile.appendLineToFileAbs("User " + userId + ",", commonPath + "UserWithNoTrainingDay.csv");
 					numOfValidRTs.put(userId, 0);
 					continue;
 				}
@@ -552,8 +549,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 				if (userTrainingTimelines.size() == 0)
 				{
 					System.out.println("Warning: Skipping this user " + userId + " as it has 0 training days");
-					WToFile.appendLineToFileAbs("User " + userId + ",",
-							commonPath + "UserWithNoTrainingDay.csv");
+					WToFile.appendLineToFileAbs("User " + userId + ",", commonPath + "UserWithNoTrainingDay.csv");
 					numOfValidRTs.put(userId, 0);
 					continue;
 				}
@@ -1217,11 +1213,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 			int totalNumOfRTs = (numberOfMorningRTs + numberOfAfternoonRTs + numberOfEveningRTs);
 			if (totalNumOfRTs <= 0)
 			{
-				WToFile
-						.appendLineToFileAbs(
-								userName + "," + numberOfMorningRTs + "," + numberOfAfternoonRTs + ","
-										+ numberOfEveningRTs + "," + totalNumOfRTs + "\n",
-								commonPath + "UsersWithNoValidRTs.csv");
+				WToFile.appendLineToFileAbs(userName + "," + numberOfMorningRTs + "," + numberOfAfternoonRTs + ","
+						+ numberOfEveningRTs + "," + totalNumOfRTs + "\n", commonPath + "UsersWithNoValidRTs.csv");
 				continue; // continue to the next user
 			}
 			// End of Added on Jan 15 2018
@@ -1314,8 +1307,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 		System.out.println("Time taken for executing Recommendation Tests for this matching unit ="
 				+ (recommTestsEndtime - ctmu1) / 1000 + "seconds");
-		WToFile.appendLineToFileAbs(
-				"MU=" + matchingUnit + ",time(s)=" + ((recommTestsEndtime - ctmu1) / 1000) + "\n",
+		WToFile.appendLineToFileAbs("MU=" + matchingUnit + ",time(s)=" + ((recommTestsEndtime - ctmu1) / 1000) + "\n",
 				Constant.getOutputCoreResultsPath() + "RecommendationTestsTimeTaken.csv");
 		// writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
 

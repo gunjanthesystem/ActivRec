@@ -17,7 +17,7 @@ public class RandomNumber
 
 	public static void main(String args[])
 	{
-		randomlySelect100Users(1672);
+		randomlySelectNUserIndices(1666, 100);
 	}
 
 	/**
@@ -55,16 +55,20 @@ public class RandomNumber
 	 * To sample random users
 	 * <p>
 	 * 
+	 * @param totalNumOfUsers
+	 * @param numOfUsersToSelect
 	 * @since April 23 2018
-	 * @param args
 	 */
-	public static void randomlySelect100Users(int totalNumOfUsers)
+	public static void randomlySelectNUserIndices(int totalNumOfUsers, int numOfUsersToSelect)
 	{
-		int numOfUsersToSelect = 100;
+		// int numOfUsersToSelect = 100;
+		List<Integer> allUserIndices = IntStream.rangeClosed(0, totalNumOfUsers - 1).boxed()
+				.collect(Collectors.toList());
 
-		List<Integer> allUserIndices = IntStream.rangeClosed(1, totalNumOfUsers).boxed().collect(Collectors.toList());
 		System.out.println(allUserIndices.toString());
 		Random r = new Random();
+
+		// Shuffle random number of times
 		int numOfSHuffles = 100 + r.nextInt(100) + r.nextInt(100);
 		for (int i = 0; i < numOfSHuffles; i++)
 		{
@@ -78,7 +82,8 @@ public class RandomNumber
 		StringBuilder sb = new StringBuilder();
 		listOfSelectedIndices.stream().forEachOrdered(e -> sb.append(e + "\n"));
 		System.out.println(listOfSelectedIndices.toString());
-		WToFile.writeToNewFile(sb.toString(), "./dataToRead/RandomlySample100UsersApril23_2018.csv");
+		// WToFile.writeToNewFile(sb.toString(), "./dataToRead/RandomlySample100UsersApril23_2018.csv");
+		WToFile.writeToNewFile(sb.toString(), "./dataToRead/RandomlySample100UsersApril24_2018.csv");
 	}
 
 	/**

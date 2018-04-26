@@ -889,7 +889,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 		// Start of added on Feb 4 2018
 		// double EDAlpha = 0.5;
-		if (this.EDAlpha > 0)
+		// if (this.EDAlpha > 0)//Disabled on April 26 2018
+		if (this.EDAlpha > -1)// Added on April 26 2018
 		{
 			if (this.getShouldComputeFeatureLevelDistance() == false)
 			{
@@ -899,7 +900,6 @@ public class HJEditDistance extends AlignmentBasedDistance
 					combineActAndFeatLevelDistance(dAct, dFeat, activityObjects1.size(), activityObjects2.size(),
 							EDAlpha);
 		}
-
 		else
 		{
 			distanceTotal = dAct + dFeat;

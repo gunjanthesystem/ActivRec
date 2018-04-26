@@ -79,5 +79,6 @@ public class VerbosityConstants
 
 	public static final boolean writeRankedRecommsWOScoreForEachSeqIndex = false;
 	public static final boolean writeDataActualForEachSeqIndex = false;
+	public static final boolean writeTrainTestTimelinesAOsPerUser = true;
 
 }
