@@ -321,8 +321,9 @@ public class ControllerWithoutServer
 					List<String> sampledUserIndicesStr = ReadingFromFile
 							// .oneColumnReaderString("./dataToRead/RandomlySample100Users/Mar1_2018.csv", ",", 0,
 							// false);
-							.oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
-									false);
+							// .oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
+							.oneColumnReaderString(Constant.pathToRandomLySampleUserIndices, ",", 0, false);
+					System.out.println("pathToRandomLySampleUserIndices=" + Constant.pathToRandomLySampleUserIndices);
 					List<Integer> sampledUserIndices = sampledUserIndicesStr.stream().map(i -> Integer.valueOf(i))
 							.collect(Collectors.toList());
 

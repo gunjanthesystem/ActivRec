@@ -1615,18 +1615,22 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredTrainingTimelineForThisUser);
 
 			// start of debug print
-			sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. original day timelines:");
-			trainingTimelineForThisUserDate.entrySet().stream().forEachOrdered(e -> sb
-					.append("\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
-			sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. sorted day timelines:");
-			trainingTimelineForThisUserDateDescByDate.entrySet().stream().forEachOrdered(e -> sb
-					.append("\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
-			sb.append("\\n-->User =" + trainTestForAUser.getKey() + "\n. filtered day timelines:");
-			sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence());
-			System.out.println(sb.toString() + "\n--\n");
+			if (VerbosityConstants.WriteFilterTrainTimelinesByRecentDays)
+			{
+				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. original day timelines:");
+				trainingTimelineForThisUserDate.entrySet().stream().forEachOrdered(e -> sb.append(
+						"\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
+				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. sorted day timelines:");
+				trainingTimelineForThisUserDateDescByDate.entrySet().stream().forEachOrdered(e -> sb.append(
+						"\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
+				sb.append("\\n-->User =" + trainTestForAUser.getKey() + "\n. filtered day timelines:");
+				sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence()
+						+ "\n--\n");
+			}
 			// end of debug print
 
 		}
+		WToFile.appendLineToFileAbs(sb.toString() + "\n--\n", Constant.getCommonPath() + "FilteringOfTrainingDays.csv");
 
 		return trainTimelineForAllUsers;
 	}
@@ -1680,7 +1684,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredTrainingTimelineForThisUser);
 
 			// start of debug print
-			if (false)
+			if (VerbosityConstants.WriteFilterTrainTimelinesByRecentDays)
 			{
 				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. original day timelines: size = "
 						+ trainingTimelineForThisUserDate.size());
@@ -1690,11 +1694,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				setOfSelectedDatesForThisUser.stream().forEachOrdered(e -> sb.append("\n" + e.toString() + "--"));
 				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. filtered day timelines: size= "
 						+ filteredTrainingTimelineForThisUser.size());
-				sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence());
-				System.out.println(sb.toString() + "\n--\n");
+				sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence()
+						+ "\n--\n");
+				// System.out.println(sb.toString() + "\n--\n");
 			}
 			// end of debug print
-
+			WToFile.appendLineToFileAbs(sb.toString() + "\n--\n",
+					Constant.getCommonPath() + "FilteringOfTrainingDays.csv");
 		}
 
 		return trainTimelineForAllUsers;

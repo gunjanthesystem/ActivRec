@@ -68,6 +68,7 @@ public class VerbosityConstants
 	public static final boolean WriteMaxNumberOfDistinctRecommendation = false;
 
 	public static final boolean WriteFilterCandByCurActTimeThreshInSecs = false;
+	public static final boolean WriteFilterTrainTimelinesByRecentDays = false;
 
 	/**
 	 * to save writing non essential redudant stuffs
