@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.AltSeqPredictor;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
@@ -86,24 +87,31 @@ public class SuperController
 		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
 
 		//
-		main0();
-		// cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
-		// "./dataWritten/Dec20_Ncount_100U_9kN_1C_ThreshNN-750", "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1",
-		// "./dataWritten/Jan23_SameSamples_AKOM5DayOrder3", "./dataWritten/Jan3_Sampling_AKOM1DayOrder1",
-		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors",
-		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_error6Jan",
-		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors_run2",
-		// "./dataWritten/Jan31_AKOM_5DayFilter_Order5", "./dataWritten/Jan31_AKOM_1DayFilter_Order5",
-		// "./dataWritten/Jan31_AKOM_5DayFilter_Order3", "./dataWritten/Jan31_AKOM_1DayFilter_Order3",
-		// "./dataWritten/Jan31_AKOM_1DayFilter_Order1", "./dataWritten/Jan31_AKOM_5DayFilter_Order1",
-		// "./dataWritten/Dec20_AKOM_5DayFilter_Order5", "./dataWritten/Dec26_AKOM_5DayFilter_Order3",
-		// "./dataWritten/Dec20_AKOM_1DayFilter_Order5_part1", "./dataWritten/Dec20_AKOM_1DayFilter_Order3",
-		// "./dataWritten/Dec20_AKOM_1DayFilter_Order5", "./dataWritten/Dec20_AKOM_5DayFilter_Order3_incomplete",
-		// "./dataWritten/Dec20_AKOM_5DayFilter_Order3_part1", "./dataWritten/Dec20_AKOM_AllDayFilter_Order1",
-		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part1",
-		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part2",
-		// "./dataWritten/Jan18_Sampling_Ncount10DayThreshold50",
-		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1", });
+		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+
+		for (String sampledUserIndicesSet : sampledUserIndicesSets)
+		{
+			main0(sampledUserIndicesSet);
+		} // cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
+			// "./dataWritten/Dec20_Ncount_100U_9kN_1C_ThreshNN-750", "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1",
+			// "./dataWritten/Jan23_SameSamples_AKOM5DayOrder3", "./dataWritten/Jan3_Sampling_AKOM1DayOrder1",
+			// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors",
+			// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_error6Jan",
+			// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors_run2",
+			// "./dataWritten/Jan31_AKOM_5DayFilter_Order5", "./dataWritten/Jan31_AKOM_1DayFilter_Order5",
+			// "./dataWritten/Jan31_AKOM_5DayFilter_Order3", "./dataWritten/Jan31_AKOM_1DayFilter_Order3",
+			// "./dataWritten/Jan31_AKOM_1DayFilter_Order1", "./dataWritten/Jan31_AKOM_5DayFilter_Order1",
+			// "./dataWritten/Dec20_AKOM_5DayFilter_Order5", "./dataWritten/Dec26_AKOM_5DayFilter_Order3",
+			// "./dataWritten/Dec20_AKOM_1DayFilter_Order5_part1", "./dataWritten/Dec20_AKOM_1DayFilter_Order3",
+			// "./dataWritten/Dec20_AKOM_1DayFilter_Order5", "./dataWritten/Dec20_AKOM_5DayFilter_Order3_incomplete",
+			// "./dataWritten/Dec20_AKOM_5DayFilter_Order3_part1", "./dataWritten/Dec20_AKOM_AllDayFilter_Order1",
+			// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part1",
+			// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part2",
+			// "./dataWritten/Jan18_Sampling_Ncount10DayThreshold50",
+			// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1", });
 	}
 
 	/**
@@ -138,55 +146,80 @@ public class SuperController
 		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
 	}
 
-	public static void main0()
+	/**
+	 * 
+	 * @param sampledUserIndicesSetFile
+	 */
+	public static void main0(String sampledUserIndicesSetFile)
 	{
 		System.out.println("Java Version:" + System.getProperty("java.version"));
 
-		String featuresUsedLabel = "", distNormalisationLabel = "";
-		// if (Constant.useActivityNameInFED)
-		// {
-		// featuresUsedLabel += "ActName";
-		// }
-		if (Constant.useStartTimeInFED)
+		String featuresUsedLabel = "", distNormalisationLabel = "", predictorLabel = "", EDAlphaLabel = "",
+				StFilterLabel = "", sampledUserSetLabel = "";
+
+		// Start of added on April 28 2018
+		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
+		String userSetLabelSplitted[] = sampledUserIndicesSetFile.split("\\.");
+		System.out.println("userSetLabelSplitted=" + Arrays.asList(userSetLabelSplitted));
+		sampledUserSetLabel = userSetLabelSplitted[2];
+		System.out.println("sampledUserSetLabel=" + sampledUserSetLabel);
+		Constant.pathToRandomLySampleUserIndices = sampledUserIndicesSetFile;
+		// End of added on April 28 2018
+
+		if (Constant.altSeqPredictor.equals(AltSeqPredictor.PureAKOM))
 		{
-			featuresUsedLabel += "STime";
-		}
-		if (Constant.useLocationInFED)
-		{
-			featuresUsedLabel += "Loc";
+			predictorLabel = AltSeqPredictor.PureAKOM.toString();
+			predictorLabel += "Order" + Constant.getAKOMHighestOrder();
 		}
 
-		if (Constant.usePopularityInFED)
+		else
 		{
-			featuresUsedLabel += "Pop";
-		}
+			EDAlphaLabel = "ED" + Constant.EDAlpha;
+			StFilterLabel = "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs";
 
-		if (Constant.useDistFromPrevInFED)
-		{
-			featuresUsedLabel += "DistPrev";
-		}
+			// if (Constant.useActivityNameInFED)
+			// {
+			// featuresUsedLabel += "ActName";
+			// }
+			if (Constant.useStartTimeInFED)
+			{
+				featuresUsedLabel += "STime";
+			}
+			if (Constant.useLocationInFED)
+			{
+				featuresUsedLabel += "Loc";
+			}
 
-		if (Constant.useDurationFromPrevInFED)
-		{
-			featuresUsedLabel += "DurPrev";
-		}
+			if (Constant.usePopularityInFED)
+			{
+				featuresUsedLabel += "Pop";
+			}
 
-		if (Constant.useFeatureDistancesOfAllActs)
-		{
-			featuresUsedLabel += "AllActsFD";
-		}
+			if (Constant.useDistFromPrevInFED)
+			{
+				featuresUsedLabel += "DistPrev";
+			}
 
-		if (Constant.useRTVerseNormalisationForED)
-		{
-			distNormalisationLabel = "RTV";
-		}
+			if (Constant.useDurationFromPrevInFED)
+			{
+				featuresUsedLabel += "DurPrev";
+			}
 
+			if (Constant.useFeatureDistancesOfAllActs)
+			{
+				featuresUsedLabel += "AllActsFD";
+			}
+
+			if (Constant.useRTVerseNormalisationForED)
+			{
+				distNormalisationLabel = "RTV";
+			}
+		}
 		// Start
 		String[] commonPaths = // { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + "ED" + Constant.EDAlpha + featuresUsedLabel + "StFilter"
-						+ (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs" + distNormalisationLabel
-						+ "/" };
+						+ LocalDateTime.now().getDayOfMonth() + sampledUserSetLabel + predictorLabel + EDAlphaLabel
+						+ featuresUsedLabel + StFilterLabel + distNormalisationLabel + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };

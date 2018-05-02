@@ -240,7 +240,15 @@ public class TestDummy1
 	{
 		// colorPalleteTests();
 		// bafflingBooleanTest();
-		nanTest();
+		// nanTest();
+
+		String s = "/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned/dataWritten/APR27PureAKOMOrder3/AllPerDirectTopKAgreements_3.csv";
+		String[] splitted = s.split("Order");
+		String[] splitted2 = splitted[1].split("/");
+		double muForOrder = Double.valueOf(splitted2[0]);
+		System.out.println(Arrays.asList(splitted).toString());
+		System.out.println(Arrays.asList(splitted2).toString());
+		System.out.println(muForOrder);
 	}
 
 	private static void nanTest()

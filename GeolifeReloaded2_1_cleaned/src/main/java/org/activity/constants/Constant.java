@@ -85,7 +85,7 @@ public final class Constant
 	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
-
+	// PureAKOM has no cand extraction
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10//AKOM
 
 	private static int AKOMHighestOrder = -1;// 1;// 3;// SWITCH_NOV10
@@ -176,17 +176,17 @@ public final class Constant
 
 	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
 	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
-	public static final double EDAlpha = 1;// 0.8;// 0.5;// SWITCH_NOV10
+	public static final double EDAlpha = 0.5;// 0.8;// 0.5;// SWITCH_NOV10
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
 	public static final boolean scoreRecommsByLocProximity = false;// SWITCH_NOV10
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
-	public static final boolean useStartTimeInFED = false;// SWITCH_NOV10
-	public static final boolean useLocationInFED = false;// SWITCH_NOV10
-	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
-	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
-	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
+	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
+	public static final boolean useLocationInFED = true;// SWITCH_NOV10
+	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
+	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
+	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
 	public static final boolean useRTVerseNormalisationForED = true;// SWITCH_April24
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
@@ -199,11 +199,12 @@ public final class Constant
 
 	// need to implement it in AlignmentBasedDistance.getFeatureLevelDistanceGowallaPD25Feb2018() before turning true
 	public static final boolean useDistFromNextInFED = false;
-	public static final boolean useDurationFromNextInFED = false;// SWITCH_NOV10
+	public static final boolean useDurationFromNextInFED = false;
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
 	public static final boolean useRandomlySampled100Users = true;// false;// true;// SWITCH_NOV10
+	public static String pathToRandomLySampleUserIndices = "";
 	public static final boolean runForAllUsersAtOnce = false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
@@ -266,6 +267,7 @@ public final class Constant
 	// 2, 4,6, 8, 1, 3, 10 11, 12,13,14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38,
 	// 40,42 };
 
+	public static final double matchingUnitAsPastCountFixed[] = { 0, 1, 2, 3, 4, 6, 8 };
 	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 			17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
 
@@ -358,9 +360,27 @@ public final class Constant
 
 	public static final boolean needsToPruneFirstUnknown = false;
 
+	public static final double epsilonForFloatZero = 1.0E-50;// to compare if floating point numbers are equal.
+
 	/////////////////////////// End of variable declarations//////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
+
+	public static final boolean equalsForFloat(double a, double b)
+	{
+		if (Math.abs(a - b) < Constant.epsilonForFloatZero)
+			return true;
+		else
+			return false;
+	}
+
+	public static final boolean equalsForFloat(Double a, Double b)
+	{
+		if (Math.abs(a - b) < Constant.epsilonForFloatZero)
+			return true;
+		else
+			return false;
+	}
 
 	/**
 	 * 
@@ -1322,6 +1342,7 @@ public final class Constant
 		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFED);
 		s.append("\nassignFallbackZoneId:" + assignFallbackZoneIdWhenConvertCinsToAO);
 		s.append("\nrandomLySample100Users:" + useRandomlySampled100Users);
+		s.append("\npathToRandomLySampleUserIndices:" + pathToRandomLySampleUserIndices);
 		s.append("\nuseCheckinEntryV2:" + useCheckinEntryV2);
 		s.append("\nrunForAllUsersAtOnce:" + runForAllUsersAtOnce);
 		s.append("\nreduceAndCleanTimelinesBeforeRecomm:" + reduceAndCleanTimelinesBeforeRecomm);
@@ -1352,6 +1373,7 @@ public final class Constant
 						+ considerAvgAltitudeInFeatureWiseEditDistance);
 			}
 		}
+		s.append("\nepsilonForFloatZero:" + epsilonForFloatZero);
 		s.append("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 		return s.toString();
 

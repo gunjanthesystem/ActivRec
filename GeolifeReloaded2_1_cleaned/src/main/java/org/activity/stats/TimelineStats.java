@@ -91,7 +91,6 @@ public class TimelineStats
 	 * 
 	 * @param usersTimelines
 	 */
-	// @SuppressWarnings("unused")
 	public static void timelineStatsController(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
 	{
@@ -154,6 +153,7 @@ public class TimelineStats
 		}
 		else
 		{
+			System.out.println("NOTE: NOT cleaning and rearranging users day timelines !!");
 			usersDayTimelines = usersDayTimelinesAll;
 		}
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines);
@@ -174,7 +174,6 @@ public class TimelineStats
 			/**
 			 * For each user, for sequence of each features, get Sample Entropy vs m (segment length)
 			 */
-
 			case "TimeSeriesCorrelationAnalysis":
 			{
 				transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelines));
