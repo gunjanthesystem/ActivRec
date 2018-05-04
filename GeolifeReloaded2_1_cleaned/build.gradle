@@ -101,9 +101,12 @@ dependencies
 	//compile name: 'spmf'
 	
     
-    compile "org.deeplearning4j:deeplearning4j-core:0.9.1"//0.8.0
-	compile "org.nd4j:nd4j-native-platform:0.9.1"
-    compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
+    //compile "org.deeplearning4j:deeplearning4j-core:0.9.1"//0.8.0
+    compile 'org.deeplearning4j:deeplearning4j-core:1.0.0-alpha'
+    //compile "org.nd4j:nd4j-native-platform:0.9.1"
+    compile 'org.nd4j:nd4j:1.0.0-alpha'
+    //compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
+    //compile 'org.deeplearning4j:deeplearning4j-ui-parent:1.0.0-alpha'
 
     compile "org.renjin:renjin-script-engine:0.8.2527"
     compile "org.moeaframework:moeaframework:2.12"
@@ -115,8 +118,8 @@ dependencies
     //compile 'com.github.Username:Reponame:Tag
     compile 'com.github.rterp:GMapsFX:d4f4765'
     compile 'com.github.gluonhq:maps:21f09e8'
-   	// compile "org.geotools:gt-shapefile:${geoToolsVersion}"
-   	// compile "org.geotools:gt-swing:${geoToolsVersion}"
+    // compile "org.geotools:gt-shapefile:${geoToolsVersion}"
+    // compile "org.geotools:gt-swing:${geoToolsVersion}"
     compile group: 'org.geotools', name: 'gt-brewer', version: '19.0'
     //For geotoolss
     //compile group: 'javax.media', name: 'jai_core', version: '1.1.3'
