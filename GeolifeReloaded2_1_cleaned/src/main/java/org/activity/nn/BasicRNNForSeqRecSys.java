@@ -346,7 +346,8 @@ public class BasicRNNForSeqRecSys
 	}
 
 	/**
-	 *
+	 * TODO: SEEMS SOME METHODS THEY HAVE BEEN DISABLED IN THE NEW VERSION
+	 * 
 	 * @param iterations
 	 * @param learningRate
 	 * @param numOfEpochs
@@ -360,8 +361,8 @@ public class BasicRNNForSeqRecSys
 		this.numOfEpochs = numOfEpochs;
 		// some common parameters
 		NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
-		builder.iterations(iterations);
-		builder.learningRate(learningRate);
+		// builder.iterations(iterations);//TODO: SEEMS THEY HAVE BEEN DISABLED IN THE NEW VERSION
+		// builder.learningRate(learningRate);//TODO: SEEMS THEY HAVE BEEN DISABLED IN THE NEW VERSION
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		builder.seed(123);
 		builder.biasInit(0);
