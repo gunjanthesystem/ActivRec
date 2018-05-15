@@ -47,50 +47,59 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";// ResultsApril26ToRead_2.csv";
-		String pathToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY2ResultsDistributionFirstToMax3/FiveDays/";
+		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsMay10ToRead_1.csv";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";//
+		// ResultsApril26ToRead_2.csv";
+		String pathToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/";
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY2ResultsDistributionFirstToMax3/FiveDays/";
+
 		String resultForUserGroupingMay2 = pathToRead
 				+ "/Concatenated/ConcatenatedED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
 		String resultForUserGroupingMay4 = pathToRead
 				+ "/Concatenated/ConcatenatedED1.0AllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
-		if (false)
+
+		if (true)
 		{
 			fetchResultsFromServersInFormat(resultsLabelsPathFileToRead);
 		}
-
-		// String fileToSort = ;String sortedFileToWrite = ;String uniqueConfigsFileToWrite = ;
-		// sortIgnoringDates(pathToRead + "GTE100UserLabels.csv", pathToRead + "GTE100UserLabelsSorted.csv");
-		Set<String> uniqueConfigs = findUniqueConfigs(pathToRead + "GTE100UserLabels.csv",
-				pathToRead + "GTE100UserLabelsUniqueConfigs.csv");
-
-		PopUps.showMessage("Finished findUniqueConfigs");
-		concatenateFromDifferentSetsOfUsers(pathToRead, pathToRead + "Concatenated/",
-				new String[] { "userMUKeyVals.csv", "MinMUWithMaxFirst3.csv", "MinMUWithMaxFirst0Aware.csv" },
-				uniqueConfigs);
-
-		PopUps.showMessage("Finished first concatenateFromDifferentSetsOfUsers");
-		splitUsersMUZeroNonZeroGroup(resultForUserGroupingMay4, pathToRead + "Concatenated/");
-
-		PopUps.showMessage("Finished splitUsersMUZeroNonZeroGroup");
-		// Choose fixed MU for each user based on one given result: resultForUserGroupingMay4
-		Map<String, Integer> userIdentifierChosenMU = getUserChosenBestMUBasedOnGiveFile(resultForUserGroupingMay4,
-				pathToRead + "Concatenated/");
-
-		String secondPathToRead = "";
-		if (true)
-		{
-			// fetch results from server again, writing files for fixed MU for each user "ChosenMU.csv"
-			secondPathToRead = fetchResultsFromServersInFormat(resultsLabelsPathFileToRead, false, false, true,
-					userIdentifierChosenMU, "");
-		}
 		else
 		{
-			secondPathToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY4ResultsDistributionFirstToMax3/FiveDays/";
+			// String fileToSort = ;String sortedFileToWrite = ;String uniqueConfigsFileToWrite = ;
+			// sortIgnoringDates(pathToRead + "GTE100UserLabels.csv", pathToRead + "GTE100UserLabelsSorted.csv");
+			Set<String> uniqueConfigs = findUniqueConfigs(pathToRead + "GTE100UserLabels.csv",
+					pathToRead + "GTE100UserLabelsUniqueConfigs.csv");
+
+			PopUps.showMessage("Finished findUniqueConfigs");
+			concatenateFromDifferentSetsOfUsers(pathToRead, pathToRead + "Concatenated/",
+					new String[] { "userMUKeyVals.csv", "MinMUWithMaxFirst3.csv", "MinMUWithMaxFirst0Aware.csv" },
+					uniqueConfigs);
+
+			PopUps.showMessage("Finished first concatenateFromDifferentSetsOfUsers");
+			splitUsersMUZeroNonZeroGroup(resultForUserGroupingMay4, pathToRead + "Concatenated/");
+
+			PopUps.showMessage("Finished splitUsersMUZeroNonZeroGroup");
+			// Choose fixed MU for each user based on one given result: resultForUserGroupingMay4
+			Map<String, Integer> userIdentifierChosenMU = getUserChosenBestMUBasedOnGiveFile(resultForUserGroupingMay4,
+					pathToRead + "Concatenated/");
+
+			String secondPathToRead = "";
+			if (true)
+			{
+				// fetch results from server again, writing files for fixed MU for each user "ChosenMU.csv"
+				secondPathToRead = fetchResultsFromServersInFormat(resultsLabelsPathFileToRead, false, false, true,
+						userIdentifierChosenMU, "");
+			}
+			else
+			{
+				secondPathToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY4ResultsDistributionFirstToMax3/FiveDays/";
+			}
+			// concatenating ChosenMU.csv form different sets of users
+			concatenateFromDifferentSetsOfUsers(secondPathToRead, secondPathToRead + "Concatenated/",
+					new String[] { "ChosenMU.csv" }, uniqueConfigs);
+
+			PopUps.showMessage("Finished second concatenateFromDifferentSetsOfUsers");
 		}
-		// concatenating ChosenMU.csv form different sets of users
-		concatenateFromDifferentSetsOfUsers(secondPathToRead, secondPathToRead + "Concatenated/",
-				new String[] { "ChosenMU.csv" }, uniqueConfigs);
-		PopUps.showMessage("Finished second concatenateFromDifferentSetsOfUsers");
+
 		System.exit(0);
 
 	}
@@ -288,8 +297,15 @@ public class ResultsDistributionEvaluation
 		for (String r : res)
 		{
 			r = r.replace("LikeRecSys", "");// remove "LikeRecSys" comment in label
-			r = r.substring(5);
 
+			if (r.contains("APR"))
+			{
+				r = r.substring(5);
+			}
+			else if (r.contains("MAY"))
+			{
+				r = r.substring(4);
+			}
 			for (String set : sets)
 			{
 				r = r.replace("Set" + set, "");

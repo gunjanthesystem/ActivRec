@@ -277,6 +277,8 @@ public final class StatsUtils
 
 	/**
 	 * Create org.apache.commons.math3.stat.descriptive.DescriptiveStatistics object from the ArrayList(Double)
+	 * <P>
+	 * TODO: REDUNDANT: remove safely later
 	 * 
 	 * @param valsReceived
 	 * @return
@@ -291,13 +293,42 @@ public final class StatsUtils
 		return new DescriptiveStatistics(vals);
 	}
 
-	public static void main0(String args[])
+	/**
+	 * Create org.apache.commons.math3.stat.descriptive.DescriptiveStatistics object from the ArrayList(Double)
+	 * 
+	 * @param valsReceived
+	 * @return
+	 */
+	public static DescriptiveStatistics getDescriptiveStatistics(List<Double> valsReceived)
+	{
+		double vals[] = new double[valsReceived.size()];
+		for (int i = 0; i < valsReceived.size(); i++)
+		{
+			vals[i] = valsReceived.get(i);
+		}
+		return new DescriptiveStatistics(vals);
+	}
+
+	public static void checkPercentile()
 	{
 		// compare percentile computation
-		List<Double> vals = new Random().doubles(20, 0, 100).boxed().collect(Collectors.toList());
+		List<Double> vals = new Random().doubles(1000, 0, 100).map(e -> StatsUtils.round(e, 1)).boxed()
+				.collect(Collectors.toList());
 		System.out.println("vals = " + vals);
 
 		double quantile = 0.5;
+
+		System.out.println(getDescriptiveStatistics(vals));
+		System.out.println("1e-55=" + getPercentile(vals, 1e-55));
+		System.out.println("0.000000000000000000001=" + getPercentile(vals, 0.000000000000000000001));
+		System.out.println("0.00009=" + getPercentile(vals, 0.00009));
+		System.out.println("0.1=" + getPercentile(vals, 0.1));
+		System.out.println("1=" + getPercentile(vals, 1));
+		System.out.println("25=" + getPercentile(vals, 25));
+		System.out.println("50=" + getPercentile(vals, 50));
+		System.out.println("75=" + getPercentile(vals, 75));
+		System.out.println("99=" + getPercentile(vals, 99));
+		System.out.println("100=" + getPercentile(vals, 100));
 
 		long t3 = System.nanoTime();
 		System.out.println(getPercentileSlower(vals, quantile));
@@ -313,7 +344,8 @@ public final class StatsUtils
 
 	public static void main(String args[])
 	{
-		checkBinnning();
+		// checkBinnning();
+		checkPercentile();
 	}
 
 	private static void checkBinnning()
@@ -1136,7 +1168,7 @@ public final class StatsUtils
 
 		else
 		{
-			if (Math.abs(max - min) > 1e-10)
+			if (Math.abs(max - min) <= 1e-10)
 			{
 				System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min
 						+ ") <=0 =" + (max - min)));
@@ -1160,26 +1192,73 @@ public final class StatsUtils
 	public static double minMaxNormWORound(double val, double max, double min)
 	{
 		// if ((max - min) > 0.0000000000000000)
-		if ((max - min) > 0.0000000000000000000000000001)
+		double maxMinusMin = max - min;
+		if (maxMinusMin > 1.0E-50)// changed from 0.0000000000000000000000000001 to 1.0E-50 on May 8 2018
 		{
-			return ((val - min) / (max - min));
+			return ((val - min) / maxMinusMin);
 		}
-		else if ((min - max) > 0.0000000000000000000000000001)
+		// else if ((min - max) > 1.0E-50)/ // else if (min > max)
+		else if ((min - max) > 1.0E-50)
 		{
 			PopUps.printTracedErrorMsgWithExit(("Error: Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max
-					+ ")- min(" + min + ") <=0 =" + (max - min)));
+					+ ")- min(" + min + ") <=0 =" + maxMinusMin));
 			return 0;
 		}
 
-		else
-		{
-			if (Math.abs(max - min) > 1e-10)
-			{
-				System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min
-						+ ") <=0 =" + (max - min)));
-			}
+		else // min == max, i.e., (Math.abs(max - min) <= 1.0e-50)
+		{ // if (Math.abs(max - min) <= 1.0e-10)// changed from > to <= on May 8 2018
+			System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min + ") <=0 ="
+					+ maxMinusMin));
 			// Warning: Alert!! val0.25 = minMaxNorm: max(0.25)- min(0.25) <=0 =0.0
 			// val = 0.25, max = 0.25, min =0.25, max-min = 0;
+			return 0;
+		}
+
+	}
+
+	/**
+	 * Returns min max norm if max - min >0 else return 0 (as distance) ...leading to 1 as similarity (rounded off to 4
+	 * decimal places)
+	 * 
+	 * @param val
+	 * @param max
+	 * @param min
+	 * @param upperbound
+	 * @param withWarningForEqualMinMax
+	 * @return
+	 */
+	public static double minMaxNormWORoundWithUpperBound(double val, double max, double min, double upperbound,
+			boolean withWarningForEqualMinMax)
+	{
+		double maxMinusMin = max - min;
+
+		if (maxMinusMin > 1.0E-50)// changed from 0.0000000000000000000000000001 to 1.0E-50 on May 8 2018
+		{
+			double res = ((val - min) / maxMinusMin);
+			if (res > upperbound)
+			{
+				return upperbound;
+			}
+			else
+			{
+				return res;
+			}
+		}
+		// else if ((min - max) > 1.0E-50)// 0.0000000000000000000000000001)
+		else if ((min - max) > 1.0E-50)
+		{
+			PopUps.printTracedErrorMsgWithExit(("Error: Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max
+					+ ")- min(" + min + ") <=0 =" + maxMinusMin));
+			return 0;
+		}
+
+		else // min == max, i.e., (Math.abs(max - min) <= 1.0e-50)
+		{
+			if (withWarningForEqualMinMax)
+			{ // if (Math.abs(max - min) <= 1.0e-10)// changed from > to <= on May 8 2018
+				System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min
+						+ ") <=0 =" + maxMinusMin));
+			}
 			return 0;
 		}
 

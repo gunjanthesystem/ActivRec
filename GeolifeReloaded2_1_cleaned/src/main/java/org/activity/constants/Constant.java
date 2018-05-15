@@ -86,11 +86,13 @@ public final class Constant
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
+
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10//AKOM
 
 	private static int AKOMHighestOrder = -1;// 1;// 3;// SWITCH_NOV10
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
+
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
 	 * restricting this baseline to day boundaries
@@ -102,6 +104,7 @@ public final class Constant
 	 * restricting this baseline to day boundaries
 	 */
 	public static final boolean ClosestTimeAllowSpillOverDays = true;
+
 	/**
 	 * Determines if candidate timelines only includes those days which contain the current activity name
 	 */
@@ -176,7 +179,7 @@ public final class Constant
 
 	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
 	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
-	public static final double EDAlpha = 0.5;// 0.8;// 0.5;// SWITCH_NOV10
+	public static double EDAlpha = -99;// 0.8;// 0.5;// SWITCH_NOV10
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
 	public static final boolean scoreRecommsByLocProximity = false;// SWITCH_NOV10
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
@@ -187,7 +190,9 @@ public final class Constant
 	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
+
 	public static final boolean useRTVerseNormalisationForED = true;// SWITCH_April24
+	public static final double percentileForRTVerseMaxForEDNorm = 75;// -1// SWITCH_April24
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
 
@@ -365,6 +370,10 @@ public final class Constant
 	/////////////////////////// End of variable declarations//////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
+	// public void setEDAlpha(double d)
+	// {
+	// EDAlpha = d;
+	// }
 
 	public static final boolean equalsForFloat(double a, double b)
 	{
@@ -1350,6 +1359,7 @@ public final class Constant
 		s.append("\ncleanTimelinesAgainInsideRecommendationTests:" + cleanTimelinesAgainInsideRecommendationTests);
 		s.append("\ncleanTimelinesAgainInsideTrainTestSplit:" + cleanTimelinesAgainInsideTrainTestSplit);
 		s.append("\nuseRTVerseNormalisationForED:" + useRTVerseNormalisationForED);
+		s.append("\npercentileForRTVerseMaxForEDNorm:" + percentileForRTVerseMaxForEDNorm);
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums;
 import org.activity.constants.Enums.AltSeqPredictor;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.CSVUtils;
@@ -70,7 +71,16 @@ public class SuperController
 		CSVUtils.concatenateCSVFiles(fileNamesToConcactenate, true, commonPath + filename);
 	}
 
-	public static void main(String args[])
+	public static void main__(String args[])
+	{
+		String absFileNameWithRootPathsToSearch = "./dataWritten/clarityPathsToCheckForErrMay10.csv";
+		String commonPathToWrite = "./dataWritten/";
+		int expectedNumOfColumnsInRoothPathFile = 3;
+		Searcher.searchErrorExceptsInPaths(absFileNameWithRootPathsToSearch, commonPathToWrite,
+				expectedNumOfColumnsInRoothPathFile);
+	}
+
+	public static void main(String args[])// _importantMay10
 	{
 		// searchContentInFile();
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
@@ -87,31 +97,37 @@ public class SuperController
 		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
 
 		//
-		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetB",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+		double[] EDAlphas = { 0.35, 0.75, 1, 0.15, 0, 0.5 };
 
-		for (String sampledUserIndicesSet : sampledUserIndicesSets)
+		for (double edAlphaForAnExp : EDAlphas)
 		{
-			main0(sampledUserIndicesSet);
-		} // cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
-			// "./dataWritten/Dec20_Ncount_100U_9kN_1C_ThreshNN-750", "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1",
-			// "./dataWritten/Jan23_SameSamples_AKOM5DayOrder3", "./dataWritten/Jan3_Sampling_AKOM1DayOrder1",
-			// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors",
-			// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_error6Jan",
-			// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors_run2",
-			// "./dataWritten/Jan31_AKOM_5DayFilter_Order5", "./dataWritten/Jan31_AKOM_1DayFilter_Order5",
-			// "./dataWritten/Jan31_AKOM_5DayFilter_Order3", "./dataWritten/Jan31_AKOM_1DayFilter_Order3",
-			// "./dataWritten/Jan31_AKOM_1DayFilter_Order1", "./dataWritten/Jan31_AKOM_5DayFilter_Order1",
-			// "./dataWritten/Dec20_AKOM_5DayFilter_Order5", "./dataWritten/Dec26_AKOM_5DayFilter_Order3",
-			// "./dataWritten/Dec20_AKOM_1DayFilter_Order5_part1", "./dataWritten/Dec20_AKOM_1DayFilter_Order3",
-			// "./dataWritten/Dec20_AKOM_1DayFilter_Order5", "./dataWritten/Dec20_AKOM_5DayFilter_Order3_incomplete",
-			// "./dataWritten/Dec20_AKOM_5DayFilter_Order3_part1", "./dataWritten/Dec20_AKOM_AllDayFilter_Order1",
-			// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part1",
-			// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part2",
-			// "./dataWritten/Jan18_Sampling_Ncount10DayThreshold50",
-			// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1", });
+			for (String sampledUserIndicesSet : sampledUserIndicesSets)
+			{
+				main0(sampledUserIndicesSet, edAlphaForAnExp);
+			}
+		}
+		// cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
+		// "./dataWritten/Dec20_Ncount_100U_9kN_1C_ThreshNN-750", "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1",
+		// "./dataWritten/Jan23_SameSamples_AKOM5DayOrder3", "./dataWritten/Jan3_Sampling_AKOM1DayOrder1",
+		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors",
+		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_error6Jan",
+		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors_run2",
+		// "./dataWritten/Jan31_AKOM_5DayFilter_Order5", "./dataWritten/Jan31_AKOM_1DayFilter_Order5",
+		// "./dataWritten/Jan31_AKOM_5DayFilter_Order3", "./dataWritten/Jan31_AKOM_1DayFilter_Order3",
+		// "./dataWritten/Jan31_AKOM_1DayFilter_Order1", "./dataWritten/Jan31_AKOM_5DayFilter_Order1",
+		// "./dataWritten/Dec20_AKOM_5DayFilter_Order5", "./dataWritten/Dec26_AKOM_5DayFilter_Order3",
+		// "./dataWritten/Dec20_AKOM_1DayFilter_Order5_part1", "./dataWritten/Dec20_AKOM_1DayFilter_Order3",
+		// "./dataWritten/Dec20_AKOM_1DayFilter_Order5", "./dataWritten/Dec20_AKOM_5DayFilter_Order3_incomplete",
+		// "./dataWritten/Dec20_AKOM_5DayFilter_Order3_part1", "./dataWritten/Dec20_AKOM_AllDayFilter_Order1",
+		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part1",
+		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part2",
+		// "./dataWritten/Jan18_Sampling_Ncount10DayThreshold50",
+		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1", });
 	}
 
 	/**
@@ -149,22 +165,49 @@ public class SuperController
 	/**
 	 * 
 	 * @param sampledUserIndicesSetFile
+	 * @param EDAlphaForThisExperiment
+	 *            >-1 if we want to set in here instead of hardcoding it in the Constant class.
 	 */
-	public static void main0(String sampledUserIndicesSetFile)
+	public static void main0(String sampledUserIndicesSetFile, double EDAlphaForThisExperiment)
 	{
-		System.out.println("Java Version:" + System.getProperty("java.version"));
+		System.out.println("For this experiment: Java Version:" + System.getProperty("java.version"));
 
 		String featuresUsedLabel = "", distNormalisationLabel = "", predictorLabel = "", EDAlphaLabel = "",
-				StFilterLabel = "", sampledUserSetLabel = "";
+				StFilterLabel = "", sampledUserSetLabel = "", nearestNeighbourCandLabel = "";
 
 		// Start of added on April 28 2018
 		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
 		String userSetLabelSplitted[] = sampledUserIndicesSetFile.split("\\.");
 		System.out.println("userSetLabelSplitted=" + Arrays.asList(userSetLabelSplitted));
 		sampledUserSetLabel = userSetLabelSplitted[2];
+		if (sampledUserSetLabel.equals("csv"))
+		{
+			sampledUserSetLabel = "";
+		}
 		System.out.println("sampledUserSetLabel=" + sampledUserSetLabel);
 		Constant.pathToRandomLySampleUserIndices = sampledUserIndicesSetFile;
+		System.out.println("Constant.pathToRandomLySampleUserIndices=" + sampledUserIndicesSetFile);
 		// End of added on April 28 2018
+
+		// Start of adding on May6 2018
+		if (EDAlphaForThisExperiment > -1)// when EDAlphaForThisExperiment is <=-1, means we do not need to set it here.
+		{
+			Constant.EDAlpha = EDAlphaForThisExperiment;
+			System.out.println("SETTING EDAlpha dynamically");
+		}
+		else
+		{
+			System.out.println("NOT SETTING EDAlpha dynamically");
+		}
+		System.out.println("Constant.EDAlpha=" + Constant.EDAlpha);
+		if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour))
+		{
+			if (Constant.nearestNeighbourCandEDThreshold != 500)
+			{
+				nearestNeighbourCandLabel = String.valueOf(Constant.nearestNeighbourCandEDThreshold);
+			}
+		}
+		// End of adding on May6 2018
 
 		if (Constant.altSeqPredictor.equals(AltSeqPredictor.PureAKOM))
 		{
@@ -213,13 +256,18 @@ public class SuperController
 			if (Constant.useRTVerseNormalisationForED)
 			{
 				distNormalisationLabel = "RTV";
+				if (Constant.percentileForRTVerseMaxForEDNorm > -1)
+				{
+					distNormalisationLabel = (int) Constant.percentileForRTVerseMaxForEDNorm + distNormalisationLabel;
+				}
 			}
 		}
 		// Start
 		String[] commonPaths = // { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
 						+ LocalDateTime.now().getDayOfMonth() + sampledUserSetLabel + predictorLabel + EDAlphaLabel
-						+ featuresUsedLabel + StFilterLabel + distNormalisationLabel + "/" };
+						+ featuresUsedLabel + StFilterLabel + distNormalisationLabel + nearestNeighbourCandLabel
+						+ "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
