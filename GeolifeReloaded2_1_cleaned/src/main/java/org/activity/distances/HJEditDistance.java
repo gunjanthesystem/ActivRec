@@ -8,6 +8,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums.GowallaFeatures;
@@ -1428,6 +1429,11 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 		}
 
+		else
+		{
+			PopUps.showError("Error: unrecognised minOrMax = " + minOrMax);
+		}
+
 		// Start of sanity check
 		if (false)// Sanity checked Okay on 22 April 2018 by quick visual inspection
 		{
@@ -1442,6 +1448,42 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 		return summaryFeatureDiffOverAllActs;
 		// return new Pair<>(maxFeatureDiffOverAllActs, minFeatureDiffOverAllActs);
+	}
+
+	/**
+	 * <p>
+	 * Assuming that all maps in the list contain the same set of keys (i.e., same GowallaFeatures)
+	 * 
+	 * @param listOfListOfFeatDiffs
+	 * @param percentile
+	 *            in range (0,100]
+	 * @return
+	 * @since May 8 2018
+	 */
+	public static EnumMap<GowallaFeatures, Double> getPthPercentileInRTVerseOfDiffs(
+			List<List<EnumMap<GowallaFeatures, Double>>> listOfListOfFeatDiffs, double percentile)
+	{
+
+		// Max feature diff for each of the GowallaFeature. In other words, max diff value for each feature over
+		// corresponding pairwise comparison of each act obj of the two timelines
+		EnumMap<GowallaFeatures, Double> summaryFeatureDiffOverAllActs = new EnumMap<>(GowallaFeatures.class);
+
+		List<EnumMap<GowallaFeatures, Double>> allCollected = listOfListOfFeatDiffs.stream().flatMap(l -> l.stream())
+				.collect(Collectors.toList());
+
+		// Assuming that all maps in the list contain the same set of keys (i.e., same GowallaFeatures)
+		Set<GowallaFeatures> listOfGowallaFeatures = allCollected.get(0).keySet();
+
+		for (GowallaFeatures gowallaFeature : listOfGowallaFeatures)
+		{
+			List<Double> allValsForThisFeature = allCollected.stream().map(listEntry -> listEntry.get(gowallaFeature))
+					.collect(Collectors.toList());
+
+			Double pthPercentileForThisFeature = StatsUtils.getPercentile(allValsForThisFeature, percentile);
+			summaryFeatureDiffOverAllActs.put(gowallaFeature, pthPercentileForThisFeature);
+		}
+
+		return summaryFeatureDiffOverAllActs;
 	}
 
 	// /**

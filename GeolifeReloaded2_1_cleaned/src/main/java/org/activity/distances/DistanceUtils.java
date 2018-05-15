@@ -464,9 +464,36 @@ public class DistanceUtils
 		// timeline:summaryStatForEachCand)
 		EnumMap<GowallaFeatures, Double> minOfMinOfDiffs = HJEditDistance
 				.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 0);
-		EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs = HJEditDistance
-				.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 1);
+		EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs = new EnumMap<>(GowallaFeatures.class);
+		if (Constant.percentileForRTVerseMaxForEDNorm == -1)
+		{
+			maxOfMaxOfDiffs = HJEditDistance
+					.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 1);
+		}
 		/////////////////// End of finding min max
+		// Start of May8 addition
+		else if (Constant.percentileForRTVerseMaxForEDNorm > -1)// then replace maxOfMax by pth percentile val
+		{
+			// list over cands and then list over each AO in that cand
+			List<List<EnumMap<GowallaFeatures, Double>>> listOfListOfFeatDiffs = candAEDFeatDiffs.entrySet().stream()
+					.map(e -> e.getValue().getThird()).collect(Collectors.toList());
+			EnumMap<GowallaFeatures, Double> pRTVersePercentileOfDiffs = HJEditDistance
+					.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, 75);
+
+			if (false)// sanity checking percentil implementation and maxOfMax implementation gives same result
+			{// passed ok on May 8 2018
+				sanityCheckRTVersePthPercentileByMinMax(minOfMinOfDiffs, maxOfMaxOfDiffs, listOfListOfFeatDiffs);
+			}
+
+			// replace maxOfMax by pPercentileVal
+			maxOfMaxOfDiffs = pRTVersePercentileOfDiffs;
+		}
+		// End of May 8 addition
+
+		if (maxOfMaxOfDiffs.size() == 0)
+		{
+			PopUps.showError("Error: maxOfMaxOfDiffs.size() = " + maxOfMaxOfDiffs.size());
+		}
 
 		// <CandidateTimeline ID, Edit distance>
 		LinkedHashMap<String, Pair<String, Double>> candEditDistancesNoLogging = getRTVerseMinMaxNormalisedEditDistancesNoLogging(
@@ -489,6 +516,43 @@ public class DistanceUtils
 		// End of Sanity Check if no logging version is giving identical output as logging version:
 
 		return candEditDistancesNoLogging;
+	}
+
+	/**
+	 * passed ok on May 8 2018
+	 * 
+	 * @param minOfMinOfDiffs
+	 * @param maxOfMaxOfDiffs
+	 * @param listOfListOfFeatDiffs
+	 */
+	private static boolean sanityCheckRTVersePthPercentileByMinMax(EnumMap<GowallaFeatures, Double> minOfMinOfDiffs,
+			EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs,
+			List<List<EnumMap<GowallaFeatures, Double>>> listOfListOfFeatDiffs)
+	{
+		boolean sane = true;
+		EnumMap<GowallaFeatures, Double> p100RTVersePercentileOfDiffs = HJEditDistance
+				.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, 100);
+
+		EnumMap<GowallaFeatures, Double> p1RTVersePercentileOfDiffs = HJEditDistance
+				.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, 1e-55);
+
+		if (p100RTVersePercentileOfDiffs.equals(maxOfMaxOfDiffs) == false)
+		{
+			PopUps.showError("Error p100RTVersePercentileOfDiffs.equals(maxOfMaxOfDiffs)==false");
+			sane = false;
+		}
+		if (p1RTVersePercentileOfDiffs.equals(minOfMinOfDiffs) == false)
+		{
+			PopUps.showError("Error p1RTVersePercentileOfDiffs.equals(minOfMinOfDiffs)==false");
+			sane = false;
+		}
+		WToFile.appendLineToFileAbs(
+				"p100RTVersePercentileOfDiffs=\n" + p100RTVersePercentileOfDiffs.toString() + "\n"
+						+ "maxOfMaxOfDiffs=\n" + maxOfMaxOfDiffs.toString() + "\n" + "p1RTVersePercentileOfDiffs=\n"
+						+ p1RTVersePercentileOfDiffs.toString() + "\n" + "minOfMinOfDiffs=\n"
+						+ minOfMinOfDiffs.toString() + "\nsane=" + sane + "\n\n",
+				Constant.getCommonPath() + "Debug8MayPthPercentileInRTVerseSanityLog.csv");
+		return sane;
 	}
 
 	/**
@@ -610,8 +674,13 @@ public class DistanceUtils
 				for (Entry<GowallaFeatures, Double> diffEntry : mapOfFeatureDiffForAnAO.entrySet())
 				{
 					GowallaFeatures featureID = diffEntry.getKey();
-					double normalisedFeatureDiffVal = StatsUtils.minMaxNormWORound(diffEntry.getValue(),
-							maxOfMaxOfDiffs.get(featureID), minOfMinOfDiffs.get(featureID));
+
+					// $$Disabled on May 14: double normalisedFeatureDiffVal =
+					// StatsUtils.minMaxNormWORound(diffEntry.getValue(),maxOfMaxOfDiffs.get(featureID),
+					// minOfMinOfDiffs.get(featureID));
+
+					double normalisedFeatureDiffVal = StatsUtils.minMaxNormWORoundWithUpperBound(diffEntry.getValue(),
+							maxOfMaxOfDiffs.get(featureID), minOfMinOfDiffs.get(featureID), 1.0d, false);
 
 					double wtForThisFeature = featureWeightMap.get(featureID);
 					featDistForThisAOForThisCand += (wtForThisFeature * normalisedFeatureDiffVal);
@@ -677,7 +746,7 @@ public class DistanceUtils
 			if (meanOverAOsNormFDForThisCand > 1)
 			{
 				WToFile.appendLineToFileAbs(meanOverAOsNormFDForThisCand + "\n" + logAOsThisCand,
-						Constant.getCommonPath() + "Debug22April2018.csv");
+						Constant.getCommonPath() + "ErrorDebug22April2018.csv");
 				// System.out.println("\nDebug22April2018: normFeatureDistForThisCand=" + normFeatureDistForThisCand
 				// + "\nlogAOThisCand=\n" + logAOsThisCand.toString() + "\nsumOfWtOfFeaturesUsedExceptPD="
 				// + sumOfWtOfFeaturesUsedExceptPD);
@@ -820,8 +889,13 @@ public class DistanceUtils
 				for (Entry<GowallaFeatures, Double> diffEntry : mapOfFeatureDiffForAnAO.entrySet())
 				{
 					GowallaFeatures featureID = diffEntry.getKey();
-					double normalisedFeatureDiffVal = StatsUtils.minMaxNormWORound(diffEntry.getValue(),
-							maxOfMaxOfDiffs.get(featureID), minOfMinOfDiffs.get(featureID));
+
+					// $$Disabled on May 14: double normalisedFeatureDiffVal =
+					// StatsUtils.minMaxNormWORound(diffEntry.getValue(),maxOfMaxOfDiffs.get(featureID),
+					// minOfMinOfDiffs.get(featureID));
+
+					double normalisedFeatureDiffVal = StatsUtils.minMaxNormWORoundWithUpperBound(diffEntry.getValue(),
+							maxOfMaxOfDiffs.get(featureID), minOfMinOfDiffs.get(featureID), 1.0d, false);
 
 					double wtForThisFeature = featureWeightMap.get(featureID);
 					featDistForThisAOForThisCand += (wtForThisFeature * normalisedFeatureDiffVal);
@@ -887,7 +961,7 @@ public class DistanceUtils
 			if (meanOverAOsNormFDForThisCand > 1)
 			{
 				WToFile.appendLineToFileAbs(meanOverAOsNormFDForThisCand + "\n",
-						Constant.getCommonPath() + "Debug22April2018.csv");
+						Constant.getCommonPath() + "ErrorDebug22April2018.csv");
 				// System.out.println("\nDebug22April2018: normFeatureDistForThisCand=" + normFeatureDistForThisCand
 				// + "\nlogAOThisCand=\n" + logAOsThisCand.toString() + "\nsumOfWtOfFeaturesUsedExceptPD="
 				// + sumOfWtOfFeaturesUsedExceptPD);

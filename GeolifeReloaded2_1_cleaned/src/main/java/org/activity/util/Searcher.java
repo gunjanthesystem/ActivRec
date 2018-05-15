@@ -6,6 +6,7 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -15,6 +16,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 import org.activity.objects.Triple;
 import org.activity.probability.ProbabilityUtilityBelt;
@@ -529,6 +531,42 @@ public class Searcher
 	public static void main1(String args[])
 	{
 		System.out.println(fileContainsString(Paths.get("/home/gunjan/rcloneLogs.txt"), "ajooba", true));
+	}
+
+	/**
+	 * 
+	 * @param absFileNameWithRootPathsToSearch
+	 * @param commonPathToWrite
+	 * @param expectedNumOfColumnsInRoothPathFile
+	 *            also note that that the path is expected to be the last column
+	 */
+	public static void searchErrorExceptsInPaths(String absFileNameWithRootPathsToSearch, String commonPathToWrite,
+			int expectedNumOfColumnsInRoothPathFile)
+	{
+		String fileNameToWrite = commonPathToWrite + LocalDateTime.now().getMonth().toString().substring(0, 3)
+				+ LocalDateTime.now().getDayOfMonth() + "ErrorsExceptionsCheckedFor.txt";
+		WToFile.writeToNewFile("", fileNameToWrite);
+
+		List<List<String>> readData = ReadingFromFile.readLinesIntoListOfLists(absFileNameWithRootPathsToSearch, ",");
+		List<String> commonPathsToCheck = new ArrayList<>();
+		for (List<String> e : readData)
+		{
+			if (e.size() == expectedNumOfColumnsInRoothPathFile)
+			{
+				commonPathsToCheck.add(e.get(expectedNumOfColumnsInRoothPathFile - 1));
+			}
+		}
+
+		System.out.println("commonPathsToCheck=\n" + String.join("\n", commonPathsToCheck));
+		System.out.println("commonPathsToCheck.size()=" + commonPathsToCheck.size());
+
+		for (String commonPath : commonPathsToCheck)
+		{
+			Triple<Set<Path>, Set<Path>, String> errors = Searcher.search2(commonPath, "Log", "rror", "");
+			Triple<Set<Path>, Set<Path>, String> exceptions = Searcher.search2(commonPath, "Log", "xception", "");
+			WToFile.appendLineToFileAbs(errors.getThird() + "\n" + exceptions.getThird(), fileNameToWrite);
+		}
+		System.out.println("All done");
 	}
 
 	public static void main0(String[] args)
