@@ -37,6 +37,7 @@ import org.activity.objects.Timeline;
 import org.activity.objects.UserGowalla;
 import org.activity.probability.ProbabilityUtilityBelt;
 import org.activity.sanityChecks.ResultsSanityChecks;
+import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
@@ -160,12 +161,18 @@ public class ControllerWithoutServer
 			// ,// "1001" };
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 
-			WToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					Constant.getCommonPath() + "NumOfDaysPerUsersDayTimelines.csv");
-
-			String commonBasePath = Constant.getCommonPath();
-
-			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
+			String s1;
+			String s2;
+			s2 = Constant.getCommonPath();
+			s1 = s2 + "NumOfDaysPerUsersDayTimelines.csv";
+			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines, s1);
+			String commonBasePath;
+			commonBasePath = Constant.getCommonPath();
+			String s3;
+			String s4 = PerformanceAnalytics.getHeapInformation();
+			s3 = "Before sampleUsersExec\n" + s4;
+			System.out.println(s3);
+			
 
 			///////////////////
 			// TimelineUtils.writeNumOfNullTZCinsPerUserPerLocID(usersCleanedDayTimelines,
@@ -1437,18 +1444,18 @@ public class ControllerWithoutServer
 		}
 		if (writeNumOfActsPerUsersDayTimelines)
 		{
-			WToFile.writeNumOfActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
+			TimelineStats.writeNumOfActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
 					"GowallaPerUserDayNumOfActs" + labelEnd + ".csv");
 		}
 		if (writeNumOfDaysPerUsersDayTimelines)
 		{
-			WToFile.writeNumOfDaysPerUsersDayTimelinesSameFile(timelines,
+			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(timelines,
 					Constant.getCommonPath() + "NumOfDaysPerUser" + labelEnd + ".csv");
 
 		}
 		if (writeNumOfDistinctValidActsPerUsersDayTimelines)
 		{
-			WToFile.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
+			TimelineStats.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
 					"GowallaPerUserDayNumOfDistinctValidActs" + labelEnd + ".csv");
 		}
 		System.out.println(" Num of users" + labelEnd + "= " + timelines.size());

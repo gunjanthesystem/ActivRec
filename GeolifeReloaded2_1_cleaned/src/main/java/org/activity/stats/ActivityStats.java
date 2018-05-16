@@ -1,10 +1,6 @@
 package org.activity.stats;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,67 +9,65 @@ import java.util.TreeMap;
 import org.activity.constants.Constant;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
-import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.spatial.SpatialUtils;
 import org.activity.util.UtilityBelt;
 
 public class ActivityStats
 {
-	static String pathToWrite;
+	// static String pathToWrite;
 
-	/**
-	 * INCOMPLETE
-	 * 
-	 * @param usersDayTimelinesAll
-	 */
-	public static void getActivityStatsPerDay(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
-	{
-		Constant.setCommonPath(Constant.getOutputCoreResultsPath());
+	// /**
+	// * INCOMPLETE
+	// *
+	// * @param usersDayTimelinesAll
+	// */
+	// public static void getActivityStatsPerDay(LinkedHashMap<String, LinkedHashMap<Date, Timeline>>
+	// usersDayTimelinesAll)
+	// {
+	// Constant.setCommonPath(Constant.getOutputCoreResultsPath());
+	//
+	// String directoryToWrite = Constant.getOutputCoreResultsPath() + Constant.getDatabaseName()
+	// + LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+	// + "ActivityPerDayStats";
+	//
+	// new File(directoryToWrite).mkdir();
+	// pathToWrite = directoryToWrite + "/";
+	// Constant.setCommonPath(pathToWrite);
+	// PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
+	//
+	// // Disabled on April 24 2018, should abstract the writing stats and cleaning parts separately
+	// // LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
+	// // usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
+	//
+	// }
 
-		String directoryToWrite;
-
-		directoryToWrite = Constant.getOutputCoreResultsPath() + Constant.getDatabaseName()
-				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
-				+ "ActivityPerDayStats";
-
-		new File(directoryToWrite).mkdir();
-		pathToWrite = directoryToWrite + "/";
-		Constant.setCommonPath(pathToWrite);
-		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
-
-		// Disabled on April 24 2018, should abstract the writing stats and cleaning parts separately
-		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
-		// usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
-
-	}
-
-	/**
-	 * INCOMPLETE
-	 * 
-	 * @param usersDayTimelinesAll
-	 */
-	public static void writeDistinctActivities(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
-	{
-		Constant.setCommonPath(Constant.getOutputCoreResultsPath());
-
-		String directoryToWrite;
-
-		directoryToWrite = Constant.getOutputCoreResultsPath() + Constant.getDatabaseName()
-				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
-				+ "ActivityPerDayStats";
-
-		new File(directoryToWrite).mkdir();
-		pathToWrite = directoryToWrite + "/";
-		Constant.setCommonPath(pathToWrite);
-		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
-
-		// Disabled on 24 April 2018, better to abstract away writing part from cleaning part.
-		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
-		// usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
-
-	}
+	// /**
+	// * INCOMPLETE
+	// *
+	// * @param usersDayTimelinesAll
+	// */
+	// public static void writeDistinctActivities(
+	// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
+	// {
+	// Constant.setCommonPath(Constant.getOutputCoreResultsPath());
+	//
+	// String directoryToWrite;
+	//
+	// directoryToWrite = Constant.getOutputCoreResultsPath() + Constant.getDatabaseName()
+	// + LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+	// + "ActivityPerDayStats";
+	//
+	// new File(directoryToWrite).mkdir();
+	// pathToWrite = directoryToWrite + "/";
+	// Constant.setCommonPath(pathToWrite);
+	// PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
+	//
+	// // Disabled on 24 April 2018, better to abstract away writing part from cleaning part.
+	// // LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines = new LinkedHashMap<>();
+	// // usersDayTimelines = TimelineUtils.cleanDayTimelines(usersDayTimelinesAll);
+	//
+	// }
 
 	public static void main(String[] args)
 	{

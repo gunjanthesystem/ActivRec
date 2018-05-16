@@ -184,24 +184,92 @@ public class TestDummy1
 		// System.out.println(testStringBuilder());
 	}
 
-	public static void checkReferencing(String args[])
+	public static void main(String args[])
 	{
-		HashMap<String, ArrayList<String>> map = new HashMap<>();
+		checkReferencing();
+	}
 
+	/**
+	 * 
+	 */
+	public static void checkReferencing()
+	{
+		HashMap<String, ArrayList<String>> map;
+		map = new HashMap<>();
 		map.put("India", new ArrayList<String>(Arrays.asList("New Delhi", "Mumbai")));
 		map.put("China", new ArrayList<String>(Arrays.asList("Beijing", "Shanghai")));
 		map.put("Indonesia", new ArrayList<String>(Arrays.asList("Jakarta", "Surabaya")));
+		map.put("Ireland", new ArrayList<String>(Arrays.asList("Dublin", "Cork", "Galway")));
+		map.put("Canada", new ArrayList<String>(Arrays.asList("Vancouver", "Toronto", "Montreal")));
 
 		map.get("India").add("Kolkata");
 
 		List<String> citiesOfIndia = map.get("India");
 		citiesOfIndia.add("Bangalore");
 
-		StringBuilder sb = new StringBuilder();
+		printMapOfListsVals("map", map);
+
+		HashMap<String, ArrayList<String>> mapFromChangeValOnPassedObj = changeValOnPassedObj(map, "India");
+		printMapOfListsVals("mapFromChangeValOnPassedObj", mapFromChangeValOnPassedObj);
+		printMapOfListsVals("map", map);
+
+		HashMap<String, ArrayList<String>> mapFromChangeValOnWorkingCopy = changeValOnWorkingCopy(map, "China");
+		printMapOfListsVals("mapFromChangeValOnWorkingCopy", mapFromChangeValOnWorkingCopy);
+		printMapOfListsVals("map", map);
+
+		HashMap<String, ArrayList<String>> mapFromChangeValOnClone = changeValOnClone(map, "Indonesia");
+		printMapOfListsVals("mapFromChangeValOnClone", mapFromChangeValOnClone);
+		printMapOfListsVals("map", map);
+
+		HashMap<String, ArrayList<String>> mapFromChangeValOnDefensiveCopyinge = changeValOnTypicalDefensiveCopying(map,
+				"Canada");
+		printMapOfListsVals("mapFromChangeValOnDefensiveCopyinge", mapFromChangeValOnDefensiveCopyinge);
+		printMapOfListsVals("map", map);
+		/**
+		 * Lesson: clone() is not sufficient as it provide only shallow copy and simply creating a new
+		 * declaration/pointer to the reference (which i used to do sometimes earlier) is not sufficient.
+		 */
+	}
+
+	private static void printMapOfListsVals(String label, HashMap<String, ArrayList<String>> map)
+	{
+		StringBuilder sb = new StringBuilder(label + "=");
 		map.entrySet().stream().peek(e -> sb.append("\n" + e.getKey() + "\t")).map(e -> e.getValue())
 				.flatMap(v -> v.stream()).forEachOrdered(v -> sb.append(v + ","));
+		System.out.println(sb.toString() + "\n--------\n");
+	}
 
-		System.out.println(sb.toString());
+	private static HashMap<String, ArrayList<String>> changeValOnPassedObj(HashMap<String, ArrayList<String>> map2,
+			String keyToDelete)
+	{
+		map2.remove(keyToDelete);
+		return map2;
+	}
+
+	private static HashMap<String, ArrayList<String>> changeValOnWorkingCopy(HashMap<String, ArrayList<String>> map2,
+			String keyToDelete)
+	{
+		HashMap<String, ArrayList<String>> mapWC = map2;
+		mapWC.remove(keyToDelete);
+		return mapWC;
+	}
+
+	private static HashMap<String, ArrayList<String>> changeValOnClone(HashMap<String, ArrayList<String>> map2,
+			String keyToDelete)
+	{
+		HashMap<String, ArrayList<String>> mapWC = (HashMap<String, ArrayList<String>>) map2.clone();
+		mapWC.get("Ireland").add("InvalidCity");
+		mapWC.remove(keyToDelete);
+		return mapWC;
+	}
+
+	private static HashMap<String, ArrayList<String>> changeValOnTypicalDefensiveCopying(
+			HashMap<String, ArrayList<String>> map2, String keyToDelete)
+	{
+		HashMap<String, ArrayList<String>> mapWC = new HashMap<>(map2);
+		mapWC.get("Ireland").add("InvalidCity2");
+		mapWC.remove(keyToDelete);
+		return mapWC;
 	}
 
 	public static void main3(String args[])
@@ -236,7 +304,7 @@ public class TestDummy1
 		System.out.println(sb.toString());
 	}
 
-	public static void main(String args[])
+	public static void main4(String args[])
 	{
 		// colorPalleteTests();
 		// bafflingBooleanTest();
