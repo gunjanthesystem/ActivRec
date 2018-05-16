@@ -12,12 +12,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.clustering.Cluster;
@@ -36,6 +38,7 @@ import org.activity.stats.entropy.SampleEntropyG;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
+import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineUtils;
@@ -2552,6 +2555,11 @@ public class TimelineStats
 		WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
 	}
 
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @param fileNamePhrase
+	 */
 	public static void writeAllNumOfDistinctActsPerDayInTimelines(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String fileNamePhrase)
 	{
@@ -2907,6 +2915,318 @@ public class TimelineStats
 		//
 		// counted.entrySet().stream().forEach(e -> s.append(e.getKey() + "||" + e.getValue() + "\n"));
 		// WritingToFile.writeToNewFile(s.toString(), absFileNamePhrase);
+	}
+
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @param absFileNamePhrase
+	 * @return
+	 */
+	public static LinkedHashMap<String, TreeMap<Integer, Integer>> getFreqCountForEachActIDPerUser(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String absFileNamePhrase)
+	{
+		LinkedHashMap<String, TreeMap<Integer, Integer>> userActCountMap = new LinkedHashMap<>(
+				usersDayTimelines.size());
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelines.entrySet())
+		{
+			TreeMap<Integer, Integer> actIdCountMapForThisUser = new TreeMap<>();
+
+			for (Entry<Date, Timeline> dateEntryForThisUser : userEntry.getValue().entrySet())
+			{
+				Timeline dayTimeline = dateEntryForThisUser.getValue();
+				for (ActivityObject ao : dayTimeline.getActivityObjectsInTimeline())
+				{
+					int actID = ao.getActivityID();
+					int updatedActCount = 1;
+					if (actIdCountMapForThisUser.containsKey(actID))
+					{
+						updatedActCount = 1 + actIdCountMapForThisUser.get(actID);
+					}
+					actIdCountMapForThisUser.put(actID, updatedActCount);
+				}
+			}
+			userActCountMap.put(userEntry.getKey(), actIdCountMapForThisUser);
+		}
+		return userActCountMap;
+	}
+
+	/**
+	 * 
+	 * @param userActCountMap
+	 * @param absFileNameToWrite
+	 * @param delimiter
+	 * @param uniqueActIDs
+	 */
+	public static void writeFreqCountForEachActIDPerUser(
+			LinkedHashMap<String, TreeMap<Integer, Integer>> userActCountMap, String absFileNameToWrite,
+			String delimiter, TreeSet<Integer> uniqueActIDs)
+	{
+		StringBuilder sbToWrite = new StringBuilder("UserID");
+		uniqueActIDs.stream().forEachOrdered(id -> sbToWrite.append(delimiter + id));
+		sbToWrite.append("\n");
+
+		for (Entry<String, TreeMap<Integer, Integer>> userEntry : userActCountMap.entrySet())
+		{
+			sbToWrite.append(userEntry.getKey());
+			TreeMap<Integer, Integer> actCountMapForThisUser = userEntry.getValue();
+
+			for (Integer actID : uniqueActIDs)
+			{
+				Integer actCountForThisUserForThisAct = actCountMapForThisUser.get(actID);
+				if (actCountForThisUserForThisAct == null)
+				{
+					actCountForThisUserForThisAct = 0;
+				}
+				sbToWrite.append(delimiter + actCountForThisUserForThisAct);
+			}
+			sbToWrite.append("\n");
+		}
+		WToFile.writeToNewFile(sbToWrite.toString(), absFileNameToWrite);
+	}
+
+	/**
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param timelinesPhrase
+	 */
+	public static void writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(String userName,
+			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase)
+	{
+		String commonPath = Constant.getCommonPath();//
+		StringBuilder toWrite = new StringBuilder();
+
+		try
+		{
+			System.out.println("writing " + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv");
+			String fileName = commonPath + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv";
+
+			File file = new File(fileName);
+			file.delete();
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+			BufferedWriter bw = new BufferedWriter(fw);
+
+			bw.write("Date, Num_of_Distict_Valid_Activities\n");// bw.newLine();
+
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
+			{
+				int numOfDistinctValidActivities = entry.getValue().countNumberOfValidDistinctActivities();
+				toWrite.append(entry.getKey() + "," + numOfDistinctValidActivities + "\n");
+				// bw.write(entry.getKey() + "," + numOfDistinctValidActivities);
+				// bw.newLine();
+			}
+			bw.write(toWrite.toString());
+			bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+	}
+
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @param timelinesPhrase
+	 * @param fileName
+	 */
+	public static void writeNumOfActsPerUsersDayTimelinesSameFile(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
+			String fileName)
+	{
+		// System.out.println("Common path=" + commonPath);
+		String commonPath = Constant.getCommonPath();//
+		System.out.println("Inside writeNumOfActsPerUsersDayTimelinesSameFile(): num of users received = "
+				+ usersDayTimelines.size());
+		System.out.println("Common path=" + commonPath);
+		try
+		{
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
+			{
+				writeNumOfActsInGivenDayTimelinesSameFile(entry.getKey(), entry.getValue(), timelinesPhrase, fileName);
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+		System.out.println("Exiting writeNumOfActsPerUsersDayTimelinesSameFile()");
+	}
+
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @param timelinesPhrase
+	 * @param fileName
+	 */
+	public static void writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
+			String fileName)
+	{
+		// System.out.println("Common path=" + commonPath);
+		String commonPath = Constant.getCommonPath();//
+		System.out.println("Inside writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(): num of users received = "
+				+ usersDayTimelines.size());
+		System.out.println("Common path=" + commonPath);
+		try
+		{
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
+			{
+				writeNumOfDistinctValidActsInGivenDayTimelinesSameFile(entry.getKey(), entry.getValue(),
+						timelinesPhrase, fileName);
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+		System.out.println("Exiting writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile()");
+	}
+
+	/**
+	 * 
+	 * @param usersDayTimelines
+	 * @param absFileName
+	 */
+	public static void writeNumOfDaysPerUsersDayTimelinesSameFile(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String absFileName)
+	{
+		// System.out.println("Common path=" + commonPath);
+		String commonPath = Constant.getCommonPath();//
+		System.out.println("Inside writeNumOfDaysPerUsersDayTimelinesSameFile(): num of users received = "
+				+ usersDayTimelines.size());
+		System.out.println("Common path=" + commonPath);
+		StringBuilder msg = new StringBuilder();
+		msg.append("User,#Days\n");
+		try
+		{
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
+			{
+				msg.append(entry.getKey() + "," + entry.getValue().size() + "\n");
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+
+		WToFile.writeToNewFile(msg.toString(), absFileName);
+		System.out.println("Exiting writeNumOfDaysPerUsersDayTimelinesSameFile()");
+	}
+
+	/**
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param timelinesPhrase
+	 * @param fileName
+	 */
+	public static void writeNumOfActsInGivenDayTimelinesSameFile(String userName,
+			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase, String fileName)
+	{
+		String commonPath = Constant.getCommonPath();//
+		try
+		{
+			fileName = commonPath + fileName;
+			StringBuilder toWrite = new StringBuilder();
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
+			{
+				toWrite.append(
+						userName + "," + entry.getKey() + "," + entry.getValue().getActivityObjectsInDay().size());
+				toWrite.append("\n");
+			}
+			WToFile.appendLineToFileAbs(toWrite.toString(), fileName);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+	}
+
+	/////
+	/**
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param timelinesPhrase
+	 * @param fileName
+	 */
+	public static void writeNumOfDistinctValidActsInGivenDayTimelinesSameFile(String userName,
+			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase, String fileName)
+	{
+		String commonPath = Constant.getCommonPath();//
+		try
+		{
+			fileName = commonPath + fileName;
+			StringBuilder toWrite = new StringBuilder();
+			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
+			{
+				toWrite.append(userName + "," + entry.getKey() + ","
+						+ entry.getValue().countNumberOfValidDistinctActivities() + "\n");
+			}
+			WToFile.appendLineToFileAbs(toWrite.toString(), fileName);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+	}
+
+	/**
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param verbose
+	 * @param absFileNameToWrite
+	 * @return
+	 */
+	public static Pair<Long, Long> writeNumberOfActsWithMultipleWorkingLevelCatID(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean verbose,
+			String absFileNameToWrite)
+	{
+		long numOfActWithMultipleWorkingLevelCatID = 0, numOfAOs = 0;
+		HashSet<String> multipleWorkingLevelCatIds = new HashSet<>();
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+		{
+			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+			{
+				for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+				{
+					numOfAOs += 1;
+					if (RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs()).length > 1)
+					{
+						multipleWorkingLevelCatIds.add(ao.getWorkingLevelCatIDs());
+						numOfActWithMultipleWorkingLevelCatID += 1;
+					}
+				}
+			}
+		}
+
+		if (verbose)
+		{
+			System.out.println("num of AOs = " + numOfAOs);
+			System.out.println("numOfActWithMultipleWorkingLevelCatID = " + numOfActWithMultipleWorkingLevelCatID);
+			System.out.println("% ActWithMultipleWorkingLevelCatID = "
+					+ ((numOfActWithMultipleWorkingLevelCatID / numOfAOs) * 100));
+		}
+
+		WToFile.writeToNewFile(
+				multipleWorkingLevelCatIds.stream().map(s -> s.toString()).collect(Collectors.joining("\n")),
+				absFileNameToWrite);
+
+		return new Pair<Long, Long>(numOfActWithMultipleWorkingLevelCatID, numOfAOs);
 	}
 
 	// /**

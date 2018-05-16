@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -586,6 +587,71 @@ public class TimelineUtils
 		// System.exit(0);
 		return userDaytimelines;
 	}
+
+	// tt
+	/**
+	 * To create toy timelines
+	 * 
+	 * Activity events ---> day timelines (later, not here)---> user timelines
+	 * <p>
+	 * <font color = red>make sure that the timezone is set appropriately</font>
+	 * </p>
+	 * 
+	 * @param allActivityEvents
+	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
+	 * @since May 14 2018
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createToyUserTimelinesFromCheckinEntriesGowallaFaster1_V2(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesGiven)
+	{
+		long ct1 = System.currentTimeMillis();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesUnmodView = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Collections
+				.unmodifiableMap(userDaytimelinesGiven);
+		int numOfUsers = 5, minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7, numOfUniqueActs = 5,
+				minNumOfUniqueActIDsPerDay = 3;
+
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = new LinkedHashMap<>();
+		List<String> selectedUsers = userDaytimelinesUnmodView.keySet().stream().limit(numOfUsers)
+				.collect(Collectors.toList());
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> uEntry : userDaytimelinesUnmodView.entrySet())
+		{
+			if (selectedUsers.contains(uEntry.getKey()))
+			{
+				LinkedHashMap<Date, Timeline> dayTimelinesForThisUser = uEntry.getValue();
+
+				Map<Date, Timeline> dayTimelinesWithMinUniqueActIDs = dayTimelinesForThisUser.entrySet().stream()
+						.filter(dE -> getUniqueActIDsInTimeline(dE.getValue()).size() >= minNumOfUniqueActIDsPerDay)
+						.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+
+				// LinkedHashMap<Date, Timeline> selectedToyDayTimelinesForThisUser
+				// =dayTimelinesWithMinUniqueActIDs.collect(Collectors.toM)
+				// int numOfDayForThisUser = StatsUtils.randomInRange(minNumOfDaysPerUser, maxNumOfDaysPerUser);
+				//
+				// LinkedHashMap<Date, Timeline> selectedToyDayTimelinesForThisUser = new LinkedHashMap<>();
+				// // select days with atleast 3 unique actID and not more than 10 acts in the day;
+				// for (Entry<Date, Timeline> dayTimelineEntry : dayTimelinesForThisUser.entrySet())
+				// {
+				// Timeline dayTimeline = dayTimelineEntry.getValue();
+				// Set<Integer> uniqueActIDsInDayTimeline = dayTimeline.getActivityObjectsInTimeline().stream()
+				// .map(ao -> ao.getActivityID()).collect(Collectors.toSet());
+				//
+				// if (uniqueActIDsInDayTimeline.size() >= 3)
+				// {
+				// selectedToyDayTimelinesForThisUser.put(dayTimelineEntry.getKey(), dayTimelineEntry.getValue());
+				// // if(selectedToyDayTimelinesForThisUser.size()==)
+				// }
+				//
+				// }
+				toyTimelines.put(uEntry.getKey(), (LinkedHashMap<Date, Timeline>) dayTimelinesWithMinUniqueActIDs);
+			}
+		}
+
+		// find the frequency count of each act for each user.
+
+		return null;
+	}
+	// tt
 
 	/**
 	 * INCOMPLETE
@@ -4721,6 +4787,18 @@ public class TimelineUtils
 			e.printStackTrace();
 		}
 		return uniqueActIDs;
+	}
+
+	/**
+	 * Extract unique activity IDs from the given timeline
+	 * 
+	 * @param givenTimeline
+	 * @return
+	 */
+	public static Set<Integer> getUniqueActIDsInTimeline(Timeline givenTimeline)
+	{
+		return givenTimeline.getActivityObjectsInTimeline().stream().map(ao -> ao.getActivityID())
+				.collect(Collectors.toSet());
 	}
 
 	/**

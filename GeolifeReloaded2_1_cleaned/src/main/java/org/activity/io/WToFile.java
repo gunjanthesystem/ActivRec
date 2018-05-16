@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +42,10 @@ import org.activity.objects.TimelineWithNext;
 import org.activity.objects.TrackListenEntry;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.objects.Triple;
+import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
-import org.activity.util.RegexUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.complex.Complex;
 
@@ -58,8 +57,8 @@ import org.apache.commons.math3.complex.Complex;
  */
 public class WToFile
 {
-	static String commonPath;// = Constant.getCommonPath();//
-								// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
+	// static String commonPath;// = Constant.getCommonPath();//
+	// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
 
 	// static final String[] activityNames = { "Not Available", "Unknown", "airplane", "bike", "boat", "bus", "car",
 	// "motorcycle", "run", "subway", "taxi",
@@ -481,7 +480,7 @@ public class WToFile
 
 	public static void writeArrayList2(ArrayList<Pair<String, Long>> arrayList, String fileNameToUse, String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -516,7 +515,7 @@ public class WToFile
 
 	public static void writeArrayList(ArrayList<Pair<String, Long>> arrayList, String fileNameToUse, String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -893,7 +892,7 @@ public class WToFile
 	public static void writeArrayListFlatActivityLogEntry(ArrayList<FlatActivityLogEntry> arrayList,
 			String fileNameToUse, String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -960,7 +959,7 @@ public class WToFile
 	 */
 	public static void appendLineToFile(String msg, String fileNameToUse)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		// System.out.println("commonPath in writeString() is "+commonPath);
 		try
 		{
@@ -1049,7 +1048,7 @@ public class WToFile
 	public static void writeTimestampedActivityObjectsForUser(LinkedHashMap<Timestamp, ActivityObject> ts,
 			String fileNameToUse, String userName)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + userName + fileNameToUse + ".csv";
@@ -1190,7 +1189,7 @@ public class WToFile
 	public static void writeTimeSeriesOnlyIntValueForUser(LinkedHashMap<Timestamp, Integer> ts, String fileNameToUse,
 			String userName)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + userName + fileNameToUse + ".csv";
@@ -1224,7 +1223,7 @@ public class WToFile
 	public static void writeTimeSeriesCharForUser(LinkedHashMap<Timestamp, String> ts, String fileNameToUse,
 			String userName)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + userName + fileNameToUse + ".csv";
@@ -1244,12 +1243,8 @@ public class WToFile
 			{
 				String timestamp = entry.getKey().toString();
 
-				bw.write(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n"); // also
-																											// removes
-																											// the last
-																											// nano
-																											// seconds
-																											// precision
+				bw.write(timestamp.substring(0, timestamp.length() - 2) + "," + entry.getValue() + "\n");
+				// also removes the last nano seconds precision
 			}
 			bw.close();
 		}
@@ -1262,7 +1257,7 @@ public class WToFile
 
 	public static void writeShannonEntropy(LinkedHashMap<String, Double> ts, String fileNameToUse)// , String userName)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -1661,7 +1656,7 @@ public class WToFile
 	public static void writeLinkedHashMapOfTreemap(LinkedHashMap<String, TreeMap<Timestamp, String>> mapOfMap,
 			String fileNameToUse, String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -1939,7 +1934,7 @@ public class WToFile
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapOfMap, String fileNameToUse,
 			String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -1982,7 +1977,7 @@ public class WToFile
 	public static void writeLinkedHashMapOfTreemapDataEntry(
 			LinkedHashMap<String, TreeMap<Timestamp, DataEntry>> mapOfMap, String fileNameToUse, String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -2026,7 +2021,7 @@ public class WToFile
 			LinkedHashMap<String, TreeMap<Timestamp, TrackListenEntry>> mapOfMap, String fileNameToUse,
 			String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -2070,7 +2065,7 @@ public class WToFile
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapOfMap, String fileNameToUse,
 			String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -2110,7 +2105,7 @@ public class WToFile
 	public static void writeLinkedHashMapOfTreemapAllString(LinkedHashMap<String, TreeMap<String, String>> mapOfMap,
 			String fileNameToUse, String headerLine)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + fileNameToUse + ".csv";
@@ -2166,7 +2161,7 @@ public class WToFile
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> data, String activityNameToLookFor,
 			String fileNameEnd)
 	{
-		String fileName = commonPath + activityNameToLookFor.replaceAll(" ", "_") + fileNameEnd + ".csv";
+		String fileName = Constant.getCommonPath() + activityNameToLookFor.replaceAll(" ", "_") + fileNameEnd + ".csv";
 
 		try
 		{
@@ -2218,7 +2213,7 @@ public class WToFile
 	public static void writeActivityTypeWithTimeDifference(LinkedHashMap<String, TreeMap<Timestamp, String>> data,
 			String activityNameToLookFor, String fileNameEnd)
 	{
-		String fileName = commonPath + activityNameToLookFor.replaceAll(" ", "_") + fileNameEnd + ".csv";
+		String fileName = Constant.getCommonPath() + activityNameToLookFor.replaceAll(" ", "_") + fileNameEnd + ".csv";
 
 		try
 		{
@@ -2273,7 +2268,7 @@ public class WToFile
 			LinkedHashMap<String, TreeMap<Timestamp, TrajectoryEntry>> mapForAllDataMergedPlusDuration,
 			String activityNameToLookFor, String fileNameEnd, boolean onlySandwiches)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + activityNameToLookFor.replaceAll(" ", "_") + fileNameEnd + ".csv";
@@ -2466,7 +2461,7 @@ public class WToFile
 			LinkedHashMap<String, TreeMap<Timestamp, String>> mapForAllDataMergedPlusDuration,
 			String activityNameToLookFor, String fileNameEnd)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + activityNameToLookFor.replaceAll(" ", "_") + fileNameEnd + ".csv";
@@ -2612,7 +2607,7 @@ public class WToFile
 	public static void writeEditSimilarityCalculation(ArrayList<ActivityObject> ActivityObjects1,
 			ArrayList<ActivityObject> ActivityObjects2, double editDistance)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "EditSimilarityCalculations.csv";
@@ -2657,7 +2652,7 @@ public class WToFile
 
 	public static void writeEditSimilarityCalculationsHeader()
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "EditSimilarityCalculations.csv";
@@ -2692,7 +2687,7 @@ public class WToFile
 			ArrayList<ActivityObject> ActivityObjects2, double editDistance, String trace, double dAct, double dFeat,
 			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			StringBuilder msgToWrite = new StringBuilder(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + ","
@@ -2740,7 +2735,7 @@ public class WToFile
 
 	public static void writeOnlyTrace(String trace)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "tracesEncountered.csv";
@@ -2764,7 +2759,7 @@ public class WToFile
 	 */
 	public static void writeEditDistancesOfAllEndPointsHeader()
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "EditDistancesForAllEndPoints.csv";
@@ -2811,7 +2806,7 @@ public class WToFile
 	public static void writeEndPoinIndexCheck24Oct(String currentAct, String cand, ArrayList<Integer> arr1,
 			ArrayList<Integer> arr2)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "EndPoinIndexCheck24Oct.csv";
@@ -2845,7 +2840,7 @@ public class WToFile
 
 	public static void writeEditDistance(double editDistance)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "EditDistance.csv";
@@ -3031,7 +3026,7 @@ public class WToFile
 			ArrayList<Triple<ActivityObject, Double, Integer>> topNextActivityObjects,
 			ArrayList<ActivityObject> currentTimeline, boolean writeCandidateTimeline, boolean writeEditOperations)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "EditDistancePerRtPerCand.csv";
@@ -3137,7 +3132,7 @@ public class WToFile
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
 	// Enums.CaseType caseType)
 	{
-		commonPath = Constant.getCommonPath();
+		String commonPath = Constant.getCommonPath();
 		try
 		{
 			StringBuilder sbToWrite = new StringBuilder();
@@ -3248,7 +3243,7 @@ public class WToFile
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
 	// Enums.CaseType caseType)
 	{
-		commonPath = Constant.getCommonPath();
+		String commonPath = Constant.getCommonPath();
 		try
 		{
 			StringBuilder sbToWrite = new StringBuilder();
@@ -3357,7 +3352,7 @@ public class WToFile
 	 */
 	public static void writeDistanceScoresSortedMapHeader()
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "EditDistancePerRtPerCand.csv";
@@ -3381,7 +3376,7 @@ public class WToFile
 	public static void writeStartTimeDistancesSorted(
 			LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> getDistanceScoresSorted)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			String fileName = commonPath + "StartTimeDistancePerRtPerCand.csv";
@@ -3405,48 +3400,6 @@ public class WToFile
 	}
 
 	/**
-	 * 
-	 * @param userName
-	 * @param userTimelines
-	 * @param timelinesPhrase
-	 */
-	public static void writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase)
-	{
-		commonPath = Constant.getCommonPath();//
-		StringBuilder toWrite = new StringBuilder();
-
-		try
-		{
-			System.out.println("writing " + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv");
-			String fileName = commonPath + userName + "CountDistinctValidIn" + timelinesPhrase + ".csv";
-
-			File file = new File(fileName);
-			file.delete();
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-			BufferedWriter bw = new BufferedWriter(fw);
-
-			bw.write("Date, Num_of_Distict_Valid_Activities\n");// bw.newLine();
-
-			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
-			{
-				int numOfDistinctValidActivities = entry.getValue().countNumberOfValidDistinctActivities();
-				toWrite.append(entry.getKey() + "," + numOfDistinctValidActivities + "\n");
-				// bw.write(entry.getKey() + "," + numOfDistinctValidActivities);
-				// bw.newLine();
-			}
-			bw.write(toWrite.toString());
-			bw.close();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-	}
-
-	/**
 	 * Write all the given day timelines.
 	 * 
 	 * @param usersDayTimelines
@@ -3460,7 +3413,7 @@ public class WToFile
 			boolean writeAvgAltitude)
 	{
 		// System.out.println("Common path=" + commonPath);
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		System.out.println("Inside writeUsersDayTimelines(): num of users received = " + usersDayTimelines.size());
 		System.out.println("Common path=" + commonPath);
 		try
@@ -3495,7 +3448,7 @@ public class WToFile
 			String fileName)
 	{
 		// System.out.println("Common path=" + commonPath);
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		System.out.println(
 				"Inside writeUsersDayTimelinesSameFile(): num of users received = " + usersDayTimelines.size());
 		System.out.println("Common path=" + commonPath);
@@ -3517,102 +3470,6 @@ public class WToFile
 	}
 
 	/**
-	 * 
-	 * @param usersDayTimelines
-	 * @param timelinesPhrase
-	 * @param fileName
-	 */
-	public static void writeNumOfActsPerUsersDayTimelinesSameFile(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
-			String fileName)
-	{
-		// System.out.println("Common path=" + commonPath);
-		commonPath = Constant.getCommonPath();//
-		System.out.println("Inside writeNumOfActsPerUsersDayTimelinesSameFile(): num of users received = "
-				+ usersDayTimelines.size());
-		System.out.println("Common path=" + commonPath);
-		try
-		{
-			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
-			{
-				writeNumOfActsInGivenDayTimelinesSameFile(entry.getKey(), entry.getValue(), timelinesPhrase, fileName);
-			}
-
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-		System.out.println("Exiting writeNumOfActsPerUsersDayTimelinesSameFile()");
-	}
-
-	/**
-	 * 
-	 * @param usersDayTimelines
-	 * @param timelinesPhrase
-	 * @param fileName
-	 */
-	public static void writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
-			String fileName)
-	{
-		// System.out.println("Common path=" + commonPath);
-		commonPath = Constant.getCommonPath();//
-		System.out.println("Inside writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(): num of users received = "
-				+ usersDayTimelines.size());
-		System.out.println("Common path=" + commonPath);
-		try
-		{
-			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
-			{
-				writeNumOfDistinctValidActsInGivenDayTimelinesSameFile(entry.getKey(), entry.getValue(),
-						timelinesPhrase, fileName);
-			}
-
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-		System.out.println("Exiting writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile()");
-	}
-
-	/**
-	 * 
-	 * @param usersDayTimelines
-	 * @param absFileName
-	 */
-	public static void writeNumOfDaysPerUsersDayTimelinesSameFile(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String absFileName)
-	{
-		// System.out.println("Common path=" + commonPath);
-		commonPath = Constant.getCommonPath();//
-		System.out.println("Inside writeNumOfDaysPerUsersDayTimelinesSameFile(): num of users received = "
-				+ usersDayTimelines.size());
-		System.out.println("Common path=" + commonPath);
-		StringBuilder msg = new StringBuilder();
-		msg.append("User,#Days\n");
-		try
-		{
-			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
-			{
-				msg.append(entry.getKey() + "," + entry.getValue().size() + "\n");
-			}
-
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-
-		WToFile.writeToNewFile(msg.toString(), absFileName);
-		System.out.println("Exiting writeNumOfDaysPerUsersDayTimelinesSameFile()");
-	}
-
-	/**
 	 * Write all day timelines for a given user
 	 * 
 	 * @param userName
@@ -3626,7 +3483,7 @@ public class WToFile
 			String timelinesPhrase, boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled,
 			boolean writeAvgAltitude)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 
 		try
 		{
@@ -3718,7 +3575,7 @@ public class WToFile
 			String timelinesPhrase, boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled,
 			boolean writeAvgAltitude, String fileName)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			fileName = commonPath + fileName;// userName + "DayTimelines" + timelinesPhrase + ".csv";
@@ -3800,7 +3657,7 @@ public class WToFile
 			String timelinesPhrase, boolean writeStartEndGeoCoordinates, boolean writeDistanceTravelled,
 			boolean writeAvgAltitude, String fileName)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		try
 		{
 			fileName = commonPath + fileName;
@@ -3858,66 +3715,6 @@ public class WToFile
 		}
 	}
 
-	/**
-	 * 
-	 * @param userName
-	 * @param userTimelines
-	 * @param timelinesPhrase
-	 * @param fileName
-	 */
-	public static void writeNumOfActsInGivenDayTimelinesSameFile(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase, String fileName)
-	{
-		commonPath = Constant.getCommonPath();//
-		try
-		{
-			fileName = commonPath + fileName;
-			StringBuilder toWrite = new StringBuilder();
-			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
-			{
-				toWrite.append(
-						userName + "," + entry.getKey() + "," + entry.getValue().getActivityObjectsInDay().size());
-				toWrite.append("\n");
-			}
-			WToFile.appendLineToFileAbs(toWrite.toString(), fileName);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-	}
-
-	/////
-	/**
-	 * 
-	 * @param userName
-	 * @param userTimelines
-	 * @param timelinesPhrase
-	 * @param fileName
-	 */
-	public static void writeNumOfDistinctValidActsInGivenDayTimelinesSameFile(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase, String fileName)
-	{
-		commonPath = Constant.getCommonPath();//
-		try
-		{
-			fileName = commonPath + fileName;
-			StringBuilder toWrite = new StringBuilder();
-			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
-			{
-				toWrite.append(userName + "," + entry.getKey() + ","
-						+ entry.getValue().countNumberOfValidDistinctActivities() + "\n");
-			}
-			WToFile.appendLineToFileAbs(toWrite.toString(), fileName);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-	}
-
 	/////
 	/**
 	 * Sums the duration in seconds of activities for each of the days of given day timelines and writes it to a file
@@ -3931,7 +3728,7 @@ public class WToFile
 	public static LinkedHashMap<String, Long> writeActivityDurationInGivenDayTimelines(String userName,
 			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		String[] activityNames = Constant.getActivityNames();// activityNames;
 		LinkedHashMap<String, Long> activityNameDurationPairsOverAllDayTimelines = new LinkedHashMap<String, Long>();
 		// count over all the days
@@ -4051,7 +3848,7 @@ public class WToFile
 	public static LinkedHashMap<String, Long> writeActivityCountsInGivenDayTimelines(String userName,
 			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 
 		if (VerbosityConstants.verbose) System.out.println("Inside writeActivityCountsInGivenDayTimelines");
 
@@ -4196,7 +3993,7 @@ public class WToFile
 	public static LinkedHashMap<String, Double> writeActivityOccPercentageOfTimelines(String userName,
 			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		LinkedHashMap<String, Double> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Double>();
 		String[] activityNames = Constant.getActivityNames();// .activityNames;
 		try
@@ -4310,17 +4107,15 @@ public class WToFile
 
 	}
 
-	/*
+	/**
+	 * 
 	 * This method is called from DCU_DataLoader
+	 * <p>
+	 * OUTOUT VALIDATED WITH SQL OUTPUT OK
 	 */
-	public static int writeActivityDistributionOcurrence(LinkedHashMap<String, TreeMap<Timestamp, String>> allData) // OUTOUT
-																													// VALIDATED
-																													// WITH
-																													// SQL
-																													// OUTPUT
-																													// OK
+	public static int writeActivityDistributionOcurrence(LinkedHashMap<String, TreeMap<Timestamp, String>> allData)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		// <User , <day-month-year, <activity name, count of occurence> >>
 		LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Integer>>> dataToWrite = new LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Integer>>>();
 		String[] activityNames = Constant.getActivityNames();// .activityNames;
@@ -4447,14 +4242,15 @@ public class WToFile
 		return 0;
 	}
 
-	public static int writeActivityDistributionDuration(LinkedHashMap<String, TreeMap<Timestamp, String>> allData) // OUTOUT
-																													// VALIDATED
-																													// WITH
-																													// SQL
-																													// OUTPUT
-																													// OK
+	// OUTOUT VALIDATED WITH SQL OUTPUT OK
+	/**
+	 * 
+	 * @param allData
+	 * @return
+	 */
+	public static int writeActivityDistributionDuration(LinkedHashMap<String, TreeMap<Timestamp, String>> allData)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		// <User , <day-month-year, <activity name, sum of duration in seconds> >>
 		LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Long>>> dataToWrite = new LinkedHashMap<String, TreeMap<String, LinkedHashMap<String, Long>>>();
 		String[] activityNames = Constant.getActivityNames();// .activityNames;
@@ -4627,7 +4423,7 @@ public class WToFile
 	public static void writeSimpleMapToFile(Map<String, Long> map, String absFileName, String headerKey,
 			String headerValue)
 	{
-		commonPath = Constant.getCommonPath();//
+		String commonPath = Constant.getCommonPath();//
 		if (map.size() == 0 || map == null)
 		{
 			new Exception("Alert! writeSimpleMapToFile, the passed map is empty or null");
@@ -4837,7 +4633,8 @@ public class WToFile
 				// writeSimpleLinkedHashMapToFile(LinkedHashMap<String, ?> map, String absFileName, String headerKey,
 				// String headerValue)
 			}
-			WToFile.writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
+			TimelineStats.writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(userName, timelinesCursor,
+					timelinesSet);
 		}
 
 		return resultsToReturn;
@@ -5020,50 +4817,6 @@ public class WToFile
 		}
 
 		return isEmpty;
-	}
-
-	/**
-	 * 
-	 * @param usersCleanedDayTimelines
-	 * @param verbose
-	 * @param absFileNameToWrite
-	 * @return
-	 */
-	public static Pair<Long, Long> writeNumberOfActsWithMultipleWorkingLevelCatID(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean verbose,
-			String absFileNameToWrite)
-	{
-		long numOfActWithMultipleWorkingLevelCatID = 0, numOfAOs = 0;
-		HashSet<String> multipleWorkingLevelCatIds = new HashSet<>();
-
-		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
-		{
-			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
-			{
-				for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
-				{
-					numOfAOs += 1;
-					if (RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs()).length > 1)
-					{
-						multipleWorkingLevelCatIds.add(ao.getWorkingLevelCatIDs());
-						numOfActWithMultipleWorkingLevelCatID += 1;
-					}
-				}
-			}
-		}
-
-		if (verbose)
-		{
-			System.out.println("num of AOs = " + numOfAOs);
-			System.out.println("numOfActWithMultipleWorkingLevelCatID = " + numOfActWithMultipleWorkingLevelCatID);
-			System.out.println("% ActWithMultipleWorkingLevelCatID = "
-					+ ((numOfActWithMultipleWorkingLevelCatID / numOfAOs) * 100));
-		}
-
-		writeToNewFile(multipleWorkingLevelCatIds.stream().map(s -> s.toString()).collect(Collectors.joining("\n")),
-				absFileNameToWrite);
-
-		return new Pair<Long, Long>(numOfActWithMultipleWorkingLevelCatID, numOfAOs);
 	}
 
 	/**
