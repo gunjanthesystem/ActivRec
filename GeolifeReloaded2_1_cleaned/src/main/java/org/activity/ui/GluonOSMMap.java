@@ -25,6 +25,7 @@ import com.gluonhq.maps.MapPoint;
 import com.gluonhq.maps.MapView;
 import com.gluonhq.maps.demo.PoiLayer;
 import com.gluonhq.maps.demo.PoiLayer2Faster;
+import com.jfoenix.controls.JFXSlider;
 
 import jViridis.ColorMap;
 import javafx.application.Application;
@@ -33,7 +34,6 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -144,7 +144,8 @@ public class GluonOSMMap extends Application
 
 		BorderPane toolPane = new BorderPane();
 
-		Slider slider = new Slider(1, BaseMap.MAX_ZOOM, 1);
+		JFXSlider slider = new JFXSlider(1, BaseMap.MAX_ZOOM, 1);
+		// Slider slider = new Slider(1, BaseMap.MAX_ZOOM, 1);
 		slider.setOrientation(Orientation.VERTICAL);
 		slider.setShowTickMarks(true);
 		slider.setShowTickLabels(true);

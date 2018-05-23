@@ -46,7 +46,7 @@ public class ActivityBox2 extends Group
 		// System.out.println("ActivityBox2() created");
 		setAutoSizeChildren(false);
 
-		System.out.println("this.isResizable()=" + this.isResizable());
+		// System.out.println("this.isResizable()=" + this.isResizable());
 
 		this.setCache(true);
 		this.setCacheHint(CacheHint.SPEED);

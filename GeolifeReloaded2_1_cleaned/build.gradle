@@ -86,8 +86,10 @@ dependencies
 	// compile 'org.controlsfx:controlsfx-samples:8.40.13'
 
 	// material design for javafx
-    //compile 'com.jfoenix:jfoenix:8.0.1'
+    compile 'com.jfoenix:jfoenix:8.0.1'
 	
+	//Icon packs for Java applications
+	compile 'org.kordamp.ikonli:ikonli-javafx:2.1.1'
 	//for amidst toolkit
 	//compile 'eu.amidst:module-all:0.6.1'
     //compile 'com.hugin:hugin:1.0.0'

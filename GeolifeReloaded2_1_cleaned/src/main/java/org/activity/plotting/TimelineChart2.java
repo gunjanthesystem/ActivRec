@@ -22,6 +22,7 @@ public class TimelineChart2 extends XYChart<Number, String>
 {
 
 	// double heightOfActivityBox;
+	boolean verbose = false;
 
 	/**
 	 * Construct a new TimelineChart with the given axis.
@@ -105,17 +106,21 @@ public class TimelineChart2 extends XYChart<Number, String>
 
 				// to find best height start
 				// System.out.println("item= " + item);
-				System.out.println("displayedXVal= " + displayedXVal);
-				System.out.println("displayedYVal= " + displayedYVal);
+				if (verbose)
+				{
+					System.out.println("displayedXVal= " + displayedXVal);
+					System.out.println("displayedYVal= " + displayedYVal);
 
-				System.out.println("xDispPosition= " + xDispPosition);
-				System.out.println("yDispPosition= " + yDispPosition);
-				// System.out.println("--> yAxis.getMaxHeight() =" + yAxis.getMaxHeight());
-				// System.out.println("--> yAxis.getMinHeight() =" + yAxis.getMinHeight());
-				// System.out.println("--> yAxis.getPrefHeight() =" + yAxis.getPrefHeight());
-				// System.out.println("--> yAxis.autoRangingProperty() =" + yAxis.autoRangingProperty());//true
-				// $$ System.out.println("--> this.height() =" + this.getHeight());
-				// $$ System.out.println("--> heightOfActBox = " + heightOfActBox);
+					System.out.println("xDispPosition= " + xDispPosition);
+					System.out.println("yDispPosition= " + yDispPosition);
+					// System.out.println("--> yAxis.getMaxHeight() =" + yAxis.getMaxHeight());
+					// System.out.println("--> yAxis.getMinHeight() =" + yAxis.getMinHeight());
+					// System.out.println("--> yAxis.getPrefHeight() =" + yAxis.getPrefHeight());
+					// System.out.println("--> yAxis.autoRangingProperty() =" + yAxis.autoRangingProperty());//true
+					// $$ System.out.println("--> this.height() =" + this.getHeight());
+					// $$ System.out.println("--> heightOfActBox = " + heightOfActBox);
+				}
+
 				// heightOfActBox+emptySpaceAboveActBox+emptySpaceBelowActBox = (heightOfChart/numOfUsers)
 				// heightOfActBox+0.25*heightOfActBox+0.25*heightOfActBox = (heightOfChart/numOfUsers)
 				// to find best height end
@@ -129,6 +134,9 @@ public class TimelineChart2 extends XYChart<Number, String>
 				if (itemNode instanceof ActivityBox2 && extra != null)
 				{
 					double endTS = xAxis.getDisplayPosition(extra.getEndTimestamp());
+					
+					if (verbose)
+					{
 					System.out.println("extra.getEndTimestamp()= " + extra.getEndTimestamp());
 					System.out.println("endTS= " + endTS);
 
@@ -137,6 +145,7 @@ public class TimelineChart2 extends XYChart<Number, String>
 					IntStream.rangeClosed(1, 10).map(i -> i * 5)
 							.forEachOrdered(i -> sb.append("\nxval= " + i + " pos=" + xAxis.getDisplayPosition(i)));
 					System.out.println(sb.toString());
+					}
 					// double high = xAxis.getDisplayPosition(extra.getHigh());
 					// double low = xAxis.getDisplayPosition(extra.getLow());
 					// calculate activity box width

@@ -3441,14 +3441,16 @@ public class WToFile
 	 * @param writeStartEndGeocoordinates
 	 * @param writeDistanceTravelled
 	 * @param writeAvgAltitude
+	 * @param fileName
+	 * @param commonPath
 	 */
 	public static void writeUsersDayTimelinesSameFile(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines, String timelinesPhrase,
 			boolean writeStartEndGeocoordinates, boolean writeDistanceTravelled, boolean writeAvgAltitude,
-			String fileName)
+			String fileName, String commonPath)
 	{
 		// System.out.println("Common path=" + commonPath);
-		String commonPath = Constant.getCommonPath();//
+		// String commonPath = Constant.getCommonPath();//
 		System.out.println(
 				"Inside writeUsersDayTimelinesSameFile(): num of users received = " + usersDayTimelines.size());
 		System.out.println("Common path=" + commonPath);
@@ -3713,398 +3715,6 @@ public class WToFile
 			e.printStackTrace();
 			System.exit(-5);
 		}
-	}
-
-	/////
-	/**
-	 * Sums the duration in seconds of activities for each of the days of given day timelines and writes it to a file
-	 * and sums the duration activities over all days of given timelines and return it as a LinkedHashMap
-	 * 
-	 * @param userName
-	 * @param userTimelines
-	 * @param fileNamePhrase
-	 * @return duration of activities over all days of given timelines
-	 */
-	public static LinkedHashMap<String, Long> writeActivityDurationInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
-	{
-		String commonPath = Constant.getCommonPath();//
-		String[] activityNames = Constant.getActivityNames();// activityNames;
-		LinkedHashMap<String, Long> activityNameDurationPairsOverAllDayTimelines = new LinkedHashMap<String, Long>();
-		// count over all the days
-
-		try
-		{
-			// String userName=entryForUser.getKey();
-			// System.out.println("\nUser ="+entryForUser.getKey());
-			String fileName = commonPath + userName + "ActivityDuration" + fileNamePhrase + ".csv";
-
-			if (VerbosityConstants.verbose)
-			{
-				System.out.println("writing " + userName + "ActivityDuration" + fileNamePhrase + ".csv");
-			}
-
-			StringBuilder toWrite = new StringBuilder();
-
-			toWrite.append(",");
-			// bw.write(",");
-
-			for (String activityName : activityNames)
-			{
-				if (UtilityBelt.isValidActivityName(activityName) == false)
-				// (activityName.equals("Unknown")|| activityName.equals("Others"))
-				{
-					continue;
-				}
-				toWrite.append("," + activityName);
-				// bw.write("," + activityName);
-				activityNameDurationPairsOverAllDayTimelines.put(activityName, new Long(0));
-			}
-			toWrite.append("\n");
-			// bw.newLine();
-
-			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
-			{
-				// System.out.println("Date =" + entry.getKey());
-				// bw.write(entry.getKey().toString());
-				// bw.write("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
-
-				toWrite.append(entry.getKey().toString() + ","
-						+ (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
-
-				ArrayList<ActivityObject> activitiesInDay = entry.getValue().getActivityObjectsInDay();
-				LinkedHashMap<String, Long> activityNameDurationPairs = new LinkedHashMap<String, Long>();
-
-				for (String activityName : activityNames) // written beforehand to maintain the same order of activity
-															// names
-				{
-					if (UtilityBelt.isValidActivityName(activityName))
-					// if((activityName.equalsIgnoreCase("Others")||activityName.equalsIgnoreCase("Unknown"))==false)
-					{
-						activityNameDurationPairs.put(activityName, new Long(0));
-					}
-				}
-
-				for (ActivityObject actEvent : activitiesInDay)
-				{
-					if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
-					// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
-					// actEvent.getActivityName().equalsIgnoreCase("Others") ) ==false)
-					{
-						Long durationInSecondsForActivity = actEvent.getDurationInSeconds();
-						// summing of duration for current day
-						activityNameDurationPairs.put(actEvent.getActivityName(),
-								activityNameDurationPairs.get(actEvent.getActivityName())
-										+ durationInSecondsForActivity);
-
-						// accumulative duration over all days
-						activityNameDurationPairsOverAllDayTimelines.put(actEvent.getActivityName(),
-								activityNameDurationPairsOverAllDayTimelines.get(actEvent.getActivityName())
-										+ durationInSecondsForActivity);
-					}
-				}
-
-				// write the activityNameDurationPairs to the file
-				for (Map.Entry<String, Long> entryWrite : activityNameDurationPairs.entrySet())
-				{
-					// bw.write("," + entryWrite.getValue());
-					toWrite.append("," + entryWrite.getValue());
-				}
-				toWrite.append("\n");
-				// bw.newLine();
-			}
-			// File file = new File(fileName);
-			// file.delete();
-			// FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-			// BufferedWriter bw = new BufferedWriter(fw);
-			WToFile.writeToNewFile(toWrite.toString(), fileName);
-			// bw.close();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-
-		writeSimpleLinkedHashMapToFileAppend(activityNameDurationPairsOverAllDayTimelines,
-				commonPath + "ActivityNameDurationPairsOver" + fileNamePhrase + ".csv", "Activity", "Duration");
-		// TODO check if it indeed should be an append
-
-		return activityNameDurationPairsOverAllDayTimelines;
-
-	}
-
-	// ///////////////////
-	/**
-	 * Counts activities for each of the days of given day timelines and writes it to a file and counts activities over
-	 * all days of given timelines and return it as a LinkedHashMap (fileName = commonPath + userName + "ActivityCounts"
-	 * + fileNamePhrase + ".csv")
-	 * 
-	 * @param userName
-	 * @param userTimelines
-	 * @param fileNamePhrase
-	 * @return count of activities over all days of given timelines
-	 */
-	public static LinkedHashMap<String, Long> writeActivityCountsInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
-	{
-		String commonPath = Constant.getCommonPath();//
-
-		if (VerbosityConstants.verbose) System.out.println("Inside writeActivityCountsInGivenDayTimelines");
-
-		/* <Activity Name, count over all days> */
-		LinkedHashMap<String, Long> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Long>();
-		// count over all the days
-		String[] activityNames = Constant.getActivityNames();// .activityNames;
-		try
-		{
-			// String userName=entryForUser.getKey();
-			// System.out.println("\nUser ="+entryForUser.getKey());
-			String fileName = commonPath + userName + "ActivityCounts" + fileNamePhrase + ".csv";
-
-			if (VerbosityConstants.verbose)
-			{
-				System.out.println("writing " + userName + "ActivityCounts" + fileNamePhrase + ".csv");
-			}
-			// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileName);// new BufferedWriter(fw);
-
-			StringBuilder bwString = new StringBuilder();
-			bwString.append(",");
-			// bw.write(",");
-
-			for (String activityName : activityNames)
-			{
-				if (UtilityBelt.isValidActivityName(activityName) == false) // if(activityName.equals("Unknown")||
-																			// activityName.equals("Not Available"))
-				{
-					continue;
-				}
-				// bw.write("," + activityName);
-				bwString.append("," + activityName);
-				// System.out.println("ajooba:activityName = " + activityName + " bwString" + bwString.toString());
-				activityNameCountPairsOverAllDayTimelines.put(activityName, new Long(0));
-			}
-			// bw.newLine();
-			bwString.append("\n");
-
-			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
-			{
-				// System.out.println("Date =" + entry.getKey());
-				// bw.write(entry.getKey().toString());
-				// bw.write("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
-
-				bwString.append(entry.getKey().toString());
-				bwString.append("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
-
-				ArrayList<ActivityObject> activitiesInDay = entry.getValue().getActivityObjectsInDay();
-
-				/* <Activity Name, count for the current day> */
-				LinkedHashMap<String, Integer> activityNameCountPairs = new LinkedHashMap<String, Integer>();
-
-				// written beforehand to maintain the same order of activity names
-				for (String activityName : activityNames)
-				{
-					if (UtilityBelt.isValidActivityName(activityName))
-					// if((activityName.equalsIgnoreCase("Not
-					// Available")||activityName.equalsIgnoreCase("Unknown"))==false)
-					{
-						// System.out.println(" putting down -" + activityName + "- in activityNameCountPairs");
-						activityNameCountPairs.put(activityName, 0);
-					}
-				}
-
-				for (ActivityObject actEvent : activitiesInDay)
-				{
-					if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
-					// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
-					// actEvent.getActivityName().equalsIgnoreCase("Not Available") ) ==false)
-					{
-						String actName = actEvent.getActivityName();
-						// System.out.println(activityNameCountPairs.size());
-
-						// Integer val;
-						// if (activityNameCountPairs.get(actName) == null)
-						// {
-						// val = 0;
-						// }
-						// else
-						// {
-						// val = activityNameCountPairs.get(actName);
-						// }
-						Integer val = activityNameCountPairs.get(actName);
-						if (val == null)
-						{
-							new Exception(
-									"Exception in org.activity.io.WritingToFile.writeActivityCountsInGivenDayTimelines(String, LinkedHashMap<Date, Timeline>, String) : actName = "
-											+ actName + " has null val");// System.out.println("actName = " + actName);
-						}
-
-						// System.out.println("val:" + val);
-						Integer newVal = new Integer(val.intValue() + 1);
-						// count for current day
-						activityNameCountPairs.put(actName, newVal);
-
-						// accumulative count over all days
-						activityNameCountPairsOverAllDayTimelines.put(actEvent.getActivityName(),
-								activityNameCountPairsOverAllDayTimelines.get(actEvent.getActivityName()) + 1);
-					}
-				}
-
-				// write the activityNameCountPairs to the file
-				for (Map.Entry<String, Integer> entryWrite : activityNameCountPairs.entrySet())
-				{
-					// bw.write("," + entryWrite.getValue());
-					bwString.append("," + entryWrite.getValue());
-				}
-
-				bwString.append("\n");
-				// bw.newLine();
-			}
-			WToFile.writeToNewFile(bwString.toString(), fileName);
-			// bw.write(bwString.toString());
-			// bw.close();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-
-		writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
-				commonPath + "ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count");
-		// TODO check if it indeed should be an append
-
-		if (VerbosityConstants.verbose) System.out.println("Exiting writeActivityCountsInGivenDayTimelines");
-
-		return activityNameCountPairsOverAllDayTimelines;
-
-	}
-
-	// ///////////////////
-	/**
-	 * percentage of timelines in which the activity occurrs and counts activities over all days of given timelines and
-	 * return it as a LinkedHashMap
-	 * 
-	 * @param userName
-	 * @param userTimelines
-	 * @param fileNamePhrase
-	 * @return count of activities over all days of given timelines
-	 */
-	public static LinkedHashMap<String, Double> writeActivityOccPercentageOfTimelines(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase)
-	{
-		String commonPath = Constant.getCommonPath();//
-		LinkedHashMap<String, Double> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Double>();
-		String[] activityNames = Constant.getActivityNames();// .activityNames;
-		try
-		{
-			// String userName=entryForUser.getKey();
-			// System.out.println("\nUser ="+entryForUser.getKey());
-			String fileName = commonPath + userName + "ActivityOccPerTimelines" + fileNamePhrase + ".csv";
-
-			if (VerbosityConstants.verbose)
-			{
-				System.out.println("writing " + userName + "ActivityOccPerTimelines" + fileNamePhrase + ".csv");
-			}
-
-			StringBuilder toWrite = new StringBuilder();
-			// bw.write(",");
-
-			int actIndex = -1;
-			for (String activityName : activityNames)
-			{
-				actIndex += 1;
-				if (UtilityBelt.isValidActivityName(activityName) == false)
-				// if(activityName.equals("Unknown")|| activityName.equals("Not Available"))
-				{
-					continue;
-				}
-
-				if (Constant.getDatabaseName().equals("gowalla1"))
-				{
-					// bw.write("," + activityName);
-					toWrite.append("," + Constant.activityNamesGowallaLabels.get(actIndex));
-				}
-				else
-				{
-					// bw.write("," + activityName);
-					toWrite.append("," + activityName);
-
-				}
-
-				activityNameCountPairsOverAllDayTimelines.put(activityName, new Double(0));
-			}
-			// bw.newLine();
-			toWrite.append("\n");
-
-			double numOfTimelines = userTimelines.size();
-
-			for (String activityName : activityNames) // written beforehand to maintain the same order of activity names
-			{
-				if (UtilityBelt.isValidActivityName(activityName))
-				// if((activityName.equalsIgnoreCase("Not Available")||activityName.equalsIgnoreCase("Unknown"))==false)
-				{
-					activityNameCountPairsOverAllDayTimelines.put(activityName, new Double(0));
-				}
-			}
-
-			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
-			{
-				// System.out.println("Date =" + entry.getKey());
-				// bw.write(entry.getKey().toString());
-				// bw.write("," + (UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
-
-				ArrayList<ActivityObject> activitiesInDay = entry.getValue().getActivityObjectsInDay();
-
-				// written beforehand to maintain the same order of activity names
-				for (String activityName : activityNames)
-				{
-					if (UtilityBelt.isValidActivityName(activityName))
-					{
-						if (entry.getValue().hasActivityName(activityName) == true)
-						{
-							activityNameCountPairsOverAllDayTimelines.put(activityName,
-									activityNameCountPairsOverAllDayTimelines.get(activityName) + 1);
-						}
-					}
-				}
-			}
-
-			// write the activityNameCountPairs to the file
-			for (Map.Entry<String, Double> entryWrite : activityNameCountPairsOverAllDayTimelines.entrySet())
-			{
-				String actName = entryWrite.getKey();
-				Double val = entryWrite.getValue();
-				double percentageOccurrenceOverTimeline = ((double) activityNameCountPairsOverAllDayTimelines
-						.get(actName) / (double) numOfTimelines) * 100;
-				activityNameCountPairsOverAllDayTimelines.put(actName, percentageOccurrenceOverTimeline);
-				// bw.write("," + percentageOccurrenceOverTimeline);
-				toWrite.append("," + percentageOccurrenceOverTimeline);
-			}
-			// bw.newLine();
-			toWrite.append("\n");
-
-			// File file = new File(fileName);
-			// file.delete();
-			// FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-			// BufferedWriter bw = new BufferedWriter(fw);
-			WToFile.writeToNewFile(toWrite.toString(), fileName);
-			// bw.close();
-		}
-
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-5);
-		}
-
-		writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
-				commonPath + "ActivityOccPerTimelines" + fileNamePhrase + ".csv", "Activity", "Count");// TODO check if
-																										// it indeed
-		// should be an append
-
-		return activityNameCountPairsOverAllDayTimelines;
-
 	}
 
 	/**
@@ -4595,32 +4205,32 @@ public class WToFile
 
 			if (timelinesSet.equals("TrainingTimelines"))
 			{
-				activityNameCountPairsOverAllTrainingDays = WToFile.writeActivityCountsInGivenDayTimelines(userName,
-						timelinesCursor, timelinesSet);
+				activityNameCountPairsOverAllTrainingDays = TimelineStats
+						.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet, commonPath);
 				activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 						.sortByValueDesc(activityNameCountPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameCountPairsOverAllTrainingDays",
 						activityNameCountPairsOverAllTrainingDays);
 
-				activityNameDurationPairsOverAllTrainingDays = WToFile
-						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet);
+				activityNameDurationPairsOverAllTrainingDays = TimelineStats
+						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet, commonPath);
 				activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 						.sortByValueDesc(activityNameDurationPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameDurationPairsOverAllTrainingDays",
 						activityNameDurationPairsOverAllTrainingDays);
 
-				activityNameOccPercentageOverAllTrainingDays = WToFile.writeActivityOccPercentageOfTimelines(userName,
-						timelinesCursor, timelinesSet);
+				activityNameOccPercentageOverAllTrainingDays = TimelineStats
+						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet, commonPath);
 			}
 
 			else
 			{
-				LinkedHashMap<String, Long> actCountRes1 = WToFile.writeActivityCountsInGivenDayTimelines(userName,
-						timelinesCursor, timelinesSet);
-				LinkedHashMap<String, Long> actDurationRes1 = WToFile.writeActivityDurationInGivenDayTimelines(userName,
-						timelinesCursor, timelinesSet);
-				LinkedHashMap<String, Double> actOccPercentageRes1 = WToFile
-						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet);
+				LinkedHashMap<String, Long> actCountRes1 = TimelineStats
+						.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet, commonPath);
+				LinkedHashMap<String, Long> actDurationRes1 = TimelineStats
+						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet, commonPath);
+				LinkedHashMap<String, Double> actOccPercentageRes1 = TimelineStats
+						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet, commonPath);
 
 				writeSimpleLinkedHashMapToFileAppend(actCountRes1,
 						commonPath + "ActivityCounts" + timelinesSet + ".csv", "dummy", "dummy");

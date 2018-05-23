@@ -77,6 +77,7 @@ public class ControllerWithoutServer
 			// pathToLatestSerialisedTimelines = "", pathForLatestSerialisedTimelines = "", commonPath = "";
 
 			setPathsSerialisedJSONTimelines(databaseName);
+
 			// new ConnectDatabase(Constant.getDatabaseName()); // all method and variable in this class are static
 			// new Constant(commonPath, Constant.getDatabaseName());
 
@@ -91,7 +92,7 @@ public class ControllerWithoutServer
 			Constant.initialise(commonPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap);
-
+			String commonBasePath = Constant.getCommonPath();
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 					+ PerformanceAnalytics.getHeapPercentageFree());
 
@@ -100,7 +101,7 @@ public class ControllerWithoutServer
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = createAllTimelines(
 					databaseName, Constant.toSerializeJSONArray, Constant.toDeSerializeJSONArray,
 					Constant.toCreateTimelines, Constant.toSerializeTimelines, Constant.toDeSerializeTimelines);
-
+			//PopUps.showMessage("here0");
 			////////// ~~~~~~~~~~~~~~~~~`
 			//////////// for Gowalla start
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
@@ -113,17 +114,19 @@ public class ControllerWithoutServer
 				if (Constant.For9kUsers)// For 9k users
 				{
 					usersCleanedDayTimelines = reduceAndCleanTimelines2(databaseName, usersDayTimelinesOriginal, true,
-							Constant.getCommonPath(), 10, 7, 500);
+							commonBasePath, 10, 7, 500);
 				}
 				else // For 916 users
 				{
-					usersCleanedDayTimelines = reduceAndCleanTimelines(databaseName, usersDayTimelinesOriginal, true);
+					usersCleanedDayTimelines = reduceAndCleanTimelines(databaseName, usersDayTimelinesOriginal, true,
+							commonBasePath);
 				}
 			}
 			else// in this case, we are expecting the data is already subsetting and cleaned
 			{
 				usersCleanedDayTimelines = usersDayTimelinesOriginal;
-				writeTimelineStats(usersCleanedDayTimelines, false, true, true, true, "usersCleanedDayTimelines");
+				writeTimelineStats(usersCleanedDayTimelines, false, true, true, true, "UsersCleanedDayTimelines",
+						commonBasePath);
 			}
 
 			usersDayTimelinesOriginal = null; // null this out so as to be ready for garbage collection.
@@ -160,19 +163,14 @@ public class ControllerWithoutServer
 			// String groupsOf100UsersLabels[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };
 			// ,// "1001" };
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
+			// String commonBasePath = Constant.getCommonPath();
+			//PopUps.showMessage("here01");
+			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
+					commonBasePath + "NumOfDaysPerUsersDayTimelines.csv");
 
-			String s1;
-			String s2;
-			s2 = Constant.getCommonPath();
-			s1 = s2 + "NumOfDaysPerUsersDayTimelines.csv";
-			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines, s1);
-			String commonBasePath;
-			commonBasePath = Constant.getCommonPath();
-			String s3;
-			String s4 = PerformanceAnalytics.getHeapInformation();
-			s3 = "Before sampleUsersExec\n" + s4;
-			System.out.println(s3);
-			
+			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
+			//PopUps.showMessage("here02");
+			///
 
 			///////////////////
 			// TimelineUtils.writeNumOfNullTZCinsPerUserPerLocID(usersCleanedDayTimelines,
@@ -185,73 +183,23 @@ public class ControllerWithoutServer
 			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines, true));
 			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines, true));
 			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true, "NumOfUniquePDValPerUser.csv");
+			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 
 			if (false)// temporary
 			{
 				TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
 				TimelineUtils.writeLocationObjects(Constant.getUniqueLocIDs(),
 						DomainConstants.getLocIDLocationObjectDictionary(),
-						Constant.getCommonPath() + "UniqueLocationObjects.csv");
+						commonBasePath + "UniqueLocationObjects.csv");
 				// SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
 				TimelineUtils.writeUserObjects(usersCleanedDayTimelines.keySet(),
-						DomainConstants.getUserIDUserObjectDictionary(),
-						Constant.getCommonPath() + "UniqueUserObjects.csv");
+						DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
 				System.exit(0);
 			}
 
 			if (false)// temporary for 22 feb 2018,
-			{// temporary for 22 feb 2018, to find the unique locations in the training timelines (most recent five
-				// days) and test timelines, this chunk of code has been borrowed from
-				// RecommendationtestsMar2017GenSeq3Nov2017.java
-				LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
-				// training test timelines for all users continuous
-				LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous = null;
-
-				long tt1 = System.currentTimeMillis();
-				if (Constant.collaborativeCandidates)
-				{
-					trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(
-							usersCleanedDayTimelines, Constant.percentageInTraining,
-							Constant.cleanTimelinesAgainInsideTrainTestSplit);
-
-					if (Constant.filterTrainingTimelinesByRecentDays)
-					{
-						trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
-								.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
-										Constant.getRecentDaysInTrainingTimelines());
-					}
-					else
-					{
-						// sampledUsersTimelines
-						trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
-								.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
-					}
-				}
-				System.out.println("time take for timeline train test splitting which might be save in experiment ="
-						+ ((System.currentTimeMillis() - tt1) * 1.0) / 1000 + " secs");
-
-				Set<Integer> uniqueLocTrains = TimelineUtils.getUniqueLocIDs(trainTimelinesAllUsersContinuous, true,
-						Constant.getCommonPath() + "UniqueLocIDs5DaysTrain.csv");
-				Set<Integer> uniqueLocTests = TimelineUtils.getUniqueLocIDsFromTestOnly(trainTestTimelinesForAllUsersDW,
-						true, Constant.getCommonPath() + "UniqueLocIDsTest.csv");
-
-				Set<Integer> uniqueLocTrainsTests = new TreeSet<>();
-				uniqueLocTrainsTests.addAll(uniqueLocTrains);
-				uniqueLocTrainsTests.addAll(uniqueLocTests);
-				WToFile.writeToNewFile(uniqueLocTrainsTests.stream().map(e -> e.toString())
-						.collect(Collectors.joining("\n")).toString(),
-						Constant.getCommonPath() + "UniqueLocIDs5DaysTrainTest.csv");
-
-				TimelineUtils.writeLocationObjects(uniqueLocTrainsTests,
-						DomainConstants.getLocIDLocationObjectDictionary(),
-						Constant.getCommonPath() + "UniqueLocationObjects5DaysTrainTest.csv");
-
-				TimelineUtils.writeAllActObjs(trainTimelinesAllUsersContinuous,
-						Constant.getCommonPath() + "AllActObjs5DaysTrain.csv");
-				TimelineUtils.writeAllActObjsFromTestOnly(trainTestTimelinesForAllUsersDW,
-						Constant.getCommonPath() + "AllActObjsTest.csv");
-				// TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
-				System.exit(0);
+			{
+				findUniqueLocationsInTrainTest(usersCleanedDayTimelines, true);
 			}
 			// Curtain 8 Feb 2018 start
 			// $$TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
@@ -274,51 +222,27 @@ public class ControllerWithoutServer
 			// // important curtain 1 start 21 Dec 2017 10 Feb 2017
 			DomainConstants.clearGowallaLocZoneIdMap();// to save memory
 
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = TimelineUtils
+					.createToyUserTimelinesFromCheckinEntriesGowallaFaster1_V2(usersCleanedDayTimelines);
+			{
+				Serializer.kryoSerializeThis(usersCleanedDayToyTimelines,
+						Constant.getCommonPath() + "ToyTimelines21May.kryo");
+				System.exit(0);
+			}
+
+			TimelineStats.timelineStatsController(usersCleanedDayToyTimelines);
+			PopUps.showMessage("here");
+			WToFile.writeUsersDayTimelinesSameFile(usersCleanedDayToyTimelines, "usersCleanedDayToyTimelines", false,
+					false, false, "GowallaUserDayToyTimelines.csv", commonBasePath);
+			PopUps.showMessage("here2");
+			// $$TimelineStats.timelineStatsController(usersCleanedDayTimelines);
+			System.exit(0);
+			// End of Moved here on 18 May 2018
+
 			if (Constant.For9kUsers)
 			{
-				// Start of curtain Aug 14 2017
-				// $$selectGivenUsersExecuteRecommendationTests(usersCleanedDayTimelines, IntStream
-				// $$ .of(DomainConstants.gowallaUserIDInUserGroup1Users).boxed().collect(Collectors.toList()),
-				// $$commonBasePath, "1");
-				// End of curtain Aug 14 2017
-				boolean useSampledUsersFromFile = true;
-				ArrayList<ArrayList<String>> listOfSampledUserIDs = null;
-				if (useSampledUsersFromFile)
-				{
-					String sampledUsersListFile = "./dataToRead/Jan16/randomlySampleUsers.txt";
-					System.out.println("Reading Sampled users from " + sampledUsersListFile);
-					listOfSampledUserIDs = ReadingFromFile.readRandomSamplesIntoListOfLists(sampledUsersListFile, 13,
-							21, ",");
-
-					int listNum = 0;
-					for (ArrayList<String> l : listOfSampledUserIDs)
-					{
-						System.out.println("List num:" + (++listNum));
-						System.out.println(l.toString());
-					}
-				}
-				else
-				{
-					System.out.println("New Randomly Sampling users");
-					listOfSampledUserIDs = randomlySampleUsersIDs(usersCleanedDayTimelines, 9, 1000);
-				}
-
-				for (int sampleID = 0; sampleID < listOfSampledUserIDs.size(); sampleID++)
-				{
-					System.out.println(" listOfSampledUserIDs.get(sampleID)= " + listOfSampledUserIDs.get(sampleID));
-					System.out.println(
-							" listOfSampledUserIDs.get(sampleID).size= " + listOfSampledUserIDs.get(sampleID).size());
-
-					LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUserCleanedDayTimelines = getDayTimelinesForUserIDsV2(
-							usersCleanedDayTimelines, listOfSampledUserIDs.get(sampleID));
-					System.out
-							.println("sampledUserCleanedDayTimelines.size()=" + sampledUserCleanedDayTimelines.size());
-					sampleUsersExecuteRecommendationTests(sampledUserCleanedDayTimelines,
-							DomainConstants.gowallaUserGroupsLabels, commonBasePath + "Sample" + sampleID + "/");
-
-					new EvaluationSeq(3, commonBasePath + "Sample" + sampleID + "/",
-							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor));
-				}
+				sampleUsersExecuteExperimentsFor9kUsers(commonBasePath, usersCleanedDayTimelines,
+						Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor));
 				// System.exit(0);
 			}
 			else
@@ -327,7 +251,6 @@ public class ControllerWithoutServer
 				{
 					List<String> sampledUserIndicesStr = ReadingFromFile
 							// .oneColumnReaderString("./dataToRead/RandomlySample100Users/Mar1_2018.csv", ",", 0,
-							// false);
 							// .oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
 							.oneColumnReaderString(Constant.pathToRandomLySampleUserIndices, ",", 0, false);
 					System.out.println("pathToRandomLySampleUserIndices=" + Constant.pathToRandomLySampleUserIndices);
@@ -460,6 +383,143 @@ public class ControllerWithoutServer
 
 	}
 
+	private void writeActIDNamesInFixedOrder(String absFileNameToWrite)
+	{
+		String[] activityNames = Constant.getActivityNames();
+		StringBuilder sb = new StringBuilder("ActID,ActName\n");
+		for (String a : activityNames)
+		{
+			sb.append(a + "," + DomainConstants.catIDNameDictionary.get(Integer.valueOf(a)) + "\n");
+		}
+		WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);// Constant.getCommonPath() + "CatIDNameMap.csv");
+	}
+
+	/**
+	 * <p>
+	 * logic extracted to a method on 18 May 2018, before it was part of ControllerWithoutServer constructor. Not sure
+	 * whether it should be static or non-static. However, keeping it static at the moment to avoid chances of unwanted
+	 * state changes.
+	 * 
+	 * @param commonBasePath
+	 * @param usersCleanedDayTimelines
+	 * @param muArray
+	 * @throws IOException
+	 */
+	private static void sampleUsersExecuteExperimentsFor9kUsers(String commonBasePath,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, double[] muArray)
+			throws IOException
+	{
+		// Start of curtain Aug 14 2017
+		// $$selectGivenUsersExecuteRecommendationTests(usersCleanedDayTimelines, IntStream
+		// $$ .of(DomainConstants.gowallaUserIDInUserGroup1Users).boxed().collect(Collectors.toList()),
+		// $$commonBasePath, "1");
+		// End of curtain Aug 14 2017
+		boolean useSampledUsersFromFile = true;
+		ArrayList<ArrayList<String>> listOfSampledUserIDs = null;
+		if (useSampledUsersFromFile)
+		{
+			String sampledUsersListFile = "./dataToRead/Jan16/randomlySampleUsers.txt";
+			System.out.println("Reading Sampled users from " + sampledUsersListFile);
+			listOfSampledUserIDs = ReadingFromFile.readRandomSamplesIntoListOfLists(sampledUsersListFile, 13, 21, ",");
+
+			int listNum = 0;
+			for (ArrayList<String> l : listOfSampledUserIDs)
+			{
+				System.out.println("List num:" + (++listNum));
+				System.out.println(l.toString());
+			}
+		}
+		else
+		{
+			System.out.println("New Randomly Sampling users");
+			listOfSampledUserIDs = randomlySampleUsersIDs(usersCleanedDayTimelines, 9, 1000);
+		}
+
+		for (int sampleID = 0; sampleID < listOfSampledUserIDs.size(); sampleID++)
+		{
+			System.out.println(" listOfSampledUserIDs.get(sampleID)= " + listOfSampledUserIDs.get(sampleID));
+			System.out
+					.println(" listOfSampledUserIDs.get(sampleID).size= " + listOfSampledUserIDs.get(sampleID).size());
+
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUserCleanedDayTimelines = getDayTimelinesForUserIDsV2(
+					usersCleanedDayTimelines, listOfSampledUserIDs.get(sampleID));
+
+			System.out.println("sampledUserCleanedDayTimelines.size()=" + sampledUserCleanedDayTimelines.size());
+
+			sampleUsersExecuteRecommendationTests(sampledUserCleanedDayTimelines,
+					DomainConstants.gowallaUserGroupsLabels, commonBasePath + "Sample" + sampleID + "/");
+
+			new EvaluationSeq(3, commonBasePath + "Sample" + sampleID + "/", muArray);
+		}
+
+	}
+
+	/**
+	 * // temporary for 22 feb 2018, to find the unique locations in the training timelines (most recent five // days)
+	 * and test timelines, this chunk of code has been borrowed from // RecommendationtestsMar2017GenSeq3Nov2017.java
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param exit
+	 * @since 22 feb 2018
+	 */
+	private void findUniqueLocationsInTrainTest(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean exit)
+	{
+		// temporary for 22 feb 2018, to find the unique locations in the training timelines (most recent five
+		// days) and test timelines, this chunk of code has been borrowed from
+		// RecommendationtestsMar2017GenSeq3Nov2017.java
+		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
+		// training test timelines for all users continuous
+		LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous = null;
+
+		long tt1 = System.currentTimeMillis();
+		if (Constant.collaborativeCandidates)
+		{
+			trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(usersCleanedDayTimelines,
+					Constant.percentageInTraining, Constant.cleanTimelinesAgainInsideTrainTestSplit);
+
+			if (Constant.filterTrainingTimelinesByRecentDays)
+			{
+				trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
+								Constant.getRecentDaysInTrainingTimelines());
+			}
+			else
+			{
+				// sampledUsersTimelines
+				trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+						.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
+			}
+		}
+		System.out.println("time take for timeline train test splitting which might be save in experiment ="
+				+ ((System.currentTimeMillis() - tt1) * 1.0) / 1000 + " secs");
+
+		Set<Integer> uniqueLocTrains = TimelineUtils.getUniqueLocIDs(trainTimelinesAllUsersContinuous, true,
+				Constant.getCommonPath() + "UniqueLocIDs5DaysTrain.csv");
+		Set<Integer> uniqueLocTests = TimelineUtils.getUniqueLocIDsFromTestOnly(trainTestTimelinesForAllUsersDW, true,
+				Constant.getCommonPath() + "UniqueLocIDsTest.csv");
+
+		Set<Integer> uniqueLocTrainsTests = new TreeSet<>();
+		uniqueLocTrainsTests.addAll(uniqueLocTrains);
+		uniqueLocTrainsTests.addAll(uniqueLocTests);
+		WToFile.writeToNewFile(
+				uniqueLocTrainsTests.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
+				Constant.getCommonPath() + "UniqueLocIDs5DaysTrainTest.csv");
+
+		TimelineUtils.writeLocationObjects(uniqueLocTrainsTests, DomainConstants.getLocIDLocationObjectDictionary(),
+				Constant.getCommonPath() + "UniqueLocationObjects5DaysTrainTest.csv");
+
+		TimelineUtils.writeAllActObjs(trainTimelinesAllUsersContinuous,
+				Constant.getCommonPath() + "AllActObjs5DaysTrain.csv");
+		TimelineUtils.writeAllActObjsFromTestOnly(trainTestTimelinesForAllUsersDW,
+				Constant.getCommonPath() + "AllActObjsTest.csv");
+		// TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
+		if (exit)
+		{
+			System.exit(0);
+		}
+	}
+
 	/**
 	 * 
 	 * @param usersCleanedDayTimelines
@@ -467,7 +527,7 @@ public class ControllerWithoutServer
 	 * @param sizeOfEachSublist
 	 * @return
 	 */
-	private ArrayList<ArrayList<String>> randomlySampleUsersIDs(
+	private static ArrayList<ArrayList<String>> randomlySampleUsersIDs(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, int numOfSublists,
 			int sizeOfEachSublist)
 	{
@@ -603,7 +663,7 @@ public class ControllerWithoutServer
 	 * @param commonBasePath
 	 * @throws IOException
 	 */
-	private void sampleUsersExecuteRecommendationTests(
+	private static void sampleUsersExecuteRecommendationTests(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
 			String[] groupsOf100UsersLabels, String commonBasePath) throws IOException
 	{
@@ -615,7 +675,7 @@ public class ControllerWithoutServer
 		{
 			System.out.println("-- iteration start for groupsOf100UsersLabel = " + groupsOf100UsersLabel);
 			// important so as to wipe the previously assigned user ids
-			Constant.initialise(commonPath, Constant.getDatabaseName());
+			Constant.initialise(commonBasePath, Constant.getDatabaseName());
 
 			int startUserIndex = Integer.valueOf(groupsOf100UsersLabel) - 1;// 100
 			int endUserIndex = startUserIndex + 99;// $$ should be 99;// 199;// 140; // 199
@@ -1053,7 +1113,7 @@ public class ControllerWithoutServer
 	 * @param userIDsToSelect
 	 * @return day timelines for given user ids
 	 */
-	public LinkedHashMap<String, LinkedHashMap<Date, Timeline>> getDayTimelinesForUserIDsV2(
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> getDayTimelinesForUserIDsV2(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines,
 			ArrayList<String> userIDsToSelect)
 	{
@@ -1082,8 +1142,14 @@ public class ControllerWithoutServer
 	}
 
 	/**
-	 * Sets pathToLatestSerialisedJSONArray, pathForLatestSerialisedJSONArray, pathToLatestSerialisedTimelines,
-	 * pathForLatestSerialisedTimelines
+	 * Sets the following paths:
+	 * <p>
+	 * <ul>
+	 * <li>pathToLatestSerialisedJSONArray</li>
+	 * <li>pathForLatestSerialisedJSONArray</li>
+	 * <li>pathToLatestSerialisedTimelines</li>
+	 * <li>commonPath</li>
+	 * </ul>
 	 * 
 	 * @param databaseName
 	 */
@@ -1306,7 +1372,8 @@ public class ControllerWithoutServer
 		// Originally received timelines
 		if (writeToFile)
 		{
-			writeTimelineStats(usersDayTimelinesOriginal, false, true, true, true, "OriginalBeforeReduceClean");
+			writeTimelineStats(usersDayTimelinesOriginal, false, true, true, true, "OriginalBeforeReduceClean",
+					commonPath);
 		}
 
 		if (databaseName.equals("gowalla1"))
@@ -1322,7 +1389,7 @@ public class ControllerWithoutServer
 				.cleanUsersDayTimelines(usersDayTimelinesOriginal);
 		if (writeToFile)
 		{
-			writeTimelineStats(usersCleanedDayTimelines, false, true, true, false, "Cleaned");
+			writeTimelineStats(usersCleanedDayTimelines, false, true, true, false, "Cleaned", commonPath);
 		}
 		///
 
@@ -1334,7 +1401,7 @@ public class ControllerWithoutServer
 
 		if (writeToFile)
 		{
-			writeTimelineStats(usersDayTimelinesOriginal, true, true, true, true, "cleaned reduced3");
+			writeTimelineStats(usersDayTimelinesOriginal, true, true, true, true, "cleaned reduced3", commonPath);
 		}
 
 		return usersCleanedDayTimelines;
@@ -1359,21 +1426,24 @@ public class ControllerWithoutServer
 	 * @param databaseName
 	 * @param usersDayTimelinesOriginal
 	 * @param writeToFile
+	 * @param commonPathToWrite
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceAndCleanTimelines(String databaseName,
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal, boolean writeToFile,
+			String commonPathToWrite)
 	{
 		// Originally received timelines
 		if (writeToFile)
 		{
-			writeTimelineStats(usersDayTimelinesOriginal, false, true, true, true, "OriginalBeforeReduceClean");
+			writeTimelineStats(usersDayTimelinesOriginal, false, true, true, true, "OriginalBeforeReduceClean",
+					commonPathToWrite);
 		}
 
 		if (databaseName.equals("gowalla1"))
 		{
 			usersDayTimelinesOriginal = reduceGowallaTimelinesByActDensity(databaseName, usersDayTimelinesOriginal,
-					true, 10, 50);
+					true, 10, 50, commonPathToWrite);
 		}
 
 		///// clean timelines
@@ -1384,7 +1454,7 @@ public class ControllerWithoutServer
 		if (writeToFile)
 		{
 			writeTimelineStats(usersCleanedDayTimelines, false, true, true, false,
-					"RemovedLT10ActPerDayLT50DaysCleaned");
+					"RemovedLT10ActPerDayLT50DaysCleaned", commonPathToWrite);
 		}
 
 		if (databaseName.equals("gowalla1"))
@@ -1396,7 +1466,7 @@ public class ControllerWithoutServer
 			if (writeToFile)
 			{
 				writeTimelineStats(usersCleanedDayTimelines, false, true, true, false,
-						"RemovedLT10ActPerDayLT50DaysCleanedLT50Days");
+						"RemovedLT10ActPerDayLT50DaysCleanedLT50Days", commonPathToWrite);
 			}
 
 			/////////
@@ -1408,7 +1478,7 @@ public class ControllerWithoutServer
 			if (writeToFile)
 			{
 				writeTimelineStats(usersCleanedDayTimelines, true, true, true, true,
-						"RemovedLT10ActPerDayLT50DaysCleanedLT50DaysBlUsers");
+						"RemovedLT10ActPerDayLT50DaysCleanedLT50DaysBlUsers", commonPathToWrite);
 			}
 		}
 		return usersCleanedDayTimelines;
@@ -1422,11 +1492,12 @@ public class ControllerWithoutServer
 	 * @param writeNumOfDaysPerUsersDayTimelines
 	 * @param writeNumOfDistinctValidActsPerUsersDayTimelines
 	 * @param labelEnd
+	 * @param commonPathToWrite
 	 */
 	public static void writeTimelineStats(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> timelines,
 			boolean writeSubsetOfTimelines, boolean writeNumOfActsPerUsersDayTimelines,
 			boolean writeNumOfDaysPerUsersDayTimelines, boolean writeNumOfDistinctValidActsPerUsersDayTimelines,
-			String labelEnd)
+			String labelEnd, String commonPathToWrite)
 	{
 		// Writing user day timelines. big file ~ 17.3GB
 		// WritingToFile.writeUsersDayTimelinesSameFile(timelines,"usersCleanedDayTimelinesReduced"+labelEnd,false,
@@ -1440,23 +1511,24 @@ public class ControllerWithoutServer
 			WToFile.writeUsersDayTimelinesSameFile(
 					new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>(timelinesSampled),
 					"usersDayTimelines" + labelEnd + "First2UsersOnly", false, false, false,
-					"GowallaUserDayTimelines" + labelEnd + "First2UsersOnly.csv");// users
+					"GowallaUserDayTimelines" + labelEnd + "First2UsersOnly.csv", commonPathToWrite);// users
 		}
 		if (writeNumOfActsPerUsersDayTimelines)
 		{
 			TimelineStats.writeNumOfActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
-					"GowallaPerUserDayNumOfActs" + labelEnd + ".csv");
+					"GowallaPerUserDayNumOfActs" + labelEnd + ".csv", commonPathToWrite);
 		}
 		if (writeNumOfDaysPerUsersDayTimelines)
 		{
 			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(timelines,
-					Constant.getCommonPath() + "NumOfDaysPerUser" + labelEnd + ".csv");
+					commonPathToWrite + "NumOfDaysPerUser" + labelEnd + ".csv");
 
 		}
 		if (writeNumOfDistinctValidActsPerUsersDayTimelines)
 		{
-			TimelineStats.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(timelines, "usersDayTimelines" + labelEnd,
-					"GowallaPerUserDayNumOfDistinctValidActs" + labelEnd + ".csv");
+			TimelineStats.writeNumOfDistinctValidActsPerUsersDayTimelinesSameFile(timelines,
+					"usersDayTimelines" + labelEnd, "GowallaPerUserDayNumOfDistinctValidActs" + labelEnd + ".csv",
+					commonPathToWrite);
 		}
 		System.out.println(" Num of users" + labelEnd + "= " + timelines.size());
 	}
@@ -1500,7 +1572,7 @@ public class ControllerWithoutServer
 					commonPath + "removeDayTimelinesWithLessThan" + actsPerDayLowerLimit + "ActLog.csv", writeLogs);
 			if (writeToFile)
 			{
-				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd);
+				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd, commonPath);
 			}
 		}
 		//////////
@@ -1516,7 +1588,7 @@ public class ControllerWithoutServer
 
 			if (writeToFile)
 			{
-				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd);
+				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd, commonPath);
 			}
 		}
 		//////////
@@ -1531,7 +1603,7 @@ public class ControllerWithoutServer
 					commonPath + "removeDayTimelinesWithLessThan" + numOfSuchDaysLowerLimit + "DaysLog.csv");
 			if (writeToFile)
 			{
-				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd);
+				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false, labelEnd, commonPath);
 
 			}
 		}
@@ -1552,11 +1624,12 @@ public class ControllerWithoutServer
 	 * @param writeToFile
 	 * @param actsPerDayThreshold
 	 * @param suchDaysThreshold
+	 * @param commonPath
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceGowallaTimelinesByActDensity(
 			String databaseName, LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal,
-			boolean writeToFile, int actsPerDayThreshold, int suchDaysThreshold)
+			boolean writeToFile, int actsPerDayThreshold, int suchDaysThreshold, String commonPath)
 	{// formerly reduceGowallaTimelines
 		System.out.println("Inside reduceGowallaTimelinesByActDensity");
 
@@ -1580,7 +1653,7 @@ public class ControllerWithoutServer
 			if (writeToFile)
 			{
 				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false,
-						"RemovedLT" + actsPerDayThreshold + "ActPerDay");
+						"RemovedLT" + actsPerDayThreshold + "ActPerDay", commonPath);
 			}
 
 			//////////
@@ -1593,7 +1666,7 @@ public class ControllerWithoutServer
 			if (writeToFile)
 			{
 				writeTimelineStats(usersDayTimelinesOriginal, false, true, true, false,
-						"RemovedLT" + actsPerDayThreshold + "ActPerDayLT" + suchDaysThreshold + "Days");
+						"RemovedLT" + actsPerDayThreshold + "ActPerDayLT" + suchDaysThreshold + "Days", commonPath);
 			}
 
 			return usersDayTimelinesOriginal;

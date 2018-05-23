@@ -902,6 +902,77 @@ public class CSVUtils
 
 	/**
 	 * 
+	 * @param listOfAbsFileNames
+	 * @param hasColumnHeader
+	 *            to make sure columnHeadersAreNotRepeated
+	 * 
+	 * @param absfileToWrite
+	 * @param delimiter
+	 * @param rowHeaderPerFile
+	 * @since May 18 2018
+	 */
+	public static void concatCSVFilesWithRowHeaderPerFile(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
+			String absfileToWrite, char delimiter, ArrayList<String> rowHeaderPerFile)
+	{
+		int countOfFiles = 0, countOfTotalLines = 0;
+		try
+		{
+			for (String fileToRead : listOfAbsFileNames)
+			{
+				countOfFiles += 1;
+				List<CSVRecord> csvRecords = CSVUtils.getCSVRecords(fileToRead, delimiter);
+
+				// System.out.println("read records from " + fileToRead + " are :");
+
+				BufferedWriter bw = WToFile.getBufferedWriterForExistingFile(absfileToWrite);
+				CSVPrinter printer = new CSVPrinter(bw, CSVFormat.DEFAULT.withDelimiter(delimiter).withQuote(null));
+
+				int countOfLines = 0;
+				for (CSVRecord r : csvRecords)
+				{
+					countOfLines += 1;
+
+					// dont write the header for non-first files
+					if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1)
+					{
+						continue;
+					}
+					// System.out.println(r.toString());
+
+					ArrayList<String> valsToWriteForThisRow = new ArrayList<>();
+
+					if (hasColumnHeader && countOfFiles == 1 && countOfLines == 1)
+					{
+						valsToWriteForThisRow.add("rowHeaderPerFile");
+					}
+					else// for non header lines only
+					{
+						valsToWriteForThisRow.add(rowHeaderPerFile.get(countOfFiles - 1));
+					}
+
+					for (int i = 0; i < r.size(); i++)
+					{
+						valsToWriteForThisRow.add(r.get(i));
+					}
+					printer.printRecord(valsToWriteForThisRow);
+
+				}
+				System.out.println(countOfLines + " lines read for this user");
+				countOfTotalLines += countOfLines;
+
+				printer.close();
+			}
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
 	 * @param absFileToSplit
 	 * @param hasColumnHeader
 	 * @param delimiter

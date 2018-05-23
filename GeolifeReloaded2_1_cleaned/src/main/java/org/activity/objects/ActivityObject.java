@@ -100,6 +100,16 @@ public class ActivityObject implements Serializable
 	ZoneId timeZoneId;
 
 	/**
+	 * For Serialisation purposes.
+	 * 
+	 * @since 21 May 2018
+	 */
+	public ActivityObject()
+	{
+
+	}
+
+	/**
 	 * @since April 9 2018
 	 * @return
 	 */
