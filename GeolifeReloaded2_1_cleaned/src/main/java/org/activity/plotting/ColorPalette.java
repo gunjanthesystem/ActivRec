@@ -78,7 +78,7 @@ public class ColorPalette
 	// #ref :
 	// https://graphicdesign.stackexchange.com/questions/3682/where-can-i-find-a-large-palette-set-of-contrasting-colors-for-coloring-many-d
 
-	static String[] colors269 = new String[] { "#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941",
+	static final String[] colors269 = new String[] { "#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941",
 			"#006FA6", "#A30059", "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF",
 			"#997D87", "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
 			"#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100", "#DDEFFF",

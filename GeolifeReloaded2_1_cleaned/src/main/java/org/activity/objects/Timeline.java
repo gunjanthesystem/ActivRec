@@ -48,6 +48,16 @@ public class Timeline implements Serializable
 	}
 
 	/**
+	 * For serialisation purposes
+	 * 
+	 * @since May 21 2018
+	 */
+	public Timeline()
+	{
+
+	}
+
+	/**
 	 * Create Timeline from given Activity Objects
 	 * 
 	 * 

@@ -353,7 +353,7 @@ public class SuperController
 		// String commonPath = "./dataWritten/Nov6_NCount916U916N100T/";// Aug17/";
 		// $$String commonPath = "./dataWritten/Nov12_NCount916U916N1C500T/";// Aug17/";
 		System.out.println("commonPath = " + commonPath);
-		String commonPathGowalla = commonPath;
+		String outputCoreResultsPathGowalla = commonPath;
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
@@ -421,8 +421,9 @@ public class SuperController
 
 		Constant.setDatabaseName("gowalla1");// ("dcu_data_2");// "geolife1"
 		// Constant.caseType = Enums.CaseType.SimpleV3;/// "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
-		Constant.setOutputCoreResultsPath(commonPathGowalla);// commonPathGeolife;// commonPathDCU + "SimpleV3/";//
-																// "/home/gunjan/DCU/SimpleV3/";//
+		Constant.setOutputCoreResultsPath(outputCoreResultsPathGowalla);// commonPathGeolife;// commonPathDCU +
+																		// "SimpleV3/";//
+		// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
 

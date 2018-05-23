@@ -152,7 +152,7 @@ public class DesktopActivityDashBoard extends Application
 			long tTimeline0 = System.currentTimeMillis();
 			Tab timelineTabCircle = new Tab("timelineTabCircle Historical Timelines All Users");
 			TimelineChartAppGeneric tcC = new TimelineChartAppGeneric(timelineData, true, "ActivityCircle");
-			timelineTabCircle.setContent(tcC.getVbox());// timelinesVBox2);
+			timelineTabCircle.setContent(tcC.getVBox());// timelinesVBox2);
 			timelineTabCircle.setClosable(true);
 			tabsToAdd.add(timelineTabCircle);
 			long tTimelinen = System.currentTimeMillis();
@@ -173,19 +173,19 @@ public class DesktopActivityDashBoard extends Application
 				Tab timelineTabD = new Tab("timelineTabD Historical Timelines All Users");
 				TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(timelineData, true, "ActivityBox");
 				// TODO: Issue: not scaling correctly with range change.
-				timelineTabD.setContent(tcD.getVbox());// timelinesVBox2);
+				timelineTabD.setContent(tcD.getVBox());// timelinesVBox2);
 				timelineTabD.setClosable(true);
 				tabsToAdd.add(timelineTabD);
 
 				Tab timelineTabE = new Tab("timelineTabE Historical Timelines All Users");
 				TimelineChartAppGeneric tcE = new TimelineChartAppGeneric(timelineData, true, "LineChart");
-				timelineTabE.setContent(tcE.getVbox());// timelinesVBox2);
+				timelineTabE.setContent(tcE.getVBox());// timelinesVBox2);
 				timelineTabE.setClosable(true);
 				tabsToAdd.add(timelineTabE);
 
 				Tab timelineTabScattter = new Tab("timelineTabScattter Historical Timelines All Users");
 				TimelineChartAppGeneric tcScattter = new TimelineChartAppGeneric(timelineData, true, "ScatterChart");
-				timelineTabScattter.setContent(tcScattter.getVbox());// timelinesVBox2);
+				timelineTabScattter.setContent(tcScattter.getVBox());// timelinesVBox2);
 				timelineTabScattter.setClosable(true);
 				tabsToAdd.add(timelineTabScattter);
 			}

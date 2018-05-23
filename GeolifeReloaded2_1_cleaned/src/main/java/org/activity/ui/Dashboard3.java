@@ -1,14 +1,21 @@
 package org.activity.ui;
 
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.activity.constants.Constant;
+import org.activity.constants.PathConstants;
+import org.activity.io.Serializer;
+import org.activity.objects.Timeline;
 import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartAppCanvas;
 import org.activity.plotting.TimelineChartAppGeneric;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -50,6 +57,7 @@ import javafx.stage.Stage;
 public class Dashboard3 extends Application
 {
 	Stage stage;
+	String pathToToyTimelines = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY21ED0.35STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTV/ToyTimelines21May.kryo";
 	// MenuBar menuBar;
 
 	// private final TableView treeView = new TableView();
@@ -65,6 +73,13 @@ public class Dashboard3 extends Application
 	{
 		long t0 = System.currentTimeMillis();
 		ScreenDetails.printScreensDetails();
+
+		PathConstants.intialise(Constant.For9kUsers);
+		Constant.initialise("./", "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
+				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
+				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap);
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+				.kryoDeSerializeThis(pathToToyTimelines);
 
 		// final Stage stageRef = stage;
 		// StageStyle stageStyle = StageStyle.DECORATED;
@@ -82,7 +97,7 @@ public class Dashboard3 extends Application
 
 		HBox hBoxMenus = new HBox(generateMenuBar());
 
-		TabPane tabPane = createTabs();
+		TabPane tabPane = createTabs(false, usersCleanedDayToyTimelines);
 		// tabPane.setPrefHeight(getHeight());
 
 		// VBox mainPane = new VBox();
@@ -107,9 +122,24 @@ public class Dashboard3 extends Application
 		Scene scene = new Scene(borderPane);// createTabs());// createContent(DataGenerator.getData2()));// , 270, 370);
 
 		scene.setFill(Color.TRANSPARENT);
-		scene.getStylesheets().add("./jfxtras/styles/jmetro8/GJMetroLightTheme.css");// gsheetNative.css");
 
-		// scene.getStylesheets().add(getClass().getResource("gsheet1.css").toExternalForm());
+		// disabled on May 21,
+		// ##scene.getStylesheets().add("./jfxtras/styles/jmetro8/GJMetroLightTheme.css");// gsheetNative.css");
+		// $$scene.getStylesheets().add("./org/activity/ui/resources/css/gsheetNative.css");
+		// System.out.println("Working Directory = " + System.getProperty("user.dir"));
+		// System.out.println("Dashboard3.class=" + Dashboard3.class);
+
+		final ObservableList<String> stylesheets = scene.getStylesheets();
+		stylesheets.addAll(// "./org/activity/ui/resources/css/jfoenix-main-demo.css",
+				// "./org/activity/ui/resources/css/gsheetNative.css",
+				// "./org/activity/ui/resources/css/jfoenix-design.css", // jfoenix-design.css",
+				"./org/activity/ui/resources/css/jfoenix-components.css",
+				"./org/activity/ui/resources/css/gsheetNative01.css");
+
+		// scene.getStylesheets().add("./org/activity/ui/resources/css/gsheetNative01.css");
+		// URL cssURL = Dashboard3.class.getResource("/css/gsheetNative.css");// .toExternalForm();
+		// System.out.println("cssURL=" + cssURL);
+
 		stage.setScene(scene);
 		stage.setTitle("Dashboard");
 		stage.setWidth(600);
@@ -132,32 +162,44 @@ public class Dashboard3 extends Application
 
 	/**
 	 * 
+	 * @param usersCleanedDayToyTimelines
+	 * @param useSyntheticData
 	 * @return
 	 */
-	private TabPane createTabs()
+	private TabPane createTabs(boolean useSyntheticData,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
 	{
 		TabPane tabPane = new TabPane();
 		List<Tab> tabsToAdd = new ArrayList<>();
 		try
 		{
-
-			///
-
 			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
-
 			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 50, 12, 5, 864000, 60 * 20, 10800);
 
-			long tTimeline0 = System.currentTimeMillis();
-			Tab timelineTabCircle = new Tab("timelineTabCircle Historical Timelines All Users");
-			TimelineChartAppGeneric tcC = new TimelineChartAppGeneric(timelineData, true, "ActivityCircle");
-			timelineTabCircle.setContent(tcC.getVbox());// timelinesVBox2);
-			timelineTabCircle.setClosable(true);
-			tabsToAdd.add(timelineTabCircle);
-			long tTimelinen = System.currentTimeMillis();
-			System.out.println("Time taken TimelineChartAppGeneric = " + (tTimelinen - tTimeline0) + " ms");
+			if (false)
+			{
+				long tTimeline0 = System.currentTimeMillis();
+				Tab timelineTabCircle = new Tab("(Synth-Circle) Historical Timelines All Users");
+				TimelineChartAppGeneric tcC = new TimelineChartAppGeneric(timelineData, true, "ActivityCircle");
+				timelineTabCircle.setContent(tcC.getVBox());// timelinesVBox2);
+				timelineTabCircle.setClosable(true);
+				tabsToAdd.add(timelineTabCircle);
+				long tTimelinen = System.currentTimeMillis();
+				System.out.println("Time taken TimelineChartAppGeneric = " + (tTimelinen - tTimeline0) + " ms");
+			}
+			long tTimelineReal0 = System.currentTimeMillis();
+			Tab timelineTabCircleReal = new Tab("(Toy-Circle) Historical Timelines All Users");
+			TimelineChartAppGeneric tcCReal = new TimelineChartAppGeneric(usersCleanedDayToyTimelines, true,
+					"ActivityCircle");
+			timelineTabCircleReal.setContent(tcCReal.getVBox());// timelinesVBox2);
+			timelineTabCircleReal.setClosable(true);
+			tabsToAdd.add(timelineTabCircleReal);
+			long tTimelineRealn = System.currentTimeMillis();
+			System.out
+					.println("Time taken TimelineChartAppGeneric real = " + (tTimelineRealn - tTimelineReal0) + " ms");
 
 			long tTimelineCanvas0 = System.currentTimeMillis();
-			Tab timelineTabCanvas = new Tab("timelineTabCanvas Historical Timelines All Users");
+			Tab timelineTabCanvas = new Tab("(Synth-Canvas) Historical Timelines All Users");
 			TimelineChartAppCanvas tcCanvas = new TimelineChartAppCanvas(timelineData, false);
 			timelineTabCanvas.setContent(tcCanvas.getVbox());// timelinesVBox2);
 			timelineTabCanvas.setClosable(true);
@@ -165,23 +207,24 @@ public class Dashboard3 extends Application
 			long tTimelineCanvasn = System.currentTimeMillis();
 			System.out.println("Time taken TimelineChartAppCanvas = " + (tTimelineCanvasn - tTimelineCanvas0) + " ms");
 
-			Tab timelineTabD = new Tab("timelineTabD Historical Timelines All Users");
-			TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(timelineData, true, "ActivityBox");
+			Tab timelineTabD = new Tab("(Synth-Box) Historical Timelines All Users");
+			TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(/* usersCleanedDayToyTimelines */ timelineData,
+					true, "ActivityBox");
 			// TODO: Issue: not scaling correctly with range change.
-			timelineTabD.setContent(tcD.getVbox());// timelinesVBox2);
+			timelineTabD.setContent(tcD.getVBox());// timelinesVBox2);
 			timelineTabD.setClosable(true);
 			tabsToAdd.add(timelineTabD);
 			if (false)
 			{
 				Tab timelineTabE = new Tab("timelineTabE Historical Timelines All Users");
 				TimelineChartAppGeneric tcE = new TimelineChartAppGeneric(timelineData, true, "LineChart");
-				timelineTabE.setContent(tcE.getVbox());// timelinesVBox2);
+				timelineTabE.setContent(tcE.getVBox());// timelinesVBox2);
 				timelineTabE.setClosable(true);
 				tabsToAdd.add(timelineTabE);
 
 				Tab timelineTabScattter = new Tab("timelineTabScattter Historical Timelines All Users");
 				TimelineChartAppGeneric tcScattter = new TimelineChartAppGeneric(timelineData, true, "ScatterChart");
-				timelineTabScattter.setContent(tcScattter.getVbox());// timelinesVBox2);
+				timelineTabScattter.setContent(tcScattter.getVBox());// timelinesVBox2);
 				timelineTabScattter.setClosable(true);
 				tabsToAdd.add(timelineTabScattter);
 			}
@@ -316,39 +359,44 @@ public class Dashboard3 extends Application
 
 			/***********************************************/
 			// $$ Start of disabled on Mar 17 2018
-			long ttOSMmap1 = System.currentTimeMillis();
-			Tab osmMapTab = new Tab("Locations OSM Map");
-			GluonOSMMap osmapPane = new GluonOSMMap();
 
-			String absFileNameForLatLonToReadAsMarker2 = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
-			String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
-			String absFileNameForLatLonToReadAsMarkerTargetLocs = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicNWLA_ByPids_Mar31.csv";
-			String absFileNameForLatLonToReadAsMarkerTargetLocsApril6 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
-			// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
+			boolean doMapPlot = false;
+			if (doMapPlot)
+			{
+				long ttOSMmap1 = System.currentTimeMillis();
+				Tab osmMapTab = new Tab("Locations OSM Map");
+				GluonOSMMap osmapPane = new GluonOSMMap();
 
-			// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_SlimmedForMap.csv";//
-			// gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
+				String absFileNameForLatLonToReadAsMarker2 = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
+				String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
+				String absFileNameForLatLonToReadAsMarkerTargetLocs = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicNWLA_ByPids_Mar31.csv";
+				String absFileNameForLatLonToReadAsMarkerTargetLocsApril6 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
+				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
 
-			// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago.csv";
+				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_SlimmedForMap.csv";//
+				// gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
 
-			String delimiter2 = ",";
+				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago.csv";
 
-			// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
-			// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
-			int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
-			BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerTargetLocsApril6, delimiter2,
-					latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 1), false, false);// Color.rgb(193,
-																											// 49,
-			// 34, 0.3));
+				String delimiter2 = ",";
 
-			// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
-			// latColIndex2, lonColIndex2, labelColIndex2, fillIndex, 6);// , Color.rgb(0, 105, 106, 0.3));
+				// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
+				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
+				int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
+				BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerTargetLocsApril6, delimiter2,
+						latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 1), false, false);// Color.rgb(193,
+																												// 49,
+				// 34, 0.3));
 
-			osmMapTab.setContent(bp2);
-			osmMapTab.setClosable(false);
-			tabsToAdd.add(osmMapTab);
-			long ttOSMmap2 = System.currentTimeMillis();
-			System.out.println("osm map = " + (ttOSMmap2 - ttOSMmap1));
+				// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
+				// latColIndex2, lonColIndex2, labelColIndex2, fillIndex, 6);// , Color.rgb(0, 105, 106, 0.3));
+
+				osmMapTab.setContent(bp2);
+				osmMapTab.setClosable(false);
+				tabsToAdd.add(osmMapTab);
+				long ttOSMmap2 = System.currentTimeMillis();
+				System.out.println("osm map = " + (ttOSMmap2 - ttOSMmap1));
+			}
 			// $$ End of disabled on Mar 17 2018
 			/***********************************************/
 

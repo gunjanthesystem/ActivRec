@@ -69,7 +69,8 @@ public class TimelinesAttributesExtractionCleaned1
 
 		// PopUps.showMessage("num of users for feature extraction = " + usersDayTimelines.size());
 		// WritingToFile.writeUsersDayTimelines(usersDayTimelines, "users", true, true, true);// users
-		TimelineStats.writeNumOfActivityObjectsInTimelines(usersDayTimelines, "NumOfActivityObjectsInCleanedTimelines");
+		TimelineStats.writeNumOfAOsInTimelines(usersDayTimelines,
+				pathToWrite + "NumOfActivityObjectsInCleanedTimelines.csv");
 
 		initialiseTimelineAttributeVectors(usersDayTimelines);
 		// $$ addDoubleFeatureToFeatureVectors(getSequenceEntropyAfterExpungingInvalids(usersDayTimelines),
@@ -461,7 +462,7 @@ public class TimelinesAttributesExtractionCleaned1
 			for (Map.Entry<Integer, LinkedHashMap<String, Double>> entryNGram : entryUser.getValue().entrySet())
 			{
 				WToFile.appendLineToFile("\tfor " + entryNGram.getKey() + "-Gram: " + "\n", fileNamePhrase);// +
-																													// entryUser.getKey());
+																											// entryUser.getKey());
 				WToFile.appendLineToFile("  features are:" + "\n", fileNamePhrase);
 				for (Map.Entry<String, Double> entryF : entryNGram.getValue().entrySet())
 				{

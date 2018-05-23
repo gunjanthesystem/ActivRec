@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -605,12 +605,15 @@ public class TimelineUtils
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesGiven)
 	{
 		long ct1 = System.currentTimeMillis();
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesUnmodView = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Collections
-				.unmodifiableMap(userDaytimelinesGiven);
+		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesUnmodView = (LinkedHashMap<String,
+		// LinkedHashMap<Date, Timeline>>) Collections
+		// .unmodifiableMap(userDaytimelinesGiven);
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesUnmodView = (userDaytimelinesGiven);
 		int numOfUsers = 5, minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7, numOfUniqueActs = 5,
 				minNumOfUniqueActIDsPerDay = 3;
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = new LinkedHashMap<>();
+
 		List<String> selectedUsers = userDaytimelinesUnmodView.keySet().stream().limit(numOfUsers)
 				.collect(Collectors.toList());
 
@@ -619,11 +622,19 @@ public class TimelineUtils
 			if (selectedUsers.contains(uEntry.getKey()))
 			{
 				LinkedHashMap<Date, Timeline> dayTimelinesForThisUser = uEntry.getValue();
+				// LinkedHashMap<Date, Timeline> dayTimelinesWithMinUniqueActIDs = new LinkedHashMap<>();
 
 				Map<Date, Timeline> dayTimelinesWithMinUniqueActIDs = dayTimelinesForThisUser.entrySet().stream()
 						.filter(dE -> getUniqueActIDsInTimeline(dE.getValue()).size() >= minNumOfUniqueActIDsPerDay)
-						.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+						.collect(Collectors.toMap(e -> (Date) e.getKey(), e -> (Timeline) e.getValue(), (e1, e2) -> e1,
+								LinkedHashMap::new));
 
+				// for (Entry<Date, Timeline> e : dayTimelinesForThisUser.entrySet())
+				// {
+				// Timeline t = e.getValue();
+				// if(e.getValue())
+				//
+				// }
 				// LinkedHashMap<Date, Timeline> selectedToyDayTimelinesForThisUser
 				// =dayTimelinesWithMinUniqueActIDs.collect(Collectors.toM)
 				// int numOfDayForThisUser = StatsUtils.randomInRange(minNumOfDaysPerUser, maxNumOfDaysPerUser);
@@ -649,7 +660,7 @@ public class TimelineUtils
 
 		// find the frequency count of each act for each user.
 
-		return null;
+		return toyTimelines;
 	}
 	// tt
 
@@ -2887,6 +2898,10 @@ public class TimelineUtils
 	////
 	/**
 	 * 
+	 * shouldBelongToSingleDay: false
+	 * <p>
+	 * shouldBelongToSingleUser: true
+	 * 
 	 * @param usersTimelines
 	 * @return LinkedHashMap<User ID as String, Timeline of the user with user id as integer as timeline id>
 	 */
@@ -4634,6 +4649,44 @@ public class TimelineUtils
 	}
 
 	/**
+	 * Extract unique location IDs per actID from the given timelines
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 */
+	public static TreeSet<Integer> getUniqueLocIDsPerActID(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
+	{
+		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
+		TreeMap<Integer, SortedSet<Integer>> actIDLocIDMap = new TreeMap<>();
+
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			{
+				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				{
+					e2.getValue().getActivityObjectsInTimeline().stream()
+							.forEach(ao -> uniqueLocIDs.addAll(ao.getLocationIDs()));
+				}
+			}
+			System.out.println("Inside getUniqueLocIDs: uniqueLocIDs.size()=" + uniqueLocIDs.size());
+			if (write)
+			{
+				// WritingToFile.writeToNewFile(uniqueLocIDs.toString(), );
+				WToFile.writeToNewFile(
+						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
+						Constant.getCommonPath() + "UniqueLocIDs.csv");// );
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return uniqueLocIDs;
+	}
+
+	/**
 	 * Extract unique location IDs from the given timelines
 	 * 
 	 * @param usersCleanedDayTimelines
@@ -4806,12 +4859,12 @@ public class TimelineUtils
 	 * 
 	 * @param usersCleanedDayTimelines
 	 * @param writeToFile
-	 * @param fileName
+	 * @param absFileNameToWrite
 	 * @return
 	 */
 	public static LinkedHashMap<String, TreeSet<Integer>> getUniquePDValPerUser(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile,
-			String fileName)
+			String absFileNameToWrite)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("User,#UniquePDVals\n");
@@ -4834,7 +4887,7 @@ public class TimelineUtils
 
 			if (writeToFile)
 			{
-				WToFile.writeToNewFile(sb.toString(), Constant.getOutputCoreResultsPath() + fileName);// "NumOfUniquePDValPerUser.csv");
+				WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);// "NumOfUniquePDValPerUser.csv");
 			}
 		}
 		catch (Exception e)

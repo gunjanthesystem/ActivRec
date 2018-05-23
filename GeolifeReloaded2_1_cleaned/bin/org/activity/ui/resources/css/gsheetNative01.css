@@ -1,0 +1,53 @@
+
+.root{
+    -fx-font-size: 18pt;
+    -fx-font-family: "Segoe UI Semilight", "Segoe UI Light", "Segoe UI", Helvetica, Arial, sans-serif;
+}
+/*
+.menu{
+  -fx-border-width: 2pt;
+  -fx-padding:5pt;
+}
+
+.button{
+    -fx-padding:10pt;
+    -fx-alignment: center;
+    -fx-margin: 20pt;
+    -fx-background-color: rgb(128,184,200);
+}
+
+*/
+.button-raised{
+   /* -fx-padding:10pt;*/
+    -fx-alignment: center;
+    -fx-margin: 30pt;
+    -fx-background-color: rgb(77,102,204);
+    -fx-text-fill: WHITE;
+}
+
+.button{
+   /* -fx-padding:10pt;*/
+    -fx-alignment: center;
+    -fx-margin: 30pt;
+    -fx-background-color: rgb(0,105,106);/*rgb(77,102,204);*/
+    -fx-text-fill: WHITE;
+}
+
+/*
+.vbox{
+    -fx-alignment: right;
+    -fx-spacing: 20pt;
+}
+*/
+.chart-line-symbol {
+    -fx-background-radius: 15px;
+ }
+
+ .chart-symbol  { /* cross */
+    -fx-background-color: CHART_COLOR_1;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-shape: "M2,0 L5,4 L8,0 L10,0 L10,2 L6,5 L10,8 L10,10 L8,10 L5,6 L2,10 L0,10 L0,8 L4,5 L0,2 L0,0 Z";
+}
+
+

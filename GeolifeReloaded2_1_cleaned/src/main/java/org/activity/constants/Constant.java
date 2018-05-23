@@ -345,6 +345,8 @@ public final class Constant
 	static String outputCoreResultsPath = "";
 
 	static String[] activityNames;
+	static Map<Integer, Integer> actIDNameIndexMap;// <actID, index of actID in activityNames array>
+
 	static Set<Integer> uniqueActivityIDs;
 	static Set<Integer> uniqueLocationIDs;
 
@@ -620,6 +622,8 @@ public final class Constant
 		{
 			editDistancesMemorizer = new EditDistanceMemorizer(Constant.editDistancesMemorizerBufferSize);
 		} // Constant.setDistanceUsed("HJEditDistance");
+
+		setActIDNameIndexMap(databaseName, Constant.getActivityNames());
 	}
 
 	//
@@ -660,6 +664,58 @@ public final class Constant
 	// }
 
 	// /////////
+	/**
+	 * Set actIDNameIndexMap which is map of <actID, index of actID in activityNames array>
+	 * 
+	 * @param databaseName
+	 * @param activityNames
+	 * @return
+	 */
+	private static boolean setActIDNameIndexMap(String databaseName, String[] activityNames)
+	{
+		Map<Integer, Integer> res = new LinkedHashMap<>(activityNames.length);
+
+		if (databaseName.equals("gowalla1"))
+		{
+			int index = 0;
+			for (String activityName : activityNames)
+			{ // since in gowalla dataset act name is act id
+				res.put(Integer.valueOf(activityName), index++);
+			}
+			actIDNameIndexMap = res;
+			return true;
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit("Not checked correctness for databaseName=" + databaseName);
+		}
+		return false;
+
+	}
+
+	/**
+	 * Get actIDNameIndexMap which is map of <actID, index of actID in activityNames array>
+	 * 
+	 * @return
+	 */
+	public static Map<Integer, Integer> getActIDNameIndexMap()
+	{
+		return actIDNameIndexMap;
+	}
+
+	/**
+	 * Get index of actID in activityNames.
+	 * <p>
+	 * This can be obtained from the map of <actID, index of actID in activityNames array>
+	 */
+	public static Integer getIndexOfActIDInActNames(Integer actID)
+	{
+		// System.out.println("actIDNameIndexMap.size()=" + actIDNameIndexMap.size() + " given actID=" + actID
+		// + " contains=" + actIDNameIndexMap.containsKey(actID));
+
+		// System.out.println(actIDNameIndexMap);
+		return actIDNameIndexMap.get(actID);
+	}
 
 	public static Classifier getClassifierUsed()
 	{
@@ -936,7 +992,8 @@ public final class Constant
 					activityNames = res.toArray(new String[res.size()]);
 
 					// StringBuilder sb = new StringBuilder();
-					System.out.println(Arrays.asList(activityNames).stream().collect(Collectors.joining(",")));
+					System.out.println("Constant.activityNames=\n"
+							+ Arrays.asList(activityNames).stream().collect(Collectors.joining(",")));
 
 					// activityNamesGowallaLabels = (ArrayList<String>) Arrays.asList(activityNames).stream()
 					// .map(a -> DomainConstants.catIDNameDictionary.get(a)).collect(Collectors.toList());

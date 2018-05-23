@@ -2,6 +2,7 @@ package org.activity.plotting;
 
 import java.util.Arrays;
 
+import org.activity.constants.Constant;
 import org.activity.ui.UIUtilityBox;
 
 import javafx.scene.CacheHint;
@@ -80,12 +81,16 @@ public class ActivityCircle extends Group
 		/// Start of moved from updateStyleClasses() to avoid repeated calls
 		getStyleClass().setAll("activitybox-box", seriesStyleClass, dataStyleClass);
 		actID = actExtraVals.getActivityID();
+		// System.out.println("actExtraVals= " + actExtraVals.toString());
 		setBackGround();
 	}
 
 	private void setBackGround()
 	{
-		circle.setFill(ColorPalette.getInsightSecondaryColor(actID % 11));
+		// circle.setFill(ColorPalette.getInsightSecondaryColor(actID % 11));
+		// circle.setFill(ColorPalette.getColors269Color(actID));
+		circle.setFill(ColorPalette.getColors269Color(Constant.getIndexOfActIDInActNames(actID)));// only works for real
+																									// data
 	}
 
 	/**

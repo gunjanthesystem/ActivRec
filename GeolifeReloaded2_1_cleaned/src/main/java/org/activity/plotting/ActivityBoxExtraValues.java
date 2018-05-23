@@ -62,11 +62,21 @@ public class ActivityBoxExtraValues
 		return startLatitude;
 	}
 
-	private static final String FORMAT = "ActivityBoxExtraValues{end=%f, ActName=%s, ActID=%f, locationName=%s}";
+	public double getEndLatitude()
+	{
+		return endLatitude;
+	}
+
+	private static final String FORMAT = "ActivityBoxExtraValues{end=%f, ActName=%s, ActID=%d, LocName=%s}";
 
 	@Override
 	public String toString()
 	{
-		return String.format(FORMAT, endTimestamp, activityName, activityID, locationName);
+		// String endTSString = new SimpleDateFormat("MM/dd/yy HH:mm:ss").format(endTimestamp);
+		//
+		// return "endTS="+endTimestamp+","
+		return "ajooba";
+		// return String.format(FORMAT, endTimestamp, activityName, activityID, locationName);
+
 	}
 }
