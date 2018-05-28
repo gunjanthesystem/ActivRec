@@ -132,7 +132,7 @@ public class Dashboard3 extends Application
 		final ObservableList<String> stylesheets = scene.getStylesheets();
 		stylesheets.addAll(// "./org/activity/ui/resources/css/jfoenix-main-demo.css",
 				// "./org/activity/ui/resources/css/gsheetNative.css",
-				// "./org/activity/ui/resources/css/jfoenix-design.css", // jfoenix-design.css",
+				"./org/activity/ui/resources/css/jfoenix-design.css", // jfoenix-design.css",
 				"./org/activity/ui/resources/css/jfoenix-components.css",
 				"./org/activity/ui/resources/css/gsheetNative01.css");
 

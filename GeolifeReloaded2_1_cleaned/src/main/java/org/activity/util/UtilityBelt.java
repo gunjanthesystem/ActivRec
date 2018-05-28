@@ -32,6 +32,8 @@ import org.activity.ui.PopUps;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 /**
  * 
  * @author gunjan
@@ -1949,6 +1951,36 @@ public class UtilityBelt
 			System.out.print("val =" + distEntry.getValue().getSecond());
 		}
 		System.out.println("\n-----------");
+	}
+
+	/**
+	 * Faster and lighter hashmap
+	 * 
+	 * @since 27 Feb
+	 * @param map
+	 * @return
+	 */
+	public static <T> Int2ObjectOpenHashMap<T> toFasterIntObjectOpenHashMap(Map<Integer, T> map)
+	{
+		System.out.println("Inside toFasterIntObjectOpenHashMap");
+		double m2 = PerformanceAnalytics.getUsedMemoryInMB();
+		long t1 = System.currentTimeMillis();
+	
+		Int2ObjectOpenHashMap<T> mapFASTHashMap = new Int2ObjectOpenHashMap<>(map.size());
+	
+		map.entrySet().stream().forEach(e -> mapFASTHashMap.put(e.getKey().intValue(), e.getValue()));
+		long t2 = System.currentTimeMillis();
+	
+		double m3 = PerformanceAnalytics.getUsedMemoryInMB();
+		System.out.println("---used mem:" + m3 + " MB");
+		System.out.println("****** change mem:" + (m3 - m2) + " MBS");
+	
+		System.out.println("\n\nTime taken to created mapFASTHashMap= " + (t2 - t1) + "ms");
+		System.out.println("map.size()= " + map.size());
+		System.out.println("mapFASTHashMap.size()= " + mapFASTHashMap.size());
+		System.out.println(
+				"mapFASTHashMap.keySet().equals(map.keySet())= " + mapFASTHashMap.keySet().equals(map.keySet()));
+		return mapFASTHashMap;
 	}
 
 }

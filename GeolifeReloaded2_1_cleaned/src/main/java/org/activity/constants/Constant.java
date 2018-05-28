@@ -7,6 +7,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -347,8 +349,17 @@ public final class Constant
 	static String[] activityNames;
 	static Map<Integer, Integer> actIDNameIndexMap;// <actID, index of actID in activityNames array>
 
-	static Set<Integer> uniqueActivityIDs;
-	static Set<Integer> uniqueLocationIDs;
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	private static Set<Integer> uniqueActivityIDs;
+	private static LinkedHashMap<String, TreeSet<Integer>> uniquePDValsPerUser;
+
+	private static Set<Integer> uniqueLocationIDs;
+	private static TreeMap<Integer, TreeSet<Integer>> uniqueLocationIDsPerActID;// actIDLocIDsMap;
+
+	// map of {userID,{unique actIDs for this user, {unique locIDs for this actID for this userID}}}
+	private static TreeMap<String, TreeMap<Integer, LinkedHashSet<Integer>>> userIDActIDLocIDsMap;
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	// public static TreeMap<Integer, Character> catIDCharCodeMap = null;
 	// public static TreeMap<Character, Integer> charCodeCatIDMap = null;
@@ -1011,14 +1022,48 @@ public final class Constant
 		}
 	}
 
+	public static LinkedHashMap<String, TreeSet<Integer>> getUniquePDValsPerUser()
+	{
+		return uniquePDValsPerUser;
+	}
+
+	public static void setUniquePDValsPerUser(LinkedHashMap<String, TreeSet<Integer>> uniquePDValsPerUser)
+	{
+		Constant.uniquePDValsPerUser = uniquePDValsPerUser;
+	}
+
+	/**
+	 * 
+	 * @return map of {userID,{unique actIDs for this user, {unique locIDs for this actID for this userID}}}
+	 */
+	public static TreeMap<String, TreeMap<Integer, LinkedHashSet<Integer>>> getUserIDActIDLocIDsMap()
+	{
+		return userIDActIDLocIDsMap;
+	}
+
+	/**
+	 * 
+	 * @param userIDActIDLocIDsMap
+	 */
+	public static void setUserIDActIDLocIDsMap(
+			TreeMap<String, TreeMap<Integer, LinkedHashSet<Integer>>> userIDActIDLocIDsMap)
+	{
+		Constant.userIDActIDLocIDsMap = userIDActIDLocIDsMap;
+	}
+
+	public static TreeMap<Integer, TreeSet<Integer>> getUniqueLocationIDsPerActID()
+	{
+		return uniqueLocationIDsPerActID;
+	}
+
+	public static void setUniqueLocationIDsPerActID(TreeMap<Integer, TreeSet<Integer>> uniqueLocationIDsPerActID)
+	{
+		Constant.uniqueLocationIDsPerActID = uniqueLocationIDsPerActID;
+	}
+
 	public static Set<Integer> getUniqueLocIDs()
 	{
 		return uniqueLocationIDs;
-	}
-
-	public static Set<Integer> getUniqueActivityIDs()
-	{
-		return uniqueActivityIDs;
 	}
 
 	public static void setUniqueLocIDs(Set<Integer> locIDs)
@@ -1045,6 +1090,11 @@ public final class Constant
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public static Set<Integer> getUniqueActivityIDs()
+	{
+		return uniqueActivityIDs;
 	}
 
 	public static void setUniqueActivityIDs(Set<Integer> activityIDs)

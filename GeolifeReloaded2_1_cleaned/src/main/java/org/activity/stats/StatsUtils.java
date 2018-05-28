@@ -1087,6 +1087,18 @@ public final class StatsUtils
 	}
 
 	/**
+	 * Return a random in within the given range
+	 * 
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	public static long randomInRange(long min, long max)
+	{
+		return (min + (int) (Math.random() * ((max - min) + 1)));
+	}
+
+	/**
 	 * Return a random in within the given range with bias for a particular integer value
 	 * 
 	 * @param min

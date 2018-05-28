@@ -24,6 +24,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
+import org.activity.generator.ToyTimelineUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
@@ -101,7 +102,7 @@ public class ControllerWithoutServer
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = createAllTimelines(
 					databaseName, Constant.toSerializeJSONArray, Constant.toDeSerializeJSONArray,
 					Constant.toCreateTimelines, Constant.toSerializeTimelines, Constant.toDeSerializeTimelines);
-			//PopUps.showMessage("here0");
+			// PopUps.showMessage("here0");
 			////////// ~~~~~~~~~~~~~~~~~`
 			//////////// for Gowalla start
 			// WritingToFile.writeUsersDayTimelinesSameFile(usersDayTimelinesOriginal, "usersDayTimelinesOriginal",
@@ -164,12 +165,12 @@ public class ControllerWithoutServer
 			// ,// "1001" };
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 			// String commonBasePath = Constant.getCommonPath();
-			//PopUps.showMessage("here01");
+			// PopUps.showMessage("here01");
 			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 					commonBasePath + "NumOfDaysPerUsersDayTimelines.csv");
 
 			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
-			//PopUps.showMessage("here02");
+			// PopUps.showMessage("here02");
 			///
 
 			///////////////////
@@ -180,11 +181,9 @@ public class ControllerWithoutServer
 			// $ "NOTZForCleanedSubsettedTraintestData");
 
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
-			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(usersCleanedDayTimelines, true));
-			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(usersCleanedDayTimelines, true));
-			TimelineUtils.getUniquePDValPerUser(usersCleanedDayTimelines, true, "NumOfUniquePDValPerUser.csv");
+			setDataVarietyConstants(usersCleanedDayTimelines, true);
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
-
+			System.exit(0);
 			if (false)// temporary
 			{
 				TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
@@ -222,8 +221,14 @@ public class ControllerWithoutServer
 			// // important curtain 1 start 21 Dec 2017 10 Feb 2017
 			DomainConstants.clearGowallaLocZoneIdMap();// to save memory
 
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = TimelineUtils
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = ToyTimelineUtils
 					.createToyUserTimelinesFromCheckinEntriesGowallaFaster1_V2(usersCleanedDayTimelines);
+
+			ToyTimelineUtils.createToyUserTimelinesManuallyGowallaFaster1_V2(usersCleanedDayTimelines.keySet(),
+					Constant.getUniqueActivityIDs(), Constant.getUniqueLocationIDsPerActID(),
+					Constant.getUniqueLocIDs(), PathConstants.commonPathToGowallaPreProcessedData);
+
+			if (true)
 			{
 				Serializer.kryoSerializeThis(usersCleanedDayToyTimelines,
 						Constant.getCommonPath() + "ToyTimelines21May.kryo");
@@ -383,6 +388,28 @@ public class ControllerWithoutServer
 
 	}
 
+	/**
+	 * Set and write UniqueLocIDs, UniqueLocIDsPerActID, UserIDActIDLocIDMap, UniqueActivityIDs, UniquePDValPerUser in
+	 * the given timelines
+	 * 
+	 * @param givenDayTimelines
+	 * @param write
+	 */
+	private void setDataVarietyConstants(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> givenDayTimelines,
+			boolean write)
+	{
+		Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(givenDayTimelines, write));
+		Constant.setUniqueLocationIDsPerActID(TimelineUtils.getUniqueLocIDsPerActID(givenDayTimelines, write));
+		Constant.setUserIDActIDLocIDsMap(TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write));
+		Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(givenDayTimelines, write));
+		Constant.setUniquePDValsPerUser(TimelineUtils.getUniquePDValPerUser(givenDayTimelines, write));
+	}
+
+	/**
+	 * Writes actID, Act names in the order foxed in Constant.activityNames
+	 * 
+	 * @param absFileNameToWrite
+	 */
 	private void writeActIDNamesInFixedOrder(String absFileNameToWrite)
 	{
 		String[] activityNames = Constant.getActivityNames();
@@ -1289,7 +1316,7 @@ public class ControllerWithoutServer
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllUserData.kryo");
 			// LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData = (LinkedHashMap<Integer,
 			// LocationGowalla>)//Serializer.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
-			Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData = toFasterIntObjectOpenHashMap(
+			Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData = UtilityBelt.toFasterIntObjectOpenHashMap(
 					(LinkedHashMap<Integer, LocationGowalla>) Serializer
 							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo"));
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
@@ -1671,36 +1698,6 @@ public class ControllerWithoutServer
 
 			return usersDayTimelinesOriginal;
 		}
-	}
-
-	/**
-	 * Faster and lighter hashmap
-	 * 
-	 * @since 27 Feb
-	 * @param map
-	 * @return
-	 */
-	public static <T> Int2ObjectOpenHashMap<T> toFasterIntObjectOpenHashMap(Map<Integer, T> map)
-	{
-		System.out.println("Inside toFasterIntObjectOpenHashMap");
-		double m2 = PerformanceAnalytics.getUsedMemoryInMB();
-		long t1 = System.currentTimeMillis();
-
-		Int2ObjectOpenHashMap<T> mapFASTHashMap = new Int2ObjectOpenHashMap<>(map.size());
-
-		map.entrySet().stream().forEach(e -> mapFASTHashMap.put(e.getKey().intValue(), e.getValue()));
-		long t2 = System.currentTimeMillis();
-
-		double m3 = PerformanceAnalytics.getUsedMemoryInMB();
-		System.out.println("---used mem:" + m3 + " MB");
-		System.out.println("****** change mem:" + (m3 - m2) + " MBS");
-
-		System.out.println("\n\nTime taken to created mapFASTHashMap= " + (t2 - t1) + "ms");
-		System.out.println("map.size()= " + map.size());
-		System.out.println("mapFASTHashMap.size()= " + mapFASTHashMap.size());
-		System.out.println(
-				"mapFASTHashMap.keySet().equals(map.keySet())= " + mapFASTHashMap.keySet().equals(map.keySet()));
-		return mapFASTHashMap;
 	}
 
 }
