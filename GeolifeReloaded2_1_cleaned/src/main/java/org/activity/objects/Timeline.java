@@ -54,7 +54,7 @@ public class Timeline implements Serializable
 	 */
 	public Timeline()
 	{
-
+		activityObjectsInTimeline = new ArrayList<>();
 	}
 
 	/**

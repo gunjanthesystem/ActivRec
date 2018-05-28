@@ -21,7 +21,8 @@ public class TimelineChartCircle extends XYChart<Number, String>
 {
 
 	// double heightOfActivityBox;
-boolean verbose=false;
+	boolean verbose = false;
+
 	/**
 	 * Construct a new TimelineChart with the given axis.
 	 *
@@ -66,8 +67,10 @@ boolean verbose=false;
 	@Override
 	protected void layoutPlotChildren()
 	{
-		System.out.println("\nTimelineChartCircle.layoutPlotChildren() called");
-
+		if (verbose)
+		{
+			System.out.println("\nTimelineChartCircle.layoutPlotChildren() called");
+		}
 		// we have nothing to layout if no data is present
 		if (getData() == null)
 		{

@@ -321,7 +321,7 @@ public class TimelineChartAppGeneric extends Pane
 				{
 					double translateX = scrollEvent.getDeltaX();
 					double translateY = scrollEvent.getDeltaY();
-					System.out.println("Scrolled, deltaX: " + translateX + ", deltaY: " + translateY);
+					// $$System.out.println("Scrolled, deltaX: " + translateX + ", deltaY: " + translateY);
 
 					if (Math.abs(translateX) > 0)
 					{
@@ -348,8 +348,8 @@ public class TimelineChartAppGeneric extends Pane
 					// calculate new position of the circle
 					double newXPosition = mousePressedInitX + dragX;
 
-					System.out.println("dragEventHandler active: getX(): " + me.getX() + ", getY(): " + me.getY()
-							+ " dragX= " + dragX + " dragY= " + dragY);
+					// $$ System.out.println("dragEventHandler active: getX(): " + me.getX() + ", getY(): " + me.getY()
+					// $$ + " dragX= " + dragX + " dragY= " + dragY);
 
 					if (Math.abs(dragX) > 0)
 					{
@@ -445,7 +445,7 @@ public class TimelineChartAppGeneric extends Pane
 		double sliderLow = hSlider.getLowValue();
 
 		// System.out.println("event.x=" + scrollEvent.getX());
-		System.out.println(String.format("(%.2f)", xAxis.getValueForDisplay(scrollEvent.getX())));
+		// System.out.println(String.format("(%.2f)", xAxis.getValueForDisplay(scrollEvent.getX())));
 		// yAxis.getValueForDisplay(scrollEvent.getY())));
 
 		double newCentreXPoint = (double) xAxis.getValueForDisplay(scrollEvent.getX());
@@ -531,6 +531,8 @@ public class TimelineChartAppGeneric extends Pane
 		hSlider.setMajorTickUnit(Math.max((maxXAxis - minXAxis) / 20, 1));
 		hSlider.setShowTickMarks(true);
 		hSlider.setShowTickLabels(true);
+		StringConverter converter2 = new EpochStringConverter();
+		hSlider.setLabelFormatter(converter2);
 
 		final Label caption = new Label("Select Time Range");
 		caption.setStyle("-fx-font-weight: bold");

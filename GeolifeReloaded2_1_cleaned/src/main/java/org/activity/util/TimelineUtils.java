@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -588,82 +587,7 @@ public class TimelineUtils
 		return userDaytimelines;
 	}
 
-	// tt
-	/**
-	 * To create toy timelines
-	 * 
-	 * Activity events ---> day timelines (later, not here)---> user timelines
-	 * <p>
-	 * <font color = red>make sure that the timezone is set appropriately</font>
-	 * </p>
-	 * 
-	 * @param allActivityEvents
-	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
-	 * @since May 14 2018
-	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createToyUserTimelinesFromCheckinEntriesGowallaFaster1_V2(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesGiven)
-	{
-		long ct1 = System.currentTimeMillis();
-		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesUnmodView = (LinkedHashMap<String,
-		// LinkedHashMap<Date, Timeline>>) Collections
-		// .unmodifiableMap(userDaytimelinesGiven);
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesUnmodView = (userDaytimelinesGiven);
-		int numOfUsers = 5, minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7, numOfUniqueActs = 5,
-				minNumOfUniqueActIDsPerDay = 3;
-
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = new LinkedHashMap<>();
-
-		List<String> selectedUsers = userDaytimelinesUnmodView.keySet().stream().limit(numOfUsers)
-				.collect(Collectors.toList());
-
-		for (Entry<String, LinkedHashMap<Date, Timeline>> uEntry : userDaytimelinesUnmodView.entrySet())
-		{
-			if (selectedUsers.contains(uEntry.getKey()))
-			{
-				LinkedHashMap<Date, Timeline> dayTimelinesForThisUser = uEntry.getValue();
-				// LinkedHashMap<Date, Timeline> dayTimelinesWithMinUniqueActIDs = new LinkedHashMap<>();
-
-				Map<Date, Timeline> dayTimelinesWithMinUniqueActIDs = dayTimelinesForThisUser.entrySet().stream()
-						.filter(dE -> getUniqueActIDsInTimeline(dE.getValue()).size() >= minNumOfUniqueActIDsPerDay)
-						.collect(Collectors.toMap(e -> (Date) e.getKey(), e -> (Timeline) e.getValue(), (e1, e2) -> e1,
-								LinkedHashMap::new));
-
-				// for (Entry<Date, Timeline> e : dayTimelinesForThisUser.entrySet())
-				// {
-				// Timeline t = e.getValue();
-				// if(e.getValue())
-				//
-				// }
-				// LinkedHashMap<Date, Timeline> selectedToyDayTimelinesForThisUser
-				// =dayTimelinesWithMinUniqueActIDs.collect(Collectors.toM)
-				// int numOfDayForThisUser = StatsUtils.randomInRange(minNumOfDaysPerUser, maxNumOfDaysPerUser);
-				//
-				// LinkedHashMap<Date, Timeline> selectedToyDayTimelinesForThisUser = new LinkedHashMap<>();
-				// // select days with atleast 3 unique actID and not more than 10 acts in the day;
-				// for (Entry<Date, Timeline> dayTimelineEntry : dayTimelinesForThisUser.entrySet())
-				// {
-				// Timeline dayTimeline = dayTimelineEntry.getValue();
-				// Set<Integer> uniqueActIDsInDayTimeline = dayTimeline.getActivityObjectsInTimeline().stream()
-				// .map(ao -> ao.getActivityID()).collect(Collectors.toSet());
-				//
-				// if (uniqueActIDsInDayTimeline.size() >= 3)
-				// {
-				// selectedToyDayTimelinesForThisUser.put(dayTimelineEntry.getKey(), dayTimelineEntry.getValue());
-				// // if(selectedToyDayTimelinesForThisUser.size()==)
-				// }
-				//
-				// }
-				toyTimelines.put(uEntry.getKey(), (LinkedHashMap<Date, Timeline>) dayTimelinesWithMinUniqueActIDs);
-			}
-		}
-
-		// find the frequency count of each act for each user.
-
-		return toyTimelines;
-	}
-	// tt
-
+	// mm
 	/**
 	 * INCOMPLETE
 	 * 
@@ -1198,6 +1122,7 @@ public class TimelineUtils
 		// Start of added on April 6 2018
 		System.out.println(" num of unique actIDs = " + uniqueActIDs.size());
 		System.out.println(" num of unique uniqueWorkingLevelActIDs = " + uniqueWorkingLevelActIDs.size());
+
 		WToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZuniqueActIDs.csv");
 		WToFile.writeToNewFile(
@@ -1410,18 +1335,19 @@ public class TimelineUtils
 				+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
 
 		// Start of added on April 6 2018
+		String phrase = "CinToAOConv_";
 		System.out.println(" num of unique zoneIDs = " + uniqueZoneIDs.size());
 		System.out.println(" num of unique actIDs = " + uniqueActIDs.size());
 		System.out.println(" num of unique uniqueWorkingLevelActIDs = " + uniqueWorkingLevelActIDs.size());
 		WToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
-				Constant.getOutputCoreResultsPath() + "ZZuniqueActIDs.csv");
+				Constant.getOutputCoreResultsPath() + phrase + "UniqueActIDs.csv");
 		WToFile.writeToNewFile(
 				uniqueWorkingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
-				Constant.getOutputCoreResultsPath() + "ZZuniqueWorkingLevelActIDs.csv");
+				Constant.getOutputCoreResultsPath() + phrase + "UniqueWorkingLevelActIDs.csv");
 		WToFile.writeToNewFile(actIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
-				Constant.getOutputCoreResultsPath() + "ZZactIDs.csv");
+				Constant.getOutputCoreResultsPath() + phrase + "ActIDs.csv");
 		WToFile.writeToNewFile(workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
-				Constant.getOutputCoreResultsPath() + "ZZworkingLevelActIDs.csv");
+				Constant.getOutputCoreResultsPath() + phrase + "WorkingLevelActIDs.csv");
 		// End of added on April 6 2018
 
 		WToFile.writeToNewFile(
@@ -4614,6 +4540,8 @@ public class TimelineUtils
 
 	/**
 	 * Extract unique location IDs from the given timelines
+	 * <p>
+	 * For daywise timelines as input
 	 * 
 	 * @param usersCleanedDayTimelines
 	 * @return
@@ -4624,11 +4552,11 @@ public class TimelineUtils
 		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
 		try
 		{
-			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
-				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
 				{
-					e2.getValue().getActivityObjectsInTimeline().stream()
+					dateEntry.getValue().getActivityObjectsInTimeline().stream()
 							.forEach(ao -> uniqueLocIDs.addAll(ao.getLocationIDs()));
 				}
 			}
@@ -4654,40 +4582,129 @@ public class TimelineUtils
 	 * @param usersCleanedDayTimelines
 	 * @return
 	 */
-	public static TreeSet<Integer> getUniqueLocIDsPerActID(
+	public static TreeMap<Integer, TreeSet<Integer>> getUniqueLocIDsPerActID(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
 	{
-		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
-		TreeMap<Integer, SortedSet<Integer>> actIDLocIDMap = new TreeMap<>();
+		// map of <act id, <list of locations>>
+		TreeMap<Integer, TreeSet<Integer>> actIDLocIDsMap = new TreeMap<>();
 
 		try
 		{
-			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
-				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
 				{
-					e2.getValue().getActivityObjectsInTimeline().stream()
-							.forEach(ao -> uniqueLocIDs.addAll(ao.getLocationIDs()));
+					Timeline timelineForThisDay = dateEntry.getValue();
+
+					for (ActivityObject ao : timelineForThisDay.getActivityObjectsInTimeline())
+					{
+						TreeSet<Integer> locationIDsForThisActID = actIDLocIDsMap.get(ao.getActivityID());
+						if (locationIDsForThisActID == null)
+						{
+							locationIDsForThisActID = new TreeSet<>();
+						}
+						locationIDsForThisActID.addAll(ao.getLocationIDs());
+						actIDLocIDsMap.put(ao.getActivityID(), locationIDsForThisActID);
+					}
 				}
 			}
-			System.out.println("Inside getUniqueLocIDs: uniqueLocIDs.size()=" + uniqueLocIDs.size());
+
 			if (write)
 			{
-				// WritingToFile.writeToNewFile(uniqueLocIDs.toString(), );
-				WToFile.writeToNewFile(
-						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
-						Constant.getCommonPath() + "UniqueLocIDs.csv");// );
+				StringBuilder sb = new StringBuilder("actID,NumOfLocIDs,listOfLocIDs\n");
+				for (Entry<Integer, TreeSet<Integer>> actEntry : actIDLocIDsMap.entrySet())
+				{
+					sb.append(actEntry.getKey() + "," + actEntry.getValue().size());
+					actEntry.getValue().stream().forEachOrdered(l -> sb.append("," + l));
+					sb.append("\n");
+					// actEntry.getValue().stream().collect(Collectors.joining(","));
+					// String.join(",", actEntry.getValue());
+					// sb.append(actEntry.getValue().stream().collect(Collectors.joining(",")) + "\n");
+				}
+				WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + "UniqueLocIDsPerActID.csv");// );
 			}
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		return uniqueLocIDs;
+		return actIDLocIDsMap;
 	}
 
+	//
 	/**
-	 * Extract unique location IDs from the given timelines
+	 * Extract {userID,{unique actIDs for this user, {unique locIDs for this actID for this userID}}}
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 * @since May 24 2018
+	 */
+	public static TreeMap<String, TreeMap<Integer, LinkedHashSet<Integer>>> getUserIDActIDLocIDMap(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
+	{
+		// map of {userID,{unique actIDs for this user, {unique locIDs for this actID for this userID}}}
+		TreeMap<String, TreeMap<Integer, LinkedHashSet<Integer>>> userIDActIDLocIDsMap = new TreeMap<>();
+
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				String userID = userEntry.getKey();
+
+				TreeMap<Integer, LinkedHashSet<Integer>> actIDsLocIDsForThisUser = new TreeMap<>();
+
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+				{
+					Timeline timelineForThisDay = dateEntry.getValue();
+
+					for (ActivityObject ao : timelineForThisDay.getActivityObjectsInTimeline())
+					{
+						Integer actID = ao.getActivityID();
+						LinkedHashSet<Integer> locIDsForThisActIDForThisUser = actIDsLocIDsForThisUser.get(actID);
+
+						if (locIDsForThisActIDForThisUser == null)
+						{
+							locIDsForThisActIDForThisUser = new LinkedHashSet<>();
+						}
+
+						locIDsForThisActIDForThisUser.addAll(ao.getLocationIDs());
+
+						actIDsLocIDsForThisUser.put(actID, locIDsForThisActIDForThisUser);
+					}
+				} // end of loop over date entries for this user
+				userIDActIDLocIDsMap.put(userID, actIDsLocIDsForThisUser);
+			}
+
+			if (write)
+			{
+				StringBuilder sb = new StringBuilder("UserID,ActID,NumOfLocIDs,ListOfLocIDs\n");
+				for (Entry<String, TreeMap<Integer, LinkedHashSet<Integer>>> userEntry : userIDActIDLocIDsMap
+						.entrySet())
+				{
+					String userID = userEntry.getKey();
+
+					for (Entry<Integer, LinkedHashSet<Integer>> actEntry : userEntry.getValue().entrySet())
+					{
+						sb.append(userID + "," + actEntry.getKey() + "," + actEntry.getValue().size() + "," + actEntry
+								.getValue().stream().map(i -> String.valueOf(i)).collect(Collectors.joining(","))
+								+ "\n");
+					}
+				}
+				WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + "UserIDActIDLocIDsMap.csv");// );
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return userIDActIDLocIDsMap;
+	}
+
+	//
+	/**
+	 * Extract unique location IDs from the given timelines.
+	 * <p>
+	 * For continous timelines as input
 	 * 
 	 * @param usersCleanedDayTimelines
 	 * @param write
@@ -4821,18 +4838,21 @@ public class TimelineUtils
 		TreeSet<Integer> uniqueActIDs = new TreeSet<>();
 		try
 		{
-			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 			{
-				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				for (Entry<Date, Timeline> dayTimelineEntry : userEntry.getValue().entrySet())
 				{
-					e2.getValue().getActivityObjectsInTimeline().stream()
+					dayTimelineEntry.getValue().getActivityObjectsInTimeline().stream()
 							.forEach(ao -> uniqueActIDs.add(ao.getActivityID()));
 				}
 			}
 			System.out.println("Inside getUniqueActivityIDs: uniqueActIDs.size()=" + uniqueActIDs.size());
+
 			if (write)
 			{
-				WToFile.writeToNewFile(uniqueActIDs.toString(), Constant.getCommonPath() + "uniqueActIDs.csv");
+				WToFile.writeToNewFile(
+						uniqueActIDs.stream().map(i -> String.valueOf(i)).collect(Collectors.joining("\n")),
+						Constant.getCommonPath() + "UniqueActIDs.csv");
 			}
 		}
 		catch (Exception e)
@@ -4859,15 +4879,13 @@ public class TimelineUtils
 	 * 
 	 * @param usersCleanedDayTimelines
 	 * @param writeToFile
-	 * @param absFileNameToWrite
 	 * @return
 	 */
 	public static LinkedHashMap<String, TreeSet<Integer>> getUniquePDValPerUser(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile,
-			String absFileNameToWrite)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("User,#UniquePDVals\n");
+		sb.append("User,NumOfUniquePDVals,UniquePDVals\n");
 		LinkedHashMap<String, TreeSet<Integer>> uniquePDValsPerUser = new LinkedHashMap<>();
 		try
 		{
@@ -4881,13 +4899,16 @@ public class TimelineUtils
 							.forEach(ao -> uniquePDValsForThisUser.addAll(ao.getPrimaryDimensionVal()));
 				}
 				uniquePDValsPerUser.put(user, uniquePDValsForThisUser);
-				sb.append(user + "," + uniquePDValsForThisUser.size() + "\n");
+
+				sb.append(user + "," + uniquePDValsForThisUser.size() + ","
+						+ uniquePDValsForThisUser.stream().map(i -> String.valueOf(i)).collect(Collectors.joining(","))
+						+ "\n");
 			}
 			// System.out.println("Inside getUniqueActivityIDs: uniqueActIDs.size()=" + uniqueActIDs.size());
 
 			if (writeToFile)
 			{
-				WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);// "NumOfUniquePDValPerUser.csv");
+				WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + "UniquePDValsPerUser.csv");// "NumOfUniquePDValPerUser.csv");
 			}
 		}
 		catch (Exception e)
