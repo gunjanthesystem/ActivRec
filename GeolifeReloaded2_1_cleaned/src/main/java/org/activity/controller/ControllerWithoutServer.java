@@ -181,9 +181,9 @@ public class ControllerWithoutServer
 			// $ "NOTZForCleanedSubsettedTraintestData");
 
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
-			setDataVarietyConstants(usersCleanedDayTimelines, true);
+			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true);
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
-			System.exit(0);
+			// System.exit(0);
 			if (false)// temporary
 			{
 				TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
@@ -221,31 +221,48 @@ public class ControllerWithoutServer
 			// // important curtain 1 start 21 Dec 2017 10 Feb 2017
 			DomainConstants.clearGowallaLocZoneIdMap();// to save memory
 
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = ToyTimelineUtils
-					.createToyUserTimelinesFromCheckinEntriesGowallaFaster1_V2(usersCleanedDayTimelines);
-
-			ToyTimelineUtils.createToyUserTimelinesManuallyGowallaFaster1_V2(usersCleanedDayTimelines.keySet(),
-					Constant.getUniqueActivityIDs(), Constant.getUniqueLocationIDsPerActID(),
-					Constant.getUniqueLocIDs(), PathConstants.commonPathToGowallaPreProcessedData);
-
-			if (true)
+			if (Constant.useToyTimelines)
 			{
-				Serializer.kryoSerializeThis(usersCleanedDayToyTimelines,
-						Constant.getCommonPath() + "ToyTimelines21May.kryo");
-				System.exit(0);
-			}
+				boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;
+				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines = null;
+				if (createToyTimelines)
+				{
+					// Create Toy timelines by sampling
+					// $$ ToyTimelineUtils.createToyTimelinesSamplingCinEntriesGowalla(usersCleanedDayTimelines);
+					// creating toy timelines manually
+					usersToyDayTimelines = ToyTimelineUtils.createToyTimelinesManuallyGowalla(
+							usersCleanedDayTimelines.keySet(), Constant.getUniqueActivityIDs(),
+							Constant.getUniqueLocationIDsPerActID(), Constant.getUniqueLocIDs(),
+							PathConstants.commonPathToGowallaPreProcessedData);
+				}
+				if (serialiseToyTimelines)
+				{
+					Serializer.kryoSerializeThis(usersToyDayTimelines,
+							Constant.getCommonPath() + "ToyTimelinesManually28May.kryo");
+				}
+				if (deserialiseToyTimelines)
+				{
+					usersToyDayTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+							.kryoDeSerializeThis(PathConstants.pathToToyTimelines);
+				}
+				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", false);
+				// PopUps.showMessage("After toy timelines creation!!");
+				// $$Disabled on May29 2018 TimelineStats.timelineStatsController(usersCleanedDayToyTimelines);
+				// PopUps.showMessage("here");
+				WToFile.writeUsersDayTimelinesSameFile(usersToyDayTimelines, "usersToyDayTimelines", false, false,
+						false, "GowallaUserDayToyTimelines.csv", commonBasePath);
+				// PopUps.showMessage("here2");
+				TimelineStats.timelineStatsController(usersToyDayTimelines);
+				// System.exit(0);
+				// End of Moved here on 18 May 2018
 
-			TimelineStats.timelineStatsController(usersCleanedDayToyTimelines);
-			PopUps.showMessage("here");
-			WToFile.writeUsersDayTimelinesSameFile(usersCleanedDayToyTimelines, "usersCleanedDayToyTimelines", false,
-					false, false, "GowallaUserDayToyTimelines.csv", commonBasePath);
-			PopUps.showMessage("here2");
-			// $$TimelineStats.timelineStatsController(usersCleanedDayTimelines);
-			System.exit(0);
-			// End of Moved here on 18 May 2018
+				// make the usersCleanedDayTimelines point to the toy timelines
+				usersCleanedDayTimelines = usersToyDayTimelines;
+			}
 
 			if (Constant.For9kUsers)
 			{
+				System.out.println("For9kUsers :");
 				sampleUsersExecuteExperimentsFor9kUsers(commonBasePath, usersCleanedDayTimelines,
 						Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor));
 				// System.exit(0);
@@ -254,6 +271,7 @@ public class ControllerWithoutServer
 			{
 				if (Constant.useRandomlySampled100Users)
 				{
+					System.out.println("useRandomlySampled100Users :");
 					List<String> sampledUserIndicesStr = ReadingFromFile
 							// .oneColumnReaderString("./dataToRead/RandomlySample100Users/Mar1_2018.csv", ",", 0,
 							// .oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
@@ -267,6 +285,7 @@ public class ControllerWithoutServer
 				}
 				else if (Constant.runForAllUsersAtOnce)
 				{
+					System.out.println("runForAllUsersAtOnce :");
 					if (true)
 					{
 						int numOfUsers = usersCleanedDayTimelines.size();
@@ -389,20 +408,35 @@ public class ControllerWithoutServer
 	}
 
 	/**
-	 * Set and write UniqueLocIDs, UniqueLocIDsPerActID, UserIDActIDLocIDMap, UniqueActivityIDs, UniquePDValPerUser in
-	 * the given timelines
+	 * Set and/or write UniqueLocIDs, UniqueLocIDsPerActID, UserIDActIDLocIDMap, UniqueActivityIDs, UniquePDValPerUser
+	 * in the given timelines
 	 * 
 	 * @param givenDayTimelines
 	 * @param write
+	 * @param labelPhrase
+	 * @param setConstantVariables
 	 */
-	private void setDataVarietyConstants(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> givenDayTimelines,
-			boolean write)
+	public static void setDataVarietyConstants(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> givenDayTimelines,
+			boolean write, String labelPhrase, boolean setConstantVariables)
 	{
-		Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(givenDayTimelines, write));
-		Constant.setUniqueLocationIDsPerActID(TimelineUtils.getUniqueLocIDsPerActID(givenDayTimelines, write));
-		Constant.setUserIDActIDLocIDsMap(TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write));
-		Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(givenDayTimelines, write));
-		Constant.setUniquePDValsPerUser(TimelineUtils.getUniquePDValPerUser(givenDayTimelines, write));
+		if (setConstantVariables)
+		{
+			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(givenDayTimelines, write, labelPhrase));
+			Constant.setUniqueLocationIDsPerActID(
+					TimelineUtils.getUniqueLocIDsPerActID(givenDayTimelines, write, labelPhrase));
+			Constant.setUserIDActIDLocIDsMap(
+					TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write, labelPhrase));
+			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(givenDayTimelines, write, labelPhrase));
+			Constant.setUniquePDValsPerUser(TimelineUtils.getUniquePDValPerUser(givenDayTimelines, write, labelPhrase));
+		}
+		else
+		{
+			TimelineUtils.getUniqueLocIDs(givenDayTimelines, write, labelPhrase);
+			TimelineUtils.getUniqueLocIDsPerActID(givenDayTimelines, write, labelPhrase);
+			TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write, labelPhrase);
+			TimelineUtils.getUniqueActivityIDs(givenDayTimelines, write, labelPhrase);
+			TimelineUtils.getUniquePDValPerUser(givenDayTimelines, write, labelPhrase);
+		}
 	}
 
 	/**
@@ -1316,8 +1350,8 @@ public class ControllerWithoutServer
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllUserData.kryo");
 			// LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData = (LinkedHashMap<Integer,
 			// LocationGowalla>)//Serializer.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
-			Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData = UtilityBelt.toFasterIntObjectOpenHashMap(
-					(LinkedHashMap<Integer, LocationGowalla>) Serializer
+			Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData = UtilityBelt
+					.toFasterIntObjectOpenHashMap((LinkedHashMap<Integer, LocationGowalla>) Serializer
 							.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo"));
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllLocationData.kryo");
 

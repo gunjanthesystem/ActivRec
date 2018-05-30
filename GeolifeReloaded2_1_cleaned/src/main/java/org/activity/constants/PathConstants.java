@@ -19,6 +19,7 @@ public class PathConstants
 	public static String pathToLocationTimezoneInfo;
 	public static String pathToSerialisedGowallaLocZoneIdMap;
 	// ./dataToRead/Feb26/UniqueLocationObjects5DaysTrainTestWithTZUsingPy.csv
+	public static final String pathToToyTimelines = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY30Toy/ToyTimelinesManually28May.kryo";
 
 	/**
 	 * Set paths to serialised datasets

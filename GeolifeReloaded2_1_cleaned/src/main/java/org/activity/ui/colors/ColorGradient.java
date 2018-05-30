@@ -1,4 +1,4 @@
-package org.activity.ui.temp;
+package org.activity.ui.colors;
 
 import java.awt.Color;
 

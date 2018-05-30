@@ -4544,10 +4544,12 @@ public class TimelineUtils
 	 * For daywise timelines as input
 	 * 
 	 * @param usersCleanedDayTimelines
+	 * @param labelPhrase
 	 * @return
 	 */
 	public static TreeSet<Integer> getUniqueLocIDs(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write,
+			String labelPhrase)
 	{
 		TreeSet<Integer> uniqueLocIDs = new TreeSet<>();
 		try
@@ -4566,7 +4568,7 @@ public class TimelineUtils
 				// WritingToFile.writeToNewFile(uniqueLocIDs.toString(), );
 				WToFile.writeToNewFile(
 						uniqueLocIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
-						Constant.getCommonPath() + "UniqueLocIDs.csv");// );
+						Constant.getCommonPath() + labelPhrase + "UniqueLocIDs.csv");// );
 			}
 		}
 		catch (Exception e)
@@ -4580,10 +4582,12 @@ public class TimelineUtils
 	 * Extract unique location IDs per actID from the given timelines
 	 * 
 	 * @param usersCleanedDayTimelines
+	 * @param labelPhrase
 	 * @return
 	 */
 	public static TreeMap<Integer, TreeSet<Integer>> getUniqueLocIDsPerActID(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write,
+			String labelPhrase)
 	{
 		// map of <act id, <list of locations>>
 		TreeMap<Integer, TreeSet<Integer>> actIDLocIDsMap = new TreeMap<>();
@@ -4621,7 +4625,8 @@ public class TimelineUtils
 					// String.join(",", actEntry.getValue());
 					// sb.append(actEntry.getValue().stream().collect(Collectors.joining(",")) + "\n");
 				}
-				WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + "UniqueLocIDsPerActID.csv");// );
+				WToFile.writeToNewFile(sb.toString(),
+						Constant.getCommonPath() + labelPhrase + "UniqueLocIDsPerActID.csv");// );
 			}
 		}
 		catch (Exception e)
@@ -4636,11 +4641,13 @@ public class TimelineUtils
 	 * Extract {userID,{unique actIDs for this user, {unique locIDs for this actID for this userID}}}
 	 * 
 	 * @param usersCleanedDayTimelines
+	 * @param labelPhrase
 	 * @return
 	 * @since May 24 2018
 	 */
 	public static TreeMap<String, TreeMap<Integer, LinkedHashSet<Integer>>> getUserIDActIDLocIDMap(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write,
+			String labelPhrase)
 	{
 		// map of {userID,{unique actIDs for this user, {unique locIDs for this actID for this userID}}}
 		TreeMap<String, TreeMap<Integer, LinkedHashSet<Integer>>> userIDActIDLocIDsMap = new TreeMap<>();
@@ -4690,7 +4697,8 @@ public class TimelineUtils
 								+ "\n");
 					}
 				}
-				WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + "UserIDActIDLocIDsMap.csv");// );
+				WToFile.writeToNewFile(sb.toString(),
+						Constant.getCommonPath() + labelPhrase + "UserIDActIDLocIDsMap.csv");// );
 			}
 		}
 		catch (Exception e)
@@ -4830,10 +4838,12 @@ public class TimelineUtils
 	 * 
 	 * @param usersCleanedDayTimelines
 	 * @param write
+	 * @param labelPhrase
 	 * @return
 	 */
 	public static TreeSet<Integer> getUniqueActivityIDs(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write,
+			String labelPhrase)
 	{
 		TreeSet<Integer> uniqueActIDs = new TreeSet<>();
 		try
@@ -4852,7 +4862,7 @@ public class TimelineUtils
 			{
 				WToFile.writeToNewFile(
 						uniqueActIDs.stream().map(i -> String.valueOf(i)).collect(Collectors.joining("\n")),
-						Constant.getCommonPath() + "UniqueActIDs.csv");
+						Constant.getCommonPath() + labelPhrase + "UniqueActIDs.csv");
 			}
 		}
 		catch (Exception e)
@@ -4879,10 +4889,12 @@ public class TimelineUtils
 	 * 
 	 * @param usersCleanedDayTimelines
 	 * @param writeToFile
+	 * @param labelPhrase
 	 * @return
 	 */
 	public static LinkedHashMap<String, TreeSet<Integer>> getUniquePDValPerUser(
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile,
+			String labelPhrase)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("User,NumOfUniquePDVals,UniquePDVals\n");
@@ -4908,7 +4920,8 @@ public class TimelineUtils
 
 			if (writeToFile)
 			{
-				WToFile.writeToNewFile(sb.toString(), Constant.getCommonPath() + "UniquePDValsPerUser.csv");// "NumOfUniquePDValPerUser.csv");
+				WToFile.writeToNewFile(sb.toString(),
+						Constant.getCommonPath() + labelPhrase + "UniquePDValsPerUser.csv");// "NumOfUniquePDValPerUser.csv");
 			}
 		}
 		catch (Exception e)

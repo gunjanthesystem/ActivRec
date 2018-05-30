@@ -13,8 +13,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.activity.constants.Constant;
 import org.activity.io.Serializer;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Timeline;
@@ -24,6 +27,7 @@ import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
+import org.apache.commons.math3.distribution.EnumeratedRealDistribution;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -37,7 +41,7 @@ public class ToyTimelineUtils
 
 	// tt
 	/**
-	 * To create toy timelines
+	 * To create toy timelines by sampling from CHeckinEntries
 	 * 
 	 * Activity events ---> day timelines (later, not here)---> user timelines
 	 * <p>
@@ -48,7 +52,7 @@ public class ToyTimelineUtils
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 * @since May 14 2018
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createToyUserTimelinesFromCheckinEntriesGowallaFaster1_V2(
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createToyTimelinesSamplingCinEntriesGowalla(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDaytimelinesGiven)
 	{
 		long ct1 = System.currentTimeMillis();
@@ -129,25 +133,28 @@ public class ToyTimelineUtils
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 * @since May 24 2018
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createToyUserTimelinesManuallyGowallaFaster1_V2(
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createToyTimelinesManuallyGowalla(
 			Set<String> uniqueUserIDs, Set<Integer> uniqueActivityIDs,
 			TreeMap<Integer, TreeSet<Integer>> uniqueLocationIDsPerActID, Set<Integer> uniqueLocIDs,
 			String pathToGowallaPreProcessedData)
 	{
 		long ct1 = System.currentTimeMillis();
 
+		// PopUps.showMessage("Inside createToyTimelinesManuallyGowalla");
+		System.out.println("Inside createToyTimelinesManuallyGowalla");
 		Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData = UtilityBelt
 				.toFasterIntObjectOpenHashMap((LinkedHashMap<Integer, LocationGowalla>) Serializer
 						.kryoDeSerializeThis(pathToGowallaPreProcessedData + "mapForAllLocationData.kryo"));
 
-		int numOfUsers = 5, numOfUniqueActs = 5;// minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7,
+		int numOfUsers = 5, numOfUniqueActs = 7;// minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7,
 		// minNumOfUniqueActIDsPerDay = 3, maxNumOfUniqueActIDsPerDay = 5;
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = new LinkedHashMap<>(numOfUsers);
 
 		// Selected userIDs
 		List<String> selectedUserIDs = uniqueUserIDs.stream().limit(numOfUsers).collect(Collectors.toList());
-		int[] userIndices = new int[] { 0, 1, 2, 3, 4 };// IntStream.rangeClosed(0, numOfUsers).toArray();//1,2,3,4,5
+		// int[] userIndices = new int[] { 0, 1, 2, 3, 4 };// IntStream.rangeClosed(0, numOfUsers).toArray();//1,2,3,4,5
+		int[] userIndices = IntStream.range(0, numOfUsers).toArray();// 1,2,3,4,5
 		Sanity.eq(numOfUsers, userIndices.length,
 				"numOfUsers= " + numOfUsers + " != userIndices.length= " + userIndices.length);
 
@@ -158,19 +165,32 @@ public class ToyTimelineUtils
 		List<Integer> uniqueActIDsSelected = uniqueActIDsList.stream().limit(numOfUniqueActs)
 				.collect(Collectors.toList());
 
+		System.out.println("uniqueActIDsSelected = " + uniqueActIDsSelected);
 		// Random r = new Random();
 		// r.nextInt(numOfUniqueActs);
 
 		// Distribution for number of acts per day
 		int[] numOfActsPerDay = new int[] { 3, 4, 5, 8 };
-		double[] pmdForNumOfActsPerDay = new double[] { 0.2, 0.4, 0.25, 0.15 };// probability mass distribution
+		double[] pmdForNumOfActsPerDay = new double[] { 0.15, 0.4, 0.3, 0.15 };// probability mass distribution
 		EnumeratedIntegerDistribution distriForNumOfActsPerDay = new EnumeratedIntegerDistribution(numOfActsPerDay,
 				pmdForNumOfActsPerDay);
 
+		double[] valsForPmdForActID = new double[] { 0.05, 0.20, 0.20, 0.35, 0.25 };
+		double[] pmdForValsForPmdForActID = new double[] { 0.15, 0.2, 0.2, 0.3, 0.15 };// probability mass distribution
+		EnumeratedRealDistribution distriForValsForPmdForActID = new EnumeratedRealDistribution(valsForPmdForActID,
+				pmdForValsForPmdForActID);
+
+		int[] indexOfRandomActID = IntStream.range(0, numOfUniqueActs).toArray();
+		double[] pmdForIndexOfRandomActID = distriForValsForPmdForActID.sample(numOfUniqueActs);
+		EnumeratedIntegerDistribution distriForIndexOfRandomActID = new EnumeratedIntegerDistribution(
+				indexOfRandomActID, pmdForIndexOfRandomActID);
+
 		int[] numOfDaysForUserIndices = new int[] { 5, 3, 5, 6, 8 };
 
-		long minStartTimestampInSecs = 1328119200;// Wednesday, February 1, 2012 6:00:00 PM
-		long maxStartTimestampInSecs = 1359741600;// Friday, February 1, 2013 6:00:00 PM
+		long minStartTimestampInms = 1330930800000L;// Monday, March 5, 2012 7:00:00 AM
+		// long today = 1527533804000l;
+		System.out.println("minStartTimestampInSecs= " + new Timestamp(minStartTimestampInms));
+		// long maxStartTimestampInSecs = 1359741600;// Friday, February 1, 2013 6:00:00 PM
 
 		int[] timeGapsInMins = new int[] { 10, 20, 60 * 1, 60 * 2, 60 * 3 };
 		double[] pmdForTimeGapsInMins = new double[] { 0.10, 0.20, 0.20, 0.25, 0.25 };
@@ -186,37 +206,57 @@ public class ToyTimelineUtils
 		{
 			String userID = selectedUserIDs.get(u);
 			int numOfDays = numOfDaysForUserIndices[u];
-			// get a random start date from min to +10 days
-			long startTSForThisUser = minStartTimestampInSecs + StatsUtils.randomInRange(0, 10 * 24 * 60 * 60);
 
+			// get a random start date from min to +10 days
+			// long startTSForThisUser = minStartTimestampInms;// + 1000 * StatsUtils.randomInRange(0, 10 * 24 * 60 *
+			// 60);
 			LinkedHashMap<Date, Timeline> toyDayTimelinesForThisUser = new LinkedHashMap<>();
 
-			long startTSForThisUserThisDay = startTSForThisUser;
+			// long startTSForThisUserThisDay = startTSForThisUser;
+			long timestampOfPrevAOThisUser = -99;
+			// start timestamp for this user's data
+			long timestampOfCurrentAOThisUser = minStartTimestampInms + 1000 * 60 * StatsUtils.randomInRange(0, 200);
 
 			for (int d = 0; d < numOfDays; d++)
 			{
+				// Timeline timelineForThisDay = new Timeline(new ArrayList<>(), true, true);
+				ArrayList<ActivityObject> aosForThisDay = new ArrayList<>();
+				// timelineForThisDay.isShouldBelongToSingleDay()
 				// Date dateForThisUserThisDay = DateTimeUtils.getDate(new Timestamp(startTSForThisUserThisDay));
 				// long maxAllowableTSForThisDay = dateForThisUserThisDay.getTime();
 				int numOfActsInThisDay = distriForNumOfActsPerDay.sample();
+				// long startTSForCurrentAO = startTSForThisUserThisDay + (d * 24 * 60 * 60 * 1000);
+				if ((timestampOfPrevAOThisUser > 0)
+						&& (DateTimeUtils.isSameDate(new Timestamp(timestampOfPrevAOThisUser),
+								new Timestamp(timestampOfCurrentAOThisUser))))
+				{// move timestampOfCurrentAOThisUser to next day
+					timestampOfCurrentAOThisUser = DateTimeUtils.getSucceedingDate(timestampOfCurrentAOThisUser);
+				}
 
-				Timeline timelineForThisDay = new Timeline();
+				// if weekend then, skip to next weekday
+				if (DateTimeUtils.isWeekend(timestampOfCurrentAOThisUser))
+				{
+					timestampOfCurrentAOThisUser = DateTimeUtils.getSucceedingWeekDate(timestampOfCurrentAOThisUser);
+				}
 
-				Date dateForThisUserThisDay = new Date(startTSForThisUserThisDay);
+				Date dateForThisUserThisDay = new Date(timestampOfCurrentAOThisUser);
+				System.out.println("startTSForCurrentAO = " + new Timestamp(timestampOfCurrentAOThisUser));
 
-				long startTSForCurrentAO = startTSForThisUserThisDay;
-				int randomActIDForCurrentAO = StatsUtils.randomInRangeWithBias(0, numOfUniqueActs - 1, 0, .35);
-
+				int randomActIDForCurrentAO = uniqueActIDsSelected.get(distriForIndexOfRandomActID.sample());
+				// .get(StatsUtils.randomInRangeWithBias(0, numOfUniqueActs - 1, 0, .15));
+				// System.out.println("randomActIDForCurrentAO=" + randomActIDForCurrentAO);
 				// get location for this actID;
-				List<Integer> locIDsForCurrentActID = new ArrayList<>(
-						uniqueLocationIDsPerActID.get(randomActIDForCurrentAO));
+				TreeSet<Integer> locIDsForThisActID = uniqueLocationIDsPerActID.get(randomActIDForCurrentAO);
+				List<Integer> locIDsForCurrentActID = new ArrayList<>(locIDsForThisActID);
+
 				int randomLocIndex = StatsUtils.randomInRange(0, locIDsForCurrentActID.size() - 1);
 				int randomLocIDForCurrentAO = locIDsForCurrentActID.get(randomLocIndex);
-				long prevTS = -99;
 
 				for (int a = 0; a < numOfActsInThisDay; a++)
 				{
 					// choose next actID randomly
-					int randomActIDForNextAO = StatsUtils.randomInRangeWithBias(0, numOfUniqueActs - 1, 0, .35);
+					int randomActIDForNextAO = uniqueActIDsSelected.get(distriForIndexOfRandomActID.sample());
+					// .get(StatsUtils.randomInRangeWithBias(0, numOfUniqueActs - 1, 0, .35));
 
 					// get location for next actID;
 					List<Integer> locIDsForNextActID = new ArrayList<>(
@@ -224,17 +264,20 @@ public class ToyTimelineUtils
 					int randomLocIDForNextAO = locIDsForNextActID
 							.get(StatsUtils.randomInRange(0, locIDsForNextActID.size() - 1));
 
-					long startTSForNextAO = startTSForCurrentAO + distriForTimeGapsInMins.sample();
+					long timestampOfNextAOForThisUser = timestampOfCurrentAOThisUser
+							+ distriForTimeGapsInMins.sample() * 60 * 1000;
 
 					String locationName = "", startLatitude = "", startLongitude = "", startAltitude = "";
-					double distanceInMFromPrev = distriForDistGapsInKMs.sample();
-					long durationInSecFromPrev = prevTS < 0 ? 0 : (startTSForCurrentAO - prevTS);
+					double distanceInMFromPrev = 1000 * distriForDistGapsInKMs.sample();
+					long durationInSecFromPrev = timestampOfPrevAOThisUser < 0 ? 0
+							: (timestampOfCurrentAOThisUser - timestampOfPrevAOThisUser) / 1000;
 
 					double distanceInMFromNext = 0;
 					long durationInSecFromNext = 0;
 					ZoneId currentZoneId = ZoneId.of("UTC");// added on April 8 2018
 
-					ArrayList<Integer> locIDs = new ArrayList<Integer>(randomLocIDForCurrentAO);
+					ArrayList<Integer> locIDs = new ArrayList<Integer>();
+					locIDs.add(randomLocIDForCurrentAO);
 					int numOfLocIDs = locIDs.size();
 					int photos_count = 0, checkins_count = 0, users_count = 0, radius_meters = 0, highlights_count = 0,
 							items_count = 0, max_items_count = 0;
@@ -273,31 +316,34 @@ public class ToyTimelineUtils
 					}
 
 					ActivityObject ao = new ActivityObject(randomActIDForCurrentAO, locIDs,
-							String.valueOf(randomActIDForCurrentAO), locationName, new Timestamp(startTSForCurrentAO),
-							startLatitude, startLongitude, startAltitude, userID, photos_count, checkins_count,
-							users_count, radius_meters, highlights_count, items_count, max_items_count,
-							String.valueOf(randomActIDForCurrentAO), distanceInMFromPrev, durationInSecFromPrev,
-							currentZoneId, distanceInMFromNext, durationInSecFromNext);
+							String.valueOf(randomActIDForCurrentAO), locationName,
+							new Timestamp(timestampOfCurrentAOThisUser), startLatitude, startLongitude, startAltitude,
+							userID, photos_count, checkins_count, users_count, radius_meters, highlights_count,
+							items_count, max_items_count, String.valueOf(randomActIDForCurrentAO), distanceInMFromPrev,
+							durationInSecFromPrev, currentZoneId, distanceInMFromNext, durationInSecFromNext);
 
-					timelineForThisDay.appendAO(ao);
+					// timelineForThisDay.appendAO(ao);
+					aosForThisDay.add(ao);
 
-					prevTS = startTSForCurrentAO;
-					startTSForCurrentAO = startTSForNextAO;
+					timestampOfPrevAOThisUser = timestampOfCurrentAOThisUser;
+					timestampOfCurrentAOThisUser = timestampOfNextAOForThisUser;
+					timestampOfNextAOForThisUser = -1;
+
 					randomActIDForCurrentAO = randomActIDForNextAO;
 					randomLocIDForCurrentAO = randomLocIDForNextAO;
 
-					startTSForThisUserThisDay = startTSForNextAO;
+					// startTSForThisUserThisDay = startTSForNextAO;
 
 					// if new startTS goes beyond the current day, stop addind AOs for this day and move to next day.
-					if (DateTimeUtils.isSameDate(new Timestamp(startTSForNextAO),
-							new Timestamp(startTSForThisUserThisDay)) == false)
+					// if the new prev (which was current) and the new current (which was next) are not the same day
+					// then stop adding AOs and move to next day
+					if (DateTimeUtils.isSameDate(new Timestamp(timestampOfPrevAOThisUser),
+							new Timestamp(timestampOfCurrentAOThisUser)) == false)
 					{
 						break;
 					}
-
 				} // end of loop over AOs in the day
-
-				toyDayTimelinesForThisUser.put(dateForThisUserThisDay, timelineForThisDay);
+				toyDayTimelinesForThisUser.put(dateForThisUserThisDay, new Timeline(aosForThisDay, true, true));// timelineForThisDay);
 			} // end of loop over days
 
 			toyTimelines.put(userID, toyDayTimelinesForThisUser);
@@ -306,6 +352,21 @@ public class ToyTimelineUtils
 		// toyTimelines.put(uEntry.getKey(), (LinkedHashMap<Date, Timeline>) dayTimelinesWithMinUniqueActIDs);
 		// find the frequency count of each act for each user.
 
+		StringBuilder sbTS = new StringBuilder();
+		for (Entry<String, LinkedHashMap<Date, Timeline>> uE : toyTimelines.entrySet())
+		{
+			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
+			{
+				sbTS.append("\n" + dE.getKey().toString());
+				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				{
+					sbTS.append(">>" + ao.getStartTimestamp());
+				}
+			}
+			sbTS.append("\n");
+		}
+
+		WToFile.writeToNewFile(sbTS.toString(), Constant.getCommonPath() + "ToytimelinesTimestampsOnly.csv");
 		return toyTimelines;
 	}
 

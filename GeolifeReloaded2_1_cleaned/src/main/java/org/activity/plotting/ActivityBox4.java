@@ -3,6 +3,7 @@ package org.activity.plotting;
 import java.util.Arrays;
 
 import org.activity.ui.UIUtilityBox;
+import org.activity.ui.colors.ColorPalette;
 
 //javafx.geometry.Insets
 //import javafx.geometry.Insets;

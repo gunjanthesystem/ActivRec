@@ -1,0 +1,586 @@
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:657:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-658-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-659-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:841:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-842-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-843-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:1755:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-1756-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-1757-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:3935:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-3936-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-3937-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java:2049:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-2050-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-2051-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java:4639:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-4640-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-4641-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:435:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-436-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-437-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:659:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-660-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-661-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:1051:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1052-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1053-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:1965:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1966-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1967-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:4153:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-4154-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-4155-
+--
+./main/java/org/activity/generator/DatageneratorUtils.java:553:	// Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatageneratorUtils.java-554-	// currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatageneratorUtils.java-555-	//
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:484:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-485-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-486-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:1174:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-1175-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-1176-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:3113:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-3114-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-3115-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java:2810:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-2811-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-2812-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java:5419:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-5420-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-5421-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:563:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-564-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-565-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:1253:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-1254-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-1255-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:3493:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-3494-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-3495-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:465:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-466-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-467-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:689:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-690-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-691-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:1268:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-1269-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-1270-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:2182:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-2183-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-2184-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:4508:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-4509-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-4510-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:556:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-557-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-558-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:1246:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-1247-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-1248-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:3486:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-3487-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-3488-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java:3654:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-3655-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-3656-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java:6080:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-6081-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-6082-
+--
+./main/java/org/activity/util/TimelineExtractors.java:915:						Timestamp newStartTS = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-916-								ae.getEndTimestampInms() - (hoursExtension * 60 * 60 * 1000));
+./main/java/org/activity/util/TimelineExtractors.java-917-
+--
+./main/java/org/activity/util/TimelineExtractors.java:1746:				Timestamp newCandEndTimestamp = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-1747-						ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
+./main/java/org/activity/util/TimelineExtractors.java-1748-				// decreasing 1 second (because this convention followed in data generation (not for Gowalla IMHO)
+--
+./main/java/org/activity/util/TimelineExtractors.java:1755:				Timestamp newCandStartTimestamp = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-1756-						ae.getStartTimestamp().getTime() - matchingUnitInMilliSeconds);
+./main/java/org/activity/util/TimelineExtractors.java-1757-
+--
+./main/java/org/activity/objects/CopyOfActivityObject.java:407:		middleTimestamp = new Timestamp(
+./main/java/org/activity/objects/CopyOfActivityObject.java-408-				startTimestamp.getTime() + ((endTimestamp.getTime() - startTimestamp.getTime()) / 2));
+./main/java/org/activity/objects/CopyOfActivityObject.java-409-
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2288:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2289-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2290-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2351:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2352-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2353-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2497:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2498-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2499-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2601:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2602-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2603-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2675:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2676-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2677-		ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2229:// Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2230-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2231-// if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2292:// Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2293-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2294-// if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2438:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2439-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2440-// ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2542:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2543-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2544-// ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2616:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2617-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2618-// ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2198:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2199-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2200-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2261:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2262-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2263-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2407:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2408-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2409-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2511:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2512-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2513-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2585:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2586-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2587-		ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:657:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-658-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-659-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:841:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-842-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-843-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:1755:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-1756-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-1757-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:3935:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-3936-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-3937-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java:2049:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-2050-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-2051-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java:4639:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-4640-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-4641-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:435:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-436-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-437-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:659:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-660-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-661-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:1051:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1052-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1053-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:1965:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1966-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1967-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:4153:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-4154-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-4155-
+--
+./main/java/org/activity/generator/DatageneratorUtils.java:553:	// Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatageneratorUtils.java-554-	// currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatageneratorUtils.java-555-	//
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:484:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-485-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-486-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:1174:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-1175-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-1176-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:3113:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-3114-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-3115-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java:2810:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-2811-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-2812-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java:5419:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-5420-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-5421-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:563:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-564-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-565-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:1253:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-1254-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-1255-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:3493:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-3494-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-3495-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:465:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-466-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-467-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:689:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-690-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-691-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:1268:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-1269-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-1270-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:2182:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-2183-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-2184-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:4508:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-4509-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-4510-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:556:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-557-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-558-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:1246:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-1247-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-1248-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:3486:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-3487-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-3488-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java:3654:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-3655-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-3656-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java:6080:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-6081-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-6082-
+--
+./main/java/org/activity/util/TimelineExtractors.java:915:						Timestamp newStartTS = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-916-								ae.getEndTimestampInms() - (hoursExtension * 60 * 60 * 1000));
+./main/java/org/activity/util/TimelineExtractors.java-917-
+--
+./main/java/org/activity/util/TimelineExtractors.java:1746:				Timestamp newCandEndTimestamp = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-1747-						ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
+./main/java/org/activity/util/TimelineExtractors.java-1748-				// decreasing 1 second (because this convention followed in data generation (not for Gowalla IMHO)
+--
+./main/java/org/activity/util/TimelineExtractors.java:1755:				Timestamp newCandStartTimestamp = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-1756-						ae.getStartTimestamp().getTime() - matchingUnitInMilliSeconds);
+./main/java/org/activity/util/TimelineExtractors.java-1757-
+--
+./main/java/org/activity/objects/CopyOfActivityObject.java:407:		middleTimestamp = new Timestamp(
+./main/java/org/activity/objects/CopyOfActivityObject.java-408-				startTimestamp.getTime() + ((endTimestamp.getTime() - startTimestamp.getTime()) / 2));
+./main/java/org/activity/objects/CopyOfActivityObject.java-409-
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2288:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2289-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2290-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2351:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2352-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2353-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2497:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2498-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2499-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2601:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2602-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2603-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2675:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2676-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2677-		ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2229:// Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2230-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2231-// if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2292:// Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2293-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2294-// if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2438:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2439-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2440-// ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2542:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2543-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2544-// ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2616:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2617-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2618-// ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2198:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2199-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2200-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2261:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2262-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2263-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2407:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2408-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2409-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2511:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2512-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2513-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2585:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2586-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2587-		ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:657:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-658-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-659-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:841:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-842-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-843-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:1755:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-1756-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-1757-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java:3935:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-3936-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM.java-3937-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java:2049:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-2050-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-2051-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java:4639:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-4640-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerTrajNoMode.java-4641-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:435:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-436-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-437-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:659:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-660-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-661-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:1051:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1052-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1053-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:1965:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1966-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-1967-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java:4153:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-4154-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker.java-4155-
+--
+./main/java/org/activity/generator/DatageneratorUtils.java:553:	// Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatageneratorUtils.java-554-	// currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatageneratorUtils.java-555-	//
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:484:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-485-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-486-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:1174:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-1175-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-1176-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java:3113:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-3114-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolife.java-3115-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java:2810:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-2811-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-2812-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java:5419:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-5420-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuicker.java-5421-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:563:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-564-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-565-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:1253:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-1254-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-1255-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java:3493:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-3494-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuicker.java-3495-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:465:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-466-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-467-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:689:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-690-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-691-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:1268:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-1269-										currentOriginalTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-1270-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:2182:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-2183-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-2184-
+--
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java:4508:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-4509-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorLastFM2Quicker2ByUser.java-4510-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:556:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-557-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-558-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:1246:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-1247-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-1248-
+--
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java:3486:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-3487-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGeolifeQuickerUMAPRexperiments.java-3488-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java:3654:							Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-3655-									currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-3656-
+--
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java:6080:								Timestamp startOfNewUnknown = new Timestamp(
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-6081-										currentTimestamp.getTime() + (assumeContinuesBeforeNextInSecs * 1000));
+./main/java/org/activity/generator/DatabaseCreatorGowallaQuickerPreprocessor.java-6082-
+--
+./main/java/org/activity/util/TimelineExtractors.java:915:						Timestamp newStartTS = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-916-								ae.getEndTimestampInms() - (hoursExtension * 60 * 60 * 1000));
+./main/java/org/activity/util/TimelineExtractors.java-917-
+--
+./main/java/org/activity/util/TimelineExtractors.java:1746:				Timestamp newCandEndTimestamp = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-1747-						ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
+./main/java/org/activity/util/TimelineExtractors.java-1748-				// decreasing 1 second (because this convention followed in data generation (not for Gowalla IMHO)
+--
+./main/java/org/activity/util/TimelineExtractors.java:1755:				Timestamp newCandStartTimestamp = new Timestamp(
+./main/java/org/activity/util/TimelineExtractors.java-1756-						ae.getStartTimestamp().getTime() - matchingUnitInMilliSeconds);
+./main/java/org/activity/util/TimelineExtractors.java-1757-
+--
+./main/java/org/activity/objects/CopyOfActivityObject.java:407:		middleTimestamp = new Timestamp(
+./main/java/org/activity/objects/CopyOfActivityObject.java-408-				startTimestamp.getTime() + ((endTimestamp.getTime() - startTimestamp.getTime()) / 2));
+./main/java/org/activity/objects/CopyOfActivityObject.java-409-
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2288:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2289-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2290-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2351:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2352-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2353-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2497:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2498-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2499-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2601:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2602-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2603-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java:2675:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2676-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017.java-2677-		ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2229:// Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2230-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2231-// if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2292:// Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2293-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2294-// if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2438:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2439-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2440-// ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2542:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2543-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2544-// ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java:2616:// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2617-//
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NOTUSED.java-2618-// ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2198:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2199-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2200-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2261:		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2262-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2263-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2407:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2408-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2409-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2511:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2512-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2513-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+--
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java:2585:		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2586-
+./main/java/org/activity/evaluation/RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018.java-2587-		ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);

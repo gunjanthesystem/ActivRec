@@ -2,7 +2,7 @@ package org.activity.plotting;
 
 import java.util.List;
 
-import org.activity.ui.EpochStringConverter;
+import org.activity.ui.EpochDoubleStringConverter;
 import org.controlsfx.control.RangeSlider;
 
 import javafx.beans.binding.Bindings;
@@ -188,7 +188,7 @@ public class TimelineChartApp2 extends Pane
 		// LocalDateTime date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
 		if (false)// for date formatted axis
 		{
-			StringConverter converter2 = new EpochStringConverter();
+			StringConverter converter2 = new EpochDoubleStringConverter();
 			xAxis.setTickLabelFormatter(converter2);
 		} // (new NumberAxis.DefaultFormatter(xAxis, "$", "*"));
 			// (new NumberAxis.DefaultFormatter(yAxis, "$ ", null));
@@ -310,7 +310,7 @@ public class TimelineChartApp2 extends Pane
 		// LocalDateTime date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
 		if (false)// for date formatted axis
 		{
-			StringConverter converter2 = new EpochStringConverter();
+			StringConverter converter2 = new EpochDoubleStringConverter();
 			xAxis.setTickLabelFormatter(converter2);
 		} // (new NumberAxis.DefaultFormatter(xAxis, "$", "*"));
 			// (new NumberAxis.DefaultFormatter(yAxis, "$ ", null));

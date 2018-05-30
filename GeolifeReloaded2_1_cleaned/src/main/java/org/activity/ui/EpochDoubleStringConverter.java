@@ -7,7 +7,13 @@ import java.time.format.DateTimeFormatter;
 
 import javafx.util.converter.DoubleStringConverter;
 
-public class EpochStringConverter extends DoubleStringConverter
+/**
+ * Convert epochs in ms to String
+ * 
+ * @author gunjan
+ *
+ */
+public class EpochDoubleStringConverter extends DoubleStringConverter
 {
 
 	/** {@inheritDoc} */

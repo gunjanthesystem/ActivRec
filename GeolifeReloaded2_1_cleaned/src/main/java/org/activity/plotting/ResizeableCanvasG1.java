@@ -3,6 +3,8 @@ package org.activity.plotting;
 import java.util.Collections;
 import java.util.List;
 
+import org.activity.ui.colors.ColorPalette;
+
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;

@@ -339,7 +339,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						 * effect, hence should not be of major concern. (UserId,ActName,RepresentativeAO)
 						 */
 						LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
-						LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
+						LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDurationInms = new LinkedHashMap<>();
 						// PopUps.showMessage("Starting iteration over user");
 
 						/**
@@ -492,7 +492,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 									LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
 									mapOfRepAOs.put(userId, repAOsForThisUser);
-									mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
+									mapOfMedianPreSuccDurationInms.put(userId, repAOResult.getSecond());
 								}
 								else
 								{// collaborative approach
@@ -506,7 +506,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 										LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = repAOResult
 												.getFirst();
 										mapOfRepAOs.put(userId, repAOsForThisUser);
-										mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
+										mapOfMedianPreSuccDurationInms.put(userId, repAOResult.getSecond());
 									}
 								}
 							}
@@ -962,8 +962,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 										// PopUps.showMessage("here12_2");
 										ActivityObject repAOForTopRecommActName = getRepresentativeAOForActName(
 												Constant.preBuildRepAOGenericUser, Constant.collaborativeCandidates,
-												Constant.buildRepAOJustInTime, mapOfRepAOs, mapOfMedianPreSuccDuration,
-												repAOResultGenericUser, userId, recommendationTimes[seqIndex],
+												Constant.buildRepAOJustInTime, mapOfRepAOs,
+												mapOfMedianPreSuccDurationInms, repAOResultGenericUser, userId,
+												recommendationTimes[seqIndex],
 												topRecommendedPrimaryDimensionVal[seqIndex], recommMaster,
 												this.primaryDimension);
 
@@ -1409,10 +1410,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * @param collaborativeCandidates
 	 * @param buildRepAOJustInTime
 	 * @param mapOfRepAOs
-	 * @param mapOfMedianPreSuccDuration
+	 * @param mapOfMedianPreSuccDurationInms
 	 * @param repAOResultGenericUser
 	 * @param userId
-	 * @param recommendationTime
+	 * @param recommendationTimestamp
 	 * @param topRecommendedPrimarDimensionVal
 	 * @param recommMaster
 	 * @param primaryDimension
@@ -1421,9 +1422,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	private ActivityObject getRepresentativeAOForActName(boolean preBuildRepAOGenericUser,
 			boolean collaborativeCandidates, boolean buildRepAOJustInTime,
 			LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs,
-			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration,
+			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDurationInms,
 			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser,
-			int userId, Timestamp recommendationTime, String topRecommendedPrimarDimensionVal,
+			int userId, Timestamp recommendationTimestamp, String topRecommendedPrimarDimensionVal,
 			RecommendationMasterI recommMaster, PrimaryDimension primaryDimension)
 	{
 		ActivityObject repAOForTopRecommActName = null;
@@ -1437,14 +1438,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			// disabled on 9 Feb 2018 end
 
 			repAOForTopRecommActName = getRepresentativeAOCollGenericV2(
-					Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTime, primaryDimension,
+					Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp, primaryDimension,
 					repAOResultGenericUser);
 
 			// Sanity check Feb8 Starts
 			if (false)
 			{
 				ActivityObject aoTemp = getRepresentativeAOCollGenericV2(
-						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTime, primaryDimension,
+						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp, primaryDimension,
 						repAOResultGenericUser);
 				WToFile.appendLineToFileAbs(
 						repAOForTopRecommActName.toStringAllGowallaTS() + "\n" + aoTemp.toStringAllGowallaTS() + "\n\n",
@@ -1459,12 +1460,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			{
 				// for just-in-time computation of representative activity object
 				repAOForTopRecommActName = getRepresentativeAOColl(Integer.valueOf(topRecommendedPrimarDimensionVal),
-						userId, recommendationTime, primaryDimension, recommMaster);
+						userId, recommendationTimestamp, primaryDimension, recommMaster);
 			}
 			else
 			{
 				repAOForTopRecommActName = getRepresentativeAO(Integer.valueOf(topRecommendedPrimarDimensionVal),
-						mapOfRepAOs, mapOfMedianPreSuccDuration, userId, recommendationTime, primaryDimension);
+						mapOfRepAOs, mapOfMedianPreSuccDurationInms, userId, recommendationTimestamp, primaryDimension);
 				// also use this for collaborative approach when using prebuilt
 				// representative AOs created from training timelines of other users.
 			}
@@ -1761,7 +1762,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		boolean sanityCheck = false;
 		System.out.println("Inside buildRepresentativeAOsForUserPDV2 for user " + userId);
 		LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
-		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
+		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDurationInms = null;
 		LinkedHashMap<String, Timeline> collTrainingTimelines = new LinkedHashMap<>();
 
 		long t1 = System.currentTimeMillis();
@@ -1781,8 +1782,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				/**
 				 * Useful for deciding upon the start timestamp from representative AO
 				 */
-				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
-				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDValInms = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDValInms = new LinkedHashMap<>();
 
 				// earlier version was using all possible vals fro PD but now using only those in training data.
 				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
@@ -1811,8 +1812,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				for (Integer pdVal : distinctPDValsEncounteredInTraining)
 				{
 					aosForEachPDVal.put(pdVal, new ArrayList<>());
-					durationFromPrevForEachPDVal.put(pdVal, new ArrayList<>());
-					durationFromNextForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromPrevForEachPDValInms.put(pdVal, new ArrayList<>());
+					durationFromNextForEachPDValInms.put(pdVal, new ArrayList<>());
 				}
 
 				// populate the map for list of aos for each act name
@@ -1822,7 +1823,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					String userID = trainingTimelineEntry.getKey();
 
 					// long durationFromPreviousInSecs = 0;
-					long prevTimestamp = 0;
+					long prevTimestampInms = 0;
 					Set<Integer> prevPDValEncountered = null;
 
 					for (ActivityObject ao : trainingTimelineEntry.getValue().getActivityObjectsInTimeline())
@@ -1842,13 +1843,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						}
 
 						// store the preceeding and succeeding durations
-						long currentTimestamp = ao.getStartTimestamp().getTime();
+						long currentTimestampInms = ao.getStartTimestamp().getTime();
 
-						if (prevTimestamp != 0)
+						if (prevTimestampInms != 0)
 						{ // add the preceeding duration for this AO
 							for (Integer pdVal : uniquePdValsInAO)
 							{
-								durationFromPrevForEachPDVal.get(pdVal).add(currentTimestamp - prevTimestamp);
+								durationFromPrevForEachPDValInms.get(pdVal)
+										.add(currentTimestampInms - prevTimestampInms);
 							}
 						}
 
@@ -1857,11 +1859,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							// add the succeeding duration for the previous AO
 							for (Integer prevPDVal : prevPDValEncountered)
 							{
-								durationFromNextForEachPDVal.get(prevPDVal).add(currentTimestamp - prevTimestamp);
+								durationFromNextForEachPDValInms.get(prevPDVal)
+										.add(currentTimestampInms - prevTimestampInms);
 							}
 						}
 
-						prevTimestamp = currentTimestamp;
+						prevTimestampInms = currentTimestampInms;
 						prevPDValEncountered = uniquePdValsInAO;
 					}
 				}
@@ -1885,11 +1888,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					// .print(ao.getPrimaryDimensionVal("/") + "-" + ao.getStartTimestampInms() + ">>"));
 
 					System.out.println("durationFromPrevForEachPDValue:");
-					durationFromPrevForEachPDVal.entrySet().stream()
+					durationFromPrevForEachPDValInms.entrySet().stream()
 							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
 
 					System.out.println("durationFromNextForEachPDValue:");
-					durationFromNextForEachPDVal.entrySet().stream()
+					durationFromNextForEachPDValInms.entrySet().stream()
 							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
 					// SANITY CHECK OK for durationFromPrevForEachActName durationFromNextForEachActName
 
@@ -1937,11 +1940,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				////////////////////////// sanity check end
 
 				Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
-						userId, aosForEachPDVal, durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
+						userId, aosForEachPDVal, durationFromPrevForEachPDValInms, durationFromNextForEachPDValInms);
 
 				repAOsForThisUser = result.getFirst();
-				actMedianPreSuccDuration = result.getSecond();
-			}
+				actMedianPreSuccDurationInms = result.getSecond();
+			} // end of else
 		}
 		catch (Exception e)
 		{
@@ -1952,7 +1955,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				+ ((t2 - t1) * 1.0 / 1000) + "secs");
 
 		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(
-				repAOsForThisUser, actMedianPreSuccDuration);
+				repAOsForThisUser, actMedianPreSuccDurationInms);
 
 	}
 
@@ -1994,8 +1997,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				/**
 				 * Could be useful for deciding upon the start timestamp from representative AO
 				 */
-				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
-				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDValInms = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDValInms = new LinkedHashMap<>();
 
 				// earlier version was using all possible vals fro PD but now using only those in training data.
 				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
@@ -2020,8 +2023,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				for (Integer pdVal : distinctPDValsEncounteredInTraining)
 				{
 					aosForEachPDVal.put(pdVal, new ArrayList<>());
-					durationFromPrevForEachPDVal.put(pdVal, new ArrayList<>());
-					durationFromNextForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromPrevForEachPDValInms.put(pdVal, new ArrayList<>());
+					durationFromNextForEachPDValInms.put(pdVal, new ArrayList<>());
 				}
 
 				// populate the map for list of aos for each act name
@@ -2031,7 +2034,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					String userID = trainingTimelineEntry.getKey();
 
 					// long durationFromPreviousInSecs = 0;
-					long prevTimestamp = 0;
+					long prevTimestampInms = 0;
 					Set<Integer> prevPDValEncountered = null;
 
 					for (ActivityObject ao : trainingTimelineEntry.getValue().getActivityObjectsInTimeline())
@@ -2051,13 +2054,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						}
 
 						// store the preceeding and succeeding durations
-						long currentTimestamp = ao.getStartTimestamp().getTime();
+						long currentTimestampInms = ao.getStartTimestamp().getTime();
 
-						if (prevTimestamp != 0)
+						if (prevTimestampInms != 0)
 						{ // add the preceeding duration for this AO
 							for (Integer pdVal : uniquePdValsInAO)
 							{
-								durationFromPrevForEachPDVal.get(pdVal).add(currentTimestamp - prevTimestamp);
+								durationFromPrevForEachPDValInms.get(pdVal)
+										.add(currentTimestampInms - prevTimestampInms);
 							}
 						}
 
@@ -2066,11 +2070,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							// add the succeeding duration for the previous AO
 							for (Integer prevPDVal : prevPDValEncountered)
 							{
-								durationFromNextForEachPDVal.get(prevPDVal).add(currentTimestamp - prevTimestamp);
+								durationFromNextForEachPDValInms.get(prevPDVal)
+										.add(currentTimestampInms - prevTimestampInms);
 							}
 						}
 
-						prevTimestamp = currentTimestamp;
+						prevTimestampInms = currentTimestampInms;
 						prevPDValEncountered = uniquePdValsInAO;
 					}
 				}
@@ -2094,11 +2099,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					// .print(ao.getPrimaryDimensionVal("/") + "-" + ao.getStartTimestampInms() + ">>"));
 
 					System.out.println("durationFromPrevForEachPDValue:");
-					durationFromPrevForEachPDVal.entrySet().stream()
+					durationFromPrevForEachPDValInms.entrySet().stream()
 							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
 
 					System.out.println("durationFromNextForEachPDValue:");
-					durationFromNextForEachPDVal.entrySet().stream()
+					durationFromNextForEachPDValInms.entrySet().stream()
 							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
 					// SANITY CHECK OK for durationFromPrevForEachActName durationFromNextForEachActName
 
@@ -2146,7 +2151,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				////////////////////////// sanity check end
 
 				result = computeRepresentativeActivityObjectForUserPDV2GenericUser(aosForEachPDVal,
-						durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
+						durationFromPrevForEachPDValInms, durationFromNextForEachPDValInms);
 
 				// repAOsForThisUser = result.getFirst();
 				// actMedianPreSuccDuration = result.getSecond();
@@ -2258,6 +2263,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * @param topRecommActName
 	 * @param mapOfRepAOs
 	 * @param mapOfMedianPreSuccDuration
+	 *            SHOULD BE IN MILLI SECONDS
 	 * @param userId
 	 * @param recommendationTime
 	 * @return
@@ -2320,17 +2326,17 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * 
 	 * @param topPrimaryDimensionVal
 	 * @param mapOfRepAOs
-	 * @param mapOfMedianPreSuccDuration
+	 * @param mapOfMedianPreSuccDurationInms
 	 * @param userId
-	 * @param recommendationTime
+	 * @param recommendationTimestamp
 	 * @param primaryDimension
 	 * @return
 	 * @since 14 July 2017
 	 */
 	private ActivityObject getRepresentativeAO(Integer topPrimaryDimensionVal,
 			LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs,
-			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration, int userId,
-			Timestamp recommendationTime, PrimaryDimension primaryDimension)
+			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDurationInms, int userId,
+			Timestamp recommendationTimestamp, PrimaryDimension primaryDimension)
 	{
 		ActivityObject repAO = mapOfRepAOs.get(userId).get(topPrimaryDimensionVal);
 		if (repAO == null)
@@ -2339,29 +2345,29 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					+ topPrimaryDimensionVal + " not found in mapOfRepAo");
 		}
 
-		double medianPreceedingDuration = mapOfMedianPreSuccDuration.get(userId).get(topPrimaryDimensionVal).getFirst();
-		if (medianPreceedingDuration <= 0)
+		double medianPreceedingDurationInms = mapOfMedianPreSuccDurationInms.get(userId).get(topPrimaryDimensionVal).getFirst();
+		if (medianPreceedingDurationInms <= 0)
 		{
 			PopUps.printTracedErrorMsgWithExit(
-					"Error in getRepresentativeAO: medianPreceedingDuration = " + medianPreceedingDuration);
+					"Error in getRepresentativeAO: medianPreceedingDuration = " + medianPreceedingDurationInms);
 		}
 
-		long recommTime = recommendationTime.getTime();
+		long recommTimeInms = recommendationTimestamp.getTime();
 
-		Timestamp newRecommTimestamp = new Timestamp((long) (recommTime + medianPreceedingDuration));
+		Timestamp newRecommTimestamp = new Timestamp((long) (recommTimeInms + medianPreceedingDurationInms));
 
-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+		if (!DateTimeUtils.isSameDate(recommendationTimestamp, newRecommTimestamp))
 		{
-			System.err.println("recommendationTime = " + recommendationTime + " newRecommTimestamp= "
-					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDuration
+			System.err.println("recommendationTime = " + recommendationTimestamp + " newRecommTimestamp= "
+					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDurationInms
 					+ " for topRecommActName =" + topPrimaryDimensionVal);
 		}
 
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Debug: getRepresentativeAO: old recommendationTime="
-					+ recommendationTime.toLocalDateTime().toString() + "medianPreceedingDuration="
-					+ medianPreceedingDuration + "  new recommendationTime="
+					+ recommendationTimestamp.toLocalDateTime().toString() + "medianPreceedingDuration="
+					+ medianPreceedingDurationInms + "  new recommendationTime="
 					+ newRecommTimestamp.toLocalDateTime().toString());
 		}
 		repAO.setEndTimestamp(newRecommTimestamp); // only end timestamp used, make sure there is no start timestamp,
@@ -2385,20 +2391,20 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * 
 	 * @param topPrimaryDimensionVal
 	 * @param userId
-	 * @param recommendationTime
+	 * @param recommendationTimestamp
 	 * @param primaryDimension
 	 * @param recommMaster
 	 * @return
 	 * @since 1 August 2017
 	 */
 	private ActivityObject getRepresentativeAOColl(Integer topPrimaryDimensionVal, int userId,
-			Timestamp recommendationTime, PrimaryDimension primaryDimension, RecommendationMasterI recommMaster)
+			Timestamp recommendationTimestamp, PrimaryDimension primaryDimension, RecommendationMasterI recommMaster)
 	{
 		// StringBuilder verboseMsg = new StringBuilder();
 		// System.out.println("Inside getRepresentativeAOColl(): topPrimaryDimensionVal=" + topPrimaryDimensionVal +
 		// "\n");
 
-		ArrayList<Long> durationPreceeding = new ArrayList<>();
+		ArrayList<Long> durationPreceedingInms = new ArrayList<>();
 		ArrayList<ActivityObject> aosWithSamePDVal = new ArrayList<>();
 
 		// iterate over the candidate timelines (which are to be used to create representative activity objects)
@@ -2419,22 +2425,22 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			// System.out.println("actObjs.size():" + actObjs.size() + "!= Constant.getCurrentMatchingUnit():"
 			// + Constant.getCurrentMatchingUnit());
 
-			long prevTS = -99, currentTS = -99;
+			long prevTSInms = -99, currentTSInms = -99;
 			for (ActivityObject ao : actObjs)
 			{
-				currentTS = ao.getStartTimestamp().getTime();
+				currentTSInms = ao.getStartTimestamp().getTime();
 
 				// contains the act name we are looking for
 				if (ao.getPrimaryDimensionVal().contains(topPrimaryDimensionVal))
 				{
 					aosWithSamePDVal.add(ao);
 
-					if (prevTS > 0)
+					if (prevTSInms > 0)
 					{
-						durationPreceeding.add(currentTS - prevTS);
+						durationPreceedingInms.add(currentTSInms - prevTSInms);
 					}
 				}
-				prevTS = currentTS;
+				prevTSInms = currentTSInms;
 			}
 			// System.out.println("");
 		}
@@ -2445,7 +2451,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		// aosWithSamePDVal.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
 		// System.out.println(sb.toString());
 
-		double medianPreceedingDuration = StatsUtils.getDescriptiveStatisticsLong(durationPreceeding,
+		double medianPreceedingDurationInms = StatsUtils.getDescriptiveStatisticsLong(durationPreceedingInms,
 				"durationPreceeding", userId + "__" + topPrimaryDimensionVal + "durationPreceeding.txt", false)
 				.getPercentile(50);
 
@@ -2494,24 +2500,24 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				break;
 		}
 
-		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTimestamp.getTime() + medianPreceedingDurationInms));
 
 		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
 				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,
 				-1, -1, new String[] { "" });
 
-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+		if (!DateTimeUtils.isSameDate(recommendationTimestamp, newRecommTimestamp))
 		{
-			System.out.print("Warning: recommendationTime = " + recommendationTime + " newRecommTimestamp= "
-					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDuration
+			System.out.print("Warning: recommendationTime = " + recommendationTimestamp + " newRecommTimestamp= "
+					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDurationInms
 					+ " for topRecommActName =" + topPrimaryDimensionVal);
 		}
 		//
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Debug: getRepresentativeAO: old recommendationTime="
-					+ recommendationTime.toLocalDateTime().toString() + "medianPreceedingDuration="
-					+ medianPreceedingDuration + " new recommendationTime="
+					+ recommendationTimestamp.toLocalDateTime().toString() + "medianPreceedingDuration="
+					+ medianPreceedingDurationInms + " new recommendationTime="
 					+ newRecommTimestamp.toLocalDateTime().toString());
 		}
 		// System.out.println("repAO=" + repAOForThisActNameForThisUser.toStringAllGowallaTS());
@@ -2528,14 +2534,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * 
 	 * @param topPrimaryDimensionVal
 	 * @param userId
-	 * @param recommendationTime
+	 * @param recommendationTimestamp
 	 * @param primaryDimension
 	 * @param repAOResultGenericUser
 	 *            {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
 	 * @return
 	 */
 	private ActivityObject getRepresentativeAOCollGeneric(Integer topPrimaryDimensionVal, int userId,
-			Timestamp recommendationTime, PrimaryDimension primaryDimension,
+			Timestamp recommendationTimestamp, PrimaryDimension primaryDimension,
 			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser)
 	{
 		// StringBuilder verboseMsg = new StringBuilder();
@@ -2598,15 +2604,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				break;
 		}
 
-		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTimestamp.getTime() + medianPreceedingDuration));
 
 		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
 				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,
 				-1, -1, new String[] { "" });
 
-		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+		if (!DateTimeUtils.isSameDate(recommendationTimestamp, newRecommTimestamp))
 		{
-			System.out.print("Warning: recommendationTime = " + recommendationTime + " newRecommTimestamp= "
+			System.out.print("Warning: recommendationTime = " + recommendationTimestamp + " newRecommTimestamp= "
 					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDuration
 					+ " for topRecommActName =" + topPrimaryDimensionVal);
 		}
@@ -2614,7 +2620,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Debug getRepresentativeAOCollGeneric: getRepresentativeAO: old recommendationTime="
-					+ recommendationTime.toLocalDateTime().toString() + "medianPreceedingDuration="
+					+ recommendationTimestamp.toLocalDateTime().toString() + "medianPreceedingDuration="
 					+ medianPreceedingDuration + " new recommendationTime="
 					+ newRecommTimestamp.toLocalDateTime().toString());
 		}
@@ -3284,7 +3290,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		boolean sanityCheck = false;
 		System.out.println("Inside buildRepresentativeAOsForUserPDV2 for user " + userId);
 		LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
-		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
+		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDurationInms = null;
 
 		long t1 = System.currentTimeMillis();
 		try
@@ -3303,8 +3309,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				/**
 				 * Useful for deciding upon the start timestamp from representative AO
 				 */
-				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal = new LinkedHashMap<>();
-				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDValInms = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDValInms = new LinkedHashMap<>();
 
 				// earlier version was using all possible vals fro PD but now using only those in training data.
 				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
@@ -3320,13 +3326,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				for (Integer pdVal : distinctPDValsEncounteredInTraining)
 				{
 					aosForEachPDVal.put(pdVal, new ArrayList<>());
-					durationFromPrevForEachPDVal.put(pdVal, new ArrayList<>());
-					durationFromNextForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromPrevForEachPDValInms.put(pdVal, new ArrayList<>());
+					durationFromNextForEachPDValInms.put(pdVal, new ArrayList<>());
 				}
 
 				// populate the map for list of aos for each act name
 				// long durationFromPreviousInSecs = 0;
-				long prevTimestamp = 0;
+				long prevTimestampInms = 0;
 				Set<Integer> prevPDValEncountered = null;
 
 				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
@@ -3345,13 +3351,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					}
 
 					// store the preceeding and succeeding durations
-					long currentTimestamp = ao.getStartTimestamp().getTime();
+					long currentTimestampInms = ao.getStartTimestamp().getTime();
 
-					if (prevTimestamp != 0)
+					if (prevTimestampInms != 0)
 					{ // add the preceeding duration for this AO
 						for (Integer pdVal : uniquePdValsInAO)
 						{
-							durationFromPrevForEachPDVal.get(pdVal).add(currentTimestamp - prevTimestamp);
+							durationFromPrevForEachPDValInms.get(pdVal).add(currentTimestampInms - prevTimestampInms);
 						}
 					}
 
@@ -3360,11 +3366,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// add the succeeding duration for the previous AO
 						for (Integer prevPDVal : prevPDValEncountered)
 						{
-							durationFromNextForEachPDVal.get(prevPDVal).add(currentTimestamp - prevTimestamp);
+							durationFromNextForEachPDValInms.get(prevPDVal)
+									.add(currentTimestampInms - prevTimestampInms);
 						}
 					}
 
-					prevTimestamp = currentTimestamp;
+					prevTimestampInms = currentTimestampInms;
 					prevPDValEncountered = uniquePdValsInAO;
 				}
 
@@ -3388,11 +3395,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							.print(ao.getPrimaryDimensionVal("/") + "-" + ao.getStartTimestampInms() + ">>"));
 
 					System.out.println("durationFromPrevForEachPDValue:");
-					durationFromPrevForEachPDVal.entrySet().stream()
+					durationFromPrevForEachPDValInms.entrySet().stream()
 							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
 
 					System.out.println("durationFromNextForEachPDValue:");
-					durationFromNextForEachPDVal.entrySet().stream()
+					durationFromNextForEachPDValInms.entrySet().stream()
 							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
 					// SANITY CHECK OK for durationFromPrevForEachActName durationFromNextForEachActName
 
@@ -3440,10 +3447,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				////////////////////////// sanity check end
 
 				Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
-						userId, aosForEachPDVal, durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
+						userId, aosForEachPDVal, durationFromPrevForEachPDValInms, durationFromNextForEachPDValInms);
 
 				repAOsForThisUser = result.getFirst();
-				actMedianPreSuccDuration = result.getSecond();
+				actMedianPreSuccDurationInms = result.getSecond();
 			}
 		}
 		catch (Exception e)
@@ -3455,7 +3462,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				+ ((t2 - t1) * 1.0 / 1000) + "secs");
 
 		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(
-				repAOsForThisUser, actMedianPreSuccDuration);
+				repAOsForThisUser, actMedianPreSuccDurationInms);
 	}
 
 	/**
@@ -3664,18 +3671,18 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * 
 	 * @param userID
 	 * @param aosForEachPDVal
-	 * @param durationFromPrevForEachPDVal
-	 * @param durationFromNextForEachPDVal
+	 * @param durationFromPrevForEachPDValInms
+	 * @param durationFromNextForEachPDValInms
 	 * @return
 	 */
 	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserPDV2(
 			int userID, LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal,
-			LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal,
-			LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal)
+			LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDValInms,
+			LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDValInms)
 	{
 		System.out.println("Inside computeRepresentativeActivityObjectForUserPDV2 for userID" + userID);
 		LinkedHashMap<Integer, ActivityObject> repAOs = new LinkedHashMap<>();
-		LinkedHashMap<Integer, Pair<Double, Double>> actMedPreSuccDuration = new LinkedHashMap<>();
+		LinkedHashMap<Integer, Pair<Double, Double>> actMedPreSuccDurationInms = new LinkedHashMap<>();
 
 		System.out.println(
 				PerformanceAnalytics.getHeapInformation() + "\n" + PerformanceAnalytics.getHeapPercentageFree());
@@ -3687,14 +3694,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			}
 
 			// feature of Gowalla activity object used in edit distance and necessary for recommendation.
-			for (Integer pdVal : durationFromPrevForEachPDVal.keySet())// aosForEachPDVal.entrySet())
+			for (Integer pdVal : durationFromPrevForEachPDValInms.keySet())// aosForEachPDVal.entrySet())
 			{
-				double medianDurationFromPrevForEachActName = StatsUtils.getDescriptiveStatisticsLong(
-						durationFromPrevForEachPDVal.get(pdVal), "durationFromPrevForEachActName",
+				double medianDurationFromPrevForEachActNameInms = StatsUtils.getDescriptiveStatisticsLong(
+						durationFromPrevForEachPDValInms.get(pdVal), "durationFromPrevForEachActName",
 						userID + "__" + pdVal + "durationFromPrevForEachActName.txt", false).getPercentile(50);
 
-				double medianDurationFromNextForEachActName = StatsUtils.getDescriptiveStatisticsLong(
-						durationFromNextForEachPDVal.get(pdVal), "durationFromPrevForEachActName",
+				double medianDurationFromNextForEachActNameInms = StatsUtils.getDescriptiveStatisticsLong(
+						durationFromNextForEachPDValInms.get(pdVal), "durationFromPrevForEachActName",
 						userID + "__" + pdVal + "durationFromPrevForEachActName.txt", false).getPercentile(50);
 
 				// Dummy because we are not going to actually use this, we will instead extract the timestamp from the
@@ -3754,8 +3761,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						-1, -1, workingLevelCatIDs, -1, -1, new String[] { "" });
 
 				repAOs.put(pdVal, repAOForThisActNameForThisUser);
-				actMedPreSuccDuration.put(pdVal,
-						new Pair<>(medianDurationFromPrevForEachActName, medianDurationFromNextForEachActName));
+				actMedPreSuccDurationInms.put(pdVal,
+						new Pair<>(medianDurationFromPrevForEachActNameInms, medianDurationFromNextForEachActNameInms));
 
 			}
 		}
@@ -3766,7 +3773,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 		System.out.println("Exiting computeRepresentativeActivityObjectForUserPDV2 for userID" + userID);
 		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(repAOs,
-				actMedPreSuccDuration);
+				actMedPreSuccDurationInms);
 	}
 
 	/**
@@ -3793,14 +3800,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * 
 	 * @param userID
 	 * @param aosForEachPDVal
-	 * @param durationFromPrevForEachPDVal
-	 * @param durationFromNextForEachPDVal
+	 * @param durationFromPrevForEachPDValInms
+	 * @param durationFromNextForEachPDValInms
 	 * @return
 	 */
 	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserPDV2GenericUser(
 			LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal,
-			LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal,
-			LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal)
+			LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDValInms,
+			LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDValInms)
 	{
 		System.out.println("Inside computeRepresentativeActivityObjectForUserPDV2genericUser for generic user");
 		LinkedHashMap<Integer, ActivityObject> repAOs = new LinkedHashMap<>();
@@ -3816,16 +3823,16 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			}
 
 			// feature of Gowalla activity object used in edit distance and necessary for recommendation.
-			for (Integer pdVal : durationFromPrevForEachPDVal.keySet())// aosForEachPDVal.entrySet())
+			for (Integer pdVal : durationFromPrevForEachPDValInms.keySet())// aosForEachPDVal.entrySet())
 			{
 				double medianDurationFromPrevForEachActName = StatsUtils
-						.getDescriptiveStatisticsLong(durationFromPrevForEachPDVal.get(pdVal),
+						.getDescriptiveStatisticsLong(durationFromPrevForEachPDValInms.get(pdVal),
 								"durationFromPrevForEachActName",
 								"GenericUser__" + pdVal + "durationFromPrevForEachActName.txt", false)
 						.getPercentile(50);
 
 				double medianDurationFromNextForEachActName = StatsUtils
-						.getDescriptiveStatisticsLong(durationFromNextForEachPDVal.get(pdVal),
+						.getDescriptiveStatisticsLong(durationFromNextForEachPDValInms.get(pdVal),
 								"durationFromPrevForEachActName",
 								"GenericUser__" + pdVal + "durationFromPrevForEachActName.txt", false)
 						.getPercentile(50);
