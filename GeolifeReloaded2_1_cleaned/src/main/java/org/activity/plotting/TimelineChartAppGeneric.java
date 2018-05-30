@@ -11,7 +11,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
-import org.activity.ui.EpochStringConverter;
+import org.activity.ui.EpochDoubleStringConverter;
 import org.activity.ui.PopUps;
 import org.controlsfx.control.RangeSlider;
 
@@ -178,7 +178,7 @@ public class TimelineChartAppGeneric extends Pane
 		// return vbox;
 		this.getChildren().add(vbox);
 
-		bindScrollToRangeSliderV2(hSlider, timelineChart, 25000, xAxis);
+		bindScrollToRangeSliderV2(hSlider, timelineChart, 250, xAxis);// 25000
 	}
 
 	// public void handle(InputEvent event)
@@ -311,6 +311,9 @@ public class TimelineChartAppGeneric extends Pane
 	{
 		double sliderMax = hSlider.getMax();
 		double sliderMin = hSlider.getMin();
+
+		// System.out.println("sliderMax= " + sliderMax + "\tsliderMin= " + sliderMin);
+
 		double translateMultiplier = (sliderMax - sliderMin) / scrollDeltaSteps;
 		double zoomMultiplier = scrollDeltaSteps * 500;
 
@@ -321,7 +324,7 @@ public class TimelineChartAppGeneric extends Pane
 				{
 					double translateX = scrollEvent.getDeltaX();
 					double translateY = scrollEvent.getDeltaY();
-					// $$System.out.println("Scrolled, deltaX: " + translateX + ", deltaY: " + translateY);
+					// System.out.println("\t\tScrolled, deltaX: " + translateX + ", deltaY: " + translateY);
 
 					if (Math.abs(translateX) > 0)
 					{
@@ -329,9 +332,12 @@ public class TimelineChartAppGeneric extends Pane
 					}
 
 					// For zoomin the slider in response to vertical scroll
-					if (Math.abs(translateY) > 0)
+					if (true)
 					{
-						zoomSlider(hSlider, xAxis, sliderMax, sliderMin, zoomMultiplier, scrollEvent, translateY);
+						if (Math.abs(translateY) > 0)
+						{
+							zoomSlider(hSlider, xAxis, sliderMax, sliderMin, zoomMultiplier, scrollEvent, translateY);
+						}
 					}
 				}
 
@@ -483,16 +489,28 @@ public class TimelineChartAppGeneric extends Pane
 		}
 	}
 
+	/**
+	 * 
+	 * @param hSlider
+	 * @param translateMultiplier
+	 * @param translateX
+	 * @param sliderMax
+	 * @param sliderMin
+	 */
 	private void translateSlider(RangeSlider hSlider, double translateMultiplier, double translateX, double sliderMax,
 			double sliderMin)
 	{
 		double sliderHigh = hSlider.getHighValue();
 		double sliderLow = hSlider.getLowValue();
+		double sliderWidth = (sliderHigh - sliderLow);
 
-		double addendum = translateMultiplier * translateX;
+		double addendum = translateX * translateMultiplier;
 
-		double sliderNewHigh = sliderHigh + addendum;
-		double sliderNewLow = sliderLow + addendum;
+		double sliderNewHigh = addendum + sliderHigh;
+		double sliderNewLow = addendum + sliderLow;
+
+		// System.out.println("sliderNewHigh=" + sliderNewHigh + " sliderMax=" + sliderMax + " sliderNewLow="
+		// + sliderNewLow + " sliderMin=" + sliderMin);
 
 		// For translating the slider in response to horizontal scroll
 		// restrict slider's max-min width changing.
@@ -501,6 +519,34 @@ public class TimelineChartAppGeneric extends Pane
 			hSlider.setLowValue(sliderNewLow);
 			hSlider.setHighValue(sliderNewHigh);
 		}
+		else
+		{
+			// System.out.println("Not moving as beyond boundary");
+			// System.out.println("sliderNewHigh=" + sliderNewHigh + " sliderMax=" + sliderMax + " sliderNewLow="
+			// + sliderNewLow + " sliderMin=" + sliderMin);
+
+			if (sliderNewHigh > sliderMax)
+			{
+				// System.out.println(" higher than max");
+				hSlider.setHighValue(sliderMax);
+				hSlider.setLowValue(sliderMax - sliderWidth);
+			}
+			else if (sliderNewLow < sliderMin)
+			{
+				// System.out.println(" lower than min");
+				hSlider.setLowValue(sliderMin);
+				hSlider.setHighValue(sliderMin + sliderWidth);
+			}
+			else
+			{
+				System.out.println(
+						"org.activity.plotting.TimelineChartAppGeneric.translateSlider():\nUnknown translation case:--> sliderNewHigh="
+								+ sliderNewHigh + " sliderMax=" + sliderMax + " sliderNewLow=" + sliderNewLow
+								+ " sliderMin=" + sliderMin);
+			}
+		}
+		// System.out.println("sliderSetHigh=" + hSlider.getHighValue() + " sliderMax=" + sliderMax + " sliderSetLow="
+		// + hSlider.getLowValue() + " sliderMin=" + sliderMin + "\n");
 	}
 
 	/**
@@ -531,7 +577,8 @@ public class TimelineChartAppGeneric extends Pane
 		hSlider.setMajorTickUnit(Math.max((maxXAxis - minXAxis) / 20, 1));
 		hSlider.setShowTickMarks(true);
 		hSlider.setShowTickLabels(true);
-		StringConverter converter2 = new EpochStringConverter();
+
+		StringConverter converter2 = new EpochDoubleStringConverter();
 		hSlider.setLabelFormatter(converter2);
 
 		final Label caption = new Label("Select Time Range");
@@ -541,13 +588,16 @@ public class TimelineChartAppGeneric extends Pane
 		// final TextField minValue = new TextField(Double.toString(hSlider.getMin()));
 		final JFXTextField minValue = new JFXTextField(Double.toString(hSlider.getMin()));
 		minValue.setLabelFloat(true);
+		// minValue.setTextFormatter(new TextFormatter);
 		minValue.setPromptText("Min time");
 		minValue.setPrefWidth(120);
+		minValue.setStyle("-fx-font-size: 0.65em;");
 
 		final JFXTextField maxValue = new JFXTextField(Double.toString(hSlider.getMax()));
 		maxValue.setLabelFloat(true);
-		maxValue.setPromptText("Max time");
+		maxValue.setPromptText("Max time");// -fx-font-size: 0.75em;
 		maxValue.setPrefWidth(120);
+		maxValue.setStyle("-fx-font-size: 0.65em;");
 
 		// ref:
 		// https://stackoverflow.com/questions/21450328/how-to-bind-two-different-javafx-properties-string-and-double-with-stringconve
@@ -567,7 +617,7 @@ public class TimelineChartAppGeneric extends Pane
 
 		// Button updateButton = new Button("Apply");
 		JFXButton updateButton = new JFXButton("Apply");
-		// updateButton.getStyleClass().add("button-raised");
+		updateButton.getStyleClass().add("button-raised");
 		// updateButton.setStyle("-fx-font-size: 18pt;");
 
 		updateButton.setOnAction(e ->
@@ -702,7 +752,7 @@ public class TimelineChartAppGeneric extends Pane
 		// LocalDateTime date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
 		if (true)// for date formatted axis
 		{
-			StringConverter converter2 = new EpochStringConverter();
+			StringConverter converter2 = new EpochDoubleStringConverter();
 			xAxis.setTickLabelFormatter(converter2);
 		} // (new NumberAxis.DefaultFormatter(xAxis, "$", "*"));
 			// (new NumberAxis.DefaultFormatter(yAxis, "$ ", null));

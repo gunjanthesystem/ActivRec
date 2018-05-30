@@ -17,6 +17,8 @@
     -fx-background-color: rgb(128,184,200);
 }
   */
+
+/* 
 .button-raised{
     -fx-padding:7pt;
     -fx-alignment: center;
@@ -24,14 +26,16 @@
     -fx-background-color: rgb(77,102,204);
     -fx-text-fill: WHITE;
 }
-
+ */
 .button{
     -fx-padding:7pt;
     -fx-alignment: center;
     -fx-margin: 30pt;
+    -fx-font-size: 18pt;
     -fx-background-color: rgb(0,105,106);/*rgb(77,102,204);*/
     -fx-text-fill: WHITE;
 }
+
 
 /*  
 .vbox{

@@ -12,6 +12,7 @@ import org.activity.io.ReadingFromFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
+import org.activity.ui.colors.ColorPalette;
 
 import com.gluonhq.charm.down.ServiceFactory;
 import com.gluonhq.charm.down.Services;
@@ -447,7 +448,7 @@ public class GluonOSMMap extends Application
 		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
 				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
 		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst();
-		Color[] colors = awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
+		Color[] colors = ColorPalette.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
 		System.out.println("color.length=" + colors.length);
 
 		/////////////////
@@ -528,7 +529,7 @@ public class GluonOSMMap extends Application
 				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
 		List<Pair<Double, Integer>> valBinIndexMap = binningRes.getFirst();
 
-		Color[] colors = awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
+		Color[] colors = ColorPalette.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
 		System.out.println("color.length=" + colors.length);
 		// System.out.println(listOfLocs.toString());
 		// System.out.println("listOfLocs.size()=" + listOfLocs.size());
@@ -558,78 +559,6 @@ public class GluonOSMMap extends Application
 		return answer;
 
 	}
-
-	public static Color awtColorToJavaFXColor(java.awt.Color awtColor)
-	{
-		return javafx.scene.paint.Color.rgb(awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(),
-				(awtColor.getAlpha() / 255.0));
-	}
-
-	public static Color[] awtColorToJavaFXColor(java.awt.Color[] awtColor)
-	{
-		Color[] res = new Color[awtColor.length];
-
-		for (int i = 0; i < awtColor.length; i++)
-		{
-			res[i] = awtColorToJavaFXColor(awtColor[i]);
-		}
-		return res;
-
-	}
-	// /**
-	// *
-	// * @param absFileNameForLatLong
-	// * @param delimiter
-	// * @param latColIndex
-	// * @param lonColIndex
-	// * @param labelColIndex
-	// */
-	// public static List<Triple<Double, Double, String>> readListOfLocations(String absFileNameForLatLong,
-	// String delimiter, int latColIndex, int lonColIndex, int labelColIndex)
-	// {
-	// // String absFileNameForLatLong = ;
-	//
-	// List<List<String>> lines = ReadingFromFile.readLinesIntoListOfLists(absFileNameForLatLong, ",");
-	// // System.out.println("lines.size()=" + lines.size());
-	// List<Triple<Double, Double, String>> listOfLocations = new ArrayList<>();
-	// int count = 0;
-	//
-	// for (List<String> line : lines)
-	// {
-	// count += 1;
-	//
-	// if (count == 1)
-	// {
-	// continue;
-	// }
-	// if (++count > 1000000)
-	// {
-	// break;
-	// }
-	// // System.out.println("line= " + line);
-	// // System.out.println("here 1");
-	//
-	// Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(latColIndex)),
-	// Double.valueOf(line.get(lonColIndex)), "id=" + line.get(labelColIndex));
-	//
-	// // LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
-	// // // Double.valueOf(line.get(2).substring(0, 4)));
-	// // // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),
-	// // // Double.valueOf(line.get(2).substring(0, 4)));
-	// // System.out.println("LatLong= " + markerLatLong2.toString());
-	// // markerOptions2.position(markerLatLong2).title(line.get(1)).visible(true);
-	// // System.out.println("here2");
-	// // myMarker2 = new Marker(markerOptions2);
-	// // System.out.println("here3");
-	// listOfLocations.add(val);
-	// }
-	//
-	// // StringBuilder sb = new StringBuilder();
-	// // listOfMarkers.stream().forEachOrdered(e -> sb.append(e.toString() + "\n"));
-	// // System.out.println("List of markers= " + sb.toString());
-	// // System.out.println("listOfLocations.size()=" + listOfLocations.size());
-	// return listOfLocations;
-	// }
 
 	/**
 	 * 

@@ -4,14 +4,20 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.PathConstants;
+import org.activity.controller.ControllerWithoutServer;
 import org.activity.io.Serializer;
 import org.activity.objects.Timeline;
 import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartAppCanvas;
 import org.activity.plotting.TimelineChartAppGeneric;
+import org.activity.ui.colors.ColorPalette;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -56,8 +62,10 @@ import javafx.stage.Stage;
  */
 public class Dashboard3 extends Application
 {
+	public static Map<Integer, Integer> actIDIndexMap;
 	Stage stage;
-	String pathToToyTimelines = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY21ED0.35STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTV/ToyTimelines21May.kryo";
+	String pathToToyTimelines = PathConstants.pathToToyTimelines;
+	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY21ED0.35STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTV/ToyTimelines21May.kryo";
 	// MenuBar menuBar;
 
 	// private final TableView treeView = new TableView();
@@ -78,8 +86,19 @@ public class Dashboard3 extends Application
 		Constant.initialise("./", "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap);
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines;
+		usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 				.kryoDeSerializeThis(pathToToyTimelines);
+
+		ControllerWithoutServer.setDataVarietyConstants(usersCleanedDayToyTimelines, true, "ToyTs_", true);
+		List<Integer> uniqueActIDs = new ArrayList<>(Constant.getUniqueActivityIDs());
+
+		ColorPalette.setColors("Paired", uniqueActIDs.size());
+
+		actIDIndexMap = IntStream.range(0, uniqueActIDs.size()).boxed()
+				.collect(Collectors.toMap(i -> uniqueActIDs.get(i), Function.identity()));
+		System.out.println("actIDIndexMap=\n" + actIDIndexMap);
 
 		// final Stage stageRef = stage;
 		// StageStyle stageStyle = StageStyle.DECORATED;

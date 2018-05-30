@@ -37,7 +37,6 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.stats.entropy.SampleEntropyG;
-import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
@@ -136,7 +135,7 @@ public class TimelineStats
 		pathToWrite = directoryToWrite + "/";
 		Constant.setCommonPath(pathToWrite);
 		String databaseName = Constant.getDatabaseName();
-		PopUps.showMessage("path to write: " + pathToWrite);
+		// $$PopUps.showMessage("path to write: " + pathToWrite);
 		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(pathToWrite + "ConsoleLog.txt");
 		// /////////////////////
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesCleaned = new LinkedHashMap<String, LinkedHashMap<Date, Timeline>>();

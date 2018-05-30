@@ -210,9 +210,9 @@ public final class Constant
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean useRandomlySampled100Users = true;// false;// true;// SWITCH_NOV10
+	public static final boolean useRandomlySampled100Users = false;// false;// true;// SWITCH_NOV10
 	public static String pathToRandomLySampleUserIndices = "";
-	public static final boolean runForAllUsersAtOnce = false;// true;// SWITCH_April8
+	public static final boolean runForAllUsersAtOnce = true;// false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
 
@@ -220,7 +220,7 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-
+	public static final boolean useToyTimelines = true;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -1467,6 +1467,7 @@ public final class Constant
 		s.append("\ncleanTimelinesAgainInsideTrainTestSplit:" + cleanTimelinesAgainInsideTrainTestSplit);
 		s.append("\nuseRTVerseNormalisationForED:" + useRTVerseNormalisationForED);
 		s.append("\npercentileForRTVerseMaxForEDNorm:" + percentileForRTVerseMaxForEDNorm);
+		s.append("\nuseToyTimelines:" + useToyTimelines);
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))

@@ -2,8 +2,9 @@ package org.activity.plotting;
 
 import java.util.Arrays;
 
-import org.activity.constants.Constant;
+import org.activity.ui.Dashboard3;
 import org.activity.ui.UIUtilityBox;
+import org.activity.ui.colors.ColorPalette;
 
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
@@ -87,10 +88,14 @@ public class ActivityCircle extends Group
 
 	private void setBackGround()
 	{
+
 		// circle.setFill(ColorPalette.getInsightSecondaryColor(actID % 11));
 		// circle.setFill(ColorPalette.getColors269Color(actID));
-		circle.setFill(ColorPalette.getColors269Color(Constant.getIndexOfActIDInActNames(actID)));// only works for real
-																									// data
+		// circle.setFill(ColorPalette.getColors269Color(Constant.getIndexOfActIDInActNames(actID)));// only works for
+		// real data
+		// circle.setFill(ColorPalette.getInsightSecondaryColor(Dashboard3.actIDIndexMap.get(actID)));// only
+		circle.setFill(ColorPalette.getColor(Dashboard3.actIDIndexMap.get(actID)));// only
+		// works for real
 	}
 
 	/**

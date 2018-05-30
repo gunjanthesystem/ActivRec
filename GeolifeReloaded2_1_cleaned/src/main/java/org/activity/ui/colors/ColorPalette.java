@@ -1,9 +1,12 @@
-package org.activity.plotting;
+package org.activity.ui.colors;
+
+import org.geotools.brewer.color.ColorBrewer;
 
 import javafx.scene.paint.Color;
 
 public class ColorPalette
 {
+	static Color[] colors;
 
 	public ColorPalette()
 	{
@@ -50,7 +53,7 @@ public class ColorPalette
 
 	public static Color getInsightSecondaryColor(int id)
 	{
-		if (id > colors269.length)
+		if (id > InsightSecondary.length)
 		{
 			System.err.println("Error: color our of palette range: id = " + id);
 			return null;
@@ -61,6 +64,109 @@ public class ColorPalette
 		}
 		// Color k;
 	}
+
+	public static void setColors(String paletteName, int size)
+	{
+		if (size <= 10 && paletteName.contains("Insight") == false)
+		{
+			ColorBrewer brewer = ColorBrewer.instance();
+			// String paletteName = "GrBu";
+			colors = awtColorToJavaFXColor(brewer.getPalette(paletteName).getColors(size));
+		}
+		else if (size <= 12 && paletteName.contains("InsightSecondary"))
+		{
+			colors = new Color[size];
+			for (int i = 0; i < size; i++)
+			{
+				colors[i] = getInsightSecondaryColor(i);
+			}
+		}
+		else // if (size <= 12 && paletteName.contains("InsightSecondary"))
+		{
+			colors = new Color[size];
+			for (int i = 0; i < size; i++)
+			{
+				colors[i] = getColors269Color(i);
+			}
+		}
+	}
+
+	public static Color getColor(int index)
+	{
+		return colors[index];
+	}
+
+	public static Color awtColorToJavaFXColor(java.awt.Color awtColor)
+	{
+		return javafx.scene.paint.Color.rgb(awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(),
+				(awtColor.getAlpha() / 255.0));
+	}
+
+	public static Color[] awtColorToJavaFXColor(java.awt.Color[] awtColor)
+	{
+		Color[] res = new Color[awtColor.length];
+
+		for (int i = 0; i < awtColor.length; i++)
+		{
+			res[i] = awtColorToJavaFXColor(awtColor[i]);
+		}
+		return res;
+
+	}
+	// /**
+	// *
+	// * @param absFileNameForLatLong
+	// * @param delimiter
+	// * @param latColIndex
+	// * @param lonColIndex
+	// * @param labelColIndex
+	// */
+	// public static List<Triple<Double, Double, String>> readListOfLocations(String absFileNameForLatLong,
+	// String delimiter, int latColIndex, int lonColIndex, int labelColIndex)
+	// {
+	// // String absFileNameForLatLong = ;
+	//
+	// List<List<String>> lines = ReadingFromFile.readLinesIntoListOfLists(absFileNameForLatLong, ",");
+	// // System.out.println("lines.size()=" + lines.size());
+	// List<Triple<Double, Double, String>> listOfLocations = new ArrayList<>();
+	// int count = 0;
+	//
+	// for (List<String> line : lines)
+	// {
+	// count += 1;
+	//
+	// if (count == 1)
+	// {
+	// continue;
+	// }
+	// if (++count > 1000000)
+	// {
+	// break;
+	// }
+	// // System.out.println("line= " + line);
+	// // System.out.println("here 1");
+	//
+	// Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(latColIndex)),
+	// Double.valueOf(line.get(lonColIndex)), "id=" + line.get(labelColIndex));
+	//
+	// // LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
+	// // // Double.valueOf(line.get(2).substring(0, 4)));
+	// // // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),
+	// // // Double.valueOf(line.get(2).substring(0, 4)));
+	// // System.out.println("LatLong= " + markerLatLong2.toString());
+	// // markerOptions2.position(markerLatLong2).title(line.get(1)).visible(true);
+	// // System.out.println("here2");
+	// // myMarker2 = new Marker(markerOptions2);
+	// // System.out.println("here3");
+	// listOfLocations.add(val);
+	// }
+	//
+	// // StringBuilder sb = new StringBuilder();
+	// // listOfMarkers.stream().forEachOrdered(e -> sb.append(e.toString() + "\n"));
+	// // System.out.println("List of markers= " + sb.toString());
+	// // System.out.println("listOfLocations.size()=" + listOfLocations.size());
+	// return listOfLocations;
+	// }
 
 	static String[] InsightAll = new String[] { "rgb(127,38,54)", "rgb(0,107,148)", "rgb(114,202,195)",
 			"rgb(146,200,62)", "rgb(0,105,106)", "rgb(76,183,72)", "rgb(176,215,227)", "rgb(255,198,52)",

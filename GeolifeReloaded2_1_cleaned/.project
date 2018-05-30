@@ -20,11 +20,17 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>spartan.tipper</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>de.walware.statet.base.StatetNature</nature>
 		<nature>de.walware.statet.r.RNature</nature>
+		<nature>il.org.spartan.nature</nature>
 	</natures>
 </projectDescription>

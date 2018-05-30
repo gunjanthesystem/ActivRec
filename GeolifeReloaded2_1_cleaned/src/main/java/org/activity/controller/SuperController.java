@@ -102,10 +102,16 @@ public class SuperController
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+
 		double[] EDAlphas = { 0.35, 0.75, 1, 0.15, 0, 0.5 };
 
 		for (double edAlphaForAnExp : EDAlphas)
 		{
+			if (Constant.useToyTimelines)
+			{
+				// Note: sampledUserIndicesSets are irrelavant for the toy timelines
+				main0(sampledUserIndicesSets[0], edAlphaForAnExp);
+			}
 			for (String sampledUserIndicesSet : sampledUserIndicesSets)
 			{
 				main0(sampledUserIndicesSet, edAlphaForAnExp);

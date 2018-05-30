@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.activity.evaluation.Evaluation;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 
 /**
@@ -711,4 +712,64 @@ public class DateTimeUtils
 		return timeCategory;
 	}
 
+	/**
+	 * 
+	 * @param givenTS
+	 * @return
+	 */
+	public static long getSucceedingDate(long givenTS)
+	{
+		String s1 = "Inside getSucceedingDate:\t givenTS=" + new Timestamp(givenTS);
+		System.out.print(s1);
+		long tsOfNextDay = givenTS + (1000 * 60 * 60 * StatsUtils.randomInRange(1, 3));
+		// add random num of hours between [5,50]
+		// Date currentDate = new Date(ts);
+
+		// keep on increasing TS until it reaches succeeding day.
+		while (isSameDate(new Timestamp(givenTS), new Timestamp(tsOfNextDay)))
+		{
+			tsOfNextDay = tsOfNextDay + (1000 * 60 * 60 * StatsUtils.randomInRange(1, 3));
+		}
+
+		System.out.println("\ttsOfNextDay=" + new Timestamp(tsOfNextDay));
+
+		return tsOfNextDay;
+	}
+
+	public static boolean isWeekend(long timestampInms)
+	{
+		int day = new Timestamp(timestampInms).getDay();
+		if (day == 0 || day == 6)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 * @param givenTS
+	 * @return
+	 */
+	public static long getSucceedingWeekDate(long givenTS)
+	{
+
+		System.out.print("Inside getSucceedingWeekDate:\t givenTS=" + new Timestamp(givenTS));
+		long tsOfNextDay = givenTS + (1000 * 60 * 60 * StatsUtils.randomInRange(1, 3));
+		// add random num of hours between [5,50]
+		// Date currentDate = new Date(ts);
+
+		// keep on increasing TS until it reaches succeeding day.
+		while (isSameDate(new Timestamp(givenTS), new Timestamp(tsOfNextDay)) || isWeekend(tsOfNextDay))
+		{
+			tsOfNextDay = tsOfNextDay + (1000 * 60 * 60 * StatsUtils.randomInRange(1, 3));
+		}
+
+		System.out.println("\ttsOfNextDay=" + new Timestamp(tsOfNextDay));
+
+		return tsOfNextDay;
+	}
 }
