@@ -181,7 +181,9 @@ public class ControllerWithoutServer
 			// $ "NOTZForCleanedSubsettedTraintestData");
 
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
+
 			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true);
+
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 			// System.exit(0);
 			if (false)// temporary
@@ -223,7 +225,7 @@ public class ControllerWithoutServer
 
 			if (Constant.useToyTimelines)
 			{
-				boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;
+				boolean createToyTimelines = true, serialiseToyTimelines = true, deserialiseToyTimelines = false;// strue;
 				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines = null;
 				if (createToyTimelines)
 				{
@@ -238,14 +240,31 @@ public class ControllerWithoutServer
 				if (serialiseToyTimelines)
 				{
 					Serializer.kryoSerializeThis(usersToyDayTimelines,
-							Constant.getCommonPath() + "ToyTimelinesManually28May.kryo");
+							Constant.getCommonPath() + "ToyTimelinesManually6June.kryo");
 				}
 				if (deserialiseToyTimelines)
 				{
 					usersToyDayTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 							.kryoDeSerializeThis(PathConstants.pathToToyTimelines);
+					// System.exit(0);
 				}
-				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", false);
+
+				ToyTimelineUtils.writeOnlyActIDs(usersToyDayTimelines,
+						Constant.getCommonPath() + "ToyTimelinesOnlyActIDs.csv");
+				ToyTimelineUtils.writeOnlyActIDs2(usersToyDayTimelines,
+						Constant.getCommonPath() + "ToyTimelinesOnlyActIDs2.csv");
+				ToyTimelineUtils.writeActIDTS(usersToyDayTimelines,
+						Constant.getCommonPath() + "ToyTimelinesActIDTS.csv");
+
+				// do it again using the toy timelines
+				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true);
+
+				// done especially for toy timelines to avoid writing all activitie in timeline activity stats.
+				Constant.setActivityNames(
+						Constant.getUniqueActivityIDs().stream().map(i -> String.valueOf(i)).toArray(String[]::new));
+
+				writeActIDNamesInFixedOrder(Constant.getCommonPath() + "ToyCatIDNameMap.csv");
+
 				// PopUps.showMessage("After toy timelines creation!!");
 				// $$Disabled on May29 2018 TimelineStats.timelineStatsController(usersCleanedDayToyTimelines);
 				// PopUps.showMessage("here");
@@ -253,7 +272,7 @@ public class ControllerWithoutServer
 						false, "GowallaUserDayToyTimelines.csv", commonBasePath);
 				// PopUps.showMessage("here2");
 				TimelineStats.timelineStatsController(usersToyDayTimelines);
-				// System.exit(0);
+				System.exit(0);
 				// End of Moved here on 18 May 2018
 
 				// make the usersCleanedDayTimelines point to the toy timelines
@@ -275,8 +294,8 @@ public class ControllerWithoutServer
 					List<String> sampledUserIndicesStr = ReadingFromFile
 							// .oneColumnReaderString("./dataToRead/RandomlySample100Users/Mar1_2018.csv", ",", 0,
 							// .oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
-							.oneColumnReaderString(Constant.pathToRandomLySampleUserIndices, ",", 0, false);
-					System.out.println("pathToRandomLySampleUserIndices=" + Constant.pathToRandomLySampleUserIndices);
+							.oneColumnReaderString(Constant.pathToRandomlySampledUserIndices, ",", 0, false);
+					System.out.println("pathToRandomLySampleUserIndices=" + Constant.pathToRandomlySampledUserIndices);
 					List<Integer> sampledUserIndices = sampledUserIndicesStr.stream().map(i -> Integer.valueOf(i))
 							.collect(Collectors.toList());
 

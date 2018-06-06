@@ -3331,8 +3331,24 @@ public class AlignmentBasedDistance
 			{
 				System.out.println("more than one word!");
 			}
-			System.out.println("levenshteinDists = " + levenshteinDists);
-			System.out.println("lowestRes = " + lowestRes.toString());
+			// $$ System.out.println("levenshteinDists = " + levenshteinDists);
+
+			StringBuilder sb = new StringBuilder();
+			for (Triple<String, Double, Triple<char[], int[], int[]>> s : levenshteinDists)
+			{
+				Triple<char[], int[], int[]> third = s.getThird();
+
+				sb.append("trace= " + s.getFirst() + ", dist=" + s.getSecond() + ", { DISNTrace="
+						+ Arrays.toString(third.getFirst()) + ", coordTraces=" + Arrays.toString(third.getSecond())
+						+ ", coordTraces=" + Arrays.toString(third.getThird()) + "}");
+
+			}
+
+			System.out.println("levenshteinDists = " + sb.toString());
+			// System.out.println("lowestRes = " + lowestRes.toString());
+			System.out.println("lowestRes = " + lowestRes.getFirst() + ", " + lowestRes.getSecond() + " , {"
+					+ lowestRes.getThird().getFirst() + "," + Arrays.toString(lowestRes.getThird().getSecond()) + ","
+					+ Arrays.toString(lowestRes.getThird().getThird()));
 		}
 
 		return lowestRes;

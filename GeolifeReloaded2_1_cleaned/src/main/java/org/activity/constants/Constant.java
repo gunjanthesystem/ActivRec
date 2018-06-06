@@ -182,6 +182,7 @@ public final class Constant
 	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
 	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
 	public static double EDAlpha = -99;// 0.8;// 0.5;// SWITCH_NOV10
+
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
 	public static final boolean scoreRecommsByLocProximity = false;// SWITCH_NOV10
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
@@ -211,7 +212,8 @@ public final class Constant
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
 	public static final boolean useRandomlySampled100Users = false;// false;// true;// SWITCH_NOV10
-	public static String pathToRandomLySampleUserIndices = "";
+	public static String pathToRandomlySampledUserIndices = "";
+
 	public static final boolean runForAllUsersAtOnce = true;// false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
@@ -383,9 +385,25 @@ public final class Constant
 	/////////////////////////// End of variable declarations//////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
-	// public void setEDAlpha(double d)
+
+	// public static String getPathToRandomlySampledUserIndices()
 	// {
-	// EDAlpha = d;
+	// return pathToRandomlySampledUserIndices;
+	// }
+	//
+	// public static void setPathToRandomlySampledUserIndices(String pathToRandomlySampledUserIndices)
+	// {
+	// Constant.pathToRandomlySampledUserIndices = pathToRandomlySampledUserIndices;
+	// }
+	//
+	// public static double getEDAlpha()
+	// {
+	// return EDAlpha;
+	// }
+	//
+	// public static void setEDAlpha(double eDAlpha)
+	// {
+	// EDAlpha = eDAlpha;
 	// }
 
 	public static final boolean equalsForFloat(double a, double b)
@@ -1022,6 +1040,16 @@ public final class Constant
 		}
 	}
 
+	/**
+	 * 
+	 * @param givenActNames
+	 * @since 6 June 2018
+	 */
+	public static void setActivityNames(String[] givenActNames)
+	{
+		activityNames = givenActNames;
+	}
+
 	public static LinkedHashMap<String, TreeSet<Integer>> getUniquePDValsPerUser()
 	{
 		return uniquePDValsPerUser;
@@ -1458,7 +1486,7 @@ public final class Constant
 		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFED);
 		s.append("\nassignFallbackZoneId:" + assignFallbackZoneIdWhenConvertCinsToAO);
 		s.append("\nrandomLySample100Users:" + useRandomlySampled100Users);
-		s.append("\npathToRandomLySampleUserIndices:" + pathToRandomLySampleUserIndices);
+		s.append("\npathToRandomLySampleUserIndices:" + pathToRandomlySampledUserIndices);
 		s.append("\nuseCheckinEntryV2:" + useCheckinEntryV2);
 		s.append("\nrunForAllUsersAtOnce:" + runForAllUsersAtOnce);
 		s.append("\nreduceAndCleanTimelinesBeforeRecomm:" + reduceAndCleanTimelinesBeforeRecomm);

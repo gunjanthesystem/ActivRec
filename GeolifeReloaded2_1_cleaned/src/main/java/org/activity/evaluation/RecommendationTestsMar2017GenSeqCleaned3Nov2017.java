@@ -127,6 +127,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	{
 		System.out.println("\n\n **********Entering RecommendationTestsMar2017GenSeqCleaned2********** " + lookPastType
 				+ " " + caseType + " lengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
+		PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
 		long recommTestsStarttime = System.currentTimeMillis();
 
 		this.primaryDimension = Constant.primaryDimension;
@@ -204,6 +205,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						BufferedWriter actualSeqBw = WToFile.getBWForNewFile(commonPath + "dataActualSequence.csv");// **
 
 						ArrayList<BufferedWriter> bwsDataActual = new ArrayList<>(this.recommSeqLength);
+						// added on 5 June 18, to write current activity for each RT in matrix format
+						// ArrayList<BufferedWriter> bwsCurrentActivity = new ArrayList<>(this.recommSeqLength);
 
 						BufferedWriter topNextActsWithoutDistance = WToFile
 								.getBWForNewFile(commonPath + "topNextActivitiesWithoutDistance.csv");
@@ -247,6 +250,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									commonPath + "dataRankedRecommendationWithoutScores" + i + ".csv"));
 
 							bwsDataActual.add(i, WToFile.getBWForNewFile(commonPath + "dataActual" + i + ".csv"));
+							// bwsCurrentActivity.add(i,
+							// WToFile.getBWForNewFile(commonPath + "currentActivityMatrix" + i + ".csv"));
 						}
 
 						/**
@@ -634,6 +639,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 								ArrayList<StringBuilder> sbsDataActualToWriteForThisUserDate = createListOfStringBuilders(
 										recommSeqLength);
+
+								// Added on June 5 2018
+								// ArrayList<StringBuilder> sbsCurrentActivityToWriteForThisUserDate =
+								// createListOfStringBuilders(
+								// recommSeqLength);
 
 								StringBuilder dataActualSeqActsToWriteForThisUserDate = new StringBuilder();
 								StringBuilder metaIfCurrentTargetSameToWriteForThisUserDate = new StringBuilder();
@@ -1097,6 +1107,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 											sbsDataActualToWriteForThisUserDate.get(seqI)
 													.append(actsActualDoneInSeq.get(seqI)).append(",");
 										}
+
+										// if (VerbosityConstants.writeCurrentTimelineForEachSeqIndex)
+										// { sbsCurrentActivityToWriteForThisUserDate.get(seqI).append("").append(",");}
+
 										rankedRecommWithScoreToWriteForThisUserDate.get(seqI)
 												.append(rankedRecommWithScoreForThisRTIter.get(seqI)).append(",");
 
@@ -1438,15 +1452,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			// disabled on 9 Feb 2018 end
 
 			repAOForTopRecommActName = getRepresentativeAOCollGenericV2(
-					Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp, primaryDimension,
-					repAOResultGenericUser);
+					Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp,
+					primaryDimension, repAOResultGenericUser);
 
 			// Sanity check Feb8 Starts
 			if (false)
 			{
 				ActivityObject aoTemp = getRepresentativeAOCollGenericV2(
-						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp, primaryDimension,
-						repAOResultGenericUser);
+						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp,
+						primaryDimension, repAOResultGenericUser);
 				WToFile.appendLineToFileAbs(
 						repAOForTopRecommActName.toStringAllGowallaTS() + "\n" + aoTemp.toStringAllGowallaTS() + "\n\n",
 						this.commonPath + "getRepresentativeAOCollGenericV2SanityCheck.txt");
@@ -2335,8 +2349,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 */
 	private ActivityObject getRepresentativeAO(Integer topPrimaryDimensionVal,
 			LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs,
-			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDurationInms, int userId,
-			Timestamp recommendationTimestamp, PrimaryDimension primaryDimension)
+			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDurationInms,
+			int userId, Timestamp recommendationTimestamp, PrimaryDimension primaryDimension)
 	{
 		ActivityObject repAO = mapOfRepAOs.get(userId).get(topPrimaryDimensionVal);
 		if (repAO == null)
@@ -2345,7 +2359,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					+ topPrimaryDimensionVal + " not found in mapOfRepAo");
 		}
 
-		double medianPreceedingDurationInms = mapOfMedianPreSuccDurationInms.get(userId).get(topPrimaryDimensionVal).getFirst();
+		double medianPreceedingDurationInms = mapOfMedianPreSuccDurationInms.get(userId).get(topPrimaryDimensionVal)
+				.getFirst();
 		if (medianPreceedingDurationInms <= 0)
 		{
 			PopUps.printTracedErrorMsgWithExit(
@@ -2359,8 +2374,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		if (!DateTimeUtils.isSameDate(recommendationTimestamp, newRecommTimestamp))
 		{
 			System.err.println("recommendationTime = " + recommendationTimestamp + " newRecommTimestamp= "
-					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDurationInms
-					+ " for topRecommActName =" + topPrimaryDimensionVal);
+					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = "
+					+ medianPreceedingDurationInms + " for topRecommActName =" + topPrimaryDimensionVal);
 		}
 
 		if (VerbosityConstants.verbose)
@@ -2500,7 +2515,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				break;
 		}
 
-		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTimestamp.getTime() + medianPreceedingDurationInms));
+		Timestamp newRecommTimestamp = new Timestamp(
+				(long) (recommendationTimestamp.getTime() + medianPreceedingDurationInms));
 
 		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
 				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,
@@ -2509,8 +2525,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		if (!DateTimeUtils.isSameDate(recommendationTimestamp, newRecommTimestamp))
 		{
 			System.out.print("Warning: recommendationTime = " + recommendationTimestamp + " newRecommTimestamp= "
-					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDurationInms
-					+ " for topRecommActName =" + topPrimaryDimensionVal);
+					+ newRecommTimestamp + " are not same day. medianPreceedingDuration = "
+					+ medianPreceedingDurationInms + " for topRecommActName =" + topPrimaryDimensionVal);
 		}
 		//
 		if (VerbosityConstants.verbose)
@@ -2604,7 +2620,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				break;
 		}
 
-		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTimestamp.getTime() + medianPreceedingDuration));
+		Timestamp newRecommTimestamp = new Timestamp(
+				(long) (recommendationTimestamp.getTime() + medianPreceedingDuration));
 
 		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
 				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,

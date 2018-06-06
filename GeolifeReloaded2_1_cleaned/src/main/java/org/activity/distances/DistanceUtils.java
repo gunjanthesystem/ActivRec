@@ -445,7 +445,8 @@ public class DistanceUtils
 		// e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
 		// caseType, hjEditDistance, editDistancesMemorizer);//candAEDFeatDiffs.put(e.getKey(), res);}
 		// Alternatively
-		candAEDFeatDiffs = candidateTimelines.entrySet().parallelStream().collect(Collectors.toMap(
+		// TODO: TEMPORARILY DISABLE PARALLEL
+		candAEDFeatDiffs = candidateTimelines.entrySet()/* .parallelStream() */.stream().collect(Collectors.toMap(
 				e -> (String) e.getKey(),
 				e -> getActEditDistancesFeatDiffs(e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm,
 						timeAtRecomm, e.getKey(), caseType, hjEditDistance, editDistancesMemorizer),
