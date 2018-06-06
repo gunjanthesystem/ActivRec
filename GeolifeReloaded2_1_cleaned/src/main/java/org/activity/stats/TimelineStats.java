@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class TimelineStats
 	 * ActivityRegularityAnalysisTwoLevel";// "ActivityRegularityAnalysisOneLevel";// "Clustering";// "Clustering";// //
 	 * NGramAnalysis"; // "TimeSeriesAnalysis", "FeatureAnalysis"
 	 */
-	static final String typeOfAnalysis = "TimelineStats";// "NGramAnalysis";
+	static final String typeOfAnalysis = "NGramAnalysis";// "TimelineStats";// "NGramAnalysis";
 	// "TimelineStats";// "NGramAnalysis";// "TimeSeriesCorrelationAnalysis";// "SampleEntropyPerMAnalysis";//
 	// "SampleEntropyPerMAnalysis";//
 	// "TimeSeriesAnalysis";// "AlgorithmicAnalysis2"; "Clustering";// "ClusteringTimelineHolistic";// "
@@ -291,6 +292,7 @@ public class TimelineStats
 			}
 		}
 		consoleLogStream.close();
+		WToFile.resetConsoleOutput();
 	}
 
 	/**
@@ -2461,11 +2463,15 @@ public class TimelineStats
 		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
 
 		StringBuilder s = new StringBuilder();
-		s.append("User, User, NumOfActivityObjects");
+		s.append("User, User, NumOfActivityObjects, NumOfDistinctActIDsForThisUser");
 		for (Map.Entry<String, Timeline> entry : usersTimelines.entrySet())
 		{
+			Set<Integer> uniqueActIDsForThisUser = entry.getValue().getActivityObjectsInTimeline().stream()
+					.map(ao -> ao.getActivityID()).collect(Collectors.toSet());
+
 			s.append("\n" + entry.getKey() + "," + (Constant.getIndexOfUserID(Integer.valueOf(entry.getKey())) + 1)
-					+ "," + entry.getValue().size());
+					+ "," + entry.getValue().size() + "," + uniqueActIDsForThisUser.size() + ","
+					+ uniqueActIDsForThisUser.toString());
 		}
 
 		// WToFile.appendLineToFile(s.toString(), Constant.getDatabaseName() + fileNamePhrase);
@@ -2511,14 +2517,19 @@ public class TimelineStats
 			rowHeaderForEachUser.add(userName);
 		}
 
+		String headerForRowHeader = "UserName,Date,Day,";
 		CSVUtils.concatCSVFilesWithRowHeaderPerFile(actCountUserFilesToConcatenate, true,
-				pathToWrite + "AllUsersActivityCountsAllTimelines.csv", ',', rowHeaderForEachUser);
+				pathToWrite + "AllUsersActivityCountsAllTimelines.csv", ',', rowHeaderForEachUser, headerForRowHeader);
 
-		CSVUtils.concatCSVFilesWithRowHeaderPerFile(actDurationUserFilesToConcatenate, true,
-				pathToWrite + "AllUsersActivityDurationAllTimelines.csv", ',', rowHeaderForEachUser);
+		if (!Constant.getDatabaseName().equals("gowalla1"))
+		{// since gowalla data does not have duration
+			CSVUtils.concatCSVFilesWithRowHeaderPerFile(actDurationUserFilesToConcatenate, true,
+					pathToWrite + "AllUsersActivityDurationAllTimelines.csv", ',', rowHeaderForEachUser,
+					headerForRowHeader);
+		}
 
 		CSVUtils.concatCSVFilesWithRowHeaderPerFile(actOccuPerFilesToConcatenate, true,
-				pathToWrite + "AllUsersActivityOccPerAllTimelines.csv", ',', rowHeaderForEachUser);
+				pathToWrite + "AllUsersActivityOccPerAllTimelines.csv", ',', rowHeaderForEachUser, headerForRowHeader);
 	}
 
 	/**

@@ -2,6 +2,8 @@ package org.activity.io;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -387,6 +389,28 @@ public class WToFile
 		}
 
 		return consoleLogStream;
+	}
+
+	/**
+	 * Resetting console output to standard streams
+	 * <p>
+	 * ref: https://stackoverflow.com/questions/5339499/resetting-standard-output-stream
+	 * 
+	 * @param fullPathFileName
+	 *            absolute path with filename
+	 * @return PrintStream <b><font color="red">Remember to close this Printstream after writing to it.</font></b>
+	 */
+	public static void resetConsoleOutput()
+	{
+		try
+		{
+			System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
+			System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.out)));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**

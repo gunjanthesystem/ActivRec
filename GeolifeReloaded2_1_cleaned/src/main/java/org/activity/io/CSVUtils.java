@@ -909,10 +909,11 @@ public class CSVUtils
 	 * @param absfileToWrite
 	 * @param delimiter
 	 * @param rowHeaderPerFile
+	 * @param headerForRowHeader
 	 * @since May 18 2018
 	 */
 	public static void concatCSVFilesWithRowHeaderPerFile(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
-			String absfileToWrite, char delimiter, ArrayList<String> rowHeaderPerFile)
+			String absfileToWrite, char delimiter, ArrayList<String> rowHeaderPerFile, String headerForRowHeader)
 	{
 		int countOfFiles = 0, countOfTotalLines = 0;
 		try
@@ -943,7 +944,7 @@ public class CSVUtils
 
 					if (hasColumnHeader && countOfFiles == 1 && countOfLines == 1)
 					{
-						valsToWriteForThisRow.add("rowHeaderPerFile");
+						valsToWriteForThisRow.add(headerForRowHeader);
 					}
 					else// for non header lines only
 					{

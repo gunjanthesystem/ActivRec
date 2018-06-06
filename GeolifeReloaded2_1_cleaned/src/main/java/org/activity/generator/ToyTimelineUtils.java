@@ -23,6 +23,7 @@ import org.activity.objects.LocationGowalla;
 import org.activity.objects.Timeline;
 import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
+import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
@@ -146,7 +147,7 @@ public class ToyTimelineUtils
 				.toFasterIntObjectOpenHashMap((LinkedHashMap<Integer, LocationGowalla>) Serializer
 						.kryoDeSerializeThis(pathToGowallaPreProcessedData + "mapForAllLocationData.kryo"));
 
-		int numOfUsers = 5, numOfUniqueActs = 7;// minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7,
+		int numOfUsers = 5, numOfUniqueActs = 8;// minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7,
 		// minNumOfUniqueActIDsPerDay = 3, maxNumOfUniqueActIDsPerDay = 5;
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = new LinkedHashMap<>(numOfUsers);
@@ -175,15 +176,17 @@ public class ToyTimelineUtils
 		EnumeratedIntegerDistribution distriForNumOfActsPerDay = new EnumeratedIntegerDistribution(numOfActsPerDay,
 				pmdForNumOfActsPerDay);
 
-		double[] valsForPmdForActID = new double[] { 0.05, 0.20, 0.20, 0.35, 0.25 };
-		double[] pmdForValsForPmdForActID = new double[] { 0.15, 0.2, 0.2, 0.3, 0.15 };// probability mass distribution
+		// lower-> less num of unqiue acts for a user
+		double[] percentOfTotalUniqueActsForUser = new double[] { 30, 100, 80, 60, 20 };
+		double[] pmdForPercentOfTotalUniqueActsForUser = new double[] { 0.15, 0.35, 0.25, 0.10, 0.15 };
+		EnumeratedRealDistribution distriForPercentOfTotalUniqueActsForUser = new EnumeratedRealDistribution(
+				percentOfTotalUniqueActsForUser, pmdForPercentOfTotalUniqueActsForUser);
+
+		double[] valsForPmdForActID = new double[] { 0.05, 0.10, 0.25, 0.40, 0.20 };// { 0.05, 0.20, 0.20, 0.35, 0.25 };
+		double[] pmdForValsForPmdForActID = new double[] { 0.05, 0.30, 0.25, 0.15, 0.15 };
+		// probability mass distribution { 0.15, 0.2, 0.2, 0.3, 0.15 }
 		EnumeratedRealDistribution distriForValsForPmdForActID = new EnumeratedRealDistribution(valsForPmdForActID,
 				pmdForValsForPmdForActID);
-
-		int[] indexOfRandomActID = IntStream.range(0, numOfUniqueActs).toArray();
-		double[] pmdForIndexOfRandomActID = distriForValsForPmdForActID.sample(numOfUniqueActs);
-		EnumeratedIntegerDistribution distriForIndexOfRandomActID = new EnumeratedIntegerDistribution(
-				indexOfRandomActID, pmdForIndexOfRandomActID);
 
 		int[] numOfDaysForUserIndices = new int[] { 5, 3, 5, 6, 8 };
 
@@ -206,6 +209,18 @@ public class ToyTimelineUtils
 		{
 			String userID = selectedUserIDs.get(u);
 			int numOfDays = numOfDaysForUserIndices[u];
+
+			int numOfUniqueActIDsForThisUser = (int) Math
+					.ceil(((distriForPercentOfTotalUniqueActsForUser.sample() / 100.0) * uniqueActIDsSelected.size()));
+			PopUps.showMessage("numOfUniqueActIDsForThisUser = " + numOfUniqueActIDsForThisUser);
+			Collections.shuffle(uniqueActIDsSelected);// randmise the order
+			List<Integer> uniqueActIDsSelectedForThisUser = uniqueActIDsSelected.stream()
+					.limit(numOfUniqueActIDsForThisUser).collect(Collectors.toList());
+
+			int[] indicesOfRandomActID = IntStream.range(0, numOfUniqueActIDsForThisUser).toArray();
+			double[] pmdForIndexOfRandomActID = distriForValsForPmdForActID.sample(numOfUniqueActIDsForThisUser);
+			EnumeratedIntegerDistribution distriForIndexOfRandomActID = new EnumeratedIntegerDistribution(
+					indicesOfRandomActID, pmdForIndexOfRandomActID);
 
 			// get a random start date from min to +10 days
 			// long startTSForThisUser = minStartTimestampInms;// + 1000 * StatsUtils.randomInRange(0, 10 * 24 * 60 *
@@ -242,7 +257,7 @@ public class ToyTimelineUtils
 				Date dateForThisUserThisDay = new Date(timestampOfCurrentAOThisUser);
 				System.out.println("startTSForCurrentAO = " + new Timestamp(timestampOfCurrentAOThisUser));
 
-				int randomActIDForCurrentAO = uniqueActIDsSelected.get(distriForIndexOfRandomActID.sample());
+				int randomActIDForCurrentAO = uniqueActIDsSelectedForThisUser.get(distriForIndexOfRandomActID.sample());
 				// .get(StatsUtils.randomInRangeWithBias(0, numOfUniqueActs - 1, 0, .15));
 				// System.out.println("randomActIDForCurrentAO=" + randomActIDForCurrentAO);
 				// get location for this actID;
@@ -255,7 +270,23 @@ public class ToyTimelineUtils
 				for (int a = 0; a < numOfActsInThisDay; a++)
 				{
 					// choose next actID randomly
-					int randomActIDForNextAO = uniqueActIDsSelected.get(distriForIndexOfRandomActID.sample());
+
+					int randomActIDForNextAO = uniqueActIDsSelectedForThisUser
+							.get(distriForIndexOfRandomActID.sample());
+
+					// to minimise occurrence of consecutively similar actID
+					while (randomActIDForNextAO == randomActIDForCurrentAO)
+					{// to allow more consecutives decrease the range of (0,3)
+						if (StatsUtils.randomInRange(1, 5) == 1)// 20% allowance
+						{// allow
+							break;
+						}
+						else
+						{// not allow consecutive
+							randomActIDForNextAO = uniqueActIDsSelectedForThisUser
+									.get(distriForIndexOfRandomActID.sample());
+						}
+					}
 					// .get(StatsUtils.randomInRangeWithBias(0, numOfUniqueActs - 1, 0, .35));
 
 					// get location for next actID;
@@ -352,7 +383,8 @@ public class ToyTimelineUtils
 		// toyTimelines.put(uEntry.getKey(), (LinkedHashMap<Date, Timeline>) dayTimelinesWithMinUniqueActIDs);
 		// find the frequency count of each act for each user.
 
-		StringBuilder sbTS = new StringBuilder();
+		StringBuilder sbTS;
+		sbTS = new StringBuilder();
 		for (Entry<String, LinkedHashMap<Date, Timeline>> uE : toyTimelines.entrySet())
 		{
 			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
@@ -368,6 +400,66 @@ public class ToyTimelineUtils
 
 		WToFile.writeToNewFile(sbTS.toString(), Constant.getCommonPath() + "ToytimelinesTimestampsOnly.csv");
 		return toyTimelines;
+	}
+
+	public static void writeOnlyActIDs(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines,
+			String absFileToWrite)
+	{
+		StringBuilder sbTS = new StringBuilder();
+		for (Entry<String, LinkedHashMap<Date, Timeline>> uE : toyTimelines.entrySet())
+		{
+			sbTS.append("\n User: " + uE.getKey());
+			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
+			{
+				sbTS.append("\n" + dE.getKey().toString());
+				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				{
+					sbTS.append(">>" + ao.getActivityID());
+				}
+			}
+			// sbTS.append("\n");
+		}
+		WToFile.writeToNewFile(sbTS.toString(), absFileToWrite);
+	}
+
+	public static void writeOnlyActIDs2(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines,
+			String absFileToWrite)
+	{
+		StringBuilder sbTS = new StringBuilder();
+		for (Entry<String, LinkedHashMap<Date, Timeline>> uE : toyTimelines.entrySet())
+		{
+			sbTS.append("\n User: " + uE.getKey());
+			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
+			{
+				// sbTS.append("\n" + dE.getKey().toString());
+				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				{
+					sbTS.append(">>" + ao.getActivityID());
+				}
+			}
+			// sbTS.append("\n");
+		}
+		WToFile.writeToNewFile(sbTS.toString(), absFileToWrite);
+	}
+
+	public static void writeActIDTS(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines,
+			String absFileToWrite)
+	{
+		StringBuilder sbTS = new StringBuilder();
+		for (Entry<String, LinkedHashMap<Date, Timeline>> uE : toyTimelines.entrySet())
+		{
+			sbTS.append("\n User: " + uE.getKey());
+			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
+			{
+				// sbTS.append("\n" + dE.getKey().toString());
+				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				{
+					sbTS.append(">>" + ao.getActivityID() + "-" + ao.getStartTimestamp());
+				}
+			}
+			// sbTS.append("\n");
+		}
+		WToFile.writeToNewFile(sbTS.toString(), absFileToWrite);
 	}
 
 }

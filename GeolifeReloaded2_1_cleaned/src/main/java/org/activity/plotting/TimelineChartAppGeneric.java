@@ -81,6 +81,12 @@ public class TimelineChartAppGeneric extends Pane
 		return vbox;
 	}
 
+	/**
+	 * 
+	 * @param dataReceived
+	 * @param hasXAxisRangeSlider
+	 * @param typeOfTimelineChart
+	 */
 	public TimelineChartAppGeneric(List<List<List<String>>> dataReceived, boolean hasXAxisRangeSlider,
 			String typeOfTimelineChart)
 	{
@@ -119,7 +125,9 @@ public class TimelineChartAppGeneric extends Pane
 		// this.setXAxis(maxXAxis, minXAxis);
 
 		vbox.getChildren().add(timelineChart);
+
 		vbox.getChildren().add(createXAxisRangeSlider((NumberAxis) timelineChart.getXAxis(), maxXAxis, minXAxis));
+
 		VBox.setVgrow(timelineChart, Priority.ALWAYS);
 		// return vbox;
 		this.getChildren().add(vbox);

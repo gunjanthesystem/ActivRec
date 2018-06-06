@@ -80,6 +80,10 @@ public class SuperController
 				expectedNumOfColumnsInRoothPathFile);
 	}
 
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String args[])// _importantMay10
 	{
 		// searchContentInFile();
@@ -96,25 +100,28 @@ public class SuperController
 		// "/dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs/", "/dataWritten/Mar1ED0.25DurFPDistFPStFilter3hrs/",
 		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
 
-		//
 		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetB",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
 				"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
 
-		double[] EDAlphas = { 0.35, 0.75, 1, 0.15, 0, 0.5 };
+		double[] EDAlphas = { /* 0.35, 0.75, 1, 0.15, 0, */ 0.5 };
 
 		for (double edAlphaForAnExp : EDAlphas)
 		{
 			if (Constant.useToyTimelines)
 			{
+				// PopUps.showMessage("here inside toy!");
 				// Note: sampledUserIndicesSets are irrelavant for the toy timelines
 				main0(sampledUserIndicesSets[0], edAlphaForAnExp);
 			}
-			for (String sampledUserIndicesSet : sampledUserIndicesSets)
+			else
 			{
-				main0(sampledUserIndicesSet, edAlphaForAnExp);
+				for (String sampledUserIndicesSet : sampledUserIndicesSets)
+				{
+					main0(sampledUserIndicesSet, edAlphaForAnExp);
+				}
 			}
 		}
 		// cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
@@ -158,7 +165,7 @@ public class SuperController
 				Constant.setAKOMHighestOrder(order);
 				Constant.setRecentDaysInTrainingTimelines(numOfDay);
 
-				runExperiments(commonPath, false, true, true);
+				runExperiments(commonPath, false, true, true, "gowalla1");
 				// cleanUpSpace(commonPath, 0.80);
 				System.out.println("finished for commonPath = " + commonPath);
 			}
@@ -169,6 +176,11 @@ public class SuperController
 	}
 
 	/**
+	 * Precursor to running experiments for the users in sampledUserIndicesSetFile
+	 * <ul>
+	 * <li>Sets Constant.pathToRandomlySampledUserIndices, Constant.EDAlpha, labelForExperimentConfig</li>
+	 * <li>call runExperiments for different commonPaths</li>
+	 * </ul>
 	 * 
 	 * @param sampledUserIndicesSetFile
 	 * @param EDAlphaForThisExperiment
@@ -177,12 +189,98 @@ public class SuperController
 	public static void main0(String sampledUserIndicesSetFile, double EDAlphaForThisExperiment)
 	{
 		System.out.println("For this experiment: Java Version:" + System.getProperty("java.version"));
+		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
+		Constant.pathToRandomlySampledUserIndices = sampledUserIndicesSetFile;
+		System.out.println("Constant.pathToRandomLySampleUserIndices=" + sampledUserIndicesSetFile);
 
+		if (EDAlphaForThisExperiment > -1)// when EDAlphaForThisExperiment is <=-1, means we do not need to set it here.
+		{
+			Constant.EDAlpha = EDAlphaForThisExperiment;// Constant.setEDAlpha(EDAlphaForThisExperiment);//
+			System.out.println("SETTING EDAlpha dynamically");
+		}
+		else
+		{
+			System.out.println("NOT SETTING EDAlpha dynamically");
+		}
+		System.out.println("Constant.EDAlpha=" + Constant.EDAlpha);
+
+		String labelForExperimentConfig = getLabelForExperimentConfig(sampledUserIndicesSetFile);
+
+		String[] commonPaths = // { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + "/" };
+
+		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
+		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
+		/// run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar1ED
+		// "/run/media/gunjan/Buffer/Vault/GowallaResults/March1/" };
+		//
+		// Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis
+		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" }; //
+		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/"
+		// "/run/media/gunjan/BufferVault/GowallaResults/Feb25/" };
+		// "/run/media/gunjan/BufferVault/GowallaResults/Feb24/" };
+		// + "Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" };
+		// + "Feb18NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.4/" };
+		// + "/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
+		// + "/run/media/gunjan/BufferVault/GowallaResults/Feb13/" };
+		// "./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
+		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime5hrs/" };
+		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
+		// + "//Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8_part1/" };
+		// Feb11NCount_5DayFilter_ThreshNN500MedianRepCinsHierED/" };
+		// + "Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/" };//
+		// + "Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
+		// Feb8NCount_5DayFilter_ThreshNN500EditDists/" };
+		// + "//Jan31_SameSamples_AKOM5DayOrder3Test/" };
+		// + "Jan23_SameSamples_AKOM5DayOrder1/" };
+		// Jan6_Sampling_Ncount5DayThreshold500
+		// AKOM_916U_915N_5dayC_Order-3/" };//
+		// ""/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };
+		// + "Dec20_AKOM_1Cand_Order1/" };
+		// "./dataWritten/Ncount_100U_9kN_1C_ThreshNN-750/" };
+		// "./dataWrittenDec20_AKOM_1Cand_Order1/" };
+		// "./dataWritten/Dec20_NCount_AllCand5DayFilter/" };
+		// "./dataWritten/Dec16_PureAKOM_NoCandDayFIlter_Order3/" };
+		// "/run/media/gunjan/BufferVault/GowallaResults/Dec14_PureAKOM_NoCandDayFilter_Order1/" };
+		// ./dataWritten/Dec11NGram/" };// { "./dataWritten/Nov16_AKOM3_916U_10cand/",
+		// "./dataWritten/Nov16_AKOM3_916U_50cand/", "./dataWritten/Nov16_AKOM3_916U_100cand/" };
+		// int[] numOfCandsPerUser = { 10, 50, 100 }; { "/dataWritten/Nov10_AKOM1_9k1cand/"};
+		// { "./dataWritten/Nov12_NCount916U916N1C1500T/", "./dataWritten/Nov12_NCount916U916N1C750T/",
+		// "./dataWritten/Nov12_NCount916U916N1C500T/", "./dataWritten/Nov12_NCount916U916N1C250T/" };
+
+		for (int i = 0; i <= commonPaths.length - 1; i++)
+		{
+			File directory = new File(commonPaths[i]);
+			if (!directory.exists())
+			{
+				directory.mkdir();
+				// If you require it to make the entire directory path including parents,
+				// use directory.mkdirs(); here instead.
+			}
+			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
+			runExperiments(commonPaths[i], true, true, true, "gowalla1");
+			// cleanUpSpace(commonPaths[i], 0.90);
+			System.out.println("finished for commonPath = " + commonPaths[i]);
+		}
+
+		System.out.println(" Exiting SuperController");
+		// End
+		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
+	}
+
+	/**
+	 * Create the label for the experiment. Notes: Depends on several (static) paramaters from the Constant class.
+	 * 
+	 * @param sampledUserIndicesSetFile
+	 * @return
+	 */
+	private static String getLabelForExperimentConfig(String sampledUserIndicesSetFile)
+	{
 		String featuresUsedLabel = "", distNormalisationLabel = "", predictorLabel = "", EDAlphaLabel = "",
 				StFilterLabel = "", sampledUserSetLabel = "", nearestNeighbourCandLabel = "";
 
-		// Start of added on April 28 2018
-		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
+		// String sampledUserSetLabel;
 		String userSetLabelSplitted[] = sampledUserIndicesSetFile.split("\\.");
 		System.out.println("userSetLabelSplitted=" + Arrays.asList(userSetLabelSplitted));
 		sampledUserSetLabel = userSetLabelSplitted[2];
@@ -191,21 +289,7 @@ public class SuperController
 			sampledUserSetLabel = "";
 		}
 		System.out.println("sampledUserSetLabel=" + sampledUserSetLabel);
-		Constant.pathToRandomLySampleUserIndices = sampledUserIndicesSetFile;
-		System.out.println("Constant.pathToRandomLySampleUserIndices=" + sampledUserIndicesSetFile);
-		// End of added on April 28 2018
 
-		// Start of adding on May6 2018
-		if (EDAlphaForThisExperiment > -1)// when EDAlphaForThisExperiment is <=-1, means we do not need to set it here.
-		{
-			Constant.EDAlpha = EDAlphaForThisExperiment;
-			System.out.println("SETTING EDAlpha dynamically");
-		}
-		else
-		{
-			System.out.println("NOT SETTING EDAlpha dynamically");
-		}
-		System.out.println("Constant.EDAlpha=" + Constant.EDAlpha);
 		if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour))
 		{
 			if (Constant.nearestNeighbourCandEDThreshold != 500)
@@ -268,70 +352,9 @@ public class SuperController
 				}
 			}
 		}
-		// Start
-		String[] commonPaths = // { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + sampledUserSetLabel + predictorLabel + EDAlphaLabel
-						+ featuresUsedLabel + StFilterLabel + distNormalisationLabel + nearestNeighbourCandLabel
-						+ "/" };
 
-		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
-		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
-		/// run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar1ED
-		// "/run/media/gunjan/Buffer/Vault/GowallaResults/March1/" };
-		//
-		// Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis
-		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" }; //
-		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/"
-		// "/run/media/gunjan/BufferVault/GowallaResults/Feb25/" };
-		// "/run/media/gunjan/BufferVault/GowallaResults/Feb24/" };
-		// + "Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" };
-		// + "Feb18NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.4/" };
-		// + "/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
-		// + "/run/media/gunjan/BufferVault/GowallaResults/Feb13/" };
-		// "./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
-		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime5hrs/" };
-		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
-		// + "//Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8_part1/" };
-		// Feb11NCount_5DayFilter_ThreshNN500MedianRepCinsHierED/" };
-		// + "Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/" };//
-		// + "Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
-		// Feb8NCount_5DayFilter_ThreshNN500EditDists/" };
-		// + "//Jan31_SameSamples_AKOM5DayOrder3Test/" };
-		// + "Jan23_SameSamples_AKOM5DayOrder1/" };
-		// Jan6_Sampling_Ncount5DayThreshold500
-		// AKOM_916U_915N_5dayC_Order-3/" };//
-		// ""/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };
-		// + "Dec20_AKOM_1Cand_Order1/" };
-		// "./dataWritten/Ncount_100U_9kN_1C_ThreshNN-750/" };
-		// "./dataWrittenDec20_AKOM_1Cand_Order1/" };
-		// "./dataWritten/Dec20_NCount_AllCand5DayFilter/" };
-		// "./dataWritten/Dec16_PureAKOM_NoCandDayFIlter_Order3/" };
-		// "/run/media/gunjan/BufferVault/GowallaResults/Dec14_PureAKOM_NoCandDayFilter_Order1/" };
-		// ./dataWritten/Dec11NGram/" };// { "./dataWritten/Nov16_AKOM3_916U_10cand/",
-		// "./dataWritten/Nov16_AKOM3_916U_50cand/", "./dataWritten/Nov16_AKOM3_916U_100cand/" };
-		// int[] numOfCandsPerUser = { 10, 50, 100 }; { "/dataWritten/Nov10_AKOM1_9k1cand/"};
-		// { "./dataWritten/Nov12_NCount916U916N1C1500T/", "./dataWritten/Nov12_NCount916U916N1C750T/",
-		// "./dataWritten/Nov12_NCount916U916N1C500T/", "./dataWritten/Nov12_NCount916U916N1C250T/" };
-
-		for (int i = 0; i <= commonPaths.length - 1; i++)
-		{
-			File directory = new File(commonPaths[i]);
-			if (!directory.exists())
-			{
-				directory.mkdir();
-				// If you require it to make the entire directory path including parents,
-				// use directory.mkdirs(); here instead.
-			}
-			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], true, true, true);
-			// cleanUpSpace(commonPaths[i], 0.90);
-			System.out.println("finished for commonPath = " + commonPaths[i]);
-		}
-
-		System.out.println(" Exiting SuperController");
-		// End
-		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
+		return sampledUserSetLabel + predictorLabel + EDAlphaLabel + featuresUsedLabel + StFilterLabel
+				+ distNormalisationLabel + nearestNeighbourCandLabel;
 	}
 
 	public static void cleanUp(String[] pathsToClean)
@@ -339,18 +362,26 @@ public class SuperController
 		for (String pathToClean : pathsToClean)
 		{
 			cleanUpSpace(pathToClean, 0.90);
-		}
+		} // All correct
 	}
 
-	// All correct
 	/**
+	 * Run experiments:
+	 * <ul>
+	 * <li>Set databasename,outputCoreResultsPath, distanceUsed</li>
+	 * <li>Run ControllerWithoutServer</li>
+	 * <li>Run EvaluationSeq</li>
+	 * <li>Check for errors/exceptions in Log files</li>
+	 * </ul>
 	 * 
 	 * @param commonPath
 	 * @param recommendation
 	 * @param evaluation
 	 * @param hasMUs
+	 * @param databaseName
 	 **/
-	public static void runExperiments(String commonPath, boolean recommendation, boolean evaluation, boolean hasMUs)
+	public static void runExperiments(String commonPath, boolean recommendation, boolean evaluation, boolean hasMUs,
+			String databaseName)
 	{
 		long at = System.currentTimeMillis();
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC"y)); // added on April 21, 2016
@@ -359,7 +390,7 @@ public class SuperController
 		// String commonPath = "./dataWritten/Nov6_NCount916U916N100T/";// Aug17/";
 		// $$String commonPath = "./dataWritten/Nov12_NCount916U916N1C500T/";// Aug17/";
 		System.out.println("commonPath = " + commonPath);
-		String outputCoreResultsPathGowalla = commonPath;
+		// String outputCoreResultsPathGowalla = commonPath;
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
@@ -425,10 +456,9 @@ public class SuperController
 		// new ControllerWithoutServer();
 		// $$ CURRENT END
 
-		Constant.setDatabaseName("gowalla1");// ("dcu_data_2");// "geolife1"
+		Constant.setDatabaseName(databaseName);// "gowalla1");// ("dcu_data_2");// "geolife1"
 		// Constant.caseType = Enums.CaseType.SimpleV3;/// "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
-		Constant.setOutputCoreResultsPath(outputCoreResultsPathGowalla);// commonPathGeolife;// commonPathDCU +
-																		// "SimpleV3/";//
+		Constant.setOutputCoreResultsPath(commonPath);// commonPathGeolife;// commonPathDCU + "SimpleV3/";//
 		// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");

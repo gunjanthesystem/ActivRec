@@ -1,5 +1,6 @@
 package org.activity.plotting;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 
 import org.activity.ui.Dashboard3;
@@ -109,7 +110,11 @@ public class ActivityCircle extends Group
 	{
 		// System.out.println("updateTooltip() called");
 		GTooltipContent tooltipContent = (GTooltipContent) tooltip.getGraphic();
-		tooltipContent.update(endTimestamp, actName, high, low);
+		String endTSString = new Timestamp(Double.valueOf(endTimestamp).longValue()).toString();
+		// System.out.println("endTimestamp = " + endTimestamp);
+		// System.out.println("endTimestamp = " + endTSString);
+		//
+		tooltipContent.update(endTSString, actName, high, low);
 	}
 
 	/**

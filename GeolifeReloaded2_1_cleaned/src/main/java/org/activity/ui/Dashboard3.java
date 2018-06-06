@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -13,11 +14,13 @@ import org.activity.constants.Constant;
 import org.activity.constants.PathConstants;
 import org.activity.controller.ControllerWithoutServer;
 import org.activity.io.Serializer;
+import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartAppCanvas;
 import org.activity.plotting.TimelineChartAppGeneric;
 import org.activity.ui.colors.ColorPalette;
+import org.activity.util.TimelineUtils;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -49,6 +52,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -190,6 +196,10 @@ public class Dashboard3 extends Application
 	{
 		TabPane tabPane = new TabPane();
 		List<Tab> tabsToAdd = new ArrayList<>();
+
+		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = toOnlySeqOfActIDs(
+		// usersCleanedDayToyTimelines);
+
 		try
 		{
 			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
@@ -205,6 +215,7 @@ public class Dashboard3 extends Application
 				tabsToAdd.add(timelineTabCircle);
 				long tTimelinen = System.currentTimeMillis();
 				System.out.println("Time taken TimelineChartAppGeneric = " + (tTimelinen - tTimeline0) + " ms");
+
 			}
 			long tTimelineReal0 = System.currentTimeMillis();
 			Tab timelineTabCircleReal = new Tab("(Toy-Circle) Historical Timelines All Users");
@@ -217,14 +228,26 @@ public class Dashboard3 extends Application
 			System.out
 					.println("Time taken TimelineChartAppGeneric real = " + (tTimelineRealn - tTimelineReal0) + " ms");
 
-			long tTimelineCanvas0 = System.currentTimeMillis();
-			Tab timelineTabCanvas = new Tab("(Synth-Canvas) Historical Timelines All Users");
-			TimelineChartAppCanvas tcCanvas = new TimelineChartAppCanvas(timelineData, false);
-			timelineTabCanvas.setContent(tcCanvas.getVbox());// timelinesVBox2);
-			timelineTabCanvas.setClosable(true);
-			tabsToAdd.add(timelineTabCanvas);
-			long tTimelineCanvasn = System.currentTimeMillis();
-			System.out.println("Time taken TimelineChartAppCanvas = " + (tTimelineCanvasn - tTimelineCanvas0) + " ms");
+			if (true)
+			{
+				Tab onlyActIDsAsRects = new Tab("Only ActIDs Sequence");
+				onlyActIDsAsRects.setContent(createOnlyActIDsAsRects(usersCleanedDayToyTimelines));
+				onlyActIDsAsRects.setClosable(true);
+				tabsToAdd.add(onlyActIDsAsRects);
+			}
+
+			if (false)
+			{
+				long tTimelineCanvas0 = System.currentTimeMillis();
+				Tab timelineTabCanvas = new Tab("(Synth-Canvas) Historical Timelines All Users");
+				TimelineChartAppCanvas tcCanvas = new TimelineChartAppCanvas(timelineData, false);
+				timelineTabCanvas.setContent(tcCanvas.getVbox());// timelinesVBox2);
+				timelineTabCanvas.setClosable(true);
+				tabsToAdd.add(timelineTabCanvas);
+				long tTimelineCanvasn = System.currentTimeMillis();
+				System.out.println(
+						"Time taken TimelineChartAppCanvas = " + (tTimelineCanvasn - tTimelineCanvas0) + " ms");
+			}
 
 			Tab timelineTabD = new Tab("(Synth-Box) Historical Timelines All Users");
 			TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(/* usersCleanedDayToyTimelines */ timelineData,
@@ -464,6 +487,94 @@ public class Dashboard3 extends Application
 			e.printStackTrace();
 		}
 		return tabPane;
+	}
+
+	// private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toOnlySeqOfActIDs(
+	// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
+	// {
+	// long dummySTTSinms = 0;
+	// long dummyDurationinms = 4 * 1000;
+	//
+	// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> onlyActIDs = new LinkedHashMap<>();
+	//
+	// for (Entry<String, LinkedHashMap<Date, Timeline>> uEntry : usersCleanedDayToyTimelines.entrySet())
+	// {
+	// long startTSForUser = 0;
+	//
+	// for (Entry<Date, Timeline> dateEntry : uEntry.getValue().entrySet())
+	// {
+	// ArrayList<ActivityObject> allAOsInDay = new ArrayList<>();
+	// for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+	// {
+	// ao.setStartTimestamp(new Timestamp(startTSForUser));
+	// ao.setEndTimestamp(new Timestamp(startTSForUser + dummyDurationinms));
+	// startTSForUser = startTSForUser + dummyDurationinms + 1 * 1000;
+	// }
+	// Timeline t = new Timeline(allAOsInDay, false, true);
+	//
+	// }
+	// }
+	// return null;
+	// }
+
+	private Node createOnlyActIDsAsRects(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
+	{
+		LinkedHashMap<String, Timeline> continousTimelines = TimelineUtils
+				.dayTimelinesToTimelines(usersCleanedDayToyTimelines);
+
+		double widthOfActRect = 50, widthOfUserRect = 150;
+
+		ScrollPane s1 = new ScrollPane();
+
+		VBox vBox = new VBox();
+		vBox.setSpacing(10);
+		vBox.setAlignment(Pos.CENTER);
+
+		for (Entry<String, Timeline> userEntry : continousTimelines.entrySet())
+		{
+			HBox hBox = new HBox();
+			hBox.setSpacing(6);
+			hBox.setAlignment(Pos.CENTER_LEFT);
+
+			hBox.getChildren().add(createStackPane(Color.WHITE, "User " + userEntry.getKey(), widthOfUserRect));
+
+			for (ActivityObject ao : userEntry.getValue().getActivityObjectsInTimeline())
+			{
+				hBox.getChildren()
+						.add(createStackPane(ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID())),
+								String.valueOf(ao.getActivityID()), widthOfActRect));
+			}
+			vBox.getChildren().add(hBox);
+		}
+		s1.setContent(vBox);
+		s1.setFitToHeight(true);
+		s1.setFitToWidth(true);
+		return s1;
+	}
+
+	private Rectangle createRectangle(Color color, double width)
+	{
+		Rectangle rect1 = new Rectangle(0, 45, width, 50);
+		// Fill rectangle with color
+		rect1.setFill(color);
+		return rect1;
+	}
+
+	private Text createText(String text)
+	{
+		Text t = new Text();
+		// t.setFont(new Font(20));
+		t.setFont(Font.font(null, FontWeight.BOLD, 20));
+		t.setText(text);
+		return t;
+	}
+
+	private StackPane createStackPane(Color color, String text, double width)
+	{
+		final StackPane stack = new StackPane();
+		stack.getChildren().addAll(createRectangle(color, width), createText(text));
+		return stack;
 	}
 
 	Node createTableDemoNode()

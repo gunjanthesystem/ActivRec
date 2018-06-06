@@ -1,5 +1,6 @@
 package org.activity.ui.colors;
 
+import org.activity.ui.PopUps;
 import org.geotools.brewer.color.ColorBrewer;
 
 import javafx.scene.paint.Color;
@@ -93,6 +94,10 @@ public class ColorPalette
 
 	public static Color getColor(int index)
 	{
+		if (colors[index] == null)
+		{
+			PopUps.showError("colors[index]==null: colours not set, use setColors().");
+		}
 		return colors[index];
 	}
 
