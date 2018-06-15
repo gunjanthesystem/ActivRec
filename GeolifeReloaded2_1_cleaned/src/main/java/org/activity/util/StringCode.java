@@ -1031,7 +1031,7 @@ public class StringCode
 	 * @param activityObjects
 	 * @return
 	 */
-	public static String getStringCodeForActivityObjects(ArrayList<ActivityObject> activityObjects)
+	public static String getStringCodeForActivityObjectsFromActID(ArrayList<ActivityObject> activityObjects)
 	{
 		StringBuilder code = new StringBuilder();
 		// long t1, t2, t3, t4;
@@ -1039,7 +1039,7 @@ public class StringCode
 		for (ActivityObject ao : activityObjects)
 		{
 			// t1 = System.nanoTime();
-			code.append(ao.getCharCode());
+			code.append(ao.getCharCodeFromActID());
 			// t2 = System.nanoTime();
 		}
 
@@ -1085,7 +1085,7 @@ public class StringCode
 		int i = 0;
 		for (ActivityObject ao : activityObjects)
 		{
-			code[i] = (ao.getCharCode());
+			code[i] = (ao.getCharCodeFromActID());
 			i++;
 		}
 
@@ -1347,7 +1347,7 @@ public class StringCode
 		// Working category level, i.e., the category level used in the act objects are same as the level desired
 		if (DomainConstants.gowallaWorkingCatLevel == hierarchyLevelForEDForAO)
 		{
-			return (ArrayList<String>) Collections.singletonList(getStringCodeForActivityObjects(activityObjects));
+			return (ArrayList<String>) Collections.singletonList(getStringCodeForActivityObjectsFromActID(activityObjects));
 		}
 
 		// Working category level, i.e., the category level used in the act objects is lower (more specific) than the
@@ -1452,7 +1452,7 @@ public class StringCode
 		// Working category level, i.e., the category level used in the act objects are same as the level desired
 		if (DomainConstants.gowallaWorkingCatLevel == hierarchyLevelForEDForAO)
 		{
-			return getStringCodeForActivityObjects(activityObjects);
+			return getStringCodeForActivityObjectsFromActID(activityObjects);
 		}
 
 		// Working category level, i.e., the category level used in the act objects is lower (more specific) than the

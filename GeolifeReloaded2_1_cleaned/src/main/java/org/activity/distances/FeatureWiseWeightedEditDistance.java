@@ -194,8 +194,8 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 		 */
 		LinkedHashMap<String, Pair<String, Double>> mapOfDistances = new LinkedHashMap<String, Pair<String, Double>>();
 
-		String stringCodeForActivityNames1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
-		String stringCodeForActivityNames2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
+		String stringCodeForActivityNames1 = StringCode.getStringCodeForActivityObjectsFromActID(activityObjects1);
+		String stringCodeForActivityNames2 = StringCode.getStringCodeForActivityObjectsFromActID(activityObjects2);
 
 		Pair<String, Double> levenshteinActivityNameTripe = getMySimpleLevenshteinDistancePair(
 				stringCodeForActivityNames1, stringCodeForActivityNames2, 1, 1, 2);

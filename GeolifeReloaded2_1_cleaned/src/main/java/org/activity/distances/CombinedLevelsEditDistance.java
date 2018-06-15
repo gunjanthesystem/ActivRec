@@ -727,8 +727,8 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 		activityObjects1 = pruneFirstUnknown(activityObjects1);
 		activityObjects2 = pruneFirstUnknown(activityObjects2);
 
-		String stringCodeForActivityObjects1 = StringCode.getStringCodeForActivityObjects(activityObjects1);
-		String stringCodeForActivityObjects2 = StringCode.getStringCodeForActivityObjects(activityObjects2);
+		String stringCodeForActivityObjects1 = StringCode.getStringCodeForActivityObjectsFromActID(activityObjects1);
+		String stringCodeForActivityObjects2 = StringCode.getStringCodeForActivityObjectsFromActID(activityObjects2);
 
 		// double levenshteinDistance =StringUtils.getLevenshteinDistance(stringCodeForActivityObjects1,
 		// stringCodeForActivityObjects2);

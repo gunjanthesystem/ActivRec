@@ -13,6 +13,8 @@ import java.util.stream.IntStream;
 
 import org.activity.stats.StatsUtils;
 import org.activity.util.RegexUtils;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.IntArraySerializer;
 import com.esotericsoftware.kryo.serializers.DefaultSerializers.StringSerializer;
@@ -186,7 +188,14 @@ public class TestDummy1
 
 	public static void main(String args[])
 	{
-		checkReferencing();
+		// $$ checkReferencing();
+		checkNDArray();
+	}
+
+	public static void checkNDArray()
+	{
+		INDArray input135 = Nd4j.zeros(1, 3, 5);
+		// System.out.println("input135=\n" + input135.toString());
 	}
 
 	/**

@@ -35,7 +35,7 @@ import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeqNov2017;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
-import org.activity.recomm.RecommendationMasterRNN1Nov2017;
+import org.activity.recomm.RecommendationMasterRNN1Jun2018;
 import org.activity.sanityChecks.Sanity;
 import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.stats.StatsUtils;
@@ -127,7 +127,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	{
 		System.out.println("\n\n **********Entering RecommendationTestsMar2017GenSeqCleaned2********** " + lookPastType
 				+ " " + caseType + " lengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
-		PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
+		// PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
 		long recommTestsStarttime = System.currentTimeMillis();
 
 		this.primaryDimension = Constant.primaryDimension;
@@ -323,7 +323,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// for org.activity.io.WritingToFile.writeEditDistancesPerRtPerCand() which is called in recomm
 						// master
 						WToFile.writeToNewFile(
-								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline\n",
+								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand,CurrTimeline,CandTimeline, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline\n",
 								commonPath + "EditDistancePerRtPerCand.csv");
 
 						System.out.println(Constant.getCommonPath() + "\n" + Constant.getAllGlobalConstants());
@@ -833,11 +833,26 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1)
 										// Alternative algorithm
-										{
-											recommMasters[seqIndex] = new RecommendationMasterRNN1Nov2017(50, 2,
-													dateToRecomm, recommTimesStrings[0], userId,
-													trainTestTimelinesForAllUsersDW, trainTimelinesAllUsersContinuous);
-
+										{// recommMasters[seqIndex]
+											RecommendationMasterRNN1Jun2018 rnnMaster = null;
+											// Since this algorithm does not recommend interatively;
+											if (seqIndex == 0)
+											{
+												rnnMaster = new RecommendationMasterRNN1Jun2018(userTrainingTimelines,
+														userTestTimelines, dateToRecomm, recommTimesStrings[0], userId,
+														thresholdValue, typeOfThreshold, caseType, this.lookPastType,
+														false, repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
+														trainTimelinesAllUsersContinuous, Constant.altSeqPredictor,
+														recommSeqLength);
+											}
+											else
+											{
+												rnnMaster = (RecommendationMasterRNN1Jun2018) recommMasters[0];
+											}
+											rnnMaster.setIndexOfRecommSeq(seqIndex);
+											recommMasters[seqIndex] = rnnMaster;
+											// (50, 2,dateToRecomm, recommTimesStrings[0], userId,
+											// trainTestTimelinesForAllUsersDW, trainTimelinesAllUsersContinuous);
 										}
 
 										else

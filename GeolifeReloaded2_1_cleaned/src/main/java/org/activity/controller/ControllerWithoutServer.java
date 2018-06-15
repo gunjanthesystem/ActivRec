@@ -225,7 +225,7 @@ public class ControllerWithoutServer
 
 			if (Constant.useToyTimelines)
 			{
-				boolean createToyTimelines = true, serialiseToyTimelines = true, deserialiseToyTimelines = false;// strue;
+				boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;// strue;
 				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines = null;
 				if (createToyTimelines)
 				{
@@ -272,7 +272,7 @@ public class ControllerWithoutServer
 						false, "GowallaUserDayToyTimelines.csv", commonBasePath);
 				// PopUps.showMessage("here2");
 				TimelineStats.timelineStatsController(usersToyDayTimelines);
-				System.exit(0);
+				// System.exit(0);
 				// End of Moved here on 18 May 2018
 
 				// make the usersCleanedDayTimelines point to the toy timelines

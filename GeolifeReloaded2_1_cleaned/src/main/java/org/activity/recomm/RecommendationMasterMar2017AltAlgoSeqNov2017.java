@@ -270,6 +270,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			// System.out.println("Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM) = "
 			// + Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM));
 			if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
+			// || Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 			{
 				System.out.println("NO CAND EXTRACTION!");
 				this.candidateTimelines = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
@@ -279,7 +280,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			}
 			else
 			{
-				System.out.println("Extracting Candidates");
+				System.out.println("Alert! Extracting Candidates");
 				this.candidateTimelines = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines,
 						lookPastType, this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm,
 						matchingUnitInCountsOrHours, this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers,
@@ -1486,7 +1487,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		StringBuilder code = new StringBuilder();
 		for (ActivityObject ao : activityObjects)
 		{
-			code.append(ao.getCharCode());
+			code.append(ao.getCharCodeFromActID());
 		}
 		return code.toString();
 	}
