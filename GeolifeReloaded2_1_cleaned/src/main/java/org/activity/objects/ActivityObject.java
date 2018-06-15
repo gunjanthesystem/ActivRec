@@ -1204,7 +1204,7 @@ public class ActivityObject implements Serializable
 	 * @since 30 Nov 2016
 	 * @return
 	 */
-	public char getCharCode()
+	public char getCharCodeFromActID()
 	{
 		// PopUps.printTracedWarningMsg("DebugMar9: look who is calling\n");
 		return StringCode.getCharCodeFromActivityID(this.activityID);

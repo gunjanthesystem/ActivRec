@@ -89,11 +89,13 @@ public final class Constant
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10//AKOM
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.RNN1;// SWITCH_NOV10//AKOM
 
 	private static int AKOMHighestOrder = -1;// 1;// 3;// SWITCH_NOV10
+	private static int RNNCurrentActivitityLength = 1;
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
+	public static final boolean sameRNNForAllRTsOfAUser = true;// SWITCH_NOV10
 
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
@@ -195,7 +197,7 @@ public final class Constant
 	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
 
 	public static final boolean useRTVerseNormalisationForED = true;// SWITCH_April24
-	public static final double percentileForRTVerseMaxForEDNorm = 75;// -1// SWITCH_April24
+	public static final double percentileForRTVerseMaxForEDNorm = 100;// -1// SWITCH_April24
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
 
@@ -222,7 +224,7 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useToyTimelines = true;
+	public static final boolean useToyTimelines = false;// true;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -517,6 +519,10 @@ public final class Constant
 			matchingUnitArray = new double[] { Constant.AKOMHighestOrder - 1 }; // added on 31 Jan 2018
 			// System.out.println("Here set");
 			// PopUps.showError("Here Set");
+		}
+		else if (altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
+		{
+			matchingUnitArray = new double[] { Constant.RNNCurrentActivitityLength };
 		}
 
 		else if (lookPastType.equals(Enums.LookPastType.NCount))// "Count"))
@@ -1403,7 +1409,9 @@ public final class Constant
 		s.append("\nlookPastType:" + lookPastType);
 		s.append("\naltSeqPredictor:" + altSeqPredictor);
 		s.append("\nAKOMHighestOrder:" + AKOMHighestOrder);
+		s.append("\nRNNCurrentActivitityLength:" + RNNCurrentActivitityLength);
 		s.append("\nsameAKOMForAllRTsOfAUser:" + sameAKOMForAllRTsOfAUser);
+		s.append("\nsameRNNForAllRTsOfAUser:" + sameRNNForAllRTsOfAUser);
 
 		s.append("\nDaywiseAllowSpillOverDaysOfCurr:" + DaywiseAllowSpillOverDaysOfCurr);
 		s.append("\nClosestTimeAllowSpillOverDays:" + ClosestTimeAllowSpillOverDays);
@@ -1591,6 +1599,11 @@ public final class Constant
 	public static Int2CharOpenHashMap getActIDCharCodeMap()
 	{
 		return actIDCharCodeMap;
+	}
+
+	public static Char2IntOpenHashMap getCharCodeActIDMap()
+	{
+		return charCodeActIDMap;
 	}
 
 }

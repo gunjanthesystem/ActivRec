@@ -521,7 +521,7 @@ public class Timeline implements Serializable
 	{
 		StringBuilder stringCodeForTimeline = new StringBuilder();
 
-		activityObjectsInTimeline.stream().forEachOrdered(ao -> stringCodeForTimeline.append(ao.getCharCode()));
+		activityObjectsInTimeline.stream().forEachOrdered(ao -> stringCodeForTimeline.append(ao.getCharCodeFromActID()));
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{
@@ -545,7 +545,7 @@ public class Timeline implements Serializable
 		StringBuilder stringCodeForTimeline = new StringBuilder();
 
 		activityObjectsInTimeline.stream()
-				.forEachOrdered(ao -> stringCodeForTimeline.append(ao.getCharCode()).append(delimiter));
+				.forEachOrdered(ao -> stringCodeForTimeline.append(ao.getCharCodeFromActID()).append(delimiter));
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{

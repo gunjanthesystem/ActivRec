@@ -196,9 +196,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 		else
 		{
 			stringCodesForActivityObjects1 = (ArrayList<String>) Collections
-					.singletonList(StringCode.getStringCodeForActivityObjects(activityObjects1));
+					.singletonList(StringCode.getStringCodeForActivityObjectsFromActID(activityObjects1));
 			stringCodesForActivityObjects2 = (ArrayList<String>) Collections
-					.singletonList(StringCode.getStringCodeForActivityObjects(activityObjects2));
+					.singletonList(StringCode.getStringCodeForActivityObjectsFromActID(activityObjects2));
 		}
 
 		Pair<String, Double> levenshteinDistance = null;
@@ -342,9 +342,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 		else
 		{
 			stringCodesForActivityObjects1 = (ArrayList<String>) Collections
-					.singletonList(StringCode.getStringCodeForActivityObjects(activityObjects1));
+					.singletonList(StringCode.getStringCodeForActivityObjectsFromActID(activityObjects1));
 			stringCodesForActivityObjects2 = (ArrayList<String>) Collections
-					.singletonList(StringCode.getStringCodeForActivityObjects(activityObjects2));
+					.singletonList(StringCode.getStringCodeForActivityObjectsFromActID(activityObjects2));
 		}
 
 		Pair<String, Double> levenshteinDistance = null;

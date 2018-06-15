@@ -44,6 +44,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -537,13 +538,13 @@ public class Dashboard3 extends Application
 			hBox.setSpacing(6);
 			hBox.setAlignment(Pos.CENTER_LEFT);
 
-			hBox.getChildren().add(createStackPane(Color.WHITE, "User " + userEntry.getKey(), widthOfUserRect));
+			hBox.getChildren().add(createStackPane(Color.WHITE, "User " + userEntry.getKey(), widthOfUserRect, ""));
 
 			for (ActivityObject ao : userEntry.getValue().getActivityObjectsInTimeline())
 			{
 				hBox.getChildren()
 						.add(createStackPane(ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID())),
-								String.valueOf(ao.getActivityID()), widthOfActRect));
+								String.valueOf(ao.getActivityID()), widthOfActRect, ao.getStartTimestamp().toString()));
 			}
 			vBox.getChildren().add(hBox);
 		}
@@ -570,10 +571,15 @@ public class Dashboard3 extends Application
 		return t;
 	}
 
-	private StackPane createStackPane(Color color, String text, double width)
+	private StackPane createStackPane(Color color, String text, double width, String tooltipText)
 	{
 		final StackPane stack = new StackPane();
-		stack.getChildren().addAll(createRectangle(color, width), createText(text));
+		Rectangle r = createRectangle(color, width);
+		stack.getChildren().addAll(r, createText(text));
+		Tooltip tooltip2 = new Tooltip();
+		UIUtilityBox.hackTooltipStartTiming(tooltip2);
+		tooltip2.setText(tooltipText);
+		Tooltip.install(stack, tooltip2);
 		return stack;
 	}
 

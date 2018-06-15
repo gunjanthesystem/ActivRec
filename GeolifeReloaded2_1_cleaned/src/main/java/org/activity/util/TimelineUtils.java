@@ -3711,8 +3711,8 @@ public class TimelineUtils
 
 		// find the end points in the userDayTimeline
 		char activityAtRecommPointAsStringCode = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1)
-				.getCharCode();
-		String activitiesGuidingAsStringCode = StringCode.getStringCodeForActivityObjects(activitiesGuidingRecomm);
+				.getCharCodeFromActID();
+		String activitiesGuidingAsStringCode = StringCode.getStringCodeForActivityObjectsFromActID(activitiesGuidingRecomm);
 		String userDayTimelineAsStringCode = candidateDayTimeline.getActivityObjectsAsStringCode();
 
 		ArrayList<Integer> indicesOfEndPointActivityInDayButNotLastValid = getIndicesOfEndPointActivityInDayButNotLastValid(

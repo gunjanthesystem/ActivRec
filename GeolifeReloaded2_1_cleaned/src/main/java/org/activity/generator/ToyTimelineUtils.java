@@ -147,7 +147,7 @@ public class ToyTimelineUtils
 				.toFasterIntObjectOpenHashMap((LinkedHashMap<Integer, LocationGowalla>) Serializer
 						.kryoDeSerializeThis(pathToGowallaPreProcessedData + "mapForAllLocationData.kryo"));
 
-		int numOfUsers = 5, numOfUniqueActs = 8;// minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7,
+		int numOfUsers = 5, numOfUniqueActs = 10;// minNumOfDaysPerUser = 5, maxNumOfDaysPerUser = 7,
 		// minNumOfUniqueActIDsPerDay = 3, maxNumOfUniqueActIDsPerDay = 5;
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = new LinkedHashMap<>(numOfUsers);
@@ -171,19 +171,19 @@ public class ToyTimelineUtils
 		// r.nextInt(numOfUniqueActs);
 
 		// Distribution for number of acts per day
-		int[] numOfActsPerDay = new int[] { 3, 4, 5, 8 };
+		int[] numOfActsPerDay = new int[] { 7, 5, 6, 8 };// { 3, 4, 5, 8 };
 		double[] pmdForNumOfActsPerDay = new double[] { 0.15, 0.4, 0.3, 0.15 };// probability mass distribution
 		EnumeratedIntegerDistribution distriForNumOfActsPerDay = new EnumeratedIntegerDistribution(numOfActsPerDay,
 				pmdForNumOfActsPerDay);
 
 		// lower-> less num of unqiue acts for a user
-		double[] percentOfTotalUniqueActsForUser = new double[] { 30, 100, 80, 60, 20 };
+		double[] percentOfTotalUniqueActsForUser = new double[] { 30, 100, 80, 60, 80 };
 		double[] pmdForPercentOfTotalUniqueActsForUser = new double[] { 0.15, 0.35, 0.25, 0.10, 0.15 };
 		EnumeratedRealDistribution distriForPercentOfTotalUniqueActsForUser = new EnumeratedRealDistribution(
 				percentOfTotalUniqueActsForUser, pmdForPercentOfTotalUniqueActsForUser);
 
-		double[] valsForPmdForActID = new double[] { 0.05, 0.10, 0.25, 0.40, 0.20 };// { 0.05, 0.20, 0.20, 0.35, 0.25 };
-		double[] pmdForValsForPmdForActID = new double[] { 0.05, 0.30, 0.25, 0.15, 0.15 };
+		double[] valsForPmdForActID = new double[] { 0.15, 0.25, 0.40, 0.20 };// { 0.05, 0.20, 0.20, 0.35, 0.25 };
+		double[] pmdForValsForPmdForActID = new double[] { 0.30, 0.25, 0.15, 0.20 };
 		// probability mass distribution { 0.15, 0.2, 0.2, 0.3, 0.15 }
 		EnumeratedRealDistribution distriForValsForPmdForActID = new EnumeratedRealDistribution(valsForPmdForActID,
 				pmdForValsForPmdForActID);

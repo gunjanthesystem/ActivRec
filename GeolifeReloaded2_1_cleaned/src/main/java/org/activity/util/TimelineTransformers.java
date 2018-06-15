@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -16,6 +17,9 @@ import org.activity.objects.Timeline;
 import org.activity.stats.HilbertCurveUtils;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
+
+import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
 
 /**
  * 
@@ -416,7 +420,7 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = dataEntry.getValue().getCharCode();
+					value = dataEntry.getValue().getCharCodeFromActID();
 					dataToPut.put(dataEntry.getKey(), String.valueOf(value));
 				}
 
@@ -460,7 +464,7 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = String.valueOf(dataEntry.getValue().getCharCode());
+					value = String.valueOf(dataEntry.getValue().getCharCodeFromActID());
 					dataToPut.append(value);
 				}
 
@@ -508,7 +512,7 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = String.valueOf(dataEntry.getValue().getCharCode());
+					value = String.valueOf(dataEntry.getValue().getCharCodeFromActID());
 					dataToPut.append(value);
 				}
 
@@ -831,6 +835,86 @@ public class TimelineTransformers
 		}
 
 		return seqOfActIDs2;
+	}
+
+	/**
+	 * 
+	 * @param givenAOs
+	 * @param verbose
+	 * @param actIDCharCodeMap
+	 *            (expected get it from Constant class)
+	 * @return
+	 * @since 14 June 2018
+	 */
+	public static ArrayList<Character> listOfActObjsToListOfCharCodesFromActIDs(ArrayList<ActivityObject> givenAOs,
+			boolean verbose, Int2CharOpenHashMap actIDCharCodeMap)
+	{
+		ArrayList<Character> seqOfActIDs2 = new ArrayList<>(givenAOs.size());
+		// ArrayList<Integer> seqOfActIDs = new ArrayList<>(givenAOs.size());
+		// for (ActivityObject ao : givenAOs){ seqOfActIDs.add(Integer.valueOf(ao.getActivityName()));}
+
+		for (ActivityObject ao : givenAOs)
+		{
+			seqOfActIDs2.add(actIDCharCodeMap.get(ao.getActivityID()));
+			// seqOfActIDs2.add(ao.getCharCodeFromActID());
+		}
+
+		// start of sanity check Passed
+		// if (true){if (seqOfActIDs.equals(seqOfActIDs2)){
+		// System.out.println("Sanity check Dec 15_2 passed");
+		// }else{System.out.println("Sanity check Dec 15_2 failed");} }
+		// end of sanity check
+
+		if (verbose)
+		{
+			StringBuilder sb = new StringBuilder();
+			givenAOs.stream().forEachOrdered(ao -> sb.append(ao.getActivityID() + ">>"));
+			sb.append("\n");
+			seqOfActIDs2.stream().forEachOrdered(i -> sb.append(i + ">>"));
+			System.out.println("---listOfActObjsToListOfCharCodesFromActIDs verbose-\n" + sb.toString() + "\n-----\n");
+		}
+
+		return seqOfActIDs2;
+	}
+
+	/**
+	 * 
+	 * @param givenAOs
+	 * @param verbose
+	 * @param actIDCharCodeMap
+	 *            (expected get it from Constant class)
+	 * @return
+	 * @since 14 June 2018
+	 */
+	public static ArrayList<Integer> listOfCharCodesToActIDs(List<Character> charCodes, boolean verbose,
+			Char2IntOpenHashMap charCodeActIDMap)
+	{
+		ArrayList<Integer> seqOfActIDs = new ArrayList<>(charCodes.size());
+		// ArrayList<Integer> seqOfActIDs = new ArrayList<>(givenAOs.size());
+		// for (ActivityObject ao : givenAOs){ seqOfActIDs.add(Integer.valueOf(ao.getActivityName()));}
+
+		for (Character c : charCodes)
+		{
+			seqOfActIDs.add(charCodeActIDMap.get(c.charValue()));
+			// seqOfActIDs2.add(ao.getCharCodeFromActID());
+		}
+
+		// start of sanity check Passed
+		// if (true){if (seqOfActIDs.equals(seqOfActIDs2)){
+		// System.out.println("Sanity check Dec 15_2 passed");
+		// }else{System.out.println("Sanity check Dec 15_2 failed");} }
+		// end of sanity check
+
+		if (verbose)
+		{
+			StringBuilder sb = new StringBuilder();
+			charCodes.stream().forEachOrdered(c -> sb.append(c.charValue() + ">>"));
+			sb.append("\n");
+			seqOfActIDs.stream().forEachOrdered(i -> sb.append(i + ">>"));
+			System.out.println("---listOfCharCodesToActIDs verbose-\n" + sb.toString() + "\n-----\n");
+		}
+
+		return seqOfActIDs;
 	}
 
 	/**

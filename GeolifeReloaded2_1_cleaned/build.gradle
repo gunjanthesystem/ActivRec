@@ -104,9 +104,12 @@ dependencies
 	
     
     //compile "org.deeplearning4j:deeplearning4j-core:0.9.1"//0.8.0
-    compile 'org.deeplearning4j:deeplearning4j-core:1.0.0-alpha'
-    //compile "org.nd4j:nd4j-native-platform:0.9.1"
-    compile 'org.nd4j:nd4j:1.0.0-alpha'
+    compile 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta'
+    //1.0.0-alpha'
+    
+    compile 'org.nd4j:nd4j-native-platform:1.0.0-beta'//0.9.1"
+    //compile 'org.nd4j:nd4j-native-platform:1.0.0-alpha'
+    //compile 'org.nd4j:nd4j:1.0.0-beta'//1.0.0-alpha'
     //compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
     //compile 'org.deeplearning4j:deeplearning4j-ui-parent:1.0.0-alpha'
 
@@ -178,7 +181,8 @@ apply plugin: "us.kirchmeier.capsule"
 /////////////////////////////////////////////////////////////////////////////
 
 //  to run 
-mainClassName = 'org.activity.generator.DatabaseCreatorGowallaQuicker1'
+mainClassName = 'org.activity.controller.SuperController'
+//'org.activity.generator.DatabaseCreatorGowallaQuicker1'
 //'org.activity.controller.SuperController'
 //'org.activity.generator.GowallaPreProcessorUtils'
 

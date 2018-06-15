@@ -3288,12 +3288,16 @@ public class WToFile
 				// "null";
 
 				String candidateTimelineAsString = " ";
+				String candidateTimelineAsStringPDOnly = " ";
 				String editOperationsString = " ";
 
 				if (writeCandidateTimeline)
 				{
 					candidateTimelineAsString = candidateTimelines.get(candTimelineID)
 							.getActivityObjectPDValsWithTimestampsInSequence();
+
+					candidateTimelineAsStringPDOnly = getTimelineAsOnlyPDVal(
+							candidateTimelines.get(candTimelineID).getActivityObjectsInTimeline());
 				}
 
 				if (writeEditOperations)
@@ -3317,6 +3321,8 @@ public class WToFile
 					writefull = false;
 				}
 
+				String currTimelineOnlyPD = getTimelineAsOnlyPDVal(currentTimeline);
+
 				///
 				Integer endPointIndexInCand = endPointIndicesInCands.get(candTimelineID);
 				ActivityObject endPointActivityInCandidate = candidateTimelines.get(candTimelineID)
@@ -3332,8 +3338,9 @@ public class WToFile
 				///
 
 				sbToWrite.append(userString + "," + dateString + "," + timeString + "," + candTimelineID + ","
-						+ endPointIndexInCand + "," + editOperationsString + "," + editDist + "," + countOfL1Ops + ","
-						+ countOfL2Ops + "," + nextAOPDVals + "," + diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
+						+ endPointIndexInCand + "," + currTimelineOnlyPD + "," + candidateTimelineAsStringPDOnly + ","
+						+ editOperationsString + "," + editDist + "," + countOfL1Ops + "," + countOfL2Ops + ","
+						+ nextAOPDVals + "," + diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
 						+ diffEndTimeForEndPointsCand_n_GuidingInSecs + "," + candidateTimelineAsString + ","
 						+ currentTimelineString + "\n");
 
@@ -3367,6 +3374,22 @@ public class WToFile
 		{
 			s += ">>" + ao.getActivityName() + "--" + ao.getPrimaryDimensionVal("|") + "--" + ao.getStartTimestamp()
 					+ "--" + ao.getDurationInSeconds();
+		}
+		return s;
+	}
+
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	public static String getTimelineAsOnlyPDVal(ArrayList<ActivityObject> array)
+	{
+		String s = "";
+
+		for (ActivityObject ao : array)
+		{
+			s += ">>" + ao.getPrimaryDimensionVal("|");
 		}
 		return s;
 	}

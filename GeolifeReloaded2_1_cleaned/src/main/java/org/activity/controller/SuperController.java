@@ -100,13 +100,14 @@ public class SuperController
 		// "/dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs/", "/dataWritten/Mar1ED0.25DurFPDistFPStFilter3hrs/",
 		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
 
-		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv",
-				"./dataToRead/RandomlySample100UsersApril24_2018.SetB",
-				"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
-				"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
-				"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv" };
+		// ,
+		// "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+		// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",
+		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD",
+		// "./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
 
-		double[] EDAlphas = { /* 0.35, 0.75, 1, 0.15, 0, */ 0.5 };
+		double[] EDAlphas = { -1/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
 
 		for (double edAlphaForAnExp : EDAlphas)
 		{
