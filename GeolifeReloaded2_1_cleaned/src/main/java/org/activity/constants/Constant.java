@@ -225,6 +225,11 @@ public final class Constant
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
 	public static final boolean useToyTimelines = false;// true;
+
+	public static final int numOfHiddenLayersInRNN1 = 5;
+	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 100;
+	public static final int numOfTrainingEpochsInRNN1 = 500;
+	public static final double learningRateInRNN1 = 0.001;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -522,7 +527,7 @@ public final class Constant
 		}
 		else if (altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 		{
-			matchingUnitArray = new double[] { Constant.RNNCurrentActivitityLength };
+			matchingUnitArray = new double[] { Constant.RNNCurrentActivitityLength - 1 };
 		}
 
 		else if (lookPastType.equals(Enums.LookPastType.NCount))// "Count"))
@@ -1504,6 +1509,10 @@ public final class Constant
 		s.append("\nuseRTVerseNormalisationForED:" + useRTVerseNormalisationForED);
 		s.append("\npercentileForRTVerseMaxForEDNorm:" + percentileForRTVerseMaxForEDNorm);
 		s.append("\nuseToyTimelines:" + useToyTimelines);
+		s.append("\nnumOfHiddenLayersInRNN1:" + numOfHiddenLayersInRNN1);
+		s.append("\nnumOfNeuronsInEachHiddenLayerInRNN1:" + numOfNeuronsInEachHiddenLayerInRNN1);
+		s.append("\nnumOfTrainingEpochsInRNN1:" + Constant.numOfTrainingEpochsInRNN1);
+		s.append("\nlearningRateInRNN1:" + Constant.learningRateInRNN1);
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))

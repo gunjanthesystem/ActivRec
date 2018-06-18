@@ -577,8 +577,8 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 			// Non relevant Curtain end
 
 			this.recommendedActivityNamesWithRankscores = getTopPredictedRNNActivityPDVals(this.activitiesGuidingRecomm,
-					this.lookPastType, this.candidateTimelines, 1, false, Constant.getAKOMHighestOrder(),
-					this.userIDAtRecomm, altSeqPredictor, recommSeqLength);
+					this.lookPastType, this.candidateTimelines, 1, false, this.userIDAtRecomm, altSeqPredictor,
+					recommSeqLength);
 
 			// $$this.recommendedActivityNamesWithRankscores =
 
@@ -685,7 +685,6 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 	 * @param candidateTimelines
 	 * @param constantValScore
 	 * @param verbose
-	 * @param highestOrder
 	 * @param userID
 	 * @param alternateSeqPredictor
 	 * @param recommSeqLength
@@ -694,9 +693,8 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 	 */
 	private ArrayList<LinkedHashMap<String, Double>> getTopPredictedRNNActivityPDVals(
 			ArrayList<ActivityObject> activitiesGuidingRecomm, LookPastType lookPastType,
-			LinkedHashMap<String, Timeline> candidateTimelines, double constantValScore, boolean verbose,
-			int highestOrder, String userID, Enums.AltSeqPredictor alternateSeqPredictor, int recommSeqLength)
-			throws Exception
+			LinkedHashMap<String, Timeline> candidateTimelines, double constantValScore, boolean verbose, String userID,
+			Enums.AltSeqPredictor alternateSeqPredictor, int recommSeqLength) throws Exception
 	{
 		int numOfNextPredictions = recommSeqLength;
 		ArrayList<LinkedHashMap<String, Double>> res = new ArrayList<>();
@@ -791,14 +789,13 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 			Enums.AltSeqPredictor alternateSeqPredictor, int nextHowManyPredictions, boolean verbose) throws Exception
 	{
 		ArrayList<ArrayList<Character>> candTimelinesAsSeq = new ArrayList<>();
-
 		List<Character> predSymbol = new ArrayList<>();
 
 		BasicRNNWC2_SeqRec2018 seqPredictor = null;
 		boolean savedReTrain = false;
 		BasicRNNWC2_SeqRec2018 sanityCheckSeqPredictor = null;
 
-		if (Constant.sameRNNForAllRTsOfAUser && alternateSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
+		if (Constant.sameRNNForAllRTsOfAUser)// && alternateSeqPredictor.equals(Enums.AltSeqPredictor.RNN1)
 		{
 			seqPredictor = BasicRNNWC2_SeqRec2018.getRNNPredictorsForEachUserStored(userID);
 
