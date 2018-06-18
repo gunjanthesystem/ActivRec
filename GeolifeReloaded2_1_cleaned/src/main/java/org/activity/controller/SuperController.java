@@ -306,6 +306,13 @@ public class SuperController
 			predictorLabel += "Order" + Constant.getAKOMHighestOrder();
 		}
 
+		else if (Constant.altSeqPredictor.equals(AltSeqPredictor.RNN1))
+		{
+			predictorLabel = AltSeqPredictor.RNN1.toString();
+			predictorLabel += Constant.numOfHiddenLayersInRNN1 + "HL" + Constant.numOfNeuronsInEachHiddenLayerInRNN1
+					+ "Neu" + Constant.numOfTrainingEpochsInRNN1 + "Epochs";
+		}
+
 		else
 		{
 			EDAlphaLabel = "ED" + Constant.EDAlpha;

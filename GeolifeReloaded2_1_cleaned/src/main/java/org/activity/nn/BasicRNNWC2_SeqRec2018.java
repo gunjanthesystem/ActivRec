@@ -35,7 +35,7 @@ public class BasicRNNWC2_SeqRec2018
 {
 	private char[] trainingString;
 	private char[] testString;
-	private final List<Character> allPossibleChars = new ArrayList<>(); // a list of all possible characters
+	private final List<Character> allPossibleChars;// = new ArrayList<>(); // a list of all possible characters
 
 	// RNN dimensions
 	private int HIDDEN_LAYER_WIDTH = 50;
@@ -64,6 +64,7 @@ public class BasicRNNWC2_SeqRec2018
 	{
 		HIDDEN_LAYER_WIDTH = numOfNeuronsInHiddenLayer;
 		HIDDEN_LAYER_COUNT = numOfHiddenLayers;
+		allPossibleChars = new ArrayList<>();
 	}
 
 	/**
@@ -203,8 +204,29 @@ public class BasicRNNWC2_SeqRec2018
 	 */
 	public BasicRNNWC2_SeqRec2018(ArrayList<ArrayList<Character>> trainingString, String userID, boolean verbose)
 	{
-		this(50, 2, verbose, userID, 500, 0.001, BasicRNNWC2_SeqRec2018.flattenList(trainingString, verbose));
+
+		this(Constant.numOfNeuronsInEachHiddenLayerInRNN1, Constant.numOfHiddenLayersInRNN1, verbose, userID,
+				Constant.numOfTrainingEpochsInRNN1, Constant.learningRateInRNN1,
+				BasicRNNWC2_SeqRec2018.flattenList(trainingString, verbose));
 	}
+
+	// /**
+	// *
+	// * @param numOfNeuronsInHiddenLayer
+	// * @param numOfHiddenLayers
+	// * @param verbose
+	// * @param userID
+	// * @param numOfTrainingEpochs
+	// * @param learningRate
+	// * @param trainingString
+	// */
+	// public BasicRNNWC2_SeqRec2018(int numOfNeuronsInHiddenLayer, int numOfHiddenLayers, boolean verbose, String
+	// userID,
+	// int numOfTrainingEpochs, double learningRate, char[] trainingString, Set<Character> setOfAllPossibleChars)
+	// {
+	// this.allPossibleChars.addAll(setOfAllPossibleChars);
+	//
+	// }
 
 	/**
 	 * 
@@ -219,12 +241,11 @@ public class BasicRNNWC2_SeqRec2018
 	public BasicRNNWC2_SeqRec2018(int numOfNeuronsInHiddenLayer, int numOfHiddenLayers, boolean verbose, String userID,
 			int numOfTrainingEpochs, double learningRate, char[] trainingString)
 	{
+		this(numOfNeuronsInHiddenLayer, numOfHiddenLayers);
 		long t1 = System.currentTimeMillis();
+
 		try
 		{
-			HIDDEN_LAYER_WIDTH = numOfNeuronsInHiddenLayer;
-			HIDDEN_LAYER_COUNT = numOfHiddenLayers;
-
 			this.setTrainingString(trainingString, verbose);
 			// rnnA.setTestString("h".toCharArray(), true);
 			this.configureAndCreateRNN(learningRate);

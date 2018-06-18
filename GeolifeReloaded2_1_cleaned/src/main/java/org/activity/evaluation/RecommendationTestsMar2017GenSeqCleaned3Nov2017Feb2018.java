@@ -35,7 +35,6 @@ import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeqNov2017;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
-import org.activity.recomm.RecommendationMasterRNN1Nov2017;
 import org.activity.sanityChecks.Sanity;
 import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.stats.StatsUtils;
@@ -826,9 +825,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 						else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1)
 						// Alternative algorithm
 						{
-							recommMasters[seqIndex] = new RecommendationMasterRNN1Nov2017(50, 2, dateToRecomm,
-									recommTimesStrings[0], userId, trainTestTimelinesForAllUsersDW,
-									trainTimelinesAllUsersContinuous);
+							// recommMasters[seqIndex] = new RecommendationMasterRNN1Nov2018(50, 2, dateToRecomm,
+							// recommTimesStrings[0], userId, trainTestTimelinesForAllUsersDW,
+							// trainTimelinesAllUsersContinuous);
 
 						}
 
