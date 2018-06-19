@@ -107,7 +107,8 @@ dependencies
     compile 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta'
     //1.0.0-alpha'
     
-    compile 'org.nd4j:nd4j-native-platform:1.0.0-beta'//0.9.1"
+    //compile 'org.nd4j:nd4j-native-platform:1.0.0-beta'//0.9.1"
+    compile group: 'org.nd4j', name: 'nd4j-cuda-9.1-platform', version: '1.0.0-beta'
     //compile 'org.nd4j:nd4j-native-platform:1.0.0-alpha'
     //compile 'org.nd4j:nd4j:1.0.0-beta'//1.0.0-alpha'
     //compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
@@ -186,9 +187,9 @@ mainClassName = 'org.activity.controller.SuperController'
 //'org.activity.controller.SuperController'
 //'org.activity.generator.GowallaPreProcessorUtils'
 
-task fatCapsule(type: FatCapsule) {
-  applicationClass 'org.activity.controller.SuperController'
-}
+// task fatCapsule(type: FatCapsule) {
+//   applicationClass 'org.activity.controller.SuperController'
+// }
 
 //////////////
 /*jar { //shadowJar
@@ -200,16 +201,19 @@ task fatCapsule(type: FatCapsule) {
 }*/
 /////////////
 
-task fatJar(type: Jar) {
-	manifest {
-        attributes 'Implementation-Title': 'SuperController',
-        	'Implementation-Version': version,
-        	'Main-Class': mainClassName
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
+/// Disabled as not needed at the moment
+// task fatJar(type: Jar) {
+// 	manifest {
+//         attributes 'Implementation-Title': 'SuperController',
+//         	'Implementation-Version': version,
+//         	'Main-Class': mainClassName
+//     }
+//     baseName = project.name + '-all'
+//     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+//     with jar
+// }
+///
+
 //org.activity.generator.DatabaseCreatorGowallaQuicker0
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath

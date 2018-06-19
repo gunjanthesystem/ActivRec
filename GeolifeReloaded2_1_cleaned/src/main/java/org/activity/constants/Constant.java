@@ -228,7 +228,7 @@ public final class Constant
 
 	public static final int numOfHiddenLayersInRNN1 = 5;
 	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 100;
-	public static final int numOfTrainingEpochsInRNN1 = 500;
+	public static final int numOfTrainingEpochsInRNN1 = 300;
 	public static final double learningRateInRNN1 = 0.001;
 	////////////////////////////////////////////////////////////////////////
 
