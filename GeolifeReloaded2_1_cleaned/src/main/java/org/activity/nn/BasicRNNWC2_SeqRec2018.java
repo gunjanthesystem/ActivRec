@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.io.WToFile;
 import org.activity.ui.PopUps;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -244,6 +245,11 @@ public class BasicRNNWC2_SeqRec2018
 		this(numOfNeuronsInHiddenLayer, numOfHiddenLayers);
 		long t1 = System.currentTimeMillis();
 
+		System.out.println("Inside BasicRNNWC2_SeqRec2018: numOfNeuronsInHiddenLayer= " + numOfNeuronsInHiddenLayer
+				+ " numOfHiddenLayers=" + numOfHiddenLayers + " numOfTrainingEpochs=" + numOfTrainingEpochs
+				+ " learningRate=" + learningRate + " userID=" + userID + " trainingString.length="
+				+ trainingString.length);// + " trainingString=\n" + new String(trainingString) + "\n");
+
 		try
 		{
 			this.setTrainingString(trainingString, verbose);
@@ -285,6 +291,8 @@ public class BasicRNNWC2_SeqRec2018
 
 		for (int epoch = 0; epoch < numOfTrainingEpochs; epoch++)
 		{
+			long t1 = System.currentTimeMillis();
+
 			System.out.println("---------- Start of Training Epoch " + epoch);
 
 			// train the data
@@ -298,13 +306,13 @@ public class BasicRNNWC2_SeqRec2018
 			// put the first character into the rnn as an initialisation
 			INDArray testInit = Nd4j.zeros(allPossibleChars.size());
 			testInit.putScalar(allPossibleChars.indexOf(trainingString[0]), 1);
-			System.out.println("testInit = " + testInit);
+			// $$System.out.println("testInit = " + testInit);
 
 			// run one step -> IMPORTANT: rnnTimeStep() must be called, not
 			// output()
 			// the output shows what the net thinks what should come next
 			INDArray output = net.rnnTimeStep(testInit);
-			System.out.println("output initial - " + output);
+			// $$System.out.println("output initial - " + output);
 
 			// now the net should guess LEARNSTRING.length more characters
 			if (false)
@@ -326,7 +334,11 @@ public class BasicRNNWC2_SeqRec2018
 					output = net.rnnTimeStep(nextInput);
 				}
 			}
-			System.out.println("---------- End of Training Epoch " + epoch);
+
+			long timeTakenForThisEpoch = System.currentTimeMillis() - t1;
+			System.out.println("---------- End of Training Epoch " + epoch + " took " + timeTakenForThisEpoch + " ms");
+			WToFile.appendLineToFileAbs(epoch + "," + timeTakenForThisEpoch + "\n",
+					Constant.getCommonPath() + "RNN1TimeTakenPerEpoch.csv");
 		}
 		System.out.println("End of Training");
 	}
