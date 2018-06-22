@@ -107,8 +107,8 @@ dependencies
     compile 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta'
     //1.0.0-alpha'
     
-    //compile 'org.nd4j:nd4j-native-platform:1.0.0-beta'//0.9.1"
-    compile group: 'org.nd4j', name: 'nd4j-cuda-9.1-platform', version: '1.0.0-beta'
+    compile 'org.nd4j:nd4j-native-platform:1.0.0-beta'//0.9.1"
+   // compile group: 'org.nd4j', name: 'nd4j-cuda-9.0-platform', version: '1.0.0-beta'
     //compile 'org.nd4j:nd4j-native-platform:1.0.0-alpha'
     //compile 'org.nd4j:nd4j:1.0.0-beta'//1.0.0-alpha'
     //compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
