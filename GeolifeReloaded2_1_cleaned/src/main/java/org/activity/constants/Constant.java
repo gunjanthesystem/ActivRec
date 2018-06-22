@@ -96,6 +96,7 @@ public final class Constant
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	public static final boolean sameRNNForAllRTsOfAUser = true;// SWITCH_NOV10
+	public static final boolean sameRNNForALLUsers = true;// SWITCH_JUN
 
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
@@ -224,11 +225,11 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useToyTimelines = false;// true;
+	public static final boolean useToyTimelines = true;// true;
 
 	public static final int numOfHiddenLayersInRNN1 = 5;
 	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 100;
-	public static final int numOfTrainingEpochsInRNN1 = 300;
+	public static final int numOfTrainingEpochsInRNN1 = 50;
 	public static final double learningRateInRNN1 = 0.001;
 	////////////////////////////////////////////////////////////////////////
 
@@ -1417,6 +1418,7 @@ public final class Constant
 		s.append("\nRNNCurrentActivitityLength:" + RNNCurrentActivitityLength);
 		s.append("\nsameAKOMForAllRTsOfAUser:" + sameAKOMForAllRTsOfAUser);
 		s.append("\nsameRNNForAllRTsOfAUser:" + sameRNNForAllRTsOfAUser);
+		s.append("\nsameRNNForALLUsers:" + sameRNNForALLUsers);
 
 		s.append("\nDaywiseAllowSpillOverDaysOfCurr:" + DaywiseAllowSpillOverDaysOfCurr);
 		s.append("\nClosestTimeAllowSpillOverDays:" + ClosestTimeAllowSpillOverDays);

@@ -182,7 +182,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 	 * @param lookPastType
 	 * @param dummy
 	 * @param actObjsToAddToCurrentTimeline
-	 * @param trainTestTimelinesForAllUsers
+	 * @param trainTestTimelinesForAllUsersDW
 	 * @param trainTimelinesAllUsersContinuous
 	 * @param altSeqPredictor
 	 * @param recommSeqLength
@@ -191,7 +191,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
 			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold, Enums.CaseType caseType,
 			Enums.LookPastType lookPastType, boolean dummy, ArrayList<ActivityObject> actObjsToAddToCurrentTimeline,
-			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor,
 			int recommSeqLength)
 	{
@@ -295,13 +295,22 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 			System.out.println("NO CAND EXTRACTION!");
 			this.candidateTimelines = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
 			// Only removing the current user's data from candidate.
-			candidateTimelines.remove(userIDAtRecomm);
+			Timeline removedCandCurrUser = candidateTimelines.remove(userIDAtRecomm);
+			if (removedCandCurrUser != null)
+			{
+				System.out.println("Removed userIDAtRecomm from cand");
+			}
+			else
+			{
+				PopUps.showError("userIDAtRecomm:" + userIDAtRecomm
+						+ " supposed to be removed from cands was not in cands or had null value.");
+			}
 			// trainTimelinesAllUsersContinuous;//
 
 			// if (VerbosityConstants.verbose)
 			{
 				String s1 = "Inside recomm master :trainTestTimelinesForAllUsers.size()= "
-						+ trainTestTimelinesForAllUsers.size() + " trainTimelinesAllUsersContinuous.size()="
+						+ trainTestTimelinesForAllUsersDW.size() + " trainTimelinesAllUsersContinuous.size()="
 						+ trainTimelinesAllUsersContinuous.size() + "candTimelines.size()= "
 						+ candidateTimelines.size();
 				System.out.println(s1);

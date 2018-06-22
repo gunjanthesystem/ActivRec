@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.io.WToFile;
 import org.activity.ui.PopUps;
+import org.apache.commons.math3.primes.Primes;
+import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
@@ -50,6 +52,27 @@ public class BasicRNNWC2_SeqRec2018
 	public static final BasicRNNWC2_SeqRec2018 getRNNPredictorsForEachUserStored(String userID)
 	{
 		return rnnPredictorsForEachUserStored.get(userID);
+	}
+
+	/**
+	 * 
+	 * @param network
+	 * @param verbose
+	 * @return
+	 */
+	public int getNumberOfParameters(boolean verbose)
+	{
+		int numOfParams = net.numParams();
+
+		if (verbose)
+		{
+			System.out.println("Total number of parameters: " + numOfParams);
+			for (int i = 0; i < net.getnLayers(); i++)
+			{
+				System.out.println("Layer " + i + " number of parameters: " + net.getLayer(i).numParams());
+			}
+		}
+		return numOfParams;
 	}
 
 	/**
@@ -150,14 +173,18 @@ public class BasicRNNWC2_SeqRec2018
 		boolean verbose = true;
 		// define a sentence to learn.
 		// Add a special character at the beginning so the RNN learns the complete string and ends with the marker.
-		String trainingString = "hellohelohellohelohellohelohellohelohellohelohellohelo";// "*Der Cottbuser Postkutscher
-																							// putzt den Cottbuser
+		String trainingString = "hellohelohellohelohellohelohellohelohellohelohellohelohhhhh";// "*Der Cottbuser
+																								// Postkutscher
+																								// putzt den Cottbuser
+
+		getSplitSize(55846, 100, 0.05);
+		System.exit(0);
 		// Postkutschkasten.";
 		System.out.println("trainingString= " + trainingString);
 		BasicRNNWC2_SeqRec2018 rnnA = new BasicRNNWC2_SeqRec2018(50, 2);
 		rnnA.setTrainingString(trainingString, verbose);
 		rnnA.setTestString("h".toCharArray(), verbose);
-		rnnA.configureAndCreateRNN(0.001);
+		rnnA.configureAndCreateRNN(0.001, -1);
 		DataSet trainingData = rnnA.createTrainingDataset(rnnA.trainingString, rnnA.getAllpossiblechars(), verbose);
 
 		int numOfTrainingEpochs = 500;
@@ -195,6 +222,50 @@ public class BasicRNNWC2_SeqRec2018
 			System.out.println("\nflattenedList=\n" + flattenedList);
 		}
 		return res;
+	}
+
+	/**
+	 * to split one long sequence into multiple sequences
+	 * 
+	 * @param lengthOfSingleLongSeq
+	 * @param thresholdForSmallerSize
+	 * @param minSmallerSizeRatio
+	 * @return
+	 */
+	public static int getSplitSize(int lengthOfSingleLongSeq, int thresholdForSmallerSize, double minSmallerSizeRatio)
+	{
+		System.out.println("Inside getSplitSize(): lengthOfSingleLongSeq= " + lengthOfSingleLongSeq);
+
+		double smallerSplitApproxSize = minSmallerSizeRatio * lengthOfSingleLongSeq;
+		System.out.println("smallerSplitApproxSize= " + smallerSplitApproxSize);
+		// int thresholdForSmallerSize = 100;
+		int smallerSizeSelected = -1;
+
+		if (Primes.isPrime(lengthOfSingleLongSeq))
+		{
+			System.out.println("------------------\nWARNING! Cannot split cleanly as lengthOfSingleLongSeq= "
+					+ lengthOfSingleLongSeq
+					+ " is PRIME!!\nDeleting 1 from lengthOfSingleLongSeq. Hence you MUST DELETE one character from the sequence to be split.\n------------------\n");
+			lengthOfSingleLongSeq -= 1;
+		}
+
+		if (smallerSplitApproxSize <= thresholdForSmallerSize)
+		{
+			System.out.println("Warning!: probably u do not need to split as smallerSplitApproxSize= "
+					+ smallerSplitApproxSize + " <=" + thresholdForSmallerSize);
+		}
+		else
+		{
+			int smallerSizeTemp = (int) Math.ceil(smallerSplitApproxSize);
+			// find the smallerSize (<thresholdForSmallerSize), which is a divisor of lengthOfSingleLongSeq
+			while (lengthOfSingleLongSeq % smallerSizeTemp != 0)
+			{
+				smallerSizeTemp += 1;
+			}
+			smallerSizeSelected = smallerSizeTemp;
+			System.out.println("smallerSizeSelected=" + smallerSizeSelected);
+		}
+		return lengthOfSingleLongSeq;
 	}
 
 	/**
@@ -244,17 +315,32 @@ public class BasicRNNWC2_SeqRec2018
 	{
 		this(numOfNeuronsInHiddenLayer, numOfHiddenLayers);
 		long t1 = System.currentTimeMillis();
+		int lengthOfTBPTT = (int) (0.25 * trainingString.length);
 
 		System.out.println("Inside BasicRNNWC2_SeqRec2018: numOfNeuronsInHiddenLayer= " + numOfNeuronsInHiddenLayer
 				+ " numOfHiddenLayers=" + numOfHiddenLayers + " numOfTrainingEpochs=" + numOfTrainingEpochs
 				+ " learningRate=" + learningRate + " userID=" + userID + " trainingString.length="
-				+ trainingString.length);// + " trainingString=\n" + new String(trainingString) + "\n");
+				+ trainingString.length + " lengthOfTBPTT=" + lengthOfTBPTT);
+		// + " trainingString=\n" + new String(trainingString) + "\n");
+
+		// TODO TEMP
+		if (false)// temporarily trimming training data to last N characters only
+		{
+			int N = 50;
+			char[] trimmedTrainingData = new char[N];
+			for (int i = 0; i < N; i++)
+			{
+				trimmedTrainingData[i] = trainingString[i];
+			}
+			trainingString = trimmedTrainingData;
+			System.out.println("WARNING! TRIMMING TRAINING STRING SIZE TO " + N);
+		}
 
 		try
 		{
 			this.setTrainingString(trainingString, verbose);
 			// rnnA.setTestString("h".toCharArray(), true);
-			this.configureAndCreateRNN(learningRate);
+			this.configureAndCreateRNN(learningRate, lengthOfTBPTT);
 			DataSet trainingData = this.createTrainingDataset(this.trainingString, this.getAllpossiblechars(), verbose);
 
 			this.trainTheNetwork(numOfTrainingEpochs, trainingData, verbose);
@@ -407,9 +493,10 @@ public class BasicRNNWC2_SeqRec2018
 	/**
 	 * 
 	 * @param learningRate
-	 * @return
+	 * @param tbpttLength
+	 *            length for truncate back propagation through time
 	 */
-	public void configureAndCreateRNN(double learningRate)
+	public void configureAndCreateRNN(double learningRate, int tbpttLength)
 	// int iterations, double learningRate, int numOfEpochs, boolean verbose)
 	{
 		System.out.println("configureAndCreateRNN() called");
@@ -451,6 +538,14 @@ public class BasicRNNWC2_SeqRec2018
 		// finish builder
 		listOfConfigsBuilder.pretrain(false);
 		listOfConfigsBuilder.backprop(true);
+
+		// Start of added on 20 June
+		if (tbpttLength > 0)// truncated backpropagation through time.
+		{
+			listOfConfigsBuilder.backpropType(BackpropType.TruncatedBPTT).tBPTTForwardLength(tbpttLength)
+					.tBPTTBackwardLength(tbpttLength);
+		}
+		// End of added on 20 June
 
 		// create network
 		MultiLayerConfiguration conf = listOfConfigsBuilder.build();

@@ -275,7 +275,16 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				System.out.println("NO CAND EXTRACTION!");
 				this.candidateTimelines = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
 				// Only removing the current user's data from candidate.
-				candidateTimelines.remove(userIDAtRecomm);
+				Timeline removedCandCurrUser = candidateTimelines.remove(userIDAtRecomm);
+				if (removedCandCurrUser != null)
+				{
+					System.out.println("Removed userIDAtRecomm from cand");
+				}
+				else
+				{
+					PopUps.showError("userIDAtRecomm:" + userIDAtRecomm
+							+ " supposed to be removed from cands was not in cands or had null value.");
+				}
 				// trainTimelinesAllUsersContinuous;//
 			}
 			else
