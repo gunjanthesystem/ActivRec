@@ -19,6 +19,8 @@ import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.evaluation.Evaluation;
 import org.activity.nn.BasicRNNWC2_SeqRec2018;
+import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
+import org.activity.nn.NNUtils;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
@@ -294,18 +296,27 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 
 			System.out.println("NO CAND EXTRACTION!");
 			this.candidateTimelines = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
-			// Only removing the current user's data from candidate.
-			Timeline removedCandCurrUser = candidateTimelines.remove(userIDAtRecomm);
-			if (removedCandCurrUser != null)
+
+			if (Constant.sameRNNForALLUsers == true)
 			{
-				System.out.println("Removed userIDAtRecomm from cand");
+				System.out.println(
+						"Since sameRNNForALLUsers is TRUE, not removing the current users's training timeline from cands.");
 			}
-			else
+			else // then REMOVE THE CURRENT USER'S TRAINING TIMELINE FROM CANDS
 			{
-				PopUps.showError("userIDAtRecomm:" + userIDAtRecomm
-						+ " supposed to be removed from cands was not in cands or had null value.");
+				// Only removing the current user's data from candidate.
+				Timeline removedCandCurrUser = candidateTimelines.remove(userIDAtRecomm);
+				if (removedCandCurrUser != null)
+				{
+					System.out.println("Removed userIDAtRecomm from cands");
+				}
+				else
+				{
+					PopUps.showError("userIDAtRecomm:" + userIDAtRecomm
+							+ " supposed to be removed from cands was not in cands or had null value.");
+				}
+				// trainTimelinesAllUsersContinuous;//
 			}
-			// trainTimelinesAllUsersContinuous;//
 
 			// if (VerbosityConstants.verbose)
 			{
@@ -823,6 +834,28 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 				System.out.println("Ajooba: already trained RNN for this user:" + userID);
 			}
 		}
+		else if (Constant.sameRNNForALLUsers)// RNN trained only once and reused for all users for all RTs
+		{
+			String userIDForAllUsers = "IDForAllUsers";
+			seqPredictor = BasicRNNWC2_SeqRec2018.getRNNPredictorsForEachUserStored(userIDForAllUsers);
+
+			if (seqPredictor == null) // RNN NOT already trained
+			{
+				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+				{
+					candTimelinesAsSeq.add(TimelineTransformers.listOfActObjsToListOfCharCodesFromActIDs(
+							candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
+				}
+				System.out.println(
+						"Num of users in cand timelines (#cands) = " + candidateTimelinesWithNextAppended.size());
+				seqPredictor = new BasicRNNWC2_SeqRec2018(candTimelinesAsSeq, userIDForAllUsers, verbose);// verbose);
+			}
+			else
+			{
+				savedReTrain = true;
+				System.out.println("Ajooba: (sameRNNForALLUsers) already trained RNN:" + userID);
+			}
+		}
 		else
 		{
 			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
@@ -834,6 +867,105 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 		}
 
 		predSymbol = seqPredictor.predictNextNValues2(nextHowManyPredictions, false, currSeq);// verbose);
+
+		// Start of Sanity CHeck
+		// if (savedReTrain)// PASSED
+		// {
+		// // training again and checking if predSYmbol same as fetched from pretrained model
+		// for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+		// {
+		// candTimelinesAsSeq.add(TimelineTransformers
+		// .timelineToSeqOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
+		// }
+		// AKOMSeqPredictor sanityCheckseqPredictor = new AKOMSeqPredictor(candTimelinesAsSeq, highestOrder, false,
+		// userID);// verbose);
+		// int sanityCheckPredSymbol = seqPredictor.getAKOMPrediction(currSeq, false);// verbose);
+		//
+		// Sanity.eq(sanityCheckPredSymbol, predSymbol,
+		// "Sanity Error sanityCheckPredSymbol=" + sanityCheckPredSymbol + "!= predSymbol" + predSymbol);
+		// System.out.println(
+		// "SanityCHeck sanityCheckPredSymbol=" + sanityCheckPredSymbol + ", predSymbol=" + predSymbol);
+		// }
+		// End of Sanity check
+
+		return predSymbol;
+	}
+
+	/**
+	 * 
+	 *
+	 * @param userID
+	 * @param currSeq
+	 * @param candidateTimelinesWithNextAppended
+	 * @param alternateSeqPredictor
+	 * @param nextHowManyPredictions
+	 * @param verbose
+	 * @return
+	 * @throws Exception
+	 */
+	private List<Character> getRNNPredictedSymbolLSTM1(String userID, ArrayList<Character> currSeq,
+			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended,
+			Enums.AltSeqPredictor alternateSeqPredictor, int nextHowManyPredictions, boolean verbose) throws Exception
+	{
+		ArrayList<ArrayList<Character>> candTimelinesAsSeq = new ArrayList<>();
+		List<Character> predSymbol = new ArrayList<>();
+
+		LSTMCharModelling_SeqRecJun2018 seqPredictor = null;
+		boolean savedReTrain = false;
+		LSTMCharModelling_SeqRecJun2018 sanityCheckSeqPredictor = null;
+
+		if (Constant.sameRNNForAllRTsOfAUser)// && alternateSeqPredictor.equals(Enums.AltSeqPredictor.RNN1)
+		{
+			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userID);
+
+			if (seqPredictor == null) // RNN NOT already trained for this user
+			{
+				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+				{
+					candTimelinesAsSeq.add(TimelineTransformers.listOfActObjsToListOfCharCodesFromActIDs(
+							candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
+				}
+				seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userID, verbose);// verbose);
+			}
+			else
+			{
+				savedReTrain = true;
+				System.out.println("Ajooba: already trained RNN for this user:" + userID);
+			}
+		}
+		else if (Constant.sameRNNForALLUsers)// RNN trained only once and reused for all users for all RTs
+		{
+			String userIDForAllUsers = "IDForAllUsers";
+			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userIDForAllUsers);
+
+			if (seqPredictor == null) // RNN NOT already trained
+			{
+				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+				{
+					candTimelinesAsSeq.add(TimelineTransformers.listOfActObjsToListOfCharCodesFromActIDs(
+							candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
+				}
+				System.out.println(
+						"Num of users in cand timelines (#cands) = " + candidateTimelinesWithNextAppended.size());
+				seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userIDForAllUsers, verbose);// verbose);
+			}
+			else
+			{
+				savedReTrain = true;
+				System.out.println("Ajooba: (sameRNNForALLUsers) already trained RNN:" + userID);
+			}
+		}
+		else
+		{
+			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+			{
+				candTimelinesAsSeq.add(TimelineTransformers.listOfActObjsToListOfCharCodesFromActIDs(
+						candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
+			}
+			seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userID, verbose);// verbose);
+		}
+
+		predSymbol = seqPredictor.predictNextNValues5(NNUtils.listToCharArr(currSeq), nextHowManyPredictions, verbose);
 
 		// Start of Sanity CHeck
 		// if (savedReTrain)// PASSED

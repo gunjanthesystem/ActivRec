@@ -435,10 +435,11 @@ public class BasicRNNWC2_SeqRec2018
 	 * @param verbose
 	 * @param testString
 	 * @return
+	 * @deprecated
 	 */
 	public List<Character> predictNextNValues2(int N, boolean verbose, ArrayList<Character> testString)
 	{
-		char[] testStringArr = new char[testString.size()];
+		char[] testStringArr = new char[testString.size()];// TODO MOST LIKELY INCORRECT, CHECK IF EMPTY
 		return predictNextNValues2(N, verbose, testStringArr);
 	}
 
