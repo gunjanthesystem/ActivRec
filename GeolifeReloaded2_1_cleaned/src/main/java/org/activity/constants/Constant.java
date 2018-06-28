@@ -227,9 +227,9 @@ public final class Constant
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
 	public static final boolean useToyTimelines = true;// true;
 
-	public static final int numOfHiddenLayersInRNN1 = 5;
-	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 100;
-	public static final int numOfTrainingEpochsInRNN1 = 50;
+	public static final int numOfHiddenLayersInRNN1 = 3;
+	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 50;
+	public static final int numOfTrainingEpochsInRNN1 = 20;
 	public static final double learningRateInRNN1 = 0.001;
 	////////////////////////////////////////////////////////////////////////
 
