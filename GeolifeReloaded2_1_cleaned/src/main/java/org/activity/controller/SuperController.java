@@ -20,6 +20,7 @@ import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.Searcher;
+import org.nd4j.jita.conf.CudaEnvironment;
 //import org.nd4j.jita.conf.Configuration;
 //import org.nd4j.jita.conf.CudaEnvironment;
 import org.nd4j.linalg.factory.Nd4j;
@@ -108,58 +109,55 @@ public class SuperController
 
 	private static void setupCUDAEnviron()
 	{
+		// see
+		// https://github.com/deeplearning4j/nd4j/blob/78c96a8a3f7aab948af84902c144e1b2123c4436/nd4j-backends/nd4j-backend-impls/nd4j-cuda/src/test/java/jcuda/jcublas/ops/DevicesTests.java#L18-L18
+		// https://github.com/deeplearning4j/deeplearning4j/issues/2374
+		org.nd4j.jita.conf.Configuration config = CudaEnvironment.getInstance().getConfiguration();
+		config.allowCrossDeviceAccess(true);
+		config.allowMultiGPU(true);
+
+		System.out.println("availableDevices = " + config.getAvailableDevices());
+		System.out.println("bannedDevices = " + config.getBannedDevices());
+		System.out.println("isCrossDeviceAccessAllowed = " + config.isCrossDeviceAccessAllowed());
+		System.out.println("isForcedSingleGPU = " + config.isForcedSingleGPU());
+		List<Integer> cudaDevices = findCudaDevices();
+		System.out.println("cudaDevices = " + cudaDevices);
+
+		if (false)// not relevant as masking GPUs at environment level
+		{
+			int numOfGPUsToUse = 2;
+			int numOfGPUsSelected = 0;
+
+			for (int dev : cudaDevices)
+			{
+				if (numOfGPUsSelected < numOfGPUsToUse)
+				{
+					config.useDevice(dev);
+					numOfGPUsSelected += 1;
+				}
+				else
+				{
+					// System.out.println("Banning device: " + dev);
+					config.banDevice(dev);
+				}
+			}
+		}
+		// config.useDevices(0);
+		// config.banDevice(1, 2, 3);
+		System.out.println("availableDevices = " + config.getAvailableDevices());
+		System.out.println("bannedDevices = " + config.getBannedDevices());
+		System.out.println("Device list " + config.getAvailableDevices().toString());
+
+		// Configuration cudaConfig = CudaEnvironment.getInstance().getConfiguration();
+		// cudaConfig.allowMultiGPU(false).allowCrossDeviceAccess(false).useDevices(1);
+		// CudaEnvironment.getInstance().getConfiguration().GPU
+
+		// allow large cache: upto 6GiB, see: https://deeplearning4j.org/gpu
+		config.setMaximumDeviceCacheableLength(1024 * 1024 * 1024L).setMaximumDeviceCache(10L * 1024 * 1024 * 1024L)
+				.setMaximumHostCacheableLength(1024 * 1024 * 1024L).setMaximumHostCache(10L * 1024 * 1024 * 1024L);
+
+		System.out.println("Exiting setupCUDAEnvrion.");// : printing environ:-\n" + printEnvironmentInformation());
 	}
-	// {
-	// // see
-	// //
-	// https://github.com/deeplearning4j/nd4j/blob/78c96a8a3f7aab948af84902c144e1b2123c4436/nd4j-backends/nd4j-backend-impls/nd4j-cuda/src/test/java/jcuda/jcublas/ops/DevicesTests.java#L18-L18
-	// // https://github.com/deeplearning4j/deeplearning4j/issues/2374
-	// Configuration config = CudaEnvironment.getInstance().getConfiguration();
-	// config.allowCrossDeviceAccess(true);
-	// config.allowMultiGPU(true);
-	//
-	// System.out.println("availableDevices = " + config.getAvailableDevices());
-	// System.out.println("bannedDevices = " + config.getBannedDevices());
-	// System.out.println("isCrossDeviceAccessAllowed = " + config.isCrossDeviceAccessAllowed());
-	// System.out.println("isForcedSingleGPU = " + config.isForcedSingleGPU());
-	// List<Integer> cudaDevices = findCudaDevices();
-	// System.out.println("cudaDevices = " + cudaDevices);
-	//
-	// if (false)// not relevant as masking GPUs at environment level
-	// {
-	// int numOfGPUsToUse = 2;
-	// int numOfGPUsSelected = 0;
-	//
-	// for (int dev : cudaDevices)
-	// {
-	// if (numOfGPUsSelected < numOfGPUsToUse)
-	// {
-	// config.useDevice(dev);
-	// numOfGPUsSelected += 1;
-	// }
-	// else
-	// {
-	// // System.out.println("Banning device: " + dev);
-	// config.banDevice(dev);
-	// }
-	// }
-	// }
-	// // config.useDevices(0);
-	// // config.banDevice(1, 2, 3);
-	// System.out.println("availableDevices = " + config.getAvailableDevices());
-	// System.out.println("bannedDevices = " + config.getBannedDevices());
-	// System.out.println("Device list " + config.getAvailableDevices().toString());
-	//
-	// // Configuration cudaConfig = CudaEnvironment.getInstance().getConfiguration();
-	// // cudaConfig.allowMultiGPU(false).allowCrossDeviceAccess(false).useDevices(1);
-	// // CudaEnvironment.getInstance().getConfiguration().GPU
-	//
-	// // allow large cache: upto 6GiB, see: https://deeplearning4j.org/gpu
-	// config.setMaximumDeviceCacheableLength(1024 * 1024 * 1024L).setMaximumDeviceCache(8L * 1024 * 1024 * 1024L)
-	// .setMaximumHostCacheableLength(1024 * 1024 * 1024L).setMaximumHostCache(8L * 1024 * 1024 * 1024L);
-	//
-	// System.out.println("Exiting setupCUDAEnvrion.");// : printing environ:-\n" + printEnvironmentInformation());
-	// }
 
 	/**
 	 * 
@@ -167,7 +165,10 @@ public class SuperController
 	 */
 	public static void main(String args[])// _importantMay10
 	{
-		// setupCUDAEnviron();
+		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
+		{
+			setupCUDAEnviron();
+		}
 		// searchContentInFile();
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
 		// cleanUpSpace("./dataWritten/Mar5ED0.0STimeStFilter0hrs/", 0.9);
@@ -182,14 +183,16 @@ public class SuperController
 		// "/dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs/", "/dataWritten/Mar1ED0.25DurFPDistFPStFilter3hrs/",
 		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
 
-		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv" };
-		// ,
+		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
 
-		double[] EDAlphas = { -1/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
+		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
+
+		double[] EDAlphas = { 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
 
 		for (double edAlphaForAnExp : EDAlphas)
 		{

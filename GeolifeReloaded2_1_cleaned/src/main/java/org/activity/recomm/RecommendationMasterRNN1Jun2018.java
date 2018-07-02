@@ -749,8 +749,10 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 
 			// System.out.println("predictedNextSymbol = ");
 			// TimelineTransformers.timelineToSeqOfActIDs(timeline, delimiter)
-			List<Character> predSymbol = getRNNPredictedSymbol(userID, currSeq, candidateTimelinesWithNextAppended,
+			List<Character> predSymbol = getRNNPredictedSymbolLSTM1(userID, currSeq, candidateTimelinesWithNextAppended,
 					alternateSeqPredictor, numOfNextPredictions, verbose);
+			// getRNNPredictedSymbol(userID, currSeq, candidateTimelinesWithNextAppended,
+			// alternateSeqPredictor, numOfNextPredictions, verbose);
 
 			// String userID, ArrayList<Character> currSeq,
 			// LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended,
@@ -803,6 +805,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 	 * @param verbose
 	 * @return
 	 * @throws Exception
+	 * @deprecated
 	 */
 	private List<Character> getRNNPredictedSymbol(String userID, ArrayList<Character> currSeq,
 			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended,
@@ -909,12 +912,36 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 	{
 		ArrayList<ArrayList<Character>> candTimelinesAsSeq = new ArrayList<>();
 		List<Character> predSymbol = new ArrayList<>();
+		System.out.println("----> Inside getRNNPredictedSymbolLSTM1.\nNum of users in cand timelines (#cands) = "
+				+ candidateTimelinesWithNextAppended.size());
 
 		LSTMCharModelling_SeqRecJun2018 seqPredictor = null;
 		boolean savedReTrain = false;
 		LSTMCharModelling_SeqRecJun2018 sanityCheckSeqPredictor = null;
 
-		if (Constant.sameRNNForAllRTsOfAUser)// && alternateSeqPredictor.equals(Enums.AltSeqPredictor.RNN1)
+		if (Constant.sameRNNForALLUsers)// RNN trained only once and reused for all users for all RTs
+		{
+			System.out.println("sameRNNForALLUsers!!");
+			String userIDForAllUsers = "IDForAllUsers";
+			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userIDForAllUsers);
+
+			if (seqPredictor == null) // RNN NOT already trained
+			{
+				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
+				{
+					candTimelinesAsSeq.add(TimelineTransformers.listOfActObjsToListOfCharCodesFromActIDs(
+							candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
+				}
+
+				seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userIDForAllUsers, verbose);// verbose);
+			}
+			else
+			{
+				savedReTrain = true;
+				System.out.println("Ajooba: (sameRNNForALLUsers) already trained RNN:" + userID);
+			}
+		}
+		else if (Constant.sameRNNForAllRTsOfAUser)// && alternateSeqPredictor.equals(Enums.AltSeqPredictor.RNN1)
 		{
 			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userID);
 
@@ -933,28 +960,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 				System.out.println("Ajooba: already trained RNN for this user:" + userID);
 			}
 		}
-		else if (Constant.sameRNNForALLUsers)// RNN trained only once and reused for all users for all RTs
-		{
-			String userIDForAllUsers = "IDForAllUsers";
-			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userIDForAllUsers);
 
-			if (seqPredictor == null) // RNN NOT already trained
-			{
-				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
-				{
-					candTimelinesAsSeq.add(TimelineTransformers.listOfActObjsToListOfCharCodesFromActIDs(
-							candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
-				}
-				System.out.println(
-						"Num of users in cand timelines (#cands) = " + candidateTimelinesWithNextAppended.size());
-				seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userIDForAllUsers, verbose);// verbose);
-			}
-			else
-			{
-				savedReTrain = true;
-				System.out.println("Ajooba: (sameRNNForALLUsers) already trained RNN:" + userID);
-			}
-		}
 		else
 		{
 			for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
@@ -986,7 +992,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 		// "SanityCHeck sanityCheckPredSymbol=" + sanityCheckPredSymbol + ", predSymbol=" + predSymbol);
 		// }
 		// End of Sanity check
-
+		System.out.println("----> Exiting getRNNPredictedSymbolLSTM1.");
 		return predSymbol;
 	}
 

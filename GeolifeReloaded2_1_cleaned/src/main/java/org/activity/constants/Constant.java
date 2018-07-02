@@ -89,14 +89,15 @@ public final class Constant
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.RNN1;// SWITCH_NOV10//AKOM
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10
+	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = -1;// 1;// 3;// SWITCH_NOV10
 	private static int RNNCurrentActivitityLength = 1;
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	public static final boolean sameRNNForAllRTsOfAUser = true;// SWITCH_NOV10
-	public static final boolean sameRNNForALLUsers = true;// SWITCH_JUN
+	public static final boolean sameRNNForALLUsers = false;// SWITCH_JUN
 
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
@@ -192,10 +193,10 @@ public final class Constant
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
 	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
-	public static final boolean useLocationInFED = true;// SWITCH_NOV10
-	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
-	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
-	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
+	public static final boolean useLocationInFED = false;// SWITCH_NOV10
+	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
+	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
+	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
 
 	public static final boolean useRTVerseNormalisationForED = true;// SWITCH_April24
 	public static final double percentileForRTVerseMaxForEDNorm = 100;// -1// SWITCH_April24
@@ -214,10 +215,10 @@ public final class Constant
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean useRandomlySampled100Users = false;// false;// true;// SWITCH_NOV10
+	public static final boolean useRandomlySampled100Users = true;// false;// false;// true;// SWITCH_NOV10
 	public static String pathToRandomlySampledUserIndices = "";
 
-	public static final boolean runForAllUsersAtOnce = true;// false;// true;// SWITCH_April8
+	public static final boolean runForAllUsersAtOnce = false;// true;// false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
 
@@ -225,11 +226,13 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useToyTimelines = true;// true;
+	public static final boolean useToyTimelines = false;// true;
 
 	public static final int numOfHiddenLayersInRNN1 = 3;
-	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 50;
-	public static final int numOfTrainingEpochsInRNN1 = 20;
+	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;
+	public static final int numOfTrainingEpochsInRNN1 = 300;
+	public static final boolean varWidthPerHiddenLayerRNN1 = false;// true;
+	public static final int[] varWidthsPerHiddenLayerRNN1 = {};// { 512, 256 };
 	public static final double learningRateInRNN1 = 0.001;
 	////////////////////////////////////////////////////////////////////////
 
@@ -1515,6 +1518,9 @@ public final class Constant
 		s.append("\nnumOfNeuronsInEachHiddenLayerInRNN1:" + numOfNeuronsInEachHiddenLayerInRNN1);
 		s.append("\nnumOfTrainingEpochsInRNN1:" + Constant.numOfTrainingEpochsInRNN1);
 		s.append("\nlearningRateInRNN1:" + Constant.learningRateInRNN1);
+
+		s.append("\nvarWidthPerHiddenLayerRNN1:" + Constant.varWidthPerHiddenLayerRNN1);
+		s.append("\nvarWidthsPerHiddenLayerRNN1:" + Arrays.toString(Constant.varWidthsPerHiddenLayerRNN1));
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
