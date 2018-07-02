@@ -151,7 +151,7 @@ public class LSTMCharModelling_SeqRecJun2018
 	 */
 	public static char[] flattenList(ArrayList<ArrayList<Character>> givenData, boolean verbose)
 	{
-		List<Character> flattenedList = new ArrayList();
+		List<Character> flattenedList = new ArrayList<>();
 
 		for (ArrayList<Character> innerList : givenData)
 		{
@@ -169,9 +169,17 @@ public class LSTMCharModelling_SeqRecJun2018
 
 		if (verbose)
 		{
-			System.out.println("givenData=\n" + givenData);
-			System.out.println("\nflattenedList=\n" + flattenedList);
+			StringBuilder sb = new StringBuilder();
+			int sizeOfGivenData = givenData.stream().mapToInt(l -> l.size()).sum();
+			sb.append("sizeOfGivenData = " + sizeOfGivenData + " flattenedList.size()=" + flattenedList.size()
+					+ " sane =" + (sizeOfGivenData == flattenedList.size()) + "\n");
+			if (sizeOfGivenData <= 5000)
+			{
+				sb.append("givenData=\n" + givenData + "\nflattenedList=\n" + flattenedList + "\n");
+			}
+			System.out.println(sb.toString());
 		}
+
 		return res;
 	}
 
@@ -269,7 +277,7 @@ public class LSTMCharModelling_SeqRecJun2018
 		long t1 = System.currentTimeMillis();
 
 		// Length of each training example sequence to use. This could certainly be increased
-		int exampleLength = getSplitSize(trainingString.length, 1000, 0.05);
+		int exampleLength = 1000;// getSplitSize(trainingString.length, 1000, 0.02);
 		int miniBatchSize = 256; // Size of mini batch to use when training
 		int lengthOfTBPTT = (int) (0.10 * trainingString.length);
 
@@ -296,9 +304,8 @@ public class LSTMCharModelling_SeqRecJun2018
 		try
 		{
 			this.iter = new CharIteratorJun2018(trainingString, miniBatchSize, exampleLength, verbose);
-			System.out.println("iter.toString=\n" + iter.toString());
 			int nOut = iter.totalOutcomes();
-			System.out.println("nOut= " + nOut);
+			System.out.println("iter.toString=\n" + iter.toString() + "\nnOut= " + nOut);
 
 			// LSTMCharModelling_SeqRecJun2018 rnnA = new LSTMCharModelling_SeqRecJun2018(lstmLayerSize, numOfLayers);
 			// rnnA.setAllPossibleChars(trainingString, verbose);
@@ -329,8 +336,10 @@ public class LSTMCharModelling_SeqRecJun2018
 			// DataSet trainingData = this.createTrainingDataset(this.trainingString, this.getAllpossiblechars(),
 			// verbose);
 			// this.trainTheNetwork(numOfTrainingEpochs, trainingData, verbose);
+
 			// be careful of storing this as this object can consume a lot of memory
-			if (Constant.sameRNNForAllRTsOfAUser)
+			// storing the trained RNN
+			if (Constant.sameRNNForAllRTsOfAUser || Constant.sameRNNForALLUsers)
 			{
 				lstmPredictorsForEachUserStored.put(userID, this);
 			}
@@ -367,6 +376,7 @@ public class LSTMCharModelling_SeqRecJun2018
 	{
 
 		System.out.println("---> Inside trainTheNetwork called()");
+		long t00Fit = System.currentTimeMillis();
 		// StringBuilder sb = new StringBuilder();
 		System.out.println("allPossibleChars= " + iter.getAllPossibleChars());
 		System.out.println("Will start training now\n");
@@ -399,7 +409,7 @@ public class LSTMCharModelling_SeqRecJun2018
 			iter.reset(); // Reset iterator for another epoch
 		}
 
-		System.out.println("End of Training");
+		System.out.println("End of Training took: " + (System.currentTimeMillis() - t00Fit) + " ms");
 		System.out.println("---> Exiting trainTheNetwork called()");
 	}
 
@@ -547,11 +557,12 @@ public class LSTMCharModelling_SeqRecJun2018
 				{
 					outputProbDistribution[charIndex] = output.getDouble(sampleIndex, charIndex);
 				}
-				Map<Character, Double> charProbMapSorted = NNUtils.sortByValueDescNoShuffle(
-						NNUtils.getCharProbMap(NNUtils.roundTheArrayVals(outputProbDistribution, 2), iter));
+				Map<Character, Double> charProbMapSorted = NNUtils
+						.sortByValueDescNoShuffle(NNUtils.getCharProbMap(outputProbDistribution, iter));
+
 				sbLog.append("\tsampleIndex=" + sampleIndex + "\toutputProbDistribution.length="
 						+ outputProbDistribution.length + "\toutputProbDistribution=\n"
-						+ NNUtils.getCharProbForPrint(charProbMapSorted) + "\n");
+						+ NNUtils.getCharProbForPrint(charProbMapSorted, 5) + "\n");
 
 				// first process the last output of the network to a concrete
 				// neuron, the neuron with the highest output has the highest
@@ -664,11 +675,12 @@ public class LSTMCharModelling_SeqRecJun2018
 				}
 
 				///////////
-				Map<Character, Double> charProbMapSorted = NNUtils.sortByValueDescNoShuffle(
-						NNUtils.getCharProbMap(NNUtils.roundTheArrayVals(outputProbDistribution, 2), iter));
+				Map<Character, Double> charProbMapSorted = NNUtils
+						.sortByValueDescNoShuffle(NNUtils.getCharProbMap(outputProbDistribution, iter));
+
 				sbLog.append("\tsampleIndex=" + sampleIndex + "\toutputProbDistribution.length="
 						+ outputProbDistribution.length + "\toutputProbDistribution=\n"
-						+ NNUtils.getCharProbForPrint(charProbMapSorted) + "\n");
+						+ NNUtils.getCharProbForPrint(charProbMapSorted, 5) + "\n");
 
 				/////////////
 
@@ -773,8 +785,7 @@ public class LSTMCharModelling_SeqRecJun2018
 
 		NNUtils.getNumberOfParameters(net, true);// not essential, just for info
 
-		System.out.println("ANN configured and initialized");
-		System.out.println("---Exiting configureAndCreateRNN()");
+		System.out.println("ANN configured and initialized\n---Exiting configureAndCreateRNN()");
 	}
 
 	/**

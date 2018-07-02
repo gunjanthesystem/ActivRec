@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -47,18 +48,21 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsMay10ToRead_1.csv";
+		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsMay18ToRead_1Jun28T.csv";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsMay10ToRead_1.csv";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";//
 		// ResultsApril26ToRead_2.csv";
-		String pathToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/";
+		String pathToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/";
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/";
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY2ResultsDistributionFirstToMax3/FiveDays/";
 
 		String resultForUserGroupingMay2 = pathToRead
 				+ "/Concatenated/ConcatenatedED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
-		String resultForUserGroupingMay4 = pathToRead
-				+ "/Concatenated/ConcatenatedED1.0AllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
+		String resultForUserGroupingMay4 = // pathToRead
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/"
+						+ "/Concatenated/ConcatenatedED1.0AllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
 
-		if (true)
+		if (false)
 		{
 			fetchResultsFromServersInFormat(resultsLabelsPathFileToRead);
 		}
@@ -141,6 +145,7 @@ public class ResultsDistributionEvaluation
 	}
 
 	/**
+	 * To concatenateResultsFromAllSets
 	 * 
 	 * @param commonPath
 	 * @param commonPathToWrite
@@ -158,6 +163,11 @@ public class ResultsDistributionEvaluation
 
 	}
 
+	/**
+	 * 
+	 * @param splitOnBasisOfThisFile
+	 * @param pathToWrite
+	 */
 	public static void splitUsersMUZeroNonZeroGroup(String splitOnBasisOfThisFile, String pathToWrite)
 	{
 		List<List<String>> readData = ReadingFromFile.readLinesIntoListOfLists(splitOnBasisOfThisFile, ",");
@@ -299,6 +309,10 @@ public class ResultsDistributionEvaluation
 			r = r.replace("LikeRecSys", "");// remove "LikeRecSys" comment in label
 
 			if (r.contains("APR"))
+			{
+				r = r.substring(5);
+			}
+			if (r.contains("JUN"))
 			{
 				r = r.substring(5);
 			}
@@ -521,7 +535,7 @@ public class ResultsDistributionEvaluation
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";//
 		// ResultsApril26ToRead_2.csv";
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
-		double muArray[] = Constant.matchingUnitAsPastCountFixed;
+		double muArray[] = { 0 };// Constant.matchingUnitAsPastCountFixed;
 		String pathToRead = "", resultsLabel = "", host = "";
 
 		try
@@ -553,9 +567,7 @@ public class ResultsDistributionEvaluation
 			}
 
 		}
-		catch (
-
-		Exception e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -1278,8 +1290,10 @@ public class ResultsDistributionEvaluation
 		}
 		catch (NullPointerException e)
 		{
+			e.printStackTrace();
 			WToFile.appendLineToFileAbs(PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n"),
 					pathToWrite + "ExceptionsEncountered.csv");
+			System.exit(-1);
 			return null;
 		}
 		return (userMUKeyVals);
@@ -1322,13 +1336,18 @@ public class ResultsDistributionEvaluation
 
 		String userSetLabel = "";
 		try
-		{// if PureAKOM, then mu is order of AKOM -1
+		{
+			// if PureAKOM, then mu is order of AKOM -1
 			if (pathToRead.contains("PureAKOMOrder"))
 			{
 				String[] splitted = pathToRead.split("Order");
 				String[] splitted2 = splitted[1].split("/");
 				double muForOrder = Double.valueOf(splitted2[0]);
 				muArray = new double[] { muForOrder - 1 };
+			}
+			else if (pathToRead.contains("RNN1"))
+			{
+				muArray = new double[] { 0 };
 			}
 			if (pathToRead.contains("Set"))
 			{
@@ -1614,6 +1633,12 @@ public class ResultsDistributionEvaluation
 			// expecting only one MU for PureAKOM
 			if ((muArray.length == 1) && pathToRead.contains("PureAKOMOrder"))
 			{
+				System.out.println("Alert! PureAKOMOrder hence mu=" + Arrays.toString(muArray));
+				chosenMUForThisUser = (int) muArray[0];
+			}
+			if ((muArray.length == 1) && pathToRead.contains("RNN1"))
+			{
+				System.out.println("Alert! RNN1 hence mu=" + Arrays.toString(muArray));
 				chosenMUForThisUser = (int) muArray[0];
 			}
 

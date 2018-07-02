@@ -242,9 +242,6 @@ public class CharIteratorJun2018 implements DataSetIterator
 	 */
 	private void initializeOffsets(boolean shuffleOffsets)
 	{
-		System.out.println(
-				"------>Inside initializeOffsets: This defines the order in which parts of the file are fetched. trainingString.length="
-						+ trainingString.length + " exampleLength=" + exampleLength);
 		StringBuilder sb = new StringBuilder(
 				"------>Inside initializeOffsets: This defines the order in which parts of the file are fetched. trainingString.length="
 						+ trainingString.length + " exampleLength=" + exampleLength);

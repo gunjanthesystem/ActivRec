@@ -26,11 +26,12 @@ public class NNUtils
 		int numOfParams = net.numParams();
 		if (verbose)
 		{
-			System.out.println("Total number of parameters: " + numOfParams);
+			StringBuilder sb = new StringBuilder("Total number of parameters: " + numOfParams + "\n");
 			for (int i = 0; i < net.getnLayers(); i++)
 			{
-				System.out.println("Layer " + i + " number of parameters: " + net.getLayer(i).numParams());
+				sb.append("Layer " + i + " number of parameters: " + net.getLayer(i).numParams() + "\n");
 			}
+			System.out.println(sb.toString());
 		}
 		return numOfParams;
 	}
@@ -98,28 +99,30 @@ public class NNUtils
 
 	/**
 	 * 
-	 * @param roundTheArrayVals
-	 * @param iter
-	 * @return char-probablity
+	 * @param charProbMap
+	 * @param roundedToDecimals
+	 *            (just for printing)
+	 * @return
 	 */
-	public static String getCharProbForPrint(Map<Character, Double> charProbMap)
+	public static String getCharProbForPrint(Map<Character, Double> charProbMap, int roundedToDecimals)
 	{
 		// Map<Character, Double> charProbMapSorted = sortByValueDescNoShuffle(charProbMap);
 		StringBuilder sb = new StringBuilder();
 		for (Entry<Character, Double> e : charProbMap.entrySet())
 		{
 			Character ch = e.getKey();
+			double roundedVal = Precision.round(e.getValue(), roundedToDecimals);
 			if ((char) ch == '\n')
 			{
-				sb.append("\t" + "\\n" + "-" + e.getValue());
+				sb.append("\t" + "\\n" + "-" + roundedVal);
 			}
 			else if ((char) ch == '\t')
 			{
-				sb.append("\t" + "\\t" + "-" + e.getValue());
+				sb.append("\t" + "\\t" + "-" + roundedVal);
 			}
 			else
 			{
-				sb.append("\t" + e.getKey() + "-" + e.getValue());
+				sb.append("\t" + e.getKey() + "-" + roundedVal);
 			}
 		}
 		return sb.toString();

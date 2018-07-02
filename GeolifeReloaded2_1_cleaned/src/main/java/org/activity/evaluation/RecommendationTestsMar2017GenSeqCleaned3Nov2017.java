@@ -27,6 +27,7 @@ import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
+import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
@@ -418,9 +419,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 							// Start of Added on 21 Dec 2017
 							if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
-									|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM))
+									|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+									|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 							{
 								AKOMSeqPredictorLighter.clearSeqPredictorsForEachUserStored();
+								LSTMCharModelling_SeqRecJun2018.clearLSTMPredictorsForEachUserStored();
 							}
 							// End of Added on 21 Dec 2017
 
@@ -1696,11 +1699,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			Set<Date> setOfSelectedDatesForThisUser = trainingDatesForThisUserList.stream().limit(numOfRecentDays)
 					.collect(Collectors.toSet());
 
-			System.out.println(
-					"UserID=" + trainTestForAUser.getKey() + " numOfTrainingDays=" + trainingDatesForThisUserList.size()
-							+ "\ttrainingDatesForThisUserList= \n" + trainingDatesForThisUserList);
-			System.out.println("numOfSelectedTrainingDays= " + setOfSelectedDatesForThisUser.size()
-					+ "\t\tsetOfSelectedDatesForThisUser= \n" + setOfSelectedDatesForThisUser);
+			if (VerbosityConstants.verbose)// added on 29 June 2018 to reduce verbosity of output
+			{
+				System.out.println("UserID=" + trainTestForAUser.getKey() + " numOfTrainingDays="
+						+ trainingDatesForThisUserList.size() + "\ttrainingDatesForThisUserList= \n"
+						+ trainingDatesForThisUserList);
+				System.out.println("numOfSelectedTrainingDays= " + setOfSelectedDatesForThisUser.size()
+						+ "\t\tsetOfSelectedDatesForThisUser= \n" + setOfSelectedDatesForThisUser);
+			}
 
 			// filter by date in setOfSelectedDatesForThisUser
 			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate
