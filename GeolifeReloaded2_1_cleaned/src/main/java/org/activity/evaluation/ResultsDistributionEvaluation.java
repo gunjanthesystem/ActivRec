@@ -170,6 +170,8 @@ public class ResultsDistributionEvaluation
 	 */
 	public static void splitUsersMUZeroNonZeroGroup(String splitOnBasisOfThisFile, String pathToWrite)
 	{
+		System.out.println(
+				"Inside splitUsersMUZeroNonZeroGroup: \nCreating user groups based on file: " + splitOnBasisOfThisFile);
 		List<List<String>> readData = ReadingFromFile.readLinesIntoListOfLists(splitOnBasisOfThisFile, ",");
 		System.out.println("removing header: " + readData.remove(0));// remove header
 		int indexOfMinMuWithMaxFirst3 = 1;

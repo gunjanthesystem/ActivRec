@@ -1,17 +1,30 @@
 package org.activity.nn;
 
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.io.WToFile;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.apache.commons.math3.primes.Primes;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.util.Precision;
+import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -21,6 +34,8 @@ import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.FileStatsStorage;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.indexaccum.IMax;
@@ -88,6 +103,104 @@ public class LSTMCharModelling_SeqRecJun2018
 
 	public static void main(String args[])
 	{
+		char text[] = getCharArrayFromText("./dataToRead/TomSawyer.txt", null, 56000);
+		LSTMCharModelling_SeqRecJun2018 lstm1 = new LSTMCharModelling_SeqRecJun2018(
+				Constant.numOfNeuronsInEachHiddenLayerInRNN1, Constant.numOfHiddenLayersInRNN1, false, "none",
+				Constant.numOfTrainingEpochsInRNN1, Constant.learningRateInRNN1, text);
+		System.out.println("Completed");
+	}
+
+	private static char[] getCharArrayFromText(String fileLocation, String commentChars, int limit)
+	{
+		// String fileLocation = "";
+		// String commentChars = "";
+		Charset textFileEncoding = Charset.defaultCharset();
+		StringBuilder sb = new StringBuilder();
+
+		try
+		{
+			char[] validCharacters = CharacterIterator_WC1.getMinimalCharacterSet(); // Which characters are allowed?
+																						// Others
+			Set<Character> validCharSet = new HashSet<>(validCharacters.length);
+			for (char ch : validCharacters)
+			{
+				validCharSet.add(ch);
+			}
+
+			//////////
+			// Load file and convert contents to a char[]
+			boolean newLineValid = validCharSet.contains('\n');
+
+			List<String> lines = Files.readAllLines(new File(fileLocation).toPath(), textFileEncoding);
+			sb.append("#lines read from raw file = " + lines.size() + "\n");
+
+			// Ignore commented lines
+			if (commentChars != null)
+			{
+				List<String> withoutComments = new ArrayList<>();
+				for (String line : lines)
+				{
+					if (!line.startsWith(commentChars))
+					{
+						withoutComments.add(line);
+					}
+				}
+				lines = withoutComments;
+			}
+
+			int maxSize = lines.size(); // add lines.size() to account for newline characters at end of each line
+
+			for (String s : lines)
+			{
+				maxSize += s.length();
+			}
+
+			sb.append("#lines ignoring commented lines read from raw file = " + lines.size() + " maxSize = " + maxSize
+					+ "\n");
+
+			char[] characters = new char[limit];
+			int index = 0;
+
+			sb.append("Looping over all lines\n");
+
+			for (String s : lines)
+			{
+				char[] thisLine = s.toCharArray();
+				for (char charInThisLine : thisLine)
+				{
+					if (!validCharSet.contains(charInThisLine))
+					{
+						continue;
+					}
+					characters[index++] = charInThisLine;
+					if (index > limit - 1)
+					{
+						break;
+					}
+				}
+				if (index > limit - 1)
+				{
+					break;
+				}
+
+				if (newLineValid) characters[index++] = '\n';
+			}
+
+			sb.append("character.length()=" + characters.length + "\n");
+			System.out.println(sb.toString());
+			return characters;
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+
+		}
+		return null;
+	}
+
+	public static void main1(String args[])
+	{
 		boolean verbose = true;
 
 		int lstmLayerSize = 200; // Number of units in each LSTM layer
@@ -128,7 +241,7 @@ public class LSTMCharModelling_SeqRecJun2018
 
 		// DataSet trainingData = rnnA.createTrainingDataset(rnnA.trainingString, rnnA.getAllpossiblechars(), verbose);
 
-		rnnA.trainTheNetwork(numOfTrainingEpochs, iter, verbose);
+		rnnA.trainTheNetwork(numOfTrainingEpochs, iter, verbose, false);
 
 		// List<Character> predictions = rnnA.predictNextNValues2(numOfNextCharactersToPredict,
 		// iter.getAllPossCharsAsOrderedList(), false, testString.toCharArray(), rnnA.net);
@@ -137,7 +250,7 @@ public class LSTMCharModelling_SeqRecJun2018
 		// testString.toCharArray(), true);
 
 		List<Character> predictions = predictNextNValues4(testString.toCharArray(), rnnA.net, iter,
-				numOfNextCharactersToPredict, verbose);
+				numOfNextCharactersToPredict, verbose, null, null, testString, false);
 
 		System.out.println("Predicted seq = " + predictions);
 		// true, rnnA.getTestString());
@@ -277,15 +390,18 @@ public class LSTMCharModelling_SeqRecJun2018
 		long t1 = System.currentTimeMillis();
 
 		// Length of each training example sequence to use. This could certainly be increased
-		int exampleLength = 1000;// getSplitSize(trainingString.length, 1000, 0.02);
-		int miniBatchSize = 256; // Size of mini batch to use when training
-		int lengthOfTBPTT = (int) (0.10 * trainingString.length);
+		int exampleLength = Constant.exampleLengthInRNN1;// 1000;// getSplitSize(trainingString.length, 1000, 0.02);
+		int miniBatchSize = Constant.miniBatchSizeInRNN1;// 256; // Size of mini batch to use when training
+		int lengthOfTBPTT = (int) (0.10 * exampleLength);// trainingString.length);
 
 		System.out.println("Inside LSTMCharModelling_SeqRecJun2018: numOfNeuronsInHiddenLayer= "
 				+ numOfNeuronsInHiddenLayer + " numOfHiddenLayers=" + numOfHiddenLayers + " numOfTrainingEpochs="
 				+ numOfTrainingEpochs + " learningRate=" + learningRate + " userID=" + userID
 				+ " trainingString.length=" + trainingString.length + " exampleLength=" + exampleLength
 				+ " miniBatchSize=" + miniBatchSize + " lengthOfTBPTT=" + lengthOfTBPTT);
+
+		// String nnConfig = "nHL:" + (net.getnLayers() - 2) + "neHL:" + Constant.numOfNeuronsInEachHiddenLayerInRNN1 +
+		// "";
 		// + " trainingString=\n" + new String(trainingString) + "\n");
 
 		// TODO TEMP
@@ -316,7 +432,7 @@ public class LSTMCharModelling_SeqRecJun2018
 			// DataSet trainingData = rnnA.createTrainingDataset(rnnA.trainingString, rnnA.getAllpossiblechars(),
 			// verbose);
 
-			this.trainTheNetwork(numOfTrainingEpochs, iter, verbose);
+			this.trainTheNetwork(numOfTrainingEpochs, iter, verbose, Constant.doVisualizationRNN1);
 
 			// List<Character> predictions = rnnA.predictNextNValues2(numOfNextCharactersToPredict,
 			// iter.getAllPossCharsAsOrderedList(), false, testString.toCharArray(), rnnA.net);
@@ -371,26 +487,32 @@ public class LSTMCharModelling_SeqRecJun2018
 	 * @param numOfTrainingEpochs
 	 * @param iter
 	 * @param verbose
+	 * @param dovisualizationrnn1
+	 *            org.activity.nn.LSTMCharModelling_SeqRecJun2018.trainTheNetwork(int, CharIteratorJun2018, boolean,
+	 *            boolean)
 	 */
-	private void trainTheNetwork(int numOfTrainingEpochs, CharIteratorJun2018 iter, boolean verbose)
+	private void trainTheNetwork(int numOfTrainingEpochs, CharIteratorJun2018 iter, boolean verbose,
+			boolean dovisualizationrnn1)
 	{
-
-		System.out.println("---> Inside trainTheNetwork called()");
 		long t00Fit = System.currentTimeMillis();
 		// StringBuilder sb = new StringBuilder();
-		System.out.println("allPossibleChars= " + iter.getAllPossibleChars());
-		System.out.println("Will start training now\n");
+		System.out.println("---> Inside trainTheNetwork called()\n allPossibleChars= "
+				+ new String(iter.getAllPossibleChars()) + "\nWill start training now\n");
 
 		// int generateSamplesEveryNMinibatches = 10; // How frequently to generate samples from the network?
 		// String generationInitialization = null; // Optional character initialization; a random character is used if
-		// null
-		// int nCharactersToSample = 300;
-		// int nSamplesToGenerate = 2;
-		// int miniBatchNumber = 0;
+		// null //int nCharactersToSample = 300; int nSamplesToGenerate = 2; int miniBatchNumber = 0;
+
+		if (dovisualizationrnn1)
+		{
+			File statsFile = new File(Constant.getCommonPath() + "TomSawUIStorageLSTMCharModelling_SeqRec.dl4j");
+			StatsStorage statsStorage = new FileStatsStorage(statsFile);
+			net.setListeners(new StatsListener(statsStorage), new ScoreIterationListener(10));
+		}
 
 		for (int epochCount = 0; epochCount < numOfTrainingEpochs; epochCount++)
 		{
-			long t1 = System.currentTimeMillis();
+			// long t1 = System.currentTimeMillis();
 			System.out.println("========== epochCount = " + epochCount);
 
 			int iterationCount = 0;
@@ -411,6 +533,7 @@ public class LSTMCharModelling_SeqRecJun2018
 
 		System.out.println("End of Training took: " + (System.currentTimeMillis() - t00Fit) + " ms");
 		System.out.println("---> Exiting trainTheNetwork called()");
+		System.exit(0);// TODO
 	}
 
 	// /**
@@ -608,11 +731,19 @@ public class LSTMCharModelling_SeqRecJun2018
 	 * @param net
 	 * @param iter
 	 * @param numOfNextCharactersToPredict
+	 * @param timeAtRecommForLoggingOnly
+	 * @param dateAtRecommForLoggingOnly
+	 * @param userIDForLoggingOnly
+	 * @param writeDistributionToFile
+	 * 
 	 * @return
 	 */
-	public List<Character> predictNextNValues5(char[] init, int numOfNextCharactersToPredict, boolean verbose)
+	public List<Character> predictNextNValues5(char[] init, int numOfNextCharactersToPredict, boolean verbose,
+			Date dateAtRecommForLoggingOnly, Time timeAtRecommForLoggingOnly, String userIDForLoggingOnly,
+			boolean writeDistributionToFile)
 	{
-		return predictNextNValues4(init, this.net, this.iter, numOfNextCharactersToPredict, verbose);
+		return predictNextNValues4(init, this.net, this.iter, numOfNextCharactersToPredict, verbose,
+				dateAtRecommForLoggingOnly, timeAtRecommForLoggingOnly, userIDForLoggingOnly, writeDistributionToFile);
 	}
 
 	/**
@@ -624,10 +755,15 @@ public class LSTMCharModelling_SeqRecJun2018
 	 * @param iter
 	 * @param numOfNextCharactersToPredict
 	 * @param verbose
+	 * @param timeAtRecommForLoggingOnly
+	 * @param dateAtRecommForLoggingOnly
+	 * @param userIDForLoggingOnly
+	 * @param writeDistributionToFile
 	 * @return
 	 */
 	private static List<Character> predictNextNValues4(char[] init, MultiLayerNetwork net, CharIteratorJun2018 iter,
-			int numOfNextCharactersToPredict, boolean verbose)
+			int numOfNextCharactersToPredict, boolean verbose, Date dateAtRecommForLoggingOnly,
+			Time timeAtRecommForLoggingOnly, String userIDForLoggingOnly, boolean writeDistributionToFile)
 	{
 		int numSamples = 1;
 
@@ -658,11 +794,12 @@ public class LSTMCharModelling_SeqRecJun2018
 		output = output.tensorAlongDimension(output.size(2) - 1, 1, 0); // Gets the last time step output
 		sbLog.append("\tAfter TAD: output.shape()=" + Arrays.toString(output.shape()) + "\n");
 
-		for (int i = 0; i < numOfNextCharactersToPredict; i++)
+		for (int nextIndex = 0; nextIndex < numOfNextCharactersToPredict; nextIndex++)
 		{
 			// Set up next input (single time step) by sampling from previous output
 			INDArray nextInput = Nd4j.zeros(numSamples, iter.inputColumns());
-			sbLog.append("\n\t--i=" + i + "\tnextInput.shape()=" + Arrays.toString(nextInput.shape()) + "\n");
+			sbLog.append("\n\t--nextIndex=" + nextIndex + "\tnextInput.shape()=" + Arrays.toString(nextInput.shape())
+					+ "\n");
 
 			// Output is a probability distribution. Sample from this for each example we want to generate, and add it
 			// to the new input
@@ -675,8 +812,13 @@ public class LSTMCharModelling_SeqRecJun2018
 				}
 
 				///////////
-				Map<Character, Double> charProbMapSorted = NNUtils
-						.sortByValueDescNoShuffle(NNUtils.getCharProbMap(outputProbDistribution, iter));
+				Map<Character, Double> charProbMap = NNUtils.getCharProbMap(outputProbDistribution, iter);
+				if (writeDistributionToFile)
+				{
+					writePredictionProbabilityDistribution(charProbMap, dateAtRecommForLoggingOnly,
+							timeAtRecommForLoggingOnly, nextIndex, userIDForLoggingOnly);
+				}
+				Map<Character, Double> charProbMapSorted = NNUtils.sortByValueDescNoShuffle(charProbMap);
 
 				sbLog.append("\tsampleIndex=" + sampleIndex + "\toutputProbDistribution.length="
 						+ outputProbDistribution.length + "\toutputProbDistribution=\n"
@@ -690,7 +832,7 @@ public class LSTMCharModelling_SeqRecJun2018
 				char predicatedVal2 = Collections
 						.max(charProbMapSorted.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
 				// print the chosen output
-				sbLog.append("\n-- prediction@Step" + (i + 1) + ": predicatedVal= " + predicatedVal
+				sbLog.append("\n-- prediction@Step" + (nextIndex + 1) + ": predicatedVal= " + predicatedVal
 						+ " predicatedVal2= " + predicatedVal2);
 
 				predVals.add(predicatedVal);
@@ -708,6 +850,52 @@ public class LSTMCharModelling_SeqRecJun2018
 		System.out.println(sbLog.toString());
 
 		return predVals;
+	}
+
+	/**
+	 * Write prediction probability distribution to a file
+	 * 
+	 * @param charProbMap
+	 * @param timeAtRecommForLoggingOnly
+	 * @param dateAtRecommForLoggingOnly
+	 * @param nextIndex
+	 * @param userIDForLoggingOnly
+	 */
+	private static void writePredictionProbabilityDistribution(Map<Character, Double> charProbMap,
+			Date dateAtRecommForLoggingOnly, Time timeAtRecommForLoggingOnly, int nextIndex,
+			String userIDForLoggingOnly)
+	{
+		String absFileNameToWrite = Constant.getCommonPath() + "PredictionProbabilityDistribution.csv";
+		int roundedToDecimals = 7;
+
+		// if the file does not exist, write new file with header
+		if (new File(absFileNameToWrite).isFile() == false)
+		{
+			String header = "UserID,DateAtRecomm,TimeAtRecomm,NextIndex,";
+			header += charProbMap.entrySet().stream().map(e -> String.valueOf(e.getKey()))
+					.collect(Collectors.joining(","));
+
+			WToFile.writeToNewFile(header.toString() + ",MaxProb,MinProb,StdDev,FirstQuartile,ThirdQuartile\n",
+					absFileNameToWrite);
+		}
+
+		StringBuilder sb = new StringBuilder(userIDForLoggingOnly + "," + dateAtRecommForLoggingOnly + ","
+				+ timeAtRecommForLoggingOnly + "," + nextIndex);
+
+		List<Double> probDistribution = charProbMap.entrySet().stream().map(e -> e.getValue())
+				.collect(Collectors.toList());
+		DescriptiveStatistics ds = StatsUtils.getDescriptiveStatistics(probDistribution);
+
+		charProbMap.entrySet().stream()
+				.forEachOrdered(e -> sb.append("," + Precision.round(e.getValue(), roundedToDecimals)));
+
+		sb.append("," + Precision.round(ds.getMax(), roundedToDecimals) + ","
+				+ Precision.round(ds.getMin(), roundedToDecimals) + ","
+				+ Precision.round(ds.getStandardDeviation(), roundedToDecimals) + ","
+				+ Precision.round(ds.getPercentile(50), roundedToDecimals) + ","
+				+ Precision.round(ds.getPercentile(75), roundedToDecimals));
+
+		WToFile.appendLineToFileAbs(sb.toString() + "\n", absFileNameToWrite);
 	}
 
 	/**

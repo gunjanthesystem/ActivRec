@@ -1,5 +1,8 @@
 package org.activity.constants;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -20,6 +23,7 @@ import org.activity.distances.AlignmentBasedDistance;
 import org.activity.generator.DatabaseCreatorGowallaQuicker0;
 import org.activity.io.EditDistanceMemorizer;
 import org.activity.io.Serializer;
+import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.TraceMatrix;
 import org.activity.ui.PopUps;
@@ -89,7 +93,7 @@ public final class Constant
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.RNN1;// SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = -1;// 1;// 3;// SWITCH_NOV10
@@ -97,7 +101,7 @@ public final class Constant
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	public static final boolean sameRNNForAllRTsOfAUser = true;// SWITCH_NOV10
-	public static final boolean sameRNNForALLUsers = false;// SWITCH_JUN
+	public static final boolean sameRNNForALLUsers = true;// SWITCH_JUN
 
 	/**
 	 * determines if current timeline is allowed to go beyond the day boundaries, note that until the KDD paper, we were
@@ -215,10 +219,15 @@ public final class Constant
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean useRandomlySampled100Users = true;// false;// false;// true;// SWITCH_NOV10
+	public static final boolean useRandomlySampled100Users = false;// false;// false;// true;// SWITCH_NOV10
+	/**
+	 * Use only subset of the users from the randomly sampled users (useful for running small sample experiments for
+	 * faster iterations)
+	 */
+	public static final boolean useSelectedGTZeroUsersFromRandomlySampled100Users = true;
 	public static String pathToRandomlySampledUserIndices = "";
 
-	public static final boolean runForAllUsersAtOnce = false;// true;// false;// true;// SWITCH_April8
+	public static final boolean runForAllUsersAtOnce = true;// false;// true;// false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
 
@@ -228,12 +237,17 @@ public final class Constant
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
 	public static final boolean useToyTimelines = false;// true;
 
-	public static final int numOfHiddenLayersInRNN1 = 3;
+	public static final int numOfHiddenLayersInRNN1 = 3;// 3;
 	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;
 	public static final int numOfTrainingEpochsInRNN1 = 300;
 	public static final boolean varWidthPerHiddenLayerRNN1 = false;// true;
 	public static final int[] varWidthsPerHiddenLayerRNN1 = {};// { 512, 256 };
 	public static final double learningRateInRNN1 = 0.001;
+	public static final int exampleLengthInRNN1 = 1000;
+	public static final int miniBatchSizeInRNN1 = 256;
+	// public static final int lengthOfBPTTInRNN1 = 256; // 5587
+
+	public static final boolean doVisualizationRNN1 = true;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -393,7 +407,9 @@ public final class Constant
 
 	public static final double epsilonForFloatZero = 1.0E-50;// to compare if floating point numbers are equal.
 
-	/////////////////////////// End of variable declarations//////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////// End of variable declarations //////////////////////////////////
+	//// DO NOT CHANGE THE ABOVE COMMENTED LINE AS IT IS USED AS A MARKER WHEN REFLECTING THIS FILE
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1504,6 +1520,8 @@ public final class Constant
 		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFED);
 		s.append("\nassignFallbackZoneId:" + assignFallbackZoneIdWhenConvertCinsToAO);
 		s.append("\nrandomLySample100Users:" + useRandomlySampled100Users);
+		s.append("\nuseSelectedGTZeroUsersFromRandomlySampled100Users:"
+				+ useSelectedGTZeroUsersFromRandomlySampled100Users);
 		s.append("\npathToRandomLySampleUserIndices:" + pathToRandomlySampledUserIndices);
 		s.append("\nuseCheckinEntryV2:" + useCheckinEntryV2);
 		s.append("\nrunForAllUsersAtOnce:" + runForAllUsersAtOnce);
@@ -1518,6 +1536,9 @@ public final class Constant
 		s.append("\nnumOfNeuronsInEachHiddenLayerInRNN1:" + numOfNeuronsInEachHiddenLayerInRNN1);
 		s.append("\nnumOfTrainingEpochsInRNN1:" + Constant.numOfTrainingEpochsInRNN1);
 		s.append("\nlearningRateInRNN1:" + Constant.learningRateInRNN1);
+
+		s.append("\nexampleLengthInRNN1:" + Constant.exampleLengthInRNN1);
+		s.append("\nminiBatchSizeInRNN1:" + Constant.miniBatchSizeInRNN1);
 
 		s.append("\nvarWidthPerHiddenLayerRNN1:" + Constant.varWidthPerHiddenLayerRNN1);
 		s.append("\nvarWidthsPerHiddenLayerRNN1:" + Arrays.toString(Constant.varWidthsPerHiddenLayerRNN1));
@@ -1621,6 +1642,37 @@ public final class Constant
 	public static Char2IntOpenHashMap getCharCodeActIDMap()
 	{
 		return charCodeActIDMap;
+	}
+
+	/**
+	 * Read the paramter setting in the Constant.java source file and write it to the given path.
+	 * 
+	 * @param absCOnstantConfigFileToWrite
+	 */
+	public static void reflectTheConfigInConstantFile(String absCOnstantConfigFileToWrite)
+	{
+		String absFileNameToRead = "./src/main/java/org/activity/constants/Constant.java";
+		StringBuilder sb = new StringBuilder();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(absFileNameToRead)))
+		{
+			String line;
+			while ((line = br.readLine()) != null)
+			{
+				if (line.contains("/ End of variable declarations /"))
+				{
+					break;
+				}
+				sb.append(line + "\n");
+			}
+			WToFile.writeToNewFile(sb.toString(), absCOnstantConfigFileToWrite);
+			System.out.println("reflected the config in Constant.java\n");
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 }

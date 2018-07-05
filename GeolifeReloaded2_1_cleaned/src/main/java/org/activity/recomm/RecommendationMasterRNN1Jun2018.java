@@ -117,7 +117,8 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 	private LinkedHashMap<String, Double> similarityOfEndPointActivityObjectCand;
 
 	/**
-	 * Recommended Activity names with their rank score, (earlier used to be LinkedHashMap<String, Double>>)
+	 * Recommended Activity names with their rank score, (earlier used to be LinkedHashMap<String, Double>> but now
+	 * since we are not recommending iteratively, instead recommending for all the steps at once, we have a list)
 	 */
 	private ArrayList<LinkedHashMap<String, Double>> recommendedActivityNamesWithRankscores;
 	private ArrayList<String> rankedRecommendedActNamesWithRankScoresStr;
@@ -598,7 +599,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 
 			this.recommendedActivityNamesWithRankscores = getTopPredictedRNNActivityPDVals(this.activitiesGuidingRecomm,
 					this.lookPastType, this.candidateTimelines, 1, false, this.userIDAtRecomm, altSeqPredictor,
-					recommSeqLength);
+					recommSeqLength, this.dateAtRecomm, this.timeAtRecomm);
 
 			// $$this.recommendedActivityNamesWithRankscores =
 
@@ -708,13 +709,16 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 	 * @param userID
 	 * @param alternateSeqPredictor
 	 * @param recommSeqLength
-	 * @return one linkedHashmapfor each step
+	 * @param timeAtRecommForLoggingOnly
+	 * @param dateAtRecommForLoggingOnly
+	 * @return List of LinkedHashMaps, one linkedHashmap for each step
 	 * @throws Exception
 	 */
 	private ArrayList<LinkedHashMap<String, Double>> getTopPredictedRNNActivityPDVals(
 			ArrayList<ActivityObject> activitiesGuidingRecomm, LookPastType lookPastType,
 			LinkedHashMap<String, Timeline> candidateTimelines, double constantValScore, boolean verbose, String userID,
-			Enums.AltSeqPredictor alternateSeqPredictor, int recommSeqLength) throws Exception
+			Enums.AltSeqPredictor alternateSeqPredictor, int recommSeqLength, Date dateAtRecommForLoggingOnly,
+			Time timeAtRecommForLoggingOnly) throws Exception
 	{
 		int numOfNextPredictions = recommSeqLength;
 		ArrayList<LinkedHashMap<String, Double>> res = new ArrayList<>();
@@ -750,7 +754,8 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 			// System.out.println("predictedNextSymbol = ");
 			// TimelineTransformers.timelineToSeqOfActIDs(timeline, delimiter)
 			List<Character> predSymbol = getRNNPredictedSymbolLSTM1(userID, currSeq, candidateTimelinesWithNextAppended,
-					alternateSeqPredictor, numOfNextPredictions, verbose);
+					alternateSeqPredictor, numOfNextPredictions, verbose, dateAtRecommForLoggingOnly,
+					timeAtRecommForLoggingOnly);
 			// getRNNPredictedSymbol(userID, currSeq, candidateTimelinesWithNextAppended,
 			// alternateSeqPredictor, numOfNextPredictions, verbose);
 
@@ -903,12 +908,15 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 	 * @param alternateSeqPredictor
 	 * @param nextHowManyPredictions
 	 * @param verbose
+	 * @param timeAtRecommForLoggingOnly
+	 * @param dateAtRecommForLoggingOnly
 	 * @return
 	 * @throws Exception
 	 */
 	private List<Character> getRNNPredictedSymbolLSTM1(String userID, ArrayList<Character> currSeq,
 			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended,
-			Enums.AltSeqPredictor alternateSeqPredictor, int nextHowManyPredictions, boolean verbose) throws Exception
+			Enums.AltSeqPredictor alternateSeqPredictor, int nextHowManyPredictions, boolean verbose,
+			Date dateAtRecommForLoggingOnly, Time timeAtRecommForLoggingOnly) throws Exception
 	{
 		ArrayList<ArrayList<Character>> candTimelinesAsSeq = new ArrayList<>();
 		List<Character> predSymbol = new ArrayList<>();
@@ -971,7 +979,9 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 			seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userID, verbose);// verbose);
 		}
 
-		predSymbol = seqPredictor.predictNextNValues5(NNUtils.listToCharArr(currSeq), nextHowManyPredictions, verbose);
+		predSymbol = seqPredictor.predictNextNValues5(NNUtils.listToCharArr(currSeq), nextHowManyPredictions, verbose,
+				dateAtRecommForLoggingOnly, timeAtRecommForLoggingOnly, userID,
+				VerbosityConstants.writeRNN1PredProbDistribution);
 
 		// Start of Sanity CHeck
 		// if (savedReTrain)// PASSED

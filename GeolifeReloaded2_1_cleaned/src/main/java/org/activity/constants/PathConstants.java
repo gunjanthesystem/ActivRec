@@ -1,5 +1,10 @@
 package org.activity.constants;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.activity.io.ReadingFromFile;
+
 /**
  * To centralise paths which need to be set for experiments
  * 
@@ -20,6 +25,9 @@ public class PathConstants
 	public static String pathToSerialisedGowallaLocZoneIdMap;
 	// ./dataToRead/Feb26/UniqueLocationObjects5DaysTrainTestWithTZUsingPy.csv
 	public static final String pathToToyTimelines = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN7ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTVToyRun6Chosen/ToyTimelinesManually6June.kryo";
+
+	public static final String pathToFileWithIndicesOfGTZeroUsers = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/Concatenated/MinMUWithMaxFirst3_GTZero.csv";
+
 	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY30Toy/ToyTimelinesManually28May.kryo";
 
 	/**
@@ -114,5 +122,16 @@ public class PathConstants
 		// //end of curtain April 9 2018
 	}
 	// public final static String pathToSerialisedCatIDsHierDist;
+
+	/**
+	 * 
+	 */
+	public static List<String> o(String fileWithIndicesOfUserWithGTZero)
+	{
+		List<String> readData = ReadingFromFile.oneColumnReaderString(fileWithIndicesOfUserWithGTZero, ",", 0, false);
+		System.out.println("Read userIndicesWithGTZeroBestMU: " + readData.size() + " indices :- \n"
+				+ readData.stream().collect(Collectors.joining("\n")));
+		return readData;
+	}
 
 }
