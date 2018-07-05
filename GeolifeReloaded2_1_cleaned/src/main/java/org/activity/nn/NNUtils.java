@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.commons.math3.util.Precision;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -44,7 +45,7 @@ public class NNUtils
 	 */
 	public static Map<Character, Double> getCharProbMap(double[] probDistribution, CharIteratorJun2018 iter)
 	{
-		Map<Character, Double> charProbMap = new LinkedHashMap<>();
+		Map<Character, Double> charProbMap = new TreeMap<>();
 		for (int index = 0; index < probDistribution.length; index++)
 		{
 			charProbMap.put(new Character(iter.convertIndexToCharacter(index)), probDistribution[index]);

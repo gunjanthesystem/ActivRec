@@ -1,9 +1,11 @@
 package org.activity.evaluation;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 
@@ -27,7 +29,17 @@ public class ResultSamplingUtil
 
 	public static void main(String args[])
 	{
-		allUserResultsTo5SetsOf100RResults();
+		if (false)
+		{
+			allUserResultsTo5SetsOf100RResults();
+			Constant.reflectTheConfigInConstantFile(
+					"./dataWritten/ReflectedConfig" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+							+ LocalDateTime.now().getDayOfMonth() + ".java");
+		}
+
+		// manali
+		// $$PathConstants.getUserIndicesWithGTZero(PathConstants.pathToFileWithIndicesOfGTZeroUsers);
+
 	}
 
 	/**

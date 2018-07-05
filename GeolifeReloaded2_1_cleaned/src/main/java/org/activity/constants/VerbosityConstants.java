@@ -83,6 +83,8 @@ public class VerbosityConstants
 	public static final boolean writeRankedRecommsWOScoreForEachSeqIndex = false;
 	public static final boolean writeDataActualForEachSeqIndex = false;
 	public static final boolean writeTrainTestTimelinesAOsPerUser = true;
+
+	public static final boolean writeRNN1PredProbDistribution = true;
 	// End of curtain 30 May 2018 for running Toy
 
 	// ======================================================================================

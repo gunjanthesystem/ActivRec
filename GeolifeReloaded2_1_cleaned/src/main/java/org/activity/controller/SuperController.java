@@ -183,14 +183,14 @@ public class SuperController
 		// "/dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs/", "/dataWritten/Mar1ED0.25DurFPDistFPStFilter3hrs/",
 		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
 
-		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv",
-		// "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
-		// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",
-		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD",
-		// "./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
+				"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
 
-		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
-				"./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
+		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
+		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
 
 		double[] EDAlphas = { 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
 
@@ -207,6 +207,10 @@ public class SuperController
 				for (String sampledUserIndicesSet : sampledUserIndicesSets)
 				{
 					main0(sampledUserIndicesSet, edAlphaForAnExp);
+					if (Constant.runForAllUsersAtOnce)
+					{
+						break;// because we are not using the sample users indices, hence we need to run it only once.
+					}
 				}
 			}
 		}
@@ -555,6 +559,10 @@ public class SuperController
 		// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
+
+		Constant.reflectTheConfigInConstantFile(
+				commonPath + "Constant" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+						+ LocalDateTime.now().getDayOfMonth() + ".java");
 
 		if (recommendation)
 		{

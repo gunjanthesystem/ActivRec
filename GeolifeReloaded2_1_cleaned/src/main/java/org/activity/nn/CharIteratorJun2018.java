@@ -71,10 +71,14 @@ public class CharIteratorJun2018 implements DataSetIterator
 	@Override
 	public String toString()
 	{
-		return "CharIteratorJun2018 [allPossibleChars=" + Arrays.toString(allPossibleChars) + ", trainingString="
-				+ Arrays.toString(trainingString) + ", charToIndexMap=" + charToIndexMap + ", exampleLength="
-				+ exampleLength + ", miniBatchSize=" + miniBatchSize + ", exampleStartOffsets=" + exampleStartOffsets
-				+ ", shuffleOffsetsForExamples=" + shuffleOffsetsForExamples + "]";
+		String trainingStringToPrint = trainingString.length > 1000
+				? "long training string of sizer( >1000) = " + trainingString.length
+				: Arrays.toString(trainingString);
+
+		return "CharIteratorJun2018 [\nallPossibleChars=" + Arrays.toString(allPossibleChars) + ", \ntrainingString="
+				+ trainingStringToPrint + ", \ncharToIndexMap=" + charToIndexMap + ", \nexampleLength=" + exampleLength
+				+ ", \nminiBatchSize=" + miniBatchSize + ", \nexampleStartOffsets=" + exampleStartOffsets
+				+ ", \nshuffleOffsetsForExamples=" + shuffleOffsetsForExamples + "]";
 	}
 
 	/**
