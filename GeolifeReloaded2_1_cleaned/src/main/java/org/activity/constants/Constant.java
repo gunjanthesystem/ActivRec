@@ -93,10 +93,10 @@ public final class Constant
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.RNN1;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;// SWITCH_NOV10
 	// .RNN1;AKOM
 
-	private static int AKOMHighestOrder = -1;// 1;// 3;// SWITCH_NOV10
+	private static int AKOMHighestOrder = 2;// 1;// 3;// SWITCH_NOV10
 	private static int RNNCurrentActivitityLength = 1;
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
@@ -155,7 +155,7 @@ public final class Constant
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
-	public static final boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_NOV10
+	public static final boolean filterTrainingTimelinesByRecentDays = true;// MANALI true;// SWITCH_NOV10
 	private static int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
 
 	// Filtering the candidate timeline
@@ -237,14 +237,15 @@ public final class Constant
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
 	public static final boolean useToyTimelines = false;// true;
 
-	public static final int numOfHiddenLayersInRNN1 = 3;// 3;
-	public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;
-	public static final int numOfTrainingEpochsInRNN1 = 300;
-	public static final boolean varWidthPerHiddenLayerRNN1 = false;// true;
-	public static final int[] varWidthsPerHiddenLayerRNN1 = {};// { 512, 256 };
+	// public static final int numOfHiddenLayersInRNN1 = 3;// 3;
+	// public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;
+	public static final int numOfTrainingEpochsInRNN1 = 500;
+	// public static final boolean varWidthPerHiddenLayerRNN1 = false;// true;
+	public static final int[] neuronsInHiddenLayersRNN1 = { 500, 500, 500 };// { 512, 256 };
 	public static final double learningRateInRNN1 = 0.001;
+	public static final double l2RegularisationCoeffRNN1 = 0.001;
 	public static final int exampleLengthInRNN1 = 1000;
-	public static final int miniBatchSizeInRNN1 = 256;
+	public static final int miniBatchSizeInRNN1 = 256;// 256;
 	// public static final int lengthOfBPTTInRNN1 = 256; // 5587
 
 	public static final boolean doVisualizationRNN1 = true;
@@ -1532,16 +1533,17 @@ public final class Constant
 		s.append("\nuseRTVerseNormalisationForED:" + useRTVerseNormalisationForED);
 		s.append("\npercentileForRTVerseMaxForEDNorm:" + percentileForRTVerseMaxForEDNorm);
 		s.append("\nuseToyTimelines:" + useToyTimelines);
-		s.append("\nnumOfHiddenLayersInRNN1:" + numOfHiddenLayersInRNN1);
-		s.append("\nnumOfNeuronsInEachHiddenLayerInRNN1:" + numOfNeuronsInEachHiddenLayerInRNN1);
+		// s.append("\nnumOfHiddenLayersInRNN1:" + numOfHiddenLayersInRNN1);
+		// s.append("\nnumOfNeuronsInEachHiddenLayerInRNN1:" + numOfNeuronsInEachHiddenLayerInRNN1);
 		s.append("\nnumOfTrainingEpochsInRNN1:" + Constant.numOfTrainingEpochsInRNN1);
 		s.append("\nlearningRateInRNN1:" + Constant.learningRateInRNN1);
+		s.append("\nl2RegularisationCoeffRNN1:" + Constant.l2RegularisationCoeffRNN1);
 
 		s.append("\nexampleLengthInRNN1:" + Constant.exampleLengthInRNN1);
 		s.append("\nminiBatchSizeInRNN1:" + Constant.miniBatchSizeInRNN1);
 
-		s.append("\nvarWidthPerHiddenLayerRNN1:" + Constant.varWidthPerHiddenLayerRNN1);
-		s.append("\nvarWidthsPerHiddenLayerRNN1:" + Arrays.toString(Constant.varWidthsPerHiddenLayerRNN1));
+		// s.append("\nvarWidthPerHiddenLayerRNN1:" + Constant.varWidthPerHiddenLayerRNN1);
+		s.append("\nneuronsInHiddenLayersRNN1:" + Arrays.toString(Constant.neuronsInHiddenLayersRNN1));
 
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))

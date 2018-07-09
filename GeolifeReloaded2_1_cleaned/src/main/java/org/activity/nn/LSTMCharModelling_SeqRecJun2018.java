@@ -1,6 +1,7 @@
 package org.activity.nn;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.sql.Date;
@@ -18,9 +19,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.controller.SuperController;
 import org.activity.io.WToFile;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
+import org.activity.util.DateTimeUtils;
 import org.apache.commons.math3.primes.Primes;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.Precision;
@@ -62,8 +65,12 @@ public class LSTMCharModelling_SeqRecJun2018
 	// private final List<Character> allPossibleChars;// = new ArrayList<>(); // a list of all possible characters
 
 	// LSTM dimensions
-	private int HIDDEN_LAYER_WIDTH;// = 200;// Number of units in each LSTM layer, lstmLayerSize
-	private int HIDDEN_LAYER_COUNT;// = 2;
+	// replace by variable width hidden layers set by numOfUnitsInHiddenLayersInOrder on 5 July 2018
+	// private int HIDDEN_LAYER_WIDTH;// = 200;// Number of units in each LSTM layer, lstmLayerSize
+	// private int HIDDEN_LAYER_COUNT;// = 2;
+
+	private int[] numOfUnitsInHiddenLayersInOrder;
+
 	private static final Random r = new Random(7894);
 
 	///////////////////
@@ -94,102 +101,74 @@ public class LSTMCharModelling_SeqRecJun2018
 		lstmPredictorsForEachUserStored.clear();
 	}
 
-	public LSTMCharModelling_SeqRecJun2018(int numOfNeuronsInHiddenLayer, int numOfHiddenLayers)
+	public static final String getRNN1Label()
 	{
-		HIDDEN_LAYER_WIDTH = numOfNeuronsInHiddenLayer;
-		HIDDEN_LAYER_COUNT = numOfHiddenLayers;
-		// allPossibleChars = new ArrayList<>();
+		return Arrays.stream(Constant.neuronsInHiddenLayersRNN1).mapToObj(i -> String.valueOf(i))
+				.collect(Collectors.joining("_")) + "_HL" + Constant.numOfTrainingEpochsInRNN1 + "Epochs"
+				+ String.valueOf(Constant.learningRateInRNN1).replace("0.", "") + "LR" + Constant.exampleLengthInRNN1
+				+ "ln";
 	}
 
-	public static void main(String args[])
+	/**
+	 * 
+	 * @param fileLocation
+	 * @param commentChars
+	 * @param limit
+	 * @return
+	 */
+	private static char[] getCharArrayFromFile(String fileLocation, int limit)
 	{
-		char text[] = getCharArrayFromText("./dataToRead/TomSawyer.txt", null, 56000);
-		LSTMCharModelling_SeqRecJun2018 lstm1 = new LSTMCharModelling_SeqRecJun2018(
-				Constant.numOfNeuronsInEachHiddenLayerInRNN1, Constant.numOfHiddenLayersInRNN1, false, "none",
-				Constant.numOfTrainingEpochsInRNN1, Constant.learningRateInRNN1, text);
-		System.out.println("Completed");
-	}
-
-	private static char[] getCharArrayFromText(String fileLocation, String commentChars, int limit)
-	{
-		// String fileLocation = "";
-		// String commentChars = "";
 		Charset textFileEncoding = Charset.defaultCharset();
 		StringBuilder sb = new StringBuilder();
 
 		try
 		{
-			char[] validCharacters = CharacterIterator_WC1.getMinimalCharacterSet(); // Which characters are allowed?
-																						// Others
-			Set<Character> validCharSet = new HashSet<>(validCharacters.length);
-			for (char ch : validCharacters)
-			{
-				validCharSet.add(ch);
-			}
-
-			//////////
-			// Load file and convert contents to a char[]
-			boolean newLineValid = validCharSet.contains('\n');
-
 			List<String> lines = Files.readAllLines(new File(fileLocation).toPath(), textFileEncoding);
 			sb.append("#lines read from raw file = " + lines.size() + "\n");
 
-			// Ignore commented lines
-			if (commentChars != null)
-			{
-				List<String> withoutComments = new ArrayList<>();
-				for (String line : lines)
-				{
-					if (!line.startsWith(commentChars))
-					{
-						withoutComments.add(line);
-					}
-				}
-				lines = withoutComments;
-			}
-
-			int maxSize = lines.size(); // add lines.size() to account for newline characters at end of each line
-
+			int maxSize = 0;// lines.size(); // add lines.size() to account for newline characters at end of each line
 			for (String s : lines)
 			{
 				maxSize += s.length();
 			}
 
-			sb.append("#lines ignoring commented lines read from raw file = " + lines.size() + " maxSize = " + maxSize
-					+ "\n");
+			int arrayCapacity = (limit != -1) ? limit : maxSize;
 
-			char[] characters = new char[limit];
-			int index = 0;
+			sb.append("#lines read from raw file = " + lines.size() + " maxSize = " + maxSize + " arrayCapacity = "
+					+ arrayCapacity + "\n");
+
+			char[] resultantCharArray = new char[arrayCapacity];
 
 			sb.append("Looping over all lines\n");
+			int index = 0;
 
 			for (String s : lines)
 			{
-				char[] thisLine = s.toCharArray();
-				for (char charInThisLine : thisLine)
+				char[] charsInThisLine = s.toCharArray();
+				for (char charInThisLine : charsInThisLine)
 				{
-					if (!validCharSet.contains(charInThisLine))
-					{
-						continue;
-					}
-					characters[index++] = charInThisLine;
-					if (index > limit - 1)
+					// if (charInThisLine == '\n')
+					// {
+					// System.out.println("ALERT!! Skipping newline");
+					// continue;
+					// }
+					resultantCharArray[index++] = charInThisLine;
+
+					if (index == limit)
 					{
 						break;
 					}
 				}
-				if (index > limit - 1)
+				if (index == limit)
 				{
 					break;
 				}
-
-				if (newLineValid) characters[index++] = '\n';
+				// resultantCharArray[index++] = '\n';// add newline as line separator
 			}
 
-			sb.append("character.length()=" + characters.length + "\n");
+			sb.append("character.length()=" + resultantCharArray.length + " " + "\n");
 			System.out.println(sb.toString());
-			return characters;
-
+			return resultantCharArray;
 		}
 		catch (Exception e)
 		{
@@ -197,6 +176,64 @@ public class LSTMCharModelling_SeqRecJun2018
 
 		}
 		return null;
+	}
+
+	public LSTMCharModelling_SeqRecJun2018(int numOfNeuronsInHiddenLayer, int numOfHiddenLayers)
+	{
+		// HIDDEN_LAYER_WIDTH = numOfNeuronsInHiddenLayer;
+		// HIDDEN_LAYER_COUNT = numOfHiddenLayers;
+
+		numOfUnitsInHiddenLayersInOrder = new int[numOfHiddenLayers];
+		for (int hl = 0; hl < numOfHiddenLayers; hl++)
+		{
+			numOfUnitsInHiddenLayersInOrder[hl] = numOfNeuronsInHiddenLayer;
+		}
+		// allPossibleChars = new ArrayList<>();
+	}
+
+	public LSTMCharModelling_SeqRecJun2018(int[] numOfUnitsInHiddenLayersInOrder)
+	{
+		this.numOfUnitsInHiddenLayersInOrder = numOfUnitsInHiddenLayersInOrder;
+		// allPossibleChars = new ArrayList<>();
+	}
+
+	public static void main(String args[])
+	{
+		if (true)
+		{
+			SuperController.setupCUDAEnviron();
+		}
+
+		// String trainingStringNoRecentDa="TrainingStringNoRecentDayFilter.txt"
+
+		// char text[] = getCharArrayFromTextWithValidEnglishCharsOnly("./dataToRead/TomSawyer.txt", null, 56000);
+		char trainingCharArray[] = getCharArrayFromFile("./dataToRead/TrainingStringNoRecentDayFilter.txt", -1);// TrainingString
+		String outputDirectory = "./dataWritten/RNNExperiments" + DateTimeUtils.getMonthDateLabel() + "/SeqRec"
+				+ LSTMCharModelling_SeqRecJun2018.getRNN1Label() + DateTimeUtils.getMonthDateHourMinLabel();
+
+		new File(outputDirectory).mkdirs();
+		Constant.setCommonPath(outputDirectory + "/");
+
+		PrintStream consoleLogStream = WToFile.redirectConsoleOutput(
+				Constant.getCommonPath() + "ConsoleLog" + DateTimeUtils.getMonthDateHourMinLabel() + ".txt");
+
+		System.out.println("read trainingCharArray.length" + trainingCharArray.length);
+		if (true)
+		{
+			// print the last 10 characters for
+			// System.out.println("read text= \n" + Arrays.toString(trainingCharArray));
+			for (int i = trainingCharArray.length - 1; i > (trainingCharArray.length - 10); i--)
+			{
+				System.out.println("i=" + i + " char=" + trainingCharArray[i]);
+			}
+		}
+		// System.exit(0);
+		LSTMCharModelling_SeqRecJun2018 lstm1 = new LSTMCharModelling_SeqRecJun2018(Constant.neuronsInHiddenLayersRNN1,
+				false, "none", Constant.numOfTrainingEpochsInRNN1, Constant.learningRateInRNN1,
+				Constant.l2RegularisationCoeffRNN1, trainingCharArray);
+
+		consoleLogStream.close();
+		System.out.println("Completed");
 	}
 
 	public static void main1(String args[])
@@ -237,7 +274,7 @@ public class LSTMCharModelling_SeqRecJun2018
 		// rnnA.setAllPossibleChars(trainingString, verbose);
 
 		// rnnA.setTestString("h".toCharArray(), verbose);
-		rnnA.configureAndCreateRNN(0.001, 2, iter);
+		rnnA.configureAndCreateRNN(0.001, 2, 0.001, iter);
 
 		// DataSet trainingData = rnnA.createTrainingDataset(rnnA.trainingString, rnnA.getAllpossiblechars(), verbose);
 
@@ -280,7 +317,7 @@ public class LSTMCharModelling_SeqRecJun2018
 			res[i] = flattenedList.get(i);
 		}
 
-		if (verbose)
+		if (true) // verbose)
 		{
 			StringBuilder sb = new StringBuilder();
 			int sizeOfGivenData = givenData.stream().mapToInt(l -> l.size()).sum();
@@ -291,6 +328,26 @@ public class LSTMCharModelling_SeqRecJun2018
 				sb.append("givenData=\n" + givenData + "\nflattenedList=\n" + flattenedList + "\n");
 			}
 			System.out.println(sb.toString());
+		}
+
+		if (true)// temporarily write to file, one long string
+		{
+			StringBuilder sb = new StringBuilder();
+			String fileToWrite = Constant.getCommonPath() + "TrainingStringNoRecentDayFilter.txt";
+			// LeakyBucket lb = new LeakyBucket(5000, Constant.getCommonPath() + "TrainingString.txt", true);
+			for (int i = 0; i < res.length; i++)
+			{
+				sb.append(res[i]);
+				if (i % 5000 == 0)
+				{
+					WToFile.appendLineToFileAbs(sb.toString(), fileToWrite);
+					sb.setLength(0);
+				}
+			}
+			WToFile.appendLineToFileAbs(sb.toString(), fileToWrite);
+			sb.setLength(0);
+			System.exit(0);
+
 		}
 
 		return res;
@@ -350,8 +407,8 @@ public class LSTMCharModelling_SeqRecJun2018
 			boolean verbose)
 	{
 
-		this(Constant.numOfNeuronsInEachHiddenLayerInRNN1, Constant.numOfHiddenLayersInRNN1, verbose, userID,
-				Constant.numOfTrainingEpochsInRNN1, Constant.learningRateInRNN1,
+		this(Constant.neuronsInHiddenLayersRNN1, verbose, userID, Constant.numOfTrainingEpochsInRNN1,
+				Constant.learningRateInRNN1, Constant.l2RegularisationCoeffRNN1,
 				LSTMCharModelling_SeqRecJun2018.flattenList(trainingString, verbose));
 	}
 
@@ -374,19 +431,26 @@ public class LSTMCharModelling_SeqRecJun2018
 	// }
 
 	/**
+	 * <ol>
+	 * <li>Set paramaters</li>
+	 * <li>Create char iterator</li>
+	 * <li>configureAndCreateRNN</li>
+	 * <li>trainTheNetwork</li>
+	 * <li>store the RNN if suitable</li>
+	 * </ol>
 	 * 
-	 * @param numOfNeuronsInHiddenLayer
-	 * @param numOfHiddenLayers
+	 * @param neuronsInEachHiddenLayerInOrder
 	 * @param verbose
 	 * @param userID
 	 * @param numOfTrainingEpochs
 	 * @param learningRate
+	 * @param l2RegularisationCoeff
 	 * @param trainingString
 	 */
-	public LSTMCharModelling_SeqRecJun2018(int numOfNeuronsInHiddenLayer, int numOfHiddenLayers, boolean verbose,
-			String userID, int numOfTrainingEpochs, double learningRate, char[] trainingString)
+	public LSTMCharModelling_SeqRecJun2018(int[] neuronsInEachHiddenLayerInOrder, boolean verbose, String userID,
+			int numOfTrainingEpochs, double learningRate, double l2RegularisationCoeff, char[] trainingString)
 	{
-		this(numOfNeuronsInHiddenLayer, numOfHiddenLayers);
+		this(neuronsInEachHiddenLayerInOrder);// this(numOfNeuronsInHiddenLayer, numOfHiddenLayers);
 		long t1 = System.currentTimeMillis();
 
 		// Length of each training example sequence to use. This could certainly be increased
@@ -394,11 +458,20 @@ public class LSTMCharModelling_SeqRecJun2018
 		int miniBatchSize = Constant.miniBatchSizeInRNN1;// 256; // Size of mini batch to use when training
 		int lengthOfTBPTT = (int) (0.10 * exampleLength);// trainingString.length);
 
-		System.out.println("Inside LSTMCharModelling_SeqRecJun2018: numOfNeuronsInHiddenLayer= "
-				+ numOfNeuronsInHiddenLayer + " numOfHiddenLayers=" + numOfHiddenLayers + " numOfTrainingEpochs="
-				+ numOfTrainingEpochs + " learningRate=" + learningRate + " userID=" + userID
-				+ " trainingString.length=" + trainingString.length + " exampleLength=" + exampleLength
-				+ " miniBatchSize=" + miniBatchSize + " lengthOfTBPTT=" + lengthOfTBPTT);
+		// System.out.println("Inside LSTMCharModelling_SeqRecJun2018: neuronsInHiddenLayer= "
+		// + Arrays.toString(neuronsInEachHiddenLayerInOrder) + " numOfTrainingEpochs=" + numOfTrainingEpochs
+		// + " learningRate=" + learningRate + " userID=" + userID + " trainingString.length="
+		// + trainingString.length + " exampleLength=" + exampleLength + " miniBatchSize=" + miniBatchSize
+		// + " lengthOfTBPTT=" + lengthOfTBPTT);
+
+		String nnConfig = "Hidden Layers: " + Arrays.toString(neuronsInEachHiddenLayerInOrder)
+				+ "\nnumOfTrainingEpochs: " + numOfTrainingEpochs + "\nlearningRate: " + learningRate
+				+ "\nl2Regularisation: " + l2RegularisationCoeff + "\nexampleLength: " + exampleLength
+				+ "\nminiBatchSize: " + miniBatchSize + "\nlengthOfTBPTT: " + lengthOfTBPTT + "\nuserID: " + userID
+				+ "\ntrainingString.length: " + trainingString.length + "\n";
+
+		WToFile.appendLineToFileAbs(nnConfig, Constant.getCommonPath() + "NNConfig.csv");
+		System.out.println("Inside LSTMCharModelling_SeqRecJun2018: " + nnConfig);
 
 		// String nnConfig = "nHL:" + (net.getnLayers() - 2) + "neHL:" + Constant.numOfNeuronsInEachHiddenLayerInRNN1 +
 		// "";
@@ -427,7 +500,7 @@ public class LSTMCharModelling_SeqRecJun2018
 			// rnnA.setAllPossibleChars(trainingString, verbose);
 
 			// rnnA.setTestString("h".toCharArray(), verbose);
-			this.configureAndCreateRNN(learningRate, lengthOfTBPTT, iter);
+			this.configureAndCreateRNN(learningRate, lengthOfTBPTT, l2RegularisationCoeff, iter);
 
 			// DataSet trainingData = rnnA.createTrainingDataset(rnnA.trainingString, rnnA.getAllpossiblechars(),
 			// verbose);
@@ -505,7 +578,15 @@ public class LSTMCharModelling_SeqRecJun2018
 
 		if (dovisualizationrnn1)
 		{
-			File statsFile = new File(Constant.getCommonPath() + "TomSawUIStorageLSTMCharModelling_SeqRec.dl4j");
+			File statsFile = new File(
+					Constant.getCommonPath() + "UIStorageSeqRec" + LSTMCharModelling_SeqRecJun2018.getRNN1Label()
+							+ DateTimeUtils.getMonthDateHourMinLabel() + ".dl4j");
+
+			if (statsFile.exists())
+			{
+				PopUps.showMessage("Warning in trainTheNetwork: " + statsFile + " already exists");
+			}
+
 			StatsStorage statsStorage = new FileStatsStorage(statsFile);
 			net.setListeners(new StatsListener(statsStorage), new ScoreIterationListener(10));
 		}
@@ -533,7 +614,7 @@ public class LSTMCharModelling_SeqRecJun2018
 
 		System.out.println("End of Training took: " + (System.currentTimeMillis() - t00Fit) + " ms");
 		System.out.println("---> Exiting trainTheNetwork called()");
-		System.exit(0);// TODO
+		// System.exit(0);// TODO
 	}
 
 	// /**
@@ -903,16 +984,19 @@ public class LSTMCharModelling_SeqRecJun2018
 	 * @param learningRate
 	 * @param tbpttLength
 	 *            length for truncate back propagation through time
+	 * @param l2RegularisationCoeff
+	 * 
 	 * @param iter
 	 */
-	public void configureAndCreateRNN(double learningRate, int tbpttLength, CharIteratorJun2018 iter)
+	public void configureAndCreateRNN(double learningRate, int tbpttLength, double l2RegularisationCoeff,
+			CharIteratorJun2018 iter)
 	// int iterations, double learningRate, int numOfEpochs, boolean verbose)
 	{
 		System.out.println("---Inside configureAndCreateRNN() called");
 		/////////////// Start of set common parameters for NN
 		NeuralNetConfiguration.Builder nnConfigBuilder = new NeuralNetConfiguration.Builder();
 		nnConfigBuilder.seed(123);
-		nnConfigBuilder.l2(0.001);
+		nnConfigBuilder.l2(l2RegularisationCoeff);// 0.001);
 		nnConfigBuilder.weightInit(WeightInit.XAVIER);
 		nnConfigBuilder.updater(new RmsProp(learningRate));
 		// nnConfigBuilder.biasInit(0);
@@ -929,26 +1013,32 @@ public class LSTMCharModelling_SeqRecJun2018
 		int numOfOutputs = iter.totalOutcomes();
 		System.out.println("numOfInputs= " + numOfInputs);
 
-		for (int layerIndex = 0; layerIndex < HIDDEN_LAYER_COUNT; layerIndex++)
+		// for (int layerIndex = 0; layerIndex < HIDDEN_LAYER_COUNT; layerIndex++)
+		for (int hiddenLayerIndex = 0; hiddenLayerIndex < this.numOfUnitsInHiddenLayersInOrder.length; hiddenLayerIndex++)
 		{
+			int numOfUnitsInThisHiddenLayer = numOfUnitsInHiddenLayersInOrder[hiddenLayerIndex];
 			LSTM.Builder hiddenLayerBuilder = new LSTM.Builder();
-			hiddenLayerBuilder.nIn(layerIndex == 0 ? numOfInputs : HIDDEN_LAYER_WIDTH);
-			hiddenLayerBuilder.nOut(HIDDEN_LAYER_WIDTH);
+			// check if first hidden layer
+			hiddenLayerBuilder.nIn(hiddenLayerIndex == 0 ? numOfInputs : numOfUnitsInThisHiddenLayer);
+			hiddenLayerBuilder.nOut(numOfUnitsInThisHiddenLayer);
 			// adopted activation function from LSTMCharModellingExample seems to work well with RNNs
 			hiddenLayerBuilder.activation(Activation.TANH);
-			listOfConfigBuilder.layer(layerIndex, hiddenLayerBuilder.build());
+			listOfConfigBuilder.layer(hiddenLayerIndex, hiddenLayerBuilder.build());
 		}
 		/////////////// End of configure the hidden layers iteratively
 
 		/////////////// Start of configure the output layer
+		int numOfUnitInLastHiddenLayer = numOfUnitsInHiddenLayersInOrder[numOfUnitsInHiddenLayersInOrder.length - 1];
+
 		// we need to use RnnOutputLayer for our RNN
 		RnnOutputLayer.Builder outputLayerBuilder = new RnnOutputLayer.Builder(LossFunction.MCXENT);
 		// softmax normalizes the output neurons, the sum of all outputs is 1
 		// this is required for our sampleFromDistribution-function
 		outputLayerBuilder.activation(Activation.SOFTMAX);
-		outputLayerBuilder.nIn(HIDDEN_LAYER_WIDTH);
+		outputLayerBuilder.nIn(numOfUnitInLastHiddenLayer);// HIDDEN_LAYER_WIDTH);
 		outputLayerBuilder.nOut(numOfOutputs);
-		listOfConfigBuilder.layer(HIDDEN_LAYER_COUNT, outputLayerBuilder.build());
+		// listOfConfigBuilder.layer(HIDDEN_LAYER_COUNT, outputLayerBuilder.build());
+		listOfConfigBuilder.layer(numOfUnitsInHiddenLayersInOrder.length, outputLayerBuilder.build());
 		/////////////// End of configure the output layer
 
 		// finish builder
@@ -1001,19 +1091,121 @@ public class LSTMCharModelling_SeqRecJun2018
 	// return testString;
 	// }
 
-	public int getHIDDEN_LAYER_WIDTH()
-	{
-		return HIDDEN_LAYER_WIDTH;
-	}
+	// public int getHIDDEN_LAYER_WIDTH()
+	// {
+	// return HIDDEN_LAYER_WIDTH;
+	// }
 
 	public int getHIDDEN_LAYER_COUNT()
 	{
-		return HIDDEN_LAYER_COUNT;
+		return this.numOfUnitsInHiddenLayersInOrder.length;
+	}
+
+	public int[] getNumOfUnitsInHiddenLayersInOrder()
+	{
+		return numOfUnitsInHiddenLayersInOrder;
 	}
 
 	public MultiLayerNetwork getNet()
 	{
 		return net;
+	}
+
+	/**
+	 * 
+	 * @param fileLocation
+	 * @param commentChars
+	 * @param limit
+	 * @return
+	 */
+	private static char[] getCharArrayFromTextWithValidEnglishCharsOnly(String fileLocation, String commentChars,
+			int limit)
+	{
+		// String fileLocation = "";
+		// String commentChars = "";
+		Charset textFileEncoding = Charset.defaultCharset();
+		StringBuilder sb = new StringBuilder();
+
+		try
+		{
+			char[] validCharacters = CharacterIterator_WC1.getMinimalCharacterSet(); // Which characters are allowed?
+			Set<Character> validCharSet = new HashSet<>(validCharacters.length);
+			for (char ch : validCharacters)
+			{
+				validCharSet.add(ch);
+			}
+
+			// Load file and convert contents to a char[]
+			boolean newLineValid = validCharSet.contains('\n');
+			List<String> lines = Files.readAllLines(new File(fileLocation).toPath(), textFileEncoding);
+			sb.append("#lines read from raw file = " + lines.size() + "\n");
+
+			// Ignore commented lines
+			if (commentChars != null)
+			{
+				List<String> withoutComments = new ArrayList<>();
+				for (String line : lines)
+				{
+					if (!line.startsWith(commentChars))
+					{
+						withoutComments.add(line);
+					}
+				}
+				lines = withoutComments;
+			}
+
+			int maxSize = lines.size(); // add lines.size() to account for newline characters at end of each line
+
+			for (String s : lines)
+			{
+				maxSize += s.length();
+			}
+
+			sb.append("#lines ignoring commented lines read from raw file = " + lines.size() + " maxSize = " + maxSize
+					+ "\n");
+
+			char[] characters = new char[limit];
+			int index = 0;
+
+			sb.append("Looping over all lines\n");
+
+			for (String s : lines)
+			{
+				char[] thisLine = s.toCharArray();
+				for (char charInThisLine : thisLine)
+				{
+					if (!validCharSet.contains(charInThisLine))
+					{
+						continue;
+					}
+					characters[index++] = charInThisLine;
+					if (index == limit)
+					{
+						break;
+					}
+				}
+				if (index == limit)
+				{
+					break;
+				}
+
+				if (newLineValid)
+				{
+					characters[index++] = '\n';
+				}
+			}
+
+			sb.append("character.length()=" + characters.length + "\n");
+			System.out.println(sb.toString());
+			return characters;
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+
+		}
+		return null;
 	}
 
 	// public char[] getTrainingString()

@@ -354,7 +354,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
 
 						// training test timelines for all users continuous
-						LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous = null;
+						LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd = null;
 
 						/**
 						 * {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
@@ -370,16 +370,16 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 							if (Constant.filterTrainingTimelinesByRecentDays)
 							{
-								trainTimelinesAllUsersContinuous = getContinousTrainingTimelinesWithFilterByRecentDaysV2(
+								trainTimelinesAllUsersContinuousFiltrd = getContinousTrainingTimelinesWithFilterByRecentDaysV2(
 										trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines());
 							}
 							else
 							{ // sampledUsersTimelines
-								trainTimelinesAllUsersContinuous = getContinousTrainingTimelines(
+								trainTimelinesAllUsersContinuousFiltrd = getContinousTrainingTimelines(
 										trainTestTimelinesForAllUsersDW);
 							}
 							StringBuilder sbT1 = new StringBuilder();
-							trainTimelinesAllUsersContinuous.entrySet().stream()
+							trainTimelinesAllUsersContinuousFiltrd.entrySet().stream()
 									.forEachOrdered(e -> sbT1.append(e.getKey() + "," + e.getValue().size() + "\n"));
 							WToFile.appendLineToFileAbs(sbT1.toString(),
 									this.commonPath + "User_NumOfActsInTraining.csv");
@@ -409,7 +409,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 						System.out.println("\nWill now loop over users in RecommTests: num of userIDs.length= "
 								+ userIDs.length + " trainTimelinesAllUsersContinuous.size()="
-								+ trainTimelinesAllUsersContinuous.size());
+								+ trainTimelinesAllUsersContinuousFiltrd.size());
 
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
@@ -522,11 +522,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 							if (Constant.collaborativeCandidates)
 							{
-								if (trainTimelinesAllUsersContinuous.size() <= 1)
+								if (trainTimelinesAllUsersContinuousFiltrd.size() <= 1)
 								{
 									System.out.println("Warning: Skipping this user " + userId
 											+ " as it has 1 training user: trainTimelinesAllUsersContinuous.size()="
-											+ trainTimelinesAllUsersContinuous.size());
+											+ trainTimelinesAllUsersContinuousFiltrd.size());
 									WToFile.appendLineToFileAbs("User " + userId + ",",
 											commonPath + "UserWithNoTrainingDay.csv");
 									numOfValidRTs.put(userId, 0);
@@ -831,7 +831,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
 													matchingUnit, caseType, this.lookPastType, false,
 													repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-													trainTimelinesAllUsersContinuous, Constant.altSeqPredictor);
+													trainTimelinesAllUsersContinuousFiltrd, Constant.altSeqPredictor);
 										}
 
 										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1)
@@ -845,7 +845,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 														userTestTimelines, dateToRecomm, recommTimesStrings[0], userId,
 														thresholdValue, typeOfThreshold, caseType, this.lookPastType,
 														false, repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-														trainTimelinesAllUsersContinuous, Constant.altSeqPredictor,
+														trainTimelinesAllUsersContinuousFiltrd, Constant.altSeqPredictor,
 														recommSeqLength);
 											}
 											else
@@ -865,7 +865,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
 													matchingUnit, caseType, this.lookPastType, false,
 													repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-													trainTimelinesAllUsersContinuous);
+													trainTimelinesAllUsersContinuousFiltrd);
 										}
 
 										// Note: RT passed to the recommendation master is always endTimestamp. This is

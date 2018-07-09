@@ -16,6 +16,7 @@ import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
+import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
@@ -107,7 +108,7 @@ public class SuperController
 		return availableDevices;
 	}
 
-	private static void setupCUDAEnviron()
+	public static void setupCUDAEnviron()
 	{
 		// see
 		// https://github.com/deeplearning4j/nd4j/blob/78c96a8a3f7aab948af84902c144e1b2123c4436/nd4j-backends/nd4j-backend-impls/nd4j-cuda/src/test/java/jcuda/jcublas/ops/DevicesTests.java#L18-L18
@@ -167,7 +168,7 @@ public class SuperController
 	{
 		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 		{
-			setupCUDAEnviron();
+			// $$setupCUDAEnviron();
 		}
 		// searchContentInFile();
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
@@ -192,7 +193,7 @@ public class SuperController
 		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
 
-		double[] EDAlphas = { 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
+		double[] EDAlphas = { -1 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
 
 		for (double edAlphaForAnExp : EDAlphas)
 		{
@@ -398,8 +399,9 @@ public class SuperController
 		else if (Constant.altSeqPredictor.equals(AltSeqPredictor.RNN1))
 		{
 			predictorLabel = AltSeqPredictor.RNN1.toString();
-			predictorLabel += Constant.numOfHiddenLayersInRNN1 + "HL" + Constant.numOfNeuronsInEachHiddenLayerInRNN1
-					+ "Neu" + Constant.numOfTrainingEpochsInRNN1 + "Epochs";
+			predictorLabel += LSTMCharModelling_SeqRecJun2018.getRNN1Label();
+			// Constant.numOfHiddenLayersInRNN1 + "HL" + Constant.numOfNeuronsInEachHiddenLayerInRNN1
+			// + "Neu" + Constant.numOfTrainingEpochsInRNN1 + "Epochs";
 		}
 
 		else

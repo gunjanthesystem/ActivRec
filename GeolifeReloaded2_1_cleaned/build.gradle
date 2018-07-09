@@ -104,9 +104,8 @@ dependencies
 	
     
     //compile "org.deeplearning4j:deeplearning4j-core:0.9.1"//0.8.0
-    compile 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta'
+    compile 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta'   
     //1.0.0-alpha'
-    
     //compile 'org.nd4j:nd4j-native-platform:1.0.0-beta'//0.9.1"
     compile group: 'org.nd4j', name: 'nd4j-cuda-9.0-platform', version: '1.0.0-beta'
     //compile 'org.nd4j:nd4j-native-platform:1.0.0-alpha'
@@ -114,6 +113,16 @@ dependencies
     compile 'org.deeplearning4j:deeplearning4j-ui_2.11:1.0.0-beta'
     //compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
     //compile 'org.deeplearning4j:deeplearning4j-ui-parent:1.0.0-alpha'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/arbiter-core
+    compile group: 'org.deeplearning4j', name: 'arbiter-core', version: '1.0.0-beta'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/arbiter-deeplearning4j
+    compile group: 'org.deeplearning4j', name: 'arbiter-deeplearning4j', version: '1.0.0-beta'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/arbiter-server
+    compile group: 'org.deeplearning4j', name: 'arbiter-server', version: '1.0.0-beta'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/arbiter-ui
+    compile group: 'org.deeplearning4j', name: 'arbiter-ui_2.11', version: '1.0.0-beta'
+
+    
 
     compile "org.renjin:renjin-script-engine:0.8.2527"
     compile "org.moeaframework:moeaframework:2.12"

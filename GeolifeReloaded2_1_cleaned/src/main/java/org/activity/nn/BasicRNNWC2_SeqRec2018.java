@@ -269,6 +269,8 @@ public class BasicRNNWC2_SeqRec2018
 	}
 
 	/**
+	 * ALERT: num of neurons in each hidden layer is equal to the first value in Constant.varWidthsPerHiddenLayerRNN1
+	 * i.e., Constant.varWidthsPerHiddenLayerRNN1[0]
 	 * 
 	 * @param trainingString
 	 * @param userID
@@ -277,7 +279,7 @@ public class BasicRNNWC2_SeqRec2018
 	public BasicRNNWC2_SeqRec2018(ArrayList<ArrayList<Character>> trainingString, String userID, boolean verbose)
 	{
 
-		this(Constant.numOfNeuronsInEachHiddenLayerInRNN1, Constant.numOfHiddenLayersInRNN1, verbose, userID,
+		this(Constant.neuronsInHiddenLayersRNN1[0], Constant.neuronsInHiddenLayersRNN1.length, verbose, userID,
 				Constant.numOfTrainingEpochsInRNN1, Constant.learningRateInRNN1,
 				BasicRNNWC2_SeqRec2018.flattenList(trainingString, verbose));
 	}
