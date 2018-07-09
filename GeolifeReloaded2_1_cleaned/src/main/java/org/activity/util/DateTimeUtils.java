@@ -64,24 +64,49 @@ public class DateTimeUtils
 
 	public static void main(String[] args)
 	{
-		String timestampString = "2011-06-23T02:24:22Z";
+		System.out.println(getMonthDateLabel());
+		System.out.println(getMonthDateHourMinLabel());
+		System.out.println(getMonthDateHourMinLabelWithSeparators("|"));
+		if (false)
+		{
+			String timestampString = "2011-06-23T02:24:22Z";
 
-		// Instant instant = Instant.parse(timestampString);
-		// System.out.println("instant = \t\t" + instant);
-		TimeZone tz1 = TimeZone.getTimeZone("America/Los_Angeles");
-		// ZonedDateTime zonedDataTime = ZonedDateTime.ofInstant(instant, tz1.toZoneId());
+			// Instant instant = Instant.parse(timestampString);
+			// System.out.println("instant = \t\t" + instant);
+			TimeZone tz1 = TimeZone.getTimeZone("America/Los_Angeles");
+			// ZonedDateTime zonedDataTime = ZonedDateTime.ofInstant(instant, tz1.toZoneId());
 
-		LocalDateTime zonedLocalDataTime = zuluToTimeZonedLocalDateTime(timestampString, tz1.toZoneId());
-		// System.out.println("zonedDataTime = \t" + zonedDataTime);
-		System.out.println("localzonedTS  = \t" + zonedLocalDataTime);
-		System.out.println("localzonedDate  = \t" + zonedLocalDataTime.toLocalDate());
+			LocalDateTime zonedLocalDataTime = zuluToTimeZonedLocalDateTime(timestampString, tz1.toZoneId());
+			// System.out.println("zonedDataTime = \t" + zonedDataTime);
+			System.out.println("localzonedTS  = \t" + zonedLocalDataTime);
+			System.out.println("localzonedDate  = \t" + zonedLocalDataTime.toLocalDate());
 
-		LocalDateTime now1 = LocalDateTime.now();
-		LocalDateTime now2 = LocalDateTime.now();
+			LocalDateTime now1 = LocalDateTime.now();
+			LocalDateTime now2 = LocalDateTime.now();
 
-		System.out.println("diff =" + getZonedTimeDiffInSecs(now1, ZoneId.of("Z"), now1, tz1.toZoneId()) + " secs");
-		System.out.println(
-				"diff =" + getZonedTimeDiffInSecs(now1, ZoneId.of("Z"), now1, tz1.toZoneId()) / (60 * 60.0) + " hrs");
+			System.out.println("diff =" + getZonedTimeDiffInSecs(now1, ZoneId.of("Z"), now1, tz1.toZoneId()) + " secs");
+			System.out.println("diff ="
+					+ getZonedTimeDiffInSecs(now1, ZoneId.of("Z"), now1, tz1.toZoneId()) / (60 * 60.0) + " hrs");
+		}
+	}
+
+	public static String getMonthDateLabel()
+	{
+		return (LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth());
+	}
+
+	public static String getMonthDateHourMinLabel()
+	{
+		LocalDateTime ld = LocalDateTime.now();
+		return ld.getMonth().toString().substring(0, 3) + ld.getDayOfMonth() + "H" + ld.getHour() + "M"
+				+ ld.getMinute();
+	}
+
+	public static String getMonthDateHourMinLabelWithSeparators(String sep)
+	{
+		LocalDateTime ld = LocalDateTime.now();
+		return sep + ld.getMonth().toString().substring(0, 3) + ld.getDayOfMonth() + "H" + ld.getHour() + "M"
+				+ ld.getMinute() + sep;
 	}
 
 	/**
