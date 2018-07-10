@@ -125,6 +125,7 @@ public class ControllerWithoutServer
 			}
 			else// in this case, we are expecting the data is already subsetting and cleaned
 			{
+				System.out.println("Alert! Not reducing and cleaning data !!");
 				usersCleanedDayTimelines = usersDayTimelinesOriginal;
 				writeTimelineStats(usersCleanedDayTimelines, false, true, true, true, "UsersCleanedDayTimelines",
 						commonBasePath);
@@ -186,7 +187,7 @@ public class ControllerWithoutServer
 
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 			// System.exit(0);
-			if (false)// temporary
+			if (true)// temporary
 			{
 				TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
 				TimelineUtils.writeLocationObjects(Constant.getUniqueLocIDs(),
@@ -195,13 +196,15 @@ public class ControllerWithoutServer
 				// SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
 				TimelineUtils.writeUserObjects(usersCleanedDayTimelines.keySet(),
 						DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
+
+			}
+
+			if (true)// temporary for 22 feb 2018,
+			{
+				findUniqueLocationsInTrainTest(usersCleanedDayTimelines, true);
 				System.exit(0);
 			}
 
-			if (false)// temporary for 22 feb 2018,
-			{
-				findUniqueLocationsInTrainTest(usersCleanedDayTimelines, true);
-			}
 			// Curtain 8 Feb 2018 start
 			// $$TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
 
@@ -459,7 +462,7 @@ public class ControllerWithoutServer
 	}
 
 	/**
-	 * Writes actID, Act names in the order foxed in Constant.activityNames
+	 * Writes actID, Act names in the order fixed in Constant.activityNames
 	 * 
 	 * @param absFileNameToWrite
 	 */
@@ -537,6 +540,14 @@ public class ControllerWithoutServer
 	/**
 	 * // temporary for 22 feb 2018, to find the unique locations in the training timelines (most recent five // days)
 	 * and test timelines, this chunk of code has been borrowed from // RecommendationtestsMar2017GenSeq3Nov2017.java
+	 * <p>
+	 * Writes the following files:-
+	 * <ol>
+	 * <li>UniqueLocIDs5DaysTrainTest.csv</li>
+	 * <li>UniqueLocationObjects5DaysTrainTest.csv</li>
+	 * <li>AllActObjs5DaysTrain.csv</li>
+	 * <li>AllActObjsTest.csv</li>
+	 * </ol>
 	 * 
 	 * @param usersCleanedDayTimelines
 	 * @param exit
@@ -550,7 +561,7 @@ public class ControllerWithoutServer
 		// RecommendationtestsMar2017GenSeq3Nov2017.java
 		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
 		// training test timelines for all users continuous
-		LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous = null;
+		LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd = null;
 
 		long tt1 = System.currentTimeMillis();
 		if (Constant.collaborativeCandidates)
@@ -560,21 +571,21 @@ public class ControllerWithoutServer
 
 			if (Constant.filterTrainingTimelinesByRecentDays)
 			{
-				trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
 								Constant.getRecentDaysInTrainingTimelines());
 			}
 			else
 			{
 				// sampledUsersTimelines
-				trainTimelinesAllUsersContinuous = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
 			}
 		}
 		System.out.println("time take for timeline train test splitting which might be save in experiment ="
 				+ ((System.currentTimeMillis() - tt1) * 1.0) / 1000 + " secs");
 
-		Set<Integer> uniqueLocTrains = TimelineUtils.getUniqueLocIDs(trainTimelinesAllUsersContinuous, true,
+		Set<Integer> uniqueLocTrains = TimelineUtils.getUniqueLocIDs(trainTimelinesAllUsersContinuousFiltrd, true,
 				Constant.getCommonPath() + "UniqueLocIDs5DaysTrain.csv");
 		Set<Integer> uniqueLocTests = TimelineUtils.getUniqueLocIDsFromTestOnly(trainTestTimelinesForAllUsersDW, true,
 				Constant.getCommonPath() + "UniqueLocIDsTest.csv");
@@ -582,6 +593,7 @@ public class ControllerWithoutServer
 		Set<Integer> uniqueLocTrainsTests = new TreeSet<>();
 		uniqueLocTrainsTests.addAll(uniqueLocTrains);
 		uniqueLocTrainsTests.addAll(uniqueLocTests);
+
 		WToFile.writeToNewFile(
 				uniqueLocTrainsTests.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
 				Constant.getCommonPath() + "UniqueLocIDs5DaysTrainTest.csv");
@@ -589,7 +601,7 @@ public class ControllerWithoutServer
 		TimelineUtils.writeLocationObjects(uniqueLocTrainsTests, DomainConstants.getLocIDLocationObjectDictionary(),
 				Constant.getCommonPath() + "UniqueLocationObjects5DaysTrainTest.csv");
 
-		TimelineUtils.writeAllActObjs(trainTimelinesAllUsersContinuous,
+		TimelineUtils.writeAllActObjs(trainTimelinesAllUsersContinuousFiltrd,
 				Constant.getCommonPath() + "AllActObjs5DaysTrain.csv");
 		TimelineUtils.writeAllActObjsFromTestOnly(trainTestTimelinesForAllUsersDW,
 				Constant.getCommonPath() + "AllActObjsTest.csv");

@@ -403,7 +403,7 @@ public class Dashboard3 extends Application
 			/***********************************************/
 			// $$ Start of disabled on Mar 17 2018
 
-			boolean doMapPlot = false;
+			boolean doMapPlot = true;
 			if (doMapPlot)
 			{
 				long ttOSMmap1 = System.currentTimeMillis();
@@ -414,6 +414,12 @@ public class Dashboard3 extends Application
 				String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
 				String absFileNameForLatLonToReadAsMarkerTargetLocs = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicNWLA_ByPids_Mar31.csv";
 				String absFileNameForLatLonToReadAsMarkerTargetLocsApril6 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
+
+				String pathToLocationAnalysis = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUL10ForLocationAnalysis2/";
+
+				String absFileNameForLatLon5MostRecenTrainTestJul10 = pathToLocationAnalysis
+						+ "UniqueLocationObjects5DaysTrainTest.csv";
+				String absFileNameForLatLonAllJul10 = pathToLocationAnalysis + "UniqueLocationObjects.csv";
 				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
 
 				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_SlimmedForMap.csv";//
@@ -425,10 +431,11 @@ public class Dashboard3 extends Application
 
 				// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
 				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
-				int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
-				BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonToReadAsMarkerTargetLocsApril6, delimiter2,
-						latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 1), false, false);// Color.rgb(193,
-																												// 49,
+				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
+				int latColIndex2 = 9, lonColIndex2 = 10, labelColIndex2 = 12;
+				BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonAllJul10, delimiter2, latColIndex2,
+						lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false);// Color.rgb(193,
+																										// 49,
 				// 34, 0.3));
 
 				// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,

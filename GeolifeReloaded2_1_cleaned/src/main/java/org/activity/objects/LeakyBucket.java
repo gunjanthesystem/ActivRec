@@ -19,6 +19,7 @@ public class LeakyBucket
 	boolean verboseWriting;
 
 	/**
+	 * Don't forget to flush the bucket in the end.
 	 * 
 	 * @param bucketThreshold
 	 * @param absFileNameToWriteTo
@@ -37,6 +38,11 @@ public class LeakyBucket
 		bucket.setLength(0);
 	}
 
+	/**
+	 * Don't forget to flush the bucket in the end.
+	 * 
+	 * @param s
+	 */
 	public void addToLeakyBucket(String s)
 	{
 		bucket.append(s);
@@ -53,6 +59,11 @@ public class LeakyBucket
 		}
 	}
 
+	/**
+	 * Don't forget to flush the bucket in the end.
+	 * 
+	 * @param s
+	 */
 	public void addToLeakyBucketWithNewline(String s)
 	{
 		addToLeakyBucket(s + "\n");

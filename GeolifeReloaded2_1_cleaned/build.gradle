@@ -123,6 +123,11 @@ dependencies
     compile group: 'org.deeplearning4j', name: 'arbiter-ui_2.11', version: '1.0.0-beta'
 
     
+    // https://mvnrepository.com/artifact/com.vividsolutions/jts-core
+    //required by geo-grid, though to self: can i replace it with more updated:  https://mvnrepository.com/artifact/org.locationtech.jts/jts-core/1.15.1
+    compile group: 'com.vividsolutions', name: 'jts-core', version: '1.14.0'
+
+    
 
     compile "org.renjin:renjin-script-engine:0.8.2527"
     compile "org.moeaframework:moeaframework:2.12"

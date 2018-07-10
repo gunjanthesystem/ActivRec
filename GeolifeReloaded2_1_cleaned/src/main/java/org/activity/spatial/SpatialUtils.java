@@ -1,6 +1,7 @@
 package org.activity.spatial;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +19,12 @@ import org.activity.io.WToFile;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.LocationSlim;
 import org.activity.objects.Pair;
+import org.activity.objects.Triple;
 import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.DateTimeUtils;
 import org.apache.commons.math3.util.FastMath;
 
 public final class SpatialUtils
@@ -81,8 +84,7 @@ public final class SpatialUtils
 
 			Map<Long, Map<Integer, Pair<Long, Double>>> allLocNearestForEachActIDDists = res.getSecond();
 			// write(allLocNearestForEachActIDDists, commonPath + "allLocNearestForEachActIDDists.csv");
-			WToFile.writeMapOfMap(allLocNearestForEachActIDDists,
-					"loc1ID,ActD,(NearestLoc2ID,NearestLoc2DistInM)\n",
+			WToFile.writeMapOfMap(allLocNearestForEachActIDDists, "loc1ID,ActD,(NearestLoc2ID,NearestLoc2DistInM)\n",
 					commonPath + "allLocNearestForEachActIDDists.csv");
 
 			long tt3 = System.currentTimeMillis();
@@ -320,6 +322,47 @@ public final class SpatialUtils
 		// }
 		// WritingToFile.appendLineToFileAbsolute(sb.toString(),
 		// "./dataWritten/locationDistances/locationDistances.csv");
+	}
+
+	public static void spatialDistanceDatabaseController10July2018()
+	{
+		getDistanceBetweenAllLocations10July2018();
+	}
+
+	public static void getDistanceBetweenAllLocations10July2018()
+	{
+		String pathToWrite = "./dataWritten/LocDistanceComputation" + DateTimeUtils.getMonthDateLabel() + "/";
+		WToFile.createDirectoryIfNotExists(pathToWrite);
+		WToFile.redirectConsoleOutput(pathToWrite + "consoleLog.txt");
+
+		String pathToLocationAnalysis = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUL10ForLocationAnalysis2/";
+		String absFileNameForLatLon5MostRecenTrainTestJul10 = pathToLocationAnalysis
+				+ "UniqueLocationObjects5DaysTrainTest.csv";
+		String absFileNameForLatLonAllJul10 = pathToLocationAnalysis + "UniqueLocationObjects.csv";
+		int latColIndex2 = 9, lonColIndex2 = 10, labelColIndex2 = 0;// locID as label
+
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile
+				.readListOfLocationsV2(absFileNameForLatLonAllJul10, ",", latColIndex2, lonColIndex2, labelColIndex2);
+		System.out.println("listOfLocs.size()= " + listOfLocs.size());
+
+		Map<Integer, Long> locIndexLocIDMap = new HashMap<>(listOfLocs.size());
+		Map<Long, Pair<Double, Double>> locIDLatLonMap = new HashMap<>(listOfLocs.size());
+
+		int index = 0;
+		for (Triple<Double, Double, String> e : listOfLocs)
+		{
+			Long locID = Long.valueOf(e.getThird());
+
+			locIndexLocIDMap.put(index, locID);
+			locIDLatLonMap.put(locID, new Pair<>(e.getFirst(), e.getSecond()));
+		}
+
+		System.out.println("locIndexLocIDMap.size() = " + locIndexLocIDMap.size());
+		System.out.println("locIDLatLonMap.size() = " + locIDLatLonMap.size());
+
+		Serializer.kryoSerializeThis(locIndexLocIDMap, pathToWrite + "locIndexLocIDMap.kryo");
+		Serializer.kryoSerializeThis(locIDLatLonMap, pathToWrite + "locIDLatLonMap.kryo");
+
 	}
 
 	/**

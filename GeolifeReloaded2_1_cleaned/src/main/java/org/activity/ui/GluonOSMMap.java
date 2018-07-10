@@ -122,7 +122,7 @@ public class GluonOSMMap extends Application
 		view.setCenter(42.472309, 6.897996);
 		view.setZoom(4);
 
-		List<Triple<Double, Double, String>> listOfLocs = readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
 				delimiter, latColIndex, lonColIndex, labelColIndex);
 
 		System.out.println("listOfLocs.size() = " + listOfLocs.size());
@@ -206,7 +206,7 @@ public class GluonOSMMap extends Application
 		view.setCenter(42.472309, 6.897996);
 		view.setZoom(4);
 
-		List<Triple<Double, Double, String>> listOfLocs = readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
 				delimiter, latColIndex, lonColIndex, labelColIndex);
 
 		System.out.println("listOfLocs.size() = " + listOfLocs.size());
@@ -558,136 +558,6 @@ public class GluonOSMMap extends Application
 		// 0.65))));
 		return answer;
 
-	}
-
-	/**
-	 * 
-	 * @param absFileNameForLatLong
-	 * @param delimiter
-	 * @param latColIndex
-	 * @param lonColIndex
-	 * @param labelColIndex
-	 */
-	public static List<Triple<Double, Double, String>> readListOfLocationsV2(String absFileNameForLatLong,
-			String delimiter, int latColIndex, int lonColIndex, int labelColIndex)
-	{
-		List<Triple<Double, Double, String>> listOfLocations = new ArrayList<>();
-		try
-		{
-			List<List<String>> lines = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
-					new FileInputStream(new File(absFileNameForLatLong)), ",", true, false,
-					new int[] { latColIndex, lonColIndex, labelColIndex });
-
-			System.out.println("lines.size()=" + lines.size());
-
-			int count = 0;
-
-			for (List<String> line : lines)
-			{
-				count += 1;
-
-				if (count == 1)
-				{
-					continue;
-				}
-				// if (count > 50000)
-				// {
-				// break;
-				// }
-				// System.out.println("line= " + line);
-				// System.out.println("here 1");
-
-				Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(0)),
-						Double.valueOf(line.get(1)), line.get(2));
-
-				// LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
-				// // Double.valueOf(line.get(2).substring(0, 4)));
-				// // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),
-				// // Double.valueOf(line.get(2).substring(0, 4)));
-				// System.out.println("LatLong= " + markerLatLong2.toString());
-				// markerOptions2.position(markerLatLong2).title(line.get(1)).visible(true);
-				// System.out.println("here2");
-				// myMarker2 = new Marker(markerOptions2);
-				// System.out.println("here3");
-				listOfLocations.add(val);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		// StringBuilder sb = new StringBuilder();
-		// listOfMarkers.stream().forEachOrdered(e -> sb.append(e.toString() + "\n"));
-		// System.out.println("List of markers= " + sb.toString());
-		// System.out.println("listOfLocations.size()=" + listOfLocations.size());
-		return listOfLocations;
-	}
-
-	/**
-	 * 
-	 * @param absFileNameForLatLong
-	 * @param delimiter
-	 * @param latColIndex
-	 * @param lonColIndex
-	 * @param labelColIndex
-	 */
-	public static Pair<List<Triple<Double, Double, String>>, Double> readListOfLocationsV3(String absFileNameForLatLong,
-			String delimiter, int latColIndex, int lonColIndex, int labelColIndex, int fillValColIndex)
-	{
-		List<Triple<Double, Double, String>> listOfLocations = new ArrayList<>();
-		List<Double> fillVal = new ArrayList();
-
-		try
-		{
-			List<List<String>> lines = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
-					new FileInputStream(new File(absFileNameForLatLong)), ",", true, false,
-					new int[] { latColIndex, lonColIndex, labelColIndex, fillValColIndex });
-
-			System.out.println("lines.size()=" + lines.size());
-
-			int count = 0;
-
-			for (List<String> line : lines)
-			{
-				count += 1;
-
-				if (count == 1)
-				{
-					continue;
-				}
-				if (++count > 20000)
-				{
-					break;
-				}
-				// System.out.println("line= " + line);
-				// System.out.println("here 1");
-
-				Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(0)),
-						Double.valueOf(line.get(1)), "id=" + line.get(2));
-
-				fillVal.add(Double.valueOf(line.get(3)));
-
-				// LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
-				// // Double.valueOf(line.get(2).substring(0, 4)));
-				// // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),
-				// // Double.valueOf(line.get(2).substring(0, 4)));
-				// System.out.println("LatLong= " + markerLatLong2.toString());
-				// markerOptions2.position(markerLatLong2).title(line.get(1)).visible(true);
-				// System.out.println("here2");
-				// myMarker2 = new Marker(markerOptions2);
-				// System.out.println("here3");
-				listOfLocations.add(val);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		// StringBuilder sb = new StringBuilder();
-		// listOfMarkers.stream().forEachOrdered(e -> sb.append(e.toString() + "\n"));
-		// System.out.println("List of markers= " + sb.toString());
-		// System.out.println("listOfLocations.size()=" + listOfLocations.size());
-		return null;// new Pair<List<Triple<Double, Double, String>>, Double>(listOfLocations, fillVal);
 	}
 
 	/**
