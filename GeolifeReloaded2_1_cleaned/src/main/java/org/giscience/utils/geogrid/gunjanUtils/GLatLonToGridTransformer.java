@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import org.activity.io.WToFile;
 import org.activity.objects.LeakyBucket;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
+import org.activity.stats.StatsUtils;
 import org.activity.util.DateTimeUtils;
 import org.giscience.utils.geogrid.cells.GridCell;
 import org.giscience.utils.geogrid.grids.ISEA3H;
@@ -26,7 +28,7 @@ import org.giscience.utils.geogrid.grids.ISEA3H;
  */
 public class GLatLonToGridTransformer
 {
-	static int gridResolution = 14;
+	static int gridResolution = 16;
 	ISEA3H theGrid;
 
 	public static void main(String args[])
@@ -35,7 +37,7 @@ public class GLatLonToGridTransformer
 				+ "/";
 		WToFile.createDirectoryIfNotExists(pathToWrite);
 		WToFile.redirectConsoleOutput(pathToWrite + "consoleLog.txt");
-
+		System.out.println("gridResolution = " + gridResolution);
 		try
 		{
 			GLatLonToGridTransformer gt = new GLatLonToGridTransformer(gridResolution);
@@ -78,7 +80,8 @@ public class GLatLonToGridTransformer
 						Collectors.toMap(e -> Long.valueOf(e.getFirst().getThird()), e -> e.getSecond().getID()));
 				System.out.println("locIDGridIDMap.size()= " + locIDGridIDMap.size());
 
-				Map<Long, Set<Long>> gridIDLocIDs = getLocIDsInEachGrid(latLonLocIDGridCellAllLocs);
+				Map<Long, Set<Long>> gridIDLocIDs = getLocIDsInEachGrid(latLonLocIDGridCellAllLocs, true,
+						pathToWrite + "gridIDLocIDs.csv");
 				System.out.println("gridIDLocIDs.size()= " + gridIDLocIDs.size());
 
 				Serializer.kryoSerializeThis(latLonLocIDGridCellAllLocs,
@@ -105,7 +108,8 @@ public class GLatLonToGridTransformer
 	}
 
 	private static Map<Long, Set<Long>> getLocIDsInEachGrid(
-			List<Pair<Triple<Double, Double, String>, GridCell>> latLonLocIDGridCellAllLocs)
+			List<Pair<Triple<Double, Double, String>, GridCell>> latLonLocIDGridCellAllLocs, boolean writeToFile,
+			String absFileNameToWrite)
 	{
 		Map<Long, Set<Long>> gridIDLocIDs = new HashMap<>();
 
@@ -121,6 +125,30 @@ public class GLatLonToGridTransformer
 			long gridID = e.getSecond().getID();
 			long locID = Long.valueOf(e.getFirst().getThird());
 			gridIDLocIDs.get(gridID).add(locID);
+		}
+
+		if (writeToFile)
+		{
+			LeakyBucket lb = new LeakyBucket(5000, absFileNameToWrite, false);
+			lb.addToLeakyBucketWithNewline("gridID,NumOfLocIDs,LocIDs");
+
+			List<Double> numOfLocIDsInEachGridID = new ArrayList<>();
+
+			for (Entry<Long, Set<Long>> e : gridIDLocIDs.entrySet())
+			{
+				String locIDsString = e.getValue().stream().map(v -> String.valueOf(v))
+						.collect(Collectors.joining("|"));
+
+				int numOfLocIDs = e.getValue().size();
+				numOfLocIDsInEachGridID.add((double) numOfLocIDs);
+
+				lb.addToLeakyBucketWithNewline(e.getKey() + "," + numOfLocIDs + "," + locIDsString);
+			}
+			lb.flushLeakyBucket();
+
+			// StatsUtils.binValuesByNumOfBins(numOfLocIDsInEachGridID, 200, true);
+			StatsUtils.binValuesByBinSize(numOfLocIDsInEachGridID, 5, true, 0, "Histogram of numOfLocIDsInEachGridID");
+
 		}
 
 		return gridIDLocIDs;
@@ -155,8 +183,8 @@ public class GLatLonToGridTransformer
 		// print properties of the grid
 		System.out.format("number of hexagon cells: %d%n", theGrid.numberOfHexagonalCells());
 		System.out.format("number of pentagon cells: %d%n", theGrid.numberOfPentagonalCells());
-		System.out.format("diameter of a hexagon cell: %f%n", theGrid.diameterOfHexagonalCellOnIcosahedron());
-		System.out.format("area of a hexagon cell: %f%n", theGrid.areaOfAHexagonalCell());
+		System.out.format("diameter of a hexagon cell (km): %f%n", theGrid.diameterOfHexagonalCellOnIcosahedron());
+		System.out.format("area of a hexagon cell (sq km): %f%n", theGrid.areaOfAHexagonalCell());
 		System.out.println("------");
 
 	}

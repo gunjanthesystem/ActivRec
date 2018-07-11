@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
@@ -85,6 +87,42 @@ public final class StatsUtils
 	 * @param vals
 	 * @param binSize
 	 * @param verbose
+	 * @param minValueFixed
+	 * @return {Pair{val,binIndex} map, numOfBins}
+	 *
+	 */
+	public static Pair<List<Pair<Double, Integer>>, Integer> binValuesByBinSize(List<Double> vals, double binSize,
+			boolean verbose, double minValueFixed, String title)
+	{
+		// 100, 101, 100.5,100.99
+		if (verbose)
+		{
+			System.out.println("~~~~~~~  Histogram of numOfLocIDsInEachGridID ~~~~~~~~~~ ");
+		}
+
+		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
+		double minVal = minValueFixed;
+		double maxValExcluding = Math.floor(maxVal) + 1; // 101, 102, 101
+		int numOfBins = (int) Math.ceil((maxValExcluding - minVal) / binSize);
+
+		Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> res = binVals(
+				vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose);
+
+		if (verbose)
+		{
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+		}
+
+		List<Pair<Double, Integer>> valToBinIndex = res.getFirst();
+		return new Pair<List<Pair<Double, Integer>>, Integer>(valToBinIndex, numOfBins);
+	}
+
+	/**
+	 * Assign each val to a bin
+	 * 
+	 * @param vals
+	 * @param binSize
+	 * @param verbose
 	 * @return Triple{valToBinIndex, binIndexBoundary, binIndexListOfVals}
 	 */
 	public static Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> binValuesByBinSize2(
@@ -127,6 +165,31 @@ public final class StatsUtils
 
 		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
 		double minVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).min().getAsDouble();
+		double maxValExcluding = Math.floor(maxVal) + 1; // 101, 102, 101
+		double binSize = (int) Math.ceil((maxValExcluding - minVal) / numOfBins);
+
+		Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> res = binVals(
+				vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose);
+		List<Pair<Double, Integer>> valToBinIndex = res.getFirst();
+		return new Pair<List<Pair<Double, Integer>>, Double>(valToBinIndex, binSize);
+	}
+
+	/**
+	 * Assign each val to a bin
+	 * 
+	 * @param vals
+	 * @param numOfBins
+	 * @param verbose
+	 * @param minValueFixed
+	 * @return {Pair{val,binIndex} map, binSize}
+	 * @since 11 July 2018
+	 */
+	public static Pair<List<Pair<Double, Integer>>, Double> binValuesByNumOfBins(List<Double> vals, int numOfBins,
+			boolean verbose, int minValueFixed)
+	{
+
+		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
+		double minVal = minValueFixed;
 		double maxValExcluding = Math.floor(maxVal) + 1; // 101, 102, 101
 		double binSize = (int) Math.ceil((maxValExcluding - minVal) / numOfBins);
 
@@ -213,7 +276,7 @@ public final class StatsUtils
 		}
 		//
 
-		if (verbose)
+		if (verbose && false)// disabled as replaced by better verbose DO NOT DELETE
 		{
 			System.out.println("\nnumOfVals=" + vals.size() + "\nnumOfBins=" + numOfBins + "\nmaxVal=" + maxVal
 					+ "\nmaxValExcluding=" + maxValExcluding + "\nminVal=" + minVal + "\nbinSize=" + binSize);
@@ -243,6 +306,46 @@ public final class StatsUtils
 
 			System.out.println(sbT1.toString());
 
+		}
+
+		if (verbose)
+		{
+			StringBuilder sbT1 = new StringBuilder("-------------------\n");
+
+			sbT1.append("\nnumOfVals=" + vals.size() + "\nnumOfBins=" + numOfBins + "\nbinSize=" + binSize + "\nminVal="
+					+ minVal + "\nmaxVal=" + maxVal + "\nmaxValExcluding=" + maxValExcluding + "\n");
+
+			sbT1.append("\nbinIndex - BinBoundary - %OfTotalVals - NumOfVals\n");
+
+			int sumOfNumOfValsInEachBin = binIndexListOfVals.entrySet().stream().mapToInt(e -> e.getValue().size())
+					.sum();
+			int maxOfNumOfValsInABin = binIndexListOfVals.entrySet().stream().mapToInt(e -> e.getValue().size()).max()
+					.getAsInt();
+			String plotChar = "|";
+			int maxBarWidth = 180;
+			// double numOfCharsForEachVal = maxBarWidth / maxNumOfValsInABin;
+
+			for (Entry<Integer, List<Double>> e : binIndexListOfVals.entrySet())
+			{
+				Integer binIndex = e.getKey();
+				int numOfValuesInThisBin = e.getValue().size();
+				Pair<Double, Double> binBoundary = binIndexBoundary.get(binIndex);
+
+				double percentageOfTotalValues = (numOfValuesInThisBin * 100.0 / sumOfNumOfValsInEachBin);
+
+				String string = StringUtils.fixedLengthString(binIndex + "-" + "[" + binBoundary.getFirst() + ","
+						+ binBoundary.getSecond() + ")- " + StatsUtils.round(percentageOfTotalValues, 2) + "% -", 28);
+
+				int widthOfBar = ((maxBarWidth * numOfValuesInThisBin) / maxOfNumOfValsInABin);
+
+				String bar1 = new String(new char[widthOfBar]).replace("\0", plotChar);
+				sbT1.append(string + bar1 + "\t" + numOfValuesInThisBin + "\n");
+
+			}
+
+			sbT1.append("\nSum of vals= " + sumOfNumOfValsInEachBin + "\n-------------------\n");
+
+			System.out.println(sbT1.toString());
 		}
 		return new Triple<>(valToBinIndex, binIndexBoundary, binIndexListOfVals);
 	}
@@ -344,8 +447,8 @@ public final class StatsUtils
 
 	public static void main(String args[])
 	{
-		// checkBinnning();
-		checkPercentile();
+		checkBinnning();
+		// checkPercentile();
 	}
 
 	private static void checkBinnning()
