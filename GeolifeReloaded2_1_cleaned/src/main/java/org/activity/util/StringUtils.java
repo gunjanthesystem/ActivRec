@@ -17,6 +17,18 @@ import org.activity.objects.Pair;
 public class StringUtils
 {
 
+	/**
+	 * ref:https://stackoverflow.com/questions/13475388/generate-fixed-length-strings-filled-with-whitespaces/32045108
+	 * 
+	 * @param string
+	 * @param length
+	 * @return
+	 */
+	public static String fixedLengthString(String string, int length)
+	{
+		return String.format("%1$" + length + "s", string);
+	}
+
 	public static void main0(String[] args)
 	{
 		ArrayList<String> list = new ArrayList<String>();

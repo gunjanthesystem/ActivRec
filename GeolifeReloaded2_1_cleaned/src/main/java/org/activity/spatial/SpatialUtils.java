@@ -295,13 +295,15 @@ public final class SpatialUtils
 	// spatialDistanceDatabaseController
 	public static void main(String args[])
 	{
-		// compareHaversines();
+		compareHaversines();
 		// spatialDistanceDatabaseController(
 		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/UniqueLocationObjects5DaysTrainTest.csv",
 		// "/run/media/gunjan/BufferVault/GowallaResults/Feb23/");
 
-		spatialDistanceDatabaseController2("./dataWritten/Feb22/UniqueLocationObjects5DaysTrainTest.csv",
-				"./dataWritten/Feb23/");
+		// $$ spatialDistanceDatabaseController2("./dataWritten/Feb22/UniqueLocationObjects5DaysTrainTest.csv",
+		// "./dataWritten/Feb23/");
+
+		// getDistanceBetweenAllLocations10July2018();
 	}
 
 	public static void compareHaversines()
@@ -346,21 +348,24 @@ public final class SpatialUtils
 		System.out.println("listOfLocs.size()= " + listOfLocs.size());
 
 		Map<Integer, Long> locIndexLocIDMap = new HashMap<>(listOfLocs.size());
+		Map<Long, Integer> locIDLocIndexMap = new HashMap<>(listOfLocs.size());
 		Map<Long, Pair<Double, Double>> locIDLatLonMap = new HashMap<>(listOfLocs.size());
 
 		int index = 0;
 		for (Triple<Double, Double, String> e : listOfLocs)
 		{
 			Long locID = Long.valueOf(e.getThird());
-
 			locIndexLocIDMap.put(index, locID);
+			locIDLocIndexMap.put(locID, index);
 			locIDLatLonMap.put(locID, new Pair<>(e.getFirst(), e.getSecond()));
 		}
 
 		System.out.println("locIndexLocIDMap.size() = " + locIndexLocIDMap.size());
+		System.out.println("locIDLocIndexMap.size() = " + locIDLocIndexMap.size());
 		System.out.println("locIDLatLonMap.size() = " + locIDLatLonMap.size());
 
 		Serializer.kryoSerializeThis(locIndexLocIDMap, pathToWrite + "locIndexLocIDMap.kryo");
+		Serializer.kryoSerializeThis(locIDLocIndexMap, pathToWrite + "locIDLocIndexMap.kryo");
 		Serializer.kryoSerializeThis(locIDLatLonMap, pathToWrite + "locIDLatLonMap.kryo");
 
 	}
@@ -384,8 +389,12 @@ public final class SpatialUtils
 
 			// TreeSet<Integer> uniqueLocIDsInCleanedTimelines = (TreeSet<Integer>) Serializer
 			// .deSerializeThis("./dataToRead/July12/UniqueLocIDsInCleanedTimeines.ser");
-			TreeSet<Integer> uniqueLocIDsInCleanedTimelines = (TreeSet<Integer>) Serializer
-					.kryoDeSerializeThis(PathConstants.pathToSerialisedUniqueLocIDsInCleanedTimelines);
+
+			// Disabled on 11 July 2018
+			// TreeSet<Integer> uniqueLocIDsInCleanedTimelines = (TreeSet<Integer>) Serializer
+			// .kryoDeSerializeThis(PathConstants.pathToSerialisedUniqueLocIDsInCleanedTimelines);
+
+			Set<Integer> uniqueLocIDsInCleanedTimelines = locObjs.keySet();
 
 			System.out.println("Num of unique loc ids = " + uniqueLocIDsInCleanedTimelines.size());
 			long t1 = System.currentTimeMillis();
@@ -436,10 +445,13 @@ public final class SpatialUtils
 					// + "\nhaversineDist3=" + haversineDist3);
 					Sanity.eq(haversineDist, haversineDist2, haversineDist3, "haverfunctions are giving diff results");
 					Sanity.eq(haversineDist4, haversineDist5, "haverfunctions are giving diff results");
-					System.out.println(haversineDist + " , " + haversineDist2 + " , " + haversineDist3 + " , "
-							+ haversineDist4 + " , " + haversineDist5);
 
-					System.exit(0);
+					if (true)
+					{
+						System.out.println(haversineDist + " , " + haversineDist2 + " , " + haversineDist3 + " , "
+								+ haversineDist4 + " , " + haversineDist5);
+					}
+					// System.exit(0);
 					distMapForLocID1.put(locID2, haversineDist);
 				}
 				locIDsHaversineDists.put(locID1, distMapForLocID1);
@@ -782,6 +794,15 @@ public final class SpatialUtils
 		return haversineFastMathV2NoRound(lat1, lon1, lat2, lon2);
 	}
 
+	/**
+	 * Fastest at the moment
+	 * 
+	 * @param lat1s
+	 * @param lon1s
+	 * @param lat2s
+	 * @param lon2s
+	 * @return
+	 */
 	public static double haversineFastMathV3NoRound(String lat1s, String lon1s, String lat2s, String lon2s)
 	{
 		double lat1 = Double.parseDouble(lat1s);
