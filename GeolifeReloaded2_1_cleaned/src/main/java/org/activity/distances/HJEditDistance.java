@@ -781,9 +781,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// + stringCodesForActivityObjects2 + "," + (stringCodesForActivityObjects2FU) + "\n";
 		// WritingToFile.appendLineToFileAbsolute(debug9Mar.toString(),
 		// Constant.getOutputCoreResultsPath() + "DebugMar9_2018.csv");
-		/// temp end
-
-		// }
+		/// temp end // }
 
 		Triple<String, Double, Triple<char[], int[], int[]>> levenshteinDistance = null;
 		long t1 = System.nanoTime();

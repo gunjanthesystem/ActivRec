@@ -168,7 +168,7 @@ public class SuperController
 	{
 		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 		{
-			// $$setupCUDAEnviron();
+			setupCUDAEnviron();
 		}
 		// searchContentInFile();
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
@@ -194,7 +194,7 @@ public class SuperController
 		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
 
-		double[] EDAlphas = { -1 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
+		double[] EDAlphas = { 1 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
 
 		for (double edAlphaForAnExp : EDAlphas)
 		{
@@ -298,9 +298,10 @@ public class SuperController
 
 		String labelForExperimentConfig = getLabelForExperimentConfig(sampledUserIndicesSetFile);
 
-		String[] commonPaths = // { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + "/" };
+		String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+				// { "./dataWritten/"
+				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+				+ labelForExperimentConfig + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };

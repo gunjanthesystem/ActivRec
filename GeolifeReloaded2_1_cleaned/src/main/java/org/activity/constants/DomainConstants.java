@@ -123,6 +123,12 @@ public class DomainConstants
 	 */
 	static LinkedHashMap<Integer, Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>> userIDRepAOResultMap;
 
+	/**
+	 * Added on 12 July 2018 {direct cat id, list{list of catids at level 1,list of catids at level 2, list of catids at
+	 * level 3 }
+	 */
+	public static TreeMap<Integer, ArrayList<ArrayList<Integer>>> catIDLevelWiseCatIDsList;
+
 	/////////////////////////////////////////////////////////////
 
 	public static boolean isActNameTheActID()
@@ -362,7 +368,12 @@ public class DomainConstants
 				Constant.HierarchicalCatIDLevelForEditDistance, true);
 	}
 
-	public static ArrayList<Integer> getGivenLevelCatID(int givenCatID)
+	/**
+	 * @deprecated on 12 July 2018 for design reason (minimising number of knobs)
+	 * @param givenCatID
+	 * @return
+	 */
+	public static ArrayList<Integer> getGivenLevelCatIDBefore12July2018(int givenCatID)
 	{
 		if (catIDGivenLevelCatIDMap == null)
 		{
@@ -381,6 +392,37 @@ public class DomainConstants
 
 	/**
 	 * 
+	 * @param givenCatID
+	 * @param givenLevel
+	 *            1, 2 or 3
+	 * @return
+	 * @since 12 July 2018
+	 */
+	public static ArrayList<Integer> getGivenLevelCatID(int givenCatID, int givenLevel)
+	{
+		if (catIDLevelWiseCatIDsList == null)
+		{
+			System.out.println(PopUps.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList==null"));
+			System.exit(1);
+		}
+
+		if (givenLevel < 1 || givenLevel > 3)
+		{
+			PopUps.printTracedErrorMsg("Error in getGivenLevelCatID: givenLevel= " + givenLevel);
+			System.exit(1);
+		}
+
+		if (catIDLevelWiseCatIDsList.get(givenCatID) == null)
+		{
+			System.err.println(PopUps
+					.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList.get(givenCatID" + givenCatID + ")==null"));
+		}
+
+		return catIDLevelWiseCatIDsList.get(givenCatID).get(givenLevel - 1);
+	}
+
+	/**
+	 * 
 	 * @param pathToSerialisedLevelWiseCatIDsDict
 	 * @param givenLevel
 	 * @param writeToFile
@@ -389,13 +431,18 @@ public class DomainConstants
 	public static TreeMap<Integer, ArrayList<Integer>> getGivenLevelCatIDForAllCatIDs(
 			String pathToSerialisedLevelWiseCatIDsDict, int givenLevel, boolean writeToFile)
 	{
+		PopUps.showMessage("getGivenLevelCatIDForAllCatIDs called");
 		TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap = new TreeMap<>();
 		ArrayList<Integer> catIDsWithNoGivenLevelCatID = new ArrayList<>();
 
 		if (givenLevel > 3 || givenLevel < 1)
-		{
-			System.err.println(
-					PopUps.getTracedErrorMsg("Error: only three levels for Gowalla while given level =" + givenLevel));
+		{// changed on July 12 2018
+			// System.err.println(
+			// PopUps.getTracedErrorMsg("Error: only three levels for Gowalla while given level =" + givenLevel));
+			PopUps.printTracedWarningMsg(
+					"Warning in getGivenLevelCatIDForAllCatIDs (only three levels for Gowalla while given level ="
+							+ givenLevel + " will return null");
+			return null;
 		}
 
 		TreeMap<Integer, String[]> catIDLevelWiseCatIDsDict = (TreeMap<Integer, String[]>) Serializer
@@ -447,14 +494,79 @@ public class DomainConstants
 			StringBuilder sb1 = new StringBuilder();
 			catIDGivenLevelCatIDMap.entrySet().stream()
 					.forEach(e -> sb1.append(e.getKey()).append("-").append(e.getValue()).append("\n"));
-			WToFile.writeToNewFile(sb1.toString(), "catIDGivenLevelCatIDMap.csv");
+			WToFile.writeToNewFile(sb1.toString(), Constant.getCommonPath() + "catIDGivenLevelCatIDMap.csv");
 
 			StringBuilder sb2 = new StringBuilder();
 			catIDsWithNoGivenLevelCatID.stream().forEach(e -> sb2.append(String.valueOf(e)).append("\n"));
-			WToFile.writeToNewFile(sb2.toString(), "catIDsWithNoGivenLevelCatID.csv");
+			WToFile.writeToNewFile(sb2.toString(), Constant.getCommonPath() + "catIDsWithNoGivenLevelCatID.csv");
 		}
 
 		return catIDGivenLevelCatIDMap;
+	}
+
+	/**
+	 * see for how it was originally created:
+	 * org.activity.generator.DatabaseCreatorGowallaQuicker1.getLevelWiseCatIDsForAllCatIDs(TreeMap<Integer, String>,
+	 * DefaultMutableTreeNode, int)
+	 * 
+	 * @param pathToSerialisedLevelWiseCatIDsDict
+	 * @since 12 July 2018
+	 */
+	public static void setCatIDLevelWiseCatIDsList(String pathToSerialisedLevelWiseCatIDsDict)
+	{
+		catIDLevelWiseCatIDsList = new TreeMap<>();
+
+		/*
+		 * see the following method for how it was originally created:
+		 * org.activity.generator.DatabaseCreatorGowallaQuicker1.getLevelWiseCatIDsForAllCatIDs(TreeMap<Integer,
+		 * String>, DefaultMutableTreeNode, int)
+		 */
+		TreeMap<Integer, String[]> catIDLevelWiseCatIDsDictDeserialised = (TreeMap<Integer, String[]>) Serializer
+				.kryoDeSerializeThis(pathToSerialisedLevelWiseCatIDsDict);
+
+		for (Entry<Integer, String[]> catIDEntry : catIDLevelWiseCatIDsDictDeserialised.entrySet())
+		{
+			Integer directCatID = catIDEntry.getKey();
+			String[] arr = catIDEntry.getValue();
+			ArrayList<ArrayList<Integer>> levelWiseCatIDForThis = new ArrayList<>(3);
+
+			for (int level = 1; level <= 3; level++)
+			{
+				String givenLevelCatIDs = arr[level - 1];
+				ArrayList<Integer> thisLevelCatIDs = new ArrayList<>();
+
+				if (givenLevelCatIDs == null || givenLevelCatIDs.trim().length() == 0)
+				{ // does not have a single numeric catID and does not contain "__" which would be for multiple cat
+					// ids does not have given level cat id.//catIDsWithNoGivenLevelCatID.add(catIDEntry.getKey());
+				}
+
+				else if (givenLevelCatIDs.contains("__") == true)
+				{
+					String[] splitted = RegexUtils.patternDoubleUnderScore.split(givenLevelCatIDs);
+					thisLevelCatIDs = (ArrayList<Integer>) Arrays.stream(splitted).map(s -> Integer.valueOf(s))
+							.collect(Collectors.toList());
+				}
+
+				else if (StringUtils.isNumeric(givenLevelCatIDs))
+				{
+					thisLevelCatIDs.add(Integer.valueOf(givenLevelCatIDs));
+				}
+
+				else
+				{
+					PopUps.showError(
+							"Error in org.activity.constants.DomainConstants.setCatIDLevelWiseCatIDsDict(String): for directCatID = "
+									+ directCatID + " givenLevelCatIDs = " + givenLevelCatIDs);
+				}
+				levelWiseCatIDForThis.add(level - 1, thisLevelCatIDs);
+			}
+			catIDLevelWiseCatIDsList.put(directCatID, levelWiseCatIDForThis);
+		}
+
+		StringBuilder sb3 = new StringBuilder("DirectCatID,Level1,Level2,Level3");
+		catIDLevelWiseCatIDsList.entrySet().stream().forEachOrdered(e -> sb3.append(
+				e.getKey() + "," + e.getValue().get(0) + "," + e.getValue().get(1) + "," + e.getValue().get(2) + "\n"));
+		WToFile.writeToNewFile(sb3.toString(), Constant.commonPath + "catIDLevelWiseCatIDsList.csv");
 	}
 
 	public static boolean isGowallaUserIDWithGT553MaxActsPerDay(int userID)

@@ -93,7 +93,7 @@ public final class Constant
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.AKOM;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = 2;// 1;// 3;// SWITCH_NOV10
@@ -129,7 +129,7 @@ public final class Constant
 	public static boolean useJarForMySimpleLevenshteinDistance = false;// true;
 
 	/****** Evaluation Constants Start ***********/
-	public static final boolean EvalPrecisionRecallFMeasure = false;// true;// false;
+	public static final boolean EvalPrecisionRecallFMeasure = true;// true;// false;
 	/****** Evaluation Constants End ***********/
 
 	static TimeZone timeZoneForExperiments = null;
@@ -139,7 +139,7 @@ public final class Constant
 	/**
 	 * determines the hierarchical level of the activity name to be used in edit distance computation
 	 */
-	public static final int HierarchicalCatIDLevelForEditDistance = 1;// 2;// 1;// 2, -1 when not used
+	public static final int HierarchicalCatIDLevelForEditDistance = -1;// 2;// 1;// 2, -1 when not used
 
 	public static final boolean buildRepAOJustInTime = false;
 	public static final boolean preBuildRepAOGenericUser = true; // TODO think about it
@@ -197,7 +197,7 @@ public final class Constant
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
 	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
-	public static final boolean useLocationInFED = false;// SWITCH_NOV10
+	public static final boolean useLocationInFED = true;// SWITCH_NOV10
 	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
@@ -219,15 +219,15 @@ public final class Constant
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean useRandomlySampled100Users = false;// false;// false;// true;// SWITCH_NOV10
+	public static final boolean useRandomlySampled100Users = true;// false;// false;// true;// SWITCH_NOV10
 	/**
 	 * Use only subset of the users from the randomly sampled users (useful for running small sample experiments for
 	 * faster iterations)
 	 */
-	public static final boolean useSelectedGTZeroUsersFromRandomlySampled100Users = true;
+	public static final boolean useSelectedGTZeroUsersFromRandomlySampled100Users = false;
 	public static String pathToRandomlySampledUserIndices = "";
 
-	public static final boolean runForAllUsersAtOnce = true;// false;// true;// false;// true;// SWITCH_April8
+	public static final boolean runForAllUsersAtOnce = false;// false;// true;// false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
 
@@ -678,6 +678,9 @@ public final class Constant
 		DomainConstants.setCatIDGivenLevelCatIDMap();
 		DomainConstants.setUserIDUserObjectDictionary(pathToSerialisedUserObjects);
 		DomainConstants.setGowallaLocZoneIdMap(pathToSerialisedGowallaLocZoneIdMap);
+
+		// TODO: take the path as an argument.
+		DomainConstants.setCatIDLevelWiseCatIDsList(PathConstants.pathToSerialisedLevelWiseCatIDsDict);
 
 		if (Constant.memorizeEditDistance)
 		{

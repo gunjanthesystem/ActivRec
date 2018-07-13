@@ -32,6 +32,9 @@ public class StringCode
 	 * unique not for all unique location ids in the dataset but not only the total number of unique location ids in the
 	 * two timelines amongst whom the edit distance is being computed. Note: one activity object can also have multiple
 	 * loc ids when it is actually a merged activity object.
+	 * <p>
+	 * Note 12 July 2018: i dont think at the moment it is dynamically generating locally unique char code but instead
+	 * it is just mapping pdVal to char
 	 * 
 	 * @param activityObjects1
 	 * @param activityObjects2
@@ -1347,7 +1350,8 @@ public class StringCode
 		// Working category level, i.e., the category level used in the act objects are same as the level desired
 		if (DomainConstants.gowallaWorkingCatLevel == hierarchyLevelForEDForAO)
 		{
-			return (ArrayList<String>) Collections.singletonList(getStringCodeForActivityObjectsFromActID(activityObjects));
+			return (ArrayList<String>) Collections
+					.singletonList(getStringCodeForActivityObjectsFromActID(activityObjects));
 		}
 
 		// Working category level, i.e., the category level used in the act objects is lower (more specific) than the
@@ -1367,8 +1371,8 @@ public class StringCode
 			{
 				// extract the corresponding hierarchy level cat id, its a list because there can be more than one. for
 				// example, Vineyard is in Community as well as Food
-				ArrayList<Integer> desiredHierarchyLevelActiIDs = DomainConstants
-						.getGivenLevelCatID(ao.getActivityID());
+				ArrayList<Integer> desiredHierarchyLevelActiIDs = DomainConstants.getGivenLevelCatID(ao.getActivityID(),
+						hierarchyLevelForEDForAO);
 				// convert to ArrayList of String/Character
 				// ArrayList<String> desiredHierarchyLevelActiIDsChar = (ArrayList<String>) desiredHierarchyLevelActiIDs
 				// .stream().map(i -> Integer.toString(i)).collect(Collectors.toList());
@@ -1470,7 +1474,8 @@ public class StringCode
 			for (ActivityObject ao : activityObjects)
 			{
 				int workingLevelActID = ao.getActivityID();
-				ArrayList<Integer> desiredHierarchyLevelActiIDs = DomainConstants.getGivenLevelCatID(workingLevelActID);
+				ArrayList<Integer> desiredHierarchyLevelActiIDs = DomainConstants.getGivenLevelCatID(workingLevelActID,
+						hierarchyLevelForEDForAO);
 
 				// System.out.println("workingLevelActID=" + workingLevelActID + " desiredHierarchyLevelActiID="
 				// + desiredHierarchyLevelActiID);

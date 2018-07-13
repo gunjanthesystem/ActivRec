@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -47,13 +49,19 @@ public class EvaluationSeq
 	// "301", "401", "501",
 	// "601", "701", "801","901" };
 
+	// List of filenames from different user groups (i.e., 100 users group) which need to be concenated to get results
+	// for all (500) users in single file
 	// for each individual seq index
+	// outer list for each MU, inner list for each user group
 	ArrayList<ArrayList<String>> listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
 			listOfPerAgreementsFilesL1;
 
 	// for top k indices in a sequence
 	ArrayList<ArrayList<String>> listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
 			listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1;
+
+	ArrayList<ArrayList<String>> listOfMeanReciprocalRankFiles, listOfReciprocalRankFiles, listOfAvgPrevisionFiles,
+			listOfAvgRecallFiles, listOfAvgFMeasureFiles;
 
 	/**
 	 * FOR NO MUs, useful for baseline
@@ -75,8 +83,7 @@ public class EvaluationSeq
 		int totalNumOfUsersComputedFor = 0;
 		try
 		{
-			PrintStream consoleLogStream = WToFile
-					.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
+			PrintStream consoleLogStream = WToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
 
 			for (String groupsOf100UsersLabel : groupsOf100UsersLabels)
 			{
@@ -213,8 +220,7 @@ public class EvaluationSeq
 					Constant.setCommonPath(commonPath);
 					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
 
-					PrintStream consoleLogStream = WToFile
-							.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
+					PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
 					int numOfUsersComputedFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
 					totalNumOfUsersComputedFor += numOfUsersComputedFor;
@@ -225,34 +231,34 @@ public class EvaluationSeq
 
 					// create lists of filenames of results for different MUs which need to be concatenated
 					String algoLabel = "Algo";
+					String timeCategory = "All";
+					// for (String timeCategory : timeCategories){
+					listOfNumAgreementsFiles.get(muIndex)
+							.add(commonPath + algoLabel + timeCategory + "NumDirectAgreements.csv");
+					listOfPerAgreementsFiles.get(muIndex)
+							.add(commonPath + algoLabel + timeCategory + "PercentageDirectAgreements.csv");
+					listOfNumAgreementsFilesL1.get(muIndex)
+							.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectAgreements.csv");
+					listOfPerAgreementsFilesL1.get(muIndex)
+							.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectAgreements.csv");
 
-					for (String timeCategory : timeCategories)
-					{
-						listOfNumAgreementsFiles.get(muIndex)
-								.add(commonPath + algoLabel + timeCategory + "NumDirectAgreements.csv");
-						listOfPerAgreementsFiles.get(muIndex)
-								.add(commonPath + algoLabel + timeCategory + "PercentageDirectAgreements.csv");
-						listOfNumAgreementsFilesL1.get(muIndex)
-								.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectAgreements.csv");
-						listOfPerAgreementsFilesL1.get(muIndex)
-								.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectAgreements.csv");
-
-						listOfNumTopKAgreementsFiles.get(muIndex)
-								.add(commonPath + algoLabel + timeCategory + "NumDirectTopKAgreements.csv");
-						listOfPerTopKAgreementsFiles.get(muIndex)
-								.add(commonPath + algoLabel + timeCategory + "PercentageDirectTopKAgreements.csv");
-						listOfNumTopKAgreementsFilesL1.get(muIndex)
-								.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectTopKAgreements.csv");
-						listOfPerTopKAgreementsFilesL1.get(muIndex).add(
-								commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectTopKAgreements.csv");
-					}
+					listOfNumTopKAgreementsFiles.get(muIndex)
+							.add(commonPath + algoLabel + timeCategory + "NumDirectTopKAgreements.csv");
+					listOfPerTopKAgreementsFiles.get(muIndex)
+							.add(commonPath + algoLabel + timeCategory + "PercentageDirectTopKAgreements.csv");
+					listOfNumTopKAgreementsFilesL1.get(muIndex)
+							.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectTopKAgreements.csv");
+					listOfPerTopKAgreementsFilesL1.get(muIndex)
+							.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectTopKAgreements.csv");
+					// }
 					consoleLogStream.close();
-				}
+				} // end of loop over MUs
 
-			}
+			} // end of loop over groups of 100 users
 
-			WToFile.appendLineToFileAbs("Now will concatenate files: ",
+			WToFile.appendLineToFileAbs("Now will concatenate files from different groups of 100 users: ",
 					Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
+			System.out.println("Debug: listOfNumTopKAgreementsFiles = \n" + listOfNumTopKAgreementsFiles.toString());
 			System.out.println("Now will concatenate files: ");
 			// PopUps.showMessage("BREAKING");
 			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
@@ -317,8 +323,7 @@ public class EvaluationSeq
 					Constant.setCommonPath(commonPath);
 					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
 
-					PrintStream consoleLogStream = WToFile
-							.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
+					PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
 					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
 					totalNumOfUsersComputedFor += numOfUsersComputerFor;
@@ -905,23 +910,53 @@ public class EvaluationSeq
 	public int doEvaluationSeq(int seqLength, String pathToReadResults, String pathToWrite, String commonPath,
 			boolean verbose)
 	{
-		int numOfUsersComputedFor = Integer.MIN_VALUE;
-		System.out.println("Inside  doEvaluationSeq");
+		int numOfUsersComputedForSeqPred = Integer.MIN_VALUE;
+		// all data must have same number of users, i.e., same numer of rows, i.e., same size for outer arraylist.
+		Set<Integer> numOfUsersSanityCheck = new LinkedHashSet<>();
+
+		System.out.println("Inside doEvaluationSeq");
 		try
 		{
+			{// block for evaluating sequence prediction overall
+				Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysPredSeq = readDataMetaActualTopK(
+						pathToReadResults, "dataRecommSequenceWithScore.csv", "dataActualSequence.csv", commonPath,
+						verbose);
+
+				ArrayList<ArrayList<String>> arrayMeta = readArraysPredSeq.getFirst();
+				ArrayList<ArrayList<String>> arrayRecommendedSequence = readArraysPredSeq.getThird();
+				ArrayList<ArrayList<String>> arrayActualSequence = readArraysPredSeq.getSecond();
+
+				numOfUsersSanityCheck.add(arrayMeta.size());
+				numOfUsersSanityCheck.add(arrayRecommendedSequence.size());
+				numOfUsersSanityCheck.add(arrayActualSequence.size());
+
+				numOfUsersComputedForSeqPred = doEvaluationSeq(arrayMeta, arrayRecommendedSequence, arrayActualSequence,
+						timeCategories, "Algo", verbose, pathToWrite, seqLength);
+			}
+
+			// block for evaluating sequence prediction at each first K
+			for (int seqIndex = 0; seqIndex < seqLength; seqIndex++)
+			{
+				Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysForFirstK = readDataMetaActualTopK(
+						pathToReadResults, "dataRankedRecommendationWithScores" + seqLength + ".csv",
+						"dataActual" + seqIndex + ".csv", commonPath, verbose);
+
+				// should be same same meta for all
+				ArrayList<ArrayList<String>> arrayMetaFirstK = readArraysForFirstK.getFirst();
+				ArrayList<ArrayList<String>> arrayRecommendedSequenceFirstK = readArraysForFirstK.getThird();
+				ArrayList<ArrayList<String>> arrayActualSequenceFirstK = readArraysForFirstK.getSecond();
+
+				numOfUsersSanityCheck.add(arrayMetaFirstK.size());
+				numOfUsersSanityCheck.add(arrayRecommendedSequenceFirstK.size());
+				numOfUsersSanityCheck.add(arrayActualSequenceFirstK.size());
+
+				doEvaluationNonSeq(arrayMetaFirstK, arrayRecommendedSequenceFirstK, arrayActualSequenceFirstK,
+						timeCategories, Constant.EvalPrecisionRecallFMeasure, theKOriginal, "AlgoStep" + seqIndex);
+			}
+
 			// for (int i = 0; i < seqLength; i++)
 			// {
 			// Triple(arrayMeta, arrayActual, arrayTopK)
-			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArrays = readDataForSeqIndex(
-					seqLength, pathToReadResults, commonPath, verbose);
-
-			ArrayList<ArrayList<String>> arrayMeta = readArrays.getFirst();
-			ArrayList<ArrayList<String>> arrayRecommendedSequence = readArrays.getThird();
-			ArrayList<ArrayList<String>> arrayActualSequence = readArrays.getSecond();
-
-			numOfUsersComputedFor = doEvaluationSeq(arrayMeta, arrayRecommendedSequence, arrayActualSequence,
-					timeCategories, "Algo", verbose, pathToWrite, seqLength);
-
 			// if (Constant.DoBaselineOccurrence)
 			// {
 			// doEvaluation(arrayMeta, arrayBaselineOccurrence, arrayActual, timeCategories,
@@ -933,6 +968,10 @@ public class EvaluationSeq
 			// Constant.EvalPrecisionRecallFMeasure, theKOriginal, "BaselineDuration");
 			// }
 			// }
+			if (numOfUsersSanityCheck.size() != 1)
+			{
+				PopUps.showError("Error: numOfUsersSanityCheck.size() = " + numOfUsersSanityCheck.size());
+			}
 
 		}
 		catch (Exception e)
@@ -940,26 +979,29 @@ public class EvaluationSeq
 			e.printStackTrace();
 			PopUps.showException(e, "org.activity.evaluation.EvaluationSeq.doEvaluationSeq()");
 		}
+
 		System.out.println("Exiting  doEvaluationSeq");
 
 		// System.out.println("All test stats done");
 		// PopUps.showMessage("All test stats done");
-		return numOfUsersComputedFor;
+		return numOfUsersComputedForSeqPred;
 	}
 
 	/**
 	 * 
-	 * @param seqIndex
 	 * @param pathToReadResults
+	 * @param predictionDataFileName
+	 * @param actualDataFileName
 	 * @param commonPath
 	 * @param verbose
 	 * @return Triple(arrayMeta, arrayActual, arrayTopK)
 	 */
-	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readDataForSeqIndex(
-			int seqIndex, String pathToReadResults, String commonPath, boolean verbose)
+	public static Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readDataMetaActualTopK(
+			String pathToReadResults, String predictionDataFileName, String actualDataFileName, String commonPath,
+			boolean verbose)
 	{
 		// commonPath = Constant.getCommonPath();
-		System.out.println("Inside Evaluation: common path is:" + commonPath);
+		System.out.println("Inside readDataForSeqIndex: common path is:" + commonPath);
 
 		BufferedReader brMeta = null, brTopK = null, brActual = null;
 		// , brBaseLineOccurrence = null,brBaseLineDuration = null, brCurrentTargetSame = null;
@@ -1011,8 +1053,10 @@ public class EvaluationSeq
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine, baseLineOccurrenceCurrentLine,
 					baseLineDurationCurrentLine, currentTargetSame;
 			brMeta = new BufferedReader(new FileReader(pathToReadResults + "meta.csv"));
-			brTopK = new BufferedReader(new FileReader(pathToReadResults + "dataRecommSequenceWithScore.csv"));// /dataRecommTop5.csv"));
-			brActual = new BufferedReader(new FileReader(pathToReadResults + "dataActualSequence.csv"));
+			brTopK = new BufferedReader(new FileReader(pathToReadResults + predictionDataFileName));
+			// "dataRecommSequenceWithScore.csv"));// /dataRecommTop5.csv"));
+			brActual = new BufferedReader(new FileReader(pathToReadResults + actualDataFileName));
+			// "dataActualSequence.csv"));
 
 			// brCurrentTargetSame = new BufferedReader(new FileReader(commonPath +
 			// "metaIfCurrentTargetSameWriter.csv"));
@@ -1070,10 +1114,8 @@ public class EvaluationSeq
 	}
 
 	/**
-	 * writePrecisionRecallFMeasure, writeReciprocalRank, writeMeanReciprocalRank, writeAvgPrecisionsForAllKs,
-	 * writeAvgRecallsForAllKs, writeAvgFMeasuresForAllKs
 	 * 
-	 * 
+	 * for level 2 and level 1: writeDirectAgreements, writeNumAndPercentageDirectAgreements, writeDirectTopKAgreements
 	 * 
 	 * @param arrayMeta
 	 * @param arrayRecommendedSeq
@@ -1225,8 +1267,7 @@ public class EvaluationSeq
 				}
 			}
 
-			WToFile.writeToNewFile(sb.toString(),
-					pathToWrite + fileNamePhrase + timeCategory + "DirectAgreements.csv");
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + fileNamePhrase + timeCategory + "DirectAgreements.csv");
 
 		}
 		catch (Exception e)
@@ -1428,8 +1469,10 @@ public class EvaluationSeq
 			}
 			else if (levelAtWhichToMatch > 0 && levelAtWhichToMatch < 3)
 			{
-				ArrayList<Integer> catID1AtGivenLevel = DomainConstants.getGivenLevelCatID(Integer.valueOf(catID1));
-				ArrayList<Integer> catID2AtGivenLevel = DomainConstants.getGivenLevelCatID(Integer.valueOf(catID2));
+				ArrayList<Integer> catID1AtGivenLevel = DomainConstants.getGivenLevelCatID(Integer.valueOf(catID1),
+						levelAtWhichToMatch);
+				ArrayList<Integer> catID2AtGivenLevel = DomainConstants.getGivenLevelCatID(Integer.valueOf(catID2),
+						levelAtWhichToMatch);
 
 				int intersection = UtilityBelt.getIntersection(catID1AtGivenLevel, catID2AtGivenLevel).size();
 
@@ -1506,12 +1549,12 @@ public class EvaluationSeq
 	/**
 	 * 
 	 * @param dataToRead
-	 * @param label
+	 * @param labelForLog
 	 * @return Triple (arrayData, countOfLinesData, log.toString())
 	 * @throws IOException
 	 */
 	private static Triple<ArrayList<ArrayList<String>>, Integer, String> extractDataFromFile(BufferedReader dataToRead,
-			String label, boolean verbose) throws IOException
+			String labelForLog, boolean verbose) throws IOException
 	{
 		// outer arraylist: rows, inner arraylist: cols
 		ArrayList<ArrayList<String>> arrayData = new ArrayList<ArrayList<String>>();
@@ -1527,7 +1570,7 @@ public class EvaluationSeq
 			// System.out.println("number of tokens in this meta line=" + tokensInCurrentMetaLine.length);
 			if (verbose)
 			{
-				log.append(label + " line num:" + (countOfLinesData + 1) + "#tokensInLine:"
+				log.append(labelForLog + " line num:" + (countOfLinesData + 1) + "#tokensInLine:"
 						+ tokensInCurrentDataLine.length + "\n");
 			}
 			for (int i = 0; i < tokensInCurrentDataLine.length; i++)
@@ -1538,7 +1581,7 @@ public class EvaluationSeq
 			arrayData.add(currentLineArray);
 			countOfLinesData++;
 		}
-		log.append("\n number of " + label + " lines =" + countOfLinesData + "\n");
+		log.append("\n number of " + labelForLog + " lines =" + countOfLinesData + "\n");
 
 		return new Triple<ArrayList<ArrayList<String>>, Integer, String>(arrayData, countOfLinesData, log.toString());
 	}

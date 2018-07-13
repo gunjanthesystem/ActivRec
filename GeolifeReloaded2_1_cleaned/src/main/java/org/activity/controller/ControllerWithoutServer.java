@@ -187,7 +187,7 @@ public class ControllerWithoutServer
 
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 			// System.exit(0);
-			if (true)// temporary
+			if (false)// temporary
 			{
 				TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
 				TimelineUtils.writeLocationObjects(Constant.getUniqueLocIDs(),
@@ -199,7 +199,7 @@ public class ControllerWithoutServer
 
 			}
 
-			if (true)// temporary for 22 feb 2018,
+			if (false)// temporary for 22 feb 2018,
 			{
 				findUniqueLocationsInTrainTest(usersCleanedDayTimelines, true);
 				System.exit(0);
