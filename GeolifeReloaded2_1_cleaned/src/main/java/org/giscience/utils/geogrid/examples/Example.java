@@ -41,6 +41,7 @@ public class Example
 		System.out.format("number of pentagon cells: %d%n", g.numberOfPentagonalCells());
 		System.out.format("diameter of a hexagon cell: %f%n", g.diameterOfHexagonalCellOnIcosahedron());
 		System.out.format("area of a hexagon cell: %f%n", g.areaOfAHexagonalCell());
+		System.out.println("num of faces in project: " + p.numberOfFaces());
 		System.out.println("------");
 
 		// get cells in given bounds
@@ -53,7 +54,14 @@ public class Example
 		{
 			double lat = Math.random() * 180 - 90;
 			double lon = Math.random() * 360;
+
 			GridCell c = g.cellForLocation(lat, lon);
+			GeoCoordinates centreOfCell = new GeoCoordinates(c.getLat(), c.getLon());
+			System.out.println("random loc = " + lat + " , " + lon);
+			System.out.println("centreOfCell = " + centreOfCell.toString());
+
+			System.out.println("cellforcentre = " + g.cellForLocation(centreOfCell));
+			//
 			System.out.println(c);
 			System.out.println("------");
 		}

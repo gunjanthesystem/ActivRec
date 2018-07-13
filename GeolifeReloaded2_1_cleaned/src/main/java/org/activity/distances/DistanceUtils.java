@@ -818,7 +818,7 @@ public class DistanceUtils
 		}
 		/////
 
-		double EDGamma;
+		// double EDGamma;
 		double sumOfWtOfFeaturesUsedExceptPD = hjEditDistance.getSumOfWeightOfFeaturesExceptPrimaryDimension();
 
 		// Start of Get max of ActED over all cand
@@ -930,10 +930,10 @@ public class DistanceUtils
 			double normActDistForThisCand = StatsUtils.minMaxNormWORound(actDistForThisCand, maxActEDOverAllCands,
 					minActEDOverAllCands);
 			double meanOverAOsNormFDForThisCand = sumOfNormFDsOverAOsOfThisCand / listOfAOsForThisCand.size();
-			double medianOverAOsNormFDForThisCand = StatUtils.percentile(normFDsOverAOsOfThisCand, 50);
-			double varianceOverAOsNormFDForThisCand = StatUtils.variance(normFDsOverAOsOfThisCand);
-			double stdDevOverAOsNormFDForThisCand = Math.sqrt(varianceOverAOsNormFDForThisCand);
-			double meanUponStdDev = meanOverAOsNormFDForThisCand / stdDevOverAOsNormFDForThisCand;
+			// double medianOverAOsNormFDForThisCand = StatUtils.percentile(normFDsOverAOsOfThisCand, 50);
+			// double varianceOverAOsNormFDForThisCand = StatUtils.variance(normFDsOverAOsOfThisCand);
+			// double stdDevOverAOsNormFDForThisCand = Math.sqrt(varianceOverAOsNormFDForThisCand);
+			// double meanUponStdDev = meanOverAOsNormFDForThisCand / stdDevOverAOsNormFDForThisCand;
 
 			// IMPORTANT
 			double resultantEditDist = -999999;

@@ -31,6 +31,12 @@ public class GLatLonToGridTransformer
 	static int gridResolution = 16;
 	ISEA3H theGrid;
 
+	public static void fun1()
+	{
+		GridCell c;
+
+	}
+
 	public static void main(String args[])
 	{
 		String pathToWrite = "./dataWritten/HexGridRes" + gridResolution + "_" + DateTimeUtils.getMonthDateLabel()
