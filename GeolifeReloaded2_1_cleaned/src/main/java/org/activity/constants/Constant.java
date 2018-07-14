@@ -249,6 +249,9 @@ public final class Constant
 	// public static final int lengthOfBPTTInRNN1 = 256; // 5587
 
 	public static final boolean doVisualizationRNN1 = true;
+
+	public static final boolean mapLocIDToGridID = true;
+	public static final PrimaryDimension secondaryDimension = PrimaryDimension.ActivityID;// LocationID;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -1548,6 +1551,8 @@ public final class Constant
 		// s.append("\nvarWidthPerHiddenLayerRNN1:" + Constant.varWidthPerHiddenLayerRNN1);
 		s.append("\nneuronsInHiddenLayersRNN1:" + Arrays.toString(Constant.neuronsInHiddenLayersRNN1));
 
+		s.append("\ndoVisualizationRNN1:" + Constant.doVisualizationRNN1);
+		s.append("\nmapLocIDToGridID:" + Constant.mapLocIDToGridID);
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{

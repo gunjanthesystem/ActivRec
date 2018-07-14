@@ -457,9 +457,13 @@ public class DistanceUtils
 		// loop over all res to find max and min for normalisation
 		// For each candidate, finding max feature diff for each gowalla feature over all the activity objects in that
 		// candidate timeline. (horizontal aggregations)
-		List<EnumMap<GowallaFeatures, DoubleSummaryStatistics>> summaryStatForEachCand = candAEDFeatDiffs.entrySet()
-				.stream().map(e -> HJEditDistance.getSummaryStatsForEachFeatureDiffOverList(e.getValue().getThird()))
-				.collect(Collectors.toList());
+		List<EnumMap<GowallaFeatures, DoubleSummaryStatistics>> summaryStatForEachCand = null;
+		if (hjEditDistance.getShouldComputeFeatureLevelDistance())
+		{
+			summaryStatForEachCand = candAEDFeatDiffs.entrySet().stream()
+					.map(e -> HJEditDistance.getSummaryStatsForEachFeatureDiffOverList(e.getValue().getThird()))
+					.collect(Collectors.toList());
+		}
 
 		// Aggregation (across candidate timelines) of aggregation (across activity objects in each cand
 		// timeline:summaryStatForEachCand)
@@ -772,6 +776,10 @@ public class DistanceUtils
 	}
 
 	/**
+	 * TODO modified the following method with shouldComputeFeatureLevelDiffs
+	 * <P>
+	 * check the modification and ensure logging version as same modification
+	 * <P>
 	 * Fork of org.activity.distances.DistanceUtils.getRTVerseMinMaxNormalisedEditDistances(), removing all logging for
 	 * performance
 	 * <p>
@@ -803,8 +811,8 @@ public class DistanceUtils
 			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
-
 		EnumMap<GowallaFeatures, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
+		boolean shouldComputeFeatureLevelDiffs = hjEditDistance.getShouldComputeFeatureLevelDistance();
 
 		double EDAlpha = Constant.EDAlpha;
 		double EDBeta = 1 - EDAlpha;
@@ -873,77 +881,92 @@ public class DistanceUtils
 
 			int indexOfAOForThisCand = -1;
 
-			// loop over the list of AO for this cand
-			for (EnumMap<GowallaFeatures, Double> mapOfFeatureDiffForAnAO : listOfAOsForThisCand)
+			if (shouldComputeFeatureLevelDiffs)// this if added on 13 July
 			{
-				indexOfAOForThisCand += 1;
-				double featDistForThisAOForThisCand = 0;// double sanityCheckFeatureWtSum = 0;
-
-				///////
-				// logTxt.append(
-				// "\n\t\tcountOfAOForThisCand=" + indexOfAOForThisCand + " now loop over features for this AO");
-				// logEachAO
-				// logAOsThisCand.append(candInfo + "," + indexOfAOForThisCand + ",");
-				////////
-
-				// loop over each of the Gowalla Feature
-				for (Entry<GowallaFeatures, Double> diffEntry : mapOfFeatureDiffForAnAO.entrySet())
+				// loop over the list of AO for this cand
+				for (EnumMap<GowallaFeatures, Double> mapOfFeatureDiffForAnAO : listOfAOsForThisCand)
 				{
-					GowallaFeatures featureID = diffEntry.getKey();
+					indexOfAOForThisCand += 1;
+					double featDistForThisAOForThisCand = 0;// double sanityCheckFeatureWtSum = 0;
+					///////
+					// logTxt.append(
+					// "\n\t\tcountOfAOForThisCand=" + indexOfAOForThisCand + " now loop over features for this AO");
+					// logEachAO
+					// logAOsThisCand.append(candInfo + "," + indexOfAOForThisCand + ",");
+					////////
+					// loop over each of the Gowalla Feature
+					for (Entry<GowallaFeatures, Double> diffEntry : mapOfFeatureDiffForAnAO.entrySet())
+					{
+						GowallaFeatures featureID = diffEntry.getKey();
 
-					// $$Disabled on May 14: double normalisedFeatureDiffVal =
-					// StatsUtils.minMaxNormWORound(diffEntry.getValue(),maxOfMaxOfDiffs.get(featureID),
-					// minOfMinOfDiffs.get(featureID));
+						// $$Disabled on May 14: double normalisedFeatureDiffVal =
+						// StatsUtils.minMaxNormWORound(diffEntry.getValue(),maxOfMaxOfDiffs.get(featureID),
+						// minOfMinOfDiffs.get(featureID));
 
-					double normalisedFeatureDiffVal = StatsUtils.minMaxNormWORoundWithUpperBound(diffEntry.getValue(),
-							maxOfMaxOfDiffs.get(featureID), minOfMinOfDiffs.get(featureID), 1.0d, false);
+						double normalisedFeatureDiffVal = StatsUtils.minMaxNormWORoundWithUpperBound(
+								diffEntry.getValue(), maxOfMaxOfDiffs.get(featureID), minOfMinOfDiffs.get(featureID),
+								1.0d, false);
 
-					double wtForThisFeature = featureWeightMap.get(featureID);
-					featDistForThisAOForThisCand += (wtForThisFeature * normalisedFeatureDiffVal);
+						double wtForThisFeature = featureWeightMap.get(featureID);
+						featDistForThisAOForThisCand += (wtForThisFeature * normalisedFeatureDiffVal);
 
-					//////
-					// logTxt.append("\n\t\t\tfeatureID=" + featureID + " featDiff=" + diffEntry.getValue()
-					// + " normalisedFeatureDiffVal=" + normalisedFeatureDiffVal + " wtForThisFeature="
-					// + wtForThisFeature + " featureDistForThisAOForThisCand=" + featDistForThisAOForThisCand
-					// + " maxOfMaxOfDiffs=" + maxOfMaxOfDiffs.get(featureID) + " minOfMinOfDiffs="
-					// + minOfMinOfDiffs.get(featureID));
-					// logAOsThisCand.append(StatsUtils.roundAsString(diffEntry.getValue(), 4) + ","
-					// + StatsUtils.roundAsString(normalisedFeatureDiffVal, 4) + ",");// rounding for logging
-					////// sanityCheckFeatureWtSum += wtForThisFeature;
-				} // end of loop over Gowalla features
+						//////
+						// logTxt.append("\n\t\t\tfeatureID=" + featureID + " featDiff=" + diffEntry.getValue()
+						// + " normalisedFeatureDiffVal=" + normalisedFeatureDiffVal + " wtForThisFeature="
+						// + wtForThisFeature + " featureDistForThisAOForThisCand=" + featDistForThisAOForThisCand
+						// + " maxOfMaxOfDiffs=" + maxOfMaxOfDiffs.get(featureID) + " minOfMinOfDiffs="
+						// + minOfMinOfDiffs.get(featureID));
+						// logAOsThisCand.append(StatsUtils.roundAsString(diffEntry.getValue(), 4) + ","
+						// + StatsUtils.roundAsString(normalisedFeatureDiffVal, 4) + ",");// rounding for logging
+						////// sanityCheckFeatureWtSum += wtForThisFeature;
+					} // end of loop over Gowalla features
 
-				// For SanityCheck sanityCheckFeatureWtSum
-				// if (true){ Sanity.eq(sanityCheckFeatureWtSum,
-				// sumOfWtOfFeaturesUsedExceptPD,"Error:sanityCheckFeatureWtSum=" +sanityCheckFeatureWtSum+ "
-				// sumOfWtOfFeaturesUsedExceptPD=" + sumOfWtOfFeaturesUsedExceptPD);}
+					// For SanityCheck sanityCheckFeatureWtSum
+					// if (true){ Sanity.eq(sanityCheckFeatureWtSum,
+					// sumOfWtOfFeaturesUsedExceptPD,"Error:sanityCheckFeatureWtSum=" +sanityCheckFeatureWtSum+ "
+					// sumOfWtOfFeaturesUsedExceptPD=" + sumOfWtOfFeaturesUsedExceptPD);}
 
-				double normFDForThisAOForThisCand = featDistForThisAOForThisCand / sumOfWtOfFeaturesUsedExceptPD;
-				sumOfNormFDsOverAOsOfThisCand += normFDForThisAOForThisCand;
-				normFDsOverAOsOfThisCand[indexOfAOForThisCand] = normFDForThisAOForThisCand;
+					double normFDForThisAOForThisCand = featDistForThisAOForThisCand / sumOfWtOfFeaturesUsedExceptPD;
+					sumOfNormFDsOverAOsOfThisCand += normFDForThisAOForThisCand;
+					normFDsOverAOsOfThisCand[indexOfAOForThisCand] = normFDForThisAOForThisCand;
 
-				/////////
-				// logTxt.append("\n\t\tfeatDistForThisAOForThisCand=" + featDistForThisAOForThisCand);
-				// logAOsThisCand.append("|" + "," + StatsUtils.roundAsString(normFDForThisAOForThisCand, 4) + "\n");
-				////////
-			} // end of loop over the list of AOs for this cand
+					/////////
+					// logTxt.append("\n\t\tfeatDistForThisAOForThisCand=" + featDistForThisAOForThisCand);
+					// logAOsThisCand.append("|" + "," + StatsUtils.roundAsString(normFDForThisAOForThisCand, 4) +
+					///////// "\n");
+					////////
+				} // end of loop over the list of AOs for this cand
+			} // end of if shouldComputeFeatureLevelDiffs
 
 			double normActDistForThisCand = StatsUtils.minMaxNormWORound(actDistForThisCand, maxActEDOverAllCands,
 					minActEDOverAllCands);
-			double meanOverAOsNormFDForThisCand = sumOfNormFDsOverAOsOfThisCand / listOfAOsForThisCand.size();
-			// double medianOverAOsNormFDForThisCand = StatUtils.percentile(normFDsOverAOsOfThisCand, 50);
-			// double varianceOverAOsNormFDForThisCand = StatUtils.variance(normFDsOverAOsOfThisCand);
-			// double stdDevOverAOsNormFDForThisCand = Math.sqrt(varianceOverAOsNormFDForThisCand);
-			// double meanUponStdDev = meanOverAOsNormFDForThisCand / stdDevOverAOsNormFDForThisCand;
 
 			// IMPORTANT
 			double resultantEditDist = -999999;
-			if (EDBeta == 0)
+			if (EDBeta == 0)// shouldComputeFeatureLevelDiffs is true
 			{// since 0*NaN is NaN
 				resultantEditDist = (EDAlpha) * normActDistForThisCand;
 			}
 			else
 			{
+				double meanOverAOsNormFDForThisCand = sumOfNormFDsOverAOsOfThisCand / listOfAOsForThisCand.size();
+				// double medianOverAOsNormFDForThisCand = StatUtils.percentile(normFDsOverAOsOfThisCand, 50);
+				// double varianceOverAOsNormFDForThisCand = StatUtils.variance(normFDsOverAOsOfThisCand);
+				// double stdDevOverAOsNormFDForThisCand = Math.sqrt(varianceOverAOsNormFDForThisCand);
+				// double meanUponStdDev = meanOverAOsNormFDForThisCand / stdDevOverAOsNormFDForThisCand;
+
 				resultantEditDist = (EDAlpha) * normActDistForThisCand + (EDBeta) * meanOverAOsNormFDForThisCand;
+
+				// Sanity check start
+				if (meanOverAOsNormFDForThisCand > 1)
+				{
+					WToFile.appendLineToFileAbs(meanOverAOsNormFDForThisCand + "\n",
+							Constant.getCommonPath() + "ErrorDebug22April2018.csv");
+					// System.out.println("\nDebug22April2018: normFeatureDistForThisCand=" + normFeatureDistForThisCand
+					// + "\nlogAOThisCand=\n" + logAOsThisCand.toString() + "\nsumOfWtOfFeaturesUsedExceptPD="
+					// + sumOfWtOfFeaturesUsedExceptPD);
+				}
+				// Sanity check end
 			}
 
 			res.put(candEntry.getKey(), new Pair<>(AEDTraceForThisCand, resultantEditDist));
@@ -958,16 +981,6 @@ public class DistanceUtils
 			// logEachAO.append(",,,,,,,,,,,,,,,," + featureDistForThisCand + "," + normActDistForThisCand + ","
 			// + resultantEditDist + "\n");
 
-			// Sanity check start
-			if (meanOverAOsNormFDForThisCand > 1)
-			{
-				WToFile.appendLineToFileAbs(meanOverAOsNormFDForThisCand + "\n",
-						Constant.getCommonPath() + "ErrorDebug22April2018.csv");
-				// System.out.println("\nDebug22April2018: normFeatureDistForThisCand=" + normFeatureDistForThisCand
-				// + "\nlogAOThisCand=\n" + logAOsThisCand.toString() + "\nsumOfWtOfFeaturesUsedExceptPD="
-				// + sumOfWtOfFeaturesUsedExceptPD);
-			}
-			// Sanity check end
 			// logEachAOAllCands.append(logAOsThisCand.toString());
 			/////////
 		} // end of loop over cands

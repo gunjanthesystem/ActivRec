@@ -57,6 +57,7 @@ public class ActivityObject implements Serializable
 	 */
 	// LinkedHashSet<Integer> locationIDs;
 	ArrayList<Integer> locationIDs;
+	long gridID;// introduced on 13 July 2018
 	String activityName, locationName;
 	/**
 	 * workingLevelCatIDs are "__" separated catID for the given working level in hierarhcy
@@ -155,6 +156,11 @@ public class ActivityObject implements Serializable
 	public String getPrimaryDimensionVal(String delimiter)
 	{
 		return this.getPrimaryDimensionVal().stream().map(s -> s.toString()).collect(Collectors.joining(delimiter));
+	}
+
+	public long getGridID()
+	{
+		return this.gridID;
 	}
 
 	/**
@@ -538,6 +544,51 @@ public class ActivityObject implements Serializable
 	 * @param timeZoneId
 	 * @param distanceInMFromNext
 	 * @param durationInSecFromNext
+	 * @param gridID
+	 *            introduced on 13 July 2018
+	 * @since 13 July 2018
+	 */
+	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
+			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
+			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
+			long durationInSecsFromPrev, ZoneId timeZoneId, double distanceInMFromNext, long durationInSecFromNext,
+			long gridID)
+	{
+		this(activityID, locationIDs, activityName, locationName, startTimestamp, startLatitude, startLongitude,
+				startAltitude, userID, photos_count, checkins_count, users_count, radius_meters, highlights_count,
+				items_count, max_items_count, workingLevelCatIDs, distanceInMFromPrev, durationInSecsFromPrev,
+				timeZoneId, distanceInMFromNext, durationInSecFromNext);
+
+		this.gridID = gridID;
+	}
+
+	/**
+	 * 
+	 * @param activityID
+	 * @param locationIDs
+	 * @param activityName
+	 * @param locationName
+	 * @param startTimestamp
+	 * @param startLatitude
+	 * @param startLongitude
+	 * @param startAltitude
+	 * @param userID
+	 * @param photos_count
+	 * @param checkins_count
+	 * @param users_count
+	 * @param radius_meters
+	 * @param highlights_count
+	 * @param items_count
+	 * @param max_items_count
+	 * @param workingLevelCatIDs
+	 * @param distanceInMFromPrev
+	 * @param durationInSecsFromPrev
+	 * @param timeZoneId
+	 * @param distanceInMFromNext
+	 * @param durationInSecFromNext
+	 *            <p>
+	 * @until used until 12 July 2018
 	 */
 	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
@@ -684,7 +735,7 @@ public class ActivityObject implements Serializable
 									 */ + "__userID=" + userID + "__photos_count=" + photos_count + "__cins_count="
 				+ checkins_count + "__users_count=" + users_count + "__radius_m=" + radius_meters + "__highlts_count="
 				+ highlights_count + "__items_count=" + items_count + "__max_items_count=" + max_items_count
-				+ "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev;
+				+ "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev + "__gridID" + gridID;
 	}
 
 	public String toStringAllGowallaTS()
@@ -700,7 +751,8 @@ public class ActivityObject implements Serializable
 																			 */ + "__uID=" + userID + "__photos_c="
 				+ photos_count + "__cins_c=" + checkins_count + "__users_c=" + users_count + "__radius_m="
 				+ radius_meters + "__highlts_count=" + highlights_count + "__items_c=" + items_count + "__max_items_c="
-				+ max_items_count + "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev;
+				+ max_items_count + "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev + "__gridID"
+				+ gridID;
 	}
 
 	public String toStringAllGowallaTSWithName()
@@ -723,7 +775,8 @@ public class ActivityObject implements Serializable
 																			 */ + "__uID=" + userID + "__photos_c="
 				+ photos_count + "__cins_c=" + checkins_count + "__users_c=" + users_count + "__radius_m="
 				+ radius_meters + "__highlts_count=" + highlights_count + "__items_c=" + items_count + "__max_items_c="
-				+ max_items_count + "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev;
+				+ max_items_count + "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev + "__gridID"
+				+ gridID;
 	}
 
 	/**
@@ -746,7 +799,7 @@ public class ActivityObject implements Serializable
 				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
 				+ checkins_count + delimiter + users_count + delimiter + radius_meters + delimiter + highlights_count
 				+ delimiter + items_count + delimiter + max_items_count + delimiter + distInMFromPrev + delimiter
-				+ durInSecFromPrev;
+				+ durInSecFromPrev + delimiter + gridID;
 	}
 
 	/**
@@ -762,7 +815,7 @@ public class ActivityObject implements Serializable
 				+ "workLvlCat" + delimiter + "stTS" + delimiter + "stLat" + delimiter + "stLon" + delimiter + "uID"
 				+ delimiter + "photos_c" + delimiter + "cins_c" + delimiter + "users_c" + delimiter + "radius_m"
 				+ delimiter + "highlts_count" + delimiter + "items_c" + delimiter + "max_items_c" + delimiter
-				+ "distPrev" + delimiter + "durPrev";
+				+ "distPrev" + delimiter + "durPrev" + delimiter + "gridID";
 	}
 
 	public String toString()

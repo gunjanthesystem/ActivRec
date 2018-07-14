@@ -1167,6 +1167,8 @@ public class TimelineUtils
 			Int2ObjectOpenHashMap<LocationGowalla> locationObjects)
 	{
 		System.out.println("Inside convertCheckinEntriesToActivityObjectsGowallaV2():");
+		DomainConstants.setGridIDLocIDGowallaMaps();
+		Map<Long, Long> locIDGridIDMap = DomainConstants.getLocIDGridIDGowallaMap();
 
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
@@ -1302,6 +1304,7 @@ public class TimelineUtils
 						numOfCInsWithMultipleDistinctLocIDs += 1;
 					}
 
+					long gridID = getGridID(locIDs, locIDGridIDMap);
 					// ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
 					ActivityObject ao = new ActivityObject(
 							activityID, locIDs, activityName, locationName, startTimestamp, startLatitude,
@@ -1358,6 +1361,29 @@ public class TimelineUtils
 		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
 		return activityObjectsDatewise;
 
+	}
+
+	private static long getGridID(ArrayList<Integer> locIDs, Map<Long, Long> locIDGridIDMap)
+	{
+		StringBuilder sbLog = new StringBuilder();
+		Set<Long> gridIDs = new TreeSet<>();
+
+		for (int locID : locIDs)
+		{
+			long gridID = locIDGridIDMap.get(new Long(locID));
+			sbLog.append("locID," + locID + ",GridID," + gridID + "\n");
+			gridIDs.add(gridID);
+		}
+
+		WToFile.appendLineToFileAbs(sbLog.toString(),
+				Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelines.csv");
+
+		WToFile.appendLineToFileAbs(gridIDs.size() + "\n",
+				Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelinesSize.csv");
+
+		List<Long> gridIDsList = new ArrayList<>();
+		gridIDsList.addAll(gridIDs);
+		return gridIDsList.get(0);
 	}
 
 	/**

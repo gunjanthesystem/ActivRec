@@ -712,6 +712,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 			String timeAtRecomm, String candidateTimelineId)
 	{
 		// PrimaryDimension primaryDimension = Constant.primaryDimension;//moved to constructor
+
+		boolean shouldComputeFeatureLevelDistance = this.getShouldComputeFeatureLevelDistance();
+
 		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("\n---calc HJeditDist between " + activityObjects1Original.size() + " & "
@@ -762,7 +765,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// t5 = System.nanoTime();
 
 		// Start of added on 17 Mar 2018
-		if (Constant.useFeatureDistancesOfAllActs)
+		if (Constant.useFeatureDistancesOfAllActs && shouldComputeFeatureLevelDistance)
 		{
 			dFeat = getFeatureLevelEditDistanceAllActsV2(activityObjects1, activityObjects2);
 		}
@@ -859,7 +862,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 			else if (operationChar == 'N')
 			{
-				if (Constant.useFeatureDistancesOfAllActs == false)
+				if (Constant.useFeatureDistancesOfAllActs == false && shouldComputeFeatureLevelDistance)
 				{// i.e., feature distance of only N (matched) act objs
 					// System.out.println("dAct=" + dAct);
 					double decayWt = 1;
@@ -891,7 +894,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// if (this.EDAlpha > 0)//Disabled on April 26 2018
 		if (this.EDAlpha > -1)// Added on April 26 2018
 		{
-			if (this.getShouldComputeFeatureLevelDistance() == false)
+			if (shouldComputeFeatureLevelDistance == false)
 			{
 				dFeat = 0;
 			}
@@ -1018,7 +1021,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 	{
 		double actED = 0;
 		List<EnumMap<GowallaFeatures, Double>> featDiffs = null;
-
+		boolean shouldComputeFeatureLevelDiffs = this.getShouldComputeFeatureLevelDistance();
 		// max value of feature diff over all AOs (horizontally) for this cand timeline (wrt corresonding AO in current
 		// timeline)EnumMap<GowallaFeatures, Double> maxFeatureDiffs = new EnumMap<>(GowallaFeatures.class);
 
@@ -1038,7 +1041,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		}
 
 		// Start of added on 17 Mar 2018
-		if (Constant.useFeatureDistancesOfAllActs)
+		if (Constant.useFeatureDistancesOfAllActs && shouldComputeFeatureLevelDiffs)
 		{
 			// dFeat = getFeatureLevelEditDistanceAllActsV2(activityObjects1, activityObjects2);
 			featDiffs = getFeatureLevelDiffsAllActsV2(actObjs1, actObjs2);
@@ -1089,7 +1092,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 			}
 			else if (operationChar == 'N')
 			{
-				if (Constant.useFeatureDistancesOfAllActs == false)
+				if (Constant.useFeatureDistancesOfAllActs == false && shouldComputeFeatureLevelDiffs)
 				{
 					numOfNsForSanityCheck += 1;
 					// i.e., feature distance of only N (matched) act objs
