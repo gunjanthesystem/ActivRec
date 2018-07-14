@@ -129,7 +129,31 @@ public class DomainConstants
 	 */
 	public static TreeMap<Integer, ArrayList<ArrayList<Integer>>> catIDLevelWiseCatIDsList;
 
+	static Map<Long, Set<Long>> gridIDLocIDsGowallaMap;
+	static Map<Long, Long> locIDGridIDGowallaMap;
 	/////////////////////////////////////////////////////////////
+
+	public static void setGridIDLocIDGowallaMaps()
+	{
+		gridIDLocIDsGowallaMap = (Map<Long, Set<Long>>) Serializer
+				.kryoDeSerializeThis(PathConstants.pathToSerialisedGridIDLocIDsGowallaMap);
+
+		locIDGridIDGowallaMap = (Map<Long, Long>) Serializer
+				.kryoDeSerializeThis(PathConstants.pathToSerialisedLocIDGridIDGowallaMap);
+
+		System.out.println("gridIDLocIDsGowallaMap.size()=" + gridIDLocIDsGowallaMap.size());
+		System.out.println("locIDGridIDGowallaMap.size()=" + locIDGridIDGowallaMap.size());
+	}
+
+	public static Map<Long, Set<Long>> getGridIDLocIDsGowallaMap()
+	{
+		return gridIDLocIDsGowallaMap;
+	}
+
+	public static Map<Long, Long> getLocIDGridIDGowallaMap()
+	{
+		return locIDGridIDGowallaMap;
+	}
 
 	public static boolean isActNameTheActID()
 	{
@@ -418,7 +442,15 @@ public class DomainConstants
 					.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList.get(givenCatID" + givenCatID + ")==null"));
 		}
 
-		return catIDLevelWiseCatIDsList.get(givenCatID).get(givenLevel - 1);
+		ArrayList<Integer> catIDsForGivenLevelForGivenDirectCatID = catIDLevelWiseCatIDsList.get(givenCatID).get(givenLevel - 1);
+
+		if (catIDsForGivenLevelForGivenDirectCatID.size() == 0 || catIDsForGivenLevelForGivenDirectCatID == null)
+		{
+			System.err.println(PopUps.getTracedErrorMsg(
+					"Error: catIDLevelWiseCatIDsList.get(givenCatID" + givenCatID + ") for the given level is empty"));
+		}
+
+		return catIDsForGivenLevelForGivenDirectCatID;
 	}
 
 	/**
@@ -431,7 +463,7 @@ public class DomainConstants
 	public static TreeMap<Integer, ArrayList<Integer>> getGivenLevelCatIDForAllCatIDs(
 			String pathToSerialisedLevelWiseCatIDsDict, int givenLevel, boolean writeToFile)
 	{
-		PopUps.showMessage("getGivenLevelCatIDForAllCatIDs called");
+		// $$PopUps.showMessage("getGivenLevelCatIDForAllCatIDs called");
 		TreeMap<Integer, ArrayList<Integer>> catIDGivenLevelCatIDMap = new TreeMap<>();
 		ArrayList<Integer> catIDsWithNoGivenLevelCatID = new ArrayList<>();
 
@@ -439,7 +471,8 @@ public class DomainConstants
 		{// changed on July 12 2018
 			// System.err.println(
 			// PopUps.getTracedErrorMsg("Error: only three levels for Gowalla while given level =" + givenLevel));
-			PopUps.printTracedWarningMsg(
+			// PopUps.printTracedWarningMsg
+			System.err.println(
 					"Warning in getGivenLevelCatIDForAllCatIDs (only three levels for Gowalla while given level ="
 							+ givenLevel + " will return null");
 			return null;
@@ -529,6 +562,7 @@ public class DomainConstants
 			Integer directCatID = catIDEntry.getKey();
 			String[] arr = catIDEntry.getValue();
 			ArrayList<ArrayList<Integer>> levelWiseCatIDForThis = new ArrayList<>(3);
+			boolean atleastOneLevelArrayIsNonEmpty = false;
 
 			for (int level = 1; level <= 3; level++)
 			{
@@ -558,15 +592,25 @@ public class DomainConstants
 							"Error in org.activity.constants.DomainConstants.setCatIDLevelWiseCatIDsDict(String): for directCatID = "
 									+ directCatID + " givenLevelCatIDs = " + givenLevelCatIDs);
 				}
+
+				if (thisLevelCatIDs.size() > 0)
+				{
+					atleastOneLevelArrayIsNonEmpty = true;
+				}
+
 				levelWiseCatIDForThis.add(level - 1, thisLevelCatIDs);
 			}
-			catIDLevelWiseCatIDsList.put(directCatID, levelWiseCatIDForThis);
+
+			if (atleastOneLevelArrayIsNonEmpty)
+			{
+				catIDLevelWiseCatIDsList.put(directCatID, levelWiseCatIDForThis);
+			}
 		}
 
-		StringBuilder sb3 = new StringBuilder("DirectCatID,Level1,Level2,Level3");
+		StringBuilder sb3 = new StringBuilder("DirectCatID,Level1,Level2,Level3\n");
 		catIDLevelWiseCatIDsList.entrySet().stream().forEachOrdered(e -> sb3.append(
 				e.getKey() + "," + e.getValue().get(0) + "," + e.getValue().get(1) + "," + e.getValue().get(2) + "\n"));
-		WToFile.writeToNewFile(sb3.toString(), Constant.commonPath + "catIDLevelWiseCatIDsList.csv");
+		WToFile.writeToNewFile(sb3.toString(), Constant.commonPath + "catIDLevelWiseCatIDsListNonEmpty.csv");
 	}
 
 	public static boolean isGowallaUserIDWithGT553MaxActsPerDay(int userID)

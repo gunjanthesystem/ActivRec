@@ -31,6 +31,20 @@ public class PathConstants
 	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY30Toy/ToyTimelinesManually28May.kryo";
 
 	/**
+	 * Map<Long, Long>
+	 * <p>
+	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).locIDGridIDMap
+	 */
+	public static final String pathToSerialisedLocIDGridIDGowallaMap = "./dataToRead/HexGridRes16_JUL11/locIDGridIDMap.kryo";
+
+	/**
+	 * Map<Long, Set<Long>>
+	 * <p>
+	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).gridIDLocIDs
+	 */
+	public static final String pathToSerialisedGridIDLocIDsGowallaMap = "./dataToRead/HexGridRes16_JUL11/gridIDLocIDs.kryo";
+
+	/**
 	 * Set paths to serialised datasets
 	 * 
 	 * @param For9kUsers

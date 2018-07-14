@@ -156,7 +156,7 @@ public class AlignmentBasedDistance
 							+ "so that the computed values for dAct are not multiplied by EDAlpha and reduced.");
 			shouldComputeFeatureLevelDistance = false;
 		}
-		System.out.println("shouldComputeFeatureLevelDistance= " + shouldComputeFeatureLevelDistance);
+		System.out.println("IMPORTANT: shouldComputeFeatureLevelDistance= " + shouldComputeFeatureLevelDistance);
 	}
 
 	/**
