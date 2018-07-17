@@ -46,7 +46,7 @@ public class AlignmentBasedDistance
 
 	EnumMap<GowallaFeatures, Double> featureWeightMap;// added on April 17 2018
 
-	private final PrimaryDimension primaryDimension;
+	protected final PrimaryDimension primaryDimension;
 	private boolean shouldComputeFeatureLevelDistance;
 	double wtActivityName;// = 3d;
 	double wtStartTime;// = 1d;// 0.6d;
@@ -114,11 +114,11 @@ public class AlignmentBasedDistance
 	 * 
 	 * @throws Exception
 	 */
-	public AlignmentBasedDistance()
+	public AlignmentBasedDistance(PrimaryDimension primaryDimension)
 	{
 		setGowallaFeaturesToUseInDistance();
 		setWeightsAndCosts(); // VERY IMPORTANT
-		primaryDimension = Constant.primaryDimension;
+		this.primaryDimension = primaryDimension;
 		setShouldComputeFeatureLevelDistance();
 		if (!Constant.useTolerance)// == false)
 		{
@@ -294,7 +294,7 @@ public class AlignmentBasedDistance
 	/**
 	 * Note that wtFullActivityObject will vary according to which features are used (set to be used by
 	 * use_FeatureX_InFED). Hence the return value is regulated by which features are set to be used.
-	 * 
+	 *
 	 * @return
 	 * @since April 10 2018
 	 */
@@ -314,6 +314,30 @@ public class AlignmentBasedDistance
 			return -1;
 		}
 	}
+
+	// /**
+	// * Note that wtFullActivityObject will vary according to which features are used (set to be used by
+	// * use_FeatureX_InFED). Hence the return value is regulated by which features are set to be used.
+	// *
+	// * @return
+	// * @since 17 July 2018
+	// */
+	// public double getSumOfWeightOfFeaturesExceptGivenDimension(PrimaryDimension givenDimension)
+	// {
+	// if (givenDimension.equals(PrimaryDimension.ActivityID))
+	// {
+	// return wtFullActivityObject - wtActivityName;
+	// }
+	// else if (givenDimension.equals(PrimaryDimension.LocationID))
+	// {
+	// return wtFullActivityObject - wtLocation;
+	// }
+	// else
+	// {
+	// PopUps.showError("Error: unrecognised primary dimension =" + givenDimension);
+	// return -1;
+	// }
+	// }
 
 	/**
 	 * 
@@ -3210,7 +3234,7 @@ public class AlignmentBasedDistance
 	 * 
 	 * @param activityObjects1
 	 * @param activityObjects2
-	 * @param primaryDimension
+	 * @param givenDimension
 	 * @param insertWt
 	 * @param deleteWt
 	 * @param replaceWt
@@ -3227,11 +3251,13 @@ public class AlignmentBasedDistance
 	 */
 	public static Triple<String, Double, Triple<char[], int[], int[]>> getLowestMySimpleLevenshteinDistance(
 			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2,
-			PrimaryDimension primaryDimension, int insertWt, int deleteWt, int replaceWt)
+			PrimaryDimension givenDimension, int insertWt, int deleteWt, int replaceWt)
 	{
 		// long t0, t2, t3, t4, t5, t6;t0 = t2 = t3 = t4 = t5 = t6 = Long.MIN_VALUE;t0 = System.nanoTime();
-		HashMap<Integer, Character> uniqueCharCodes = StringCode.getLocallyUniqueCharCodeMap(activityObjects1,
-				activityObjects2, primaryDimension);
+		// HashMap<Integer, Character> uniqueCharCodes = StringCode.getLocallyUniqueCharCodeMap(activityObjects1,
+		// activityObjects2, primaryDimension);
+		HashMap<Integer, Character> uniqueCharCodes = StringCode.getLocallyUniqueCharCodeMap17July2018(activityObjects1,
+				activityObjects2, givenDimension);
 		// t2 = System.nanoTime();
 		// Int2CharOpenHashMap uniqueCharCodesFU = StringCode.getLocallyUniqueCharCodeMapFU(activityObjects1,
 		// activityObjects2, primaryDimension);
@@ -3269,10 +3295,10 @@ public class AlignmentBasedDistance
 		// Constant.getOutputCoreResultsPath() + "DebugMar9_2018.csv");
 		/// temp end
 		// }
-		stringCodesForActivityObjects1 = StringCode.getStringCodesForActivityObjects(activityObjects1, primaryDimension,
-				uniqueCharCodes, VerbosityConstants.verbose);
-		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects(activityObjects2, primaryDimension,
-				uniqueCharCodes, VerbosityConstants.verbose);
+		stringCodesForActivityObjects1 = StringCode.getStringCodesForActivityObjects17July2018(activityObjects1,
+				givenDimension, uniqueCharCodes, VerbosityConstants.verbose);
+		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects17July2018(activityObjects2,
+				givenDimension, uniqueCharCodes, VerbosityConstants.verbose);
 		// t5 = System.nanoTime();
 
 		return getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1, stringCodesForActivityObjects2,

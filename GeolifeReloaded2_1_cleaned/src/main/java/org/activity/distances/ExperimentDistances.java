@@ -26,7 +26,7 @@ public class ExperimentDistances
 		ArrayList<ArrayList<ActivityObject>> arrOfArrActObject = getActivityObjectsSubList(arrayOfTimelines.get(0),
 				arrayOfTimelines.get(1), 0, 10);
 
-		OTMDSAMEditDistance otDist = new OTMDSAMEditDistance();
+		OTMDSAMEditDistance otDist = new OTMDSAMEditDistance(Constant.primaryDimension);
 		// otDist.getFeatureStringLevenshteinSAXWithTrace(arrOfArrActObject.get(0), arrOfArrActObject.get(1));
 		otDist.getFeatureStringLevenshteinSAXWithTrace(getActivityObjectsSubList(arrayOfTimelines.get(0), 0, 5),
 				getActivityObjectsSubList(arrayOfTimelines.get(1), 0, 8));

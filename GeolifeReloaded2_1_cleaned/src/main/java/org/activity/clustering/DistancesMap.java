@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.activity.constants.Constant;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
 import org.activity.objects.Pair;
@@ -31,7 +32,7 @@ public class DistancesMap
 		this.dataPoints = dataPoints;
 		this.distanceToUse = distanceToUse;
 		System.out.println("distance to use=" + distanceToUse);
-		alignmentBasedDistance = new AlignmentBasedDistance();
+		alignmentBasedDistance = new AlignmentBasedDistance(Constant.primaryDimension);
 		setDistancesMap();
 	}
 
@@ -66,25 +67,33 @@ public class DistancesMap
 		}
 	}
 
+	/**
+	 * introduced Constant.primaryDimension inside the method on 17 July 2018 TODO: check compatibility of this
+	 * refactoring later
+	 * 
+	 * @param A
+	 * @param B
+	 * @return
+	 */
 	public double computeDistancesBetweenDataPoints(DataPoint A, DataPoint B)
 	{
 		switch (distanceToUse)
 		{
-		case "HJDistance":
-			Pair<String, Double> dist = (new HJEditDistance()).getHJEditDistanceWithTrace(
-					A.toTimeline().getActivityObjectsInTimeline(), B.toTimeline().getActivityObjectsInTimeline(), "",
-					"", "", "0");// 0);
-			// .(A.getDataValue().toString(), B.getDataValue().toString(), 1, 1, 2);
-			return dist.getSecond();
+			case "HJDistance":
+				Pair<String, Double> dist = (new HJEditDistance(Constant.primaryDimension)).getHJEditDistanceWithTrace(
+						A.toTimeline().getActivityObjectsInTimeline(), B.toTimeline().getActivityObjectsInTimeline(),
+						"", "", "", "0");// 0);
+				// .(A.getDataValue().toString(), B.getDataValue().toString(), 1, 1, 2);
+				return dist.getSecond();
 
-		case "SimpleLevenshtein":
-			return AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace(A.getDataValue().toString(),
-					B.getDataValue().toString(), 1, 1, 2);
+			case "SimpleLevenshtein":
+				return AlignmentBasedDistance.getMySimpleLevenshteinDistanceWithoutTrace(A.getDataValue().toString(),
+						B.getDataValue().toString(), 1, 1, 2);
 
-		default:
-			UtilityBelt.showErrorExceptionPopup(
-					"Unknown distance to use in org.activity.clustering.DistancesMap.computeDistancesBetweenDataPoints()");
-			return (Double) null;
+			default:
+				UtilityBelt.showErrorExceptionPopup(
+						"Unknown distance to use in org.activity.clustering.DistancesMap.computeDistancesBetweenDataPoints()");
+				return (Double) null;
 		}
 	}
 

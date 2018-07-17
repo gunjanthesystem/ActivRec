@@ -131,6 +131,8 @@ public class DomainConstants
 
 	static Map<Long, Set<Long>> gridIDLocIDsGowallaMap;
 	static Map<Long, Long> locIDGridIDGowallaMap;
+	static Map<Long, Integer> locIDGridIndexGowallaMap;
+
 	/////////////////////////////////////////////////////////////
 
 	public static void setGridIDLocIDGowallaMaps()
@@ -141,8 +143,12 @@ public class DomainConstants
 		locIDGridIDGowallaMap = (Map<Long, Long>) Serializer
 				.kryoDeSerializeThis(PathConstants.pathToSerialisedLocIDGridIDGowallaMap);
 
+		locIDGridIndexGowallaMap = (Map<Long, Integer>) Serializer
+				.kryoDeSerializeThis(PathConstants.pathToSerialisedLocIDGridIndexGowallaMap);
+
 		System.out.println("gridIDLocIDsGowallaMap.size()=" + gridIDLocIDsGowallaMap.size());
 		System.out.println("locIDGridIDGowallaMap.size()=" + locIDGridIDGowallaMap.size());
+		System.out.println("locIDGridIndexGowallaMap.size()=" + locIDGridIndexGowallaMap.size());
 	}
 
 	public static Map<Long, Set<Long>> getGridIDLocIDsGowallaMap()
@@ -153,6 +159,11 @@ public class DomainConstants
 	public static Map<Long, Long> getLocIDGridIDGowallaMap()
 	{
 		return locIDGridIDGowallaMap;
+	}
+
+	public static Map<Long, Integer> getLocIDGridIndexGowallaMap()
+	{
+		return locIDGridIndexGowallaMap;
 	}
 
 	public static boolean isActNameTheActID()
@@ -442,7 +453,8 @@ public class DomainConstants
 					.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList.get(givenCatID" + givenCatID + ")==null"));
 		}
 
-		ArrayList<Integer> catIDsForGivenLevelForGivenDirectCatID = catIDLevelWiseCatIDsList.get(givenCatID).get(givenLevel - 1);
+		ArrayList<Integer> catIDsForGivenLevelForGivenDirectCatID = catIDLevelWiseCatIDsList.get(givenCatID)
+				.get(givenLevel - 1);
 
 		if (catIDsForGivenLevelForGivenDirectCatID.size() == 0 || catIDsForGivenLevelForGivenDirectCatID == null)
 		{

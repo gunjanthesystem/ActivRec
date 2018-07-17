@@ -2,6 +2,7 @@ package org.activity.distances;
 
 import java.util.ArrayList;
 
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
@@ -18,9 +19,9 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 	/**
 	 * Sets the tolerance according the truth value of Constant.useTolerance
 	 */
-	public CombinedLevelsEditDistance()
+	public CombinedLevelsEditDistance(PrimaryDimension primaryDimension)
 	{
-		super();
+		super(primaryDimension);
 		System.out.println("Error: Using CombinedLevelEditDistance, we are not supposed to use this");
 		// this error message is dependent on our current experimental setup
 	}

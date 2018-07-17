@@ -57,7 +57,7 @@ public class ActivityObject implements Serializable
 	 */
 	// LinkedHashSet<Integer> locationIDs;
 	ArrayList<Integer> locationIDs;
-	long gridID;// introduced on 13 July 2018
+	int gridIndex;// introduced on 13 July 2018
 	String activityName, locationName;
 	/**
 	 * workingLevelCatIDs are "__" separated catID for the given working level in hierarhcy
@@ -158,9 +158,21 @@ public class ActivityObject implements Serializable
 		return this.getPrimaryDimensionVal().stream().map(s -> s.toString()).collect(Collectors.joining(delimiter));
 	}
 
+	/**
+	 * if there is one primary dimension val, i.e., no merger then no delimitation
+	 * 
+	 * @param delimiter
+	 * @return
+	 */
+	public String getGivenDimensionVal(String delimiter, PrimaryDimension givenDimension)
+	{
+		return this.getGivenDimensionVal(givenDimension).stream().map(s -> s.toString())
+				.collect(Collectors.joining(delimiter));
+	}
+
 	public long getGridID()
 	{
-		return this.gridID;
+		return this.gridIndex;
 	}
 
 	/**
@@ -187,6 +199,62 @@ public class ActivityObject implements Serializable
 				return null;
 		}
 	}
+
+	/**
+	 * 
+	 * @param ao
+	 * @param primaryDimension
+	 * @return
+	 */
+	public ArrayList<Integer> getGivenDimensionVal(PrimaryDimension givenDimension)
+	{
+		switch (givenDimension)
+		{
+			case ActivityID:
+				ArrayList<Integer> arr = new ArrayList<>();
+				arr.add(this.getActivityID());
+				return arr;
+			// return new ArrayList<>(this.getActivityID());// only one activity name is expected even when merged.
+			case LocationID:
+				LinkedHashSet<Integer> uniqueLocationIDs = new LinkedHashSet<>(this.getLocationIDs());
+				return new ArrayList<Integer>(uniqueLocationIDs);
+			case LocationGridID:
+				ArrayList<Integer> gridIndicesArr = new ArrayList<>();
+				gridIndicesArr.add(this.gridIndex);
+				return gridIndicesArr;
+			// this.getLocationIDs();
+			default:
+				PopUps.printTracedErrorMsgWithExit("Unknown givenDimension dimension val = " + givenDimension);
+				return null;
+		}
+	}
+
+	// /**
+	// *
+	// * @param ao
+	// * @param primaryDimension
+	// * @return
+	// */
+	// public ArrayList<Integer> getGivenDimensionVal(PrimaryDimension givenDimension)
+	// {
+	// switch (givenDimension)
+	// {
+	// case ActivityID:
+	// ArrayList<Integer> arr = new ArrayList<>();
+	// arr.add(this.getActivityID());
+	// return arr;
+	// // return new ArrayList<>(this.getActivityID());// only one activity name is expected even when merged.
+	// case LocationID:
+	// LinkedHashSet<Integer> uniqueLocationIDs = new LinkedHashSet<>(this.getLocationIDs());
+	// return new ArrayList<Integer>(uniqueLocationIDs);
+	// case LocationGridID:
+	// return this.gridID;
+	// // this.getLocationIDs();
+	// default:
+	// PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
+	// return null;
+	// }
+	// }
 
 	/**
 	 * Whether this activity object and ao2 are equal with respect to the current primary dimension. They are considered
@@ -229,6 +297,43 @@ public class ActivityObject implements Serializable
 	 * @param ao
 	 * @param primaryDimension
 	 * @return
+	 */
+	public boolean equalsWrtGivenDimension(ActivityObject ao2, PrimaryDimension givenDimension)
+	{
+		switch (givenDimension)
+		{
+			case ActivityID:
+				return this.activityID == ao2.getActivityID();
+			case LocationID:
+				// actually this approach for Location ID also works for activity id but is slower since set
+				// intersection, hence create a lighter methods for activityID
+				Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
+						ao2.getPrimaryDimensionVal());
+
+				if (intersection.size() > 0)
+				{// System.out.println("intersection.size() = " + intersection.size() + " returning TRUE");
+					return true;
+				}
+				else
+				{ // System.out.println("intersection.size() = " + intersection.size() + " returning FALSE");
+					return false;
+				}
+			case LocationGridID:
+				return this.gridIndex == ao2.getGridID();
+			default:
+				PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
+				return false;
+		}
+	}
+
+	/**
+	 * Whether this activity object and ao2 are equal with respect to the current primary dimension. They are considered
+	 * equal if they share any value, i.e., size of intersection of primary values>1
+	 * 
+	 * @param ao
+	 * @param primaryDimension
+	 * @return
+	 * @deprecated
 	 */
 	public boolean equalsWrtPrimaryDimension0(ActivityObject ao2)
 	{
@@ -553,14 +658,14 @@ public class ActivityObject implements Serializable
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
 			long durationInSecsFromPrev, ZoneId timeZoneId, double distanceInMFromNext, long durationInSecFromNext,
-			long gridID)
+			int gridID)
 	{
 		this(activityID, locationIDs, activityName, locationName, startTimestamp, startLatitude, startLongitude,
 				startAltitude, userID, photos_count, checkins_count, users_count, radius_meters, highlights_count,
 				items_count, max_items_count, workingLevelCatIDs, distanceInMFromPrev, durationInSecsFromPrev,
 				timeZoneId, distanceInMFromNext, durationInSecFromNext);
 
-		this.gridID = gridID;
+		this.gridIndex = gridID;
 	}
 
 	/**
@@ -735,7 +840,7 @@ public class ActivityObject implements Serializable
 									 */ + "__userID=" + userID + "__photos_count=" + photos_count + "__cins_count="
 				+ checkins_count + "__users_count=" + users_count + "__radius_m=" + radius_meters + "__highlts_count="
 				+ highlights_count + "__items_count=" + items_count + "__max_items_count=" + max_items_count
-				+ "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev + "__gridID" + gridID;
+				+ "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev + "__gridID" + gridIndex;
 	}
 
 	public String toStringAllGowallaTS()
@@ -752,7 +857,7 @@ public class ActivityObject implements Serializable
 				+ photos_count + "__cins_c=" + checkins_count + "__users_c=" + users_count + "__radius_m="
 				+ radius_meters + "__highlts_count=" + highlights_count + "__items_c=" + items_count + "__max_items_c="
 				+ max_items_count + "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev + "__gridID"
-				+ gridID;
+				+ gridIndex;
 	}
 
 	public String toStringAllGowallaTSWithName()
@@ -776,7 +881,7 @@ public class ActivityObject implements Serializable
 				+ photos_count + "__cins_c=" + checkins_count + "__users_c=" + users_count + "__radius_m="
 				+ radius_meters + "__highlts_count=" + highlights_count + "__items_c=" + items_count + "__max_items_c="
 				+ max_items_count + "__distPrev=" + distInMFromPrev + "__durPrev=" + durInSecFromPrev + "__gridID"
-				+ gridID;
+				+ gridIndex;
 	}
 
 	/**
@@ -799,7 +904,7 @@ public class ActivityObject implements Serializable
 				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
 				+ checkins_count + delimiter + users_count + delimiter + radius_meters + delimiter + highlights_count
 				+ delimiter + items_count + delimiter + max_items_count + delimiter + distInMFromPrev + delimiter
-				+ durInSecFromPrev + delimiter + gridID;
+				+ durInSecFromPrev + delimiter + gridIndex;
 	}
 
 	/**

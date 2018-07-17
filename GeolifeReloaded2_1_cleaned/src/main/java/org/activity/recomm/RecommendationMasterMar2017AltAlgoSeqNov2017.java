@@ -15,7 +15,6 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
-import org.activity.constants.Enums.TypeOfThreshold;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.evaluation.Evaluation;
@@ -23,7 +22,6 @@ import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
-import org.activity.objects.Triple;
 import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -32,7 +30,6 @@ import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineExtractors;
 import org.activity.util.TimelineTransformers;
-import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -293,7 +290,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				this.candidateTimelines = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines,
 						lookPastType, this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm,
 						matchingUnitInCountsOrHours, this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers,
-						trainTimelinesAllUsersContinuous);
+						trainTimelinesAllUsersContinuous, Constant.primaryDimension);
 			}
 			// if (VerbosityConstants.verbose)
 			{
@@ -850,74 +847,74 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		return candUserIDs;
 	}
 
-	/**
-	 * 
-	 * @param distancesMapUnsorted
-	 * @param typeOfThreshold
-	 * @param thresholdVal
-	 * @param activitiesGuidingRecomm
-	 * @return Triple{prunedDistancesMap,thresholdAsDistance,thresholdPruningNoEffect}
-	 */
-	private static Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> pruneAboveThreshold(
-			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted, TypeOfThreshold typeOfThreshold,
-			double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("Inside pruneAboveThreshold:\n");
-
-		double thresholdAsDistance = -1;
-		if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
-		{
-			thresholdAsDistance = thresholdVal / 100;
-		}
-		else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
-		{
-			double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
-			thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
-		}
-		else
-		{
-			System.err.println(PopUps.getTracedErrorMsg("Error: type of threshold unknown in recommendation master"));
-			// errorExists = true;
-			System.exit(-2);
-		}
-		sb.append("thresholdAsDistance=" + thresholdAsDistance + "\n before pruning distancesMapUnsorted =\n");
-		for (Entry<String, Pair<String, Double>> e : distancesMapUnsorted.entrySet())
-		{
-			sb.append(e.getKey() + "--" + e.getValue().toString() + "\n");
-		}
-
-		int countCandBeforeThresholdPruning = distancesMapUnsorted.size();// distanceScoresSorted.size();
-		distancesMapUnsorted = TimelineUtils.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
-		int countCandAfterThresholdPruning = distancesMapUnsorted.size();
-
-		sb.append("After pruning distancesMapUnsorted =\n");
-		for (Entry<String, Pair<String, Double>> e : distancesMapUnsorted.entrySet())
-		{
-			sb.append(e.getKey() + "--" + e.getValue().toString() + "\n");
-		}
-
-		sb.append("thresholdAsDistance=" + thresholdAsDistance + " countCandBeforeThresholdPruning="
-				+ countCandBeforeThresholdPruning + "countCandAfterThresholdPruning=" + countCandAfterThresholdPruning
-				+ "\n");
-		if (VerbosityConstants.verbose)
-		{
-			System.out.println(sb.toString());
-		}
-		boolean thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
-
-		if (!thresholdPruningNoEffect)
-		{
-			// System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
-			// PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
-			if (!Constant.useiiWASThreshold)
-			{
-				System.err.println("Error: threshold pruning is happening.");// +msg);
-			}
-		}
-		return new Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean>(distancesMapUnsorted,
-				thresholdAsDistance, thresholdPruningNoEffect);
-	}
+	// /**
+	// *
+	// * @param distancesMapUnsorted
+	// * @param typeOfThreshold
+	// * @param thresholdVal
+	// * @param activitiesGuidingRecomm
+	// * @return Triple{prunedDistancesMap,thresholdAsDistance,thresholdPruningNoEffect}
+	// */
+	// private static Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> pruneAboveThreshold(
+	// LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted, TypeOfThreshold typeOfThreshold,
+	// double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm)
+	// {
+	// StringBuilder sb = new StringBuilder();
+	// sb.append("Inside pruneAboveThreshold:\n");
+	//
+	// double thresholdAsDistance = -1;
+	// if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
+	// {
+	// thresholdAsDistance = thresholdVal / 100;
+	// }
+	// else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
+	// {
+	// double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
+	// thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
+	// }
+	// else
+	// {
+	// System.err.println(PopUps.getTracedErrorMsg("Error: type of threshold unknown in recommendation master"));
+	// // errorExists = true;
+	// System.exit(-2);
+	// }
+	// sb.append("thresholdAsDistance=" + thresholdAsDistance + "\n before pruning distancesMapUnsorted =\n");
+	// for (Entry<String, Pair<String, Double>> e : distancesMapUnsorted.entrySet())
+	// {
+	// sb.append(e.getKey() + "--" + e.getValue().toString() + "\n");
+	// }
+	//
+	// int countCandBeforeThresholdPruning = distancesMapUnsorted.size();// distanceScoresSorted.size();
+	// distancesMapUnsorted = TimelineUtils.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
+	// int countCandAfterThresholdPruning = distancesMapUnsorted.size();
+	//
+	// sb.append("After pruning distancesMapUnsorted =\n");
+	// for (Entry<String, Pair<String, Double>> e : distancesMapUnsorted.entrySet())
+	// {
+	// sb.append(e.getKey() + "--" + e.getValue().toString() + "\n");
+	// }
+	//
+	// sb.append("thresholdAsDistance=" + thresholdAsDistance + " countCandBeforeThresholdPruning="
+	// + countCandBeforeThresholdPruning + "countCandAfterThresholdPruning=" + countCandAfterThresholdPruning
+	// + "\n");
+	// if (VerbosityConstants.verbose)
+	// {
+	// System.out.println(sb.toString());
+	// }
+	// boolean thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
+	//
+	// if (!thresholdPruningNoEffect)
+	// {
+	// // System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
+	// // PopUps.showMessage("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
+	// if (!Constant.useiiWASThreshold)
+	// {
+	// System.err.println("Error: threshold pruning is happening.");// +msg);
+	// }
+	// }
+	// return new Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean>(distancesMapUnsorted,
+	// thresholdAsDistance, thresholdPruningNoEffect);
+	// }
 
 	/**
 	 * 

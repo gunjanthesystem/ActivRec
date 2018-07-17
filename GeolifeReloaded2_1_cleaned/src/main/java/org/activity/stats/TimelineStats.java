@@ -28,6 +28,7 @@ import org.activity.clustering.KCentroids;
 import org.activity.clustering.KCentroidsTimelines;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
@@ -919,7 +920,8 @@ public class TimelineStats
 					TreeMap<Double, Double> mapOfAvgEDPerMU = new TreeMap<Double, Double>();
 					for (Double mu : MUs)
 					{
-						double avgPairwiseED = getAvgPairwiseTwoLevelEditDistance(mu, activityName, timeline);
+						double avgPairwiseED = getAvgPairwiseTwoLevelEditDistance(mu, activityName, timeline,
+								Constant.primaryDimension);
 						mapOfAvgEDPerMU.put(mu, avgPairwiseED);
 					}
 					activityNamesMap.put(activityName, mapOfAvgEDPerMU);
@@ -1099,9 +1101,11 @@ public class TimelineStats
 	 * @param mu
 	 * @param activityName
 	 * @param timeline
+	 * @param primaryDimension
 	 * @return
 	 */
-	private static double getAvgPairwiseTwoLevelEditDistance(Double mu, String activityName, Timeline timeline)
+	private static double getAvgPairwiseTwoLevelEditDistance(Double mu, String activityName, Timeline timeline,
+			PrimaryDimension primaryDimension)
 	{
 		System.out
 				.println("Inside getAvgPairwiseTwoLevelEditDistance for activity name: " + activityName + " mu:" + mu);
@@ -1132,7 +1136,7 @@ public class TimelineStats
 
 		System.out.println("exiting getAvgPairwiseTwoLevelEditDistance");
 
-		return getAvgPairwiseTwoLevelED(segments);
+		return getAvgPairwiseTwoLevelED(segments, primaryDimension);
 	}
 
 	/**
@@ -1140,9 +1144,11 @@ public class TimelineStats
 	 * COMPARISON TO SELF.
 	 * 
 	 * @param segments
+	 * @param primaryDimension
 	 * @return
 	 */
-	private static double getAvgPairwiseTwoLevelED(ArrayList<ArrayList<ActivityObject>> segments)
+	private static double getAvgPairwiseTwoLevelED(ArrayList<ArrayList<ActivityObject>> segments,
+			PrimaryDimension primaryDimension)
 	{
 		// System.out.println("Inside getAvgPairwiseTwoLevelED");
 		int count = 0;
@@ -1151,7 +1157,7 @@ public class TimelineStats
 		{
 			for (int j = i; j < segments.size(); j++)// TODO SHOULD I START FROM J=I+1
 			{
-				HJEditDistance hjDist = new HJEditDistance();
+				HJEditDistance hjDist = new HJEditDistance(primaryDimension);
 				Pair<String, Double> dist = hjDist.getHJEditDistanceWithTrace(segments.get(i), segments.get(j), "", "",
 						"", "1");// new
 									// Long(1)
@@ -1167,9 +1173,11 @@ public class TimelineStats
 	 * Returns the avg pariwise two-level edit distance between the segments (Arrays of ActivityObjects)
 	 * 
 	 * @param segments
+	 * @param primaryDimension
 	 * @return
 	 */
-	private static double[] getPairwiseTwoLevelEDs(ArrayList<ArrayList<ActivityObject>> segments)
+	private static double[] getPairwiseTwoLevelEDs(ArrayList<ArrayList<ActivityObject>> segments,
+			PrimaryDimension primaryDimension)
 	{
 		// System.out.println("Inside getAvgPairwiseTwoLevelED");
 		if (segments.size() == 1) // only one segment
@@ -1185,7 +1193,7 @@ public class TimelineStats
 		{
 			for (int j = i + 1; j < segments.size(); j++)// should i START FROM J=I+1
 			{
-				HJEditDistance hjDist = new HJEditDistance();
+				HJEditDistance hjDist = new HJEditDistance(primaryDimension);
 				Pair<String, Double> dist = hjDist.getHJEditDistanceWithTrace(segments.get(i), segments.get(j), "", "",
 						"", "1");// new Pair("a", new Double(2));// ALERT ALERT ALTER ALERT ALERT
 				distances.add(dist.getSecond());// , 1, 1, 2);
@@ -2131,7 +2139,8 @@ public class TimelineStats
 					ArrayList<ArrayList<ActivityObject>> trailSegments = getTrailSegments(mu, startIndices,
 							timelineForUser);
 
-					double pairwiseTwoLevelEditDistances[] = getPairwiseTwoLevelEDs(trailSegments);
+					double pairwiseTwoLevelEditDistances[] = getPairwiseTwoLevelEDs(trailSegments,
+							Constant.primaryDimension);
 					resultForATwoGram.put(mu, pairwiseTwoLevelEditDistances);
 				}
 
@@ -2187,7 +2196,8 @@ public class TimelineStats
 					ArrayList<ArrayList<ActivityObject>> trailSegments = getTrailSegments(mu, startIndices,
 							timelineForUser);
 
-					double pairwiseTwoLevelEditDistances[] = getPairwiseTwoLevelEDs(trailSegments);
+					double pairwiseTwoLevelEditDistances[] = getPairwiseTwoLevelEDs(trailSegments,
+							Constant.primaryDimension);
 					resultForAMU.put(new Pair(twoGram, startIndices.size()), pairwiseTwoLevelEditDistances);
 				}
 

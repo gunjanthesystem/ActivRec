@@ -251,7 +251,7 @@ public final class Constant
 	public static final boolean doVisualizationRNN1 = true;
 
 	public static final boolean mapLocIDToGridID = true;
-	public static final PrimaryDimension secondaryDimension = PrimaryDimension.ActivityID;// LocationID;
+	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -1452,7 +1452,8 @@ public final class Constant
 		s.append("\ncaseType:" + caseType);
 		s.append("\nrankScoring: " + rankScoring);
 		s.append("\nALPHA:" + ALPHA);
-		s.append("\nWeights of features: " + (new AlignmentBasedDistance()).getAllWeightsOfFeatures());
+		s.append("\nWeights of features: "
+				+ (new AlignmentBasedDistance(Constant.primaryDimension)).getAllWeightsOfFeatures());
 		s.append("\ndistanceUsed:" + distanceUsed);
 
 		s.append("\nuseTolerance:" + useTolerance);
@@ -1553,6 +1554,7 @@ public final class Constant
 
 		s.append("\ndoVisualizationRNN1:" + Constant.doVisualizationRNN1);
 		s.append("\nmapLocIDToGridID:" + Constant.mapLocIDToGridID);
+		s.append("\nsecondaryDimension:" + Constant.secondaryDimension);
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{

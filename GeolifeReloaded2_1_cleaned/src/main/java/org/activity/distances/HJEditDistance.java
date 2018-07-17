@@ -35,26 +35,26 @@ import org.activity.util.StringCode;
 public class HJEditDistance extends AlignmentBasedDistance
 {
 	double EDAlpha;
-	PrimaryDimension primaryDimension;
+	// PrimaryDimension primaryDimension;
 	boolean needsToPruneFirstUnknown;
 
 	/**
 	 * Sets the tolerance according the truth value of Constant.useTolerance
 	 */
-	public HJEditDistance()
+	public HJEditDistance(PrimaryDimension primaryDimension)
 	{
-		super();
+		super(primaryDimension);
 		this.EDAlpha = -99999;
-		primaryDimension = Constant.primaryDimension;
+		// this.primaryDimension = primaryDimension;
 		needsToPruneFirstUnknown = Constant.needsToPruneFirstUnknown;
 	}
 
-	public HJEditDistance(double edAlpha)
+	public HJEditDistance(double edAlpha, PrimaryDimension primaryDimension)
 	{
-		super();
+		super(primaryDimension);
 		this.EDAlpha = edAlpha;
 		System.out.println("Setting EDAlpha=" + this.EDAlpha);
-		primaryDimension = Constant.primaryDimension;
+		// this.primaryDimension = primaryDimension;
 		needsToPruneFirstUnknown = Constant.needsToPruneFirstUnknown;
 	}
 
@@ -702,7 +702,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param timeAtRecomm
 	 *            only used for writing to file
 	 * @param candidateTimelineId
-	 * @param primaryDimension
+	 * 
 	 * @return Pair<Trace as String, Edit Distance> ///we can also do n Pair<Trace as String, Pair <total Edit Distance,
 	 *         act level edit distance> /
 	 * @since Mar 1 2018
@@ -758,10 +758,10 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// {
 		// //end of curtain 17 July 2017
 		// t4 = System.nanoTime();
-		stringCodesForActivityObjects1 = StringCode.getStringCodesForActivityObjects(activityObjects1, primaryDimension,
-				uniqueCharCodes, VerbosityConstants.verbose);
-		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects(activityObjects2, primaryDimension,
-				uniqueCharCodes, VerbosityConstants.verbose);
+		stringCodesForActivityObjects1 = StringCode.getStringCodesForActivityObjects17July2018(activityObjects1,
+				primaryDimension, uniqueCharCodes, VerbosityConstants.verbose);
+		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects17July2018(activityObjects2,
+				primaryDimension, uniqueCharCodes, VerbosityConstants.verbose);
 		// t5 = System.nanoTime();
 
 		// Start of added on 17 Mar 2018
@@ -1005,7 +1005,6 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param timeAtRecomm
 	 *            only used for writing to file
 	 * @param candidateTimelineId
-	 * @param primaryDimension
 	 * @return Triple{TraceAsString,ActLevelEditDistance,List of EnumMap of {GowallaFeatures, DiffForThatFeature} one
 	 *         for each corresponding AO comparison}}
 	 *         <p>
@@ -1597,6 +1596,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param size1
 	 * @param size2
 	 * @param alpha
+	 * 
 	 * @return
 	 */
 	private double combineActAndFeatLevelDistance(double dAct, double dFeat, int size1, int size2, double alpha)

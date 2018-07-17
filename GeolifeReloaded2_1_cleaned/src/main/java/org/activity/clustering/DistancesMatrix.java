@@ -21,7 +21,7 @@ public class DistancesMatrix
 		Constant.considerAllFeaturesForFeatureWiseEditDistance = false;
 		Constant.setFeatureToConsiderForFeatureWiseEditDistance(true, false, false, false, false, false, false);
 
-		featureWiseEditDistance = new FeatureWiseEditDistance();
+		featureWiseEditDistance = new FeatureWiseEditDistance(Constant.primaryDimension);
 	}
 
 	public int precomputeDistance()

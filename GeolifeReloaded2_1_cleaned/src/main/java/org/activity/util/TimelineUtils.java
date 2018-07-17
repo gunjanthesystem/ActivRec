@@ -1,5 +1,6 @@
 package org.activity.util;
 
+import java.io.File;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -1168,7 +1169,7 @@ public class TimelineUtils
 	{
 		System.out.println("Inside convertCheckinEntriesToActivityObjectsGowallaV2():");
 		DomainConstants.setGridIDLocIDGowallaMaps();
-		Map<Long, Long> locIDGridIDMap = DomainConstants.getLocIDGridIDGowallaMap();
+		Map<Long, Integer> locIDGridIndexMap = DomainConstants.getLocIDGridIndexGowallaMap();
 
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
@@ -1304,7 +1305,7 @@ public class TimelineUtils
 						numOfCInsWithMultipleDistinctLocIDs += 1;
 					}
 
-					long gridID = getGridID(locIDs, locIDGridIDMap);
+					long gridID = getGridID(locIDs, locIDGridIndexMap);
 					// ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
 					ActivityObject ao = new ActivityObject(
 							activityID, locIDs, activityName, locationName, startTimestamp, startLatitude,
@@ -1363,27 +1364,73 @@ public class TimelineUtils
 
 	}
 
-	private static long getGridID(ArrayList<Integer> locIDs, Map<Long, Long> locIDGridIDMap)
+	/**
+	 * 
+	 * @param locIDs
+	 * @param locIDGridIDMap
+	 * @return
+	 */
+	private static long getGridID(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap)
 	{
 		StringBuilder sbLog = new StringBuilder();
-		Set<Long> gridIDs = new TreeSet<>();
+		Set<Integer> uniqueLocIDs = new TreeSet<>();
+		Set<Integer> uniqueGridIndices = new TreeSet<>();
+		Map<Integer, Integer> gridIndicesCount = new LinkedHashMap<>();
+		List<Integer> gridIndices = new ArrayList<>();
 
 		for (int locID : locIDs)
 		{
-			long gridID = locIDGridIDMap.get(new Long(locID));
-			sbLog.append("locID," + locID + ",GridID," + gridID + "\n");
-			gridIDs.add(gridID);
+			Integer gridIndex = locIDGridIndexMap.get(new Long(locID));
+			sbLog.append("locID," + locID + ",gridIndex," + gridIndex + "\n");
+
+			uniqueLocIDs.add(locID);
+			uniqueGridIndices.add(gridIndex);
+			gridIndices.add(gridIndex);
+
+			Integer oldCount = gridIndicesCount.get(gridIndex);
+			if (oldCount == null)
+			{
+				gridIndicesCount.put(gridIndex, 1);
+			}
+			else
+			{
+				gridIndicesCount.put(gridIndex, oldCount + 1);
+			}
 		}
+
+		List<Long> gridIndicesWithMaxCount = (List<Long>) ComparatorUtils.getKeysWithMaxValues(gridIndicesCount);
 
 		WToFile.appendLineToFileAbs(sbLog.toString(),
 				Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelines.csv");
 
-		WToFile.appendLineToFileAbs(gridIDs.size() + "\n",
+		WToFile.appendLineToFileAbs(
+				gridIndices.size() + "," + uniqueGridIndices.size() + ","
+						+ gridIndices.stream().map(l -> String.valueOf(l)).collect(Collectors.joining("|")) + "\n",
 				Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelinesSize.csv");
 
-		List<Long> gridIDsList = new ArrayList<>();
-		gridIDsList.addAll(gridIDs);
-		return gridIDsList.get(0);
+		// #LocationIDs,#UniqueLocationIDs,#GridIDs,#UniqueGridIDs,#GridIDsWithMaxCount,LocIDs,GridIDs,GridIDsWithMaxCount
+
+		if (uniqueGridIndices.size() > 1)
+		{
+			String fileNameToWrite = Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelinesStats.csv";
+			File f = new File(fileNameToWrite);
+			if (!f.exists())
+			{
+				WToFile.appendLineToFileAbs(
+						"#LocationIDs,#UniqueLocationIDs,#GridIDs,#UniqueGridIDs,#GridIDsWithMaxCount,LocIDs,GridIDs,GridIDsWithMaxCount\n",
+						fileNameToWrite);
+			}
+
+			WToFile.appendLineToFileAbs(locIDs.size() + "," + uniqueLocIDs.size() + "," + gridIndices.size() + ","
+					+ uniqueGridIndices.size() + "," + gridIndicesWithMaxCount.size() + ","
+					+ StringUtils.collectionToString(locIDs, "|") + ","
+					+ StringUtils.collectionToString(gridIndices, "|") + ","
+					+ StringUtils.collectionToString(gridIndicesWithMaxCount, "|") + "\n", fileNameToWrite);
+		}
+
+		// List<Long> gridIDsList = new ArrayList<>();
+		// gridIDsList.addAll(uniqueGridIDs);
+		return gridIndicesWithMaxCount.get(0);
 	}
 
 	/**

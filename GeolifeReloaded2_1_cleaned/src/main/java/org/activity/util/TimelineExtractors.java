@@ -212,7 +212,7 @@ public class TimelineExtractors
 			/* Time timeAtRecomm, */ String userIDAtRecomm, double matchingUnitInCountsOrHours,
 			ActivityObject activityAtRecommPoint,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersOrig,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
 		LinkedHashMap<String, Timeline> candidateTimelines = null;
 		LinkedHashMap<Date, Timeline> trainingTimelinesDaywise = trainingTimelineOrig;
@@ -321,7 +321,7 @@ public class TimelineExtractors
 			{
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
 						trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType, activityAtRecommPoint,
-						userIDAtRecomm, trainTimelinesAllUsersContinuous);
+						userIDAtRecomm, trainTimelinesAllUsersContinuous, dimensionToMatch);
 			}
 			else
 			{
@@ -348,7 +348,7 @@ public class TimelineExtractors
 			{
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
 						trainTestTimelinesForAllUsers, 0, lookPastType, activityAtRecommPoint, userIDAtRecomm,
-						trainTimelinesAllUsersContinuous);
+						trainTimelinesAllUsersContinuous, dimensionToMatch);
 			}
 			else
 			{
@@ -485,7 +485,7 @@ public class TimelineExtractors
 			/* Time timeAtRecomm, */ String userIDAtRecomm, double matchingUnitInCountsOrHours,
 			ActivityObject activityAtRecommPoint,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersOrig,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
 		LinkedHashMap<String, Timeline> candidateTimelines = null;
 		LinkedHashMap<Date, Timeline> trainingTimelinesDaywise = trainingTimelineOrig;
@@ -695,7 +695,7 @@ public class TimelineExtractors
 				// sb.append("For NCount NHours: collaborative\n");
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
 						trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType, activityAtRecommPoint,
-						userIDAtRecomm, trainTimelinesAllUsersContinuous);
+						userIDAtRecomm, trainTimelinesAllUsersContinuous, dimensionToMatch);
 			}
 			else
 			{
@@ -724,7 +724,7 @@ public class TimelineExtractors
 				// sb.append("For NGram: collaborative\n");
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
 						trainTestTimelinesForAllUsers, 0, lookPastType, activityAtRecommPoint, userIDAtRecomm,
-						trainTimelinesAllUsersContinuous);
+						trainTimelinesAllUsersContinuous, dimensionToMatch);
 			}
 			else
 			{
@@ -1183,16 +1183,18 @@ public class TimelineExtractors
 	/**
 	 * 
 	 * @param trainTestTimelinesForAllUsers
-	 * @param matchingUnitInCountsOrHours
+	 * @param matchingUnit
 	 * @param lookPastType
 	 * @param activityAtRecommPoint
 	 * @param userIDAtRecomm
+	 * @param trainTimelinesAllUsersContinuous
+	 * @param dimensionToMatch
 	 * @return
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUColl(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			double matchingUnit, LookPastType lookPastType, ActivityObject activityAtRecommPoint, String userIDAtRecomm,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
 		System.out.println("Inside extractCandidateTimelinesMUColl :trainTestTimelinesForAllUsers.size()= "
 				+ trainTestTimelinesForAllUsers.size() + " mu=" + matchingUnit);
@@ -1210,7 +1212,7 @@ public class TimelineExtractors
 
 			return extractCandidateTimelinesMUCountColl(/* trainingTimeline, trainTestTimelinesForAllUsers, */
 					new Double(matchingUnit).intValue(), activityAtRecommPoint, userIDAtRecomm,
-					trainTimelinesAllUsersContinuous);
+					trainTimelinesAllUsersContinuous, dimensionToMatch);
 		}
 		// TODO: implement MU hours
 		// else if (lookPastType.equals(Enums.LookPastType.NHours))// .equalsIgnoreCase("Hrs"))
@@ -1370,6 +1372,9 @@ public class TimelineExtractors
 	 * @param activityAtRecommPoint
 	 * @param userIDAtRecomm
 	 * @param trainTimelinesAllUsersContinuous
+	 * @param dimensionToMatch
+	 *            (added on 16 July 2018) which dimension to match, initially it was activity name/id, later extended to
+	 *            allow location/gridID
 	 * @return
 	 * @since 3 Aug 2017
 	 */
@@ -1377,7 +1382,7 @@ public class TimelineExtractors
 			// Timeline trainingTimelineqqq,
 			// LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersZZ,
 			int matchingUnitInCounts, ActivityObject activityAtRecommPoint, String userIDAtRecomm,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
 		LinkedHashMap<String, TimelineWithNext> candidateTimelines = new LinkedHashMap<>();
 		long tS = System.nanoTime();
@@ -1441,7 +1446,8 @@ public class TimelineExtractors
 					// + b + "\n");}
 					// end sanity check
 
-					if (ae.equalsWrtPrimaryDimension(activityAtRecommPoint)) // same name as current activity)
+					// if (ae.equalsWrtPrimaryDimension(activityAtRecommPoint)) // same name as current activity)
+					if (ae.equalsWrtGivenDimension(activityAtRecommPoint, dimensionToMatch))
 					{
 						// Timestamp newCandEndTimestamp= new
 						// Timestamp(ae.getStartTimestamp().getTime()+ae.getDurationInSeconds()*1000-1000); //decreasing
@@ -1463,9 +1469,10 @@ public class TimelineExtractors
 						ActivityObject nextValidActivityForCandidate;
 						nextValidActivityForCandidate = trainingTimelineForThisUser
 								.getNextValidActivityAfterActivityAtThisPositionPD(newCandEndIndex);
+
 						if (nextValidActivityForCandidate == null)
 						{
-							numCandsRejectedDueToNoValidNextActivity = numCandsRejectedDueToNoValidNextActivity + 1;
+							numCandsRejectedDueToNoValidNextActivity += 1;
 							System.out.println("\tThis candidate rejected due to no next valid activity object;");
 							// if (i == 0)// this was first activity of the timeline
 							// { System.out.println("\tThis iser rejected due to no next valid cand");

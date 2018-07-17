@@ -84,6 +84,6 @@ public class Enums
 
 	public enum PrimaryDimension
 	{
-		ActivityID, LocationID;
+		ActivityID, LocationID, LocationGridID;
 	}
 }
