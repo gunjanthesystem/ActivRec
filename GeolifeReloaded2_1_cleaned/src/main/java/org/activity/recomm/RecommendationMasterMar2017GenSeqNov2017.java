@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.LookPastType;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.Enums.TypeOfThreshold;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
@@ -175,36 +176,38 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 	/**
 	 * 
+	 * @param dname
+	 * @param primaryDimension
 	 * @return
 	 */
-	private final int initialiseDistancesUsed(String dname)
+	private final int initialiseDistancesUsed(String dname, PrimaryDimension primaryDimension)
 	{
-		alignmentBasedDistance = new AlignmentBasedDistance(); // used for case based similarity
+		alignmentBasedDistance = new AlignmentBasedDistance(primaryDimension); // used for case based similarity
 		//
 		switch (dname)
 		{
 			case "HJEditDistance":
 				if (Constant.EDAlpha < 0)
 				{
-					hjEditDistance = new HJEditDistance();
+					hjEditDistance = new HJEditDistance(primaryDimension);
 				}
 				else
 				{
-					hjEditDistance = new HJEditDistance(Constant.EDAlpha);
+					hjEditDistance = new HJEditDistance(Constant.EDAlpha, primaryDimension);
 				}
 
 				break;
 
 			case "FeatureWiseEditDistance":
-				featureWiseEditDistance = new FeatureWiseEditDistance();
+				featureWiseEditDistance = new FeatureWiseEditDistance(primaryDimension);
 				break;
 
 			case "FeatureWiseWeightedEditDistance":
-				featureWiseWeightedEditDistance = new FeatureWiseWeightedEditDistance();
+				featureWiseWeightedEditDistance = new FeatureWiseWeightedEditDistance(primaryDimension);
 				break;
 
 			case "OTMDSAMEditDistance":
-				OTMDSAMEditDistance = new OTMDSAMEditDistance();
+				OTMDSAMEditDistance = new OTMDSAMEditDistance(primaryDimension);
 				break;
 
 			default:
@@ -263,7 +266,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 			long recommMasterT0 = System.currentTimeMillis();
 
-			initialiseDistancesUsed(Constant.getDistanceUsed());
+			initialiseDistancesUsed(Constant.getDistanceUsed(), Constant.primaryDimension);
 			System.out.println("hjED.toString=" + this.hjEditDistance.toString());
 
 			editDistancesMemorizer = new EditDistanceMemorizer();
@@ -361,7 +364,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 			this.candidateTimelines = TimelineExtractors.extractCandidateTimelines(trainingTimelines, lookPastType,
 					this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm, matchingUnitInCountsOrHours,
-					this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers, trainTimelinesAllUsersContinuous);
+					this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers, trainTimelinesAllUsersContinuous,
+					Constant.primaryDimension);
 
 			// Start of added on Feb 12 2018
 			if (Constant.filterCandByCurActTimeThreshInSecs > 0)
@@ -451,7 +455,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			{// changed from "Constant.useThreshold ==false)" on May 10 but should not affect result since we were not
 				// doing thresholding anyway
 				Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
-						distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm);
+						distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm,
+						Constant.primaryDimension);
 				distancesMapUnsorted = prunedRes.getFirst();
 				this.thresholdAsDistance = prunedRes.getSecond();
 				this.thresholdPruningNoEffect = prunedRes.getThird();
@@ -769,11 +774,12 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	 * @param typeOfThreshold
 	 * @param thresholdVal
 	 * @param activitiesGuidingRecomm
+	 * @param primaryDimension
 	 * @return Triple{prunedDistancesMap,thresholdAsDistance,thresholdPruningNoEffect}
 	 */
 	private static Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> pruneAboveThreshold(
 			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted, TypeOfThreshold typeOfThreshold,
-			double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm)
+			double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm, PrimaryDimension primaryDimension)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Inside pruneAboveThreshold:\n");
@@ -785,7 +791,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		}
 		else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
 		{
-			double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
+			double maxEditDistance = (new AlignmentBasedDistance(primaryDimension))
+					.maxEditDistance(activitiesGuidingRecomm);
 			thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
 		}
 		else

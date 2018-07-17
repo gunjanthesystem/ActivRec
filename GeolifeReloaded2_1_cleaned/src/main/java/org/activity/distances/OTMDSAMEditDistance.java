@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
@@ -17,9 +18,9 @@ import org.activity.objects.Triple;
  */
 public class OTMDSAMEditDistance extends AlignmentBasedDistance
 {
-	public OTMDSAMEditDistance()
+	public OTMDSAMEditDistance(PrimaryDimension primaryDimension)
 	{
-		super(); // nothing used form super yet
+		super(primaryDimension); // nothing used form super yet
 	}
 
 	/**
@@ -44,8 +45,8 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 		ArrayList<ActivityObject> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
 		ArrayList<ActivityObject> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
 
-		LinkedHashMap<String, Pair<String, Double>> featureWiseEditDistance = new FeatureWiseEditDistance()
-				.getFeatureWiseEditDistanceWithTrace(activityObjects1, activityObjects2);
+		LinkedHashMap<String, Pair<String, Double>> featureWiseEditDistance = new FeatureWiseEditDistance(
+				primaryDimension).getFeatureWiseEditDistanceWithTrace(activityObjects1, activityObjects2);
 		@SuppressWarnings("rawtypes")
 		ArrayList allEditOperations = getAllEditOperations(featureWiseEditDistance);
 

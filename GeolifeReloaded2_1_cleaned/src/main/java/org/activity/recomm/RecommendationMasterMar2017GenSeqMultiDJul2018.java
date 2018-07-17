@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.LookPastType;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.Enums.TypeOfThreshold;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
@@ -70,6 +71,10 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 	private LinkedHashMap<String, Timeline> candidateTimelines;
 	// here key is the TimelineID, which is already a class variable of Value,
 	// So we could have used ArrayList but we used LinkedHashMap purely for search performance reasons
+
+	// in case of MU approach {TimelineIDString, TimelineWithNext}, if daywise approach {Date as String, Timeline}
+	// candidate timelines for secondary dimension, e.g. location grid
+	private LinkedHashMap<String, Timeline> candidateTimelinesSecDim;
 
 	private Date dateAtRecomm;
 	private Time timeAtRecomm;
@@ -156,7 +161,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 	 * the activities guiding recommendation are pruned out from set of candidate timelines
 	 */
 
-	HJEditDistance hjEditDistance = null;
+	HJEditDistance hjEditDistancePrimaryDim = null;
+	HJEditDistance hjEditDistanceSecondaryDim = null;
 	AlignmentBasedDistance alignmentBasedDistance = null;
 	FeatureWiseEditDistance featureWiseEditDistance = null;
 	FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance = null;
@@ -174,36 +180,40 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 
 	/**
 	 * 
+	 * @param dname
+	 * @param primaryDimension
+	 * @param secondaryDimension
 	 * @return
 	 */
-	private final int initialiseDistancesUsed(String dname)
+	private final int initialiseDistancesUsed(String dname, PrimaryDimension primaryDimension,
+			PrimaryDimension secondaryDimension)
 	{
-		alignmentBasedDistance = new AlignmentBasedDistance(); // used for case based similarity
+		alignmentBasedDistance = new AlignmentBasedDistance(primaryDimension); // used for case based similarity
 		//
 		switch (dname)
 		{
 			case "HJEditDistance":
 				if (Constant.EDAlpha < 0)
 				{
-					hjEditDistance = new HJEditDistance();
+					hjEditDistancePrimaryDim = new HJEditDistance(primaryDimension);
 				}
 				else
 				{
-					hjEditDistance = new HJEditDistance(Constant.EDAlpha);
+					hjEditDistancePrimaryDim = new HJEditDistance(Constant.EDAlpha, primaryDimension);
 				}
 
 				break;
 
 			case "FeatureWiseEditDistance":
-				featureWiseEditDistance = new FeatureWiseEditDistance();
+				featureWiseEditDistance = new FeatureWiseEditDistance(primaryDimension);
 				break;
 
 			case "FeatureWiseWeightedEditDistance":
-				featureWiseWeightedEditDistance = new FeatureWiseWeightedEditDistance();
+				featureWiseWeightedEditDistance = new FeatureWiseWeightedEditDistance(primaryDimension);
 				break;
 
 			case "OTMDSAMEditDistance":
-				OTMDSAMEditDistance = new OTMDSAMEditDistance();
+				OTMDSAMEditDistance = new OTMDSAMEditDistance(primaryDimension);
 				break;
 
 			default:
@@ -262,8 +272,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 			long recommMasterT0 = System.currentTimeMillis();
 
-			initialiseDistancesUsed(Constant.getDistanceUsed());
-			System.out.println("hjED.toString=" + this.hjEditDistance.toString());
+			initialiseDistancesUsed(Constant.getDistanceUsed(), Constant.primaryDimension, Constant.secondaryDimension);
+			System.out.println("hjED.toString=" + this.hjEditDistancePrimaryDim.toString());
 
 			editDistancesMemorizer = new EditDistanceMemorizer();
 			this.lookPastType = lookPastType;
@@ -360,7 +370,15 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 
 			this.candidateTimelines = TimelineExtractors.extractCandidateTimelines(trainingTimelines, lookPastType,
 					this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm, matchingUnitInCountsOrHours,
-					this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers, trainTimelinesAllUsersContinuous);
+					this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers, trainTimelinesAllUsersContinuous,
+					Constant.primaryDimension);
+
+			// start of added on 16 July 2018
+			this.candidateTimelinesSecDim = TimelineExtractors.extractCandidateTimelines(trainingTimelines,
+					lookPastType, this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm,
+					matchingUnitInCountsOrHours, this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers,
+					trainTimelinesAllUsersContinuous, Constant.secondaryDimension);
+			// end of added on 16 July 2018
 
 			// Start of added on Feb 12 2018
 			if (Constant.filterCandByCurActTimeThreshInSecs > 0)
@@ -396,6 +414,11 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				System.out.println("the candidate timelines are as follows:");
 				candidateTimelines.entrySet().stream()
 						.forEach(t -> System.out.println(t.getValue().getPrimaryDimensionValsInSequence()));
+
+				System.out.println("Number of secondary candidate timelines =" + candidateTimelinesSecDim.size());
+				System.out.println("the secondary candidate timelines are as follows:");
+				candidateTimelinesSecDim.entrySet().stream().forEach(t -> System.out
+						.println(t.getValue().getGivenDimensionValsInSequence(Constant.secondaryDimension)));
 				// getActivityObjectNamesInSequence()));
 			}
 
@@ -410,6 +433,23 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				this.thresholdPruningNoEffect = true;
 				return;
 			}
+			else if (candidateTimelinesSecDim.size() == 0)
+			{
+				System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
+						+ " at time:" + timeAtRecomm + "  because there are no secondary ("
+						+ Constant.secondaryDimension + ") candidate timelines");
+				WToFile.appendLineToFileAbs(
+						userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candidateTimelines.size() + ","
+								+ candidateTimelinesSecDim.size() + "\n",
+						Constant.getCommonPath() + "RTsRejWithPrimaryButNoSecondaryCands.csv");
+				// this.singleNextRecommendedActivity = null;
+				this.hasCandidateTimelines = false;
+				// this.topNextActivities =null;
+				this.nextActivityObjectsFromCands = null;
+				this.thresholdPruningNoEffect = true;
+				return;
+			}
+
 			else
 			{
 				this.hasCandidateTimelines = true;
@@ -425,7 +465,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> normalisedDistFromCandsRes = DistanceUtils
 					.getNormalisedDistancesForCandidateTimelines(candidateTimelines, activitiesGuidingRecomm, caseType,
 							this.userIDAtRecomm, this.dateAtRecomm, this.timeAtRecomm, Constant.getDistanceUsed(),
-							this.lookPastType, this.hjEditDistance, this.featureWiseEditDistance,
+							this.lookPastType, this.hjEditDistancePrimaryDim, this.featureWiseEditDistance,
 							this.featureWiseWeightedEditDistance, this.OTMDSAMEditDistance,
 							this.editDistancesMemorizer);
 			// editDistancesMemorizer.serialise(this.userIDAtRecomm);
@@ -450,7 +490,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			{// changed from "Constant.useThreshold ==false)" on May 10 but should not affect result since we were not
 				// doing thresholding anyway
 				Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> prunedRes = pruneAboveThreshold(
-						distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm);
+						distancesMapUnsorted, typeOfThreshold, thresholdVal, activitiesGuidingRecomm,
+						Constant.primaryDimension);
 				distancesMapUnsorted = prunedRes.getFirst();
 				this.thresholdAsDistance = prunedRes.getSecond();
 				this.thresholdPruningNoEffect = prunedRes.getThird();
@@ -768,11 +809,12 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 	 * @param typeOfThreshold
 	 * @param thresholdVal
 	 * @param activitiesGuidingRecomm
+	 * @param primaryDimension
 	 * @return Triple{prunedDistancesMap,thresholdAsDistance,thresholdPruningNoEffect}
 	 */
 	private static Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> pruneAboveThreshold(
 			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted, TypeOfThreshold typeOfThreshold,
-			double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm)
+			double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm, PrimaryDimension primaryDimension)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Inside pruneAboveThreshold:\n");
@@ -784,7 +826,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		}
 		else if (typeOfThreshold.equals(Enums.TypeOfThreshold.Percent))// IgnoreCase("Percent"))
 		{
-			double maxEditDistance = (new AlignmentBasedDistance()).maxEditDistance(activitiesGuidingRecomm);
+			double maxEditDistance = (new AlignmentBasedDistance(primaryDimension))
+					.maxEditDistance(activitiesGuidingRecomm);
 			thresholdAsDistance = maxEditDistance * (thresholdVal / 100);
 		}
 		else

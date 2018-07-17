@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,58 @@ public class GLatLonToGridTransformer
 
 	}
 
+	public static void getDistanceBetweenGrids(String pathToSerialisedGridIDCellMapToUse)
+	{
+		try
+		{
+			Map<Long, GridCell> gridIDGridCellMap = (Map<Long, GridCell>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedGridIDCellMapToUse);
+
+			int numOfUniqueGrids = gridIDGridCellMap.size();
+
+			if (false)
+			{// creating 2d array for fetch efficiency but high space cost
+				Map<Integer, Long> gridIndexIDMap = new TreeMap<>();
+				Map<Long, Integer> gridIDIndexMap = new TreeMap<>();
+				int gridIDIndex = 0;
+				for (Entry<Long, GridCell> e : gridIDGridCellMap.entrySet())
+				{
+					gridIndexIDMap.put(gridIDIndex, e.getKey());
+					gridIDIndexMap.put(e.getKey(), gridIDIndex);
+					gridIDIndex += 1;
+				}
+
+				double[][] distancesBetweenGrids = new double[numOfUniqueGrids][numOfUniqueGrids];
+			}
+
+			for (Entry<Long, GridCell> eOuter : gridIDGridCellMap.entrySet())
+			{
+				Long gridID1 = eOuter.getKey();
+
+				for (Entry<Long, GridCell> eInnner : gridIDGridCellMap.entrySet())
+				{
+					Long gridID2 = eInnner.getKey();
+					if (gridID1.equals(gridID2) == false)
+					{
+						eOuter.getValue().getLat();
+					}
+				}
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
 	public static void main(String args[])
+	{
+		main1();
+	}
+
+	public static void main1()
 	{
 		String pathToWrite = "./dataWritten/HexGridRes" + gridResolution + "_" + DateTimeUtils.getMonthDateLabel()
 				+ "/";
@@ -61,11 +113,12 @@ public class GLatLonToGridTransformer
 				System.out.println(c);
 				System.out.println("------");
 				System.out.println("GridID= " + c.getID());
+				System.out.println("lat of cell= " + c.getLat() + " lon of cell= " + c.getLon());
 			}
 
 			if (true)
 			{
-				String pathToLocationAnalysis = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUL10ForLocationAnalysis2/";
+				String pathToLocationAnalysis = "./dataWritten/JUL10ForLocationAnalysis2/";
 				String absFileNameForLatLon5MostRecenTrainTestJul10 = pathToLocationAnalysis
 						+ "UniqueLocationObjects5DaysTrainTest.csv";
 				String absFileNameForLatLonAllJul10 = pathToLocationAnalysis + "UniqueLocationObjects.csv";
@@ -82,9 +135,35 @@ public class GLatLonToGridTransformer
 
 				System.out.println("Time taken to find and write grids = " + (t2 - t1) + " secs");
 
+				Set<GridCell> uniqueGridCells = latLonLocIDGridCellAllLocs.stream().map(v -> v.getSecond())
+						.collect(Collectors.toSet());
+				System.out.println("uniqueGridCells.size()= " + uniqueGridCells.size());
+
+				Map<Long, GridCell> gridIDGridCellMap = uniqueGridCells.stream()
+						.collect(Collectors.toMap(gc -> gc.getID(), gc -> gc));
+				System.out.println("gridIDGridCellMap.size()= " + uniqueGridCells.size());
+
+				///////////////////////////
+				Map<Integer, Long> gridIndexIDMap = new TreeMap<>();
+				Map<Long, Integer> gridIDIndexMap = new TreeMap<>();
+				int gridIDIndex = 0;
+				for (Entry<Long, GridCell> e : gridIDGridCellMap.entrySet())
+				{
+					gridIndexIDMap.put(gridIDIndex, e.getKey());
+					gridIDIndexMap.put(e.getKey(), gridIDIndex);
+					gridIDIndex += 1;
+				}
+				System.out.println("gridIndexIDMap.size()= " + gridIndexIDMap.size());
+				System.out.println("gridIDIndexMap.size()= " + gridIDIndexMap.size());
+				///////////////////////////
+
 				Map<Long, Long> locIDGridIDMap = latLonLocIDGridCellAllLocs.stream().collect(
 						Collectors.toMap(e -> Long.valueOf(e.getFirst().getThird()), e -> e.getSecond().getID()));
 				System.out.println("locIDGridIDMap.size()= " + locIDGridIDMap.size());
+
+				Map<Long, Integer> locIDGridIndexMap = latLonLocIDGridCellAllLocs.stream().collect(Collectors.toMap(
+						e -> Long.valueOf(e.getFirst().getThird()), e -> gridIDIndexMap.get(e.getSecond().getID())));
+				System.out.println("locIDGridIndexMap.size()= " + locIDGridIndexMap.size());
 
 				Map<Long, Set<Long>> gridIDLocIDs = getLocIDsInEachGrid(latLonLocIDGridCellAllLocs, true,
 						pathToWrite + "gridIDLocIDs.csv");
@@ -92,19 +171,23 @@ public class GLatLonToGridTransformer
 
 				Serializer.kryoSerializeThis(latLonLocIDGridCellAllLocs,
 						pathToWrite + "latLonLocIDGridCellAllLocs.kryo");
+				Serializer.kryoSerializeThis(gridIndexIDMap, pathToWrite + "gridIndexIDMap.kryo");
+				Serializer.kryoSerializeThis(gridIDIndexMap, pathToWrite + "gridIDIndexMap.kryo");
 				Serializer.kryoSerializeThis(locIDGridIDMap, pathToWrite + "locIDGridIDMap.kryo");
+				Serializer.kryoSerializeThis(locIDGridIndexMap, pathToWrite + "locIDGridIndexMap.kryo");
 				Serializer.kryoSerializeThis(gridIDLocIDs, pathToWrite + "gridIDLocIDs.kryo");
+				Serializer.kryoSerializeThis(gridIDGridCellMap, pathToWrite + "gridIDGridCellMap.kryo");
+
+				List<Long> allGridIDs = ReadingFromFile
+						.oneColumnReaderLong(pathToWrite + "latLonLocIDGridCellAllLocs.csv", ",", 3, true);
+
+				Set<Long> uniqueGridIDs = new TreeSet<>();
+				uniqueGridIDs.addAll(allGridIDs);
+
+				System.out.println("Num of gridIDs = " + allGridIDs.size());
+				System.out.println("Num of unique gridIDs = " + uniqueGridIDs.size());
+				System.out.println("% unique of total " + (100 * uniqueGridIDs.size()) / allGridIDs.size());
 			}
-
-			List<Long> allGridIDs = ReadingFromFile.oneColumnReaderLong(pathToWrite + "latLonLocIDGridCellAllLocs.csv",
-					",", 3, true);
-
-			Set<Long> uniqueGridIDs = new TreeSet<>();
-			uniqueGridIDs.addAll(allGridIDs);
-
-			System.out.println("Num of gridIDs = " + allGridIDs.size());
-			System.out.println("Num of unique gridIDs = " + uniqueGridIDs.size());
-			System.out.println("% unique of total " + (100 * uniqueGridIDs.size()) / allGridIDs.size());
 		}
 		catch (Exception e)
 		{

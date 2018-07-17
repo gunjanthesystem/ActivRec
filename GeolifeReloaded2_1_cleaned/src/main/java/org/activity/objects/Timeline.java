@@ -9,6 +9,7 @@ import java.util.LongSummaryStatistics;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.SanityConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.ui.PopUps;
@@ -219,7 +220,7 @@ public class Timeline implements Serializable
 	 * Returns the next valid Activity Object in the Timeline after the given index.
 	 * <p>
 	 * 
-	 * 
+	 * @deprecated superceded by org.activity.objects.Timeline.getNextValidActivityAfterActivityAtThisPositionPD(int)
 	 * @param indexOfActivityObject
 	 * @return
 	 */
@@ -284,7 +285,7 @@ public class Timeline implements Serializable
 	/**
 	 * Returns the next valid Activity Object in the Timeline after the given index.
 	 * <p>
-	 * 
+	 * Primary dimension here is ONLY used to check if the activity is valid or not and for verbose logging output.
 	 * 
 	 * @param indexOfActivityObject
 	 * @return
@@ -341,7 +342,8 @@ public class Timeline implements Serializable
 				// System.err.println("\t End point index was:" + indexOfActivityObject);
 				System.err.println("\t Next valid activity object found at index:" + indexOfNextValidActivityObject);
 			}
-			System.out.println("\t Next valid activity is " + nextValidActivityObject.getPrimaryDimensionVal("/"));
+			System.out.println("\t Next valid activity is " + nextValidActivityObject.toStringAllGowallaTSWithName());
+			// .getPrimaryDimensionVal("/"));
 		}
 
 		return nextValidActivityObject;
@@ -386,7 +388,17 @@ public class Timeline implements Serializable
 		return sb.toString();
 	}
 
-	//
+	/**
+	 * 
+	 * @return
+	 */
+	public String getGivenDimensionValsInSequence(PrimaryDimension givenDimension)
+	{
+		StringBuilder sb = new StringBuilder();
+		activityObjectsInTimeline.stream()
+				.forEachOrdered(ao -> sb.append(" >>" + ao.getGivenDimensionVal("/", givenDimension)));
+		return sb.toString();
+	} //
 
 	///////////////
 	public String getActivityObjectNamesInSequenceWithFeatures()
@@ -521,7 +533,8 @@ public class Timeline implements Serializable
 	{
 		StringBuilder stringCodeForTimeline = new StringBuilder();
 
-		activityObjectsInTimeline.stream().forEachOrdered(ao -> stringCodeForTimeline.append(ao.getCharCodeFromActID()));
+		activityObjectsInTimeline.stream()
+				.forEachOrdered(ao -> stringCodeForTimeline.append(ao.getCharCodeFromActID()));
 
 		if (this.getActivityObjectsInTimeline().size() != stringCodeForTimeline.length())
 		{

@@ -35,14 +35,21 @@ public class PathConstants
 	 * <p>
 	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).locIDGridIDMap
 	 */
-	public static final String pathToSerialisedLocIDGridIDGowallaMap = "./dataToRead/HexGridRes16_JUL11/locIDGridIDMap.kryo";
+	public static final String pathToSerialisedLocIDGridIDGowallaMap = "./dataToRead/HexGridRes16_JUL17/locIDGridIDMap.kryo";
+
+	/**
+	 * Map<Long, Integer>
+	 * <p>
+	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).locIDGridIDMap
+	 */
+	public static final String pathToSerialisedLocIDGridIndexGowallaMap = "./dataToRead/HexGridRes16_JUL17/locIDGridIndexMap.kryo";
 
 	/**
 	 * Map<Long, Set<Long>>
 	 * <p>
 	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).gridIDLocIDs
 	 */
-	public static final String pathToSerialisedGridIDLocIDsGowallaMap = "./dataToRead/HexGridRes16_JUL11/gridIDLocIDs.kryo";
+	public static final String pathToSerialisedGridIDLocIDsGowallaMap = "./dataToRead/HexGridRes16_JUL17/gridIDLocIDs.kryo";
 
 	/**
 	 * Set paths to serialised datasets

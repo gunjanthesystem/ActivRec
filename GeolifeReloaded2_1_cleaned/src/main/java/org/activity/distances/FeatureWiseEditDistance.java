@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
@@ -19,9 +20,13 @@ import org.activity.util.StringCode;
  */
 public class FeatureWiseEditDistance extends AlignmentBasedDistance
 {
-	public FeatureWiseEditDistance()
+	/**
+	 * 
+	 * @param primaryDimension
+	 */
+	public FeatureWiseEditDistance(PrimaryDimension primaryDimension)
 	{
-		super(); // nothing used form super yet
+		super(primaryDimension); // nothing used form super yet
 	}
 
 	/**

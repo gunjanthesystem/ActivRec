@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.activity.io.WToFile;
 import org.activity.objects.Pair;
@@ -775,4 +777,15 @@ public class StringUtils
 		return (str.length() - str.replace(subStr, "").length()) / subStr.length();
 	}
 
+	/**
+	 * 
+	 * @param s
+	 * @param delimiter
+	 * @return
+	 * @since 16 July 2018
+	 */
+	public static <T> String collectionToString(Collection<T> s, String delimiter)
+	{
+		return s.stream().map(v -> String.valueOf(v)).collect(Collectors.joining(delimiter));
+	}
 }
