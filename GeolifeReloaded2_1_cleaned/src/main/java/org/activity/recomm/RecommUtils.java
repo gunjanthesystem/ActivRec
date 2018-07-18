@@ -9,6 +9,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Pair;
@@ -61,15 +62,17 @@ public class RecommUtils
 	 * @param caseType
 	 * @param similarityOfEndPointActObjCands
 	 *            used for CaseBasedV1_3 approach
+	 * @param lookPastType
 	 * @param distancesSortedMap
 	 *            used for closest time approach in which case it is {candid, Pair{act name of act obj of cloeset, abs
 	 *            diff of st}}
+	 * @param givenDimension
 	 * @return
 	 */
-	static LinkedHashMap<String, Double> createRankedTopRecommendedActivityPDVals(
+	static LinkedHashMap<String, Double> createRankedTopRecommendedActivityGDVals(
 			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsFromCands, CaseType caseType,
 			LinkedHashMap<String, Double> similarityOfEndPointActObjCands, LookPastType lookPastType,
-			LinkedHashMap<String, Pair<String, Double>> distancesSortedMap)
+			LinkedHashMap<String, Pair<String, Double>> distancesSortedMap, PrimaryDimension givenDimension)
 	{
 
 		if (lookPastType.equals(Enums.LookPastType.ClosestTime))
@@ -84,7 +87,7 @@ public class RecommUtils
 			{
 				case SimpleV3:
 					// createRankedTopRecommendedPDValsSimpleV3_3
-					return createRankedTopRecommendedPDValsSimpleV3_3(nextActivityObjectsFromCands);
+					return createRankedTopRecommendedGDValsSimpleV3_3(nextActivityObjectsFromCands, givenDimension);
 				case CaseBasedV1:
 					return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
 							similarityOfEndPointActObjCands);
@@ -297,19 +300,24 @@ public class RecommUtils
 	 * setRankedRecommendedActivityNamesWithRankScores setRankedRecommendedActivityNamesWithoutRankScores
 	 * 
 	 * Is function with Constants Beta and rank scoring
+	 * <p>
+	 * Changed from primary dimension version to given dimension verion on 18 July 2018
 	 * 
+	 * @param nextActivityObjectsWithDistance
+	 * @param givenDimension
+	 *            added on 18 July 2018
+	 * @return {ActivityName,Rankscore} sorted by descending order of rank score
 	 * @since IN VERSION 2 WE HAD MIN MAX NORMALISATION INSIDE THIS FUNCTION, IN THIS V3 WE WILL NOT HAVE NORMALISATION
 	 *        OF EDIT DISTANCE INSIDE THIS FUNCTION AS THE NORMALISATION IS DONE BEFOREHAND IN THE METHOD WHICH FETCHED
 	 *        THE NORMALISED EDIT DISTANCE FOR CANDIDATE TIMELINES
-	 * @param topNextActivityObjectsWithDistance
-	 * @return {ActivityName,Rankscore} sorted by descending order of rank score
 	 */
-	public static LinkedHashMap<String, Double> createRankedTopRecommendedPDValsSimpleV3_3(
-			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsWithDistance)
+	public static LinkedHashMap<String, Double> createRankedTopRecommendedGDValsSimpleV3_3(
+			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsWithDistance,
+			PrimaryDimension givenDimension)
 	{
 		// $$System.out.println("\ninside createRankedTopRecommendedActivityNamesSimpleV3_3:");
 		// <ActivityName,RankScore>
-		LinkedHashMap<String, Double> recommendedActivityPDValsRankscorePairs = new LinkedHashMap<>();
+		LinkedHashMap<String, Double> recommendedActivityGDValsRankscorePairs = new LinkedHashMap<>();
 
 		StringBuilder rankScoreCalc = new StringBuilder();
 
@@ -317,22 +325,22 @@ public class RecommUtils
 		{ // String candTimelineID = nextActObj.getKey();
 			double normEditDistanceVal = nextActObj.getValue().getSecond();
 
-			for (Integer pdVal : nextActObj.getValue().getFirst().getPrimaryDimensionVal())
+			for (Integer gdVal : nextActObj.getValue().getFirst().getGivenDimensionVal(givenDimension))// .getPrimaryDimensionVal())
 			{// if the next activity object is a merged one
-				String nextActivityPDVal = pdVal.toString();
+				String nextActivityGDVal = gdVal.toString();
 
 				// represents similarity
 				double simRankScore = (1d - normEditDistanceVal);// * simEndPointActivityObject;
 				rankScoreCalc.append("Simple RANK SCORE (1- normED) =" + "1-" + normEditDistanceVal + "\n");
 
-				if (recommendedActivityPDValsRankscorePairs.containsKey(nextActivityPDVal) == false)
+				if (recommendedActivityGDValsRankscorePairs.containsKey(nextActivityGDVal) == false)
 				{
-					recommendedActivityPDValsRankscorePairs.put(nextActivityPDVal, simRankScore);
+					recommendedActivityGDValsRankscorePairs.put(nextActivityGDVal, simRankScore);
 				}
 				else
 				{
-					recommendedActivityPDValsRankscorePairs.put(nextActivityPDVal,
-							recommendedActivityPDValsRankscorePairs.get(nextActivityPDVal) + simRankScore);
+					recommendedActivityGDValsRankscorePairs.put(nextActivityGDVal,
+							recommendedActivityGDValsRankscorePairs.get(nextActivityGDVal) + simRankScore);
 				}
 			}
 
@@ -345,15 +353,15 @@ public class RecommUtils
 
 		// Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value
 		// of rank)
-		recommendedActivityPDValsRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
-				.sortByValueDesc(recommendedActivityPDValsRankscorePairs);
+		recommendedActivityGDValsRankscorePairs = (LinkedHashMap<String, Double>) ComparatorUtils
+				.sortByValueDesc(recommendedActivityGDValsRankscorePairs);
 
-		if (recommendedActivityPDValsRankscorePairs == null || recommendedActivityPDValsRankscorePairs.size() == 0)
+		if (recommendedActivityGDValsRankscorePairs == null || recommendedActivityGDValsRankscorePairs.size() == 0)
 		{
-			PopUps.printTracedErrorMsg("Error: recommendedActivityPDValsRankscorePairs.size() = "
-					+ recommendedActivityPDValsRankscorePairs.size());
+			PopUps.printTracedErrorMsg("Error: recommendedActivityGDValsRankscorePairs.size() = "
+					+ recommendedActivityGDValsRankscorePairs.size());
 		}
-		return recommendedActivityPDValsRankscorePairs;
+		return recommendedActivityGDValsRankscorePairs;
 	}
 
 	/**
@@ -501,8 +509,12 @@ public class RecommUtils
 	/**
 	 * Fetches the next Activity Objects with their edit distance from the candidate timelines (wrt Current Timeline)
 	 * 
+	 * 
 	 * @param editDistanceSorted
 	 * @param candidateTimelines
+	 * @param lookPastType
+	 * @param endPointIndicesForDaywise
+	 *            only used for daywise approach
 	 * @return TimelineID,Pair{Next Activity Object,edit distance}
 	 */
 	public static LinkedHashMap<String, Pair<ActivityObject, Double>> fetchNextActivityObjects(

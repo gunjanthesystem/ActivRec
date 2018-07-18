@@ -562,13 +562,14 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 						this.activitiesGuidingRecomm, activityObjectAtRecommPoint,
 						VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
 						VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand,
-						this.endPointIndicesConsideredInCands, Constant.primaryDimension);
+						this.endPointIndicesConsideredInCands, Constant.primaryDimension,
+						Constant.getCommonPath() + "EditDistancePerRtPerCand.csv");
 			}
 
 			//////// Create ranked recommended act names
-			this.recommendedActivityNamesWithRankscores = RecommUtils.createRankedTopRecommendedActivityPDVals(
+			this.recommendedActivityNamesWithRankscores = RecommUtils.createRankedTopRecommendedActivityGDVals(
 					this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand,
-					this.lookPastType, this.distancesSortedMap);
+					this.lookPastType, this.distancesSortedMap, Constant.primaryDimension);
 
 			// Start of added on 20 Feb 2018
 			if (Constant.scoreRecommsByLocProximity)

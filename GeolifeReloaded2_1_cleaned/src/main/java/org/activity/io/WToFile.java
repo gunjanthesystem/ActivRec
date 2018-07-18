@@ -3251,19 +3251,22 @@ public class WToFile
 	 * @param timeAtRecomm
 	 * @param editDistancesSorted
 	 * @param candidateTimelines
-	 * @param currentActivityObject
 	 * @param nextActObjs
 	 * @param currentTimeline
+	 * @param currentActivityObject
 	 * @param writeCandidateTimeline
 	 * @param writeEditOperations
 	 * @param endPointIndicesInCands
+	 * @param primaryDimension
+	 * @param absFileNameToWriteTo
 	 */
 	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<String, Pair<String, Double>> editDistancesSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines,
 			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs, ArrayList<ActivityObject> currentTimeline,
 			ActivityObject currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
-			LinkedHashMap<String, Integer> endPointIndicesInCands, PrimaryDimension primaryDimension)
+			LinkedHashMap<String, Integer> endPointIndicesInCands, PrimaryDimension primaryDimension,
+			String absFileNameToWriteTo)
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
 	// Enums.CaseType caseType)
 	{
@@ -3353,7 +3356,8 @@ public class WToFile
 				// + countOfL1Ops + "," + countOfL2Ops + "," + topNextAOName + "," + candidateTimelineAsString + "," +
 				// ",'"); }
 			}
-			WToFile.appendLineToFileAbs(sbToWrite.toString(), commonPath + "EditDistancePerRtPerCand.csv");
+			WToFile.appendLineToFileAbs(sbToWrite.toString(), absFileNameToWriteTo);// commonPath +
+																					// "EditDistancePerRtPerCand.csv");
 		}
 		catch (Exception e)
 		{
