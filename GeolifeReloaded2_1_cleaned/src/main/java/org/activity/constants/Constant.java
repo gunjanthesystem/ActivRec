@@ -189,7 +189,7 @@ public final class Constant
 
 	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
 	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
-	public static double EDAlpha = -99;// 0.8;// 0.5;// SWITCH_NOV10
+	public static double EDAlpha = 1;// 0.8;// 0.5;// SWITCH_NOV10
 
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
 	public static final boolean scoreRecommsByLocProximity = false;// SWITCH_NOV10

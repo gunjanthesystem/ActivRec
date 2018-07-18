@@ -1197,7 +1197,8 @@ public class TimelineExtractors
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
 		System.out.println("Inside extractCandidateTimelinesMUColl :trainTestTimelinesForAllUsers.size()= "
-				+ trainTestTimelinesForAllUsers.size() + " mu=" + matchingUnit);
+				+ trainTestTimelinesForAllUsers.size() + " mu=" + matchingUnit + " dimensionToMatch="
+				+ dimensionToMatch);
 
 		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NGram))// IgnoreCase("Count"))
 		{

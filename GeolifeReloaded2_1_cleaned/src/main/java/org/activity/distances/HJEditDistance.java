@@ -1019,7 +1019,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 			String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		double actED = 0;
-		List<EnumMap<GowallaFeatures, Double>> featDiffs = null;
+		List<EnumMap<GowallaFeatures, Double>> featDiffs = new ArrayList<>();
 		boolean shouldComputeFeatureLevelDiffs = this.getShouldComputeFeatureLevelDistance();
 		// max value of feature diff over all AOs (horizontally) for this cand timeline (wrt corresonding AO in current
 		// timeline)EnumMap<GowallaFeatures, Double> maxFeatureDiffs = new EnumMap<>(GowallaFeatures.class);
@@ -1154,11 +1154,22 @@ public class HJEditDistance extends AlignmentBasedDistance
 			System.out.println(sb.toString());
 		}
 
+		// Start of temp
+		// System.out.println("levenshteinDistance.getFirst() = " + levenshteinDistance.getFirst() + " actED= " + actED
+		// + " featDiffs.size()=" + featDiffs.size());
+		Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> result = new Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>(
+				levenshteinDistance.getFirst(), actED, featDiffs);
+
+		// if (result == null)
+		// {
+		// System.out.println("Eureka!! results is null");
+		// }
+		// end of temp
+
 		// $ WritingToFile.writeOnlyTrace(levenshteinDistance.getFirst());
 		// WritingToFile.writeEditSimilarityCalculation(activityObjects1,activityObjects2,levenshteinDistance);
 		// WritingToFile.writeEditDistance(levenshteinDistance);
-		return new Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>(levenshteinDistance.getFirst(), actED,
-				featDiffs);
+		return result;
 		// new Pair<String, Double>(levenshteinDistance.getFirst(), distanceTotal);
 	}
 

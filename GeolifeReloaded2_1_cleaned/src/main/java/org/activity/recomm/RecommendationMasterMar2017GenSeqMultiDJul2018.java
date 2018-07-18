@@ -150,7 +150,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 	private String rankedRecommendedSecDimValsWithRankScoresStr;
 	private String rankedRecommendedSecDimValsWithoutRankScoresStr;
 
-	private boolean hasCandidateTimelines, hasPrimaryDImCandTimelinesBelowThreshold;
+	private boolean hasCandidateTimelines, hasPrimaryDimCandTimelinesBelowThreshold;
 
 	private boolean nextActivityJustAfterRecommPointIsInvalid;
 	private double thresholdAsDistance = Double.MAX_VALUE;
@@ -213,10 +213,12 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				if (Constant.EDAlpha < 0)
 				{
 					hjEditDistancePrimaryDim = new HJEditDistance(primaryDimension);
+					hjEditDistanceSecondaryDim = new HJEditDistance(secondaryDimension);
 				}
 				else
 				{
 					hjEditDistancePrimaryDim = new HJEditDistance(Constant.EDAlpha, primaryDimension);
+					hjEditDistanceSecondaryDim = new HJEditDistance(Constant.EDAlpha, secondaryDimension);
 				}
 
 				break;
@@ -293,7 +295,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			this.secondaryDimension = Constant.secondaryDimension;
 
 			initialiseDistancesUsed(Constant.getDistanceUsed(), primaryDimension, secondaryDimension);
-			System.out.println("hjED.toString=" + this.hjEditDistancePrimaryDim.toString());
+			System.out.println("hjEditDistancePrimaryDim.toString=" + this.hjEditDistancePrimaryDim.toString());
+			System.out.println("hjEditDistanceSecondaryDim.toString=" + this.hjEditDistanceSecondaryDim.toString());
 
 			editDistancesMemorizer = new EditDistanceMemorizer();
 			this.lookPastType = lookPastType;
@@ -430,7 +433,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				System.out.println("\nprimaryDimensionValAtRecommPoint at Recomm point (Current Activity) ="
 						+ primaryDimensionValAtRecommPoint);
 
-				System.out.println("Number of candidate timelines =" + candidateTimelinesPrimDim.size());
+				System.out.println("Number of primary candidate timelines =" + candidateTimelinesPrimDim.size());
 				System.out.println("the candidate timelines are as follows:");
 				candidateTimelinesPrimDim.entrySet().stream()
 						.forEach(t -> System.out.println(t.getValue().getPrimaryDimensionValsInSequence()));
@@ -538,12 +541,12 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			if (distancesMapPrimaryDimUnsorted.size() == 0)
 			{
 				System.out.println("Warning: No candidate timelines below threshold distance");
-				hasPrimaryDImCandTimelinesBelowThreshold = false;
+				hasPrimaryDimCandTimelinesBelowThreshold = false;
 				return;
 			}
 			else
 			{
-				hasPrimaryDImCandTimelinesBelowThreshold = true;
+				hasPrimaryDimCandTimelinesBelowThreshold = true;
 			}
 
 			// Is this sorting necessary?
@@ -699,12 +702,12 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 						+ rankedRecommendedActNamesWithRankScoresStr);
 				System.out.println("Debug: rankedRecommendedActNamesWithoutRankScoresStr= "
 						+ rankedRecommendedActNamesWithoutRankScoresStr);
-				
+
 				System.out.println("Debug: rankedRecommendedSecDimValsWithRankScoresStr= "
 						+ rankedRecommendedSecDimValsWithRankScoresStr);
 				System.out.println("Debug: rankedRecommendedSecDimValsWithoutRankScoresStr= "
 						+ rankedRecommendedSecDimValsWithoutRankScoresStr);
-				
+
 				System.out.println("Constant.removeCurrentActivityNameFromRecommendations = "
 						+ Constant.removeCurrentActivityNameFromRecommendations);
 			}
@@ -1006,6 +1009,20 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		return res.toString();
 	}
 
+	/**
+	 * @since 18 July
+	 */
+	public String getActivityGDGuidingRecomm(PrimaryDimension givenDimension)
+	{
+		StringBuilder res = new StringBuilder();
+
+		for (ActivityObject ae : activitiesGuidingRecomm)
+		{
+			res = StringUtils.fCat(res, ">>", ae.getGivenDimensionVal("|", givenDimension));
+			// res.append(">>" + ae.getActivityName());
+		}
+		return res.toString();
+	}
 	// $$start here
 
 	// // /
@@ -1629,11 +1646,24 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				.map(e -> (Timeline) e.getValue()).collect(Collectors.toList());
 	}
 
+	/**
+	 * @since 18 July 2018
+	 * @return
+	 */
+	public ArrayList<Timeline> getOnlySecDimCandidateTimeslines()
+	{
+		return (ArrayList<Timeline>) this.candidateTimelinesSecDim.entrySet().stream().map(e -> (Timeline) e.getValue())
+				.collect(Collectors.toList());
+	}
+
 	public Set<String> getCandidateTimelineIDs()
 	{
 		return this.candidateTimelinesPrimDim.keySet();
 	}
 
+	/**
+	 * take care of sec dim cands as well.
+	 */
 	public boolean hasCandidateTimeslines()
 	{
 		return hasCandidateTimelines;
@@ -1641,7 +1671,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 
 	public boolean hasCandidateTimelinesBelowThreshold()
 	{
-		return hasPrimaryDImCandTimelinesBelowThreshold;
+		return hasPrimaryDimCandTimelinesBelowThreshold;
 	}
 
 	public boolean hasThresholdPruningNoEffect()
@@ -1676,7 +1706,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		// threshold while there is no candidate below threshold, u shouldnt
 		// have called this function");
 		// }
-		if (this.hasPrimaryDImCandTimelinesBelowThreshold)
+		if (this.hasPrimaryDimCandTimelinesBelowThreshold)
 		{/*
 			 * Assuming that threshold has already been applied
 			 */
@@ -1685,6 +1715,28 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		else
 		{
 			return 0;
+		}
+	}
+
+	/**
+	 * @since 18 July 2018
+	 */
+	public int getNumOfSecDimCandTimelines() // satisfying threshold
+	{
+		// if(hasCandidateTimelinesBelowThreshold==false)
+		// {
+		// System.err.println("Error: Sanity Check RM60 failed: trying to get number of candidate timelines below
+		// threshold while there is no candidate below threshold, u shouldnt
+		// have called this function");
+		// }
+		if (secondaryDimDistancesSortedMap == null)
+		{
+			return 0;
+
+		}
+		else
+		{
+			return this.secondaryDimDistancesSortedMap.size();
 		}
 	}
 
@@ -1740,9 +1792,33 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		return this.rankedRecommendedActNamesWithRankScoresStr;
 	}
 
+	/**
+	 * @since 18 July 2018
+	 */
+	public String getRankedRecommendedSecDimValsWithoutRankScores()
+	{
+		return this.rankedRecommendedSecDimValsWithoutRankScoresStr;
+	}
+
+	/**
+	 * @since 18 July 2018
+	 */
+	public String getRankedRecommendedSecDimValsWithRankScores()
+	{
+		return this.rankedRecommendedSecDimValsWithRankScoresStr;
+	}
+
 	public int getNumOfDistinctRecommendations()
 	{
 		return recommendedActivityNamesWithRankscores.size();
+	}
+
+	/**
+	 * @since 18 July 2018
+	 */
+	public int getNumOfDistinctSecDimRecommendations()
+	{
+		return recommendedSecondaryDimValsWithRankscores.size();
 	}
 
 	public LinkedHashMap<String, Pair<String, Double>> getDistancesSortedMap()

@@ -308,6 +308,10 @@ public class AlignmentBasedDistance
 		{
 			return wtFullActivityObject - wtLocation;
 		}
+		else if (primaryDimension.equals(PrimaryDimension.LocationGridID))
+		{
+			return wtFullActivityObject - wtLocation;
+		}
 		else
 		{
 			PopUps.showError("Error: unrecognised primary dimension =" + primaryDimension);
