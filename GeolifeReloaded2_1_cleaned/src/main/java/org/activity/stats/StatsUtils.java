@@ -1266,8 +1266,9 @@ public final class StatsUtils
 	 * @param max
 	 * @param min
 	 * @return
+	 * @deprecated on 18 July 2018
 	 */
-	public static double minMaxNorm(double val, double max, double min)
+	public static double minMaxNormV0(double val, double max, double min)
 	{
 		// if ((max - min) > 0.0000000000000000)
 		if ((max - min) > 0.0000000000000000000000000001)
@@ -1304,7 +1305,46 @@ public final class StatsUtils
 	 * @param min
 	 * @return
 	 */
-	public static double minMaxNormWORound(double val, double max, double min)
+	public static double minMaxNorm(double val, double max, double min)
+	{
+		// if ((max - min) > 0.0000000000000000)
+		double maxMinusMin = max - min;
+		double effectiveZero = 1.0E-50;
+
+		if (maxMinusMin > effectiveZero)// changed from 0.0000000000000000000000000001 to 1.0E-50 on May 8 2018
+		{// max > min wrt effective zero.
+			return round(((val - min) / maxMinusMin), 4);
+		}
+		// else if ((min - max) > 1.0E-50)/ // else if (min > max)
+		else if ((min - max) > effectiveZero)
+		{// min > max wrt to effective zero
+			PopUps.printTracedErrorMsgWithExit(("Error: Warning: Alert!! min > max wrt to effective zero val=" + val
+					+ ", minMaxNorm: max(" + max + ")- min(" + min + ") <=0 =" + maxMinusMin));
+			return 0;
+		}
+
+		else // min == max wrt to effective zero, i.e., (Math.abs(max - min) <= 1.0e-50)
+		{ // if (Math.abs(max - min) <= 1.0e-10)// changed from > to <= on May 8 2018
+			System.err.println(("Warning: Alert!! min == max wrt to effective zero val=" + val + ", minMaxNorm: max("
+					+ max + ")- min(" + min + ") <=0 =" + maxMinusMin));
+			// Warning: Alert!! val0.25 = minMaxNorm: max(0.25)- min(0.25) <=0 =0.0
+			// val = 0.25, max = 0.25, min =0.25, max-min = 0;
+			return 0;
+		}
+
+	}
+
+	/**
+	 * Returns min max norm if max - min >0 else return 0 (as distance) ...leading to 1 as similarity (rounded off to 4
+	 * decimal places)
+	 * 
+	 * @param val
+	 * @param max
+	 * @param min
+	 * @return
+	 * @deprecated on 18 July 2018
+	 */
+	public static double minMaxNormWORoundV0(double val, double max, double min)
 	{
 		// if ((max - min) > 0.0000000000000000)
 		double maxMinusMin = max - min;
@@ -1324,6 +1364,44 @@ public final class StatsUtils
 		{ // if (Math.abs(max - min) <= 1.0e-10)// changed from > to <= on May 8 2018
 			System.err.println(("Warning: Alert!! val=" + val + ", minMaxNorm: max(" + max + ")- min(" + min + ") <=0 ="
 					+ maxMinusMin));
+			// Warning: Alert!! val0.25 = minMaxNorm: max(0.25)- min(0.25) <=0 =0.0
+			// val = 0.25, max = 0.25, min =0.25, max-min = 0;
+			return 0;
+		}
+
+	}
+
+	/**
+	 * Returns min max norm if max - min >0 else return 0 (as distance) ...leading to 1 as similarity (rounded off to 4
+	 * decimal places)
+	 * 
+	 * @param val
+	 * @param max
+	 * @param min
+	 * @return
+	 */
+	public static double minMaxNormWORound(double val, double max, double min)
+	{
+		// if ((max - min) > 0.0000000000000000)
+		double maxMinusMin = max - min;
+		double effectiveZero = 1.0E-50;
+
+		if (maxMinusMin > effectiveZero)// changed from 0.0000000000000000000000000001 to 1.0E-50 on May 8 2018
+		{// max > min wrt effective zero.
+			return ((val - min) / maxMinusMin);
+		}
+		// else if ((min - max) > 1.0E-50)/ // else if (min > max)
+		else if ((min - max) > effectiveZero)
+		{// min > max wrt to effective zero
+			PopUps.printTracedErrorMsgWithExit(("Error: Warning: Alert!! min > max wrt to effective zero val=" + val
+					+ ", minMaxNorm: max(" + max + ")- min(" + min + ") <=0 =" + maxMinusMin));
+			return 0;
+		}
+
+		else // min == max wrt to effective zero, i.e., (Math.abs(max - min) <= 1.0e-50)
+		{ // if (Math.abs(max - min) <= 1.0e-10)// changed from > to <= on May 8 2018
+			System.err.println(("Warning: Alert!! min == max wrt to effective zero val=" + val + ", minMaxNorm: max("
+					+ max + ")- min(" + min + ") <=0 =" + maxMinusMin));
 			// Warning: Alert!! val0.25 = minMaxNorm: max(0.25)- min(0.25) <=0 =0.0
 			// val = 0.25, max = 0.25, min =0.25, max-min = 0;
 			return 0;

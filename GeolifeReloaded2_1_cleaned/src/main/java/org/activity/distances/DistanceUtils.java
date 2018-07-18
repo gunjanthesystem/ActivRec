@@ -446,11 +446,26 @@ public class DistanceUtils
 		// caseType, hjEditDistance, editDistancesMemorizer);//candAEDFeatDiffs.put(e.getKey(), res);}
 		// Alternatively
 		// TODO: TEMPORARILY DISABLE PARALLEL
-		candAEDFeatDiffs = candidateTimelines.entrySet()/* .parallelStream() */.stream().collect(Collectors.toMap(
-				e -> (String) e.getKey(),
-				e -> getActEditDistancesFeatDiffs(e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm,
-						timeAtRecomm, e.getKey(), caseType, hjEditDistance, editDistancesMemorizer),
-				(oldValue, newValue) -> newValue, LinkedHashMap::new));
+
+		if (false)// longer version to find null issue//temp 18 July 2018
+		{
+			for (Entry<String, Timeline> e : candidateTimelines.entrySet())
+			{
+				String key = (String) e.getKey();
+				Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> value = getActEditDistancesFeatDiffs(
+						e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
+						caseType, hjEditDistance, editDistancesMemorizer);
+				candAEDFeatDiffs.put(key, value);
+			}
+		}
+		else
+		{ // use this when null issue is resolved: resolved
+			candAEDFeatDiffs = candidateTimelines.entrySet()/* .parallelStream() */.stream().collect(Collectors.toMap(
+					e -> (String) e.getKey(),
+					e -> getActEditDistancesFeatDiffs(e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm,
+							timeAtRecomm, e.getKey(), caseType, hjEditDistance, editDistancesMemorizer),
+					(oldValue, newValue) -> newValue, LinkedHashMap::new));
+		}
 		// end of code to be parallelised
 
 		/////////////////// Start of finding min max
@@ -467,37 +482,46 @@ public class DistanceUtils
 
 		// Aggregation (across candidate timelines) of aggregation (across activity objects in each cand
 		// timeline:summaryStatForEachCand)
-		EnumMap<GowallaFeatures, Double> minOfMinOfDiffs = HJEditDistance
-				.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 0);
-		EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs = new EnumMap<>(GowallaFeatures.class);
-		if (Constant.percentileForRTVerseMaxForEDNorm == -1)
-		{
-			maxOfMaxOfDiffs = HJEditDistance
-					.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 1);
-		}
-		/////////////////// End of finding min max
-		// Start of May8 addition
-		else if (Constant.percentileForRTVerseMaxForEDNorm > -1)// then replace maxOfMax by pth percentile val
-		{
-			// list over cands and then list over each AO in that cand
-			List<List<EnumMap<GowallaFeatures, Double>>> listOfListOfFeatDiffs = candAEDFeatDiffs.entrySet().stream()
-					.map(e -> e.getValue().getThird()).collect(Collectors.toList());
-			EnumMap<GowallaFeatures, Double> pRTVersePercentileOfDiffs = HJEditDistance
-					.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, 75);
 
-			if (false)// sanity checking percentil implementation and maxOfMax implementation gives same result
-			{// passed ok on May 8 2018
-				sanityCheckRTVersePthPercentileByMinMax(minOfMinOfDiffs, maxOfMaxOfDiffs, listOfListOfFeatDiffs);
+		EnumMap<GowallaFeatures, Double> minOfMinOfDiffs = null;
+		EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs = null;
+
+		if (hjEditDistance.getShouldComputeFeatureLevelDistance())
+		{
+			minOfMinOfDiffs = HJEditDistance
+					.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 0);
+			maxOfMaxOfDiffs = new EnumMap<>(GowallaFeatures.class);
+
+			if (Constant.percentileForRTVerseMaxForEDNorm == -1)
+			{
+				maxOfMaxOfDiffs = HJEditDistance
+						.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 1);
 			}
 
-			// replace maxOfMax by pPercentileVal
-			maxOfMaxOfDiffs = pRTVersePercentileOfDiffs;
-		}
-		// End of May 8 addition
+			/////////////////// End of finding min max
+			// Start of May8 addition
+			else if (Constant.percentileForRTVerseMaxForEDNorm > -1)// then replace maxOfMax by pth percentile val
+			{
+				// list over cands and then list over each AO in that cand
+				List<List<EnumMap<GowallaFeatures, Double>>> listOfListOfFeatDiffs = candAEDFeatDiffs.entrySet()
+						.stream().map(e -> e.getValue().getThird()).collect(Collectors.toList());
+				EnumMap<GowallaFeatures, Double> pRTVersePercentileOfDiffs = HJEditDistance
+						.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, 75);
 
-		if (maxOfMaxOfDiffs.size() == 0)
-		{
-			PopUps.showError("Error: maxOfMaxOfDiffs.size() = " + maxOfMaxOfDiffs.size());
+				if (false)// sanity checking percentil implementation and maxOfMax implementation gives same result
+				{// passed ok on May 8 2018
+					sanityCheckRTVersePthPercentileByMinMax(minOfMinOfDiffs, maxOfMaxOfDiffs, listOfListOfFeatDiffs);
+				}
+
+				// replace maxOfMax by pPercentileVal
+				maxOfMaxOfDiffs = pRTVersePercentileOfDiffs;
+			}
+			// End of May 8 addition
+
+			if (maxOfMaxOfDiffs.size() == 0)
+			{
+				PopUps.showError("Error: maxOfMaxOfDiffs.size() = " + maxOfMaxOfDiffs.size());
+			}
 		}
 
 		// <CandidateTimeline ID, Edit distance>
@@ -606,12 +630,26 @@ public class DistanceUtils
 		}
 		/////
 
-		double EDGamma;
+		// double EDGamma;
 		double sumOfWtOfFeaturesUsedExceptPD = hjEditDistance.getSumOfWeightOfFeaturesExceptPrimaryDimension();
 
 		// Start of Get max of ActED over all cand
 		double maxActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
 				.max().getAsDouble();
+
+		if (true)// sanity check
+		{
+			if (maxActEDOverAllCands < Constant.epsilonForFloatZero)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("Debug18July:maxActEDOverAllCands= " + maxActEDOverAllCands + "\n");
+				candAEDFeatDiffs.entrySet().stream()// .mapToDouble(e -> e.getValue().getSecond())
+						.forEachOrdered(
+								e -> sb.append(" " + e.getValue().getFirst() + "--" + e.getValue().getSecond() + ","));
+				System.out.println(sb.toString());
+			}
+		}
+
 		double minActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
 				.min().getAsDouble();
 		// End of Get max of ActED over all cand
@@ -1531,6 +1569,42 @@ public class DistanceUtils
 				// editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
 				// candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
 				// dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+				if (true)// temp
+				{
+					if (hjEditDistance == null)
+					{
+						System.out.println("hjEditDistance==null");
+					}
+					if (candTimeline == null)
+					{
+						System.out.println("candTimeline==null");
+					}
+					if (candTimeline.getActivityObjectsInTimeline() == null)
+					{
+						System.out.println("candTimeline.getActivityObjectsInTimeline()==null");
+					}
+					if (activitiesGuidingRecomm == null)
+					{
+						System.out.println("activitiesGuidingRecomm==null");
+					}
+					if (userAtRecomm == null)
+					{
+						System.out.println("userAtRecomm==null");
+					}
+					if (dateAtRecomm == null)
+					{
+						System.out.println("dateAtRecomm==null");
+					}
+					if (timeAtRecomm == null)
+					{
+						System.out.println("timeAtRecomm==null");
+					}
+					if (candTimeline.getTimelineID() == null)
+					{
+						System.out.println(" candTimeline.getTimelineID()m==null");
+					}
+				}
+
 				actEDFeatDiffsForThisCandidate = hjEditDistance.getActEditDistWithTrace_FeatDiffs_13April2018(
 						candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
 						dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
@@ -1959,6 +2033,7 @@ public class DistanceUtils
 		// // .forEachOrdered(e -> sbTemp1.append(e.getKey() + "--" + e.getValue() + "\n"));
 		// // System.out.println(sbTemp1.toString());
 		// End Sanity check
+		System.out.println("Dimension for cand= " + hjEditDistance.primaryDimension);
 		System.out.println("before filter candEditDistances.size():" + candEditDistances.size());
 		// System.out.println("Constant.typeOfCandThreshold= " + Constant.typeOfCandThreshold);
 		// System.out.println("Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour)= "
@@ -1978,9 +2053,17 @@ public class DistanceUtils
 		}
 
 		System.out.println("\nafter filter candEditDistances.size():" + candEditDistances.size());
-		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = normalisedDistancesOverTheSet(
-				candEditDistances, userAtRecomm, dateAtRecomm, timeAtRecomm);
+		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = null;
 
+		if (Constant.useRTVerseNormalisationForED)
+		{// not necessary as already normalised
+			normalisedCandEditDistances = candEditDistances;
+		}
+		else
+		{
+			normalisedCandEditDistances = normalisedDistancesOverTheSet(candEditDistances, userAtRecomm, dateAtRecomm,
+					timeAtRecomm);
+		}
 		return normalisedCandEditDistances;
 	}
 

@@ -1370,7 +1370,7 @@ public class TimelineUtils
 	 * @param locIDGridIDMap
 	 * @return
 	 */
-	private static long getGridID(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap)
+	private static int getGridID(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap)
 	{
 		StringBuilder sbLog = new StringBuilder();
 		Set<Integer> uniqueLocIDs = new TreeSet<>();
@@ -1398,7 +1398,7 @@ public class TimelineUtils
 			}
 		}
 
-		List<Long> gridIndicesWithMaxCount = (List<Long>) ComparatorUtils.getKeysWithMaxValues(gridIndicesCount);
+		List<Integer> gridIndicesWithMaxCount = (List<Integer>) ComparatorUtils.getKeysWithMaxValues(gridIndicesCount);
 
 		WToFile.appendLineToFileAbs(sbLog.toString(),
 				Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelines.csv");

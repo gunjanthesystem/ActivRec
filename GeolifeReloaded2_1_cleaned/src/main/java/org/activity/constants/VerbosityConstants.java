@@ -31,7 +31,7 @@ public class VerbosityConstants
 	// minimises verbosity
 	public static final boolean verboseSAX = false;// false;
 	public static boolean verboseLevenstein = false;// true;// false;// false;// false;// false;
-	public static final boolean verboseNormalisation = false;// false;// false;
+	public static final boolean verboseNormalisation = true;// false;// false;
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;
 	public static final boolean verboseOTMDSAM = false;
@@ -75,13 +75,13 @@ public class VerbosityConstants
 	/**
 	 * to save writing non essential redudant stuffs
 	 */
-	public static final boolean WriteTopNextActivitiesWithoutDistance = false;
-	public static final boolean WriteTopNextActivitiesWithDistance = false;
+	public static final boolean WriteTopNextActivitiesWithoutDistance = true;
+	public static final boolean WriteTopNextActivitiesWithDistance = true;
 
-	public static final boolean WriteRaw = false;// SWITCH
+	public static final boolean WriteRaw = true;// SWITCH
 
-	public static final boolean writeRankedRecommsWOScoreForEachSeqIndex = false;
-	public static final boolean writeDataActualForEachSeqIndex = false;
+	public static final boolean writeRankedRecommsWOScoreForEachSeqIndex = true;// false;
+	public static final boolean writeDataActualForEachSeqIndex = true;
 	public static final boolean writeTrainTestTimelinesAOsPerUser = true;
 
 	public static final boolean writeRNN1PredProbDistribution = true;

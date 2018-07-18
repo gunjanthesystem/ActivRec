@@ -24,6 +24,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
+import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018;
 import org.activity.generator.ToyTimelineUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.SerializableJSONArray;
@@ -977,10 +978,18 @@ public class ControllerWithoutServer
 		// Constant.percentageInTraining);
 		// // end of curtain may 4 2017
 		// System.exit(0);
-		RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
-				sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
-				Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
-
+		if (Constant.doSecondaryDimension)
+		{
+			RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018(
+					sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
+					Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
+		}
+		else
+		{
+			RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
+					sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
+					Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
+		}
 		/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
 
 		// RecommendationTestsDayWise2FasterJan2016 recommendationsTest = new
