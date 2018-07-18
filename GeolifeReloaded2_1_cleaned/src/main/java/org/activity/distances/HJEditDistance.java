@@ -1027,7 +1027,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		if (VerbosityConstants.verboseDistance)
 		{
 			System.out.println("\n---calc HJeditDist between " + actObjs1Original.size() + " & "
-					+ actObjs2Original.size() + " objs");
+					+ actObjs2Original.size() + " objs" + "  primaryDimension=" + this.primaryDimension);
 		}
 
 		ArrayList<ActivityObject> actObjs1 = actObjs1Original;

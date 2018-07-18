@@ -251,6 +251,8 @@ public final class Constant
 	public static final boolean doVisualizationRNN1 = true;
 
 	public static final boolean mapLocIDToGridID = true;
+
+	public static final boolean doSecondaryDimension = true;
 	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
 	////////////////////////////////////////////////////////////////////////
 
@@ -1554,6 +1556,7 @@ public final class Constant
 
 		s.append("\ndoVisualizationRNN1:" + Constant.doVisualizationRNN1);
 		s.append("\nmapLocIDToGridID:" + Constant.mapLocIDToGridID);
+		s.append("\ndoSecondaryDimension:" + Constant.doSecondaryDimension);
 		s.append("\nsecondaryDimension:" + Constant.secondaryDimension);
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))

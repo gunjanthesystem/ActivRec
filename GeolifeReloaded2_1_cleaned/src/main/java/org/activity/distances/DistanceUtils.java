@@ -2374,6 +2374,16 @@ public class DistanceUtils
 
 		System.out.println(
 				"getNormalisedDistancesOverTheSet: #Vals max=" + numOfValsAtMax + " #Vals min=" + numOfValsAtMin);
+
+		if (true)
+		{
+			if (normalisedDistances.equals(setOfDistances))
+			{
+				System.out.println(
+						"Alert! org.activity.distances.DistanceUtils.normalisedDistancesOverTheSet() had no effect.");
+			}
+		}
+
 		return normalisedDistances;
 	}
 

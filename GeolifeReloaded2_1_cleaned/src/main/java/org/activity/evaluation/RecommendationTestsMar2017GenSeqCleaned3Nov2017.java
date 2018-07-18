@@ -34,6 +34,7 @@ import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeqNov2017;
+import org.activity.recomm.RecommendationMasterMar2017GenSeqMultiDJul2018;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
 import org.activity.recomm.RecommendationMasterRNN1Jun2018;
@@ -845,8 +846,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 														userTestTimelines, dateToRecomm, recommTimesStrings[0], userId,
 														thresholdValue, typeOfThreshold, caseType, this.lookPastType,
 														false, repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-														trainTimelinesAllUsersContinuousFiltrd, Constant.altSeqPredictor,
-														recommSeqLength);
+														trainTimelinesAllUsersContinuousFiltrd,
+														Constant.altSeqPredictor, recommSeqLength);
 											}
 											else
 											{
@@ -860,12 +861,24 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 										else
 										{
-											recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqNov2017(
-													userTrainingTimelines, userTestTimelines, dateToRecomm,
-													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
-													matchingUnit, caseType, this.lookPastType, false,
-													repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-													trainTimelinesAllUsersContinuousFiltrd);
+											if (Constant.doSecondaryDimension)
+											{ // added on 18 July 2018
+												recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqMultiDJul2018(
+														userTrainingTimelines, userTestTimelines, dateToRecomm,
+														recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
+														matchingUnit, caseType, this.lookPastType, false,
+														repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
+														trainTimelinesAllUsersContinuousFiltrd);
+											}
+											else
+											{
+												recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqNov2017(
+														userTrainingTimelines, userTestTimelines, dateToRecomm,
+														recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
+														matchingUnit, caseType, this.lookPastType, false,
+														repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
+														trainTimelinesAllUsersContinuousFiltrd);
+											}
 										}
 
 										// Note: RT passed to the recommendation master is always endTimestamp. This is
