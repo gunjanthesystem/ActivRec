@@ -109,7 +109,7 @@ public class EvaluationSeq
 				// PrintStream consoleLogStream =
 				// WritingToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
 
-				int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
+				int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true, "");
 				totalNumOfUsersComputedFor += numOfUsersComputerFor;
 				System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
 				System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
@@ -148,11 +148,11 @@ public class EvaluationSeq
 			// PopUps.showMessage("BREAKING");
 			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
 					listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
-					listOfPerAgreementsFilesL1);
+					listOfPerAgreementsFilesL1, "");
 
 			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
 					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
-					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1);
+					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1, "");
 
 			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
 					"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
@@ -162,9 +162,9 @@ public class EvaluationSeq
 			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
 
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
-					"SummaryLog");
+					"SummaryLog", "");
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
-					summaryStats, "SummaryTopKLog");
+					summaryStats, "SummaryTopKLog", "");
 			// consoleLogStream.close();
 		}
 		catch (Exception e)
@@ -180,10 +180,16 @@ public class EvaluationSeq
 	 * @param seqLength
 	 * @param outputCoreResultsPath
 	 * @param matchingUnitAsPastCount
+	 * @param dimensionPhrase
+	 *            only if necessary, not essential for primary dimension, e.g. SecDim for secondary dimension
+	 *            <p>
+	 *            used as of 18 July 2018
 	 */
-	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount)
+	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount,
+			String dimensionPhrase)
 	{
 		// commonPath = "./dataWritten/";
+		PopUps.showMessage("Starting EvaluationSeq for dimensionPhrase = " + dimensionPhrase);
 		if (Constant.useRandomlySampled100Users)
 		{
 			groupsOf100UsersLabels = new String[] { DomainConstants.gowalla100RandomUsersLabel };
@@ -222,7 +228,8 @@ public class EvaluationSeq
 
 					PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
-					int numOfUsersComputedFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
+					int numOfUsersComputedFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true,
+							dimensionPhrase);
 					totalNumOfUsersComputedFor += numOfUsersComputedFor;
 					System.out.println("numOfUsersComputerFor = " + numOfUsersComputedFor);
 					System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
@@ -233,23 +240,23 @@ public class EvaluationSeq
 					String algoLabel = "Algo";
 					String timeCategory = "All";
 					// for (String timeCategory : timeCategories){
-					listOfNumAgreementsFiles.get(muIndex)
-							.add(commonPath + algoLabel + timeCategory + "NumDirectAgreements.csv");
-					listOfPerAgreementsFiles.get(muIndex)
-							.add(commonPath + algoLabel + timeCategory + "PercentageDirectAgreements.csv");
-					listOfNumAgreementsFilesL1.get(muIndex)
-							.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectAgreements.csv");
-					listOfPerAgreementsFilesL1.get(muIndex)
-							.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectAgreements.csv");
+					listOfNumAgreementsFiles.get(muIndex).add(
+							commonPath + algoLabel + timeCategory + "NumDirectAgreements" + dimensionPhrase + ".csv");
+					listOfPerAgreementsFiles.get(muIndex).add(commonPath + algoLabel + timeCategory
+							+ "PercentageDirectAgreements" + dimensionPhrase + ".csv");
+					listOfNumAgreementsFilesL1.get(muIndex).add(commonPath + algoLabel + "L1" + timeCategory
+							+ "NumDirectAgreements" + dimensionPhrase + ".csv");
+					listOfPerAgreementsFilesL1.get(muIndex).add(commonPath + algoLabel + "L1" + timeCategory
+							+ "PercentageDirectAgreements" + dimensionPhrase + ".csv");
 
-					listOfNumTopKAgreementsFiles.get(muIndex)
-							.add(commonPath + algoLabel + timeCategory + "NumDirectTopKAgreements.csv");
-					listOfPerTopKAgreementsFiles.get(muIndex)
-							.add(commonPath + algoLabel + timeCategory + "PercentageDirectTopKAgreements.csv");
-					listOfNumTopKAgreementsFilesL1.get(muIndex)
-							.add(commonPath + algoLabel + "L1" + timeCategory + "NumDirectTopKAgreements.csv");
-					listOfPerTopKAgreementsFilesL1.get(muIndex)
-							.add(commonPath + algoLabel + "L1" + timeCategory + "PercentageDirectTopKAgreements.csv");
+					listOfNumTopKAgreementsFiles.get(muIndex).add(commonPath + algoLabel + timeCategory
+							+ "NumDirectTopKAgreements" + dimensionPhrase + ".csv");
+					listOfPerTopKAgreementsFiles.get(muIndex).add(commonPath + algoLabel + timeCategory
+							+ "PercentageDirectTopKAgreements" + dimensionPhrase + ".csv");
+					listOfNumTopKAgreementsFilesL1.get(muIndex).add(commonPath + algoLabel + "L1" + timeCategory
+							+ "NumDirectTopKAgreements" + dimensionPhrase + ".csv");
+					listOfPerTopKAgreementsFilesL1.get(muIndex).add(commonPath + algoLabel + "L1" + timeCategory
+							+ "PercentageDirectTopKAgreements" + dimensionPhrase + ".csv");
 					// }
 					consoleLogStream.close();
 				} // end of loop over MUs
@@ -263,11 +270,11 @@ public class EvaluationSeq
 			// PopUps.showMessage("BREAKING");
 			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
 					listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
-					listOfPerAgreementsFilesL1);
+					listOfPerAgreementsFilesL1, dimensionPhrase);
 
 			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
 					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
-					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1);
+					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1, dimensionPhrase);
 
 			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
 					"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
@@ -280,10 +287,11 @@ public class EvaluationSeq
 			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
 
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
-					"SummaryLog");
+					"SummaryLog", dimensionPhrase);
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
-					summaryStats, "SummaryTopKLog");
-			WToFile.appendLineToFileAbs("Finishing: ", Constant.getOutputCoreResultsPath() + "Debug1.txt\n");
+					summaryStats, "SummaryTopKLog", dimensionPhrase);
+			WToFile.appendLineToFileAbs("Finishing: ",
+					Constant.getOutputCoreResultsPath() + "Debug1" + dimensionPhrase + ".txt\n");
 		}
 		catch (Exception e)
 		{
@@ -325,7 +333,8 @@ public class EvaluationSeq
 
 					PrintStream consoleLogStream = WToFile.redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
-					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true);
+					int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true,
+							"");
 					totalNumOfUsersComputedFor += numOfUsersComputerFor;
 					System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
 					System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
@@ -363,11 +372,11 @@ public class EvaluationSeq
 			// PopUps.showMessage("BREAKING");
 			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
 					listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
-					listOfPerAgreementsFilesL1);
+					listOfPerAgreementsFilesL1, "");
 
 			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
 					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
-					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1);
+					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1, "");
 
 			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
 					"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
@@ -377,9 +386,9 @@ public class EvaluationSeq
 			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
 
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
-					"SummaryLog");
+					"SummaryLog", "");
 			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
-					summaryStats, "SummaryTopKLog");
+					summaryStats, "SummaryTopKLog", "");
 
 		}
 		catch (Exception e)
@@ -443,7 +452,7 @@ public class EvaluationSeq
 						// .redirectConsoleOutput(commonPath + "EvaluationLog.txt");
 
 						int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath,
-								false);
+								false, "");
 						totalNumOfUsersComputedFor += numOfUsersComputerFor;
 						System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
 						System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
@@ -487,11 +496,11 @@ public class EvaluationSeq
 
 					ArrayList<String> listOfWrittenFiles = concatenateFiles(pathT, matchingUnitAsPastCount,
 							listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
-							listOfPerAgreementsFilesL1);
+							listOfPerAgreementsFilesL1, "");
 
 					ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(pathT, matchingUnitAsPastCount,
 							listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles, listOfNumTopKAgreementsFilesL1,
-							listOfPerTopKAgreementsFilesL1);
+							listOfPerTopKAgreementsFilesL1, "");
 
 					String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
 							"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
@@ -501,9 +510,9 @@ public class EvaluationSeq
 					SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
 
 					summariseResults(seqLength, pathT, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
-							"SummaryLog");
+							"SummaryLog", "");
 					summariseResults(seqLength, pathT, matchingUnitAsPastCount, fileNamePhrasesTopK, summaryStats,
-							"SummaryTopKLog");
+							"SummaryTopKLog", "");
 				} // end of loop over thresholds
 			} // end of loop over users
 			consoleLogStream.close();
@@ -589,7 +598,7 @@ public class EvaluationSeq
 	 * @return
 	 */
 	private static ArrayList<ArrayList<Double>> getSummaryPerMUPerSeqIndex(int seqLength, String pathToRead,
-			double[] matchingUnitAsPastCount, String fileNamePhraseToRead, SummaryStat stat)
+			double[] matchingUnitAsPastCount, String fileNamePhraseToRead, SummaryStat stat, String dimensionPhrase)
 	{
 		// outerlist is for mu, inner list for seq index
 		ArrayList<ArrayList<Double>> summaryPerMUPerSeqIndex = new ArrayList<ArrayList<Double>>();
@@ -598,8 +607,8 @@ public class EvaluationSeq
 		{
 			int mu = (int) matchingUnitAsPastCount[muIndex];
 
-			ArrayList<Double> summaryStatsPerIndex = StatsUtils
-					.getColumnSummaryStatDouble(pathToRead + fileNamePhraseToRead + mu + ".csv", seqLength, 4, stat);
+			ArrayList<Double> summaryStatsPerIndex = StatsUtils.getColumnSummaryStatDouble(
+					pathToRead + fileNamePhraseToRead + mu + dimensionPhrase + ".csv", seqLength, 4, stat);
 
 			summaryPerMUPerSeqIndex.add(summaryStatsPerIndex);
 		}
@@ -618,7 +627,7 @@ public class EvaluationSeq
 	 * @param summaryStats
 	 */
 	private static void summariseResults(int seqLength, String pathToWrite, double[] matchingUnitAsPastCount,
-			String[] fileNamePhrases, SummaryStat[] summaryStats, String consoleLogFileName)
+			String[] fileNamePhrases, SummaryStat[] summaryStats, String consoleLogFileName, String dimensionPhrase)
 	{
 		// String[] fileNamePhrases = { "", "" };
 		// SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
@@ -642,10 +651,10 @@ public class EvaluationSeq
 			for (SummaryStat stat : summaryStats)
 			{
 				ArrayList<ArrayList<Double>> summaryPerMUPerSeqIndex = getSummaryPerMUPerSeqIndex(seqLength,
-						pathToWrite, matchingUnitAsPastCount, fileNamePhraseToRead, stat);
+						pathToWrite, matchingUnitAsPastCount, fileNamePhraseToRead, stat, dimensionPhrase);
 
 				WToFile.writeArrayListOfArrayList(summaryPerMUPerSeqIndex,
-						pathToWrite + stat + fileNamePhraseToRead + ".csv", ",", colNames, rowNames);
+						pathToWrite + stat + fileNamePhraseToRead + dimensionPhrase + ".csv", ",", colNames, rowNames);
 			}
 		}
 		// consoleLogStream.close();
@@ -784,7 +793,7 @@ public class EvaluationSeq
 			ArrayList<ArrayList<String>> listOfNumAgreementsFiles,
 			ArrayList<ArrayList<String>> listOfPerAgreementsFiles,
 			ArrayList<ArrayList<String>> listOfNumAgreementsFilesL1,
-			ArrayList<ArrayList<String>> listOfPerAgreementsFilesL1)
+			ArrayList<ArrayList<String>> listOfPerAgreementsFilesL1, String dimensionPhrase)
 	{
 		ArrayList<String> listOfWrittenFiles = new ArrayList<String>();
 		// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVConcatLog.txt");
@@ -797,20 +806,20 @@ public class EvaluationSeq
 			// listOfNumAgreementsFiles.get(muIndex));
 
 			CSVUtils.concatenateCSVFiles(listOfNumAgreementsFiles.get(muIndex), true,
-					pathToWrite + "AllNumDirectAgreements_" + mu + ".csv");
-			listOfWrittenFiles.add(pathToWrite + "AllNumDirectAgreements" + mu + ".csv");
+					pathToWrite + "AllNumDirectAgreements_" + mu + dimensionPhrase + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllNumDirectAgreements" + mu + dimensionPhrase + ".csv");
 
 			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFiles.get(muIndex), true,
-					pathToWrite + "AllPerDirectAgreements_" + mu + ".csv");
-			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreements" + mu + ".csv");
+					pathToWrite + "AllPerDirectAgreements_" + mu + dimensionPhrase + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreements" + mu + dimensionPhrase + ".csv");
 
 			CSVUtils.concatenateCSVFiles(listOfNumAgreementsFilesL1.get(muIndex), true,
-					pathToWrite + "AllNumDirectAgreementsL1_" + mu + ".csv");
-			listOfWrittenFiles.add(pathToWrite + "AllNumDirectAgreementsL1" + mu + ".csv");
+					pathToWrite + "AllNumDirectAgreementsL1_" + mu + dimensionPhrase + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllNumDirectAgreementsL1" + mu + dimensionPhrase + ".csv");
 
 			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFilesL1.get(muIndex), true,
-					pathToWrite + "AllPerDirectAgreementsL1_" + mu + ".csv");
-			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreementsL1" + mu + ".csv");
+					pathToWrite + "AllPerDirectAgreementsL1_" + mu + dimensionPhrase + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreementsL1" + mu + dimensionPhrase + ".csv");
 		}
 		// consoleLogStream.close();
 
@@ -834,7 +843,7 @@ public class EvaluationSeq
 			ArrayList<ArrayList<String>> listOfNumTopKAgreementsFiles,
 			ArrayList<ArrayList<String>> listOfPerTopKAgreementsFiles,
 			ArrayList<ArrayList<String>> listOfNumTopKAgreementsFilesL1,
-			ArrayList<ArrayList<String>> listOfPerTopKAgreementsFilesL1)
+			ArrayList<ArrayList<String>> listOfPerTopKAgreementsFilesL1, String dimensionPhrase)
 	{
 		ArrayList<String> listOfWrittenFiles = new ArrayList<String>();
 		// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVTopKConcatLog.txt");
@@ -847,20 +856,20 @@ public class EvaluationSeq
 			// listOfNumAgreementsFiles.get(muIndex));
 
 			CSVUtils.concatenateCSVFiles(listOfNumTopKAgreementsFiles.get(muIndex), true,
-					pathToWrite + "AllNumDirectTopKAgreements_" + mu + ".csv");
-			listOfWrittenFiles.add(pathToWrite + "AllNumDirectTopKAgreements_" + mu + ".csv");
+					pathToWrite + "AllNumDirectTopKAgreements_" + mu + dimensionPhrase + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllNumDirectTopKAgreements_" + mu + dimensionPhrase + ".csv");
 
 			CSVUtils.concatenateCSVFiles(listOfPerTopKAgreementsFiles.get(muIndex), true,
-					pathToWrite + "AllPerDirectTopKAgreements_" + mu + ".csv");
-			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreements_" + mu + ".csv");
+					pathToWrite + "AllPerDirectTopKAgreements_" + mu + dimensionPhrase + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreements_" + mu + dimensionPhrase + ".csv");
 
 			CSVUtils.concatenateCSVFiles(listOfNumTopKAgreementsFilesL1.get(muIndex), true,
-					pathToWrite + "AllNumDirectTopKAgreementsL1_" + mu + ".csv");
-			listOfWrittenFiles.add(pathToWrite + "AllNumDirectTopKAgreementsL1_" + mu + ".csv");
+					pathToWrite + "AllNumDirectTopKAgreementsL1_" + mu + dimensionPhrase + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllNumDirectTopKAgreementsL1_" + mu + dimensionPhrase + ".csv");
 
 			CSVUtils.concatenateCSVFiles(listOfPerTopKAgreementsFilesL1.get(muIndex), true,
-					pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + ".csv");
-			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + ".csv");
+					pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + dimensionPhrase + ".csv");
+			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + dimensionPhrase + ".csv");
 		}
 		// consoleLogStream.close();
 
@@ -905,22 +914,26 @@ public class EvaluationSeq
 	 * @param pathToWrite
 	 * @param commonPath
 	 * @param verbose
+	 * @param dimensionPhrase
+	 *            intrdocued on 19 July 2018
 	 * @return
+	 *         <p>
+	 *         used as of 19 July 2018
 	 */
 	public int doEvaluationSeq(int seqLength, String pathToReadResults, String pathToWrite, String commonPath,
-			boolean verbose)
+			boolean verbose, String dimensionPhrase)
 	{
 		int numOfUsersComputedForSeqPred = Integer.MIN_VALUE;
 		// all data must have same number of users, i.e., same numer of rows, i.e., same size for outer arraylist.
 		Set<Integer> numOfUsersSanityCheck = new LinkedHashSet<>();
 
-		System.out.println("Inside doEvaluationSeq");
+		System.out.println("Inside doEvaluationSeq dimensionPhrase=" + dimensionPhrase);
 		try
 		{
 			{// block for evaluating sequence prediction overall
 				Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysPredSeq = readDataMetaActualTopK(
-						pathToReadResults, "dataRecommSequenceWithScore.csv", "dataActualSequence.csv", commonPath,
-						verbose);
+						pathToReadResults, "dataRecommSequence" + dimensionPhrase + "WithScore.csv",
+						"dataActualSequence" + dimensionPhrase + ".csv", commonPath, verbose);
 
 				ArrayList<ArrayList<String>> arrayMeta = readArraysPredSeq.getFirst();
 				ArrayList<ArrayList<String>> arrayRecommendedSequence = readArraysPredSeq.getThird();
@@ -931,15 +944,16 @@ public class EvaluationSeq
 				numOfUsersSanityCheck.add(arrayActualSequence.size());
 
 				numOfUsersComputedForSeqPred = doEvaluationSeq(arrayMeta, arrayRecommendedSequence, arrayActualSequence,
-						timeCategories, "Algo", verbose, pathToWrite, seqLength);
+						timeCategories, "Algo", verbose, pathToWrite, seqLength, dimensionPhrase);
 			}
 
 			// block for evaluating sequence prediction at each first K
 			for (int seqIndex = 0; seqIndex < seqLength; seqIndex++)
 			{
 				Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysForFirstK = readDataMetaActualTopK(
-						pathToReadResults, "dataRankedRecommendationWithScores" + seqLength + ".csv",
-						"dataActual" + seqIndex + ".csv", commonPath, verbose);
+						pathToReadResults, "dataRankedRecommendation" + dimensionPhrase + "WithoutScores"
+								+ seqIndex/* seqLength */ + ".csv",
+						"dataActual" + dimensionPhrase + seqIndex + ".csv", commonPath, verbose);
 
 				// should be same same meta for all
 				ArrayList<ArrayList<String>> arrayMetaFirstK = readArraysForFirstK.getFirst();
@@ -951,7 +965,8 @@ public class EvaluationSeq
 				numOfUsersSanityCheck.add(arrayActualSequenceFirstK.size());
 
 				doEvaluationNonSeq(arrayMetaFirstK, arrayRecommendedSequenceFirstK, arrayActualSequenceFirstK,
-						timeCategories, Constant.EvalPrecisionRecallFMeasure, theKOriginal, "AlgoStep" + seqIndex);
+						timeCategories, Constant.EvalPrecisionRecallFMeasure, theKOriginal, "AlgoStep" + seqIndex,
+						dimensionPhrase);
 			}
 
 			// for (int i = 0; i < seqLength; i++)
@@ -1001,7 +1016,9 @@ public class EvaluationSeq
 			boolean verbose)
 	{
 		// commonPath = Constant.getCommonPath();
-		System.out.println("Inside readDataForSeqIndex: common path is:" + commonPath);
+		System.out.println("Inside readDataForSeqIndex: common path is:" + commonPath + "\npathToReadResults="
+				+ pathToReadResults + "\npredictionDataFileName=" + predictionDataFileName + "\nactualDataFileName="
+				+ actualDataFileName);
 
 		BufferedReader brMeta = null, brTopK = null, brActual = null;
 		// , brBaseLineOccurrence = null,brBaseLineDuration = null, brCurrentTargetSame = null;
@@ -1122,11 +1139,17 @@ public class EvaluationSeq
 	 * @param arrayActualSeq
 	 * @param timeCategories
 	 * @param algoLabel
+	 * @param verbose
+	 * @param pathToWrite
+	 * @param seqLength
+	 * @param dimensionPhrase
+	 *            introduced on 19 July 2018 only for filenames of files to be written
 	 * @return
 	 */
 	private static int doEvaluationSeq(ArrayList<ArrayList<String>> arrayMeta,
 			ArrayList<ArrayList<String>> arrayRecommendedSeq, ArrayList<ArrayList<String>> arrayActualSeq,
-			String[] timeCategories, String algoLabel, boolean verbose, String pathToWrite, int seqLength)
+			String[] timeCategories, String algoLabel, boolean verbose, String pathToWrite, int seqLength,
+			String dimensionPhrase)
 	{
 		int numOfUsers = arrayMeta.size();
 		int numOfUsersFromDirectAgreements = Integer.MIN_VALUE;
@@ -1141,19 +1164,22 @@ public class EvaluationSeq
 			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements = computeDirectAgreements(algoLabel,
 					timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, -1);
 
-			writeDirectAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite);
+			writeDirectAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite, dimensionPhrase);
 			writeNumAndPercentageDirectAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite,
-					seqLength);
-			writeDirectTopKAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite, seqLength);
+					seqLength, dimensionPhrase);
+			writeDirectTopKAgreements(algoLabel, timeCategory, arrayDirectAgreements, pathToWrite, seqLength,
+					dimensionPhrase);
 
 			// category level: level 1
 			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreementsL1 = computeDirectAgreements(algoLabel,
 					timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, 1);
 
-			writeDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite);
+			writeDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
+					dimensionPhrase);
 			writeNumAndPercentageDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
-					seqLength);
-			writeDirectTopKAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite, seqLength);
+					seqLength, dimensionPhrase);
+			writeDirectTopKAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite, seqLength,
+					dimensionPhrase);
 
 			numOfUsersFromDirectAgreements = arrayDirectAgreements.size();
 		}
@@ -1169,7 +1195,8 @@ public class EvaluationSeq
 	 * @param pathToWrite
 	 */
 	private static void writeNumAndPercentageDirectAgreements(String fileNamePhrase, String timeCategory,
-			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite, int seqLength)
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite, int seqLength,
+			String dimensionPhrase)
 	{
 		try
 		{
@@ -1211,9 +1238,9 @@ public class EvaluationSeq
 			}
 
 			WToFile.writeToNewFile(sb.toString(),
-					pathToWrite + fileNamePhrase + timeCategory + "NumDirectAgreements.csv");
-			WToFile.writeToNewFile(sbPercentage.toString(),
-					pathToWrite + fileNamePhrase + timeCategory + "PercentageDirectAgreements.csv");
+					pathToWrite + fileNamePhrase + timeCategory + "NumDirectAgreements" + dimensionPhrase + ".csv");
+			WToFile.writeToNewFile(sbPercentage.toString(), pathToWrite + fileNamePhrase + timeCategory
+					+ "PercentageDirectAgreements" + dimensionPhrase + ".csv");
 		}
 		catch (Exception e)
 		{
@@ -1231,7 +1258,7 @@ public class EvaluationSeq
 	 * @param pathToWritex
 	 */
 	private static void writeDirectAgreements(String fileNamePhrase, String timeCategory,
-			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite)
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite, String dimensionPhrase)
 	{
 		System.out
 				.println("Ajooba writeDirectAgreements: arrayDirectAgreements.size()= " + arrayDirectAgreements.size());
@@ -1267,7 +1294,8 @@ public class EvaluationSeq
 				}
 			}
 
-			WToFile.writeToNewFile(sb.toString(), pathToWrite + fileNamePhrase + timeCategory + "DirectAgreements.csv");
+			WToFile.writeToNewFile(sb.toString(),
+					pathToWrite + fileNamePhrase + timeCategory + "DirectAgreements" + dimensionPhrase + ".csv");
 
 		}
 		catch (Exception e)
@@ -1286,7 +1314,8 @@ public class EvaluationSeq
 	 * @param pathToWrite
 	 */
 	private static void writeDirectTopKAgreements(String fileNamePhrase, String timeCategory,
-			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite, int seqLength)
+			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreements, String pathToWrite, int seqLength,
+			String dimensionPhrase)
 	{
 		try
 		{
@@ -1330,9 +1359,9 @@ public class EvaluationSeq
 			}
 
 			WToFile.writeToNewFile(sb.toString(),
-					pathToWrite + fileNamePhrase + timeCategory + "NumDirectTopKAgreements.csv");
-			WToFile.writeToNewFile(sbPercentage.toString(),
-					pathToWrite + fileNamePhrase + timeCategory + "PercentageDirectTopKAgreements.csv");
+					pathToWrite + fileNamePhrase + timeCategory + "NumDirectTopKAgreements" + dimensionPhrase + ".csv");
+			WToFile.writeToNewFile(sbPercentage.toString(), pathToWrite + fileNamePhrase + timeCategory
+					+ "PercentageDirectTopKAgreements" + dimensionPhrase + ".csv");
 		}
 		catch (Exception e)
 		{
@@ -1524,13 +1553,13 @@ public class EvaluationSeq
 	 */
 	private static void doEvaluationNonSeq(ArrayList<ArrayList<String>> arrayMeta,
 			ArrayList<ArrayList<String>> arrayTopK, ArrayList<ArrayList<String>> arrayActual, String[] timeCategories,
-			boolean evalPrecisionRecallFMeasure, int theKOriginal, String algoLabel)
+			boolean evalPrecisionRecallFMeasure, int theKOriginal, String algoLabel, String dimensionPhrase)
 	{
 		int numOfUsers = arrayTopK.size();
 		for (String timeCategory : timeCategories)
 		{
-			writeReciprocalRank(algoLabel, timeCategory, arrayMeta, arrayTopK, arrayActual);
-			writeMeanReciprocalRank(algoLabel, timeCategory, numOfUsers); // average over data points
+			writeReciprocalRank(algoLabel, timeCategory, arrayMeta, arrayTopK, arrayActual, dimensionPhrase);
+			writeMeanReciprocalRank(algoLabel, timeCategory, numOfUsers, dimensionPhrase); // average over data points
 
 			if (evalPrecisionRecallFMeasure)
 			{
@@ -1539,9 +1568,10 @@ public class EvaluationSeq
 					writePrecisionRecallFMeasure(algoLabel, timeCategory, theK, arrayMeta, arrayTopK, arrayActual);
 				}
 
-				writeAvgPrecisionsForAllKs(algoLabel, timeCategory, numOfUsers); // average over data points
-				writeAvgRecallsForAllKs(algoLabel, timeCategory, numOfUsers);
-				writeAvgFMeasuresForAllKs(algoLabel, timeCategory, numOfUsers);
+				writeAvgPrecisionsForAllKs(algoLabel, timeCategory, numOfUsers, dimensionPhrase); // average over data
+																									// points
+				writeAvgRecallsForAllKs(algoLabel, timeCategory, numOfUsers, dimensionPhrase);
+				writeAvgFMeasuresForAllKs(algoLabel, timeCategory, numOfUsers, dimensionPhrase);
 			}
 		}
 	}
@@ -1602,14 +1632,15 @@ public class EvaluationSeq
 	 */
 	public static void writeReciprocalRank(String fileNamePhrase, String timeCategory,
 			ArrayList<ArrayList<String>> arrayMeta, ArrayList<ArrayList<String>> arrayTopK,
-			ArrayList<ArrayList<String>> arrayActual)
+			ArrayList<ArrayList<String>> arrayActual, String dimensionPhrase)
 	{
 		String commonPath = Constant.getCommonPath();
 		BufferedWriter bwRR = null;
 		try
 		{
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine;
-			bwRR = WToFile.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv");
+			bwRR = WToFile.getBWForNewFile(
+					commonPath + fileNamePhrase + timeCategory + "ReciprocalRank" + dimensionPhrase + ".csv");
 			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
 					+ "   size of actual array=" + arrayActual.size());
 
@@ -1766,8 +1797,8 @@ public class EvaluationSeq
 
 				// bwNumberOfRecommendationTimes.write(ConnectDatabase.getUserNameFromDatabase(i) + ",");
 
-				int[] userIDs = Constant.getUserIDs();
-				bwNumberOfRecommendationTimes.write(userIDs[i] + ",");
+				// int[] userIDs = Constant.getUserIDs();//disable on 19 July, instead of userIDs, lets use row id as id
+				// bwNumberOfRecommendationTimes.write();// userIDs[i] + ",");//disabled on 19 July
 
 				// int theK=0;
 				int countOfRecommendationTimesConsidered = 0; // =count of meta entries considered
@@ -1899,18 +1930,21 @@ public class EvaluationSeq
 
 	/**
 	 * THIS MIGHT HAVE THE POSSIBILITY OF OPTIMISATION
+	 * <p>
+	 * NOTE: Reads ReciprocalRank file.
 	 * 
 	 * @param fileNamePhrase
 	 * @param timeCategory
 	 * @param numUsers
 	 */
-	public static void writeMeanReciprocalRank(String fileNamePhrase, String timeCategory, int numUsers)
+	public static void writeMeanReciprocalRank(String fileNamePhrase, String timeCategory, int numUsers,
+			String dimensionPhrase)
 	{
 		String commonPath = Constant.getCommonPath();
 		try
 		{
-			BufferedWriter bw = WToFile
-					.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "MeanReciprocalRank.csv");
+			BufferedWriter bw = WToFile.getBWForNewFile(
+					commonPath + fileNamePhrase + timeCategory + "MeanReciprocalRank" + dimensionPhrase + ".csv");
 			bw.write(",MRR\n");
 
 			for (int user = 0; user < numUsers; user++)
@@ -1918,15 +1952,15 @@ public class EvaluationSeq
 				bw.write("User_" + user + ","); // TODO: currently this starts from User_0, change it to start from
 												// User_1 but this will also require necessary changes in other
 												// places
-				BufferedReader br = new BufferedReader(
-						new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
+				BufferedReader br = new BufferedReader(new FileReader(
+						commonPath + fileNamePhrase + timeCategory + "ReciprocalRank" + dimensionPhrase + ".csv"));
 				String currentLine;
 
 				if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 				{
 					System.out.println("Calculating MRR for user:" + user);
-					System.out.println(
-							("reading for MRR: " + commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
+					System.out.println(("reading for MRR: " + commonPath + fileNamePhrase + timeCategory
+							+ "ReciprocalRank" + dimensionPhrase + ".csv"));
 				}
 
 				int lineNumber = 0;
@@ -1954,7 +1988,7 @@ public class EvaluationSeq
 						if (currentLine.trim().length() == 0)
 						{
 							System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath
-									+ fileNamePhrase + timeCategory + "ReciprocalRank.csv");
+									+ fileNamePhrase + timeCategory + "ReciprocalRank" + dimensionPhrase + ".csv");
 						}
 
 						else
@@ -2008,19 +2042,21 @@ public class EvaluationSeq
 	 * @param timeCategory
 	 * @param numUsers
 	 */
-	public static void writeAvgPrecisionsForAllKs(String fileNamePhrase, String timeCategory, int numUsers)
+	public static void writeAvgPrecisionsForAllKs(String fileNamePhrase, String timeCategory, int numUsers,
+			String dimensionPhrase)
 	{
 		// BufferedReader br= null;
 		String commonPath = Constant.getCommonPath();
 		try
 		{
-			File file = new File(commonPath + fileNamePhrase + timeCategory + "AvgPrecision.csv");
+			File file = new File(
+					commonPath + fileNamePhrase + timeCategory + "AvgPrecision" + dimensionPhrase + ".csv");
 
 			file.delete();
 			file.createNewFile();
 
 			File validRTCountFile = new File(
-					commonPath + fileNamePhrase + timeCategory + "AvgPrecisionCountValidRT.csv");
+					commonPath + fileNamePhrase + timeCategory + "AvgPrecisionCountValidRT" + dimensionPhrase + ".csv");
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
@@ -2045,8 +2081,8 @@ public class EvaluationSeq
 				{
 					BufferedReader br = new BufferedReader(
 							new FileReader(commonPath + fileNamePhrase + timeCategory + "top" + K + "Precision.csv"));
-					System.out.println(("reading for avg precision: " + commonPath + fileNamePhrase + timeCategory
-							+ "top" + K + "Precision.csv"));
+					System.out.println("reading for avg precision: " + commonPath + fileNamePhrase + timeCategory
+							+ "top" + K + "Precision.csv" + " dimensionPhrase=" + dimensionPhrase);
 					String currentLine;
 
 					int lineNumber = 0;
@@ -2131,13 +2167,14 @@ public class EvaluationSeq
 	 * @param timeCategory
 	 * @param numUsers
 	 */
-	public static void writeAvgRecallsForAllKs(String fileNamePhrase, String timeCategory, int numUsers)
+	public static void writeAvgRecallsForAllKs(String fileNamePhrase, String timeCategory, int numUsers,
+			String dimensionPhrase)
 	{
 		// BufferedReader br= null;
 		String commonPath = Constant.getCommonPath();
 		try
 		{
-			File file = new File(commonPath + fileNamePhrase + timeCategory + "AvgRecall.csv");
+			File file = new File(commonPath + fileNamePhrase + timeCategory + "AvgRecall" + dimensionPhrase + ".csv");
 			file.delete();
 			if (!file.exists())
 			{
@@ -2147,7 +2184,8 @@ public class EvaluationSeq
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 
-			File validRTCountFile = new File(commonPath + fileNamePhrase + timeCategory + "AvgRecallCountValidRT.csv");
+			File validRTCountFile = new File(
+					commonPath + fileNamePhrase + timeCategory + "AvgRecallCountValidRT" + dimensionPhrase + ".csv");
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
@@ -2188,7 +2226,8 @@ public class EvaluationSeq
 							if (currentLine.trim().length() == 0)
 							{
 								System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath
-										+ fileNamePhrase + timeCategory + "top" + K + "Precision.csv");
+										+ fileNamePhrase + timeCategory + "top" + K + "Precision.csv dimensionPhrase="
+										+ dimensionPhrase);
 							}
 							else
 							{
@@ -2242,13 +2281,14 @@ public class EvaluationSeq
 	 * @param timeCategory
 	 * @param numUsers
 	 */
-	public static void writeAvgFMeasuresForAllKs(String fileNamePhrase, String timeCategory, int numUsers)
+	public static void writeAvgFMeasuresForAllKs(String fileNamePhrase, String timeCategory, int numUsers,
+			String dimensionPhrase)
 	{
 		// BufferedReader br= null;
 		String commonPath = Constant.getCommonPath();
 		try
 		{
-			File file = new File(commonPath + fileNamePhrase + timeCategory + "AvgFMeasure.csv");
+			File file = new File(commonPath + fileNamePhrase + timeCategory + "AvgFMeasure" + dimensionPhrase + ".csv");
 
 			file.delete();
 
@@ -2261,7 +2301,7 @@ public class EvaluationSeq
 			BufferedWriter bw = new BufferedWriter(fw);
 
 			File validRTCountFile = new File(
-					commonPath + fileNamePhrase + timeCategory + "AvgFMeasureCountValidRT.csv");
+					commonPath + fileNamePhrase + timeCategory + "AvgFMeasureCountValidRT" + dimensionPhrase + ".csv");
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
@@ -2302,7 +2342,8 @@ public class EvaluationSeq
 							if (currentLine.trim().length() == 0)
 							{
 								System.out.println(" NOTE: line for user(" + user + ") is EMPTY for " + commonPath
-										+ fileNamePhrase + timeCategory + "top" + K + "Precision.csv");
+										+ fileNamePhrase + timeCategory + "top" + K + "Precision.csv dimensionPhrase="
+										+ dimensionPhrase);
 							}
 
 							else

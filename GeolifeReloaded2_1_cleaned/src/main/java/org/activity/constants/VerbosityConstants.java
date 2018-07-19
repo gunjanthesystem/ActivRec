@@ -75,10 +75,10 @@ public class VerbosityConstants
 	/**
 	 * to save writing non essential redudant stuffs
 	 */
-	public static final boolean WriteTopNextActivitiesWithoutDistance = true;
-	public static final boolean WriteTopNextActivitiesWithDistance = true;
+	public static final boolean WriteTopNextActivitiesWithoutDistance = false;
+	public static final boolean WriteTopNextActivitiesWithDistance = false;
 
-	public static final boolean WriteRaw = true;// SWITCH
+	public static final boolean WriteRaw = false;// SWITCH
 
 	public static final boolean writeRankedRecommsWOScoreForEachSeqIndex = true;// false;
 	public static final boolean writeDataActualForEachSeqIndex = true;
