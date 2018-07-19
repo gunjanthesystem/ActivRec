@@ -1485,6 +1485,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										bwsRaw.get(seqI).write(sbsRawToWriteForThisUserDate.get(seqI).toString());
 										bwsRawSecDim.get(seqI)
 												.write(sbsRawSecDimToWriteForThisUserDate.get(seqI).toString());
+										if (Constant.debug18July2018)
+										{
+											System.out.println(
+													"debug18July2018 1490: -sbsRawSecDimToWriteForThisUserDate.get(seqI) ="
+															+ sbsRawSecDimToWriteForThisUserDate.get(seqI));
+										}
 									}
 									bwsRankedRecommWithScore.get(seqI)
 											.write(rankedRecommWithScoreToWriteForThisUserDate.get(seqI).toString());
@@ -1623,6 +1629,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 
 						// $$new Evaluation();
 
+						System.out.println("All BWs closed :" + pruningHasSaturated);
 						System.out.println("Pruning has Saturated is :" + pruningHasSaturated);
 						// String msg = "";
 
@@ -1876,7 +1883,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 	 * @param actsActualDoneInSeq
 	 * @param rankedRecommWithScoreForThisRTIter
 	 */
-	private void writeRawLogs(String userName, String dateToRecomm, String weekDay,
+	private static void writeRawLogs(String userName, String dateToRecomm, String weekDay,
 			StringBuilder sbsRawToWriteForThisUserDate, String timeCategory, RecommendationMasterI recommMaster,
 			String recommTimesString, String actActualDoneInSeq, String rankedRecommWithScoreForThisRTIter)
 	{
@@ -1911,7 +1918,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 	 * @param rankedRecommWithScoreForThisRTIter
 	 * @since 18 July 2018
 	 */
-	private void writeRawLogsSecDim(String userName, String dateToRecomm, String weekDay,
+	private static void writeRawLogsSecDim(String userName, String dateToRecomm, String weekDay,
 			StringBuilder sbsRawToWriteForThisUserDate, String timeCategory,
 			RecommendationMasterMar2017GenSeqMultiDJul2018 recommMaster, String recommTimesString,
 			String actActualDoneInSeq, String rankedRecommWithScoreForThisRTIter, PrimaryDimension secondaryDimension)
@@ -1932,6 +1939,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 				// recommP1.getAvgEndSimilarity()
 				// , "," , recommP1.getSDEndSimilarity()
 				+ Boolean.toString((currentActName.equals(actActualDoneInSeq))) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
+
+		if (Constant.debug18July2018)
+		{
+			System.out.println("Debug18July2018: Inside writeRawLogsSecDim: sbsRawToWriteForThisUserDate.length()="
+					+ sbsRawToWriteForThisUserDate.length());
+		}
 	}
 
 	/**

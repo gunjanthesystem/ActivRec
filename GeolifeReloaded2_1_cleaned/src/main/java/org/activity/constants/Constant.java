@@ -46,6 +46,8 @@ public final class Constant
 	// ////************* PARAMETERS TO BE SET ********************//////
 	public static final boolean removeCurrentActivityNameFromRecommendations = false;// true;
 
+	// addded as constant on 19 July 2018
+	public static final int lengthOfRecommendedSequence = 1;
 	/**
 	 * whether there threshold should be applied on candidate timelines based on edit distance
 	 */
@@ -254,6 +256,7 @@ public final class Constant
 
 	public static final boolean doSecondaryDimension = true;
 	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
+	public static final boolean debug18July2018 = false;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -683,7 +686,7 @@ public final class Constant
 		DomainConstants.setCatIDGivenLevelCatIDMap();
 		DomainConstants.setUserIDUserObjectDictionary(pathToSerialisedUserObjects);
 		DomainConstants.setGowallaLocZoneIdMap(pathToSerialisedGowallaLocZoneIdMap);
-
+		DomainConstants.setGridIDLocIDGowallaMaps();
 		// TODO: take the path as an argument.
 		DomainConstants.setCatIDLevelWiseCatIDsList(PathConstants.pathToSerialisedLevelWiseCatIDsDict);
 
@@ -1581,6 +1584,7 @@ public final class Constant
 			}
 		}
 		s.append("\nepsilonForFloatZero:" + epsilonForFloatZero);
+		s.append("\nlengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
 		s.append("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 		return s.toString();
 

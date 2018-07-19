@@ -146,6 +146,23 @@ public class DomainConstants
 		locIDGridIndexGowallaMap = (Map<Long, Integer>) Serializer
 				.kryoDeSerializeThis(PathConstants.pathToSerialisedLocIDGridIndexGowallaMap);
 
+		if (true)// write
+		{
+			StringBuilder sb1 = new StringBuilder("GridID\tLocIDs\n");
+			gridIDLocIDsGowallaMap.entrySet().stream()
+					.forEach(e -> sb1.append(e.getKey() + "\t" + e.getValue() + "\n"));
+			WToFile.appendLineToFileAbs(sb1.toString(), Constant.getCommonPath() + "gridIDLocIDsGowallaMap.csv");
+
+			StringBuilder sb2 = new StringBuilder("LocID\tGridID\n");
+			locIDGridIDGowallaMap.entrySet().stream().forEach(e -> sb2.append(e.getKey() + "\t" + e.getValue() + "\n"));
+			WToFile.appendLineToFileAbs(sb2.toString(), Constant.getCommonPath() + "locIDGridIDGowallaMap.csv");
+
+			StringBuilder sb3 = new StringBuilder("LocID\tGridIndex\n");
+			locIDGridIndexGowallaMap.entrySet().stream()
+					.forEach(e -> sb3.append(e.getKey() + "\t" + e.getValue() + "\n"));
+			WToFile.appendLineToFileAbs(sb3.toString(), Constant.getCommonPath() + "locIDGridIndexGowallaMap.csv");
+
+		}
 		System.out.println("gridIDLocIDsGowallaMap.size()=" + gridIDLocIDsGowallaMap.size());
 		System.out.println("locIDGridIDGowallaMap.size()=" + locIDGridIDGowallaMap.size());
 		System.out.println("locIDGridIndexGowallaMap.size()=" + locIDGridIndexGowallaMap.size());

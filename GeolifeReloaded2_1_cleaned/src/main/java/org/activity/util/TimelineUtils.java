@@ -26,6 +26,7 @@ import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.HJEditDistance;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
@@ -1168,7 +1169,7 @@ public class TimelineUtils
 			Int2ObjectOpenHashMap<LocationGowalla> locationObjects)
 	{
 		System.out.println("Inside convertCheckinEntriesToActivityObjectsGowallaV2():");
-		DomainConstants.setGridIDLocIDGowallaMaps();
+		// DomainConstants.setGridIDLocIDGowallaMaps();
 		Map<Long, Integer> locIDGridIndexMap = DomainConstants.getLocIDGridIndexGowallaMap();
 
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
@@ -1305,14 +1306,14 @@ public class TimelineUtils
 						numOfCInsWithMultipleDistinctLocIDs += 1;
 					}
 
-					long gridID = getGridID(locIDs, locIDGridIndexMap);
+					int gridID = getGridID(locIDs, locIDGridIndexMap, userID, startTimestamp);
 					// ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
 					ActivityObject ao = new ActivityObject(
 							activityID, locIDs, activityName, locationName, startTimestamp, startLatitude,
 							startLongitude, startAltitude, userID, photos_count, checkins_count, users_count,
 							radius_meters, highlights_count, items_count, max_items_count, cin.getWorkingLevelCatIDs(),
 							distaneInMFromPrev, durationInSecFromPrev, /* levelWiseCatIDs, */
-							currentZoneId, distanceInMFromNext, durationInSecFromNext);
+							currentZoneId, distanceInMFromNext, durationInSecFromNext, gridID);
 
 					// Start of sanity check of April 6
 					uniqueActIDs.add(ao.getActivityID());
@@ -1367,10 +1368,13 @@ public class TimelineUtils
 	/**
 	 * 
 	 * @param locIDs
-	 * @param locIDGridIDMap
+	 * @param locIDGridIndexMap
+	 * @param userForLog
+	 * @param tsForLog
 	 * @return
 	 */
-	private static int getGridID(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap)
+	private static int getGridID(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap, String userForLog,
+			Timestamp tsForLog)
 	{
 		StringBuilder sbLog = new StringBuilder();
 		Set<Integer> uniqueLocIDs = new TreeSet<>();
@@ -1401,18 +1405,18 @@ public class TimelineUtils
 		List<Integer> gridIndicesWithMaxCount = (List<Integer>) ComparatorUtils.getKeysWithMaxValues(gridIndicesCount);
 
 		WToFile.appendLineToFileAbs(sbLog.toString(),
-				Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelines.csv");
+				Constant.getCommonPath() + "LocIDGridIndexWhileCreatingTimelines.csv");
 
 		WToFile.appendLineToFileAbs(
 				gridIndices.size() + "," + uniqueGridIndices.size() + ","
 						+ gridIndices.stream().map(l -> String.valueOf(l)).collect(Collectors.joining("|")) + "\n",
-				Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelinesSize.csv");
+				Constant.getCommonPath() + "LocIDGridIndexWhileCreatingTimelinesSize.csv");
 
 		// #LocationIDs,#UniqueLocationIDs,#GridIDs,#UniqueGridIDs,#GridIDsWithMaxCount,LocIDs,GridIDs,GridIDsWithMaxCount
 
 		if (uniqueGridIndices.size() > 1)
 		{
-			String fileNameToWrite = Constant.getCommonPath() + "LocIDGridIDWhileCreatingTimelinesStats.csv";
+			String fileNameToWrite = Constant.getCommonPath() + "LocIDGridIndexWhileCreatingTimelinesStats.csv";
 			File f = new File(fileNameToWrite);
 			if (!f.exists())
 			{
@@ -1430,7 +1434,13 @@ public class TimelineUtils
 
 		// List<Long> gridIDsList = new ArrayList<>();
 		// gridIDsList.addAll(uniqueGridIDs);
-		return gridIndicesWithMaxCount.get(0);
+		int gridIndexToReturn = gridIndicesWithMaxCount.get(0);
+
+		WToFile.appendLineToFileAbs("locIDs\t" + locIDs.stream().map(v -> v.toString()).collect(Collectors.joining("|"))
+				+ "\tgridIndexToReturn\t" + gridIndexToReturn + "\tu\t" + userForLog + "\tts\t" + tsForLog + "\n",
+				Constant.getCommonPath() + "GridIndexPerCheckin.csv");
+
+		return gridIndexToReturn;
 	}
 
 	/**
@@ -4657,6 +4667,49 @@ public class TimelineUtils
 	}
 
 	/**
+	 * Extract unique given dimension from the given timelines
+	 * <p>
+	 * For daywise timelines as input
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param labelPhrase
+	 * @return
+	 */
+	public static TreeSet<Integer> getUniqueGivenDimensionVals(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write,
+			String labelPhrase, PrimaryDimension givenDimension)
+	{
+		TreeSet<Integer> uniqueGivenDimensionVals = new TreeSet<>();
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+				{
+					dateEntry.getValue().getActivityObjectsInTimeline().stream()
+							.forEach(ao -> uniqueGivenDimensionVals.addAll(ao.getGivenDimensionVal(givenDimension)));
+				}
+			}
+			System.out.println("Inside givenDimension = " + givenDimension
+					+ ", getUniqueGivenDimensionVals: uniqueGivenDimensionVals.size()="
+					+ uniqueGivenDimensionVals.size());
+			if (write)
+			{
+				// WritingToFile.writeToNewFile(uniqueLocIDs.toString(), );
+				WToFile.writeToNewFile(
+						uniqueGivenDimensionVals.stream().map(e -> e.toString()).collect(Collectors.joining("\n"))
+								.toString(),
+						Constant.getCommonPath() + labelPhrase + "Unique" + givenDimension + "Vals.csv");// );
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return uniqueGivenDimensionVals;
+	}
+
+	/**
 	 * Extract unique location IDs per actID from the given timelines
 	 * 
 	 * @param usersCleanedDayTimelines
@@ -5007,6 +5060,131 @@ public class TimelineUtils
 			e.printStackTrace();
 		}
 		return uniquePDValsPerUser;
+	}
+
+	/**
+	 * Extract unique given dimension Vals per user
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param writeToFile
+	 * @param labelPhrase
+	 * @param givenDimension
+	 * @return
+	 * @since 18 July 2018
+	 */
+	public static LinkedHashMap<String, TreeSet<Integer>> getUniqueGivenDimensionValPerUser(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile,
+			String labelPhrase, PrimaryDimension givenDimension)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("User,NumOfUnique" + givenDimension + "Vals,UniqueGDVals\n");
+		LinkedHashMap<String, TreeSet<Integer>> uniqueGDValsPerUser = new LinkedHashMap<>();
+
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			{
+				String user = e.getKey();
+				TreeSet<Integer> uniqueGDValsForThisUser = new TreeSet<>();
+				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
+				{
+					e2.getValue().getActivityObjectsInTimeline().stream()
+							.forEach(ao -> uniqueGDValsForThisUser.addAll(ao.getGivenDimensionVal(givenDimension)));
+				}
+				uniqueGDValsPerUser.put(user, uniqueGDValsForThisUser);
+
+				sb.append(user + "," + uniqueGDValsForThisUser.size() + ","
+						+ uniqueGDValsForThisUser.stream().map(i -> String.valueOf(i)).collect(Collectors.joining(","))
+						+ "\n");
+			}
+			// System.out.println("Inside getUniqueActivityIDs: uniqueActIDs.size()=" + uniqueActIDs.size());
+
+			if (writeToFile)
+			{
+				WToFile.writeToNewFile(sb.toString(),
+						Constant.getCommonPath() + labelPhrase + "Unique" + givenDimension + "ValsPerUser.csv");// "NumOfUniquePDValPerUser.csv");
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return uniqueGDValsPerUser;
+	}
+
+	/**
+	 * Get count for each unique given dimension val per user
+	 * <p>
+	 * This can be extended to get the count per user per day
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param writeToFile
+	 * @param labelPhrase
+	 * @param givenDimension
+	 * @param uniqueGivenDimenalVals
+	 * @return
+	 * @since 18 July 2018
+	 */
+	public static LinkedHashMap<String, TreeMap<Integer, Integer>> getGivenDimensionValCountPerUser(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean writeToFile,
+			String labelPhrase, PrimaryDimension givenDimension, TreeSet<Integer> uniqueGivenDimenalVals)
+	{
+		// StringBuilder sb = new StringBuilder();
+		// sb.append("User,NumOfUnique" + givenDimension + "Vals,UniqueGDVals\n");
+		// {user, {GDVal,count}}
+		LinkedHashMap<String, TreeMap<Integer, Integer>> GDValCountPerUser = new LinkedHashMap<>();
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			{
+				String user = e.getKey();
+
+				// if new user
+				if (GDValCountPerUser.containsKey(user) == false)
+				{// intialise with empty count for each unique value of given dimension
+					Map<Integer, Integer> GDValsCountForThisUser = uniqueGivenDimenalVals.stream()
+							.collect(Collectors.toMap(k -> Integer.valueOf(k), k -> Integer.valueOf(0)));
+					GDValCountPerUser.put(user, (TreeMap<Integer, Integer>) GDValsCountForThisUser);
+				}
+
+				for (Entry<Date, Timeline> dayEntry : e.getValue().entrySet())
+				{
+					for (ActivityObject ao : dayEntry.getValue().getActivityObjectsInTimeline())
+					{
+						ArrayList<Integer> gdVals = ao.getGivenDimensionVal(givenDimension);
+
+						for (Integer gdVal : gdVals)
+						{
+							Integer oldVal = GDValCountPerUser.get(user).get(gdVal);
+							GDValCountPerUser.get(user).put(gdVal, oldVal + 1);
+						}
+					}
+				}
+			}
+
+			if (writeToFile)
+			{
+				String absFileNameToWrite = Constant.getCommonPath() + labelPhrase + givenDimension
+						+ "ValsCountPerUser.csv";// "NumOfUniquePDValPerUser.csv");
+				StringBuilder sb = new StringBuilder("user");
+				uniqueGivenDimenalVals.stream().forEachOrdered(v -> sb.append("," + String.valueOf(v)));
+				sb.append("\n");
+
+				for (Entry<String, TreeMap<Integer, Integer>> entry : GDValCountPerUser.entrySet())
+				{
+					sb.append(entry.getKey());
+					uniqueGivenDimenalVals.stream()
+							.forEachOrdered(v -> sb.append("," + String.valueOf(entry.getValue().get(v))));
+					sb.append("\n");
+				}
+				WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return GDValCountPerUser;
 	}
 
 	/**

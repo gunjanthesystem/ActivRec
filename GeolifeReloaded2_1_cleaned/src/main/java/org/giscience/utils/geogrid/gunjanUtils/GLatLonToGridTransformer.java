@@ -84,6 +84,45 @@ public class GLatLonToGridTransformer
 
 	}
 
+	public static void getDistanceBetweenLocIDs(String pathToSerialisedLatLongLocIDGridMapToUse)
+	{
+		try
+		{
+			List<Pair<Triple<Double, Double, String>, GridCell>> latLonLocIDGridCellAllLocs = (List<Pair<Triple<Double, Double, String>, GridCell>>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedLatLongLocIDGridMapToUse);
+
+			// locID1,locID2
+			// Map<HashSet<Integer>,>
+
+			int numOfUniqueLocIDs = latLonLocIDGridCellAllLocs.size();
+
+			for (Pair<Triple<Double, Double, String>, GridCell> eOuter : latLonLocIDGridCellAllLocs)
+			{
+				double lat = eOuter.getFirst().getFirst();
+				double lon = eOuter.getFirst().getSecond();
+				Integer locID = Integer.valueOf(eOuter.getFirst().getThird());
+
+				for (Pair<Triple<Double, Double, String>, GridCell> eInner : latLonLocIDGridCellAllLocs)
+				{
+					double lat2 = eInner.getFirst().getFirst();
+					double lon2 = eInner.getFirst().getSecond();
+					Integer locID2 = Integer.valueOf(eInner.getFirst().getThird());
+
+					if (locID.equals(locID2) == false)
+					{
+
+					}
+				}
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
 	public static void main(String args[])
 	{
 		main1();

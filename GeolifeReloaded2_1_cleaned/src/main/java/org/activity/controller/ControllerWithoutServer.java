@@ -184,7 +184,7 @@ public class ControllerWithoutServer
 
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
 
-			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true);
+			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true, false);
 
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 			// System.exit(0);
@@ -261,7 +261,7 @@ public class ControllerWithoutServer
 						Constant.getCommonPath() + "ToyTimelinesActIDTS.csv");
 
 				// do it again using the toy timelines
-				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true);
+				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true, true);
 
 				// done especially for toy timelines to avoid writing all activitie in timeline activity stats.
 				Constant.setActivityNames(
@@ -304,7 +304,8 @@ public class ControllerWithoutServer
 							.collect(Collectors.toList());
 
 					sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines,
-							DomainConstants.gowalla100RandomUsersLabel, sampledUserIndices, commonBasePath);
+							DomainConstants.gowalla100RandomUsersLabel, sampledUserIndices, commonBasePath,
+							Constant.lengthOfRecommendedSequence);
 				}
 				else if (Constant.runForAllUsersAtOnce)
 				{
@@ -315,7 +316,7 @@ public class ControllerWithoutServer
 						List<Integer> allUserIndices = IntStream.range(0, numOfUsers).boxed()
 								.collect(Collectors.toList());
 						sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines, "All", allUserIndices,
-								commonBasePath);
+								commonBasePath, Constant.lengthOfRecommendedSequence);
 						ResultsSanityChecks.assertSameNumOfRTsAcrossAllMUsForUsers(commonBasePath, false);
 					}
 					if (false)// temporary sanity check
@@ -438,9 +439,10 @@ public class ControllerWithoutServer
 	 * @param write
 	 * @param labelPhrase
 	 * @param setConstantVariables
+	 * @param skipNonEssentials
 	 */
 	public static void setDataVarietyConstants(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> givenDayTimelines,
-			boolean write, String labelPhrase, boolean setConstantVariables)
+			boolean write, String labelPhrase, boolean setConstantVariables, boolean skipNonEssentials)
 	{
 		if (setConstantVariables)
 		{
@@ -459,6 +461,27 @@ public class ControllerWithoutServer
 			TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write, labelPhrase);
 			TimelineUtils.getUniqueActivityIDs(givenDayTimelines, write, labelPhrase);
 			TimelineUtils.getUniquePDValPerUser(givenDayTimelines, write, labelPhrase);
+		}
+
+		if (!skipNonEssentials)// skippable for speed
+		{
+			if (Constant.secondaryDimension != null)
+			{
+				TimelineUtils.getUniqueGivenDimensionValPerUser(givenDayTimelines, write, labelPhrase,
+						Constant.secondaryDimension);
+
+				TreeSet<Integer> uniqueSecDimVals = TimelineUtils.getUniqueGivenDimensionVals(givenDayTimelines, write,
+						labelPhrase, Constant.secondaryDimension);
+
+				TreeSet<Integer> uniquePrimaryDimVals = TimelineUtils.getUniqueGivenDimensionVals(givenDayTimelines,
+						write, labelPhrase, Constant.primaryDimension);
+
+				TimelineUtils.getGivenDimensionValCountPerUser(givenDayTimelines, write, labelPhrase,
+						Constant.secondaryDimension, uniqueSecDimVals);
+
+				TimelineUtils.getGivenDimensionValCountPerUser(givenDayTimelines, write, labelPhrase,
+						Constant.primaryDimension, uniquePrimaryDimVals);
+			}
 		}
 	}
 
@@ -533,7 +556,7 @@ public class ControllerWithoutServer
 			sampleUsersExecuteRecommendationTests(sampledUserCleanedDayTimelines,
 					DomainConstants.gowallaUserGroupsLabels, commonBasePath + "Sample" + sampleID + "/");
 
-			new EvaluationSeq(3, commonBasePath + "Sample" + sampleID + "/", muArray);
+			new EvaluationSeq(3, commonBasePath + "Sample" + sampleID + "/", muArray, "");
 		}
 
 	}
@@ -879,12 +902,15 @@ public class ControllerWithoutServer
 	 * @param groupsOf100UsersLabel
 	 * @param userIndicesToSelect
 	 * @param commonBasePath
+	 * @param lengthOfRecommendedSequence
 	 * @throws IOException
+	 * 
 	 * @since Mar 2 2018
 	 */
 	private void sampleUsersByIndicesExecuteRecommendationTests(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String groupOf100UsersLabel,
-			List<Integer> userIndicesToSelect, String commonBasePath) throws IOException
+			List<Integer> userIndicesToSelect, String commonBasePath, int lengthOfRecommendedSequence)
+			throws IOException
 	{
 		// LinkedHashMap<Integer, String> indexOfBlackListedUsers = new LinkedHashMap<>();
 		System.out.println(
@@ -982,13 +1008,13 @@ public class ControllerWithoutServer
 		{
 			RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018(
 					sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
-					Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
+					Constant.getUserIDs(), Constant.percentageInTraining, lengthOfRecommendedSequence, allUsers);
 		}
 		else
 		{
 			RecommendationTestsMar2017GenSeqCleaned3Nov2017 recommendationsTest = new RecommendationTestsMar2017GenSeqCleaned3Nov2017(
 					sampledUsers, Constant.lookPastType, Constant.caseType, Constant.typeOfiiWASThresholds,
-					Constant.getUserIDs(), Constant.percentageInTraining, 3, allUsers);
+					Constant.getUserIDs(), Constant.percentageInTraining, lengthOfRecommendedSequence, allUsers);
 		}
 		/// /// RecommendationTestsMar2017GenDummyOnlyRTCount
 

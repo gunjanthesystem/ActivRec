@@ -352,7 +352,7 @@ public class SuperController
 				// use directory.mkdirs(); here instead.
 			}
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], true, true, true, "gowalla1");
+			runExperiments(commonPaths[i], false, true, true, "gowalla1");
 			// cleanUpSpace(commonPaths[i], 0.90);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
@@ -580,15 +580,31 @@ public class SuperController
 		{// curtain may 26 2017 start
 			System.out.println("Doing evaluation...");
 			if (hasMUs)
-			{// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90 });
-				new EvaluationSeq(3, commonPath,
-						Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor));
+			{
+
+				// if (false)
+				{
+					if (Constant.doSecondaryDimension)
+					{
+						new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
+								Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor),
+								"SecDim");
+					}
+				}
+				// if (true)// temporarily disable for debugging TODO
+				{
+					// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90
+					// });
+					new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
+							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor), "");
+				}
 				// , new int[] {30, 50, 60, 70, 90// });
 			}
 			else
 			{
-				new EvaluationSeq(3, commonPath);// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90
-													// });
+				new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath);
+				// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90
+				// });
 			} // //curtain may 26 2017 end
 		}
 		// **************************************************************************************************************//
