@@ -96,7 +96,7 @@ public class GowallaPreProcessorUtils
 		ArrayList<String> fileNamesToConcatenate = (ArrayList<String>) IntStream.rangeClosed(1, 10)
 				.mapToObj(i -> commonPath + i + ".csv").collect(Collectors.toList());
 		System.out.println("Files to concatenate:\n" + fileNamesToConcatenate.toString());
-		CSVUtils.concatenateCSVFiles(fileNamesToConcatenate, true,
+		CSVUtils.concatenateCSVFilesV2(fileNamesToConcatenate, true,
 				"/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018TZAll.csv", ',');
 		////
 	}

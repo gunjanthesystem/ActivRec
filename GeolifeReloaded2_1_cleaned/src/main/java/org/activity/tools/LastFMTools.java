@@ -35,9 +35,9 @@ public class LastFMTools
 					.add(commonPathToReadResults + "Split" + i + "AfterMergingContinuousSlimmer.csv");
 		}
 
-		CSVUtils.concatenateCSVFiles(listOfOutputFileNames, true,
+		CSVUtils.concatenateCSVFilesV2(listOfOutputFileNames, true,
 				pathToWriteResults + "AllUsersAfterMergingContinuous.csv", '\t');
-		CSVUtils.concatenateCSVFiles(listOfOutputFileNamesSlimmer, true,
+		CSVUtils.concatenateCSVFilesV2(listOfOutputFileNamesSlimmer, true,
 				pathToWriteResults + "AllUsersAfterMergingContinuousSlimmer.csv", '\t');
 	}
 }

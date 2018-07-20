@@ -26,6 +26,7 @@ import org.activity.io.SFTPFile;
 import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
+import org.activity.sanityChecks.Sanity;
 import org.activity.ui.PopUps;
 
 import com.jcraft.jsch.Session;
@@ -41,6 +42,7 @@ public class ResultsDistributionEvaluation
 {
 	static final int port = 22;
 	// static final int firstToMax = 3;
+	static final int[] firstToMaxInOrder = { 1 };// 3, 2, 1 };
 
 	public ResultsDistributionEvaluation()
 	{
@@ -48,6 +50,88 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
+		// $$mainBefore19July();
+		String[] dimensionPhrase = { "" };// ,"SecDim" };
+		for (String s : dimensionPhrase)
+		{
+			main19July2018(s);
+		}
+	}
+
+	public static void main19July2018(String dimensionPhrase)
+	{
+		// String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsJuly19ToRead_1.csv";
+		// ResultsMay18ToRead_1Jun28T.csv";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsMay10ToRead_1.csv";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";//
+		// ResultsApril26ToRead_2.csv";
+		String pathToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUL20ResultsDistributionFirstToMax1/FiveDays/";
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/";
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/";
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY2ResultsDistributionFirstToMax3/FiveDays/";
+
+		String resultForUserGroupingMay2 = pathToRead
+				+ "/Concatenated/ConcatenatedED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
+		String resultForUserGroupingMay4 = // pathToRead
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/"
+						+ "/Concatenated/ConcatenatedED1.0AllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
+		int firstToMax = 1;
+		if (false)
+		{
+			fetchResultsFromServersInFormat(resultsLabelsPathFileToRead, firstToMax, dimensionPhrase);
+		}
+		else
+		{
+			// String fileToSort = ;String sortedFileToWrite = ;String uniqueConfigsFileToWrite = ;
+			// sortIgnoringDates(pathToRead + "GTE100UserLabels.csv", pathToRead + "GTE100UserLabelsSorted.csv");
+			Set<String> uniqueConfigs = findUniqueConfigs(pathToRead + "GTE100UserLabels.csv",
+					pathToRead + "GTE100UserLabelsUniqueConfigs.csv");
+
+			PopUps.showMessage("Finished findUniqueConfigs");
+			concatenateFromDifferentSetsOfUsers(pathToRead, pathToRead + "Concatenated/",
+					new String[] { "userMUKeyVals.csv", "MinMUWithMaxFirst3.csv", "MinMUWithMaxFirst0Aware.csv" },
+					uniqueConfigs);
+
+			PopUps.showMessage("Finished first concatenateFromDifferentSetsOfUsers");
+			splitUsersMUZeroNonZeroGroup(resultForUserGroupingMay4, pathToRead + "Concatenated/");
+
+			PopUps.showMessage("Finished splitUsersMUZeroNonZeroGroup");
+			// Choose fixed MU for each user based on one given result: resultForUserGroupingMay4
+			Map<String, Integer> userIdentifierChosenMU = getUserChosenBestMUBasedOnGiveFile(resultForUserGroupingMay4,
+					pathToRead + "Concatenated/");
+
+			String secondPathToRead = "";
+			if (true)
+			{
+				// fetch results from server again, writing files for fixed MU for each user "ChosenMU.csv"
+				secondPathToRead = fetchResultsFromServersInFormat19July2018(resultsLabelsPathFileToRead, false, false,
+						true, userIdentifierChosenMU, "", firstToMax, dimensionPhrase);
+			}
+			else
+			{
+				secondPathToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY4ResultsDistributionFirstToMax3/FiveDays/";
+			}
+			// concatenating ChosenMU.csv form different sets of users
+			concatenateFromDifferentSetsOfUsers(secondPathToRead, secondPathToRead + "Concatenated/",
+					new String[] { "ChosenMU.csv" }, uniqueConfigs);
+
+			PopUps.showMessage("Finished second concatenateFromDifferentSetsOfUsers");
+		}
+
+		System.exit(0);
+
+	}
+
+	/**
+	 * For sequence recommendation
+	 * <p>
+	 * Used before 19 July 2018.
+	 * 
+	 */
+	public static void mainBefore19July(String dimensionPhrase)
+	{
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
 		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsMay18ToRead_1Jun28T.csv";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsMay10ToRead_1.csv";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";//
@@ -61,10 +145,10 @@ public class ResultsDistributionEvaluation
 		String resultForUserGroupingMay4 = // pathToRead
 				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/"
 						+ "/Concatenated/ConcatenatedED1.0AllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
-
+		int firstToMax = 3;
 		if (false)
 		{
-			fetchResultsFromServersInFormat(resultsLabelsPathFileToRead);
+			fetchResultsFromServersInFormat(resultsLabelsPathFileToRead, firstToMax, dimensionPhrase);
 		}
 		else
 		{
@@ -403,7 +487,7 @@ public class ResultsDistributionEvaluation
 						} // end of loop over set
 						System.out.println("-----------------\nfilesToConcatenateInOrder= \n\t"
 								+ String.join("\n\t", filesToConcatenateInOrder) + "\n");
-						CSVUtils.concatenateCSVFiles(filesToConcatenateInOrder, true,
+						CSVUtils.concatenateCSVFilesV2(filesToConcatenateInOrder, true,
 								commonPathToWrite + "Concatenated" + config + labelTail1 + labelTail2, ',');
 					}
 				} // end of loop of resultsLabelTail
@@ -416,7 +500,15 @@ public class ResultsDistributionEvaluation
 		}
 	}
 
-	public static void fetchResultsFromServersInFormat(String resultsLabelsPathFileToRead)
+	/**
+	 * 
+	 * @param resultsLabelsPathFileToRead
+	 * @param firstToMax
+	 * @param dimensionPhrase
+	 * @param statFileNames
+	 */
+	public static void fetchResultsFromServersInFormat(String resultsLabelsPathFileToRead, int firstToMax,
+			String dimensionPhrase)
 	{
 		// runOneDay();
 		// runFiveDays();
@@ -426,8 +518,19 @@ public class ResultsDistributionEvaluation
 		// runFeb11FiveDaysResults();//disabled on feb 18 2018
 		// runFeb17FiveDaysResults();
 		// $$runMar9FiveDaysResults();
-		runApril10Results(resultsLabelsPathFileToRead, 3);
+		//
+		runApril10Results(resultsLabelsPathFileToRead, firstToMax, dimensionPhrase);
 		SFTPFile.closeAllChannels();
+	}
+
+	public static String fetchResultsFromServersInFormat19July2018(String resultsLabelsPathFileToRead,
+			boolean doFirstToMax, boolean doFirstToMaxZeroAware, boolean doChosenMUForEachUser,
+			Map<String, Integer> userIdentifierChosenMuMap, String pathToWrite, int firstToMax, String dimensionPhrase)
+	{
+		String pathWritten = runMayResults19July2018(resultsLabelsPathFileToRead, firstToMax, doFirstToMax,
+				doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap, pathToWrite, dimensionPhrase);
+		SFTPFile.closeAllChannels();
+		return pathWritten;
 	}
 
 	/**
@@ -501,7 +604,7 @@ public class ResultsDistributionEvaluation
 
 					int resSize = getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray,
 							statFileNames, host, firstToMax, doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser,
-							userIdentifierChosenMuMap);
+							userIdentifierChosenMuMap, "", firstToMaxInOrder);
 
 					if (resSize < 0)
 					{
@@ -519,25 +622,35 @@ public class ResultsDistributionEvaluation
 	}
 
 	/**
-	 * @param pathToRead2
-	 * @since Feb 2 2018
-	 * @param args
+	 * 
+	 * @param resultsLabelsPathFileToRead
+	 * @param firstToMax
+	 * @param doFirstToMax
+	 * @param doFirstToMaxZeroAware
+	 * @param doChosenMUForEachUser
+	 * @param userIdentifierChosenMuMap
+	 * @param dimensionPhrase
+	 * 
+	 * @return
+	 * @since May 4 2018
 	 */
-	public static void runApril10Results(String resultsLabelsPathFileToRead, int firstToMax)
+	public static String runMayResults19July2018(String resultsLabelsPathFileToRead, int firstToMax,
+			boolean doFirstToMax, boolean doFirstToMaxZeroAware, boolean doChosenMUForEachUser,
+			Map<String, Integer> userIdentifierChosenMuMap, String pathToWrite, String dimensionPhrase)
 	{
-
-		String pathToWrite = "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-				+ LocalDateTime.now().getDayOfMonth() + "ResultsDistributionFirstToMax" + firstToMax + "/FiveDays/";// "./dataWritten/Mar9/FiveDays/";
+		if (pathToWrite.trim().length() == 0)
+		{
+			pathToWrite = "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+					+ LocalDateTime.now().getDayOfMonth() + "ResultsDistributionFirstToMax" + firstToMax + "/FiveDays/";// "./dataWritten/Mar9/FiveDays/";
+		}
 		WToFile.createDirectoryIfNotExists(pathToWrite);
 		WToFile.createDirectoryIfNotExists(pathToWrite + "ReadMe/");
 
-		// String resultsLabelsPathFile =
-		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril10ToRead.csv";
-		// String resultsLabelsPathFile =
-		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";//
-		// ResultsApril26ToRead_2.csv";
 		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
-		double muArray[] = { 0 };// Constant.matchingUnitAsPastCountFixed;
+		String statFileNamesPRF[] = { "AvgPrecision_", "AvgRecall_", "AvgFMeasure_" };
+		String statFileNamesMRR[] = { "AllMeanReciprocalRank_" };
+
+		double muArray[] = Constant.matchingUnitAsPastCountFixed;
 		String pathToRead = "", resultsLabel = "", host = "";
 
 		try
@@ -555,12 +668,102 @@ public class ResultsDistributionEvaluation
 
 					host = getHostFromString(resEntry.get(1)).trim();
 
-					WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + resultsLabel + "UserLabels.csv");
+					WToFile.appendLineToFileAbs(resultsLabel + "\n",
+							pathToWrite + resultsLabel + "UserLabels" + dimensionPhrase + ".csv");
+
+					System.out.println(
+							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
+
+					int resSize = getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray,
+							statFileNames, host, firstToMax, doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser,
+							userIdentifierChosenMuMap, dimensionPhrase, firstToMaxInOrder);
+
+					int resSize2 = getResultsForEachStatFile_PrecisionRecallFMeasure2(pathToWrite, resultsLabel,
+							pathToRead, muArray, statFileNamesPRF, host, 5, doFirstToMax, doFirstToMaxZeroAware,
+							doChosenMUForEachUser, userIdentifierChosenMuMap, dimensionPhrase);
+
+					int resSize3 = getResultsForEachStatFile_MRR2(pathToWrite, resultsLabel, pathToRead, muArray,
+							statFileNamesMRR, host, 1, doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser,
+							userIdentifierChosenMuMap, dimensionPhrase);
+
+					Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
+					Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
+					if (resSize < 0)
+					{
+						continue;
+					}
+				}
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return pathToWrite;
+	}
+
+	/**
+	 * 
+	 * @param resultsLabelsPathFileToRead
+	 * @param firstToMax
+	 * @param dimensionPhrase
+	 * @param statFileNames
+	 *            e..g, { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+	 * @since Feb 2 2018
+	 * @updated 19 July 2018
+	 */
+	public static void runApril10Results(String resultsLabelsPathFileToRead, int firstToMax, String dimensionPhrase)
+	{
+
+		String pathToWrite = "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+				+ LocalDateTime.now().getDayOfMonth() + "ResultsDistributionFirstToMax" + firstToMax + "/FiveDays/";// "./dataWritten/Mar9/FiveDays/";
+		WToFile.createDirectoryIfNotExists(pathToWrite);
+		WToFile.createDirectoryIfNotExists(pathToWrite + "ReadMe/");
+
+		// String resultsLabelsPathFile =
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril10ToRead.csv";
+		// String resultsLabelsPathFile =
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";//
+		// ResultsApril26ToRead_2.csv";
+		String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+		String statFileNamesPRF[] = { "AvgPrecision_", "AvgRecall_", "AvgFMeasure_" };
+		String statFileNamesMRR[] = { "AllMeanReciprocalRank_" };
+
+		double muArray[] = Constant.matchingUnitAsPastCountFixed;// { 0 }
+		String pathToRead = "", resultsLabel = "", host = "";
+
+		try
+		{
+			List<List<String>> resLabels = ReadingFromFile.nColumnReaderString(
+					Files.newInputStream(Paths.get(resultsLabelsPathFileToRead), StandardOpenOption.READ), ",", false);
+
+			for (List<String> resEntry : resLabels)
+			{
+				if (resEntry.size() == 3)
+				{
+					pathToRead = resEntry.get(2).trim();
+					String splitted[] = pathToRead.split("/");
+					resultsLabel = splitted[splitted.length - 1];
+
+					host = getHostFromString(resEntry.get(1)).trim();
+
+					WToFile.appendLineToFileAbs(resultsLabel + "\n",
+							pathToWrite + resultsLabel + "UserLabels" + dimensionPhrase + ".csv");
 
 					System.out.println(
 							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
 					int resSize = getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray,
-							statFileNames, host, firstToMax);
+							statFileNames, host, firstToMax, dimensionPhrase, firstToMaxInOrder);
+
+					int resSize2 = getResultsForEachStatFile_PrecisionRecallFMeasure(pathToWrite, resultsLabel,
+							pathToRead, muArray, statFileNamesPRF, host, 5, dimensionPhrase);
+
+					int resSize3 = getResultsForEachStatFile_MRR(pathToWrite, resultsLabel, pathToRead, muArray,
+							statFileNamesMRR, host, 1, dimensionPhrase);
+
+					Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
+					Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
 					if (resSize < 0)
 					{
 						continue;
@@ -630,7 +833,7 @@ public class ResultsDistributionEvaluation
 					System.out.println(
 							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
 					int resSize = getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray,
-							statFileNames, host, firstToMax);
+							statFileNames, host, firstToMax, "", firstToMaxInOrder);
 					if (resSize < 0)
 					{
 						continue;
@@ -692,7 +895,7 @@ public class ResultsDistributionEvaluation
 					System.out.println(
 							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
 					int resSize = getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray,
-							statFileNames, host, firstToMax);
+							statFileNames, host, firstToMax, "", firstToMaxInOrder);
 					if (resSize < 0)
 					{
 						continue;
@@ -728,13 +931,15 @@ public class ResultsDistributionEvaluation
 	 * @throws Exception
 	 */
 	public static int getResultsForEachStatFile(String pathToWrite, String resultsLabel, String pathToRead,
-			double[] muArray, String[] statFileNames, String host, int firstToMax)
+			double[] muArray, String[] statFileNames, String host, int firstToMax, String dimensionPhrase,
+			int[] firstToMaxInOrder)
 	{
 		Map<Integer, Map<Integer, List<Double>>> res = null;
 
 		for (String statFileName : statFileNames)
 		{
-			res = getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax);
+			res = getResult19July2018(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
+					dimensionPhrase, false, firstToMaxInOrder);
 		}
 
 		if (res == null)
@@ -759,6 +964,161 @@ public class ResultsDistributionEvaluation
 	}
 
 	/**
+	 * Fork of getResultsForEachStatFile Call getResult() for each stat file and accumulates results in a map
+	 * 
+	 * @param pathToWrite
+	 * @param resultsLabel
+	 * @param pathToRead
+	 * @param muArray
+	 * @param statFileNames
+	 * @param host
+	 * @param firstToMax
+	 *            5 -> Max top1, i.e. last col
+	 * @param dimensionPhrase
+	 * @param firstToMaxInOrder
+	 * @return
+	 * @since 19 July 2018
+	 */
+	public static int getResultsForEachStatFile_PrecisionRecallFMeasure(String pathToWrite, String resultsLabel,
+			String pathToRead, double[] muArray, String[] statFileNames, String host, int firstToMax,
+			String dimensionPhrase)
+	{
+		Map<Integer, Map<Integer, List<Double>>> res = null;
+
+		for (String statFileName : statFileNames)
+		{
+			res = getResult19July2018_MRR_PRF(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host,
+					firstToMax/* 5= Max top1, i.e. last col */, dimensionPhrase, true, new int[] { 5, 4, 3, 2, 1 },
+					true, "top5,top4,top3,top2,top1");
+		}
+		if (res == null)
+		{
+			return -1;
+		}
+		// if (res.size() >= 100)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
+		// }
+		// if (res.size() == 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "E916UserLabels.csv");
+		// }
+		//
+		// if (res.size() < 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
+		// }
+		return res.size();
+	}
+
+	public static int getResultsForEachStatFile_PrecisionRecallFMeasure2(String pathToWrite, String resultsLabel,
+			String pathToRead, double[] muArray, String[] statFileNames, String host, int firstToMax,
+			boolean doFirstToMax, boolean doFirstToMaxZeroAware, boolean doChosenMUForEachUser,
+			Map<String, Integer> userIdentifierChosenMuMap, String dimensionPhrase)
+	{
+		Map<Integer, Map<Integer, List<Double>>> res = null;
+
+		for (String statFileName : statFileNames)
+		{
+			res = getResultChosenMU(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
+					doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap,
+					dimensionPhrase, false, new int[] { 5, 4, 3, 2, 1 }, true, "top5,top4,top3,top2,top1");
+			// res = getResult19July2018_MRR_PRF(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host,
+			// firstToMax/* 5= Max top1, i.e. last col */, dimensionPhrase, true, new int[] { 5, 4, 3, 2, 1 },
+			// true, "top5,top4,top3,top2,top1");
+		}
+		// if (res.size() >= 100)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
+		// }
+		// if (res.size() == 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "E916UserLabels.csv");
+		// }
+		//
+		// if (res.size() < 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
+		// }
+		return res.size();
+	}
+
+	/**
+	 * Fork of getResultsForEachStatFile Call getResult() for each stat file and accumulates results in a map
+	 * 
+	 * @param pathToWrite
+	 * @param resultsLabel
+	 * @param pathToRead
+	 * @param muArray
+	 * @param statFileNames
+	 * @param host
+	 * @param firstToMax
+	 * @return
+	 * @throws Exception
+	 * @since 19 July 2018
+	 */
+	public static int getResultsForEachStatFile_MRR2(String pathToWrite, String resultsLabel, String pathToRead,
+			double[] muArray, String[] statFileNames, String host, int firstToMax, boolean doFirstToMax,
+			boolean doFirstToMaxZeroAware, boolean doChosenMUForEachUser,
+			Map<String, Integer> userIdentifierChosenMuMap, String dimensionPhrase)
+	{
+		Map<Integer, Map<Integer, List<Double>>> res = null;
+
+		for (String statFileName : statFileNames)
+		{
+			res = getResultChosenMU(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
+					doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap,
+					dimensionPhrase, false, new int[] { 1 }, true, "MRR");
+			// res = getResult19July2018_MRR_PRF(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, 1,
+			// dimensionPhrase, true, new int[] { 1 }, true, "MRR");
+		}
+		// if (res.size() >= 100)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
+		// }
+		// if (res.size() == 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "E916UserLabels.csv");
+		// }
+		//
+		// if (res.size() < 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
+		// }
+		return res.size();
+	}
+
+	public static int getResultsForEachStatFile_MRR(String pathToWrite, String resultsLabel, String pathToRead,
+			double[] muArray, String[] statFileNames, String host, int firstToMax, String dimensionPhrase)
+	{
+		Map<Integer, Map<Integer, List<Double>>> res = null;
+
+		for (String statFileName : statFileNames)
+		{
+			res = getResult19July2018_MRR_PRF(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, 1,
+					dimensionPhrase, true, new int[] { 1 }, true, "MRR");
+		}
+		if (res == null)
+		{
+			return -1;
+		}
+		// if (res.size() >= 100)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
+		// }
+		// if (res.size() == 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "E916UserLabels.csv");
+		// }
+		//
+		// if (res.size() < 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
+		// }
+		return res.size();
+	}
+
+	/**
 	 * Call getResult() for each stat file and accumulates results in a map
 	 * 
 	 * @param pathToWrite
@@ -778,14 +1138,16 @@ public class ResultsDistributionEvaluation
 	public static int getResultsForEachStatFile(String pathToWrite, String resultsLabel, String pathToRead,
 			double[] muArray, String[] statFileNames, String host, int firstToMax, boolean doFirstToMax,
 			boolean doFirstToMaxZeroAware, boolean doChosenMUForEachUser,
-			Map<String, Integer> userIdentifierChosenMuMap)
+			Map<String, Integer> userIdentifierChosenMuMap, String dimensionPhrase, int[] firstToMaxInOrder)
 	{
 		Map<Integer, Map<Integer, List<Double>>> res = null;
 
 		for (String statFileName : statFileNames)
 		{
-			res = getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
-					doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap);
+			res = getResultChosenMU(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
+					doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap,
+					dimensionPhrase, false, firstToMaxInOrder, false, "First1,First2,First3");
+			// new int[] { 5, 4, 3, 2, 1 }, true, "top5,top4,top3,top2,top1");
 		}
 
 		if (res == null)
@@ -852,21 +1214,21 @@ public class ResultsDistributionEvaluation
 			for (String statFileName : statFileNames)
 			{
 				getResult(pathToWrite, resultsLabel, pathToRead, new double[] { order - 1 }, statFileName,
-						Utils.engineHost, firstToMax);
+						Utils.engineHost, firstToMax, "");
 			}
 		}
 		resultsLabel = "Ncount_916U_915N_1dayC_ThreshNN-500";
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_Ncount_AllCand1DayFilter_part1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_1dayC_ThreshPer-50";
 		pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec26_NCount_AllCand1DayFilter_percentile50/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax, "");
 		}
 
 	}
@@ -896,7 +1258,7 @@ public class ResultsDistributionEvaluation
 			for (String statFileName : statFileNames)
 			{
 				getResult(pathToWrite, resultsLabel, pathToRead, new double[] { order - 1 }, statFileName,
-						Utils.engineHost, firstToMax);
+						Utils.engineHost, firstToMax, "");
 			}
 		}
 
@@ -904,21 +1266,21 @@ public class ResultsDistributionEvaluation
 		pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_NCount_AllCand5DayFilter/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-50";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan20Ncount5DayThreshold50/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-100";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan20Ncount5DayThreshold100/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax, "");
 		}
 
 	}
@@ -941,7 +1303,7 @@ public class ResultsDistributionEvaluation
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Feb2NCount_5Day_ThresholdNN600/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax, "");
 		}
 	}
 
@@ -962,7 +1324,7 @@ public class ResultsDistributionEvaluation
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax, "");
 		}
 	}
 
@@ -996,7 +1358,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.howitzerHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-1_run2";
@@ -1004,7 +1366,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.engineHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-3";
@@ -1012,7 +1374,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 2 }, statFileName, Utils.engineHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-5";
@@ -1020,7 +1382,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, Utils.engineHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-5_run2";
@@ -1028,21 +1390,21 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, Utils.howitzerHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_1dayC_ThreshNN-500";
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_Ncount_AllCand1DayFilter_part1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_1dayC_ThreshPer-50";
 		pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec26_NCount_AllCand1DayFilter_percentile50/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax, "");
 		}
 
 	}
@@ -1075,7 +1437,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.howitzerHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "AKOM_916U_915N_5dayC_Order-1_run2";
@@ -1083,7 +1445,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.engineHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		////////////////////////
@@ -1092,7 +1454,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 2 }, statFileName, Utils.engineHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "AKOM_916U_915N_5dayC_Order-5";
@@ -1100,28 +1462,28 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 4 }, statFileName, Utils.engineHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-500";
 		pathToRead = "/Users/gunjankumar/SyncedWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_NCount_AllCand5DayFilter/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.mortarHost, firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-50";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan20Ncount5DayThreshold50/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_5dayC_ThreshNN-100";
 		pathToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Jan20Ncount5DayThreshold100/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.engineHost, firstToMax, "");
 		}
 
 	}
@@ -1155,7 +1517,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.howitzerHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-3";
@@ -1163,7 +1525,7 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.engineHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "AKOM_916U_915N_1dayC_Order-5";
@@ -1171,32 +1533,40 @@ public class ResultsDistributionEvaluation
 		for (String statFileName : statFileNames)
 		{
 			getResult(pathToWrite, resultsLabel, pathToRead, new double[] { 0 }, statFileName, Utils.engineHost,
-					firstToMax);
+					firstToMax, "");
 		}
 
 		resultsLabel = "Ncount_916U_915N_1dayC_ThreshNN-500";
 		pathToRead = "/Users/admin/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/Dec20_Ncount_AllCand1DayFilter_part1/";
 		for (String statFileName : statFileNames)
 		{
-			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax);
+			getResult(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, Utils.howitzerHost, firstToMax, "");
 		}
 
 	}
 
 	/**
+	 * Fork of org.activity.evaluation.ResultsDistributionEvaluation.getResult(String, String, String, double[], String,
+	 * String, int, String) to allow refactoring without having to take care of compatibility of other than concerned
+	 * calls to it.
 	 * 
 	 * @param pathToWrite
 	 * @param resultsLabel
 	 * @param pathToRead
 	 * @param muArray
-	 * @param statFileName
+	 * @param statFileNameToRead
 	 * @param host
 	 * @param firstToMax
 	 * @param doFirstToMax
+	 * @param dimensionPhrase
+	 * @param statFileHasHeader
+	 * @param firstToMaxInOrder
 	 * @return
+	 * @since 19 July 2018
 	 */
-	private static Map<Integer, Map<Integer, List<Double>>> getResult(String pathToWrite, String resultsLabel,
-			String pathToRead, double[] muArray, String statFileName, String host, int firstToMax)
+	private static Map<Integer, Map<Integer, List<Double>>> getResult19July2018(String pathToWrite, String resultsLabel,
+			String pathToRead, double[] muArray, String statFileNameToRead, String host, int firstToMax,
+			String dimensionPhrase, boolean statFileHasHeader, int[] firstToMaxInOrder)
 
 	{
 		String passwd = Utils.getPassWordForHost(host);
@@ -1230,7 +1600,294 @@ public class ResultsDistributionEvaluation
 				int mu = (int) muD;
 				List<List<Double>> readResFromFile = null;
 
-				String statFileForThisMU = pathToRead + statFileName + mu + ".csv";
+				String statFileForThisMU = pathToRead + statFileNameToRead + mu + dimensionPhrase + ".csv";
+
+				if (host.contains("local"))
+				{// each row corresponds to a user
+					readResFromFile = ReadingFromFile.nColumnReaderDouble(statFileForThisMU, ",", statFileHasHeader);
+				}
+				else
+				{
+					Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port,
+							statFileForThisMU, user, passwd);
+					readResFromFile = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",",
+							statFileHasHeader);
+				}
+				// System.out.println("mu= " + mu + " res=" + res);
+				muKeyAllValsMap.put(mu, readResFromFile);
+				// inputAndSession.getSecond().disconnect();
+			}
+
+			// Convert to user wise result
+			// userIndex , <MU, <list of first1,2,3 for that user and mu>>
+			userMUKeyVals = transformToUserWise(muArray, muKeyAllValsMap);
+
+			writeUserMuKeyVals(userMUKeyVals,
+					pathToWrite + resultsLabel + "_" + statFileNameToRead + "userMUKeyVals" + dimensionPhrase + ".csv",
+					userSetLabel, "First1,First2,First3");
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			// userIndex, min mu with highest first 3, first3 for this mu and user
+			Map<Integer, Pair<Integer, List<Double>>> firstsForMinMUWithMaxFxForEachUser = getValsForMinMUHavingMaxF3(
+					firstToMax, userMUKeyVals);
+			StringBuilder sb = new StringBuilder("userIndex,minMuWithMaxFirst3,First1,First2,First3\n");
+			//// user, min mu with highest first 3, first3 for this mu and user
+			for (Entry<Integer, Pair<Integer, List<Double>>> r : firstsForMinMUWithMaxFxForEachUser.entrySet())
+			{
+				// sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst() + ","
+				// + r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+				// + r.getValue().getSecond().get(2) + "\n");
+				// modified on 19 July 2018 so that it also works only first1
+				sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+				for (double firstVal : r.getValue().getSecond())
+				{
+					sb.append("," + firstVal);
+				}
+				sb.append("\n");
+			}
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileNameToRead
+					+ "MinMUWithMaxFirst" + firstToMax + dimensionPhrase + ".csv");
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			// userIndex, min mu with highest first 3, first3 for this mu and user
+			Map<Integer, Triple<Integer, List<Double>, Integer>> firstsForMinMUWithMaxFx0AwareForEachUser = getValsForMinMUHavingMaxF3ZeroAware(
+					firstToMaxInOrder, userMUKeyVals);
+			StringBuilder sb2 = new StringBuilder("userIndex,minMuWithMaxFirst3,First1,First2,First3,ChosenFirst\n");
+			//// user, min mu with highest first 3, first3 for this mu and user
+			for (Entry<Integer, Triple<Integer, List<Double>, Integer>> r : firstsForMinMUWithMaxFx0AwareForEachUser
+					.entrySet())
+			{
+				// sb2.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst() + ","
+				// + r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+				// + r.getValue().getSecond().get(2) + "," + r.getValue().getThird() + "\n");
+				sb2.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+				for (double firstVal : r.getValue().getSecond())
+				{
+					sb2.append("," + firstVal);
+				}
+				sb2.append("," + r.getValue().getThird() + "\n");
+			}
+			WToFile.writeToNewFile(sb2.toString(), pathToWrite + resultsLabel + "_" + statFileNameToRead
+					+ "MinMUWithMaxFirst0Aware" + dimensionPhrase + ".csv");
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+
+			WToFile.writeToNewFile(host + ":" + pathToRead, pathToWrite + "ReadMe/" + resultsLabel + "_"
+					+ statFileNameToRead + "ReadMe" + dimensionPhrase + ".txt");
+		}
+		catch (NullPointerException e)
+		{
+			e.printStackTrace();
+			String s = "pathToRead=" + pathToRead + "\nresultsLabel=" + resultsLabel + "\nstatFileNameToRead="
+					+ statFileNameToRead;
+			WToFile.appendLineToFileAbs(
+					PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n") + " \nfor:" + s,
+					pathToWrite + "ExceptionsEncountered" + dimensionPhrase + ".csv");
+
+			System.exit(-1);
+			return null;
+		}
+		return (userMUKeyVals);
+
+	}
+
+	/**
+	 * Fork of org.activity.evaluation.ResultsDistributionEvaluation.getResult19July2018(String, String, String,
+	 * double[], String, String, int, String) for MRR, avg percision , recall, fmeasure.
+	 * 
+	 * @param pathToWrite
+	 * @param resultsLabel
+	 * @param pathToRead
+	 * @param muArray
+	 * @param statFileNameToRead
+	 *            MRR, AvgPrecision, AvgRecall, AvgFMeasure at top 5,4,3,2,1
+	 * @param host
+	 * @param firstToMax
+	 * @param dimensionPhrase
+	 * @param statFileHasColHeader
+	 * @param firstToMaxInOrder
+	 * @param statFileHasRowHeader
+	 * @param valColHeader
+	 *            "top5,top4,top3,top2,top1"
+	 * @return
+	 */
+	private static Map<Integer, Map<Integer, List<Double>>> getResult19July2018_MRR_PRF(String pathToWrite,
+			String resultsLabel, String pathToRead, double[] muArray, String statFileNameToRead, String host,
+			int firstToMax, String dimensionPhrase, boolean statFileHasColHeader, int[] firstToMaxInOrder,
+			boolean statFileHasRowHeader, String valColHeader)
+
+	{
+		String passwd = Utils.getPassWordForHost(host);
+		String user = Utils.getUserForHost(host);
+
+		// MU , <list for each user, <list of recall@5,recall@4,...recall@1 for that user and mu>>
+		Map<Integer, List<List<Double>>> muKeyAllValsMap = new LinkedHashMap<>();
+
+		// Convert to user wise result
+		// userIndex , <MU, <list of recall@5,recall@4,...recall@1 for that user and mu>>
+		Map<Integer, Map<Integer, List<Double>>> userMUKeyVals = null;
+
+		String userSetLabel = "";
+		try
+		{// if PureAKOM, then mu is order of AKOM -1
+			if (pathToRead.contains("PureAKOMOrder"))
+			{
+				String[] splitted = pathToRead.split("Order");
+				String[] splitted2 = splitted[1].split("/");
+				double muForOrder = Double.valueOf(splitted2[0]);
+				muArray = new double[] { muForOrder - 1 };
+			}
+			if (pathToRead.contains("Set"))
+			{
+				int i = pathToRead.indexOf("Set");
+				userSetLabel = pathToRead.substring(i, i + 4);
+			}
+
+			for (double muD : muArray)
+			{
+				int mu = (int) muD;
+				List<List<Double>> readResFromFile = null;
+
+				String statFileForThisMU = pathToRead + statFileNameToRead + mu + dimensionPhrase + ".csv";
+
+				if (host.contains("local"))
+				{// each row corresponds to a user
+					readResFromFile = ReadingFromFile.nColumnReaderDouble(statFileForThisMU, ",", statFileHasColHeader,
+							statFileHasRowHeader);
+				}
+				else
+				{
+					Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port,
+							statFileForThisMU, user, passwd);
+					readResFromFile = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",",
+							statFileHasColHeader, statFileHasRowHeader);
+				}
+				// System.out.println("mu= " + mu + " res=" + res);
+				muKeyAllValsMap.put(mu, readResFromFile);
+				// inputAndSession.getSecond().disconnect();
+			}
+
+			// Convert to user wise result
+			// userIndex , <MU, <list of first1,2,3 for that user and mu>>
+			userMUKeyVals = transformToUserWise(muArray, muKeyAllValsMap);
+
+			writeUserMuKeyVals(userMUKeyVals,
+					pathToWrite + resultsLabel + "_" + statFileNameToRead + "userMUKeyVals" + dimensionPhrase + ".csv",
+					userSetLabel, valColHeader);
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			// userIndex, min mu with highest first 3, first3 for this mu and user
+			Map<Integer, Pair<Integer, List<Double>>> firstsForMinMUWithMaxFxForEachUser = getValsForMinMUHavingMaxF3(
+					firstToMax, userMUKeyVals);
+			StringBuilder sb = new StringBuilder("userIndex,minMuWithMaxFirst3," + valColHeader + "\n");
+			// IntStream.rangeClosed(1, 3);
+			//// user, min mu with highest first 3, first3 for this mu and user
+			for (Entry<Integer, Pair<Integer, List<Double>>> r : firstsForMinMUWithMaxFxForEachUser.entrySet())
+			{
+				// sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst() + ","
+				// + r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+				// + r.getValue().getSecond().get(2) + "\n");
+				// modified on 19 July 2018 so that it also works only first1
+				sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+				for (double firstVal : r.getValue().getSecond())
+				{
+					sb.append("," + firstVal);
+				}
+				sb.append("\n");
+			}
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileNameToRead
+					+ "MinMUWithMaxFirst" + firstToMax + dimensionPhrase + ".csv");
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			// userIndex, min mu with highest first 3, first3 for this mu and user
+			Map<Integer, Triple<Integer, List<Double>, Integer>> firstsForMinMUWithMaxFx0AwareForEachUser = getValsForMinMUHavingMaxF3ZeroAware(
+					firstToMaxInOrder, userMUKeyVals);
+			StringBuilder sb2 = new StringBuilder("userIndex,minMuWithMaxFirst3," + valColHeader + ",ChosenFirst\n");
+			//// user, min mu with highest first 3, first3 for this mu and user
+			for (Entry<Integer, Triple<Integer, List<Double>, Integer>> r : firstsForMinMUWithMaxFx0AwareForEachUser
+					.entrySet())
+			{
+				// sb2.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst() + ","
+				// + r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+				// + r.getValue().getSecond().get(2) + "," + r.getValue().getThird() + "\n");
+				sb2.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+				for (double firstVal : r.getValue().getSecond())
+				{
+					sb2.append("," + firstVal);
+				}
+				sb2.append("," + r.getValue().getThird() + "\n");
+			}
+			WToFile.writeToNewFile(sb2.toString(), pathToWrite + resultsLabel + "_" + statFileNameToRead
+					+ "MinMUWithMaxFirst0Aware" + dimensionPhrase + ".csv");
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+
+			WToFile.writeToNewFile(host + ":" + pathToRead, pathToWrite + "ReadMe/" + resultsLabel + "_"
+					+ statFileNameToRead + "ReadMe" + dimensionPhrase + ".txt");
+		}
+		catch (NullPointerException e)
+		{
+			e.printStackTrace();
+			WToFile.appendLineToFileAbs(PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n"),
+					pathToWrite + "ExceptionsEncountered" + dimensionPhrase + ".csv");
+			System.exit(-1);
+			return null;
+		}
+		return (userMUKeyVals);
+
+	}
+
+	/**
+	 * 
+	 * @param pathToWrite
+	 * @param resultsLabel
+	 * @param pathToRead
+	 * @param muArray
+	 * @param statFileNameToRead
+	 * @param host
+	 * @param firstToMax
+	 * @param doFirstToMax
+	 * @param dimensionPhrase
+	 *            added on 19 July 2018
+	 * @return
+	 */
+	private static Map<Integer, Map<Integer, List<Double>>> getResult(String pathToWrite, String resultsLabel,
+			String pathToRead, double[] muArray, String statFileNameToRead, String host, int firstToMax,
+			String dimensionPhrase)
+
+	{
+		String passwd = Utils.getPassWordForHost(host);
+		String user = Utils.getUserForHost(host);
+
+		// MU , <list for each user, <list of first1,2,3 for that user and mu>>
+		Map<Integer, List<List<Double>>> muKeyAllValsMap = new LinkedHashMap<>();
+
+		// Convert to user wise result
+		// userIndex , <MU, <list of first1,2,3 for that user and mu>>
+		Map<Integer, Map<Integer, List<Double>>> userMUKeyVals = null;
+
+		String userSetLabel = "";
+		try
+		{// if PureAKOM, then mu is order of AKOM -1
+			if (pathToRead.contains("PureAKOMOrder"))
+			{
+				String[] splitted = pathToRead.split("Order");
+				String[] splitted2 = splitted[1].split("/");
+				double muForOrder = Double.valueOf(splitted2[0]);
+				muArray = new double[] { muForOrder - 1 };
+			}
+			if (pathToRead.contains("Set"))
+			{
+				int i = pathToRead.indexOf("Set");
+				userSetLabel = pathToRead.substring(i, i + 4);
+			}
+
+			for (double muD : muArray)
+			{
+				int mu = (int) muD;
+				List<List<Double>> readResFromFile = null;
+
+				String statFileForThisMU = pathToRead + statFileNameToRead + mu + dimensionPhrase + ".csv";
 
 				if (host.contains("local"))
 				{// each row corresponds to a user
@@ -1251,8 +1908,9 @@ public class ResultsDistributionEvaluation
 			// userIndex , <MU, <list of first1,2,3 for that user and mu>>
 			userMUKeyVals = transformToUserWise(muArray, muKeyAllValsMap);
 
-			writeUserMuKeyVals(userMUKeyVals, pathToWrite + resultsLabel + "_" + statFileName + "userMUKeyVals.csv",
-					userSetLabel);
+			writeUserMuKeyVals(userMUKeyVals,
+					pathToWrite + resultsLabel + "_" + statFileNameToRead + "userMUKeyVals" + dimensionPhrase + ".csv",
+					userSetLabel, "First1,First2,First3");
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 			// userIndex, min mu with highest first 3, first3 for this mu and user
@@ -1266,8 +1924,8 @@ public class ResultsDistributionEvaluation
 						+ r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
 						+ r.getValue().getSecond().get(2) + "\n");
 			}
-			WToFile.writeToNewFile(sb.toString(),
-					pathToWrite + resultsLabel + "_" + statFileName + "MinMUWithMaxFirst" + firstToMax + ".csv");
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileNameToRead
+					+ "MinMUWithMaxFirst" + firstToMax + dimensionPhrase + ".csv");
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1283,18 +1941,18 @@ public class ResultsDistributionEvaluation
 						+ r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
 						+ r.getValue().getSecond().get(2) + "," + r.getValue().getThird() + "\n");
 			}
-			WToFile.writeToNewFile(sb2.toString(),
-					pathToWrite + resultsLabel + "_" + statFileName + "MinMUWithMaxFirst0Aware.csv");
+			WToFile.writeToNewFile(sb2.toString(), pathToWrite + resultsLabel + "_" + statFileNameToRead
+					+ "MinMUWithMaxFirst0Aware" + dimensionPhrase + ".csv");
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 
-			WToFile.writeToNewFile(host + ":" + pathToRead,
-					pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe.txt");
+			WToFile.writeToNewFile(host + ":" + pathToRead, pathToWrite + "ReadMe/" + resultsLabel + "_"
+					+ statFileNameToRead + "ReadMe" + dimensionPhrase + ".txt");
 		}
 		catch (NullPointerException e)
 		{
 			e.printStackTrace();
 			WToFile.appendLineToFileAbs(PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n"),
-					pathToWrite + "ExceptionsEncountered.csv");
+					pathToWrite + "ExceptionsEncountered" + dimensionPhrase + ".csv");
 			System.exit(-1);
 			return null;
 		}
@@ -1306,6 +1964,8 @@ public class ResultsDistributionEvaluation
 	 * Fork of org.activity.evaluation.ResultsDistributionEvaluation.getResult(String, String, String, double[], String,
 	 * String, int)
 	 * <p>
+	 * TODO: safely delete this later after safely refactoring calls to this method, as it can now be replaced by the
+	 * succeeding method.
 	 * 
 	 * @param pathToWrite
 	 * @param resultsLabel
@@ -1320,11 +1980,13 @@ public class ResultsDistributionEvaluation
 	 * @param userIdentifierChosenMuMap
 	 * @return
 	 * @since May 4 2018
+	 * @deprecated
 	 */
 	private static Map<Integer, Map<Integer, List<Double>>> getResult(String pathToWrite, String resultsLabel,
 			String pathToRead, double[] muArray, String statFileName, String host, int firstToMax, boolean doFirstToMax,
 			boolean doFirstToMaxZeroAware, boolean doChosenMUForEachUser,
-			Map<String, Integer> userIdentifierChosenMuMap)
+			Map<String, Integer> userIdentifierChosenMuMap, String dimensionPhrase, boolean statFileHasHeader,
+			int[] firstToMaxInOrder)
 	{
 		String passwd = Utils.getPassWordForHost(host);
 		String user = Utils.getUserForHost(host);
@@ -1362,17 +2024,19 @@ public class ResultsDistributionEvaluation
 				int mu = (int) muD;
 				List<List<Double>> readResFromFile = null;
 
-				String statFileForThisMU = pathToRead + statFileName + mu + ".csv";
+				// String statFileForThisMU = pathToRead + statFileName + mu + ".csv";
+				String statFileForThisMU = pathToRead + statFileName + mu + dimensionPhrase + ".csv";
 
 				if (host.contains("local"))
 				{// each row corresponds to a user
-					readResFromFile = ReadingFromFile.nColumnReaderDouble(statFileForThisMU, ",", false);
+					readResFromFile = ReadingFromFile.nColumnReaderDouble(statFileForThisMU, ",", statFileHasHeader);
 				}
 				else
 				{
 					Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port,
 							statFileForThisMU, user, passwd);
-					readResFromFile = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",", false);
+					readResFromFile = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",",
+							statFileHasHeader);
 				}
 				// System.out.println("mu= " + mu + " res=" + res);
 				muKeyAllValsMap.put(mu, readResFromFile);
@@ -1383,8 +2047,9 @@ public class ResultsDistributionEvaluation
 			// userIndex , <MU, <list of first1,2,3 for that user and mu>>
 			userMUKeyVals = transformToUserWise(muArray, muKeyAllValsMap);
 
-			writeUserMuKeyVals(userMUKeyVals, pathToWrite + resultsLabel + "_" + statFileName + "userMUKeyVals.csv",
-					userSetLabel);
+			writeUserMuKeyVals(userMUKeyVals,
+					pathToWrite + resultsLabel + "_" + statFileName + "userMUKeyVals" + dimensionPhrase + ".csv",
+					userSetLabel, "First1,First2,First3");
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 			if (doFirstToMax)
@@ -1396,12 +2061,19 @@ public class ResultsDistributionEvaluation
 				//// user, min mu with highest first 3, first3 for this mu and user
 				for (Entry<Integer, Pair<Integer, List<Double>>> r : firstsForMinMUWithMaxFxForEachUser.entrySet())
 				{
-					sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst() + ","
-							+ r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
-							+ r.getValue().getSecond().get(2) + "\n");
+					sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+					// + "," + r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+					// + r.getValue().getSecond().get(2) + "\n");
+
+					for (double v : r.getValue().getSecond())
+					{
+						sb.append("," + v);
+					}
+					sb.append("\n");
 				}
-				WToFile.writeToNewFile(sb.toString(),
-						pathToWrite + resultsLabel + "_" + statFileName + "MinMUWithMaxFirst" + firstToMax + ".csv");
+
+				WToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName
+						+ "MinMUWithMaxFirst" + firstToMax + dimensionPhrase + ".csv");
 			}
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1410,19 +2082,25 @@ public class ResultsDistributionEvaluation
 			{
 				// userIndex, min mu with highest first 3, first3 for this mu and user
 				Map<Integer, Triple<Integer, List<Double>, Integer>> firstsForMinMUWithMaxFx0AwareForEachUser = getValsForMinMUHavingMaxF3ZeroAware(
-						new int[] { 3, 2, 1 }, userMUKeyVals);
+						firstToMaxInOrder, userMUKeyVals);
 				StringBuilder sb2 = new StringBuilder(
 						"userIndex,minMuWithMaxFirst3,First1,First2,First3,ChosenFirst\n");
 				//// user, min mu with highest first 3, first3 for this mu and user
 				for (Entry<Integer, Triple<Integer, List<Double>, Integer>> r : firstsForMinMUWithMaxFx0AwareForEachUser
 						.entrySet())
 				{
-					sb2.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst() + ","
-							+ r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
-							+ r.getValue().getSecond().get(2) + "," + r.getValue().getThird() + "\n");
+					sb2.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+					// + "," + r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+					// + r.getValue().getSecond().get(2) + "," + r.getValue().getThird() + "\n");
+					for (double d : r.getValue().getSecond())
+					{
+						sb2.append("," + d);
+					}
+					sb2.append("," + r.getValue().getThird() + "\n");
+
 				}
-				WToFile.writeToNewFile(sb2.toString(),
-						pathToWrite + resultsLabel + "_" + statFileName + "MinMUWithMaxFirst0Aware.csv");
+				WToFile.writeToNewFile(sb2.toString(), pathToWrite + resultsLabel + "_" + statFileName
+						+ "MinMUWithMaxFirst0Aware" + dimensionPhrase + ".csv");
 			}
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1437,20 +2115,216 @@ public class ResultsDistributionEvaluation
 				//// user, min mu with highest first 3, first3 for this mu and user
 				for (Entry<Integer, Pair<Integer, List<Double>>> r : firstsForChosenMUForEachUser.entrySet())
 				{
-					sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst() + ","
-							+ r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
-							+ r.getValue().getSecond().get(2) + "\n");
+					sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+					// + ","+ r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+					// + r.getValue().getSecond().get(2) + "\n");
+					for (double v : r.getValue().getSecond())
+					{
+						sb.append("," + v);
+					}
+					sb.append("\n");
 				}
-				WToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName + "ChosenMU.csv");
+				WToFile.writeToNewFile(sb.toString(),
+						pathToWrite + resultsLabel + "_" + statFileName + "ChosenMU" + dimensionPhrase + ".csv");
 			}
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 			WToFile.writeToNewFile(host + ":" + pathToRead,
-					pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe.txt");
+					pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe" + dimensionPhrase + ".txt");
 		}
 		catch (NullPointerException e)
 		{
-			WToFile.appendLineToFileAbs(PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n"),
-					pathToWrite + "ExceptionsEncountered.csv");
+			e.printStackTrace();
+			String s = "pathToRead=" + pathToRead + "\nresultsLabel=" + resultsLabel + "\nstatFileNameToRead="
+					+ statFileName;
+			WToFile.appendLineToFileAbs(
+					PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n") + " \nfor:" + s,
+					pathToWrite + "ExceptionsEncountered" + dimensionPhrase + ".csv");
+
+			System.exit(-1);
+			return null;
+		}
+		return (userMUKeyVals);
+	}
+
+	/**
+	 * Fork of org.activity.evaluation.ResultsDistributionEvaluation.getResult(String, String, String, double[], String,
+	 * String, int, boolean, boolean, boolean, Map<String, Integer>, String, boolean, int[])
+	 * <p>
+	 * 
+	 * @param pathToWrite
+	 * @param resultsLabel
+	 * @param pathToRead
+	 * @param muArray
+	 * @param statFileName
+	 * @param host
+	 * @param firstToMax
+	 * @param doFirstToMax
+	 * @param doFirstToMaxZeroAware
+	 * @param doChosenMUForEachUser
+	 * @param userIdentifierChosenMuMap
+	 * @return
+	 * @since 19 July 2018
+	 */
+	private static Map<Integer, Map<Integer, List<Double>>> getResultChosenMU(String pathToWrite, String resultsLabel,
+			String pathToRead, double[] muArray, String statFileName, String host, int firstToMax, boolean doFirstToMax,
+			boolean doFirstToMaxZeroAware, boolean doChosenMUForEachUser,
+			Map<String, Integer> userIdentifierChosenMuMap, String dimensionPhrase, boolean statFileHasColHeader,
+			int[] firstToMaxInOrder, boolean statFileHasRowHeader, String valColHeader)
+	{
+		String passwd = Utils.getPassWordForHost(host);
+		String user = Utils.getUserForHost(host);
+
+		// MU , <list for each user, <list of first1,2,3 for that user and mu>>
+		Map<Integer, List<List<Double>>> muKeyAllValsMap = new LinkedHashMap<>();
+
+		// Convert to user wise result
+		// userIndex , <MU, <list of first1,2,3 for that user and mu>>
+		Map<Integer, Map<Integer, List<Double>>> userMUKeyVals = null;
+
+		String userSetLabel = "";
+		try
+		{
+			// if PureAKOM, then mu is order of AKOM -1
+			if (pathToRead.contains("PureAKOMOrder"))
+			{
+				String[] splitted = pathToRead.split("Order");
+				String[] splitted2 = splitted[1].split("/");
+				double muForOrder = Double.valueOf(splitted2[0]);
+				muArray = new double[] { muForOrder - 1 };
+			}
+			else if (pathToRead.contains("RNN1"))
+			{
+				muArray = new double[] { 0 };
+			}
+			if (pathToRead.contains("Set"))
+			{
+				int i = pathToRead.indexOf("Set");
+				userSetLabel = pathToRead.substring(i, i + 4);
+			}
+
+			for (double muD : muArray)
+			{
+				int mu = (int) muD;
+				List<List<Double>> readResFromFile = null;
+
+				// String statFileForThisMU = pathToRead + statFileName + mu + ".csv";
+				String statFileForThisMU = pathToRead + statFileName + mu + dimensionPhrase + ".csv";
+
+				if (host.contains("local"))
+				{// each row corresponds to a user
+					readResFromFile = ReadingFromFile.nColumnReaderDouble(statFileForThisMU, ",", statFileHasColHeader,
+							statFileHasRowHeader);
+				}
+				else
+				{
+					Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port,
+							statFileForThisMU, user, passwd);
+					readResFromFile = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",",
+							statFileHasColHeader, statFileHasRowHeader);
+				}
+				// System.out.println("mu= " + mu + " res=" + res);
+				muKeyAllValsMap.put(mu, readResFromFile);
+				// inputAndSession.getSecond().disconnect();
+			}
+
+			// Convert to user wise result
+			// userIndex , <MU, <list of first1,2,3 for that user and mu>>
+			userMUKeyVals = transformToUserWise(muArray, muKeyAllValsMap);
+
+			writeUserMuKeyVals(userMUKeyVals,
+					pathToWrite + resultsLabel + "_" + statFileName + "userMUKeyVals" + dimensionPhrase + ".csv",
+					userSetLabel, valColHeader);
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			if (doFirstToMax)
+			{
+				// userIndex, min mu with highest first 3, first3 for this mu and user
+				Map<Integer, Pair<Integer, List<Double>>> firstsForMinMUWithMaxFxForEachUser = getValsForMinMUHavingMaxF3(
+						firstToMax, userMUKeyVals);
+				StringBuilder sb = new StringBuilder("userIndex,minMuWithMaxFirst3," + valColHeader + "\n");
+				//// user, min mu with highest first 3, first3 for this mu and user
+				for (Entry<Integer, Pair<Integer, List<Double>>> r : firstsForMinMUWithMaxFxForEachUser.entrySet())
+				{
+					sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+					// + "," + r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+					// + r.getValue().getSecond().get(2) + "\n");
+
+					for (double v : r.getValue().getSecond())
+					{
+						sb.append("," + v);
+					}
+					sb.append("\n");
+				}
+
+				WToFile.writeToNewFile(sb.toString(), pathToWrite + resultsLabel + "_" + statFileName
+						+ "MinMUWithMaxFirst" + firstToMax + dimensionPhrase + ".csv");
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			if (doFirstToMaxZeroAware)
+			{
+				// userIndex, min mu with highest first 3, first3 for this mu and user
+				Map<Integer, Triple<Integer, List<Double>, Integer>> firstsForMinMUWithMaxFx0AwareForEachUser = getValsForMinMUHavingMaxF3ZeroAware(
+						firstToMaxInOrder, userMUKeyVals);
+				StringBuilder sb2 = new StringBuilder(
+						"userIndex,minMuWithMaxFirst3," + valColHeader + ",ChosenFirst\n");
+				//// user, min mu with highest first 3, first3 for this mu and user
+				for (Entry<Integer, Triple<Integer, List<Double>, Integer>> r : firstsForMinMUWithMaxFx0AwareForEachUser
+						.entrySet())
+				{
+					sb2.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+					// + "," + r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+					// + r.getValue().getSecond().get(2) + "," + r.getValue().getThird() + "\n");
+					for (double d : r.getValue().getSecond())
+					{
+						sb2.append("," + d);
+					}
+					sb2.append("," + r.getValue().getThird() + "\n");
+
+				}
+				WToFile.writeToNewFile(sb2.toString(), pathToWrite + resultsLabel + "_" + statFileName
+						+ "MinMUWithMaxFirst0Aware" + dimensionPhrase + ".csv");
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			if (doChosenMUForEachUser)
+			{
+				// userIndex, min mu with highest first 3, first3 for this mu and user
+				Map<Integer, Pair<Integer, List<Double>>> firstsForChosenMUForEachUser = getValsForCHosenMUForEachUser(
+						userMUKeyVals, userIdentifierChosenMuMap, userSetLabel, muArray, pathToRead);
+
+				StringBuilder sb = new StringBuilder("userIndex,ChosenMU," + valColHeader + "\n");
+				//// user, min mu with highest first 3, first3 for this mu and user
+				for (Entry<Integer, Pair<Integer, List<Double>>> r : firstsForChosenMUForEachUser.entrySet())
+				{
+					sb.append(userSetLabel + r.getKey() + "," + r.getValue().getFirst());
+					// + ","+ r.getValue().getSecond().get(0) + "," + r.getValue().getSecond().get(1) + ","
+					// + r.getValue().getSecond().get(2) + "\n");
+					for (double v : r.getValue().getSecond())
+					{
+						sb.append("," + v);
+					}
+					sb.append("\n");
+				}
+				WToFile.writeToNewFile(sb.toString(),
+						pathToWrite + resultsLabel + "_" + statFileName + "ChosenMU" + dimensionPhrase + ".csv");
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			WToFile.writeToNewFile(host + ":" + pathToRead,
+					pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe" + dimensionPhrase + ".txt");
+		}
+		catch (NullPointerException e)
+		{
+			e.printStackTrace();
+			String s = "pathToRead=" + pathToRead + "\nresultsLabel=" + resultsLabel + "\nstatFileNameToRead="
+					+ statFileName;
+			WToFile.appendLineToFileAbs(
+					PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n") + " \nfor:" + s,
+					pathToWrite + "ExceptionsEncountered" + dimensionPhrase + ".csv");
+
+			System.exit(-1);
 			return null;
 		}
 		return (userMUKeyVals);
@@ -1462,11 +2336,13 @@ public class ResultsDistributionEvaluation
 	 * @param userMUKeyVals
 	 * @param fileNameToWrite
 	 * @param userSetLabel
+	 * @param valColHeader
+	 *            "First1,First2,First3
 	 */
 	private static void writeUserMuKeyVals(Map<Integer, Map<Integer, List<Double>>> userMUKeyVals,
-			String fileNameToWrite, String userSetLabel)
+			String fileNameToWrite, String userSetLabel, String valColHeader)
 	{
-		StringBuilder sb = new StringBuilder("UserIndex,MU,First1,First2,First3\n");
+		StringBuilder sb = new StringBuilder("UserIndex,MU," + valColHeader + "\n");
 		for (Entry<Integer, Map<Integer, List<Double>>> e : userMUKeyVals.entrySet())
 		{
 			Integer userIndex = e.getKey();

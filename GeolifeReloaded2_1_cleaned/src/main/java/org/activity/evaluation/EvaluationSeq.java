@@ -60,8 +60,8 @@ public class EvaluationSeq
 	ArrayList<ArrayList<String>> listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
 			listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1;
 
-	ArrayList<ArrayList<String>> listOfMeanReciprocalRankFiles, listOfReciprocalRankFiles, listOfAvgPrevisionFiles,
-			listOfAvgRecallFiles, listOfAvgFMeasureFiles;
+	ArrayList<ArrayList<String>> listOfStep0MeanReciprocalRankFiles, listOfStep0AvgPrecisionFiles,
+			listOfStep0AvgRecallFiles, listOfStep0AvgFMeasureFiles;// listOfReciprocalRankFiles,
 
 	/**
 	 * FOR NO MUs, useful for baseline
@@ -257,6 +257,18 @@ public class EvaluationSeq
 							+ "NumDirectTopKAgreements" + dimensionPhrase + ".csv");
 					listOfPerTopKAgreementsFilesL1.get(muIndex).add(commonPath + algoLabel + "L1" + timeCategory
 							+ "PercentageDirectTopKAgreements" + dimensionPhrase + ".csv");
+
+					// start of added on 19 July 2018
+					listOfStep0MeanReciprocalRankFiles.get(muIndex).add(commonPath + algoLabel + "Step0" + timeCategory
+							+ "MeanReciprocalRank" + dimensionPhrase + ".csv");
+					listOfStep0AvgPrecisionFiles.get(muIndex).add(commonPath + algoLabel + "Step0" + timeCategory
+							+ "AvgPrecision" + dimensionPhrase + ".csv");
+					listOfStep0AvgRecallFiles.get(muIndex).add(
+							commonPath + algoLabel + "Step0" + timeCategory + "AvgRecall" + dimensionPhrase + ".csv");
+					listOfStep0AvgFMeasureFiles.get(muIndex).add(
+							commonPath + algoLabel + "Step0" + timeCategory + "AvgFMeasure" + dimensionPhrase + ".csv");
+					// end of added on 19 July 2018
+
 					// }
 					consoleLogStream.close();
 				} // end of loop over MUs
@@ -275,6 +287,11 @@ public class EvaluationSeq
 			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
 					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
 					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1, dimensionPhrase);
+
+			ArrayList<String> listOfMRR_P_R_F_Files = concatenateMRRPrecisonRecallFMeasureFiles(outputCoreResultsPath,
+					matchingUnitAsPastCount, listOfStep0MeanReciprocalRankFiles, listOfStep0AvgPrecisionFiles,
+					listOfStep0AvgRecallFiles, listOfStep0AvgFMeasureFiles, dimensionPhrase);
+			// end of file condatenation from different user groups
 
 			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
 					"AllNumDirectAgreementsL1_", "AllPerDirectAgreementsL1_" };
@@ -542,6 +559,11 @@ public class EvaluationSeq
 		listOfNumTopKAgreementsFilesL1 = new ArrayList<>();
 		listOfPerTopKAgreementsFilesL1 = new ArrayList<>();
 
+		listOfStep0MeanReciprocalRankFiles = new ArrayList<>();
+		listOfStep0AvgPrecisionFiles = new ArrayList<>();
+		listOfStep0AvgRecallFiles = new ArrayList<>();
+		listOfStep0AvgFMeasureFiles = new ArrayList<>();
+
 		// we concatenate results for each mu over all users (groups)
 		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 		{
@@ -554,6 +576,11 @@ public class EvaluationSeq
 			listOfPerTopKAgreementsFiles.add(muIndex, new ArrayList<String>());
 			listOfNumTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
 			listOfPerTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+
+			listOfStep0MeanReciprocalRankFiles.add(muIndex, new ArrayList<String>());
+			listOfStep0AvgPrecisionFiles.add(muIndex, new ArrayList<String>());
+			listOfStep0AvgRecallFiles.add(muIndex, new ArrayList<String>());
+			listOfStep0AvgFMeasureFiles.add(muIndex, new ArrayList<String>());
 		}
 	}
 
@@ -805,19 +832,19 @@ public class EvaluationSeq
 			// PopUps.showMessage("listOfNumAgreementsFilesget(muIndex) = " +
 			// listOfNumAgreementsFiles.get(muIndex));
 
-			CSVUtils.concatenateCSVFiles(listOfNumAgreementsFiles.get(muIndex), true,
+			CSVUtils.concatenateCSVFiles(listOfNumAgreementsFiles.get(muIndex), false,
 					pathToWrite + "AllNumDirectAgreements_" + mu + dimensionPhrase + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllNumDirectAgreements" + mu + dimensionPhrase + ".csv");
 
-			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFiles.get(muIndex), true,
+			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFiles.get(muIndex), false,
 					pathToWrite + "AllPerDirectAgreements_" + mu + dimensionPhrase + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreements" + mu + dimensionPhrase + ".csv");
 
-			CSVUtils.concatenateCSVFiles(listOfNumAgreementsFilesL1.get(muIndex), true,
+			CSVUtils.concatenateCSVFiles(listOfNumAgreementsFilesL1.get(muIndex), false,
 					pathToWrite + "AllNumDirectAgreementsL1_" + mu + dimensionPhrase + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllNumDirectAgreementsL1" + mu + dimensionPhrase + ".csv");
 
-			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFilesL1.get(muIndex), true,
+			CSVUtils.concatenateCSVFiles(listOfPerAgreementsFilesL1.get(muIndex), false,
 					pathToWrite + "AllPerDirectAgreementsL1_" + mu + dimensionPhrase + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllPerDirectAgreementsL1" + mu + dimensionPhrase + ".csv");
 		}
@@ -855,21 +882,72 @@ public class EvaluationSeq
 			// PopUps.showMessage("listOfNumAgreementsFilesget(muIndex) = " +
 			// listOfNumAgreementsFiles.get(muIndex));
 
-			CSVUtils.concatenateCSVFiles(listOfNumTopKAgreementsFiles.get(muIndex), true,
+			CSVUtils.concatenateCSVFiles(listOfNumTopKAgreementsFiles.get(muIndex), false,
 					pathToWrite + "AllNumDirectTopKAgreements_" + mu + dimensionPhrase + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllNumDirectTopKAgreements_" + mu + dimensionPhrase + ".csv");
 
-			CSVUtils.concatenateCSVFiles(listOfPerTopKAgreementsFiles.get(muIndex), true,
+			CSVUtils.concatenateCSVFiles(listOfPerTopKAgreementsFiles.get(muIndex), false,
 					pathToWrite + "AllPerDirectTopKAgreements_" + mu + dimensionPhrase + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreements_" + mu + dimensionPhrase + ".csv");
 
-			CSVUtils.concatenateCSVFiles(listOfNumTopKAgreementsFilesL1.get(muIndex), true,
+			CSVUtils.concatenateCSVFiles(listOfNumTopKAgreementsFilesL1.get(muIndex), false,
 					pathToWrite + "AllNumDirectTopKAgreementsL1_" + mu + dimensionPhrase + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllNumDirectTopKAgreementsL1_" + mu + dimensionPhrase + ".csv");
 
-			CSVUtils.concatenateCSVFiles(listOfPerTopKAgreementsFilesL1.get(muIndex), true,
+			CSVUtils.concatenateCSVFiles(listOfPerTopKAgreementsFilesL1.get(muIndex), false,
 					pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + dimensionPhrase + ".csv");
 			listOfWrittenFiles.add(pathToWrite + "AllPerDirectTopKAgreementsL1_" + mu + dimensionPhrase + ".csv");
+		}
+		// consoleLogStream.close();
+
+		return listOfWrittenFiles;
+
+	}
+
+	/**
+	 * For each mu, concatenate results files for each groups of users, so that we get single files containing results
+	 * for all users.
+	 * 
+	 * @param pathToWrite
+	 * @param matchingUnitAsPastCount
+	 * @param listOfStep0MeanReciprocalRankFiles
+	 * @param listOfStep0AvgPrecisionFiles
+	 * @param listOfStep0AvgRecallFiles
+	 * @param listOfStep0AvgFMeasureFiles
+	 * @param dimensionPhrase
+	 * @return
+	 */
+	private static ArrayList<String> concatenateMRRPrecisonRecallFMeasureFiles(String pathToWrite,
+			double matchingUnitAsPastCount[], ArrayList<ArrayList<String>> listOfStep0MeanReciprocalRankFiles,
+			ArrayList<ArrayList<String>> listOfStep0AvgPrecisionFiles,
+			ArrayList<ArrayList<String>> listOfStep0AvgRecallFiles,
+			ArrayList<ArrayList<String>> listOfStep0AvgFMeasureFiles, String dimensionPhrase)
+	{
+		ArrayList<String> listOfWrittenFiles = new ArrayList<String>();
+		// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVConcatLog.txt");
+
+		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+		{
+			int mu = (int) matchingUnitAsPastCount[muIndex];
+			// PopUps.showMessage("Will now concatenate:" + listOfNumAgreementsFiles.get(muIndex).size() + "files");
+			// PopUps.showMessage("listOfNumAgreementsFilesget(muIndex) = " +
+			// listOfNumAgreementsFiles.get(muIndex));
+
+			String fileNameToWrite1 = pathToWrite + "AllMeanReciprocalRank_" + mu + dimensionPhrase + ".csv";
+			CSVUtils.concatenateCSVFiles(listOfStep0MeanReciprocalRankFiles.get(muIndex), true, fileNameToWrite1);
+			listOfWrittenFiles.add(fileNameToWrite1);
+
+			String fileNameToWrite2 = pathToWrite + "AvgPrecision_" + mu + dimensionPhrase + ".csv";
+			CSVUtils.concatenateCSVFiles(listOfStep0AvgPrecisionFiles.get(muIndex), true, fileNameToWrite2);
+			listOfWrittenFiles.add(fileNameToWrite2);
+
+			String fileNameToWrite3 = pathToWrite + "AvgRecall_" + mu + dimensionPhrase + ".csv";
+			CSVUtils.concatenateCSVFiles(listOfStep0AvgRecallFiles.get(muIndex), true, fileNameToWrite3);
+			listOfWrittenFiles.add(fileNameToWrite3);
+
+			String fileNameToWrite4 = pathToWrite + "AvgFMeasure_" + mu + dimensionPhrase + ".csv";
+			CSVUtils.concatenateCSVFiles(listOfStep0AvgFMeasureFiles.get(muIndex), true, fileNameToWrite4);
+			listOfWrittenFiles.add(fileNameToWrite4);
 		}
 		// consoleLogStream.close();
 
