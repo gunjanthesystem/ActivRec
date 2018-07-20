@@ -297,6 +297,29 @@ public class ReadingFromFile
 	 * @param hasHeader
 	 * @return
 	 */
+	public static List<List<Double>> nColumnReaderDouble(String absFileNameToRead, String delimiter,
+			boolean hasColHeader, boolean hasRowHeader)
+	{
+		List<List<Double>> res = null;
+		try
+		{
+			res = ReadingFromFile.nColumnReaderDouble(new BufferedInputStream(new FileInputStream(absFileNameToRead)),
+					delimiter, hasColHeader, hasRowHeader);
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasHeader
+	 * @return
+	 */
 	public static List<List<Double>> nColumnReaderDouble(InputStream inputStream, String delimiter, boolean hasHeader)
 	{
 
@@ -321,6 +344,42 @@ public class ReadingFromFile
 						.collect(Collectors.toList());
 
 			}
+			// System.out.println("Size of raw =" + raw.size());
+			br.close();
+		}
+
+		catch (Exception e)
+		{
+			System.err.println("Exception reading file from inputStream: " + inputStream.toString());
+			e.printStackTrace();
+		}
+		return raw;
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 * @param delimiter
+	 * @param hasColHeader
+	 * @param hasRowHeader
+	 * @return
+	 * @since 19 July 2018
+	 */
+	public static List<List<Double>> nColumnReaderDouble(InputStream inputStream, String delimiter,
+			boolean hasColHeader, boolean hasRowHeader)
+	{
+
+		List<List<Double>> raw = new ArrayList<>();
+		BufferedReader br;
+
+		int numOfColsToSkip = hasRowHeader ? 1 : 0;
+		int numOfRowsToSkip = hasColHeader ? 1 : 0;
+		try
+		{
+			br = new BufferedReader(new InputStreamReader(inputStream));
+			raw = br.lines().skip(numOfRowsToSkip).map((String s) -> Arrays.asList(s.split(Pattern.quote(delimiter)))
+					.stream().skip(numOfColsToSkip).map(n -> Double.parseDouble(n)).collect(Collectors.toList()))
+					.collect(Collectors.toList());
 			// System.out.println("Size of raw =" + raw.size());
 			br.close();
 		}
@@ -864,13 +923,25 @@ public class ReadingFromFile
 
 	public static void main(String args[])
 	{
-		ArrayList<ArrayList<String>> sublists = readRandomSamplesIntoListOfLists(
-				"dataWritten/Jan16/randomlySampleUsers.txt", 13, 21, ",");
-
-		for (ArrayList<String> l : sublists)
+		if (false)
 		{
-			System.out.println(l.toString());
+			ArrayList<ArrayList<String>> sublists = readRandomSamplesIntoListOfLists(
+					"dataWritten/Jan16/randomlySampleUsers.txt", 13, 21, ",");
+
+			for (ArrayList<String> l : sublists)
+			{
+				System.out.println(l.toString());
+			}
 		}
+
+		String absFileNameToRead = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/AvgRecall_3.csv";
+		List<List<Double>> res = nColumnReaderDouble(absFileNameToRead, ",", true, true);
+
+		for (List<Double> v : res)
+		{
+			System.out.println(v);
+		}
+
 	}
 
 	/**
@@ -1201,15 +1272,15 @@ public class ReadingFromFile
 			List<List<String>> lines = nColumnReaderStringLargeFileSelectedColumns(
 					new FileInputStream(new File(absFileNameForLatLong)), ",", true, false,
 					new int[] { latColIndex, lonColIndex, labelColIndex });
-	
+
 			System.out.println("lines.size()=" + lines.size());
-	
+
 			int count = 0;
-	
+
 			for (List<String> line : lines)
 			{
 				count += 1;
-	
+
 				if (count == 1)
 				{
 					continue;
@@ -1220,10 +1291,10 @@ public class ReadingFromFile
 				// }
 				// System.out.println("line= " + line);
 				// System.out.println("here 1");
-	
+
 				Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(0)),
 						Double.valueOf(line.get(1)), line.get(2));
-	
+
 				// LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
 				// // Double.valueOf(line.get(2).substring(0, 4)));
 				// // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),
@@ -1260,21 +1331,21 @@ public class ReadingFromFile
 	{
 		List<Triple<Double, Double, String>> listOfLocations = new ArrayList<>();
 		List<Double> fillVal = new ArrayList();
-	
+
 		try
 		{
 			List<List<String>> lines = nColumnReaderStringLargeFileSelectedColumns(
 					new FileInputStream(new File(absFileNameForLatLong)), ",", true, false,
 					new int[] { latColIndex, lonColIndex, labelColIndex, fillValColIndex });
-	
+
 			System.out.println("lines.size()=" + lines.size());
-	
+
 			int count = 0;
-	
+
 			for (List<String> line : lines)
 			{
 				count += 1;
-	
+
 				if (count == 1)
 				{
 					continue;
@@ -1285,12 +1356,12 @@ public class ReadingFromFile
 				}
 				// System.out.println("line= " + line);
 				// System.out.println("here 1");
-	
+
 				Triple<Double, Double, String> val = new Triple<>(Double.valueOf(line.get(0)),
 						Double.valueOf(line.get(1)), "id=" + line.get(2));
-	
+
 				fillVal.add(Double.valueOf(line.get(3)));
-	
+
 				// LatLong markerLatLong2 = new LatLong(-1.6073826, 67.9382483);// 47.606189, -122.335842);
 				// // Double.valueOf(line.get(2).substring(0, 4)));
 				// // LatLong markerLatLong2 = new LatLong(Double.valueOf(line.get(3).substring(0, 4)),

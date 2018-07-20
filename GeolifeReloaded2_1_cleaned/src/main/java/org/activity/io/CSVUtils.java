@@ -158,7 +158,7 @@ public class CSVUtils
 			{
 				fileNamesToConcatentate.add(commonPath + i + ".csv");
 			}
-			CSVUtils.concatenateCSVFiles(fileNamesToConcatentate, true, commonPath + "AllConcatenated.csv", ',');
+			CSVUtils.concatenateCSVFilesV2(fileNamesToConcatentate, true, commonPath + "AllConcatenated.csv", ',');
 		}
 		catch (Exception e)
 		{
@@ -707,6 +707,12 @@ public class CSVUtils
 				for (CSVRecord r : csvRecords)
 				{
 					countOfLines += 1;
+
+					// added back again on 19 July 2018
+					if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1)// TODO check for correct behaviour
+					{// dont write the header for non-first files
+						continue;
+					}
 					// Changed on 25 June
 					// if (hasColumnHeader && countOfFiles != 1 && countOfLines == 1) // dont write the header for
 					// if (hasColumnHeader && countOfLines == 1) // dont write the header for
@@ -856,7 +862,7 @@ public class CSVUtils
 	 * @param hasColumnHeader
 	 *            to make sure columnHeadersAreNotRepeated
 	 */
-	public static void concatenateCSVFiles(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
+	public static void concatenateCSVFilesV2(ArrayList<String> listOfAbsFileNames, boolean hasColumnHeader,
 			String absfileToWrite, char delimiter)
 	{
 		int countOfFiles = 0, countOfTotalLines = 0;
