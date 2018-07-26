@@ -477,7 +477,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			// Is this sorting necessary?
 			// Disabling on Aug 3
 			if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.NearestNeighbour
-					&& Constant.nearestNeighbourCandEDThreshold >= 1)
+					&& Constant.nearestNeighbourCandEDThresholdPrimDim >= 1)
 			{ // because already sorted while filtering
 				distancesSortedMap = distancesMapUnsorted;
 			}

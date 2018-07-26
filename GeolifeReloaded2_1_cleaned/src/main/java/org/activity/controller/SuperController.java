@@ -184,11 +184,11 @@ public class SuperController
 		// "/dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs/", "/dataWritten/Mar1ED0.25DurFPDistFPStFilter3hrs/",
 		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
 
-		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv" // };
-				, "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
-				"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
-				"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
-				"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv" };
+		// , "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+		// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",
+		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD",
+		// "./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
 
 		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
@@ -297,8 +297,15 @@ public class SuperController
 
 		String labelForExperimentConfig = getLabelForExperimentConfig(sampledUserIndicesSetFile);
 
-		String[] commonPaths = // { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+		String[] commonPaths = // {
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
+				// };
+				// {
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
+				// };
+				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+						// { "./dataWritten/"
+						+ LocalDateTime.now().getMonth().toString().substring(0, 3)
 						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
@@ -369,7 +376,8 @@ public class SuperController
 	private static String getLabelForExperimentConfig(String sampledUserIndicesSetFile)
 	{
 		String featuresUsedLabel = "", distNormalisationLabel = "", predictorLabel = "", EDAlphaLabel = "",
-				StFilterLabel = "", sampledUserSetLabel = "", nearestNeighbourCandLabel = "";
+				StFilterLabel = "", sampledUserSetLabel = "", nearestNeighbourCandLabel = "",
+				filterTrainingTimelinesLabel = "";
 
 		// String sampledUserSetLabel;
 		String userSetLabelSplitted[] = sampledUserIndicesSetFile.split("\\.");
@@ -383,12 +391,28 @@ public class SuperController
 
 		if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour))
 		{
-			if (Constant.nearestNeighbourCandEDThreshold != 500)
+			if (Constant.nearestNeighbourCandEDThresholdPrimDim != 500
+					|| Constant.nearestNeighbourCandEDThresholdSecDim != 500)
 			{
-				nearestNeighbourCandLabel = String.valueOf(Constant.nearestNeighbourCandEDThreshold);
+				nearestNeighbourCandLabel = String.valueOf(Constant.nearestNeighbourCandEDThresholdPrimDim) + "PDNTh"
+						+ String.valueOf(Constant.nearestNeighbourCandEDThresholdSecDim) + "SDNTh";
 			}
 		}
 		// End of adding on May6 2018
+
+		// Start of adding on 25 July 2018
+		if (Constant.filterTrainingTimelinesByRecentDays == false)
+		{
+			filterTrainingTimelinesLabel = "NoTTFilter";
+		}
+		else
+		{
+			if (Constant.getRecentDaysInTrainingTimelines() != 5)
+			{
+				filterTrainingTimelinesLabel = Constant.getRecentDaysInTrainingTimelines() + "DaysTTFilter";
+			}
+		}
+		// End of adding on 25 July 2018
 
 		if (Constant.altSeqPredictor.equals(AltSeqPredictor.PureAKOM))
 		{
@@ -453,7 +477,7 @@ public class SuperController
 		}
 
 		return sampledUserSetLabel + predictorLabel + EDAlphaLabel + featuresUsedLabel + StFilterLabel
-				+ distNormalisationLabel + nearestNeighbourCandLabel;
+				+ distNormalisationLabel + nearestNeighbourCandLabel + filterTrainingTimelinesLabel;
 	}
 
 	public static void cleanUp(String[] pathsToClean)
@@ -579,23 +603,40 @@ public class SuperController
 			System.out.println("Doing evaluation...");
 			if (hasMUs)
 			{
+				boolean evalPostFiltering = false;
+				boolean evalSeqPrediction = true;
+				String dimensionPhrase = "SecDim";
+				String[] pfFilterNames = { "Fltr_on_Top1Loc", "Fltr_on_ActualLocPF", "Fltr_on_TopKLocsPF",
+						"WtdAlphaPF" };
 
-				// if (false)
+				if (true)
 				{
-					if (Constant.doSecondaryDimension)
-					{
-						new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
-								Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor),
-								"SecDim");
-					}
-				}
-				// if (true)// temporarily disable for debugging TODO
-				{
-					// new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90
-					// });
 					new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
-							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor), "");
+							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor), "", false,
+							true);
 				}
+
+				// for (String pfPhrase : pfFilterNames)
+				if (false && Constant.doSecondaryDimension)
+				{
+					new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
+							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor),
+							dimensionPhrase, false, true);
+				}
+				// if (true)
+				// { if (Constant.doSecondaryDimension)
+				// { // for (String pfPhrase : pfFilterNames)
+				// {new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
+				// Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor),
+				// "SecDim", evalPostFiltering, evalSeqPrediction);// "SecDim");
+				// }}}
+				// if (false)// temporarily disable for debugging TODO
+				// { // new EvaluationSeq(3, commonPath, Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70,
+				// 90
+				// // });
+				// new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
+				// Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor), "",
+				// evalPostFiltering, evalSeqPrediction);}
 				// , new int[] {30, 50, 60, 70, 90// });
 			}
 			else

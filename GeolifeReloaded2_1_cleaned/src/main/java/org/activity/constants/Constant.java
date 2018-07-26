@@ -30,6 +30,7 @@ import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
 import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
+import org.giscience.utils.geogrid.gunjanUtils.GridDistancesProvider;
 
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
@@ -157,7 +158,7 @@ public final class Constant
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
-	public static final boolean filterTrainingTimelinesByRecentDays = true;// MANALI true;// SWITCH_NOV10
+	public static final boolean filterTrainingTimelinesByRecentDays = true;// TODO MANALI true;// SWITCH_NOV10
 	private static int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
 
 	// Filtering the candidate timeline
@@ -174,9 +175,11 @@ public final class Constant
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int nearestNeighbourCandEDThreshold = 500;// 750;// 500;// 500;/// -1;// 100;// 1500;// 100;//
-																	// -1
-																	// for no filter//SWITCH_NOV10
+	public static final int nearestNeighbourCandEDThresholdPrimDim = 500;// 750;// 500;// 500;/// -1;// 100;//
+																			// 1500;// 100;//
+	// -1 for no filter//SWITCH_NOV10
+	// added on 23 July 2018 to keep it separate from the threshold used for primary dimension
+	public static final int nearestNeighbourCandEDThresholdSecDim = 50;
 
 	// End of parameters for Candidate timelines
 	// --------------------------------------------------------------------------//
@@ -198,8 +201,8 @@ public final class Constant
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
-	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
-	public static final boolean useLocationInFED = true;// SWITCH_NOV10
+	public static final boolean useStartTimeInFED = false;// SWITCH_NOV10
+	public static final boolean useLocationInFED = false;// SWITCH_NOV10
 	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
@@ -257,6 +260,8 @@ public final class Constant
 	public static final boolean doSecondaryDimension = true;
 	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
 	public static final boolean debug18July2018 = false;
+	public static final boolean doWeightedEditDistanceForSecDim = false;
+	public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -441,6 +446,28 @@ public final class Constant
 	// {
 	// EDAlpha = eDAlpha;
 	// }
+	/**
+	 * 
+	 * @param givenDimension
+	 * @return
+	 * @since 25 July 2018
+	 */
+	public static final int getNearestNeighbourCandEDThresholdGivenDim(PrimaryDimension givenDimension)
+	{
+		if (givenDimension.equals(Constant.primaryDimension))
+		{
+			return nearestNeighbourCandEDThresholdPrimDim;
+		}
+		else if (givenDimension.equals(Constant.secondaryDimension))
+		{
+			return nearestNeighbourCandEDThresholdSecDim;
+		}
+		PopUps.showError(
+				"Error in getNearestNeighbourCandEDThresholdGivenDim: unrecognised given dimension: " + givenDimension);
+		return -9999;
+
+	}
+	// public static final int nearestNeighbourCandEDThresholdSecDim = 100;
 
 	public static final boolean equalsForFloat(double a, double b)
 	{
@@ -696,6 +723,12 @@ public final class Constant
 		} // Constant.setDistanceUsed("HJEditDistance");
 
 		setActIDNameIndexMap(databaseName, Constant.getActivityNames());
+
+		if (Constant.doWeightedEditDistanceForSecDim)
+		{
+			gdDistProvider = new GridDistancesProvider(PathConstants.pathToSerialisedGridIndexPairDist,
+					PathConstants.pathToSerialisedGridIndexPairDistConverter);
+		}
 	}
 
 	//
@@ -1509,8 +1542,8 @@ public final class Constant
 		s.append("\nfilterCandByCurActTimeThreshInSecs:" + filterCandByCurActTimeThreshInSecs);
 
 		s.append("\npercentileCandEDThreshold:" + percentileCandEDThreshold);
-		s.append("\nnearestNeighbourCandEDThreshold:" + nearestNeighbourCandEDThreshold);
-		//
+		s.append("\nnearestNeighbourCandEDThresholdPrimDim:" + nearestNeighbourCandEDThresholdPrimDim);
+		s.append("\nnearestNeighbourCandEDThresholdSecDim:" + nearestNeighbourCandEDThresholdSecDim);
 
 		s.append("\neditDistancesMemorizerBufferSize:" + editDistancesMemorizerBufferSize);
 		s.append("\nmemorizeEditDistance:" + memorizeEditDistance);
@@ -1561,6 +1594,7 @@ public final class Constant
 		s.append("\nmapLocIDToGridID:" + Constant.mapLocIDToGridID);
 		s.append("\ndoSecondaryDimension:" + Constant.doSecondaryDimension);
 		s.append("\nsecondaryDimension:" + Constant.secondaryDimension);
+		s.append("\ndoWeightedEditDistanceForSecDim:" + Constant.doWeightedEditDistanceForSecDim);
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{

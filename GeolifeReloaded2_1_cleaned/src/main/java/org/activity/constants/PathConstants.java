@@ -51,6 +51,9 @@ public class PathConstants
 	 */
 	public static final String pathToSerialisedGridIDLocIDsGowallaMap = "./dataToRead/HexGridRes16_JUL17/gridIDLocIDs.kryo";
 
+	public static final String pathToSerialisedGridIndexPairDist = "./dataWritten/JUL25GridIndexDistances/pairedIndicesTo1DConverterIntDoubleWith1DConverter.kryo";
+	public static final String pathToSerialisedGridIndexPairDistConverter = "./dataWritten/JUL25GridIndexDistances/gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
+
 	/**
 	 * Set paths to serialised datasets
 	 * 

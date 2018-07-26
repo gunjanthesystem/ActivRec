@@ -94,18 +94,24 @@ public class Dashboard3 extends Application
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap);
 
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines;
-		usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-				.kryoDeSerializeThis(pathToToyTimelines);
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = null;
 
-		ControllerWithoutServer.setDataVarietyConstants(usersCleanedDayToyTimelines, true, "ToyTs_", true, true);
-		List<Integer> uniqueActIDs = new ArrayList<>(Constant.getUniqueActivityIDs());
+		if (false)// disabled on 24 July 2018, as i getting deserialisation error, perhaps because ActivityObject class
+					// has changes this serialised toy timelines being read were created. remedy to do later, create toy
+					// timelines again.
+		{
 
-		ColorPalette.setColors("Paired", uniqueActIDs.size());
+			usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+					.kryoDeSerializeThis(pathToToyTimelines);
+			ControllerWithoutServer.setDataVarietyConstants(usersCleanedDayToyTimelines, true, "ToyTs_", true, true);
 
-		actIDIndexMap = IntStream.range(0, uniqueActIDs.size()).boxed()
-				.collect(Collectors.toMap(i -> uniqueActIDs.get(i), Function.identity()));
-		System.out.println("actIDIndexMap=\n" + actIDIndexMap);
+			List<Integer> uniqueActIDs = new ArrayList<>(Constant.getUniqueActivityIDs());
+			ColorPalette.setColors("Paired", uniqueActIDs.size());
+			actIDIndexMap = IntStream.range(0, uniqueActIDs.size()).boxed()
+					.collect(Collectors.toMap(i -> uniqueActIDs.get(i), Function.identity()));
+			System.out.println("actIDIndexMap=\n" + actIDIndexMap);
+
+		}
 
 		// final Stage stageRef = stage;
 		// StageStyle stageStyle = StageStyle.DECORATED;
@@ -197,16 +203,23 @@ public class Dashboard3 extends Application
 	{
 		TabPane tabPane = new TabPane();
 		List<Tab> tabsToAdd = new ArrayList<>();
-
 		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = toOnlySeqOfActIDs(
 		// usersCleanedDayToyTimelines);
+		System.out.println("Entered createTabs()");
+		boolean doSyntheticDataCircleTimelines = false;
+		boolean doGivenDataCircleTimelines = false;
+		boolean doGivenDataOnlyActIDSeq = false;
+		boolean doSyntheticDataCanvasTimelines = false;
+		boolean doSyntheticDataBoxTimelines = false;
+		boolean doSyntheticDataLineTimelines = false;
+		boolean doMapPlot = true;
 
 		try
 		{
 			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
 			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 50, 12, 5, 864000, 60 * 20, 10800);
 
-			if (false)
+			if (doSyntheticDataCircleTimelines)
 			{
 				long tTimeline0 = System.currentTimeMillis();
 				Tab timelineTabCircle = new Tab("(Synth-Circle) Historical Timelines All Users");
@@ -218,18 +231,20 @@ public class Dashboard3 extends Application
 				System.out.println("Time taken TimelineChartAppGeneric = " + (tTimelinen - tTimeline0) + " ms");
 
 			}
-			long tTimelineReal0 = System.currentTimeMillis();
-			Tab timelineTabCircleReal = new Tab("(Toy-Circle) Historical Timelines All Users");
-			TimelineChartAppGeneric tcCReal = new TimelineChartAppGeneric(usersCleanedDayToyTimelines, true,
-					"ActivityCircle");
-			timelineTabCircleReal.setContent(tcCReal.getVBox());// timelinesVBox2);
-			timelineTabCircleReal.setClosable(true);
-			tabsToAdd.add(timelineTabCircleReal);
-			long tTimelineRealn = System.currentTimeMillis();
-			System.out
-					.println("Time taken TimelineChartAppGeneric real = " + (tTimelineRealn - tTimelineReal0) + " ms");
-
-			if (true)
+			if (doGivenDataCircleTimelines)
+			{
+				long tTimelineReal0 = System.currentTimeMillis();
+				Tab timelineTabCircleReal = new Tab("(Toy-Circle) Historical Timelines All Users");
+				TimelineChartAppGeneric tcCReal = new TimelineChartAppGeneric(usersCleanedDayToyTimelines, true,
+						"ActivityCircle");
+				timelineTabCircleReal.setContent(tcCReal.getVBox());// timelinesVBox2);
+				timelineTabCircleReal.setClosable(true);
+				tabsToAdd.add(timelineTabCircleReal);
+				long tTimelineRealn = System.currentTimeMillis();
+				System.out.println(
+						"Time taken TimelineChartAppGeneric real = " + (tTimelineRealn - tTimelineReal0) + " ms");
+			}
+			if (doGivenDataOnlyActIDSeq)
 			{
 				Tab onlyActIDsAsRects = new Tab("Only ActIDs Sequence");
 				onlyActIDsAsRects.setContent(createOnlyActIDsAsRects(usersCleanedDayToyTimelines));
@@ -237,7 +252,7 @@ public class Dashboard3 extends Application
 				tabsToAdd.add(onlyActIDsAsRects);
 			}
 
-			if (false)
+			if (doSyntheticDataCanvasTimelines)
 			{
 				long tTimelineCanvas0 = System.currentTimeMillis();
 				Tab timelineTabCanvas = new Tab("(Synth-Canvas) Historical Timelines All Users");
@@ -250,14 +265,17 @@ public class Dashboard3 extends Application
 						"Time taken TimelineChartAppCanvas = " + (tTimelineCanvasn - tTimelineCanvas0) + " ms");
 			}
 
-			Tab timelineTabD = new Tab("(Synth-Box) Historical Timelines All Users");
-			TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(/* usersCleanedDayToyTimelines */ timelineData,
-					true, "ActivityBox");
-			// TODO: Issue: not scaling correctly with range change.
-			timelineTabD.setContent(tcD.getVBox());// timelinesVBox2);
-			timelineTabD.setClosable(true);
-			tabsToAdd.add(timelineTabD);
-			if (false)
+			if (doSyntheticDataBoxTimelines)
+			{
+				Tab timelineTabD = new Tab("(Synth-Box) Historical Timelines All Users");
+				TimelineChartAppGeneric tcD = new TimelineChartAppGeneric(
+						/* usersCleanedDayToyTimelines */ timelineData, true, "ActivityBox");
+				// TODO: Issue: not scaling correctly with range change.
+				timelineTabD.setContent(tcD.getVBox());// timelinesVBox2);
+				timelineTabD.setClosable(true);
+				tabsToAdd.add(timelineTabD);
+			}
+			if (doSyntheticDataLineTimelines)
 			{
 				Tab timelineTabE = new Tab("timelineTabE Historical Timelines All Users");
 				TimelineChartAppGeneric tcE = new TimelineChartAppGeneric(timelineData, true, "LineChart");
@@ -403,7 +421,6 @@ public class Dashboard3 extends Application
 			/***********************************************/
 			// $$ Start of disabled on Mar 17 2018
 
-			boolean doMapPlot = true;
 			if (doMapPlot)
 			{
 				long ttOSMmap1 = System.currentTimeMillis();
@@ -414,33 +431,25 @@ public class Dashboard3 extends Application
 				String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
 				String absFileNameForLatLonToReadAsMarkerTargetLocs = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicNWLA_ByPids_Mar31.csv";
 				String absFileNameForLatLonToReadAsMarkerTargetLocsApril6 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
-
 				String pathToLocationAnalysis = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUL10ForLocationAnalysis2/";
-
 				String absFileNameForLatLon5MostRecenTrainTestJul10 = pathToLocationAnalysis
 						+ "UniqueLocationObjects5DaysTrainTest.csv";
 				String absFileNameForLatLonAllJul10 = pathToLocationAnalysis + "UniqueLocationObjects.csv";
 				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
-
 				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_SlimmedForMap.csv";//
 				// gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
-
 				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago.csv";
-
-				String delimiter2 = ",";
-
 				// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
 				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
 				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
 				int latColIndex2 = 9, lonColIndex2 = 10, labelColIndex2 = 12;
-				BorderPane bp2 = osmapPane.getMapPane(absFileNameForLatLonAllJul10, delimiter2, latColIndex2,
-						lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false);// Color.rgb(193,
-																										// 49,
-				// 34, 0.3));
+				BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(absFileNameForLatLon5MostRecenTrainTestJul10,
+						",", latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false,
+						"\t\tShowing UniqueLocationObjects5DaysTrainTest");
 
+				// Color.rgb(193, 49, 34, 0.3));
 				// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
 				// latColIndex2, lonColIndex2, labelColIndex2, fillIndex, 6);// , Color.rgb(0, 105, 106, 0.3));
-
 				osmMapTab.setContent(bp2);
 				osmMapTab.setClosable(false);
 				tabsToAdd.add(osmMapTab);

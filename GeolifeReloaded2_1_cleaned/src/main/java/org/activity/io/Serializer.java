@@ -39,6 +39,7 @@ public class Serializer
 	 * 
 	 * @param obj
 	 * @param fileName
+	 * @deprecated favor kryoSerializeThis
 	 */
 	public static void serializeThis(Object obj, String fileName)
 	{
@@ -647,6 +648,11 @@ public class Serializer
 		System.out.println("Successfully kryo deserialised " + fileName + " in " + (lt - dt) / 1000 + " secs");
 		return obj;
 	}
+
+	// public static void toDelete()
+	// {
+	// kryo.util.DefaultClassResolver;
+	// }
 
 	/**
 	 * 

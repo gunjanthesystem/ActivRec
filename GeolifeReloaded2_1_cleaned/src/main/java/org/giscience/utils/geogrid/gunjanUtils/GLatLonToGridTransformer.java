@@ -3,6 +3,7 @@ package org.giscience.utils.geogrid.gunjanUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,14 +12,22 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.activity.constants.PathConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
+import org.activity.objects.FastFlippableIntPair;
 import org.activity.objects.LeakyBucket;
 import org.activity.objects.Pair;
+import org.activity.objects.PairedIndicesTo1DArrayConverter;
+import org.activity.objects.PairedIndicesTo1DArrayStorage;
 import org.activity.objects.Triple;
+import org.activity.sanityChecks.Sanity;
+import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
+import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.PerformanceAnalytics;
 import org.giscience.utils.geogrid.cells.GridCell;
 import org.giscience.utils.geogrid.grids.ISEA3H;
 
@@ -38,6 +47,11 @@ public class GLatLonToGridTransformer
 
 	}
 
+	/**
+	 * NOT USER
+	 * 
+	 * @param pathToSerialisedGridIDCellMapToUse
+	 */
 	public static void getDistanceBetweenGrids(String pathToSerialisedGridIDCellMapToUse)
 	{
 		try
@@ -84,6 +98,11 @@ public class GLatLonToGridTransformer
 
 	}
 
+	/**
+	 * NOT USED
+	 * 
+	 * @param pathToSerialisedLatLongLocIDGridMapToUse
+	 */
 	public static void getDistanceBetweenLocIDs(String pathToSerialisedLatLongLocIDGridMapToUse)
 	{
 		try
@@ -93,13 +112,13 @@ public class GLatLonToGridTransformer
 
 			// locID1,locID2
 			// Map<HashSet<Integer>,>
-
+			int countOfComputations = 0;
 			int numOfUniqueLocIDs = latLonLocIDGridCellAllLocs.size();
 
 			for (Pair<Triple<Double, Double, String>, GridCell> eOuter : latLonLocIDGridCellAllLocs)
 			{
-				double lat = eOuter.getFirst().getFirst();
-				double lon = eOuter.getFirst().getSecond();
+				double lat1 = eOuter.getFirst().getFirst();
+				double lon1 = eOuter.getFirst().getSecond();
 				Integer locID = Integer.valueOf(eOuter.getFirst().getThird());
 
 				for (Pair<Triple<Double, Double, String>, GridCell> eInner : latLonLocIDGridCellAllLocs)
@@ -110,7 +129,8 @@ public class GLatLonToGridTransformer
 
 					if (locID.equals(locID2) == false)
 					{
-
+						double haversineDist5 = SpatialUtils.haversineFastMathV3NoRound(lat1, lon1, lat2, lon2);
+						countOfComputations += 1;
 					}
 				}
 			}
@@ -125,7 +145,600 @@ public class GLatLonToGridTransformer
 
 	public static void main(String args[])
 	{
-		main1();
+		// $$ main1();//disabled on 22 July 2018
+
+		// Used on 22 July and then disabled
+		// mapJavaGridIndexToRGridID(true,"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/July22RGridIDJavaGridIndex/");
+
+		// long t1 = System.currentTimeMillis();
+		// Map<FastFlippableIntPair, Double> precomputedDistances = (Map<FastFlippableIntPair, Double>) Serializer
+		// .kryoDeSerializeThis(
+		// "./dataWritten/July23RGridIDJavaGridIndexDistances_3/gridIndexPairHaversineDist.kryo");
+		// long t2 = System.currentTimeMillis();
+		// System.out.println("Deserialisation took: " + (t2 - t1) / 1000 + " secs");
+		// System.out.println("precomputedDistances.size() = " + precomputedDistances.size());
+		// System.out.println(" used memory in MiB: " + PerformanceAnalytics.getUsedMemoryInMB());
+
+		String commonPathToRead = "./dataToRead/July22RGridIDJavaGridIndex/";
+		/// run/media/gunjan/BackupVault/GOWALLA/GowallaResults
+		String commonPathToWrite = "./dataWritten/" + DateTimeUtils.getMonthDateLabel() + "GridIndexDistances/";
+		// PairedIndicesComplexityComparison/";
+		WToFile.createDirectoryIfNotExists(commonPathToWrite);
+		WToFile.redirectConsoleOutput(commonPathToWrite + "consoleLog.txt");
+
+		int limitOnNumberOfComputations = -1;
+
+		// computeDistancesBetweenGridCentresFFlippableIntPair(commonPathToWrite, true, commonPathToRead,
+		// limitOnNumberOfComputations, "FFlippableIntPair");
+		//
+		// computeDistancesBetweenGridCentresStringKeys(commonPathToWrite, true, commonPathToRead,
+		// limitOnNumberOfComputations, "StringKeys");
+		//
+		// computeDistancesBetweenGridCentresPairedTo1D(commonPathToWrite, true, commonPathToRead,
+		// limitOnNumberOfComputations, "PairedTo1D");
+
+		String fileNamePhrase = "IntDoubleWith1DConverter";
+		computeDistancesBetweenGridCentresIntDoubleWith1DConverter(commonPathToWrite, true, commonPathToRead,
+				limitOnNumberOfComputations, fileNamePhrase);
+
+		if (true)
+		{
+			HashMap<Integer, Double> gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
+					.kryoDeSerializeThis(commonPathToWrite + "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
+			// Int2DoubleOpenHashMap gridIndexPairHaversineDist = (Int2DoubleOpenHashMap) Serializer
+			// .kryoDeSerializeThis(commonPathToWrite + "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
+			// Int2DoubleOpenHashMap
+			System.out.println("deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
+		}
+
+		if (true)
+		{
+			PairedIndicesTo1DArrayConverter pairedIndicesTo1DArrayConverter =
+					// (PairedIndicesTo1DArrayConverter) Serializer
+					// .kryoDeSerializeThis(commonPathToWrite + "pairedIndicesTo1DConverter" + fileNamePhrase + ".kryo",
+					// PairedIndicesTo1DArrayConverter.class);
+					(PairedIndicesTo1DArrayConverter) Serializer.kryoDeSerializeThis(
+							commonPathToWrite + "pairedIndicesTo1DConverter" + fileNamePhrase + ".kryo");
+			System.out.println(
+					"deserialised pairedIndicesTo1DArrayConverter= " + pairedIndicesTo1DArrayConverter.toString());
+		}
+
+		//
+
+	}
+
+	/**
+	 * USED
+	 * 
+	 * @param pathToWrite
+	 * @param writeToFile
+	 * @param commonPathToRead
+	 * @param limitOfNumOfComputations
+	 * @param fileNamePhraseToWrite
+	 * @since 24 July 2018
+	 */
+	public static void computeDistancesBetweenGridCentresIntDoubleWith1DConverter(String pathToWrite,
+			boolean writeToFile, String commonPathToRead, int limitOfNumOfComputations, String fileNamePhraseToWrite)
+	{
+		String pathToJavaGridIndexRGridID = commonPathToRead + "javaGridIndexRGridID.kryo";
+		String pathToJavaGridIndexRGridLatRGridLon = commonPathToRead + "javaGridIndexRGridLatRGridLon.kryo";
+		System.out.println("\n\nInside computeDistancesBetweenGridCentres using FastFlippableIntPair: ");
+		try
+		{
+			Map<Integer, String> javaGridIndexRGridID = (Map<Integer, String>) Serializer
+					.kryoDeSerializeThis(pathToJavaGridIndexRGridID);
+			Map<Integer, double[]> javaGridIndexRGridLatRGridLon = (Map<Integer, double[]>) Serializer
+					.kryoDeSerializeThis(pathToJavaGridIndexRGridLatRGridLon);
+
+			System.out.println("javaGridIndexRGridID.size() = " + javaGridIndexRGridID.size()
+					+ "\njavaGridIndexRGridLatRGridLon.size()=" + javaGridIndexRGridLatRGridLon.size());
+			Sanity.eq(javaGridIndexRGridID.size(), javaGridIndexRGridLatRGridLon.size(),
+					"Error: javaGridIndexRGridID.size()!=njavaGridIndexRGridLatRGridLon.size()");
+
+			PairedIndicesTo1DArrayConverter pairedIndicesTo1DConverter = new PairedIndicesTo1DArrayConverter(
+					javaGridIndexRGridID.size());
+			int numOfUniquePairs = pairedIndicesTo1DConverter.getSizeOf1DArray();
+			System.out.println("numOfUniquePairs = " + numOfUniquePairs);
+			if (numOfUniquePairs > Integer.MAX_VALUE)
+			{
+				PopUps.showError("numOfUniquePairs= " + numOfUniquePairs + "  > Integer.MAX_VALUE");
+			}
+			HashMap<Integer, Double> gridIndexPairHaversineDist = new HashMap<>((int) numOfUniquePairs);
+			// Int2DoubleOpenHashMap gridIndexPairHaversineDist = new Int2DoubleOpenHashMap((int) numOfUniquePairs);
+
+			// sanity check indices start: check is all gridIndices are 1... size with increment of 1.
+			for (int index = 0; index < javaGridIndexRGridLatRGridLon.size(); index++)
+			{
+				if (javaGridIndexRGridLatRGridLon.containsKey(index) == false)
+				{
+					PopUps.showError("Error: javaGridIndexRGridLatRGridLon does not contain index = " + index);
+				}
+			}
+			// sanity check indices end: check is all gridIndices are 1... size with increment of 1.
+
+			if (true)
+			{
+				int countOfComputations = 0;
+				long t1 = System.currentTimeMillis();
+
+				for (int index1 = 0; index1 < (javaGridIndexRGridLatRGridLon.size() - 1); index1++)
+				{
+					double[] latLonEntry1 = javaGridIndexRGridLatRGridLon.get(index1);
+					double lat1 = latLonEntry1[0];
+					double lon1 = latLonEntry1[1];
+
+					for (int index2 = index1 + 1; index2 < (javaGridIndexRGridLatRGridLon.size()); index2++)
+					{
+						double[] latLonEntry2 = javaGridIndexRGridLatRGridLon.get(index2);
+						double lat2 = latLonEntry2[0];
+						double lon2 = latLonEntry2[1];
+
+						double haversineDist5 = SpatialUtils.haversineFastMathV3NoRound(lat1, lon1, lat2, lon2);
+						countOfComputations += 1;
+
+						gridIndexPairHaversineDist.put(
+								pairedIndicesTo1DConverter.pairedIndicesTo1DArrayIndex(index1, index2), haversineDist5);
+						// if (countOfComputations > 10000){ break;}
+						if (limitOfNumOfComputations > 0 && (countOfComputations % limitOfNumOfComputations == 0))
+						{
+							System.out.print("countOfComputations = " + countOfComputations);
+							System.out.println("  used memory in MiB: " + PerformanceAnalytics.getUsedMemoryInMB());
+							break;
+						}
+						if (countOfComputations % 500000 == 0)
+						{
+							System.out.print("countOfComputations = " + countOfComputations);
+							System.out.println("  used memory in MiB: " + PerformanceAnalytics.getUsedMemoryInMB());
+						}
+					}
+					if (limitOfNumOfComputations > 0 && (countOfComputations % limitOfNumOfComputations == 0))
+					{
+						break;
+					}
+				}
+
+				System.out.println("#HaversineComputations = " + countOfComputations + " time taken= "
+						+ (System.currentTimeMillis() - t1) + " ms");
+			}
+
+			System.out
+					.println("After computation, before serialisation:\n" + PerformanceAnalytics.getHeapInformation());
+			System.out.println("gridIndexPairHaversineDist.size() = " + gridIndexPairHaversineDist.size());
+			Serializer.kryoSerializeThis(gridIndexPairHaversineDist,
+					pathToWrite + "gridIndexPairHaversineDist" + fileNamePhraseToWrite + ".kryo");
+			Serializer.kryoSerializeThis(pairedIndicesTo1DConverter,
+					pathToWrite + "pairedIndicesTo1DConverter" + fileNamePhraseToWrite + ".kryo");
+			System.out.println("After computation, after serialisation:\n" + PerformanceAnalytics.getHeapInformation());
+
+			if (writeToFile)
+			{
+				LeakyBucket lb = new LeakyBucket(10000,
+						pathToWrite + "gridIndexPairHaversineDist" + fileNamePhraseToWrite + ".csv", false);
+				lb.addToLeakyBucketWithNewline("1DIndex,PairIndex1,PairIndex2,HaversineDist");
+				gridIndexPairHaversineDist.entrySet().stream()
+						.forEachOrdered(e -> lb.addToLeakyBucketWithNewline(e.getKey() + "," + e.getValue()));
+				lb.flushLeakyBucket();
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param pathToWrite
+	 * @param writeToFile
+	 * @param commonPathToRead
+	 * @param limitOfNumOfComputations
+	 * @param fileNamePhraseToWrite
+	 */
+	public static void computeDistancesBetweenGridCentresPairedTo1D(String pathToWrite, boolean writeToFile,
+			String commonPathToRead, int limitOfNumOfComputations, String fileNamePhraseToWrite)
+	{
+		String pathToJavaGridIndexRGridID = commonPathToRead + "javaGridIndexRGridID.kryo";
+		String pathToJavaGridIndexRGridLatRGridLon = commonPathToRead + "javaGridIndexRGridLatRGridLon.kryo";
+		System.out.println("\n\nInside computeDistancesBetweenGridCentresV3 using PairedIndicesTo1DArrayStorage: ");
+		try
+		{
+			Map<Integer, String> javaGridIndexRGridID = (Map<Integer, String>) Serializer
+					.kryoDeSerializeThis(pathToJavaGridIndexRGridID);
+			Map<Integer, double[]> javaGridIndexRGridLatRGridLon = (Map<Integer, double[]>) Serializer
+					.kryoDeSerializeThis(pathToJavaGridIndexRGridLatRGridLon);
+
+			System.out.println("javaGridIndexRGridID.size() = " + javaGridIndexRGridID.size()
+					+ "\njavaGridIndexRGridLatRGridLon.size()=" + javaGridIndexRGridLatRGridLon.size());
+			Sanity.eq(javaGridIndexRGridID.size(), javaGridIndexRGridLatRGridLon.size(),
+					"Error: javaGridIndexRGridID.size()!=njavaGridIndexRGridLatRGridLon.size()");
+
+			long numOfUniquePairs = ((long) javaGridIndexRGridID.size() * ((long) javaGridIndexRGridID.size() - 1)) / 2; // n(n-1)/2
+			System.out.println("numOfUniquePairs = " + numOfUniquePairs);
+			if (numOfUniquePairs > Integer.MAX_VALUE)
+			{
+				PopUps.showError("numOfUniquePairs= " + numOfUniquePairs + "  > Integer.MAX_VALUE");
+			}
+
+			PairedIndicesTo1DArrayStorage gridIndexPairHaversineDist = new PairedIndicesTo1DArrayStorage(
+					javaGridIndexRGridID.size());
+
+			// sanity check indices start: check is all gridIndices are 1... size with increment of 1.
+			for (int index = 0; index < javaGridIndexRGridLatRGridLon.size(); index++)
+			{
+				if (javaGridIndexRGridLatRGridLon.containsKey(index) == false)
+				{
+					PopUps.showError("Error: javaGridIndexRGridLatRGridLon does not contain index = " + index);
+				}
+			}
+			// sanity check indices end: check is all gridIndices are 1... size with increment of 1.
+
+			if (true)
+			{
+				int countOfComputations = 0;
+				long t1 = System.currentTimeMillis();
+
+				for (int index1 = 0; index1 < (javaGridIndexRGridLatRGridLon.size() - 1); index1++)
+				{
+					double[] latLonEntry1 = javaGridIndexRGridLatRGridLon.get(index1);
+					double lat1 = latLonEntry1[0];
+					double lon1 = latLonEntry1[1];
+
+					for (int index2 = index1 + 1; index2 < (javaGridIndexRGridLatRGridLon.size() - 1); index2++)
+					{
+						double[] latLonEntry2 = javaGridIndexRGridLatRGridLon.get(index2);
+						double lat2 = latLonEntry2[0];
+						double lon2 = latLonEntry2[1];
+
+						double haversineDist5 = SpatialUtils.haversineFastMathV3NoRound(lat1, lon1, lat2, lon2);
+						countOfComputations += 1;
+
+						// gridIndexPairHaversineDist.put(getOrderedIndexPairString(index1, index2), haversineDist5);
+						gridIndexPairHaversineDist.addVal(index1, index2, haversineDist5);
+						// if (countOfComputations > 10000){ break;}
+						if (limitOfNumOfComputations > 0 && (countOfComputations % limitOfNumOfComputations == 0))
+						{
+							System.out.print("countOfComputations = " + countOfComputations);
+							System.out.println("  used memory in MiB: " + PerformanceAnalytics.getUsedMemoryInMB());
+							break;
+						}
+					}
+					if (limitOfNumOfComputations > 0 && (countOfComputations % limitOfNumOfComputations == 0))
+					{
+						break;
+					}
+				}
+
+				System.out.println("#HaversineComputations = " + countOfComputations + " time taken= "
+						+ (System.currentTimeMillis() - t1) + " ms");
+			}
+
+			System.out
+					.println("After computation, before serialisation:\n" + PerformanceAnalytics.getHeapInformation());
+			System.out.println(
+					"gridIndexPairHaversineDist.size() = " + gridIndexPairHaversineDist.getValsStored().length);
+			Serializer.kryoSerializeThis(gridIndexPairHaversineDist,
+					pathToWrite + "gridIndexPairHaversineDist" + fileNamePhraseToWrite + ".kryo");
+			System.out.println("After computation, after serialisation:\n" + PerformanceAnalytics.getHeapInformation());
+
+			if (writeToFile)
+			{
+				LeakyBucket lb = new LeakyBucket(10000,
+						pathToWrite + "gridIndexPairHaversineDist" + fileNamePhraseToWrite + ".csv", false);
+				double[] vals = gridIndexPairHaversineDist.getValsStored();
+
+				for (double v : vals)
+				{
+					lb.addToLeakyBucketWithNewline(String.valueOf(v));
+				}
+
+				lb.flushLeakyBucket();
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param pathToWrite
+	 * @param writeToFile
+	 * @param commonPathToRead
+	 * @param limitOfNumOfComputations
+	 * @param fileNamePhraseToWrite
+	 */
+	public static void computeDistancesBetweenGridCentresStringKeys(String pathToWrite, boolean writeToFile,
+			String commonPathToRead, int limitOfNumOfComputations, String fileNamePhraseToWrite)
+	{
+		String pathToJavaGridIndexRGridID = commonPathToRead + "javaGridIndexRGridID.kryo";
+		String pathToJavaGridIndexRGridLatRGridLon = commonPathToRead + "javaGridIndexRGridLatRGridLon.kryo";
+		System.out.println("\n\nInside computeDistancesBetweenGridCentresV2 using String keys: ");
+		try
+		{
+			Map<Integer, String> javaGridIndexRGridID = (Map<Integer, String>) Serializer
+					.kryoDeSerializeThis(pathToJavaGridIndexRGridID);
+			Map<Integer, double[]> javaGridIndexRGridLatRGridLon = (Map<Integer, double[]>) Serializer
+					.kryoDeSerializeThis(pathToJavaGridIndexRGridLatRGridLon);
+
+			System.out.println("javaGridIndexRGridID.size() = " + javaGridIndexRGridID.size()
+					+ "\njavaGridIndexRGridLatRGridLon.size()=" + javaGridIndexRGridLatRGridLon.size());
+			Sanity.eq(javaGridIndexRGridID.size(), javaGridIndexRGridLatRGridLon.size(),
+					"Error: javaGridIndexRGridID.size()!=njavaGridIndexRGridLatRGridLon.size()");
+
+			long numOfUniquePairs = ((long) javaGridIndexRGridID.size() * ((long) javaGridIndexRGridID.size() - 1)) / 2; // n(n-1)/2
+			System.out.println("numOfUniquePairs = " + numOfUniquePairs);
+			if (numOfUniquePairs > Integer.MAX_VALUE)
+			{
+				PopUps.showError("numOfUniquePairs= " + numOfUniquePairs + "  > Integer.MAX_VALUE");
+			}
+
+			Map<String, Double> gridIndexPairHaversineDist = new HashMap<>((int) numOfUniquePairs + 1);
+
+			// sanity check indices start: check is all gridIndices are 1... size with increment of 1.
+			for (int index = 0; index < javaGridIndexRGridLatRGridLon.size(); index++)
+			{
+				if (javaGridIndexRGridLatRGridLon.containsKey(index) == false)
+				{
+					PopUps.showError("Error: javaGridIndexRGridLatRGridLon does not contain index = " + index);
+				}
+			}
+			// sanity check indices end: check is all gridIndices are 1... size with increment of 1.
+
+			if (true)
+			{
+				int countOfComputations = 0;
+				long t1 = System.currentTimeMillis();
+
+				for (int index1 = 0; index1 < (javaGridIndexRGridLatRGridLon.size() - 1); index1++)
+				{
+					double[] latLonEntry1 = javaGridIndexRGridLatRGridLon.get(index1);
+					double lat1 = latLonEntry1[0];
+					double lon1 = latLonEntry1[1];
+
+					for (int index2 = index1 + 1; index2 < (javaGridIndexRGridLatRGridLon.size() - 1); index2++)
+					{
+						double[] latLonEntry2 = javaGridIndexRGridLatRGridLon.get(index2);
+						double lat2 = latLonEntry2[0];
+						double lon2 = latLonEntry2[1];
+
+						double haversineDist5 = SpatialUtils.haversineFastMathV3NoRound(lat1, lon1, lat2, lon2);
+						countOfComputations += 1;
+
+						gridIndexPairHaversineDist.put(getOrderedIndexPairString(index1, index2), haversineDist5);
+						// if (countOfComputations > 10000){ break;}
+						if (limitOfNumOfComputations > 0 && (countOfComputations % limitOfNumOfComputations == 0))
+						{
+							System.out.print("countOfComputations = " + countOfComputations);
+							System.out.println("  used memory in MiB: " + PerformanceAnalytics.getUsedMemoryInMB());
+							break;
+						}
+					}
+					if (limitOfNumOfComputations > 0 && (countOfComputations % limitOfNumOfComputations == 0))
+					{
+						break;
+					}
+				}
+
+				System.out.println("#HaversineComputations = " + countOfComputations + " time taken= "
+						+ (System.currentTimeMillis() - t1) + " ms");
+			}
+
+			System.out
+					.println("After computation, before serialisation:\n" + PerformanceAnalytics.getHeapInformation());
+			System.out.println("gridIndexPairHaversineDist.size() = " + gridIndexPairHaversineDist.size());
+			Serializer.kryoSerializeThis(gridIndexPairHaversineDist,
+					pathToWrite + "gridIndexPairHaversineDist" + fileNamePhraseToWrite + ".kryo");
+			System.out.println("After computation, after serialisation:\n" + PerformanceAnalytics.getHeapInformation());
+
+			if (writeToFile)
+			{
+				LeakyBucket lb = new LeakyBucket(10000,
+						pathToWrite + "gridIndexPairHaversineDist" + fileNamePhraseToWrite + ".csv", false);
+				gridIndexPairHaversineDist.entrySet().stream()
+						.forEachOrdered(e -> lb.addToLeakyBucketWithNewline(e.getKey() + "," + e.getValue()));
+				lb.flushLeakyBucket();
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	private static String getOrderedIndexPairString(int index1, int index2)
+	{
+		if (index1 <= index2)
+		{
+			return index1 + "_" + index2;
+		}
+		else
+		{
+			return index2 + "_" + index1;
+		}
+	}
+
+	/**
+	 * USED
+	 * 
+	 * @param pathToWrite
+	 * @param writeToFile
+	 * @param commonPathToRead
+	 * @param limitOfNumOfComputations
+	 * @param fileNamePhraseToWrite
+	 * @since 22 July 2018
+	 */
+	public static void computeDistancesBetweenGridCentresFFlippableIntPair(String pathToWrite, boolean writeToFile,
+			String commonPathToRead, int limitOfNumOfComputations, String fileNamePhraseToWrite)
+	{
+		String pathToJavaGridIndexRGridID = commonPathToRead + "javaGridIndexRGridID.kryo";
+		String pathToJavaGridIndexRGridLatRGridLon = commonPathToRead + "javaGridIndexRGridLatRGridLon.kryo";
+		System.out.println("\n\nInside computeDistancesBetweenGridCentres using FastFlippableIntPair: ");
+		try
+		{
+			Map<Integer, String> javaGridIndexRGridID = (Map<Integer, String>) Serializer
+					.kryoDeSerializeThis(pathToJavaGridIndexRGridID);
+			Map<Integer, double[]> javaGridIndexRGridLatRGridLon = (Map<Integer, double[]>) Serializer
+					.kryoDeSerializeThis(pathToJavaGridIndexRGridLatRGridLon);
+
+			System.out.println("javaGridIndexRGridID.size() = " + javaGridIndexRGridID.size()
+					+ "\njavaGridIndexRGridLatRGridLon.size()=" + javaGridIndexRGridLatRGridLon.size());
+			Sanity.eq(javaGridIndexRGridID.size(), javaGridIndexRGridLatRGridLon.size(),
+					"Error: javaGridIndexRGridID.size()!=njavaGridIndexRGridLatRGridLon.size()");
+
+			long numOfUniquePairs = ((long) javaGridIndexRGridID.size() * ((long) javaGridIndexRGridID.size() - 1)) / 2; // n(n-1)/2
+			System.out.println("numOfUniquePairs = " + numOfUniquePairs);
+			if (numOfUniquePairs > Integer.MAX_VALUE)
+			{
+				PopUps.showError("numOfUniquePairs= " + numOfUniquePairs + "  > Integer.MAX_VALUE");
+			}
+
+			Map<FastFlippableIntPair, Double> gridIndexPairHaversineDist = new HashMap<>((int) numOfUniquePairs + 1);
+
+			// sanity check indices start: check is all gridIndices are 1... size with increment of 1.
+			for (int index = 0; index < javaGridIndexRGridLatRGridLon.size(); index++)
+			{
+				if (javaGridIndexRGridLatRGridLon.containsKey(index) == false)
+				{
+					PopUps.showError("Error: javaGridIndexRGridLatRGridLon does not contain index = " + index);
+				}
+			}
+			// sanity check indices end: check is all gridIndices are 1... size with increment of 1.
+
+			if (true)
+			{
+				int countOfComputations = 0;
+				long t1 = System.currentTimeMillis();
+
+				for (int index1 = 0; index1 < (javaGridIndexRGridLatRGridLon.size() - 1); index1++)
+				{
+					double[] latLonEntry1 = javaGridIndexRGridLatRGridLon.get(index1);
+					double lat1 = latLonEntry1[0];
+					double lon1 = latLonEntry1[1];
+
+					for (int index2 = index1 + 1; index2 < (javaGridIndexRGridLatRGridLon.size() - 1); index2++)
+					{
+						double[] latLonEntry2 = javaGridIndexRGridLatRGridLon.get(index2);
+						double lat2 = latLonEntry2[0];
+						double lon2 = latLonEntry2[1];
+
+						double haversineDist5 = SpatialUtils.haversineFastMathV3NoRound(lat1, lon1, lat2, lon2);
+						countOfComputations += 1;
+
+						gridIndexPairHaversineDist.put(new FastFlippableIntPair(index1, index2), haversineDist5);
+						// if (countOfComputations > 10000){ break;}
+						if (limitOfNumOfComputations > 0 && (countOfComputations % limitOfNumOfComputations == 0))
+						{
+							System.out.print("countOfComputations = " + countOfComputations);
+							System.out.println("  used memory in MiB: " + PerformanceAnalytics.getUsedMemoryInMB());
+							break;
+						}
+					}
+					if (limitOfNumOfComputations > 0 && (countOfComputations % limitOfNumOfComputations == 0))
+					{
+						break;
+					}
+				}
+
+				System.out.println("#HaversineComputations = " + countOfComputations + " time taken= "
+						+ (System.currentTimeMillis() - t1) + " ms");
+			}
+
+			System.out
+					.println("After computation, before serialisation:\n" + PerformanceAnalytics.getHeapInformation());
+			System.out.println("gridIndexPairHaversineDist.size() = " + gridIndexPairHaversineDist.size());
+			Serializer.kryoSerializeThis(gridIndexPairHaversineDist,
+					pathToWrite + "gridIndexPairHaversineDist" + fileNamePhraseToWrite + ".kryo");
+			System.out.println("After computation, after serialisation:\n" + PerformanceAnalytics.getHeapInformation());
+
+			if (writeToFile)
+			{
+				LeakyBucket lb = new LeakyBucket(10000,
+						pathToWrite + "gridIndexPairHaversineDist" + fileNamePhraseToWrite + ".csv", false);
+				gridIndexPairHaversineDist.entrySet().stream().forEachOrdered(e -> lb.addToLeakyBucketWithNewline(
+						e.getKey().getLower() + "," + e.getKey().getHigher() + "," + e.getValue()));
+				lb.flushLeakyBucket();
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * So effectively speaking now we have locID -> JavaGridIndex and locID -> RGridID
+	 * 
+	 * <p>
+	 * todo: map RGridID -> JavaGridIndex
+	 * <p>
+	 * how: - read locID -> JavaGridIndex - read locID -> RGridID - loop over locID, and write corresonding
+	 * JavaGridIndex and RGridID
+	 * <p>
+	 * 
+	 * writes:wrote: a)javaGridIndexRGridID.csv/kryo, b)javaGridIndexRGridLatRGridLon.csv/kryo (ps: 07/22/18 12:29:33
+	 * PM)
+	 * 
+	 * @since 22 July 2018
+	 */
+	public static void mapJavaGridIndexToRGridID(boolean writeToFile, String absFileToWrite)
+	{
+		String pathToRLocIDGridID = "/home/gunjan/RWorkspace/GowallaRWorks/locIDCellIDUsingR.csv";
+		Map<Integer, String> javaGridIndexRGridID = new LinkedHashMap<>();
+		Map<Integer, double[]> javaGridIndexRGridLatRGridLon = new LinkedHashMap<>();
+		// Map<Integer, String> javaGridIndexRGridID = new LinkedHashMap<>();
+		//
+		try
+		{
+			Map<Long, Integer> locIDJavaGridIndexGowallaMap = (Map<Long, Integer>) Serializer
+					.kryoDeSerializeThis(PathConstants.pathToSerialisedLocIDGridIndexGowallaMap);
+			System.out.println("locIDJavaGridIndexGowallaMap.size()= " + locIDJavaGridIndexGowallaMap.size());
+
+			List<List<String>> rDataRead = ReadingFromFile.nColumnReaderString(pathToRLocIDGridID, ",", true);
+
+			for (List<String> entry : rDataRead)
+			{
+				Long locID = Long.valueOf(entry.get(0));
+
+				String cellID = entry.get(3);
+				Double cellLat = Double.valueOf(entry.get(1));
+				Double cellLon = Double.valueOf(entry.get(2));
+
+				Integer javaGridIndexForThisLocID = locIDJavaGridIndexGowallaMap.get(locID);
+
+				javaGridIndexRGridID.put(javaGridIndexForThisLocID, cellID);
+				javaGridIndexRGridLatRGridLon.put(javaGridIndexForThisLocID, new double[] { cellLat, cellLon });
+			}
+
+			System.out.println("javaGridIndexRGridID.size()= " + javaGridIndexRGridID.size());
+			Serializer.kryoSerializeThis(javaGridIndexRGridID, absFileToWrite + "javaGridIndexRGridID.kryo");
+
+			System.out.println("javaGridIndexRGridLatRGridLon.size()= " + javaGridIndexRGridLatRGridLon.size());
+			Serializer.kryoSerializeThis(javaGridIndexRGridLatRGridLon,
+					absFileToWrite + "javaGridIndexRGridLatRGridLon.kryo");
+
+			if (writeToFile)
+			{
+				StringBuilder sb = new StringBuilder("javaGridIndex,RGridID\n");
+				javaGridIndexRGridID.entrySet().stream()
+						.forEachOrdered(e -> sb.append(e.getKey() + "," + e.getValue() + "\n"));
+				WToFile.writeToNewFile(sb.toString(), absFileToWrite + "javaGridIndexRGridID.csv");
+
+				StringBuilder sb2 = new StringBuilder("javaGridIndex,RGridCellLat,RGridCellLon\n");
+				javaGridIndexRGridLatRGridLon.entrySet().stream().forEachOrdered(
+						e -> sb2.append(e.getKey() + "," + e.getValue()[0] + "," + e.getValue()[1] + "\n"));
+				WToFile.writeToNewFile(sb2.toString(), absFileToWrite + "javaGridIndexRGridLatRGridLon.csv");
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 	public static void main1()
