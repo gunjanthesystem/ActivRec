@@ -444,6 +444,9 @@ public class ControllerWithoutServer
 	public static void setDataVarietyConstants(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> givenDayTimelines,
 			boolean write, String labelPhrase, boolean setConstantVariables, boolean skipNonEssentials)
 	{
+		TimelineUtils.getUniqueLocGridIDsPerActID(givenDayTimelines, true, labelPhrase);
+		// System.exit(0);
+
 		if (setConstantVariables)
 		{
 			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(givenDayTimelines, write, labelPhrase));
@@ -556,7 +559,7 @@ public class ControllerWithoutServer
 			sampleUsersExecuteRecommendationTests(sampledUserCleanedDayTimelines,
 					DomainConstants.gowallaUserGroupsLabels, commonBasePath + "Sample" + sampleID + "/");
 
-			new EvaluationSeq(3, commonBasePath + "Sample" + sampleID + "/", muArray, "");
+			new EvaluationSeq(3, commonBasePath + "Sample" + sampleID + "/", muArray, "", false, true);
 		}
 
 	}

@@ -50,6 +50,7 @@ public class Sanity
 		{
 			errorMsgConsole += "a = " + a + "!= b=" + b;
 			System.err.println(PopUps.getTracedErrorMsg(errorMsgConsole));
+			System.out.println(PopUps.getTracedErrorMsg(errorMsgConsole));// TODO may be redundant added on 20 July 2018
 			PopUps.showError(errorMsgConsole);
 			return false;
 		}

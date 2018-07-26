@@ -3262,6 +3262,13 @@ public class AlignmentBasedDistance
 		// activityObjects2, primaryDimension);
 		HashMap<Integer, Character> uniqueCharCodes = StringCode.getLocallyUniqueCharCodeMap17July2018(activityObjects1,
 				activityObjects2, givenDimension);
+
+		// Start of added on 26 July 2018
+		// if (givenDimension.equals(PrimaryDimension.LocationGridID) && Constant.doWeightedEditDistanceForSecDim)
+		// {
+		// double maxDistanceBetweeenPairs = getMaxDistance(activityObjects1, activityObjects2, givenDimension);
+		// }
+		// End of added on 26 July 2018
 		// t2 = System.nanoTime();
 		// Int2CharOpenHashMap uniqueCharCodesFU = StringCode.getLocallyUniqueCharCodeMapFU(activityObjects1,
 		// activityObjects2, primaryDimension);
@@ -3309,6 +3316,18 @@ public class AlignmentBasedDistance
 				insertWt, deleteWt, replaceWt);
 		// getMySimpleLevenshteinDistance
 	}
+
+	// private static double getMaxDistance(ArrayList<ActivityObject> activityObjects1,
+	// ArrayList<ActivityObject> activityObjects2, PrimaryDimension givenDimension)
+	// {
+	// Set<Integer> gridIndices1 = activityObjects1.stream().map(ao -> ao.getGivenDimensionVal(givenDimension))
+	// .flatMap(l -> l.stream()).collect(Collectors.toSet());
+	// Set<Integer> gridIndices2 = activityObjects2.stream().map(ao -> ao.getGivenDimensionVal(givenDimension))
+	// .flatMap(l -> l.stream()).collect(Collectors.toSet());
+	//
+	// List<Integer>
+	// return 0;
+	// }
 
 	/**
 	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.

@@ -17,6 +17,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
+import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.constants.Enums.TypeOfThreshold;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
@@ -329,9 +330,9 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 					+ this.matchingUnitInCountsOrHours);
 
 			//////
-			Pair<TimelineWithNext, Double> extCurrTimelineRes = null; // extracted current timeline resultant (after
-																		// addition of prev recomm AOs)
+			Pair<TimelineWithNext, Double> extCurrTimelineRes = null;
 
+			// extracted current timeline resultant (after addition of prev recomm AOs)
 			if (actObjsToAddToCurrentTimeline.size() > 0)
 			{
 				extCurrTimelineRes = TimelineExtractors.extractCurrentTimelineSeq(testTimelines, lookPastType,
@@ -549,21 +550,11 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				hasPrimaryDimCandTimelinesBelowThreshold = true;
 			}
 
-			// Is this sorting necessary?
-			// Disabling on Aug 3
-			if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.NearestNeighbour
-					&& Constant.nearestNeighbourCandEDThreshold >= 1)
-			{ // because already sorted while filtering
-				primaryDimDistancesSortedMap = distancesMapPrimaryDimUnsorted;
-				secondaryDimDistancesSortedMap = distancesMapSecondaryDimUnsorted;// added 17 July 2018
-			}
-			else
-			{
-				primaryDimDistancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
-						.sortByValueAscendingStrStrDoub(distancesMapPrimaryDimUnsorted);
-				secondaryDimDistancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
-						.sortByValueAscendingStrStrDoub(distancesMapSecondaryDimUnsorted);// added 17 July 2018
-			}
+			// Is this sorting necessary? // Disabling on Aug 3
+			primaryDimDistancesSortedMap = sortIfNecessary(distancesMapPrimaryDimUnsorted, Constant.typeOfCandThreshold,
+					Constant.nearestNeighbourCandEDThresholdPrimDim);
+			secondaryDimDistancesSortedMap = sortIfNecessary(distancesMapSecondaryDimUnsorted,
+					Constant.typeOfCandThreshold, Constant.nearestNeighbourCandEDThresholdSecDim);
 
 			if (caseType.equals(Enums.CaseType.CaseBasedV1))
 			{
@@ -754,6 +745,60 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		}
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
+	}
+
+	/**
+	 * if typeOfCandThreshold is NearestNeighbour and nearestNeighbourCandEDThresholdGivenDim is valid (>=1), then no
+	 * need to sort the map as the map must have already been sorted during filtering using th threshold.
+	 * <p>
+	 * Extracted logic to this method.
+	 * 
+	 * @param givenDimDistancesSortedMap
+	 * @param typeOfCandThreshold
+	 * @param nearestneighbourcandedthresholdprimdim
+	 * @return
+	 * @since 23 July 2018
+	 */
+	private static LinkedHashMap<String, Pair<String, Double>> sortIfNecessary(
+			LinkedHashMap<String, Pair<String, Double>> givenDimDistancesUnSortedMap,
+			TypeOfCandThreshold typeOfCandThreshold, int nearestNeighbourCandEDThresholdGivenDim)
+	{
+		LinkedHashMap<String, Pair<String, Double>> givenDimDistancesSortedMap = null;
+
+		if (typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour)
+				&& nearestNeighbourCandEDThresholdGivenDim >= 1)
+		{ // because already sorted while filtering
+			givenDimDistancesSortedMap = givenDimDistancesUnSortedMap;
+		}
+		else
+		{
+			givenDimDistancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
+					.sortByValueAscendingStrStrDoub(givenDimDistancesUnSortedMap);
+		}
+
+		// before 23 July 2018: this following commented out code was inside the constructor.
+		// if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.NearestNeighbour
+		// && Constant.nearestNeighbourCandEDThresholdPrimDim >= 1)
+		// { // because already sorted while filtering
+		// primaryDimDistancesSortedMap = distancesMapPrimaryDimUnsorted;
+		// }
+		// else
+		// {
+		// primaryDimDistancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
+		// .sortByValueAscendingStrStrDoub(distancesMapPrimaryDimUnsorted);
+		// }
+		// if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.NearestNeighbour
+		// && Constant.nearestNeighbourCandEDThresholdSecDim >= 1)
+		// { // because already sorted while filtering
+		// secondaryDimDistancesSortedMap = distancesMapSecondaryDimUnsorted;// added 17 July 2018
+		// }
+		// else
+		// {
+		// secondaryDimDistancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
+		// .sortByValueAscendingStrStrDoub(distancesMapSecondaryDimUnsorted);// added 17 July 2018
+		// }
+
+		return givenDimDistancesSortedMap;
 	}
 
 	/**
@@ -1632,7 +1677,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				count++;
 			}
 		}
-		return count++;
+		return count;
 	}
 
 	public Timeline getCandidateTimeline(String timelineID)

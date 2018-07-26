@@ -43,6 +43,9 @@ public class ResultsDistributionEvaluation
 	static final int port = 22;
 	// static final int firstToMax = 3;
 	static final int[] firstToMaxInOrder = { 1 };// 3, 2, 1 };
+	static final String userSetlabels[] = { "" };// , "B", "C", "D", "E" };
+	static final boolean tempDisable20July2018 = true;
+	static final int firstToMax = 1;
 
 	public ResultsDistributionEvaluation()
 	{
@@ -51,8 +54,13 @@ public class ResultsDistributionEvaluation
 	public static void main(String args[])
 	{
 		// $$mainBefore19July();
-		String[] dimensionPhrase = { "" };// ,"SecDim" };
-		for (String s : dimensionPhrase)
+		// String[] dimensionPhrase = { "Fltr_on_Top1Loc" };
+		String[] pfFilterNames = { "SecDim", "", "WtdAlphaPF", "Fltr_on_TopKLocsPF", "Fltr_on_ActualLocPF",
+				"Fltr_on_Top1Loc" };
+		// "" , "Fltr_on_Top1Loc" "Fltr_on_ActualLocPF" };// ,
+		// "Fltr_on_TopKLocsPF",
+		// "WtdAlphaPF" };
+		for (String s : pfFilterNames)
 		{
 			main19July2018(s);
 		}
@@ -61,7 +69,7 @@ public class ResultsDistributionEvaluation
 	public static void main19July2018(String dimensionPhrase)
 	{
 		// String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
-		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsJuly19ToRead_1.csv";
+		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsJuly26ToRead_1.csv";
 		// ResultsMay18ToRead_1Jun28T.csv";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsMay10ToRead_1.csv";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsApril30ToRead_2.csv";//
@@ -71,13 +79,14 @@ public class ResultsDistributionEvaluation
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/";
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY2ResultsDistributionFirstToMax3/FiveDays/";
 
-		String resultForUserGroupingMay2 = pathToRead
-				+ "/Concatenated/ConcatenatedED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
+		// $$String resultForUserGroupingMay2 = pathToRead
+		// $$ +
+		// "/Concatenated/ConcatenatedED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
 		String resultForUserGroupingMay4 = // pathToRead
 				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY10ResultsDistributionFirstToMax3/FiveDays/"
 						+ "/Concatenated/ConcatenatedED1.0AllActsFDStFilter0hrsRTV_AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware.csv";
 		int firstToMax = 1;
-		if (false)
+		if (true)
 		{
 			fetchResultsFromServersInFormat(resultsLabelsPathFileToRead, firstToMax, dimensionPhrase);
 		}
@@ -89,13 +98,18 @@ public class ResultsDistributionEvaluation
 					pathToRead + "GTE100UserLabelsUniqueConfigs.csv");
 
 			PopUps.showMessage("Finished findUniqueConfigs");
-			concatenateFromDifferentSetsOfUsers(pathToRead, pathToRead + "Concatenated/",
-					new String[] { "userMUKeyVals.csv", "MinMUWithMaxFirst3.csv", "MinMUWithMaxFirst0Aware.csv" },
-					uniqueConfigs);
 
-			PopUps.showMessage("Finished first concatenateFromDifferentSetsOfUsers");
-			splitUsersMUZeroNonZeroGroup(resultForUserGroupingMay4, pathToRead + "Concatenated/");
+			if (tempDisable20July2018)
+			{
+				concatenateFromDifferentSetsOfUsers(pathToRead, pathToRead + "Concatenated/",
+						new String[] { "userMUKeyVals" + dimensionPhrase + ".csv",
+								"MinMUWithMaxFirst" + firstToMax + dimensionPhrase + ".csv",
+								"MinMUWithMaxFirst0Aware" + dimensionPhrase + ".csv" },
+						uniqueConfigs, userSetlabels);
 
+				PopUps.showMessage("Finished first concatenateFromDifferentSetsOfUsers");
+				splitUsersMUZeroNonZeroGroup(resultForUserGroupingMay4, pathToRead + "Concatenated/");
+			}
 			PopUps.showMessage("Finished splitUsersMUZeroNonZeroGroup");
 			// Choose fixed MU for each user based on one given result: resultForUserGroupingMay4
 			Map<String, Integer> userIdentifierChosenMU = getUserChosenBestMUBasedOnGiveFile(resultForUserGroupingMay4,
@@ -114,12 +128,12 @@ public class ResultsDistributionEvaluation
 			}
 			// concatenating ChosenMU.csv form different sets of users
 			concatenateFromDifferentSetsOfUsers(secondPathToRead, secondPathToRead + "Concatenated/",
-					new String[] { "ChosenMU.csv" }, uniqueConfigs);
+					new String[] { "ChosenMU" + dimensionPhrase + ".csv" }, uniqueConfigs, userSetlabels);
 
 			PopUps.showMessage("Finished second concatenateFromDifferentSetsOfUsers");
 		}
 
-		System.exit(0);
+		// System.exit(0);
 
 	}
 
@@ -160,7 +174,7 @@ public class ResultsDistributionEvaluation
 			PopUps.showMessage("Finished findUniqueConfigs");
 			concatenateFromDifferentSetsOfUsers(pathToRead, pathToRead + "Concatenated/",
 					new String[] { "userMUKeyVals.csv", "MinMUWithMaxFirst3.csv", "MinMUWithMaxFirst0Aware.csv" },
-					uniqueConfigs);
+					uniqueConfigs, userSetlabels);
 
 			PopUps.showMessage("Finished first concatenateFromDifferentSetsOfUsers");
 			splitUsersMUZeroNonZeroGroup(resultForUserGroupingMay4, pathToRead + "Concatenated/");
@@ -183,7 +197,7 @@ public class ResultsDistributionEvaluation
 			}
 			// concatenating ChosenMU.csv form different sets of users
 			concatenateFromDifferentSetsOfUsers(secondPathToRead, secondPathToRead + "Concatenated/",
-					new String[] { "ChosenMU.csv" }, uniqueConfigs);
+					new String[] { "ChosenMU.csv" }, uniqueConfigs, userSetlabels);
 
 			PopUps.showMessage("Finished second concatenateFromDifferentSetsOfUsers");
 		}
@@ -236,13 +250,15 @@ public class ResultsDistributionEvaluation
 	 * @param fileToConcatenateLabelTails
 	 */
 	public static void concatenateFromDifferentSetsOfUsers(String commonPath, String commonPathToWrite,
-			String[] fileToConcatenateLabelTails, Set<String> uniqueConfigs)
+			String[] fileToConcatenateLabelTails, Set<String> uniqueConfigs, String userSetlabels[])
 	{
+
 		// String commonPath =
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY2ResultsDistributionFirstToMax3/FiveDays/";
 		// String commonPathToWrite = commonPath + "Concatenated/";
 		WToFile.createDirectoryIfNotExists(commonPathToWrite);
-		concatenateResultsFromAllSets(uniqueConfigs, commonPath, commonPathToWrite, fileToConcatenateLabelTails);
+		concatenateResultsFromAllSets(uniqueConfigs, commonPath, commonPathToWrite, fileToConcatenateLabelTails,
+				userSetlabels);
 		// findGroupsOfUsersBasedOnBestMU(uniqueConfigs, commonPath);
 
 	}
@@ -430,13 +446,15 @@ public class ResultsDistributionEvaluation
 	 * @param commonPathToWrite
 	 */
 	private static void concatenateResultsFromAllSets(Set<String> uniqueConfigs, String commonPathToRead,
-			String commonPathToWrite, String[] resultLabelTails2)
+			String commonPathToWrite, String[] resultLabelTails2, String userSetlabels[])
 	{
 		String[] resultLabelTails1 = { "_AllPerDirectTopKAgreementsL1_", "_AllPerDirectTopKAgreements_" };
+		// String statFileNamesPRF[] = { "_AvgPrecision_", "AvgRecall_", "AvgFMeasure_" };
+		// String statFileNamesMRR[] = { "_AllMeanReciprocalRank_" };
 		// String[] resultLabelTails2 = { "userMUKeyVals.csv", "MinMUWithMaxFirst3.csv", "MinMUWithMaxFirst0Aware.csv"
 		// };
 
-		String sets[] = { "", "B", "C", "D", "E" };
+		String sets[] = userSetlabels;// { "" };// , "B", "C", "D", "E" };
 
 		// get list of files in the current directory
 		try
@@ -674,10 +692,13 @@ public class ResultsDistributionEvaluation
 					System.out.println(
 							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
 
-					int resSize = getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray,
-							statFileNames, host, firstToMax, doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser,
-							userIdentifierChosenMuMap, dimensionPhrase, firstToMaxInOrder);
-
+					int resSize = -1;
+					if (tempDisable20July2018)
+					{
+						getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray, statFileNames, host,
+								firstToMax, doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser,
+								userIdentifierChosenMuMap, dimensionPhrase, firstToMaxInOrder);
+					}
 					int resSize2 = getResultsForEachStatFile_PrecisionRecallFMeasure2(pathToWrite, resultsLabel,
 							pathToRead, muArray, statFileNamesPRF, host, 5, doFirstToMax, doFirstToMaxZeroAware,
 							doChosenMUForEachUser, userIdentifierChosenMuMap, dimensionPhrase);
@@ -686,9 +707,12 @@ public class ResultsDistributionEvaluation
 							statFileNamesMRR, host, 1, doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser,
 							userIdentifierChosenMuMap, dimensionPhrase);
 
-					Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
-					Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
-					if (resSize < 0)
+					if (tempDisable20July2018)
+					{
+						Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
+						Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
+					}
+					if (resSize2 < 0)
 					{
 						continue;
 					}
@@ -753,8 +777,12 @@ public class ResultsDistributionEvaluation
 
 					System.out.println(
 							"pathToRead= " + pathToRead + " \nresultsLabel:" + resultsLabel + "\nhost:" + host + "\n");
-					int resSize = getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray,
-							statFileNames, host, firstToMax, dimensionPhrase, firstToMaxInOrder);
+					int resSize = -1;
+					if (!tempDisable20July2018)
+					{
+						resSize = getResultsForEachStatFile(pathToWrite, resultsLabel, pathToRead, muArray,
+								statFileNames, host, firstToMax, dimensionPhrase, firstToMaxInOrder);
+					}
 
 					int resSize2 = getResultsForEachStatFile_PrecisionRecallFMeasure(pathToWrite, resultsLabel,
 							pathToRead, muArray, statFileNamesPRF, host, 5, dimensionPhrase);
@@ -762,9 +790,13 @@ public class ResultsDistributionEvaluation
 					int resSize3 = getResultsForEachStatFile_MRR(pathToWrite, resultsLabel, pathToRead, muArray,
 							statFileNamesMRR, host, 1, dimensionPhrase);
 
-					Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
-					Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
-					if (resSize < 0)
+					if (!tempDisable20July2018)
+					{
+						Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
+						Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
+					}
+
+					if (resSize2 < 0)
 					{
 						continue;
 					}
@@ -1022,7 +1054,7 @@ public class ResultsDistributionEvaluation
 		{
 			res = getResultChosenMU(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
 					doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap,
-					dimensionPhrase, false, new int[] { 5, 4, 3, 2, 1 }, true, "top5,top4,top3,top2,top1");
+					dimensionPhrase, true, new int[] { 5, 4, 3, 2, 1 }, true, "top5,top4,top3,top2,top1");
 			// res = getResult19July2018_MRR_PRF(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host,
 			// firstToMax/* 5= Max top1, i.e. last col */, dimensionPhrase, true, new int[] { 5, 4, 3, 2, 1 },
 			// true, "top5,top4,top3,top2,top1");
@@ -1068,7 +1100,7 @@ public class ResultsDistributionEvaluation
 		{
 			res = getResultChosenMU(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
 					doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap,
-					dimensionPhrase, false, new int[] { 1 }, true, "MRR");
+					dimensionPhrase, true, new int[] { 1 }, true, "MRR");
 			// res = getResult19July2018_MRR_PRF(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, 1,
 			// dimensionPhrase, true, new int[] { 1 }, true, "MRR");
 		}

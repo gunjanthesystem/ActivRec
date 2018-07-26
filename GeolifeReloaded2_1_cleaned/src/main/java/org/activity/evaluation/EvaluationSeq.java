@@ -27,6 +27,7 @@ import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
+import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -62,6 +63,9 @@ public class EvaluationSeq
 
 	ArrayList<ArrayList<String>> listOfStep0MeanReciprocalRankFiles, listOfStep0AvgPrecisionFiles,
 			listOfStep0AvgRecallFiles, listOfStep0AvgFMeasureFiles;// listOfReciprocalRankFiles,
+
+	boolean evaluatePostFiltering;// = false;
+	boolean evaluateSeqPrediction;
 
 	/**
 	 * FOR NO MUs, useful for baseline
@@ -184,10 +188,15 @@ public class EvaluationSeq
 	 *            only if necessary, not essential for primary dimension, e.g. SecDim for secondary dimension
 	 *            <p>
 	 *            used as of 18 July 2018
+	 * @param evaluatePostFiltering
+	 * @param evaluatedSequencePrediction
 	 */
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount,
-			String dimensionPhrase)
+			String dimensionPhrase, boolean evaluatePostFiltering, boolean evaluatedSequencePrediction)// sdsd
 	{
+		this.evaluatePostFiltering = evaluatePostFiltering;
+		this.evaluateSeqPrediction = evaluatedSequencePrediction;
+
 		// commonPath = "./dataWritten/";
 		PopUps.showMessage("Starting EvaluationSeq for dimensionPhrase = " + dimensionPhrase);
 		if (Constant.useRandomlySampled100Users)
@@ -1008,7 +1017,10 @@ public class EvaluationSeq
 		System.out.println("Inside doEvaluationSeq dimensionPhrase=" + dimensionPhrase);
 		try
 		{
+			// if (evaluatePostFiltering == false)// temp on 20 July 2018, remove
+			if (this.evaluateSeqPrediction)
 			{// block for evaluating sequence prediction overall
+				// {
 				Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysPredSeq = readDataMetaActualTopK(
 						pathToReadResults, "dataRecommSequence" + dimensionPhrase + "WithScore.csv",
 						"dataActualSequence" + dimensionPhrase + ".csv", commonPath, verbose);
@@ -1028,10 +1040,21 @@ public class EvaluationSeq
 			// block for evaluating sequence prediction at each first K
 			for (int seqIndex = 0; seqIndex < seqLength; seqIndex++)
 			{
+				String actualFileToEvaluateAgainst = "";
+
+				if (evaluatePostFiltering == false)
+				{// matched against actual data of corresponding dimension
+					actualFileToEvaluateAgainst = "dataActual" + dimensionPhrase + seqIndex + ".csv";
+				}
+				else// for postfiltering
+				{// matched against actual data of primary (no) dimension
+					actualFileToEvaluateAgainst = "dataActual" + "" + seqIndex + ".csv";
+				}
+
 				Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysForFirstK = readDataMetaActualTopK(
 						pathToReadResults, "dataRankedRecommendation" + dimensionPhrase + "WithoutScores"
 								+ seqIndex/* seqLength */ + ".csv",
-						"dataActual" + dimensionPhrase + seqIndex + ".csv", commonPath, verbose);
+						actualFileToEvaluateAgainst, commonPath, verbose);
 
 				// should be same same meta for all
 				ArrayList<ArrayList<String>> arrayMetaFirstK = readArraysForFirstK.getFirst();
@@ -1164,23 +1187,28 @@ public class EvaluationSeq
 					verbose);
 			arrayMeta = metaExtracted.getFirst();
 			int countOfLinesMeta = metaExtracted.getSecond();
+			int countOfTotalMetaToken = metaExtracted.getFirst().stream().mapToInt(v -> v.size()).sum();
 			consoleLogBuilder.append(metaExtracted.getThird());
 
 			Triple<ArrayList<ArrayList<String>>, Integer, String> topKExtracted = extractDataFromFile(brTopK, "topK",
 					verbose);
 			arrayTopK = topKExtracted.getFirst();
 			int countOfLinesTopK = topKExtracted.getSecond();
+			int countOfTotalTopKToken = topKExtracted.getFirst().stream().mapToInt(v -> v.size()).sum();
 			consoleLogBuilder.append(topKExtracted.getThird());
 
 			Triple<ArrayList<ArrayList<String>>, Integer, String> actualExtracted = extractDataFromFile(brActual,
 					"actual", verbose);
 			arrayActual = actualExtracted.getFirst();
 			int countOfLinesActual = actualExtracted.getSecond();
+			int countOfTotalActualToken = actualExtracted.getFirst().stream().mapToInt(v -> v.size()).sum();
 			consoleLogBuilder.append(actualExtracted.getThird());
 
 			consoleLogBuilder.append("\n number of actual lines =" + countOfLinesTopK + "\n");
 			consoleLogBuilder.append("size of meta array=" + arrayMeta.size() + "     size of topK array="
 					+ arrayTopK.size() + "   size of actual array=" + arrayMeta.size() + "\n");
+			consoleLogBuilder.append("countOfTotalMetaToken=" + countOfTotalMetaToken + "     countOfTotalTopKToken="
+					+ countOfTotalTopKToken + "   countOfTotalActualToken=" + countOfTotalActualToken + "\n");
 			// + " size of current target same array=" + arrayCurrentTargetSame.size() + "\n");
 
 			if (ComparatorUtils.areAllEqual(countOfLinesMeta, countOfLinesTopK, countOfLinesActual, arrayMeta.size(),
@@ -1190,6 +1218,13 @@ public class EvaluationSeq
 						+ countOfLinesMeta + ",countOfLinesTopK=" + countOfLinesTopK + " countOfLinesActual="
 						+ countOfLinesActual + ", arrayMeta.size()=" + arrayMeta.size() + ", arrayTopK.size()="
 						+ arrayTopK.size() + ", arrayActual.size()=" + arrayActual.size()));
+			}
+			if (ComparatorUtils.areAllEqual(countOfTotalMetaToken, countOfTotalTopKToken,
+					countOfTotalActualToken) == false)
+			{
+				System.err.println(PopUps.getTracedErrorMsg("Error line numbers mismatch: countOfTotalMetaToken="
+						+ countOfTotalMetaToken + ",countOfTotalTopKToken=" + countOfTotalTopKToken
+						+ " countOfTotalActualToken=" + countOfTotalActualToken));
 			}
 
 			System.out.println(consoleLogBuilder.toString());
@@ -1221,7 +1256,8 @@ public class EvaluationSeq
 	 * @param pathToWrite
 	 * @param seqLength
 	 * @param dimensionPhrase
-	 *            introduced on 19 July 2018 only for filenames of files to be written
+	 *            - do level 2 evaluation only then dimensionPhrase is "" - introduced on 19 July 2018 only for
+	 *            filenames of files to be written
 	 * @return
 	 */
 	private static int doEvaluationSeq(ArrayList<ArrayList<String>> arrayMeta,
@@ -1249,16 +1285,18 @@ public class EvaluationSeq
 					dimensionPhrase);
 
 			// category level: level 1
-			ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreementsL1 = computeDirectAgreements(algoLabel,
-					timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, 1);
+			if (dimensionPhrase.equals(""))// primary dimension
+			{
+				ArrayList<ArrayList<ArrayList<Integer>>> arrayDirectAgreementsL1 = computeDirectAgreements(algoLabel,
+						timeCategory, arrayMeta, arrayRecommendedSeq, arrayActualSeq, 1);
 
-			writeDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
-					dimensionPhrase);
-			writeNumAndPercentageDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
-					seqLength, dimensionPhrase);
-			writeDirectTopKAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite, seqLength,
-					dimensionPhrase);
-
+				writeDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
+						dimensionPhrase);
+				writeNumAndPercentageDirectAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1,
+						pathToWrite, seqLength, dimensionPhrase);
+				writeDirectTopKAgreements(algoLabel + "L1", timeCategory, arrayDirectAgreementsL1, pathToWrite,
+						seqLength, dimensionPhrase);
+			}
 			numOfUsersFromDirectAgreements = arrayDirectAgreements.size();
 		}
 
@@ -1674,17 +1712,35 @@ public class EvaluationSeq
 		{
 			ArrayList<String> currentLineArray = new ArrayList<String>();
 			// System.out.println(metaCurrentLine);
-			String[] tokensInCurrentDataLine = RegexUtils.patternComma.split(dataCurrentLine);
+			String[] tokensInCurrentDataLine = RegexUtils.patternComma.split(dataCurrentLine, -1);// ends with comma
+			// -1 argument added on //changed on 20 July 2018
 			// System.out.println("number of tokens in this meta line=" + tokensInCurrentMetaLine.length);
 			if (verbose)
 			{
 				log.append(labelForLog + " line num:" + (countOfLinesData + 1) + "#tokensInLine:"
 						+ tokensInCurrentDataLine.length + "\n");
 			}
-			for (int i = 0; i < tokensInCurrentDataLine.length; i++)
+			// for (int i = 0; i < tokensInCurrentDataLine.length; i++)
+			for (int i = 0; i < tokensInCurrentDataLine.length - 1; i++)// changed on 20 July 2018
 			{
 				currentLineArray.add(tokensInCurrentDataLine[i]);
 			}
+
+			// Start of sanity check 20 July 2018
+			long numOfCommas = dataCurrentLine.chars().filter(num -> num == ',').count();
+			Sanity.eq(numOfCommas, currentLineArray.size(),
+					"Error in extractDataFromFile for dataToRead = " + dataToRead + " lineNum= "
+							+ (countOfLinesData + 1) + " numOfCommas=" + numOfCommas + " currentLineArray.size()= "
+							+ currentLineArray.size() + "\n currentLineArray = " + currentLineArray
+							+ "\ndataCurrentLine= " + dataCurrentLine + "\ntokensInCurrentDataLine="
+							+ tokensInCurrentDataLine);
+			if (false)
+			{
+				System.out.println(" currentLineArray.size()= " + currentLineArray.size() + "\n currentLineArray = "
+						+ currentLineArray + "\ndataCurrentLine= " + dataCurrentLine + "\ntokensInCurrentDataLine="
+						+ tokensInCurrentDataLine);
+			}
+			// End of sanity check 20 July 2018
 
 			arrayData.add(currentLineArray);
 			countOfLinesData++;
@@ -1714,11 +1770,14 @@ public class EvaluationSeq
 	{
 		String commonPath = Constant.getCommonPath();
 		BufferedWriter bwRR = null;
+		BufferedWriter bwEmptyRecomms = null;
 		try
 		{
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine;
 			bwRR = WToFile.getBWForNewFile(
 					commonPath + fileNamePhrase + timeCategory + "ReciprocalRank" + dimensionPhrase + ".csv");
+			bwEmptyRecomms = WToFile.getBWForNewFile(
+					commonPath + fileNamePhrase + timeCategory + "EmptyRecommsCount" + dimensionPhrase + ".csv");
 			System.out.println("size of meta array=" + arrayMeta.size() + "     size of topK array=" + arrayTopK.size()
 					+ "   size of actual array=" + arrayActual.size());
 
@@ -1728,6 +1787,7 @@ public class EvaluationSeq
 				// $$System.out.println("Calculating RR for user:" + i);
 				double RR = -99;
 				int countOfRecommendationTimesConsidered = 0; // =count of meta entries considered
+				int countOfRTsForThisUserWithEmptyRecommendation = 0;
 
 				for (int j = 0; j < currentLineArray.size(); j++) // iterating over recommendation times (or columns)
 				{
@@ -1738,31 +1798,43 @@ public class EvaluationSeq
 						countOfRecommendationTimesConsidered++;
 
 						String actual = arrayActual.get(i).get(j);
-
-						String[] topKString = RegexUtils.patternDoubleUnderScore.split(arrayTopK.get(i).get(j));
-						// $$ arrayTopK.get(i).get(j).split("__");
-						// topK is of the form string: __a__b__c__d__e is of length 6...
-						// value at index 0 is empty.
-
-						int rank = -99;
-						for (int y = 1; y <= topKString.length - 1; y++)
+						String topKRecommForThisUserForThisRT = arrayTopK.get(i).get(j);
+						if (topKRecommForThisUserForThisRT.equals(null)
+								|| topKRecommForThisUserForThisRT.trim().length() == 0)
 						{
-							if (topKString[y].equalsIgnoreCase(actual))
-							{
-								rank = y;
-								break;// assuming that the actual occurs only once in the recommended list
-							}
-						}
-
-						if (rank != -99)
-						{
-							RR = round((double) 1 / rank, 4);
+							// empty recommendation list
+							countOfRTsForThisUserWithEmptyRecommendation += 1;
+							RR = -1; // assuming the rank is at infinity
 						}
 						else
 						{
-							RR = 0; // assuming the rank is at infinity
+							String[] topKString = RegexUtils.patternDoubleUnderScore
+									.split(topKRecommForThisUserForThisRT);
+							// $$ arrayTopK.get(i).get(j).split("__");
+							// topK is of the form string: __a__b__c__d__e is of length 6...
+							// value at index 0 is empty.
+
+							int rank = -99;
+							for (int y = 1; y <= topKString.length - 1; y++)
+							{
+								if (topKString[y].equalsIgnoreCase(actual))
+								{
+									rank = y;
+									break;// assuming that the actual occurs only once in the recommended list
+								}
+							}
+
+							if (rank != -99)
+							{
+								RR = round((double) 1 / rank, 4);
+							}
+							else
+							{
+								RR = 0; // assuming the rank is at infinity
+							}
 						}
 						bwRR.write(RR + ",");
+
 						if (VerbosityConstants.verbose)
 						{
 							System.out.println("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j));
@@ -1772,8 +1844,10 @@ public class EvaluationSeq
 					}
 				} // end of current line array
 				bwRR.write("\n");
+				bwEmptyRecomms.write(countOfRTsForThisUserWithEmptyRecommendation + "\n");
 			}
 			bwRR.close();
+			bwEmptyRecomms.close();
 		}
 		catch (Exception e)
 		{
@@ -1888,76 +1962,84 @@ public class EvaluationSeq
 							|| timeCategory.equals("All"))
 					{
 						countOfRecommendationTimesConsidered++;
+						int countOfOccurence = 0; // the number of times the actual item appears in the top K
+						// recommended list. NOTE: in the current case will be always be either 1 or 0.
 
 						String actual = arrayActual.get(i).get(j);
-
-						String[] topKStrings = RegexUtils.patternDoubleUnderScore.split(arrayTopK.get(i).get(j));
-						// arrayTopK.get(i).get(j).split("__");
-						// topK is of the form string: __a__b__c__d__e is of length 6...
-						// value at index 0 is empty.
-
-						theK = theKOriginal;
-						// System.out.println();
-
-						if (topKStrings.length - 1 < theK) // for this RT we are not able to make K recommendations as
-															// less than K recommendations are present.
+						String topKForThisUserThisRT = arrayTopK.get(i).get(j);
+						if (topKForThisUserThisRT.equals(null) || topKForThisUserThisRT.trim().length() == 0)
 						{
-							// System.err.println
-							consoleLogBuilder.append("Warning: For " + currentLineArray.get(j) + ", Only top "
-									+ (topKStrings.length - 1) + " recommendation present while the asked for K is "
-									+ theK + "\tDecreasing asked for K to " + (topKStrings.length - 1) + "\n");
-							// +"\nWriting -999 values");
-							theK = topKStrings.length - 1;
-							// $topKPrecisionVal=-9999;
-							// $topKRecallVal=-9999;
-							// $topKFVal=-9999;
-						}
-						// theK=topKStrings.length-1;
-						// $else
-						// ${
-						if (VerbosityConstants.verbose)
-						{
-							consoleLogBuilder
-									.append("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j) + "\n");
-							consoleLogBuilder.append("actual string =" + actual + "\n");
-						}
-						int countOfOccurence = 0; // the number of times the actual item appears in the top K
-													// recommended list. NOTE: in the current case will be always be
-													// either 1
-													// or 0.
-
-						for (int y = 1; y <= theK; y++)
-						{
-							if (topKStrings[y].equalsIgnoreCase(actual))
-							{
-								countOfOccurence++;
-							}
-						}
-
-						if (countOfOccurence > 1)
-						{
-							// System.err.println
-							consoleLogBuilder.append(
-									"Error: in writePrecisionRecallFMeasure(): the actual string appears multiple times in topK, which should not be the case as per our current algorithm.\n");
-						}
-						if (countOfOccurence > 0)
-						{
-							countOfOccurence = 1;
-						}
-
-						topKPrecisionVal = round((double) countOfOccurence / theKOriginal, 4);
-						topKRecallVal = round((double) countOfOccurence / 1, 4); // since there is only one actual
-																					// values
-
-						if ((topKPrecisionVal + topKRecallVal) == 0)
-						{
-							topKFVal = 0;
+							topKPrecisionVal = -1; // assigning 0 , or may be -1 for
+							topKRecallVal = -1;
+							topKFVal = -1;
 						}
 						else
 						{
-							topKFVal = 2 * ((topKPrecisionVal * topKRecallVal) / (topKPrecisionVal + topKRecallVal));
+							String[] topKStrings = RegexUtils.patternDoubleUnderScore.split(arrayTopK.get(i).get(j));
+							// arrayTopK.get(i).get(j).split("__");
+							// topK is of the form string: __a__b__c__d__e is of length 6...
+							// value at index 0 is empty.
+
+							theK = theKOriginal;
+							// System.out.println();
+
+							if (topKStrings.length - 1 < theK) // for this RT we are not able to make K recommendations
+																// as less than K recommendations are present.
+							{
+								// System.err.println
+								consoleLogBuilder.append("Warning: For " + currentLineArray.get(j) + ", Only top "
+										+ (topKStrings.length - 1) + " recommendation present while the asked for K is "
+										+ theK + "\tDecreasing asked for K to " + (topKStrings.length - 1) + "\n");
+								// +"\nWriting -999 values");
+								theK = topKStrings.length - 1;
+								// $topKPrecisionVal=-9999;
+								// $topKRecallVal=-9999;
+								// $topKFVal=-9999;
+							}
+							// theK=topKStrings.length-1;
+							// $else
+							// ${
+							if (VerbosityConstants.verbose)
+							{
+								consoleLogBuilder
+										.append("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j) + "\n");
+								consoleLogBuilder.append("actual string =" + actual + "\n");
+							}
+
+							for (int y = 1; y <= theK; y++)
+							{
+								if (topKStrings[y].equalsIgnoreCase(actual))
+								{
+									countOfOccurence++;
+								}
+							}
+
+							if (countOfOccurence > 1)
+							{
+								// System.err.println
+								consoleLogBuilder.append(
+										"Error: in writePrecisionRecallFMeasure(): the actual string appears multiple times in topK, which should not be the case as per our current algorithm.\n");
+							}
+							if (countOfOccurence > 0)
+							{
+								countOfOccurence = 1;
+							}
+
+							topKPrecisionVal = round((double) countOfOccurence / theKOriginal, 4);
+							topKRecallVal = round((double) countOfOccurence / 1, 4); // since there is only one actual
+																						// values
+
+							if ((topKPrecisionVal + topKRecallVal) == 0)
+							{
+								topKFVal = 0;
+							}
+							else
+							{
+								topKFVal = 2
+										* ((topKPrecisionVal * topKRecallVal) / (topKPrecisionVal + topKRecallVal));
+							}
+							topKFVal = round(topKFVal, 4);
 						}
-						topKFVal = round(topKFVal, 4);
 
 						bwTopKPrecision.write(topKPrecisionVal + ",");
 						bwTopKRecall.write(topKRecallVal + ",");

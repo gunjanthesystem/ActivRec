@@ -28,10 +28,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.n52.matlab.control.MatlabConnectionException;
-import org.n52.matlab.control.MatlabInvocationException;
-import org.n52.matlab.control.MatlabProxy;
-import org.n52.matlab.control.MatlabProxyFactory;
 
 //import org.apache.commons.collections.keyvalue.MultiKey;
 
@@ -445,24 +441,24 @@ public class TestExperiments
 		}
 	}
 
-	public static void checkMatlabControl() throws MatlabConnectionException, MatlabInvocationException
-	{
-		// Create a proxy, which we will use to control MATLAB
-		MatlabProxyFactory factory = new MatlabProxyFactory();
-		MatlabProxy proxy = factory.getProxy();
-
-		// Display 'hello world' just like when using the demo
-		// proxy.eval("disp('hello world')");
-
-		// Set a variable, add to it, retrieve it, and print the result
-		proxy.setVariable("a", 5);
-		proxy.eval("a = a + 6");
-		double result = ((double[]) proxy.getVariable("a"))[0];
-		System.out.println("Result: " + result);
-
-		// Disconnect the proxy from MATLAB
-		proxy.disconnect();
-	}
+	// public static void checkMatlabControl() throws MatlabConnectionException, MatlabInvocationException
+	// {
+	// // Create a proxy, which we will use to control MATLAB
+	// MatlabProxyFactory factory = new MatlabProxyFactory();
+	// MatlabProxy proxy = factory.getProxy();
+	//
+	// // Display 'hello world' just like when using the demo
+	// // proxy.eval("disp('hello world')");
+	//
+	// // Set a variable, add to it, retrieve it, and print the result
+	// proxy.setVariable("a", 5);
+	// proxy.eval("a = a + 6");
+	// double result = ((double[]) proxy.getVariable("a"))[0];
+	// System.out.println("Result: " + result);
+	//
+	// // Disconnect the proxy from MATLAB
+	// proxy.disconnect();
+	// }
 
 	public static void checkHjorthParameters()
 	{

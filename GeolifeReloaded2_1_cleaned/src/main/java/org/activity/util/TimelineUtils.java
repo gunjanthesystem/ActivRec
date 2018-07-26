@@ -1306,14 +1306,14 @@ public class TimelineUtils
 						numOfCInsWithMultipleDistinctLocIDs += 1;
 					}
 
-					int gridID = getGridID(locIDs, locIDGridIndexMap, userID, startTimestamp);
+					int gridIndex = getGridIndex(locIDs, locIDGridIndexMap, userID, startTimestamp);
 					// ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
 					ActivityObject ao = new ActivityObject(
 							activityID, locIDs, activityName, locationName, startTimestamp, startLatitude,
 							startLongitude, startAltitude, userID, photos_count, checkins_count, users_count,
 							radius_meters, highlights_count, items_count, max_items_count, cin.getWorkingLevelCatIDs(),
 							distaneInMFromPrev, durationInSecFromPrev, /* levelWiseCatIDs, */
-							currentZoneId, distanceInMFromNext, durationInSecFromNext, gridID);
+							currentZoneId, distanceInMFromNext, durationInSecFromNext, gridIndex);
 
 					// Start of sanity check of April 6
 					uniqueActIDs.add(ao.getActivityID());
@@ -1373,7 +1373,7 @@ public class TimelineUtils
 	 * @param tsForLog
 	 * @return
 	 */
-	private static int getGridID(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap, String userForLog,
+	private static int getGridIndex(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap, String userForLog,
 			Timestamp tsForLog)
 	{
 		StringBuilder sbLog = new StringBuilder();
@@ -4767,6 +4767,132 @@ public class TimelineUtils
 		return actIDLocIDsMap;
 	}
 
+	/**
+	 * Extract unique location IDs per actID from the given timelines
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param labelPhrase
+	 * @return
+	 */
+	public static TreeMap<Integer, TreeSet<Integer>> getUniqueLocGridIDsPerActID(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write,
+			String labelPhrase)
+	{
+		// map of <act id, <list of locations>>
+		TreeMap<Integer, TreeSet<Integer>> actIDLocIDsMap = new TreeMap<>();
+
+		try
+		{
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			{
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+				{
+					Timeline timelineForThisDay = dateEntry.getValue();
+
+					for (ActivityObject ao : timelineForThisDay.getActivityObjectsInTimeline())
+					{
+						TreeSet<Integer> locationIDsForThisActID = actIDLocIDsMap.get(ao.getActivityID());
+						if (locationIDsForThisActID == null)
+						{
+							locationIDsForThisActID = new TreeSet<>();
+						}
+						locationIDsForThisActID.addAll(ao.getGivenDimensionVal(PrimaryDimension.LocationGridID));// .getLocationIDs());
+						actIDLocIDsMap.put(ao.getActivityID(), locationIDsForThisActID);
+					}
+				}
+			}
+
+			if (write)
+			{
+				StringBuilder sb = new StringBuilder("actID,NumOfLocGridIDs,listOfLocGridIDs\n");
+				for (Entry<Integer, TreeSet<Integer>> actEntry : actIDLocIDsMap.entrySet())
+				{
+					sb.append(actEntry.getKey() + "," + actEntry.getValue().size());
+					actEntry.getValue().stream().forEachOrdered(l -> sb.append("," + l));
+					sb.append("\n");
+					// actEntry.getValue().stream().collect(Collectors.joining(","));
+					// String.join(",", actEntry.getValue());
+					// sb.append(actEntry.getValue().stream().collect(Collectors.joining(",")) + "\n");
+				}
+				WToFile.writeToNewFile(sb.toString(),
+						Constant.getCommonPath() + labelPhrase + "actIDLocGridIDsMap.csv");// );
+			}
+			Serializer.kryoSerializeThis(actIDLocIDsMap, Constant.getCommonPath() + "actIDLocGridIDsMap.kryo");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return actIDLocIDsMap;
+	}
+
+	// /**
+	// * Extract unique location IDs per actID from the given timelines
+	// *
+	// * @param usersCleanedDayTimelines
+	// * @param labelPhrase
+	// * @return
+	// */
+	// public static TreeMap<Integer, TreeSet<Integer>> getUniqueActIDsPerLocGridID(
+	// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean write,
+	// String labelPhrase)
+	// {
+	// PrimaryDimension perGivenDimension = PrimaryDimension.LocationGridID;
+	// // PrimaryDimension targetDimension = PrimaryDimension.ActivityID;
+	// // map of <act id, <list of locations>>
+	// TreeMap<Integer, TreeSet<Integer>> actIDLocGridIDsMap = new TreeMap<>();
+	//
+	// try
+	// {
+	// for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+	// {
+	// for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+	// {
+	// Timeline timelineForThisDay = dateEntry.getValue();
+	//
+	// for (ActivityObject ao : timelineForThisDay.getActivityObjectsInTimeline())
+	// {
+	// int actID = ao.getActivityID();
+	//
+	// for (Integer locGridID : ao.getGivenDimensionVal(perGivenDimension))
+	// {
+	// // TreeSet<Integer> locationIDsForThisActID = actIDLocGridIDsMap.get(ao.getActivityID());
+	// TreeSet<Integer> actIDsForThisLocationID = actIDLocGridIDsMap.get(ao.getActivityID());
+	//
+	// if (locationIDsForThisActID == null)
+	// {
+	// locationIDsForThisActID = new TreeSet<>();
+	// }
+	// locationIDsForThisActID.addAll(ao.getLocationIDs());
+	// actIDLocGridIDsMap.put(ao.getActivityID(), locationIDsForThisActID);
+	// }
+	// }
+	// }
+	// }
+	//
+	// if (write)
+	// {
+	// StringBuilder sb = new StringBuilder("actID,NumOfLocIDs,listOfLocIDs\n");
+	// for (Entry<Integer, TreeSet<Integer>> actEntry : actIDLocGridIDsMap.entrySet())
+	// {
+	// sb.append(actEntry.getKey() + "," + actEntry.getValue().size());
+	// actEntry.getValue().stream().forEachOrdered(l -> sb.append("," + l));
+	// sb.append("\n");
+	// // actEntry.getValue().stream().collect(Collectors.joining(","));
+	// // String.join(",", actEntry.getValue());
+	// // sb.append(actEntry.getValue().stream().collect(Collectors.joining(",")) + "\n");
+	// }
+	// WToFile.writeToNewFile(sb.toString(),
+	// Constant.getCommonPath() + labelPhrase + "UniqueLocIDsPerActID.csv");// );
+	// }
+	// }
+	// catch (Exception e)
+	// {
+	// e.printStackTrace();
+	// }
+	// return actIDLocGridIDsMap;
+	// }
+
 	//
 	/**
 	 * Extract {userID,{unique actIDs for this user, {unique locIDs for this actID for this userID}}}
@@ -5142,9 +5268,13 @@ public class TimelineUtils
 				// if new user
 				if (GDValCountPerUser.containsKey(user) == false)
 				{// intialise with empty count for each unique value of given dimension
-					Map<Integer, Integer> GDValsCountForThisUser = uniqueGivenDimenalVals.stream()
-							.collect(Collectors.toMap(k -> Integer.valueOf(k), k -> Integer.valueOf(0)));
-					GDValCountPerUser.put(user, (TreeMap<Integer, Integer>) GDValsCountForThisUser);
+					// Map<Integer, Integer> GDValsCountForThisUser = uniqueGivenDimenalVals.stream()
+					// .collect(Collectors.toMap(k -> Integer.valueOf(k), k -> Integer.valueOf(0)));
+					TreeMap<Integer, Integer> GDValsCountForThisUser = uniqueGivenDimenalVals.stream()
+							.collect(Collectors.toMap(k -> Integer.valueOf(k), k -> Integer.valueOf(0),
+									(oldVal, newVal) -> newVal, TreeMap::new));
+
+					GDValCountPerUser.put(user, GDValsCountForThisUser);
 				}
 
 				for (Entry<Date, Timeline> dayEntry : e.getValue().entrySet())

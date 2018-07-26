@@ -35,6 +35,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -83,8 +84,8 @@ public class GluonOSMMap extends Application
 		String delimiter = ",";
 		int latColIndex = 3, lonColIndex = 2, labelColIndex = 1;
 
-		BorderPane bp = getMapPane(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex,
-				labelColIndex, 3, Color.rgb(193, 49, 34, 0.65), false, false);
+		BorderPane bp = getMapPaneForListOfLocations(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex,
+				lonColIndex, labelColIndex, 3, Color.rgb(193, 49, 34, 0.65), false, false, "Info label test");
 
 		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
 		Scene scene = new Scene(bp, bounds.getWidth(), bounds.getHeight());
@@ -107,9 +108,9 @@ public class GluonOSMMap extends Application
 	 * @param clearMapCache
 	 * @return
 	 */
-	public BorderPane getMapPane(String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
-			int lonColIndex, int labelColIndex, int sizeOfIcon, Color colorOfIcon, boolean colorByLabel,
-			boolean clearMapCache)
+	public BorderPane getMapPaneForListOfLocations(String absFileNameForLatLonToReadAsMarker, String delimiter,
+			int latColIndex, int lonColIndex, int labelColIndex, int sizeOfIcon, Color colorOfIcon,
+			boolean colorByLabel, boolean clearMapCache, String infoLabelText)
 	// String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
 	// int lonColIndex, int labelColIndex, boolean useCustomMarker) throws Exception
 	{
@@ -122,8 +123,8 @@ public class GluonOSMMap extends Application
 		view.setCenter(42.472309, 6.897996);
 		view.setZoom(4);
 
-		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
-				delimiter, latColIndex, lonColIndex, labelColIndex);
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
+				absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex, labelColIndex);
 
 		System.out.println("listOfLocs.size() = " + listOfLocs.size());
 		// view.addLayer(positionLayerV2(listOfLocs, sizeOfIcon, colorOfIcon));
@@ -168,12 +169,16 @@ public class GluonOSMMap extends Application
 		// iv3.setViewport(viewportRect);
 		// iv3.setRotate(90);
 		// toolPane.setBottom(iv3);
-
 		// End of April 8 2018
 
+		// start of July 24 2018
+		Label infoLabel = new Label(infoLabelText);
+
+		// end of July 24 2018
 		BorderPane bp = new BorderPane();
 		bp.setCenter(view);
 		bp.setRight(toolPane);
+		bp.setBottom(infoLabel);// added on July24 2018
 		toolPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.0);");
 		// final Label label = new Label("Gluon Maps Demo");
 		// label.setAlignment(Pos.CENTER);
@@ -206,8 +211,8 @@ public class GluonOSMMap extends Application
 		view.setCenter(42.472309, 6.897996);
 		view.setZoom(4);
 
-		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(absFileNameForLatLonToReadAsMarker,
-				delimiter, latColIndex, lonColIndex, labelColIndex);
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
+				absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex, labelColIndex);
 
 		System.out.println("listOfLocs.size() = " + listOfLocs.size());
 		// view.addLayer(positionLayerV2(listOfLocs, sizeOfIcon, colorOfIcon));
@@ -448,7 +453,8 @@ public class GluonOSMMap extends Application
 		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
 				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
 		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst();
-		Color[] colors = ColorPalette.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
+		Color[] colors = ColorPalette
+				.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
 		System.out.println("color.length=" + colors.length);
 
 		/////////////////
@@ -529,7 +535,8 @@ public class GluonOSMMap extends Application
 				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
 		List<Pair<Double, Integer>> valBinIndexMap = binningRes.getFirst();
 
-		Color[] colors = ColorPalette.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
+		Color[] colors = ColorPalette
+				.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
 		System.out.println("color.length=" + colors.length);
 		// System.out.println(listOfLocs.toString());
 		// System.out.println("listOfLocs.size()=" + listOfLocs.size());

@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
@@ -17,6 +19,7 @@ import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.GowallaFeatures;
 import org.activity.constants.Enums.LookPastType;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.EditDistanceMemorizer;
 import org.activity.io.WToFile;
@@ -438,6 +441,11 @@ public class DistanceUtils
 		LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs = new LinkedHashMap<>(
 				candidateTimelines.size());
 
+		// Start of added on 26 July 2018
+		// getListOfUniqueGivenDimensionValsInRTVerse(candidateTimelines, activitiesGuidingRecomm,
+		// hjEditDistance.primaryDimension);
+		// End of added on 26 July 2018
+
 		// Start of code to be parallelised
 		// for (Entry<String, Timeline> e : candidateTimelines.entrySet())
 		// {// loop over candidates
@@ -545,6 +553,32 @@ public class DistanceUtils
 		// End of Sanity Check if no logging version is giving identical output as logging version:
 
 		return candEditDistancesNoLogging;
+	}
+
+	/**
+	 * 
+	 * @param candidateTimelines
+	 * @param activitiesGuidingRecomm
+	 * @param givenDimension
+	 * @since 26 July 2018
+	 */
+	private static void getListOfUniqueGivenDimensionValsInRTVerse(LinkedHashMap<String, Timeline> candidateTimelines,
+			ArrayList<ActivityObject> activitiesGuidingRecomm, PrimaryDimension givenDimension)
+	{
+		Set<Integer> uniqueLocGridIDInRTVerse = new TreeSet<>();
+		List<Integer> uniqueLocGridIDInRTVerseList = new ArrayList<>();
+		uniqueLocGridIDInRTVerse
+				.addAll(activitiesGuidingRecomm.stream().map(ao -> ao.getGivenDimensionVal(givenDimension))
+						.flatMap(l -> l.stream()).collect(Collectors.toSet()));
+		for (Entry<String, Timeline> e : candidateTimelines.entrySet())
+		{
+			Set<Integer> uniqueLocIDsInThisCand = e.getValue().getActivityObjectsInTimeline().stream()
+					.map(ao -> ao.getGivenDimensionVal(givenDimension)).flatMap(l -> l.stream())
+					.collect(Collectors.toSet());
+			uniqueLocGridIDInRTVerse.addAll(uniqueLocIDsInThisCand);
+		}
+		uniqueLocGridIDInRTVerseList.addAll(uniqueLocGridIDInRTVerse);
+		System.out.println("uniqueLocGridIDInRTVerseList.size() = " + uniqueLocGridIDInRTVerse);
 	}
 
 	/**
@@ -1974,6 +2008,8 @@ public class DistanceUtils
 	 * @param timeAtRecomm
 	 *            used only for writing to file
 	 * @param hjEditDistance
+	 *            the primary dimension for hjEditDistance is the given dimension (i.e., the dimension used to extract
+	 *            the candidate timelines)
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
 	 */
 
@@ -2041,7 +2077,8 @@ public class DistanceUtils
 		if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour))
 		{// Constant.nearestNeighbourThreshold > 0)
 			candEditDistances = filterCandsNearestNeighbours(candEditDistances,
-					Constant.nearestNeighbourCandEDThreshold);
+					Constant.getNearestNeighbourCandEDThresholdGivenDim(hjEditDistance.primaryDimension));
+			// Constant.nearestNeighbourCandEDThresholdPrimDim);
 		}
 		else if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.Percentile))
 		{
@@ -2050,20 +2087,22 @@ public class DistanceUtils
 		}
 		else if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.None))
 		{
+			System.out.println("Alert! no filtering cands");
 		}
 
 		System.out.println("\nafter filter candEditDistances.size():" + candEditDistances.size());
 		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = null;
 
-		if (Constant.useRTVerseNormalisationForED)
-		{// not necessary as already normalised
-			normalisedCandEditDistances = candEditDistances;
-		}
-		else
-		{
-			normalisedCandEditDistances = normalisedDistancesOverTheSet(candEditDistances, userAtRecomm, dateAtRecomm,
-					timeAtRecomm);
-		}
+		// if (Constant.useRTVerseNormalisationForED)
+		// {// not necessary as already normalised
+		// normalisedCandEditDistances = candEditDistances;
+		// }
+		// else
+		// {//makes sense to do normalisation again since some candidates have been filtered out, hence the min and max
+		// ED over the set might have changed.
+		normalisedCandEditDistances = normalisedDistancesOverTheSet(candEditDistances, userAtRecomm, dateAtRecomm,
+				timeAtRecomm);
+		// }
 		return normalisedCandEditDistances;
 	}
 
@@ -2077,7 +2116,16 @@ public class DistanceUtils
 	private static LinkedHashMap<String, Pair<String, Double>> filterCandsNearestNeighbours(
 			LinkedHashMap<String, Pair<String, Double>> candEditDistances, int nearestNeighbourThreshold)
 	{
-		System.out.print("... filtering CandsNearestNeighbours");
+		System.out
+				.print("... filtering CandsNearestNeighbours, nearestNeighbourThreshold= " + nearestNeighbourThreshold);
+
+		if (nearestNeighbourThreshold < 0)
+		{
+			PopUps.showError("Error in filterCandsNearestNeighbours. nearestNeighbourThreshold <0 = "
+					+ nearestNeighbourThreshold);
+			System.exit(-1);
+		}
+
 		LinkedHashMap<String, Pair<String, Double>> candEditDistancesSorted = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
 				.sortByValueAscendingStrStrDoub(candEditDistances);
 
@@ -2464,6 +2512,11 @@ public class DistanceUtils
 			{
 				System.out.println(
 						"Alert! org.activity.distances.DistanceUtils.normalisedDistancesOverTheSet() had no effect.");
+			}
+			else
+			{
+				System.out.println(
+						"Alert! org.activity.distances.DistanceUtils.normalisedDistancesOverTheSet() HAS effect.");
 			}
 		}
 
