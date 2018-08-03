@@ -304,12 +304,15 @@ public class ReadingFromFile
 		List<List<Double>> res = null;
 		try
 		{
+			System.out.println("Reading file: " + absFileNameToRead);
 			res = ReadingFromFile.nColumnReaderDouble(new BufferedInputStream(new FileInputStream(absFileNameToRead)),
 					delimiter, hasColHeader, hasRowHeader);
 		}
-		catch (FileNotFoundException e)
+		catch (IOException e)
 		{
+			System.err.println("Error reading file: " + absFileNameToRead);
 			e.printStackTrace();
+			System.exit(-1);
 		}
 		return res;
 	}
@@ -364,6 +367,7 @@ public class ReadingFromFile
 	 * @param hasColHeader
 	 * @param hasRowHeader
 	 * @return
+	 * @throws IOException
 	 * @since 19 July 2018
 	 */
 	public static List<List<Double>> nColumnReaderDouble(InputStream inputStream, String delimiter,

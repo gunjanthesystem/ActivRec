@@ -9,15 +9,15 @@ import org.activity.io.WToFile;
 
 public class Utils
 {
-	static String mortarUsr;
-	static String engineUsr;
-	static final String howitzerUsr = engineUsr = mortarUsr = "gunjan";
-	static final String clarityUsr = "gunjankumar";
-	static final String howitzerHost = "howitzer.ucd.ie";
-	static final String engineHost = "theengine.ucd.ie";
-	static final String mortarHost = "mortar.ucd.ie";
-	static final String clarityHost = "claritytrec.ucd.ie";
-	static final String localHost = "local";
+	// public static String mortarUsr;
+	// public static String engineUsr;
+	// public static final String howitzerUsr = engineUsr = mortarUsr = "gunjan";
+	// public static final String clarityUsr = "gunjankumar";
+	// static final String howitzerHost = "howitzer.ucd.ie";
+	// static final String engineHost = "theengine.ucd.ie";
+	// static final String mortarHost = "mortar.ucd.ie";
+	// static final String clarityHost = "claritytrec.ucd.ie";
+	// static final String localHost = "local";
 
 	public static void main(String args[])
 	{
@@ -56,59 +56,6 @@ public class Utils
 			e.printStackTrace();
 		}
 
-	}
-
-	/**
-	 * 
-	 * @param host
-	 * @return
-	 */
-	protected static String getPassWordForHost(String host)
-	{
-		String passwd = null;
-		switch (host)
-		{
-			case Utils.howitzerHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToPRead/Jan26/serverInfo.kry", ",", 0, false)
-						.get(0);
-				break;
-			case Utils.mortarHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToPRead/Jan26/serverInfo.kry", ",", 1, false)
-						.get(0);
-				break;
-			case Utils.engineHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToPRead/Jan26/serverInfo.kry", ",", 2, false)
-						.get(0);
-				break;
-			case Utils.clarityHost:
-				passwd = ReadingFromFile.oneColumnReaderString("./dataToPRead/Jan26/serverInfo.kry", ",", 3, false)
-						.get(0);
-				break;
-
-		}
-		return passwd;
-	}
-
-	/**
-	 * 
-	 * @param host
-	 * @return
-	 */
-	protected static String getUserForHost(String host)
-	{
-		switch (host)
-		{
-			case Utils.clarityHost:
-				return Utils.clarityUsr;
-			case Utils.mortarHost:
-				return Utils.mortarUsr;
-			case Utils.engineHost:
-				return Utils.engineUsr;
-			case Utils.howitzerHost:
-				return Utils.howitzerUsr;
-
-		}
-		return host;
 	}
 
 }

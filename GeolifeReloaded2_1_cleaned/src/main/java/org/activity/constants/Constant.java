@@ -179,7 +179,7 @@ public final class Constant
 																			// 1500;// 100;//
 	// -1 for no filter//SWITCH_NOV10
 	// added on 23 July 2018 to keep it separate from the threshold used for primary dimension
-	public static final int nearestNeighbourCandEDThresholdSecDim = 50;
+	public static final int nearestNeighbourCandEDThresholdSecDim = 500;
 
 	// End of parameters for Candidate timelines
 	// --------------------------------------------------------------------------//

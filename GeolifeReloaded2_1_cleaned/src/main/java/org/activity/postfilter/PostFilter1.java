@@ -19,22 +19,29 @@ import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 
 public class PostFilter1
 {
-	static final String pathToLocGridIDsPerActID = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataToRead/actIDLocGridIDsMap.kryo";
-
-	static final String pathToWriteLog = "./dataWritten/July26PF/";// July20PF/";
+	static final String pathToLocGridIDsPerActID = "./dataToRead/actIDLocGridIDsMap.kryo";// TODO SANITY CHECK THIS
+	static String pathToWriteLog;// = "./dataWritten/July26PF/";// July20PF/";
 
 	public static void main(String args[])
 	{
+		String pathToReadRecommendationResultsFrom = "./dataWritten/JUL26ED1.0AllActsFDStFilter0hrs100RTVNoTTFilter/100R/";
+		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/100R/";
+		pathToWriteLog = DateTimeUtils.getMonthDateHourMinLabel() + "PF/";
 		WToFile.createDirectoryIfNotExists(pathToWriteLog);
-		new PostFilter1();
-
+		new PostFilter1(pathToReadRecommendationResultsFrom);
 	}
 
-	public PostFilter1()
+	/**
+	 * Note: the post filtered recommendations are written back to the same results path.
+	 * 
+	 * @param pathToReadRecommendationResultsFrom
+	 */
+	public PostFilter1(String pathToReadRecommendationResultsFrom)
 	{
 		WToFile.redirectConsoleOutput(pathToWriteLog + "ConsoleLog.csv");
 		// map of <act id, <list of locations>>
@@ -48,7 +55,8 @@ public class PostFilter1
 		// System.exit(0);
 
 		boolean verbose = false;
-		String outerPath = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/100R/";
+		String outerPath = pathToReadRecommendationResultsFrom;
+		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/100R/";
 		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/100R/";
 		Constant.setCommonPath(outerPath);
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
@@ -57,7 +65,7 @@ public class PostFilter1
 		Constant.initialise(outerPath, "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap);
-		String[] dimensionPhrases = { "", "SecDim" };
+		// String[] dimensionPhrases = { "", "SecDim" };
 
 		double[] muArray = Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor);
 		for (double mu : muArray)
