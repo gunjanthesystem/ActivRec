@@ -62,7 +62,8 @@ public class EvaluationSeq
 			listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1;
 
 	ArrayList<ArrayList<String>> listOfStep0MeanReciprocalRankFiles, listOfStep0AvgPrecisionFiles,
-			listOfStep0AvgRecallFiles, listOfStep0AvgFMeasureFiles;// listOfReciprocalRankFiles,
+			listOfStep0AvgRecallFiles, listOfStep0AvgFMeasureFiles, listOfStep0AvgRecallCountValidRTFiles,
+			listOfStep0EmptyRecommsCountFiles;// listOfReciprocalRankFiles,
 
 	boolean evaluatePostFiltering;// = false;
 	boolean evaluateSeqPrediction;
@@ -278,6 +279,13 @@ public class EvaluationSeq
 							commonPath + algoLabel + "Step0" + timeCategory + "AvgFMeasure" + dimensionPhrase + ".csv");
 					// end of added on 19 July 2018
 
+					// start of added on 30 July 2018
+					listOfStep0AvgRecallCountValidRTFiles.get(muIndex).add(commonPath + algoLabel + "Step0"
+							+ timeCategory + "AvgRecallCountValidRT" + dimensionPhrase + ".csv");
+					listOfStep0EmptyRecommsCountFiles.get(muIndex).add(commonPath + algoLabel + "Step0" + timeCategory
+							+ "EmptyRecommsCount" + dimensionPhrase + ".csv");
+					// end of added on 30 July 2018
+
 					// }
 					consoleLogStream.close();
 				} // end of loop over MUs
@@ -300,6 +308,10 @@ public class EvaluationSeq
 			ArrayList<String> listOfMRR_P_R_F_Files = concatenateMRRPrecisonRecallFMeasureFiles(outputCoreResultsPath,
 					matchingUnitAsPastCount, listOfStep0MeanReciprocalRankFiles, listOfStep0AvgPrecisionFiles,
 					listOfStep0AvgRecallFiles, listOfStep0AvgFMeasureFiles, dimensionPhrase);
+
+			ArrayList<String> listOfCountFiles = concatenateCountFiles(outputCoreResultsPath, matchingUnitAsPastCount,
+					listOfStep0AvgRecallCountValidRTFiles, listOfStep0EmptyRecommsCountFiles, dimensionPhrase);
+
 			// end of file condatenation from different user groups
 
 			String[] fileNamePhrases = { "AllNumDirectAgreements_", "AllPerDirectAgreements_",
@@ -573,6 +585,9 @@ public class EvaluationSeq
 		listOfStep0AvgRecallFiles = new ArrayList<>();
 		listOfStep0AvgFMeasureFiles = new ArrayList<>();
 
+		listOfStep0AvgRecallCountValidRTFiles = new ArrayList<>();// added on 30 July 2018
+		listOfStep0EmptyRecommsCountFiles = new ArrayList<>();// added on 30 July 2018
+
 		// we concatenate results for each mu over all users (groups)
 		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 		{
@@ -590,6 +605,9 @@ public class EvaluationSeq
 			listOfStep0AvgPrecisionFiles.add(muIndex, new ArrayList<String>());
 			listOfStep0AvgRecallFiles.add(muIndex, new ArrayList<String>());
 			listOfStep0AvgFMeasureFiles.add(muIndex, new ArrayList<String>());
+
+			listOfStep0AvgRecallCountValidRTFiles.add(muIndex, new ArrayList<String>());
+			listOfStep0EmptyRecommsCountFiles.add(muIndex, new ArrayList<String>());
 		}
 	}
 
@@ -946,15 +964,15 @@ public class EvaluationSeq
 			CSVUtils.concatenateCSVFiles(listOfStep0MeanReciprocalRankFiles.get(muIndex), true, fileNameToWrite1);
 			listOfWrittenFiles.add(fileNameToWrite1);
 
-			String fileNameToWrite2 = pathToWrite + "AvgPrecision_" + mu + dimensionPhrase + ".csv";
+			String fileNameToWrite2 = pathToWrite + "AllAvgPrecision_" + mu + dimensionPhrase + ".csv";
 			CSVUtils.concatenateCSVFiles(listOfStep0AvgPrecisionFiles.get(muIndex), true, fileNameToWrite2);
 			listOfWrittenFiles.add(fileNameToWrite2);
 
-			String fileNameToWrite3 = pathToWrite + "AvgRecall_" + mu + dimensionPhrase + ".csv";
+			String fileNameToWrite3 = pathToWrite + "AllAvgRecall_" + mu + dimensionPhrase + ".csv";
 			CSVUtils.concatenateCSVFiles(listOfStep0AvgRecallFiles.get(muIndex), true, fileNameToWrite3);
 			listOfWrittenFiles.add(fileNameToWrite3);
 
-			String fileNameToWrite4 = pathToWrite + "AvgFMeasure_" + mu + dimensionPhrase + ".csv";
+			String fileNameToWrite4 = pathToWrite + "AllAvgFMeasure_" + mu + dimensionPhrase + ".csv";
 			CSVUtils.concatenateCSVFiles(listOfStep0AvgFMeasureFiles.get(muIndex), true, fileNameToWrite4);
 			listOfWrittenFiles.add(fileNameToWrite4);
 		}
@@ -964,9 +982,48 @@ public class EvaluationSeq
 
 	}
 
-	/// Start of added on 21 Dec
+	/// Start of added on 30 July 2018
+	/**
+	 * For each mu, concatenate results count files for each groups of users, so that we get single files containing
+	 * results for all users.
+	 * 
+	 * @param pathToWrite
+	 * @param matchingUnitAsPastCount
+	 * @param listOfStep0AvgRecallCountValidRTFiles
+	 * @param listOfStep0EmptyRecommsCountFiles
+	 * @param dimensionPhrase
+	 * @return
+	 * @since 30 July 2018
+	 */
+	private static ArrayList<String> concatenateCountFiles(String pathToWrite, double matchingUnitAsPastCount[],
+			ArrayList<ArrayList<String>> listOfStep0AvgRecallCountValidRTFiles,
+			ArrayList<ArrayList<String>> listOfStep0EmptyRecommsCountFiles, String dimensionPhrase)
+	{
+		ArrayList<String> listOfWrittenFiles = new ArrayList<String>();
+		// PrintStream consoleLogStream = WritingToFile.redirectConsoleOutput(pathToWrite + "CSVConcatLog.txt");
 
-	/// End of added on 21 Dec
+		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+		{
+			int mu = (int) matchingUnitAsPastCount[muIndex];
+			// PopUps.showMessage("Will now concatenate:" + listOfNumAgreementsFiles.get(muIndex).size() + "files");
+			// PopUps.showMessage("listOfNumAgreementsFilesget(muIndex) = " +
+			// listOfNumAgreementsFiles.get(muIndex));
+
+			String fileNameToWrite1 = pathToWrite + "AllAvgRecallCountValidRT" + mu + dimensionPhrase + ".csv";
+			CSVUtils.concatenateCSVFiles(listOfStep0AvgRecallCountValidRTFiles.get(muIndex), true, fileNameToWrite1);
+			listOfWrittenFiles.add(fileNameToWrite1);
+
+			String fileNameToWrite2 = pathToWrite + "AllEmptyRecommsCount" + mu + dimensionPhrase + ".csv";
+			CSVUtils.concatenateCSVFiles(listOfStep0EmptyRecommsCountFiles.get(muIndex), false, fileNameToWrite2);
+			listOfWrittenFiles.add(fileNameToWrite2);
+		}
+		// consoleLogStream.close();
+
+		return listOfWrittenFiles;
+
+	}
+
+	/// End of added on 30 July 2018
 
 	/**
 	 * 

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.activity.io.ReadingFromFile;
 import org.activity.io.SFTPFile;
+import org.activity.io.ServerUtils;
 import org.activity.objects.Pair;
 import org.activity.plotting.ChartUtils;
 import org.activity.plotting0.FXUtils;
@@ -39,10 +40,10 @@ public class EditDistanceEvaluation
 		// String fileToRead =
 		// "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb4_NCount_5DayFilter_ThreshPer55EditDists/1/MatchingUnit3.0/EditSimilarityCalculations.csv";
 		String fileToRead2 = "/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis/1/MatchingUnit3.0/EditSimilarityCalculations.csv";
-		String host = Utils.clarityHost;
+		String host = ServerUtils.clarityHost;
 		int port = 22;
 		Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port, fileToRead2,
-				Utils.getUserForHost(host), Utils.getPassWordForHost(host));
+				ServerUtils.getUserForHost(host), ServerUtils.getPassWordForHost(host));
 
 		long t1 = System.currentTimeMillis();
 		List<List<String>> EDTraces = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumnsWithWrite(
@@ -154,11 +155,11 @@ public class EditDistanceEvaluation
 	public static void main0()
 	{
 		String fileToRead = "/home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb4_NCount_5DayFilter_ThreshPer55EditDists/1/MatchingUnit3.0/EditSimilarityCalculations.csv";
-		String host = Utils.engineHost;
+		String host = ServerUtils.engineHost;
 		int port = 22;
 
 		Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port, fileToRead,
-				Utils.howitzerUsr, Utils.getPassWordForHost(host));
+				ServerUtils.howitzerUsr, ServerUtils.getPassWordForHost(host));
 
 		long t1 = System.currentTimeMillis();
 		ReadingFromFile.nColumnReaderStringLargeFileSelectedColumnsWithWrite(inputAndSession.getFirst(), ",", true,

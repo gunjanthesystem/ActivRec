@@ -183,7 +183,32 @@ public class SuperController
 		// "/dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime",
 		// "/dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs/", "/dataWritten/Mar1ED0.25DurFPDistFPStFilter3hrs/",
 		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
-
+		// cleanUp(new String[] {
+		// "./dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs ",
+		// "./dataWritten/Jan6_Sampling_Ncount5DayThreshold500",
+		// "./dataWritten/Jan6_Sampling_Ncount1DayThreshold500",
+		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.75DistDurOnlyFeature",
+		// "./dataWritten/Feb28ED0.75DurFPDistFPStFilter3hrs",
+		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_consolidated",
+		// "./dataWritten/Feb18NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha1",
+		// "./dataWritten/Feb8NCount_5DayFilter_ThreshNN500EditDists", "./dataWritten/Jan20Ncount5DayThreshold100",
+		// "./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime5hrs",
+		// "./dataWritten/Mar5ED0.5DurPrevStFilter0hrs",
+		// "./dataWritten/Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8",
+		// "./dataWritten/Mar5ED0.5DistPrevStFilter0hrs",
+		// "./dataWritten/Mar3ED0.5STimeDistPrevDurPrevStFilter3hrs",
+		// "./dataWritten/Mar3ED0.5STimeDistPrevDurPrevStFilter0hrs",
+		// "./dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5",
+		// "./dataWritten/Mar1ED0.75DurFPDistFPStFilter3hrs",
+		// "./dataWritten/Feb8NCount_5DayFilter_ThreshNN500MedianRepCins",
+		// "./dataWritten/Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8_part1",
+		// "./dataWritten/Feb7_EDInvestigation", "./dataWritten/Jan20Ncount5DayThreshold50",
+		// "./dataWritten/Mar1ED0.75DurFPDistFPStFilter3hrs_part2",
+		// "./dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDParallelRun2",
+		// "./dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDParallelRun3",
+		// "./dataWritten/Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6",
+		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_part1" });
+		// System.exit(0);
 		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv" };
 		// , "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",
@@ -195,24 +220,30 @@ public class SuperController
 
 		double[] EDAlphas = { 1 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
 
-		for (double edAlphaForAnExp : EDAlphas)
+		// added on 29 July 2018 when running for multiple iterations
+		for (int iteration = 0; iteration < 1; iteration++)
 		{
-			if (Constant.useToyTimelines)
+			for (double edAlphaForAnExp : EDAlphas)
 			{
-				// PopUps.showMessage("here inside toy!");
-				// Note: sampledUserIndicesSets are irrelavant for the toy timelines
-				main0(sampledUserIndicesSets[0], edAlphaForAnExp);
-			}
-			else
-			{
-				for (String sampledUserIndicesSet : sampledUserIndicesSets)
+				if (Constant.useToyTimelines)
 				{
-					main0(sampledUserIndicesSet, edAlphaForAnExp);
-					if (Constant.runForAllUsersAtOnce)
+					// PopUps.showMessage("here inside toy!");
+					// Note: sampledUserIndicesSets are irrelavant for the toy timelines
+					main0(sampledUserIndicesSets[0], edAlphaForAnExp, "iter" + iteration);
+				}
+				else
+				{
+					for (String sampledUserIndicesSet : sampledUserIndicesSets)
 					{
-						break;// because we are not using the sample users indices, hence we need to run it only once.
+						main0(sampledUserIndicesSet, edAlphaForAnExp, "");// "iter" + iteration);
+						if (Constant.runForAllUsersAtOnce)
+						{
+							break;// because we are not using the sample users indices, hence we need to run it only
+									// once.
+						}
 					}
 				}
+				PopUps.showMessage("Exiting main");
 			}
 		}
 		// cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
@@ -276,8 +307,9 @@ public class SuperController
 	 * @param sampledUserIndicesSetFile
 	 * @param EDAlphaForThisExperiment
 	 *            >-1 if we want to set in here instead of hardcoding it in the Constant class.
+	 * @param iterationLabel
 	 */
-	public static void main0(String sampledUserIndicesSetFile, double EDAlphaForThisExperiment)
+	public static void main0(String sampledUserIndicesSetFile, double EDAlphaForThisExperiment, String iterationLabel)
 	{
 		System.out.println("For this experiment: Java Version:" + System.getProperty("java.version"));
 		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
@@ -299,14 +331,12 @@ public class SuperController
 
 		String[] commonPaths = // {
 				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
-				// };
-				// {
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
-				// };
-				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-						// { "./dataWritten/"
-						+ LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + "/" };
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
+				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/" };
+		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
+		// { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+		// { "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+		// + LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
@@ -357,12 +387,13 @@ public class SuperController
 				// use directory.mkdirs(); here instead.
 			}
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], true, true, true, "gowalla1");
+			runExperiments(commonPaths[i], false, true, true, "gowalla1");
 			// cleanUpSpace(commonPaths[i], 0.90);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
 
-		System.out.println(" Exiting SuperController");
+		System.out.println(" Exiting main0");
+		PopUps.showMessage("Exiting main0");
 		// End
 		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
 	}
@@ -603,25 +634,35 @@ public class SuperController
 			System.out.println("Doing evaluation...");
 			if (hasMUs)
 			{
-				boolean evalPostFiltering = false;
-				boolean evalSeqPrediction = true;
-				String dimensionPhrase = "SecDim";
-				String[] pfFilterNames = { "Fltr_on_Top1Loc", "Fltr_on_ActualLocPF", "Fltr_on_TopKLocsPF",
-						"WtdAlphaPF" };
-
-				if (true)
+				// boolean evalPostFiltering = false;
+				// boolean evalSeqPrediction = true;
+				// String dimensionPhrase = "SecDim";
+				// TODO Why running all three at once is resultsing in empty files. Has it got something to do with
+				// program not exiting upon completion?
+				if (true)// primary dimension
 				{
 					new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
 							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor), "", false,
 							true);
 				}
 
-				// for (String pfPhrase : pfFilterNames)
-				if (false && Constant.doSecondaryDimension)
+				if (true && Constant.doSecondaryDimension)// secondary dimension
 				{
 					new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
-							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor),
-							dimensionPhrase, false, true);
+							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor), "SecDim",
+							false, true);
+
+				}
+				if (true)
+				{
+					String[] pfFilterNames = { "Fltr_on_Top1Loc", "Fltr_on_ActualLocPF", "Fltr_on_TopKLocsPF",
+							"WtdAlphaPF" };
+					for (String pfPhrase : pfFilterNames)// postfiltering
+					{
+						new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
+								Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor),
+								pfPhrase, true, false);
+					}
 				}
 				// if (true)
 				// { if (Constant.doSecondaryDimension)
