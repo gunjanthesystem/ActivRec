@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.PathConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.evaluation.EvaluationSeq;
@@ -29,20 +30,32 @@ public class PostFilter1
 
 	public static void main(String args[])
 	{
-		String pathToReadRecommendationResultsFrom = "./dataWritten/JUL26ED1.0AllActsFDStFilter0hrs100RTVNoTTFilter/100R/";
+		String pathToReadRecommendationResultsFrom = "./dataWritten/JUL26ED1.0AllActsFDStFilter0hrs100RTVNoTTFilter/";// 100R/";
 		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/100R/";
-		pathToWriteLog = DateTimeUtils.getMonthDateHourMinLabel() + "PF/";
-		WToFile.createDirectoryIfNotExists(pathToWriteLog);
 		new PostFilter1(pathToReadRecommendationResultsFrom);
 	}
 
 	/**
 	 * Note: the post filtered recommendations are written back to the same results path.
 	 * 
-	 * @param pathToReadRecommendationResultsFrom
+	 * @param commonPathToReadFrom
 	 */
-	public PostFilter1(String pathToReadRecommendationResultsFrom)
+	public PostFilter1(String commonPathToReadFrom)
 	{
+		String groupsOf100UsersLabels = "";
+		if (Constant.useRandomlySampled100Users)
+		{
+			groupsOf100UsersLabels = DomainConstants.gowalla100RandomUsersLabel;
+		}
+		if (Constant.runForAllUsersAtOnce)
+		{
+			groupsOf100UsersLabels = "All";
+		}
+
+		String pathToReadRecommendationResultsFrom = commonPathToReadFrom + groupsOf100UsersLabels + "/";
+		pathToWriteLog = pathToReadRecommendationResultsFrom + DateTimeUtils.getMonthDateHourMinLabel() + "PF/";
+		WToFile.createDirectoryIfNotExists(pathToWriteLog);
+
 		WToFile.redirectConsoleOutput(pathToWriteLog + "ConsoleLog.csv");
 		// map of <act id, <list of locations>>
 		TreeMap<Integer, TreeSet<Integer>> actIDLocGridIDsMap = (TreeMap<Integer, TreeSet<Integer>>) Serializer
@@ -101,8 +114,8 @@ public class PostFilter1
 
 			// System.exit(0);
 		}
-		PopUps.showMessage("All done");
-		System.exit(0);
+		PopUps.showMessage("All postfilterings done");
+		// System.exit(0);
 	}
 
 	/**

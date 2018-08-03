@@ -19,6 +19,7 @@ import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
+import org.activity.objects.PairedIndicesTo1DArrayConverter;
 import org.activity.objects.UserGowalla;
 import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
@@ -133,7 +134,64 @@ public class DomainConstants
 	static Map<Long, Long> locIDGridIDGowallaMap;
 	static Map<Long, Integer> locIDGridIndexGowallaMap;
 
+	static HashMap<Integer, Double> gridIndexPairHaversineDist;// added on 3 Aug 2018
+	static PairedIndicesTo1DArrayConverter pairedIndicesTo1DArrayConverter;// added on 3 Aug 2018
+
 	/////////////////////////////////////////////////////////////
+
+	/**
+	 * Deserializes and set gridIndexPairHaversineDist and pairedIndicesTo1DArrayConverter for that.
+	 * <p>
+	 * Note: the data is to be read from the engine.
+	 */
+	public static void setGridIndexPairDistMaps()
+	{
+		String fileNamePhrase = "IntDoubleWith1DConverter";
+		try
+		{
+			gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
+					.kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
+							+ "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
+			System.out.println("deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
+
+			pairedIndicesTo1DArrayConverter = (PairedIndicesTo1DArrayConverter) Serializer
+					.kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
+							+ "pairedIndicesTo1DConverter" + fileNamePhrase + ".kryo");
+			System.out.println(
+					"deserialised pairedIndicesTo1DArrayConverter= " + pairedIndicesTo1DArrayConverter.toString());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param gridIndex1
+	 * @param gridIndex2
+	 * @return
+	 */
+	public static double getHaversineDistForGridIndexPairs(int gridIndex1, int gridIndex2)
+	{
+		if (gridIndexPairHaversineDist == null || pairedIndicesTo1DArrayConverter == null
+				|| gridIndexPairHaversineDist.size() == 0)
+		{
+			PopUps.showError("Error: GridIndexPairDistMaps NOT SET!!");
+			System.exit(-1);
+		}
+
+		int oneDIndex = pairedIndicesTo1DArrayConverter.pairedIndicesTo1DArrayIndex(gridIndex1, gridIndex2);
+		Double dist = gridIndexPairHaversineDist.get(oneDIndex);
+
+		if (dist == null)
+		{
+			PopUps.showError(
+					"Error: dist not available for gridIndex1=" + gridIndex1 + " gridIndex2=" + gridIndex2 + " !!");
+			System.exit(-1);
+		}
+		return dist;
+	}
 
 	public static void setGridIDLocIDGowallaMaps()
 	{

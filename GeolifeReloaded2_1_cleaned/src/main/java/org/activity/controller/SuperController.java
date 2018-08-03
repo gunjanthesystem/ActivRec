@@ -18,6 +18,7 @@ import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.Triple;
+import org.activity.postfilter.PostFilter1;
 import org.activity.ui.PopUps;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.Searcher;
@@ -174,7 +175,11 @@ public class SuperController
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
 		// cleanUpSpace("./dataWritten/Mar5ED0.0STimeStFilter0hrs/", 0.9);
 		// runAllAKOMExperiments();
-		// $ cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaseline/", 0.9);
+		cleanUpSpace("./dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs", 0.97);//
+		cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount5DayThreshold500", 0.97);//
+		cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount1DayThreshold500", 0.97);//
+		cleanUpSpace("./dataWritten/Feb28ED0.75DurFPDistFPStFilter3hrs ", 0.97);//
+		/// home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaseline/", 0.9);
 		// $cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaselineForUserNumInvestigation/",0.9);
 		// cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenClosestTimeBaseline/", 0.9);
 		// cleanUp(new String[] { "/dataWritten/Aug3_Only1CandPU/", "/dataWritten/Aug3_Only1CandPU2/",
@@ -332,11 +337,11 @@ public class SuperController
 		String[] commonPaths = // {
 				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
 				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
-				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/" };
-		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
-		// { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-		// { "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-		// + LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
+				// { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
@@ -387,7 +392,7 @@ public class SuperController
 				// use directory.mkdirs(); here instead.
 			}
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], false, true, true, "gowalla1");
+			runExperiments(commonPaths[i], true, true, true, "gowalla1");
 			// cleanUpSpace(commonPaths[i], 0.90);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
@@ -537,6 +542,7 @@ public class SuperController
 	public static void runExperiments(String commonPath, boolean recommendation, boolean evaluation, boolean hasMUs,
 			String databaseName)
 	{
+		boolean doPostFiltering = true;
 		long at = System.currentTimeMillis();
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC"y)); // added on April 21, 2016
 		System.out.println("Beginning runExperiments:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
@@ -653,8 +659,11 @@ public class SuperController
 							false, true);
 
 				}
-				if (true)
+				if (doPostFiltering)
 				{
+					new PostFilter1(commonPath); // requires results from preceeding EvaluationSeq
+
+					// Evaluate postfiltering
 					String[] pfFilterNames = { "Fltr_on_Top1Loc", "Fltr_on_ActualLocPF", "Fltr_on_TopKLocsPF",
 							"WtdAlphaPF" };
 					for (String pfPhrase : pfFilterNames)// postfiltering

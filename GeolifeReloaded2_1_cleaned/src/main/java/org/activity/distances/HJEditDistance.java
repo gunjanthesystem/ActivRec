@@ -705,8 +705,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * 
 	 * @return Pair<Trace as String, Edit Distance> ///we can also do n Pair<Trace as String, Pair <total Edit Distance,
 	 *         act level edit distance> /
-	 * @since Mar 1 2018
-	 * TODO 25 July 2018: needs to be checked if correctly works for secondary dimension or not
+	 * @since Mar 1 2018 TODO 25 July 2018: needs to be checked if correctly works for secondary dimension or not
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
 			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
@@ -791,7 +790,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		long t1 = System.nanoTime();
 
 		levenshteinDistance = getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1,
-				stringCodesForActivityObjects2, 1, 1, 2);// getMySimpleLevenshteinDistance
+				stringCodesForActivityObjects2, 1, 1, 2, null);// getMySimpleLevenshteinDistance
 
 		if (false)// sanity checking new getLowestMySimpleLevenshteinDistance and getMySimpleLevenshteinDistance()
 		{

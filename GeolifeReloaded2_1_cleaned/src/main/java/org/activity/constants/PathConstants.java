@@ -54,6 +54,8 @@ public class PathConstants
 	public static final String pathToSerialisedGridIndexPairDist = "./dataWritten/JUL25GridIndexDistances/pairedIndicesTo1DConverterIntDoubleWith1DConverter.kryo";
 	public static final String pathToSerialisedGridIndexPairDistConverter = "./dataWritten/JUL25GridIndexDistances/gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
 
+	public static final String pathToSerialisedHaversineDistOnEngine = "./dataWritten/AUG2GridIndexDistances/";
+
 	/**
 	 * Set paths to serialised datasets
 	 * 

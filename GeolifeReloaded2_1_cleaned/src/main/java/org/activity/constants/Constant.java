@@ -30,7 +30,6 @@ import org.activity.ui.PopUps;
 import org.activity.ui.UIUtilityBox;
 import org.activity.util.StringCode;
 import org.activity.util.UtilityBelt;
-import org.giscience.utils.geogrid.gunjanUtils.GridDistancesProvider;
 
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
@@ -74,7 +73,9 @@ public final class Constant
 	 */
 	public static final boolean useTolerance = true;// false;
 
-	public static final boolean useHierarchicalDistance = false;// true; // SWITCH_NOV10//
+	public static final boolean useHierarchicalDistance = false;// TODO THIS IS BROKEN NOW BECAUSE OF REFACTORING AROUND
+																// 3 AUG 2018. NEEDS TO BE RE-DONE
+	// true; // SWITCH_NOV10//
 	/**
 	 * Determines whether the sorting of candiates is stable or unstable
 	 */
@@ -207,7 +208,8 @@ public final class Constant
 	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
 
-	public static final boolean useRTVerseNormalisationForED = true;// SWITCH_April24
+	public static final boolean useRTVerseNormalisationForED = true; // TODO KEEP IT true, false version
+	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
 	public static final double percentileForRTVerseMaxForEDNorm = 100;// -1// SWITCH_April24
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
@@ -233,7 +235,8 @@ public final class Constant
 	public static String pathToRandomlySampledUserIndices = "";
 
 	public static final boolean runForAllUsersAtOnce = false;// false;// true;// false;// true;// SWITCH_April8
-	public static final boolean useCheckinEntryV2 = true;// SWITCH_April8
+	public static final boolean useCheckinEntryV2 = true;// TODO: keep it true as the other verion may not be uptodate
+															// (Aug3,2018) SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
 
 	public static final boolean cleanTimelinesAgainInsideRecommendationTests = false;// SWITCH_April11
@@ -260,8 +263,9 @@ public final class Constant
 	public static final boolean doSecondaryDimension = true;
 	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
 	public static final boolean debug18July2018 = false;
-	public static final boolean doWeightedEditDistanceForSecDim = false;
-	public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
+	public static final boolean doWeightedEditDistanceForSecDim = true;
+	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
+	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -726,8 +730,9 @@ public final class Constant
 
 		if (Constant.doWeightedEditDistanceForSecDim)
 		{
-			gdDistProvider = new GridDistancesProvider(PathConstants.pathToSerialisedGridIndexPairDist,
-					PathConstants.pathToSerialisedGridIndexPairDistConverter);
+			DomainConstants.setGridIndexPairDistMaps();
+			// gdDistProvider = new GridDistancesProvider(PathConstants.pathToSerialisedGridIndexPairDist,
+			// PathConstants.pathToSerialisedGridIndexPairDistConverter);
 		}
 	}
 
@@ -887,31 +892,29 @@ public final class Constant
 
 		switch (dname)
 		{
-			case "HJEditDistance":
-				distanceUsed = "HJEditDistance";
-				break;
-			case "FeatureWiseEditDistance":
-				distanceUsed = "FeatureWiseEditDistance";
-				break;
+		case "HJEditDistance":
+			distanceUsed = "HJEditDistance";
+			break;
+		case "FeatureWiseEditDistance":
+			distanceUsed = "FeatureWiseEditDistance";
+			break;
 
-			case "FeatureWiseWeightedEditDistance":
-				distanceUsed = "FeatureWiseWeightedEditDistance";
-				break;
+		case "FeatureWiseWeightedEditDistance":
+			distanceUsed = "FeatureWiseWeightedEditDistance";
+			break;
 
-			case "OTMDSAMEditDistance":
-				distanceUsed = "OTMDSAMEditDistance";
-				break;
-			default:
-				PopUps.showError(
-						"Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:"
-								+ dname);
-				System.err.println(
-						"Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:"
-								+ dname);
-				// throw new
-				// Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:"
-				// + dname);
-				System.exit(-1);
+		case "OTMDSAMEditDistance":
+			distanceUsed = "OTMDSAMEditDistance";
+			break;
+		default:
+			PopUps.showError(
+					"Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:" + dname);
+			System.err.println(
+					"Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:" + dname);
+			// throw new
+			// Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance specified:"
+			// + dname);
+			System.exit(-1);
 		}
 		// if(dname.trim().equals("HJEditDistance")
 	}
@@ -988,36 +991,35 @@ public final class Constant
 		{
 			switch (DATABASE_NAME)
 			{
-				case "geolife1":
-					switch (Constant.howManyUsers)
-					{
-						case "AllUsers":
-							userIDs = DomainConstants.allUserIDsGeolifeData;
-							break;
-						case "TenUsers":
-							userIDs = DomainConstants.tenUserIDsGeolifeData;
-							break;
-						case "UsersAbove10RTs":
-							userIDs = DomainConstants.above10RTsUserIDsGeolifeData;
-							break;
-						default:
-							UtilityBelt
-									.showErrorExceptionPopup("unknown Constant.howManyUsers =" + Constant.howManyUsers);
-							break;
-					}
-					// userIDs = userIDsGeolifeData;
+			case "geolife1":
+				switch (Constant.howManyUsers)
+				{
+				case "AllUsers":
+					userIDs = DomainConstants.allUserIDsGeolifeData;
 					break;
-				case "dcu_data_2":
-					userIDs = DomainConstants.userIDsDCUData;
+				case "TenUsers":
+					userIDs = DomainConstants.tenUserIDsGeolifeData;
 					break;
-				case "gowalla1":
-					userIDs = DomainConstants.gowallaUserIDs;
+				case "UsersAbove10RTs":
+					userIDs = DomainConstants.above10RTsUserIDsGeolifeData;
 					break;
 				default:
-					System.out.println(DATABASE_NAME.equals("dcu_data_2"));
-					System.err.println("Error in setUserIDs: unrecognised database name:" + DATABASE_NAME);
-					throw new Exception();
-					// break;
+					UtilityBelt.showErrorExceptionPopup("unknown Constant.howManyUsers =" + Constant.howManyUsers);
+					break;
+				}
+				// userIDs = userIDsGeolifeData;
+				break;
+			case "dcu_data_2":
+				userIDs = DomainConstants.userIDsDCUData;
+				break;
+			case "gowalla1":
+				userIDs = DomainConstants.gowallaUserIDs;
+				break;
+			default:
+				System.out.println(DATABASE_NAME.equals("dcu_data_2"));
+				System.err.println("Error in setUserIDs: unrecognised database name:" + DATABASE_NAME);
+				throw new Exception();
+				// break;
 			}
 		}
 		catch (Exception e)
@@ -1049,24 +1051,24 @@ public final class Constant
 		{
 			switch (DATABASE_NAME)
 			{
-				case "geolife1":
-					INVALID_ACTIVITY1 = "Unknown";
-					INVALID_ACTIVITY2 = "Not Available";
-					break;
-				case "dcu_data_2":
-					INVALID_ACTIVITY1 = "Unknown";
-					INVALID_ACTIVITY2 = "Others";
-					break;
+			case "geolife1":
+				INVALID_ACTIVITY1 = "Unknown";
+				INVALID_ACTIVITY2 = "Not Available";
+				break;
+			case "dcu_data_2":
+				INVALID_ACTIVITY1 = "Unknown";
+				INVALID_ACTIVITY2 = "Others";
+				break;
 
-				case "gowalla1":
-					INVALID_ACTIVITY1 = "Unknown";
-					INVALID_ACTIVITY2 = "Not Available";
-					break;
+			case "gowalla1":
+				INVALID_ACTIVITY1 = "Unknown";
+				INVALID_ACTIVITY2 = "Not Available";
+				break;
 
-				default:
-					System.err.println("Error in setInvalidNames: unrecognised database name:" + DATABASE_NAME);
-					throw new Exception();
-					// break;
+			default:
+				System.err.println("Error in setInvalidNames: unrecognised database name:" + DATABASE_NAME);
+				throw new Exception();
+				// break;
 			}
 		}
 		catch (Exception e)
@@ -1081,33 +1083,33 @@ public final class Constant
 		{
 			switch (DATABASE_NAME)
 			{
-				case "geolife1":
-					activityNames = DomainConstants.GeolifeActivityNames;
-					break;
-				case "dcu_data_2":
-					activityNames = DomainConstants.DCUDataActivityNames;
-					break;
-				case "gowalla1":
-					DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
-							.deSerializeThis(DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName);
-					LinkedHashSet<String> res = UIUtilityBox
-							.getNodesAtGivenDepth(DomainConstants.gowallaWorkingCatLevel, rootOfCategoryTree);
-					System.out.println(
-							"num of nodes at depth " + DomainConstants.gowallaWorkingCatLevel + " are: " + res.size());
-					activityNames = res.toArray(new String[res.size()]);
+			case "geolife1":
+				activityNames = DomainConstants.GeolifeActivityNames;
+				break;
+			case "dcu_data_2":
+				activityNames = DomainConstants.DCUDataActivityNames;
+				break;
+			case "gowalla1":
+				DefaultMutableTreeNode rootOfCategoryTree = (DefaultMutableTreeNode) Serializer
+						.deSerializeThis(DatabaseCreatorGowallaQuicker0.categoryHierarchyTreeFileName);
+				LinkedHashSet<String> res = UIUtilityBox.getNodesAtGivenDepth(DomainConstants.gowallaWorkingCatLevel,
+						rootOfCategoryTree);
+				System.out.println(
+						"num of nodes at depth " + DomainConstants.gowallaWorkingCatLevel + " are: " + res.size());
+				activityNames = res.toArray(new String[res.size()]);
 
-					// StringBuilder sb = new StringBuilder();
-					System.out.println("Constant.activityNames=\n"
-							+ Arrays.asList(activityNames).stream().collect(Collectors.joining(",")));
+				// StringBuilder sb = new StringBuilder();
+				System.out.println("Constant.activityNames=\n"
+						+ Arrays.asList(activityNames).stream().collect(Collectors.joining(",")));
 
-					// activityNamesGowallaLabels = (ArrayList<String>) Arrays.asList(activityNames).stream()
-					// .map(a -> DomainConstants.catIDNameDictionary.get(a)).collect(Collectors.toList());
-					// gowallaActivityNames;
-					break;
-				default:
-					System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
-					throw new Exception();
-					// break;
+				// activityNamesGowallaLabels = (ArrayList<String>) Arrays.asList(activityNames).stream()
+				// .map(a -> DomainConstants.catIDNameDictionary.get(a)).collect(Collectors.toList());
+				// gowallaActivityNames;
+				break;
+			default:
+				System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
+				throw new Exception();
+				// break;
 			}
 		}
 		catch (Exception e)
@@ -1176,18 +1178,18 @@ public final class Constant
 		{
 			switch (DATABASE_NAME)
 			{
-				// case "geolife1":
-				// activityNames = DomainConstants.GeolifeActivityNames;
-				// break;
-				// case "dcu_data_2":
-				// activityNames = DomainConstants.DCUDataActivityNames;
-				// break;
-				case "gowalla1":
-					uniqueLocationIDs = locIDs;
-					break;
-				default:
-					PopUps.printTracedErrorMsgWithExit(
-							"Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
+			// case "geolife1":
+			// activityNames = DomainConstants.GeolifeActivityNames;
+			// break;
+			// case "dcu_data_2":
+			// activityNames = DomainConstants.DCUDataActivityNames;
+			// break;
+			case "gowalla1":
+				uniqueLocationIDs = locIDs;
+				break;
+			default:
+				PopUps.printTracedErrorMsgWithExit(
+						"Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
 			}
 		}
 		catch (Exception e)
@@ -1207,18 +1209,18 @@ public final class Constant
 		{
 			switch (DATABASE_NAME)
 			{
-				// case "geolife1":
-				// activityNames = DomainConstants.GeolifeActivityNames;
-				// break;
-				// case "dcu_data_2":
-				// activityNames = DomainConstants.DCUDataActivityNames;
-				// break;
-				case "gowalla1":
-					uniqueActivityIDs = activityIDs;
-					break;
-				default:
-					PopUps.printTracedErrorMsgWithExit(
-							"Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
+			// case "geolife1":
+			// activityNames = DomainConstants.GeolifeActivityNames;
+			// break;
+			// case "dcu_data_2":
+			// activityNames = DomainConstants.DCUDataActivityNames;
+			// break;
+			case "gowalla1":
+				uniqueActivityIDs = activityIDs;
+				break;
+			default:
+				PopUps.printTracedErrorMsgWithExit(
+						"Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
 			}
 		}
 		catch (Exception e)
@@ -1256,17 +1258,17 @@ public final class Constant
 
 		switch (DATABASE_NAME)
 		{
-			case "geolife1":
-				return 7;// or 5 //activity name, start time, duration, dist travelled, start geo, end geo, avg altitude
-			// break;
-			case "dcu_data_2":
-				return 3; // activity name, start time, duration
-			case "gowalla1":
-				return 2; // activity name, start time
-			// break;
-			default:
-				System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
-				return -1;
+		case "geolife1":
+			return 7;// or 5 //activity name, start time, duration, dist travelled, start geo, end geo, avg altitude
+		// break;
+		case "dcu_data_2":
+			return 3; // activity name, start time, duration
+		case "gowalla1":
+			return 2; // activity name, start time
+		// break;
+		default:
+			System.err.println("Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
+			return -1;
 		}
 
 	}
@@ -1595,6 +1597,7 @@ public final class Constant
 		s.append("\ndoSecondaryDimension:" + Constant.doSecondaryDimension);
 		s.append("\nsecondaryDimension:" + Constant.secondaryDimension);
 		s.append("\ndoWeightedEditDistanceForSecDim:" + Constant.doWeightedEditDistanceForSecDim);
+		s.append("\nmaxDistanceThresholdForLocGridDissmilarity:" + Constant.maxDistanceThresholdForLocGridDissmilarity);
 		// s.append("\n:" + );
 		if (distanceUsed.equals("FeatureWiseEditDistance"))
 		{
