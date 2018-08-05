@@ -56,6 +56,8 @@ public class PathConstants
 
 	public static final String pathToSerialisedHaversineDistOnEngine = "./dataWritten/AUG2GridIndexDistances/";
 
+	public static final String pathToJavaGridIndexRGridLatRGridLon = "./dataToRead/July30RGridIDJavaGridIndex/javaGridIndexRGridLatRGridLon.kryo";
+
 	/**
 	 * Set paths to serialised datasets
 	 * 

@@ -57,6 +57,7 @@ public class PairedIndicesTo1DArrayConverter implements Serializable
 	}
 
 	/**
+	 * TODO: SHOULD NOT ALLOW INDEX1= INDEX2
 	 * 
 	 * @param index1
 	 * @param index2

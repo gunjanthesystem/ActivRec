@@ -41,16 +41,11 @@ public class GLatLonToGridTransformer
 	static int gridResolution = 16;
 	ISEA3H theGrid;
 
-	public static void fun1()
-	{
-		GridCell c;
-
-	}
-
 	/**
-	 * NOT USER
+	 * NOT USED
 	 * 
 	 * @param pathToSerialisedGridIDCellMapToUse
+	 * @deprecated
 	 */
 	public static void getDistanceBetweenGrids(String pathToSerialisedGridIDCellMapToUse)
 	{
@@ -147,7 +142,60 @@ public class GLatLonToGridTransformer
 	{
 		//
 		System.out.println("Inside main()");
-		mainToComputeDistancesBetweenGrids();
+		// $$ disabled on 4 Aug 2018//mainToComputeDistancesBetweenGrids();
+
+		readBoundaryCoordinatesOfHexCells();
+	}
+
+	/**
+	 * 
+	 * @since 3 Aug 2018
+	 */
+	public static void readBoundaryCoordinatesOfHexCells()
+	{
+		String fileToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gridBounaries.csv";
+		String pathToWrite = "./dataWritten/Aug4GridAnalysis/";
+		Map<String, ArrayList<String[]>> cellIDBoundaryLatLons = new LinkedHashMap<>();
+
+		int indexOfCellID = 6;
+		int indexOfLat = 1;
+		int indexOfLon = 0;
+
+		try
+		{
+			WToFile.createDirectoryIfNotExists(pathToWrite);
+
+			List<List<String>> allData = ReadingFromFile.readLinesIntoListOfLists(fileToRead, ",");
+
+			for (List<String> rowEntry : allData)
+			{
+				String cellID = rowEntry.get(indexOfCellID);
+				String[] boundaryLoc = { rowEntry.get(indexOfLat), rowEntry.get(indexOfLon) };
+
+				ArrayList<String[]> listForThisCellID = cellIDBoundaryLatLons.get(cellID);
+				if (listForThisCellID == null)
+				{
+					cellIDBoundaryLatLons.put(cellID, new ArrayList<>(6));
+				}
+				cellIDBoundaryLatLons.get(cellID).add(boundaryLoc);
+			}
+
+			if (true)// sanityCheck
+			{
+				boolean allGridCellsHav6BoundaryPoints = cellIDBoundaryLatLons.entrySet().stream()
+						.anyMatch(e -> e.getValue().size() != 6);
+				if (!allGridCellsHav6BoundaryPoints)
+				{
+					PopUps.showError("Error: allGridCellsHav6BoundaryPoints =" + allGridCellsHav6BoundaryPoints);
+				}
+			}
+
+			Serializer.kryoSerializeThis(cellIDBoundaryLatLons, pathToWrite + "cellIDBoundaryLatLons.kryo");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public static void analysePrecomputedDistances()

@@ -175,10 +175,16 @@ public class SuperController
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
 		// cleanUpSpace("./dataWritten/Mar5ED0.0STimeStFilter0hrs/", 0.9);
 		// runAllAKOMExperiments();
-		cleanUpSpace("./dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs", 0.97);//
-		cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount5DayThreshold500", 0.97);//
-		cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount1DayThreshold500", 0.97);//
-		cleanUpSpace("./dataWritten/Feb28ED0.75DurFPDistFPStFilter3hrs ", 0.97);//
+		// $$cleanUpSpace("./dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs", 0.97);//
+		// /Feb27ED0.5DurFPDistFPStFilter3hrs
+		// cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount5DayThreshold500", 1, "Raw");
+		// cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount1DayThreshold500", 1, "Raw");
+		// cleanUpSpace("./dataWritten/Jan20Ncount5DayThreshold100", 1, "Raw");
+
+		// $$cleanUpSpace("./dataWritten/xyz", 0.97, "Raw.csv");//
+		// cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount5DayThreshold500", 0.97);//
+		// cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount1DayThreshold500", 0.97);//
+		// cleanUpSpace("./dataWritten/Feb28ED0.75DurFPDistFPStFilter3hrs ", 0.97);//
 		/// home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaseline/", 0.9);
 		// $cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaselineForUserNumInvestigation/",0.9);
 		// cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenClosestTimeBaseline/", 0.9);
@@ -934,10 +940,35 @@ public class SuperController
 				Arrays.asList("rror", "xception"), ratioOfPercentageFilesToDelete);
 
 		System.out.println("result= " + deleteConsoleLogs);
-		// Timestamp
 
 		// .getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
 		WToFile.writeToNewFile(deleteConsoleLogs, commonPath + "CleanUpSafelyRandomlyDeleteConsoleLogsForSpace"
 				+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".txt");
 	}
+
+	/**
+	 * Delete a given % of files including "fileNamePattern" in their name and having no error and exception to save
+	 * space.
+	 * 
+	 * @param commonPath
+	 * @param ratioOfPercentageFilesToDelete
+	 *            % of files including "fileNamePattern" in their name and having no error and exception to delete
+	 * @param fileNamePattern
+	 * 
+	 **/
+	public static void cleanUpSpace(String commonPath, double ratioOfPercentageFilesToDelete, String fileNamePattern)
+	{
+		System.out.println("cleanUpSpace called on commonPath=" + commonPath + "\n");
+
+		String deleteFilesMatchingFileNamePattern = Searcher.searchAndRandomDelete2(commonPath, fileNamePattern,
+				Arrays.asList("rror", "xception"), ratioOfPercentageFilesToDelete);
+
+		System.out.println("result= " + deleteFilesMatchingFileNamePattern);
+
+		// .getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+		WToFile.writeToNewFile(deleteFilesMatchingFileNamePattern,
+				commonPath + "CleanUpSafelyRandomlyDelete" + fileNamePattern + "ForSpace"
+						+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".txt");
+	}
+
 }
