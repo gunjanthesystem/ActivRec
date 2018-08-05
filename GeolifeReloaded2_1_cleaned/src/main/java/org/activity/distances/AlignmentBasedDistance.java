@@ -3573,6 +3573,7 @@ public class AlignmentBasedDistance
 		List<Integer> listOfUniqueDimVals = new ArrayList<>(uniqueCharCodes.size());
 		listOfUniqueDimVals.addAll(uniqueCharCodes.keySet());
 
+		StringBuilder sb1 = new StringBuilder();// for debugging
 		// Allowing redundancy as max num of unique loc grid cant be more than 8+8 (highest MU) and thus total size of
 		// map 256 is manageable.
 		for (int dimVal1 : listOfUniqueDimVals)
@@ -3580,17 +3581,37 @@ public class AlignmentBasedDistance
 			for (int dimVal2 : listOfUniqueDimVals)
 			{
 				String key = uniqueCharCodes.get(dimVal1) + "_" + uniqueCharCodes.get(dimVal2);
-				Double dist = DomainConstants.getHaversineDistForGridIndexPairs(dimVal1, dimVal2);
-				replaceWtModifierMap.put(key, getDissimilarityScoreForDist(dist));
+				Double dist = null;
+
+				if (dimVal1 == dimVal2)
+				{
+					dist = 0d;
+				}
+				else
+				{
+					dist = DomainConstants.getHaversineDistForGridIndexPairs(dimVal1, dimVal2);
+				}
+
+				Double dissimilarityScore = getDissimilarityScoreForDist(dist);
+				replaceWtModifierMap.put(key, dissimilarityScore);
+
+				// start of for sanity check
+				sb1.append(dimVal1 + "," + dimVal2 + "," + uniqueCharCodes.get(dimVal1) + "_"
+						+ uniqueCharCodes.get(dimVal2) + "," + dist + "," + dissimilarityScore + "\n");
+				// end of for sanity check
 			}
 		}
 
 		if (true)// TODO: temporary for debugging
 		{
+			WToFile.appendLineToFileAbs(sb1.toString() + "\n",
+					Constant.getCommonPath() + "DebugReplaceWtMultiplierMap1.csv");
+
 			StringBuilder sb = new StringBuilder();
 			replaceWtModifierMap.entrySet().stream()
 					.forEachOrdered(e -> sb.append(e.getKey() + "," + e.getValue() + "\n"));
-			WToFile.writeToNewFile(sb.toString() + "\n", Constant.getCommonPath() + "ForDebugReplaceWtModifierMap.csv");
+			WToFile.appendLineToFileAbs(sb.toString() + "\n",
+					Constant.getCommonPath() + "DebugReplaceWtMultiplierMap2.csv");
 		}
 
 		return replaceWtModifierMap;

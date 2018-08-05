@@ -206,13 +206,13 @@ public class Dashboard3 extends Application
 		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = toOnlySeqOfActIDs(
 		// usersCleanedDayToyTimelines);
 		System.out.println("Entered createTabs()");
-		boolean doSyntheticDataCircleTimelines = false;
-		boolean doGivenDataCircleTimelines = false;
-		boolean doGivenDataOnlyActIDSeq = false;
-		boolean doSyntheticDataCanvasTimelines = false;
-		boolean doSyntheticDataBoxTimelines = false;
-		boolean doSyntheticDataLineTimelines = false;
-		boolean doMapPlot = true;
+		final boolean doSyntheticDataCircleTimelines = false;
+		final boolean doGivenDataCircleTimelines = false;
+		final boolean doGivenDataOnlyActIDSeq = false;
+		final boolean doSyntheticDataCanvasTimelines = false;
+		final boolean doSyntheticDataBoxTimelines = false;
+		final boolean doSyntheticDataLineTimelines = false;
+		final boolean doMapPlot = true;
 
 		try
 		{

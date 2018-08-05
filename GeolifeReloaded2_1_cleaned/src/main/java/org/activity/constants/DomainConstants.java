@@ -21,6 +21,7 @@ import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.PairedIndicesTo1DArrayConverter;
 import org.activity.objects.UserGowalla;
+import org.activity.spatial.SpatialUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -134,6 +135,11 @@ public class DomainConstants
 	static Map<Long, Long> locIDGridIDGowallaMap;
 	static Map<Long, Integer> locIDGridIndexGowallaMap;
 
+	/**
+	 * as of 4 Aug 2018, only used for Sanity check
+	 */
+	static Map<Integer, double[]> javaGridIndexRGridLatRGridLon;
+
 	static HashMap<Integer, Double> gridIndexPairHaversineDist;// added on 3 Aug 2018
 	static PairedIndicesTo1DArrayConverter pairedIndicesTo1DArrayConverter;// added on 3 Aug 2018
 
@@ -181,6 +187,12 @@ public class DomainConstants
 			System.exit(-1);
 		}
 
+		if (gridIndex1 == gridIndex2)
+		{
+			PopUps.showError("Error: gridIndex1 = gridIndex2 (NOT allowed for pairedIndicesTo1DArrayConverter");
+			System.exit(-1);
+		}
+
 		int oneDIndex = pairedIndicesTo1DArrayConverter.pairedIndicesTo1DArrayIndex(gridIndex1, gridIndex2);
 		Double dist = gridIndexPairHaversineDist.get(oneDIndex);
 
@@ -190,6 +202,32 @@ public class DomainConstants
 					"Error: dist not available for gridIndex1=" + gridIndex1 + " gridIndex2=" + gridIndex2 + " !!");
 			System.exit(-1);
 		}
+
+		// Sanity check pass ok on Aug 5 2018
+		if (false)// Sanity check of distance fetched from deserialised precomputed distance vs actual distance
+		{
+			// Sanity check if precomputed distances between grid centres are correclty fetched
+			// get grid centre lat,lon for gridIndex1 and gridInex3
+			double[] latLon1 = javaGridIndexRGridLatRGridLon.get(gridIndex1);
+			double[] latLon2 = javaGridIndexRGridLatRGridLon.get(gridIndex2);
+			// reomputing haversine distance to match it with precomputed distance
+			double recomputedHaversineDist = SpatialUtils.haversineFastMathV3NoRound(latLon1[0], latLon1[1], latLon2[0],
+					latLon2[1]);
+
+			boolean insane = Math.abs(dist - recomputedHaversineDist) > 1.0E-6;// Constant.epsilonForFloatZero;
+
+			WToFile.appendLineToFileAbs(
+					gridIndex1 + "," + gridIndex2 + "," + latLon1[0] + "," + latLon1[1] + "," + latLon2[0] + ","
+							+ latLon2[1] + "," + dist + "," + recomputedHaversineDist + "," + insane + "\n",
+					Constant.getCommonPath() + "DebuggetHaversineDistForGridIndexPairs.csv");
+
+			if (insane)
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: precomputed (" + dist + ") and recomputed ("
+						+ recomputedHaversineDist + ") distances do not match!");
+			}
+		}
+
 		return dist;
 	}
 
@@ -203,6 +241,10 @@ public class DomainConstants
 
 		locIDGridIndexGowallaMap = (Map<Long, Integer>) Serializer
 				.kryoDeSerializeThis(PathConstants.pathToSerialisedLocIDGridIndexGowallaMap);
+
+		// as of 4 Aug 2018, only used for Sanity check
+		javaGridIndexRGridLatRGridLon = (Map<Integer, double[]>) Serializer
+				.kryoDeSerializeThis(PathConstants.pathToJavaGridIndexRGridLatRGridLon);
 
 		if (true)// write
 		{
@@ -220,10 +262,16 @@ public class DomainConstants
 					.forEach(e -> sb3.append(e.getKey() + "\t" + e.getValue() + "\n"));
 			WToFile.appendLineToFileAbs(sb3.toString(), Constant.getCommonPath() + "locIDGridIndexGowallaMap.csv");
 
+			StringBuilder sb4 = new StringBuilder("GridIndex\tTGridCentreLat\tRGridCentrLon\n");
+			javaGridIndexRGridLatRGridLon.entrySet().stream()
+					.forEach(e -> sb4.append(e.getKey() + "\t" + e.getValue()[0] + "\t" + e.getValue()[1] + "\n"));
+			WToFile.appendLineToFileAbs(sb4.toString(), Constant.getCommonPath() + "javaGridIndexRGridLatRGridLon.csv");
+
 		}
 		System.out.println("gridIDLocIDsGowallaMap.size()=" + gridIDLocIDsGowallaMap.size());
 		System.out.println("locIDGridIDGowallaMap.size()=" + locIDGridIDGowallaMap.size());
 		System.out.println("locIDGridIndexGowallaMap.size()=" + locIDGridIndexGowallaMap.size());
+		System.out.println("javaGridIndexRGridLatRGridLon.size()=" + javaGridIndexRGridLatRGridLon.size());
 	}
 
 	public static Map<Long, Set<Long>> getGridIDLocIDsGowallaMap()
