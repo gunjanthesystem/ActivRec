@@ -3688,7 +3688,7 @@ public class TimelineUtils
 		if (collaborativeCandidates)
 		{
 			LinkedHashMap<String, Timeline> candidateTimelines = TimelineExtractors
-					.extractDaywiseCandidateTimelinesColl(dateAtRecomm, userIDAtRecomm, activityAtRecommPoint,
+					.extractDaywiseCandidateTimelinesCollV2(dateAtRecomm, userIDAtRecomm, activityAtRecommPoint,
 							trainTestTimelinesForAllUsers, Constant.only1CandFromEachCollUser,
 							Constant.onlyPastFromRecommDateInCandInColl);
 			if (candidateTimelines.size() > 0)
@@ -3819,29 +3819,29 @@ public class TimelineUtils
 		// getting distance scores for each subcandidate
 		switch (distanceUsed)
 		{
-			case "HJEditDistance":
+		case "HJEditDistance":
+		{
+			// HJEditDistance editSimilarity = new HJEditDistance();
+			for (Integer indexOfEndPointWithValidAfterIt : indicesOfEndPointActivityInDayButNotLastValid)
 			{
-				// HJEditDistance editSimilarity = new HJEditDistance();
-				for (Integer indexOfEndPointWithValidAfterIt : indicesOfEndPointActivityInDayButNotLastValid)
-				{
-					// long t1 = System.currentTimeMillis();
-					Pair<String, Double> distance = hjEditDistance.getHJEditDistanceWithTrace(
-							candidateDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
-									indexOfEndPointWithValidAfterIt + 1),
-							activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateID);
-					// System.out.println(
-					// "getHJEditDistanceWithTrace computed in: " + (System.currentTimeMillis() - t1) + " ms");
-					distanceScoresForEachSubsequence.put(indexOfEndPointWithValidAfterIt, distance);
-					// System.out.println("Distance between:\n
-					// activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
-					// "\n and subsequence of
-					// Cand:"+UtilityBelt.getActivityNamesFromArrayList(userDayTimeline.getActivityObjectsInDayFromToIndex(0,indicesOfEndPointActivityInDay1.get(i)+1)));
-				}
-				break;
+				// long t1 = System.currentTimeMillis();
+				Pair<String, Double> distance = hjEditDistance.getHJEditDistanceWithTrace(
+						candidateDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
+								indexOfEndPointWithValidAfterIt + 1),
+						activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateID);
+				// System.out.println(
+				// "getHJEditDistanceWithTrace computed in: " + (System.currentTimeMillis() - t1) + " ms");
+				distanceScoresForEachSubsequence.put(indexOfEndPointWithValidAfterIt, distance);
+				// System.out.println("Distance between:\n
+				// activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
+				// "\n and subsequence of
+				// Cand:"+UtilityBelt.getActivityNamesFromArrayList(userDayTimeline.getActivityObjectsInDayFromToIndex(0,indicesOfEndPointActivityInDay1.get(i)+1)));
 			}
-			default:
-				System.err.println(PopUps.getTracedErrorMsg("Error unknown distance:" + distanceUsed));
-				System.exit(-1);
+			break;
+		}
+		default:
+			System.err.println(PopUps.getTracedErrorMsg("Error unknown distance:" + distanceUsed));
+			System.exit(-1);
 		}
 
 		// sort by each subcand by edit distance

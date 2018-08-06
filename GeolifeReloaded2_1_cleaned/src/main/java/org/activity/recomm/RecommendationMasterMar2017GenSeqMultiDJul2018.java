@@ -210,40 +210,40 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		//
 		switch (dname)
 		{
-			case "HJEditDistance":
-				if (Constant.EDAlpha < 0)
-				{
-					hjEditDistancePrimaryDim = new HJEditDistance(primaryDimension);
-					hjEditDistanceSecondaryDim = new HJEditDistance(secondaryDimension);
-				}
-				else
-				{
-					hjEditDistancePrimaryDim = new HJEditDistance(Constant.EDAlpha, primaryDimension);
-					hjEditDistanceSecondaryDim = new HJEditDistance(Constant.EDAlpha, secondaryDimension);
-				}
+		case "HJEditDistance":
+			if (Constant.EDAlpha < 0)
+			{
+				hjEditDistancePrimaryDim = new HJEditDistance(primaryDimension);
+				hjEditDistanceSecondaryDim = new HJEditDistance(secondaryDimension);
+			}
+			else
+			{
+				hjEditDistancePrimaryDim = new HJEditDistance(Constant.EDAlpha, primaryDimension);
+				hjEditDistanceSecondaryDim = new HJEditDistance(Constant.EDAlpha, secondaryDimension);
+			}
 
-				break;
+			break;
 
-			case "FeatureWiseEditDistance":
-				featureWiseEditDistance = new FeatureWiseEditDistance(primaryDimension);
-				break;
+		case "FeatureWiseEditDistance":
+			featureWiseEditDistance = new FeatureWiseEditDistance(primaryDimension);
+			break;
 
-			case "FeatureWiseWeightedEditDistance":
-				featureWiseWeightedEditDistance = new FeatureWiseWeightedEditDistance(primaryDimension);
-				break;
+		case "FeatureWiseWeightedEditDistance":
+			featureWiseWeightedEditDistance = new FeatureWiseWeightedEditDistance(primaryDimension);
+			break;
 
-			case "OTMDSAMEditDistance":
-				OTMDSAMEditDistance = new OTMDSAMEditDistance(primaryDimension);
-				break;
+		case "OTMDSAMEditDistance":
+			OTMDSAMEditDistance = new OTMDSAMEditDistance(primaryDimension);
+			break;
 
-			default:
-				PopUps.showError(
-						"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
-								+ dname);
-				System.err.println(PopUps.getTracedErrorMsg(
-						"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
-								+ dname));
-				System.exit(-1);
+		default:
+			PopUps.showError(
+					"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
+							+ dname);
+			System.err.println(PopUps.getTracedErrorMsg(
+					"Error in org.activity.recomm.RecommendationMasterMU.initialiseDistanceUsed(): Unknown distance specified:"
+							+ dname));
+			System.exit(-1);
 		}
 		return 0;
 	}
@@ -392,13 +392,13 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 					+ trainTestTimelinesForAllUsers.size() + " trainTimelinesAllUsersContinuous.size()="
 					+ trainTimelinesAllUsersContinuous.size());
 
-			this.candidateTimelinesPrimDim = TimelineExtractors.extractCandidateTimelines(trainingTimelines,
+			this.candidateTimelinesPrimDim = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines,
 					lookPastType, this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm,
 					matchingUnitInCountsOrHours, this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers,
 					trainTimelinesAllUsersContinuous, this.primaryDimension);
 
 			// start of added on 16 July 2018
-			this.candidateTimelinesSecDim = TimelineExtractors.extractCandidateTimelines(trainingTimelines,
+			this.candidateTimelinesSecDim = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines,
 					lookPastType, this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm,
 					matchingUnitInCountsOrHours, this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers,
 					trainTimelinesAllUsersContinuous, this.secondaryDimension);
@@ -433,6 +433,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				// System.out.println("\nActivity at Recomm point (Current Activity) =" + activityNameAtRecommPoint);
 				System.out.println("\nprimaryDimensionValAtRecommPoint at Recomm point (Current Activity) ="
 						+ primaryDimensionValAtRecommPoint);
+				System.out.println("\nsecondaryDimensionValAtRecommPoint at Recomm point (Current Activity) ="
+						+ this.activityObjectAtRecommPoint.getGivenDimensionVal(",", this.secondaryDimension));
 
 				System.out.println("Number of primary candidate timelines =" + candidateTimelinesPrimDim.size());
 				System.out.println("the candidate timelines are as follows:");
@@ -441,8 +443,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 
 				System.out.println("Number of secondary candidate timelines =" + candidateTimelinesSecDim.size());
 				System.out.println("the secondary candidate timelines are as follows:");
-				candidateTimelinesSecDim.entrySet().stream().forEach(t -> System.out
-						.println(t.getValue().getGivenDimensionValsInSequence(Constant.secondaryDimension)));
+				candidateTimelinesSecDim.entrySet().stream().forEach(
+						t -> System.out.println(t.getValue().getGivenDimensionValsInSequence(this.secondaryDimension)));
 				// getActivityObjectNamesInSequence()));
 			}
 
@@ -460,8 +462,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			else if (candidateTimelinesSecDim.size() == 0)
 			{
 				System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
-						+ " at time:" + timeAtRecomm + "  because there are no secondary ("
-						+ Constant.secondaryDimension + ") candidate timelines");
+						+ " at time:" + timeAtRecomm + "  because there are no secondary (" + this.secondaryDimension
+						+ ") candidate timelines");
 				WToFile.appendLineToFileAbs(
 						userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candidateTimelinesPrimDim.size()
 								+ "," + candidateTimelinesSecDim.size() + "\n",
@@ -831,7 +833,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		sbToWrite1.append("Top next activities are:\n");// +this.topNextRecommendedActivities);
 		nextActivityObjectsFromPrimaryCands.entrySet().stream()
 				.forEach(e -> sbToWrite1.append(" >>" + e.getValue().getFirst().getGivenDimensionVal(givenDimension)
-		// .getPrimaryDimensionVal()// .getActivityName()
+				// .getPrimaryDimensionVal()// .getActivityName()
 						+ ":" + e.getValue().getSecond()));
 		System.out.println(sbToWrite1.toString());
 		System.out.println("\nDebug note192_end: getActivityNamesGuidingRecommwithTimestamps() "
@@ -1581,19 +1583,18 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 
 				switch (Constant.getDatabaseName()) // (Constant.DATABASE_NAME)
 				{
-					case "geolife1":
-						endPointEditDistanceForThisCandidate = alignmentBasedDistance
-								.getCaseBasedV1SimilarityGeolifeData(endPointActivityObjectCandidate,
-										endPointActivityObjectCurrentTimeline, userID);
-						break;
-					case "dcu_data_2":
-						endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityDCUData(
-								endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
-						break;
-					default:
-						System.err.println(PopUps.getTracedErrorMsg(
-								"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
-						break;
+				case "geolife1":
+					endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityGeolifeData(
+							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
+					break;
+				case "dcu_data_2":
+					endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityDCUData(
+							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
+					break;
+				default:
+					System.err.println(PopUps.getTracedErrorMsg(
+							"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
+					break;
 				}
 
 			}

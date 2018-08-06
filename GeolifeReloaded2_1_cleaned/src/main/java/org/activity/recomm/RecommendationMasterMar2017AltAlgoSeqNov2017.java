@@ -15,6 +15,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.evaluation.Evaluation;
@@ -757,6 +758,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	// candTimelinesAsSeq
 	{
 		ArrayList<ArrayList<Integer>> candTimelinesAsSeq = new ArrayList<>();
+		PrimaryDimension givenDimension = Constant.primaryDimension;// Added on 5 Aug 2018 for compatibility with
+																	// refactored methods
 
 		int predSymbol = -1;
 		AKOMSeqPredictorLighter seqPredictor = null;
@@ -765,7 +768,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 		if (Constant.sameAKOMForAllRTsOfAUser && alternateSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM))
 		{
-			seqPredictor = AKOMSeqPredictorLighter.getSeqPredictorsForEachUserStored(userID);
+			seqPredictor = AKOMSeqPredictorLighter.getSeqPredictorsForEachUserStored(userID, givenDimension);
 			if (seqPredictor == null) // AKOM NOT already trained for this user
 			{
 				for (Entry<String, Timeline> candT : candidateTimelinesWithNextAppended.entrySet())
@@ -773,7 +776,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 					candTimelinesAsSeq.add(TimelineTransformers
 							.listOfActObjsToListOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
 				}
-				seqPredictor = new AKOMSeqPredictorLighter(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
+				seqPredictor = new AKOMSeqPredictorLighter(candTimelinesAsSeq, highestOrder, false, userID,
+						givenDimension);// verbose);
 			}
 			else
 			{
@@ -788,7 +792,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				candTimelinesAsSeq.add(TimelineTransformers
 						.listOfActObjsToListOfActIDs(candT.getValue().getActivityObjectsInTimeline(), false));
 			}
-			seqPredictor = new AKOMSeqPredictorLighter(candTimelinesAsSeq, highestOrder, false, userID);// verbose);
+			seqPredictor = new AKOMSeqPredictorLighter(candTimelinesAsSeq, highestOrder, false, userID, givenDimension);// verbose);
 		}
 
 		predSymbol = seqPredictor.getAKOMPrediction(currSeq, false);// verbose);
@@ -1335,20 +1339,19 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 		switch (lookPastType)
 		{
-			case Daywise:
-				return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines,
-						endPointIndicesForDaywise);
-			case NCount:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			case NHours:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			case ClosestTime:
-				return null;
-			case NGram:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			default:
-				System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
-				return null;
+		case Daywise:
+			return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines, endPointIndicesForDaywise);
+		case NCount:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		case NHours:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		case ClosestTime:
+			return null;
+		case NGram:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		default:
+			System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
+			return null;
 		}
 
 	}
@@ -1436,19 +1439,18 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 				switch (Constant.getDatabaseName()) // (Constant.DATABASE_NAME)
 				{
-					case "geolife1":
-						endPointEditDistanceForThisCandidate = alignmentBasedDistance
-								.getCaseBasedV1SimilarityGeolifeData(endPointActivityObjectCandidate,
-										endPointActivityObjectCurrentTimeline, userID);
-						break;
-					case "dcu_data_2":
-						endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityDCUData(
-								endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
-						break;
-					default:
-						System.err.println(PopUps.getTracedErrorMsg(
-								"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
-						break;
+				case "geolife1":
+					endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityGeolifeData(
+							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
+					break;
+				case "dcu_data_2":
+					endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityDCUData(
+							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
+					break;
+				default:
+					System.err.println(PopUps.getTracedErrorMsg(
+							"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
+					break;
 				}
 
 			}
