@@ -55,8 +55,7 @@ import org.activity.util.UtilityBelt;
  * @since 05 Aug, 2018
  * @author gunjan
  */
-public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018
-		implements RecommendationMasterI, RecommendationMasterMultiDI// IRecommenderMaster
+public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements RecommendationMasterMultiDI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
 	private double reductionInMatchingUnit = 0;
@@ -810,7 +809,8 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018
 			// System.out.println("predictedNextSymbol = " +
 			// SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
 			Integer predictedGivenDimensionVal = Integer.valueOf(predSymbol);
-			System.out.println(" = " + predictedGivenDimensionVal.toString());
+			System.out.println("givenDimension = " + givenDimension + "\npredictedGivenDimensionVal = "
+					+ predictedGivenDimensionVal.toString());
 
 			if (predictedGivenDimensionVal.equals(-1))
 			{

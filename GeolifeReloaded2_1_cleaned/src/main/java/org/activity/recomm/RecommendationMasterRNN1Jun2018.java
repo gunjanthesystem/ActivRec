@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.LookPastType;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.evaluation.Evaluation;
@@ -915,6 +916,8 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 			Enums.AltSeqPredictor alternateSeqPredictor, int nextHowManyPredictions, boolean verbose,
 			Date dateAtRecommForLoggingOnly, Time timeAtRecommForLoggingOnly) throws Exception
 	{
+		PrimaryDimension givenDimension = Constant.primaryDimension; // added on Aug 6 for compatibility with refactored
+																		// methods
 		ArrayList<ArrayList<Character>> candTimelinesAsSeq = new ArrayList<>();
 		List<Character> predSymbol = new ArrayList<>();
 		System.out.println("----> Inside getRNNPredictedSymbolLSTM1.\nNum of users in cand timelines (#cands) = "
@@ -928,7 +931,8 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 		{
 			System.out.println("sameRNNForALLUsers!!");
 			String userIDForAllUsers = "IDForAllUsers";
-			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userIDForAllUsers);
+			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userIDForAllUsers,
+					Constant.primaryDimension);
 
 			if (seqPredictor == null) // RNN NOT already trained
 			{
@@ -938,7 +942,8 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 							candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
 				}
 
-				seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userIDForAllUsers, verbose);// verbose);
+				seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userIDForAllUsers, verbose,
+						givenDimension);// verbose);
 			}
 			else
 			{
@@ -948,7 +953,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 		}
 		else if (Constant.sameRNNForAllRTsOfAUser)// && alternateSeqPredictor.equals(Enums.AltSeqPredictor.RNN1)
 		{
-			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userID);
+			seqPredictor = LSTMCharModelling_SeqRecJun2018.getLSTMPredictorsForEachUserStored(userID, givenDimension);
 
 			if (seqPredictor == null) // RNN NOT already trained for this user
 			{
@@ -957,7 +962,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 					candTimelinesAsSeq.add(TimelineTransformers.listOfActObjsToListOfCharCodesFromActIDs(
 							candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
 				}
-				seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userID, verbose);// verbose);
+				seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userID, verbose, givenDimension);// verbose);
 			}
 			else
 			{
@@ -973,7 +978,7 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 				candTimelinesAsSeq.add(TimelineTransformers.listOfActObjsToListOfCharCodesFromActIDs(
 						candT.getValue().getActivityObjectsInTimeline(), false, Constant.getActIDCharCodeMap()));
 			}
-			seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userID, verbose);// verbose);
+			seqPredictor = new LSTMCharModelling_SeqRecJun2018(candTimelinesAsSeq, userID, verbose, givenDimension);// verbose);
 		}
 
 		predSymbol = seqPredictor.predictNextNValues5(NNUtils.listToCharArr(currSeq), nextHowManyPredictions, verbose,
@@ -1534,20 +1539,19 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 
 		switch (lookPastType)
 		{
-			case Daywise:
-				return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines,
-						endPointIndicesForDaywise);
-			case NCount:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			case NHours:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			case ClosestTime:
-				return null;
-			case NGram:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			default:
-				System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
-				return null;
+		case Daywise:
+			return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines, endPointIndicesForDaywise);
+		case NCount:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		case NHours:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		case ClosestTime:
+			return null;
+		case NGram:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		default:
+			System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
+			return null;
 		}
 
 	}
@@ -1635,19 +1639,18 @@ public class RecommendationMasterRNN1Jun2018 implements RecommendationMasterI// 
 
 				switch (Constant.getDatabaseName()) // (Constant.DATABASE_NAME)
 				{
-					case "geolife1":
-						endPointEditDistanceForThisCandidate = alignmentBasedDistance
-								.getCaseBasedV1SimilarityGeolifeData(endPointActivityObjectCandidate,
-										endPointActivityObjectCurrentTimeline, userID);
-						break;
-					case "dcu_data_2":
-						endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityDCUData(
-								endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
-						break;
-					default:
-						System.err.println(PopUps.getTracedErrorMsg(
-								"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
-						break;
+				case "geolife1":
+					endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityGeolifeData(
+							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
+					break;
+				case "dcu_data_2":
+					endPointEditDistanceForThisCandidate = alignmentBasedDistance.getCaseBasedV1SimilarityDCUData(
+							endPointActivityObjectCandidate, endPointActivityObjectCurrentTimeline, userID);
+					break;
+				default:
+					System.err.println(PopUps.getTracedErrorMsg(
+							"Error in getCaseSimilarityEndPointActivityObjectCand: unrecognised database name"));
+					break;
 				}
 
 			}

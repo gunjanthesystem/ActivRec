@@ -345,8 +345,9 @@ public class SuperController
 				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
 				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
 				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
-				// { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-				{ "./dataWritten/" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+						// { "./dataWritten/"
+						+ LocalDateTime.now().getMonth().toString().substring(0, 3)
 						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
