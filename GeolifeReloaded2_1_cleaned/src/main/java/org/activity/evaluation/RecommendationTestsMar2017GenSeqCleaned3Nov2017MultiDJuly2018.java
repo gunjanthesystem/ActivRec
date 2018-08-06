@@ -34,6 +34,7 @@ import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqMultiDJul2018;
+import org.activity.recomm.RecommendationMasterMultiDI;
 import org.activity.sanityChecks.Sanity;
 import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.stats.StatsUtils;
@@ -43,6 +44,7 @@ import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
+import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineUtils;
 
 /**
@@ -874,8 +876,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 									// ///////////////////Start//////////////////////////////////
 									// /IMPORTANT
 									long ta1 = System.currentTimeMillis();
-
-									RecommendationMasterMar2017GenSeqMultiDJul2018 recommMasters[] = new RecommendationMasterMar2017GenSeqMultiDJul2018[recommSeqLength];
+									// RecommendationMasterMar2017GenSeqMultiDJul2018
+									RecommendationMasterMultiDI recommMasters[] = new RecommendationMasterMar2017GenSeqMultiDJul2018[recommSeqLength];
 
 									// start of curtain April 7 //iterative recommendation
 									ArrayList<ActivityObject> repAOsFromPrevRecomms = new ArrayList<>(recommSeqLength);
@@ -982,7 +984,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										// work. RT is only important for extraction of current timeline
 
 										//////////////////////////
-										RecommendationMasterMar2017GenSeqMultiDJul2018 recommMaster = recommMasters[seqIndex];
+										// RecommendationMasterMar2017GenSeqMultiDJul2018
+										RecommendationMasterMultiDI recommMaster = recommMasters[seqIndex];
 										////////////////////////////////////////////////////////////////////////
 
 										double thresholdAsDistance = recommMasters[0].getThresholdAsDistance();
@@ -1919,14 +1922,16 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 	 * @since 18 July 2018
 	 */
 	private static void writeRawLogsSecDim(String userName, String dateToRecomm, String weekDay,
-			StringBuilder sbsRawToWriteForThisUserDate, String timeCategory,
-			RecommendationMasterMar2017GenSeqMultiDJul2018 recommMaster, String recommTimesString,
-			String actActualDoneInSeq, String rankedRecommWithScoreForThisRTIter, PrimaryDimension secondaryDimension)
+			StringBuilder sbsRawToWriteForThisUserDate, String timeCategory, RecommendationMasterMultiDI recommMaster,
+			String recommTimesString, String actActualDoneInSeq, String rankedRecommWithScoreForThisRTIter,
+			PrimaryDimension secondaryDimension)
 	{
 		String currentActName = recommMaster.getActivityObjectAtRecomm().getGivenDimensionVal("|", secondaryDimension);
 
 		sbsRawToWriteForThisUserDate.append(userName + "," + dateToRecomm + "," + recommTimesString + "," + timeCategory
-				+ "," + recommMaster.getActivityGDGuidingRecomm(secondaryDimension)/* withTimestamps */
+				+ ","
+				+ TimelineTransformers.getActivityGDGuidingRecomm(secondaryDimension,
+						recommMaster.getActsGuidingRecomm()) /* withTimestamps */
 				+ "," + currentActName + "," + Integer.toString(recommMaster.getNumOfValidActsInActsGuidingRecomm())
 				+ "," + Integer.toString(recommMaster.getNumOfActsInActsGuidingRecomm()) + ","
 				+ Integer.toString(recommMaster.getNumOfSecDimCandTimelines()) + "," + weekDay + ","
@@ -2865,34 +2870,34 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 
 		switch (primaryDimension)
 		{
-			case ActivityID:
-			{
-				activityID = topPrimaryDimensionVal;
-				if (Constant.getDatabaseName().equals("gowalla1"))
-				{// for gowalla dataset, act id and act name are same
-					activityName = String.valueOf(topPrimaryDimensionVal);
-					workingLevelCatIDs = topPrimaryDimensionVal + "__";
-				}
-				else
-				{
-					PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
-				}
-
-				break;
-			}
-			case LocationID:
-			{
-				locationIDs.add(topPrimaryDimensionVal);
+		case ActivityID:
+		{
+			activityID = topPrimaryDimensionVal;
+			if (Constant.getDatabaseName().equals("gowalla1"))
+			{// for gowalla dataset, act id and act name are same
+				activityName = String.valueOf(topPrimaryDimensionVal);
 				workingLevelCatIDs = topPrimaryDimensionVal + "__";
-				// locationName =
-				// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
-				// if (locationName == null || locationName.length() == 0)
-				// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
-				break;
 			}
-			default:
-				PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
-				break;
+			else
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
+			}
+
+			break;
+		}
+		case LocationID:
+		{
+			locationIDs.add(topPrimaryDimensionVal);
+			workingLevelCatIDs = topPrimaryDimensionVal + "__";
+			// locationName =
+			// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+			// if (locationName == null || locationName.length() == 0)
+			// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+			break;
+		}
+		default:
+			PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
+			break;
 		}
 
 		Timestamp newRecommTimestamp = new Timestamp(
@@ -2970,34 +2975,34 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 
 		switch (primaryDimension)
 		{
-			case ActivityID:
-			{
-				activityID = topPrimaryDimensionVal;
-				if (Constant.getDatabaseName().equals("gowalla1"))
-				{// for gowalla dataset, act id and act name are same
-					activityName = String.valueOf(topPrimaryDimensionVal);
-					workingLevelCatIDs = topPrimaryDimensionVal + "__";
-				}
-				else
-				{
-					PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
-				}
-
-				break;
-			}
-			case LocationID:
-			{
-				locationIDs.add(topPrimaryDimensionVal);
+		case ActivityID:
+		{
+			activityID = topPrimaryDimensionVal;
+			if (Constant.getDatabaseName().equals("gowalla1"))
+			{// for gowalla dataset, act id and act name are same
+				activityName = String.valueOf(topPrimaryDimensionVal);
 				workingLevelCatIDs = topPrimaryDimensionVal + "__";
-				// locationName =
-				// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
-				// if (locationName == null || locationName.length() == 0)
-				// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
-				break;
 			}
-			default:
-				PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
-				break;
+			else
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
+			}
+
+			break;
+		}
+		case LocationID:
+		{
+			locationIDs.add(topPrimaryDimensionVal);
+			workingLevelCatIDs = topPrimaryDimensionVal + "__";
+			// locationName =
+			// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+			// if (locationName == null || locationName.length() == 0)
+			// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+			break;
+		}
+		default:
+			PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
+			break;
 		}
 
 		Timestamp newRecommTimestamp = new Timestamp(
@@ -3267,17 +3272,17 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 		System.out.println("setThresholdsArray");
 		switch (typeOfThreshold)
 		{
-			case Percent:// "Percent":
-				this.thresholdsArray = percentThresholds;
-				break;
-			case Global:// "Global":
-				this.thresholdsArray = globalThresholds;
-				break;
-			// case "None":
-			// this.thresholdsArray = new int[] { 10000000 };
-			// break;
-			default:
-				System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
+		case Percent:// "Percent":
+			this.thresholdsArray = percentThresholds;
+			break;
+		case Global:// "Global":
+			this.thresholdsArray = globalThresholds;
+			break;
+		// case "None":
+		// this.thresholdsArray = new int[] { 10000000 };
+		// break;
+		default:
+			System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
 		}
 	}
 
@@ -4125,27 +4130,27 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 
 				switch (primaryDimension)
 				{
-					case ActivityID:
-					{
-						activityID = pdVal;
-						activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
-						workingLevelCatIDs = pdVal + "__";
-						break;
-					}
-					case LocationID:
-					{
-						locationIDs.add(pdVal);
-						workingLevelCatIDs = pdVal + "__";
-						// locationName =
-						// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
-						// if (locationName == null || locationName.length() == 0)
-						// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
-						break;
-					}
-					default:
-						PopUps.printTracedErrorMsgWithExit(
-								"Error: unknown primaryDimension = " + Constant.primaryDimension);
-						break;
+				case ActivityID:
+				{
+					activityID = pdVal;
+					activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
+					workingLevelCatIDs = pdVal + "__";
+					break;
+				}
+				case LocationID:
+				{
+					locationIDs.add(pdVal);
+					workingLevelCatIDs = pdVal + "__";
+					// locationName =
+					// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+					// if (locationName == null || locationName.length() == 0)
+					// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+					break;
+				}
+				default:
+					PopUps.printTracedErrorMsgWithExit(
+							"Error: unknown primaryDimension = " + Constant.primaryDimension);
+					break;
 				}
 				// ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String
 				// locationName, Timestamp startTimestamp, String startLatitude, String startLongitude, String
@@ -4258,27 +4263,27 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 
 				switch (primaryDimension)
 				{
-					case ActivityID:
-					{
-						activityID = pdVal;
-						activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
-						workingLevelCatIDs = pdVal + "__";
-						break;
-					}
-					case LocationID:
-					{
-						locationIDs.add(pdVal);
-						workingLevelCatIDs = pdVal + "__";
-						// locationName =
-						// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
-						// if (locationName == null || locationName.length() == 0)
-						// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
-						break;
-					}
-					default:
-						PopUps.printTracedErrorMsgWithExit(
-								"Error: unknown primaryDimension = " + Constant.primaryDimension);
-						break;
+				case ActivityID:
+				{
+					activityID = pdVal;
+					activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
+					workingLevelCatIDs = pdVal + "__";
+					break;
+				}
+				case LocationID:
+				{
+					locationIDs.add(pdVal);
+					workingLevelCatIDs = pdVal + "__";
+					// locationName =
+					// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+					// if (locationName == null || locationName.length() == 0)
+					// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+					break;
+				}
+				default:
+					PopUps.printTracedErrorMsgWithExit(
+							"Error: unknown primaryDimension = " + Constant.primaryDimension);
+					break;
 				}
 				// ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String
 				// locationName, Timestamp startTimestamp, String startLatitude, String startLongitude, String

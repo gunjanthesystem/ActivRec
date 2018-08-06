@@ -84,6 +84,7 @@ public class AKOMSeqPredictorLighter
 	public static final void clearSeqPredictorsForEachUserStored()
 	{
 		seqPredictorsForEachUserStoredPrimDim.clear();
+		seqPredictorsForEachUserStoredSecDim.clear();
 	}
 
 	public static void main(String args[])

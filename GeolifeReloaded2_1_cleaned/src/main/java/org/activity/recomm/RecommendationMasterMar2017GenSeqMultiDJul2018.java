@@ -61,7 +61,8 @@ import org.activity.util.UtilityBelt;
  * @since 13 July 2018
  * @author gunjan
  */
-public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements RecommendationMasterI// IRecommenderMaster
+public class RecommendationMasterMar2017GenSeqMultiDJul2018
+		implements RecommendationMasterI, RecommendationMasterMultiDI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
 	private double reductionInMatchingUnit = 0;
@@ -1056,20 +1057,6 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		return res.toString();
 	}
 
-	/**
-	 * @since 18 July
-	 */
-	public String getActivityGDGuidingRecomm(PrimaryDimension givenDimension)
-	{
-		StringBuilder res = new StringBuilder();
-
-		for (ActivityObject ae : activitiesGuidingRecomm)
-		{
-			res = StringUtils.fCat(res, ">>", ae.getGivenDimensionVal("|", givenDimension));
-			// res.append(">>" + ae.getActivityName());
-		}
-		return res.toString();
-	}
 	// $$start here
 
 	// // /
