@@ -31,6 +31,22 @@ public class TimelineTransformers
 {
 
 	/**
+	 * @since 18 July
+	 */
+	public static String getActivityGDGuidingRecomm(PrimaryDimension givenDimension,
+			ArrayList<ActivityObject> activitiesGuidingRecomm)
+	{
+		StringBuilder res = new StringBuilder();
+
+		for (ActivityObject ae : activitiesGuidingRecomm)
+		{
+			res = StringUtils.fCat(res, ">>", ae.getGivenDimensionVal("|", givenDimension));
+			// res.append(">>" + ae.getActivityName());
+		}
+		return res.toString();
+	}
+
+	/**
 	 * 
 	 * @param ts
 	 * @return

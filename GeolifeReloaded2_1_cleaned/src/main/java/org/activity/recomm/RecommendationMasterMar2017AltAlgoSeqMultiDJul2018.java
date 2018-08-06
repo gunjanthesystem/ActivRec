@@ -55,7 +55,8 @@ import org.activity.util.UtilityBelt;
  * @since 05 Aug, 2018
  * @author gunjan
  */
-public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements RecommendationMasterI// IRecommenderMaster
+public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018
+		implements RecommendationMasterI, RecommendationMasterMultiDI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
 	private double reductionInMatchingUnit = 0;
@@ -1776,6 +1777,30 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 	}
 
 	/**
+	 * @since 6 Aug 2018
+	 */
+	public int getNumOfSecDimCandTimelines() // satisfying threshold
+	{
+		return this.candidateTimelinesSecDim.size();
+	}
+
+	/**
+	 * @since 6 Aug 2018
+	 */
+	public String getRankedRecommendedSecDimValsWithoutRankScores()
+	{
+		return this.rankedRecommendedSecDimValsWithoutRankScoresStr;
+	}
+
+	/**
+	 * @since 6 Aug 2018
+	 */
+	public String getRankedRecommendedSecDimValsWithRankScores()
+	{
+		return this.rankedRecommendedSecDimValsWithRankScoresStr;
+	}
+
+	/**
 	 * Returns next activity names as String
 	 * 
 	 * @return
@@ -1830,6 +1855,14 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 	public int getNumOfDistinctRecommendations()
 	{
 		return recommendedActivityNamesWithRankscores.size();
+	}
+
+	/**
+	 * @since 6 Aug 2018
+	 */
+	public int getNumOfDistinctSecDimRecommendations()
+	{
+		return recommendedSecondaryDimValsWithRankscores.size();
 	}
 
 	public LinkedHashMap<String, Pair<String, Double>> getDistancesSortedMap()

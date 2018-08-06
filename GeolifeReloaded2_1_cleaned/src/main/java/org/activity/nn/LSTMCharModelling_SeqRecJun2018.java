@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.controller.SuperController;
 import org.activity.io.WToFile;
 import org.activity.stats.StatsUtils;
@@ -61,6 +62,8 @@ public class LSTMCharModelling_SeqRecJun2018
 {
 	// private char[] trainingString;
 	private char[] testString;
+
+	PrimaryDimension givenDimension;
 	// delegating this to dataset iterator
 	// private final List<Character> allPossibleChars;// = new ArrayList<>(); // a list of all possible characters
 
@@ -85,11 +88,12 @@ public class LSTMCharModelling_SeqRecJun2018
 
 	CharIteratorJun2018 iter;
 
-	private static LinkedHashMap<String, LSTMCharModelling_SeqRecJun2018> lstmPredictorsForEachUserStored = new LinkedHashMap<>();
+	private static LinkedHashMap<String, LSTMCharModelling_SeqRecJun2018> lstmPredictorsPrimDimForEachUserStored = new LinkedHashMap<>();
+	private static LinkedHashMap<String, LSTMCharModelling_SeqRecJun2018> lstmPredictorsSecDimForEachUserStored = new LinkedHashMap<>();
 
 	public static final LSTMCharModelling_SeqRecJun2018 getLSTMPredictorsForEachUserStored(String userID)
 	{
-		return lstmPredictorsForEachUserStored.get(userID);
+		return lstmPredictorsPrimDimForEachUserStored.get(userID);
 	}
 
 	/**
@@ -98,7 +102,8 @@ public class LSTMCharModelling_SeqRecJun2018
 	 */
 	public static final void clearLSTMPredictorsForEachUserStored()
 	{
-		lstmPredictorsForEachUserStored.clear();
+		lstmPredictorsPrimDimForEachUserStored.clear();
+		lstmPredictorsSecDimForEachUserStored.clear();
 	}
 
 	public static final String getRNN1Label()
@@ -530,7 +535,7 @@ public class LSTMCharModelling_SeqRecJun2018
 			// storing the trained RNN
 			if (Constant.sameRNNForAllRTsOfAUser || Constant.sameRNNForALLUsers)
 			{
-				lstmPredictorsForEachUserStored.put(userID, this);
+				lstmPredictorsPrimDimForEachUserStored.put(userID, this);
 			}
 			// rnnA.predictNextNValues2(8, true);
 		}
