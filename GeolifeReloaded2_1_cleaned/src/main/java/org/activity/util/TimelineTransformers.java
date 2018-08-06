@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
@@ -829,6 +830,65 @@ public class TimelineTransformers
 		{
 			StringBuilder sb = new StringBuilder();
 			givenAOs.stream().forEachOrdered(ao -> sb.append(ao.getActivityID() + ">>"));
+			sb.append("\n");
+			seqOfActIDs2.stream().forEachOrdered(i -> sb.append(i + ">>"));
+			System.out.println("---timelineToSeqOfActIDs verbose-\n" + sb.toString() + "\n-----\n");
+		}
+
+		return seqOfActIDs2;
+	}
+
+	/**
+	 * Convert list of activity objects to a list of given dimensionVals
+	 * <p>
+	 * Created to use for each loop instead of streams as stream was running out memory.
+	 * <p>
+	 * <font color="red"><b>Alert!! if any ActivityObject has multiple given dimension val, we select only the first
+	 * one.</b></font>
+	 * 
+	 * @param givenAOs
+	 * @param verbose
+	 * @param givenDimension
+	 * 
+	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
+	 *         given delimiter
+	 * @since 5 Aug 2019
+	 */
+	public static ArrayList<Integer> listOfActObjsToListOfGivenDimensionVals(ArrayList<ActivityObject> givenAOs,
+			boolean verbose, PrimaryDimension givenDimension)
+	{
+		ArrayList<Integer> seqOfActIDs2 = new ArrayList<>(givenAOs.size());
+		// ArrayList<Integer> seqOfActIDs = new ArrayList<>(givenAOs.size());
+		// for (ActivityObject ao : givenAOs){ seqOfActIDs.add(Integer.valueOf(ao.getActivityName()));}
+		int countOfActObjsWithMultipleGivenDimensionVals = 0;
+
+		for (ActivityObject ao : givenAOs)
+		{
+			ArrayList<Integer> givenDimensionVals = ao.getGivenDimensionVal(givenDimension);
+			if (givenDimensionVals.size() > 1)
+			{
+				countOfActObjsWithMultipleGivenDimensionVals += 1;
+			}
+
+			seqOfActIDs2.add(givenDimensionVals.get(0));// select only the first val
+		}
+
+		// start of sanity check Passed
+		// if (true){if (seqOfActIDs.equals(seqOfActIDs2)){
+		// System.out.println("Sanity check Dec 15_2 passed");
+		// }else{System.out.println("Sanity check Dec 15_2 failed");} }
+		// end of sanity check
+		if (countOfActObjsWithMultipleGivenDimensionVals > 0)
+		{
+			System.out.println(
+					"DebugAug5: Warning in listOfActObjsToListOfGivenDimensionVals: countOfActObjsWithMultipleGivenDimensionVals(>0)="
+							+ countOfActObjsWithMultipleGivenDimensionVals);
+		}
+
+		if (verbose)
+		{
+			StringBuilder sb = new StringBuilder();
+			givenAOs.stream().forEachOrdered(ao -> sb.append(ao.getGivenDimensionVal("_", givenDimension) + ">>"));
 			sb.append("\n");
 			seqOfActIDs2.stream().forEachOrdered(i -> sb.append(i + ">>"));
 			System.out.println("---timelineToSeqOfActIDs verbose-\n" + sb.toString() + "\n-----\n");

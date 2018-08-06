@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.ui.PopUps;
 
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.Item;
@@ -35,15 +36,45 @@ public class AKOMSeqPredictorLighter
 	MarkovAllKPredictor predictionModel;
 	int orderOfMarkovModel;
 	String trainingStats;
+	PrimaryDimension givenDimension;// added on 5 Aug 2018
+
+	public PrimaryDimension getGivenDimension()
+	{
+		return givenDimension;
+	}
+
 	/**
 	 * <UserID, SeqPredictor> Used in case of PureAKOM when we do not need to retrain AKOM model for each RT of a user
 	 * separately.
 	 */
-	private static LinkedHashMap<String, AKOMSeqPredictorLighter> seqPredictorsForEachUserStored = new LinkedHashMap<>();
+	private static LinkedHashMap<String, AKOMSeqPredictorLighter> seqPredictorsForEachUserStoredPrimDim = new LinkedHashMap<>();
+	private static LinkedHashMap<String, AKOMSeqPredictorLighter> seqPredictorsForEachUserStoredSecDim = new LinkedHashMap<>();
 
-	public static final AKOMSeqPredictorLighter getSeqPredictorsForEachUserStored(String userID)
+	/**
+	 * 
+	 * @param userID
+	 * @param givenDimension
+	 *            //added on 5 Aug 2018
+	 * @return
+	 */
+	public static final AKOMSeqPredictorLighter getSeqPredictorsForEachUserStored(String userID,
+			PrimaryDimension givenDimension)
 	{
-		return seqPredictorsForEachUserStored.get(userID);
+		if (givenDimension.equals(Constant.primaryDimension))
+		{
+			return seqPredictorsForEachUserStoredPrimDim.get(userID);
+		}
+
+		else if (givenDimension.equals(Constant.secondaryDimension))
+		{
+			return seqPredictorsForEachUserStoredSecDim.get(userID);
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error in getSeqPredictorsForEachUserStored(): unrecognised given dimension: " + givenDimension);
+			return null;
+		}
 	}
 
 	/**
@@ -52,7 +83,7 @@ public class AKOMSeqPredictorLighter
 	 */
 	public static final void clearSeqPredictorsForEachUserStored()
 	{
-		seqPredictorsForEachUserStored.clear();
+		seqPredictorsForEachUserStoredPrimDim.clear();
 	}
 
 	public static void main(String args[])
@@ -91,7 +122,7 @@ public class AKOMSeqPredictorLighter
 
 			ArrayList<Integer> curr = (ArrayList<Integer>) IntStream.of(2, 3).boxed().collect(Collectors.toList());
 
-			AKOMSeqPredictorLighter p = new AKOMSeqPredictorLighter(trainingSet, 4, true, "dummy");
+			AKOMSeqPredictorLighter p = new AKOMSeqPredictorLighter(trainingSet, 4, true, "dummy", null);
 			System.out.println("predictedNextSymbol = " + p.getAKOMPrediction(curr, true));
 		}
 	}
@@ -106,12 +137,17 @@ public class AKOMSeqPredictorLighter
 	 * 
 	 * @param trainingTimelines
 	 * @param orderOfMarkovModel
-	 * @param user
+	 * @param verbose
+	 * @param userID
+	 * @param givenDimension
+	 *            used only to identify the stored AKOMSeqPredictorLighter object for this dimension //added on 5 Aug
+	 *            2018
 	 */
 	public AKOMSeqPredictorLighter(ArrayList<ArrayList<Integer>> trainingTimelines, int orderOfMarkovModel,
-			boolean verbose, String userID)
+			boolean verbose, String userID, PrimaryDimension givenDimension)
 	{
 		long t1 = System.currentTimeMillis();
+		this.givenDimension = givenDimension;
 		// System.out.println("Instanting AKOMSeqPredictor: " + PerformanceAnalytics.getHeapInformation());
 		try
 		{
@@ -142,7 +178,7 @@ public class AKOMSeqPredictorLighter
 			// be careful of storing this as this object can consume a lot of memory
 			if (Constant.sameAKOMForAllRTsOfAUser)
 			{
-				seqPredictorsForEachUserStored.put(userID, this);
+				seqPredictorsForEachUserStoredPrimDim.put(userID, this);
 			}
 			// System.out.println("After training in AKOMSeqPredictor: " + PerformanceAnalytics.getHeapInformation());
 		}
