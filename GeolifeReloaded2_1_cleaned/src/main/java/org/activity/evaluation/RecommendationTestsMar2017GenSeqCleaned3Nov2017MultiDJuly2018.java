@@ -33,6 +33,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterI;
+import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeqMultiDJul2018;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqMultiDJul2018;
 import org.activity.recomm.RecommendationMasterMultiDI;
 import org.activity.sanityChecks.Sanity;
@@ -877,7 +878,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 									// /IMPORTANT
 									long ta1 = System.currentTimeMillis();
 									// RecommendationMasterMar2017GenSeqMultiDJul2018
-									RecommendationMasterMultiDI recommMasters[] = new RecommendationMasterMar2017GenSeqMultiDJul2018[recommSeqLength];
+									RecommendationMasterMultiDI recommMasters[] = new RecommendationMasterMultiDI[recommSeqLength];
 
 									// start of curtain April 7 //iterative recommendation
 									ArrayList<ActivityObject> repAOsFromPrevRecomms = new ArrayList<>(recommSeqLength);
@@ -917,7 +918,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										// }
 										// // Alternative algorithm
 										// // else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.PureAKOM)
-										// else if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
+										// elseif (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
 										// || Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM))
 										// // && (this.lookPastType.equals(Enums.LookPastType.Daywise)
 										// {
@@ -928,7 +929,6 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										// repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
 										// trainTimelinesAllUsersContinuousFiltrd, Constant.altSeqPredictor);
 										// }
-										//
 										// else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1)
 										// // Alternative algorithm
 										// {// recommMasters[seqIndex]
@@ -952,12 +952,25 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										// // (50, 2,dateToRecomm, recommTimesStrings[0], userId,
 										// // trainTestTimelinesForAllUsersDW, trainTimelinesAllUsersContinuous);
 										// }
-										//
 										// else
 										// $$ END of curtain 18 July since these not implemented for secondary dim
+										if (Constant.doSecondaryDimension)
 										{
-											if (Constant.doSecondaryDimension)
-											{ // added on 18 July 2018
+											if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
+													|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM))
+											// && (this.lookPastType.equals(Enums.LookPastType.Daywise)
+											{// added on 6 Aug 2018
+												recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeqMultiDJul2018(
+														userTrainingTimelines, userTestTimelines, dateToRecomm,
+														recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
+														matchingUnit, caseType, this.lookPastType, false,
+														repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
+														trainTimelinesAllUsersContinuousFiltrd,
+														Constant.altSeqPredictor);
+											}
+											else
+											{
+												// added on 18 July 2018
 												recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqMultiDJul2018(
 														userTrainingTimelines, userTestTimelines, dateToRecomm,
 														recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
@@ -965,18 +978,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 														repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
 														trainTimelinesAllUsersContinuousFiltrd);
 											}
-											else
-											{// $$disabled on 18 July as not implemented for multiD
-												// recommMasters[seqIndex] = new
-												// RecommendationMasterMar2017GenSeqNov2017(
-												// userTrainingTimelines, userTestTimelines, dateToRecomm,
-												// recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
-												// matchingUnit, caseType, this.lookPastType, false,
-												// repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-												// trainTimelinesAllUsersContinuousFiltrd);
-												PopUps.showError("Error 967: Constant.doSecondaryDimension = "
-														+ Constant.doSecondaryDimension);
-											}
+										}
+										else
+										{
+											PopUps.showError(
+													"Error 967: Constant.doSecondaryDimension was expected to be true but is = "
+															+ Constant.doSecondaryDimension);
 										}
 
 										// Note: RT passed to the recommendation master is always endTimestamp. This is
@@ -1082,12 +1089,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										if (VerbosityConstants.verbose)
 										{
 											System.out.println(
-													"recommMasters[i] .getRankedRecommendedActNamesWithoutRankScores()"
+													"recommMasters[i].getRankedRecommendedActNamesWithoutRankScores()"
 															+ recommMasters[seqIndex]
 																	.getRankedRecommendedActNamesWithoutRankScores());
 
 											System.out.println(
-													"recommMasters[i] .getRankedRecommendedSecDimValsWithoutRankScores()"
+													"recommMasters[i].getRankedRecommendedSecDimValsWithoutRankScores()"
 															+ recommMasters[seqIndex]
 																	.getRankedRecommendedSecDimValsWithoutRankScores());
 										}
@@ -1733,7 +1740,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 			RecommendationMasterI recommMaster, PrimaryDimension primaryDimension)
 	{
 		ActivityObject repAOForTopRecommActName = null;
-
+		System.out.println("Fetching repAO for topRecommendedPrimarDimensionVal = " + topRecommendedPrimarDimensionVal);
 		if (preBuildRepAOGenericUser)
 		{
 			// disabled on 9 Feb 2018 start
@@ -3070,7 +3077,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 		// aosWithSamePDVal.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
 		// System.out.println(sb.toString());
 
-		double medianPreceedingDuration = repAOResultGenericUser.getSecond().get(topPrimaryDimensionVal).getFirst();
+		// changed from double to Double on 6 Aug 2018
+		Double medianPreceedingDuration = repAOResultGenericUser.getSecond().get(topPrimaryDimensionVal).getFirst();
+		if (medianPreceedingDuration == null)
+		{
+			PopUps.printTracedErrorMsg(
+					"Error in getRepresentativeAOCollGenericV2(): medianPreceedingDuration not available for topPrimaryDimensionVal="
+							+ topPrimaryDimensionVal);
+		}
 
 		// double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
 		// int medianCinsCount = (int) StatsUtils

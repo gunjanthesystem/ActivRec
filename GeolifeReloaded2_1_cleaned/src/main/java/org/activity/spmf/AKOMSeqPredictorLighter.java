@@ -179,7 +179,14 @@ public class AKOMSeqPredictorLighter
 			// be careful of storing this as this object can consume a lot of memory
 			if (Constant.sameAKOMForAllRTsOfAUser)
 			{
-				seqPredictorsForEachUserStoredPrimDim.put(userID, this);
+				if (givenDimension.equals(Constant.primaryDimension))
+				{
+					seqPredictorsForEachUserStoredPrimDim.put(userID, this);
+				}
+				else if (givenDimension.equals(Constant.secondaryDimension))
+				{
+					seqPredictorsForEachUserStoredSecDim.put(userID, this);
+				}
 			}
 			// System.out.println("After training in AKOMSeqPredictor: " + PerformanceAnalytics.getHeapInformation());
 		}

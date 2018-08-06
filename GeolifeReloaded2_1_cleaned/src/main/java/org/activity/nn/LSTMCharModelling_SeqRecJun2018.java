@@ -91,9 +91,26 @@ public class LSTMCharModelling_SeqRecJun2018
 	private static LinkedHashMap<String, LSTMCharModelling_SeqRecJun2018> lstmPredictorsPrimDimForEachUserStored = new LinkedHashMap<>();
 	private static LinkedHashMap<String, LSTMCharModelling_SeqRecJun2018> lstmPredictorsSecDimForEachUserStored = new LinkedHashMap<>();
 
-	public static final LSTMCharModelling_SeqRecJun2018 getLSTMPredictorsForEachUserStored(String userID)
+	public static final LSTMCharModelling_SeqRecJun2018 getLSTMPredictorsForEachUserStored(String userID,
+			PrimaryDimension givenDimension)
 	{
-		return lstmPredictorsPrimDimForEachUserStored.get(userID);
+		//
+		if (givenDimension.equals(Constant.primaryDimension))
+		{
+			return lstmPredictorsPrimDimForEachUserStored.get(userID);
+		}
+
+		else if (givenDimension.equals(Constant.secondaryDimension))
+		{
+			return lstmPredictorsSecDimForEachUserStored.get(userID);
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error in getLSTMPredictorsForEachUserStored(): unrecognised given dimension: " + givenDimension);
+			return null;
+		}
+
 	}
 
 	/**
@@ -235,7 +252,7 @@ public class LSTMCharModelling_SeqRecJun2018
 		// System.exit(0);
 		LSTMCharModelling_SeqRecJun2018 lstm1 = new LSTMCharModelling_SeqRecJun2018(Constant.neuronsInHiddenLayersRNN1,
 				false, "none", Constant.numOfTrainingEpochsInRNN1, Constant.learningRateInRNN1,
-				Constant.l2RegularisationCoeffRNN1, trainingCharArray);
+				Constant.l2RegularisationCoeffRNN1, trainingCharArray, Constant.primaryDimension);
 
 		consoleLogStream.close();
 		System.out.println("Completed");
@@ -407,14 +424,17 @@ public class LSTMCharModelling_SeqRecJun2018
 	 * @param trainingString
 	 * @param userID
 	 * @param verbose
+	 * @param givenDimension
+	 *            used only to identify the stored LSTMCharModelling_SeqRecJun2018 object for this dimension //added on
+	 *            6 Aug 2018
 	 */
 	public LSTMCharModelling_SeqRecJun2018(ArrayList<ArrayList<Character>> trainingString, String userID,
-			boolean verbose)
+			boolean verbose, PrimaryDimension givenDimension)
 	{
 
 		this(Constant.neuronsInHiddenLayersRNN1, verbose, userID, Constant.numOfTrainingEpochsInRNN1,
 				Constant.learningRateInRNN1, Constant.l2RegularisationCoeffRNN1,
-				LSTMCharModelling_SeqRecJun2018.flattenList(trainingString, verbose));
+				LSTMCharModelling_SeqRecJun2018.flattenList(trainingString, verbose), givenDimension);
 	}
 
 	// /**
@@ -451,12 +471,17 @@ public class LSTMCharModelling_SeqRecJun2018
 	 * @param learningRate
 	 * @param l2RegularisationCoeff
 	 * @param trainingString
+	 * @param givenDimension
+	 *            used only to identify the stored LSTMCharModelling_SeqRecJun2018 object for this dimension //added on
+	 *            6 Aug 2018
 	 */
 	public LSTMCharModelling_SeqRecJun2018(int[] neuronsInEachHiddenLayerInOrder, boolean verbose, String userID,
-			int numOfTrainingEpochs, double learningRate, double l2RegularisationCoeff, char[] trainingString)
+			int numOfTrainingEpochs, double learningRate, double l2RegularisationCoeff, char[] trainingString,
+			PrimaryDimension givenDimension)
 	{
 		this(neuronsInEachHiddenLayerInOrder);// this(numOfNeuronsInHiddenLayer, numOfHiddenLayers);
 		long t1 = System.currentTimeMillis();
+		this.givenDimension = givenDimension;
 
 		// Length of each training example sequence to use. This could certainly be increased
 		int exampleLength = Constant.exampleLengthInRNN1;// 1000;// getSplitSize(trainingString.length, 1000, 0.02);
@@ -535,7 +560,14 @@ public class LSTMCharModelling_SeqRecJun2018
 			// storing the trained RNN
 			if (Constant.sameRNNForAllRTsOfAUser || Constant.sameRNNForALLUsers)
 			{
-				lstmPredictorsPrimDimForEachUserStored.put(userID, this);
+				if (givenDimension.equals(Constant.primaryDimension))
+				{
+					lstmPredictorsPrimDimForEachUserStored.put(userID, this);
+				}
+				else if (givenDimension.equals(Constant.secondaryDimension))
+				{
+					lstmPredictorsSecDimForEachUserStored.put(userID, this);
+				}
 			}
 			// rnnA.predictNextNValues2(8, true);
 		}

@@ -97,7 +97,7 @@ public final class Constant
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;// SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = 2;// 1;// 3;// SWITCH_NOV10

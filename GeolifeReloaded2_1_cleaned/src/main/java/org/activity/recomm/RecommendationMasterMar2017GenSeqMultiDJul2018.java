@@ -61,8 +61,7 @@ import org.activity.util.UtilityBelt;
  * @since 13 July 2018
  * @author gunjan
  */
-public class RecommendationMasterMar2017GenSeqMultiDJul2018
-		implements RecommendationMasterI, RecommendationMasterMultiDI// IRecommenderMaster
+public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements RecommendationMasterMultiDI// IRecommenderMaster
 {
 	private double matchingUnitInCountsOrHours;
 	private double reductionInMatchingUnit = 0;
@@ -287,8 +286,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018
 		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
 		try
 		{
-			System.out.println(
-					"\n-----------Starting RecommendationMasterMar2017GenSeqNov2017 " + lookPastType + "-------------");
+			System.out.println("\n-----------Starting RecommendationMasterMar2017GenSeqMultiDJul2018 " + lookPastType
+					+ "-------------");
 
 			String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 			long recommMasterT0 = System.currentTimeMillis();
