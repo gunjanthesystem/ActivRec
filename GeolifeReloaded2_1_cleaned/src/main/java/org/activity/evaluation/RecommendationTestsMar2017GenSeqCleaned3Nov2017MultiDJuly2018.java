@@ -371,7 +371,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 								commonPath + "EditSimilarityCalculationsSecDim.csv");
 
 						// writes the header for EditDistancePerRtPerCand.csv//
-						// WritingToFile.writeDistanceScoresSortedMapHeader();
+						WToFile.writeDistanceScoresSortedMapHeader(new String[] { "EditDistancePerRtPerCandPrimDim.csv",
+								"EditDistancePerRtPerCandSecDim.csv" });
 						// for org.activity.io.WritingToFile.writeEditDistancesPerRtPerCand() which is called in recomm
 						// master
 						WToFile.writeToNewFile(

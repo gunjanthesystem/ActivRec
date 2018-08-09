@@ -597,8 +597,8 @@ public class Serializer
 	{
 		Object obj = null;
 		FileInputStream fis = null;
-		System.out.println("Kryo Deserialising ..." + fileName);
 		long dt = System.currentTimeMillis();
+		System.out.println("Kryo Deserialising ..." + fileName + " start-time:" + new Timestamp(dt));
 		try
 		{
 			RandomAccessFile raf = new RandomAccessFile(fileName, "rw");

@@ -68,7 +68,7 @@ public class Enums
 
 	public enum TypeOfCandThreshold
 	{
-		None, NearestNeighbour, Percentile
+		None, NearestNeighbour, Percentile, NearestNeighbourWithEDValThresh;// EDValThresh added on 8 Aug 2018
 	}
 	// typeOfThresholds[];// = { "Global" };// Global"};//"Percent"
 

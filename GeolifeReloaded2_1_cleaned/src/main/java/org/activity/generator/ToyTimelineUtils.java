@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
@@ -143,6 +145,8 @@ public class ToyTimelineUtils
 
 		// PopUps.showMessage("Inside createToyTimelinesManuallyGowalla");
 		System.out.println("Inside createToyTimelinesManuallyGowalla");
+		Map<Long, Integer> locIDGridIndexMap = DomainConstants.getLocIDGridIndexGowallaMap();// added on 6 Aug 2018
+
 		Int2ObjectOpenHashMap<LocationGowalla> mapForAllLocationData = UtilityBelt
 				.toFasterIntObjectOpenHashMap((LinkedHashMap<Integer, LocationGowalla>) Serializer
 						.kryoDeSerializeThis(pathToGowallaPreProcessedData + "mapForAllLocationData.kryo"));
@@ -346,12 +350,16 @@ public class ToyTimelineUtils
 						max_items_count = max_items_count / numOfLocIDs;
 					}
 
+					// int gridIndex = 0;// added on 6 Aug 2018
+					int gridIndex = TimelineUtils.getGridIndex(locIDs, locIDGridIndexMap, userID,
+							new Timestamp(timestampOfCurrentAOThisUser));
 					ActivityObject ao = new ActivityObject(randomActIDForCurrentAO, locIDs,
 							String.valueOf(randomActIDForCurrentAO), locationName,
 							new Timestamp(timestampOfCurrentAOThisUser), startLatitude, startLongitude, startAltitude,
 							userID, photos_count, checkins_count, users_count, radius_meters, highlights_count,
 							items_count, max_items_count, String.valueOf(randomActIDForCurrentAO), distanceInMFromPrev,
-							durationInSecFromPrev, currentZoneId, distanceInMFromNext, durationInSecFromNext);
+							durationInSecFromPrev, currentZoneId, distanceInMFromNext, durationInSecFromNext,
+							gridIndex);
 
 					// timelineForThisDay.appendAO(ao);
 					aosForThisDay.add(ao);
@@ -415,6 +423,33 @@ public class ToyTimelineUtils
 				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
 				{
 					sbTS.append(">>" + ao.getActivityID());
+				}
+			}
+			// sbTS.append("\n");
+		}
+		WToFile.writeToNewFile(sbTS.toString(), absFileToWrite);
+	}
+
+	/**
+	 * 
+	 * @param toyTimelines
+	 * @param absFileToWrite
+	 * @param givenDimension
+	 * @since Aug 6 2018
+	 */
+	public static void writeOnlyGivenDimensionVals(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines,
+			String absFileToWrite, PrimaryDimension givenDimension)
+	{
+		StringBuilder sbTS = new StringBuilder();
+		for (Entry<String, LinkedHashMap<Date, Timeline>> uE : toyTimelines.entrySet())
+		{
+			sbTS.append("\n User: " + uE.getKey());
+			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
+			{
+				sbTS.append("\n" + dE.getKey().toString());
+				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				{
+					sbTS.append(">>" + ao.getGivenDimensionVal("_", givenDimension));
 				}
 			}
 			// sbTS.append("\n");

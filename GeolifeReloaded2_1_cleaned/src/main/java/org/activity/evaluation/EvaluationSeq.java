@@ -101,7 +101,7 @@ public class EvaluationSeq
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
 						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
-						PathConstants.pathToSerialisedGowallaLocZoneIdMap);
+						PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
 
 				// for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				// {
@@ -226,7 +226,7 @@ public class EvaluationSeq
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
 						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
-						PathConstants.pathToSerialisedGowallaLocZoneIdMap);
+						PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -359,7 +359,7 @@ public class EvaluationSeq
 				Constant.initialise(commonPath, Constant.getDatabaseName(),
 						PathConstants.pathToSerialisedCatIDsHierDist, PathConstants.pathToSerialisedCatIDNameDictionary,
 						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
-						PathConstants.pathToSerialisedGowallaLocZoneIdMap);
+						PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
 
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
@@ -474,7 +474,7 @@ public class EvaluationSeq
 					Constant.initialise(pathT, Constant.getDatabaseName(), PathConstants.pathToSerialisedCatIDsHierDist,
 							PathConstants.pathToSerialisedCatIDNameDictionary,
 							PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
-							PathConstants.pathToSerialisedGowallaLocZoneIdMap);
+							PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
 					System.out.println("Constant.initialise done ---");
 					// outputCoreResultsPath = commonPathT;
 

@@ -3486,7 +3486,8 @@ public class AlignmentBasedDistance
 		// Start of added on 3 Aug 2018
 		if (givenDimension.equals(PrimaryDimension.LocationGridID) && Constant.doWeightedEditDistanceForSecDim)
 		{
-			System.out.println("DebugAug3: will createReplaceWtModifierMapForDistSensitiveLocGrids!!");
+			// disabled the print on Aug 7 to decrease size of consoleLogs
+			// $$System.out.println("DebugAug3: will createReplaceWtModifierMapForDistSensitiveLocGrids!!");
 			replaceWtMultiplierMap = createReplaceWtModifierMapForDistSensitiveLocGrids(uniqueCharCodes);
 		}
 		// End of added on 3 Aug 2018
@@ -3602,7 +3603,7 @@ public class AlignmentBasedDistance
 			}
 		}
 
-		if (true)// TODO: temporary for debugging
+		if (VerbosityConstants.writeReplaceWtMultiplierMap)// TODO: temporary for debugging
 		{
 			WToFile.appendLineToFileAbs(sb1.toString() + "\n",
 					Constant.getCommonPath() + "DebugReplaceWtMultiplierMap1.csv");

@@ -97,10 +97,10 @@ public final class Constant
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;// SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10
 	// .RNN1;AKOM
 
-	private static int AKOMHighestOrder = 2;// 1;// 3;// SWITCH_NOV10
+	private static int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
 	private static int RNNCurrentActivitityLength = 1;
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
@@ -162,8 +162,10 @@ public final class Constant
 	public static final boolean filterTrainingTimelinesByRecentDays = true;// TODO MANALI true;// SWITCH_NOV10
 	private static int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
 
-	// Filtering the candidate timeline
-	public static final Enums.TypeOfCandThreshold typeOfCandThreshold = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
+	// Filtering the candidate timeline ..
+	public static final Enums.TypeOfCandThreshold typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
+	// added on 8 Aug 2018
+	public static final Enums.TypeOfCandThreshold typeOfCandThresholdSecDim = TypeOfCandThreshold.NearestNeighbourWithEDValThresh;
 	// None,Percentile // SWITCH_NOV10
 
 	public static final int filterCandByCurActTimeThreshInSecs = -1;// 10800;// -1; 18000; 3600 7200; //SWITCH_NOV10
@@ -178,9 +180,11 @@ public final class Constant
 	 */
 	public static final int nearestNeighbourCandEDThresholdPrimDim = 500;// 750;// 500;// 500;/// -1;// 100;//
 																			// 1500;// 100;//
+	public static final double candEDValThresholdPrimDim = -1;
 	// -1 for no filter//SWITCH_NOV10
 	// added on 23 July 2018 to keep it separate from the threshold used for primary dimension
-	public static final int nearestNeighbourCandEDThresholdSecDim = 500;
+	public static final int nearestNeighbourCandEDThresholdSecDim = 50;// 0;
+	public static final double candEDValThresholdSecDim = 0.5;
 
 	// End of parameters for Candidate timelines
 	// --------------------------------------------------------------------------//
@@ -243,7 +247,7 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useToyTimelines = false;// true;
+	public static final boolean useToyTimelines = false;// false;// true;/SWITCH_AUG6
 
 	// public static final int numOfHiddenLayersInRNN1 = 3;// 3;
 	// public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;
@@ -263,7 +267,7 @@ public final class Constant
 	public static final boolean doSecondaryDimension = true;
 	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
 	public static final boolean debug18July2018 = false;
-	public static final boolean doWeightedEditDistanceForSecDim = true;
+	public static final boolean doWeightedEditDistanceForSecDim = false;// true;//SWITCH_AUG
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 	////////////////////////////////////////////////////////////////////////
@@ -471,6 +475,28 @@ public final class Constant
 		return -9999;
 
 	}
+
+	/**
+	 * 
+	 * @param givenDimension
+	 * @return
+	 * @since 9 Aug 2018
+	 */
+	public static final double getEDThresholdGivenDim(PrimaryDimension givenDimension)
+	{
+		if (givenDimension.equals(Constant.primaryDimension))
+		{
+			return candEDValThresholdPrimDim;
+		}
+		else if (givenDimension.equals(Constant.secondaryDimension))
+		{
+			return candEDValThresholdSecDim;
+		}
+		PopUps.showError("Error in geEDThresholdGivenDim: unrecognised given dimension: " + givenDimension);
+		return -9999;
+
+	}
+
 	// public static final int nearestNeighbourCandEDThresholdSecDim = 100;
 
 	public static final boolean equalsForFloat(double a, double b)
@@ -695,10 +721,13 @@ public final class Constant
 	 * @param pathToSerialisedLocationObjects
 	 * @param pathToSerialisedUserObjects
 	 * @param pathToSerialisedGowallaLocZoneIdMap
+	 * @param canSetGridIndexPairHaversineDistMaps
+	 *            //added on 7 Aug 2018 to avoid unessential deserialisation in case of evaluation.
 	 */
 	public static void initialise(String givenCommonpath, String databaseName, String catIDsHierDistSerialisedFile,
 			String pathToSerialisedCatIDNameDictionary, String pathToSerialisedLocationObjects,
-			String pathToSerialisedUserObjects, String pathToSerialisedGowallaLocZoneIdMap)
+			String pathToSerialisedUserObjects, String pathToSerialisedGowallaLocZoneIdMap,
+			boolean canSetGridIndexPairHaversineDistMaps)
 	{
 
 		Constant.setDatabaseName(databaseName);
@@ -730,12 +759,19 @@ public final class Constant
 
 		if (Constant.doWeightedEditDistanceForSecDim)
 		{
-			DomainConstants.setGridIndexPairDistMaps();
+			DomainConstants.setGridIndexPairHaversineDistMaps();
 			// gdDistProvider = new GridDistancesProvider(PathConstants.pathToSerialisedGridIndexPairDist,
 			// PathConstants.pathToSerialisedGridIndexPairDistConverter);
 		}
 	}
 
+	/**
+	 * @since Aug 7 2018
+	 */
+	public static void releaseHeavyObjectsNotNeededAfterRecommendation()
+	{
+		DomainConstants.unsetGridIndexPairHaversineDistMaps();
+	}
 	//
 
 	/**
@@ -1540,12 +1576,16 @@ public final class Constant
 		s.append("\nrecentDaysInTrainingTimelines:" + recentDaysInTrainingTimelines);
 
 		s.append("\nonlyPastFromRecommDateInCandInColl:" + onlyPastFromRecommDateInCandInColl);
-		s.append("\ntypeOfCandThreshold:" + typeOfCandThreshold);
+		s.append("\ntypeOfCandThresholdPrimDim:" + typeOfCandThresholdPrimDim);
+		s.append("\ntypeOfCandThresholdSecDim:" + typeOfCandThresholdSecDim);
 		s.append("\nfilterCandByCurActTimeThreshInSecs:" + filterCandByCurActTimeThreshInSecs);
 
 		s.append("\npercentileCandEDThreshold:" + percentileCandEDThreshold);
 		s.append("\nnearestNeighbourCandEDThresholdPrimDim:" + nearestNeighbourCandEDThresholdPrimDim);
 		s.append("\nnearestNeighbourCandEDThresholdSecDim:" + nearestNeighbourCandEDThresholdSecDim);
+
+		s.append("\ncandEDValThresholdPrimDim:" + candEDValThresholdPrimDim);
+		s.append("\ncandEDValThresholdSecDim:" + candEDValThresholdSecDim);
 
 		s.append("\neditDistancesMemorizerBufferSize:" + editDistancesMemorizerBufferSize);
 		s.append("\nmemorizeEditDistance:" + memorizeEditDistance);

@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
@@ -93,7 +94,7 @@ public class ControllerWithoutServer
 			PathConstants.intialise(Constant.For9kUsers);
 			Constant.initialise(commonPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
-					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap);
+					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
 			String commonBasePath = Constant.getCommonPath();
 			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 					+ PerformanceAnalytics.getHeapPercentageFree());
@@ -229,7 +230,10 @@ public class ControllerWithoutServer
 
 			if (Constant.useToyTimelines)
 			{
-				boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;// strue;
+				PopUps.showMessage("Here in Controller for toytimelines\n");
+				// disabled on Aug 6 2018 to created toy timelines again
+				// boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;//
+				boolean createToyTimelines = true, serialiseToyTimelines = true, deserialiseToyTimelines = false;// strue;
 				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines = null;
 				if (createToyTimelines)
 				{
@@ -253,12 +257,23 @@ public class ControllerWithoutServer
 					// System.exit(0);
 				}
 
+				// didnt work because the previously serialised toytimeline didnt had gridIndex as field.
+				// if (!createToyTimelines)// add locGrid to AOs in timelines, because the previously (before Aug
+				// 2018)// // created toy timelines did not had locGridIndices assigned to AOs
+				// {usersToyDayTimelines = TimelineUtils.assignLocGridIndices(usersToyDayTimelines);}
 				ToyTimelineUtils.writeOnlyActIDs(usersToyDayTimelines,
 						Constant.getCommonPath() + "ToyTimelinesOnlyActIDs.csv");
 				ToyTimelineUtils.writeOnlyActIDs2(usersToyDayTimelines,
 						Constant.getCommonPath() + "ToyTimelinesOnlyActIDs2.csv");
 				ToyTimelineUtils.writeActIDTS(usersToyDayTimelines,
 						Constant.getCommonPath() + "ToyTimelinesActIDTS.csv");
+
+				PrimaryDimension primDimTemp = Constant.primaryDimension;
+				PrimaryDimension secDimTemp = Constant.secondaryDimension;
+				ToyTimelineUtils.writeOnlyGivenDimensionVals(usersToyDayTimelines,
+						Constant.getCommonPath() + "ToyTimelinesOnly" + primDimTemp + ".csv", primDimTemp);
+				ToyTimelineUtils.writeOnlyGivenDimensionVals(usersToyDayTimelines,
+						Constant.getCommonPath() + "ToyTimelinesOnly" + secDimTemp + ".csv", secDimTemp);
 
 				// do it again using the toy timelines
 				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true, true);
@@ -276,7 +291,7 @@ public class ControllerWithoutServer
 						false, "GowallaUserDayToyTimelines.csv", commonBasePath);
 				// PopUps.showMessage("here2");
 				TimelineStats.timelineStatsController(usersToyDayTimelines);
-				// System.exit(0);
+				System.exit(0);
 				// End of Moved here on 18 May 2018
 
 				// make the usersCleanedDayTimelines point to the toy timelines
@@ -1289,69 +1304,69 @@ public class ControllerWithoutServer
 
 		switch (databaseName)
 		{
-			case "gowalla1":
-				pathToLatestSerialisedJSONArray = null;// "";
-				pathForLatestSerialisedJSONArray = "" + DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
-				pathToLatestSerialisedTimelines = null;
-				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelinesNOV30.kryo";
-				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines.kryo";
-				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";//
-				// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";
-				pathForLatestSerialisedTimelines = null;
-				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines"
-				// + currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
-				// + ".kryo";
-				commonPath = Constant.getOutputCoreResultsPath();
-				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/";
-				// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
-				// run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//
-				/// "/run/media/gunjan/BoX2/GowallaSpaceSpace/GowallaDataWorksSep16/";
-				break;
+		case "gowalla1":
+			pathToLatestSerialisedJSONArray = null;// "";
+			pathForLatestSerialisedJSONArray = "" + DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
+			pathToLatestSerialisedTimelines = null;
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelinesNOV30.kryo";
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines.kryo";
+			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";//
+			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep15DatabaseGenerationJava/GowallaUserDayTimelines13Sep2016.kryo";
+			pathForLatestSerialisedTimelines = null;
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30/UserTimelines"
+			// + currentDateTime.getMonth().toString().substring(0, 3) + currentDateTime.getDayOfMonth()
+			// + ".kryo";
+			commonPath = Constant.getOutputCoreResultsPath();
+			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/";
+			// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";// $$Nov30/";//
+			// run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//
+			/// "/run/media/gunjan/BoX2/GowallaSpaceSpace/GowallaDataWorksSep16/";
+			break;
 
-			case "geolife1":
-				pathToLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayAPR21obj";
-				// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayMAY27obj";
-				// GeolifeJSONArrayFeb13.obj";
-				pathForLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArray"
-						+ DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
+		case "geolife1":
+			pathToLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayAPR21obj";
+			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayMAY27obj";
+			// GeolifeJSONArrayFeb13.obj";
+			pathForLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArray"
+					+ DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
 
-				// $$UMAP submission
-				// $$pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data
-				// Works/UserTimelinesJUN18.lmap";//
-				// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesJUN15.lmap";//
-				// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link to Geolife Data
-				// Works/UserTimelinesAPR15.lmap";//
-				// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR10.lmap";//
-				// UserTimelinesFeb13.lmap";
+			// $$UMAP submission
+			// $$pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data
+			// Works/UserTimelinesJUN18.lmap";//
+			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesJUN15.lmap";//
+			// "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link to Geolife Data
+			// Works/UserTimelinesAPR15.lmap";//
+			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR10.lmap";//
+			// UserTimelinesFeb13.lmap";
 
-				// After UMAP submission 19th April 2016
-				pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
+			// After UMAP submission 19th April 2016
+			pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
 
-				pathForLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelines"
-						+ DateTimeUtils.getShortDateLabel(currentDateTime) + ".lmap";
-				commonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";// version 3 based on rank score
-																					// function
-				break;
+			pathForLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelines"
+					+ DateTimeUtils.getShortDateLabel(currentDateTime) + ".lmap";
+			commonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";// version 3 based on rank score
+																				// function
+			break;
 
-			case "dcu_data_2":
-				pathToLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArrayOct29.obj";
-				pathForLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArray"
-						+ DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
+		case "dcu_data_2":
+			pathToLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArrayOct29.obj";
+			pathForLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArray"
+					+ DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
 
-				pathToLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
-				// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
-				// Works/WorkingSet7July/DCUUserTimelinesJUN15.lmap";
-				// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
-				// Works/WorkingSet7July/DCUUserTimelinesMAY7.lmap"; DCUUserTimelinesOct29.lmap";
-				pathForLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
-						+ DateTimeUtils.getShortDateLabel(currentDateTime) + ".lmap";
+			pathToLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
+			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
+			// Works/WorkingSet7July/DCUUserTimelinesJUN15.lmap";
+			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
+			// Works/WorkingSet7July/DCUUserTimelinesMAY7.lmap"; DCUUserTimelinesOct29.lmap";
+			pathForLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
+					+ DateTimeUtils.getShortDateLabel(currentDateTime) + ".lmap";
 
-				commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
-				break;
+			commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
+			break;
 
-			default:
-				System.err.println("Error: unrecognised database name");
-				break;
+		default:
+			System.err.println("Error: unrecognised database name");
+			break;
 		}
 
 	}

@@ -92,7 +92,7 @@ public class Dashboard3 extends Application
 		PathConstants.intialise(Constant.For9kUsers);
 		Constant.initialise("./", "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
-				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap);
+				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = null;
 

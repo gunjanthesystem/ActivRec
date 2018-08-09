@@ -553,10 +553,10 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			}
 
 			// Is this sorting necessary? // Disabling on Aug 3
-			primaryDimDistancesSortedMap = sortIfNecessary(distancesMapPrimaryDimUnsorted, Constant.typeOfCandThreshold,
-					Constant.nearestNeighbourCandEDThresholdPrimDim);
+			primaryDimDistancesSortedMap = sortIfNecessary(distancesMapPrimaryDimUnsorted,
+					Constant.typeOfCandThresholdPrimDim, Constant.nearestNeighbourCandEDThresholdPrimDim);
 			secondaryDimDistancesSortedMap = sortIfNecessary(distancesMapSecondaryDimUnsorted,
-					Constant.typeOfCandThreshold, Constant.nearestNeighbourCandEDThresholdSecDim);
+					Constant.typeOfCandThresholdSecDim, Constant.nearestNeighbourCandEDThresholdSecDim);
 
 			if (caseType.equals(Enums.CaseType.CaseBasedV1))
 			{
@@ -601,7 +601,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 				// this will not be true when thresholding
 				if (this.thresholdPruningNoEffect)
 				{// this sanity check is only valid when not filtering cands
-					if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.None)
+					if (Constant.typeOfCandThresholdPrimDim == Enums.TypeOfCandThreshold.None)
 					{
 						if (!Sanity.eq(primaryDimDistancesSortedMap.size(), this.candidateTimelinesPrimDim.size(),
 								"Error at Sanity 349 (RecommenderMaster: editDistancesSortedMapFullCand.size()== this.candidateTimelines.size()  not satisfied"))
@@ -934,11 +934,11 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 
 		if (distancesMapUnsorted.size() != candidateTimelines.size())
 		{// Constant.nearestNeighbourCandEDThreshold > 0) // not expected when filtering is to be done
-			if (Constant.typeOfCandThreshold != Enums.TypeOfCandThreshold.None)
+			if (Constant.typeOfCandThresholdPrimDim != Enums.TypeOfCandThreshold.None)
 			{// some cands might have been removed due to thresholding
 				System.out.println("Alert: editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
 						+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ") , typeOfCandThreshold="
-						+ Constant.typeOfCandThreshold);
+						+ Constant.typeOfCandThresholdPrimDim);
 			}
 			else
 			{
