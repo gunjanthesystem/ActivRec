@@ -3257,7 +3257,7 @@ public class WToFile
 	 * @param writeCandidateTimeline
 	 * @param writeEditOperations
 	 * @param endPointIndicesInCands
-	 * @param primaryDimension
+	 * @param givenDimension
 	 * @param absFileNameToWriteTo
 	 */
 	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
@@ -3265,7 +3265,7 @@ public class WToFile
 			LinkedHashMap<String, Timeline> candidateTimelines,
 			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs, ArrayList<ActivityObject> currentTimeline,
 			ActivityObject currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
-			LinkedHashMap<String, Integer> endPointIndicesInCands, PrimaryDimension primaryDimension,
+			LinkedHashMap<String, Integer> endPointIndicesInCands, PrimaryDimension givenDimension,
 			String absFileNameToWriteTo)
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
 	// Enums.CaseType caseType)
@@ -3285,22 +3285,26 @@ public class WToFile
 				int countOfL1Ops = UtilityBelt.getCountOfLevel1Ops(editOps);// entry.getValue().getFirst());
 				int countOfL2Ops = UtilityBelt.getCountOfLevel2Ops(editOps);// entry.getValue().getFirst());
 
-				String nextAOPDVals = nextActObjs.get(candTimelineID).getFirst().getPrimaryDimensionVal("/");
+				// disabled on 7 Aug 2018
+				// $$String nextAOPDVals = nextActObjs.get(candTimelineID).getFirst().getPrimaryDimensionVal("/");
+				String nextAOGDVals = nextActObjs.get(candTimelineID).getFirst().getGivenDimensionVal("/",
+						givenDimension);
 				// //.getPrimaryDimensionVal().stream()
 				// .map(e -> e.toString()).collect(Collectors.joining("/"));// .getActivityName();//
 				// "null";
 
 				String candidateTimelineAsString = " ";
-				String candidateTimelineAsStringPDOnly = " ";
+				String candidateTimelineAsStringGDOnly = " ";
 				String editOperationsString = " ";
 
 				if (writeCandidateTimeline)
 				{
 					candidateTimelineAsString = candidateTimelines.get(candTimelineID)
-							.getActivityObjectPDValsWithTimestampsInSequence();
+							.getActivityObjectGDValsWithTimestampsInSequence(givenDimension);
+					// .getActivityObjectPDValsWithTimestampsInSequence();
 
-					candidateTimelineAsStringPDOnly = getTimelineAsOnlyPDVal(
-							candidateTimelines.get(candTimelineID).getActivityObjectsInTimeline());
+					candidateTimelineAsStringGDOnly = getTimelineAsOnlyGivenDimVal(
+							candidateTimelines.get(candTimelineID).getActivityObjectsInTimeline(), givenDimension);
 				}
 
 				if (writeEditOperations)
@@ -3319,12 +3323,12 @@ public class WToFile
 					userString = userAtRecomm;
 					dateString = dateAtRecomm.toString();
 					timeString = timeAtRecomm.toString();
-					currentTimelineString = getStringActivityObjArray(currentTimeline);
+					currentTimelineString = getStringActivityObjArray(currentTimeline, givenDimension);
 					// current timeline is same throughout an execution of this method.
 					writefull = false;
 				}
 
-				String currTimelineOnlyPD = getTimelineAsOnlyPDVal(currentTimeline);
+				String currTimelineOnlyGD = getTimelineAsOnlyGivenDimVal(currentTimeline, givenDimension);
 
 				///
 				Integer endPointIndexInCand = endPointIndicesInCands.get(candTimelineID);
@@ -3341,9 +3345,9 @@ public class WToFile
 				///
 
 				sbToWrite.append(userString + "," + dateString + "," + timeString + "," + candTimelineID + ","
-						+ endPointIndexInCand + "," + currTimelineOnlyPD + "," + candidateTimelineAsStringPDOnly + ","
+						+ endPointIndexInCand + "," + currTimelineOnlyGD + "," + candidateTimelineAsStringGDOnly + ","
 						+ editOperationsString + "," + editDist + "," + countOfL1Ops + "," + countOfL2Ops + ","
-						+ nextAOPDVals + "," + diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
+						+ nextAOGDVals + "," + diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
 						+ diffEndTimeForEndPointsCand_n_GuidingInSecs + "," + candidateTimelineAsString + ","
 						+ currentTimelineString + "\n");
 
@@ -3369,6 +3373,7 @@ public class WToFile
 	 * 
 	 * @param array
 	 * @return
+	 * @deprecated on 7 Aug 2018 should be superceeded by getStringActivityObjArray()
 	 */
 	public static String getStringActivityObjArray(ArrayList<ActivityObject> array)
 	{
@@ -3385,28 +3390,52 @@ public class WToFile
 	/**
 	 * 
 	 * @param array
+	 * @param givenDimension
 	 * @return
 	 */
-	public static String getTimelineAsOnlyPDVal(ArrayList<ActivityObject> array)
+	public static String getStringActivityObjArray(ArrayList<ActivityObject> array, PrimaryDimension givenDimension)
 	{
 		String s = "";
 
 		for (ActivityObject ao : array)
 		{
-			s += ">>" + ao.getPrimaryDimensionVal("|");
+			s += ">>" + ao.getActivityName() + "--" + ao.getGivenDimensionVal("|", givenDimension) + "--"
+					+ ao.getStartTimestamp() + "--" + ao.getDurationInSeconds();
 		}
 		return s;
 	}
 
 	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	public static String getTimelineAsOnlyGivenDimVal(ArrayList<ActivityObject> array, PrimaryDimension givenDimension)
+	{
+		String s = "";
+
+		for (ActivityObject ao : array)
+		{
+			s += ">>" + ao.getGivenDimensionVal("|", givenDimension);
+			// ao.getPrimaryDimensionVal("|");
+		}
+		return s;
+	}
+
+	public static void writeDistanceScoresSortedMapHeader(String[] arrayOfPhrases)
+	{
+		Arrays.asList(arrayOfPhrases).stream().forEach(p -> writeDistanceScoresSortedMapHeader(p));
+	}
+
+	/**
 	 * Creates the file EditDistancePerRtPerCand.csv and write the header line
 	 */
-	public static void writeDistanceScoresSortedMapHeader()
+	public static void writeDistanceScoresSortedMapHeader(String fileNamePhrase)
 	{
 		String commonPath = Constant.getCommonPath();//
 		try
 		{
-			String fileName = commonPath + "EditDistancePerRtPerCand.csv";
+			String fileName = commonPath + fileNamePhrase;// "EditDistancePerRtPerCand.csv";
 
 			FileWriter fw = new FileWriter(new File(fileName).getAbsoluteFile(), true);
 			BufferedWriter bw = new BufferedWriter(fw);
@@ -4239,19 +4268,19 @@ public class WToFile
 		{
 			switch (timelinesSet)
 			{
-				case "AllTimelines":
-					timelinesCursor = userAllDatesTimeslines;
-					break;
-				case "TrainingTimelines":
-					timelinesCursor = userTrainingTimelines;
-					break;
-				case "TestTimelines":
-					timelinesCursor = userTestTimelines;
-					break;
-				default:
-					PopUps.showError(
-							"Error in org.activity.tests.RecommendationTestsDaywiseJan2016: Unrecognised timelinesSet");
-					break;
+			case "AllTimelines":
+				timelinesCursor = userAllDatesTimeslines;
+				break;
+			case "TrainingTimelines":
+				timelinesCursor = userTrainingTimelines;
+				break;
+			case "TestTimelines":
+				timelinesCursor = userTestTimelines;
+				break;
+			default:
+				PopUps.showError(
+						"Error in org.activity.tests.RecommendationTestsDaywiseJan2016: Unrecognised timelinesSet");
+				break;
 			}
 
 			if (timelinesSet.equals("TrainingTimelines"))

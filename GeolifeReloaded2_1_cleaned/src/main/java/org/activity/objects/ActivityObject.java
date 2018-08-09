@@ -176,6 +176,16 @@ public class ActivityObject implements Serializable
 	}
 
 	/**
+	 * to add gridIndex to AOs in already created toy timelines
+	 * 
+	 * @since 6 Aug 2018
+	 */
+	public void setGridIndex(int givenGridIndex)
+	{
+		this.gridIndex = givenGridIndex;
+	}
+
+	/**
 	 * 
 	 * @param ao
 	 * @param primaryDimension
@@ -185,18 +195,18 @@ public class ActivityObject implements Serializable
 	{
 		switch (Constant.primaryDimension)
 		{
-			case ActivityID:
-				ArrayList<Integer> arr = new ArrayList<>();
-				arr.add(this.getActivityID());
-				return arr;
-			// return new ArrayList<>(this.getActivityID());// only one activity name is expected even when merged.
-			case LocationID:
-				LinkedHashSet<Integer> uniqueLocationIDs = new LinkedHashSet<>(this.getLocationIDs());
-				return new ArrayList<Integer>(uniqueLocationIDs);
-			// this.getLocationIDs();
-			default:
-				PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
-				return null;
+		case ActivityID:
+			ArrayList<Integer> arr = new ArrayList<>();
+			arr.add(this.getActivityID());
+			return arr;
+		// return new ArrayList<>(this.getActivityID());// only one activity name is expected even when merged.
+		case LocationID:
+			LinkedHashSet<Integer> uniqueLocationIDs = new LinkedHashSet<>(this.getLocationIDs());
+			return new ArrayList<Integer>(uniqueLocationIDs);
+		// this.getLocationIDs();
+		default:
+			PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
+			return null;
 		}
 	}
 
@@ -210,22 +220,22 @@ public class ActivityObject implements Serializable
 	{
 		switch (givenDimension)
 		{
-			case ActivityID:
-				ArrayList<Integer> arr = new ArrayList<>();
-				arr.add(this.getActivityID());
-				return arr;
-			// return new ArrayList<>(this.getActivityID());// only one activity name is expected even when merged.
-			case LocationID:
-				LinkedHashSet<Integer> uniqueLocationIDs = new LinkedHashSet<>(this.getLocationIDs());
-				return new ArrayList<Integer>(uniqueLocationIDs);
-			case LocationGridID:
-				ArrayList<Integer> gridIndicesArr = new ArrayList<>();
-				gridIndicesArr.add(this.gridIndex);
-				return gridIndicesArr;
-			// this.getLocationIDs();
-			default:
-				PopUps.printTracedErrorMsgWithExit("Unknown givenDimension dimension val = " + givenDimension);
-				return null;
+		case ActivityID:
+			ArrayList<Integer> arr = new ArrayList<>();
+			arr.add(this.getActivityID());
+			return arr;
+		// return new ArrayList<>(this.getActivityID());// only one activity name is expected even when merged.
+		case LocationID:
+			LinkedHashSet<Integer> uniqueLocationIDs = new LinkedHashSet<>(this.getLocationIDs());
+			return new ArrayList<Integer>(uniqueLocationIDs);
+		case LocationGridID:
+			ArrayList<Integer> gridIndicesArr = new ArrayList<>();
+			gridIndicesArr.add(this.gridIndex);
+			return gridIndicesArr;
+		// this.getLocationIDs();
+		default:
+			PopUps.printTracedErrorMsgWithExit("Unknown givenDimension dimension val = " + givenDimension);
+			return null;
 		}
 	}
 
@@ -268,25 +278,25 @@ public class ActivityObject implements Serializable
 	{
 		switch (Constant.primaryDimension)
 		{
-			case ActivityID:
-				return this.activityID == ao2.getActivityID();
-			case LocationID:
-				// actually this approach for Location ID also works for activity id but is slower since set
-				// intersection, hence create a lighter methods for activityID
-				Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
-						ao2.getPrimaryDimensionVal());
+		case ActivityID:
+			return this.activityID == ao2.getActivityID();
+		case LocationID:
+			// actually this approach for Location ID also works for activity id but is slower since set
+			// intersection, hence create a lighter methods for activityID
+			Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
+					ao2.getPrimaryDimensionVal());
 
-				if (intersection.size() > 0)
-				{// System.out.println("intersection.size() = " + intersection.size() + " returning TRUE");
-					return true;
-				}
-				else
-				{ // System.out.println("intersection.size() = " + intersection.size() + " returning FALSE");
-					return false;
-				}
-			default:
-				PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
+			if (intersection.size() > 0)
+			{// System.out.println("intersection.size() = " + intersection.size() + " returning TRUE");
+				return true;
+			}
+			else
+			{ // System.out.println("intersection.size() = " + intersection.size() + " returning FALSE");
 				return false;
+			}
+		default:
+			PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
+			return false;
 		}
 	}
 
@@ -302,27 +312,27 @@ public class ActivityObject implements Serializable
 	{
 		switch (givenDimension)
 		{
-			case ActivityID:
-				return this.activityID == ao2.getActivityID();
-			case LocationID:
-				// actually this approach for Location ID also works for activity id but is slower since set
-				// intersection, hence create a lighter methods for activityID
-				Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
-						ao2.getPrimaryDimensionVal());
+		case ActivityID:
+			return this.activityID == ao2.getActivityID();
+		case LocationID:
+			// actually this approach for Location ID also works for activity id but is slower since set
+			// intersection, hence create a lighter methods for activityID
+			Set<Integer> intersection = UtilityBelt.getIntersection(this.getPrimaryDimensionVal(),
+					ao2.getPrimaryDimensionVal());
 
-				if (intersection.size() > 0)
-				{// System.out.println("intersection.size() = " + intersection.size() + " returning TRUE");
-					return true;
-				}
-				else
-				{ // System.out.println("intersection.size() = " + intersection.size() + " returning FALSE");
-					return false;
-				}
-			case LocationGridID:
-				return this.gridIndex == ao2.getGridID();
-			default:
-				PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
+			if (intersection.size() > 0)
+			{// System.out.println("intersection.size() = " + intersection.size() + " returning TRUE");
+				return true;
+			}
+			else
+			{ // System.out.println("intersection.size() = " + intersection.size() + " returning FALSE");
 				return false;
+			}
+		case LocationGridID:
+			return this.gridIndex == ao2.getGridID();
+		default:
+			PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
+			return false;
 		}
 	}
 

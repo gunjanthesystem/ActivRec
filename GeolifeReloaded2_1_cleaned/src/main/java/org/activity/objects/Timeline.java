@@ -464,6 +464,25 @@ public class Timeline implements Serializable
 		return res.toString();
 	}
 
+	/**
+	 * 
+	 * @param givenDimension
+	 * @return
+	 * @since 7 Aug 2018
+	 */
+	public String getActivityObjectGDValsWithTimestampsInSequence(PrimaryDimension givenDimension)
+	{
+		StringBuilder res = new StringBuilder();
+
+		for (int i = 0; i < activityObjectsInTimeline.size(); i++)
+		{
+			res.append(">>" + activityObjectsInTimeline.get(i).getGivenDimensionVal("|", givenDimension) + "--"
+					+ activityObjectsInTimeline.get(i).getStartTimestamp() + "--"
+					+ activityObjectsInTimeline.get(i).getEndTimestamp());
+		}
+		return res.toString();
+	}
+
 	public String getActivityObjectNamesWithoutTimestampsInSequence()
 	{
 		StringBuilder res = new StringBuilder("");

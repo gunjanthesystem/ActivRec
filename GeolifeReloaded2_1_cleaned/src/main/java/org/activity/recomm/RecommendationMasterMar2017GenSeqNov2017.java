@@ -476,7 +476,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 			// Is this sorting necessary?
 			// Disabling on Aug 3
-			if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.NearestNeighbour
+			if (Constant.typeOfCandThresholdPrimDim == Enums.TypeOfCandThreshold.NearestNeighbour
 					&& Constant.nearestNeighbourCandEDThresholdPrimDim >= 1)
 			{ // because already sorted while filtering
 				distancesSortedMap = distancesMapUnsorted;
@@ -516,7 +516,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 				// this will not be true when thresholding
 				if (this.thresholdPruningNoEffect)
 				{// this sanity check is only valid when not filtering cands
-					if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.None)
+					if (Constant.typeOfCandThresholdPrimDim == Enums.TypeOfCandThreshold.None)
 					{
 						if (!Sanity.eq(distancesSortedMap.size(), this.candidateTimelines.size(),
 								"Error at Sanity 349 (RecommenderMaster: editDistancesSortedMapFullCand.size()== this.candidateTimelines.size()  not satisfied"))
@@ -741,11 +741,11 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 		if (distancesMapUnsorted.size() != candidateTimelines.size())
 		{// Constant.nearestNeighbourCandEDThreshold > 0) // not expected when filtering is to be done
-			if (Constant.typeOfCandThreshold != Enums.TypeOfCandThreshold.None)
+			if (Constant.typeOfCandThresholdPrimDim != Enums.TypeOfCandThreshold.None)
 			{// some cands might have been removed due to thresholding
 				System.out.println("Alert: editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
 						+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ") , typeOfCandThreshold="
-						+ Constant.typeOfCandThreshold);
+						+ Constant.typeOfCandThresholdPrimDim);
 			}
 			else
 			{

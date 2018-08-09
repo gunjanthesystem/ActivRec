@@ -12,6 +12,7 @@ import java.util.Set;
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.AltSeqPredictor;
+import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
@@ -274,6 +275,7 @@ public class SuperController
 		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part2",
 		// "./dataWritten/Jan18_Sampling_Ncount10DayThreshold50",
 		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1", });
+		System.exit(0);
 	}
 
 	/**
@@ -340,15 +342,19 @@ public class SuperController
 
 		String labelForExperimentConfig = getLabelForExperimentConfig(sampledUserIndicesSetFile);
 
-		String[] commonPaths = // {
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
-				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-						// { "./dataWritten/"
-						+ LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
+		String[] commonPaths = {
+				"/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/" };
+		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG9ED1.0AllActsFDStFilter0hrs100RTVPNN500SNNWED50|0.5/"
+		// };
+		// "./dataWritten/AUG7ED1.0AllActsFDStFilter0hrs100RTV500PDNTh10SDNThWtdSecDim/" };
+		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/" };
+		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
+		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
+		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
+		// { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+		// { "./dataWritten/"
+		// + LocalDateTime.now().getMonth().toString().substring(0, 3)
+		// + LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
@@ -399,7 +405,7 @@ public class SuperController
 				// use directory.mkdirs(); here instead.
 			}
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], true, true, true, "gowalla1");
+			runExperiments(commonPaths[i], false, true, true, "gowalla1");
 			// cleanUpSpace(commonPaths[i], 0.90);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
@@ -419,8 +425,18 @@ public class SuperController
 	private static String getLabelForExperimentConfig(String sampledUserIndicesSetFile)
 	{
 		String featuresUsedLabel = "", distNormalisationLabel = "", predictorLabel = "", EDAlphaLabel = "",
-				StFilterLabel = "", sampledUserSetLabel = "", nearestNeighbourCandLabel = "",
-				filterTrainingTimelinesLabel = "";
+				StFilterLabel = "", sampledUserSetLabel = "", candThresholdingLabel = "",
+				filterTrainingTimelinesLabel = "", toyTimelinesLabel = "", wtdEditDistanceLabel = "";
+
+		// added on 6 Aug 2018
+		if (Constant.useToyTimelines)
+		{
+			toyTimelinesLabel = "Toy";
+		}
+		if (Constant.doWeightedEditDistanceForSecDim)
+		{
+			wtdEditDistanceLabel = "WtdSecDim";
+		}
 
 		// String sampledUserSetLabel;
 		String userSetLabelSplitted[] = sampledUserIndicesSetFile.split("\\.");
@@ -432,16 +448,52 @@ public class SuperController
 		}
 		System.out.println("sampledUserSetLabel=" + sampledUserSetLabel);
 
-		if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour))
+		TypeOfCandThreshold typeOfCandThresholdPrimDim = Constant.typeOfCandThresholdPrimDim;
+		TypeOfCandThreshold typeOfCandThresholdSecDim = Constant.typeOfCandThresholdSecDim;
+
+		// if (typeOfCandThresholdPrimDim.equals(Enums.TypeOfCandThreshold.NearestNeighbour))
+		// {if (Constant.nearestNeighbourCandEDThresholdPrimDim != 500
+		// || Constant.nearestNeighbourCandEDThresholdSecDim != 500)
+		// {candThresholdingLabel = String.valueOf(Constant.nearestNeighbourCandEDThresholdPrimDim) + "PDNTh"
+		// + String.valueOf(Constant.nearestNeighbourCandEDThresholdSecDim) + "SDNTh";}}
+		// End of adding on May6 2018
+
+		// start of added on 8 Aug 2018
+		if (!typeOfCandThresholdPrimDim.equals(TypeOfCandThreshold.None))
 		{
-			if (Constant.nearestNeighbourCandEDThresholdPrimDim != 500
-					|| Constant.nearestNeighbourCandEDThresholdSecDim != 500)
+			switch (typeOfCandThresholdPrimDim)
 			{
-				nearestNeighbourCandLabel = String.valueOf(Constant.nearestNeighbourCandEDThresholdPrimDim) + "PDNTh"
-						+ String.valueOf(Constant.nearestNeighbourCandEDThresholdSecDim) + "SDNTh";
+			case NearestNeighbour:
+				candThresholdingLabel += "PNN" + Constant.nearestNeighbourCandEDThresholdPrimDim;
+				break;
+			case NearestNeighbourWithEDValThresh:
+				candThresholdingLabel += "PNNWED" + Constant.nearestNeighbourCandEDThresholdPrimDim + "|"
+						+ Constant.candEDValThresholdPrimDim;
+				break;
+			case Percentile:
+				candThresholdingLabel += "PPer" + Constant.percentileCandEDThreshold;
+				break;
 			}
 		}
-		// End of adding on May6 2018
+
+		if (!typeOfCandThresholdSecDim.equals(TypeOfCandThreshold.None))
+		{
+			switch (typeOfCandThresholdSecDim)
+			{
+			case NearestNeighbour:
+				candThresholdingLabel += "SNN" + Constant.nearestNeighbourCandEDThresholdSecDim;
+				break;
+			case NearestNeighbourWithEDValThresh:
+				candThresholdingLabel += "SNNWED" + Constant.nearestNeighbourCandEDThresholdSecDim + "|"
+						+ Constant.candEDValThresholdSecDim;
+				break;
+			case Percentile:
+				candThresholdingLabel += "SPer" + Constant.percentileCandEDThreshold;
+				break;
+			}
+		}
+
+		// end of added on 8 Aug 2018
 
 		// Start of adding on 25 July 2018
 		if (Constant.filterTrainingTimelinesByRecentDays == false)
@@ -520,7 +572,8 @@ public class SuperController
 		}
 
 		return sampledUserSetLabel + predictorLabel + EDAlphaLabel + featuresUsedLabel + StFilterLabel
-				+ distNormalisationLabel + nearestNeighbourCandLabel + filterTrainingTimelinesLabel;
+				+ distNormalisationLabel + candThresholdingLabel + filterTrainingTimelinesLabel + toyTimelinesLabel
+				+ wtdEditDistanceLabel;
 	}
 
 	public static void cleanUp(String[] pathsToClean)
@@ -642,6 +695,8 @@ public class SuperController
 			// //curtain may 19 2017 end
 		}
 
+		Constant.releaseHeavyObjectsNotNeededAfterRecommendation();
+
 		if (evaluation)
 		{// curtain may 26 2017 start
 			System.out.println("Doing evaluation...");
@@ -672,7 +727,8 @@ public class SuperController
 
 					// Evaluate postfiltering
 					String[] pfFilterNames = { "Fltr_on_Top1Loc", "Fltr_on_ActualLocPF", "Fltr_on_TopKLocsPF",
-							"WtdAlphaPF" };
+							"WtdAlphaPF", "Fltr_on_Random2LocPF", "Fltr_on_Random10LocPF", "Fltr_on_Random20LocPF",
+							"Fltr_on_Random50LocPF", "Fltr_on_RandomLocPF" };
 					for (String pfPhrase : pfFilterNames)// postfiltering
 					{
 						new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,

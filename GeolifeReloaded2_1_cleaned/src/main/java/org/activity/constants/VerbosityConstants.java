@@ -51,7 +51,7 @@ public class VerbosityConstants
 	public static boolean WriteNumActsPerRTPerCand = false;// true;// false; // this information is redundant as well
 
 	public static final boolean WriteRedundant = false;
-	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;// false;// true;
+	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = true;// false;// true;
 	public static final boolean WriteEditSimilarityCalculations = false;// true;// true;//false;// false;// false;
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
@@ -86,6 +86,7 @@ public class VerbosityConstants
 	public static final boolean writeTrainTestTimelinesAOsPerUser = true;
 
 	public static final boolean writeRNN1PredProbDistribution = true;
+	public static final boolean writeReplaceWtMultiplierMap = false;
 	// End of curtain 30 May 2018 for running Toy
 
 	// ======================================================================================

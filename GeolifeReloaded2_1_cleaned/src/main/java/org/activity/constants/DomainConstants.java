@@ -146,30 +146,83 @@ public class DomainConstants
 	/////////////////////////////////////////////////////////////
 
 	/**
+	 * 
+	 * @param gridID
+	 * @return
+	 * @since 9 Aug 2018
+	 */
+	public static double[] getRGridLatLonForGridID(Integer gridID)
+	{
+		return javaGridIndexRGridLatRGridLon.get(gridID);
+	}
+
+	/**
+	 * 
+	 * @param gridID
+	 * @return
+	 * @since 9 Aug 2018
+	 */
+	public static boolean isPresentInGowallaDataset(Integer gridID)
+	{
+		if (javaGridIndexRGridLatRGridLon.containsKey(gridID))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
 	 * Deserializes and set gridIndexPairHaversineDist and pairedIndicesTo1DArrayConverter for that.
 	 * <p>
 	 * Note: the data is to be read from the engine.
 	 */
-	public static void setGridIndexPairDistMaps()
+	public static void setGridIndexPairHaversineDistMaps()
 	{
 		String fileNamePhrase = "IntDoubleWith1DConverter";
 		try
 		{
-			gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
-					.kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
-							+ "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
-			System.out.println("deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
+			if (gridIndexPairHaversineDist != null && pairedIndicesTo1DArrayConverter != null)
+			{
+				System.out.println(
+						"Not deserialising gridIndexPairHaversineDist as it is already non null. gridIndexPairHaversineDist.size()="
+								+ gridIndexPairHaversineDist.size());
+				System.out.println(" pairedIndicesTo1DArrayConverter= " + pairedIndicesTo1DArrayConverter.toString());
+			}
+			else
+			{
+				gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
+						.kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
+								+ "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
+				System.out.println(
+						"deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
 
-			pairedIndicesTo1DArrayConverter = (PairedIndicesTo1DArrayConverter) Serializer
-					.kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
-							+ "pairedIndicesTo1DConverter" + fileNamePhrase + ".kryo");
-			System.out.println(
-					"deserialised pairedIndicesTo1DArrayConverter= " + pairedIndicesTo1DArrayConverter.toString());
+				pairedIndicesTo1DArrayConverter = (PairedIndicesTo1DArrayConverter) Serializer
+						.kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
+								+ "pairedIndicesTo1DConverter" + fileNamePhrase + ".kryo");
+				System.out.println(
+						"deserialised pairedIndicesTo1DArrayConverter= " + pairedIndicesTo1DArrayConverter.toString());
+			}
+
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Deserializes and set gridIndexPairHaversineDist and pairedIndicesTo1DArrayConverter for that.
+	 * <p>
+	 * Note: the data is to be read from the engine.
+	 */
+	public static void unsetGridIndexPairHaversineDistMaps()
+	{
+		gridIndexPairHaversineDist = null;
+		System.out.println("gridIndexPairHaversineDist set to null and pairedIndicesTo1DArrayConverter set to null ");
+		pairedIndicesTo1DArrayConverter = null;
 	}
 
 	/**

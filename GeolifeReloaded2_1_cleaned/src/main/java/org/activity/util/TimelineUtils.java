@@ -1373,8 +1373,8 @@ public class TimelineUtils
 	 * @param tsForLog
 	 * @return
 	 */
-	private static int getGridIndex(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap, String userForLog,
-			Timestamp tsForLog)
+	public final static int getGridIndex(ArrayList<Integer> locIDs, Map<Long, Integer> locIDGridIndexMap,
+			String userForLog, Timestamp tsForLog)
 	{
 		StringBuilder sbLog = new StringBuilder();
 		Set<Integer> uniqueLocIDs = new TreeSet<>();
@@ -1441,6 +1441,33 @@ public class TimelineUtils
 				Constant.getCommonPath() + "GridIndexPerCheckin.csv");
 
 		return gridIndexToReturn;
+	}
+
+	/**
+	 * Created to assign locGridIndex to already created (TOY) timelines
+	 * 
+	 * @param usersToyDayTimelines
+	 * @return
+	 * @since 6 Aug 2018
+	 */
+	public static final LinkedHashMap<String, LinkedHashMap<Date, Timeline>> assignLocGridIndices(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines)
+	{
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersToyDayTimelines.entrySet())
+		{
+			for (Entry<Date, Timeline> dateEntry : e.getValue().entrySet())
+			{
+				for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+				{
+					Map<Long, Integer> locIDGridIndexMap = DomainConstants.getLocIDGridIndexGowallaMap();
+					int gridIndex = getGridIndex(ao.getLocationIDs(), locIDGridIndexMap, e.getKey(),
+							ao.getStartTimestamp());
+					ao.setGridIndex(gridIndex);
+				}
+			}
+		}
+		return usersToyDayTimelines;
 	}
 
 	/**

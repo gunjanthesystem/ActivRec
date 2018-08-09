@@ -20,6 +20,7 @@ import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.GowallaFeatures;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
+import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.EditDistanceMemorizer;
 import org.activity.io.WToFile;
@@ -277,43 +278,42 @@ public class DistanceUtils
 
 			switch (caseType)
 			{
-				case CaseBasedV1:
-					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-					// invalids are already expunged, no need to expunge again
-					{
-						editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithoutEndCurrentActivity(
-								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-								dateAtRecomm, timeAtRecomm, candidateTimelineId);
-					}
-					else
-					{
-						editDistanceForThisCandidate = hjEditDistance
-								.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
-										userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
-					}
-					break;
+			case CaseBasedV1:
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+				// invalids are already expunged, no need to expunge again
+				{
+					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithoutEndCurrentActivity(
+							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candidateTimelineId);
+				}
+				else
+				{
+					editDistanceForThisCandidate = hjEditDistance
+							.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
+									userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
+				}
+				break;
 
-				case SimpleV3:// "SimpleV3":
-					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-					{
-						editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
-								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-								dateAtRecomm, timeAtRecomm, candidateTimelineId);
-					}
-					else
-					{
-						editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceInvalidsExpunged(
-								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-								dateAtRecomm, timeAtRecomm, candidateTimelineId);
-					}
-					break;
+			case SimpleV3:// "SimpleV3":
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+				{
+					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
+							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candidateTimelineId);
+				}
+				else
+				{
+					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceInvalidsExpunged(
+							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candidateTimelineId);
+				}
+				break;
 
-				default:
-					System.err.println(PopUps.getTracedErrorMsg(
-							"Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type"
-									+ caseType));
-					break;
+			default:
+				System.err.println(PopUps.getTracedErrorMsg(
+						"Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type" + caseType));
+				break;
 			}
 
 			candEditDistances.put(candidateTimelineId, editDistanceForThisCandidate);
@@ -1503,64 +1503,64 @@ public class DistanceUtils
 
 		switch (caseType)
 		{
-			case CaseBasedV1:
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-				// invalids are already expunged, no need to expunge again
+		case CaseBasedV1:
+			if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+			// invalids are already expunged, no need to expunge again
+			{
+				editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithoutEndCurrentActivity(
+						candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+						dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+			}
+			else
+			{
+				editDistanceForThisCandidate = hjEditDistance
+						.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+								candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+								dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+			}
+			break;
+
+		case SimpleV3:// "SimpleV3":
+			if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+			{
+				long t1 = System.nanoTime();
+				editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
+						candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+						dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+				long t2 = System.nanoTime();
+
+				if (false)
 				{
-					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithoutEndCurrentActivity(
-							candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+
+					long t3 = System.nanoTime();
+					Pair<String, Double> editDistanceForThisCandidateDUmmy = hjEditDistance
+							.getHJEditDistanceWithTraceBefore1Mar2018(candTimeline.getActivityObjectsInTimeline(),
+									activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+									candTimeline.getTimelineID());
+					long t4 = System.nanoTime();
+					// StringBuilder sb = new StringBuilder((t2 - t1) + "," + (t4 - t3) + "\n");
+					// Sanity checked OK
+					// sb.append("editDistanceForThisCandidateDUmmy.equals(editDistanceForThisCandidate) = "
+					// + editDistanceForThisCandidateDUmmy.equals(editDistanceForThisCandidate) + "\n");
+					// sb.append("editDistanceForThisCandidateDUmmy=" + editDistanceForThisCandidateDUmmy.toString()
+					// + "\neditDistanceForThisCandidate=" + editDistanceForThisCandidate.toString() + "\n");
+					WToFile.appendLineToFileAbs((t2 - t1) + "," + (t4 - t3) + "\n",
+							Constant.getCommonPath() + "Mar2_DebugED.txt");
 				}
-				else
-				{
-					editDistanceForThisCandidate = hjEditDistance
-							.getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-									candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-									dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
-				}
-				break;
 
-			case SimpleV3:// "SimpleV3":
-				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-				{
-					long t1 = System.nanoTime();
-					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
-							candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
-					long t2 = System.nanoTime();
+			}
+			else
+			{
+				editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceInvalidsExpunged(
+						candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+						dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+			}
+			break;
 
-					if (false)
-					{
-
-						long t3 = System.nanoTime();
-						Pair<String, Double> editDistanceForThisCandidateDUmmy = hjEditDistance
-								.getHJEditDistanceWithTraceBefore1Mar2018(candTimeline.getActivityObjectsInTimeline(),
-										activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
-										candTimeline.getTimelineID());
-						long t4 = System.nanoTime();
-						// StringBuilder sb = new StringBuilder((t2 - t1) + "," + (t4 - t3) + "\n");
-						// Sanity checked OK
-						// sb.append("editDistanceForThisCandidateDUmmy.equals(editDistanceForThisCandidate) = "
-						// + editDistanceForThisCandidateDUmmy.equals(editDistanceForThisCandidate) + "\n");
-						// sb.append("editDistanceForThisCandidateDUmmy=" + editDistanceForThisCandidateDUmmy.toString()
-						// + "\neditDistanceForThisCandidate=" + editDistanceForThisCandidate.toString() + "\n");
-						WToFile.appendLineToFileAbs((t2 - t1) + "," + (t4 - t3) + "\n",
-								Constant.getCommonPath() + "Mar2_DebugED.txt");
-					}
-
-				}
-				else
-				{
-					editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceInvalidsExpunged(
-							candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-							dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
-				}
-				break;
-
-			default:
-				System.err.println(PopUps.getTracedErrorMsg(
-						"Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type" + caseType));
-				break;
+		default:
+			System.err.println(PopUps.getTracedErrorMsg(
+					"Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type" + caseType));
+			break;
 		}
 
 		// editDistancesMemorizer.addToMemory(candTimelineID, Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm),
@@ -1598,59 +1598,58 @@ public class DistanceUtils
 
 		switch (caseType)
 		{
-			case SimpleV3:// "SimpleV3":
-				long t1 = System.nanoTime();
-				// editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
-				// candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-				// dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
-				if (true)// temp
+		case SimpleV3:// "SimpleV3":
+			long t1 = System.nanoTime();
+			// editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
+			// candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+			// dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+			if (true)// temp
+			{
+				if (hjEditDistance == null)
 				{
-					if (hjEditDistance == null)
-					{
-						System.out.println("hjEditDistance==null");
-					}
-					if (candTimeline == null)
-					{
-						System.out.println("candTimeline==null");
-					}
-					if (candTimeline.getActivityObjectsInTimeline() == null)
-					{
-						System.out.println("candTimeline.getActivityObjectsInTimeline()==null");
-					}
-					if (activitiesGuidingRecomm == null)
-					{
-						System.out.println("activitiesGuidingRecomm==null");
-					}
-					if (userAtRecomm == null)
-					{
-						System.out.println("userAtRecomm==null");
-					}
-					if (dateAtRecomm == null)
-					{
-						System.out.println("dateAtRecomm==null");
-					}
-					if (timeAtRecomm == null)
-					{
-						System.out.println("timeAtRecomm==null");
-					}
-					if (candTimeline.getTimelineID() == null)
-					{
-						System.out.println(" candTimeline.getTimelineID()m==null");
-					}
+					System.out.println("hjEditDistance==null");
 				}
+				if (candTimeline == null)
+				{
+					System.out.println("candTimeline==null");
+				}
+				if (candTimeline.getActivityObjectsInTimeline() == null)
+				{
+					System.out.println("candTimeline.getActivityObjectsInTimeline()==null");
+				}
+				if (activitiesGuidingRecomm == null)
+				{
+					System.out.println("activitiesGuidingRecomm==null");
+				}
+				if (userAtRecomm == null)
+				{
+					System.out.println("userAtRecomm==null");
+				}
+				if (dateAtRecomm == null)
+				{
+					System.out.println("dateAtRecomm==null");
+				}
+				if (timeAtRecomm == null)
+				{
+					System.out.println("timeAtRecomm==null");
+				}
+				if (candTimeline.getTimelineID() == null)
+				{
+					System.out.println(" candTimeline.getTimelineID()m==null");
+				}
+			}
 
-				actEDFeatDiffsForThisCandidate = hjEditDistance.getActEditDistWithTrace_FeatDiffs_13April2018(
-						candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-						dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
-				// getActEditDistWithTrace_FeatDiffs_13April2018
-				long t2 = System.nanoTime();
-				break;
+			actEDFeatDiffsForThisCandidate = hjEditDistance.getActEditDistWithTrace_FeatDiffs_13April2018(
+					candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm,
+					timeAtRecomm, candTimeline.getTimelineID());
+			// getActEditDistWithTrace_FeatDiffs_13April2018
+			long t2 = System.nanoTime();
+			break;
 
-			default:
-				System.err
-						.println(PopUps.getTracedErrorMsg("Error in getEditDistances_FeatDiffs: unidentified case type"
-								+ caseType + "\nNOTE: this method has not been implemented yet for all case types"));
-				break;
+		default:
+			System.err.println(PopUps.getTracedErrorMsg("Error in getEditDistances_FeatDiffs: unidentified case type"
+					+ caseType + "\nNOTE: this method has not been implemented yet for all case types"));
+			break;
 		}
 
 		// editDistancesMemorizer.addToMemory(candTimelineID, Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm),
@@ -1695,53 +1694,53 @@ public class DistanceUtils
 
 			switch (caseType)
 			{
-				case CaseBasedV1:// "CaseBasedV1":
-					// editDistanceForThisCandidate =
-					// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
-																		// expunge
-																		// again
-					{
-						featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-								.getFeatureWiseEditDistanceWithoutEndCurrentActivity(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-					}
-					else
-					{
-						featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-								.getFeatureWiseEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-					}
-					break;
+			case CaseBasedV1:// "CaseBasedV1":
+				// editDistanceForThisCandidate =
+				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
+																	// expunge
+																	// again
+				{
+					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
+							.getFeatureWiseEditDistanceWithoutEndCurrentActivity(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+				}
+				else
+				{
+					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
+							.getFeatureWiseEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+				}
+				break;
 
-				case SimpleV3:// "SimpleV3":
-					// editDistanceForThisCandidate =
-					// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-					{
-						featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-								.getFeatureWiseEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),
-										activitiesGuidingRecomm);// ,
-																	// userAtRecomm,
-																	// dateAtRecomm,
-																	// timeAtRecomm,
-																	// candidateTimelineId);
-					}
-					else
-					{
-						featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
-								.getFeatureWiseEditDistanceInvalidsExpunged(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);// ,
-																													// userAtRecomm,
-																													// dateAtRecomm,
-																													// timeAtRecomm,
-																													// candidateTimelineId);
-					}
-					break;
+			case SimpleV3:// "SimpleV3":
+				// editDistanceForThisCandidate =
+				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+				{
+					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
+							.getFeatureWiseEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),
+									activitiesGuidingRecomm);// ,
+																// userAtRecomm,
+																// dateAtRecomm,
+																// timeAtRecomm,
+																// candidateTimelineId);
+				}
+				else
+				{
+					featureWiseEditDistancesForThisCandidate = featureWiseEditDistance
+							.getFeatureWiseEditDistanceInvalidsExpunged(entry.getValue().getActivityObjectsInTimeline(),
+									activitiesGuidingRecomm);// ,
+																// userAtRecomm,
+																// dateAtRecomm,
+																// timeAtRecomm,
+																// candidateTimelineId);
+				}
+				break;
 
-				default:
-					System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
-					break;
+			default:
+				System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
+				break;
 			}
 			/*
 			 * if(caseType.equals("CaseBasedV1")) { editDistanceForThisCandidate =
@@ -1790,47 +1789,46 @@ public class DistanceUtils
 
 			switch (caseType)
 			{
-				case CaseBasedV1:// "CaseBasedV1":
-					// editDistanceForThisCandidate =
-					// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
-																		// expunge
-																		// again
-					{
-						editDistanceForThisCandidate = OTMDSAMEditDistance
-								.getOTMDSAMEditDistanceWithoutEndCurrentActivity(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
-										userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
-					}
-					else
-					{
-						editDistanceForThisCandidate = OTMDSAMEditDistance
-								.getOTMDSAMEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
-										userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
-					}
-					break;
+			case CaseBasedV1:// "CaseBasedV1":
+				// editDistanceForThisCandidate =
+				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
+																	// expunge
+																	// again
+				{
+					editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceWithoutEndCurrentActivity(
+							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candidateTimelineId);
+				}
+				else
+				{
+					editDistanceForThisCandidate = OTMDSAMEditDistance
+							.getOTMDSAMEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm,
+									userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
+				}
+				break;
 
-				case SimpleV3:// "SimpleV3":
-					// editDistanceForThisCandidate =
-					// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-					{
-						editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceWithTrace(
-								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-								dateAtRecomm, timeAtRecomm, candidateTimelineId);
-					}
-					else
-					{
-						editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceInvalidsExpunged(
-								entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
-								dateAtRecomm, timeAtRecomm, candidateTimelineId);
-					}
-					break;
+			case SimpleV3:// "SimpleV3":
+				// editDistanceForThisCandidate =
+				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+				{
+					editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceWithTrace(
+							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candidateTimelineId);
+				}
+				else
+				{
+					editDistanceForThisCandidate = OTMDSAMEditDistance.getOTMDSAMEditDistanceInvalidsExpunged(
+							entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+							dateAtRecomm, timeAtRecomm, candidateTimelineId);
+				}
+				break;
 
-				default:
-					System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
-					break;
+			default:
+				System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
+				break;
 			}
 			/*
 			 * if(caseType.equals("CaseBasedV1")) { editDistanceForThisCandidate =
@@ -1871,45 +1869,45 @@ public class DistanceUtils
 
 			switch (caseType)
 			{
-				case CaseBasedV1:// "CaseBasedV1":
-					// editDistanceForThisCandidate =
-					// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
-																		// expunge
-																		// again
-					{
-						featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-								.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivity(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-					}
-					else
-					{
-						featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-								.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-					}
-					break;
+			case CaseBasedV1:// "CaseBasedV1":
+				// editDistanceForThisCandidate =
+				// editSimilarity.getEditDistanceWithoutEndCurrentActivity(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS) // invalids are already expunged, no need to
+																	// expunge
+																	// again
+				{
+					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
+							.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivity(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+				}
+				else
+				{
+					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
+							.getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+				}
+				break;
 
-				case SimpleV3:// "SimpleV3":
-					// editDistanceForThisCandidate =
-					// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
-					if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
-					{
-						featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-								.getFeatureWiseWeightedEditDistanceRawValsWithTrace(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-					}
-					else
-					{
-						featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
-								.getFeatureWiseWeightedEditDistanceInvalidsExpunged(
-										entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
-					}
-					break;
+			case SimpleV3:// "SimpleV3":
+				// editDistanceForThisCandidate =
+				// editSimilarity.getEditDistanceWithTrace(entry.getValue().getActivityObjectsInTimeline(),activitiesGuidingRecomm);
+				if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+				{
+					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
+							.getFeatureWiseWeightedEditDistanceRawValsWithTrace(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+				}
+				else
+				{
+					featureWiseWeightedEditDistancesForThisCandidate = featureWiseWeightedEditDistance
+							.getFeatureWiseWeightedEditDistanceInvalidsExpunged(
+									entry.getValue().getActivityObjectsInTimeline(), activitiesGuidingRecomm);
+				}
+				break;
 
-				default:
-					System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
-					break;
+			default:
+				System.err.println("Error in getEditDistancesForCandidateTimelineFullCand: unidentified case type");
+				break;
 			}
 			/*
 			 * if(caseType.equals("CaseBasedV1")) { editDistanceForThisCandidate =
@@ -1951,34 +1949,34 @@ public class DistanceUtils
 
 		switch (distanceUsed)
 		{
-			case "HJEditDistance":
-				return getNormalisedHJEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
-						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
-						timeAtRecomm.toString(), hjEditDistance, editDistancesMemorizer);
-			case "FeatureWiseEditDistance":
-				return getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
-						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
-						timeAtRecomm.toString(), featureWiseEditDistance);
+		case "HJEditDistance":
+			return getNormalisedHJEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+					hjEditDistance, editDistancesMemorizer);
+		case "FeatureWiseEditDistance":
+			return getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+					featureWiseEditDistance);
 
-			case "FeatureWiseWeightedEditDistance":
-				return getNormalisedFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
-						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
-						timeAtRecomm.toString(), featureWiseWeightedEditDistance);
+		case "FeatureWiseWeightedEditDistance":
+			return getNormalisedFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+					featureWiseWeightedEditDistance);
 
-			case "OTMDSAMEditDistance":
-				return getNormalisedOTMDSAMEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
-						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
-						timeAtRecomm.toString(), OTMDSAMEditDistance);
-			default:
-				PopUps.showError(
-						"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand():Unknown distance specified:"
-								+ distanceUsed);
-				System.err.println(PopUps.getTracedErrorMsg(
-						"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand(): Unknown distance specified:"
-								+ distanceUsed));
-				// throw new Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance
-				// specified:" + dname);
-				System.exit(-1);
+		case "OTMDSAMEditDistance":
+			return getNormalisedOTMDSAMEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
+					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+					OTMDSAMEditDistance);
+		default:
+			PopUps.showError(
+					"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand():Unknown distance specified:"
+							+ distanceUsed);
+			System.err.println(PopUps.getTracedErrorMsg(
+					"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand(): Unknown distance specified:"
+							+ distanceUsed));
+			// throw new Exception("Error in org.activity.util.Constant.setDistanceUsed(String): Unknown distance
+			// specified:" + dname);
+			System.exit(-1);
 		}
 		System.err.println(PopUps.getTracedErrorMsg(
 				"Error in org.activity.recomm.RecommendationMasterMU.getNormalisedDistancesForCandidateTimelinesFullCand()"
@@ -2074,23 +2072,40 @@ public class DistanceUtils
 		// System.out.println("Constant.typeOfCandThreshold= " + Constant.typeOfCandThreshold);
 		// System.out.println("Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour)= "
 		// + Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour));
-		if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour))
-		{// Constant.nearestNeighbourThreshold > 0)
+		TypeOfCandThreshold typeOfCandThresholdForGivenDimension = null;
+		if (hjEditDistance.primaryDimension.equals(Constant.primaryDimension))
+		{
+			typeOfCandThresholdForGivenDimension = Constant.typeOfCandThresholdPrimDim;
+		}
+		if (hjEditDistance.primaryDimension.equals(Constant.secondaryDimension))
+		{
+			typeOfCandThresholdForGivenDimension = Constant.typeOfCandThresholdSecDim;
+		}
+
+		if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.NearestNeighbour)
+				|| typeOfCandThresholdForGivenDimension
+						.equals(Enums.TypeOfCandThreshold.NearestNeighbourWithEDValThresh))
+		{
 			candEditDistances = filterCandsNearestNeighbours(candEditDistances,
 					Constant.getNearestNeighbourCandEDThresholdGivenDim(hjEditDistance.primaryDimension));
-			// Constant.nearestNeighbourCandEDThresholdPrimDim);
 		}
-		else if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.Percentile))
+		if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.Percentile))
 		{
 			// if (Constant.percentileCandEDThreshold != 100)// Not NO Threshold
 			candEditDistances = filterCandsPercentileED(candEditDistances, Constant.percentileCandEDThreshold);
 		}
-		else if (Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.None))
+		if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.NearestNeighbourWithEDValThresh))
+		{
+			candEditDistances = filterCandsEDThreshold(candEditDistances,
+					Constant.getEDThresholdGivenDim(hjEditDistance.primaryDimension));
+		}
+		if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.None))
 		{
 			System.out.println("Alert! no filtering cands");
 		}
 
-		System.out.println("\nafter filter candEditDistances.size():" + candEditDistances.size());
+		System.out.println("\nafter filter candEditDistances.size():" + candEditDistances.size()
+				+ " typeOfCandThresholdForGivenDimension=" + typeOfCandThresholdForGivenDimension);
 		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = null;
 
 		// if (Constant.useRTVerseNormalisationForED)
@@ -2185,6 +2200,52 @@ public class DistanceUtils
 					e -> sb.append("\t" + e.getKey() + "-" + e.getValue().getSecond().toString() + "\n"));
 			System.out.println(sb.toString());
 		}
+		return candEditDistancesFiltered;
+	}
+
+	/**
+	 * Keep only the cand with ED <= x
+	 * 
+	 * @param candEditDistances
+	 * @param edUpperBoundThreshold
+	 * @return
+	 * @since 9 Aug 2018
+	 */
+	private static LinkedHashMap<String, Pair<String, Double>> filterCandsEDThreshold(
+			LinkedHashMap<String, Pair<String, Double>> candEditDistances, double edUpperBoundThreshold)
+	{
+		System.out.print("... filtering filterCandsEDThreshold, edUpperBoundThreshold <= " + edUpperBoundThreshold);
+
+		if (edUpperBoundThreshold < 0 || edUpperBoundThreshold > 1)
+		{
+			PopUps.showError(
+					"Error in filterCandsEDThreshold. edUpperBoundThreshold (<0||>1) = " + edUpperBoundThreshold);
+			System.exit(-1);
+		}
+
+		// LinkedHashMap<String, Pair<String, Double>> candEditDistancesSorted = (LinkedHashMap<String, Pair<String,
+		// Double>>) ComparatorUtils.sortByValueAscendingStrStrDoub(candEditDistances);
+
+		LinkedHashMap<String, Pair<String, Double>> candEditDistancesFiltered = new LinkedHashMap<>();
+		StringBuilder sbSanityLog = new StringBuilder();
+		int countOfErrors = 0;
+
+		for (Entry<String, Pair<String, Double>> candEntry : candEditDistances.entrySet())
+		{
+			Double edVal = candEntry.getValue().getSecond();
+			if (edVal < 0 || edVal > 1)
+			{
+				sbSanityLog.append("Warning 9 Aug in filterCandsEDThreshold()! edVal >1||<0 , edVal= " + edVal + "\n");
+				countOfErrors += 1;
+			}
+
+			if (edVal <= edUpperBoundThreshold)
+			{
+				candEditDistancesFiltered.put(candEntry.getKey(), candEntry.getValue());
+			}
+		}
+		System.out.println(sbSanityLog.toString());
+		System.out.println("Num of cand with ED out of norm range = " + countOfErrors);
 		return candEditDistancesFiltered;
 	}
 
