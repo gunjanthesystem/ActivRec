@@ -24,7 +24,8 @@ public class PathConstants
 	public static String pathToLocationTimezoneInfo;
 	public static String pathToSerialisedGowallaLocZoneIdMap;
 	// ./dataToRead/Feb26/UniqueLocationObjects5DaysTrainTestWithTZUsingPy.csv
-	public static final String pathToToyTimelines = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN7ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTVToyRun6Chosen/ToyTimelinesManually6June.kryo";
+	public static final String pathToToyTimelines6JUN = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN7ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTVToyRun6Chosen/ToyTimelinesManually6June.kryo";
+	public static final String pathToToyTimelines12AUG = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG12ToyTimelineCreation/ToyTimelinesManuallyAUG12.kryo";
 
 	public static final String pathToFileWithIndicesOfGTZeroUsers = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/Concatenated/MinMUWithMaxFirst3_GTZero.csv";
 

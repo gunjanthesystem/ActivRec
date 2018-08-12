@@ -28,7 +28,7 @@ repositories {
     maven { url "http://download.osgeo.org/webdav/geotools/" }
     maven { url "https://repo.boundlessgeo.com/release" }
     maven { url "https://jitpack.io" }
-	maven { url "https://raw.github.com/amidst/toolbox/mvn-repo/"}
+	//maven { url "https://raw.github.com/amidst/toolbox/mvn-repo/"}
     maven { url "https://plugins.gradle.org/m2/"}
     maven { url "https://oss.sonatype.org/content/repositories/snapshots"}
     maven { url "https://nexus.bedatadriven.com/content/groups/public"} //for renjin}
@@ -234,7 +234,7 @@ mainClassName = 'org.activity.controller.SuperController'
 task runApp(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = mainClassName
-  jvmArgs = ['-Xmx14g']
+  jvmArgs = ['-Xmx9g']
   //
   //,'-javaagent:libs/plumbr/plumbr.jar']
   //, '-XX:-UseGCOverheadLimit

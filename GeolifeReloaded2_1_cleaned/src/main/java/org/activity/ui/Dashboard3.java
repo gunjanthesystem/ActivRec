@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.PathConstants;
 import org.activity.controller.ControllerWithoutServer;
 import org.activity.io.Serializer;
@@ -71,7 +72,7 @@ public class Dashboard3 extends Application
 {
 	public static Map<Integer, Integer> actIDIndexMap;
 	Stage stage;
-	String pathToToyTimelines = PathConstants.pathToToyTimelines;
+	// String pathToToyTimelines = ;
 	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY21ED0.35STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTV/ToyTimelines21May.kryo";
 	// MenuBar menuBar;
 
@@ -96,13 +97,13 @@ public class Dashboard3 extends Application
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = null;
 
-		if (false)// disabled on 24 July 2018, as i getting deserialisation error, perhaps because ActivityObject class
+		if (true)// disabled on 24 July 2018, as i getting deserialisation error, perhaps because ActivityObject class
 					// has changes this serialised toy timelines being read were created. remedy to do later, create toy
 					// timelines again.
 		{
 
 			usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-					.kryoDeSerializeThis(pathToToyTimelines);
+					.kryoDeSerializeThis(PathConstants.pathToToyTimelines12AUG);
 			ControllerWithoutServer.setDataVarietyConstants(usersCleanedDayToyTimelines, true, "ToyTs_", true, true);
 
 			List<Integer> uniqueActIDs = new ArrayList<>(Constant.getUniqueActivityIDs());
@@ -207,12 +208,12 @@ public class Dashboard3 extends Application
 		// usersCleanedDayToyTimelines);
 		System.out.println("Entered createTabs()");
 		final boolean doSyntheticDataCircleTimelines = false;
-		final boolean doGivenDataCircleTimelines = false;
-		final boolean doGivenDataOnlyActIDSeq = false;
+		final boolean doGivenDataCircleTimelines = true;
+		final boolean doGivenDataOnlyActIDSeq = true;
 		final boolean doSyntheticDataCanvasTimelines = false;
 		final boolean doSyntheticDataBoxTimelines = false;
 		final boolean doSyntheticDataLineTimelines = false;
-		final boolean doMapPlot = true;
+		final boolean doMapPlot = false;
 
 		try
 		{
@@ -558,9 +559,14 @@ public class Dashboard3 extends Application
 
 			for (ActivityObject ao : userEntry.getValue().getActivityObjectsInTimeline())
 			{
+				String toolTipText = "st: " + ao.getStartTimestamp().toString() + "\nlocG: "
+						+ ao.getGivenDimensionVal("|", PrimaryDimension.LocationGridID) + "\ndistP (km): "
+						+ (ao.getDistanceInMFromPrev() / 1000) + "\ndurP (min): "
+						+ (ao.getDurationInSecondsFromPrev() / 60) + "\nphotos: " + ao.getPhotos_count();
+
 				hBox.getChildren()
 						.add(createStackPane(ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID())),
-								String.valueOf(ao.getActivityID()), widthOfActRect, ao.getStartTimestamp().toString()));
+								String.valueOf(ao.getActivityID()), widthOfActRect, toolTipText));
 			}
 			vBox.getChildren().add(hBox);
 		}
@@ -587,6 +593,14 @@ public class Dashboard3 extends Application
 		return t;
 	}
 
+	/**
+	 * 
+	 * @param color
+	 * @param text
+	 * @param width
+	 * @param tooltipText
+	 * @return
+	 */
 	private StackPane createStackPane(Color color, String text, double width, String tooltipText)
 	{
 		final StackPane stack = new StackPane();

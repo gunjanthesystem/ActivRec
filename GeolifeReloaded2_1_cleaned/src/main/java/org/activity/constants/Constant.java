@@ -165,7 +165,7 @@ public final class Constant
 	// Filtering the candidate timeline ..
 	public static final Enums.TypeOfCandThreshold typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
 	// added on 8 Aug 2018
-	public static final Enums.TypeOfCandThreshold typeOfCandThresholdSecDim = TypeOfCandThreshold.NearestNeighbourWithEDValThresh;
+	public static final Enums.TypeOfCandThreshold typeOfCandThresholdSecDim = TypeOfCandThreshold.NearestNeighbour;
 	// None,Percentile // SWITCH_NOV10
 
 	public static final int filterCandByCurActTimeThreshInSecs = -1;// 10800;// -1; 18000; 3600 7200; //SWITCH_NOV10
@@ -183,7 +183,7 @@ public final class Constant
 	public static final double candEDValThresholdPrimDim = -1;
 	// -1 for no filter//SWITCH_NOV10
 	// added on 23 July 2018 to keep it separate from the threshold used for primary dimension
-	public static final int nearestNeighbourCandEDThresholdSecDim = 50;// 0;
+	public static final int nearestNeighbourCandEDThresholdSecDim = 500;// 0;
 	public static final double candEDValThresholdSecDim = 0.5;
 
 	// End of parameters for Candidate timelines
@@ -208,6 +208,7 @@ public final class Constant
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
 	public static final boolean useStartTimeInFED = false;// SWITCH_NOV10
 	public static final boolean useLocationInFED = false;// SWITCH_NOV10
+	public static final boolean useHaversineDistInLocationFED = true;// SWITCH_NOV10 //added on Aug 11 2018
 	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
@@ -230,7 +231,7 @@ public final class Constant
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean useRandomlySampled100Users = true;// false;// false;// true;// SWITCH_NOV10
+	public static final boolean useRandomlySampled100Users = false;// true;// false;// false;// true;// SWITCH_NOV10
 	/**
 	 * Use only subset of the users from the randomly sampled users (useful for running small sample experiments for
 	 * faster iterations)
@@ -238,7 +239,7 @@ public final class Constant
 	public static final boolean useSelectedGTZeroUsersFromRandomlySampled100Users = false;
 	public static String pathToRandomlySampledUserIndices = "";
 
-	public static final boolean runForAllUsersAtOnce = false;// false;// true;// false;// true;// SWITCH_April8
+	public static final boolean runForAllUsersAtOnce = true;// false;// false;// true;// false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// TODO: keep it true as the other verion may not be uptodate
 															// (Aug3,2018) SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
@@ -247,7 +248,7 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useToyTimelines = false;// false;// true;/SWITCH_AUG6
+	public static final boolean useToyTimelines = true;// false;// true;/SWITCH_AUG6
 
 	// public static final int numOfHiddenLayersInRNN1 = 3;// 3;
 	// public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;
@@ -264,7 +265,7 @@ public final class Constant
 
 	public static final boolean mapLocIDToGridID = true;
 
-	public static final boolean doSecondaryDimension = true;
+	public static final boolean doSecondaryDimension = false;
 	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
 	public static final boolean debug18July2018 = false;
 	public static final boolean doWeightedEditDistanceForSecDim = false;// true;//SWITCH_AUG
@@ -757,7 +758,8 @@ public final class Constant
 
 		setActIDNameIndexMap(databaseName, Constant.getActivityNames());
 
-		if (Constant.doWeightedEditDistanceForSecDim)
+		if (Constant.doWeightedEditDistanceForSecDim
+				|| (Constant.useHaversineDistInLocationFED && Constant.useLocationInFED))
 		{
 			DomainConstants.setGridIndexPairHaversineDistMaps();
 			// gdDistProvider = new GridDistancesProvider(PathConstants.pathToSerialisedGridIndexPairDist,
@@ -1602,6 +1604,7 @@ public final class Constant
 		s.append("\nuseActivityNameInFED:" + useActivityNameInFED);
 		s.append("\nuseStartTimeInFED:" + useStartTimeInFED);
 		s.append("\nuseLocationInFED:" + useLocationInFED);
+		s.append("\ndistanceScaledLocationFED:" + useHaversineDistInLocationFED);
 		s.append("\nusePopularityInFED:" + usePopularityInFED);
 		s.append("\nuseDistFromPrevInFED:" + useDistFromPrevInFED);
 		s.append("\nuseDurationFromPrevInFED:" + useDurationFromPrevInFED);

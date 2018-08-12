@@ -227,6 +227,46 @@ public class DomainConstants
 
 	/**
 	 * 
+	 * @param gridIndices1
+	 * @param gridIndices2
+	 * @return
+	 * @since 11 Aug 2018
+	 */
+	public static double getMinHaversineDistForGridIndicesPairs(List<Integer> gridIndices1, List<Integer> gridIndices2)
+	{
+		double minHaversineDist = Double.MAX_VALUE;
+
+		List<Double> allDistsForSanityCheck = new ArrayList<>();
+
+		for (Integer gridIndex1 : gridIndices1)
+		{
+			for (Integer gridIndex2 : gridIndices2)
+			{
+				if (gridIndex1.equals(gridIndex2) == false)
+				{
+					double haversineDist = getHaversineDistForGridIndexPairs(gridIndex1, gridIndex2);
+					allDistsForSanityCheck.add(haversineDist);
+					if (haversineDist < minHaversineDist)
+					{
+						minHaversineDist = haversineDist;
+					}
+				}
+			}
+		}
+
+		if (false)// sanity check // Aug 11: seems not actually necessary because all AO's have been assigned only one
+					// location gridIndex
+		{
+			System.out.println("Debug11Aug getMinHaversineDistForGridIndicesPairs: Grid indices compared: "
+					+ gridIndices1 + " and " + gridIndices2 + "\n" + " all dists =" + allDistsForSanityCheck
+					+ "\nminDist = " + minHaversineDist + "\n");
+		}
+
+		return minHaversineDist;
+	}
+
+	/**
+	 * 
 	 * @param gridIndex1
 	 * @param gridIndex2
 	 * @return
