@@ -230,7 +230,7 @@ public class SuperController
 		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
 
-		double[] EDAlphas = { 1 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
+		double[] EDAlphas = { 0.5 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
 
 		// added on 29 July 2018 when running for multiple iterations
 		for (int iteration = 0; iteration < 1; iteration++)
@@ -342,19 +342,21 @@ public class SuperController
 
 		String labelForExperimentConfig = getLabelForExperimentConfig(sampledUserIndicesSetFile);
 
-		String[] commonPaths = {
-				"/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/" };
-		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG9ED1.0AllActsFDStFilter0hrs100RTVPNN500SNNWED50|0.5/"
-		// };
-		// "./dataWritten/AUG7ED1.0AllActsFDStFilter0hrs100RTV500PDNTh10SDNThWtdSecDim/" };
-		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/" };
-		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
-		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
-		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
-		// { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-		// { "./dataWritten/"
-		// + LocalDateTime.now().getMonth().toString().substring(0, 3)
-		// + LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
+		String[] commonPaths = // {
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
+				// };
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG9ED1.0AllActsFDStFilter0hrs100RTVPNN500SNNWED50|0.5/"
+				// };
+				// "./dataWritten/AUG7ED1.0AllActsFDStFilter0hrs100RTV500PDNTh10SDNThWtdSecDim/" };
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
+				// };
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
+				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
+				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+						// { "./dataWritten/"
+						+ LocalDateTime.now().getMonth().toString().substring(0, 3)
+						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
@@ -405,7 +407,7 @@ public class SuperController
 				// use directory.mkdirs(); here instead.
 			}
 			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], false, true, true, "gowalla1");
+			runExperiments(commonPaths[i], true, true, true, "gowalla1");
 			// cleanUpSpace(commonPaths[i], 0.90);
 			System.out.println("finished for commonPath = " + commonPaths[i]);
 		}
@@ -721,7 +723,7 @@ public class SuperController
 							false, true);
 
 				}
-				if (doPostFiltering)
+				if (doPostFiltering && Constant.doSecondaryDimension)
 				{
 					new PostFilter1(commonPath); // requires results from preceeding EvaluationSeq
 

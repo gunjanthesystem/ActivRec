@@ -3619,6 +3619,7 @@ public class AlignmentBasedDistance
 	}
 
 	/**
+	 * score = 1 - ((thresholdInKms - dist) / thresholdInKms);
 	 * 
 	 * @param dist
 	 * @since August 3 2018
@@ -3944,17 +3945,43 @@ public class AlignmentBasedDistance
 			{
 				if (primaryDimension.equals(PrimaryDimension.LocationID) == false)
 				{
+					// Start of disabled on 10 Aug 2018
+					// double diffLoc;
+					// if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() ==
+					// 0)
+					// { // if no matching locationIDs then add wt to dfeat
+					// diffLoc = 1;
+					// }
+					// else
+					// {
+					// diffLoc = 0;// even if one location matches, location distance is 0
+					// }
+					// featureDiffMap.put(GowallaFeatures.LocationF, diffLoc);
+					// End of disabled on 10 Aug 2018
+					// Start of added on 10 Aug 2018
 					double diffLoc;
-					if (UtilityBelt.getIntersection(ao1.getUniqueLocationIDs(), ao2.getUniqueLocationIDs()).size() == 0)
-					{ // if no matching locationIDs then add wt to dfeat
-						diffLoc = 1;
+					if (Constant.useHaversineDistInLocationFED)
+					{
+						diffLoc = DomainConstants.getMinHaversineDistForGridIndicesPairs(
+								ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID),
+								ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID));
 					}
 					else
 					{
-						diffLoc = 0;// even if one location matches, location distance is 0
+						if (UtilityBelt.getIntersection(ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID),
+								ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID)).size() == 0)
+						{ // if no matching locationIDs then add wt to dfeat
+							diffLoc = 1;
+						}
+						else
+						{
+							diffLoc = 0;// even if one location matches, location distance is 0
+						}
 					}
 					featureDiffMap.put(GowallaFeatures.LocationF, diffLoc);
+					// End of added on 10 Aug 2018
 				}
+
 			}
 			if (useActivityNameInFED)
 			{

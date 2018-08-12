@@ -223,11 +223,11 @@ public class PostFilter1
 					LinkedHashMap<String, Double> top10WithScoreSecDim = trimToTopN(topKWithScoreSecDim, 10);
 
 					top5WithScorePrimDim = minMaxNormalise(top5WithScorePrimDim);
-					top10WithScorePrimDim = minMaxNormalise(top10WithScorePrimDim);
+					top10WithScorePrimDim = minMaxNormalise(top10WithScorePrimDim);// TODO INCOMLETE
 
-					top3WithScoreSecDim = minMaxNormalise(top3WithScoreSecDim);
+					top3WithScoreSecDim = minMaxNormalise(top3WithScoreSecDim);// TODO INCOMLETE
 					top5WithScoreSecDim = minMaxNormalise(top5WithScoreSecDim);
-					top10WithScoreSecDim = minMaxNormalise(top10WithScoreSecDim);
+					top10WithScoreSecDim = minMaxNormalise(top10WithScoreSecDim);// TODO INCOMLETE
 
 					LinkedHashMap<String, Double> locGridAvailabilityScoreForEachActIDTop3 = getLocGridAvailabilityScoreForEachActID(
 							top5WithScorePrimDim, top3WithScoreSecDim, actIDLocGridIDsMap, verbose);
@@ -254,11 +254,11 @@ public class PostFilter1
 					/////////////////////
 					/////////////////////
 					// added on 9 Aug 2018
-					LinkedHashMap<String, Double> recommPDWtdAlpha25PF = weightedCombine(top5WithScorePrimDim,
-							locGridAvailabilityScoreForEachActIDTop5, 0.25, true, verbose);
-					recommPDWtdAlpha25PF.entrySet().stream()
-							.forEachOrdered(e -> sbPDWtdAlpha5_5_25PF.append("__" + e.getKey()));
-					sbPDWtdAlpha5_5_25PF.append(",");
+					// LinkedHashMap<String, Double> recommPDWtdAlpha25PF = weightedCombine(top5WithScorePrimDim,
+					// locGridAvailabilityScoreForEachActIDTop5, 0.25, true, verbose);
+					// recommPDWtdAlpha25PF.entrySet().stream()
+					// .forEachOrdered(e -> sbPDWtdAlpha5_5_25PF.append("__" + e.getKey()));
+					// sbPDWtdAlpha5_5_25PF.append(",");
 					/////////////////////
 
 					LinkedHashMap<String, Double> recommPDFltr_on_Top5LocsPF = filterKeepingPrimDimScore(

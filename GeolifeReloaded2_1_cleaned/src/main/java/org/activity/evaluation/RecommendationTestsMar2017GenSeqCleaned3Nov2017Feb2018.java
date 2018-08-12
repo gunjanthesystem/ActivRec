@@ -56,6 +56,7 @@ import org.activity.util.TimelineUtils;
  * 
  * @author gunjan
  * @since 16 Feb 2018
+ * @deprecated
  */
 public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 {
@@ -2373,34 +2374,34 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 		switch (primaryDimension)
 		{
-			case ActivityID:
-			{
-				activityID = topPrimaryDimensionVal;
-				if (Constant.getDatabaseName().equals("gowalla1"))
-				{// for gowalla dataset, act id and act name are same
-					activityName = String.valueOf(topPrimaryDimensionVal);
-					workingLevelCatIDs = topPrimaryDimensionVal + "__";
-				}
-				else
-				{
-					PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
-				}
-
-				break;
-			}
-			case LocationID:
-			{
-				locationIDs.add(topPrimaryDimensionVal);
+		case ActivityID:
+		{
+			activityID = topPrimaryDimensionVal;
+			if (Constant.getDatabaseName().equals("gowalla1"))
+			{// for gowalla dataset, act id and act name are same
+				activityName = String.valueOf(topPrimaryDimensionVal);
 				workingLevelCatIDs = topPrimaryDimensionVal + "__";
-				// locationName =
-				// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
-				// if (locationName == null || locationName.length() == 0)
-				// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
-				break;
 			}
-			default:
-				PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
-				break;
+			else
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
+			}
+
+			break;
+		}
+		case LocationID:
+		{
+			locationIDs.add(topPrimaryDimensionVal);
+			workingLevelCatIDs = topPrimaryDimensionVal + "__";
+			// locationName =
+			// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+			// if (locationName == null || locationName.length() == 0)
+			// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+			break;
+		}
+		default:
+			PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
+			break;
 		}
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
@@ -2477,34 +2478,34 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 		switch (primaryDimension)
 		{
-			case ActivityID:
-			{
-				activityID = topPrimaryDimensionVal;
-				if (Constant.getDatabaseName().equals("gowalla1"))
-				{// for gowalla dataset, act id and act name are same
-					activityName = String.valueOf(topPrimaryDimensionVal);
-					workingLevelCatIDs = topPrimaryDimensionVal + "__";
-				}
-				else
-				{
-					PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
-				}
-
-				break;
-			}
-			case LocationID:
-			{
-				locationIDs.add(topPrimaryDimensionVal);
+		case ActivityID:
+		{
+			activityID = topPrimaryDimensionVal;
+			if (Constant.getDatabaseName().equals("gowalla1"))
+			{// for gowalla dataset, act id and act name are same
+				activityName = String.valueOf(topPrimaryDimensionVal);
 				workingLevelCatIDs = topPrimaryDimensionVal + "__";
-				// locationName =
-				// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
-				// if (locationName == null || locationName.length() == 0)
-				// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
-				break;
 			}
-			default:
-				PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
-				break;
+			else
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: not implemented this for besides gowalla1");
+			}
+
+			break;
+		}
+		case LocationID:
+		{
+			locationIDs.add(topPrimaryDimensionVal);
+			workingLevelCatIDs = topPrimaryDimensionVal + "__";
+			// locationName =
+			// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+			// if (locationName == null || locationName.length() == 0)
+			// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+			break;
+		}
+		default:
+			PopUps.printTracedErrorMsgWithExit("Error: unknown primaryDimension = " + Constant.primaryDimension);
+			break;
 		}
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
@@ -2773,17 +2774,17 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 		System.out.println("setThresholdsArray");
 		switch (typeOfThreshold)
 		{
-			case Percent:// "Percent":
-				this.thresholdsArray = percentThresholds;
-				break;
-			case Global:// "Global":
-				this.thresholdsArray = globalThresholds;
-				break;
-			// case "None":
-			// this.thresholdsArray = new int[] { 10000000 };
-			// break;
-			default:
-				System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
+		case Percent:// "Percent":
+			this.thresholdsArray = percentThresholds;
+			break;
+		case Global:// "Global":
+			this.thresholdsArray = globalThresholds;
+			break;
+		// case "None":
+		// this.thresholdsArray = new int[] { 10000000 };
+		// break;
+		default:
+			System.err.println("Error: Unrecognised threshold type in setThresholdsArray():" + typeOfThreshold);
 		}
 	}
 
@@ -3630,27 +3631,27 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 				switch (primaryDimension)
 				{
-					case ActivityID:
-					{
-						activityID = pdVal;
-						activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
-						workingLevelCatIDs = pdVal + "__";
-						break;
-					}
-					case LocationID:
-					{
-						locationIDs.add(pdVal);
-						workingLevelCatIDs = pdVal + "__";
-						// locationName =
-						// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
-						// if (locationName == null || locationName.length() == 0)
-						// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
-						break;
-					}
-					default:
-						PopUps.printTracedErrorMsgWithExit(
-								"Error: unknown primaryDimension = " + Constant.primaryDimension);
-						break;
+				case ActivityID:
+				{
+					activityID = pdVal;
+					activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
+					workingLevelCatIDs = pdVal + "__";
+					break;
+				}
+				case LocationID:
+				{
+					locationIDs.add(pdVal);
+					workingLevelCatIDs = pdVal + "__";
+					// locationName =
+					// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+					// if (locationName == null || locationName.length() == 0)
+					// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+					break;
+				}
+				default:
+					PopUps.printTracedErrorMsgWithExit(
+							"Error: unknown primaryDimension = " + Constant.primaryDimension);
+					break;
 				}
 				// ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String
 				// locationName, Timestamp startTimestamp, String startLatitude, String startLongitude, String
@@ -3763,27 +3764,27 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018
 
 				switch (primaryDimension)
 				{
-					case ActivityID:
-					{
-						activityID = pdVal;
-						activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
-						workingLevelCatIDs = pdVal + "__";
-						break;
-					}
-					case LocationID:
-					{
-						locationIDs.add(pdVal);
-						workingLevelCatIDs = pdVal + "__";
-						// locationName =
-						// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
-						// if (locationName == null || locationName.length() == 0)
-						// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
-						break;
-					}
-					default:
-						PopUps.printTracedErrorMsgWithExit(
-								"Error: unknown primaryDimension = " + Constant.primaryDimension);
-						break;
+				case ActivityID:
+				{
+					activityID = pdVal;
+					activityName = String.valueOf(pdVal); // for gowalla dataset, act id and act name are same
+					workingLevelCatIDs = pdVal + "__";
+					break;
+				}
+				case LocationID:
+				{
+					locationIDs.add(pdVal);
+					workingLevelCatIDs = pdVal + "__";
+					// locationName =
+					// DomainConstants.getLocIDLocationObjectDictionary().get(pdVal).getLocationName();
+					// if (locationName == null || locationName.length() == 0)
+					// { PopUps.printTracedErrorMsg("Error: fetched locationName= " + locationName); }
+					break;
+				}
+				default:
+					PopUps.printTracedErrorMsgWithExit(
+							"Error: unknown primaryDimension = " + Constant.primaryDimension);
+					break;
 				}
 				// ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String
 				// locationName, Timestamp startTimestamp, String startLatitude, String startLongitude, String

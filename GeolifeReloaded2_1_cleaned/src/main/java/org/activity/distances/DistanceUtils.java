@@ -532,27 +532,30 @@ public class DistanceUtils
 			}
 		}
 
-		// <CandidateTimeline ID, Edit distance>
-		LinkedHashMap<String, Pair<String, Double>> candEditDistancesNoLogging = getRTVerseMinMaxNormalisedEditDistancesNoLogging(
-				candAEDFeatDiffs, minOfMinOfDiffs, maxOfMaxOfDiffs, hjEditDistance, activitiesGuidingRecomm,
-				userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelines);
-
+		LinkedHashMap<String, Pair<String, Double>> candEditDistancesRes = null;
 		// Start of Sanity Check if no logging version is giving identical output as logging version:
-		if (false)// Sanity Check passed on April 25 2018
+		if (true)// Sanity Check passed on April 25 2018
 		{
 			LinkedHashMap<String, Pair<String, Double>> candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistances(
 					candAEDFeatDiffs, minOfMinOfDiffs, maxOfMaxOfDiffs, hjEditDistance, activitiesGuidingRecomm,
 					userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelines);
 
-			boolean isNoLoggingSane = candEditDistancesNoLogging.equals(candEditDistancesLogging);
-
-			System.out.println("candEditDistancesNoLogging.equals(candEditDistancesLogging) = " + isNoLoggingSane);
-			WToFile.appendLineToFileAbs(String.valueOf(isNoLoggingSane) + "\n",
-					Constant.getCommonPath() + "DebugApr25RTVerseNoLogSanity.csv");
+			// boolean isNoLoggingSane = candEditDistancesNoLogging.equals(candEditDistancesLogging);
+			// System.out.println("candEditDistancesNoLogging.equals(candEditDistancesLogging) = " + isNoLoggingSane);
+			// WToFile.appendLineToFileAbs(String.valueOf(isNoLoggingSane) + "\n",
+			// Constant.getCommonPath() + "DebugApr25RTVerseNoLogSanity.csv");
+			candEditDistancesRes = candEditDistancesLogging;
 		}
 		// End of Sanity Check if no logging version is giving identical output as logging version:
-
-		return candEditDistancesNoLogging;
+		else
+		{
+			// <CandidateTimeline ID, Edit distance>
+			LinkedHashMap<String, Pair<String, Double>> candEditDistancesNoLogging = getRTVerseMinMaxNormalisedEditDistancesNoLogging(
+					candAEDFeatDiffs, minOfMinOfDiffs, maxOfMaxOfDiffs, hjEditDistance, activitiesGuidingRecomm,
+					userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelines);
+			candEditDistancesRes = candEditDistancesNoLogging;
+		}
+		return candEditDistancesRes;
 	}
 
 	/**
@@ -833,12 +836,14 @@ public class DistanceUtils
 			/////////
 		} // end of loop over cands
 
-		if (true)// logging
+		if (false)// logging
 		{
 			// WToFile.appendLineToFileAbs(logTxt.toString() + "\n",
 			// Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances.txt");
 			WToFile.appendLineToFileAbs(logEachCand.toString(),
 					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv");
+			// header:
+			// userAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,normActDistForThisCand,sumOfNormFDsOverAOsOfThisCand,meanOverAOsNormFDForThisCand,medianOverAOsNormFDForThisCand,stdDevOverAOsNormFDForThisCand,meanUponStdDev,resultantEditDist
 			WToFile.appendLineToFileAbs(logEachAOAllCands.toString(),
 					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
 		}
@@ -1096,6 +1101,7 @@ public class DistanceUtils
 	 *            just for logging
 	 * @since April 27 2018
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 * @deprecated
 	 */
 	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistancesV3April27(
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs,

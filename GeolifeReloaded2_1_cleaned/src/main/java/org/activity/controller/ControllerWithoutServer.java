@@ -230,10 +230,10 @@ public class ControllerWithoutServer
 
 			if (Constant.useToyTimelines)
 			{
-				PopUps.showMessage("Here in Controller for toytimelines\n");
+				// PopUps.showMessage("Here in Controller for toytimelines\n");
 				// disabled on Aug 6 2018 to created toy timelines again
 				// boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;//
-				boolean createToyTimelines = true, serialiseToyTimelines = true, deserialiseToyTimelines = false;// strue;
+				boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;// strue;
 				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines = null;
 				if (createToyTimelines)
 				{
@@ -247,13 +247,13 @@ public class ControllerWithoutServer
 				}
 				if (serialiseToyTimelines)
 				{
-					Serializer.kryoSerializeThis(usersToyDayTimelines,
-							Constant.getCommonPath() + "ToyTimelinesManually6June.kryo");
+					Serializer.kryoSerializeThis(usersToyDayTimelines, Constant.getCommonPath() + "ToyTimelinesManually"
+							+ DateTimeUtils.getMonthDateLabel() + ".kryo");
 				}
 				if (deserialiseToyTimelines)
 				{
 					usersToyDayTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-							.kryoDeSerializeThis(PathConstants.pathToToyTimelines);
+							.kryoDeSerializeThis(PathConstants.pathToToyTimelines12AUG);// .pathToToyTimelines6JUN);
 					// System.exit(0);
 				}
 
@@ -291,7 +291,7 @@ public class ControllerWithoutServer
 						false, "GowallaUserDayToyTimelines.csv", commonBasePath);
 				// PopUps.showMessage("here2");
 				TimelineStats.timelineStatsController(usersToyDayTimelines);
-				System.exit(0);
+				// System.exit(0);
 				// End of Moved here on 18 May 2018
 
 				// make the usersCleanedDayTimelines point to the toy timelines
