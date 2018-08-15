@@ -500,7 +500,9 @@ public class DistanceUtils
 					.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 0);
 			maxOfMaxOfDiffs = new EnumMap<>(GowallaFeatures.class);
 
-			if (Constant.percentileForRTVerseMaxForEDNorm == -1)
+			double percentileForRTVerseMaxForFEDNorm = Constant.percentileForRTVerseMaxForFEDNorm;
+
+			if (percentileForRTVerseMaxForFEDNorm == -1)
 			{
 				maxOfMaxOfDiffs = HJEditDistance
 						.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 1);
@@ -508,13 +510,14 @@ public class DistanceUtils
 
 			/////////////////// End of finding min max
 			// Start of May8 addition
-			else if (Constant.percentileForRTVerseMaxForEDNorm > -1)// then replace maxOfMax by pth percentile val
+			else if (percentileForRTVerseMaxForFEDNorm > -1)// then replace maxOfMax by pth percentile val
 			{
 				// list over cands and then list over each AO in that cand
 				List<List<EnumMap<GowallaFeatures, Double>>> listOfListOfFeatDiffs = candAEDFeatDiffs.entrySet()
 						.stream().map(e -> e.getValue().getThird()).collect(Collectors.toList());
+
 				EnumMap<GowallaFeatures, Double> pRTVersePercentileOfDiffs = HJEditDistance
-						.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, 75);
+						.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, percentileForRTVerseMaxForFEDNorm);// 75);
 
 				if (false)// sanity checking percentil implementation and maxOfMax implementation gives same result
 				{// passed ok on May 8 2018
@@ -836,7 +839,7 @@ public class DistanceUtils
 			/////////
 		} // end of loop over cands
 
-		if (false)// logging
+		if (VerbosityConstants.WriteRTVerseNormalisationLogs)// logging
 		{
 			// WToFile.appendLineToFileAbs(logTxt.toString() + "\n",
 			// Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances.txt");
@@ -849,6 +852,11 @@ public class DistanceUtils
 		}
 
 		logTxt.append("\n---------End  getRTVerseMinMaxNormalisedEditDistances()\n");
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println(logTxt.toString());
+		}
+
 		return res;
 	}
 
@@ -880,6 +888,8 @@ public class DistanceUtils
 	 *            just for logging
 	 * @since April 22 2018
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 * @deprecated on 12 Aug 2018 as there is a small chance that it may not have been updated to be equivalent to the
+	 *             logging version.
 	 */
 	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistancesNoLogging(
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs,

@@ -1076,39 +1076,50 @@ public class Timeline implements Serializable
 
 	}
 
-	/**
-	 *
-	 * @param timestamp
-	 * @return
-	 */
-	public int getNumOfValidActivityObjectsAfterThisTimeInSameDay(Timestamp timestampOriginal)
-	{
-		int numOfValids = 0;
-		Timestamp timestamp = timestampOriginal;
-		ActivityObject nextValidAOAfterAOAtThisTime;
-		// MANALI
-
-		Date dateOfGivenTimestamp = DateTimeUtils.getDate(timestampOriginal);
-
-		while ((nextValidAOAfterAOAtThisTime = getNextValidActivityAfterActivityAtThisTime(timestamp)) != null)
-		{
-			Date dateOfNextValidAO = DateTimeUtils.getDate(nextValidAOAfterAOAtThisTime.getEndTimestamp());
-			if (!dateOfNextValidAO.equals(dateOfGivenTimestamp))
-			{
-				break;
-			}
-
-			numOfValids += 1;
-			timestamp = nextValidAOAfterAOAtThisTime.getEndTimestamp(); // update timestamp
-		}
-
-		if (VerbosityConstants.verbose)
-		{
-			System.out.println("Debug: num of valid after timestamp " + timestampOriginal + " is: " + numOfValids);
-		}
-		return numOfValids;
-
-	}
+	// /**
+	// * Only used for verbose logs
+	// *
+	// * @param timestamp
+	// * @return
+	// * @deprecated because java.sql.Date does not work as expected if Dates are created from timestamps
+	// */
+	// public int getNumOfValidActivityObjectsAfterThisTimeInSameDay(Timestamp timestampOriginal)
+	// {
+	// int numOfValids = 0;
+	// Timestamp timestamp = timestampOriginal;
+	// ActivityObject nextValidAOAfterAOAtThisTime;
+	// // MANALI
+	//
+	// Date dateOfGivenTimestamp = DateTimeUtils.getDate(timestampOriginal);
+	//
+	// StringBuilder sbLog = new StringBuilder("Inside getNumOfValidActivityObjectsAfterThisTimeInSameDay():\n");
+	//
+	// while ((nextValidAOAfterAOAtThisTime = getNextValidActivityAfterActivityAtThisTime(timestamp)) != null)
+	// {
+	// Date dateOfNextValidAO = DateTimeUtils.getDate(nextValidAOAfterAOAtThisTime.getEndTimestamp());
+	//
+	// boolean isSameDate = dateOfNextValidAO.equals(dateOfGivenTimestamp);
+	// sbLog.append("dateOfGivenTimestamp = " + dateOfGivenTimestamp + " dateOfNextValidAO = " + dateOfNextValidAO
+	// + " isSameDate = " + isSameDate);
+	// if (!isSameDate)
+	// {
+	// break;
+	// }
+	//
+	// numOfValids += 1;
+	// timestamp = nextValidAOAfterAOAtThisTime.getEndTimestamp(); // update timestamp
+	// }
+	//
+	// if (VerbosityConstants.verbose)
+	// {
+	//
+	// System.out.println("Debug getNumOfValidActivityObjectsAfterThisTimeInSameDay: num of valid after timestamp "
+	// + timestampOriginal + " is: " + numOfValids + "\n" + sbLog.toString() + "\n");
+	//
+	// }
+	// return numOfValids;
+	//
+	// }
 
 	////
 	/**

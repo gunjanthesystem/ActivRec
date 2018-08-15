@@ -241,7 +241,7 @@ public class SuperController
 				{
 					// PopUps.showMessage("here inside toy!");
 					// Note: sampledUserIndicesSets are irrelavant for the toy timelines
-					main0(sampledUserIndicesSets[0], edAlphaForAnExp, "iter" + iteration);
+					main0(sampledUserIndicesSets[0], edAlphaForAnExp, "");
 				}
 				else
 				{
@@ -566,9 +566,9 @@ public class SuperController
 			if (Constant.useRTVerseNormalisationForED)
 			{
 				distNormalisationLabel = "RTV";
-				if (Constant.percentileForRTVerseMaxForEDNorm > -1)
+				if (Constant.percentileForRTVerseMaxForFEDNorm > -1)
 				{
-					distNormalisationLabel = (int) Constant.percentileForRTVerseMaxForEDNorm + distNormalisationLabel;
+					distNormalisationLabel = (int) Constant.percentileForRTVerseMaxForFEDNorm + distNormalisationLabel;
 				}
 			}
 		}

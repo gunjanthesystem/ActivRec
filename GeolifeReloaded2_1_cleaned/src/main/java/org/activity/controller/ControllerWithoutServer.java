@@ -290,7 +290,7 @@ public class ControllerWithoutServer
 				WToFile.writeUsersDayTimelinesSameFile(usersToyDayTimelines, "usersToyDayTimelines", false, false,
 						false, "GowallaUserDayToyTimelines.csv", commonBasePath);
 				// PopUps.showMessage("here2");
-				TimelineStats.timelineStatsController(usersToyDayTimelines);
+				// $TimelineStats.timelineStatsController(usersToyDayTimelines);
 				// System.exit(0);
 				// End of Moved here on 18 May 2018
 

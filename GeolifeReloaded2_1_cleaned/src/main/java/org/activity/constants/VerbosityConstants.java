@@ -56,6 +56,7 @@ public class VerbosityConstants
 	// public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;// false;
 	// public static final boolean WriteNormalisation = false;// false;// false;
 	// public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
+	// public static final boolean WriteRTVerseNormalisationLogs = true;
 	// /**
 	// * Write each cand of each RT in separate line
 	// */
@@ -87,6 +88,7 @@ public class VerbosityConstants
 	//
 	// public static final boolean writeRNN1PredProbDistribution = true;
 	// public static final boolean writeReplaceWtMultiplierMap = false;
+
 	// End of curtain 30 May 2018 for running Toy
 
 	// ======================================================================================
@@ -138,6 +140,8 @@ public class VerbosityConstants
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = true;// false;// false;
 	public static final boolean WriteNormalisation = true;// false;// false;
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
+	public static final boolean WriteRTVerseNormalisationLogs = true;
+
 	/**
 	 * Write each cand of each RT in separate line
 	 */

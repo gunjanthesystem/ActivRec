@@ -56,9 +56,10 @@ public class ResultsDistributionEvaluation
 	{
 		// $$mainBefore19July();
 		// String[] dimensionPhrase = { "Fltr_on_Top1Loc" };
-		String[] pfFilterNames = { "", "SecDim", "WtdAlphaPF", "Fltr_on_TopKLocsPF", "Fltr_on_ActualLocPF",
-				"Fltr_on_Top1Loc", "Fltr_on_Random2LocPF", "Fltr_on_Random10LocPF", "Fltr_on_Random20LocPF",
-				"Fltr_on_Random50LocPF", "Fltr_on_Random50LocPF", "Fltr_on_RandomLocPF" };
+		String[] pfFilterNames = { "" };
+		// , "SecDim", "WtdAlphaPF", "Fltr_on_TopKLocsPF", "Fltr_on_ActualLocPF",
+		// "Fltr_on_Top1Loc", "Fltr_on_Random2LocPF", "Fltr_on_Random10LocPF", "Fltr_on_Random20LocPF",
+		// "Fltr_on_Random50LocPF", "Fltr_on_Random50LocPF", "Fltr_on_RandomLocPF" };
 		// , "", "WtdAlphaPF", "Fltr_on_TopKLocsPF", "Fltr_on_ActualLocPF",
 		// "Fltr_on_Top1Loc" };
 		// "" , "Fltr_on_Top1Loc" "Fltr_on_ActualLocPF" };// ,
@@ -73,7 +74,8 @@ public class ResultsDistributionEvaluation
 	public static void main19July2018(String dimensionPhrase)
 	{
 		// String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
-		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsAug9ToReadRandomPF.csv";
+		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsAug12.csv";
+		// "ResultsAug9ToReadRandomPF.csv";
 		// + "ResultsAug7ToRead_1.csv";
 		/// ResultsJuly31ToRead_2.csv";
 		// ResultsMay18ToRead_1Jun28T.csv";

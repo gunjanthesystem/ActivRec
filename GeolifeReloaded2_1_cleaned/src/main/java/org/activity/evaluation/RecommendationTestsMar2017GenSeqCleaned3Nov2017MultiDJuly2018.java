@@ -848,8 +848,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 
 									if (VerbosityConstants.WriteNumOfValidsAfterAnRTInSameDay)
 									{
-										int numOfValidsAOsAfterThisRT = testDayTimelineForUser
-												.getNumOfValidActivityObjectsAfterThisTimeInSameDay(endTimeStamp);
+
+										int numOfValidsAOsAfterThisRT = TimelineUtils
+												.getValidAOsAfterThisTimeInTheDay(endTimeStamp, testDayTimelineForUser)
+												.size();
+										// testDayTimelineForUser.getNumOfValidActivityObjectsAfterThisTimeInSameDay(endTimeStamp);
 										// .getNumOfValidActivityObjectAfterThisTime(endTimeStamp);
 										sbNumOfValidsAfterAnRT.append(userId + "," + dateToRecomm + "," + endTimeStamp
 												+ "," + numOfValidsAOsAfterThisRT + "\n");

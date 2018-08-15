@@ -3087,6 +3087,88 @@ public class TimelineUtils
 	}
 
 	/**
+	 * 
+	 * @param timestamp
+	 * @param givenTimelineToCheckIn
+	 * @return
+	 * @since 12 Aug 2018
+	 */
+	public static List<ActivityObject> getValidAOsAfterThisTimeInTheDay(Timestamp timestamp,
+			Timeline givenTimelineToCheckIn)
+	{
+		int indexOfAOAtThisTime = givenTimelineToCheckIn.getIndexOfActivityObjectAtTime(timestamp);
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println(
+					"\n\rInside getValidAOsAfterThisTimeInTheDay(): indexOfAOAtThisTime = " + indexOfAOAtThisTime
+							+ " timestamp = " + timestamp + " will call now  getValidAOsAfterItInTheDay()\n");
+		}
+		return getValidAOsAfterItInTheDay(indexOfAOAtThisTime, givenTimelineToCheckIn);
+	}
+
+	///
+	/**
+	 * 
+	 * @param givenActivityObjectIndex
+	 * @param givenTimelineToCheckIn
+	 * @return
+	 * @since 12 Aug 2018
+	 */
+	public static List<ActivityObject> getValidAOsAfterItInTheDay(int givenActivityObjectIndex,
+			Timeline givenTimelineToCheckIn)
+	{
+		List<ActivityObject> validAOsAfter = new ArrayList<>();
+
+		ArrayList<ActivityObject> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
+
+		LocalDate dateOfAOAtGivenIndex = givenTimelineToCheckIn.getActivityObjectAtPosition(givenActivityObjectIndex)
+				.getEndTimestamp().toLocalDateTime().toLocalDate();
+
+		int i = -1;
+		for (i = givenActivityObjectIndex + 1; i < aosInGivenTimelineToCheckIn.size(); i++)
+		{
+			// System.out.println("for index " + i);
+			ActivityObject aoToCheck = aosInGivenTimelineToCheckIn.get(i);
+			LocalDate dateOfThisAO = aoToCheck.getEndTimestamp().toLocalDateTime().toLocalDate();
+			// System.out.println("dateOfAOAtGivenIndex = " + dateOfAOAtGivenIndex + " dateOfThisAO = " + dateOfThisAO);
+			// System.out.println("dateOfThisAO.equals(dateOfAOAtGivenIndex = " +
+			// dateOfThisAO.equals(dateOfAOAtGivenIndex));
+
+			if (dateOfThisAO.equals(dateOfAOAtGivenIndex)) // only look at aos in same day
+			{
+				// System.out.println("found same date");
+				if (UtilityBelt.isValidActivityName(aoToCheck.getActivityName()))
+				{
+					// System.out.println("found valid act");
+					validAOsAfter.add(aoToCheck);
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			StringBuilder sb = new StringBuilder(
+					"\tinside getValidAOsAfterItInTheDay\n\tactivityIndexAfterWhichToCheck=" + givenActivityObjectIndex
+							+ "\n givenTimelineToCheckIn = ");
+			givenTimelineToCheckIn.getActivityObjectsInTimeline().stream()
+					.forEachOrdered(ao -> sb.append(">>" + ao.getPrimaryDimensionVal("|")));
+			// givenTimelineToCheckIn.printActivityObjectNamesInSequence();
+			sb.append("\n\tNumber of activities in timeline=" + aosInGivenTimelineToCheckIn.size()
+					+ " validAOsAfter.size() = " + validAOsAfter.size() + "  nvalidAOsAfter=\n\t");
+			validAOsAfter.stream().forEachOrdered(ao -> sb.append(">>" + ao.getPrimaryDimensionVal("|")));
+			System.out.println(sb.toString() + "\n\tExiting getValidAOsAfterItInTheDay()\n");
+		}
+
+		return validAOsAfter;
+	}
+
+	///
+
+	/**
 	 * Checks if there is atleast N valid AOs after the given index in the given timeline on the same day as the AO at
 	 * given index
 	 * 
