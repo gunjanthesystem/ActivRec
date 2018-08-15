@@ -408,10 +408,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			{
 				System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
 						+ " at time:" + timeAtRecomm + "  because there are no candidate timelines");
-				// this.singleNextRecommendedActivity = null;
-				this.hasCandidateTimelines = false;
-				// this.topNextActivities =null;
-				this.nextActivityObjectsFromCands = null;
+				this.hasCandidateTimelines = false;// this.singleNextRecommendedActivity = null;
+				this.nextActivityObjectsFromCands = null;// this.topNextActivities =null;
 				this.thresholdPruningNoEffect = true;
 				return;
 			}
@@ -436,6 +434,22 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			// editDistancesMemorizer.serialise(this.userIDAtRecomm);
 
 			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted = normalisedDistFromCandsRes.getFirst();
+
+			if (distancesMapUnsorted.size() == 0)// added on 15 Aug 2018
+			{
+				System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
+						+ " at time:" + timeAtRecomm
+						+ "  because there are no candidate timelines (after dist computation/filtering)");
+				this.hasCandidateTimelines = false;// this.singleNextRecommendedActivity = null;
+				this.nextActivityObjectsFromCands = null;// this.topNextActivities =null;
+				this.thresholdPruningNoEffect = true;
+				return;
+			}
+			else
+			{
+				this.hasCandidateTimelines = true;
+			}
+
 			this.endPointIndicesConsideredInCands = normalisedDistFromCandsRes.getSecond();
 
 			long recommMasterT4 = System.currentTimeMillis();

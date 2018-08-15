@@ -452,10 +452,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			{
 				System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
 						+ " at time:" + timeAtRecomm + "  because there are no candidate timelines");
-				// this.singleNextRecommendedActivity = null;
-				this.hasCandidateTimelines = false;
-				// this.topNextActivities =null;
-				this.nextActivityObjectsFromPrimaryCands = null;
+				this.hasCandidateTimelines = false;// this.singleNextRecommendedActivity = null;
+				this.nextActivityObjectsFromPrimaryCands = null;// this.topNextActivities =null;
 				this.thresholdPruningNoEffect = true;
 				return;
 			}
@@ -468,14 +466,11 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 						userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candidateTimelinesPrimDim.size()
 								+ "," + candidateTimelinesSecDim.size() + "\n",
 						Constant.getCommonPath() + "RTsRejWithPrimaryButNoSecondaryCands.csv");
-				// this.singleNextRecommendedActivity = null;
-				this.hasCandidateTimelines = false;
-				// this.topNextActivities =null;
-				this.nextActivityObjectsFromPrimaryCands = null;
+				this.hasCandidateTimelines = false;// this.singleNextRecommendedActivity = null;
+				this.nextActivityObjectsFromPrimaryCands = null;// this.topNextActivities =null;
 				this.thresholdPruningNoEffect = true;
 				return;
 			}
-
 			else
 			{
 				this.hasCandidateTimelines = true;
@@ -508,6 +503,37 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 					.getFirst();
 			LinkedHashMap<String, Pair<String, Double>> distancesMapSecondaryDimUnsorted = normalisedDistFromSecondaryDimCandsRes
 					.getFirst(); // added on 17 July 2018
+
+			// start of added on 15 Aug 2018
+			if (distancesMapPrimaryDimUnsorted.size() == 0)
+			{
+				System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
+						+ " at time:" + timeAtRecomm
+						+ "  because there are no candidate timelines (after dist computation/filtering)");
+				this.hasCandidateTimelines = false;// this.singleNextRecommendedActivity = null;
+				this.nextActivityObjectsFromPrimaryCands = null;// this.topNextActivities =null;
+				this.thresholdPruningNoEffect = true;
+				return;
+			}
+			else if (distancesMapSecondaryDimUnsorted.size() == 0)
+			{
+				System.out.println("Warning: not making recommendation for " + userAtRecomm + " on date:" + dateAtRecomm
+						+ " at time:" + timeAtRecomm + "  because there are no secondary (" + this.secondaryDimension
+						+ ") candidate timelines (after dist computation/filtering)");
+				WToFile.appendLineToFileAbs(
+						userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candidateTimelinesPrimDim.size()
+								+ "," + candidateTimelinesSecDim.size() + "\n",
+						Constant.getCommonPath() + "RTsRejWithPrimButNoSecCandsAfterDistFiltering.csv");
+				this.hasCandidateTimelines = false;// this.singleNextRecommendedActivity = null;
+				this.nextActivityObjectsFromPrimaryCands = null;// this.topNextActivities =null;
+				this.thresholdPruningNoEffect = true;
+				return;
+			}
+			else
+			{
+				this.hasCandidateTimelines = true;
+			}
+			// end of added on 15 AUg 2018
 
 			this.endPointIndicesConsideredInPDCands = normalisedDistFromPrimaryDimCandsRes.getSecond();
 			this.endPointIndicesConsideredInSDCands = normalisedDistFromSecondaryDimCandsRes.getSecond();
