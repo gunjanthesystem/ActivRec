@@ -231,8 +231,10 @@ public class DistanceUtils
 
 		if (normalisedDistanceForCandTimelines == null || normalisedDistanceForCandTimelines.size() == 0)
 		{
-			PopUps.printTracedErrorMsg(
-					"Error: normalisedDistanceForCandTimelines.size=" + normalisedDistanceForCandTimelines.size());
+			// PopUps.printTracedErrorMsg(
+			// "Error: normalisedDistanceForCandTimelines.size=" + normalisedDistanceForCandTimelines.size());
+			System.err.println(
+					"Warning: normalisedDistanceForCandTimelines.size=" + normalisedDistanceForCandTimelines.size());
 		}
 
 		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(
@@ -674,8 +676,23 @@ public class DistanceUtils
 		double sumOfWtOfFeaturesUsedExceptPD = hjEditDistance.getSumOfWeightOfFeaturesExceptPrimaryDimension();
 
 		// Start of Get max of ActED over all cand
-		double maxActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
-				.max().getAsDouble();
+		double maxActEDOverAllCands = Double.MIN_VALUE;
+		// candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond()).max().getAsDouble();
+
+		// Start of added on 15 Aug 2018
+		double percentileForRTVerseMaxForAEDNorm = Constant.percentileForRTVerseMaxForAEDNorm;
+		if (percentileForRTVerseMaxForAEDNorm == -1)
+		{
+			maxActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond()).max()
+					.getAsDouble();
+		}
+		else
+		{
+			List<Double> listOfAEDs = candAEDFeatDiffs.entrySet().stream().map(e -> e.getValue().getSecond())
+					.collect(Collectors.toList());
+			maxActEDOverAllCands = StatsUtils.getPercentile(listOfAEDs, percentileForRTVerseMaxForAEDNorm);
+		}
+		// End of added on 15 Aug 2018
 
 		if (true)// sanity check
 		{
@@ -712,6 +729,9 @@ public class DistanceUtils
 		// end of initialising logging
 
 		int indexOfCandForThisRT = -1;
+
+		/** {CandID, candInfo, NormAED, NormFED} **/
+		Map<String, String> rejectedCandsDueToAEDFEDThreshold = new LinkedHashMap<>();
 
 		// Loop over cands
 		for (Entry<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candEntry : candAEDFeatDiffs
@@ -804,16 +824,41 @@ public class DistanceUtils
 
 			// IMPORTANT
 			double resultantEditDist = -999999;
+			boolean thisCandRejected = false;
+
 			if (EDBeta == 0)
 			{// since 0*NaN is NaN
-				resultantEditDist = (EDAlpha) * normActDistForThisCand;
+				if (normActDistForThisCand >= Constant.threshNormAEDForCand)// added on 14 Aug 2018
+				{
+					thisCandRejected = true;// reject this cand
+				}
+				else
+				{
+					resultantEditDist = (EDAlpha) * normActDistForThisCand;
+				}
 			}
 			else
 			{
-				resultantEditDist = (EDAlpha) * normActDistForThisCand + (EDBeta) * meanOverAOsNormFDForThisCand;
+				if (normActDistForThisCand >= Constant.threshNormAEDForCand
+						|| meanOverAOsNormFDForThisCand >= Constant.threshNormFEDForCand)// added on 14 Aug 2018
+				{
+					thisCandRejected = true;// reject this cand
+				}
+				else
+				{
+					resultantEditDist = (EDAlpha) * normActDistForThisCand + (EDBeta) * meanOverAOsNormFDForThisCand;
+				}
 			}
 
-			res.put(candEntry.getKey(), new Pair<>(AEDTraceForThisCand, resultantEditDist));
+			if (thisCandRejected == false)
+			{
+				res.put(candEntry.getKey(), new Pair<>(AEDTraceForThisCand, resultantEditDist));
+			}
+			else
+			{
+				rejectedCandsDueToAEDFEDThreshold.put(candID,
+						candInfo + "," + normActDistForThisCand + "," + meanOverAOsNormFDForThisCand);
+			}
 
 			/////////
 			logTxt.append("\n\tsumOfFeatDistsOverAOsOfThisCand=" + sumOfNormFDsOverAOsOfThisCand
@@ -821,7 +866,8 @@ public class DistanceUtils
 					+ meanOverAOsNormFDForThisCand + "\n\t-->resultantEditDist=" + resultantEditDist);
 			logEachCand.append(candInfo + "," + normActDistForThisCand + "," + sumOfNormFDsOverAOsOfThisCand + ","
 					+ meanOverAOsNormFDForThisCand + "," + medianOverAOsNormFDForThisCand + ","
-					+ stdDevOverAOsNormFDForThisCand + "," + meanUponStdDev + "," + resultantEditDist + "\n");
+					+ stdDevOverAOsNormFDForThisCand + "," + meanUponStdDev + "," + resultantEditDist + ","
+					+ thisCandRejected + "\n");
 			// logEachAO.append(",,,,,,,,,,,,,,,," + featureDistForThisCand + "," + normActDistForThisCand + ","
 			// + resultantEditDist + "\n");
 
@@ -849,6 +895,20 @@ public class DistanceUtils
 			// userAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,normActDistForThisCand,sumOfNormFDsOverAOsOfThisCand,meanOverAOsNormFDForThisCand,medianOverAOsNormFDForThisCand,stdDevOverAOsNormFDForThisCand,meanUponStdDev,resultantEditDist
 			WToFile.appendLineToFileAbs(logEachAOAllCands.toString(),
 					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
+		}
+
+		if (true)// write rejected cands for AED FED Threshold, added on 14 Aug 2018
+		{
+			StringBuilder sb1 = new StringBuilder();
+			rejectedCandsDueToAEDFEDThreshold.entrySet().stream()
+					.forEachOrdered(e -> sb1.append(e.getKey() + "," + e.getValue() + "\n"));
+			WToFile.appendLineToFileAbs(sb1.toString(), Constant.getCommonPath() + "LogOfRejectedCands.csv");
+		}
+
+		if (res.size() == 0)// all candidates filtered out due to AED FED Threshold
+		{
+			WToFile.appendLineToFileAbs(rtInfo + "\n",
+					Constant.getCommonPath() + "recommPointsRejAllCandFiltrdAEDFEDThresh.csv");
 		}
 
 		logTxt.append("\n---------End  getRTVerseMinMaxNormalisedEditDistances()\n");
@@ -2088,6 +2148,7 @@ public class DistanceUtils
 		// System.out.println("Constant.typeOfCandThreshold= " + Constant.typeOfCandThreshold);
 		// System.out.println("Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour)= "
 		// + Constant.typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour));
+
 		TypeOfCandThreshold typeOfCandThresholdForGivenDimension = null;
 		if (hjEditDistance.primaryDimension.equals(Constant.primaryDimension))
 		{
@@ -2098,30 +2159,39 @@ public class DistanceUtils
 			typeOfCandThresholdForGivenDimension = Constant.typeOfCandThresholdSecDim;
 		}
 
-		if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.NearestNeighbour)
-				|| typeOfCandThresholdForGivenDimension
-						.equals(Enums.TypeOfCandThreshold.NearestNeighbourWithEDValThresh))
+		if (candEditDistances.size() > 0)
 		{
-			candEditDistances = filterCandsNearestNeighbours(candEditDistances,
-					Constant.getNearestNeighbourCandEDThresholdGivenDim(hjEditDistance.primaryDimension));
+
+			if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.NearestNeighbour)
+					|| typeOfCandThresholdForGivenDimension
+							.equals(Enums.TypeOfCandThreshold.NearestNeighbourWithEDValThresh))
+			{
+				candEditDistances = filterCandsNearestNeighbours(candEditDistances,
+						Constant.getNearestNeighbourCandEDThresholdGivenDim(hjEditDistance.primaryDimension));
+			}
+			if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.Percentile))
+			{
+				// if (Constant.percentileCandEDThreshold != 100)// Not NO Threshold
+				candEditDistances = filterCandsPercentileED(candEditDistances, Constant.percentileCandEDThreshold);
+			}
+			if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.NearestNeighbourWithEDValThresh))
+			{
+				candEditDistances = filterCandsEDThreshold(candEditDistances,
+						Constant.getEDThresholdGivenDim(hjEditDistance.primaryDimension));
+			}
+			if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.None))
+			{
+				System.out.println("Alert! no filtering cands");
+			}
 		}
-		if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.Percentile))
+		else
 		{
-			// if (Constant.percentileCandEDThreshold != 100)// Not NO Threshold
-			candEditDistances = filterCandsPercentileED(candEditDistances, Constant.percentileCandEDThreshold);
-		}
-		if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.NearestNeighbourWithEDValThresh))
-		{
-			candEditDistances = filterCandsEDThreshold(candEditDistances,
-					Constant.getEDThresholdGivenDim(hjEditDistance.primaryDimension));
-		}
-		if (typeOfCandThresholdForGivenDimension.equals(Enums.TypeOfCandThreshold.None))
-		{
-			System.out.println("Alert! no filtering cands");
+			System.out.println("No cands, hence no need to filter");
 		}
 
 		System.out.println("\nafter filter candEditDistances.size():" + candEditDistances.size()
 				+ " typeOfCandThresholdForGivenDimension=" + typeOfCandThresholdForGivenDimension);
+
 		LinkedHashMap<String, Pair<String, Double>> normalisedCandEditDistances = null;
 
 		// if (Constant.useRTVerseNormalisationForED)
@@ -2131,8 +2201,15 @@ public class DistanceUtils
 		// else
 		// {//makes sense to do normalisation again since some candidates have been filtered out, hence the min and max
 		// ED over the set might have changed.
-		normalisedCandEditDistances = normalisedDistancesOverTheSet(candEditDistances, userAtRecomm, dateAtRecomm,
-				timeAtRecomm);
+		if (Constant.normaliseCandDistsAgainAfterFiltering)
+		{
+			normalisedCandEditDistances = normalisedDistancesOverTheSet(candEditDistances, userAtRecomm, dateAtRecomm,
+					timeAtRecomm);
+		}
+		else
+		{
+			normalisedCandEditDistances = candEditDistances;
+		}
 		// }
 		return normalisedCandEditDistances;
 	}

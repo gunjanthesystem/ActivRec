@@ -565,10 +565,14 @@ public class SuperController
 
 			if (Constant.useRTVerseNormalisationForED)
 			{
-				distNormalisationLabel = "RTV";
 				if (Constant.percentileForRTVerseMaxForFEDNorm > -1)
 				{
-					distNormalisationLabel = (int) Constant.percentileForRTVerseMaxForFEDNorm + distNormalisationLabel;
+					distNormalisationLabel = (int) Constant.percentileForRTVerseMaxForFEDNorm + "FRTV";
+				}
+				if (Constant.percentileForRTVerseMaxForAEDNorm > -1)
+				{
+					distNormalisationLabel = distNormalisationLabel + (int) Constant.percentileForRTVerseMaxForAEDNorm
+							+ "ARTV";
 				}
 			}
 		}

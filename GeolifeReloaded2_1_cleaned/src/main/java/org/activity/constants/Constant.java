@@ -215,10 +215,15 @@ public final class Constant
 
 	public static final boolean useRTVerseNormalisationForED = true; // TODO KEEP IT true, false version
 	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
-	public static final double percentileForRTVerseMaxForFEDNorm = 100;// -1// SWITCH_April24
+	public static final double percentileForRTVerseMaxForFEDNorm = 75;// -1// SWITCH_April24
+	public static final double percentileForRTVerseMaxForAEDNorm = 100;// SWITCH //added on 15 Aug 2018
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
 
+	public static final double threshNormAEDForCand = 1;// added on 14 Aug 2018
+	public static final double threshNormFEDForCand = 1;// added on 14 Aug 2018
+
+	public static final boolean normaliseCandDistsAgainAfterFiltering = true;
 	/**
 	 * If enabled, in Edit distance, instead of computing feature level edit distance just for activity objects which
 	 * matchin act name across the compared timelines, computed feature level edit distance over all act objs
@@ -1621,7 +1626,11 @@ public final class Constant
 		s.append("\ncleanTimelinesAgainInsideRecommendationTests:" + cleanTimelinesAgainInsideRecommendationTests);
 		s.append("\ncleanTimelinesAgainInsideTrainTestSplit:" + cleanTimelinesAgainInsideTrainTestSplit);
 		s.append("\nuseRTVerseNormalisationForED:" + useRTVerseNormalisationForED);
-		s.append("\npercentileForRTVerseMaxForEDNorm:" + percentileForRTVerseMaxForFEDNorm);
+		s.append("\npercentileForRTVerseMaxForFEDNorm:" + percentileForRTVerseMaxForFEDNorm);
+		s.append("\npercentileForRTVerseMaxForAEDNorm:" + percentileForRTVerseMaxForAEDNorm);
+		s.append("\nthreshNormAEDForCand:" + threshNormAEDForCand);
+		s.append("\nthreshNormFEDForCand:" + threshNormFEDForCand);
+		s.append("\nnormaliseCandDistsAgainAfterFiltering:" + normaliseCandDistsAgainAfterFiltering);
 		s.append("\nuseToyTimelines:" + useToyTimelines);
 		// s.append("\nnumOfHiddenLayersInRNN1:" + numOfHiddenLayersInRNN1);
 		// s.append("\nnumOfNeuronsInEachHiddenLayerInRNN1:" + numOfNeuronsInEachHiddenLayerInRNN1);

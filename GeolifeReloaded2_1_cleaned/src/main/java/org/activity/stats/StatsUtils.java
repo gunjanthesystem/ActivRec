@@ -415,11 +415,16 @@ public final class StatsUtils
 	public static void checkPercentile()
 	{
 		// compare percentile computation
-		List<Double> vals = new Random().doubles(1000, 0, 100).map(e -> StatsUtils.round(e, 1)).boxed()
+		List<Double> vals0 = new Random().doubles(1000, 0, 100).map(e -> StatsUtils.round(e, 1)).boxed()
 				.collect(Collectors.toList());
+
+		List<Integer> valsInt = Arrays.asList(45360, 48960, 51360, 13440, 38160, 35760, 41760, 31560, 1500, 1500, 4500,
+				5100, 18900, 26100, 28500, 24900, 4500, 8100, 14100, 14100, 8100, 15300, 24900, 21300, 21300, 14100);
+		List<Double> vals = valsInt.stream().map(i -> new Double(i)).collect(Collectors.toList());
+
 		System.out.println("vals = " + vals);
 
-		double quantile = 0.5;
+		double quantile = 75;
 
 		System.out.println(getDescriptiveStatistics(vals));
 		System.out.println("1e-55=" + getPercentile(vals, 1e-55));
@@ -447,8 +452,8 @@ public final class StatsUtils
 
 	public static void main(String args[])
 	{
-		checkBinnning();
-		// checkPercentile();
+		// checkBinnning();
+		checkPercentile();
 	}
 
 	private static void checkBinnning()
@@ -1477,22 +1482,22 @@ public final class StatsUtils
 
 		switch (stat)
 		{
-			case Mean:
-				for (ArrayList<Double> valsForAColumn : columnWiseVals)
-				{
-					columnWiseSummary.add(meanOfArrayList(valsForAColumn, roundToPlaces));
-				}
-				break;
-			case Median:
-				for (ArrayList<Double> valsForAColumn : columnWiseVals)
-				{
-					columnWiseSummary.add(medianOfArrayList(valsForAColumn, roundToPlaces));
-				}
-				break;
-			default:
-				System.err.println(
-						PopUps.getTracedErrorMsg("Unknown stat: " + stat.toString() + " reading file: " + fileToRead));
-				System.exit(-1);
+		case Mean:
+			for (ArrayList<Double> valsForAColumn : columnWiseVals)
+			{
+				columnWiseSummary.add(meanOfArrayList(valsForAColumn, roundToPlaces));
+			}
+			break;
+		case Median:
+			for (ArrayList<Double> valsForAColumn : columnWiseVals)
+			{
+				columnWiseSummary.add(medianOfArrayList(valsForAColumn, roundToPlaces));
+			}
+			break;
+		default:
+			System.err.println(
+					PopUps.getTracedErrorMsg("Unknown stat: " + stat.toString() + " reading file: " + fileToRead));
+			System.exit(-1);
 		}
 
 		return columnWiseSummary;
