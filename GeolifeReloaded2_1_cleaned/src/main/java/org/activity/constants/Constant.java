@@ -208,7 +208,7 @@ public final class Constant
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
 	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
 	public static final boolean useLocationInFED = false;// SWITCH_NOV10
-	public static final boolean useHaversineDistInLocationFED = true;// SWITCH_NOV10 //added on Aug 11 2018
+	public static final boolean useHaversineDistInLocationFED = false;// SWITCH_NOV10 //added on Aug 11 2018
 	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
@@ -216,7 +216,7 @@ public final class Constant
 	public static final boolean useRTVerseNormalisationForED = true; // TODO KEEP IT true, false version
 	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
 	public static final double percentileForRTVerseMaxForFEDNorm = 75;// -1// SWITCH_April24
-	public static final double percentileForRTVerseMaxForAEDNorm = 100;// SWITCH //added on 15 Aug 2018
+	public static final double percentileForRTVerseMaxForAEDNorm = 75;// SWITCH //added on 15 Aug 2018
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
 
@@ -236,7 +236,7 @@ public final class Constant
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean useRandomlySampled100Users = false;// true;// false;// false;// true;// SWITCH_NOV10
+	public static final boolean useRandomlySampled100Users = true;// true;// false;// false;// true;// SWITCH_NOV10
 	/**
 	 * Use only subset of the users from the randomly sampled users (useful for running small sample experiments for
 	 * faster iterations)
@@ -244,7 +244,7 @@ public final class Constant
 	public static final boolean useSelectedGTZeroUsersFromRandomlySampled100Users = false;
 	public static String pathToRandomlySampledUserIndices = "";
 
-	public static final boolean runForAllUsersAtOnce = true;// false;// false;// true;// false;// true;// SWITCH_April8
+	public static final boolean runForAllUsersAtOnce = false;// false;// false;// true;// false;// true;// SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// TODO: keep it true as the other verion may not be uptodate
 															// (Aug3,2018) SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
@@ -253,7 +253,7 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useToyTimelines = true;// false;// true;/SWITCH_AUG6
+	public static final boolean useToyTimelines = false;// false;// true;/SWITCH_AUG6
 
 	// public static final int numOfHiddenLayersInRNN1 = 3;// 3;
 	// public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;

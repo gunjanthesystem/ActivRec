@@ -74,7 +74,7 @@ public class ResultsDistributionEvaluation
 	public static void main19July2018(String dimensionPhrase)
 	{
 		// String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
-		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsAug12.csv";
+		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsAug17.csv";
 		// "ResultsAug9ToReadRandomPF.csv";
 		// + "ResultsAug7ToRead_1.csv";
 		/// ResultsJuly31ToRead_2.csv";

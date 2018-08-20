@@ -751,6 +751,7 @@ public class DistanceUtils
 					+ " ActDistForThisCand=" + actDistForThisCand + " will now loop over list of AOs for this cand:");
 			String candInfo = rtInfo + "," + candID + "," + indexOfCandForThisRT + "," + candTimelineAsString + ","
 					+ AEDTraceForThisCand + "," + actDistForThisCand;
+			String candInfoLeaner = rtInfo + "," + candID + "," + indexOfCandForThisRT;
 			////////////
 
 			List<EnumMap<GowallaFeatures, Double>> listOfAOsForThisCand = candEntry.getValue().getThird();
@@ -814,8 +815,12 @@ public class DistanceUtils
 				////////
 			} // end of loop over the list of AOs for this cand
 
-			double normActDistForThisCand = StatsUtils.minMaxNormWORound(actDistForThisCand, maxActEDOverAllCands,
-					minActEDOverAllCands);
+			// double normActDistForThisCand = StatsUtils.minMaxNormWORound(actDistForThisCand, maxActEDOverAllCands,
+			// minActEDOverAllCands);
+			double normActDistForThisCand = StatsUtils.minMaxNormWORoundWithUpperBound(actDistForThisCand,
+					maxActEDOverAllCands, minActEDOverAllCands, 1d, false);
+			//
+
 			double meanOverAOsNormFDForThisCand = sumOfNormFDsOverAOsOfThisCand / listOfAOsForThisCand.size();
 			double medianOverAOsNormFDForThisCand = StatUtils.percentile(normFDsOverAOsOfThisCand, 50);
 			double varianceOverAOsNormFDForThisCand = StatUtils.variance(normFDsOverAOsOfThisCand);
@@ -825,12 +830,13 @@ public class DistanceUtils
 			// IMPORTANT
 			double resultantEditDist = -999999;
 			boolean thisCandRejected = false;
-
+			String thisCandRejectedString = "NR";
 			if (EDBeta == 0)
 			{// since 0*NaN is NaN
 				if (normActDistForThisCand >= Constant.threshNormAEDForCand)// added on 14 Aug 2018
 				{
 					thisCandRejected = true;// reject this cand
+					thisCandRejectedString = "AR";
 				}
 				else
 				{
@@ -839,10 +845,15 @@ public class DistanceUtils
 			}
 			else
 			{
-				if (normActDistForThisCand >= Constant.threshNormAEDForCand
-						|| meanOverAOsNormFDForThisCand >= Constant.threshNormFEDForCand)// added on 14 Aug 2018
+				if (normActDistForThisCand >= Constant.threshNormAEDForCand)// added on 14 Aug 2018
 				{
 					thisCandRejected = true;// reject this cand
+					thisCandRejectedString = "AR";
+				}
+				else if (meanOverAOsNormFDForThisCand >= Constant.threshNormFEDForCand)
+				{
+					thisCandRejected = true;// reject this cand
+					thisCandRejectedString = "FR";
 				}
 				else
 				{
@@ -856,8 +867,14 @@ public class DistanceUtils
 			}
 			else
 			{
-				rejectedCandsDueToAEDFEDThreshold.put(candID,
-						candInfo + "," + normActDistForThisCand + "," + meanOverAOsNormFDForThisCand);
+				if (VerbosityConstants.WriteRTVerseNormalisationLogs)
+				{
+					rejectedCandsDueToAEDFEDThreshold.put(candID,
+							candInfo + "," + normActDistForThisCand + "," + meanOverAOsNormFDForThisCand);
+				}
+				// else
+				// {// less expensive for writing
+				// rejectedCandsDueToAEDFEDThreshold.put(candID, candInfo);//}
 			}
 
 			/////////
@@ -867,7 +884,7 @@ public class DistanceUtils
 			logEachCand.append(candInfo + "," + normActDistForThisCand + "," + sumOfNormFDsOverAOsOfThisCand + ","
 					+ meanOverAOsNormFDForThisCand + "," + medianOverAOsNormFDForThisCand + ","
 					+ stdDevOverAOsNormFDForThisCand + "," + meanUponStdDev + "," + resultantEditDist + ","
-					+ thisCandRejected + "\n");
+					+ thisCandRejectedString + "\n");
 			// logEachAO.append(",,,,,,,,,,,,,,,," + featureDistForThisCand + "," + normActDistForThisCand + ","
 			// + resultantEditDist + "\n");
 
@@ -897,7 +914,8 @@ public class DistanceUtils
 					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
 		}
 
-		if (true)// write rejected cands for AED FED Threshold, added on 14 Aug 2018
+		if (VerbosityConstants.WriteRTVerseNormalisationLogs)// write rejected cands for AED FED Threshold, added on 14
+																// Aug 2018
 		{
 			StringBuilder sb1 = new StringBuilder();
 			rejectedCandsDueToAEDFEDThreshold.entrySet().stream()
