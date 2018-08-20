@@ -174,7 +174,8 @@ public class SuperController
 		}
 		// searchContentInFile();
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
-		// cleanUpSpace("./dataWritten/Mar5ED0.0STimeStFilter0hrs/", 0.9);
+		// cleanUpSpace("./dataWritten/July31_first1/", 0.9);
+		// cleanUpSpace("./dataWritten/July23_incomplete/", 0.9);
 		// runAllAKOMExperiments();
 		// $$cleanUpSpace("./dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs", 0.97);//
 		// /Feb27ED0.5DurFPDistFPStFilter3hrs
@@ -230,7 +231,9 @@ public class SuperController
 		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
 
-		double[] EDAlphas = { 0.5 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };// 1, 0 };
+		double[] EDAlphas = { 1 };// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };//
+									// 1,
+									// 0};
 
 		// added on 29 July 2018 when running for multiple iterations
 		for (int iteration = 0; iteration < 1; iteration++)
@@ -247,7 +250,7 @@ public class SuperController
 				{
 					for (String sampledUserIndicesSet : sampledUserIndicesSets)
 					{
-						main0(sampledUserIndicesSet, edAlphaForAnExp, "");// "iter" + iteration);
+						main0(sampledUserIndicesSet, edAlphaForAnExp, "ForLog");// "iter" + iteration);
 						if (Constant.runForAllUsersAtOnce)
 						{
 							break;// because we are not using the sample users indices, hence we need to run it only
