@@ -3212,6 +3212,8 @@ public class AlignmentBasedDistance
 	public static Triple<String, Double, Triple<char[], int[], int[]>> getMySimpleLevenshteinDistance(String word1,
 			String word2, int insertWt, int deleteWt, int replaceWt, Map<String, Double> replaceWtMultiplierMap)
 	{
+		boolean useTimeDecay = Constant.useTimeDecayInAED;// added on 20 Aug 2018
+		double timeDecayPower = Constant.powerOfTimeDecayInAED;// added on 20 Aug 2018
 		// boolean useHierarchicalDistance = Constant.useHierarchicalDistance;
 		// HashMap<String, Double> catIDsHierarchicalDistance = null;
 		// if (useHierarchicalDistance){ catIDsHierarchicalDistance = DomainConstants.catIDsHierarchicalDistance;}
@@ -3295,10 +3297,24 @@ public class AlignmentBasedDistance
 					}
 					// End of added on 3 Aug 2018
 
-					double replace = dist[i][j] + (replaceWtMultiplier * replaceWt);// 2; //diagonally previous, see
-					// slides from STANFORD NLP on // min edit distance
-					double delete = dist[i][j + 1] + deleteWt;// 1;//deletion --previous row, i.e, cell above
-					double insert = dist[i + 1][j] + insertWt;// 1;// insertion --previous column, i.e, cell on left
+					// start of added on 20 Aug 2018
+					double timeDecayMultiplier = 1;
+					if (useTimeDecay)
+					{
+						int valTemp = len2 - (j + 1) + 1;
+						timeDecayMultiplier = Math.pow(valTemp, timeDecayPower);
+						// $$System.out.println("valTemp = " + valTemp + " timeDecayMultiplier = " +
+						// timeDecayMultiplier);
+					}
+					// end of added on 20 Aug 2018
+
+					// diagonally previous, see slides from STANFORD NLP on // min edit distance
+					double replace = dist[i][j] + (replaceWtMultiplier * timeDecayMultiplier * replaceWt);// 2;
+					// deletion --previous row, i.e, cell above
+					double delete = dist[i][j + 1] + (timeDecayMultiplier * deleteWt);// 1;
+					// insertion --previous column, i.e, cell on left
+					double insert = dist[i + 1][j] + (timeDecayMultiplier * insertWt);// 1;
+
 					// System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
 					// int min = replace > insert ? insert : replace;
 					// min = delete > min ? min : delete;

@@ -97,11 +97,11 @@ public class Dashboard3 extends Application
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = null;
 
-		if (true)// disabled on 24 July 2018, as i getting deserialisation error, perhaps because ActivityObject class
-					// has changes this serialised toy timelines being read were created. remedy to do later, create toy
-					// timelines again.
+		// disabled on 24 July 2018, as i getting deserialisation error, perhaps because ActivityObject class
+		// has changes this serialised toy timelines being read were created. remedy to do later, create toy
+		// timelines again.
+		if (true)
 		{
-
 			usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 					.kryoDeSerializeThis(PathConstants.pathToToyTimelines12AUG);
 			ControllerWithoutServer.setDataVarietyConstants(usersCleanedDayToyTimelines, true, "ToyTs_", true, true);
