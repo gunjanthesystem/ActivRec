@@ -14,7 +14,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.PathConstants;
 import org.activity.constants.VerbosityConstants;
-import org.activity.evaluation.EvaluationSeq;
+import org.activity.evaluation.EvalDataReader;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
 import org.activity.objects.Triple;
@@ -93,7 +93,7 @@ public class PostFilter1
 
 			int firstIndex = 0;
 			String dimensionPhrase = "";
-			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysPredSeq = EvaluationSeq
+			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysPredSeq = EvalDataReader
 					.readDataMetaActualTopK(pathToReadResults,
 							"dataRankedRecommendation" + dimensionPhrase + "WithScores" + firstIndex + ".csv",
 							"dataActual" + dimensionPhrase + firstIndex + ".csv", pathToReadResults, verbose);
@@ -103,7 +103,7 @@ public class PostFilter1
 			ArrayList<ArrayList<String>> arrayActual = readArraysPredSeq.getSecond();
 
 			dimensionPhrase = "SecDim";
-			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysPredSeqSecDim = EvaluationSeq
+			Triple<ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>, ArrayList<ArrayList<String>>> readArraysPredSeqSecDim = EvalDataReader
 					.readDataMetaActualTopK(pathToReadResults,
 							"dataRankedRecommendation" + dimensionPhrase + "WithScores" + firstIndex + ".csv",
 							"dataActual" + dimensionPhrase + firstIndex + ".csv", pathToReadResults, verbose);

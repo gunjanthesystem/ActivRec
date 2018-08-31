@@ -74,7 +74,7 @@ public class ResultsDistributionEvaluation
 	public static void main19July2018(String dimensionPhrase)
 	{
 		// String statFileNames[] = { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
-		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsAug17.csv";
+		String resultsLabelsPathFileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsAug23.csv";
 		// "ResultsAug9ToReadRandomPF.csv";
 		// + "ResultsAug7ToRead_1.csv";
 		/// ResultsJuly31ToRead_2.csv";
@@ -780,7 +780,7 @@ public class ResultsDistributionEvaluation
 
 			for (List<String> resEntry : resLabels)
 			{
-				if (resEntry.size() == 3)
+				if (resEntry.size() >= 3)
 				{
 					pathToRead = resEntry.get(2).trim();
 					String splitted[] = pathToRead.split("/");
@@ -816,6 +816,10 @@ public class ResultsDistributionEvaluation
 					{
 						continue;
 					}
+				}
+				else
+				{
+					PopUps.showError("Error: resEntry.size() = " + resEntry.size() + " <3");
 				}
 			}
 

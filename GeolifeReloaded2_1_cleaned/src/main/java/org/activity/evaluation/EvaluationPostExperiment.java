@@ -314,10 +314,8 @@ public class EvaluationPostExperiment
 			// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Feb11ImpBLNCount/Iteration1ForShowExp/Geolife/SimpleV3/";//
 			// UMAP submission
 			// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geo/SimpleV3/";//
-			String path = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/MUExperimentsBLNCount/Iteration1ForShow/Geolife/SimpleV3/"; // rexperiment
-																																				// UMAP
-																																				// corrected
-																																				// TZ
+			String path = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/MUExperimentsBLNCount/Iteration1ForShow/Geolife/SimpleV3/";
+			// rexperiment UMAP corrected TZ
 
 			// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June7FeatureWiseEdit/Geo/SimpleV3"
 			// +
@@ -338,11 +336,16 @@ public class EvaluationPostExperiment
 			{
 				Constant.setCommonPath(Constant.getOutputCoreResultsPath() + "MatchingUnit" + String.valueOf(mu) + "/");
 
+				String commonPathT = Constant.getCommonPath();
+				String[] activityNamesT = Constant.getActivityNames();
+				String dimensionPhraseT = "";
 				for (String timeCategory : timeCategories)
 				{
-					writePerActivityMeanReciprocalRank("Algo", timeCategory);
-					writePerActivityMeanReciprocalRank("BaselineOccurrence", timeCategory);
-					writePerActivityMeanReciprocalRank("BaselineDuration", timeCategory);
+					EvalMetrics.writePerActMRR("Algo", timeCategory, activityNamesT, dimensionPhraseT, commonPathT);
+					EvalMetrics.writePerActMRR("BaselineOccurrence", timeCategory, activityNamesT, dimensionPhraseT,
+							commonPathT);
+					EvalMetrics.writePerActMRR("BaselineDuration", timeCategory, activityNamesT, dimensionPhraseT,
+							commonPathT);
 				}
 			}
 			Constant.setCommonPath(Constant.getOutputCoreResultsPath());// + "MatchingUnit" + String.valueOf(mu) + "/");
@@ -699,120 +702,5 @@ public class EvaluationPostExperiment
 		}
 
 		return (commonPath + "RRAtOptimalMUForRTsFile.csv");
-	}
-
-	/**
-	 * executed post execution of experiments raw values checked
-	 * 
-	 * @param fileNamePhrase
-	 *            "Algo","BaselineOccurrence","BaselineDuration"
-	 * @param timeCategory
-	 *            { "All", "Morning", "Afternoon", "Evening" };
-	 */
-	public static void writePerActivityMeanReciprocalRank(String fileNamePhrase, String timeCategory)// , int numUsers)
-
-	{
-		// BufferedReader br= null;
-		String commonPath = Constant.getCommonPath();
-
-		try
-		{
-			BufferedWriter bw = WToFile
-					.getBWForNewFile(commonPath + fileNamePhrase + timeCategory + "PerActivityMeanReciprocalRank.csv");
-			BufferedWriter bwDistri = WToFile.getBWForNewFile(commonPath + "NumOfRTsPerAct.csv");
-			BufferedReader brRR = new BufferedReader(
-					new FileReader(commonPath + fileNamePhrase + timeCategory + "ReciprocalRank.csv"));
-			BufferedReader brDataActual = new BufferedReader(new FileReader(commonPath + "dataActual.csv"));
-
-			String[] activityNames = Constant.getActivityNames();
-
-			bw.write("User");
-			bwDistri.write("User");
-			for (String s : activityNames)
-			{
-				if (UtilityBelt.isValidActivityName(s))
-				{
-					bw.write("," + s);
-					bwDistri.write("," + s);
-				}
-			}
-			bw.newLine();
-			bwDistri.newLine();
-
-			String currentRRLine, currentDataActual;
-			int lineNumber = 0;
-			while ((currentRRLine = brRR.readLine()) != null)
-			{
-				if ((currentDataActual = brDataActual.readLine()) == null)
-				{
-					new Exception("Error: number of lines mismatch in writePerActivityMeanReciprocalRank");
-					PopUps.showException(
-							new Exception("Error: number of lines mismatch in writePerActivityMeanReciprocalRank"),
-							"writePerActivityMeanReciprocalRank");
-					System.exit(-1);
-				}
-
-				String[] rrValuesForThisUser = currentRRLine.split(",");
-				String[] dataActualValuesForThisUser = currentDataActual.split(",");
-				System.out.println("rrValuesForThisUser=" + rrValuesForThisUser.length);
-				System.out.println("dataActualValuesForThisUser=" + dataActualValuesForThisUser.length);
-
-				if (rrValuesForThisUser.length != dataActualValuesForThisUser.length)
-				{
-					new Exception("Error: number of tokens in line mismatch in writePerActivityMeanReciprocalRank");
-					PopUps.showException(
-							new Exception(
-									"Error: number of tokens in line mismatch in writePerActivityMeanReciprocalRank"),
-							"writePerActivityMeanReciprocalRank");
-					System.exit(-1);
-				}
-
-				LinkedHashMap<String, ArrayList<Double>> perActMRR = new LinkedHashMap<String, ArrayList<Double>>();
-				for (String actName : activityNames)
-				{
-					if (UtilityBelt.isValidActivityName(actName)) perActMRR.put(actName, new ArrayList<Double>()); // initialised
-																													// to
-																													// maintain
-																													// same
-																													// order
-																													// for
-																													// activity
-																													// names
-				}
-
-				int numOfTokens = rrValuesForThisUser.length;
-
-				for (int tokenI = 0; tokenI < numOfTokens; tokenI++)
-				{
-					String actualActName = dataActualValuesForThisUser[tokenI];
-					Double rrValue = Double.valueOf(rrValuesForThisUser[tokenI]);
-					perActMRR.get(actualActName).add(rrValue);
-				}
-
-				bw.write("User_" + lineNumber);
-				bwDistri.write("User_" + lineNumber);
-
-				for (Map.Entry<String, ArrayList<Double>> e : perActMRR.entrySet())
-				{
-					System.out.println(" number of vals =" + e.getValue().size());
-					bw.write("," + String.valueOf(StatsUtils.meanOfArrayList(e.getValue(), 4)));
-					bwDistri.write("," + String.valueOf(e.getValue().size()));
-				}
-				bw.newLine();
-				bwDistri.newLine();
-				lineNumber++;
-			}
-
-			brRR.close();
-			brDataActual.close();
-			bw.close();
-			bwDistri.close();
-			// bwValidRTCount.close();
-		}
-
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
 	}
 }

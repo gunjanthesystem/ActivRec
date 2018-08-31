@@ -831,9 +831,13 @@ public class DistanceUtils
 			double resultantEditDist = -999999;
 			boolean thisCandRejected = false;
 			String thisCandRejectedString = "NR";
+
+			double threshNormAEDForCand = Constant.threshNormAEDForCand;
+			double threshNormFEDForCand = Constant.threshNormFEDForCand;
+
 			if (EDBeta == 0)
 			{// since 0*NaN is NaN
-				if (normActDistForThisCand >= Constant.threshNormAEDForCand)// added on 14 Aug 2018
+				if (threshNormAEDForCand != -1 && normActDistForThisCand >= threshNormAEDForCand)// added on 14 Aug 2018
 				{
 					thisCandRejected = true;// reject this cand
 					thisCandRejectedString = "AR";
@@ -845,12 +849,12 @@ public class DistanceUtils
 			}
 			else
 			{
-				if (normActDistForThisCand >= Constant.threshNormAEDForCand)// added on 14 Aug 2018
+				if (threshNormAEDForCand != -1 && normActDistForThisCand >= threshNormAEDForCand)// added on 14 Aug 2018
 				{
 					thisCandRejected = true;// reject this cand
 					thisCandRejectedString = "AR";
 				}
-				else if (meanOverAOsNormFDForThisCand >= Constant.threshNormFEDForCand)
+				else if (threshNormFEDForCand != -1 && meanOverAOsNormFDForThisCand >= threshNormFEDForCand)
 				{
 					thisCandRejected = true;// reject this cand
 					thisCandRejectedString = "FR";

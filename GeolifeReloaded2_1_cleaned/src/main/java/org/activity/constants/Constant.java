@@ -220,8 +220,8 @@ public final class Constant
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
 
-	public static final double threshNormAEDForCand = 1;// added on 14 Aug 2018
-	public static final double threshNormFEDForCand = 1;// added on 14 Aug 2018
+	public static final double threshNormAEDForCand = -1;// added on 14 Aug 2018
+	public static final double threshNormFEDForCand = -1;// added on 14 Aug 2018
 
 	public static final boolean normaliseCandDistsAgainAfterFiltering = true;
 	/**
@@ -235,8 +235,11 @@ public final class Constant
 	public static final boolean useDurationFromNextInFED = false;
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
+	public static final boolean useTimeDecayInAED = false; /// added on 20 Aug 2018
+	public static final double powerOfTimeDecayInAED = -1.5; /// added on 20 Aug 2018
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean useRandomlySampled100Users = true;// true;// false;// false;// true;// SWITCH_NOV10
+	public static final boolean useRandomlySampled100Users = false;// toySwitch// SWITCH_NOV10
+	// runForAllUsersAtOnce and useRandomlySampled100Users to be changed simultaneously
 	/**
 	 * Use only subset of the users from the randomly sampled users (useful for running small sample experiments for
 	 * faster iterations)
@@ -244,7 +247,7 @@ public final class Constant
 	public static final boolean useSelectedGTZeroUsersFromRandomlySampled100Users = false;
 	public static String pathToRandomlySampledUserIndices = "";
 
-	public static final boolean runForAllUsersAtOnce = false;// false;// false;// true;// false;// true;// SWITCH_April8
+	public static final boolean runForAllUsersAtOnce = true;// toySwitch // SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// TODO: keep it true as the other verion may not be uptodate
 															// (Aug3,2018) SWITCH_April8
 	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
@@ -253,7 +256,7 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useToyTimelines = false;// false;// true;/SWITCH_AUG6
+	public static final boolean useToyTimelines = true;// toySwitch/SWITCH_AUG6
 
 	// public static final int numOfHiddenLayersInRNN1 = 3;// 3;
 	// public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;
@@ -1614,6 +1617,9 @@ public final class Constant
 		s.append("\nuseDistFromPrevInFED:" + useDistFromPrevInFED);
 		s.append("\nuseDurationFromPrevInFED:" + useDurationFromPrevInFED);
 		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFED);
+		s.append("\nuseTimeDecayInAED:" + useTimeDecayInAED);
+		s.append("\npowerOfTimeDecayInAED:" + powerOfTimeDecayInAED);
+
 		s.append("\nassignFallbackZoneId:" + assignFallbackZoneIdWhenConvertCinsToAO);
 		s.append("\nrandomLySample100Users:" + useRandomlySampled100Users);
 		s.append("\nuseSelectedGTZeroUsersFromRandomlySampled100Users:"

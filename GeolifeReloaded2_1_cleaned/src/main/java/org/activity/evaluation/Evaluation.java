@@ -20,7 +20,7 @@ import org.activity.util.RegexUtils;
  * (note: In earlier version (before 14 April 2015, this class was name as TestStats.java)
  * 
  * @author gunjan
- *
+ * @deprecated as it can be replaced by more generic EvaluationSeq.java
  */
 public class Evaluation
 {
@@ -1055,6 +1055,13 @@ public class Evaluation
 		}
 	}
 
+	/**
+	 * 
+	 * @param fileNamePhrase
+	 * @param timeCategory
+	 * @param numUsers
+	 * @deprecated
+	 */
 	public static void writeAvgFMeasuresForAllKs(String fileNamePhrase, String timeCategory, int numUsers)
 	{
 		// BufferedReader br= null;

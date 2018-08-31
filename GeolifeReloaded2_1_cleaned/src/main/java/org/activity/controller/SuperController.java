@@ -21,6 +21,7 @@ import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.Triple;
 import org.activity.postfilter.PostFilter1;
 import org.activity.ui.PopUps;
+import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.Searcher;
 import org.nd4j.jita.conf.CudaEnvironment;
@@ -231,9 +232,7 @@ public class SuperController
 		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
 		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
 
-		double[] EDAlphas = { 1 };// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */ };//
-									// 1,
-									// 0};
+		double[] EDAlphas = { 0.5 };// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */
 
 		// added on 29 July 2018 when running for multiple iterations
 		for (int iteration = 0; iteration < 1; iteration++)
@@ -250,7 +249,7 @@ public class SuperController
 				{
 					for (String sampledUserIndicesSet : sampledUserIndicesSets)
 					{
-						main0(sampledUserIndicesSet, edAlphaForAnExp, "ForLog");// "iter" + iteration);
+						main0(sampledUserIndicesSet, edAlphaForAnExp, "");// "iter" + iteration);
 						if (Constant.runForAllUsersAtOnce)
 						{
 							break;// because we are not using the sample users indices, hence we need to run it only
@@ -358,8 +357,7 @@ public class SuperController
 				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
 				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 						// { "./dataWritten/"
-						+ LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + labelForExperimentConfig + iterationLabel + "/" };
+						+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/" };
 
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
 		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
@@ -400,7 +398,9 @@ public class SuperController
 		// { "./dataWritten/Nov12_NCount916U916N1C1500T/", "./dataWritten/Nov12_NCount916U916N1C750T/",
 		// "./dataWritten/Nov12_NCount916U916N1C500T/", "./dataWritten/Nov12_NCount916U916N1C250T/" };
 
-		for (int i = 0; i <= commonPaths.length - 1; i++)
+		for (
+
+				int i = 0; i <= commonPaths.length - 1; i++)
 		{
 			File directory = new File(commonPaths[i]);
 			if (!directory.exists())
@@ -431,7 +431,8 @@ public class SuperController
 	{
 		String featuresUsedLabel = "", distNormalisationLabel = "", predictorLabel = "", EDAlphaLabel = "",
 				StFilterLabel = "", sampledUserSetLabel = "", candThresholdingLabel = "",
-				filterTrainingTimelinesLabel = "", toyTimelinesLabel = "", wtdEditDistanceLabel = "";
+				filterTrainingTimelinesLabel = "", toyTimelinesLabel = "", wtdEditDistanceLabel = "",
+				timeDecayLabel = "";
 
 		// added on 6 Aug 2018
 		if (Constant.useToyTimelines)
@@ -571,18 +572,33 @@ public class SuperController
 				if (Constant.percentileForRTVerseMaxForFEDNorm > -1)
 				{
 					distNormalisationLabel = (int) Constant.percentileForRTVerseMaxForFEDNorm + "FRTV";
+
+					if (Constant.threshNormFEDForCand != -1)
+					{
+						distNormalisationLabel += "T";
+					}
+
 				}
 				if (Constant.percentileForRTVerseMaxForAEDNorm > -1)
 				{
 					distNormalisationLabel = distNormalisationLabel + (int) Constant.percentileForRTVerseMaxForAEDNorm
 							+ "ARTV";
+					if (Constant.threshNormAEDForCand != -1)
+					{
+						distNormalisationLabel += "T";
+					}
 				}
 			}
 		}
 
+		if (Constant.useTimeDecayInAED)
+		{
+			timeDecayLabel = "decayA";
+		}
+
 		return sampledUserSetLabel + predictorLabel + EDAlphaLabel + featuresUsedLabel + StFilterLabel
 				+ distNormalisationLabel + candThresholdingLabel + filterTrainingTimelinesLabel + toyTimelinesLabel
-				+ wtdEditDistanceLabel;
+				+ wtdEditDistanceLabel + timeDecayLabel;
 	}
 
 	public static void cleanUp(String[] pathsToClean)
