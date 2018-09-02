@@ -47,6 +47,8 @@ import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
+import org.activity.util.TimelineTransformers;
+import org.activity.util.TimelineTrimmers;
 import org.activity.util.TimelineUtils;
 
 /**
@@ -465,7 +467,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							if (Constant.cleanTimelinesAgainInsideRecommendationTests) // added on April 11 2018
 							{// Not sure why we would need to clean day timelines agains since it was already cleaned in
 								// before being passed to this method
-								userAllDatesTimeslines = TimelineUtils.cleanUserDayTimelines(userAllDatesTimeslines,
+								userAllDatesTimeslines = TimelineTrimmers.cleanUserDayTimelines(userAllDatesTimeslines,
 										commonPath + "InsideRecommTestCleanUserDayTimelines", String.valueOf(userId));
 							}
 							// ////////////////////////////////////////////////////////////////////////////////
@@ -1618,7 +1620,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		{
 			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
 
-			Timeline trainingTimelineForThisUser = TimelineUtils
+			Timeline trainingTimelineForThisUser = TimelineTransformers
 					.dayTimelinesToATimeline(trainingTimelineForThisUserDate, false, true);
 			// convert datetime to continouse timeline
 			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), trainingTimelineForThisUser);
@@ -1657,7 +1659,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					.entrySet().stream().limit(numOfRecentDays)
 					.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
 
-			Timeline filteredTrainingTimelineForThisUser = TimelineUtils
+			Timeline filteredTrainingTimelineForThisUser = TimelineTransformers
 					.dayTimelinesToATimeline(filteredDayTrainingTimelineForThisUser, false, true);
 			// convert datetime to continouse timeline
 			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredTrainingTimelineForThisUser);
@@ -1729,7 +1731,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
 
 			// convert datetime to continouse timeline
-			Timeline filteredTrainingTimelineForThisUser = TimelineUtils
+			Timeline filteredTrainingTimelineForThisUser = TimelineTransformers
 					.dayTimelinesToATimeline(filteredDayTrainingTimelineForThisUser, false, true);
 
 			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredTrainingTimelineForThisUser);
@@ -1775,8 +1777,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		// { repAOResult = buildRepresentativeAOsForUserPDVCOll(userId, trainTestTimelinesForAllUsers,
 		// Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs()); } else {
 		repAOResult = buildRepresentativeAOsForUserPDV2(userId,
-				TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-				TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true), Constant.getUniqueLocIDs(),
+				TimelineTransformers.dayTimelinesToATimeline(userTrainingTimelines, false, true),
+				TimelineTransformers.dayTimelinesToATimeline(userTestTimelines, false, true), Constant.getUniqueLocIDs(),
 				Constant.getUniqueActivityIDs());
 
 		// Start of Sanity Check for buildRepresentativeAOsForUserPD()
@@ -1786,8 +1788,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			// buildRepresentativeAOsForUserPD and buildRepresentativeAOsForUser should be same
 			// (except data type)
 			Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName = buildRepresentativeAOsForUser(
-					userId, TimelineUtils.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-					Constant.getActivityNames(), TimelineUtils.dayTimelinesToATimeline(userTestTimelines, false, true));
+					userId, TimelineTransformers.dayTimelinesToATimeline(userTrainingTimelines, false, true),
+					Constant.getActivityNames(), TimelineTransformers.dayTimelinesToATimeline(userTestTimelines, false, true));
 			Sanity.compareOnlyNonEmpty(repAOResult, repAOResultActName);
 		}
 		// end of Sanity Check for buildRepresentativeAOsForUserPD()
@@ -1844,7 +1846,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					int userIdCursor = Integer.valueOf(trainTestForAUser.getKey());
 					if (userIdCursor != userId)
 					{
-						Timeline userTrainingTimeline = TimelineUtils
+						Timeline userTrainingTimeline = TimelineTransformers
 								.dayTimelinesToATimeline(trainTestForAUser.getValue().get(0), false, true);
 
 						for (ActivityObject ao : userTrainingTimeline.getActivityObjectsInTimeline())
@@ -2056,7 +2058,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsers
 						.entrySet())
 				{
-					Timeline userTrainingTimeline = TimelineUtils
+					Timeline userTrainingTimeline = TimelineTransformers
 							.dayTimelinesToATimeline(trainTestForAUser.getValue().get(0), false, true);
 
 					for (ActivityObject ao : userTrainingTimeline.getActivityObjectsInTimeline())

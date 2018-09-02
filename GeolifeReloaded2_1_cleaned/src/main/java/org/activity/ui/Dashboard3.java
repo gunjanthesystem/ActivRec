@@ -21,7 +21,7 @@ import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartAppCanvas;
 import org.activity.plotting.TimelineChartAppGeneric;
 import org.activity.ui.colors.ColorPalette;
-import org.activity.util.TimelineUtils;
+import org.activity.util.TimelineTransformers;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -47,12 +47,14 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -72,6 +74,7 @@ public class Dashboard3 extends Application
 {
 	public static Map<Integer, Integer> actIDIndexMap;
 	Stage stage;
+	ReusableElements reuse;
 	// String pathToToyTimelines = ;
 	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY21ED0.35STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTV/ToyTimelines21May.kryo";
 	// MenuBar menuBar;
@@ -89,6 +92,8 @@ public class Dashboard3 extends Application
 	{
 		long t0 = System.currentTimeMillis();
 		ScreenDetails.printScreensDetails();
+
+		reuse = new ReusableElements();
 
 		PathConstants.intialise(Constant.For9kUsers);
 		Constant.initialise("./", "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
@@ -249,6 +254,14 @@ public class Dashboard3 extends Application
 			{
 				Tab onlyActIDsAsRects = new Tab("Only ActIDs Sequence");
 				onlyActIDsAsRects.setContent(createOnlyActIDsAsRects(usersCleanedDayToyTimelines));
+				onlyActIDsAsRects.setClosable(true);
+				tabsToAdd.add(onlyActIDsAsRects);
+			}
+
+			if (doGivenDataOnlyActIDSeq)
+			{
+				Tab onlyActIDsAsRects = new Tab("Only ActIDs Sequence2");
+				onlyActIDsAsRects.setContent(createOnlyActIDsAsRectsV2(usersCleanedDayToyTimelines));
 				onlyActIDsAsRects.setClosable(true);
 				tabsToAdd.add(onlyActIDsAsRects);
 			}
@@ -538,7 +551,7 @@ public class Dashboard3 extends Application
 	private Node createOnlyActIDsAsRects(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
 	{
-		LinkedHashMap<String, Timeline> continousTimelines = TimelineUtils
+		LinkedHashMap<String, Timeline> continousTimelines = TimelineTransformers
 				.dayTimelinesToTimelines(usersCleanedDayToyTimelines);
 
 		double widthOfActRect = 50, widthOfUserRect = 150;
@@ -552,21 +565,17 @@ public class Dashboard3 extends Application
 		for (Entry<String, Timeline> userEntry : continousTimelines.entrySet())
 		{
 			HBox hBox = new HBox();
-			hBox.setSpacing(6);
+			// hBox.setSpacing(3);
 			hBox.setAlignment(Pos.CENTER_LEFT);
 
-			hBox.getChildren().add(createStackPane(Color.WHITE, "User " + userEntry.getKey(), widthOfUserRect, ""));
+			hBox.getChildren().add(createStackPane(Color.WHITE, null, "User " + userEntry.getKey(), widthOfUserRect, "",
+					"rectangle", null));
 
 			for (ActivityObject ao : userEntry.getValue().getActivityObjectsInTimeline())
 			{
-				String toolTipText = "st: " + ao.getStartTimestamp().toString() + "\nlocG: "
-						+ ao.getGivenDimensionVal("|", PrimaryDimension.LocationGridID) + "\ndistP (km): "
-						+ (ao.getDistanceInMFromPrev() / 1000) + "\ndurP (min): "
-						+ (ao.getDurationInSecondsFromPrev() / 60) + "\nphotos: " + ao.getPhotos_count();
-
-				hBox.getChildren()
-						.add(createStackPane(ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID())),
-								String.valueOf(ao.getActivityID()), widthOfActRect, toolTipText));
+				Color actColor = ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID()));
+				hBox.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
+						widthOfActRect, getTooltipFromAO(ao), "circle", null));
 			}
 			vBox.getChildren().add(hBox);
 		}
@@ -576,12 +585,95 @@ public class Dashboard3 extends Application
 		return s1;
 	}
 
-	private Rectangle createRectangle(Color color, double width)
+	/**
+	 * Fork of org.activity.ui.Dashboard3.createOnlyActIDsAsRects() to also indicate days
+	 * 
+	 * @param usersCleanedDayToyTimelines
+	 * @return
+	 */
+	private Node createOnlyActIDsAsRectsV2(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
+	{
+		double widthOfActRect = 50, widthOfUserRect = 150;
+
+		ScrollPane s1 = new ScrollPane();
+
+		VBox vBox = new VBox();
+		vBox.setSpacing(10);
+		vBox.setAlignment(Pos.CENTER);
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayToyTimelines.entrySet())
+		{
+			HBox hBox = new HBox();
+			// hBox.setSpacing(6);
+			hBox.setAlignment(Pos.CENTER_LEFT);
+			hBox.getChildren().add(createStackPane(Color.WHITE, null, "User " + userEntry.getKey(), widthOfUserRect, "",
+					"rectangle", null));
+
+			boolean altDayToggle = false;
+
+			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+			{
+				altDayToggle = !altDayToggle; // to identify days by differently colored border
+
+				Date date = dateEntry.getKey();
+				String dateString = date.toString();
+				Border borderForDay = null;
+
+				borderForDay = altDayToggle ? reuse.getBottomBorder1() : reuse.getBottomBorder2();
+
+				for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+				{
+					Color actColor = ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID()));
+					hBox.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
+							widthOfActRect, getTooltipFromAO(ao), "rectangle", borderForDay));
+				}
+
+			}
+
+			vBox.getChildren().add(hBox);
+		}
+		s1.setContent(vBox);
+		s1.setFitToHeight(true);
+		s1.setFitToWidth(true);
+		return s1;
+	}
+
+	public static String getTooltipFromAO(ActivityObject ao)
+	{
+		String toolTipText = "st: " + ao.getStartTimestamp().toString() + "\nlocG: "
+				+ ao.getGivenDimensionVal("|", PrimaryDimension.LocationGridID) + "\ndistP (km): "
+				+ (ao.getDistanceInMFromPrev() / 1000) + "\ndurP (min): " + (ao.getDurationInSecondsFromPrev() / 60)
+				+ "\nphotos: " + ao.getPhotos_count();
+
+		return toolTipText;
+	}
+
+	private Rectangle createRectangle(Color fillColor, Color strokeColor, double width)
 	{
 		Rectangle rect1 = new Rectangle(0, 45, width, 50);
-		// Fill rectangle with color
-		rect1.setFill(color);
+		if (strokeColor != null)
+		{
+			rect1.setStroke(strokeColor);
+			rect1.setStrokeWidth(2);
+		}
+		rect1.setFill(fillColor);
 		return rect1;
+	}
+
+	private Circle createCircle(Color fillColor, Color strokeColor, double width)
+	{
+		Circle circ = new Circle();
+		circ.setCenterX(0);
+		circ.setCenterY(0);
+		circ.setRadius(width / 2);
+		if (strokeColor != null)
+		{
+			circ.setStroke(strokeColor);
+			circ.setStrokeWidth(2);
+		}
+		circ.setFill(fillColor);
+		return circ;
 	}
 
 	private Text createText(String text)
@@ -595,21 +687,53 @@ public class Dashboard3 extends Application
 
 	/**
 	 * 
-	 * @param color
-	 * @param text
-	 * @param width
 	 * @param tooltipText
 	 * @return
 	 */
-	private StackPane createStackPane(Color color, String text, double width, String tooltipText)
+	public static Tooltip createTooltip(String tooltipText)
 	{
-		final StackPane stack = new StackPane();
-		Rectangle r = createRectangle(color, width);
-		stack.getChildren().addAll(r, createText(text));
 		Tooltip tooltip2 = new Tooltip();
 		UIUtilityBox.hackTooltipStartTiming(tooltip2);
 		tooltip2.setText(tooltipText);
-		Tooltip.install(stack, tooltip2);
+		return tooltip2;
+	}
+
+	/**
+	 * 
+	 * @param fillColor
+	 * @param strokeColor
+	 * @param labelText
+	 * @param width
+	 * @param tooltipText
+	 * @param shape
+	 * @return
+	 */
+	private StackPane createStackPane(Color fillColor, Color strokeColor, String labelText, double width,
+			String tooltipText, String shape, Border border)
+	{
+		final StackPane stack = new StackPane();
+		Node shapedNode = null;
+
+		if (border != null)
+		{
+			// stack.setBackground(bg);
+			stack.setBorder(border);
+			// stack.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+		}
+		switch (shape.toLowerCase())
+		{
+		case "rectangle":
+			shapedNode = createRectangle(fillColor, strokeColor, width);
+			break;
+		case "circle":
+			shapedNode = createCircle(fillColor, strokeColor, width);
+			break;
+		default:
+			PopUps.showError("Error: unkown shape " + shape);
+		}
+
+		stack.getChildren().addAll(shapedNode, createText(labelText));
+		Tooltip.install(stack, createTooltip(tooltipText));
 		return stack;
 	}
 

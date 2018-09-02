@@ -23,6 +23,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
+import org.activity.io.TimelineWriters;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.Pair;
@@ -1410,7 +1411,7 @@ public class UtilityBelt
 		System.out.println("** Traversing Activity Events **");
 		for (ActivityObject ao : activityEvents)
 		{
-			TimelineUtils.traverseActivityObject(ao.getDimensionIDNameValues(), ao.getDimensions());
+			TimelineWriters.traverseActivityObject(ao.getDimensionIDNameValues(), ao.getDimensions());
 			// (activityEvents.get(i)).traverseActivityObject();
 		}
 		System.out.println("** End of Traversing Activity Events **");

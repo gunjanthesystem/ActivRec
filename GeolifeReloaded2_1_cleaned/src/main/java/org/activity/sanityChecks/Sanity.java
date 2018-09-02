@@ -14,6 +14,40 @@ public class Sanity
 
 	/**
 	 * 
+	 * @param val
+	 * @param lowerLimitInclusive
+	 * @param upperLimitInclusive
+	 * @param errorMsg
+	 * @return
+	 * @since 31 Aug 2018
+	 */
+	public static boolean inRange(double val, double lowerLimitInclusive, double upperLimitInclusive, String errorMsg)
+	{
+		String msg = "";
+		if (val < lowerLimitInclusive)
+		{
+			msg = "lower than " + lowerLimitInclusive;
+		}
+		if (val > upperLimitInclusive)
+		{
+			msg = "higher than " + upperLimitInclusive;
+		}
+
+		if (msg.length() > 0)
+		{
+			errorMsg += ("\t" + msg + "\n");
+			System.err.println(PopUps.getTracedErrorMsg(errorMsg));
+			PopUps.showError(errorMsg);
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
+	 * 
 	 * @param a
 	 * @param b
 	 * @param errorMsg

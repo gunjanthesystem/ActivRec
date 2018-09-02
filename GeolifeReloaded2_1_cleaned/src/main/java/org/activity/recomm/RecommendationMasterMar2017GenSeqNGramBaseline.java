@@ -32,7 +32,9 @@ import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
-import org.activity.util.TimelineUtils;
+import org.activity.util.TimelineExtractors;
+import org.activity.util.TimelineTransformers;
+import org.activity.util.TimelineTrimmers;
 import org.activity.util.UtilityBelt;
 
 /***
@@ -260,12 +262,12 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 				LinkedHashMap<Integer, HashMap<String, Long>> nGramCountsFromTrainingTimelines = new LinkedHashMap<>();
 				System.out.println("initialising nGramCountsFromTrainingTimelines for user : " + userAtRecomm);
 
-				Timeline trainingTimelinesAsATimeline = TimelineUtils.dayTimelinesToATimeline(trainingTimelines, false,
+				Timeline trainingTimelinesAsATimeline = TimelineTransformers.dayTimelinesToATimeline(trainingTimelines, false,
 						true);
 
 				if (Constant.hasInvalidActivityNames)
 				{
-					trainingTimelinesAsATimeline = TimelineUtils.expungeInvalids(trainingTimelinesAsATimeline);
+					trainingTimelinesAsATimeline = TimelineTrimmers.expungeInvalids(trainingTimelinesAsATimeline);
 				}
 
 				String stringCodeOfTimeline = trainingTimelinesAsATimeline.getActivityObjectsAsStringCode();
@@ -534,7 +536,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 			//////
 			// converting day timelines into continuous timeline
-			Timeline testTimeline = TimelineUtils.dayTimelinesToATimeline(testTimelines, false, true);
+			Timeline testTimeline = TimelineTransformers.dayTimelinesToATimeline(testTimelines, false, true);
 			// if its subsequent seq index recommendation then take the last ao of the prev recomms
 			if (actObjsToAddToCurrentTimeline.size() > 0)
 			{
@@ -546,7 +548,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 			}
 			else // extract current activity object with mu=0
 			{
-				Pair<TimelineWithNext, Double> currentTimelineTemp = TimelineUtils
+				Pair<TimelineWithNext, Double> currentTimelineTemp = TimelineExtractors
 						.getCurrentTimelineFromLongerTimelineMUCount(testTimeline, this.dateAtRecomm, this.timeAtRecomm,
 								this.userIDAtRecomm, 0);
 				this.activitiesGuidingRecomm = currentTimelineTemp.getFirst().getActivityObjectsInTimeline();
@@ -690,7 +692,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		{
 			if (Constant.hasInvalidActivityNames)
 			{
-				testTimelinesDaywise = TimelineUtils.expungeInvalidsDayTimelines(testTimelinesOrig);
+				testTimelinesDaywise = TimelineTrimmers.expungeInvalidsDayTimelines(testTimelinesOrig);
 				// $$System.out.println("Expunging invalids before recommendation process: expunging test timelines");
 			}
 			else
@@ -702,17 +704,17 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		// //////////////////
 		if (lookPastType2.equals(Enums.LookPastType.Daywise) || lookPastType2.equals(Enums.LookPastType.ClosestTime))
 		{
-			extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineDaywise(testTimelinesDaywise,
+			extractedCurrentTimeline = TimelineExtractors.getCurrentTimelineFromLongerTimelineDaywise(testTimelinesDaywise,
 					dateAtRecomm, timeAtRecomm, userIDAtRecomm);
 		}
 		else
 		{
 			// converting day timelines into continuous timelines suitable to be used for matching unit views
-			Timeline testTimeline = TimelineUtils.dayTimelinesToATimeline(testTimelinesDaywise, false, true);
+			Timeline testTimeline = TimelineTransformers.dayTimelinesToATimeline(testTimelinesDaywise, false, true);
 
 			if (lookPastType2.equals(Enums.LookPastType.NCount))
 			{
-				Pair<TimelineWithNext, Double> result = TimelineUtils.getCurrentTimelineFromLongerTimelineMUCount(
+				Pair<TimelineWithNext, Double> result = TimelineExtractors.getCurrentTimelineFromLongerTimelineMUCount(
 						testTimeline, dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
 				extractedCurrentTimeline = result.getFirst();
 				reductionInMu = result.getSecond();
@@ -720,7 +722,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 
 			else if (lookPastType2.equals(Enums.LookPastType.NHours))
 			{
-				extractedCurrentTimeline = TimelineUtils.getCurrentTimelineFromLongerTimelineMUHours(testTimeline,
+				extractedCurrentTimeline = TimelineExtractors.getCurrentTimelineFromLongerTimelineMUHours(testTimeline,
 						dateAtRecomm, timeAtRecomm, userIDAtRecomm, matchingUnitInCountsOrHours);
 			}
 			else

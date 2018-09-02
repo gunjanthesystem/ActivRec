@@ -41,7 +41,7 @@ import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineExtractors;
-import org.activity.util.TimelineUtils;
+import org.activity.util.TimelineTrimmers;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -1028,7 +1028,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		}
 
 		int countCandBeforeThresholdPruning = distancesMapUnsorted.size();// distanceScoresSorted.size();
-		distancesMapUnsorted = TimelineUtils.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
+		distancesMapUnsorted = TimelineTrimmers.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
 		int countCandAfterThresholdPruning = distancesMapUnsorted.size();
 
 		sb.append("After pruning distancesMapUnsorted =\n");

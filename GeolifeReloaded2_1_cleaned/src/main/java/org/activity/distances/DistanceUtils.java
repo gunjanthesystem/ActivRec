@@ -45,6 +45,7 @@ import org.apache.commons.math3.stat.StatUtils;
  */
 public class DistanceUtils
 {
+
 	/**
 	 * Ensure that both vectors are of same length
 	 * 

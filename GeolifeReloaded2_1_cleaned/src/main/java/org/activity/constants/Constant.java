@@ -256,7 +256,7 @@ public final class Constant
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
 
 	public static boolean debugFeb24_2018 = false;// SWITCH_NOV10
-	public static final boolean useToyTimelines = true;// toySwitch/SWITCH_AUG6
+	public static final boolean useToyTimelines = false;// true;// toySwitch/SWITCH_AUG6
 
 	// public static final int numOfHiddenLayersInRNN1 = 3;// 3;
 	// public static final int numOfNeuronsInEachHiddenLayerInRNN1 = 500;

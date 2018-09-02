@@ -12,6 +12,7 @@ import org.activity.constants.Constant;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
+import org.activity.util.TimelineCreators;
 import org.activity.util.TimelineUtils;
 
 public class TimelineUtilsChecks
@@ -50,7 +51,7 @@ public class TimelineUtilsChecks
 		Timestamp startTimestampOfActObjAtRecommPoint = new Timestamp(1900, 1 - 1, 0, 23, 55, 0, 0);
 
 		ArrayList<Timestamp> timestampsToLookInto =
-				TimelineUtils.createTimestampsToLookAt(uniqueDatesInCands, startTimestampOfActObjAtRecommPoint, true);
+				TimelineCreators.createTimestampsToLookAt(uniqueDatesInCands, startTimestampOfActObjAtRecommPoint, true);
 
 		for (Timestamp tsToLookInto : timestampsToLookInto)
 		{
