@@ -30,6 +30,7 @@ import org.activity.generator.ToyTimelineUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
+import org.activity.io.TimelineWriters;
 import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.CheckinEntry;
@@ -45,6 +46,8 @@ import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
+import org.activity.util.TimelineCreators;
+import org.activity.util.TimelineTrimmers;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 
@@ -189,16 +192,19 @@ public class ControllerWithoutServer
 
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 			// System.exit(0);
-			if (false)// temporary
+			if (true)// temporary enabled for verbose writing of user timeline
 			{
-				TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
-				TimelineUtils.writeLocationObjects(Constant.getUniqueLocIDs(),
+				TimelineWriters.writeAllActObjs(usersCleanedDayTimelines, commonBasePath + "AllActObjs.csv");
+				TimelineWriters.writeLocationObjects(Constant.getUniqueLocIDs(),
 						DomainConstants.getLocIDLocationObjectDictionary(),
 						commonBasePath + "UniqueLocationObjects.csv");
 				// SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
-				TimelineUtils.writeUserObjects(usersCleanedDayTimelines.keySet(),
+				TimelineWriters.writeUserObjects(usersCleanedDayTimelines.keySet(),
 						DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
 
+				Serializer.kryoSerializeThis(usersCleanedDayTimelines,
+						commonBasePath + "usersCleanedDayTimelines.kryo");
+				System.exit(0);
 			}
 
 			if (false)// temporary for 22 feb 2018,
@@ -247,8 +253,8 @@ public class ControllerWithoutServer
 				}
 				if (serialiseToyTimelines)
 				{
-					Serializer.kryoSerializeThis(usersToyDayTimelines, Constant.getCommonPath() + "ToyTimelinesManually"
-							+ DateTimeUtils.getMonthDateLabel() + ".kryo");
+					Serializer.kryoSerializeThis(usersToyDayTimelines,
+							commonBasePath + "ToyTimelinesManually" + DateTimeUtils.getMonthDateLabel() + ".kryo");
 				}
 				if (deserialiseToyTimelines)
 				{
@@ -261,19 +267,16 @@ public class ControllerWithoutServer
 				// if (!createToyTimelines)// add locGrid to AOs in timelines, because the previously (before Aug
 				// 2018)// // created toy timelines did not had locGridIndices assigned to AOs
 				// {usersToyDayTimelines = TimelineUtils.assignLocGridIndices(usersToyDayTimelines);}
-				ToyTimelineUtils.writeOnlyActIDs(usersToyDayTimelines,
-						Constant.getCommonPath() + "ToyTimelinesOnlyActIDs.csv");
-				ToyTimelineUtils.writeOnlyActIDs2(usersToyDayTimelines,
-						Constant.getCommonPath() + "ToyTimelinesOnlyActIDs2.csv");
-				ToyTimelineUtils.writeActIDTS(usersToyDayTimelines,
-						Constant.getCommonPath() + "ToyTimelinesActIDTS.csv");
+				ToyTimelineUtils.writeOnlyActIDs(usersToyDayTimelines, commonBasePath + "ToyTimelinesOnlyActIDs.csv");
+				ToyTimelineUtils.writeOnlyActIDs2(usersToyDayTimelines, commonBasePath + "ToyTimelinesOnlyActIDs2.csv");
+				ToyTimelineUtils.writeActIDTS(usersToyDayTimelines, commonBasePath + "ToyTimelinesActIDTS.csv");
 
 				PrimaryDimension primDimTemp = Constant.primaryDimension;
 				PrimaryDimension secDimTemp = Constant.secondaryDimension;
 				ToyTimelineUtils.writeOnlyGivenDimensionVals(usersToyDayTimelines,
-						Constant.getCommonPath() + "ToyTimelinesOnly" + primDimTemp + ".csv", primDimTemp);
+						commonBasePath + "ToyTimelinesOnly" + primDimTemp + ".csv", primDimTemp);
 				ToyTimelineUtils.writeOnlyGivenDimensionVals(usersToyDayTimelines,
-						Constant.getCommonPath() + "ToyTimelinesOnly" + secDimTemp + ".csv", secDimTemp);
+						commonBasePath + "ToyTimelinesOnly" + secDimTemp + ".csv", secDimTemp);
 
 				// do it again using the toy timelines
 				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true, true);
@@ -282,7 +285,7 @@ public class ControllerWithoutServer
 				Constant.setActivityNames(
 						Constant.getUniqueActivityIDs().stream().map(i -> String.valueOf(i)).toArray(String[]::new));
 
-				writeActIDNamesInFixedOrder(Constant.getCommonPath() + "ToyCatIDNameMap.csv");
+				writeActIDNamesInFixedOrder(commonBasePath + "ToyCatIDNameMap.csv");
 
 				// PopUps.showMessage("After toy timelines creation!!");
 				// $$Disabled on May29 2018 TimelineStats.timelineStatsController(usersCleanedDayToyTimelines);
@@ -640,12 +643,12 @@ public class ControllerWithoutServer
 				uniqueLocTrainsTests.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
 				Constant.getCommonPath() + "UniqueLocIDs5DaysTrainTest.csv");
 
-		TimelineUtils.writeLocationObjects(uniqueLocTrainsTests, DomainConstants.getLocIDLocationObjectDictionary(),
+		TimelineWriters.writeLocationObjects(uniqueLocTrainsTests, DomainConstants.getLocIDLocationObjectDictionary(),
 				Constant.getCommonPath() + "UniqueLocationObjects5DaysTrainTest.csv");
 
-		TimelineUtils.writeAllActObjs(trainTimelinesAllUsersContinuousFiltrd,
+		TimelineWriters.writeAllActObjs(trainTimelinesAllUsersContinuousFiltrd,
 				Constant.getCommonPath() + "AllActObjs5DaysTrain.csv");
-		TimelineUtils.writeAllActObjsFromTestOnly(trainTestTimelinesForAllUsersDW,
+		TimelineWriters.writeAllActObjsFromTestOnly(trainTestTimelinesForAllUsersDW,
 				Constant.getCommonPath() + "AllActObjsTest.csv");
 		// TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
 		if (exit)
@@ -1447,7 +1450,7 @@ public class ControllerWithoutServer
 				System.out.println("before creating timelines while having deserialised objects in memory\n"
 						+ PerformanceAnalytics.getHeapInformation());
 
-				usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromCheckinEntriesGowallaFaster1_V2(
+				usersDayTimelinesOriginal = TimelineCreators.createUserTimelinesFromCheckinEntriesGowallaFaster1_V2(
 						mapForAllCheckinData, mapForAllLocationData);
 			}
 			else
@@ -1461,7 +1464,7 @@ public class ControllerWithoutServer
 				System.out.println("before creating timelines while having deserialised objects in memory\n"
 						+ PerformanceAnalytics.getHeapInformation());
 
-				usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromCheckinEntriesGowallaFaster1(
+				usersDayTimelinesOriginal = TimelineCreators.createUserTimelinesFromCheckinEntriesGowallaFaster1(
 						mapForAllCheckinData, mapForAllLocationData);
 			}
 		}
@@ -1470,7 +1473,7 @@ public class ControllerWithoutServer
 			ArrayList<ActivityObject> allActivityEvents = UtilityBelt
 					.createActivityObjectsFromJsonArray(jsonArrayD.getJSONArray());
 			// UtilityBelt.traverseActivityEvents(allActivityEvents); // Debugging Check: OK
-			usersDayTimelinesOriginal = TimelineUtils.createUserTimelinesFromActivityObjects(allActivityEvents);
+			usersDayTimelinesOriginal = TimelineCreators.createUserTimelinesFromActivityObjects(allActivityEvents);
 		}
 
 		System.out
@@ -1530,7 +1533,7 @@ public class ControllerWithoutServer
 		///// clean timelines
 		System.out.println(
 				"\n-- Removes day timelines with no valid activity, with <=1 distinct valid activity, and the weekend day timelines.");
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = TimelineUtils
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = TimelineTrimmers
 				.cleanUsersDayTimelines(usersDayTimelinesOriginal);
 		if (writeToFile)
 		{
@@ -1541,7 +1544,7 @@ public class ControllerWithoutServer
 		///// again remove users with less than 2 days (these are the clean days)
 		// if (false){// disabled
 		System.out.println("\n--again remove users with less than 2 day (these are the clean days)");
-		usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 2,
+		usersCleanedDayTimelines = TimelineTrimmers.removeUsersWithLessDays(usersCleanedDayTimelines, 2,
 				Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan2DaysLog.csv");
 
 		if (writeToFile)
@@ -1594,7 +1597,7 @@ public class ControllerWithoutServer
 		///// clean timelines
 		System.out.println(
 				"\n-- Removes day timelines with no valid activity, with <=1 distinct valid activity, and the weekend day timelines.");
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = TimelineUtils
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = TimelineTrimmers
 				.cleanUsersDayTimelines(usersDayTimelinesOriginal);
 		if (writeToFile)
 		{
@@ -1606,7 +1609,7 @@ public class ControllerWithoutServer
 		{
 			///// again remove users with less than 50 days (these are the clean days)
 			System.out.println("\n--again remove users with less than 50 days (these are the clean days)");
-			usersCleanedDayTimelines = TimelineUtils.removeUsersWithLessDays(usersCleanedDayTimelines, 50,
+			usersCleanedDayTimelines = TimelineTrimmers.removeUsersWithLessDays(usersCleanedDayTimelines, 50,
 					Constant.getCommonPath() + "removeCleanedDayTimelinesWithLessThan50DaysLog.csv");
 			if (writeToFile)
 			{
@@ -1618,7 +1621,7 @@ public class ControllerWithoutServer
 
 			///// again remove blacklisted user
 			System.out.println("\n--again remove blacklisted gowalla users");
-			usersCleanedDayTimelines = TimelineUtils.removeBlackListedUsers(databaseName, usersCleanedDayTimelines,
+			usersCleanedDayTimelines = TimelineTrimmers.removeBlackListedUsers(databaseName, usersCleanedDayTimelines,
 					Constant.getCommonPath() + "BlackListedUsers.csv");
 			if (writeToFile)
 			{
@@ -1712,7 +1715,7 @@ public class ControllerWithoutServer
 		{
 			labelEnd = "RemovedDaysWithLT" + actsPerDayLowerLimit + "ActPerDay";
 			System.out.println("\n-- removing days with less than " + actsPerDayLowerLimit + " acts per day");
-			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
+			usersDayTimelinesOriginal = TimelineTrimmers.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
 					actsPerDayLowerLimit,
 					commonPath + "removeDayTimelinesWithLessThan" + actsPerDayLowerLimit + "ActLog.csv", writeLogs);
 			if (writeToFile)
@@ -1727,7 +1730,7 @@ public class ControllerWithoutServer
 		{
 			labelEnd += "GT" + actsPerDayUpperLimit + "ActsPerDay";
 			System.out.println("\n-- removing days with greater than " + actsPerDayUpperLimit + " acts per day");
-			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithGreaterAct(usersDayTimelinesOriginal,
+			usersDayTimelinesOriginal = TimelineTrimmers.removeDayTimelinesWithGreaterAct(usersDayTimelinesOriginal,
 					actsPerDayUpperLimit,
 					commonPath + "removeDayTimelinesWithGreaterThan" + actsPerDayUpperLimit + "ActLog.csv", writeLogs);
 
@@ -1743,7 +1746,7 @@ public class ControllerWithoutServer
 		{
 			labelEnd += "UsersWithLT" + numOfSuchDaysLowerLimit + "Days";
 			System.out.println("\n-- removing users with less than " + numOfSuchDaysLowerLimit + " days");
-			usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal,
+			usersDayTimelinesOriginal = TimelineTrimmers.removeUsersWithLessDays(usersDayTimelinesOriginal,
 					numOfSuchDaysLowerLimit,
 					commonPath + "removeDayTimelinesWithLessThan" + numOfSuchDaysLowerLimit + "DaysLog.csv");
 			if (writeToFile)
@@ -1791,7 +1794,7 @@ public class ControllerWithoutServer
 		{
 			////////// removed days with less than 10 acts per day
 			System.out.println("\n-- removing days with less than " + actsPerDayThreshold + " acts per day");
-			usersDayTimelinesOriginal = TimelineUtils.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
+			usersDayTimelinesOriginal = TimelineTrimmers.removeDayTimelinesWithLessAct(usersDayTimelinesOriginal,
 					actsPerDayThreshold,
 					Constant.getCommonPath() + "removeDayTimelinesWithLessThan" + actsPerDayThreshold + "ActLog.csv",
 					true);
@@ -1805,7 +1808,7 @@ public class ControllerWithoutServer
 
 			////////// removed users with less than 50 days
 			System.out.println("\n-- removing users with less than " + suchDaysThreshold + " days");
-			usersDayTimelinesOriginal = TimelineUtils.removeUsersWithLessDays(usersDayTimelinesOriginal,
+			usersDayTimelinesOriginal = TimelineTrimmers.removeUsersWithLessDays(usersDayTimelinesOriginal,
 					suchDaysThreshold,
 					Constant.getCommonPath() + "removeDayTimelinesWithLessThan" + suchDaysThreshold + "DaysLog.csv");
 			if (writeToFile)

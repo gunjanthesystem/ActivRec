@@ -19,7 +19,7 @@ import org.activity.stats.StatsUtils;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
 import org.activity.util.TimelineTransformers;
-import org.activity.util.TimelineUtils;
+import org.activity.util.TimelineTrimmers;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -83,8 +83,8 @@ public class TimelinesAttributesExtraction
 		// $$ addDoubleFeatureToFeatureVectors(getSequenceEntropyAfterExpungingInvalids(usersDayTimelines),
 		// "ShannonsEntropy");
 
-		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
-		LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineUtils.expungeInvalids(usersTimelines);
+		LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers.dayTimelinesToTimelines(usersDayTimelines);
+		LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineTrimmers.expungeInvalids(usersTimelines);
 
 		Sanity.eq(usersDayTimelines.size(), usersTimelines.size(),
 				"(usersDayTimelines.size() !=usersTimelines.size())");

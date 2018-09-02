@@ -89,7 +89,6 @@ public class ActivityCircle extends Group
 
 	private void setBackGround()
 	{
-
 		// circle.setFill(ColorPalette.getInsightSecondaryColor(actID % 11));
 		// circle.setFill(ColorPalette.getColors269Color(actID));
 		// circle.setFill(ColorPalette.getColors269Color(Constant.getIndexOfActIDInActNames(actID)));// only works for

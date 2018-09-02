@@ -9,7 +9,8 @@ import java.util.Map;
 import org.activity.constants.Constant;
 import org.activity.objects.ActivityObject;
 import org.activity.objects.Timeline;
-import org.activity.util.TimelineUtils;
+import org.activity.util.TimelineTransformers;
+import org.activity.util.TimelineTrimmers;
 
 public class ExperimentDistances
 {
@@ -43,14 +44,14 @@ public class ExperimentDistances
 			String userID = usersTimelinesEntry.getKey();
 			LinkedHashMap<Date, Timeline> userDayTimelines = usersTimelinesEntry.getValue();
 			// System.out.println("\nUser ID: " + userID);
-			userDayTimelines = TimelineUtils.cleanUserDayTimelines(userDayTimelines);
+			userDayTimelines = TimelineTrimmers.cleanUserDayTimelines(userDayTimelines);
 
-			Timeline timeline = TimelineUtils.dayTimelinesToATimeline(userDayTimelines, false, true);
+			Timeline timeline = TimelineTransformers.dayTimelinesToATimeline(userDayTimelines, false, true);
 			// new Timeline(userDayTimelines);
 
 			if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 			{
-				timeline = TimelineUtils.expungeInvalids(timeline);
+				timeline = TimelineTrimmers.expungeInvalids(timeline);
 			}
 
 			arrayOfTimelines.add(timeline); // converts the day time to continuous dayless timeline

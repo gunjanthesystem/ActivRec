@@ -45,6 +45,7 @@ import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
 import org.activity.util.TimelineTransformers;
+import org.activity.util.TimelineTrimmers;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.lang3.ArrayUtils;
@@ -146,8 +147,8 @@ public class TimelineStats
 			writeTimelineStats(usersDayTimelinesGiven, databaseName, pathToWrite, "Uncleaned");
 			// //////////////////
 
-			usersDayTimelinesCleaned = TimelineUtils.cleanUsersDayTimelines(usersDayTimelinesGiven);
-			usersDayTimelinesCleaned = TimelineUtils.rearrangeDayTimelinesOrderForDataset(usersDayTimelinesCleaned);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
+			usersDayTimelinesCleaned = TimelineTrimmers.cleanUsersDayTimelines(usersDayTimelinesGiven);
+			usersDayTimelinesCleaned = TimelineTransformers.rearrangeDayTimelinesOrderForDataset(usersDayTimelinesCleaned);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
 			System.out.println("ALERT: CLEANING AND REARRANGING USERS DAY TIMELINES !!");
 
 			WToFile.writeUsersDayTimelines(usersDayTimelinesCleaned, "users", true, true, true);// users
@@ -184,9 +185,9 @@ public class TimelineStats
 			}
 			case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
 			{
-				LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils
+				LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers
 						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
-				LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineUtils
+				LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineTrimmers
 						.expungeInvalids(usersTimelines);
 
 				applyKCentroidsTimelinesTwoLevel(usersTimelinesInvalidsExpunged);
@@ -244,12 +245,12 @@ public class TimelineStats
 
 			case "NGramAnalysis":
 			{
-				LinkedHashMap<String, Timeline> userTimelines = TimelineUtils
+				LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
 						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
 
 				if (Constant.hasInvalidActivityNames)
 				{
-					userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+					userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
 				}
 
 				WToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
@@ -261,28 +262,28 @@ public class TimelineStats
 
 			case "AlgorithmicAnalysis":
 			{
-				LinkedHashMap<String, Timeline> userTimelines = TimelineUtils
+				LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
 						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
-				userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+				userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
 
 				performAlgorithmicAnalysis(userTimelines, 1, 20, (pathToWrite));
 				break;
 			}
 			case "AlgorithmicAnalysis2":
 			{
-				LinkedHashMap<String, Timeline> userTimelines = TimelineUtils
+				LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
 						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
-				userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+				userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
 
 				performAlgorithmicAnalysis2(userTimelines, 1, 20, (pathToWrite));
 				break;
 			}
 			case "FeatureAnalysis":
 			{
-				LinkedHashMap<String, Timeline> userTimelines = TimelineUtils
+				LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
 						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
 
-				userTimelines = TimelineUtils.expungeInvalids(userTimelines);
+				userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
 				writeAllFeaturesValues(userTimelines, pathToWrite);
 				break;
 			}
@@ -895,8 +896,8 @@ public class TimelineStats
 		LinkedHashMap<String, Timeline> allTimelines = new LinkedHashMap<String, Timeline>();
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
-			Timeline allDatesTimelineCombined = TimelineUtils.dayTimelinesToATimeline(entry.getValue(), false, true);
-			Timeline newTimeline = TimelineUtils.expungeInvalids(allDatesTimelineCombined);
+			Timeline allDatesTimelineCombined = TimelineTransformers.dayTimelinesToATimeline(entry.getValue(), false, true);
+			Timeline newTimeline = TimelineTrimmers.expungeInvalids(allDatesTimelineCombined);
 			// new Timeline(entry.getValue()));
 			allTimelines.put(entry.getKey(), newTimeline);
 		}
@@ -2448,7 +2449,7 @@ public class TimelineStats
 
 		toWrite += "Num of users = " + usersDayTimelines.size();
 
-		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
+		LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers.dayTimelinesToTimelines(usersDayTimelines);
 
 		StringBuilder s = new StringBuilder();
 		s.append("User, User, NumOfActivityObjects");
@@ -2470,7 +2471,7 @@ public class TimelineStats
 	public static void writeNumOfAOsInTimelines(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
 			String absFileNameToWrite)
 	{
-		LinkedHashMap<String, Timeline> usersTimelines = TimelineUtils.dayTimelinesToTimelines(usersDayTimelines);
+		LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers.dayTimelinesToTimelines(usersDayTimelines);
 
 		StringBuilder s = new StringBuilder();
 		s.append("User, User, NumOfActivityObjects, NumOfDistinctActIDsForThisUser");
