@@ -200,10 +200,11 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 	 * 
 	 * @param dname
 	 * @param primaryDimension
+	 * @param dynamicEDAlpha
 	 * @param secondaryDimension
 	 * @return
 	 */
-	private final int initialiseDistancesUsed(String dname, PrimaryDimension primaryDimension,
+	private final int initialiseDistancesUsed(String dname, PrimaryDimension primaryDimension, double dynamicEDAlpha,
 			PrimaryDimension secondaryDimension)
 	{
 		alignmentBasedDistance = new AlignmentBasedDistance(primaryDimension); // used for case based similarity
@@ -211,15 +212,15 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 		switch (dname)
 		{
 		case "HJEditDistance":
-			if (Constant.EDAlpha < 0)
+			if (dynamicEDAlpha < 0)
 			{
 				hjEditDistancePrimaryDim = new HJEditDistance(primaryDimension);
 				hjEditDistanceSecondaryDim = new HJEditDistance(secondaryDimension);
 			}
 			else
 			{
-				hjEditDistancePrimaryDim = new HJEditDistance(Constant.EDAlpha, primaryDimension);
-				hjEditDistanceSecondaryDim = new HJEditDistance(Constant.EDAlpha, secondaryDimension);
+				hjEditDistancePrimaryDim = new HJEditDistance(dynamicEDAlpha, primaryDimension);
+				hjEditDistanceSecondaryDim = new HJEditDistance(dynamicEDAlpha, secondaryDimension);
 			}
 
 			break;
@@ -295,7 +296,8 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			this.primaryDimension = Constant.primaryDimension;
 			this.secondaryDimension = Constant.secondaryDimension;
 
-			initialiseDistancesUsed(Constant.getDistanceUsed(), primaryDimension, secondaryDimension);
+			initialiseDistancesUsed(Constant.getDistanceUsed(), primaryDimension, Constant.getDynamicEDAlpha(),
+					secondaryDimension);
 			System.out.println("hjEditDistancePrimaryDim.toString=" + this.hjEditDistancePrimaryDim.toString());
 			System.out.println("hjEditDistanceSecondaryDim.toString=" + this.hjEditDistanceSecondaryDim.toString());
 

@@ -29,6 +29,14 @@ public class PathConstants
 
 	public static final String pathToFileWithIndicesOfGTZeroUsers = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/Concatenated/MinMUWithMaxFirst3_GTZero.csv";
 
+	// moved from SuperController on 12 Sep 2018
+	public static final String[] pathToSetsOfRandomlySampled100Users = {
+			"./dataToRead/RandomlySample100UsersApril24_2018.csv",
+			"./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+			"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
+			"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
+			"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+
 	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY30Toy/ToyTimelinesManually28May.kryo";
 
 	/**

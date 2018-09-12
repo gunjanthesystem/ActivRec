@@ -4484,7 +4484,8 @@ public class WToFile
 		File directory = new File(pathToCreate);
 		if (!directory.exists())
 		{
-			directory.mkdirs();
+			directory.mkdirs();// If you require it to make the entire directory path including parents,
+			// use directory.mkdirs(); here instead.
 		}
 	}
 

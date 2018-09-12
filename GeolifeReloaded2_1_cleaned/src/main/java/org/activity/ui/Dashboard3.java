@@ -218,7 +218,7 @@ public class Dashboard3 extends Application
 		final boolean doSyntheticDataCanvasTimelines = false;
 		final boolean doSyntheticDataBoxTimelines = false;
 		final boolean doSyntheticDataLineTimelines = false;
-		final boolean doMapPlot = false;
+		final boolean doMapPlot = true;
 
 		try
 		{

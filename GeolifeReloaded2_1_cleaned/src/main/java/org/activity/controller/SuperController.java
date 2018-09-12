@@ -1,6 +1,5 @@
 package org.activity.controller;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +12,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.AltSeqPredictor;
 import org.activity.constants.Enums.TypeOfCandThreshold;
+import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
@@ -164,6 +164,15 @@ public class SuperController
 	}
 
 	/**
+	 * <h2>In this method:</h2>
+	 * 
+	 * <ul>
+	 * <li>setup CUDAEnviron if RNN is to used</li>
+	 * <li>set sampledUserIndices (in groups of 100) to be used</li>
+	 * <li>set of EDAlphas to be use</li>
+	 * <li>Can execute multiple experiments of the same experiment</li>
+	 * <li>Make a call to main0 for each iteration, each EDAlpha, each set of randomly sampled 100 users</li>
+	 * </ul>
 	 * 
 	 * @param args
 	 */
@@ -175,108 +184,46 @@ public class SuperController
 		}
 		// searchContentInFile();
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
-		// cleanUpSpace("./dataWritten/July31_first1/", 0.9);
 		// cleanUpSpace("./dataWritten/July23_incomplete/", 0.9);
 		// runAllAKOMExperiments();
 		// $$cleanUpSpace("./dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs", 0.97);//
-		// /Feb27ED0.5DurFPDistFPStFilter3hrs
-		// cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount5DayThreshold500", 1, "Raw");
-		// cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount1DayThreshold500", 1, "Raw");
-		// cleanUpSpace("./dataWritten/Jan20Ncount5DayThreshold100", 1, "Raw");
-
 		// $$cleanUpSpace("./dataWritten/xyz", 0.97, "Raw.csv");//
-		// cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount5DayThreshold500", 0.97);//
-		// cleanUpSpace("./dataWritten/Jan6_Sampling_Ncount1DayThreshold500", 0.97);//
 		// cleanUpSpace("./dataWritten/Feb28ED0.75DurFPDistFPStFilter3hrs ", 0.97);//
-		/// home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaseline/", 0.9);
 		// $cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaselineForUserNumInvestigation/",0.9);
 		// cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenClosestTimeBaseline/", 0.9);
-		// cleanUp(new String[] { "/dataWritten/Aug3_Only1CandPU/", "/dataWritten/Aug3_Only1CandPU2/",
-		// "/dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_1/",
-		// "/dataWritten/Feb25NCount_5Day_NN500MedRepCinsNormEDAlpha0.75DistDurOnlyFeature/",
-		// "/dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime",
-		// "/dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs/", "/dataWritten/Mar1ED0.25DurFPDistFPStFilter3hrs/",
-		// "/dataWritten/Mar1ED0.5DurFPDistFPStFilter3hrs_part2/" });
-		// cleanUp(new String[] {
-		// "./dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs ",
-		// "./dataWritten/Jan6_Sampling_Ncount5DayThreshold500",
-		// "./dataWritten/Jan6_Sampling_Ncount1DayThreshold500",
-		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.75DistDurOnlyFeature",
-		// "./dataWritten/Feb28ED0.75DurFPDistFPStFilter3hrs",
-		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_consolidated",
-		// "./dataWritten/Feb18NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha1",
-		// "./dataWritten/Feb8NCount_5DayFilter_ThreshNN500EditDists", "./dataWritten/Jan20Ncount5DayThreshold100",
-		// "./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime5hrs",
-		// "./dataWritten/Mar5ED0.5DurPrevStFilter0hrs",
-		// "./dataWritten/Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8",
-		// "./dataWritten/Mar5ED0.5DistPrevStFilter0hrs",
-		// "./dataWritten/Mar3ED0.5STimeDistPrevDurPrevStFilter3hrs",
-		// "./dataWritten/Mar3ED0.5STimeDistPrevDurPrevStFilter0hrs",
-		// "./dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5",
-		// "./dataWritten/Mar1ED0.75DurFPDistFPStFilter3hrs",
-		// "./dataWritten/Feb8NCount_5DayFilter_ThreshNN500MedianRepCins",
-		// "./dataWritten/Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8_part1",
-		// "./dataWritten/Feb7_EDInvestigation", "./dataWritten/Jan20Ncount5DayThreshold50",
-		// "./dataWritten/Mar1ED0.75DurFPDistFPStFilter3hrs_part2",
-		// "./dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDParallelRun2",
-		// "./dataWritten/Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDParallelRun3",
-		// "./dataWritten/Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6",
-		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_part1" });
-		// System.exit(0);
-		String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.csv" };
-		// , "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
-		// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",
-		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD",
-		// "./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+		// cleanUp(new String[] {});
+		String[] sampledUserIndicesSets = Arrays.copyOfRange(PathConstants.pathToSetsOfRandomlySampled100Users, 0, 1);
+		double[] EDAlphas = Arrays.copyOfRange(Constant.EDAlphas, 0, 1);
+		final int numOfIterSameExp = 1;
+		// num of times same exp to be repeated to smooth out variation due to ties, randomness, etc.
 
-		// String[] sampledUserIndicesSets = { "./dataToRead/RandomlySample100UsersApril24_2018.SetE",
-		// "./dataToRead/RandomlySample100UsersApril24_2018.SetD" };
-
-		double[] EDAlphas = { 0.5 };// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */
+		// { 0.5 };// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */
 
 		// added on 29 July 2018 when running for multiple iterations
-		for (int iteration = 0; iteration < 1; iteration++)
+		for (int iteration = 0; iteration < numOfIterSameExp; iteration++)
 		{
 			for (double edAlphaForAnExp : EDAlphas)
 			{
 				if (Constant.useToyTimelines)
-				{
-					// PopUps.showMessage("here inside toy!");
+				{// PopUps.showMessage("here inside toy!");
 					// Note: sampledUserIndicesSets are irrelavant for the toy timelines
-					main0(sampledUserIndicesSets[0], edAlphaForAnExp, "");
+					runExperimentForGivenUsersAndConfig(sampledUserIndicesSets[0], edAlphaForAnExp, "");
 				}
 				else
 				{
 					for (String sampledUserIndicesSet : sampledUserIndicesSets)
 					{
-						main0(sampledUserIndicesSet, edAlphaForAnExp, "");// "iter" + iteration);
+						runExperimentForGivenUsersAndConfig(sampledUserIndicesSet, edAlphaForAnExp, "");// "iter" +
+						// iteration);
 						if (Constant.runForAllUsersAtOnce)
 						{
-							break;// because we are not using the sample users indices, hence we need to run it only
-									// once.
+							break;// here we are not using sample user indices, hence we need to run it only once.
 						}
 					}
 				}
-				PopUps.showMessage("Exiting main");
 			}
 		}
-		// cleanUp(new String[] { "./dataWritten/Dec20_AKOM_1DayFilter_Order3_todelete",
-		// "./dataWritten/Dec20_Ncount_100U_9kN_1C_ThreshNN-750", "./dataWritten/Jan23_SameSamples_AKOM5DayOrder1",
-		// "./dataWritten/Jan23_SameSamples_AKOM5DayOrder3", "./dataWritten/Jan3_Sampling_AKOM1DayOrder1",
-		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors",
-		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_error6Jan",
-		// "./dataWritten/Jan3_Sampling_AKOM1DayOrder1_withErrors_run2",
-		// "./dataWritten/Jan31_AKOM_5DayFilter_Order5", "./dataWritten/Jan31_AKOM_1DayFilter_Order5",
-		// "./dataWritten/Jan31_AKOM_5DayFilter_Order3", "./dataWritten/Jan31_AKOM_1DayFilter_Order3",
-		// "./dataWritten/Jan31_AKOM_1DayFilter_Order1", "./dataWritten/Jan31_AKOM_5DayFilter_Order1",
-		// "./dataWritten/Dec20_AKOM_5DayFilter_Order5", "./dataWritten/Dec26_AKOM_5DayFilter_Order3",
-		// "./dataWritten/Dec20_AKOM_1DayFilter_Order5_part1", "./dataWritten/Dec20_AKOM_1DayFilter_Order3",
-		// "./dataWritten/Dec20_AKOM_1DayFilter_Order5", "./dataWritten/Dec20_AKOM_5DayFilter_Order3_incomplete",
-		// "./dataWritten/Dec20_AKOM_5DayFilter_Order3_part1", "./dataWritten/Dec20_AKOM_AllDayFilter_Order1",
-		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part1",
-		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1_part2",
-		// "./dataWritten/Jan18_Sampling_Ncount10DayThreshold50",
-		// "./dataWritten/Dec15_PureAKOM_NoCandDayFIlter_Order1", });
+		PopUps.showMessage("Exiting main");
 		System.exit(0);
 	}
 
@@ -302,7 +249,7 @@ public class SuperController
 				Constant.setAKOMHighestOrder(order);
 				Constant.setRecentDaysInTrainingTimelines(numOfDay);
 
-				runExperiments(commonPath, false, true, true, "gowalla1");
+				runExperiment(commonPath, false, true, true, "gowalla1");
 				// cleanUpSpace(commonPath, 0.80);
 				System.out.println("finished for commonPath = " + commonPath);
 			}
@@ -315,7 +262,7 @@ public class SuperController
 	/**
 	 * Precursor to running experiments for the users in sampledUserIndicesSetFile
 	 * <ul>
-	 * <li>Sets Constant.pathToRandomlySampledUserIndices, Constant.EDAlpha, labelForExperimentConfig</li>
+	 * <li>Sets Constant.pathToRandomlySampledUserIndices, Constant.dynamicEDAlpha, labelForExperimentConfig</li>
 	 * <li>call runExperiments for different commonPaths</li>
 	 * </ul>
 	 * 
@@ -324,96 +271,41 @@ public class SuperController
 	 *            >-1 if we want to set in here instead of hardcoding it in the Constant class.
 	 * @param iterationLabel
 	 */
-	public static void main0(String sampledUserIndicesSetFile, double EDAlphaForThisExperiment, String iterationLabel)
+	public static void runExperimentForGivenUsersAndConfig(String sampledUserIndicesSetFile,
+			double EDAlphaForThisExperiment, String iterationLabel)
 	{
 		System.out.println("For this experiment: Java Version:" + System.getProperty("java.version"));
 		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
-		Constant.pathToRandomlySampledUserIndices = sampledUserIndicesSetFile;
+		Constant.setDynamicPathToRandomlySampledUserIndices(sampledUserIndicesSetFile);
 		System.out.println("Constant.pathToRandomLySampleUserIndices=" + sampledUserIndicesSetFile);
 
 		if (EDAlphaForThisExperiment > -1)// when EDAlphaForThisExperiment is <=-1, means we do not need to set it here.
 		{
-			Constant.EDAlpha = EDAlphaForThisExperiment;// Constant.setEDAlpha(EDAlphaForThisExperiment);//
+			Constant.setDynamicEDAlpha(EDAlphaForThisExperiment);// Constant.setEDAlpha(EDAlphaForThisExperiment);
 			System.out.println("SETTING EDAlpha dynamically");
 		}
 		else
 		{
 			System.out.println("NOT SETTING EDAlpha dynamically");
 		}
-		System.out.println("Constant.EDAlpha=" + Constant.EDAlpha);
+		System.out.println("Constant.EDAlpha=" + Constant.getDynamicEDAlpha());
 
 		String labelForExperimentConfig = getLabelForExperimentConfig(sampledUserIndicesSetFile);
 
-		String[] commonPaths = // {
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
-				// };
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG9ED1.0AllActsFDStFilter0hrs100RTVPNN500SNNWED50|0.5/"
-				// };
-				// "./dataWritten/AUG7ED1.0AllActsFDStFilter0hrs100RTV500PDNTh10SDNThWtdSecDim/" };
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
-				// };
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/"
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/"
-				// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/"
-				{ "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-						// { "./dataWritten/"
-						+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/" };
+		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+		// { "./dataWritten/"+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/" };
 
-		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar2ED" + Constant.EDAlpha
-		// + "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs/" };
-		/// run/media/gunjan/BackupVault/GOWALLA/GowallaResults/Mar1ED
-		// "/run/media/gunjan/Buffer/Vault/GowallaResults/March1/" };
-		//
-		// Feb26NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature_EDAnalysis
-		// "./dataWritten/Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" }; //
-		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/"
-		// "/run/media/gunjan/BufferVault/GowallaResults/Feb25/" };
-		// "/run/media/gunjan/BufferVault/GowallaResults/Feb24/" };
-		// + "Feb23NCount_5Day_NN500MedRepCinsNormEDAlpha0.5DistDurOnlyFeature/" };
-		// + "Feb18NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.4/" };
-		// + "/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
-		// + "/run/media/gunjan/BufferVault/GowallaResults/Feb13/" };
-		// "./dataWritten/Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
-		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime5hrs/" };
-		// + "Feb12NCount_5DayFilter_ThreshNN500MedianRepCinsFiltrdByCurrActTime/" };
-		// + "//Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.8_part1/" };
-		// Feb11NCount_5DayFilter_ThreshNN500MedianRepCinsHierED/" };
-		// + "Feb9NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.5/" };//
-		// + "Feb10NCount_5DayFilter_ThreshNN500MedianRepCinsNormEDAlpha0.6/" };
-		// Feb8NCount_5DayFilter_ThreshNN500EditDists/" };
-		// + "//Jan31_SameSamples_AKOM5DayOrder3Test/" };
-		// + "Jan23_SameSamples_AKOM5DayOrder1/" };
-		// Jan6_Sampling_Ncount5DayThreshold500
-		// AKOM_916U_915N_5dayC_Order-3/" };//
-		// ""/run/media/gunjan/BufferVault/GowallaResults/Dec20Attribus/" };
-		// + "Dec20_AKOM_1Cand_Order1/" };
-		// "./dataWritten/Ncount_100U_9kN_1C_ThreshNN-750/" };
-		// "./dataWrittenDec20_AKOM_1Cand_Order1/" };
-		// "./dataWritten/Dec20_NCount_AllCand5DayFilter/" };
-		// "./dataWritten/Dec16_PureAKOM_NoCandDayFIlter_Order3/" };
-		// "/run/media/gunjan/BufferVault/GowallaResults/Dec14_PureAKOM_NoCandDayFilter_Order1/" };
-		// ./dataWritten/Dec11NGram/" };// { "./dataWritten/Nov16_AKOM3_916U_10cand/",
-		// "./dataWritten/Nov16_AKOM3_916U_50cand/", "./dataWritten/Nov16_AKOM3_916U_100cand/" };
-		// int[] numOfCandsPerUser = { 10, 50, 100 }; { "/dataWritten/Nov10_AKOM1_9k1cand/"};
-		// { "./dataWritten/Nov12_NCount916U916N1C1500T/", "./dataWritten/Nov12_NCount916U916N1C750T/",
-		// "./dataWritten/Nov12_NCount916U916N1C500T/", "./dataWritten/Nov12_NCount916U916N1C250T/" };
+		String commonPath = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+				// { "./dataWritten/"
+				+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/";
 
-		for (
-
-				int i = 0; i <= commonPaths.length - 1; i++)
-		{
-			File directory = new File(commonPaths[i]);
-			if (!directory.exists())
-			{
-				directory.mkdir();
-				// If you require it to make the entire directory path including parents,
-				// use directory.mkdirs(); here instead.
-			}
-			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-			runExperiments(commonPaths[i], true, true, true, "gowalla1");
-			// cleanUpSpace(commonPaths[i], 0.90);
-			System.out.println("finished for commonPath = " + commonPaths[i]);
-		}
+		// for (int i = 0; i <= commonPaths.length - 1; i++){
+		WToFile.createDirectoryIfNotExists(commonPath);
+		// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
+		runExperiment(commonPath, true, true, true, "gowalla1");
+		// cleanUpSpace(commonPaths[i], 0.90);
+		System.out.println("finished for commonPath = " + commonPath);
+		// }
 
 		System.out.println(" Exiting main0");
 		PopUps.showMessage("Exiting main0");
@@ -531,7 +423,7 @@ public class SuperController
 
 		else
 		{
-			EDAlphaLabel = "ED" + Constant.EDAlpha;
+			EDAlphaLabel = "ED" + Constant.getDynamicEDAlpha();// .dynamicEDAlpha;
 			StFilterLabel = "StFilter" + (Constant.filterCandByCurActTimeThreshInSecs / (60 * 60)) + "hrs";
 
 			// if (Constant.useActivityNameInFED)
@@ -624,7 +516,7 @@ public class SuperController
 	 * @param hasMUs
 	 * @param databaseName
 	 **/
-	public static void runExperiments(String commonPath, boolean recommendation, boolean evaluation, boolean hasMUs,
+	public static void runExperiment(String commonPath, boolean recommendation, boolean evaluation, boolean hasMUs,
 			String databaseName)
 	{
 		boolean doPostFiltering = true;
@@ -642,7 +534,6 @@ public class SuperController
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/";
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/CheckJavaSqlDuplicateDateIssue/";
-
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Feb2/Timelines/";
 		// $$"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan22/";
 		// $$/ home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GowallaWeather/";
@@ -650,13 +541,11 @@ public class SuperController
 		// home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov25/";
 		// "/run/media/gunjan/BoX1/GowallaSpaceSpaceSpace/GowallaDataWorksSep19/";//
 		// "/run/media/gunjan/BoX2/GowallaSpaceSpace/GowallaDataWorksSep16/";
-
 		// $String commonPathDCU = "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/MovingTimelinesMatching/Test1/";
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June7FeatureWiseEdit/DCU/";
 		// $String commonPathGeolife = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifePerformance/Test/";
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/Test/";
-
 		// String performanceFileName = "/run/media/gunjan/HOME/gunjan/Geolife Data
 		// Works/GeolifePerformance/Test/Performance.csv"; String performanceStringHeader = "
 		// UserAtRecomm,DateAtRecomm,TimeAtRecomm,MatchingUnit,NumOfTrainingDays,NumOfValidActObjsInTrainingTimelines,NumOfValidActObjsInCurrentTimelines,NumOfCandidateTimelines,SumOfValidActObjsInAllCandTimelines,TotalTimeForRecomm,
@@ -708,9 +597,7 @@ public class SuperController
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
 
-		Constant.reflectTheConfigInConstantFile(
-				commonPath + "Constant" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + ".java");
+		Constant.reflectTheConfigInConstantFile(commonPath + "Constant" + DateTimeUtils.getMonthDateLabel() + ".java");
 
 		if (recommendation)
 		{

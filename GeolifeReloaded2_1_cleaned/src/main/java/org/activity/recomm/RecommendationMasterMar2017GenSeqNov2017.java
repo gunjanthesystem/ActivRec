@@ -178,22 +178,23 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	 * 
 	 * @param dname
 	 * @param primaryDimension
+	 * @param dynamicEDAlpha
 	 * @return
 	 */
-	private final int initialiseDistancesUsed(String dname, PrimaryDimension primaryDimension)
+	private final int initialiseDistancesUsed(String dname, PrimaryDimension primaryDimension, double dynamicEDAlpha)
 	{
 		alignmentBasedDistance = new AlignmentBasedDistance(primaryDimension); // used for case based similarity
 		//
 		switch (dname)
 		{
 		case "HJEditDistance":
-			if (Constant.EDAlpha < 0)
+			if (dynamicEDAlpha < 0)
 			{
 				hjEditDistance = new HJEditDistance(primaryDimension);
 			}
 			else
 			{
-				hjEditDistance = new HJEditDistance(Constant.EDAlpha, primaryDimension);
+				hjEditDistance = new HJEditDistance(dynamicEDAlpha, primaryDimension);
 			}
 
 			break;
@@ -266,7 +267,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 			long recommMasterT0 = System.currentTimeMillis();
 
-			initialiseDistancesUsed(Constant.getDistanceUsed(), Constant.primaryDimension);
+			initialiseDistancesUsed(Constant.getDistanceUsed(), Constant.primaryDimension,
+					Constant.getDynamicEDAlpha());
 			System.out.println("hjED.toString=" + this.hjEditDistance.toString());
 
 			editDistancesMemorizer = new EditDistanceMemorizer();
