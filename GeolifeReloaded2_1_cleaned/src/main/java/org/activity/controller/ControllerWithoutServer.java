@@ -115,6 +115,7 @@ public class ControllerWithoutServer
 			System.out.println("Before reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
 
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = null;
+
 			if (Constant.reduceAndCleanTimelinesBeforeRecomm)
 			{
 				if (Constant.For9kUsers)// For 9k users
@@ -132,8 +133,7 @@ public class ControllerWithoutServer
 			{
 				System.out.println("Alert! Not reducing and cleaning data !!");
 				usersCleanedDayTimelines = usersDayTimelinesOriginal;
-				writeTimelineStats(usersCleanedDayTimelines, false, true, true, true, "UsersCleanedDayTimelines",
-						commonBasePath);
+
 			}
 
 			usersDayTimelinesOriginal = null; // null this out so as to be ready for garbage collection.
@@ -172,8 +172,6 @@ public class ControllerWithoutServer
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 			// String commonBasePath = Constant.getCommonPath();
 			// PopUps.showMessage("here01");
-			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
-					commonBasePath + "NumOfDaysPerUsersDayTimelines.csv");
 
 			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
 			// PopUps.showMessage("here02");
@@ -186,10 +184,12 @@ public class ControllerWithoutServer
 			// $TimelineUtils.writeNumOfNullTZCinsPerUserPerLocIDTrainTestDataOnly(usersCleanedDayTimelines,
 			// $ "NOTZForCleanedSubsettedTraintestData");
 
+			writeTimelineStats(usersCleanedDayTimelines, false, true, true, true, "UsersCleanedDayTimelines",
+					commonBasePath);
+			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
+					commonBasePath + "NumOfDaysPerUsersDayTimelines.csv");
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
-
 			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true, false);
-
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 			// System.exit(0);
 			if (true)// temporary enabled for verbose writing of user timeline
@@ -313,11 +313,13 @@ public class ControllerWithoutServer
 				if (Constant.useRandomlySampled100Users)
 				{
 					System.out.println("useRandomlySampled100Users :");
+					String pathToRandomlySampled100Users = Constant.getDynamicPathToRandomlySampledUserIndices();
+
 					List<String> sampledUserIndicesStr = ReadingFromFile
 							// .oneColumnReaderString("./dataToRead/RandomlySample100Users/Mar1_2018.csv", ",", 0,
 							// .oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
-							.oneColumnReaderString(Constant.pathToRandomlySampledUserIndices, ",", 0, false);
-					System.out.println("pathToRandomLySampleUserIndices=" + Constant.pathToRandomlySampledUserIndices);
+							.oneColumnReaderString(pathToRandomlySampled100Users, ",", 0, false);
+					System.out.println("pathToRandomlySampled100Users=" + pathToRandomlySampled100Users);
 					List<Integer> sampledUserIndices = sampledUserIndicesStr.stream().map(i -> Integer.valueOf(i))
 							.collect(Collectors.toList());
 

@@ -127,7 +127,7 @@ public final class Constant
 	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType = Enums.EditDistanceTimeDistanceType.NearerScaled;
 	// .FurtherScaled;
 
-	public static String distanceUsed = "HJEditDistance"; // "FeatureWiseEditDistance",FeatureWiseEditDistance,
+	private static String dynamicDistanceUsed = "HJEditDistance"; // "FeatureWiseEditDistance",FeatureWiseEditDistance,
 															// OTMDSAMEditDistance
 
 	public static boolean useJarForMySimpleLevenshteinDistance = false;// true;
@@ -199,7 +199,11 @@ public final class Constant
 
 	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
 	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
-	public static double EDAlpha = 1;// 0.8;// 0.5;// SWITCH_NOV10
+
+	private static double dynamicEDAlpha = 1;// 0.8;// 0.5;// SWITCH_NOV10
+
+	public static final double[] EDAlphas = { 0.5, 1, 0.75, 0, 0.25, 0.35, 0.15 };// SWITCH_NOV10 added on 12 Sep 2018
+	// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */
 
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
 	public static final boolean scoreRecommsByLocProximity = false;// SWITCH_NOV10
@@ -245,7 +249,7 @@ public final class Constant
 	 * faster iterations)
 	 */
 	public static final boolean useSelectedGTZeroUsersFromRandomlySampled100Users = false;
-	public static String pathToRandomlySampledUserIndices = "";
+	private static String dynamicPathToRandomlySampledUserIndices = "";
 
 	public static final boolean runForAllUsersAtOnce = true;// toySwitch // SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// TODO: keep it true as the other verion may not be uptodate
@@ -454,15 +458,27 @@ public final class Constant
 	// Constant.pathToRandomlySampledUserIndices = pathToRandomlySampledUserIndices;
 	// }
 	//
-	// public static double getEDAlpha()
-	// {
-	// return EDAlpha;
-	// }
-	//
-	// public static void setEDAlpha(double eDAlpha)
-	// {
-	// EDAlpha = eDAlpha;
-	// }
+
+	public static double getDynamicEDAlpha()
+	{
+		return dynamicEDAlpha;
+	}
+
+	public static void setDynamicEDAlpha(double dynamicEDAlpha)
+	{
+		Constant.dynamicEDAlpha = dynamicEDAlpha;
+	}
+
+	public static String getDynamicPathToRandomlySampledUserIndices()
+	{
+		return dynamicPathToRandomlySampledUserIndices;
+	}
+
+	public static void setDynamicPathToRandomlySampledUserIndices(String dynamicPathToRandomlySampledUserIndices)
+	{
+		Constant.dynamicPathToRandomlySampledUserIndices = dynamicPathToRandomlySampledUserIndices;
+	}
+
 	/**
 	 * 
 	 * @param givenDimension
@@ -939,18 +955,18 @@ public final class Constant
 		switch (dname)
 		{
 		case "HJEditDistance":
-			distanceUsed = "HJEditDistance";
+			dynamicDistanceUsed = "HJEditDistance";
 			break;
 		case "FeatureWiseEditDistance":
-			distanceUsed = "FeatureWiseEditDistance";
+			dynamicDistanceUsed = "FeatureWiseEditDistance";
 			break;
 
 		case "FeatureWiseWeightedEditDistance":
-			distanceUsed = "FeatureWiseWeightedEditDistance";
+			dynamicDistanceUsed = "FeatureWiseWeightedEditDistance";
 			break;
 
 		case "OTMDSAMEditDistance":
-			distanceUsed = "OTMDSAMEditDistance";
+			dynamicDistanceUsed = "OTMDSAMEditDistance";
 			break;
 		default:
 			PopUps.showError(
@@ -967,7 +983,7 @@ public final class Constant
 
 	public static String getDistanceUsed()
 	{
-		return distanceUsed;
+		return dynamicDistanceUsed;
 	}
 
 	/**
@@ -1540,7 +1556,7 @@ public final class Constant
 		s.append("\nALPHA:" + ALPHA);
 		s.append("\nWeights of features: "
 				+ (new AlignmentBasedDistance(Constant.primaryDimension)).getAllWeightsOfFeatures());
-		s.append("\ndistanceUsed:" + distanceUsed);
+		s.append("\ndistanceUsed:" + dynamicDistanceUsed);
 
 		s.append("\nuseTolerance:" + useTolerance);
 
@@ -1604,7 +1620,8 @@ public final class Constant
 
 		s.append("\nuseMedianCinsForRepesentationAO:" + useMedianCinsForRepesentationAO);
 		s.append("\ncheckEDSanity:" + checkEDSanity);
-		s.append("\nEDAlpha:" + EDAlpha);
+		s.append("\ndynamicEDAlpha:" + dynamicEDAlpha);
+		s.append("\nEDAlphas:" + Arrays.asList(EDAlphas));
 		s.append("\ndisableRoundingEDCompute:" + disableRoundingEDCompute);
 		s.append("\nscoreRecommsByLocProximity:" + scoreRecommsByLocProximity);
 		s.append("\nwtScoreRecommsByLocProximity:" + wtScoreRecommsByLocProximity);
@@ -1624,7 +1641,7 @@ public final class Constant
 		s.append("\nrandomLySample100Users:" + useRandomlySampled100Users);
 		s.append("\nuseSelectedGTZeroUsersFromRandomlySampled100Users:"
 				+ useSelectedGTZeroUsersFromRandomlySampled100Users);
-		s.append("\npathToRandomLySampleUserIndices:" + pathToRandomlySampledUserIndices);
+		s.append("\ndynamicPathToRandomlySampledUserIndices:" + dynamicPathToRandomlySampledUserIndices);
 		s.append("\nuseCheckinEntryV2:" + useCheckinEntryV2);
 		s.append("\nrunForAllUsersAtOnce:" + runForAllUsersAtOnce);
 		s.append("\nreduceAndCleanTimelinesBeforeRecomm:" + reduceAndCleanTimelinesBeforeRecomm);
@@ -1657,7 +1674,7 @@ public final class Constant
 		s.append("\ndoWeightedEditDistanceForSecDim:" + Constant.doWeightedEditDistanceForSecDim);
 		s.append("\nmaxDistanceThresholdForLocGridDissmilarity:" + Constant.maxDistanceThresholdForLocGridDissmilarity);
 		// s.append("\n:" + );
-		if (distanceUsed.equals("FeatureWiseEditDistance"))
+		if (dynamicDistanceUsed.equals("FeatureWiseEditDistance"))
 		{
 			s.append("\nConsider all features for feature wise edit distance:"
 					+ considerAllFeaturesForFeatureWiseEditDistance);

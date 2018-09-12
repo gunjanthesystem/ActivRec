@@ -147,7 +147,7 @@ public class AlignmentBasedDistance
 	private void setShouldComputeFeatureLevelDistance()
 	{
 		shouldComputeFeatureLevelDistance = true;
-		if ((1 - Constant.EDAlpha) == 0)
+		if ((1 - Constant.getDynamicEDAlpha()) == 0)// .dynamicEDAlpha
 		{
 			shouldComputeFeatureLevelDistance = false;
 		}

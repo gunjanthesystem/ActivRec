@@ -661,7 +661,7 @@ public class DistanceUtils
 
 		EnumMap<GowallaFeatures, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
 
-		double EDAlpha = Constant.EDAlpha;
+		double EDAlpha = Constant.getDynamicEDAlpha();// .dynamicEDAlpha;
 		double EDBeta = 1 - EDAlpha;
 
 		/////
@@ -984,7 +984,7 @@ public class DistanceUtils
 		EnumMap<GowallaFeatures, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
 		boolean shouldComputeFeatureLevelDiffs = hjEditDistance.getShouldComputeFeatureLevelDistance();
 
-		double EDAlpha = Constant.EDAlpha;
+		double EDAlpha = Constant.getDynamicEDAlpha();// .dynamicEDAlpha;
 		double EDBeta = 1 - EDAlpha;
 
 		/////
@@ -1206,7 +1206,7 @@ public class DistanceUtils
 
 		EnumMap<GowallaFeatures, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
 
-		double EDAlpha = Constant.EDAlpha;
+		double EDAlpha = Constant.getDynamicEDAlpha();// .dynamicEDAlpha;
 		double EDBeta = 1 - EDAlpha;
 
 		/////
@@ -1420,7 +1420,7 @@ public class DistanceUtils
 
 		EnumMap<GowallaFeatures, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
 
-		double EDAlpha = Constant.EDAlpha;
+		double EDAlpha = Constant.getDynamicEDAlpha();// .dynamicEDAlpha;
 		double EDBeta = 1 - EDAlpha;
 		double EDGamma;
 		double sumOfWtOfFeaturesUsedExceptPD = hjEditDistance.getSumOfWeightOfFeaturesExceptPrimaryDimension();
