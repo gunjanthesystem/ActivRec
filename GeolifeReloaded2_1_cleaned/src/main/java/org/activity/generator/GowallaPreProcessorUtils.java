@@ -125,7 +125,7 @@ public class GowallaPreProcessorUtils
 
 	}
 
-	public static void main(String[] args)
+	public static void main1(String[] args)
 	{
 		// findNumVeryFrequentEpisodesForEachUserApril8();
 		findNumVeryFrequentEpisodesForEachUserSlidingWindow8April();

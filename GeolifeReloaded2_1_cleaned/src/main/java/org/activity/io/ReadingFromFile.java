@@ -973,8 +973,8 @@ public class ReadingFromFile
 	 * @param delimiter
 	 * @return
 	 */
-	public static ArrayList<ArrayList<String>> readLinesIntoListOfLists(String absFileName, int startLineNum,
-			int endLineNum, String delimiter)
+	public static List<List<String>> readLinesIntoListOfLists(String absFileName, int startLineNum, int endLineNum,
+			String delimiter)
 	{
 		try
 		{
@@ -1069,10 +1069,9 @@ public class ReadingFromFile
 		ArrayList<ArrayList<String>> newRes = new ArrayList<ArrayList<String>>();
 		try
 		{
-			ArrayList<ArrayList<String>> oldRes = readLinesIntoListOfLists(absFileName, startLineNum, endLineNum,
-					delimiter);
+			List<List<String>> oldRes = readLinesIntoListOfLists(absFileName, startLineNum, endLineNum, delimiter);
 
-			for (ArrayList<String> l : oldRes)
+			for (List<String> l : oldRes)
 			{// removing [ and ] from the strings
 				newRes.add(l.stream().map(s -> s.replace("]", "")).map(s -> s.replace("[", "")).map(s -> s.trim())
 						.collect(Collectors.toCollection(ArrayList::new)));

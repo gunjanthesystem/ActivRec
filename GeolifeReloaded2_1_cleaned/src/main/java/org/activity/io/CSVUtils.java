@@ -128,7 +128,8 @@ public class CSVUtils
 
 	public static void main(String[] args)
 	{
-		concatenateFetchedTimezones();
+		removeDuplicateRowsFromRawFoursquareNY();
+		// $$ concatenateFetchedTimezones();
 		// splitCSVRowise("/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv", ",", true,
 		// 10, "/home/gunjan/JupyterWorkspace/data/", "gowalla_spots_subset1_fromRaw28Feb2018smallerFile");
 		// temp();
@@ -205,6 +206,26 @@ public class CSVUtils
 
 		String noDupCheckinFileName = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/RemovingDuplicatesFromRawData/NoDup_gowalla_checkinsRaw.csv";
 		String dupLinesCheckinFileName = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/Mar15/RemovingDuplicatesFromRawData/DupLines_gowalla_checkinsRaw.csv";
+
+		// $$ check again to make sure this method is not doing anything more than the cuckoo method is doing
+		// removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,
+		// dupLinesCheckinFileName, 0);
+
+		removeDuplicationRowsUsingCuckoo(checkInFileName, noDupCheckinFileName, dupLinesCheckinFileName);
+		// UsingCuckoo
+		// curtain 1 end
+	}
+
+	/**
+	 * @since 14 Sep 2018
+	 */
+	public static void removeDuplicateRowsFromRawFoursquareNY()
+	{
+		// curtain 1 start
+		String checkInFileName = "/run/media/gunjan/BackupVault/DatasetsInBackupVault/FoursquareDatasets/dataset_tsmc2014/dataset_TSMC2014_NYC_Processed1.txt";
+		String noDupCheckinFileName = "/run/media/gunjan/BackupVault/DatasetsInBackupVault/FoursquareDatasets/dataset_tsmc2014/dataset_TSMC2014_NYC_Processed1_NoDup.txt";
+		String dupLinesCheckinFileName = "/run/media/gunjan/BackupVault/DatasetsInBackupVault/FoursquareDatasets/dataset_tsmc2014/dataset_TSMC2014_NYC_DuplicateLines.txt";
+		;
 
 		// $$ check again to make sure this method is not doing anything more than the cuckoo method is doing
 		// removeDuplicationRowsInPreVicinity(processedCheckInFileName, noDupProcessedCheckinFileName,
@@ -1430,7 +1451,7 @@ public class CSVUtils
 					boolean insert = allUniqueEntries.put(currentLineRead);
 					if (!insert)
 					{
-						String msg = "Insert failed on cuckoo filter. allLiinesCount = " + allLinesCount;
+						String msg = "Insert failed on cuckoo filter. allLinesCount = " + allLinesCount;
 						PopUps.showError(msg);
 					}
 					uniqueLines.append(currentLineRead + "\n");
