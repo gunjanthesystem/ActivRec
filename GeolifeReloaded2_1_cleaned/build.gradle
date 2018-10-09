@@ -23,7 +23,8 @@ version = '1.0'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
-    
+//:wq
+//	maven { url "https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-core"} //for tablesaw
     maven { url "http://maven.geotoolkit.org/" }
     maven { url "http://download.osgeo.org/webdav/geotools/" }
     maven { url "https://repo.boundlessgeo.com/release" }
@@ -31,14 +32,12 @@ repositories {
 	//maven { url "https://raw.github.com/amidst/toolbox/mvn-repo/"}
     maven { url "https://plugins.gradle.org/m2/"}
     maven { url "https://oss.sonatype.org/content/repositories/snapshots"}
-    maven { url "https://nexus.bedatadriven.com/content/groups/public"} //for renjin}
-        jcenter()
+    maven { url "https://nexus.bedatadriven.com/content/groups/public"} //for renjin
+	jcenter()
     mavenCentral()
-
-	// Use 'jcenter' for resolving your dependencies.
-	// You can declare any Maven/Ivy/file repository here.
 	
-   
+// Use 'jcenter' for resolving your dependencies.
+	// You can declare any Maven/Ivy/file repository here.
    //	 flatDir {
   //     dirs '/home/gunjan/Immovables/amidsttoolbox/'
        //'/home/gunjan/git/GeolifeReloaded2_1_cleaned/resources/'
@@ -134,7 +133,8 @@ dependencies
     compile "org.renjin:renjin-script-engine:0.8.2527"
     compile "org.moeaframework:moeaframework:2.12"
     compile "com.jcraft:jsch:0.1.54"
-    compile "tech.tablesaw:tablesaw-parent:0.11.4"
+	// compile "tech.tablesaw:tablesaw-core:0.25.2"
+    compile group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.25.2'
     compile group: 'xerces', name: 'xercesImpl', version: '2.11.0'
 
     //compile group: 'com.lynden', name: 'GMapsFX', version: '2.12.0'

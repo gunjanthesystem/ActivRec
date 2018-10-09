@@ -1,0 +1,1 @@
+Exception: java.io.UncheckedIOException: java.nio.charset.MalformedInputException: Input length = 1Exception: java.io.UncheckedIOException: java.nio.charset.MalformedInputException: Input length = 1Exception: java.lang.IllegalArgumentException: -1Exception: java.io.UncheckedIOException: java.nio.charset.MalformedInputException: Input length = 1

@@ -62,7 +62,7 @@ public class DateTimeUtils
 		}
 	}
 
-	public static void main(String[] args)
+	public static void main1(String[] args)
 	{
 		System.out.println(getMonthDateLabel());
 		System.out.println(getMonthDateHourMinLabel());
@@ -310,30 +310,30 @@ public class DateTimeUtils
 
 		switch (weekDayInt)
 		{
-			case 0:
-				weekDay = "Sunday";
-				break;
-			case 1:
-				weekDay = "Monday";
-				break;
-			case 2:
-				weekDay = "Tuesday";
-				break;
-			case 3:
-				weekDay = "Wednesday";
-				break;
-			case 4:
-				weekDay = "Thursday";
-				break;
-			case 5:
-				weekDay = "Friday";
-				break;
-			case 6:
-				weekDay = "Saturday";
-				break;
-			default:
-				weekDay = "not found";
-				break;
+		case 0:
+			weekDay = "Sunday";
+			break;
+		case 1:
+			weekDay = "Monday";
+			break;
+		case 2:
+			weekDay = "Tuesday";
+			break;
+		case 3:
+			weekDay = "Wednesday";
+			break;
+		case 4:
+			weekDay = "Thursday";
+			break;
+		case 5:
+			weekDay = "Friday";
+			break;
+		case 6:
+			weekDay = "Saturday";
+			break;
+		default:
+			weekDay = "not found";
+			break;
 
 		}
 

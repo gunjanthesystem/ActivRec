@@ -1253,6 +1253,8 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	 * <p>
 	 * To generate data with category information (note: category information is only available for data point for spots
 	 * 1 places.)
+	 * <p>
+	 * add distance and duration from prev line.
 	 * 
 	 * @param checkinFileName
 	 * @param spots1
@@ -1486,8 +1488,8 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 			System.out.println("userZoneHoppingCount sum = "
 					+ userZoneHoppingCount.entrySet().stream().mapToLong(e -> e.getValue()).sum());
-			WToFile.writeSimpleMapToFile(userZoneHoppingCount, commonPathToWrite + "userZoneHoppingCount.csv",
-					"User", "TimezoneHoppingCount");
+			WToFile.writeSimpleMapToFile(userZoneHoppingCount, commonPathToWrite + "userZoneHoppingCount.csv", "User",
+					"TimezoneHoppingCount");
 			WToFile.writeSimpleMapToFile(userCheckinsCount, commonPathToWrite + "userCheckinsCount.csv", "User",
 					"CheckinsCount");
 
@@ -2828,8 +2830,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WToFile
-						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
+				BufferedWriter bwMergerCaseLogs = WToFile.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);
@@ -5425,11 +5426,9 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 
 					if (entry.getValue().getNumberOfDistinctTrajectoryIDs() > 1)
 					{
-						WToFile
-								.appendLineToFileAbs(
-										"User:" + userName + ","
-												+ entry.getValue().toStringWithTrajIDWithTrajPurityCheck() + "\n",
-										commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
+						WToFile.appendLineToFileAbs("User:" + userName + ","
+								+ entry.getValue().toStringWithTrajIDWithTrajPurityCheck() + "\n",
+								commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
 					}
 					// "StartTimestamp,EndTimestamp,Mode,Latitude,Longitude,Altitude,DifferenceWithNextInSeconds,DurationInSeconds,BreakOverDaysCount"
 				}
@@ -5770,8 +5769,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 	{
 		try
 		{
-			BufferedWriter userNumOfTrajs = WToFile
-					.getBWForNewFile(Constant.getCommonPath() + "UserNumOfTrajs.csv");
+			BufferedWriter userNumOfTrajs = WToFile.getBWForNewFile(Constant.getCommonPath() + "UserNumOfTrajs.csv");
 			BufferedWriter userTrajsNumOfEntries = WToFile
 					.getBWForNewFile(Constant.getCommonPath() + "UserTrajsNumOfEntries.csv");
 
@@ -5940,8 +5938,7 @@ public class DatabaseCreatorGowallaQuickerPreprocessor
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WToFile
-						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
+				BufferedWriter bwMergerCaseLogs = WToFile.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("TrajId,Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);
