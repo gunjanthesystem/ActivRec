@@ -24,18 +24,21 @@ public class PathConstants
 	public static String pathToLocationTimezoneInfo;
 	public static String pathToSerialisedGowallaLocZoneIdMap;
 	// ./dataToRead/Feb26/UniqueLocationObjects5DaysTrainTestWithTZUsingPy.csv
-	public static final String pathToToyTimelines6JUN = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN7ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTVToyRun6Chosen/ToyTimelinesManually6June.kryo";
-	public static final String pathToToyTimelines12AUG = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG12ToyTimelineCreation/ToyTimelinesManuallyAUG12.kryo";
-
-	public static final String pathToFileWithIndicesOfGTZeroUsers = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/Concatenated/MinMUWithMaxFirst3_GTZero.csv";
+	public static String pathToToyTimelines6JUN;// =
+												// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN7ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTVToyRun6Chosen/ToyTimelinesManually6June.kryo";
+	public static String pathToToyTimelines12AUG;// =
+													// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG12ToyTimelineCreation/ToyTimelinesManuallyAUG12.kryo";
+	public static String pathToFileWithIndicesOfGTZeroUsers;// =
+															// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/Concatenated/MinMUWithMaxFirst3_GTZero.csv";
 
 	// moved from SuperController on 12 Sep 2018
-	public static final String[] pathToSetsOfRandomlySampled100Users = {
-			"./dataToRead/RandomlySample100UsersApril24_2018.csv",
-			"./dataToRead/RandomlySample100UsersApril24_2018.SetB",
-			"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
-			"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
-			"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+	public static String[] pathToSetsOfRandomlySampled100Users;
+	// = {
+	// "./dataToRead/RandomlySample100UsersApril24_2018.csv",
+	// "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+	// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",
+	// "./dataToRead/RandomlySample100UsersApril24_2018.SetD",
+	// "./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
 
 	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY30Toy/ToyTimelinesManually28May.kryo";
 
@@ -44,93 +47,140 @@ public class PathConstants
 	 * <p>
 	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).locIDGridIDMap
 	 */
-	public static final String pathToSerialisedLocIDGridIDGowallaMap = "./dataToRead/HexGridRes16_JUL17/locIDGridIDMap.kryo";
+	public static String pathToSerialisedLocIDGridIDGowallaMap;// =
+																// "./dataToRead/HexGridRes16_JUL17/locIDGridIDMap.kryo";
 
 	/**
 	 * Map<Long, Integer>
 	 * <p>
 	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).locIDGridIDMap
 	 */
-	public static final String pathToSerialisedLocIDGridIndexGowallaMap = "./dataToRead/HexGridRes16_JUL17/locIDGridIndexMap.kryo";
+	public static String pathToSerialisedLocIDGridIndexGowallaMap;// =
+																	// "./dataToRead/HexGridRes16_JUL17/locIDGridIndexMap.kryo";
 
 	/**
 	 * Map<Long, Set<Long>>
 	 * <p>
 	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).gridIDLocIDs
 	 */
-	public static final String pathToSerialisedGridIDLocIDsGowallaMap = "./dataToRead/HexGridRes16_JUL17/gridIDLocIDs.kryo";
+	public static String pathToSerialisedGridIDLocIDsGowallaMap;// =
+																// "./dataToRead/HexGridRes16_JUL17/gridIDLocIDs.kryo";
 
-	public static final String pathToSerialisedGridIndexPairDist = "./dataWritten/JUL25GridIndexDistances/pairedIndicesTo1DConverterIntDoubleWith1DConverter.kryo";
-	public static final String pathToSerialisedGridIndexPairDistConverter = "./dataWritten/JUL25GridIndexDistances/gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
+	public static String pathToSerialisedGridIndexPairDist;// =
+															// "./dataWritten/JUL25GridIndexDistances/pairedIndicesTo1DConverterIntDoubleWith1DConverter.kryo";
+	public static String pathToSerialisedGridIndexPairDistConverter;// =
+																	// "./dataWritten/JUL25GridIndexDistances/gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
 
-	public static final String pathToSerialisedHaversineDistOnEngine = "./dataWritten/AUG2GridIndexDistances/";
+	public static String pathToSerialisedHaversineDistOnEngine;// = "./dataWritten/AUG2GridIndexDistances/";
 
-	public static final String pathToJavaGridIndexRGridLatRGridLon = "./dataToRead/July30RGridIDJavaGridIndex/javaGridIndexRGridLatRGridLon.kryo";
+	public static String pathToJavaGridIndexRGridLatRGridLon;// =
+																// "./dataToRead/July30RGridIDJavaGridIndex/javaGridIndexRGridLatRGridLon.kryo";
 
 	/**
 	 * Set paths to serialised datasets
 	 * 
 	 * @param For9kUsers
+	 * @param databaseName
+	 *            (added on 12 Oct 2018)
 	 */
-	public static final void intialise(boolean For9kUsers)
+	public static final void intialise(boolean For9kUsers, String databaseName)
 	{
-
-		if (For9kUsers)
+		if (databaseName.equals("fsny1"))
 		{
-			/**
-			 * Start of Gowalla path constants for Aug 11 experiments: 9k users
-			 */
-			commonPathToGowallaPreProcessedData = "./dataToRead/Aug10/DatabaseCreatedMerged/";
-			// "./dataToRead/Mar30/DatabaseCreatedMerged/";//// Feb23
-
-			pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
-
-			// "./dataToRead/Mar30/DatabaseCreatedMerged/mapForAllLocationData.kryo";
-
-			// $$public final static String pathToSerialisedUniqueLocIDsInCleanedTimelines =
-			// "./dataToRead/Mar30/DatabaseCreatedMerged/UniqueLocIDsInCleanedTimeines.ser";
-
-			pathToSerialisedLocationObjects = commonPathToGowallaPreProcessedData + "mapForAllLocationData.kryo";
-			pathToSerialisedLevelWiseCatIDsDict = commonPathToGowallaPreProcessedData
-					+ "mapCatIDLevelWiseCatIDsDict.kryo";
-			pathToSerialisedCatIDsHierDist = commonPathToGowallaPreProcessedData + "mapCatIDsHierDist.kryo";//
-			// "./dataToRead/April7/mapCatIDsHierDist.kryo";"./dataToRead/April7/mapCatIDsHierDist.kryo"
-			pathToSerialisedMergedCheckinData = commonPathToGowallaPreProcessedData
-					+ "DatabaseCreatedMerged/mapForAllCheckinData.kryo";
-			pathToSerialisedUserObjects = commonPathToGowallaPreProcessedData + "mapForAllUserData.kryo";
-			/**
-			 * End of Gowalla path constants for Aug 11 experiments
-			 */
-
-		}
-		else
-		{
-			/**
-			 * Start of Gowalla path constants for April 8 2018 experiments: 143 users
-			 */
-			// commonPathToGowallaPreProcessedData = "./dataToRead/April8_2018/";
-			commonPathToGowallaPreProcessedData = "./dataToRead/April25_2018/";
-			System.out.println("commonPathToGowallaPreProcessedData= " + commonPathToGowallaPreProcessedData);
-
-			pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
-			pathToSerialisedLocationObjects = commonPathToGowallaPreProcessedData + "mapForAllLocationData.kryo";
-			pathToSerialisedLevelWiseCatIDsDict = commonPathToGowallaPreProcessedData
-					+ "mapCatIDLevelWiseCatIDsDict.kryo";
-			pathToSerialisedCatIDsHierDist = commonPathToGowallaPreProcessedData + "mapCatIDsHierDist.kryo";//
-			// "./dataToRead/April7/mapCatIDsHierDist.kryo";"./dataToRead/April7/mapCatIDsHierDist.kryo"
-			pathToSerialisedMergedCheckinData = commonPathToGowallaPreProcessedData
-					+ "DatabaseCreatedMerged/mapForAllCheckinData.kryo";
-			pathToSerialisedUserObjects = commonPathToGowallaPreProcessedData + "mapForAllUserData.kryo";
-			/**
-			 * End of Gowalla path constants for April 8 2018 experiments: 143 users
-			 */
-
+			String commonPath = "./dataToRead/FSNY/";
+			// commonPathToGowallaPreProcessedData = "./dataToRead/April25_2018/";
+			// System.out.println("commonPathToGowallaPreProcessedData= " + commonPathToGowallaPreProcessedData);
+			pathToSerialisedCatIDNameDictionary = commonPath + "catIDIntCatName.kryo";
+			pathToSerialisedLocationObjects = "";
+			pathToSerialisedLevelWiseCatIDsDict = "";
+			pathToSerialisedCatIDsHierDist = "";
+			pathToSerialisedMergedCheckinData = commonPath + "mapForAllCheckinData.kryo";
+			pathToSerialisedUserObjects = "";
 			// Irrelvant but included for conformity.
 			pathToLocationTimezoneInfo = "";
 			pathToSerialisedGowallaLocZoneIdMap = "";
-
 		}
+		else if (databaseName.equals("gowalla1"))
+		{
+			pathToToyTimelines6JUN = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN7ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTVToyRun6Chosen/ToyTimelinesManually6June.kryo";
+			pathToToyTimelines12AUG = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG12ToyTimelineCreation/ToyTimelinesManuallyAUG12.kryo";
+			pathToFileWithIndicesOfGTZeroUsers = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/Concatenated/MinMUWithMaxFirst3_GTZero.csv";
 
+			pathToSetsOfRandomlySampled100Users = new String[] { "./dataToRead/RandomlySample100UsersApril24_2018.csv",
+					"./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+					"./dataToRead/RandomlySample100UsersApril24_2018.SetC",
+					"./dataToRead/RandomlySample100UsersApril24_2018.SetD",
+					"./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
+
+			pathToSerialisedLocIDGridIDGowallaMap = "./dataToRead/HexGridRes16_JUL17/locIDGridIDMap.kryo";
+			pathToSerialisedLocIDGridIndexGowallaMap = "./dataToRead/HexGridRes16_JUL17/locIDGridIndexMap.kryo";
+			pathToSerialisedGridIDLocIDsGowallaMap = "./dataToRead/HexGridRes16_JUL17/gridIDLocIDs.kryo";
+			pathToSerialisedGridIndexPairDist = "./dataWritten/JUL25GridIndexDistances/pairedIndicesTo1DConverterIntDoubleWith1DConverter.kryo";
+			pathToSerialisedGridIndexPairDistConverter = "./dataWritten/JUL25GridIndexDistances/gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
+
+			pathToSerialisedHaversineDistOnEngine = "./dataWritten/AUG2GridIndexDistances/";
+			pathToJavaGridIndexRGridLatRGridLon = "./dataToRead/July30RGridIDJavaGridIndex/javaGridIndexRGridLatRGridLon.kryo";
+
+			if (For9kUsers)
+			{
+				/**
+				 * Start of Gowalla path constants for Aug 11 experiments: 9k users
+				 */
+				commonPathToGowallaPreProcessedData = "./dataToRead/Aug10/DatabaseCreatedMerged/";
+				// "./dataToRead/Mar30/DatabaseCreatedMerged/";//// Feb23
+
+				pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
+
+				// "./dataToRead/Mar30/DatabaseCreatedMerged/mapForAllLocationData.kryo";
+
+				// $$public final static String pathToSerialisedUniqueLocIDsInCleanedTimelines =
+				// "./dataToRead/Mar30/DatabaseCreatedMerged/UniqueLocIDsInCleanedTimeines.ser";
+
+				pathToSerialisedLocationObjects = commonPathToGowallaPreProcessedData + "mapForAllLocationData.kryo";
+				pathToSerialisedLevelWiseCatIDsDict = commonPathToGowallaPreProcessedData
+						+ "mapCatIDLevelWiseCatIDsDict.kryo";
+				pathToSerialisedCatIDsHierDist = commonPathToGowallaPreProcessedData + "mapCatIDsHierDist.kryo";//
+				// "./dataToRead/April7/mapCatIDsHierDist.kryo";"./dataToRead/April7/mapCatIDsHierDist.kryo"
+				pathToSerialisedMergedCheckinData = commonPathToGowallaPreProcessedData
+						+ "DatabaseCreatedMerged/mapForAllCheckinData.kryo";
+				pathToSerialisedUserObjects = commonPathToGowallaPreProcessedData + "mapForAllUserData.kryo";
+				/**
+				 * End of Gowalla path constants for Aug 11 experiments
+				 */
+
+			}
+			else
+			{
+				/**
+				 * Start of Gowalla path constants for April 8 2018 experiments: 143 users
+				 */
+				// commonPathToGowallaPreProcessedData = "./dataToRead/April8_2018/";
+				commonPathToGowallaPreProcessedData = "./dataToRead/April25_2018/";
+				System.out.println("commonPathToGowallaPreProcessedData= " + commonPathToGowallaPreProcessedData);
+
+				pathToSerialisedCatIDNameDictionary = "./dataToRead/UI/CatIDNameDictionary.kryo";
+				pathToSerialisedLocationObjects = commonPathToGowallaPreProcessedData + "mapForAllLocationData.kryo";
+				pathToSerialisedLevelWiseCatIDsDict = commonPathToGowallaPreProcessedData
+						+ "mapCatIDLevelWiseCatIDsDict.kryo";
+				pathToSerialisedCatIDsHierDist = commonPathToGowallaPreProcessedData + "mapCatIDsHierDist.kryo";//
+				// "./dataToRead/April7/mapCatIDsHierDist.kryo";"./dataToRead/April7/mapCatIDsHierDist.kryo"
+				pathToSerialisedMergedCheckinData = commonPathToGowallaPreProcessedData
+						+ "DatabaseCreatedMerged/mapForAllCheckinData.kryo";
+				pathToSerialisedUserObjects = commonPathToGowallaPreProcessedData + "mapForAllUserData.kryo";
+				/**
+				 * End of Gowalla path constants for April 8 2018 experiments: 143 users
+				 */
+
+				// Irrelvant but included for conformity.
+				pathToLocationTimezoneInfo = "";
+				pathToSerialisedGowallaLocZoneIdMap = "";
+
+			}
+		}
+		else
+		{
+			System.out.println("Error: unknown database: " + Constant.getDatabaseName());
+		}
 		// //start of curtain April 9 2018
 		// else
 		// {

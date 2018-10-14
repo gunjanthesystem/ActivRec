@@ -128,7 +128,7 @@ public final class Constant
 	// .FurtherScaled;
 
 	private static String dynamicDistanceUsed = "HJEditDistance"; // "FeatureWiseEditDistance",FeatureWiseEditDistance,
-															// OTMDSAMEditDistance
+	// OTMDSAMEditDistance
 
 	public static boolean useJarForMySimpleLevenshteinDistance = false;// true;
 
@@ -283,6 +283,9 @@ public final class Constant
 	public static final boolean doWeightedEditDistanceForSecDim = false;// true;//SWITCH_AUG
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
+
+	static String DATABASE_NAME = "fsny1";// "dcu_data_2", "geolife1", "gowalla1" ,"fsny1"// default database name,
+	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -291,6 +294,20 @@ public final class Constant
 
 	// **** Parameters to set **** DO NOT CHANGE ****//
 	public static final PrimaryDimension primaryDimension = PrimaryDimension.ActivityID;// LocationID;
+
+	public static String rankScoring = "";// "sum";// default product"; // "sum"
+	public static final Enums.CaseType caseType = Enums.CaseType.SimpleV3;// null;// String caseType CaseBasedV1";//
+	// default// CaseBasedV1 " or SimpleV3
+
+	// Redudant since we have lookPastType/**
+	// * This variable is not used for anything currently but just to write to console the type of matching
+	// static String typeOfTimelineMatching;// = "Daywise"; // N-count, N-hours
+
+	/**
+	 * ALPHA value for sum-based rank scoring
+	 */
+	public static double ALPHA = -99;// 0.25d;
+
 	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = true, // false,
 			toSerializeTimelines = false, toDeSerializeTimelines = false;
 
@@ -369,21 +386,6 @@ public final class Constant
 			considerAvgAltitudeInFeatureWiseEditDistance = false;
 
 	public static boolean UsingSQLDatabase;
-
-	static String DATABASE_NAME = "";// ;"geolife1";// default database name,
-	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
-	public static String rankScoring = "";// "sum";// default product"; // "sum"
-	public static final Enums.CaseType caseType = Enums.CaseType.SimpleV3;// null;// String caseType CaseBasedV1";//
-	// default// CaseBasedV1 " or SimpleV3
-
-	// Redudant since we have lookPastType/**
-	// * This variable is not used for anything currently but just to write to console the type of matching
-	// static String typeOfTimelineMatching;// = "Daywise"; // N-count, N-hours
-
-	/**
-	 * ALPHA value for sum-based rank scoring
-	 */
-	public static double ALPHA = -99;// 0.25d;
 
 	/**
 	 * to have the same RTs in daywise and MU, some RTs in MU have to be blacklisted as they did not had any cand
@@ -754,13 +756,38 @@ public final class Constant
 			String pathToSerialisedUserObjects, String pathToSerialisedGowallaLocZoneIdMap,
 			boolean canSetGridIndexPairHaversineDistMaps)
 	{
+		initialise(databaseName, catIDsHierDistSerialisedFile, pathToSerialisedCatIDNameDictionary,
+				pathToSerialisedLocationObjects, pathToSerialisedUserObjects, pathToSerialisedGowallaLocZoneIdMap,
+				canSetGridIndexPairHaversineDistMaps);
+		Constant.setCommonPath(givenCommonpath);
+	}
+
+	/**
+	 * 
+	 * /**
+	 * 
+	 * @param givenCommonpath
+	 * @param databaseName
+	 * @param catIDsHierDistSerialisedFile
+	 * @param pathToSerialisedCatIDNameDictionary
+	 * @param pathToSerialisedLocationObjects
+	 * @param pathToSerialisedUserObjects
+	 * @param pathToSerialisedGowallaLocZoneIdMap
+	 * @param canSetGridIndexPairHaversineDistMaps
+	 *            //added on 7 Aug 2018 to avoid unessential deserialisation in case of evaluation.
+	 */
+	public static void initialise(String databaseName, String catIDsHierDistSerialisedFile,
+			String pathToSerialisedCatIDNameDictionary, String pathToSerialisedLocationObjects,
+			String pathToSerialisedUserObjects, String pathToSerialisedGowallaLocZoneIdMap,
+			boolean canSetGridIndexPairHaversineDistMaps)
+	{
 
 		Constant.setDatabaseName(databaseName);
 		Constant.UsingSQLDatabase = false;
 		Constant.setUserIDs();
 		Constant.setInvalidNames();
 		Constant.setActivityNames();
-		Constant.setCommonPath(givenCommonpath);
+		// Constant.setCommonPath(givenCommonpath);
 		DomainConstants.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
 		DomainConstants.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
 		// Disabled setLocIDLocationObjectDictionary as it was not essential, we only needed loc name and full objects

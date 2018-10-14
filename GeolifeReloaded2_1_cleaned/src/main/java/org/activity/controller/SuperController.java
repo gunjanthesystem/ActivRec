@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.AltSeqPredictor;
+import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
@@ -164,6 +166,34 @@ public class SuperController
 	}
 
 	/**
+	 * <ul>
+	 * <li>Set default timezone</li>
+	 * <li>Set path constants</li>
+	 * </ul>
+	 * 
+	 * @param whoCalled
+	 * @param for9kUsers
+	 * @param databaseName
+	 * @return
+	 * @since 12 Oct 2018
+	 */
+	public static String starterKit(String whoCalled, boolean for9kUsers, String databaseName)
+	{
+		String message = "-- >> StarterKit started by " + whoCalled + "at: " + LocalDateTime.now() + "\n";
+		System.out.println("For this experiment: Java Version:" + System.getProperty("java.version"));
+		System.out.println(
+				PerformanceAnalytics.getHeapInformation() + "\nRunning experiments for database: " + databaseName);
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
+		Constant.setDefaultTimeZone("UTC");
+		PathConstants.intialise(for9kUsers, databaseName);
+		Constant.initialise(databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
+				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
+				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
+
+		return message;
+	}
+
+	/**
 	 * <h2>In this method:</h2>
 	 * 
 	 * <ul>
@@ -178,10 +208,17 @@ public class SuperController
 	 */
 	public static void main(String args[])// _importantMay10
 	{
+		starterKit("SuperController", Constant.For9kUsers, Constant.getDatabaseName());
+
+		boolean doRecommendation = true;
+		boolean doEvaluation = true;
+		boolean hasMUs = true;
+
 		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 		{
 			setupCUDAEnviron();
 		}
+
 		// searchContentInFile();
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
 		// cleanUpSpace("./dataWritten/July23_incomplete/", 0.9);
@@ -192,12 +229,20 @@ public class SuperController
 		// $cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaselineForUserNumInvestigation/",0.9);
 		// cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenClosestTimeBaseline/", 0.9);
 		// cleanUp(new String[] {});
-		String[] sampledUserIndicesSets = Arrays.copyOfRange(PathConstants.pathToSetsOfRandomlySampled100Users, 0, 1);
-		double[] EDAlphas = Arrays.copyOfRange(Constant.EDAlphas, 0, 1);
-		final int numOfIterSameExp = 1;
-		// num of times same exp to be repeated to smooth out variation due to ties, randomness, etc.
+		// sampledUserIndicesSets renamed to setOfSampledUserIndicesForExp
 
-		// { 0.5 };// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */
+		// Select set of sampled user indices to run for
+		// when runForAllUsersAtOnce, we are not using sample user indices, hence we need to run it only once.
+		String[] setOfSampledUserIndicesForExp = Constant.runForAllUsersAtOnce
+				? Arrays.copyOfRange(PathConstants.pathToSetsOfRandomlySampled100Users, 0, 1)
+				: Arrays.copyOfRange(PathConstants.pathToSetsOfRandomlySampled100Users, 0, 1);
+
+		// Select set of ED Alphas to run for
+		double[] EDAlphas = Arrays.copyOfRange(Constant.EDAlphas, 0, 1);
+		// num of times same exp to be repeated to smooth out variation due to ties, randomness, etc.
+		final int numOfIterSameExp = 1;
+		System.out.println("setOfSampledUserIndicesForExp = " + Arrays.toString(setOfSampledUserIndicesForExp)
+				+ "\nEDAlphas = " + Arrays.toString(EDAlphas) + "\nnumOfIterSameExp = " + numOfIterSameExp);
 
 		// added on 29 July 2018 when running for multiple iterations
 		for (int iteration = 0; iteration < numOfIterSameExp; iteration++)
@@ -207,18 +252,18 @@ public class SuperController
 				if (Constant.useToyTimelines)
 				{// PopUps.showMessage("here inside toy!");
 					// Note: sampledUserIndicesSets are irrelavant for the toy timelines
-					runExperimentForGivenUsersAndConfig(sampledUserIndicesSets[0], edAlphaForAnExp, "");
+					runExperimentForGivenUsersAndConfig(setOfSampledUserIndicesForExp[0], edAlphaForAnExp, "",
+							doRecommendation, doEvaluation, hasMUs);
 				}
 				else
 				{
-					for (String sampledUserIndicesSet : sampledUserIndicesSets)
+					for (String sampledUserIndicesSet : setOfSampledUserIndicesForExp)
 					{
-						runExperimentForGivenUsersAndConfig(sampledUserIndicesSet, edAlphaForAnExp, "");// "iter" +
+						runExperimentForGivenUsersAndConfig(sampledUserIndicesSet, edAlphaForAnExp, "",
+								doRecommendation, doEvaluation, hasMUs);// "iter" +
 						// iteration);
-						if (Constant.runForAllUsersAtOnce)
-						{
-							break;// here we are not using sample user indices, hence we need to run it only once.
-						}
+						// if (Constant.runForAllUsersAtOnce){break;}// here we are not using sample user indices, hence
+						// we need to run it only once.
 					}
 				}
 			}
@@ -270,11 +315,14 @@ public class SuperController
 	 * @param EDAlphaForThisExperiment
 	 *            >-1 if we want to set in here instead of hardcoding it in the Constant class.
 	 * @param iterationLabel
+	 * @param doRecommendation
+	 * @param doEvaluation
+	 * @param hasMUS
 	 */
 	public static void runExperimentForGivenUsersAndConfig(String sampledUserIndicesSetFile,
-			double EDAlphaForThisExperiment, String iterationLabel)
+			double EDAlphaForThisExperiment, String iterationLabel, boolean doRecommendation, boolean doEvaluation,
+			boolean hasMUS)
 	{
-		System.out.println("For this experiment: Java Version:" + System.getProperty("java.version"));
 		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
 		Constant.setDynamicPathToRandomlySampledUserIndices(sampledUserIndicesSetFile);
 		System.out.println("Constant.pathToRandomLySampleUserIndices=" + sampledUserIndicesSetFile);
@@ -290,27 +338,23 @@ public class SuperController
 		}
 		System.out.println("Constant.EDAlpha=" + Constant.getDynamicEDAlpha());
 
-		String labelForExperimentConfig = getLabelForExperimentConfig(sampledUserIndicesSetFile);
-
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 		// { "./dataWritten/"+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/" };
 
 		String commonPath = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 				// { "./dataWritten/"
-				+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/";
+				+ DateTimeUtils.getMonthDateLabel() + getLabelForExperimentConfig(sampledUserIndicesSetFile)
+				+ iterationLabel + "/";
 
 		// for (int i = 0; i <= commonPaths.length - 1; i++){
 		WToFile.createDirectoryIfNotExists(commonPath);
 		// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-		runExperiment(commonPath, true, true, true, "gowalla1");
+		runExperiment(commonPath, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName());
 		// cleanUpSpace(commonPaths[i], 0.90);
-		System.out.println("finished for commonPath = " + commonPath);
-		// }
-
-		System.out.println(" Exiting main0");
-		PopUps.showMessage("Exiting main0");
+		System.out.println("finished runExperimentForGivenUsersAndConfig for commonPath = " + commonPath);
+		System.out.println("Exiting runExperimentForGivenUsersAndConfig");
+		// PopUps.showMessage("Exiting main0");
 		// End
-		// cleanUpSpace("./dataWritten/Aug14Filter500/",0.80);
 	}
 
 	/**
@@ -504,29 +548,29 @@ public class SuperController
 	/**
 	 * Run experiments:
 	 * <ul>
-	 * <li>Set databasename,outputCoreResultsPath, distanceUsed</li>
+	 * <li>Set outputCoreResultsPath, distanceUsed</li>
 	 * <li>Run ControllerWithoutServer</li>
 	 * <li>Run EvaluationSeq</li>
 	 * <li>Check for errors/exceptions in Log files</li>
 	 * </ul>
 	 * 
 	 * @param commonPath
-	 * @param recommendation
-	 * @param evaluation
+	 * @param doRecommendation
+	 * @param doEvaluation
 	 * @param hasMUs
 	 * @param databaseName
 	 **/
-	public static void runExperiment(String commonPath, boolean recommendation, boolean evaluation, boolean hasMUs,
+	public static void runExperiment(String commonPath, boolean doRecommendation, boolean doEvaluation, boolean hasMUs,
 			String databaseName)
 	{
-		boolean doPostFiltering = true;
 		long at = System.currentTimeMillis();
+		boolean doPostFiltering = (doEvaluation == false) ? false : true;
+
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC"y)); // added on April 21, 2016
 		System.out.println("Beginning runExperiments:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
 		// String commonPath = "./dataWritten/Nov6_NCount916U916N100T/";// Aug17/";
 		// $$String commonPath = "./dataWritten/Nov12_NCount916U916N1C500T/";// Aug17/";
-		System.out.println("commonPath = " + commonPath);
 		// String outputCoreResultsPathGowalla = commonPath;
 		// + "./dataWrittenNGramBaselineForUserNumInvestigation/";// dataWrittenSeqEditL1
 		// RecommUnmergedNCount/";
@@ -590,8 +634,9 @@ public class SuperController
 		// new ControllerWithoutServer();
 		// $$ CURRENT END
 
-		Constant.setDatabaseName(databaseName);// "gowalla1");// ("dcu_data_2");// "geolife1"
+		// Constant.setDatabaseName(databaseName);// commented out on 12 Oct 2018 as already set in starter kit
 		// Constant.caseType = Enums.CaseType.SimpleV3;/// "SimpleV3";// = "CaseBasedV1";// " CaseBasedV1 " or SimpleV3
+		System.out.println("commonPath = " + commonPath);
 		Constant.setOutputCoreResultsPath(commonPath);// commonPathGeolife;// commonPathDCU + "SimpleV3/";//
 		// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
@@ -599,53 +644,51 @@ public class SuperController
 
 		Constant.reflectTheConfigInConstantFile(commonPath + "Constant" + DateTimeUtils.getMonthDateLabel() + ".java");
 
-		if (recommendation)
+		if (doRecommendation)
 		{
 			// //curtain may 19 2017 start
 			System.out.println("Doing recommendation...");
-			ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer(Constant.getDatabaseName());
+			ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer(Constant.getDatabaseName(),
+					commonPath);
 			// //curtain may 19 2017 end
 		}
 
 		Constant.releaseHeavyObjectsNotNeededAfterRecommendation();
 
-		if (evaluation)
+		if (doEvaluation)
 		{// curtain may 26 2017 start
 			System.out.println("Doing evaluation...");
+			boolean evalPrimaryDimension = true, evalSecondaryDimension = Constant.doSecondaryDimension;
+			int lengthOfRecommendedSequence = Constant.lengthOfRecommendedSequence;
+			LookPastType lookPastType = Constant.lookPastType;
+			AltSeqPredictor altSeqPredictor = Constant.altSeqPredictor;
+
 			if (hasMUs)
 			{
-				// boolean evalPostFiltering = false;
-				// boolean evalSeqPrediction = true;
+				double[] muArray = Constant.getMatchingUnitArray(lookPastType, altSeqPredictor);
+				// boolean evalPostFiltering = false;// boolean evalSeqPrediction = true;
 				// String dimensionPhrase = "SecDim";
 				// TODO Why running all three at once is resultsing in empty files. Has it got something to do with
 				// program not exiting upon completion?
-				if (true)// primary dimension
+				if (evalPrimaryDimension)// primary dimension
 				{
-					new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
-							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor), "", false,
-							true);
+					new EvaluationSeq(lengthOfRecommendedSequence, commonPath, muArray, "", false, true);
+					if (evalSecondaryDimension)// secondary dimension
+					{
+						new EvaluationSeq(lengthOfRecommendedSequence, commonPath, muArray, "SecDim", false, true);
+					}
 				}
 
-				if (true && Constant.doSecondaryDimension)// secondary dimension
-				{
-					new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
-							Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor), "SecDim",
-							false, true);
-
-				}
-				if (doPostFiltering && Constant.doSecondaryDimension)
+				if (doPostFiltering && evalSecondaryDimension)
 				{
 					new PostFilter1(commonPath); // requires results from preceeding EvaluationSeq
-
 					// Evaluate postfiltering
 					String[] pfFilterNames = { "Fltr_on_Top1Loc", "Fltr_on_ActualLocPF", "Fltr_on_TopKLocsPF",
 							"WtdAlphaPF", "Fltr_on_Random2LocPF", "Fltr_on_Random10LocPF", "Fltr_on_Random20LocPF",
 							"Fltr_on_Random50LocPF", "Fltr_on_RandomLocPF" };
 					for (String pfPhrase : pfFilterNames)// postfiltering
 					{
-						new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath,
-								Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor),
-								pfPhrase, true, false);
+						new EvaluationSeq(lengthOfRecommendedSequence, commonPath, muArray, pfPhrase, true, false);
 					}
 				}
 				// if (true)
@@ -666,9 +709,8 @@ public class SuperController
 			}
 			else
 			{
-				new EvaluationSeq(Constant.lengthOfRecommendedSequence, commonPath);
-				// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90
-				// });
+				new EvaluationSeq(lengthOfRecommendedSequence, commonPath);
+				// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90});
 			} // //curtain may 26 2017 end
 		}
 		// **************************************************************************************************************//
@@ -886,9 +928,9 @@ public class SuperController
 		// String deleteConsoleLogs = Searcher.searchAndRandomDelete(commonPath, "consoleLog", "rror", 0.65);
 		// WritingToFile.writeToNewFile(deleteConsoleLogs, commonPath + "SafelyRandomlyDeleteConsoleLogsForSpace.txt");
 
-		long bt = System.currentTimeMillis();
-		System.out.println("All done in " + ((bt - at) / 1000) + " seconds");
-		PopUps.showMessage("All done in " + ((bt - at) / 1000) + " seconds");
+		String msg = "runExperiment All done in " + ((System.currentTimeMillis() - at) / 1000) + " seconds";
+		System.out.println(msg);
+		PopUps.showMessage(msg);
 	}
 
 	/**

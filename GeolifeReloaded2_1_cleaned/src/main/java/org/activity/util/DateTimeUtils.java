@@ -615,6 +615,7 @@ public class DateTimeUtils
 	}
 
 	/**
+	 * Formerly named as 'getTimestampLastFMData()'
 	 * 
 	 * @param timestampString
 	 * @return
@@ -626,7 +627,6 @@ public class DateTimeUtils
 		{
 			Instant instant = Instant.parse(timestampString);
 			timeStamp = Timestamp.from(instant);
-
 			// System.out.println("Hours= " + timeStamp.getHours() + "Mins= " + timeStamp.getMinutes() + "Sec=" +
 			// timeStamp.getSeconds());
 		}

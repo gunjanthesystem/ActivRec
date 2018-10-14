@@ -69,7 +69,7 @@ public class EvaluationSeq
 		WToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
 				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
 
-		PathConstants.intialise(Constant.For9kUsers);
+		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
 		intialiseListOfFilenamesNoMU();
 		int totalNumOfUsersComputedFor = 0;
 		try
@@ -181,6 +181,8 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount,
 			String dimensionPhrase, boolean evaluatePostFiltering, boolean evaluatedSequencePrediction)// sdsd
 	{
+		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
+
 		this.evaluatePostFiltering = evaluatePostFiltering;
 		this.evaluateSeqPrediction = evaluatedSequencePrediction;
 
@@ -200,7 +202,6 @@ public class EvaluationSeq
 		WToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
 				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
 
-		PathConstants.intialise(Constant.For9kUsers);
 		intialiseListOfFilenames(matchingUnitAsPastCount);
 		int totalNumOfUsersComputedFor = 0;
 		try

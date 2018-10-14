@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.activity.io.WToFile;
@@ -787,5 +789,33 @@ public class StringUtils
 	public static <T> String collectionToString(Collection<T> s, String delimiter)
 	{
 		return s.stream().map(v -> String.valueOf(v)).collect(Collectors.joining(delimiter));
+	}
+
+	/**
+	 * 
+	 * @param s
+	 * @param delimiter
+	 * @return
+	 */
+	public static ArrayList<String> splitAsStringList(String s, Pattern delimiter)
+	{
+		ArrayList<String> res = new ArrayList();
+		List<String> resTemp = Arrays.asList(delimiter.split(s));
+		res.addAll(resTemp);
+		return res;
+	}
+
+	/**
+	 * 
+	 * @param s
+	 * @param delimiter
+	 * @return
+	 */
+	public static ArrayList<Integer> splitAsIntegerList(String s, Pattern delimiter)
+	{
+		List<String> resTemp = Arrays.asList(delimiter.split(s));
+		ArrayList<Integer> res = (ArrayList<Integer>) resTemp.stream().map(i -> Integer.valueOf(i))
+				.collect(Collectors.toList());
+		return res;
 	}
 }
