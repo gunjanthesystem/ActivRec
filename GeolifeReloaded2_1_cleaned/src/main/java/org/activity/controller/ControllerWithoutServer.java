@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -67,18 +66,20 @@ public class ControllerWithoutServer
 	/**
 	 * 
 	 * @param databaseName
+	 * @param commonBasePath
 	 */
-	public ControllerWithoutServer(String databaseName)
+	public ControllerWithoutServer(String databaseName, String commonBasePath)
 	{
 		try
 		{
 			System.out.println("Starting ControllerWithoutServer>>>>\n" + PerformanceAnalytics.getHeapInformation()
 					+ "\n" + "currentDateTime: " + LocalDateTime.now() + "\nRunning experiments for database: "
 					+ databaseName);
+			System.out.println(
+					PerformanceAnalytics.getHeapInformation() + "\n" + PerformanceAnalytics.getHeapPercentageFree());
 
-			TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
-			Constant.setDefaultTimeZone("UTC");
-
+			// TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
+			// Constant.setDefaultTimeZone("UTC"); Moved to org.activity.controller.SuperController.starterKit()
 			// String pathToLatestSerialisedJSONArray = "", pathForLatestSerialisedJSONArray = "",
 			// pathToLatestSerialisedTimelines = "", pathForLatestSerialisedTimelines = "", commonPath = "";
 
@@ -87,21 +88,17 @@ public class ControllerWithoutServer
 			// new ConnectDatabase(Constant.getDatabaseName()); // all method and variable in this class are static
 			// new Constant(commonPath, Constant.getDatabaseName());
 
-			System.out.println("Just before Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
-					+ PerformanceAnalytics.getHeapPercentageFree());
 			/*
 			 * $ Disabled for Gowalla dataset for now// ConnectDatabase.initialise(Constant.getDatabaseName()); // all
 			 * method and variable in this class are static
 			 */
-			// specific for Gowalla dataset
-			PathConstants.intialise(Constant.For9kUsers);
-			Constant.initialise(commonPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
-					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
-					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
-			String commonBasePath = Constant.getCommonPath();
-			System.out.println("Just after Constant.initialise:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
-					+ PerformanceAnalytics.getHeapPercentageFree());
-
+			// specific for Gowalla dataset: moved to starterKit
+			// PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
+			// Constant.initialise(commonPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
+			// PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
+			// PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
+			// String commonBasePath = Constant.getCommonPath();
+			commonPath = Constant.getCommonPath();
 			////////// ~~~~~~~~~~~~~~~~~`
 			long dt1 = System.currentTimeMillis();
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = createAllTimelines(
@@ -133,7 +130,6 @@ public class ControllerWithoutServer
 			{
 				System.out.println("Alert! Not reducing and cleaning data !!");
 				usersCleanedDayTimelines = usersDayTimelinesOriginal;
-
 			}
 
 			usersDayTimelinesOriginal = null; // null this out so as to be ready for garbage collection.
@@ -191,6 +187,7 @@ public class ControllerWithoutServer
 			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
 			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true, false);
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
+
 			// System.exit(0);
 			if (true)// temporary enabled for verbose writing of user timeline
 			{

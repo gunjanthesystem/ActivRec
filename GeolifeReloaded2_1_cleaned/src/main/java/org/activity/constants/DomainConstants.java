@@ -530,6 +530,12 @@ public class DomainConstants
 	 */
 	public static void setLocIDLocationObjectDictionary(String pathToSerialisedLocationObjects)
 	{
+		if (pathToSerialisedLocationObjects == null || pathToSerialisedLocationObjects.length() == 0)
+		{
+			System.err.println(
+					"Warning: setLocIDLocationObjectDictionary not set as pathToSerialisedLocationObjects is null or empty");
+			return;
+		}
 		try
 		{
 			locIDLocationObjectDictionary = (LinkedHashMap<Integer, LocationGowalla>) Serializer
@@ -543,6 +549,12 @@ public class DomainConstants
 
 	public static void setLocationIDNameDictionary(String pathToSerialisedLocationObjects)
 	{
+		if (pathToSerialisedLocationObjects == null || pathToSerialisedLocationObjects.length() == 0)
+		{
+			System.err.println(
+					"Warning: setLocationIDNameDictionary not set as pathToSerialisedLocationObjects is null or empty");
+			return;
+		}
 		try
 		{
 			LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionaryTemp = (LinkedHashMap<Integer, LocationGowalla>) Serializer
@@ -568,6 +580,13 @@ public class DomainConstants
 	public static void setLocationIDNameDictionary(
 			LinkedHashMap<Integer, LocationGowalla> locIDLocationObjectDictionary)
 	{
+		if (locIDLocationObjectDictionary == null || locIDLocationObjectDictionary.size() == 0)
+		{
+			System.err.println(
+					"Warning: setLocationIDNameDictionary not set as locIDLocationObjectDictionary is null or empty");
+			return;
+		}
+
 		try
 		{
 			LinkedHashMap<Integer, String> locIDNameDict = new LinkedHashMap<>();
@@ -599,6 +618,12 @@ public class DomainConstants
 	 */
 	public static void setCatIDsHierarchicalDistance(String catIDsHierDistSerialisedFile)
 	{
+		if (catIDsHierDistSerialisedFile == null || catIDsHierDistSerialisedFile.length() == 0)
+		{
+			System.err.println(
+					"Warning: setCatIDsHierarchicalDistance not set as catIDsHierDistSerialisedFile is null or empty");
+			return;
+		}
 		try
 		{
 			// System.err.println("catIDsHierDistSerialisedFile= " + catIDsHierDistSerialisedFile);

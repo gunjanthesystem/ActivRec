@@ -91,14 +91,14 @@ public class Dashboard3 extends Application
 	public void start(Stage stage)
 	{
 		long t0 = System.currentTimeMillis();
-		ScreenDetails.printScreensDetails();
 
-		reuse = new ReusableElements();
-
-		PathConstants.intialise(Constant.For9kUsers);
+		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
 		Constant.initialise("./", "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
+
+		ScreenDetails.printScreensDetails();
+		reuse = new ReusableElements();
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = null;
 
