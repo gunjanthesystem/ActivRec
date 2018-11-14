@@ -35,15 +35,17 @@ public class PostFilter1
 		String pathToReadRecommendationResultsFrom = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG9ED1.0AllActsFDStFilter0hrs100RTVPNN500SNN50/";
 		// "./dataWritten/JUL26ED1.0AllActsFDStFilter0hrs100RTVNoTTFilter/";// 100R/";
 		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL26ED1.0AllActsFDStFilter0hrs100RTV500PDNTh50SDNTh/100R/";
-		new PostFilter1(pathToReadRecommendationResultsFrom);
+		new PostFilter1(pathToReadRecommendationResultsFrom, "gowalla1");// second argument added on Nov 3 2018.
 	}
 
 	/**
 	 * Note: the post filtered recommendations are written back to the same results path.
 	 * 
 	 * @param commonPathToReadFrom
+	 * @param databaseName
+	 *            (added on 2 Nov 2018)
 	 */
-	public PostFilter1(String commonPathToReadFrom)
+	public PostFilter1(String commonPathToReadFrom, String databaseName)
 	{
 		String groupsOf100UsersLabels = "";
 		if (Constant.useRandomlySampled100Users)
@@ -77,8 +79,8 @@ public class PostFilter1
 		Constant.setCommonPath(outerPath);
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 		Constant.setDefaultTimeZone("UTC");
-		PathConstants.intialise(Constant.For9kUsers);
-		Constant.initialise(outerPath, "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
+		PathConstants.intialise(Constant.For9kUsers, databaseName);
+		Constant.initialise(outerPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
 		// String[] dimensionPhrases = { "", "SecDim" };
