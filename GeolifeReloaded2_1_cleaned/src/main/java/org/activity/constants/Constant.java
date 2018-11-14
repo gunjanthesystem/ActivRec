@@ -1005,6 +1005,7 @@ public final class Constant
 			// + dname);
 			System.exit(-1);
 		}
+		System.out.println("setDistanceUsed() called: dynamicDistanceUsed= " + dynamicDistanceUsed);
 		// if(dname.trim().equals("HJEditDistance")
 	}
 

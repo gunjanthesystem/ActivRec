@@ -712,6 +712,7 @@ public class ControllerWithoutServer
 			boolean toSerializeTimelines, boolean toDeSerializeTimelines) throws SQLException
 	{
 		long dt1 = System.currentTimeMillis();
+
 		if (toSerializeJSONArray)
 		{
 			fetchAndSerializeJSONArray(databaseName);

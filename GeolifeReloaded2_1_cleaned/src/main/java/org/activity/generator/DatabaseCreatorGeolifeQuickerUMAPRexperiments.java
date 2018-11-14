@@ -64,7 +64,10 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 																																																	// ///"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/Mar152016AllUsersDataGeneration/";//
 	// May18AllUsersDataGeneration2/";// // = "/run/media/gunjan/HOME/gunjan/Geolife
 	// Data Works/";
-	public static final String rawPathToRead = "/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link to Geolife Data Works/Raw/Geolife Trajectories 1.3/Data/";
+	public static final String rawPathToRead = "/run/media/gunjan/My Passport/Gunjan/Backups/Serious/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link to Geolife Data Works/Raw/Geolife Trajectories 1.3/Data/";
+	// added on 13 Nov 2018, found in Maroon WD backup
+	// before 13 Nov 2018//"/run/media/gunjan/OS/Users/gunjan/Documents/UCD/Projects/GeoLife/link to Geolife Data
+	// Works/Raw/Geolife Trajectories 1.3/Data/";
 	static String nameForMapToBeSerialised = "mapForAllDataMergedPlusDuration21Apr2016UMAPCorrectedTimeZone.map";// ";//"mapForAllDataMergedPlusDuration18May2015_2.map";
 	// static final String[] userNames= {"Stefan", "Tengqi","Cathal", "Zaher","Rami"};
 	public static final int continuityThresholdInSeconds = 5 * 60; // changed from 30 min in DCU dataset...., if two
@@ -190,8 +193,8 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 						true);// "trajID,timestamp,
 								// endt,mode,latitude,longitude,timedifferenceWithNextInSeconds,durationInSeconds,breakOverDaysCount",
 
-				WToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedContinuousWithDuration,
-						"Not Available", "MergedContinuous" + dataSplitLabel, true);
+				WToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedContinuousWithDuration, "Not Available",
+						"MergedContinuous" + dataSplitLabel, true);
 				WToFile.writeActivityTypeWithDurationGeo(mapForAllDataMergedContinuousWithDuration, "Unknown",
 						"MergedContinuous" + dataSplitLabel, true);
 
@@ -419,8 +422,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WToFile
-						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
+				BufferedWriter bwMergerCaseLogs = WToFile.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);
@@ -2178,8 +2180,8 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 				System.out.println("put, User:" + userID + ",#TrajectoryEntries:" + mapEachUser.size());
 			} // end of loop over users
 
-			WToFile.writeLinkedHashMapOfTreemapAllString(modesForAllTrajectoryFilesAllUsers,
-					"ModesPerTrajectoryFiles", "UserID,TrajectoryFile, NumberOfModes,Modes");
+			WToFile.writeLinkedHashMapOfTreemapAllString(modesForAllTrajectoryFilesAllUsers, "ModesPerTrajectoryFiles",
+					"UserID,TrajectoryFile, NumberOfModes,Modes");
 			WToFile.writeNegativeZeroInvalidsLatLonAltFooter("CountOfNegativeZeroUnknownAltLatLon");
 			// WritingToFile.writeLinkedHashMapOfTreemapPureTrajectoryEntries(mapForAllData,
 			// "AllDataWithAnnotation","UserID,Timestamp,Mode,Latitude,Longitude,Altitude,DifferenceWithNextInSeconds,DurationInSeconds,BreakOverDaysCount");
@@ -3159,11 +3161,9 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 
 					if (entry.getValue().getNumberOfDistinctTrajectoryIDs() > 1)
 					{
-						WToFile
-								.appendLineToFileAbs(
-										"User:" + userName + ","
-												+ entry.getValue().toStringWithTrajIDWithTrajPurityCheck() + "\n",
-										commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
+						WToFile.appendLineToFileAbs("User:" + userName + ","
+								+ entry.getValue().toStringWithTrajIDWithTrajPurityCheck() + "\n",
+								commonPath + "MergedTrajEntriesWithMoreThanOneTrajIDs.csv");
 					}
 					// "StartTimestamp,EndTimestamp,Mode,Latitude,Longitude,Altitude,DifferenceWithNextInSeconds,DurationInSeconds,BreakOverDaysCount"
 				}
@@ -3346,8 +3346,7 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WToFile
-						.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
+				BufferedWriter bwMergerCaseLogs = WToFile.getBWForNewFile(commonPath + userID + "MergerCasesLog.csv");
 				bwMergerCaseLogs.write("TrajId,Case,Mode,DurationInSecs,CurrentTS, NextTS,Comment\n");
 
 				System.out.println("\nUser =" + userID);
@@ -3872,8 +3871,8 @@ public class DatabaseCreatorGeolifeQuickerUMAPRexperiments
 			for (Map.Entry<String, TreeMap<Timestamp, TrajectoryEntry>> entryForUser : mapForAllData.entrySet())
 			{
 				String userID = entryForUser.getKey();
-				BufferedWriter bwMergerCaseLogs = WToFile.getBWForNewFile(
-						commonPath + userID + activityNameToMerge + "MergerSandwichesLog.csv");
+				BufferedWriter bwMergerCaseLogs = WToFile
+						.getBWForNewFile(commonPath + userID + activityNameToMerge + "MergerSandwichesLog.csv");
 				bwMergerCaseLogs.write(
 						"TrajId,CurrentMode,NextMode,NextToNextMode,CurrentTS, NextTS,NextToNextTS,DurationOfNext,TimestampDifferenceForDuration\n");
 

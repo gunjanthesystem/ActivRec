@@ -309,7 +309,7 @@ public final class SpatialUtils
 	public static void compareHaversines()
 	{
 		// getGivenLevelCatIDForAllCatIDs(pathToSerialisedLevelWiseCatIDsDict, 1, true);
-		PathConstants.intialise(Constant.For9kUsers);
+		PathConstants.intialise(Constant.For9kUsers, "gowalla1");// second argument added on Nov 2 2018
 		LinkedHashMap<Integer, LinkedHashMap<Integer, Double>> locIDsHaversineDists = computeHaversineDistanceBetweenAllLocIDs(
 				PathConstants.pathToSerialisedLocationObjects);
 

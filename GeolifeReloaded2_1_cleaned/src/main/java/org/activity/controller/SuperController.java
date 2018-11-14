@@ -169,6 +169,7 @@ public class SuperController
 	 * <ul>
 	 * <li>Set default timezone</li>
 	 * <li>Set path constants</li>
+	 * <li>Set constants</li>
 	 * </ul>
 	 * 
 	 * @param whoCalled
@@ -177,7 +178,7 @@ public class SuperController
 	 * @return
 	 * @since 12 Oct 2018
 	 */
-	public static String starterKit(String whoCalled, boolean for9kUsers, String databaseName)
+	public static String initializeConstants(String whoCalled, boolean for9kUsers, String databaseName)
 	{
 		String message = "-- >> StarterKit started by " + whoCalled + "at: " + LocalDateTime.now() + "\n";
 		System.out.println("For this experiment: Java Version:" + System.getProperty("java.version"));
@@ -189,6 +190,11 @@ public class SuperController
 		Constant.initialise(databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
+
+		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
+		{
+			setupCUDAEnviron();
+		}
 
 		return message;
 	}
@@ -208,16 +214,10 @@ public class SuperController
 	 */
 	public static void main(String args[])// _importantMay10
 	{
-		starterKit("SuperController", Constant.For9kUsers, Constant.getDatabaseName());
-
+		initializeConstants("SuperController", Constant.For9kUsers, Constant.getDatabaseName());
 		boolean doRecommendation = true;
 		boolean doEvaluation = true;
 		boolean hasMUs = true;
-
-		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
-		{
-			setupCUDAEnviron();
-		}
 
 		// searchContentInFile();
 		// sftp://claritytrec.ucd.ie/home/gunjankumar/SyncedWorkspace/Aug2Workspace/GeolifeReloaded2_1_cleaned
@@ -323,10 +323,7 @@ public class SuperController
 			double EDAlphaForThisExperiment, String iterationLabel, boolean doRecommendation, boolean doEvaluation,
 			boolean hasMUS)
 	{
-		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
 		Constant.setDynamicPathToRandomlySampledUserIndices(sampledUserIndicesSetFile);
-		System.out.println("Constant.pathToRandomLySampleUserIndices=" + sampledUserIndicesSetFile);
-
 		if (EDAlphaForThisExperiment > -1)// when EDAlphaForThisExperiment is <=-1, means we do not need to set it here.
 		{
 			Constant.setDynamicEDAlpha(EDAlphaForThisExperiment);// Constant.setEDAlpha(EDAlphaForThisExperiment);
@@ -336,8 +333,9 @@ public class SuperController
 		{
 			System.out.println("NOT SETTING EDAlpha dynamically");
 		}
+		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
+		System.out.println("Constant.pathToRandomLySampleUserIndices=" + sampledUserIndicesSetFile);
 		System.out.println("Constant.EDAlpha=" + Constant.getDynamicEDAlpha());
-
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 		// { "./dataWritten/"+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/" };
 
@@ -641,7 +639,6 @@ public class SuperController
 		// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
 		Constant.setDistanceUsed("HJEditDistance");
-
 		Constant.reflectTheConfigInConstantFile(commonPath + "Constant" + DateTimeUtils.getMonthDateLabel() + ".java");
 
 		if (doRecommendation)
@@ -681,7 +678,8 @@ public class SuperController
 
 				if (doPostFiltering && evalSecondaryDimension)
 				{
-					new PostFilter1(commonPath); // requires results from preceeding EvaluationSeq
+					new PostFilter1(commonPath, Constant.getDatabaseName()); // requires results from preceeding
+																				// EvaluationSeq
 					// Evaluate postfiltering
 					String[] pfFilterNames = { "Fltr_on_Top1Loc", "Fltr_on_ActualLocPF", "Fltr_on_TopKLocsPF",
 							"WtdAlphaPF", "Fltr_on_Random2LocPF", "Fltr_on_Random10LocPF", "Fltr_on_Random20LocPF",
