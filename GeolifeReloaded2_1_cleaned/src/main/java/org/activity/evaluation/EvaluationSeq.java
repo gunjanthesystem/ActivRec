@@ -579,6 +579,8 @@ public class EvaluationSeq
 		listOfStep0AvgRecallCountValidRTFiles = new ArrayList<>();// added on 30 July 2018
 		listOfStep0EmptyRecommsCountFiles = new ArrayList<>();// added on 30 July 2018
 
+		listOfStep0PerActMRRFiles = new ArrayList<>();// added on 14 Nov 2018
+
 		// we concatenate results for each mu over all users (groups)
 		for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 		{
@@ -599,6 +601,7 @@ public class EvaluationSeq
 
 			listOfStep0AvgRecallCountValidRTFiles.add(muIndex, new ArrayList<String>());
 			listOfStep0EmptyRecommsCountFiles.add(muIndex, new ArrayList<String>());
+			listOfStep0PerActMRRFiles.add(muIndex, new ArrayList<String>());
 		}
 	}
 
@@ -631,6 +634,8 @@ public class EvaluationSeq
 		listOfPerTopKAgreementsFiles.add(muIndex, new ArrayList<String>());
 		listOfNumTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
 		listOfPerTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
+
+		listOfStep0PerActMRRFiles.add(muIndex, new ArrayList<String>());
 	}
 
 	/**
@@ -1259,7 +1264,8 @@ public class EvaluationSeq
 				// average over data points
 				EvalMetrics.writeAvgRecallsForAllKs(algoLabel, timeCategory, numOfUsers, dimensionPhrase, cp);
 				EvalMetrics.writeAvgFMeasuresForAllKs(algoLabel, timeCategory, numOfUsers, dimensionPhrase, cp);
-				EvalMetrics.writePerActMRRV2(algoLabel, timeCategory, activityNamesT, arrayActual, dimensionPhrase, cp);
+				EvalMetrics.writePerActMRRV2(algoLabel, timeCategory, /* activityNamesT, */ arrayActual,
+						dimensionPhrase, cp, DomainConstants.catIDNameDictionary);
 				// NEED to modify it to take in numOfUsers.
 			}
 		}

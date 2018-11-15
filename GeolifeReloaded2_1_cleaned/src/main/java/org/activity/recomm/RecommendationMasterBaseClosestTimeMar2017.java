@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.activity.constants.VerbosityConstants;
 import org.activity.evaluation.Evaluation;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
@@ -56,9 +56,9 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	String userIDAtRecomm;
 	Timestamp timestampPointAtRecomm;
 
-	ArrayList<ActivityObject> activitiesGuidingRecomm; // sequence of activity events happening one or before the recomm
+	ArrayList<ActivityObject2018> activitiesGuidingRecomm; // sequence of activity events happening one or before the recomm
 														// point on that day
-	ActivityObject activityAtRecommPoint;
+	ActivityObject2018 activityAtRecommPoint;
 
 	/**
 	 * {Cand Date, Pair{Index of ST nearest AO, distance as diff of this ST with ST of CO}}
@@ -68,7 +68,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	 * is sorted by the value of distance in ascending order
 	 * 
 	 */
-	private LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceSortedMap; //
+	private LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> startTimeDistanceSortedMap; //
 
 	/** Recommended Activity names with their rank score */
 	private LinkedHashMap<String, Double> recommendedActivityNamesWithRankscores;
@@ -167,7 +167,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 		{
 			this.hasCandidateTimelines = true;
 		}
-		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceUnsortedMap = getDistancesforCandidateTimeline(
+		LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> startTimeDistanceUnsortedMap = getDistancesforCandidateTimeline(
 				candidateTimelines, activityAtRecommPoint);
 		// activitiesGuidingRecomm);
 
@@ -179,7 +179,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 		}
 		// ##############
 
-		this.startTimeDistanceSortedMap = (LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>>) ComparatorUtils
+		this.startTimeDistanceSortedMap = (LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>>) ComparatorUtils
 				.sortByValueAscending5(startTimeDistanceUnsortedMap);
 
 		System.out.println("---------startTimeDistanceSortedMap.size()=" + startTimeDistanceSortedMap.size());
@@ -188,7 +188,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 			System.out.println(
 					">>>>>>>>>>>>>>startTimeDistanceSortedMap is:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n Date, Index of nearest, name of nearest, dist of nearest");
 			StringBuilder temp1 = new StringBuilder();
-			for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : startTimeDistanceSortedMap.entrySet())
+			for (Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> entry : startTimeDistanceSortedMap.entrySet())
 			{
 				temp1.append("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__"
 						+ entry.getValue().getSecond().getActivityName() + "__" + entry.getValue().getThird() + "\n");
@@ -211,12 +211,12 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	 * @return
 	 */
 	// used
-	public LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> getDistancesforCandidateTimeline(
-			LinkedHashMap<Date, Timeline> candidateTimelines, ActivityObject activityObjectAtRecommPoint)
+	public LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> getDistancesforCandidateTimeline(
+			LinkedHashMap<Date, Timeline> candidateTimelines, ActivityObject2018 activityObjectAtRecommPoint)
 	{
 		// <Date of CandidateTimeline, <Index for the nearest Activity Object, Diff of Start time of nearest Activity
 		// Object with start time of current Activity Object>
-		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> distances = new LinkedHashMap<>();
+		LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> distances = new LinkedHashMap<>();
 
 		for (Map.Entry<Date, Timeline> entry : candidateTimelines.entrySet())
 		{
@@ -224,7 +224,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
 			 * current Activity Object and the distance is diff of their start times
 			 */
-			Triple<Integer, ActivityObject, Double> score = (entry.getValue()
+			Triple<Integer, ActivityObject2018, Double> score = (entry.getValue()
 					.getTimeDiffValidAOInDayWithStartTimeNearestTo(activityObjectAtRecommPoint.getStartTimestamp()));
 			distances.put(entry.getKey(), score);
 			// System.out.println("now we put "+entry.getKey()+" and score="+score);
@@ -273,14 +273,14 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	 */
 	// used
 	public void createRankedTopRecommendedActivityNames(
-			LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> startTimeDistanceSortedMap)
+			LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> startTimeDistanceSortedMap)
 	{
 		System.out.println("Debug inside createRankedTopRecommendedActivityNames:");
 		int numberOfTopNextActivityObjects = startTimeDistanceSortedMap.size();
 
 		LinkedHashMap<String, Double> recommendedActivityNamesRankscorePairs = new LinkedHashMap<>(); // <ActivityName,RankScore>
 
-		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : startTimeDistanceSortedMap.entrySet())
+		for (Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> entry : startTimeDistanceSortedMap.entrySet())
 		{
 			String topNextActivityName = entry.getValue().getSecond().getActivityName();
 			Double rankScore = 1d - Math.min(1, (entry.getValue().getThird()) / timeInSecsForRankScoreNormalisation);
@@ -400,10 +400,10 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	{
 		StringBuffer result = new StringBuffer("");// String result="";
 
-		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : this.startTimeDistanceSortedMap
+		for (Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> entry : this.startTimeDistanceSortedMap
 				.entrySet())
 		{
-			Triple<Integer, ActivityObject, Double> tripleAO = entry.getValue();
+			Triple<Integer, ActivityObject2018, Double> tripleAO = entry.getValue();
 
 			result.append("__" + tripleAO.getSecond().getActivityName());// result=result+"__"+pairAE.getFirst().getActivityName();
 
@@ -421,10 +421,10 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	{
 		StringBuffer result = new StringBuffer("");// String result="";
 
-		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : this.startTimeDistanceSortedMap
+		for (Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> entry : this.startTimeDistanceSortedMap
 				.entrySet())
 		{
-			Triple<Integer, ActivityObject, Double> tripleAO = entry.getValue();
+			Triple<Integer, ActivityObject2018, Double> tripleAO = entry.getValue();
 
 			result.append("__" + tripleAO.getSecond().getActivityName() + ":" + tripleAO.getThird().toString());// result=result+"__"+pairAE.getFirst().getActivityName();
 		}
@@ -434,7 +434,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	public int getNumberOfValidActivitiesInActivitesGuidingRecommendation()
 	{
 		int count = 0;
-		for (ActivityObject ae : this.activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : this.activitiesGuidingRecomm)
 		{
 			if (!((ae.getActivityName().equalsIgnoreCase("Others"))
 					|| (ae.getActivityName().equalsIgnoreCase("Unknown"))))
@@ -463,7 +463,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 
 		else
 		{
-			ActivityObject activityJustAfterRecommPoint = userDayTimelineAtRecomm
+			ActivityObject2018 activityJustAfterRecommPoint = userDayTimelineAtRecomm
 					.getActivityObjectAtPosition(indexOfRecommPointInDayTimeline + 1);
 			if (activityJustAfterRecommPoint.getActivityName().equals("Unknown")
 					|| activityJustAfterRecommPoint.getActivityName().equals("Others"))
@@ -474,12 +474,12 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 		return this.nextActivityJustAfterRecommPointIsInvalid;
 	}
 
-	public LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> getStartDistancesSortedMap()
+	public LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> getStartDistancesSortedMap()
 	{
 		return this.startTimeDistanceSortedMap;
 	}
 
-	public ActivityObject getActivityObjectAtRecomm()
+	public ActivityObject2018 getActivityObjectAtRecomm()
 	{
 		return this.activityAtRecommPoint;
 	}
@@ -487,7 +487,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	public String getActivityNamesGuidingRecomm()
 	{
 		StringBuilder res = new StringBuilder();
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res.append(">>" + ae.getActivityName());
 		}
@@ -497,7 +497,7 @@ public class RecommendationMasterBaseClosestTimeMar2017 // implements Recommenda
 	public String getActivityNamesGuidingRecommwithTimestamps()
 	{
 		StringBuilder res = new StringBuilder();
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res.append("  " + ae.getActivityName() + "__" + ae.getStartTimestamp() + "_to_" + ae.getEndTimestamp());
 		}

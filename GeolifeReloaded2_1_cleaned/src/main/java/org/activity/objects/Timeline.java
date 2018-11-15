@@ -32,7 +32,7 @@ public class Timeline implements Serializable
 	 */
 	String timelineID;
 	boolean shouldBelongToSingleUser, shouldBelongToSingleDay;
-	ArrayList<ActivityObject> activityObjectsInTimeline;
+	ArrayList<ActivityObject2018> activityObjectsInTimeline;
 
 	/**
 	 * Keep count of the number of Timelines created until now
@@ -43,7 +43,7 @@ public class Timeline implements Serializable
 	 * 
 	 * @param aoToAppend
 	 */
-	public void appendAO(ActivityObject aoToAppend)
+	public void appendAO(ActivityObject2018 aoToAppend)
 	{
 		this.activityObjectsInTimeline.add(aoToAppend);
 	}
@@ -68,7 +68,7 @@ public class Timeline implements Serializable
 	 * @param shouldBelongToSingleUser
 	 *            <font color = orange>currently, not checking if the ao's belong to same user</font>
 	 */
-	public Timeline(ArrayList<ActivityObject> activityObjects, boolean shouldBelongToSingleDay,
+	public Timeline(ArrayList<ActivityObject2018> activityObjects, boolean shouldBelongToSingleDay,
 			boolean shouldBelongToSingleUser)
 	{
 		if (activityObjects.size() == 0)
@@ -154,10 +154,10 @@ public class Timeline implements Serializable
 	 * @param activityObjects
 	 * @return
 	 */
-	public static String getTimelineIDFromAOs(ArrayList<ActivityObject> activityObjects)
+	public static String getTimelineIDFromAOs(ArrayList<ActivityObject2018> activityObjects)
 	{
 		// String timelineID = "-1";
-		ActivityObject firstActivityObject = activityObjects.get(0);
+		ActivityObject2018 firstActivityObject = activityObjects.get(0);
 		// $$ActivityObject lastActivityObject = activityObjects.get(activityObjects.size() - 1);
 
 		// timelineID = firstActivityObject.getUserID() + "_" + (firstActivityObject.getStartTimestampInms() / 1000) +
@@ -179,7 +179,7 @@ public class Timeline implements Serializable
 	{
 		HashSet<String> set = new HashSet<String>();
 
-		for (ActivityObject ao : activityObjectsInTimeline)
+		for (ActivityObject2018 ao : activityObjectsInTimeline)
 		{
 			String actName = ao.getActivityName();
 			if (UtilityBelt.isValidActivityName(actName))
@@ -198,7 +198,7 @@ public class Timeline implements Serializable
 	public int countNumberOfValidActivities()
 	{
 		int count = 0;
-		for (ActivityObject ao : activityObjectsInTimeline)
+		for (ActivityObject2018 ao : activityObjectsInTimeline)
 		{
 			String actName = ao.getActivityName();
 			if (UtilityBelt.isValidActivityName(actName))
@@ -209,7 +209,7 @@ public class Timeline implements Serializable
 		return count;
 	}
 
-	public ActivityObject getNextValidActivityAfterActivityAtThisTime(Timestamp timestamp)
+	public ActivityObject2018 getNextValidActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
 		// System.out.println("To find next activity object at :"+timestamp);
 		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectAtTime(timestamp);
@@ -224,9 +224,9 @@ public class Timeline implements Serializable
 	 * @param indexOfActivityObject
 	 * @return
 	 */
-	public ActivityObject getNextValidActivityAfterActivityAtThisPosition(int indexOfActivityObject)
+	public ActivityObject2018 getNextValidActivityAfterActivityAtThisPosition(int indexOfActivityObject)
 	{
-		ActivityObject nextValidActivityObject = null;
+		ActivityObject2018 nextValidActivityObject = null;
 		int indexOfNextValidActivityObject = -99;
 
 		if (indexOfActivityObject == this.activityObjectsInTimeline.size() - 1)// there are no next activities
@@ -290,9 +290,9 @@ public class Timeline implements Serializable
 	 * @param indexOfActivityObject
 	 * @return
 	 */
-	public ActivityObject getNextValidActivityAfterActivityAtThisPositionPD(int indexOfActivityObject)
+	public ActivityObject2018 getNextValidActivityAfterActivityAtThisPositionPD(int indexOfActivityObject)
 	{
-		ActivityObject nextValidActivityObject = null;
+		ActivityObject2018 nextValidActivityObject = null;
 		int indexOfNextValidActivityObject = -99;
 
 		if (indexOfActivityObject == this.activityObjectsInTimeline.size() - 1)// there are no next activities
@@ -404,7 +404,7 @@ public class Timeline implements Serializable
 	public String getActivityObjectNamesInSequenceWithFeatures()
 	{
 		String res = "";
-		for (ActivityObject ao : activityObjectsInTimeline)
+		for (ActivityObject2018 ao : activityObjectsInTimeline)
 		{
 			res += (" >>" + ao.getActivityName() + "--" + ao.getStartTimestamp() + "--" + ao.getDurationInSeconds());
 		}
@@ -501,7 +501,7 @@ public class Timeline implements Serializable
 	 * 
 	 * @return
 	 */
-	public ArrayList<ActivityObject> getActivityObjectsInTimeline()
+	public ArrayList<ActivityObject2018> getActivityObjectsInTimeline()
 	{
 		return this.activityObjectsInTimeline;
 	}
@@ -523,7 +523,7 @@ public class Timeline implements Serializable
 	 *            <font color = orange>exclusive</font>
 	 * @return ArrayList of Activity Objects in the timeline from the 'from' index until before the 'to' index
 	 */
-	public ArrayList<ActivityObject> getActivityObjectsInTimelineFromToIndex(int from, int to) // to is exclusive
+	public ArrayList<ActivityObject2018> getActivityObjectsInTimelineFromToIndex(int from, int to) // to is exclusive
 	{
 		if (to > this.activityObjectsInTimeline.size())
 		{
@@ -533,7 +533,7 @@ public class Timeline implements Serializable
 			return null;
 		}
 
-		ArrayList<ActivityObject> newList = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> newList = new ArrayList<ActivityObject2018>();
 		for (int i = from; i < to; i++)
 		{
 			newList.add(this.activityObjectsInTimeline.get(i));
@@ -786,7 +786,7 @@ public class Timeline implements Serializable
 	{
 		Timestamp timestampOfFirstOccurrence = null;
 
-		for (ActivityObject ao : this.activityObjectsInTimeline)
+		for (ActivityObject2018 ao : this.activityObjectsInTimeline)
 		{
 			if (ao.getActivityName().equals(activityNameToCheck))
 			{
@@ -811,10 +811,10 @@ public class Timeline implements Serializable
 	 * @param timestamp
 	 * @return nextActivityAfterActivityAtThisTime, null otherwise
 	 */
-	public ActivityObject getNextActivityAfterActivityAtThisTime(Timestamp timestamp)
+	public ActivityObject2018 getNextActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
 		// System.out.println("To find next activity object at :"+timestamp);
-		ActivityObject ae = activityObjectsInTimeline.get(getIndexOfActivityObjectAtTime(timestamp) + 1);
+		ActivityObject2018 ae = activityObjectsInTimeline.get(getIndexOfActivityObjectAtTime(timestamp) + 1);
 		if (ae == null)
 		{
 			System.err.println(PopUps.getTracedErrorMsg(
@@ -828,9 +828,9 @@ public class Timeline implements Serializable
 	 * @param index
 	 * @return
 	 */
-	public ActivityObject getNextActivityAfterActivityAtThisPosition(int index)
+	public ActivityObject2018 getNextActivityAfterActivityAtThisPosition(int index)
 	{
-		ActivityObject ae = null;
+		ActivityObject2018 ae = null;
 		// System.out.println("To find next activity object at :"+timestamp);
 		if (index + 1 > activityObjectsInTimeline.size() - 1)
 		{
@@ -851,9 +851,9 @@ public class Timeline implements Serializable
 	 * @param verbose
 	 * @return
 	 */
-	public ArrayList<ActivityObject> getActivityObjectsBetweenTime(Timestamp st, Timestamp et)
+	public ArrayList<ActivityObject2018> getActivityObjectsBetweenTime(Timestamp st, Timestamp et)
 	{
-		ArrayList<ActivityObject> activityObjectsIn = (ArrayList<ActivityObject>) activityObjectsInTimeline.stream()
+		ArrayList<ActivityObject2018> activityObjectsIn = (ArrayList<ActivityObject2018>) activityObjectsInTimeline.stream()
 				.filter(ao -> ao.doesOverlap(st, et)).collect(Collectors.toList());
 
 		// ArrayList<ActivityObject> activityObjectsIn2 = new ArrayList<>();
@@ -892,7 +892,7 @@ public class Timeline implements Serializable
 		int numOfAOsInTimeline = this.activityObjectsInTimeline.size();
 		for (int i = 0; i < numOfAOsInTimeline; i++)
 		{
-			ActivityObject ao = activityObjectsInTimeline.get(i);
+			ActivityObject2018 ao = activityObjectsInTimeline.get(i);
 			if (ao.getStartTimestampInms() <= givenTimeInms && ao.getEndTimestampInms() >= givenTimeInms)
 			{
 				res.add(i);
@@ -924,12 +924,12 @@ public class Timeline implements Serializable
 	 * @param ts
 	 * @return
 	 */
-	public ActivityObject getActivityObjectAtTime(Timestamp ts)
+	public ActivityObject2018 getActivityObjectAtTime(Timestamp ts)
 	{
-		ArrayList<ActivityObject> res = new ArrayList<>(1);
+		ArrayList<ActivityObject2018> res = new ArrayList<>(1);
 
 		long givenTSInms = ts.getTime();
-		for (ActivityObject ao : activityObjectsInTimeline)
+		for (ActivityObject2018 ao : activityObjectsInTimeline)
 		{
 			if (ao.getStartTimestampInms() <= givenTSInms && ao.getEndTimestampInms() >= givenTSInms)
 			{
@@ -958,9 +958,9 @@ public class Timeline implements Serializable
 	 * @param startTimestamp
 	 * @return
 	 */
-	public ArrayList<ActivityObject> getActivityObjectsStartingOnBeforeTime(Timestamp startTimestamp)
+	public ArrayList<ActivityObject2018> getActivityObjectsStartingOnBeforeTime(Timestamp startTimestamp)
 	{
-		return (ArrayList<ActivityObject>) activityObjectsInTimeline.stream()
+		return (ArrayList<ActivityObject2018>) activityObjectsInTimeline.stream()
 				.filter(ao -> ao.startsOnOrBefore(startTimestamp)).collect(Collectors.toList());
 	}
 
@@ -969,11 +969,11 @@ public class Timeline implements Serializable
 	 * @param startTimestamp
 	 * @return
 	 */
-	public ArrayList<ActivityObject> getActivityObjectsStartingOnBeforeTimeSameDay(Timestamp startTimestamp)
+	public ArrayList<ActivityObject2018> getActivityObjectsStartingOnBeforeTimeSameDay(Timestamp startTimestamp)
 	{
 		Date dateGiven = DateTimeUtils.getDate(startTimestamp);
 
-		return (ArrayList<ActivityObject>) activityObjectsInTimeline.stream()
+		return (ArrayList<ActivityObject2018>) activityObjectsInTimeline.stream()
 				.filter(ao -> ao.startsOnOrBefore(startTimestamp)).filter(ao -> ao.getEndDate().equals(dateGiven))
 				.collect(Collectors.toList());
 	}
@@ -984,7 +984,7 @@ public class Timeline implements Serializable
 	 * @param n
 	 * @return
 	 */
-	public ActivityObject getActivityObjectAtPosition(int n)
+	public ActivityObject2018 getActivityObjectAtPosition(int n)
 	{
 		return this.activityObjectsInTimeline.get(n);
 	}
@@ -1048,7 +1048,7 @@ public class Timeline implements Serializable
 	 * 
 	 * @return list of activity objects
 	 */
-	public ArrayList<ActivityObject> getActivityObjectsInDay()
+	public ArrayList<ActivityObject2018> getActivityObjectsInDay()
 	{
 		if (!this.shouldBelongToSingleDay)
 		{
@@ -1132,7 +1132,7 @@ public class Timeline implements Serializable
 	 * @return a Triple (indexOfActivityObject with nearest start time to given timestamp, that activity object, abs
 	 *         time difference in secs between the st of this ao and st of current ao t)
 	 */
-	public Triple<Integer, ActivityObject, Double> getTimeDiffValidAOInDayWithStartTimeNearestTo(Timestamp t)
+	public Triple<Integer, ActivityObject2018, Double> getTimeDiffValidAOInDayWithStartTimeNearestTo(Timestamp t)
 	{
 		if (!this.isShouldBelongToSingleDay())
 		{
@@ -1175,7 +1175,7 @@ public class Timeline implements Serializable
 					+ indexOfActivityObjectNearestST + " with time diff of " + leastDistantSTVal);
 		}
 
-		return new Triple<Integer, ActivityObject, Double>(indexOfActivityObjectNearestST,
+		return new Triple<Integer, ActivityObject2018, Double>(indexOfActivityObjectNearestST,
 				this.activityObjectsInTimeline.get(indexOfActivityObjectNearestST), (double) leastDistantSTVal);
 	}
 
@@ -1196,7 +1196,7 @@ public class Timeline implements Serializable
 	 * 
 	 * @since 12 June 2017
 	 */
-	public Triple<Integer, ActivityObject, Double> getTimeDiffValidAOWithStartTimeNearestTo(Timestamp givenTimestamp,
+	public Triple<Integer, ActivityObject2018, Double> getTimeDiffValidAOWithStartTimeNearestTo(Timestamp givenTimestamp,
 			boolean verbose)
 	{
 		long givenTimestampLong = givenTimestamp.getTime();
@@ -1233,7 +1233,7 @@ public class Timeline implements Serializable
 			}
 		}
 
-		ActivityObject nearestActObj = this.activityObjectsInTimeline.get(indexOfActivityObjectNearestST);
+		ActivityObject2018 nearestActObj = this.activityObjectsInTimeline.get(indexOfActivityObjectNearestST);
 		if (verbose)
 		{
 			// System.out.println("timeline = ");
@@ -1244,7 +1244,7 @@ public class Timeline implements Serializable
 					+ "secs act name = " + nearestActObj.getActivityName());
 		}
 
-		return new Triple<Integer, ActivityObject, Double>(indexOfActivityObjectNearestST, nearestActObj,
+		return new Triple<Integer, ActivityObject2018, Double>(indexOfActivityObjectNearestST, nearestActObj,
 				(double) leastDistantSTVal);
 	}
 

@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.activity.constants.Constant;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineTrimmers;
@@ -24,7 +24,7 @@ public class ExperimentDistances
 		traverseArrayOfTimelines(arrayOfTimelines);
 		getSizeOfTimelines(arrayOfTimelines);
 
-		ArrayList<ArrayList<ActivityObject>> arrOfArrActObject = getActivityObjectsSubList(arrayOfTimelines.get(0),
+		ArrayList<ArrayList<ActivityObject2018>> arrOfArrActObject = getActivityObjectsSubList(arrayOfTimelines.get(0),
 				arrayOfTimelines.get(1), 0, 10);
 
 		OTMDSAMEditDistance otDist = new OTMDSAMEditDistance(Constant.primaryDimension);
@@ -80,10 +80,10 @@ public class ExperimentDistances
 		System.out.println();
 	}
 
-	public static ArrayList<ActivityObject> getActivityObjectsSubList(Timeline t1, int startIndex, int endIndex)
+	public static ArrayList<ActivityObject2018> getActivityObjectsSubList(Timeline t1, int startIndex, int endIndex)
 	{
 		System.out.println("Inside getActivityObjectsSubList");
-		ArrayList<ActivityObject> a1 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> a1 = new ArrayList<ActivityObject2018>();
 		try
 		{
 			a1 = t1.getActivityObjectsInTimelineFromToIndex(startIndex, endIndex);
@@ -99,16 +99,16 @@ public class ExperimentDistances
 		return a1;
 	}
 
-	public static ArrayList<ArrayList<ActivityObject>> getActivityObjectsSubList(Timeline t1, Timeline t2,
+	public static ArrayList<ArrayList<ActivityObject2018>> getActivityObjectsSubList(Timeline t1, Timeline t2,
 			int startIndex, int endIndex)
 	{
 		System.out.println("Inside getActivityObjectsSubList");
-		ArrayList<ArrayList<ActivityObject>> arrArr = new ArrayList<ArrayList<ActivityObject>>();
+		ArrayList<ArrayList<ActivityObject2018>> arrArr = new ArrayList<ArrayList<ActivityObject2018>>();
 		try
 		{
-			ArrayList<ActivityObject> a1 = new ArrayList<>();
+			ArrayList<ActivityObject2018> a1 = new ArrayList<>();
 
-			ArrayList<ActivityObject> a2 = new ArrayList<>();
+			ArrayList<ActivityObject2018> a2 = new ArrayList<>();
 
 			a1 = t1.getActivityObjectsInTimelineFromToIndex(startIndex, endIndex);
 			a2 = t2.getActivityObjectsInTimelineFromToIndex(startIndex, endIndex);

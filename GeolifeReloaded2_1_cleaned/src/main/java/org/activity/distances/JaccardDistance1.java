@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Enums.PrimaryDimension;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.sanityChecks.Sanity;
 
 public class JaccardDistance1 implements DistMetricI
@@ -19,7 +19,7 @@ public class JaccardDistance1 implements DistMetricI
 	 * org.activity.constants.Enums.PrimaryDimension)
 	 */
 	@Override
-	public double getDistance(ArrayList<ActivityObject> t1, ArrayList<ActivityObject> t2,
+	public double getDistance(ArrayList<ActivityObject2018> t1, ArrayList<ActivityObject2018> t2,
 			PrimaryDimension givenDimension)
 	{
 		Set<Integer> pdVals1 = t1.stream().map(ao -> ao.getGivenDimensionVal(givenDimension)).flatMap(v -> v.stream())

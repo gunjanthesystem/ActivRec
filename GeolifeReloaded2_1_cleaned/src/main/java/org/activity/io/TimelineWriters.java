@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Dimension;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Timeline;
@@ -74,7 +74,7 @@ public class TimelineWriters
 	{
 		String delimiter = ",";
 		WToFile.appendLineToFileAbs(
-				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+				"User" + delimiter + ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
 				abFileNameToWrite);
 
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userData : usersCleanedDayTimelines.entrySet())
@@ -84,7 +84,7 @@ public class TimelineWriters
 			for (Entry<Date, Timeline> timeline : userData.getValue().entrySet())
 			{
 				StringBuilder sbForThisTimeline = new StringBuilder();
-				for (ActivityObject ao : timeline.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : timeline.getValue().getActivityObjectsInTimeline())
 				{
 					sbForThisTimeline
 							.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
@@ -108,7 +108,7 @@ public class TimelineWriters
 	{
 		String delimiter = ",";
 		WToFile.appendLineToFileAbs(
-				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+				"User" + delimiter + ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
 				abFileNameToWrite);
 
 		for (Entry<String, Timeline> userData : usersTimelines.entrySet())
@@ -116,7 +116,7 @@ public class TimelineWriters
 			String user = userData.getKey();
 
 			StringBuilder sbForThisTimeline = new StringBuilder();
-			for (ActivityObject ao : userData.getValue().getActivityObjectsInTimeline())
+			for (ActivityObject2018 ao : userData.getValue().getActivityObjectsInTimeline())
 			{
 				sbForThisTimeline.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
 			}
@@ -139,7 +139,7 @@ public class TimelineWriters
 	{
 		String delimiter = ",";
 		WToFile.appendLineToFileAbs(
-				"User" + delimiter + ActivityObject.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+				"User" + delimiter + ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
 				abFileNameToWrite);
 
 		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> userData : trainTestTimelinesForAllUsersDW.entrySet())
@@ -149,7 +149,7 @@ public class TimelineWriters
 			for (Entry<Date, Timeline> timeline : userData.getValue().get(1).entrySet())
 			{
 				StringBuilder sbForThisTimeline = new StringBuilder();
-				for (ActivityObject ao : timeline.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : timeline.getValue().getActivityObjectsInTimeline())
 				{
 					sbForThisTimeline
 							.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
@@ -227,7 +227,7 @@ public class TimelineWriters
 				String userID = userEntry.getKey();
 				ZoneId fallbackZoneId = null;
 
-				for (ActivityObject ao : userEntry.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : userEntry.getValue().getActivityObjectsInTimeline())
 				{
 					numOfAOs += 1;
 
@@ -403,7 +403,7 @@ public class TimelineWriters
 				ZoneId fallbackZoneId = null;
 				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
 				{
-					for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : dateEntry.getValue().getActivityObjectsInTimeline())
 					{
 						numOfAOs += 1;
 
@@ -563,7 +563,7 @@ public class TimelineWriters
 	
 	}
 
-	public static void traverseTimelines(HashMap<String, ArrayList<ActivityObject>> timeLines)
+	public static void traverseTimelines(HashMap<String, ArrayList<ActivityObject2018>> timeLines)
 	{
 		System.out.println("----------------Traversing Timelines----------");
 	
@@ -573,13 +573,13 @@ public class TimelineWriters
 			Map.Entry pairs = (Map.Entry) it.next();
 	
 			String id = pairs.getKey().toString();
-			ArrayList<ActivityObject> activityEvents = (ArrayList<ActivityObject>) pairs.getValue();
+			ArrayList<ActivityObject2018> activityEvents = (ArrayList<ActivityObject2018>) pairs.getValue();
 	
 			System.out.println("Timeline for id = " + id);
 	
 			System.out.println("Number of Activity Events =" + activityEvents.size());
 	
-			for (ActivityObject ae : activityEvents)
+			for (ActivityObject2018 ae : activityEvents)
 			{
 				System.out.print("Activity Name= " + ae.getActivityName());
 				System.out.print("Start Time= " + ae.getStartTimestamp());

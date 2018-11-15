@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 
@@ -31,8 +31,8 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	 * @return OTMDSAM Edit Distance between the two activity objects
 	 */
 	@SuppressWarnings("unchecked")
-	public Pair<String, Double> getOTMDSAMEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
-			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
+	public Pair<String, Double> getOTMDSAMEditDistanceWithTrace(ArrayList<ActivityObject2018> activityObjects1Original,
+			ArrayList<ActivityObject2018> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
 			String timeAtRecomm, String candidateTimelineId)
 	{
 		if (VerbosityConstants.verboseOTMDSAM)
@@ -42,8 +42,8 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 					+ activityObjects2Original.size() + " objs");
 		}
 
-		ArrayList<ActivityObject> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
-		ArrayList<ActivityObject> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
+		ArrayList<ActivityObject2018> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
+		ArrayList<ActivityObject2018> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
 
 		LinkedHashMap<String, Pair<String, Double>> featureWiseEditDistance = new FeatureWiseEditDistance(
 				primaryDimension).getFeatureWiseEditDistanceWithTrace(activityObjects1, activityObjects2);
@@ -228,13 +228,13 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final Pair<String, Double> getOTMDSAMEditDistanceWithoutEndCurrentActivity(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
+			ArrayList<ActivityObject2018> activityObjects1Original, ArrayList<ActivityObject2018> activityObjects2Original,
 			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
-		ArrayList<ActivityObject> activityObjects1 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects1 = new ArrayList<ActivityObject2018>();
 		activityObjects1.addAll(activityObjects1Original);
 
-		ArrayList<ActivityObject> activityObjects2 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects2 = new ArrayList<ActivityObject2018>();
 		activityObjects2.addAll(activityObjects2Original);
 
 		activityObjects1.remove(activityObjects1.size() - 1);
@@ -257,8 +257,8 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public final Pair<String, Double> getOTMDSAMEditDistanceInvalidsExpunged(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
+	public final Pair<String, Double> getOTMDSAMEditDistanceInvalidsExpunged(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			String candidateTimelineId)
 	{
 		return getOTMDSAMEditDistanceWithTrace(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2),
@@ -276,7 +276,7 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final Pair<String, Double> getOTMDSAMEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2, String userAtRecomm,
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		return getOTMDSAMEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1),
@@ -358,8 +358,8 @@ public class OTMDSAMEditDistance extends AlignmentBasedDistance
 
 	// /////////
 
-	public void getFeatureStringLevenshteinSAXWithTrace(ArrayList<ActivityObject> activityObjectsSubList,
-			ArrayList<ActivityObject> activityObjectsSubList2)
+	public void getFeatureStringLevenshteinSAXWithTrace(ArrayList<ActivityObject2018> activityObjectsSubList,
+			ArrayList<ActivityObject2018> activityObjectsSubList2)
 	{
 		// TODO Auto-generated method stub
 

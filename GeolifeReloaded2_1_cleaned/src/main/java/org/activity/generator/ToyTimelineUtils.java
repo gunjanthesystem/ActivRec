@@ -20,7 +20,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Timeline;
 import org.activity.sanityChecks.Sanity;
@@ -239,7 +239,7 @@ public class ToyTimelineUtils
 			for (int d = 0; d < numOfDays; d++)
 			{
 				// Timeline timelineForThisDay = new Timeline(new ArrayList<>(), true, true);
-				ArrayList<ActivityObject> aosForThisDay = new ArrayList<>();
+				ArrayList<ActivityObject2018> aosForThisDay = new ArrayList<>();
 				// timelineForThisDay.isShouldBelongToSingleDay()
 				// Date dateForThisUserThisDay = DateTimeUtils.getDate(new Timestamp(startTSForThisUserThisDay));
 				// long maxAllowableTSForThisDay = dateForThisUserThisDay.getTime();
@@ -353,7 +353,7 @@ public class ToyTimelineUtils
 					// int gridIndex = 0;// added on 6 Aug 2018
 					int gridIndex = TimelineUtils.getGridIndex(locIDs, locIDGridIndexMap, userID,
 							new Timestamp(timestampOfCurrentAOThisUser));
-					ActivityObject ao = new ActivityObject(randomActIDForCurrentAO, locIDs,
+					ActivityObject2018 ao = new ActivityObject2018(randomActIDForCurrentAO, locIDs,
 							String.valueOf(randomActIDForCurrentAO), locationName,
 							new Timestamp(timestampOfCurrentAOThisUser), startLatitude, startLongitude, startAltitude,
 							userID, photos_count, checkins_count, users_count, radius_meters, highlights_count,
@@ -398,7 +398,7 @@ public class ToyTimelineUtils
 			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
 			{
 				sbTS.append("\n" + dE.getKey().toString());
-				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dE.getValue().getActivityObjectsInTimeline())
 				{
 					sbTS.append(">>" + ao.getStartTimestamp());
 				}
@@ -420,7 +420,7 @@ public class ToyTimelineUtils
 			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
 			{
 				sbTS.append("\n" + dE.getKey().toString());
-				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dE.getValue().getActivityObjectsInTimeline())
 				{
 					sbTS.append(">>" + ao.getActivityID());
 				}
@@ -447,7 +447,7 @@ public class ToyTimelineUtils
 			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
 			{
 				sbTS.append("\n" + dE.getKey().toString());
-				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dE.getValue().getActivityObjectsInTimeline())
 				{
 					sbTS.append(">>" + ao.getGivenDimensionVal("_", givenDimension));
 				}
@@ -467,7 +467,7 @@ public class ToyTimelineUtils
 			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
 			{
 				// sbTS.append("\n" + dE.getKey().toString());
-				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dE.getValue().getActivityObjectsInTimeline())
 				{
 					sbTS.append(">>" + ao.getActivityID());
 				}
@@ -487,7 +487,7 @@ public class ToyTimelineUtils
 			for (Entry<Date, Timeline> dE : uE.getValue().entrySet())
 			{
 				// sbTS.append("\n" + dE.getKey().toString());
-				for (ActivityObject ao : dE.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dE.getValue().getActivityObjectsInTimeline())
 				{
 					sbTS.append(">>" + ao.getActivityID() + "-" + ao.getStartTimestamp());
 				}

@@ -16,7 +16,7 @@ public class TimelineWithNext extends Timeline
 	/**
 	 * currently the nextActivityObject is set to be always a valid ActivityObject
 	 */
-	ActivityObject nextActivityObject; //
+	ActivityObject2018 nextActivityObject; //
 	/**
 	 * -1 means 'not determined yet', '0' means 'was not invalid', '1' means 'was invalid'
 	 */
@@ -31,14 +31,14 @@ public class TimelineWithNext extends Timeline
 	 * @param shouldBelongToSingleDay
 	 * @param shouldBelongToSingleUser
 	 */
-	public TimelineWithNext(ArrayList<ActivityObject> activityObjects, ActivityObject nextActivityObject,
+	public TimelineWithNext(ArrayList<ActivityObject2018> activityObjects, ActivityObject2018 nextActivityObject,
 			boolean shouldBelongToSingleDay, boolean shouldBelongToSingleUser)
 	{
 		super(activityObjects, shouldBelongToSingleDay, shouldBelongToSingleUser);
 		this.nextActivityObject = nextActivityObject;
 	}
 
-	public ActivityObject getNextActivityObject()
+	public ActivityObject2018 getNextActivityObject()
 	{
 		return this.nextActivityObject;
 	}

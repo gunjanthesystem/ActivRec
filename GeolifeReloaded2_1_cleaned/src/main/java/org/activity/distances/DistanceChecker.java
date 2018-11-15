@@ -11,7 +11,7 @@ import org.activity.constants.PathConstants;
 import org.activity.generator.ToyTimelineUtils;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.stats.StatsUtils;
 import org.activity.util.DateTimeUtils;
@@ -73,14 +73,14 @@ public class DistanceChecker
 		ToyTimelineUtils.writeOnlyActIDs2(usersToyDayTimelines, commonPath + "ToyTimelinesOnlyActIDs2.csv");
 		ToyTimelineUtils.writeActIDTS(usersToyDayTimelines, commonPath + "ToyTimelinesActIDTS.csv");
 
-		List<ArrayList<ActivityObject>> allDayTimelines = usersToyDayTimelines.entrySet().stream()
+		List<ArrayList<ActivityObject2018>> allDayTimelines = usersToyDayTimelines.entrySet().stream()
 				.map(e -> e.getValue()).flatMap(v -> v.entrySet().stream())
 				.map(e -> e.getValue().getActivityObjectsInTimeline()).collect(Collectors.toList());
 
 		StringBuilder sb = new StringBuilder();
-		for (ArrayList<ActivityObject> timeline : allDayTimelines)
+		for (ArrayList<ActivityObject2018> timeline : allDayTimelines)
 		{
-			for (ActivityObject ao : timeline)
+			for (ActivityObject2018 ao : timeline)
 			{
 				sb.append(">>" + ao.getGivenDimensionVal("_", givenDimension));
 			}
@@ -104,15 +104,15 @@ public class DistanceChecker
 	 * @param absFileNameToWrite
 	 */
 	private static void computeDistances(PrimaryDimension givenDimension, String commonPath,
-			List<ArrayList<ActivityObject>> allDayTimelines, DistMetricI distMetric, String absFileNameToWrite)
+			List<ArrayList<ActivityObject2018>> allDayTimelines, DistMetricI distMetric, String absFileNameToWrite)
 	{
 		StringBuilder sb2 = new StringBuilder("timeline1Length, timeline2Length, distance,timeline1,timeline2\n");
-		for (ArrayList<ActivityObject> timeline1 : allDayTimelines)
+		for (ArrayList<ActivityObject2018> timeline1 : allDayTimelines)
 		{
 			String timeline1String = timeline1.stream().map(ao -> ao.getGivenDimensionVal("_", givenDimension))
 					.collect(Collectors.joining(">>"));
 
-			for (ArrayList<ActivityObject> timeline2 : allDayTimelines)
+			for (ArrayList<ActivityObject2018> timeline2 : allDayTimelines)
 			{
 				String timeline2String = timeline2.stream().map(ao -> ao.getGivenDimensionVal("_", givenDimension))
 						.collect(Collectors.joining(">>"));

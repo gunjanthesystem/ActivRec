@@ -17,7 +17,7 @@ import org.activity.constants.Enums;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
@@ -128,7 +128,7 @@ public class TimelineExtractors
 	public static Pair<TimelineWithNext, Double> extractCurrentTimelineSeq(
 			LinkedHashMap<Date, Timeline> testTimelinesOrig, LookPastType lookPastType, Date dateAtRecomm,
 			Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsOrHours,
-			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
+			ArrayList<ActivityObject2018> actObjsToAddToCurrentTimeline)
 	{
 		// System.out.println("called extractCurrentTimelineSeq");
 		Pair<TimelineWithNext, Double> extractedCurrentTimelineResult = extractCurrentTimeline(testTimelinesOrig,
@@ -137,7 +137,7 @@ public class TimelineExtractors
 		TimelineWithNext extractedCurrentTimeline = extractedCurrentTimelineResult.getFirst();
 		System.out.println("actObjsToAddToCurrentTimeline.size() = " + actObjsToAddToCurrentTimeline.size());
 		// //////////////////
-		ArrayList<ActivityObject> actObjsForCurrTimeline = new ArrayList<>(
+		ArrayList<ActivityObject2018> actObjsForCurrTimeline = new ArrayList<>(
 				extractedCurrentTimeline.getActivityObjectsInTimeline());
 
 		// sanity check is act objs to add are later than act objs in timeline
@@ -213,7 +213,7 @@ public class TimelineExtractors
 	public static LinkedHashMap<String, Timeline> extractCandidateTimelines(
 			LinkedHashMap<Date, Timeline> trainingTimelineOrig, LookPastType lookPastType, Date dateAtRecomm,
 			/* Time timeAtRecomm, */ String userIDAtRecomm, double matchingUnitInCountsOrHours,
-			ActivityObject activityAtRecommPoint,
+			ActivityObject2018 activityAtRecommPoint,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersOrig,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
@@ -395,7 +395,7 @@ public class TimelineExtractors
 	 *             the case (Constant.numOfCandsFromEachCollUser > 0)
 	 */
 	public static LinkedHashMap<String, Timeline> extractDaywiseCandidateTimelinesColl(Date dateAtRecomm,
-			String userIDAtRecomm, ActivityObject activityAtRecommPoint,
+			String userIDAtRecomm, ActivityObject2018 activityAtRecommPoint,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			boolean only1CandFromEachCollUser, boolean onlyPastFromRecommDateInCandInColl)
 	{
@@ -490,7 +490,7 @@ public class TimelineExtractors
 	public static LinkedHashMap<String, Timeline> extractCandidateTimelinesV2(
 			LinkedHashMap<Date, Timeline> trainingTimelineOrig, LookPastType lookPastType, Date dateAtRecomm,
 			/* Time timeAtRecomm, */ String userIDAtRecomm, double matchingUnitInCountsOrHours,
-			ActivityObject activityAtRecommPoint,
+			ActivityObject2018 activityAtRecommPoint,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersOrig,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
@@ -675,7 +675,7 @@ public class TimelineExtractors
 	 * @since Aug 5 2018
 	 */
 	public static LinkedHashMap<String, Timeline> extractDaywiseCandidateTimelinesCollV2(Date dateAtRecomm,
-			String userIDAtRecomm, ActivityObject activityAtRecommPoint,
+			String userIDAtRecomm, ActivityObject2018 activityAtRecommPoint,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			boolean only1CandFromEachCollUser, boolean onlyPastFromRecommDateInCandInColl)
 	{
@@ -864,7 +864,7 @@ public class TimelineExtractors
 	 * @since 15Aug 2017
 	 */
 	private static LinkedHashMap<String, Timeline> extractCandidateTimelinesClosestTimeColl(
-			ActivityObject activityAtRecommPoint, String userIDAtRecomm,
+			ActivityObject2018 activityAtRecommPoint, String userIDAtRecomm,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, int hoursExtension)
 	{
 		LinkedHashMap<String, Timeline> candidateTimelines = new LinkedHashMap<>();
@@ -893,7 +893,7 @@ public class TimelineExtractors
 				// System.out.println("userIDAtRecomm=" + userIDAtRecomm + " userIdCursor=" + userIdCursor);
 				// find the most recent occurrence of current activity name
 				// get training timeline
-				ArrayList<ActivityObject> activityObjectsInTraining = trainingTimelineForThisUser
+				ArrayList<ActivityObject2018> activityObjectsInTraining = trainingTimelineForThisUser
 						.getActivityObjectsInTimeline();
 
 				// System.out.println("Num of activity objects in training timeline=" +
@@ -909,7 +909,7 @@ public class TimelineExtractors
 				for (int i = activityObjectsInTraining.size() - 2; i >= 0; i--)
 				// for (int i = 0; i < activityObjectsInTraining.size() - 1; i++)
 				{
-					ActivityObject ae = activityObjectsInTraining.get(i);
+					ActivityObject2018 ae = activityObjectsInTraining.get(i);
 					// numOfAOsCompared += 1;
 					// System.out.println("ae = " + ae.getPrimaryDimensionVal("/"));
 					// System.out.println("activityAtRecommPoint:" + activityAtRecommPoint.getPrimaryDimensionVal("/"));
@@ -945,7 +945,7 @@ public class TimelineExtractors
 						Timestamp newStartTS = new Timestamp(
 								ae.getEndTimestampInms() - (hoursExtension * 60 * 60 * 1000));
 
-						ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimelineForThisUser
+						ArrayList<ActivityObject2018> activityObjectsForCandidate = trainingTimelineForThisUser
 								.getActivityObjectsBetweenTime(newStartTS, newEndTS);
 
 						// int newCandStartIndex = (newCandAnchorIndex - matchingUnitInCounts) >= 0
@@ -1050,7 +1050,7 @@ public class TimelineExtractors
 	 */
 	public static LinkedHashMap<Date, Timeline> extractDaywiseCandidateTimelines(
 			LinkedHashMap<Date, Timeline> dayTimelinesForUser, // ArrayList<ActivityObject> activitiesGuidingRecomm,
-			Date dateAtRecomm, ActivityObject activityAtRecommPoint)
+			Date dateAtRecomm, ActivityObject2018 activityAtRecommPoint)
 	{
 		LinkedHashMap<Date, Timeline> candidateTimelines = new LinkedHashMap<>();
 		int count = 0;
@@ -1184,7 +1184,7 @@ public class TimelineExtractors
 	 * @return
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMU(Timeline trainingTimeline,
-			double matchingUnit, Enums.LookPastType lookPastType, ActivityObject activityAtRecommPoint)
+			double matchingUnit, Enums.LookPastType lookPastType, ActivityObject2018 activityAtRecommPoint)
 	{
 		if (lookPastType.equals(Enums.LookPastType.NCount))// IgnoreCase("Count"))
 		{
@@ -1223,7 +1223,7 @@ public class TimelineExtractors
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUColl(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
-			double matchingUnit, LookPastType lookPastType, ActivityObject activityAtRecommPoint, String userIDAtRecomm,
+			double matchingUnit, LookPastType lookPastType, ActivityObject2018 activityAtRecommPoint, String userIDAtRecomm,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
 		System.out.println("Inside extractCandidateTimelinesMUColl :trainTestTimelinesForAllUsers.size()= "
@@ -1276,7 +1276,7 @@ public class TimelineExtractors
 	 * @return
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUColl(Timeline trainingTimeline,
-			double matchingUnit, Enums.LookPastType lookPastType, ActivityObject activityAtRecommPoint)
+			double matchingUnit, Enums.LookPastType lookPastType, ActivityObject2018 activityAtRecommPoint)
 	{
 		if (lookPastType.equals(Enums.LookPastType.NCount))// IgnoreCase("Count"))
 		{
@@ -1312,7 +1312,7 @@ public class TimelineExtractors
 	 * @return
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUCount(Timeline trainingTimeline,
-			int matchingUnitInCounts, ActivityObject activityAtRecommPoint)
+			int matchingUnitInCounts, ActivityObject2018 activityAtRecommPoint)
 	// ArrayList<ActivityObject>// activitiesGuidingRecomm,*/// //Date//dateAtRecomm)
 	{
 		int count = 0;
@@ -1323,7 +1323,7 @@ public class TimelineExtractors
 		// totalNumberOfProbableCands=0;
 		// numCandsRejectedDueToNoCurrentActivityAtNonLast=0;
 		int numCandsRejectedDueToNoValidNextActivity = 0;
-		ArrayList<ActivityObject> activityObjectsInTraining = trainingTimeline.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> activityObjectsInTraining = trainingTimeline.getActivityObjectsInTimeline();
 		// $$System.out.println("Number of activity objects in training timeline=" + activityObjectsInTraining.size());
 		// $$System.out.println("Current activity (activityAtRecommPoint)=" +
 		// this.activityAtRecommPoint.getActivityName());
@@ -1336,7 +1336,7 @@ public class TimelineExtractors
 		// starting from the first activity and goes until second last activity.
 		for (int i = 0; i < activityObjectsInTraining.size() - 1; i++)
 		{
-			ActivityObject ae = activityObjectsInTraining.get(i);
+			ActivityObject2018 ae = activityObjectsInTraining.get(i);
 
 			// start sanity check for equalsWrtPrimaryDimension() //can be removed after check
 			if (VerbosityConstants.checkSanityPDImplementn
@@ -1367,10 +1367,10 @@ public class TimelineExtractors
 				// $$System.out.println("\n\tStart index of candidate timeline=" + newCandStartIndex);
 				// $$System.out.println("\tEnd index of candidate timeline=" + newCandEndIndex);
 
-				ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimeline
+				ArrayList<ActivityObject2018> activityObjectsForCandidate = trainingTimeline
 						.getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandEndIndex + 1);
 				// getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp);
-				ActivityObject nextValidActivityForCandidate = trainingTimeline
+				ActivityObject2018 nextValidActivityForCandidate = trainingTimeline
 						.getNextValidActivityAfterActivityAtThisPositionPD(newCandEndIndex);
 
 				if (nextValidActivityForCandidate == null)
@@ -1412,7 +1412,7 @@ public class TimelineExtractors
 	static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUCountColl(
 			// Timeline trainingTimelineqqq,
 			// LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersZZ,
-			int matchingUnitInCounts, ActivityObject activityAtRecommPoint, String userIDAtRecomm,
+			int matchingUnitInCounts, ActivityObject2018 activityAtRecommPoint, String userIDAtRecomm,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
 	{
 		LinkedHashMap<String, TimelineWithNext> candidateTimelines = new LinkedHashMap<>();
@@ -1444,7 +1444,7 @@ public class TimelineExtractors
 				// System.out.println("userIDAtRecomm=" + userIDAtRecomm + " userIdCursor=" + userIdCursor);
 				// find the most recent occurrence of current activity name
 				// get training timeline
-				ArrayList<ActivityObject> activityObjectsInTraining = trainingTimelineForThisUser
+				ArrayList<ActivityObject2018> activityObjectsInTraining = trainingTimelineForThisUser
 						.getActivityObjectsInTimeline();
 
 				// System.out.println("Num of activity objects in training timeline=" +
@@ -1459,7 +1459,7 @@ public class TimelineExtractors
 				for (int i = activityObjectsInTraining.size() - 2; i >= 0; i--)
 				// for (int i = 0; i < activityObjectsInTraining.size() - 1; i++)
 				{
-					ActivityObject ae = activityObjectsInTraining.get(i);
+					ActivityObject2018 ae = activityObjectsInTraining.get(i);
 					// numOfAOsCompared += 1;
 					// System.out.println("ae = " + ae.getPrimaryDimensionVal("/"));
 					// System.out.println("activityAtRecommPoint:" + activityAtRecommPoint.getPrimaryDimensionVal("/"));
@@ -1495,9 +1495,9 @@ public class TimelineExtractors
 						// System.out.println( "\tnewCandEndIndex - matchingUnitInCounts=" + (newCandEndIndex -
 						// matchingUnitInCounts));
 
-						ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimelineForThisUser
+						ArrayList<ActivityObject2018> activityObjectsForCandidate = trainingTimelineForThisUser
 								.getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandEndIndex + 1);
-						ActivityObject nextValidActivityForCandidate;
+						ActivityObject2018 nextValidActivityForCandidate;
 						nextValidActivityForCandidate = trainingTimelineForThisUser
 								.getNextValidActivityAfterActivityAtThisPositionPD(newCandEndIndex);
 
@@ -1590,7 +1590,7 @@ public class TimelineExtractors
 	private static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUCountColl(
 			Timeline trainingTimelineqqq,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
-			int matchingUnitInCounts, ActivityObject activityAtRecommPoint, String userIDAtRecomm)
+			int matchingUnitInCounts, ActivityObject2018 activityAtRecommPoint, String userIDAtRecomm)
 	{
 		LinkedHashMap<String, TimelineWithNext> candidateTimelines = new LinkedHashMap<>();
 		// long tS = System.nanoTime();
@@ -1623,7 +1623,7 @@ public class TimelineExtractors
 				// System.out.println("userIDAtRecomm=" + userIDAtRecomm + " userIdCursor=" + userIdCursor);
 				// find the most recent occurrence of current activity name
 				// get training timeline
-				ArrayList<ActivityObject> activityObjectsInTraining = trainingTimelineForThisUser
+				ArrayList<ActivityObject2018> activityObjectsInTraining = trainingTimelineForThisUser
 						.getActivityObjectsInTimeline();
 
 				// System.out.println("Num of activity objects in training timeline=" +
@@ -1639,7 +1639,7 @@ public class TimelineExtractors
 				for (int i = activityObjectsInTraining.size() - 2; i >= 0; i--)
 				// for (int i = 0; i < activityObjectsInTraining.size() - 1; i++)
 				{
-					ActivityObject ae = activityObjectsInTraining.get(i);
+					ActivityObject2018 ae = activityObjectsInTraining.get(i);
 					// numOfAOsCompared += 1;
 					// System.out.println("ae = " + ae.getPrimaryDimensionVal("/"));
 					// System.out.println("activityAtRecommPoint:" + activityAtRecommPoint.getPrimaryDimensionVal("/"));
@@ -1673,10 +1673,10 @@ public class TimelineExtractors
 						// System.out.println("\n\tStart index of candidate timeline=" + newCandStartIndex);
 						// System.out.println("\tEnd index of candidate timeline=" + newCandEndIndex);
 
-						ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimelineForThisUser
+						ArrayList<ActivityObject2018> activityObjectsForCandidate = trainingTimelineForThisUser
 								.getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandEndIndex + 1);
 						// getActivityObjectsBetweenTime(newCandStartTimestamp,newCandEndTimestamp);
-						ActivityObject nextValidActivityForCandidate = trainingTimelineForThisUser
+						ActivityObject2018 nextValidActivityForCandidate = trainingTimelineForThisUser
 								.getNextValidActivityAfterActivityAtThisPositionPD(newCandEndIndex);
 
 						if (nextValidActivityForCandidate == null)
@@ -1746,7 +1746,7 @@ public class TimelineExtractors
 	 * @return
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUHours(Timeline trainingTimeline,
-			double matchingUnitInHours, ActivityObject activityAtRecommPoint)
+			double matchingUnitInHours, ActivityObject2018 activityAtRecommPoint)
 	// ArrayList<ActivityObject> activitiesGuidingRecomm,Date//dateAtRecomm)
 	{
 		int count = 0;
@@ -1756,7 +1756,7 @@ public class TimelineExtractors
 		// totalNumberOfProbableCands=0;
 		// numCandsRejectedDueToNoCurrentActivityAtNonLast=0;
 		int numCandsRejectedDueToNoValidNextActivity = 0;
-		ArrayList<ActivityObject> activityObjectsInTraining = trainingTimeline.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> activityObjectsInTraining = trainingTimeline.getActivityObjectsInTimeline();
 		System.out.println("Number of activity objects in training timeline=" + activityObjectsInTraining.size());
 		System.out.println("Current activity (activityAtRecommPoint)=" + activityAtRecommPoint.getActivityName());
 		// trainingTimeline.printActivityObjectNamesWithTimestampsInSequence();
@@ -1764,7 +1764,7 @@ public class TimelineExtractors
 		for (int i = 1; i < activityObjectsInTraining.size() - 1; i++) // starting from the second activity and goes
 																		// until second last activity.
 		{
-			ActivityObject ae = activityObjectsInTraining.get(i);
+			ActivityObject2018 ae = activityObjectsInTraining.get(i);
 
 			// start sanity check for equalsWrtPrimaryDimension() //can be removed after check
 			if (VerbosityConstants.checkSanityPDImplementn
@@ -1800,9 +1800,9 @@ public class TimelineExtractors
 				 * Note: if newCandStartTimestamp here is earlier than when the training timeline started, even then
 				 * this works correctly since we are considering intersection of what is available
 				 */
-				ArrayList<ActivityObject> activityObjectsForCandidate = trainingTimeline
+				ArrayList<ActivityObject2018> activityObjectsForCandidate = trainingTimeline
 						.getActivityObjectsBetweenTime(newCandStartTimestamp, newCandEndTimestamp);
-				ActivityObject nextValidActivityForCandidate = trainingTimeline
+				ActivityObject2018 nextValidActivityForCandidate = trainingTimeline
 						.getNextValidActivityAfterActivityAtThisTime(newCandEndTimestamp);
 
 				if (nextValidActivityForCandidate == null)
@@ -1873,14 +1873,14 @@ public class TimelineExtractors
 		}
 	
 		// identify the recommendation point in longer timeline
-		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
+		ArrayList<ActivityObject2018> activityObjectsInCurrentTimeline = longerTimeline
 				.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
 	
 		System.out.println("AOsInCurrTimeline.size()=" + activityObjectsInCurrentTimeline.size());
 	
-		ActivityObject nextValidActivityObject = longerTimeline
+		ActivityObject2018 nextValidActivityObject = longerTimeline
 				.getNextValidActivityAfterActivityAtThisPositionPD(indexOfCurrentEnd);
-		ActivityObject nextActivityObject = longerTimeline
+		ActivityObject2018 nextActivityObject = longerTimeline
 				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 	
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
@@ -1932,12 +1932,12 @@ public class TimelineExtractors
 				+ currentEndTimestamp);
 	
 		// identify the recommendation point in longer timeline
-		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = longerTimeline
+		ArrayList<ActivityObject2018> activityObjectsInCurrentTimeline = longerTimeline
 				.getActivityObjectsBetweenTime(currentStartTimestamp, currentEndTimestamp);
 	
-		ActivityObject nextValidActivityObject = longerTimeline
+		ActivityObject2018 nextValidActivityObject = longerTimeline
 				.getNextValidActivityAfterActivityAtThisTime(currentEndTimestamp);
-		ActivityObject nextActivityObject = longerTimeline.getNextActivityAfterActivityAtThisTime(currentEndTimestamp);
+		ActivityObject2018 nextActivityObject = longerTimeline.getNextActivityAfterActivityAtThisTime(currentEndTimestamp);
 	
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
 		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
@@ -1993,12 +1993,12 @@ public class TimelineExtractors
 		int indexOfCurrentEnd = currentDayTimeline.getIndexOfActivityObjectAtTime(currentEndTimestamp);
 	
 		// identify the recommendation point in longer timeline
-		ArrayList<ActivityObject> activityObjectsInCurrentTimeline = currentDayTimeline
+		ArrayList<ActivityObject2018> activityObjectsInCurrentTimeline = currentDayTimeline
 				.getActivityObjectsInTimelineFromToIndex(0, indexOfCurrentEnd + 1);
 	
-		ActivityObject nextValidActivityObject = currentDayTimeline
+		ActivityObject2018 nextValidActivityObject = currentDayTimeline
 				.getNextValidActivityAfterActivityAtThisPositionPD(indexOfCurrentEnd);
-		ActivityObject nextActivityObject = currentDayTimeline
+		ActivityObject2018 nextActivityObject = currentDayTimeline
 				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
 	
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;

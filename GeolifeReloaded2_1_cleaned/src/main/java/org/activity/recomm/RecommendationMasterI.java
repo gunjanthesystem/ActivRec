@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 
@@ -36,9 +36,9 @@ public interface RecommendationMasterI
 
 	public boolean isNextActivityJustAfterRecommPointIsInvalid();
 
-	public ActivityObject getActivityObjectAtRecomm();
+	public ActivityObject2018 getActivityObjectAtRecomm();
 
-	public ArrayList<ActivityObject> getActsGuidingRecomm();
+	public ArrayList<ActivityObject2018> getActsGuidingRecomm();
 
 	public int getNumOfCandTimelinesBelowThresh();
 

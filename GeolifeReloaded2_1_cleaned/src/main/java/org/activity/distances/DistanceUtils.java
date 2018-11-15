@@ -24,7 +24,7 @@ import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.EditDistanceMemorizer;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
@@ -114,7 +114,7 @@ public class DistanceUtils
 
 	// @SuppressWarnings("unused")
 	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getNormalisedDistancesForCandidateTimelines(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			CaseType caseType, String userIDAtRecomm, Date dateAtRecomm, Time timeAtRecomm, String distanceUsed,
 			LookPastType lookPastType, HJEditDistance hjEditDistance, FeatureWiseEditDistance featureWiseEditDistance,
 			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance,
@@ -267,7 +267,7 @@ public class DistanceUtils
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance)
 	{
@@ -360,7 +360,7 @@ public class DistanceUtils
 	 * @since Aug 9, 2017
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistsForCandsFullCandParallelWithMemory(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
 	{
@@ -426,7 +426,7 @@ public class DistanceUtils
 	 * @since April 13 2018
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
 	{
@@ -572,7 +572,7 @@ public class DistanceUtils
 	 * @since 26 July 2018
 	 */
 	private static void getListOfUniqueGivenDimensionValsInRTVerse(LinkedHashMap<String, Timeline> candidateTimelines,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, PrimaryDimension givenDimension)
+			ArrayList<ActivityObject2018> activitiesGuidingRecomm, PrimaryDimension givenDimension)
 	{
 		Set<Integer> uniqueLocGridIDInRTVerse = new TreeSet<>();
 		List<Integer> uniqueLocGridIDInRTVerseList = new ArrayList<>();
@@ -654,7 +654,7 @@ public class DistanceUtils
 	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistances(
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs,
 			EnumMap<GowallaFeatures, Double> minOfMinOfDiffs, EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs,
-			HJEditDistance hjEditDistance, ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm,
+			HJEditDistance hjEditDistance, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
@@ -977,7 +977,7 @@ public class DistanceUtils
 	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistancesNoLogging(
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs,
 			EnumMap<GowallaFeatures, Double> minOfMinOfDiffs, EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs,
-			HJEditDistance hjEditDistance, ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm,
+			HJEditDistance hjEditDistance, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
@@ -1199,7 +1199,7 @@ public class DistanceUtils
 	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistancesV3April27(
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs,
 			EnumMap<GowallaFeatures, Double> minOfMinOfDiffs, EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs,
-			HJEditDistance hjEditDistance, ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm,
+			HJEditDistance hjEditDistance, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
@@ -1413,7 +1413,7 @@ public class DistanceUtils
 	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistancesV1Incorrect(
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>> candAEDFeatDiffs,
 			EnumMap<GowallaFeatures, Double> minOfMinOfDiffs, EnumMap<GowallaFeatures, Double> maxOfMaxOfDiffs,
-			HJEditDistance hjEditDistance, ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm,
+			HJEditDistance hjEditDistance, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
@@ -1594,7 +1594,7 @@ public class DistanceUtils
 	 * @since 9 Aug 2017
 	 */
 	public static Pair<String, Double> getEditDistances(Timeline candTimeline,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
+			ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
 			String timeAtRecomm, String candTimelineID, CaseType caseType, HJEditDistance hjEditDistance,
 			EditDistanceMemorizer editDistancesMemorizer)
 	{
@@ -1689,7 +1689,7 @@ public class DistanceUtils
 	 * @since April 14 2018
 	 */
 	public static Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> getActEditDistancesFeatDiffs(
-			Timeline candTimeline, ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm,
+			Timeline candTimeline, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, String candTimelineID, CaseType caseType,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
 	{
@@ -1779,7 +1779,7 @@ public class DistanceUtils
 	 * @return <CanditateTimelineID, <FeatureName,>Pair<Trace,Edit distance of this candidate>>>
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> getFeatureWiseEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			FeatureWiseEditDistance featureWiseEditDistance)
 	{
@@ -1873,7 +1873,7 @@ public class DistanceUtils
 	 * @return <CanditateTimelineID, Pair<Trace,Edit distance of this candidate>>
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getOTMDSAMEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			OTMDSAMEditDistance OTMDSAMEditDistance)
 	{
@@ -1954,7 +1954,7 @@ public class DistanceUtils
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> getFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance)
 	{
@@ -2039,7 +2039,7 @@ public class DistanceUtils
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			String distanceUsed, HJEditDistance hjEditDistance, FeatureWiseEditDistance featureWiseEditDistance,
 			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance,
@@ -2111,7 +2111,7 @@ public class DistanceUtils
 	 */
 
 	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedHJEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
 	{
@@ -2377,7 +2377,7 @@ public class DistanceUtils
 	 * @return
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			FeatureWiseEditDistance featureWiseEditDistance)
 	{
@@ -2412,7 +2412,7 @@ public class DistanceUtils
 	 * @return
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedOTMDSAMEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			OTMDSAMEditDistance OTMDSAMEditDistance)
 	{
@@ -2438,7 +2438,7 @@ public class DistanceUtils
 	 * @return
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedFeatureWiseWeightedEditDistancesForCandidateTimelinesFullCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance)
 	{

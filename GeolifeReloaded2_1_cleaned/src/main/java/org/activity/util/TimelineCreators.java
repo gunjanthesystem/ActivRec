@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.activity.constants.Constant;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
 import org.activity.objects.LocationGowalla;
@@ -51,7 +51,7 @@ public class TimelineCreators
 		// checkinEntriesDatewise.entrySet().stream().forEachOrdered(e->sb.append(str));
 		// End of added on Aug 10 2017
 	
-		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = TimelineTransformers.convertCheckinEntriesToActivityObjectsGowalla(
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject2018>>> activityObjectsDatewise = TimelineTransformers.convertCheckinEntriesToActivityObjectsGowalla(
 				checkinEntriesDatewise, mapForAllLocationData);
 	
 		int optimalSizeWrtUsers = (int) (Math.ceil(activityObjectsDatewise.size() / 0.75));
@@ -61,17 +61,17 @@ public class TimelineCreators
 		// StringBuilder sbNumOfActsPerDayPerUser;
 		// WritingToFile.appendLineToFileAbsolute("User,Date,NumOfActsInDay\n", "NumOfActsPerUserPerDay.csv");
 	
-		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject>>> userEntry : activityObjectsDatewise.entrySet())
+		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject2018>>> userEntry : activityObjectsDatewise.entrySet())
 		{
 			String userID = userEntry.getKey();
 			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>(
 					(int) (Math.ceil(userEntry.getValue().size() / 0.75)));
 	
 			// sbNumOfActsPerDayPerUser = new StringBuilder();// "User,Day,NumOfActs\n");
-			for (Entry<Date, ArrayList<ActivityObject>> dateEntry : userEntry.getValue().entrySet())
+			for (Entry<Date, ArrayList<ActivityObject2018>> dateEntry : userEntry.getValue().entrySet())
 			{
 				Date date = dateEntry.getKey();
-				ArrayList<ActivityObject> activityObjectsInDay = dateEntry.getValue();
+				ArrayList<ActivityObject2018> activityObjectsInDay = dateEntry.getValue();
 				// String dateID = date.toString();
 				// String dayName = DateTimeUtils.getWeekDayFromWeekDayInt(date.getDay());//
 				// DateTimeUtils.getWeekDayFromWeekDayInt(date.getDayOfWeek().getValue());
@@ -122,7 +122,7 @@ public class TimelineCreators
 		// checkinEntriesDatewise.entrySet().stream().forEachOrdered(e->sb.append(str));
 		// End of added on Aug 10 2017
 	
-		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = TimelineTransformers.convertCheckinEntriesToActivityObjectsGowallaV2(
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject2018>>> activityObjectsDatewise = TimelineTransformers.convertCheckinEntriesToActivityObjectsGowallaV2(
 				checkinEntriesDatewise, mapForAllLocationData);
 	
 		int optimalSizeWrtUsers = (int) (Math.ceil(activityObjectsDatewise.size() / 0.75));
@@ -132,17 +132,17 @@ public class TimelineCreators
 		// StringBuilder sbNumOfActsPerDayPerUser;
 		// WritingToFile.appendLineToFileAbsolute("User,Date,NumOfActsInDay\n", "NumOfActsPerUserPerDay.csv");
 	
-		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject>>> userEntry : activityObjectsDatewise.entrySet())
+		for (Entry<String, TreeMap<Date, ArrayList<ActivityObject2018>>> userEntry : activityObjectsDatewise.entrySet())
 		{
 			String userID = userEntry.getKey();
 			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<>(
 					(int) (Math.ceil(userEntry.getValue().size() / 0.75)));
 	
 			// sbNumOfActsPerDayPerUser = new StringBuilder();// "User,Day,NumOfActs\n");
-			for (Entry<Date, ArrayList<ActivityObject>> dateEntry : userEntry.getValue().entrySet())
+			for (Entry<Date, ArrayList<ActivityObject2018>> dateEntry : userEntry.getValue().entrySet())
 			{
 				Date date = dateEntry.getKey();
-				ArrayList<ActivityObject> activityObjectsInDay = dateEntry.getValue();
+				ArrayList<ActivityObject2018> activityObjectsInDay = dateEntry.getValue();
 				// String dateID = date.toString();
 				// String dayName = DateTimeUtils.getWeekDayFromWeekDayInt(date.getDay());//
 				// DateTimeUtils.getWeekDayFromWeekDayInt(date.getDayOfWeek().getValue());
@@ -174,11 +174,11 @@ public class TimelineCreators
 	 * @return all users day timelines as LinkedHashMap<User id, LinkedHashMap<Date of timeline, UserDayTimeline>>
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createUserTimelinesFromActivityObjects(
-			ArrayList<ActivityObject> allActivityEvents)
+			ArrayList<ActivityObject2018> allActivityEvents)
 	{
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userTimelines = new LinkedHashMap<>();
 		// userid, usertimeline
-		LinkedHashMap<String, ArrayList<ActivityObject>> perUserActivityEvents = new LinkedHashMap<>();
+		LinkedHashMap<String, ArrayList<ActivityObject2018>> perUserActivityEvents = new LinkedHashMap<>();
 	
 		System.out.println("inside createUserTimelinesFromActivityObjects");
 	
@@ -191,7 +191,7 @@ public class TimelineCreators
 			String userID = allActivityEvents.get(i).getDimensionIDValue("User_ID");
 			if (!(perUserActivityEvents.containsKey(userID)))
 			{
-				perUserActivityEvents.put(userID, new ArrayList<ActivityObject>());
+				perUserActivityEvents.put(userID, new ArrayList<ActivityObject2018>());
 			}
 			perUserActivityEvents.get(userID).add(allActivityEvents.get(i));
 			/*
@@ -204,14 +204,14 @@ public class TimelineCreators
 		// perUserActivityEventCreated
 	
 		// Iterate over Users
-		for (Map.Entry<String, ArrayList<ActivityObject>> perUserActivityEventsEntry : perUserActivityEvents.entrySet())
+		for (Map.Entry<String, ArrayList<ActivityObject2018>> perUserActivityEventsEntry : perUserActivityEvents.entrySet())
 		{
 			System.out.println("for user:" + perUserActivityEventsEntry.getKey() + " number of activity-objects ="
 					+ perUserActivityEventsEntry.getValue().size());
 			String userID = perUserActivityEventsEntry.getKey();
-			ArrayList<ActivityObject> activityEventsForThisUser = perUserActivityEventsEntry.getValue();
+			ArrayList<ActivityObject2018> activityEventsForThisUser = perUserActivityEventsEntry.getValue();
 	
-			LinkedHashMap<Date, ArrayList<ActivityObject>> perDateActivityEventsForThisUser = new LinkedHashMap<Date, ArrayList<ActivityObject>>();
+			LinkedHashMap<Date, ArrayList<ActivityObject2018>> perDateActivityEventsForThisUser = new LinkedHashMap<Date, ArrayList<ActivityObject2018>>();
 	
 			for (int i = 0; i < activityEventsForThisUser.size(); i++) // iterare over activity events for this user
 			{
@@ -220,7 +220,7 @@ public class TimelineCreators
 									// date
 				if (!(perDateActivityEventsForThisUser.containsKey(date)))
 				{
-					perDateActivityEventsForThisUser.put(date, new ArrayList<ActivityObject>());
+					perDateActivityEventsForThisUser.put(date, new ArrayList<ActivityObject2018>());
 				}
 				perDateActivityEventsForThisUser.get(date).add(activityEventsForThisUser.get(i));
 			}
@@ -229,7 +229,7 @@ public class TimelineCreators
 	
 			LinkedHashMap<Date, Timeline> dayTimelines = new LinkedHashMap<Date, Timeline>();
 	
-			for (Map.Entry<Date, ArrayList<ActivityObject>> perDateActivityEventsForThisUserEntry : perDateActivityEventsForThisUser
+			for (Map.Entry<Date, ArrayList<ActivityObject2018>> perDateActivityEventsForThisUserEntry : perDateActivityEventsForThisUser
 					.entrySet())
 			{
 				Date date = perDateActivityEventsForThisUserEntry.getKey();
@@ -247,10 +247,10 @@ public class TimelineCreators
 	 * @param jsonArray
 	 * @return
 	 */
-	public static HashMap<String, ArrayList<ActivityObject>> createActivityObjectsFromJsonArray(JSONArray jsonArray)
+	public static HashMap<String, ArrayList<ActivityObject2018>> createActivityObjectsFromJsonArray(JSONArray jsonArray)
 	{
 	
-		HashMap<String, ArrayList<ActivityObject>> timeLines = new HashMap<String, ArrayList<ActivityObject>>();
+		HashMap<String, ArrayList<ActivityObject2018>> timeLines = new HashMap<String, ArrayList<ActivityObject2018>>();
 		// Key: Identifier for timeline (can be UserID in some case)
 		// Value: An ArrayList of ActivityEvents
 	
@@ -270,10 +270,10 @@ public class TimelineCreators
 				Timestamp endTime = DateTimeUtils.getTimestamp(endTimeString, dateString);
 				;
 	
-				if (!(timeLines.containsKey(userID))) timeLines.put(userID, new ArrayList<ActivityObject>());
+				if (!(timeLines.containsKey(userID))) timeLines.put(userID, new ArrayList<ActivityObject2018>());
 	
 				// get corresponding timeline (ArrayList of ActivityEvents) and add the Activity Event to that ArrayList
-				ActivityObject activityEvent = new ActivityObject(activityName, startTime, endTime);
+				ActivityObject2018 activityEvent = new ActivityObject2018(activityName, startTime, endTime);
 				timeLines.get(userID).add(activityEvent);
 			} // note: the ActivityEvents obtained from the database are not in chronological order, thus the ArrayList
 				// as of now does not contain Activity Events in chronological

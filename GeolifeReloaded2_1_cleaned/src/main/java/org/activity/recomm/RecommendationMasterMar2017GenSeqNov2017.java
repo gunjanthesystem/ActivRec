@@ -28,7 +28,7 @@ import org.activity.distances.OTMDSAMEditDistance;
 import org.activity.evaluation.Evaluation;
 import org.activity.io.EditDistanceMemorizer;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
@@ -82,8 +82,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	 * Current Timeline sequence of activity objects happening from the recomm point back until the matching unit
 	 */
 	private TimelineWithNext currentTimeline; // =current timelines
-	private ArrayList<ActivityObject> activitiesGuidingRecomm; // Current Timeline ,
-	private ActivityObject activityObjectAtRecommPoint; // current Activity Object
+	private ArrayList<ActivityObject2018> activitiesGuidingRecomm; // Current Timeline ,
+	private ActivityObject2018 activityObjectAtRecommPoint; // current Activity Object
 	// private String activityNameAtRecommPoint;// current Activity Name
 	private ArrayList<Integer> primaryDimensionValAtRecommPoint;// when activity is primary dimension, this is an
 																// activity id, when
@@ -113,7 +113,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	 * List of of top next activity objects with their edit distances and the timeline id of the candidate producing
 	 * them. {TimelineID, {Next Activity Object,edit distance}}
 	 */
-	private LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsFromCands;
+	private LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActivityObjectsFromCands;
 
 	/**
 	 * This is only relevant when case type is 'CaseBasedV1' (Cand TimeineId, Edit distance of the end point activity
@@ -254,7 +254,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
 			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold, double matchingUnitInCountsOrHours,
 			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
-			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline,
+			ArrayList<ActivityObject2018> actObjsToAddToCurrentTimeline,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous)
 	{
@@ -360,9 +360,13 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			// //////////////////////////
 
 			long recommMasterT1 = System.currentTimeMillis();
-			System.out.println("Inside recomm master :trainTestTimelinesForAllUsers.size()= "
-					+ trainTestTimelinesForAllUsers.size() + " trainTimelinesAllUsersContinuous.size()="
-					+ trainTimelinesAllUsersContinuous.size());
+
+			if (Constant.collaborativeCandidates)
+			{
+				System.out.println("Inside recomm master :trainTestTimelinesForAllUsers.size()= "
+						+ trainTestTimelinesForAllUsers.size() + " trainTimelinesAllUsersContinuous.size()="
+						+ trainTimelinesAllUsersContinuous.size());
+			}
 
 			this.candidateTimelines = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines, lookPastType,
 					this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm, matchingUnitInCountsOrHours,
@@ -673,7 +677,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	 */
 	private static LinkedHashMap<String, Timeline> removeCandsWithEndCurrActBeyondThresh(
 			LinkedHashMap<String, Timeline> candidateTimelines, int filterCandByCurActTimeThreshInSecs,
-			ActivityObject actObjAtRecommPoint, boolean verbose)
+			ActivityObject2018 actObjAtRecommPoint, boolean verbose)
 	{
 		LinkedHashMap<String, Timeline> filteredCands = new LinkedHashMap<>();
 		// Timestamp tsOfAOAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
@@ -693,8 +697,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 		for (Entry<String, Timeline> candEntry : candidateTimelines.entrySet())
 		{
-			ArrayList<ActivityObject> aosInCand = candEntry.getValue().getActivityObjectsInTimeline();
-			ActivityObject lastAO = aosInCand.get(aosInCand.size() - 1);
+			ArrayList<ActivityObject2018> aosInCand = candEntry.getValue().getActivityObjectsInTimeline();
+			ActivityObject2018 lastAO = aosInCand.get(aosInCand.size() - 1);
 			// Timestamp tCurrInCand = lastAO.getStartTimestamp();
 			// long timeInDayCurrInCand = DateTimeUtils.getTimeInDayInSeconds(tCurrInCand);
 			long timeInDayCurrInCand = DateTimeUtils.getTimeInDayInSecondsZoned(lastAO.getStartTimestampInms(),
@@ -796,7 +800,8 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	 */
 	private static Triple<LinkedHashMap<String, Pair<String, Double>>, Double, Boolean> pruneAboveThreshold(
 			LinkedHashMap<String, Pair<String, Double>> distancesMapUnsorted, TypeOfThreshold typeOfThreshold,
-			double thresholdVal, ArrayList<ActivityObject> activitiesGuidingRecomm, PrimaryDimension primaryDimension)
+			double thresholdVal, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
+			PrimaryDimension primaryDimension)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Inside pruneAboveThreshold:\n");
@@ -871,7 +876,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	{
 		StringBuilder res = new StringBuilder();
 
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res = StringUtils.fCat(res, ">>", ae.getActivityName());
 			// res.append(">>" + ae.getActivityName());
@@ -1370,7 +1375,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	 *         Activity Object of this candidate with end point Activity Object>
 	 */
 	public LinkedHashMap<String, Double> getCaseSimilarityEndPointActivityObjectCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, int userID, String dateAtRecomm, String timeAtRecomm,
 			AlignmentBasedDistance alignmentBasedDistance)
 	{
@@ -1379,15 +1384,15 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 		for (Map.Entry<String, Timeline> candEntry : candidateTimelines.entrySet())
 		{
-			ArrayList<ActivityObject> activityObjectsInCand = candEntry.getValue().getActivityObjectsInTimeline();
+			ArrayList<ActivityObject2018> activityObjectsInCand = candEntry.getValue().getActivityObjectsInTimeline();
 			Double endPointEditDistanceForThisCandidate = new Double(-9999);
 
 			if (caseType.equals(Enums.CaseType.CaseBasedV1))// "CaseBasedV1")) // CaseBasedV1
 			{
-				ActivityObject endPointActivityObjectCandidate = (activityObjectsInCand
+				ActivityObject2018 endPointActivityObjectCandidate = (activityObjectsInCand
 						.get(activityObjectsInCand.size() - 1)); // only the end point activity
 																	// object
-				ActivityObject endPointActivityObjectCurrentTimeline = (activitiesGuidingRecomm
+				ActivityObject2018 endPointActivityObjectCurrentTimeline = (activitiesGuidingRecomm
 						.get(activitiesGuidingRecomm.size() - 1)); // activityObjectAtRecommPoint
 
 				switch (Constant.getDatabaseName()) // (Constant.DATABASE_NAME)
@@ -1443,10 +1448,10 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 	// /
 
-	public static String getStringCodeOfActivityObjects(ArrayList<ActivityObject> activityObjects)
+	public static String getStringCodeOfActivityObjects(ArrayList<ActivityObject2018> activityObjects)
 	{
 		StringBuilder code = new StringBuilder();
-		for (ActivityObject ao : activityObjects)
+		for (ActivityObject2018 ao : activityObjects)
 		{
 			code.append(ao.getCharCodeFromActID());
 		}
@@ -1480,7 +1485,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	public int getNumOfValidActsInActsGuidingRecomm()
 	{
 		int count = 0;
-		for (ActivityObject ae : this.activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : this.activitiesGuidingRecomm)
 		{
 			if (UtilityBelt.isValidActivityName(ae.getActivityName()))
 			{
@@ -1526,7 +1531,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		return this.nextActivityJustAfterRecommPointIsInvalid;
 	}
 
-	public ActivityObject getActivityObjectAtRecomm()
+	public ActivityObject2018 getActivityObjectAtRecomm()
 	{
 		return this.activityObjectAtRecommPoint;
 	}
@@ -1590,7 +1595,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	public String getActivityNamesGuidingRecommwithTimestamps()
 	{
 		StringBuilder res = new StringBuilder();
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res = StringUtils.fCat(res, "  ", ae.getActivityName(), "__", ae.getPrimaryDimensionVal().toString(), "__",
 					ae.getStartTimestamp().toString(), "_to_", ae.getEndTimestamp().toString());
@@ -1627,7 +1632,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 		return endPointIndicesConsideredInCands;
 	}
 
-	public ArrayList<ActivityObject> getActsGuidingRecomm()
+	public ArrayList<ActivityObject2018> getActsGuidingRecomm()
 	{
 		return activitiesGuidingRecomm;
 	}

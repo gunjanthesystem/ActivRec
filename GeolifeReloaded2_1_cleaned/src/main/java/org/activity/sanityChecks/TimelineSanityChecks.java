@@ -3,7 +3,7 @@ package org.activity.sanityChecks;
 import java.util.ArrayList;
 import java.util.OptionalLong;
 
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.ui.PopUps;
 import org.activity.util.TimelineUtils;
 
@@ -16,8 +16,8 @@ public class TimelineSanityChecks
 	 * @param listOfActObjs1
 	 * @param listOfActObjs2
 	 */
-	public static boolean checkIfChronoLogicalOrder(ArrayList<ActivityObject> listOfActObjs1,
-			ArrayList<ActivityObject> listOfActObjs2)
+	public static boolean checkIfChronoLogicalOrder(ArrayList<ActivityObject2018> listOfActObjs1,
+			ArrayList<ActivityObject2018> listOfActObjs2)
 	{
 		boolean inOrder = true;
 

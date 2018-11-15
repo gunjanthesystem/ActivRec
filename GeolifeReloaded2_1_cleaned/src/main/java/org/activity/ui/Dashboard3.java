@@ -15,7 +15,7 @@ import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.PathConstants;
 import org.activity.controller.ControllerWithoutServer;
 import org.activity.io.Serializer;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartAppCanvas;
@@ -571,7 +571,7 @@ public class Dashboard3 extends Application
 			hBox.getChildren().add(createStackPane(Color.WHITE, null, "User " + userEntry.getKey(), widthOfUserRect, "",
 					"rectangle", null));
 
-			for (ActivityObject ao : userEntry.getValue().getActivityObjectsInTimeline())
+			for (ActivityObject2018 ao : userEntry.getValue().getActivityObjectsInTimeline())
 			{
 				Color actColor = ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID()));
 				hBox.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
@@ -622,7 +622,7 @@ public class Dashboard3 extends Application
 
 				borderForDay = altDayToggle ? reuse.getBottomBorder1() : reuse.getBottomBorder2();
 
-				for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dateEntry.getValue().getActivityObjectsInTimeline())
 				{
 					Color actColor = ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID()));
 					hBox.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
@@ -639,7 +639,7 @@ public class Dashboard3 extends Application
 		return s1;
 	}
 
-	public static String getTooltipFromAO(ActivityObject ao)
+	public static String getTooltipFromAO(ActivityObject2018 ao)
 	{
 		String toolTipText = "st: " + ao.getStartTimestamp().toString() + "\nlocG: "
 				+ ao.getGivenDimensionVal("|", PrimaryDimension.LocationGridID) + "\ndistP (km): "

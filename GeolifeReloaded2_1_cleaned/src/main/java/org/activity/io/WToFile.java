@@ -33,7 +33,7 @@ import org.activity.constants.Enums;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.loader.GeolifeDataLoader;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
 import org.activity.objects.DataEntry;
@@ -1069,7 +1069,7 @@ public class WToFile
 		}
 	}
 
-	public static void writeTimestampedActivityObjectsForUser(LinkedHashMap<Timestamp, ActivityObject> ts,
+	public static void writeTimestampedActivityObjectsForUser(LinkedHashMap<Timestamp, ActivityObject2018> ts,
 			String fileNameToUse, String userName)
 	{
 		String commonPath = Constant.getCommonPath();//
@@ -1088,7 +1088,7 @@ public class WToFile
 			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
 			BufferedWriter bw = new BufferedWriter(fw);
 
-			for (Map.Entry<Timestamp, ActivityObject> entry : ts.entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> entry : ts.entrySet())
 			{
 				String timestamp = entry.getKey().toString();
 
@@ -1111,11 +1111,11 @@ public class WToFile
 	}
 
 	public static void writeAllTimestampedActivityObjects(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, String fileNameToUse)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, String fileNameToUse)
 	{
 		try
 		{
-			for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+			for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 			{
 				writeTimestampedActivityObjectsForUser(entry.getValue(), fileNameToUse, entry.getKey());
 			}
@@ -2628,8 +2628,8 @@ public class WToFile
 		}
 	}
 
-	public static void writeEditSimilarityCalculation(ArrayList<ActivityObject> ActivityObjects1,
-			ArrayList<ActivityObject> ActivityObjects2, double editDistance)
+	public static void writeEditSimilarityCalculation(ArrayList<ActivityObject2018> ActivityObjects1,
+			ArrayList<ActivityObject2018> ActivityObjects2, double editDistance)
 	{
 		String commonPath = Constant.getCommonPath();//
 		try
@@ -2707,8 +2707,8 @@ public class WToFile
 	 * @param timeAtRecomm
 	 * @param candidateTimelineId
 	 */
-	public static void writeEditSimilarityCalculations(ArrayList<ActivityObject> ActivityObjects1,
-			ArrayList<ActivityObject> ActivityObjects2, double editDistance, String trace, double dAct, double dFeat,
+	public static void writeEditSimilarityCalculations(ArrayList<ActivityObject2018> ActivityObjects1,
+			ArrayList<ActivityObject2018> ActivityObjects2, double editDistance, String trace, double dAct, double dFeat,
 			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		String commonPath = Constant.getCommonPath();//
@@ -2802,7 +2802,7 @@ public class WToFile
 		}
 	}
 
-	public static void writeEditDistancesOfAllEndPoints(ArrayList<ActivityObject> activitiesGuidingRecomm,
+	public static void writeEditDistancesOfAllEndPoints(ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Timeline userDayTimeline, LinkedHashMap<Integer, Pair<String, Double>> distanceScoresForEachSubsequence)// String
 	{
 		try
@@ -2813,7 +2813,7 @@ public class WToFile
 			{
 
 				sbToWrite.append(counterEditAllEndPoints + "," + userDayTimeline.getUserID() + ","
-						+ ActivityObject.getArrayListOfActivityObjectsAsString(activitiesGuidingRecomm) + ","
+						+ ActivityObject2018.getArrayListOfActivityObjectsAsString(activitiesGuidingRecomm) + ","
 						+ userDayTimeline.getActivityObjectNamesInSequenceWithFeatures() + "," + entry.getKey() + ","
 						+ entry.getValue().getSecond() + "\n");
 			}
@@ -2925,7 +2925,7 @@ public class WToFile
 	public static void writeDistanceScoresSortedMap(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<Date, Triple<Integer, String, Double>> getDistanceScoresSorted,
 			LinkedHashMap<Date, Timeline> candidateTimelines, LinkedHashMap<Date, String> topNames,
-			ArrayList<ActivityObject> currentTimeline)
+			ArrayList<ActivityObject2018> currentTimeline)
 	{
 		try
 		{
@@ -3047,8 +3047,8 @@ public class WToFile
 	public static void writeDistanceScoresSortedMapMU(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<Integer, Pair<String, Double>> getDistanceScoresSorted,
 			LinkedHashMap<Integer, TimelineWithNext> candidateTimelines,
-			ArrayList<Triple<ActivityObject, Double, Integer>> topNextActivityObjects,
-			ArrayList<ActivityObject> currentTimeline, boolean writeCandidateTimeline, boolean writeEditOperations)
+			ArrayList<Triple<ActivityObject2018, Double, Integer>> topNextActivityObjects,
+			ArrayList<ActivityObject2018> currentTimeline, boolean writeCandidateTimeline, boolean writeEditOperations)
 	{
 		String commonPath = Constant.getCommonPath();//
 		try
@@ -3071,7 +3071,7 @@ public class WToFile
 
 				String topNextAOName = "null";
 
-				for (Triple<ActivityObject, Double, Integer> t : topNextActivityObjects)
+				for (Triple<ActivityObject2018, Double, Integer> t : topNextActivityObjects)
 				{// topNextActivityObjects should be converted to hashmap for faster access.
 					if (t.getThird() == candTimelineID)
 					{
@@ -3150,8 +3150,8 @@ public class WToFile
 	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<String, Pair<String, Double>> editDistancesSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines,
-			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs, ArrayList<ActivityObject> currentTimeline,
-			ActivityObject currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
+			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs, ArrayList<ActivityObject2018> currentTimeline,
+			ActivityObject2018 currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
 			LinkedHashMap<String, Integer> endPointIndicesInCands)
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
 	// Enums.CaseType caseType)
@@ -3205,7 +3205,7 @@ public class WToFile
 
 				///
 				Integer endPointIndexInCand = endPointIndicesInCands.get(candTimelineID);
-				ActivityObject endPointActivityInCandidate = candidateTimelines.get(candTimelineID)
+				ActivityObject2018 endPointActivityInCandidate = candidateTimelines.get(candTimelineID)
 						.getActivityObjectAtPosition(endPointIndexInCand);
 				// difference in start time of end point activity of candidate and start
 				// time of current activity
@@ -3263,8 +3263,8 @@ public class WToFile
 	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<String, Pair<String, Double>> editDistancesSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines,
-			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs, ArrayList<ActivityObject> currentTimeline,
-			ActivityObject currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
+			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs, ArrayList<ActivityObject2018> currentTimeline,
+			ActivityObject2018 currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
 			LinkedHashMap<String, Integer> endPointIndicesInCands, PrimaryDimension givenDimension,
 			String absFileNameToWriteTo)
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
@@ -3332,7 +3332,7 @@ public class WToFile
 
 				///
 				Integer endPointIndexInCand = endPointIndicesInCands.get(candTimelineID);
-				ActivityObject endPointActivityInCandidate = candidateTimelines.get(candTimelineID)
+				ActivityObject2018 endPointActivityInCandidate = candidateTimelines.get(candTimelineID)
 						.getActivityObjectAtPosition(endPointIndexInCand);
 				// difference in start time of end point activity of candidate and start
 				// time of current activity
@@ -3375,11 +3375,11 @@ public class WToFile
 	 * @return
 	 * @deprecated on 7 Aug 2018 should be superceeded by getStringActivityObjArray()
 	 */
-	public static String getStringActivityObjArray(ArrayList<ActivityObject> array)
+	public static String getStringActivityObjArray(ArrayList<ActivityObject2018> array)
 	{
 		String s = "";
 
-		for (ActivityObject ao : array)
+		for (ActivityObject2018 ao : array)
 		{
 			s += ">>" + ao.getActivityName() + "--" + ao.getPrimaryDimensionVal("|") + "--" + ao.getStartTimestamp()
 					+ "--" + ao.getDurationInSeconds();
@@ -3393,11 +3393,11 @@ public class WToFile
 	 * @param givenDimension
 	 * @return
 	 */
-	public static String getStringActivityObjArray(ArrayList<ActivityObject> array, PrimaryDimension givenDimension)
+	public static String getStringActivityObjArray(ArrayList<ActivityObject2018> array, PrimaryDimension givenDimension)
 	{
 		String s = "";
 
-		for (ActivityObject ao : array)
+		for (ActivityObject2018 ao : array)
 		{
 			s += ">>" + ao.getActivityName() + "--" + ao.getGivenDimensionVal("|", givenDimension) + "--"
 					+ ao.getStartTimestamp() + "--" + ao.getDurationInSeconds();
@@ -3410,11 +3410,11 @@ public class WToFile
 	 * @param array
 	 * @return
 	 */
-	public static String getTimelineAsOnlyGivenDimVal(ArrayList<ActivityObject> array, PrimaryDimension givenDimension)
+	public static String getTimelineAsOnlyGivenDimVal(ArrayList<ActivityObject2018> array, PrimaryDimension givenDimension)
 	{
 		String s = "";
 
-		for (ActivityObject ao : array)
+		for (ActivityObject2018 ao : array)
 		{
 			s += ">>" + ao.getGivenDimensionVal("|", givenDimension);
 			// ao.getPrimaryDimensionVal("|");
@@ -3454,7 +3454,7 @@ public class WToFile
 	}
 
 	public static void writeStartTimeDistancesSorted(
-			LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> getDistanceScoresSorted)
+			LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> getDistanceScoresSorted)
 	{
 		String commonPath = Constant.getCommonPath();//
 		try
@@ -3464,7 +3464,7 @@ public class WToFile
 			FileWriter fw = new FileWriter(new File(fileName).getAbsoluteFile(), true);
 			BufferedWriter bw = new BufferedWriter(fw);
 
-			for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : getDistanceScoresSorted.entrySet())
+			for (Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> entry : getDistanceScoresSorted.entrySet())
 			{
 				bw.write(entry.getKey() + "," + entry.getValue().getFirst() + "," + entry.getValue().getSecond() + ","
 						+ entry.getValue().getThird());
@@ -3590,7 +3590,7 @@ public class WToFile
 
 				// bw.write
 				toWrite.append(entry.getKey() + ",");
-				ArrayList<ActivityObject> ActivityObjects = entry.getValue().getActivityObjectsInDay();
+				ArrayList<ActivityObject2018> ActivityObjects = entry.getValue().getActivityObjectsInDay();
 
 				// if(!writeStartEndGeoCoordinates && !distanceTravelled && !)
 				for (int i = 0; i < ActivityObjects.size(); i++)
@@ -3678,7 +3678,7 @@ public class WToFile
 			{
 
 				toWrite += (userName + "," + entry.getKey() + ",");
-				ArrayList<ActivityObject> ActivityObjects = entry.getValue().getActivityObjectsInDay();
+				ArrayList<ActivityObject2018> ActivityObjects = entry.getValue().getActivityObjectsInDay();
 
 				// if(!writeStartEndGeoCoordinates && !distanceTravelled && !)
 				for (int i = 0; i < ActivityObjects.size(); i++)
@@ -3747,7 +3747,7 @@ public class WToFile
 			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
 			{
 				toWrite.append(userName + "," + entry.getKey() + ",");
-				ArrayList<ActivityObject> ActivityObjects = entry.getValue().getActivityObjectsInDay();
+				ArrayList<ActivityObject2018> ActivityObjects = entry.getValue().getActivityObjectsInDay();
 
 				for (int i = 0; i < ActivityObjects.size(); i++)
 				{

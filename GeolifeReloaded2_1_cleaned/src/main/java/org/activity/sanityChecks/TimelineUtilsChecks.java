@@ -9,7 +9,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.activity.constants.Constant;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.util.TimelineCreators;
@@ -61,7 +61,7 @@ public class TimelineUtilsChecks
 			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
 			 * current Activity Object and the distance is diff of their start times
 			 */
-			Triple<Integer, ActivityObject, Double> score =
+			Triple<Integer, ActivityObject2018, Double> score =
 					timeline1.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, true);
 
 		}
@@ -70,7 +70,7 @@ public class TimelineUtilsChecks
 	public static Timeline createDummyTimeline(int numOfAOs)
 	{
 		Timestamp ts0 = new Timestamp(2010 - 1900, 1 - 1, 1, 0, 0, 0, 0);
-		ArrayList<ActivityObject> aos = new ArrayList<>();
+		ArrayList<ActivityObject2018> aos = new ArrayList<>();
 
 		int randomActIndex, randomNextSecs;
 		Timestamp currentTS = ts0;
@@ -80,7 +80,7 @@ public class TimelineUtilsChecks
 			randomNextSecs = ThreadLocalRandom.current().nextInt(1000, 20000);
 
 			Timestamp ts = new Timestamp(currentTS.getTime() + randomNextSecs * 1000);
-			aos.add(new ActivityObject(actNames[randomActIndex], ts, ts));
+			aos.add(new ActivityObject2018(actNames[randomActIndex], ts, ts));
 			currentTS = ts;
 		}
 

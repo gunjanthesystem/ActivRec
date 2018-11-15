@@ -11,7 +11,7 @@ import org.activity.clustering.weka.WekaUtilityBelt;
 import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.sanityChecks.Sanity;
@@ -652,7 +652,7 @@ public class TimelinesAttributesExtractionCleaned1
 	public LinkedHashMap<String, Double> getSequenceEntropyAfterExpungingInvalids(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
 				.transformToSequenceDayWise(usersDayTimelines);// , false);
 		LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
 				.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);

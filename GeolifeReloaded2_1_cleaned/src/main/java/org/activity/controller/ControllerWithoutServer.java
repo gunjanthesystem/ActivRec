@@ -27,27 +27,31 @@ import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018;
 import org.activity.generator.ToyTimelineUtils;
 import org.activity.io.ReadingFromFile;
-import org.activity.io.SerializableJSONArray;
 import org.activity.io.Serializer;
 import org.activity.io.TimelineWriters;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
 import org.activity.objects.UserGowalla;
 import org.activity.probability.ProbabilityUtilityBelt;
 import org.activity.sanityChecks.ResultsSanityChecks;
+import org.activity.sanityChecks.Sanity;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
+import org.activity.util.BackwardsCompatibilityConverters;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
+import org.activity.util.SerializableJSONArray;
 import org.activity.util.TimelineCreators;
 import org.activity.util.TimelineTrimmers;
 import org.activity.util.TimelineUtils;
+import org.activity.util.UserDayTimeline;
 import org.activity.util.UtilityBelt;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -115,7 +119,8 @@ public class ControllerWithoutServer
 
 			if (Constant.reduceAndCleanTimelinesBeforeRecomm)
 			{
-				if (Constant.For9kUsers)// For 9k users
+
+				if (databaseName.equals("gowalla1") && Constant.For9kUsers)// For 9k users
 				{
 					usersCleanedDayTimelines = reduceAndCleanTimelines2(databaseName, usersDayTimelinesOriginal, true,
 							commonBasePath, 10, 7, 500);
@@ -125,6 +130,7 @@ public class ControllerWithoutServer
 					usersCleanedDayTimelines = reduceAndCleanTimelines(databaseName, usersDayTimelinesOriginal, true,
 							commonBasePath);
 				}
+
 			}
 			else// in this case, we are expecting the data is already subsetting and cleaned
 			{
@@ -136,6 +142,26 @@ public class ControllerWithoutServer
 			System.out.println("After reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
 			long dt3 = System.currentTimeMillis();
 			System.out.println("Time taken = " + (dt3 - dt1) + " ms");
+
+			// start of added on Nov 14 2018
+			if (databaseName.equals("geolife1"))
+			{ // Only include the selected userIDs
+				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> selectedUsersCleanedDayTimelines = new LinkedHashMap<>();
+				for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+				{
+					boolean validUser = IntStream.of(Constant.userIDs).anyMatch(x -> x == Integer.valueOf(e.getKey()));
+					if (validUser)
+					{
+						System.out.println("Selecting user: " + e.getKey());
+						selectedUsersCleanedDayTimelines.put(e.getKey(), e.getValue());
+					}
+				}
+				usersCleanedDayTimelines = selectedUsersCleanedDayTimelines;
+				System.out.println("Only selected users for geolife usersCleanedDayTimelines.size()= "
+						+ usersCleanedDayTimelines.size());
+			}
+			System.out.println("usersCleanedDayTimelines.size()= " + usersCleanedDayTimelines.size());
+			// end of added on Nov 14 2018
 			// System.exit(0);
 			/////////// start of temp
 			// $$WritingToFile.writeNumberOfActsWithMultipleWorkingLevelCatID(usersCleanedDayTimelines, true,
@@ -192,16 +218,20 @@ public class ControllerWithoutServer
 			if (true)// temporary enabled for verbose writing of user timeline
 			{
 				TimelineWriters.writeAllActObjs(usersCleanedDayTimelines, commonBasePath + "AllActObjs.csv");
-				TimelineWriters.writeLocationObjects(Constant.getUniqueLocIDs(),
-						DomainConstants.getLocIDLocationObjectDictionary(),
-						commonBasePath + "UniqueLocationObjects.csv");
-				// SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
-				TimelineWriters.writeUserObjects(usersCleanedDayTimelines.keySet(),
-						DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
+
+				if (databaseName.equals("gowalla1"))
+				{
+					TimelineWriters.writeLocationObjects(Constant.getUniqueLocIDs(),
+							DomainConstants.getLocIDLocationObjectDictionary(),
+							commonBasePath + "UniqueLocationObjects.csv");
+					// SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
+					TimelineWriters.writeUserObjects(usersCleanedDayTimelines.keySet(),
+							DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
+				}
 
 				Serializer.kryoSerializeThis(usersCleanedDayTimelines,
 						commonBasePath + "usersCleanedDayTimelines.kryo");
-				System.exit(0);
+				// $$System.exit(0);
 			}
 
 			if (false)// temporary for 22 feb 2018,
@@ -296,7 +326,7 @@ public class ControllerWithoutServer
 
 				// make the usersCleanedDayTimelines point to the toy timelines
 				usersCleanedDayTimelines = usersToyDayTimelines;
-			}
+			} // end of Toy timelines block
 
 			if (Constant.For9kUsers)
 			{
@@ -332,6 +362,7 @@ public class ControllerWithoutServer
 						int numOfUsers = usersCleanedDayTimelines.size();
 						List<Integer> allUserIndices = IntStream.range(0, numOfUsers).boxed()
 								.collect(Collectors.toList());
+						System.out.println("allUserIndices = " + allUserIndices);
 						sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines, "All", allUserIndices,
 								commonBasePath, Constant.lengthOfRecommendedSequence);
 						ResultsSanityChecks.assertSameNumOfRTsAcrossAllMUsForUsers(commonBasePath, false);
@@ -514,9 +545,20 @@ public class ControllerWithoutServer
 	{
 		String[] activityNames = Constant.getActivityNames();
 		StringBuilder sb = new StringBuilder("ActID,ActName\n");
-		for (String a : activityNames)
+
+		if (Constant.getDatabaseName().equals("gowalla1"))
 		{
-			sb.append(a + "," + DomainConstants.catIDNameDictionary.get(Integer.valueOf(a)) + "\n");
+			for (String a : activityNames)
+			{
+				sb.append(a + "," + DomainConstants.catIDNameDictionary.get(Integer.valueOf(a)) + "\n");
+			}
+		}
+		else
+		{
+			for (String a : activityNames)
+			{
+				sb.append(a + "," + a + "\n");
+			}
 		}
 		WToFile.writeToNewFile(sb.toString(), absFileNameToWrite);// Constant.getCommonPath() + "CatIDNameMap.csv");
 	}
@@ -739,6 +781,7 @@ public class ControllerWithoutServer
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = null;
 		// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
 		System.out.println("Before createTimelines\n" + PerformanceAnalytics.getHeapInformation());
+		System.out.println("TEMPORARY EXIT");// TODO CAN BE DELETE
 		if (toCreateTimelines)
 		{
 			usersDayTimelinesOriginal = createTimelines(databaseName, jsonArrayD,
@@ -764,8 +807,59 @@ public class ControllerWithoutServer
 			}
 			else
 			{
-				usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-						.deSerializeThis(pathToLatestSerialisedTimelines);
+				/// Start of Nov 14 2018 for compatibility
+				boolean do2016GeolifeCompatiblity = true;
+				if (do2016GeolifeCompatiblity)
+				{
+					long totalNumOfAOsOld = 0, totalNumOfAOsNew = 0;
+					TreeMap<Integer, String> actIDNameDict = new TreeMap<>();
+					LinkedHashMap<Integer, String> locIDNameDict = new LinkedHashMap<>();
+
+					LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOriginal2016 = (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer
+							.deSerializeThis(pathToLatestSerialisedTimelines);
+					usersDayTimelinesOriginal = new LinkedHashMap<>(); // empty it for safety
+
+					for (Entry<String, LinkedHashMap<Date, UserDayTimeline>> e : usersDayTimelinesOriginal2016
+							.entrySet())
+					{
+						LinkedHashMap<Date, Timeline> newTimelines = new LinkedHashMap<>(e.getValue().size());
+						for (Entry<Date, UserDayTimeline> dayTimelineEntry : e.getValue().entrySet())
+						{
+							Triple<Timeline, TreeMap<Integer, String>, LinkedHashMap<Integer, String>> res = BackwardsCompatibilityConverters
+									.convert2016UserDayTimelineTo2018Timeline(dayTimelineEntry.getValue());
+
+							Timeline newTimeline = res.getFirst();
+							actIDNameDict.putAll(res.getSecond());
+							locIDNameDict.putAll(res.getThird());
+
+							newTimelines.put(dayTimelineEntry.getKey(), newTimeline);
+
+							totalNumOfAOsOld += dayTimelineEntry.getValue().getActivityObjectsInDay().size();
+							totalNumOfAOsNew += newTimeline.size();
+						}
+						Sanity.eq(newTimelines.size(), e.getValue().size(),
+								"Error Nov 2014: mismtached number of timelines in conversion");
+						usersDayTimelinesOriginal.put(e.getKey(), newTimelines);
+					}
+					Sanity.eq(usersDayTimelinesOriginal2016.size(), usersDayTimelinesOriginal.size(),
+							"Error Nov 2014: mismtached number of usersDayTimelinesOriginal in conversion");
+
+					System.out.println("usersDayTimelinesOriginal2016.size()= " + usersDayTimelinesOriginal2016.size()
+							+ "   usersDayTimelinesOriginal.size()=" + usersDayTimelinesOriginal.size());
+					System.out.println(
+							"totalNumOfAOsOld= " + totalNumOfAOsOld + "  totalNumOfAOsNew=" + totalNumOfAOsNew);
+					System.out.println("");
+					DomainConstants.setCatIDNameDictionary(actIDNameDict, true);
+					DomainConstants.setLocIDNameDictionary(locIDNameDict, true);
+					// System.out.println("Temporary Exit");// TODO
+					// System.exit(-1);
+				}
+				// End of Nov 14 2018 for compatiblity of 2016 serialise objects
+				else
+				{
+					usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+							.deSerializeThis(pathToLatestSerialisedTimelines);
+				}
 			}
 			System.out.println("deserialised userTimelines.size()=" + usersDayTimelinesOriginal.size());
 			System.out.println("Deserialized Timelines");
@@ -960,7 +1054,8 @@ public class ControllerWithoutServer
 				indexOfSampleUser += 1;
 				continue;
 			}
-			if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+			if (Constant.getDatabaseName().equals("gowalla1")
+					&& DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
 			{
 				System.out.println(" ALERT ALERT ALERT !! NOT EXPECTED" + indexOfSampleUser + " Skipping user: "
 						+ userEntry.getKey() + " as in gowallaUserIDsWithGT553MaxActsPerDay");
@@ -985,17 +1080,25 @@ public class ControllerWithoutServer
 		int numOfAllUsersSkippedGT553MaxActsPerDay = 0;
 		if (Constant.collaborativeCandidates)
 		{
-			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+			if (Constant.getDatabaseName().equals("gowalla1"))
 			{
-				if (DomainConstants.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+				for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 				{
-					numOfAllUsersSkippedGT553MaxActsPerDay += 1;
-					continue;
+					if (Constant.getDatabaseName().equals("gowalla1") && DomainConstants
+							.isGowallaUserIDWithGT553MaxActsPerDay(Integer.valueOf(userEntry.getKey())))
+					{
+						numOfAllUsersSkippedGT553MaxActsPerDay += 1;
+						continue;
+					}
+					else
+					{
+						allUsers.put(userEntry.getKey(), userEntry.getValue());
+					}
 				}
-				else
-				{
-					allUsers.put(userEntry.getKey(), userEntry.getValue());
-				}
+			}
+			else
+			{
+				allUsers = usersCleanedDayTimelines;// Nov 14 2018
 			}
 			System.out.println("got timelines for all users for coll cand: allUsers.size()= " + allUsers.size());
 			// Sanity.eq(numOfUsersSkippedGT553MaxActsPerDay, numOfAllUsersSkippedGT553MaxActsPerDay,
@@ -1327,10 +1430,15 @@ public class ControllerWithoutServer
 			break;
 
 		case "geolife1":
-			pathToLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayAPR21obj";
+
+			// String localCommonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";// before 14 Nov 2018
+			String localCommonPath = "./dataToRead/GeolifeFromBackup/";// since 14 Nov 2018
+			pathToLatestSerialisedJSONArray = localCommonPath + "GeolifeJSONArrayAPR21obj";
+			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayAPR21obj";//commented out 14 Nov 2018
+			// 2am
 			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArrayMAY27obj";
 			// GeolifeJSONArrayFeb13.obj";
-			pathForLatestSerialisedJSONArray = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/GeolifeJSONArray"
+			pathForLatestSerialisedJSONArray = localCommonPath + "/GeolifeJSONArray"
 					+ DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
 
 			// $$UMAP submission
@@ -1343,12 +1451,16 @@ public class ControllerWithoutServer
 			// UserTimelinesFeb13.lmap";
 
 			// After UMAP submission 19th April 2016
-			pathToLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";
+			pathToLatestSerialisedTimelines = localCommonPath + "UserTimelinesAPR21.lmap";
+			// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelinesAPR21.lmap";//commented out 14 Nov 2018
+			// 2am
 
-			pathForLatestSerialisedTimelines = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/UserTimelines"
+			pathForLatestSerialisedTimelines = localCommonPath + "UserTimelines"
 					+ DateTimeUtils.getShortDateLabel(currentDateTime) + ".lmap";
-			commonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";// version 3 based on rank score
-																				// function
+
+			// commonPath = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/";// version 3 based on rank score
+			// function//commented out 14 Nov 2018
+			commonPath = Constant.getOutputCoreResultsPath();// since 14 Nov 2018
 			break;
 
 		case "dcu_data_2":
@@ -1470,7 +1582,7 @@ public class ControllerWithoutServer
 		}
 		else // When databaseName is not gowalla1
 		{
-			ArrayList<ActivityObject> allActivityEvents = UtilityBelt
+			ArrayList<ActivityObject2018> allActivityEvents = UtilityBelt
 					.createActivityObjectsFromJsonArray(jsonArrayD.getJSONArray());
 			// UtilityBelt.traverseActivityEvents(allActivityEvents); // Debugging Check: OK
 			usersDayTimelinesOriginal = TimelineCreators.createUserTimelinesFromActivityObjects(allActivityEvents);
@@ -1593,6 +1705,14 @@ public class ControllerWithoutServer
 			usersDayTimelinesOriginal = reduceGowallaTimelinesByActDensity(databaseName, usersDayTimelinesOriginal,
 					true, 10, 50, commonPathToWrite);
 		}
+
+		// Start of added on Nov 14 2018
+		// if (databaseName.equals("geolife1"))
+		// {
+		// usersDayTimelinesOriginal = reduceGowallaTimelinesByActDensity(databaseName, usersDayTimelinesOriginal,
+		// true, 2, 5, commonPathToWrite);
+		// }
+		// End of added on Nov 14 2018
 
 		///// clean timelines
 		System.out.println(
