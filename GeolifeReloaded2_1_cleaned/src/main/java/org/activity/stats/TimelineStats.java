@@ -34,7 +34,7 @@ import org.activity.distances.AlignmentBasedDistance;
 import org.activity.distances.HJEditDistance;
 import org.activity.io.CSVUtils;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
@@ -196,7 +196,7 @@ public class TimelineStats
 
 			case "ActivityRegularityAnalysisOneLevel":
 			{
-				LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
+				LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
 						.transformToSequenceDayWise(usersDayTimelinesCleaned);
 				LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
 						.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
@@ -232,7 +232,7 @@ public class TimelineStats
 
 			case "Clustering":
 			{
-				LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
+				LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
 						.transformToSequenceDayWise(usersDayTimelinesCleaned);// , false);
 				LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged = TimelineTransformers
 						.toCharsFromActivityObjects(sequenceAll, true);
@@ -743,7 +743,7 @@ public class TimelineStats
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesIntInvalidsExpunged =
 		// toIntsFromActivityObjects(timeSeries, true);
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines);
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
 				.transformToSequenceDayWise(usersDayTimelines);// , false);
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceInt = TimelineTransformers
 				.toIntsFromActivityObjects(sequenceAll, false);
@@ -845,7 +845,7 @@ public class TimelineStats
 	public static void performTimeSeriesEntropyAnalysis(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries = TimelineTransformers
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> timeSeries = TimelineTransformers
 				.transformToEqualIntervalTimeSeriesDayWise(usersDayTimelines, intervalInSecs);
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesInt = toTimeSeriesInt(timeSeries, false);
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesIntZeroValuedInvalids =
@@ -856,7 +856,7 @@ public class TimelineStats
 				.toCharsFromActivityObjectsNoTimestamp(timeSeries, true);
 		LinkedHashMap<String, Double> tsEntropy = getShannonEntropy(timeSeriesCharInvalidsExpungedNoTS);// , true);
 
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceAll = TimelineTransformers
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
 				.transformToSequenceDayWise(usersDayTimelines);// , false);
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceInt = toTimeSeriesInt(sequenceAll, false);
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntZeroValuedInvalids =
@@ -1065,17 +1065,17 @@ public class TimelineStats
 	 * @param timeline
 	 * @return
 	 */
-	private static ArrayList<ArrayList<ActivityObject>> getTrailSegments(Double muInCounts,
+	private static ArrayList<ArrayList<ActivityObject2018>> getTrailSegments(Double muInCounts,
 			ArrayList<Integer> beginIndices, Timeline timeline)
 	{
 		// System.out.println("Inside getTrailSegments");
-		ArrayList<ArrayList<ActivityObject>> segments = new ArrayList<ArrayList<ActivityObject>>();
+		ArrayList<ArrayList<ActivityObject2018>> segments = new ArrayList<ArrayList<ActivityObject2018>>();
 
 		for (Integer endIndex : beginIndices)
 		{
 			// NOTE: going back matchingUnitCounts FROM THE index.
 			int newStartIndex = (int) ((endIndex - muInCounts) >= 0 ? (endIndex - muInCounts) : 0);
-			ArrayList<ActivityObject> activityObjectsForSegment = timeline
+			ArrayList<ActivityObject2018> activityObjectsForSegment = timeline
 					.getActivityObjectsInTimelineFromToIndex(newStartIndex, endIndex + 1);
 			segments.add(activityObjectsForSegment);
 			// System.out.println("Num of elements in this segment = " + activityObjectsForSegment.size());
@@ -1110,12 +1110,12 @@ public class TimelineStats
 	{
 		System.out
 				.println("Inside getAvgPairwiseTwoLevelEditDistance for activity name: " + activityName + " mu:" + mu);
-		ArrayList<ArrayList<ActivityObject>> segments = new ArrayList<ArrayList<ActivityObject>>();
+		ArrayList<ArrayList<ActivityObject2018>> segments = new ArrayList<ArrayList<ActivityObject2018>>();
 		String stringCodeForActivity = StringCode.getStringCodeFromActivityName(activityName);
 
 		for (int i = 0; i < timeline.size(); i++)
 		{
-			ActivityObject current = timeline.getActivityObjectAtPosition(i);
+			ActivityObject2018 current = timeline.getActivityObjectAtPosition(i);
 			String stringCodeForCurrent = StringCode.getStringCodeFromActivityName(current.getActivityName());
 
 			if (stringCodeForCurrent.equals(stringCodeForActivity))
@@ -1148,7 +1148,7 @@ public class TimelineStats
 	 * @param primaryDimension
 	 * @return
 	 */
-	private static double getAvgPairwiseTwoLevelED(ArrayList<ArrayList<ActivityObject>> segments,
+	private static double getAvgPairwiseTwoLevelED(ArrayList<ArrayList<ActivityObject2018>> segments,
 			PrimaryDimension primaryDimension)
 	{
 		// System.out.println("Inside getAvgPairwiseTwoLevelED");
@@ -1177,7 +1177,7 @@ public class TimelineStats
 	 * @param primaryDimension
 	 * @return
 	 */
-	private static double[] getPairwiseTwoLevelEDs(ArrayList<ArrayList<ActivityObject>> segments,
+	private static double[] getPairwiseTwoLevelEDs(ArrayList<ArrayList<ActivityObject2018>> segments,
 			PrimaryDimension primaryDimension)
 	{
 		// System.out.println("Inside getAvgPairwiseTwoLevelED");
@@ -1574,7 +1574,7 @@ public class TimelineStats
 	 * @param ao
 	 * @return
 	 */
-	public static int getMagnifiedIntCodeForActivityObject(ActivityObject ao)
+	public static int getMagnifiedIntCodeForActivityObject(ActivityObject2018 ao)
 	{
 		int r = (ConnectDatabase.getActivityID(ao.getActivityName()) + 0) * 100;
 		return r;
@@ -1654,15 +1654,15 @@ public class TimelineStats
 	// return timeSeries;
 	// }
 
-	public static void traverse(LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries)
+	public static void traverse(LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> timeSeries)
 	{
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : timeSeries.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : timeSeries.entrySet())
 		{
 			String userID = entry.getKey();
 
-			for (Map.Entry<Timestamp, ActivityObject> entryInn : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> entryInn : entry.getValue().entrySet())
 			{
-				ActivityObject ao = entryInn.getValue();
+				ActivityObject2018 ao = entryInn.getValue();
 
 				String s = entryInn.getKey().toString() + "," + ao.getActivityName();
 				WToFile.appendLineToFile(s + "\n", userID + "TimeSeries");
@@ -2137,7 +2137,7 @@ public class TimelineStats
 					double mu = Constant.matchingUnitAsPastCount[muIndex];
 
 					// obtain the trail segments for this mu.
-					ArrayList<ArrayList<ActivityObject>> trailSegments = getTrailSegments(mu, startIndices,
+					ArrayList<ArrayList<ActivityObject2018>> trailSegments = getTrailSegments(mu, startIndices,
 							timelineForUser);
 
 					double pairwiseTwoLevelEditDistances[] = getPairwiseTwoLevelEDs(trailSegments,
@@ -2194,7 +2194,7 @@ public class TimelineStats
 					ArrayList<Integer> startIndices = entryTwoGram.getValue();
 
 					// obtain the trail segments for this mu and this 2gram.
-					ArrayList<ArrayList<ActivityObject>> trailSegments = getTrailSegments(mu, startIndices,
+					ArrayList<ArrayList<ActivityObject2018>> trailSegments = getTrailSegments(mu, startIndices,
 							timelineForUser);
 
 					double pairwiseTwoLevelEditDistances[] = getPairwiseTwoLevelEDs(trailSegments,
@@ -2371,7 +2371,7 @@ public class TimelineStats
 			String userID = userTimelineEntry.getKey();
 			Timeline userTimeline = userTimelineEntry.getValue();
 
-			for (ActivityObject ao : userTimeline.getActivityObjectsInTimeline())
+			for (ActivityObject2018 ao : userTimeline.getActivityObjectsInTimeline())
 			{
 				count++;
 
@@ -2623,7 +2623,7 @@ public class TimelineStats
 			// long totalNumOfDistinctActsOverAllTimelines = 0;
 			ArrayList<Double> numOfDistinctActsPerDay = new ArrayList<Double>();// size= num of days
 			double[] numOfDistinctActsPerDayArray;
-			ArrayList<ActivityObject> allActObjs = new ArrayList<ActivityObject>();
+			ArrayList<ActivityObject2018> allActObjs = new ArrayList<ActivityObject2018>();
 
 			for (Entry<Date, Timeline> entryDay : entry.getValue().entrySet())
 			{
@@ -3035,7 +3035,7 @@ public class TimelineStats
 			for (Entry<Date, Timeline> dateEntryForThisUser : userEntry.getValue().entrySet())
 			{
 				Timeline dayTimeline = dateEntryForThisUser.getValue();
-				for (ActivityObject ao : dayTimeline.getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dayTimeline.getActivityObjectsInTimeline())
 				{
 					int actID = ao.getActivityID();
 					int updatedActCount = 1;
@@ -3303,7 +3303,7 @@ public class TimelineStats
 		{
 			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
 			{
-				for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dateEntry.getValue().getActivityObjectsInTimeline())
 				{
 					numOfAOs += 1;
 					if (RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs()).length > 1)
@@ -3392,7 +3392,7 @@ public class TimelineStats
 				bwString.append(entry.getKey().toString());
 				bwString.append("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
 
-				ArrayList<ActivityObject> activitiesInDay = entry.getValue().getActivityObjectsInDay();
+				ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
 
 				/* <Activity Name, count for the current day> */
 				LinkedHashMap<String, Integer> activityNameCountPairs = new LinkedHashMap<String, Integer>();
@@ -3409,7 +3409,7 @@ public class TimelineStats
 					}
 				}
 
-				for (ActivityObject actEvent : activitiesInDay)
+				for (ActivityObject2018 actEvent : activitiesInDay)
 				{
 					if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
 					// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
@@ -3552,7 +3552,7 @@ public class TimelineStats
 				// bw.write(entry.getKey().toString());
 				// bw.write("," + (UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
 
-				ArrayList<ActivityObject> activitiesInDay = entry.getValue().getActivityObjectsInDay();
+				ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
 
 				// written beforehand to maintain the same order of activity names
 				for (String activityName : activityNames)
@@ -3663,7 +3663,7 @@ public class TimelineStats
 				toWrite.append(entry.getKey().toString() + ","
 						+ (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
 
-				ArrayList<ActivityObject> activitiesInDay = entry.getValue().getActivityObjectsInDay();
+				ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
 				LinkedHashMap<String, Long> activityNameDurationPairs = new LinkedHashMap<String, Long>();
 
 				for (String activityName : activityNames) // written beforehand to maintain the same order of activity
@@ -3676,7 +3676,7 @@ public class TimelineStats
 					}
 				}
 
-				for (ActivityObject actEvent : activitiesInDay)
+				for (ActivityObject2018 actEvent : activitiesInDay)
 				{
 					if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
 					// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||

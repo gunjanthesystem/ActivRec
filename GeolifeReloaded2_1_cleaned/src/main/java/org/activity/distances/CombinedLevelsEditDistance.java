@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.util.StringCode;
 
@@ -35,13 +35,13 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final Pair<String, Double> getEditDistanceWithoutEndCurrentActivity(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original)
+			ArrayList<ActivityObject2018> activityObjects1Original, ArrayList<ActivityObject2018> activityObjects2Original)
 	{
 		Pair<String, Double> result;
-		ArrayList<ActivityObject> activityObjects1 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects1 = new ArrayList<ActivityObject2018>();
 		activityObjects1.addAll(activityObjects1Original);
 
-		ArrayList<ActivityObject> activityObjects2 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects2 = new ArrayList<ActivityObject2018>();
 		activityObjects2.addAll(activityObjects2Original);
 
 		if (activityObjects1.size() - 1 == 0 && activityObjects2.size() - 1 == 0)
@@ -83,8 +83,8 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public final double getEditDistance(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2)
+	public final double getEditDistance(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2)
 	{
 		// double similarity=0d;//,distance=0d;
 		double editDistance = 0d;
@@ -186,7 +186,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 			for (int i = 0; i < len1; i++)
 			{
-				ActivityObject ae1 = activityObjects1.get(i);
+				ActivityObject2018 ae1 = activityObjects1.get(i);
 
 				String activityName1 = ae1.getActivityName();
 				// String location1=ae1.getLocationName();//ae1.getDimensionAttributeValue("Location_Dimension",
@@ -200,7 +200,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 				for (int j = 0; j < len2; j++)
 				{
-					ActivityObject ae2 = activityObjects2.get(j);
+					ActivityObject2018 ae2 = activityObjects2.get(j);
 
 					String activityName2 = ae2.getActivityName();
 					// String location2=ae2.getLocationName();//getDimensionAttributeValue("Location_Dimension",
@@ -376,8 +376,8 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public final double getEditDistanceInvalidsExpunged(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2)
+	public final double getEditDistanceInvalidsExpunged(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2)
 	{
 		return getEditDistance(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2));// similarity;
 	}
@@ -395,7 +395,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final Pair<String, Double> getEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2)
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2)
 	{
 		return getEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1),
 				expungeInvalids(activityObjects2));// similarity;
@@ -412,8 +412,8 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public final Pair<String, Double> getEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2)
+	public final Pair<String, Double> getEditDistanceWithTrace(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2)
 	{
 		// double similarity=0d;//,distance=0d;
 		String trace = "";
@@ -520,7 +520,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 			for (int i = 0; i < len1; i++)
 			{
-				ActivityObject ae1 = activityObjects1.get(i);
+				ActivityObject2018 ae1 = activityObjects1.get(i);
 
 				String activityName1 = ae1.getActivityName();
 				// String location1=ae1.getLocationName();//ae1.getDimensionAttributeValue("Location_Dimension",
@@ -534,7 +534,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 
 				for (int j = 0; j < len2; j++)
 				{
-					ActivityObject ae2 = activityObjects2.get(j);
+					ActivityObject2018 ae2 = activityObjects2.get(j);
 
 					String activityName2 = ae2.getActivityName();
 					// String location2=ae2.getLocationName();//getDimensionAttributeValue("Location_Dimension",
@@ -723,7 +723,7 @@ public class CombinedLevelsEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final Pair<String, Double> getMyLevenshteinDistanceAsStringCodeWithTrace(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2)
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2)
 	{
 		activityObjects1 = pruneFirstUnknown(activityObjects1);
 		activityObjects2 = pruneFirstUnknown(activityObjects2);

@@ -8,7 +8,7 @@ import java.util.Map;
 import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.ui.PopUps;
 import org.activity.util.StringCode;
@@ -38,7 +38,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public Pair<String, Double> getFeatureWiseEditDistanceWithTraceSingleFeature(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original)
+			ArrayList<ActivityObject2018> activityObjects1Original, ArrayList<ActivityObject2018> activityObjects2Original)
 	{
 		if (VerbosityConstants.verboseDistance)
 		{
@@ -88,7 +88,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 	 */
 	// getFeatureStringLevenshteinSAXWithTrace
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseEditDistanceWithTrace(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original)
+			ArrayList<ActivityObject2018> activityObjects1Original, ArrayList<ActivityObject2018> activityObjects2Original)
 	{
 		if (VerbosityConstants.verboseDistance)
 		{
@@ -96,8 +96,8 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 					+ " & " + activityObjects2Original.size() + " objs");
 		}
 
-		ArrayList<ActivityObject> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
-		ArrayList<ActivityObject> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
+		ArrayList<ActivityObject2018> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
+		ArrayList<ActivityObject2018> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
 
 		/**
 		 * <ActivityName,Pair<Trace,EditDistance>>
@@ -223,7 +223,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseEditDistanceWithoutEndCurrentActivity(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original)// ,
+			ArrayList<ActivityObject2018> activityObjects1Original, ArrayList<ActivityObject2018> activityObjects2Original)// ,
 																													// String
 																													// userAtRecomm,
 																													// String
@@ -233,10 +233,10 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 																													// Integer
 																													// candidateTimelineId)
 	{
-		ArrayList<ActivityObject> activityObjects1 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects1 = new ArrayList<ActivityObject2018>();
 		activityObjects1.addAll(activityObjects1Original);
 
-		ArrayList<ActivityObject> activityObjects2 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects2 = new ArrayList<ActivityObject2018>();
 		activityObjects2.addAll(activityObjects2Original);
 
 		activityObjects1.remove(activityObjects1.size() - 1);
@@ -261,7 +261,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseEditDistanceInvalidsExpunged(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2)// , String
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2)// , String
 																									// userAtRecomm,
 	// String dateAtRecomm, String timeAtRecomm, Integer candidateTimelineId)
 	{
@@ -281,7 +281,7 @@ public class FeatureWiseEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2)
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2)
 	{
 		return getFeatureWiseEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1),
 				expungeInvalids(activityObjects2));

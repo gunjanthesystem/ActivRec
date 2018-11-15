@@ -24,7 +24,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
 import org.activity.objects.LocationGowalla;
@@ -51,11 +51,11 @@ public class TimelineTransformers
 	 * @since 18 July
 	 */
 	public static String getActivityGDGuidingRecomm(PrimaryDimension givenDimension,
-			ArrayList<ActivityObject> activitiesGuidingRecomm)
+			ArrayList<ActivityObject2018> activitiesGuidingRecomm)
 	{
 		StringBuilder res = new StringBuilder();
 
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res = StringUtils.fCat(res, ">>", ae.getGivenDimensionVal("|", givenDimension));
 			// res.append(">>" + ae.getActivityName());
@@ -69,15 +69,15 @@ public class TimelineTransformers
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toTimeSeriesIntWithZeroValuedInvalids(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<>();
 
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Integer> dataToPut = new LinkedHashMap<>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				int value = -99;
 				if (dataEntry.getValue().isInvalidActivityName())
@@ -104,18 +104,18 @@ public class TimelineTransformers
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toIntsFromActivityObjects(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
 
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Integer> dataToPut = new LinkedHashMap<Timestamp, Integer>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				int value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -139,19 +139,19 @@ public class TimelineTransformers
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toIntsFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
 
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Integer> dataToPut = new LinkedHashMap<Timestamp, Integer>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				int value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -170,18 +170,18 @@ public class TimelineTransformers
 	}
 
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toDurationsFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Long> dataToPut = new LinkedHashMap<Timestamp, Long>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				long value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -206,18 +206,18 @@ public class TimelineTransformers
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toStartTimeFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Long> dataToPut = new LinkedHashMap<Timestamp, Long>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				long value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -236,18 +236,18 @@ public class TimelineTransformers
 	}
 
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toDistanceTravelledFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Double> dataToPut = new LinkedHashMap<Timestamp, Double>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				double value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -266,18 +266,18 @@ public class TimelineTransformers
 	}
 
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toAvgAltitudeFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Double> dataToPut = new LinkedHashMap<Timestamp, Double>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				double value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -296,18 +296,18 @@ public class TimelineTransformers
 	}
 
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toStartAltitudeFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Double> dataToPut = new LinkedHashMap<Timestamp, Double>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				double value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -326,18 +326,18 @@ public class TimelineTransformers
 	}
 
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toEndAltitudeFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Double>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Double> dataToPut = new LinkedHashMap<Timestamp, Double>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				double value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -356,18 +356,18 @@ public class TimelineTransformers
 	}
 
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toStartGeoCoordinatesFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Long> dataToPut = new LinkedHashMap<Timestamp, Long>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				long value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -391,18 +391,18 @@ public class TimelineTransformers
 	}
 
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toEndGeoCoordinatesFromActivityObjectsDummyTime(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
 		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, Long> dataToPut = new LinkedHashMap<Timestamp, Long>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				long value = -99;
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
@@ -433,18 +433,18 @@ public class TimelineTransformers
 	 * @return
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, String>> toCharsFromActivityObjects(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, LinkedHashMap<Timestamp, String>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, String>>();
 		System.out.println("inside toCharsFromActivityObjects");
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			LinkedHashMap<Timestamp, String> dataToPut = new LinkedHashMap<Timestamp, String>();
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				char value = 'X';
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (ao == null) // is ao is null, will happen if the timestamp corresponds to a place where an invalid
 								// was there but has now been removed.
@@ -472,22 +472,22 @@ public class TimelineTransformers
 	 * @return
 	 */
 	public static LinkedHashMap<String, String> toCharsFromActivityObjectsNoTimestamp(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, String> r = new LinkedHashMap<String, String>();
 		System.out.println("inside toCharsFromActivityObjectsNoTimestamp");
 
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			StringBuilder dataToPut = new StringBuilder();
 			// = new LinkedHashMap<Timestamp, String>();
 			int numberOfAOs = entry.getValue().size();
 			int numberOfNullAOs = 0;
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				String value = "X";
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (ao == null) // is ao is null, will happen if the timestamp corresponds to a place where an invalid
 								// was there but has now been removed.
@@ -520,22 +520,22 @@ public class TimelineTransformers
 	 * @return
 	 */
 	public static LinkedHashMap<String, String> toCharsFromActivityObjectsNoTimestamp2(
-			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> ts, boolean validsOnly)
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
 		LinkedHashMap<String, String> r = new LinkedHashMap<String, String>();
 		System.out.println("inside toCharsFromActivityObjectsNoTimestamp");
 
-		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject>> entry : ts.entrySet())
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
 		{
 			StringBuilder dataToPut = new StringBuilder();
 			// = new LinkedHashMap<Timestamp, String>();
 			int numberOfAOs = entry.getValue().size();
 			int numberOfNullAOs = 0;
 
-			for (Map.Entry<Timestamp, ActivityObject> dataEntry : entry.getValue().entrySet())
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
 			{
 				String value = "X";
-				ActivityObject ao = dataEntry.getValue();
+				ActivityObject2018 ao = dataEntry.getValue();
 
 				if (ao == null) // is ao is null, will happen if the timestamp corresponds to a place where an invalid
 								// was there but has now been removed.
@@ -567,18 +567,18 @@ public class TimelineTransformers
 	 * @param intervalSizeInSeconds
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> transformToEqualIntervalTimeSeriesDayWise(
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> transformToEqualIntervalTimeSeriesDayWise(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersDayTimelines, int intervalSizeInSeconds)
 	{
 		System.out.println("inside transformToEqualIntervalTimeSeriesDayWise");
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries = new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> timeSeries = new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>>();
 
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : allUsersDayTimelines.entrySet())
 		{
 			String userID = entry.getKey();
 			LinkedHashMap<Date, Timeline> dayTimelines = entry.getValue();
 
-			LinkedHashMap<Timestamp, ActivityObject> dataPoints = new LinkedHashMap<Timestamp, ActivityObject>();
+			LinkedHashMap<Timestamp, ActivityObject2018> dataPoints = new LinkedHashMap<Timestamp, ActivityObject2018>();
 
 			for (Map.Entry<Date, Timeline> entryForDay : dayTimelines.entrySet())
 			{
@@ -591,7 +591,7 @@ public class TimelineTransformers
 
 				while (cursorTimestamp.before(endTimestamp))
 				{
-					ActivityObject aoToPut = dayTimeline.getActivityObjectAtTime(cursorTimestamp); // aoToPut is null if
+					ActivityObject2018 aoToPut = dayTimeline.getActivityObjectAtTime(cursorTimestamp); // aoToPut is null if
 																									// there is no ao at
 																									// that time, will
 																									// happen when an
@@ -621,18 +621,18 @@ public class TimelineTransformers
 	 * @return
 	 */
 	// StartTimestamp, Activity Object
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> transformToSequenceDayWise(
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> transformToSequenceDayWise(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersDayTimelines)
 	{
 		System.out.println("inside transformToSequenceDayWise");
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> sequenceOfAOs = new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceOfAOs = new LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>>();
 
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : allUsersDayTimelines.entrySet())
 		{
 			String userID = entry.getKey();
 			LinkedHashMap<Date, Timeline> dayTimelines = entry.getValue();
 
-			LinkedHashMap<Timestamp, ActivityObject> dataPoints = new LinkedHashMap<Timestamp, ActivityObject>();
+			LinkedHashMap<Timestamp, ActivityObject2018> dataPoints = new LinkedHashMap<Timestamp, ActivityObject2018>();
 
 			int countOfAOs = 0;
 
@@ -641,7 +641,7 @@ public class TimelineTransformers
 				Timeline dayTimeline = entryForDay.getValue();
 				for (int i = 0; i < dayTimeline.getActivityObjectsInDay().size(); i++)
 				{
-					ActivityObject ao = dayTimeline.getActivityObjectAtPosition(i);
+					ActivityObject2018 ao = dayTimeline.getActivityObjectAtPosition(i);
 					dataPoints.put(ao.getStartTimestamp(), ao);
 					countOfAOs++;
 				}
@@ -666,17 +666,17 @@ public class TimelineTransformers
 	 * @param intervalSizeInSeconds
 	 * @return
 	 */
-	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> transformToEqualIntervalTimeSeries(
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> transformToEqualIntervalTimeSeries(
 			LinkedHashMap<String, Timeline> timelines, int intervalSizeInSeconds)
 	{
-		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> timeSeries = new LinkedHashMap<>();
 
 		for (Map.Entry<String, Timeline> entry : timelines.entrySet())
 		{
 			String userID = entry.getKey();
 			Timeline timeline = entry.getValue();
 
-			LinkedHashMap<Timestamp, ActivityObject> dataPoints = new LinkedHashMap<>();
+			LinkedHashMap<Timestamp, ActivityObject2018> dataPoints = new LinkedHashMap<>();
 
 			Timestamp cursorTimestamp = timeline.getActivityObjectAtPosition(0).getStartTimestamp();
 			Timestamp endTimestamp = timeline
@@ -707,11 +707,11 @@ public class TimelineTransformers
 	public static String timelineToSeqOfActNames(Timeline timeline, String delimiter)
 	{
 		StringBuilder s = new StringBuilder();
-		ArrayList<ActivityObject> aosInTimeline = timeline.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInTimeline = timeline.getActivityObjectsInTimeline();
 
 		TreeMap<Integer, String> catIDNameDictionary = DomainConstants.catIDNameDictionary;
 
-		for (ActivityObject ao : aosInTimeline)
+		for (ActivityObject2018 ao : aosInTimeline)
 		{
 			String catIDName = catIDNameDictionary.get(Integer.valueOf(ao.getActivityName()));
 			if (catIDName == null || catIDName.length() == 0)
@@ -739,9 +739,9 @@ public class TimelineTransformers
 	public static String timelineToSeqOfActIDs(Timeline timeline, String delimiter)
 	{
 		StringBuilder s = new StringBuilder();
-		ArrayList<ActivityObject> aosInTimeline = timeline.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInTimeline = timeline.getActivityObjectsInTimeline();
 		// TreeMap<Integer, String> catIDNameDictionary = Constant.catIDNameDictionary;
-		for (ActivityObject ao : aosInTimeline)
+		for (ActivityObject2018 ao : aosInTimeline)
 		{
 			Integer catID = Integer.valueOf(ao.getActivityName());
 			if (catID == null || catID < 0)
@@ -766,7 +766,7 @@ public class TimelineTransformers
 	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
 	 *         given delimiter
 	 */
-	public static ArrayList<Integer> timelineToSeqOfActIDs(ArrayList<ActivityObject> givenAOs)
+	public static ArrayList<Integer> timelineToSeqOfActIDs(ArrayList<ActivityObject2018> givenAOs)
 	{
 		return (ArrayList<Integer>) givenAOs.stream().map(ao -> Integer.valueOf(ao.getActivityName()))
 				.collect(Collectors.toList());
@@ -778,7 +778,7 @@ public class TimelineTransformers
 	 * @return seq of activity names (actual category names extracted from the catid name dictionary) delimited by the
 	 *         given delimiter
 	 */
-	public static ArrayList<Integer> timelineToSeqOfActIDsV0(ArrayList<ActivityObject> givenAOs, boolean verbose)
+	public static ArrayList<Integer> timelineToSeqOfActIDsV0(ArrayList<ActivityObject2018> givenAOs, boolean verbose)
 	{
 
 		ArrayList<Integer> res = (ArrayList<Integer>) givenAOs.stream().map(ao -> Integer.valueOf(ao.getActivityName()))
@@ -806,13 +806,13 @@ public class TimelineTransformers
 	 *         given delimiter
 	 * @since 15 Dec 2017
 	 */
-	public static ArrayList<Integer> listOfActObjsToListOfActIDs(ArrayList<ActivityObject> givenAOs, boolean verbose)
+	public static ArrayList<Integer> listOfActObjsToListOfActIDs(ArrayList<ActivityObject2018> givenAOs, boolean verbose)
 	{
 		ArrayList<Integer> seqOfActIDs2 = new ArrayList<>(givenAOs.size());
 		// ArrayList<Integer> seqOfActIDs = new ArrayList<>(givenAOs.size());
 		// for (ActivityObject ao : givenAOs){ seqOfActIDs.add(Integer.valueOf(ao.getActivityName()));}
 
-		for (ActivityObject ao : givenAOs)
+		for (ActivityObject2018 ao : givenAOs)
 		{
 			seqOfActIDs2.add(ao.getActivityID());
 		}
@@ -851,7 +851,7 @@ public class TimelineTransformers
 	 *         given delimiter
 	 * @since 5 Aug 2019
 	 */
-	public static ArrayList<Integer> listOfActObjsToListOfGivenDimensionVals(ArrayList<ActivityObject> givenAOs,
+	public static ArrayList<Integer> listOfActObjsToListOfGivenDimensionVals(ArrayList<ActivityObject2018> givenAOs,
 			boolean verbose, PrimaryDimension givenDimension)
 	{
 		ArrayList<Integer> seqOfActIDs2 = new ArrayList<>(givenAOs.size());
@@ -859,7 +859,7 @@ public class TimelineTransformers
 		// for (ActivityObject ao : givenAOs){ seqOfActIDs.add(Integer.valueOf(ao.getActivityName()));}
 		int countOfActObjsWithMultipleGivenDimensionVals = 0;
 
-		for (ActivityObject ao : givenAOs)
+		for (ActivityObject2018 ao : givenAOs)
 		{
 			ArrayList<Integer> givenDimensionVals = ao.getGivenDimensionVal(givenDimension);
 			if (givenDimensionVals.size() > 1)
@@ -903,14 +903,14 @@ public class TimelineTransformers
 	 * @return
 	 * @since 14 June 2018
 	 */
-	public static ArrayList<Character> listOfActObjsToListOfCharCodesFromActIDs(ArrayList<ActivityObject> givenAOs,
+	public static ArrayList<Character> listOfActObjsToListOfCharCodesFromActIDs(ArrayList<ActivityObject2018> givenAOs,
 			boolean verbose, Int2CharOpenHashMap actIDCharCodeMap)
 	{
 		ArrayList<Character> seqOfActIDs2 = new ArrayList<>(givenAOs.size());
 		// ArrayList<Integer> seqOfActIDs = new ArrayList<>(givenAOs.size());
 		// for (ActivityObject ao : givenAOs){ seqOfActIDs.add(Integer.valueOf(ao.getActivityName()));}
 
-		for (ActivityObject ao : givenAOs)
+		for (ActivityObject2018 ao : givenAOs)
 		{
 			seqOfActIDs2.add(actIDCharCodeMap.get(ao.getActivityID()));
 			// seqOfActIDs2.add(ao.getCharCodeFromActID());
@@ -1054,7 +1054,7 @@ public class TimelineTransformers
 		long dt = System.currentTimeMillis();
 		Timeline concatenatedTimeline = null;
 	
-		ArrayList<ActivityObject> allActivityObjects = new ArrayList<>();
+		ArrayList<ActivityObject2018> allActivityObjects = new ArrayList<>();
 		// ArrayList<ActivityObject> allActivityObjectsDummy = new ArrayList<>();
 	
 		// long t1 = System.nanoTime();
@@ -1123,7 +1123,7 @@ public class TimelineTransformers
 		long dt = System.currentTimeMillis();
 		Timeline concatenatedTimeline = null;
 	
-		ArrayList<ActivityObject> allActivityObjects = new ArrayList<>();
+		ArrayList<ActivityObject2018> allActivityObjects = new ArrayList<>();
 	
 		for (Map.Entry<String, Timeline> entry : dayTimelines.entrySet())
 		{
@@ -1449,7 +1449,7 @@ public class TimelineTransformers
 	 * @param locationObjects
 	 * @return
 	 */
-	public static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> convertCheckinEntriesToActivityObjectsGowalla(
+	public static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject2018>>> convertCheckinEntriesToActivityObjectsGowalla(
 			LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntry>>> checkinEntriesDatewise,
 			/* LinkedHashMap<Integer, LocationGowalla> locationObjects) */
 			Int2ObjectOpenHashMap<LocationGowalla> locationObjects)
@@ -1457,7 +1457,7 @@ public class TimelineTransformers
 		System.out.println(
 				"Inside convertCheckinEntriesToActivityObjectsGowalla(): Alert: Constant.assignFallbackZoneIdWhenConvertCinsToAO="
 						+ Constant.assignFallbackZoneIdWhenConvertCinsToAO);
-		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject2018>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
 	
 		Set<Integer> uniqueActIDs = new LinkedHashSet<>();// added on April 6 2018
@@ -1496,12 +1496,12 @@ public class TimelineTransformers
 			int numOfCinsForThisUser = 0;
 	
 			String userID = userEntry.getKey();
-			TreeMap<Date, ArrayList<ActivityObject>> dayWiseForThisUser = new TreeMap<>();
+			TreeMap<Date, ArrayList<ActivityObject2018>> dayWiseForThisUser = new TreeMap<>();
 			// System.out.print("\nuser: " + userID);
 			for (Entry<Date, ArrayList<CheckinEntry>> dateEntry : userEntry.getValue().entrySet()) // over dates
 			{
 				// Date date = dateEntry.getKey();
-				ArrayList<ActivityObject> activityObjectsForThisUserThisDate = new ArrayList<>(
+				ArrayList<ActivityObject2018> activityObjectsForThisUserThisDate = new ArrayList<>(
 						dateEntry.getValue().size());
 	
 				// System.out.println(
@@ -1634,7 +1634,7 @@ public class TimelineTransformers
 						}
 					}
 	
-					ActivityObject ao = new ActivityObject(activityID, locIDs, activityName, locationName,
+					ActivityObject2018 ao = new ActivityObject2018(activityID, locIDs, activityName, locationName,
 							startTimestamp, startLatitude, startLongitude, startAltitude, userID, photos_count,
 							checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count,
 							cin.getWorkingLevelCatIDs(), distaneInMFromPrev, durationInSecFromPrev, levelWiseCatIDs,
@@ -1729,7 +1729,7 @@ public class TimelineTransformers
 	 * @return
 	 * @since April 9 2018
 	 */
-	public static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> convertCheckinEntriesToActivityObjectsGowallaV2(
+	public static LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject2018>>> convertCheckinEntriesToActivityObjectsGowallaV2(
 			LinkedHashMap<String, TreeMap<Date, ArrayList<CheckinEntryV2>>> checkinEntriesDatewise,
 			/* LinkedHashMap<Integer, LocationGowalla> locationObjects) */
 			Int2ObjectOpenHashMap<LocationGowalla> locationObjects)
@@ -1738,7 +1738,7 @@ public class TimelineTransformers
 		// DomainConstants.setGridIDLocIDGowallaMaps();
 		Map<Long, Integer> locIDGridIndexMap = DomainConstants.getLocIDGridIndexGowallaMap();
 	
-		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject>>> activityObjectsDatewise = new LinkedHashMap<>(
+		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject2018>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
 	
 		Set<Integer> uniqueActIDs = new LinkedHashSet<>();// added on April 6 2018
@@ -1777,12 +1777,12 @@ public class TimelineTransformers
 			int numOfCinsForThisUser = 0;
 	
 			String userID = userEntry.getKey();
-			TreeMap<Date, ArrayList<ActivityObject>> dayWiseForThisUser = new TreeMap<>();
+			TreeMap<Date, ArrayList<ActivityObject2018>> dayWiseForThisUser = new TreeMap<>();
 			// System.out.print("\nuser: " + userID);
 			for (Entry<Date, ArrayList<CheckinEntryV2>> dateEntry : userEntry.getValue().entrySet()) // over dates
 			{
 				// Date date = dateEntry.getKey();
-				ArrayList<ActivityObject> activityObjectsForThisUserThisDate = new ArrayList<>(
+				ArrayList<ActivityObject2018> activityObjectsForThisUserThisDate = new ArrayList<>(
 						dateEntry.getValue().size());
 	
 				// System.out.println( "--* user:" + userID + " date:" + date.toString() + " has " +
@@ -1874,7 +1874,7 @@ public class TimelineTransformers
 	
 					int gridIndex = TimelineUtils.getGridIndex(locIDs, locIDGridIndexMap, userID, startTimestamp);
 					// ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
-					ActivityObject ao = new ActivityObject(
+					ActivityObject2018 ao = new ActivityObject2018(
 							activityID, locIDs, activityName, locationName, startTimestamp, startLatitude,
 							startLongitude, startAltitude, userID, photos_count, checkins_count, users_count,
 							radius_meters, highlights_count, items_count, max_items_count, cin.getWorkingLevelCatIDs(),

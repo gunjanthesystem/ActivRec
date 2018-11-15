@@ -27,7 +27,7 @@ import org.activity.distances.HJEditDistance;
 import org.activity.io.Serializer;
 import org.activity.io.TimelineWriters;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
@@ -46,7 +46,7 @@ public class TimelineUtils
 	 * 
 	 * @return
 	 */
-	public static int countNumberOfDistinctActivities(ArrayList<ActivityObject> ActivityObjects)
+	public static int countNumberOfDistinctActivities(ArrayList<ActivityObject2018> ActivityObjects)
 	{
 		Set<String> set = ActivityObjects.stream().map(ao -> ao.getActivityName().trim()).collect(Collectors.toSet());
 		return set.size();
@@ -177,7 +177,7 @@ public class TimelineUtils
 				Timestamp prevActivityStartTimestamp = null;
 				int numOfConsecutives = 0;
 				long timeDiff = 0;
-				for (ActivityObject aos : dateE.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 aos : dateE.getValue().getActivityObjectsInTimeline())
 				{
 					String activityName = aos.getActivityName();
 					if (activityName.equals(prevActivityName))
@@ -269,7 +269,7 @@ public class TimelineUtils
 				for (Entry<Date, Timeline> dateE : userE.getValue().entrySet())
 				{
 					String date = dateE.getKey().toString();
-					for (ActivityObject aos : dateE.getValue().getActivityObjectsInTimeline())
+					for (ActivityObject2018 aos : dateE.getValue().getActivityObjectsInTimeline())
 					{
 						aoCount += 1;
 
@@ -520,7 +520,7 @@ public class TimelineUtils
 		{
 			for (Entry<Date, Timeline> dateEntry : e.getValue().entrySet())
 			{
-				for (ActivityObject ao : dateEntry.getValue().getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : dateEntry.getValue().getActivityObjectsInTimeline())
 				{
 					Map<Long, Integer> locIDGridIndexMap = DomainConstants.getLocIDGridIndexGowallaMap();
 					int gridIndex = getGridIndex(ao.getLocationIDs(), locIDGridIndexMap, e.getKey(),
@@ -731,7 +731,7 @@ public class TimelineUtils
 	 * @param listToCheck
 	 * @return
 	 */
-	public static boolean isChronological(ArrayList<ActivityObject> listToCheck)
+	public static boolean isChronological(ArrayList<ActivityObject2018> listToCheck)
 	{
 		boolean chronologyPreserved = true;
 
@@ -756,7 +756,7 @@ public class TimelineUtils
 	public static boolean isNoValidActivityAfterIt(int activityObjectIndex, Timeline givenTimeline)
 	{
 		boolean isNoValidAfter = true;
-		ArrayList<ActivityObject> objectsInGivenTimeline = givenTimeline.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> objectsInGivenTimeline = givenTimeline.getActivityObjectsInTimeline();
 
 		System.out.println("inside isNoValidActivityAfterIt");
 		System.out.println("activityIndexAfterWhichToCheck=" + activityObjectIndex);
@@ -793,7 +793,7 @@ public class TimelineUtils
 			Timeline givenTimelineToCheckIn)
 	{
 		boolean isNoValidAfter = true;
-		ArrayList<ActivityObject> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
 
 		// Date dateOfAOAtGivenIndex = DateTimeUtils.getDate(
 		// givenTimelineToCheckIn.getActivityObjectAtPosition(givenActivityObjectIndex).getEndTimestamp());
@@ -854,7 +854,7 @@ public class TimelineUtils
 	 * @return
 	 * @since 12 Aug 2018
 	 */
-	public static List<ActivityObject> getValidAOsAfterThisTimeInTheDay(Timestamp timestamp,
+	public static List<ActivityObject2018> getValidAOsAfterThisTimeInTheDay(Timestamp timestamp,
 			Timeline givenTimelineToCheckIn)
 	{
 		int indexOfAOAtThisTime = givenTimelineToCheckIn.getIndexOfActivityObjectAtTime(timestamp);
@@ -875,12 +875,12 @@ public class TimelineUtils
 	 * @return
 	 * @since 12 Aug 2018
 	 */
-	public static List<ActivityObject> getValidAOsAfterItInTheDay(int givenActivityObjectIndex,
+	public static List<ActivityObject2018> getValidAOsAfterItInTheDay(int givenActivityObjectIndex,
 			Timeline givenTimelineToCheckIn)
 	{
-		List<ActivityObject> validAOsAfter = new ArrayList<>();
+		List<ActivityObject2018> validAOsAfter = new ArrayList<>();
 
-		ArrayList<ActivityObject> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
 
 		LocalDate dateOfAOAtGivenIndex = givenTimelineToCheckIn.getActivityObjectAtPosition(givenActivityObjectIndex)
 				.getEndTimestamp().toLocalDateTime().toLocalDate();
@@ -889,7 +889,7 @@ public class TimelineUtils
 		for (i = givenActivityObjectIndex + 1; i < aosInGivenTimelineToCheckIn.size(); i++)
 		{
 			// System.out.println("for index " + i);
-			ActivityObject aoToCheck = aosInGivenTimelineToCheckIn.get(i);
+			ActivityObject2018 aoToCheck = aosInGivenTimelineToCheckIn.get(i);
 			LocalDate dateOfThisAO = aoToCheck.getEndTimestamp().toLocalDateTime().toLocalDate();
 			// System.out.println("dateOfAOAtGivenIndex = " + dateOfAOAtGivenIndex + " dateOfThisAO = " + dateOfThisAO);
 			// System.out.println("dateOfThisAO.equals(dateOfAOAtGivenIndex = " +
@@ -941,7 +941,7 @@ public class TimelineUtils
 	public static boolean hasAtleastNValidAOsAfterItInTheDay(int givenActivityObjectIndex,
 			Timeline givenTimelineToCheckIn, int N)
 	{
-		ArrayList<ActivityObject> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
 
 		// abcde: len=5, if N = 3, valid indices = 0,1 invalid indices = 2,3,4 >(5-1-3) > 1
 		// trivial case
@@ -1006,7 +1006,7 @@ public class TimelineUtils
 	 * @param N
 	 * @return
 	 */
-	public static ArrayList<ActivityObject> getNextNValidAOsAfterActivityAtThisTimeSameDay(Timeline t,
+	public static ArrayList<ActivityObject2018> getNextNValidAOsAfterActivityAtThisTimeSameDay(Timeline t,
 			Timestamp timestamp, int N)
 	{
 
@@ -1014,13 +1014,13 @@ public class TimelineUtils
 		System.out.println("Inside getNextNValidAOsAfterActivityAtThisTimeSameDay\n given ts=" + timestamp.toString()
 				+ " localdate extracted=" + dateOfGivenTS.toString());
 
-		ArrayList<ActivityObject> result = new ArrayList<>(N);
+		ArrayList<ActivityObject2018> result = new ArrayList<>(N);
 
 		int indexOfActivityObjectAtGivenTimestamp = t.getIndexOfActivityObjectAtTime(timestamp);
 
 		for (int i = 0; i < N; i++)
 		{
-			ActivityObject ao = t
+			ActivityObject2018 ao = t
 					.getNextValidActivityAfterActivityAtThisPositionPD(indexOfActivityObjectAtGivenTimestamp + i);
 
 			// System.out.println("Debug:\nTimestamp of ao = " + ao.getEndTimestamp());FOUND OKAY in RUN
@@ -1048,7 +1048,7 @@ public class TimelineUtils
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Next valid acts: ");
-			result.stream().forEach((ActivityObject ao) -> System.out.print(ao.toStringAllGowallaTS() + ">>"));
+			result.stream().forEach((ActivityObject2018 ao) -> System.out.print(ao.toStringAllGowallaTS() + ">>"));
 			System.out.println("Exiting getNextNValidAOsAfterActivityAtThisTimeSameDay");
 		}
 		return result;
@@ -1074,7 +1074,7 @@ public class TimelineUtils
 	 * 
 	 * @return
 	 */
-	public static boolean isSameDay(ArrayList<ActivityObject> activityObjectsInDay)
+	public static boolean isSameDay(ArrayList<ActivityObject2018> activityObjectsInDay)
 	{
 		if (activityObjectsInDay.size() == 0)
 		{
@@ -1110,7 +1110,7 @@ public class TimelineUtils
 	 * @return
 	 */
 	public static boolean hasDaywiseCandidateTimelines(LinkedHashMap<Date, Timeline> trainingTimelines,
-			Date dateAtRecomm, ActivityObject activityAtRecommPoint, boolean collaborativeCandidates,
+			Date dateAtRecomm, ActivityObject2018 activityAtRecommPoint, boolean collaborativeCandidates,
 			String userIDAtRecomm,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers)
 	{
@@ -1157,7 +1157,7 @@ public class TimelineUtils
 	 * @return
 	 */
 	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getEditDistancesForDaywiseCandidateTimelines(
-			LinkedHashMap<String, Timeline> candidateTimelines2, ArrayList<ActivityObject> activitiesGuidingRecomm2,
+			LinkedHashMap<String, Timeline> candidateTimelines2, ArrayList<ActivityObject2018> activitiesGuidingRecomm2,
 			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasInvalidActivityNames,
 			String invalidActName1, String invalidActName2, String distanceUsed, HJEditDistance hjEditDistance)
 	{
@@ -1222,7 +1222,7 @@ public class TimelineUtils
 	 * @return Triple{EndIndexOfLestDistantSubCand,TraceOfEditOperation,EditDistance}
 	 */
 	public static Triple<Integer, String, Double> getEditDistanceLeastDistantSubcand(Timeline candidateDayTimeline,
-			ArrayList<ActivityObject> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
+			ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm, String dateAtRecomm,
 			String timeAtRecomm, String candidateID, boolean hasInvalidActivityNames, String invalidActName1,
 			String invalidActName2, String distanceUsed, HJEditDistance hjEditDistance)
 	{
@@ -1443,7 +1443,7 @@ public class TimelineUtils
 	 * @return {candID, Pair{ActName with nearest ST to current AO,abs time diff in secs}}
 	 */
 	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getClosestTimeDistancesForDaywiseCandidateTimelines(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasinvalidactivitynames,
 			String iNVALID_ACTIVITY1, String iNVALID_ACTIVITY2, String distanceUsed)
 	{
@@ -1458,7 +1458,7 @@ public class TimelineUtils
 		 */
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
-		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
 		for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
@@ -1467,7 +1467,7 @@ public class TimelineUtils
 			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
 			 * current Activity Object and the distance is diff of their start times
 			 */
-			Triple<Integer, ActivityObject, Double> score = (entry.getValue()
+			Triple<Integer, ActivityObject2018, Double> score = (entry.getValue()
 					.getTimeDiffValidAOInDayWithStartTimeNearestTo(startTimestampOfActObjAtRecommPoint));
 
 			distances.put(entry.getKey(),
@@ -1504,7 +1504,7 @@ public class TimelineUtils
 	 * @since 12 June 2017
 	 */
 	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getClosestTimeDistancesForCandidateTimelines(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasinvalidactivitynames,
 			String iNVALID_ACTIVITY1, String iNVALID_ACTIVITY2, String distanceUsed, boolean verbose)
 	{
@@ -1518,7 +1518,7 @@ public class TimelineUtils
 		 */
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
-		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
 		Timeline candidateTimelinesAsOne = TimelineTransformers.dayTimelinesToATimeline2(candidateTimelines, false, true);
@@ -1549,7 +1549,7 @@ public class TimelineUtils
 			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
 			 * current Activity Object and the distance is diff of their start times
 			 */
-			Triple<Integer, ActivityObject, Double> score = candidateTimelinesAsOne
+			Triple<Integer, ActivityObject2018, Double> score = candidateTimelinesAsOne
 					.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, verbose);
 
 			distances.put(d.toString(),
@@ -1607,7 +1607,7 @@ public class TimelineUtils
 	 * @since 21 July 2017
 	 */
 	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getClosestTimeDistancesForCandidateTimelinesColl(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasinvalidactivitynames,
 			String iNVALID_ACTIVITY1, String iNVALID_ACTIVITY2, String distanceUsed, boolean verbose)
 	{
@@ -1621,7 +1621,7 @@ public class TimelineUtils
 		 */
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
-		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
 		LinkedHashMap<String, LinkedHashMap<String, Timeline>> userWiseCandidateTimelines = toUserwiseTimelines(
@@ -1671,7 +1671,7 @@ public class TimelineUtils
 				 * For this candTimelinesFromAnotherUserAsOne, find the Activity Object with start timestamp nearest to
 				 * the start timestamp of current Activity Object and the distance is diff of their start times
 				 */
-				Triple<Integer, ActivityObject, Double> score = candTimelinesFromAnotherUserAsOne
+				Triple<Integer, ActivityObject2018, Double> score = candTimelinesFromAnotherUserAsOne
 						.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, verbose);
 
 				distances.put(anotherUserID + "__" + d.toString(),
@@ -1741,7 +1741,7 @@ public class TimelineUtils
 	 * @since 15 Aug 2017
 	 */
 	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getClosestTimeDistsForCandTimelinesColl1CandPerNeighbour(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean hasinvalidactivitynames,
 			String iNVALID_ACTIVITY1, String iNVALID_ACTIVITY2, String distanceUsed,
 			/* double timeDiffThresholdInMilliSecs, */boolean verbose)
@@ -1757,7 +1757,7 @@ public class TimelineUtils
 		 */
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
-		ActivityObject activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
 		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
 		LinkedHashMap<String, LinkedHashMap<String, Timeline>> userWiseCandidateTimelines = toUserwiseTimelines(
@@ -1792,7 +1792,7 @@ public class TimelineUtils
 			// { uniqueDates.add(Instant.ofEpochMilli(ao.getStartTimestampInms())
 			// .atZone(Constant.getTimeZone().toZoneId()).toLocalDate()); } }
 
-			TreeMap<Double, Triple<Integer, ActivityObject, Double>> timeDiffOfClosest = new TreeMap<>();
+			TreeMap<Double, Triple<Integer, ActivityObject2018, Double>> timeDiffOfClosest = new TreeMap<>();
 			for (Timestamp tsToLookInto : timestampsToLookInto)
 			// for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
 			{
@@ -1803,13 +1803,13 @@ public class TimelineUtils
 				 * For this candTimelinesFromAnotherUserAsOne, find the Activity Object with start timestamp nearest to
 				 * the start timestamp of current Activity Object and the distance is diff of their start times
 				 */
-				Triple<Integer, ActivityObject, Double> score = candTimelinesFromAnotherUserAsOne
+				Triple<Integer, ActivityObject2018, Double> score = candTimelinesFromAnotherUserAsOne
 						.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, verbose);
 				// System.out.println("Score= " + score.toString());
 				timeDiffOfClosest.put(score.getThird(), score);
 			}
 
-			Triple<Integer, ActivityObject, Double> closestScore = timeDiffOfClosest.firstEntry().getValue();
+			Triple<Integer, ActivityObject2018, Double> closestScore = timeDiffOfClosest.firstEntry().getValue();
 
 			if (closestScore != null)// closestScore.getThird() > timeDiffThresholdInMilliSecs)
 			{
@@ -1948,9 +1948,9 @@ public class TimelineUtils
 	public static LinkedHashSet<LocalDate> getUniqueDates(Timeline givenTimeline, boolean verbose)
 	{
 		LinkedHashSet<LocalDate> uniqueDates = new LinkedHashSet<>();
-		ArrayList<ActivityObject> aosInTimeline = givenTimeline.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInTimeline = givenTimeline.getActivityObjectsInTimeline();
 
-		for (ActivityObject ao : aosInTimeline)
+		for (ActivityObject2018 ao : aosInTimeline)
 		{
 			uniqueDates.add(Instant.ofEpochMilli(ao.getStartTimestampInms()).atZone(Constant.getTimeZone().toZoneId())
 					.toLocalDate());
@@ -1979,7 +1979,7 @@ public class TimelineUtils
 
 		for (Entry<String, Timeline> cand : candidateTimelines.entrySet())
 		{
-			for (ActivityObject ao : cand.getValue().getActivityObjectsInTimeline())
+			for (ActivityObject2018 ao : cand.getValue().getActivityObjectsInTimeline())
 			{
 				uniqueDates.add(Instant.ofEpochMilli(ao.getStartTimestampInms())
 						.atZone(Constant.getTimeZone().toZoneId()).toLocalDate());
@@ -2104,7 +2104,7 @@ public class TimelineUtils
 				{
 					Timeline timelineForThisDay = dateEntry.getValue();
 
-					for (ActivityObject ao : timelineForThisDay.getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : timelineForThisDay.getActivityObjectsInTimeline())
 					{
 						TreeSet<Integer> locationIDsForThisActID = actIDLocIDsMap.get(ao.getActivityID());
 						if (locationIDsForThisActID == null)
@@ -2162,7 +2162,7 @@ public class TimelineUtils
 				{
 					Timeline timelineForThisDay = dateEntry.getValue();
 
-					for (ActivityObject ao : timelineForThisDay.getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : timelineForThisDay.getActivityObjectsInTimeline())
 					{
 						TreeSet<Integer> locationIDsForThisActID = actIDLocIDsMap.get(ao.getActivityID());
 						if (locationIDsForThisActID == null)
@@ -2294,7 +2294,7 @@ public class TimelineUtils
 				{
 					Timeline timelineForThisDay = dateEntry.getValue();
 
-					for (ActivityObject ao : timelineForThisDay.getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : timelineForThisDay.getActivityObjectsInTimeline())
 					{
 						Integer actID = ao.getActivityID();
 						LinkedHashSet<Integer> locIDsForThisActIDForThisUser = actIDsLocIDsForThisUser.get(actID);
@@ -2434,7 +2434,7 @@ public class TimelineUtils
 			{
 				for (Entry<Date, Timeline> e2 : e.getValue().entrySet())
 				{
-					for (ActivityObject ao : e2.getValue().getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : e2.getValue().getActivityObjectsInTimeline())
 					{
 						numOfAOs += 1;
 						if (ao.getLocationIDs().size() > 1)
@@ -2652,7 +2652,7 @@ public class TimelineUtils
 
 				for (Entry<Date, Timeline> dayEntry : e.getValue().entrySet())
 				{
-					for (ActivityObject ao : dayEntry.getValue().getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : dayEntry.getValue().getActivityObjectsInTimeline())
 					{
 						ArrayList<Integer> gdVals = ao.getGivenDimensionVal(givenDimension);
 

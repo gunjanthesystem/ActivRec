@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.ui.PopUps;
 
@@ -210,8 +210,8 @@ public class Sanity
 	 * @param repAOResultActName
 	 */
 	public static void compare(
-			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultPD,
-			Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName)
+			Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultPD,
+			Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName)
 	{
 		if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID) == false)
 		{
@@ -220,20 +220,20 @@ public class Sanity
 							+ Constant.primaryDimension);
 		}
 		System.out.println("Inside compare for repAOResultPD and repAOResultActName\n");
-		LinkedHashMap<Integer, ActivityObject> repAOsPD = repAOResultPD.getFirst();
-		LinkedHashMap<String, ActivityObject> repAOsActName = repAOResultActName.getFirst();
+		LinkedHashMap<Integer, ActivityObject2018> repAOsPD = repAOResultPD.getFirst();
+		LinkedHashMap<String, ActivityObject2018> repAOsActName = repAOResultActName.getFirst();
 
 		Sanity.eq(repAOsPD.size(), repAOsActName.size(),
 				"repAOsPD.size()=" + repAOsPD.size() + "repAOsActName.size()=" + repAOsActName.size());
 
-		for (Entry<Integer, ActivityObject> repAOPDEntry : repAOsPD.entrySet())
+		for (Entry<Integer, ActivityObject2018> repAOPDEntry : repAOsPD.entrySet())
 		{
 			Integer actID = repAOPDEntry.getKey();
-			ActivityObject repAOPD = repAOPDEntry.getValue();
+			ActivityObject2018 repAOPD = repAOPDEntry.getValue();
 
 			String actName = String.valueOf(actID);
 			// corresponding entry from
-			ActivityObject repAOActName = repAOsActName.get(actName);
+			ActivityObject2018 repAOActName = repAOsActName.get(actName);
 
 			if (repAOPD.equals(repAOActName))
 			{
@@ -284,8 +284,8 @@ public class Sanity
 	 * @param repAOResultActName
 	 */
 	public static void compareOnlyNonEmpty(
-			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultPD,
-			Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName)
+			Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultPD,
+			Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName)
 	{
 		if (Constant.primaryDimension.equals(PrimaryDimension.ActivityID) == false)
 		{
@@ -294,8 +294,8 @@ public class Sanity
 							+ Constant.primaryDimension);
 		}
 		System.out.println("Inside compare for repAOResultPD and repAOResultActName\n");
-		LinkedHashMap<Integer, ActivityObject> repAOsPD = repAOResultPD.getFirst();
-		LinkedHashMap<String, ActivityObject> repAOsActName = repAOResultActName.getFirst();
+		LinkedHashMap<Integer, ActivityObject2018> repAOsPD = repAOResultPD.getFirst();
+		LinkedHashMap<String, ActivityObject2018> repAOsActName = repAOResultActName.getFirst();
 
 		if (repAOsPD.size() != repAOsActName.size())
 		{
@@ -305,14 +305,14 @@ public class Sanity
 		// their size can be unequal repAOsPD < repAOsActName because repAOsPD is only for distinct activity names in
 		// training data for that user while repAOsActName for all distinct activity names in the dataset.
 		// However the representive activity object should be same for each primary dimension val in repAOResultPD.
-		for (Entry<Integer, ActivityObject> repAOPDEntry : repAOsPD.entrySet())
+		for (Entry<Integer, ActivityObject2018> repAOPDEntry : repAOsPD.entrySet())
 		{
 			Integer actID = repAOPDEntry.getKey();
-			ActivityObject repAOPD = repAOPDEntry.getValue();
+			ActivityObject2018 repAOPD = repAOPDEntry.getValue();
 
 			String actName = String.valueOf(actID);
 			// corresponding entry from
-			ActivityObject repAOActName = repAOsActName.get(actName);
+			ActivityObject2018 repAOActName = repAOsActName.get(actName);
 
 			if (repAOPD.equals(repAOActName))
 			{

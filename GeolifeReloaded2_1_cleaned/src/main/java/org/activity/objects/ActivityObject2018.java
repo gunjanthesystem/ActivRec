@@ -19,6 +19,7 @@ import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.SanityConstants;
 import org.activity.spatial.SpatialUtils;
 import org.activity.ui.PopUps;
+import org.activity.util.ActivityObject;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringCode;
@@ -35,7 +36,7 @@ import org.activity.util.UtilityBelt;
  * @author gunjan
  *
  */
-public class ActivityObject implements Serializable
+public class ActivityObject2018 implements Serializable
 {
 
 	private static final long serialVersionUID = 5056824311499867608L;
@@ -105,10 +106,14 @@ public class ActivityObject implements Serializable
 	 * 
 	 * @since 21 May 2018
 	 */
-	public ActivityObject()
+	public ActivityObject2018()
 	{
 
 	}
+
+	// Start of added on 14 Nov 2018
+
+	// End of added on 14 Nov 2018
 
 	/**
 	 * @since April 9 2018
@@ -274,7 +279,7 @@ public class ActivityObject implements Serializable
 	 * @param primaryDimension
 	 * @return
 	 */
-	public boolean equalsWrtPrimaryDimension(ActivityObject ao2)
+	public boolean equalsWrtPrimaryDimension(ActivityObject2018 ao2)
 	{
 		switch (Constant.primaryDimension)
 		{
@@ -308,7 +313,7 @@ public class ActivityObject implements Serializable
 	 * @param primaryDimension
 	 * @return
 	 */
-	public boolean equalsWrtGivenDimension(ActivityObject ao2, PrimaryDimension givenDimension)
+	public boolean equalsWrtGivenDimension(ActivityObject2018 ao2, PrimaryDimension givenDimension)
 	{
 		switch (givenDimension)
 		{
@@ -345,7 +350,7 @@ public class ActivityObject implements Serializable
 	 * @return
 	 * @deprecated
 	 */
-	public boolean equalsWrtPrimaryDimension0(ActivityObject ao2)
+	public boolean equalsWrtPrimaryDimension0(ActivityObject2018 ao2)
 	{
 		// actually this approach for Location ID also works for activity id but is slower since set
 		// intersection, hence create a lighter methods for activityID
@@ -418,7 +423,7 @@ public class ActivityObject implements Serializable
 	 * @param items_count
 	 * @param max_items_count
 	 */
-	public ActivityObject(int activityID, int locationID, String activityName, String locationName,
+	public ActivityObject2018(int activityID, int locationID, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs)
@@ -474,7 +479,7 @@ public class ActivityObject implements Serializable
 	 * @param distanceInMFromPrev
 	 * @param durationInSecsFromPrev
 	 */
-	public ActivityObject(int activityID, int locationID, String activityName, String locationName,
+	public ActivityObject2018(int activityID, int locationID, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
@@ -536,7 +541,7 @@ public class ActivityObject implements Serializable
 	 * @param distanceInMFromPrev
 	 * @param durationInSecsFromPrev
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject2018(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
@@ -600,7 +605,7 @@ public class ActivityObject implements Serializable
 	 * @param levelWiseCatIDs
 	 * @param timeZoneId
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject2018(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
@@ -663,7 +668,7 @@ public class ActivityObject implements Serializable
 	 *            introduced on 13 July 2018
 	 * @since 13 July 2018
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject2018(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
@@ -705,7 +710,7 @@ public class ActivityObject implements Serializable
 	 *            <p>
 	 * @until used until 12 July 2018
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject2018(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
@@ -769,7 +774,7 @@ public class ActivityObject implements Serializable
 	 * @param durationInSecsFromPrev
 	 * @param levelWiseCatIDs
 	 */
-	public ActivityObject(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
+	public ActivityObject2018(int activityID, ArrayList<Integer> locationIDs, String activityName, String locationName,
 			Timestamp startTimestamp, String startLatitude, String startLongitude, String startAltitude, String userID,
 			int photos_count, int checkins_count, int users_count, int radius_meters, int highlights_count,
 			int items_count, int max_items_count, String workingLevelCatIDs, double distanceInMFromPrev,
@@ -955,29 +960,29 @@ public class ActivityObject implements Serializable
 	//
 	// }
 
-	public double getDifferenceStartingGeoCoordinates(ActivityObject ao2)
+	public double getDifferenceStartingGeoCoordinates(ActivityObject2018 ao2)
 	{
 		return SpatialUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(), ao2.getStartLongitude());
 
 	}
 
-	public double getDifferenceEndingGeoCoordinates(ActivityObject ao2)
+	public double getDifferenceEndingGeoCoordinates(ActivityObject2018 ao2)
 	{
 		return SpatialUtils.haversine(endLatitude, endLongitude, ao2.getEndLatitude(), ao2.getEndLongitude());
 
 	}
 
-	public double getDifferenceAltitude(ActivityObject ao2)
+	public double getDifferenceAltitude(ActivityObject2018 ao2)
 	{
 		return Double.parseDouble(this.getAvgAltitude()) - Double.parseDouble(ao2.getAvgAltitude());
 
 	}
 
-	public static String getArrayListOfActivityObjectsAsString(ArrayList<ActivityObject> arr)
+	public static String getArrayListOfActivityObjectsAsString(ArrayList<ActivityObject2018> arr)
 	{
 		StringBuffer str = new StringBuffer("");
 
-		for (ActivityObject ao : arr)
+		for (ActivityObject2018 ao : arr)
 		{
 			str.append(">>" + ao.toString());
 		}
@@ -991,7 +996,7 @@ public class ActivityObject implements Serializable
 	 * 
 	 * @param dimensionIDNameValues
 	 */
-	public ActivityObject(HashMap<String, String> dimensionIDNameValues) // (User_ID, 0), (Location_ID, 10100), ...
+	public ActivityObject2018(HashMap<String, String> dimensionIDNameValues) // (User_ID, 0), (Location_ID, 10100), ...
 	{
 		// System.out.println("Inside ActivityObject contructor"); //@toremoveatruntime
 
@@ -1093,6 +1098,146 @@ public class ActivityObject implements Serializable
 		// checked(on 27 June 1pm) 887 for Tessa and Yakub
 	}
 
+	/// Start of Nov 14 2018
+	/**
+	 * NOT FOUND TO BE OF USE
+	 * <P>
+	 * Creates an Activity Object given the values for the dimension Id in the form of Map of <DimensionID Name,
+	 * correspoding dimensions's value></br>
+	 * <font color="orange"> Note: used for creating Activity Objects for Timeline from raw data. </font>
+	 * 
+	 * @param dimensionIDNameValues
+	 */
+	public ActivityObject2018(ActivityObject oldAO) // (User_ID, 0),
+	// (Location_ID,
+	// 10100), ...
+	{
+		System.out.println("\nInside ActivityObject converter contructor"); // @toremoveatruntime
+		System.out.println("oldAO= \n" + oldAO.toString());
+		System.out.println("------------");
+		oldAO.traverseDimensionIDNameValues();
+		// Location_ID getDimensionAttributeValue: 128 Date_ID getDimensionAttributeValue: 252 Activity_ID
+		// getDimensionAttributeValue: 3 Time_ID getDimensionAttributeValue: 252 User_ID getDimensionAttributeValue: 10
+		this.userID = oldAO.getDimensionIDValue("User_ID");
+		this.activityID = Integer.valueOf(oldAO.getDimensionIDValue("Activity_ID"));
+		this.workingLevelCatIDs = String.valueOf(activityID);
+		this.locationIDs = new ArrayList<>(1);
+		this.locationIDs.add(Integer.valueOf(oldAO.getDimensionIDValue("Location_ID")));
+		System.out.println("------------");
+
+		// ////////create an ArrayList of Dimension Objects(created using dimension name with values) for this
+		// ActivityObject
+		// this.dimensions = new ArrayList<Dimension>();
+		// for (Map.Entry<String, String> dimensionIDNameValue : dimensionIDNameValues.entrySet())
+		// {
+		// // System.out.println("dimensionIDName:" + dimensionIDNameValue.getKey() + " dimensionIDValue:" +
+		// // dimensionIDNameValue.getValue());
+		// String dimensionName = UtilityBelt.getDimensionNameFromDimenionIDName(dimensionIDNameValue.getKey());
+		// dimensions.add(new Dimension(dimensionName, dimensionIDNameValue.getValue()));
+		// this.dimensionIDNameValues = dimensionIDNameValues; // check if it works correctly without allocating memory
+		// // to the new hashmap.
+		// }
+		// /////////
+		// System.out.println("dimensionIDNameValues created");
+
+		// storing it as class attribute to minimize number of sql requests otherwise
+		this.activityName = oldAO.getActivityName();
+
+		// getDimensionAttributeValue("Activity_Dimension", "Activity_Name").toString();
+		// String startTimeString = getDimensionAttributeValue("Time_Dimension", "Start_Time").toString();
+
+		// System.out.println("getDimensionAttributeValue(Date_Dimension,Date) is null:
+		// "+getDimensionAttributeValue("Date_Dimension","Date") == null);
+		// System.out.println("getDimensionAttributeValue(Time_Dimension,Date) is null:
+		// "+getDimensionAttributeValue("Time_Dimension","Time") == null);
+		// String startDateString = getDimensionAttributeValue("Date_Dimension", "Date").toString();// dateString in
+		// iiWAS version
+		// String endTimeString = getDimensionAttributeValue("Time_Dimension", "End_Time").toString();
+		// String endDateString; // not present in iiWAS version
+		/**
+		 * Not in DCU_Dataset
+		 */
+		// if (Constant.getDatabaseName().equalsIgnoreCase("dcu_data_2"))//
+		// (Constant.DATABASE_NAME.equalsIgnoreCase("dcu_data_2"))
+		// {
+		// endDateString = getDimensionAttributeValue("Date_Dimension", "Date").toString();
+		// // because in DCU dataset all Activity objects are broken over days
+		// }
+		// else
+		// {// geolife1
+		// endDateString = getDimensionAttributeValue("Date_Dimension", "End_Date").toString();
+		// }
+		// String durationInSecondsString = getDimensionAttributeValue("Time_Dimension","End_Time").toString();
+		this.locationName = oldAO.getDimensionIDValue("Location_ID");// oldAO.getLocationName(); since location names
+																		// were NA
+		// getDimensionAttributeValue("Location_Dimension", "Location_Name").toString();
+		if (Constant.getDatabaseName().equalsIgnoreCase("geolife1"))
+		// (Constant.DATABASE_NAME.equalsIgnoreCase("dcu_data_2") == false)
+		{
+			this.startLatitude = oldAO.getStartLatitude();
+			this.endLatitude = oldAO.getEndLatitude();
+
+			this.startLongitude = oldAO.getStartLongitude();
+			this.endLongitude = oldAO.getEndLongitude();
+
+			this.startAltitude = oldAO.getStartAltitude();
+			this.endAltitude = oldAO.getEndAltitude();
+
+			this.avgAltitude = oldAO.getAvgAltitude();
+
+			this.distanceTravelled = oldAO.getDistanceTravelled();
+			// SpatialUtils.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
+
+			if (distanceTravelled > Constant.distanceTravelledAlert && SanityConstants.checkForDistanceTravelledAnomaly)
+			{
+				System.out.println("Notice: distance travelled (high) = " + distanceTravelled
+						+ " for transportation mode = " + activityName);
+			}
+		}
+		// THIS IS TIME NOT TIMESTAMP..AS DATE IS SAME
+		this.startTimestampInms = oldAO.getStartTimestamp().getTime();
+		// DateTimeUtils.getTimestampAsLongms(startTimeString, startDateString); // in iiWAS ver,
+		// dateString
+		// is used here instead of
+		// startDateString
+		this.endTimestampInms = oldAO.getEndTimestamp().getTime();
+
+		// DateTimeUtils.getTimestampAsLongms(endTimeString, endDateString);// in iiWAS ver,
+		// dateString is
+		// used
+		// here instead of
+		// endDateString
+
+		this.durationInSeconds = oldAO.getDurationInSeconds();
+
+		System.out.println("oldAO.getStartTimestamp() = " + oldAO.getStartTimestamp() + " startTimestampInms= "
+				+ startTimestampInms);
+		System.out.println(
+				"oldAO.getEndTimestamp() = " + oldAO.getEndTimestamp() + " endTimestampInms= " + endTimestampInms);
+		System.out.println("durationInSeconds" + durationInSeconds);
+
+		System.out.println("endTimestampInms-startTimestampInms=" + (endTimestampInms - startTimestampInms));
+		// (this.endTimestampInms - this.startTimestampInms) / 1000 + 1;
+		// +1 because 1 seconds
+		// was decremented while loading data for resolving consecutive activities primarliy for visualisation
+
+		// if (this.durationInSeconds < 0)
+		// {
+		// System.err.println(
+		// "Error: Negative duration in seconds:startTimestamp=" + startTimestampInms + " endTimestamp="
+		// + endTimestampInms + " i.e., " + this.endTimestampInms + "-" + this.startTimestampInms);
+		// System.err.println("\t\t StartDateString:" + startDateString + " StartTimeString:" + startTimeString
+		// + "\n\t\t EndDateString:" + endDateString + " EndTimeString:" + endTimeString);
+		// }
+
+		// System.out.println("Exiting ActivityObject contructor-----------");
+		// System.out.println("Activity Event Create: number of dimensions"+dimensions.size()); // Debug Info: count the
+		// occurence of this in output to see if the number of activity events generated is correct:
+		// checked(on 27 June 1pm) 887 for Tessa and Yakub
+		System.out.println("new ao=\n" + this.toString() + "\nagain=\n" + this.toStringAll() + "\n");
+	}
+
+	/// End of Nov 14 2018
 	/**
 	 * @return the distanceTravelled
 	 */
@@ -1289,7 +1434,7 @@ public class ActivityObject implements Serializable
 	 * @param durationInSeconds
 	 * @param startTimeStamp
 	 */
-	ActivityObject(String activityName, String location, long durationInSeconds, Timestamp startTimeStamp)
+	ActivityObject2018(String activityName, String location, long durationInSeconds, Timestamp startTimeStamp)
 	{
 		this.activityName = activityName;
 		this.durationInSeconds = durationInSeconds;
@@ -1449,7 +1594,7 @@ public class ActivityObject implements Serializable
 	 * @param start
 	 * @param end
 	 */
-	public ActivityObject(String name, Timestamp start, Timestamp end)
+	public ActivityObject2018(String name, Timestamp start, Timestamp end)
 	{
 		// userName=user;
 		activityName = name;
@@ -1736,7 +1881,7 @@ public class ActivityObject implements Serializable
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
-		ActivityObject other = (ActivityObject) obj;
+		ActivityObject2018 other = (ActivityObject2018) obj;
 		if (activityID != other.activityID) return false;
 		if (activityName == null)
 		{

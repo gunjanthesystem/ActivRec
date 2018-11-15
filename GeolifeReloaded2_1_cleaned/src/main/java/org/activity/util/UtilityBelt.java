@@ -21,14 +21,16 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
+import org.activity.constants.SanityConstants;
 import org.activity.generator.GenerateSyntheticData;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.TimelineWriters;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TrajectoryEntry;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
@@ -42,6 +44,99 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  */
 public class UtilityBelt
 {
+
+	// start of for backup deserialisation compatibility 14 Nov 2018
+	public static Timestamp getTimestamp(String timeString, String dateString)
+	{
+		Timestamp timestamp;
+
+		String[] splittedTime = RegexUtils.patternColon.split(timeString);// timeString.split(":");
+		String[] splittedDate = RegexUtils.patternHyphen.split(dateString);// dateString.split("-");
+
+		timestamp = new Timestamp(Integer.parseInt(splittedDate[0]) - 1900, // year
+				Integer.parseInt(splittedDate[1]) - 1, // month
+				Integer.parseInt(splittedDate[2]), // day
+				Integer.parseInt(splittedTime[0]), // hours
+				Integer.parseInt(splittedTime[1]), // minutes
+				Integer.parseInt(splittedTime[2]), // seconds
+				0); // nanoseconds
+
+		return timestamp;
+	}
+
+	/**
+	 * convert it to bigdecimal form source:http://rosettacode.org/wiki/Haversine_formula#Java ? Not converting to
+	 * BigDecimal for performance concerns,
+	 * 
+	 * This uses the ‘haversine’ formula to calculate the great-circle distance between two points – that is, the
+	 * shortest distance over the earth’s surface – giving an ‘as-the-crow-flies’ distance between the points (ignoring
+	 * any hills they fly over, of course!).</br>
+	 * TODO LATER can use non-native math libraries for faster computation. User jafama or apache common maths.</br>
+	 * 
+	 * @param lat1
+	 * @param lon1
+	 * @param lat2
+	 * @param lon2
+	 * @return distance in Kilometers
+	 */
+	public static double haversine(String lat1s, String lon1s, String lat2s, String lon2s)
+	{
+
+		double lat1 = Double.parseDouble(lat1s);
+		double lon1 = Double.parseDouble(lon1s);
+
+		double lat2 = Double.parseDouble(lat2s);
+		double lon2 = Double.parseDouble(lon2s);
+
+		// System.out.println("inside haversine = " + lat1 + "," + lon1 + "--" + lat2 + "," + lon2);
+		if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90 || Math.abs(lon1) > 180 || Math.abs(lon2) > 180)
+		{
+			new Exception("Possible Error in haversin: latitude and/or longitude outside range: provided " + lat1s + ","
+					+ lon1s + "  " + lat2s + "," + lon2s);
+			if (SanityConstants.checkForHaversineAnomaly)
+			{
+				PopUps.showError("Possible Error in haversin: latitude and/or longitude outside range: provided "
+						+ lat1s + "," + lon1s + "  " + lat2s + "," + lon2s);
+			}
+			return Constant.unknownDistanceTravelled;// System.exit(-1);
+		}
+
+		double dLat = Math.toRadians(lat2 - lat1);
+		double dLon = Math.toRadians(lon2 - lon1);
+		lat1 = Math.toRadians(lat1);
+		lat2 = Math.toRadians(lat2);
+
+		// System.out.println("inside haversine = " + dLat + "," + dLon + "--" + lat2 + "," + lon2);
+
+		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+				+ Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+
+		// System.out.println("a = " + a);
+		// double sqrtVal = Math.sqrt(a);
+		//
+		// if (Double.isNaN(sqrtVal))
+		// {
+		// PopUps.showException(new Exception("NaN sqrt: for a = " + a + " for latitude and/or longitude outside range:
+		// provided " + lat1s
+		// + "," + lon1s + " " + lat2s + "," + lon2), "org.activity.util.UtilityBelt.haversine(String, String, String,
+		// String)");
+		// }
+
+		double c = 2 * Math.asin(Math.sqrt(a)); // TODO: #performanceEater
+		// System.out.println("c = " + c);
+
+		if (SanityConstants.checkForDistanceTravelledAnomaly
+				&& (StatsUtils.radiusOfEarthInKMs * c > Constant.distanceTravelledAlert))
+		{
+			System.err.println("Probable Error: haversine():+ distance >200kms (=" + StatsUtils.radiusOfEarthInKMs * c
+					+ " for latitude and/or longitude outside range: provided " + lat1s + "," + lon1s + "  " + lat2s
+					+ "," + lon2s);
+		}
+
+		return StatsUtils.round(StatsUtils.radiusOfEarthInKMs * c, 4);
+	}
+
+	// end of for backup deserialisation compatibility 14 Nov 2018
 
 	/**
 	 * Enforcing non-instantiability
@@ -233,7 +328,7 @@ public class UtilityBelt
 	 * @param toCheck
 	 * @return
 	 */
-	public static boolean isValidActivityObject(ActivityObject ao)
+	public static boolean isValidActivityObject(ActivityObject2018 ao)
 	{
 		if (Constant.getDatabaseName().equals("gowalla1")) // gowalla has no invalid activity names
 		{// to speed up
@@ -1299,12 +1394,12 @@ public class UtilityBelt
 	 * @return an ArrayList of all activityEvents created from the jsonArray (note: this json array was formed from all
 	 *         values satisfying select and where clause of query)
 	 */
-	public static ArrayList<ActivityObject> createActivityObjectsFromJsonArray(JSONArray jsonArray)
+	public static ArrayList<ActivityObject2018> createActivityObjectsFromJsonArray(JSONArray jsonArray)
 	{
 		// HashMap<String,ArrayList<ActivityObject>> timeLines = new HashMap<String,ArrayList<ActivityObject>> ();
 		// Key: Identifier for timeline (can be UserID in some case)
 		// Value: An ArrayList of ActivityEvents
-		ArrayList<ActivityObject> allActivityObjects = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> allActivityObjects = new ArrayList<ActivityObject2018>();
 
 		System.out.println("inside createActivityEventsFromJsonArray: checking parsing json array");
 		System.out.println("number of elements in json array = " + jsonArray.length());
@@ -1335,7 +1430,7 @@ public class UtilityBelt
 				dimensionIDsForActivityEvent.put("Location_ID",
 						jsonArray.getJSONObject(i).get("Location_ID").toString());
 
-				allActivityObjects.add(new ActivityObject(dimensionIDsForActivityEvent));
+				allActivityObjects.add(new ActivityObject2018(dimensionIDsForActivityEvent));// "dummyToAvoidDatabase14Nov2018"
 			} // note: the ActivityEvents obtained from the database are not in chronological order, thus the ArrayList
 				// as of now does not contain Activity Events in chronological
 				// order. Also its
@@ -1406,10 +1501,10 @@ public class UtilityBelt
 	 * return allActivityEvents; }
 	 */
 
-	public static void traverseActivityEvents(ArrayList<ActivityObject> activityEvents)
+	public static void traverseActivityEvents(ArrayList<ActivityObject2018> activityEvents)
 	{
 		System.out.println("** Traversing Activity Events **");
-		for (ActivityObject ao : activityEvents)
+		for (ActivityObject2018 ao : activityEvents)
 		{
 			TimelineWriters.traverseActivityObject(ao.getDimensionIDNameValues(), ao.getDimensions());
 			// (activityEvents.get(i)).traverseActivityObject();
@@ -1426,11 +1521,11 @@ public class UtilityBelt
 		return (int) l;
 	}
 
-	public static String getActivityNamesFromArrayList(ArrayList<ActivityObject> activityEvents)
+	public static String getActivityNamesFromArrayList(ArrayList<ActivityObject2018> activityEvents)
 	{
 		String res = "";
 
-		for (ActivityObject ae : activityEvents)
+		for (ActivityObject2018 ae : activityEvents)
 		{
 			res += "_" + ae.getActivityName();
 		}
@@ -1966,16 +2061,16 @@ public class UtilityBelt
 		System.out.println("Inside toFasterIntObjectOpenHashMap");
 		double m2 = PerformanceAnalytics.getUsedMemoryInMB();
 		long t1 = System.currentTimeMillis();
-	
+
 		Int2ObjectOpenHashMap<T> mapFASTHashMap = new Int2ObjectOpenHashMap<>(map.size());
-	
+
 		map.entrySet().stream().forEach(e -> mapFASTHashMap.put(e.getKey().intValue(), e.getValue()));
 		long t2 = System.currentTimeMillis();
-	
+
 		double m3 = PerformanceAnalytics.getUsedMemoryInMB();
 		System.out.println("---used mem:" + m3 + " MB");
 		System.out.println("****** change mem:" + (m3 - m2) + " MBS");
-	
+
 		System.out.println("\n\nTime taken to created mapFASTHashMap= " + (t2 - t1) + "ms");
 		System.out.println("map.size()= " + map.size());
 		System.out.println("mapFASTHashMap.size()= " + mapFASTHashMap.size());

@@ -10,7 +10,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.SanityConstants;
 import org.activity.constants.VerbosityConstants;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.StringCode;
@@ -39,7 +39,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	 * @param featureName
 	 * @return
 	 */
-	public double[] getArrayOfFeatures(ArrayList<ActivityObject> aos, String featureName)
+	public double[] getArrayOfFeatures(ArrayList<ActivityObject2018> aos, String featureName)
 	{
 		Object arr[] = new Object[aos.size()];
 		double arrd[] = new double[aos.size()];
@@ -84,7 +84,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	 * @param featureName
 	 * @return
 	 */
-	public Pair<Double, Double>[] getArrayOfGeocoordinates(ArrayList<ActivityObject> aos, String featureName)
+	public Pair<Double, Double>[] getArrayOfGeocoordinates(ArrayList<ActivityObject2018> aos, String featureName)
 	{
 		Object coordinates[] = new Object[aos.size()];
 		Pair<Double, Double> coordinatesd[] = new Pair[aos.size()];
@@ -122,7 +122,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public Pair<String, Double> getWeightedEditDistanceRawValsWithTraceForFeature(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2, String featureName)
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2, String featureName)
 	{
 		if (featureName.contains("Coordinates"))
 		{
@@ -153,7 +153,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public Pair<String, Double> getWeightedEditDistanceRawValsWithTraceForGeoCoordinates(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2, String featureName)
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2, String featureName)
 	{
 		if (featureName.contains("Coordinate") == false)
 		{
@@ -183,7 +183,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	 *         trace of operations
 	 */
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseWeightedEditDistanceRawValsWithTrace(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original)
+			ArrayList<ActivityObject2018> activityObjects1Original, ArrayList<ActivityObject2018> activityObjects2Original)
 	{
 		if (VerbosityConstants.verboseDistance)
 		{
@@ -191,8 +191,8 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 					+ " & " + activityObjects2Original.size() + " objs");
 		}
 
-		ArrayList<ActivityObject> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
-		ArrayList<ActivityObject> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
+		ArrayList<ActivityObject2018> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
+		ArrayList<ActivityObject2018> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
 
 		/**
 		 * <ActivityName,Pair<Trace,EditDistance>>
@@ -261,7 +261,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivity(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original)// ,
+			ArrayList<ActivityObject2018> activityObjects1Original, ArrayList<ActivityObject2018> activityObjects2Original)// ,
 																													// String
 																													// userAtRecomm,
 																													// String
@@ -271,10 +271,10 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 																													// Integer
 																													// candidateTimelineId)
 	{
-		ArrayList<ActivityObject> activityObjects1 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects1 = new ArrayList<ActivityObject2018>();
 		activityObjects1.addAll(activityObjects1Original);
 
-		ArrayList<ActivityObject> activityObjects2 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects2 = new ArrayList<ActivityObject2018>();
 		activityObjects2.addAll(activityObjects2Original);
 
 		activityObjects1.remove(activityObjects1.size() - 1);
@@ -298,7 +298,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseWeightedEditDistanceInvalidsExpunged(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2)// , String
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2)// , String
 																									// userAtRecomm,
 	// String dateAtRecomm, String timeAtRecomm, Integer candidateTimelineId)
 	{
@@ -318,7 +318,7 @@ public class FeatureWiseWeightedEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final LinkedHashMap<String, Pair<String, Double>> getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2)
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2)
 	{
 		return getFeatureWiseWeightedEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1),
 				expungeInvalids(activityObjects2));

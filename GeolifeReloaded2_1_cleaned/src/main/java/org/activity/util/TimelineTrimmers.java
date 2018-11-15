@@ -13,7 +13,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
@@ -923,8 +923,8 @@ public class TimelineTrimmers
 					PopUps.getTracedErrorMsg("Error inside UtulityBelt.expungeInvalids: timelineToPrune is null"));
 		}
 	
-		ArrayList<ActivityObject> arrayToPrune = timelineToPrune.getActivityObjectsInTimeline();
-		ArrayList<ActivityObject> arrPruned = (ArrayList<ActivityObject>) arrayToPrune.stream()
+		ArrayList<ActivityObject2018> arrayToPrune = timelineToPrune.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> arrPruned = (ArrayList<ActivityObject2018>) arrayToPrune.stream()
 				.filter(ao -> ao.isInvalidActivityName() == false).collect(Collectors.toList());
 	
 		Timeline prunedTimeline = new Timeline(arrPruned, timelineToPrune.isShouldBelongToSingleDay(),

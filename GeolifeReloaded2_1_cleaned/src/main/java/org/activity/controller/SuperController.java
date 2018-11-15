@@ -214,7 +214,8 @@ public class SuperController
 	 */
 	public static void main(String args[])// _importantMay10
 	{
-		initializeConstants("SuperController", Constant.For9kUsers, Constant.getDatabaseName());
+		String databaseName = Constant.getDatabaseName();
+		initializeConstants("SuperController", Constant.For9kUsers, databaseName);
 		boolean doRecommendation = true;
 		boolean doEvaluation = true;
 		boolean hasMUs = true;
@@ -233,12 +234,17 @@ public class SuperController
 
 		// Select set of sampled user indices to run for
 		// when runForAllUsersAtOnce, we are not using sample user indices, hence we need to run it only once.
-		String[] setOfSampledUserIndicesForExp = Constant.runForAllUsersAtOnce
-				? Arrays.copyOfRange(PathConstants.pathToSetsOfRandomlySampled100Users, 0, 1)
-				: Arrays.copyOfRange(PathConstants.pathToSetsOfRandomlySampled100Users, 0, 1);
+		String[] setOfSampledUserIndicesForExp = null;
+
+		if (databaseName.equals("gowalla1"))
+		{
+			setOfSampledUserIndicesForExp = Constant.runForAllUsersAtOnce
+					? Arrays.copyOfRange(PathConstants.pathToSetsOfRandomlySampled100Users, 0, 1)
+					: Arrays.copyOfRange(PathConstants.pathToSetsOfRandomlySampled100Users, 0, 1);
+		}
 
 		// Select set of ED Alphas to run for
-		double[] EDAlphas = Arrays.copyOfRange(Constant.EDAlphas, 0, 1);
+		double[] EDAlphas = Constant.EDAlphas;// Arrays.copyOfRange(Constant.EDAlphas, 0, 1);
 		// num of times same exp to be repeated to smooth out variation due to ties, randomness, etc.
 		final int numOfIterSameExp = 1;
 		System.out.println("setOfSampledUserIndicesForExp = " + Arrays.toString(setOfSampledUserIndicesForExp)
@@ -257,13 +263,22 @@ public class SuperController
 				}
 				else
 				{
-					for (String sampledUserIndicesSet : setOfSampledUserIndicesForExp)
+					if (databaseName.equals("gowalla1"))
 					{
-						runExperimentForGivenUsersAndConfig(sampledUserIndicesSet, edAlphaForAnExp, "",
-								doRecommendation, doEvaluation, hasMUs);// "iter" +
-						// iteration);
-						// if (Constant.runForAllUsersAtOnce){break;}// here we are not using sample user indices, hence
-						// we need to run it only once.
+						for (String sampledUserIndicesSet : setOfSampledUserIndicesForExp)
+						{
+							runExperimentForGivenUsersAndConfig(sampledUserIndicesSet, edAlphaForAnExp, "",
+									doRecommendation, doEvaluation, hasMUs);// "iter" +
+							// iteration);
+							// if (Constant.runForAllUsersAtOnce){break;}// here we are not using sample user indices,
+							// hence
+							// we need to run it only once.
+						}
+					}
+					else
+					{
+						runExperimentForGivenUsersAndConfig("", edAlphaForAnExp, "", doRecommendation, doEvaluation,
+								hasMUs);// "iter" +
 					}
 				}
 			}
@@ -294,7 +309,7 @@ public class SuperController
 				Constant.setAKOMHighestOrder(order);
 				Constant.setRecentDaysInTrainingTimelines(numOfDay);
 
-				runExperiment(commonPath, false, true, true, "gowalla1");
+				runExperiment(commonPath, false, true, true, "gowalla1", "HJEditDistance");
 				// cleanUpSpace(commonPath, 0.80);
 				System.out.println("finished for commonPath = " + commonPath);
 			}
@@ -324,30 +339,32 @@ public class SuperController
 			boolean hasMUS)
 	{
 		Constant.setDynamicPathToRandomlySampledUserIndices(sampledUserIndicesSetFile);
-		if (EDAlphaForThisExperiment > -1)// when EDAlphaForThisExperiment is <=-1, means we do not need to set it here.
+		// if (EDAlphaForThisExperiment > -1)// when EDAlphaForThisExperiment is <=-1, means we do not need to set it
+		// here.
 		{
 			Constant.setDynamicEDAlpha(EDAlphaForThisExperiment);// Constant.setEDAlpha(EDAlphaForThisExperiment);
 			System.out.println("SETTING EDAlpha dynamically");
 		}
-		else
-		{
-			System.out.println("NOT SETTING EDAlpha dynamically");
-		}
+		// else
+		// {
+		// System.out.println("NOT SETTING EDAlpha dynamically");
+		// }
 		System.out.println("sampledUserIndicesSetFile=" + sampledUserIndicesSetFile);
 		System.out.println("Constant.pathToRandomLySampleUserIndices=" + sampledUserIndicesSetFile);
 		System.out.println("Constant.EDAlpha=" + Constant.getDynamicEDAlpha());
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 		// { "./dataWritten/"+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/" };
 
-		String commonPath = "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-				// { "./dataWritten/"
-				+ DateTimeUtils.getMonthDateLabel() + getLabelForExperimentConfig(sampledUserIndicesSetFile)
-				+ iterationLabel + "/";
+		String commonPath = // "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+				"/run/media/gunjan/BackupVault/Geolife2018Results/"
+						// "./dataWritten/"
+						+ Constant.getDatabaseName() + "_" + DateTimeUtils.getMonthDateLabel()
+						+ getLabelForExperimentConfig(sampledUserIndicesSetFile) + iterationLabel + "/";
 
 		// for (int i = 0; i <= commonPaths.length - 1; i++){
 		WToFile.createDirectoryIfNotExists(commonPath);
 		// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-		runExperiment(commonPath, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName());
+		runExperiment(commonPath, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName(), "HJEditDistance");
 		// cleanUpSpace(commonPaths[i], 0.90);
 		System.out.println("finished runExperimentForGivenUsersAndConfig for commonPath = " + commonPath);
 		System.out.println("Exiting runExperimentForGivenUsersAndConfig");
@@ -366,7 +383,7 @@ public class SuperController
 		String featuresUsedLabel = "", distNormalisationLabel = "", predictorLabel = "", EDAlphaLabel = "",
 				StFilterLabel = "", sampledUserSetLabel = "", candThresholdingLabel = "",
 				filterTrainingTimelinesLabel = "", toyTimelinesLabel = "", wtdEditDistanceLabel = "",
-				timeDecayLabel = "";
+				timeDecayLabel = "", collLabel = "";
 
 		// added on 6 Aug 2018
 		if (Constant.useToyTimelines)
@@ -379,9 +396,18 @@ public class SuperController
 		}
 
 		// String sampledUserSetLabel;
-		String userSetLabelSplitted[] = sampledUserIndicesSetFile.split("\\.");
-		System.out.println("userSetLabelSplitted=" + Arrays.asList(userSetLabelSplitted));
-		sampledUserSetLabel = userSetLabelSplitted[2];
+
+		if (sampledUserIndicesSetFile == null || sampledUserIndicesSetFile.length() > 0)
+		{
+			String userSetLabelSplitted[] = sampledUserIndicesSetFile.split("\\.");
+			System.out.println("userSetLabelSplitted=" + Arrays.asList(userSetLabelSplitted));
+			sampledUserSetLabel = userSetLabelSplitted[2];
+		}
+		else
+		{
+			sampledUserSetLabel = "";
+		}
+
 		if (sampledUserSetLabel.equals("csv"))
 		{
 			sampledUserSetLabel = "";
@@ -529,10 +555,22 @@ public class SuperController
 		{
 			timeDecayLabel = "decayA";
 		}
+		if (Constant.collaborativeCandidates)
+		{
+			collLabel = "coll";
+		}
+		if (Constant.noAED)
+		{
+			collLabel = "NoAED";
+		}
+		if (Constant.noFED)
+		{
+			collLabel = "NoFED";
+		}
 
 		return sampledUserSetLabel + predictorLabel + EDAlphaLabel + featuresUsedLabel + StFilterLabel
 				+ distNormalisationLabel + candThresholdingLabel + filterTrainingTimelinesLabel + toyTimelinesLabel
-				+ wtdEditDistanceLabel + timeDecayLabel;
+				+ wtdEditDistanceLabel + timeDecayLabel + collLabel;
 	}
 
 	public static void cleanUp(String[] pathsToClean)
@@ -557,9 +595,11 @@ public class SuperController
 	 * @param doEvaluation
 	 * @param hasMUs
 	 * @param databaseName
+	 * @param distanceUsed
+	 *            e.g. "HJEditDistance"
 	 **/
 	public static void runExperiment(String commonPath, boolean doRecommendation, boolean doEvaluation, boolean hasMUs,
-			String databaseName)
+			String databaseName, String distanceUsed)
 	{
 		long at = System.currentTimeMillis();
 		boolean doPostFiltering = (doEvaluation == false) ? false : true;
@@ -638,7 +678,7 @@ public class SuperController
 		Constant.setOutputCoreResultsPath(commonPath);// commonPathGeolife;// commonPathDCU + "SimpleV3/";//
 		// "/home/gunjan/DCU/SimpleV3/";//
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April16_2015/DCUData/SimpleV3/";
-		Constant.setDistanceUsed("HJEditDistance");
+		Constant.setDistanceUsed(distanceUsed);// "HJEditDistance");
 		Constant.reflectTheConfigInConstantFile(commonPath + "Constant" + DateTimeUtils.getMonthDateLabel() + ".java");
 
 		if (doRecommendation)

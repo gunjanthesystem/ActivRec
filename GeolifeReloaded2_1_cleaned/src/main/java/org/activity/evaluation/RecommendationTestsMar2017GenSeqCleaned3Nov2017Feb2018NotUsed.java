@@ -27,7 +27,7 @@ import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
@@ -373,7 +373,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		 * we are doing it for each matching unit. Note: this is very small performance effect, hence should not be of
 		 * major concern. (UserId,ActName,RepresentativeAO)
 		 */
-		LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs = new LinkedHashMap<>();
+		LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject2018>> mapOfRepAOs = new LinkedHashMap<>();
 		LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration = new LinkedHashMap<>();
 		// PopUps.showMessage("Starting iteration over user");
 
@@ -388,7 +388,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		/**
 		 * {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
 		 */
-		Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser = null;
+		Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser = null;
 
 		if (Constant.collaborativeCandidates)
 		{
@@ -506,7 +506,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			// unit, so we can take it out of the for loop, however, it that we will also need to
 			// take out the train-test splitting of timelines out of the loop, however that can be done
 			// as well
-			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = null;
+			Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = null;
 			if (Constant.preBuildRepAOGenericUser == false)
 			{
 				if (Constant.collaborativeCandidates == false)
@@ -514,7 +514,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					repAOResult = prebuildRepresentativeActivityObjects(trainTestTimelinesForAllUsersDW, userId,
 							userTrainingTimelines, userTestTimelines);
 
-					LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
+					LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = repAOResult.getFirst();
 					mapOfRepAOs.put(userId, repAOsForThisUser);
 					mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
 				}
@@ -526,7 +526,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					{
 						repAOResult = buildRepresentativeAOsForUserPDVCOll(userId, trainTestTimelinesForAllUsersDW,
 								Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs());
-						LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = repAOResult.getFirst();
+						LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = repAOResult.getFirst();
 						mapOfRepAOs.put(userId, repAOsForThisUser);
 						mapOfMedianPreSuccDuration.put(userId, repAOResult.getSecond());
 					}
@@ -636,7 +636,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 				String weekDay = DateTimeUtils.getWeekDayFromWeekDayInt(testDate.getDay());
 
-				ArrayList<ActivityObject> activityObjectsInTestDay = testDayTimelineForUser.getActivityObjectsInDay();
+				ArrayList<ActivityObject2018> activityObjectsInTestDay = testDayTimelineForUser.getActivityObjectsInDay();
 
 				////////// added to improve write speed
 				ArrayList<StringBuilder> sbsRawToWriteForThisUserDate = createListOfStringBuilders(recommSeqLength);
@@ -674,7 +674,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 				// + activityObjectsInTestDay.size());
 				for (int indexOfAOInDay = 0; indexOfAOInDay < activityObjectsInTestDay.size() - 1; indexOfAOInDay++)
 				{
-					ActivityObject activityObjectInTestDay = activityObjectsInTestDay.get(indexOfAOInDay);
+					ActivityObject2018 activityObjectInTestDay = activityObjectsInTestDay.get(indexOfAOInDay);
 
 					String activityNameInTestDay = activityObjectInTestDay.getActivityName();
 					ArrayList<Integer> primaryDimensionValInTestDay = activityObjectInTestDay.getPrimaryDimensionVal();
@@ -712,13 +712,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					}
 
 					// Target Activity, actual next activity
-					ActivityObject nextValidActivityObjectAfterRecommPoint1 = testDayTimelineForUser
+					ActivityObject2018 nextValidActivityObjectAfterRecommPoint1 = testDayTimelineForUser
 							.getNextValidActivityAfterActivityAtThisTime(new Timestamp(year - 1900, month - 1, date,
 									endTimeStamp.getHours(), endTimeStamp.getMinutes(), endTimeStamp.getSeconds(), 0));
 
 					// checked if it is giving correct results: concern: passing end ts directly and
 					// using LocalDate for comparison
-					ArrayList<ActivityObject> nextValidActivityObjectsAfterRecommPoint1 = TimelineUtils
+					ArrayList<ActivityObject2018> nextValidActivityObjectsAfterRecommPoint1 = TimelineUtils
 							.getNextNValidAOsAfterActivityAtThisTimeSameDay(testDayTimelineForUser, endTimeStamp,
 									this.recommSeqLength);
 					// timestamp sanity check start
@@ -783,7 +783,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					RecommendationMasterI recommMasters[] = new RecommendationMasterI[recommSeqLength];
 
 					// start of curtain April 7 //iterative recommendation
-					ArrayList<ActivityObject> repAOsFromPrevRecomms = new ArrayList<>(recommSeqLength);
+					ArrayList<ActivityObject2018> repAOsFromPrevRecomms = new ArrayList<>(recommSeqLength);
 
 					// String recommendationTimeString = endTimeString;
 					String recommTimesStrings[] = new String[recommSeqLength];
@@ -956,7 +956,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 						// get the top recommended activity names from previous recommendation
 						topRecommendedPrimarDimensionVal[seqIndex] = splittedRankedRecommendedActName[1];
 						// PopUps.showMessage("here12_2");
-						ActivityObject repAOForTopRecommActName = getRepresentativeAOForActName(
+						ActivityObject2018 repAOForTopRecommActName = getRepresentativeAOForActName(
 								Constant.preBuildRepAOGenericUser, Constant.collaborativeCandidates,
 								Constant.buildRepAOJustInTime, mapOfRepAOs, mapOfMedianPreSuccDuration,
 								repAOResultGenericUser, userId, recommendationTimes[seqIndex],
@@ -1348,15 +1348,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param primaryDimension
 	 * @return
 	 */
-	private ActivityObject getRepresentativeAOForActName(boolean preBuildRepAOGenericUser,
+	private ActivityObject2018 getRepresentativeAOForActName(boolean preBuildRepAOGenericUser,
 			boolean collaborativeCandidates, boolean buildRepAOJustInTime,
-			LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs,
+			LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject2018>> mapOfRepAOs,
 			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration,
-			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser,
+			Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser,
 			int userId, Timestamp recommendationTime, String topRecommendedPrimarDimensionVal,
 			RecommendationMasterI recommMaster, PrimaryDimension primaryDimension, String commonPath)
 	{
-		ActivityObject repAOForTopRecommActName = null;
+		ActivityObject2018 repAOForTopRecommActName = null;
 
 		if (preBuildRepAOGenericUser)
 		{
@@ -1373,7 +1373,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			// Sanity check Feb8 Starts
 			if (false)
 			{
-				ActivityObject aoTemp = getRepresentativeAOCollGenericV2(
+				ActivityObject2018 aoTemp = getRepresentativeAOCollGenericV2(
 						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTime, primaryDimension,
 						repAOResultGenericUser);
 				WToFile.appendLineToFileAbs(
@@ -1627,11 +1627,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param userTestTimelines
 	 * @return
 	 */
-	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> prebuildRepresentativeActivityObjects(
+	private Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> prebuildRepresentativeActivityObjects(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers, int userId,
 			LinkedHashMap<Date, Timeline> userTrainingTimelines, LinkedHashMap<Date, Timeline> userTestTimelines)
 	{
-		Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = null;
+		Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = null;
 
 		// if (Constant.collaborativeCandidates)
 		// { repAOResult = buildRepresentativeAOsForUserPDVCOll(userId, trainTestTimelinesForAllUsers,
@@ -1647,7 +1647,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			// for Activity ID as primary dimension, the output of
 			// buildRepresentativeAOsForUserPD and buildRepresentativeAOsForUser should be same
 			// (except data type)
-			Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName = buildRepresentativeAOsForUser(
+			Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName = buildRepresentativeAOsForUser(
 					userId, TimelineTransformers.dayTimelinesToATimeline(userTrainingTimelines, false, true),
 					Constant.getActivityNames(), TimelineTransformers.dayTimelinesToATimeline(userTestTimelines, false, true));
 			Sanity.compareOnlyNonEmpty(repAOResult, repAOResultActName);
@@ -1665,7 +1665,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param uniqueActivityIDs
 	 * @return
 	 */
-	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPDVCOll(
+	private Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPDVCOll(
 			int userId, LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			Set<Integer> uniqueLocIDs, Set<Integer> uniqueActivityIDs)
 	{
@@ -1673,7 +1673,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		// mapOfRepAOs;
 		boolean sanityCheck = false;
 		System.out.println("Inside buildRepresentativeAOsForUserPDV2 for user " + userId);
-		LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
+		LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = null;
 		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
 		LinkedHashMap<String, Timeline> collTrainingTimelines = new LinkedHashMap<>();
 
@@ -1690,7 +1690,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 			else
 			{
-				LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal = new LinkedHashMap<>();
 				/**
 				 * Useful for deciding upon the start timestamp from representative AO
 				 */
@@ -1709,7 +1709,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 						Timeline userTrainingTimeline = TimelineTransformers
 								.dayTimelinesToATimeline(trainTestForAUser.getValue().get(0), false, true);
 
-						for (ActivityObject ao : userTrainingTimeline.getActivityObjectsInTimeline())
+						for (ActivityObject2018 ao : userTrainingTimeline.getActivityObjectsInTimeline())
 						{
 							distinctPDValsEncounteredInTraining.addAll(ao.getPrimaryDimensionVal());
 						}
@@ -1738,14 +1738,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					long prevTimestamp = 0;
 					Set<Integer> prevPDValEncountered = null;
 
-					for (ActivityObject ao : trainingTimelineEntry.getValue().getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : trainingTimelineEntry.getValue().getActivityObjectsInTimeline())
 					{
 						countAOs += 1;
 						Set<Integer> uniquePdValsInAO = new LinkedHashSet<>(ao.getPrimaryDimensionVal());
 						for (Integer pdVal : uniquePdValsInAO)
 						{
 							// add this act object to the correct map entry in map of aos for given act names
-							ArrayList<ActivityObject> aosStored = aosForEachPDVal.get(pdVal);
+							ArrayList<ActivityObject2018> aosStored = aosForEachPDVal.get(pdVal);
 							if (aosStored == null)
 							{
 								PopUps.printTracedErrorMsg("Error: encountered pdval '" + pdVal
@@ -1849,7 +1849,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 				////////////////////////// sanity check end
 
-				Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
+				Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
 						userId, aosForEachPDVal, durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
 
 				repAOsForThisUser = result.getFirst();
@@ -1864,7 +1864,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		System.out.println("Exiting buildRepresentativeAOsForUserPDV2 for user " + userId + " time taken = "
 				+ ((t2 - t1) * 1.0 / 1000) + "secs");
 
-		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(
+		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(
 				repAOsForThisUser, actMedianPreSuccDuration);
 
 	}
@@ -1877,7 +1877,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param uniqueActivityIDs
 	 * @return
 	 */
-	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsAllUsersPDVCOllAllUsers(
+	private Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsAllUsersPDVCOllAllUsers(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			Set<Integer> uniqueLocIDs, Set<Integer> uniqueActivityIDs)
 	{
@@ -1887,7 +1887,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		System.out.println("Inside buildRepresentativeAOsAllUsersPDVCOllAllUsers using all users ");
 		// LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
 		// LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
-		Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = null;
+		Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> result = null;
 		LinkedHashMap<String, Timeline> collTrainingTimelines = new LinkedHashMap<>();
 
 		long t1 = System.currentTimeMillis();
@@ -1903,7 +1903,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 			else
 			{
-				LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal = new LinkedHashMap<>();
 				/**
 				 * Could be useful for deciding upon the start timestamp from representative AO
 				 */
@@ -1919,7 +1919,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					Timeline userTrainingTimeline = TimelineTransformers
 							.dayTimelinesToATimeline(trainTestForAUser.getValue().get(0), false, true);
 
-					for (ActivityObject ao : userTrainingTimeline.getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : userTrainingTimeline.getActivityObjectsInTimeline())
 					{
 						distinctPDValsEncounteredInTraining.addAll(ao.getPrimaryDimensionVal());
 					}
@@ -1947,14 +1947,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					long prevTimestamp = 0;
 					Set<Integer> prevPDValEncountered = null;
 
-					for (ActivityObject ao : trainingTimelineEntry.getValue().getActivityObjectsInTimeline())
+					for (ActivityObject2018 ao : trainingTimelineEntry.getValue().getActivityObjectsInTimeline())
 					{
 						countAOs += 1;
 						Set<Integer> uniquePdValsInAO = new LinkedHashSet<>(ao.getPrimaryDimensionVal());
 						for (Integer pdVal : uniquePdValsInAO)
 						{
 							// add this act object to the correct map entry in map of aos for given act names
-							ArrayList<ActivityObject> aosStored = aosForEachPDVal.get(pdVal);
+							ArrayList<ActivityObject2018> aosStored = aosForEachPDVal.get(pdVal);
 							if (aosStored == null)
 							{
 								PopUps.printTracedErrorMsg("Error: encountered pdval '" + pdVal
@@ -2175,12 +2175,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param recommendationTime
 	 * @return
 	 */
-	private ActivityObject getRepresentativeAO(String topRecommActName,
-			LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs,
+	private ActivityObject2018 getRepresentativeAO(String topRecommActName,
+			LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject2018>> mapOfRepAOs,
 			LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration, int userId,
 			Timestamp recommendationTime)
 	{
-		ActivityObject repAO = mapOfRepAOs.get(userId).get(topRecommActName);
+		ActivityObject2018 repAO = mapOfRepAOs.get(userId).get(topRecommActName);
 		if (repAO == null)
 		{
 			System.err.println(PopUps.getTracedErrorMsg(
@@ -2240,12 +2240,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @return
 	 * @since 14 July 2017
 	 */
-	private ActivityObject getRepresentativeAO(Integer topPrimaryDimensionVal,
-			LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject>> mapOfRepAOs,
+	private ActivityObject2018 getRepresentativeAO(Integer topPrimaryDimensionVal,
+			LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject2018>> mapOfRepAOs,
 			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDuration, int userId,
 			Timestamp recommendationTime, PrimaryDimension primaryDimension)
 	{
-		ActivityObject repAO = mapOfRepAOs.get(userId).get(topPrimaryDimensionVal);
+		ActivityObject2018 repAO = mapOfRepAOs.get(userId).get(topPrimaryDimensionVal);
 		if (repAO == null)
 		{
 			PopUps.printTracedErrorMsgWithExit("Error in getRepresentativeAO: topRecommActName:"
@@ -2304,7 +2304,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @return
 	 * @since 1 August 2017
 	 */
-	private ActivityObject getRepresentativeAOColl(Integer topPrimaryDimensionVal, int userId,
+	private ActivityObject2018 getRepresentativeAOColl(Integer topPrimaryDimensionVal, int userId,
 			Timestamp recommendationTime, PrimaryDimension primaryDimension, RecommendationMasterI recommMaster)
 	{
 		// StringBuilder verboseMsg = new StringBuilder();
@@ -2312,7 +2312,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		// "\n");
 
 		ArrayList<Long> durationPreceeding = new ArrayList<>();
-		ArrayList<ActivityObject> aosWithSamePDVal = new ArrayList<>();
+		ArrayList<ActivityObject2018> aosWithSamePDVal = new ArrayList<>();
 
 		// iterate over the candidate timelines (which are to be used to create representative activity objects)
 		// System.out.println("#cands = " + recommMaster.getCandidateTimelineIDs().size());
@@ -2321,7 +2321,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			TimelineWithNext candTimeline = (TimelineWithNext) recommMaster.getCandidateTimeline(candID);
 			// candTimeline.printActivityObjectNamesWithTimestampsInSequence();
 			// System.out.println("next act=" + candTimeline.getNextActivityObject().toStringAllGowallaTS());
-			ArrayList<ActivityObject> actObjs = candTimeline.getActivityObjectsInTimeline();
+			ArrayList<ActivityObject2018> actObjs = candTimeline.getActivityObjectsInTimeline();
 			actObjs.add(candTimeline.getNextActivityObject());
 
 			// note cand will contain MU+1 acts, +1 next act
@@ -2333,7 +2333,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			// + Constant.getCurrentMatchingUnit());
 
 			long prevTS = -99, currentTS = -99;
-			for (ActivityObject ao : actObjs)
+			for (ActivityObject2018 ao : actObjs)
 			{
 				currentTS = ao.getStartTimestamp().getTime();
 
@@ -2409,7 +2409,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
 
-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+		ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs, activityName, "",
 				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,
 				-1, -1, new String[] { "" });
 
@@ -2447,16 +2447,16 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 *            {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
 	 * @return
 	 */
-	private ActivityObject getRepresentativeAOCollGeneric(Integer topPrimaryDimensionVal, int userId,
+	private ActivityObject2018 getRepresentativeAOCollGeneric(Integer topPrimaryDimensionVal, int userId,
 			Timestamp recommendationTime, PrimaryDimension primaryDimension,
-			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser)
+			Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser)
 	{
 		// StringBuilder verboseMsg = new StringBuilder();
 		// System.out.println("Inside getRepresentativeAOColl(): topPrimaryDimensionVal=" + topPrimaryDimensionVal +
 		// "\n");
 
 		ArrayList<Long> durationPreceeding = new ArrayList<>();
-		ArrayList<ActivityObject> aosWithSamePDVal = new ArrayList<>();
+		ArrayList<ActivityObject2018> aosWithSamePDVal = new ArrayList<>();
 
 		// StringBuilder sb = new StringBuilder();
 		// System.out.println("durationPreceeding= " + durationPreceeding.toString());
@@ -2513,7 +2513,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
 
-		ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs, activityName, "",
+		ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs, activityName, "",
 				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,
 				-1, -1, new String[] { "" });
 
@@ -2554,9 +2554,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @return
 	 * @since 8 Feb 2018
 	 */
-	private ActivityObject getRepresentativeAOCollGenericV2(Integer topPrimaryDimensionVal, int userId,
+	private ActivityObject2018 getRepresentativeAOCollGenericV2(Integer topPrimaryDimensionVal, int userId,
 			Timestamp recommendationTime, PrimaryDimension primaryDimension,
-			Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser)
+			Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser)
 	{
 		if (Constant.getDatabaseName().equals("gowalla1") == false)
 		{
@@ -2587,7 +2587,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
 
-		ActivityObject repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+		ActivityObject2018 repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
 
 		repAOForThisActNameForThisUser.setStartTimestamp(newRecommTimestamp);
 		repAOForThisActNameForThisUser.setEndTimestamp(newRecommTimestamp);
@@ -2619,7 +2619,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param mapOfRepAOs
 	 * @param mapOfMedianPreSuccDuration
 	 */
-	private void writeRepAOs(LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject>> mapOfRepAOs,
+	private void writeRepAOs(LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject2018>> mapOfRepAOs,
 			LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration,
 			String commonPath)
 	{
@@ -2628,7 +2628,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 		WToFile.appendLineToFileAbs("UserID,ActID,RepAO\n", commonPath + "RepAO.txt");
 
-		for (Entry<Integer, LinkedHashMap<String, ActivityObject>> uEntry : mapOfRepAOs.entrySet())
+		for (Entry<Integer, LinkedHashMap<String, ActivityObject2018>> uEntry : mapOfRepAOs.entrySet())
 		{
 			// sbTemp.append("\nUser:" + uEntry.getKey()).append("Rep AOs:\n");
 			uEntry.getValue().entrySet().stream().forEachOrdered(e -> sbTemp
@@ -2664,7 +2664,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 *             org.activity.io.WritingToFile.writeEditDistancesPerRtPerCand()
 	 */
 	private static String getRTsWithDistancesToWrite(String dateToRecomm, String weekDay, Timestamp endTimeStamp,
-			RecommendationMasterI recommP1, String actActualDone, ActivityObject activityAtRecommPoint)
+			RecommendationMasterI recommP1, String actActualDone, ActivityObject2018 activityAtRecommPoint)
 	{
 		StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
 
@@ -2676,7 +2676,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			// recommP1.getCandidateTimeslines() .get(candidateTimelineID);
 
 			int endPointIndexThisCandidate = candidateTimeline.getActivityObjectsInTimeline().size() - 1;
-			ActivityObject endPointActivityInCandidate = candidateTimeline.getActivityObjectsInTimeline()
+			ActivityObject2018 endPointActivityInCandidate = candidateTimeline.getActivityObjectsInTimeline()
 					.get(endPointIndexThisCandidate);
 
 			// difference in start time of end point activity of candidate and start
@@ -2808,13 +2808,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 *            only to find which act names occur in test but not in training
 	 * @return
 	 */
-	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> buildRepresentativeAOsForUser(
+	private Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>> buildRepresentativeAOsForUser(
 			int userId, Timeline userTrainingTimelines, String[] allPossibleActivityNames, Timeline userTestTimelines)
 	{
 		// mapOfRepAOs;
 		boolean sanityCheck = false;
 		System.out.println("Inside buildRepresentativeActivityObjects for user " + userId);
-		LinkedHashMap<String, ActivityObject> repAOsForThisUser = null;
+		LinkedHashMap<String, ActivityObject2018> repAOsForThisUser = null;
 		LinkedHashMap<String, Pair<Double, Double>> actMedianPreSuccDuration = null;
 
 		long t1 = System.currentTimeMillis();
@@ -2834,7 +2834,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			else
 			{
 
-				LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName = new LinkedHashMap<>();
+				LinkedHashMap<String, ArrayList<ActivityObject2018>> aosForEachActName = new LinkedHashMap<>();
 
 				/**
 				 * Useful for deciding upon the start timestamp from representative AO
@@ -2857,13 +2857,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 				LinkedHashSet<String> distinctActNamesEncounteredInTraining = new LinkedHashSet<>();
 
-				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : userTrainingTimelines.getActivityObjectsInTimeline())
 				{
 					String actNameEncountered = ao.getActivityName();
 					distinctActNamesEncounteredInTraining.add(actNameEncountered);
 
 					// add this act objec to the correct map entry in map of aos for given act names
-					ArrayList<ActivityObject> aosStored = aosForEachActName.get(actNameEncountered);
+					ArrayList<ActivityObject2018> aosStored = aosForEachActName.get(actNameEncountered);
 					if (aosStored == null)
 					{
 						System.err.println(PopUps.getTracedErrorMsg("Error: encountered act name '" + actNameEncountered
@@ -2945,7 +2945,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 				////////////////////////// sanity check end
 
-				Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserV2(
+				Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserV2(
 						userId, aosForEachActName, durationFromPrevForEachActName, durationFromNextForEachActName);
 				repAOsForThisUser = result.getFirst();
 				actMedianPreSuccDuration = result.getSecond();
@@ -2959,7 +2959,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		System.out.println("Exiting buildRepresentativeActivityObjects for user " + userId + " time taken = "
 				+ ((t2 - t1) * 1.0 / 1000) + "secs");
 
-		return new Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>(
+		return new Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>>(
 				repAOsForThisUser, actMedianPreSuccDuration);
 	}
 
@@ -2980,14 +2980,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param uniqueActivityIDs
 	 * @return
 	 */
-	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPD(
+	private Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPD(
 			int userId, Timeline userTrainingTimelines, Timeline userTestTimelines, Set<Integer> uniqueLocIDs,
 			Set<Integer> uniqueActivityIDs)
 	{
 		// mapOfRepAOs;
 		boolean sanityCheck = false;
 		System.out.println("Inside buildRepresentativeAOsForUserPD for user " + userId);
-		LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
+		LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = null;
 		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
 
 		long t1 = System.currentTimeMillis();
@@ -3003,7 +3003,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 			else
 			{
-				LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal = new LinkedHashMap<>();
 				/**
 				 * Useful for deciding upon the start timestamp from representative AO
 				 */
@@ -3038,7 +3038,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 				Set<Integer> prevPDValEncountered = null;
 				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
 
-				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : userTrainingTimelines.getActivityObjectsInTimeline())
 				{
 					Set<Integer> uniquePdValsInAO = new LinkedHashSet<>(ao.getPrimaryDimensionVal());
 					distinctPDValsEncounteredInTraining.addAll(ao.getPrimaryDimensionVal());
@@ -3046,7 +3046,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					for (Integer pdVal : uniquePdValsInAO)
 					{
 						// add this act object to the correct map entry in map of aos for given act names
-						ArrayList<ActivityObject> aosStored = aosForEachPDVal.get(pdVal);
+						ArrayList<ActivityObject2018> aosStored = aosForEachPDVal.get(pdVal);
 						if (aosStored == null)
 						{
 							PopUps.printTracedErrorMsg("Error: encountered pdval '" + pdVal
@@ -3150,7 +3150,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 				////////////////////////// sanity check end
 
-				Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
+				Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
 						userId, aosForEachPDVal, durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
 
 				repAOsForThisUser = result.getFirst();
@@ -3165,7 +3165,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		System.out.println("Exiting buildRepresentativeAOsForUserPD for user " + userId + " time taken = "
 				+ ((t2 - t1) * 1.0 / 1000) + "secs");
 
-		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(
+		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(
 				repAOsForThisUser, actMedianPreSuccDuration);
 	}
 
@@ -3189,14 +3189,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param uniqueActivityIDs
 	 * @return
 	 */
-	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPDV2(
+	private Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsForUserPDV2(
 			int userId, Timeline userTrainingTimelines, Timeline userTestTimelinesqq, Set<Integer> uniqueLocIDs,
 			Set<Integer> uniqueActivityIDs)
 	{
 		// mapOfRepAOs;
 		boolean sanityCheck = false;
 		System.out.println("Inside buildRepresentativeAOsForUserPDV2 for user " + userId);
-		LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
+		LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = null;
 		LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
 
 		long t1 = System.currentTimeMillis();
@@ -3212,7 +3212,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 			else
 			{
-				LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal = new LinkedHashMap<>();
 				/**
 				 * Useful for deciding upon the start timestamp from representative AO
 				 */
@@ -3222,7 +3222,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 				// earlier version was using all possible vals fro PD but now using only those in training data.
 				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
 
-				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : userTrainingTimelines.getActivityObjectsInTimeline())
 				{
 					distinctPDValsEncounteredInTraining.addAll(ao.getPrimaryDimensionVal());
 				}
@@ -3242,13 +3242,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 				long prevTimestamp = 0;
 				Set<Integer> prevPDValEncountered = null;
 
-				for (ActivityObject ao : userTrainingTimelines.getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : userTrainingTimelines.getActivityObjectsInTimeline())
 				{
 					Set<Integer> uniquePdValsInAO = new LinkedHashSet<>(ao.getPrimaryDimensionVal());
 					for (Integer pdVal : uniquePdValsInAO)
 					{
 						// add this act object to the correct map entry in map of aos for given act names
-						ArrayList<ActivityObject> aosStored = aosForEachPDVal.get(pdVal);
+						ArrayList<ActivityObject2018> aosStored = aosForEachPDVal.get(pdVal);
 						if (aosStored == null)
 						{
 							PopUps.printTracedErrorMsg("Error: encountered pdval '" + pdVal
@@ -3352,7 +3352,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 				////////////////////////// sanity check end
 
-				Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
+				Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> result = computeRepresentativeActivityObjectForUserPDV2(
 						userId, aosForEachPDVal, durationFromPrevForEachPDVal, durationFromNextForEachPDVal);
 
 				repAOsForThisUser = result.getFirst();
@@ -3367,7 +3367,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		System.out.println("Exiting buildRepresentativeAOsForUserPDV2 for user " + userId + " time taken = "
 				+ ((t2 - t1) * 1.0 / 1000) + "secs");
 
-		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(
+		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(
 				repAOsForThisUser, actMedianPreSuccDuration);
 	}
 
@@ -3427,13 +3427,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param durationFromNextForEachActName
 	 * @return
 	 */
-	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserV1(
-			int userID, LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName,
+	private Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserV1(
+			int userID, LinkedHashMap<String, ArrayList<ActivityObject2018>> aosForEachActName,
 			LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName,
 			LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName)
 	{
 		System.out.println("Inside computeRepresentativeActivityObject for userID" + userID);
-		LinkedHashMap<String, ActivityObject> repAOs = new LinkedHashMap<String, ActivityObject>();
+		LinkedHashMap<String, ActivityObject2018> repAOs = new LinkedHashMap<String, ActivityObject2018>();
 		LinkedHashMap<String, Pair<Double, Double>> actMedPreSuccDuration = new LinkedHashMap<>();
 
 		try
@@ -3447,10 +3447,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 			// feature of Gowalla activity object used in edit distance and necessary for recommendation.
 
-			for (Entry<String, ArrayList<ActivityObject>> actNameEntry : aosForEachActName.entrySet())
+			for (Entry<String, ArrayList<ActivityObject2018>> actNameEntry : aosForEachActName.entrySet())
 			{
 				String actName = actNameEntry.getKey();
-				ArrayList<ActivityObject> aos = actNameEntry.getValue();
+				ArrayList<ActivityObject2018> aos = actNameEntry.getValue();
 
 				double medianDurationFromPrevForEachActName = StatsUtils
 						.getDescriptiveStatisticsLong(durationFromPrevForEachActName.get(actName),
@@ -3473,7 +3473,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 						userID + "__" + actName + "cinsCount.txt", false).getPercentile(50);
 
 				// NOTE: we only need to take care of feature which are used for edit distance computation.
-				ActivityObject repAOForThisActNameForThisUser = new ActivityObject((int) Integer.valueOf(actName),
+				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018((int) Integer.valueOf(actName),
 						new ArrayList<Integer>(), actName, "", mediaStartTS, "", "", "", String.valueOf(userID), -1,
 						medianCinsCount, -1, -1, -1, -1, -1, actName + "__", -1, -1, new String[] { "" });
 
@@ -3489,7 +3489,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		}
 
 		System.out.println("Exiting computeRepresentativeActivityObject for userID" + userID);
-		return new Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>(repAOs,
+		return new Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>>(repAOs,
 				actMedPreSuccDuration);
 	}
 
@@ -3502,13 +3502,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param durationFromNextForEachActName
 	 * @return
 	 */
-	private Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserV2(
-			int userID, LinkedHashMap<String, ArrayList<ActivityObject>> aosForEachActName,
+	private Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserV2(
+			int userID, LinkedHashMap<String, ArrayList<ActivityObject2018>> aosForEachActName,
 			LinkedHashMap<String, ArrayList<Long>> durationFromPrevForEachActName,
 			LinkedHashMap<String, ArrayList<Long>> durationFromNextForEachActName)
 	{
 		System.out.println("Inside computeRepresentativeActivityObject for userID" + userID);
-		LinkedHashMap<String, ActivityObject> repAOs = new LinkedHashMap<String, ActivityObject>();
+		LinkedHashMap<String, ActivityObject2018> repAOs = new LinkedHashMap<String, ActivityObject2018>();
 		LinkedHashMap<String, Pair<Double, Double>> actMedPreSuccDuration = new LinkedHashMap<>();
 
 		try
@@ -3521,10 +3521,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			}
 
 			// feature of Gowalla activity object used in edit distance and necessary for recommendation.
-			for (Entry<String, ArrayList<ActivityObject>> actNameEntry : aosForEachActName.entrySet())
+			for (Entry<String, ArrayList<ActivityObject2018>> actNameEntry : aosForEachActName.entrySet())
 			{
 				String actName = actNameEntry.getKey();
-				ArrayList<ActivityObject> aos = actNameEntry.getValue();
+				ArrayList<ActivityObject2018> aos = actNameEntry.getValue();
 
 				double medianDurationFromPrevForEachActName = StatsUtils
 						.getDescriptiveStatisticsLong(durationFromPrevForEachActName.get(actName),
@@ -3553,7 +3553,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 				// .getPercentile(50);
 
 				// NOTE: we only need to take care of feature which are used for edit distance computation.
-				ActivityObject repAOForThisActNameForThisUser = new ActivityObject((int) Integer.valueOf(actName),
+				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018((int) Integer.valueOf(actName),
 						new ArrayList<Integer>(), actName, "", dummyMedianStartTS, "", "", "", String.valueOf(userID),
 						-1, -1, -1, -1, -1, -1, -1, actName + "__", -1, -1, new String[] { "" });
 
@@ -3569,7 +3569,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		}
 
 		System.out.println("Exiting computeRepresentativeActivityObject for userID" + userID);
-		return new Pair<LinkedHashMap<String, ActivityObject>, LinkedHashMap<String, Pair<Double, Double>>>(repAOs,
+		return new Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>>(repAOs,
 				actMedPreSuccDuration);
 	}
 
@@ -3581,13 +3581,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param durationFromNextForEachPDVal
 	 * @return
 	 */
-	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserPDV2(
-			int userID, LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal,
+	private Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserPDV2(
+			int userID, LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal,
 			LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal,
 			LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal)
 	{
 		System.out.println("Inside computeRepresentativeActivityObjectForUserPDV2 for userID" + userID);
-		LinkedHashMap<Integer, ActivityObject> repAOs = new LinkedHashMap<>();
+		LinkedHashMap<Integer, ActivityObject2018> repAOs = new LinkedHashMap<>();
 		LinkedHashMap<Integer, Pair<Double, Double>> actMedPreSuccDuration = new LinkedHashMap<>();
 
 		System.out.println(
@@ -3662,7 +3662,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 				// radius_meters, int highlights_count, int items_count, int max_items_count, String workingLevelCatIDs,
 				// double distanceInMFromNext, long durationInSecsFromNext, String[] levelWiseCatIDs)
 
-				ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs,
+				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs,
 						activityName, "", dummyMedianStartTS, "", "", "", String.valueOf(userID), -1, -1, -1, -1, -1,
 						-1, -1, workingLevelCatIDs, -1, -1, new String[] { "" });
 
@@ -3678,7 +3678,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		}
 
 		System.out.println("Exiting computeRepresentativeActivityObjectForUserPDV2 for userID" + userID);
-		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(repAOs,
+		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(repAOs,
 				actMedPreSuccDuration);
 	}
 
@@ -3688,11 +3688,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param PDVal
 	 * @return
 	 */
-	public Integer getMedianCheckinsCountForGivePDVal(LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal,
+	public Integer getMedianCheckinsCountForGivePDVal(LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal,
 			Integer PDVal)
 	{
 		int res = -1;
-		ArrayList<ActivityObject> aos = aosForEachPDVal.get(PDVal);
+		ArrayList<ActivityObject2018> aos = aosForEachPDVal.get(PDVal);
 
 		ArrayList<Double> cinCounts = (ArrayList<Double>) aos.stream().map(ao -> (double) ao.getCheckins_count())
 				.collect(Collectors.toList());
@@ -3710,13 +3710,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param durationFromNextForEachPDVal
 	 * @return
 	 */
-	private Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserPDV2GenericUser(
-			LinkedHashMap<Integer, ArrayList<ActivityObject>> aosForEachPDVal,
+	private Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> computeRepresentativeActivityObjectForUserPDV2GenericUser(
+			LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal,
 			LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDVal,
 			LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDVal)
 	{
 		System.out.println("Inside computeRepresentativeActivityObjectForUserPDV2genericUser for generic user");
-		LinkedHashMap<Integer, ActivityObject> repAOs = new LinkedHashMap<>();
+		LinkedHashMap<Integer, ActivityObject2018> repAOs = new LinkedHashMap<>();
 		LinkedHashMap<Integer, Pair<Double, Double>> actMedPreSuccDuration = new LinkedHashMap<>();
 
 		System.out.println(
@@ -3802,7 +3802,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 					cins_count = getMedianCheckinsCountForGivePDVal(aosForEachPDVal, pdVal);
 				}
 
-				ActivityObject repAOForThisActNameForThisUser = new ActivityObject(activityID, locationIDs,
+				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs,
 						activityName, "", dummyMedianStartTS, "", "", "", "GenericUser", -1, cins_count, -1, -1, -1, -1,
 						-1, workingLevelCatIDs, -1, -1, new String[] { "" });
 
@@ -3818,7 +3818,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		}
 
 		System.out.println("Exiting computeRepresentativeActivityObjectForUserPDV2genericUser for generic user");
-		return new Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>(repAOs,
+		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(repAOs,
 				actMedPreSuccDuration);
 	}
 

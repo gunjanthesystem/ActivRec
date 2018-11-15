@@ -16,7 +16,7 @@ import org.activity.constants.Enums.GowallaFeatures;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.TraceMatrixLeaner1;
 import org.activity.objects.Triple;
@@ -438,7 +438,7 @@ public class AlignmentBasedDistance
 	 *            the given sequence of Activity Objects
 	 * @return Edit Distance of given sequence of Activity Objects with an empty sequence of Activity Objects
 	 */
-	public final double maxEditDistance(ArrayList<ActivityObject> activityObjects1)
+	public final double maxEditDistance(ArrayList<ActivityObject2018> activityObjects1)
 	{
 		return wtFullActivityObject * activityObjects1.size();
 	}
@@ -452,8 +452,8 @@ public class AlignmentBasedDistance
 	 *            user for which recommendation is being done
 	 * @return value should be between 0 and 1
 	 */
-	public final double getCaseBasedV1SimilarityGeolifeData(ActivityObject activityObject1,
-			ActivityObject activityObject2, int userID)
+	public final double getCaseBasedV1SimilarityGeolifeData(ActivityObject2018 activityObject1,
+			ActivityObject2018 activityObject2, int userID)
 	{
 		if (VerbosityConstants.verbose)
 		{
@@ -539,7 +539,7 @@ public class AlignmentBasedDistance
 	 *            user for which recommendation is being done
 	 * @return (between 0 and 1)
 	 */
-	public final double getCaseBasedV1SimilarityDCUData(ActivityObject activityObject1, ActivityObject activityObject2,
+	public final double getCaseBasedV1SimilarityDCUData(ActivityObject2018 activityObject1, ActivityObject2018 activityObject2,
 			int userID)
 	{
 		if (VerbosityConstants.verbose)
@@ -597,7 +597,7 @@ public class AlignmentBasedDistance
 	 * @param ao2
 	 * @return
 	 */
-	public double getFeatureLevelDistance(ActivityObject ao1, ActivityObject ao2)
+	public double getFeatureLevelDistance(ActivityObject2018 ao1, ActivityObject2018 ao2)
 	{
 		double dfeat = 0;
 		// if(ao1.getStartTimestamp().getTime() != (ao2.getStartTimestamp().getTime()) )//is wrong since its comparing
@@ -668,7 +668,7 @@ public class AlignmentBasedDistance
 	 *         the two compared act objs ao1 and ao2
 	 * @since April 14 2018
 	 */
-	public EnumMap<GowallaFeatures, Double> getFeatureLevelDifference(ActivityObject ao1, ActivityObject ao2)
+	public EnumMap<GowallaFeatures, Double> getFeatureLevelDifference(ActivityObject2018 ao1, ActivityObject2018 ao2)
 	{
 		double dfeat = 0;
 		EnumMap<GowallaFeatures, Double> featureDiffs = null;
@@ -703,7 +703,7 @@ public class AlignmentBasedDistance
 	 * @param ao2
 	 * @return
 	 */
-	public double getFeatureLevelDistanceGowallaPD(ActivityObject ao1, ActivityObject ao2)
+	public double getFeatureLevelDistanceGowallaPD(ActivityObject2018 ao1, ActivityObject2018 ao2)
 	{
 		double dfeat = 0;
 		StringBuilder sbLog = new StringBuilder();
@@ -822,7 +822,7 @@ public class AlignmentBasedDistance
 	 * @param ao2
 	 * @return
 	 */
-	public double getFeatureLevelDistanceGowallaPD23Feb2018Bare(ActivityObject ao1, ActivityObject ao2)
+	public double getFeatureLevelDistanceGowallaPD23Feb2018Bare(ActivityObject2018 ao1, ActivityObject2018 ao2)
 	{
 		double dfeat = 0;
 		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
@@ -873,7 +873,7 @@ public class AlignmentBasedDistance
 	 * @param ao2
 	 * @return
 	 */
-	public double getFeatureLevelDistanceGowallaPD23Feb2018(ActivityObject ao1, ActivityObject ao2)
+	public double getFeatureLevelDistanceGowallaPD23Feb2018(ActivityObject2018 ao1, ActivityObject2018 ao2)
 	{
 		double dfeat = 0;// , dStartTime = 0, dLocation = 0, dPopularity = 0,
 		double dDistanceFromPrev = 0, dDurationFromPrev = 0;
@@ -1278,14 +1278,14 @@ public class AlignmentBasedDistance
 	 * @param arrayToPrune
 	 * @return
 	 */
-	public static ArrayList<ActivityObject> expungeInvalids(ArrayList<ActivityObject> arrayToPrune)
+	public static ArrayList<ActivityObject2018> expungeInvalids(ArrayList<ActivityObject2018> arrayToPrune)
 	{
 		if (arrayToPrune == null)
 		{
 			System.err.println("Error inside expungeInvalids: arrayToPrune is null");
 		}
 
-		ArrayList<ActivityObject> arrPruned = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> arrPruned = new ArrayList<ActivityObject2018>();
 
 		for (int i = 0; i < arrayToPrune.size(); i++)
 		{
@@ -1306,13 +1306,13 @@ public class AlignmentBasedDistance
 	 * @param arrayToPrune
 	 * @return
 	 */
-	public static ArrayList<ActivityObject> pruneFirstUnknown(ArrayList<ActivityObject> arrayToPrune)
+	public static ArrayList<ActivityObject2018> pruneFirstUnknown(ArrayList<ActivityObject2018> arrayToPrune)
 	{
 		if (arrayToPrune == null)
 		{
 			System.err.println("Error inside pruneFirstUnknown: arrayToPrune is null");
 		}
-		ArrayList<ActivityObject> arrPruned = arrayToPrune;// new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> arrPruned = arrayToPrune;// new ArrayList<ActivityObject>();
 		// if the first element is unknown, prune it
 		if (arrPruned.get(0).getActivityName().equalsIgnoreCase("Unknown"))
 		{
@@ -3488,7 +3488,7 @@ public class AlignmentBasedDistance
 	 * @since April 14, 2018
 	 */
 	public static Triple<String, Double, Triple<char[], int[], int[]>> getLowestMySimpleLevenshteinDistance(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2,
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2,
 			PrimaryDimension givenDimension, int insertWt, int deleteWt, int replaceWt)
 	{
 		// long t0, t2, t3, t4, t5, t6;t0 = t2 = t3 = t4 = t5 = t6 = Long.MIN_VALUE;t0 = System.nanoTime();
@@ -3935,8 +3935,8 @@ public class AlignmentBasedDistance
 	 *         the two compared act objs ao1 and ao2
 	 * @since April 13 2018
 	 */
-	public EnumMap<GowallaFeatures, Double> getFeatureLevelDifferenceGowallaPD13Apr2018(ActivityObject ao1,
-			ActivityObject ao2)
+	public EnumMap<GowallaFeatures, Double> getFeatureLevelDifferenceGowallaPD13Apr2018(ActivityObject2018 ao1,
+			ActivityObject2018 ao2)
 	{
 		EnumMap<GowallaFeatures, Double> featureDiffMap = new EnumMap<>(GowallaFeatures.class);
 		// StringBuilder sbLog = new StringBuilder();
@@ -4052,7 +4052,7 @@ public class AlignmentBasedDistance
 	 * @return
 	 * @since April 13 2018
 	 */
-	public double getFeatureLevelDistanceGowallaPD13Apr2018(ActivityObject ao1, ActivityObject ao2)
+	public double getFeatureLevelDistanceGowallaPD13Apr2018(ActivityObject2018 ao1, ActivityObject2018 ao2)
 	{
 		double dfeat = 0, dActivityName = 0, dStartTime = 0, dLocation = 0, dPopularity = 0;
 		double dDistanceFromPrev = 0, dDurationFromPrev = 0;
@@ -4224,7 +4224,7 @@ public class AlignmentBasedDistance
 	 * @param ao2
 	 * @return
 	 */
-	public double getFeatureLevelDistanceGowallaPD25Feb2018(ActivityObject ao1, ActivityObject ao2)
+	public double getFeatureLevelDistanceGowallaPD25Feb2018(ActivityObject2018 ao1, ActivityObject2018 ao2)
 	{
 		double dfeat = 0, dActivityName = 0, dStartTime = 0, dLocation = 0, dPopularity = 0;
 		double dDistanceFromPrev = 0, dDurationFromPrev = 0;

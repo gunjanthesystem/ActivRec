@@ -8,11 +8,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.CSVUtils;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -32,7 +34,8 @@ public class EvaluationPostExperiment
 
 	public static void main(String args[])
 	{
-		GowallaEvalCurrentEqualsTargetPerformance();
+		// GowallaEvalCurrentEqualsTargetPerformance();
+		GeolifePostExperimentsNov2018();
 		PopUps.showMessage("All done");
 	}
 
@@ -341,11 +344,11 @@ public class EvaluationPostExperiment
 				String dimensionPhraseT = "";
 				for (String timeCategory : timeCategories)
 				{
-					EvalMetrics.writePerActMRR("Algo", timeCategory, activityNamesT, dimensionPhraseT, commonPathT);
+					EvalMetrics.writePerActMRR("Algo", timeCategory, activityNamesT, dimensionPhraseT, commonPathT, "");
 					EvalMetrics.writePerActMRR("BaselineOccurrence", timeCategory, activityNamesT, dimensionPhraseT,
-							commonPathT);
+							commonPathT, "");
 					EvalMetrics.writePerActMRR("BaselineDuration", timeCategory, activityNamesT, dimensionPhraseT,
-							commonPathT);
+							commonPathT, "");
 				}
 			}
 			Constant.setCommonPath(Constant.getOutputCoreResultsPath());// + "MatchingUnit" + String.valueOf(mu) + "/");
@@ -358,6 +361,84 @@ public class EvaluationPostExperiment
 				// writePerRTRRForOptimalMUForEachUser
 				String RRForEachRTForOptimalMUFile = writePerRTRRForOptimalMUForEachUser("Algo", timeCategory);// s
 				LinkedHashMap<String, ArrayList<Double>> actRRsMap = getPerActivityEachRTKaRR("Algo", timeCategory,
+						RRForEachRTForOptimalMUFile);
+				WToFile.writeLinkedHashMapOfArrayList(actRRsMap, commonPath + "ActsRRMap.csv");
+				writePerActivityBestMeanReciprocalRankOverMUs("BaselineOccurrence", timeCategory);
+				writePerActivityBestMeanReciprocalRankOverMUs("BaselineDuration", timeCategory);
+			}
+
+		}
+	}
+
+	/**
+	 * @since 15 Nov 2018
+	 */
+	public static void PostExperimentEvaluation2018()
+	{
+
+		String commonPathToRead = "/run/media/gunjan/BackupVault/Geolife2018Results/geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED/All/";
+
+		try
+		{
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * not used at the moment
+	 * 
+	 * @since 15 Nov 2018
+	 */
+	public static void GeolifePostExperimentsNov2018()
+	{
+		Constant.setDatabaseName("geolife1");
+
+		String nextKRecommendation = "0";
+		String algoLabel = "AlgoStep" + nextKRecommendation;
+
+		{
+			String path = "/run/media/gunjan/BackupVault/Geolife2018Results/geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED/All/";
+			// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/April21/MUExperimentsBLNCount/Iteration1ForShow/Geolife/SimpleV3/";
+			Constant.setOutputCoreResultsPath(path);
+			System.out.println("path=" + path);
+			// ConnectDatabase.initialise(Constant.getDatabaseName());// .DATABASE_NAME); // all method and variable in
+			// this class are static
+			String commonPath = Constant.getOutputCoreResultsPath();
+			Constant.initialise("", Constant.getDatabaseName());// .DATABASE_NAME);
+
+			double[] matchingUnitArray = Constant.matchingUnitAsPastCount;
+			// Disabled as already written
+			for (double mu : matchingUnitArray)
+			{
+				Constant.setCommonPath(Constant.getOutputCoreResultsPath() + "MatchingUnit" + String.valueOf(mu) + "/");
+
+				String commonPathT = Constant.getCommonPath();
+				String[] activityNamesT = Constant.getActivityNames();
+				String dimensionPhraseT = "";
+				for (String timeCategory : timeCategories)
+				{
+					EvalMetrics.writePerActMRR(algoLabel, timeCategory, activityNamesT, dimensionPhraseT, commonPathT,
+							nextKRecommendation);
+					// EvalMetrics.writePerActMRR("BaselineOccurrence", timeCategory, activityNamesT, dimensionPhraseT,
+					// commonPathT);
+					// EvalMetrics.writePerActMRR("BaselineDuration", timeCategory, activityNamesT, dimensionPhraseT,
+					// commonPathT);
+				}
+			}
+			Constant.setCommonPath(Constant.getOutputCoreResultsPath());// + "MatchingUnit" + String.valueOf(mu) + "/");
+
+			for (String timeCategory : timeCategories)
+			{
+				writePerActivityBestMeanReciprocalRankOverMUs(algoLabel, timeCategory);// s
+				writePerRTBestMeanReciprocalRankOverMUs(algoLabel, timeCategory);// s
+				// ALERT: make sure that correct getObservedOptimalMUForUserNum is used in
+				// writePerRTRRForOptimalMUForEachUser
+				String RRForEachRTForOptimalMUFile = writePerRTRRForOptimalMUForEachUser(algoLabel, timeCategory);// s
+				LinkedHashMap<String, ArrayList<Double>> actRRsMap = getPerActivityEachRTKaRR(algoLabel, timeCategory,
 						RRForEachRTForOptimalMUFile);
 				WToFile.writeLinkedHashMapOfArrayList(actRRsMap, commonPath + "ActsRRMap.csv");
 				writePerActivityBestMeanReciprocalRankOverMUs("BaselineOccurrence", timeCategory);
@@ -638,6 +719,27 @@ public class EvaluationPostExperiment
 		mapOfObservedOptimal.put(18, 0);
 
 		return mapOfObservedOptimal;
+	}
+
+	/**
+	 * 
+	 * @param userChosenMU
+	 *            csv file with userID as first col and chosen MU in second col
+	 * @return
+	 */
+	public static LinkedHashMap<Double, Double> getObservedChosenMUForUserNumNov2018(String chosenMUFile)
+	{
+		List<List<Double>> res = ReadingFromFile.nColumnReaderDouble(chosenMUFile, ",", true, false);
+		LinkedHashMap<Double, Double> userChosenMU = new LinkedHashMap<>();
+
+		for (List<Double> e : res)
+		{
+			userChosenMU.put(e.get(0), e.get(1));
+		}
+
+		System.out.println("userChosenMU.size() = " + userChosenMU.size());
+		System.out.println("userChosenMU = " + userChosenMU);
+		return userChosenMU;
 	}
 
 	/**

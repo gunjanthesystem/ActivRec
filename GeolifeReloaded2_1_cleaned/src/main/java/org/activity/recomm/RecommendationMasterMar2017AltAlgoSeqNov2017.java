@@ -19,7 +19,7 @@ import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
 import org.activity.evaluation.Evaluation;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
@@ -72,8 +72,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * Current Timeline sequence of activity objects happening from the recomm point back until the matching unit
 	 */
 	private TimelineWithNext currentTimeline; // =current timelines
-	private ArrayList<ActivityObject> activitiesGuidingRecomm; // Current Timeline ,
-	private ActivityObject activityObjectAtRecommPoint; // current Activity Object
+	private ArrayList<ActivityObject2018> activitiesGuidingRecomm; // Current Timeline ,
+	private ActivityObject2018 activityObjectAtRecommPoint; // current Activity Object
 	// private String activityNameAtRecommPoint;// current Activity Name
 	private ArrayList<Integer> primaryDimensionValAtRecommPoint;// when activity is primary dimension, this is an
 																// activity id, when
@@ -103,7 +103,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * List of of top next activity objects with their edit distances and the timeline id of the candidate producing
 	 * them. {TimelineID, {Next Activity Object,edit distance}}
 	 */
-	private LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsFromCands;
+	private LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActivityObjectsFromCands;
 
 	/**
 	 * This is only relevant when case type is 'CaseBasedV1' (Cand TimeineId, Edit distance of the end point activity
@@ -167,7 +167,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
 			double thresholdVal, Enums.TypeOfThreshold typeOfThreshold, double matchingUnitInCountsOrHoursPassed,
 			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
-			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline,
+			ArrayList<ActivityObject2018> actObjsToAddToCurrentTimeline,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor)
 	{
@@ -679,7 +679,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @throws Exception
 	 */
 	private LinkedHashMap<String, Double> getTopPredictedAKOMActivityPDVals(
-			ArrayList<ActivityObject> activitiesGuidingRecomm, CaseType caseType, LookPastType lookPastType,
+			ArrayList<ActivityObject2018> activitiesGuidingRecomm, CaseType caseType, LookPastType lookPastType,
 			LinkedHashMap<String, Timeline> candidateTimelines, double constantValScore, boolean verbose,
 			int highestOrder, String userID, Enums.AltSeqPredictor alternateSeqPredictor) throws Exception
 	{
@@ -935,7 +935,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	{
 		StringBuilder res = new StringBuilder();
 
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res = StringUtils.fCat(res, ">>", ae.getActivityName());
 			// res.append(">>" + ae.getActivityName());
@@ -1192,12 +1192,12 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param candidateTimelines
 	 * @return TimelineID,Pair{Next Activity Object,edit distance}
 	 */
-	public static LinkedHashMap<String, Pair<ActivityObject, Double>> fetchNextActivityObjectsFromNext(
+	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjectsFromNext(
 			LinkedHashMap<String, Pair<String, Double>> editDistanceSortedFullCand,
 			LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		// TimelineID,Pair{Next Activity Object,edit distance}
-		LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs = new LinkedHashMap<>();
+		LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs = new LinkedHashMap<>();
 		// ArrayList<Triple<ActivityObject, Double, String>> topActivityObjects = new ArrayList<>();
 		// Triple <Next Activity Object,edit distance, TimelineID>
 
@@ -1220,7 +1220,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				Double editDistanceForCandidate = candDistEntry.getValue().getSecond();
 
 				TimelineWithNext candidateTimeline = (TimelineWithNext) candidateTimelines.get(candID);
-				ActivityObject nextActivityObjectForCand = candidateTimeline.getNextActivityObject();
+				ActivityObject2018 nextActivityObjectForCand = candidateTimeline.getNextActivityObject();
 
 				if (candidateTimeline.size() <= 0)
 				{
@@ -1233,7 +1233,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 				}
 
 				nextActObjs.put(candID,
-						new Pair<ActivityObject, Double>(nextActivityObjectForCand, editDistanceForCandidate));
+						new Pair<ActivityObject2018, Double>(nextActivityObjectForCand, editDistanceForCandidate));
 				// topActivityObjects.add(new Triple<ActivityObject, Double, String>(
 				// simCandidateTimeline.getNextActivityObject(), editDistanceForSimCandidate, simCandidateID));
 				// take the next activity object (next activity object is the valid next activity object)
@@ -1259,12 +1259,12 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param dayTimelinesForUser
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<ActivityObject, Double>> fetchNextActivityObjectsDaywise(
+	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjectsDaywise(
 			LinkedHashMap<String, Pair<String, Double>> editDistanceSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines, LinkedHashMap<String, Integer> endPointIndices)
 	{
 		// System.out.println("\n-----------------Inside fetchNextActivityObjectsDaywise");
-		LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs = new LinkedHashMap<>();
+		LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs = new LinkedHashMap<>();
 
 		if (editDistanceSorted.size() < 5)
 		{
@@ -1300,9 +1300,9 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 					System.exit(-1);
 				}
 
-				ActivityObject nextValidAO = candUserDayTimeline
+				ActivityObject2018 nextValidAO = candUserDayTimeline
 						.getNextValidActivityAfterActivityAtThisPositionPD(endPointIndexInCand);
-				nextActObjs.put(timelineID, new Pair<ActivityObject, Double>(nextValidAO, distanceOfCandTimeline));
+				nextActObjs.put(timelineID, new Pair<ActivityObject2018, Double>(nextValidAO, distanceOfCandTimeline));
 
 				if (VerbosityConstants.verbose)
 				{
@@ -1331,7 +1331,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param candidateTimelines
 	 * @return TimelineID,Pair{Next Activity Object,edit distance}
 	 */
-	public static LinkedHashMap<String, Pair<ActivityObject, Double>> fetchNextActivityObjects(
+	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjects(
 			LinkedHashMap<String, Pair<String, Double>> editDistanceSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines, Enums.LookPastType lookPastType,
 			LinkedHashMap<String, Integer> endPointIndicesForDaywise)
@@ -1417,7 +1417,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 *         Activity Object of this candidate with end point Activity Object>
 	 */
 	public LinkedHashMap<String, Double> getCaseSimilarityEndPointActivityObjectCand(
-			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject> activitiesGuidingRecomm,
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, int userID, String dateAtRecomm, String timeAtRecomm,
 			AlignmentBasedDistance alignmentBasedDistance)
 	{
@@ -1426,15 +1426,15 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 		for (Map.Entry<String, Timeline> candEntry : candidateTimelines.entrySet())
 		{
-			ArrayList<ActivityObject> activityObjectsInCand = candEntry.getValue().getActivityObjectsInTimeline();
+			ArrayList<ActivityObject2018> activityObjectsInCand = candEntry.getValue().getActivityObjectsInTimeline();
 			Double endPointEditDistanceForThisCandidate = new Double(-9999);
 
 			if (caseType.equals(Enums.CaseType.CaseBasedV1))// "CaseBasedV1")) // CaseBasedV1
 			{
-				ActivityObject endPointActivityObjectCandidate = (activityObjectsInCand
+				ActivityObject2018 endPointActivityObjectCandidate = (activityObjectsInCand
 						.get(activityObjectsInCand.size() - 1)); // only the end point activity
 																	// object
-				ActivityObject endPointActivityObjectCurrentTimeline = (activitiesGuidingRecomm
+				ActivityObject2018 endPointActivityObjectCurrentTimeline = (activitiesGuidingRecomm
 						.get(activitiesGuidingRecomm.size() - 1)); // activityObjectAtRecommPoint
 
 				switch (Constant.getDatabaseName()) // (Constant.DATABASE_NAME)
@@ -1490,10 +1490,10 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 	// /
 
-	public static String getStringCodeOfActivityObjects(ArrayList<ActivityObject> activityObjects)
+	public static String getStringCodeOfActivityObjects(ArrayList<ActivityObject2018> activityObjects)
 	{
 		StringBuilder code = new StringBuilder();
-		for (ActivityObject ao : activityObjects)
+		for (ActivityObject2018 ao : activityObjects)
 		{
 			code.append(ao.getCharCodeFromActID());
 		}
@@ -1602,7 +1602,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	public int getNumOfValidActsInActsGuidingRecomm()
 	{
 		int count = 0;
-		for (ActivityObject ae : this.activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : this.activitiesGuidingRecomm)
 		{
 			if (UtilityBelt.isValidActivityName(ae.getActivityName()))
 			{
@@ -1648,7 +1648,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		return this.nextActivityJustAfterRecommPointIsInvalid;
 	}
 
-	public ActivityObject getActivityObjectAtRecomm()
+	public ActivityObject2018 getActivityObjectAtRecomm()
 	{
 		return this.activityObjectAtRecommPoint;
 	}
@@ -1716,7 +1716,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	public String getActivityNamesGuidingRecommwithTimestamps()
 	{
 		StringBuilder res = new StringBuilder();
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res = StringUtils.fCat(res, "  ", ae.getActivityName(), "__", ae.getPrimaryDimensionVal().toString(), "__",
 					ae.getStartTimestamp().toString(), "_to_", ae.getEndTimestamp().toString());
@@ -1753,7 +1753,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		return endPointIndicesConsideredInCands;
 	}
 
-	public ArrayList<ActivityObject> getActsGuidingRecomm()
+	public ArrayList<ActivityObject2018> getActsGuidingRecomm()
 	{
 		return activitiesGuidingRecomm;
 	}

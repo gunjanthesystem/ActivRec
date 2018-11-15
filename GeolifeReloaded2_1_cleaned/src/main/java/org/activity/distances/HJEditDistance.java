@@ -15,7 +15,7 @@ import org.activity.constants.Enums.GowallaFeatures;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.sanityChecks.Sanity;
@@ -67,13 +67,14 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithoutEndCurrentActivity(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
+			ArrayList<ActivityObject2018> activityObjects1Original,
+			ArrayList<ActivityObject2018> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
+			String timeAtRecomm, String candidateTimelineId)
 	{
-		ArrayList<ActivityObject> activityObjects1 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects1 = new ArrayList<ActivityObject2018>();
 		activityObjects1.addAll(activityObjects1Original);
 
-		ArrayList<ActivityObject> activityObjects2 = new ArrayList<ActivityObject>();
+		ArrayList<ActivityObject2018> activityObjects2 = new ArrayList<ActivityObject2018>();
 		activityObjects2.addAll(activityObjects2Original);
 
 		Pair<String, Double> result;
@@ -118,9 +119,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public final Pair<String, Double> getHJEditDistanceInvalidsExpunged(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			String candidateTimelineId)
+	public final Pair<String, Double> getHJEditDistanceInvalidsExpunged(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2, String userAtRecomm, String dateAtRecomm,
+			String timeAtRecomm, String candidateTimelineId)
 	{
 		return getHJEditDistanceWithTrace(expungeInvalids(activityObjects1), expungeInvalids(activityObjects2),
 				userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);// similarity;
@@ -136,8 +137,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @return
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithoutEndCurrentActivityInvalidsExpunged(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2, String userAtRecomm,
-			String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2,
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		return getHJEditDistanceWithoutEndCurrentActivity(expungeInvalids(activityObjects1),
 				expungeInvalids(activityObjects2), userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);// similarity;
@@ -168,8 +169,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 *         act level edit distance> /
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithTraceUntil13July2017(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
+			ArrayList<ActivityObject2018> activityObjects1Original,
+			ArrayList<ActivityObject2018> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
+			String timeAtRecomm, String candidateTimelineId)
 	{
 		if (VerbosityConstants.verboseDistance)
 		{
@@ -177,8 +179,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 					+ activityObjects2Original.size() + " objs");
 		}
 
-		ArrayList<ActivityObject> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
-		ArrayList<ActivityObject> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
+		ArrayList<ActivityObject2018> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
+		ArrayList<ActivityObject2018> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
 
 		double dAct = 0, dFeat = 0, distanceTotal = 0;
 
@@ -314,8 +316,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 *         act level edit distance> /
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithTraceBackup13Jul2017(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
+			ArrayList<ActivityObject2018> activityObjects1Original,
+			ArrayList<ActivityObject2018> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
+			String timeAtRecomm, String candidateTimelineId)
 	{
 		if (VerbosityConstants.verboseDistance)
 		{
@@ -323,8 +326,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 					+ activityObjects2Original.size() + " objs");
 		}
 
-		ArrayList<ActivityObject> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
-		ArrayList<ActivityObject> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
+		ArrayList<ActivityObject2018> activityObjects1 = pruneFirstUnknown(activityObjects1Original);
+		ArrayList<ActivityObject2018> activityObjects2 = pruneFirstUnknown(activityObjects2Original);
 
 		double dAct = 0, dFeat = 0, distanceTotal = 0;
 
@@ -464,8 +467,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @since 14 July 2017
 	 */
 	public final Pair<String, Double> getHJEditDistanceWithTraceBefore1Mar2018(
-			ArrayList<ActivityObject> activityObjects1Original, ArrayList<ActivityObject> activityObjects2Original,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
+			ArrayList<ActivityObject2018> activityObjects1Original,
+			ArrayList<ActivityObject2018> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
+			String timeAtRecomm, String candidateTimelineId)
 	{
 		// PrimaryDimension primaryDimension = Constant.primaryDimension;//moved to constructor
 		if (VerbosityConstants.verboseDistance)
@@ -474,8 +478,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 					+ activityObjects2Original.size() + " objs");
 		}
 
-		ArrayList<ActivityObject> activityObjects1 = activityObjects1Original;
-		ArrayList<ActivityObject> activityObjects2 = activityObjects2Original;
+		ArrayList<ActivityObject2018> activityObjects1 = activityObjects1Original;
+		ArrayList<ActivityObject2018> activityObjects2 = activityObjects2Original;
 
 		if (needsToPruneFirstUnknown)
 		{
@@ -707,8 +711,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 *         act level edit distance> /
 	 * @since Mar 1 2018 TODO 25 July 2018: needs to be checked if correctly works for secondary dimension or not
 	 */
-	public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject> activityObjects1Original,
-			ArrayList<ActivityObject> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
+	public final Pair<String, Double> getHJEditDistanceWithTrace(ArrayList<ActivityObject2018> activityObjects1Original,
+			ArrayList<ActivityObject2018> activityObjects2Original, String userAtRecomm, String dateAtRecomm,
 			String timeAtRecomm, String candidateTimelineId)
 	{
 		// PrimaryDimension primaryDimension = Constant.primaryDimension;//moved to constructor
@@ -721,8 +725,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 					+ activityObjects2Original.size() + " objs");
 		}
 
-		ArrayList<ActivityObject> activityObjects1 = activityObjects1Original;
-		ArrayList<ActivityObject> activityObjects2 = activityObjects2Original;
+		ArrayList<ActivityObject2018> activityObjects1 = activityObjects1Original;
+		ArrayList<ActivityObject2018> activityObjects2 = activityObjects2Original;
 
 		if (needsToPruneFirstUnknown)
 		{
@@ -904,7 +908,18 @@ public class HJEditDistance extends AlignmentBasedDistance
 		}
 		else
 		{
-			distanceTotal = dAct + dFeat;
+			if (Constant.noFED)
+			{
+				distanceTotal = dAct;
+			}
+			if (Constant.noAED)
+			{
+				distanceTotal = dFeat;
+			}
+			else
+			{
+				distanceTotal = dAct + dFeat;
+			}
 			// System.out.println("distanceTotal = dAct + dFeat = " + distanceTotal + "=" + dAct + "+" + dFeat);
 		}
 		// System.out.println("EDAlpha = " + EDAlpha);
@@ -1015,8 +1030,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @since April 13 2018
 	 */
 	public final Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> getActEditDistWithTrace_FeatDiffs_13April2018(
-			ArrayList<ActivityObject> actObjs1Original, ArrayList<ActivityObject> actObjs2Original, String userAtRecomm,
-			String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
+			ArrayList<ActivityObject2018> actObjs1Original, ArrayList<ActivityObject2018> actObjs2Original,
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		double actED = 0;
 		List<EnumMap<GowallaFeatures, Double>> featDiffs = new ArrayList<>();
@@ -1030,8 +1045,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 					+ actObjs2Original.size() + " objs" + "  primaryDimension=" + this.primaryDimension);
 		}
 
-		ArrayList<ActivityObject> actObjs1 = actObjs1Original;
-		ArrayList<ActivityObject> actObjs2 = actObjs2Original;
+		ArrayList<ActivityObject2018> actObjs1 = actObjs1Original;
+		ArrayList<ActivityObject2018> actObjs2 = actObjs2Original;
 
 		if (needsToPruneFirstUnknown)
 		{
@@ -1210,15 +1225,15 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param activityObjects2
 	 * @return
 	 */
-	public double getFeatureLevelEditDistanceAllActs(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2)
+	public double getFeatureLevelEditDistanceAllActs(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2)
 	{
 		double dFeat = 0;
 		int ao1Size = activityObjects1.size();
 		int ao2Size = activityObjects2.size();
 
-		List<ActivityObject> aos1ToCompare = activityObjects1;
-		List<ActivityObject> aos2ToCompare = activityObjects2;
+		List<ActivityObject2018> aos1ToCompare = activityObjects1;
+		List<ActivityObject2018> aos2ToCompare = activityObjects2;
 
 		StringBuilder sbtt1 = new StringBuilder();
 		if (true)// debug Mar17 2018 //Sanity Checked ok
@@ -1285,8 +1300,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param actObjs2
 	 * @return
 	 */
-	public double getFeatureLevelEditDistanceAllActsV2(ArrayList<ActivityObject> actObjs1,
-			ArrayList<ActivityObject> actObjs2)
+	public double getFeatureLevelEditDistanceAllActsV2(ArrayList<ActivityObject2018> actObjs1,
+			ArrayList<ActivityObject2018> actObjs2)
 	{
 		double dFeat = 0;
 		int ao1Size = actObjs1.size();
@@ -1314,8 +1329,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 			// {decayWt = 3;}
 			// System.out.println("Decay wt=" + decayWt);
 			// System.out.println("coordOfAO1="+coordOfAO1+" coordOfAO2="+coordOfAO2);
-			ActivityObject ao1ToCompare = actObjs1.get(ao1Size - 1 - minIter);
-			ActivityObject ao2ToCompare = actObjs2.get(ao2Size - 1 - minIter);
+			ActivityObject2018 ao1ToCompare = actObjs1.get(ao1Size - 1 - minIter);
+			ActivityObject2018 ao2ToCompare = actObjs2.get(ao2Size - 1 - minIter);
 			// $sbtt1.append(ao1ToCompare.getActivityID() + "--" + ao2ToCompare.getActivityID() + "\n");
 			// Pairwise compare the last minSize AOs
 			dFeat += (decayWt * getFeatureLevelDistance(ao1ToCompare, ao2ToCompare));
@@ -1541,8 +1556,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * 
 	 * @since April 14 2018
 	 */
-	public List<EnumMap<GowallaFeatures, Double>> getFeatureLevelDiffsAllActsV2(ArrayList<ActivityObject> actObjs1,
-			ArrayList<ActivityObject> actObjs2)
+	public List<EnumMap<GowallaFeatures, Double>> getFeatureLevelDiffsAllActsV2(ArrayList<ActivityObject2018> actObjs1,
+			ArrayList<ActivityObject2018> actObjs2)
 	{
 
 		int ao1Size = actObjs1.size();
@@ -1566,8 +1581,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 		for (int minIter = 0; minIter < minSize; minIter++)
 		{
 			// System.out.println("coordOfAO1="+coordOfAO1+" coordOfAO2="+coordOfAO2);
-			ActivityObject ao1ToCompare = actObjs1.get(ao1Size - 1 - minIter);
-			ActivityObject ao2ToCompare = actObjs2.get(ao2Size - 1 - minIter);
+			ActivityObject2018 ao1ToCompare = actObjs1.get(ao1Size - 1 - minIter);
+			ActivityObject2018 ao2ToCompare = actObjs2.get(ao2Size - 1 - minIter);
 			// $sbtt1.append(ao1ToCompare.getActivityID() + "--" + ao2ToCompare.getActivityID() + "\n");
 			// Pairwise compare the last minSize AOs
 			// featureDifferencesList.add(getFeatureLevelDifferenceGowallaPD13Apr2018(ao1ToCompare, ao2ToCompare));
@@ -1593,7 +1608,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		return featureDifferencesList;
 	}
 
-	public static String getActIDsAsString(List<ActivityObject> aos)
+	public static String getActIDsAsString(List<ActivityObject2018> aos)
 	{
 		StringBuilder sb = new StringBuilder();
 		aos.stream().forEachOrdered(ao -> sb.append(">" + ao.getActivityID()));
@@ -1659,9 +1674,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 		}
 		if (VerbosityConstants.verboseDistance)
 		{
-			System.out.println("dAct=" + dAct + ",dFeat=" + dFeat + ",maxActLevelDistance=" + maxActLevelDistance
-					+ ",maxFeatLevelDistance=" + maxFeatLevelDistance + ",size1=" + size1 + ",size2=" + size2
-					+ ",costReplaceActivityObject=" + costReplaceActivityObject
+			System.out.println("alpha= " + alpha + ". dAct=" + dAct + ",dFeat=" + dFeat + ",maxActLevelDistance="
+					+ maxActLevelDistance + ",maxFeatLevelDistance=" + maxFeatLevelDistance + ",size1=" + size1
+					+ ",size2=" + size2 + ",costReplaceActivityObject=" + costReplaceActivityObject
 					+ ",getSumOfWeightOfFeaturesExceptPrimaryDimension()="
 					+ getSumOfWeightOfFeaturesExceptPrimaryDimension() + ",normalisedDACt=" + normalisedDACt
 					+ ",normalisedDFeat=" + normalisedDFeat + "," + distanceTotal);

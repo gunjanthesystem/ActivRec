@@ -21,7 +21,7 @@ import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.VerbosityConstants;
 import org.activity.evaluation.Evaluation;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
@@ -85,8 +85,8 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	 * Current Timeline sequence of activity objects happening from the recomm point back until the matching unit
 	 */
 	// private TimelineWithNext currentTimeline; // =current timelines
-	private ArrayList<ActivityObject> activitiesGuidingRecomm; // Current Timeline ,
-	private ActivityObject activityAtRecommPoint; // current Activity Object
+	private ArrayList<ActivityObject2018> activitiesGuidingRecomm; // Current Timeline ,
+	private ActivityObject2018 activityAtRecommPoint; // current Activity Object
 	private String activityNameAtRecommPoint;// current Activity Name
 
 	/**
@@ -507,7 +507,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	 */
 	public RecommendationMasterMar2017GenSeqNGramBaseline(LinkedHashMap<Date, Timeline> trainingTimelines,
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
-			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
+			ArrayList<ActivityObject2018> actObjsToAddToCurrentTimeline)
 	{
 		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
 		try
@@ -542,7 +542,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 			{
 				this.activityAtRecommPoint = actObjsToAddToCurrentTimeline
 						.get(actObjsToAddToCurrentTimeline.size() - 1);
-				this.activitiesGuidingRecomm = new ArrayList<ActivityObject>();
+				this.activitiesGuidingRecomm = new ArrayList<ActivityObject2018>();
 				activitiesGuidingRecomm.add(activityAtRecommPoint);
 
 			}
@@ -762,7 +762,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	private static Pair<TimelineWithNext, Double> extractCurrentTimelineSeq(
 			LinkedHashMap<Date, Timeline> testTimelinesOrig, LookPastType lookPastType2, Date dateAtRecomm,
 			Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInCountsOrHours,
-			ArrayList<ActivityObject> actObjsToAddToCurrentTimeline)
+			ArrayList<ActivityObject2018> actObjsToAddToCurrentTimeline)
 	{
 		// System.out.println("called extractCurrentTimelineSeq");
 		Pair<TimelineWithNext, Double> extractedCurrentTimelineResult = extractCurrentTimeline(testTimelinesOrig,
@@ -770,7 +770,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		TimelineWithNext extractedCurrentTimeline = extractedCurrentTimelineResult.getFirst();
 
 		// //////////////////
-		ArrayList<ActivityObject> actObjsForCurrTimeline = new ArrayList<>(
+		ArrayList<ActivityObject2018> actObjsForCurrTimeline = new ArrayList<>(
 				extractedCurrentTimeline.getActivityObjectsInTimeline());
 
 		// sanity check is act objs to add are later than act objs in timeline
@@ -816,7 +816,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	{
 		StringBuilder res = new StringBuilder();
 
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res = StringUtils.fCat(res, ">>", ae.getActivityName());
 			// res.append(">>" + ae.getActivityName());
@@ -917,7 +917,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	public int getNumOfValidActsInActsGuidingRecomm()
 	{
 		int count = 0;
-		for (ActivityObject ae : this.activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : this.activitiesGuidingRecomm)
 		{
 			if (UtilityBelt.isValidActivityName(ae.getActivityName()))
 			{
@@ -964,7 +964,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		return this.nextActivityJustAfterRecommPointIsInvalid;
 	}
 
-	public ActivityObject getActivityObjectAtRecomm()
+	public ActivityObject2018 getActivityObjectAtRecomm()
 	{
 		return this.activityAtRecommPoint;
 	}
@@ -1020,7 +1020,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 	public String getActivityNamesGuidingRecommwithTimestamps()
 	{
 		StringBuilder res = new StringBuilder();
-		for (ActivityObject ae : activitiesGuidingRecomm)
+		for (ActivityObject2018 ae : activitiesGuidingRecomm)
 		{
 			res = StringUtils.fCat(res, " ", ae.getActivityName(), "__", ae.getStartTimestamp().toString(), "_to_",
 					ae.getEndTimestamp().toString());
@@ -1054,7 +1054,7 @@ public class RecommendationMasterMar2017GenSeqNGramBaseline implements Recommend
 		return new LinkedHashMap<String, Integer>();// endPointIndicesConsideredInCands;
 	}
 
-	public ArrayList<ActivityObject> getActsGuidingRecomm()
+	public ArrayList<ActivityObject2018> getActsGuidingRecomm()
 	{
 		return activitiesGuidingRecomm;
 	}

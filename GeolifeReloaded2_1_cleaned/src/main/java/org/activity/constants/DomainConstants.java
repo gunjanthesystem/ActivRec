@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.Pair;
 import org.activity.objects.PairedIndicesTo1DArrayConverter;
@@ -123,7 +123,7 @@ public class DomainConstants
 	 * <P>
 	 * NOT USED AT THE MOMENT
 	 */
-	static LinkedHashMap<Integer, Pair<LinkedHashMap<Integer, ActivityObject>, LinkedHashMap<Integer, Pair<Double, Double>>>> userIDRepAOResultMap;
+	static LinkedHashMap<Integer, Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>> userIDRepAOResultMap;
 
 	/**
 	 * Added on 12 July 2018 {direct cat id, list{list of catids at level 1,list of catids at level 2, list of catids at
@@ -463,6 +463,72 @@ public class DomainConstants
 	}
 
 	/**
+	 * 
+	 * @param catName
+	 * @return
+	 * @since 14 Nov 2018
+	 */
+	public static Integer getCatIDForCatName(String catName)
+	{
+		for (Entry<Integer, String> e : catIDNameDictionary.entrySet())
+		{
+			if (e.getValue().equals(catName))
+			{
+				return e.getKey();
+			}
+		}
+
+		PopUps.printTracedErrorMsgWithExit("Error: catID not found for catname = " + catName);
+		return -999;
+	}
+
+	/**
+	 * 
+	 * @param r
+	 * @param verbose
+	 * @since Nov 14 2018
+	 */
+	public static void setCatIDNameDictionary(TreeMap<Integer, String> r, boolean verbose)
+	{
+		try
+		{
+			catIDNameDictionary = r;
+			System.out.println("Inside setCatIDNameDictionary: catIDNameDictionary.size()=" + catIDNameDictionary);
+			catIDNameDictionary.entrySet().stream()
+					.forEachOrdered(e -> System.out.println(e.getKey() + "--" + e.getValue() + "\n"));
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param r
+	 * @param verbose
+	 * @since Nov 14 2018
+	 */
+	public static void setLocIDNameDictionary(LinkedHashMap<Integer, String> r, boolean verbose)
+	{
+		try
+		{
+			locIDNameDictionary = r;
+			System.out.println("Inside setCatIDNameDictionary: catIDNameDictionary.size()=" + catIDNameDictionary);
+			locIDNameDictionary.entrySet().stream()
+					.forEachOrdered(e -> System.out.println(e.getKey() + "--" + e.getValue() + "\n"));
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
 	 * @deprecated
 	 * @return
 	 */
@@ -667,6 +733,7 @@ public class DomainConstants
 	}
 
 	/**
+	 * Return catID for given level for gowalla1 dataset, other wise returns the given CatID
 	 * 
 	 * @param givenCatID
 	 * @param givenLevel
@@ -676,34 +743,43 @@ public class DomainConstants
 	 */
 	public static ArrayList<Integer> getGivenLevelCatID(int givenCatID, int givenLevel)
 	{
-		if (catIDLevelWiseCatIDsList == null)
+		if (Constant.getDatabaseName().equals("gowalla1"))
 		{
-			System.out.println(PopUps.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList==null"));
-			System.exit(1);
+			if (catIDLevelWiseCatIDsList == null)
+			{
+				System.out.println(PopUps.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList==null"));
+				System.exit(1);
+			}
+
+			if (givenLevel < 1 || givenLevel > 3)
+			{
+				PopUps.printTracedErrorMsg("Error in getGivenLevelCatID: givenLevel= " + givenLevel);
+				System.exit(1);
+			}
+
+			if (catIDLevelWiseCatIDsList.get(givenCatID) == null)
+			{
+				System.err.println(PopUps
+						.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList.get(givenCatID" + givenCatID + ")==null"));
+			}
+
+			ArrayList<Integer> catIDsForGivenLevelForGivenDirectCatID = catIDLevelWiseCatIDsList.get(givenCatID)
+					.get(givenLevel - 1);
+
+			if (catIDsForGivenLevelForGivenDirectCatID.size() == 0 || catIDsForGivenLevelForGivenDirectCatID == null)
+			{
+				System.err.println(PopUps.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList.get(givenCatID"
+						+ givenCatID + ") for the given level is empty"));
+			}
+			return catIDsForGivenLevelForGivenDirectCatID;
+		}
+		else
+		{
+			ArrayList<Integer> sameCatID = new ArrayList<>();
+			sameCatID.add(givenCatID);
+			return sameCatID;
 		}
 
-		if (givenLevel < 1 || givenLevel > 3)
-		{
-			PopUps.printTracedErrorMsg("Error in getGivenLevelCatID: givenLevel= " + givenLevel);
-			System.exit(1);
-		}
-
-		if (catIDLevelWiseCatIDsList.get(givenCatID) == null)
-		{
-			System.err.println(PopUps
-					.getTracedErrorMsg("Error: catIDLevelWiseCatIDsList.get(givenCatID" + givenCatID + ")==null"));
-		}
-
-		ArrayList<Integer> catIDsForGivenLevelForGivenDirectCatID = catIDLevelWiseCatIDsList.get(givenCatID)
-				.get(givenLevel - 1);
-
-		if (catIDsForGivenLevelForGivenDirectCatID.size() == 0 || catIDsForGivenLevelForGivenDirectCatID == null)
-		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error: catIDLevelWiseCatIDsList.get(givenCatID" + givenCatID + ") for the given level is empty"));
-		}
-
-		return catIDsForGivenLevelForGivenDirectCatID;
 	}
 
 	/**

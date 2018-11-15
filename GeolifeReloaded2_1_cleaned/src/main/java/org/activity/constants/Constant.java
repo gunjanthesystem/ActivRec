@@ -43,8 +43,10 @@ import weka.classifiers.Classifier;
  */
 public final class Constant
 {
+	public static final boolean verboseSAX = false;// false;TEMP FOR BACKUP COMPATIBILITY TODO
+	public static final boolean checkForDistanceTravelledAnomaly = false;// false;TEMP FOR BACKUP COMPATIBILITY TODO
 	// ////************* PARAMETERS TO BE SET ********************//////
-	public static final boolean removeCurrentActivityNameFromRecommendations = false;// true;
+	public static final boolean removeCurrentActivityNameFromRecommendations = false;// false;// true;
 
 	// addded as constant on 19 July 2018
 	public static final int lengthOfRecommendedSequence = 1;
@@ -150,7 +152,7 @@ public final class Constant
 
 	// --------------------------------------------------------------------------//
 	// Start of parameters for Candidate timelines
-	public static final boolean collaborativeCandidates = true;
+	public static final boolean collaborativeCandidates = false;
 
 	// Number of candidate timelines extracted from each user in collaborative approach
 	public static final boolean only1CandFromEachCollUser = false; // SWITCH_NOV10
@@ -159,13 +161,14 @@ public final class Constant
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
-	public static final boolean filterTrainingTimelinesByRecentDays = true;// TODO MANALI true;// SWITCH_NOV10
+	public static final boolean filterTrainingTimelinesByRecentDays = false;// true;// TODO MANALI true;// SWITCH_NOV10
 	private static int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
 
 	// Filtering the candidate timeline ..
-	public static final Enums.TypeOfCandThreshold typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// NearestNeighbour,
+	public static final Enums.TypeOfCandThreshold typeOfCandThresholdPrimDim = TypeOfCandThreshold.None;// .NearestNeighbour;//
+																										// NearestNeighbour,
 	// added on 8 Aug 2018
-	public static final Enums.TypeOfCandThreshold typeOfCandThresholdSecDim = TypeOfCandThreshold.NearestNeighbour;
+	public static final Enums.TypeOfCandThreshold typeOfCandThresholdSecDim = TypeOfCandThreshold.None;// .NearestNeighbour;
 	// None,Percentile // SWITCH_NOV10
 
 	public static final int filterCandByCurActTimeThreshInSecs = -1;// 10800;// -1; 18000; 3600 7200; //SWITCH_NOV10
@@ -200,9 +203,14 @@ public final class Constant
 	public static final boolean useMedianCinsForRepesentationAO = true; // "-1"// SWITCH_NOV10
 	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
 
-	private static double dynamicEDAlpha = 1;// 0.8;// 0.5;// SWITCH_NOV10
-
-	public static final double[] EDAlphas = { 0.5, 1, 0.75, 0, 0.25, 0.35, 0.15 };// SWITCH_NOV10 added on 12 Sep 2018
+	private static double dynamicEDAlpha;// = 1;// 0.8;// 0.5;// SWITCH_NOV10
+	public static boolean noFED = true;// Nov 15 2018
+	public static boolean noAED = false;// Nov 15 2018
+	public static final double[] EDAlphas = { -1 };// 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75, 0, 0.25,
+													// 0.35, 0.15
+													// };//
+													// SWITCH_NOV10 added on 12
+	// Sep 2018
 	// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */
 
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
@@ -217,10 +225,10 @@ public final class Constant
 	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
 
-	public static final boolean useRTVerseNormalisationForED = true; // TODO KEEP IT true, false version
+	public static final boolean useRTVerseNormalisationForED = false;// true; // TODO KEEP IT true, false version
 	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
-	public static final double percentileForRTVerseMaxForFEDNorm = 75;// -1// SWITCH_April24
-	public static final double percentileForRTVerseMaxForAEDNorm = 75;// SWITCH //added on 15 Aug 2018
+	public static final double percentileForRTVerseMaxForFEDNorm = -1;// 75;// -1// SWITCH_April24
+	public static final double percentileForRTVerseMaxForAEDNorm = -1;// 75;// SWITCH //added on 15 Aug 2018
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
 
@@ -232,7 +240,7 @@ public final class Constant
 	 * If enabled, in Edit distance, instead of computing feature level edit distance just for activity objects which
 	 * matchin act name across the compared timelines, computed feature level edit distance over all act objs
 	 */
-	public static final boolean useFeatureDistancesOfAllActs = true;// SWITCH_NOV10
+	public static final boolean useFeatureDistancesOfAllActs = false;// true;// SWITCH_NOV10
 
 	// need to implement it in AlignmentBasedDistance.getFeatureLevelDistanceGowallaPD25Feb2018() before turning true
 	public static final boolean useDistFromNextInFED = false;
@@ -254,7 +262,8 @@ public final class Constant
 	public static final boolean runForAllUsersAtOnce = true;// toySwitch // SWITCH_April8
 	public static final boolean useCheckinEntryV2 = true;// TODO: keep it true as the other verion may not be uptodate
 															// (Aug3,2018) SWITCH_April8
-	public static final boolean reduceAndCleanTimelinesBeforeRecomm = false;// SWITCH_April8
+	public static final boolean reduceAndCleanTimelinesBeforeRecomm = true;// false for gowalla// true for others;//
+																			// SWITCH_April8
 
 	public static final boolean cleanTimelinesAgainInsideRecommendationTests = false;// SWITCH_April11
 	public static final boolean cleanTimelinesAgainInsideTrainTestSplit = false;// SWITCH_April24
@@ -284,7 +293,8 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "fsny1";// "dcu_data_2", "geolife1", "gowalla1" ,"fsny1"// default database name,
+	static String DATABASE_NAME = "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1" ,"fsny1"// default
+												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
 	////////////////////////////////////////////////////////////////////////
 
@@ -308,8 +318,14 @@ public final class Constant
 	 */
 	public static double ALPHA = -99;// 0.25d;
 
-	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = true, // false,
-			toSerializeTimelines = false, toDeSerializeTimelines = false;
+	// before 14 Nov 2018
+	// public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines =
+	// true, // false,
+	// toSerializeTimelines = false, toDeSerializeTimelines = false;
+
+	// since 14 Nov 2018
+	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = false, // false,
+			toSerializeTimelines = false, toDeSerializeTimelines = true;
 
 	public static final boolean hasInvalidActivityNames = false;
 
@@ -338,7 +354,7 @@ public final class Constant
 	 */
 	public static final int decimalPlacesInGeocordinatesForComputations = 100000;// 1000000;
 
-	public static String howManyUsers = "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
+	public static String howManyUsers = "UsersAbove10RTs";// "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
 
 	public static final String errorFileName = "ErrorExceptionLogFile.txt";
 	public static final String warningFileName = "WarniningLogFile.txt";
@@ -411,7 +427,8 @@ public final class Constant
 	static String outputCoreResultsPath = "";
 
 	static String[] activityNames;
-	static Map<Integer, Integer> actIDNameIndexMap;// <actID, index of actID in activityNames array>
+	// static Map<Integer, Integer> actIDNameIndexMap;// <actID, index of actID in activityNames array>
+	static Map<String, Integer> actIDNameIndexMap;// <actID, index of actID in activityNames array>
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	private static Set<Integer> uniqueActivityIDs;
@@ -788,19 +805,23 @@ public final class Constant
 		Constant.setInvalidNames();
 		Constant.setActivityNames();
 		// Constant.setCommonPath(givenCommonpath);
-		DomainConstants.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
-		DomainConstants.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
-		// Disabled setLocIDLocationObjectDictionary as it was not essential, we only needed loc name and full objects
-		// were taking signficantmemory space.
-		DomainConstants.setLocIDLocationObjectDictionary(pathToSerialisedLocationObjects);
-		DomainConstants.setLocationIDNameDictionary(DomainConstants.getLocIDLocationObjectDictionary());// pathToSerialisedLocationObjects);
-		Constant.setActIDCharCodeMap(DomainConstants.catIDNameDictionary);
-		DomainConstants.setCatIDGivenLevelCatIDMap();
-		DomainConstants.setUserIDUserObjectDictionary(pathToSerialisedUserObjects);
-		DomainConstants.setGowallaLocZoneIdMap(pathToSerialisedGowallaLocZoneIdMap);
-		DomainConstants.setGridIDLocIDGowallaMaps();
-		// TODO: take the path as an argument.
-		DomainConstants.setCatIDLevelWiseCatIDsList(PathConstants.pathToSerialisedLevelWiseCatIDsDict);
+		if (databaseName.equals("gowalla1"))
+		{
+			DomainConstants.setCatIDsHierarchicalDistance(catIDsHierDistSerialisedFile);
+			DomainConstants.setCatIDNameDictionary(pathToSerialisedCatIDNameDictionary);
+			// Disabled setLocIDLocationObjectDictionary as it was not essential, we only needed loc name and full
+			// objects
+			// were taking signficantmemory space.
+			DomainConstants.setLocIDLocationObjectDictionary(pathToSerialisedLocationObjects);
+			DomainConstants.setLocationIDNameDictionary(DomainConstants.getLocIDLocationObjectDictionary());// pathToSerialisedLocationObjects);
+			Constant.setActIDCharCodeMap(DomainConstants.catIDNameDictionary);
+			DomainConstants.setCatIDGivenLevelCatIDMap();
+			DomainConstants.setUserIDUserObjectDictionary(pathToSerialisedUserObjects);
+			DomainConstants.setGowallaLocZoneIdMap(pathToSerialisedGowallaLocZoneIdMap);
+			DomainConstants.setGridIDLocIDGowallaMaps();
+			// TODO: take the path as an argument.
+			DomainConstants.setCatIDLevelWiseCatIDsList(PathConstants.pathToSerialisedLevelWiseCatIDsDict);
+		}
 
 		if (Constant.memorizeEditDistance)
 		{
@@ -872,16 +893,22 @@ public final class Constant
 	 */
 	private static boolean setActIDNameIndexMap(String databaseName, String[] activityNames)
 	{
-		Map<Integer, Integer> res = new LinkedHashMap<>(activityNames.length);
+		Map<String, Integer> res = new LinkedHashMap<>(activityNames.length);
 
-		if (databaseName.equals("gowalla1"))
+		if (databaseName.equals("gowalla1") || databaseName.equals("geolife1"))
 		{
 			int index = 0;
 			for (String activityName : activityNames)
 			{ // since in gowalla dataset act name is act id
-				res.put(Integer.valueOf(activityName), index++);
+				// res.put(Integer.valueOf(activityName), index++);
+				res.put((activityName), index++);
 			}
 			actIDNameIndexMap = res;
+
+			if (databaseName.equals("geolife1"))
+			{
+				System.err.println("Warning: setActIDNameIndexMap not yet verified for " + databaseName);
+			}
 			return true;
 		}
 		else
@@ -897,7 +924,7 @@ public final class Constant
 	 * 
 	 * @return
 	 */
-	public static Map<Integer, Integer> getActIDNameIndexMap()
+	public static Map<String, Integer> getActIDNameIndexMap()
 	{
 		return actIDNameIndexMap;
 	}
@@ -1277,6 +1304,10 @@ public final class Constant
 			case "gowalla1":
 				uniqueLocationIDs = locIDs;
 				break;
+
+			case "geolife1":
+				uniqueLocationIDs = locIDs;// NOT TESTED, Added Nov 14 2018
+				break;
 			default:
 				PopUps.printTracedErrorMsgWithExit(
 						"Error: in setActivityNames: unrecognised database name:" + DATABASE_NAME);
@@ -1307,6 +1338,9 @@ public final class Constant
 			// break;
 			case "gowalla1":
 				uniqueActivityIDs = activityIDs;
+				break;
+			case "geolife1":
+				uniqueActivityIDs = activityIDs;// ADDED NOV 2018, NOT TESTED
 				break;
 			default:
 				PopUps.printTracedErrorMsgWithExit(

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.activity.constants.DomainConstants;
 import org.activity.constants.VerbosityConstants;
@@ -40,13 +42,15 @@ public class EvalMetrics
 	 *            "Algo","BaselineOccurrence","BaselineDuration"
 	 * @param timeCategory
 	 *            { "All", "Morning", "Afternoon", "Evening" };
-	 * @param activityNames
 	 * @param arrayActual
 	 * @param dimensionPhrase
 	 * @param commonPath
+	 * @param catIDNameDict
+	 *            added on 14 Nov 2018, since Geolife act names are not same as act ID
 	 */
-	public static void writePerActMRRV2(String fileNamePhrase, String timeCategory, String[] activityNames,
-			ArrayList<ArrayList<String>> arrayActual, String dimensionPhrase, String commonPath)
+	public static void writePerActMRRV2(String fileNamePhrase, String timeCategory, /* String[] activityNames, */
+			ArrayList<ArrayList<String>> arrayActual, String dimensionPhrase, String commonPath,
+			TreeMap<Integer, String> catIDNameDict)
 	// , int numUsers)
 	{
 		boolean verbose = true;// for sanity check
@@ -65,10 +69,12 @@ public class EvalMetrics
 
 			bw.write("User");
 			bwDistri.write("User");
-			for (String s : activityNames)
+			// for (String s : activityNames)
+			for (Entry<Integer, String> cEntry : catIDNameDict.entrySet())
 			{
-				if (UtilityBelt.isValidActivityName(s))
+				if (UtilityBelt.isValidActivityName(cEntry.getValue()))
 				{
+					String s = String.valueOf(cEntry.getKey() + "-" + cEntry.getValue());
 					bw.write("," + s);
 					bwDistri.write("," + s);
 				}
@@ -114,11 +120,19 @@ public class EvalMetrics
 
 				LinkedHashMap<String, ArrayList<Double>> perActMRR = new LinkedHashMap<String, ArrayList<Double>>();
 				// initialised to maintain same order for activity names
-				for (String actName : activityNames)
+				// for (String actName : activityNames)
+				// {
+				// if (UtilityBelt.isValidActivityName(actName))
+				// {
+				// perActMRR.put(actName, new ArrayList<Double>());
+				// }
+				// }
+
+				for (Entry<Integer, String> cEntry : catIDNameDict.entrySet())
 				{
-					if (UtilityBelt.isValidActivityName(actName))
+					if (UtilityBelt.isValidActivityName(cEntry.getValue()))
 					{
-						perActMRR.put(actName, new ArrayList<Double>());
+						perActMRR.put(String.valueOf(cEntry.getKey()), new ArrayList<Double>());// actID as key
 					}
 				}
 
@@ -179,10 +193,12 @@ public class EvalMetrics
 	 * @param activityNames
 	 * @param dimensionPhrase
 	 * @param commonPath
+	 * @param nextKRecommendation
+	 *            added on Nov 15 2018 for Step0, Step1, Step2
 	 * 
 	 */
 	public static void writePerActMRR(String fileNamePhrase, String timeCategory, String[] activityNames,
-			String dimensionPhrase, String commonPath)
+			String dimensionPhrase, String commonPath, String nextKRecommendation)
 	// , int numUsers)
 	{
 		boolean verbose = true;// for sanity check

@@ -179,7 +179,19 @@ public class PathConstants
 		}
 		else
 		{
-			System.out.println("Error: unknown database: " + Constant.getDatabaseName());
+
+			pathToSerialisedCatIDNameDictionary = "";
+			pathToSerialisedLocationObjects = "";
+			pathToSerialisedLevelWiseCatIDsDict = "";
+			pathToSerialisedCatIDsHierDist = "";
+			pathToSerialisedMergedCheckinData = "";
+			pathToSerialisedUserObjects = "";
+			// Irrelvant but included for conformity.
+			pathToLocationTimezoneInfo = "";
+			pathToSerialisedGowallaLocZoneIdMap = "";
+			System.out.println(""
+					+ "Warning :setting empty paths in org.activity.constants.PathConstants.intialise(boolean, String) for unknown database: "
+					+ Constant.getDatabaseName());
 		}
 		// //start of curtain April 9 2018
 		// else

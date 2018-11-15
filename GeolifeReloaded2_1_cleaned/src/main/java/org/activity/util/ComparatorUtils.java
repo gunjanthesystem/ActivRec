@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
@@ -421,26 +421,26 @@ public class ComparatorUtils
 	 * @param map
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> sortByValueAscending5(
-			LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> map)
+	public static LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> sortByValueAscending5(
+			LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> map)
 	{
-		List<Map.Entry<Date, Triple<Integer, ActivityObject, Double>>> list = new LinkedList<>(map.entrySet());
+		List<Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>>> list = new LinkedList<>(map.entrySet());
 		if (Constant.breakTiesWithShuffle)
 		{
 			Collections.shuffle(list);
 		}
-		Collections.sort(list, new Comparator<Map.Entry<Date, Triple<Integer, ActivityObject, Double>>>()
+		Collections.sort(list, new Comparator<Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>>>()
 			{
 				@Override
-				public int compare(Map.Entry<Date, Triple<Integer, ActivityObject, Double>> o1,
-						Map.Entry<Date, Triple<Integer, ActivityObject, Double>> o2)
+				public int compare(Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> o1,
+						Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> o2)
 				{
 					return (o1.getValue()).compareTo(o2.getValue());
 				}
 			});
 
-		LinkedHashMap<Date, Triple<Integer, ActivityObject, Double>> result = new LinkedHashMap<>();
-		for (Map.Entry<Date, Triple<Integer, ActivityObject, Double>> entry : list)
+		LinkedHashMap<Date, Triple<Integer, ActivityObject2018, Double>> result = new LinkedHashMap<>();
+		for (Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> entry : list)
 		{
 			result.put(entry.getKey(), entry.getValue());
 		}
@@ -504,11 +504,11 @@ public class ComparatorUtils
 	// return instant;
 	// }
 
-	public static Timestamp getEarliestTimestamp(ArrayList<ActivityObject> activityEvents)
+	public static Timestamp getEarliestTimestamp(ArrayList<ActivityObject2018> activityEvents)
 	{
 		Timestamp earliestTimestamp = new Timestamp(9999 - 1900, 0, 0, 0, 0, 0, 0);
 
-		for (ActivityObject activityEvent : activityEvents)
+		for (ActivityObject2018 activityEvent : activityEvents)
 		{
 			if (activityEvent.getStartTimestamp().before(earliestTimestamp))
 				earliestTimestamp = activityEvent.getStartTimestamp();
@@ -518,11 +518,11 @@ public class ComparatorUtils
 		return earliestTimestamp;
 	}
 
-	public static Timestamp getLastTimestamp(ArrayList<ActivityObject> activityEvents)
+	public static Timestamp getLastTimestamp(ArrayList<ActivityObject2018> activityEvents)
 	{
 		Timestamp lastTimestamp = new Timestamp(0 - 1900, 0, 0, 0, 0, 0, 0);
 
-		for (ActivityObject activityEvent : activityEvents)
+		for (ActivityObject2018 activityEvent : activityEvents)
 		{
 			if (activityEvent.getEndTimestamp().after(lastTimestamp)) lastTimestamp = activityEvent.getEndTimestamp();
 		}
@@ -531,19 +531,19 @@ public class ComparatorUtils
 		return lastTimestamp;
 	}
 
-	public static Timestamp getEarliestOfAllTimestamp(HashMap<String, ArrayList<ActivityObject>> timelinesToAggregate)
+	public static Timestamp getEarliestOfAllTimestamp(HashMap<String, ArrayList<ActivityObject2018>> timelinesToAggregate)
 	{
 
 		Iterator timelinesIterator = timelinesToAggregate.entrySet().iterator();
 		Map.Entry timelineEntry1 = (Map.Entry) timelinesIterator.next();
 
-		ArrayList<ActivityObject> activityEvents1 = (ArrayList<ActivityObject>) timelineEntry1.getValue();
+		ArrayList<ActivityObject2018> activityEvents1 = (ArrayList<ActivityObject2018>) timelineEntry1.getValue();
 		Timestamp earliestOfAll = getEarliestTimestamp(activityEvents1);
 
 		while (timelinesIterator.hasNext())
 		{
 			Map.Entry timelineEntry = (Map.Entry) timelinesIterator.next();
-			ArrayList<ActivityObject> activityEvents = (ArrayList<ActivityObject>) timelineEntry.getValue();
+			ArrayList<ActivityObject2018> activityEvents = (ArrayList<ActivityObject2018>) timelineEntry.getValue();
 			Timestamp currentEarliest = getEarliestTimestamp(activityEvents);
 
 			if (currentEarliest.before(earliestOfAll)) earliestOfAll = currentEarliest;
@@ -554,18 +554,18 @@ public class ComparatorUtils
 		return earliestOfAll;
 	}
 
-	public static Timestamp getLastOfAllTimestamp(HashMap<String, ArrayList<ActivityObject>> timelinesToAggregate)
+	public static Timestamp getLastOfAllTimestamp(HashMap<String, ArrayList<ActivityObject2018>> timelinesToAggregate)
 	{
 		Iterator timelinesIterator = timelinesToAggregate.entrySet().iterator();
 		Map.Entry timelineEntry1 = (Map.Entry) timelinesIterator.next();
 
-		ArrayList<ActivityObject> activityEvents1 = (ArrayList<ActivityObject>) timelineEntry1.getValue();
+		ArrayList<ActivityObject2018> activityEvents1 = (ArrayList<ActivityObject2018>) timelineEntry1.getValue();
 		Timestamp lastOfAll = getLastTimestamp(activityEvents1);
 		// Iterator timelinesIterator = timelinesToAggregate.entrySet().iterator();
 		while (timelinesIterator.hasNext())
 		{
 			Map.Entry timelineEntry = (Map.Entry) timelinesIterator.next();
-			ArrayList<ActivityObject> activityEvents = (ArrayList<ActivityObject>) timelineEntry.getValue();
+			ArrayList<ActivityObject2018> activityEvents = (ArrayList<ActivityObject2018>) timelineEntry.getValue();
 			Timestamp currentLast = getEarliestTimestamp(activityEvents);
 
 			if (currentLast.after(lastOfAll)) lastOfAll = currentLast;

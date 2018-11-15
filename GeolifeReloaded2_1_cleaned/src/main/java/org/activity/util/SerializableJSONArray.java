@@ -1,4 +1,4 @@
-package org.activity.io;
+package org.activity.util;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

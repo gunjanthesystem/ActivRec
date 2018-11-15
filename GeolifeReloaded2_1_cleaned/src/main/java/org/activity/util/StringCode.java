@@ -10,7 +10,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.SaxConstants;
 import org.activity.constants.VerbosityConstants;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.BalancedIntegerTree;
 import org.activity.stats.HilbertCurveUtils;
 import org.activity.ui.PopUps;
@@ -42,17 +42,17 @@ public class StringCode
 	 * @since 17 July 2018
 	 */
 	public static HashMap<Integer, Character> getLocallyUniqueCharCodeMap17July2018(
-			ArrayList<ActivityObject> activityObjects1, ArrayList<ActivityObject> activityObjects2,
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2,
 			PrimaryDimension givenDimension)
 	{
 		LinkedHashSet<Integer> uniqueGivenDimensionVals = new LinkedHashSet<>();
 
-		for (ActivityObject ao : activityObjects1)
+		for (ActivityObject2018 ao : activityObjects1)
 		{
 			uniqueGivenDimensionVals.addAll(ao.getGivenDimensionVal(givenDimension));
 		}
 
-		for (ActivityObject ao : activityObjects2)
+		for (ActivityObject2018 ao : activityObjects2)
 		{
 			uniqueGivenDimensionVals.addAll(ao.getGivenDimensionVal(givenDimension));
 		}
@@ -112,17 +112,17 @@ public class StringCode
 	 * @until 16 JUly 2018
 	 * @deprecated
 	 */
-	public static HashMap<Integer, Character> getLocallyUniqueCharCodeMap(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2, PrimaryDimension primaryDimension)
+	public static HashMap<Integer, Character> getLocallyUniqueCharCodeMap(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2, PrimaryDimension primaryDimension)
 	{
 		LinkedHashSet<Integer> uniquePrimaryDimensionVals = new LinkedHashSet<>();
 
-		for (ActivityObject ao : activityObjects1)
+		for (ActivityObject2018 ao : activityObjects1)
 		{
 			uniquePrimaryDimensionVals.addAll(ao.getPrimaryDimensionVal());
 		}
 
-		for (ActivityObject ao : activityObjects2)
+		for (ActivityObject2018 ao : activityObjects2)
 		{
 			uniquePrimaryDimensionVals.addAll(ao.getPrimaryDimensionVal());
 		}
@@ -179,17 +179,17 @@ public class StringCode
 	 * @return map of {primary dimension value, char code}
 	 * @deprecated
 	 */
-	public static Int2CharOpenHashMap getLocallyUniqueCharCodeMapFU(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2, PrimaryDimension primaryDimension)
+	public static Int2CharOpenHashMap getLocallyUniqueCharCodeMapFU(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2, PrimaryDimension primaryDimension)
 	{
 		IntOpenHashSet uniquePrimaryDimensionVals = new IntOpenHashSet();
 
-		for (ActivityObject ao : activityObjects1)
+		for (ActivityObject2018 ao : activityObjects1)
 		{
 			uniquePrimaryDimensionVals.addAll(ao.getPrimaryDimensionVal());
 		}
 
-		for (ActivityObject ao : activityObjects2)
+		for (ActivityObject2018 ao : activityObjects2)
 		{
 			uniquePrimaryDimensionVals.addAll(ao.getPrimaryDimensionVal());
 		}
@@ -238,8 +238,8 @@ public class StringCode
 	 * @param featureName
 	 * @return
 	 */
-	public static String[] getRelativeStringCodesForFeature(ArrayList<ActivityObject> activityObjects1,
-			ArrayList<ActivityObject> activityObjects2, String featureName)
+	public static String[] getRelativeStringCodesForFeature(ArrayList<ActivityObject2018> activityObjects1,
+			ArrayList<ActivityObject2018> activityObjects2, String featureName)
 	{
 		switch (featureName)
 		{
@@ -469,7 +469,7 @@ public class StringCode
 	 * @param actObjs
 	 * @return
 	 */
-	public static String getStringCodeForStartTime(ArrayList<ActivityObject> actObjs)
+	public static String getStringCodeForStartTime(ArrayList<ActivityObject2018> actObjs)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForStartTime");
 
@@ -519,8 +519,8 @@ public class StringCode
 	 * @param actObjs
 	 * @return
 	 */
-	public static String[] getStringCodesForStartTime(ArrayList<ActivityObject> actObjs1,
-			ArrayList<ActivityObject> actObjs2)
+	public static String[] getStringCodesForStartTime(ArrayList<ActivityObject2018> actObjs1,
+			ArrayList<ActivityObject2018> actObjs2)
 	{
 		if (VerbosityConstants.verboseSAX)
 		{
@@ -589,7 +589,7 @@ public class StringCode
 	 * @param actObjs
 	 * @return
 	 */
-	public static String getStringCodeForDuration(ArrayList<ActivityObject> actObjs)
+	public static String getStringCodeForDuration(ArrayList<ActivityObject2018> actObjs)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDuration");
 
@@ -636,8 +636,8 @@ public class StringCode
 	 * @param actObjs2
 	 * @return
 	 */
-	public static String[] getStringCodesForDuration(ArrayList<ActivityObject> actObjs1,
-			ArrayList<ActivityObject> actObjs2)
+	public static String[] getStringCodesForDuration(ArrayList<ActivityObject2018> actObjs1,
+			ArrayList<ActivityObject2018> actObjs2)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDuration");
 
@@ -693,7 +693,7 @@ public class StringCode
 		return finalResultant;
 	}
 
-	public static String getStringCodeForDistanceTravelled(ArrayList<ActivityObject> actObjs)
+	public static String getStringCodeForDistanceTravelled(ArrayList<ActivityObject2018> actObjs)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDistanceTravelled");
 		String resultant = new String();
@@ -741,8 +741,8 @@ public class StringCode
 	 * @param actObjs2
 	 * @return
 	 */
-	public static String[] getStringCodesForDistanceTravelled(ArrayList<ActivityObject> actObjs1,
-			ArrayList<ActivityObject> actObjs2)
+	public static String[] getStringCodesForDistanceTravelled(ArrayList<ActivityObject2018> actObjs1,
+			ArrayList<ActivityObject2018> actObjs2)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForDistanceTravelled");
 		String finalResultant[] = new String[2];
@@ -797,7 +797,7 @@ public class StringCode
 		return finalResultant;
 	}
 
-	public static String getStringCodeForAvgAltitudes(ArrayList<ActivityObject> actObjs)
+	public static String getStringCodeForAvgAltitudes(ArrayList<ActivityObject2018> actObjs)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForAvgAltitudes");
 		String resultant = new String();
@@ -844,8 +844,8 @@ public class StringCode
 	 * @param actObjs2
 	 * @return
 	 */
-	public static String[] getStringCodesForAvgAltitudes(ArrayList<ActivityObject> actObjs1,
-			ArrayList<ActivityObject> actObjs2)
+	public static String[] getStringCodesForAvgAltitudes(ArrayList<ActivityObject2018> actObjs1,
+			ArrayList<ActivityObject2018> actObjs2)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodeForAvgAltitudes");
 
@@ -911,8 +911,8 @@ public class StringCode
 	 * @param actObjs2
 	 * @return
 	 */
-	public static String[] getStringCodesForStartGeoCoordinates(ArrayList<ActivityObject> actObjs1,
-			ArrayList<ActivityObject> actObjs2)
+	public static String[] getStringCodesForStartGeoCoordinates(ArrayList<ActivityObject2018> actObjs1,
+			ArrayList<ActivityObject2018> actObjs2)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodesForGeoCoordinates");
 
@@ -1010,8 +1010,8 @@ public class StringCode
 	 * @param actObjs2
 	 * @return
 	 */
-	public static String[] getStringCodesForEndGeoCoordinates(ArrayList<ActivityObject> actObjs1,
-			ArrayList<ActivityObject> actObjs2)
+	public static String[] getStringCodesForEndGeoCoordinates(ArrayList<ActivityObject2018> actObjs1,
+			ArrayList<ActivityObject2018> actObjs2)
 	{
 		if (VerbosityConstants.verboseSAX) System.out.println("Inside getStringCodesForGeoCoordinates");
 
@@ -1107,12 +1107,12 @@ public class StringCode
 	 * @param activityObjects
 	 * @return
 	 */
-	public static String getStringCodeForActivityObjectsFromActID(ArrayList<ActivityObject> activityObjects)
+	public static String getStringCodeForActivityObjectsFromActID(ArrayList<ActivityObject2018> activityObjects)
 	{
 		StringBuilder code = new StringBuilder();
 		// long t1, t2, t3, t4;
 		// t1 = t2 = t3 = t4 = Long.MIN_VALUE;
-		for (ActivityObject ao : activityObjects)
+		for (ActivityObject2018 ao : activityObjects)
 		{
 			// t1 = System.nanoTime();
 			code.append(ao.getCharCodeFromActID());
@@ -1154,12 +1154,12 @@ public class StringCode
 	 * @param activityObjects
 	 * @return
 	 */
-	public static char[] getCharCodeArrayForAOs(ArrayList<ActivityObject> activityObjects)
+	public static char[] getCharCodeArrayForAOs(ArrayList<ActivityObject2018> activityObjects)
 	{
 		char[] code = new char[activityObjects.size()];
 
 		int i = 0;
-		for (ActivityObject ao : activityObjects)
+		for (ActivityObject2018 ao : activityObjects)
 		{
 			code[i] = (ao.getCharCodeFromActID());
 			i++;
@@ -1190,7 +1190,7 @@ public class StringCode
 	 * @return
 	 */
 	public static ArrayList<String> getStringCodesForActivityObjects17July2018(
-			ArrayList<ActivityObject> activityObjects, PrimaryDimension givenDimension,
+			ArrayList<ActivityObject2018> activityObjects, PrimaryDimension givenDimension,
 			HashMap<Integer, Character> uniqueCharCodes, boolean verbose)
 	{
 
@@ -1206,7 +1206,7 @@ public class StringCode
 		if (givenDimension.equals(PrimaryDimension.ActivityID)) // each ao has single act id
 		{
 			ArrayList<Integer> listOfActIDs = new ArrayList<>();
-			for (ActivityObject ao : activityObjects)
+			for (ActivityObject2018 ao : activityObjects)
 			{
 				listOfActIDs.add(ao.getActivityID());
 			}
@@ -1279,7 +1279,7 @@ public class StringCode
 	 * @until 16 July 2018
 	 * @deprecated
 	 */
-	public static ArrayList<String> getStringCodesForActivityObjects(ArrayList<ActivityObject> activityObjects,
+	public static ArrayList<String> getStringCodesForActivityObjects(ArrayList<ActivityObject2018> activityObjects,
 			PrimaryDimension primaryDimension, HashMap<Integer, Character> uniqueCharCodes, boolean verbose)
 	{
 
@@ -1295,7 +1295,7 @@ public class StringCode
 		if (primaryDimension.equals(PrimaryDimension.ActivityID)) // each ao has single act id
 		{
 			ArrayList<Integer> listOfActIDs = new ArrayList<>();
-			for (ActivityObject ao : activityObjects)
+			for (ActivityObject2018 ao : activityObjects)
 			{
 				listOfActIDs.add(ao.getActivityID());
 			}
@@ -1368,7 +1368,7 @@ public class StringCode
 	 * @since 9 March 2018
 	 * @deprecated
 	 */
-	public static ArrayList<String> getStringCodesForActivityObjectsFU(ArrayList<ActivityObject> activityObjects,
+	public static ArrayList<String> getStringCodesForActivityObjectsFU(ArrayList<ActivityObject2018> activityObjects,
 			PrimaryDimension primaryDimension, Int2CharMap uniqueCharCodes, boolean verbose)
 	{
 
@@ -1384,7 +1384,7 @@ public class StringCode
 		if (primaryDimension.equals(PrimaryDimension.ActivityID)) // each ao has single act id
 		{
 			ArrayList<Integer> listOfActIDs = new ArrayList<>();
-			for (ActivityObject ao : activityObjects)
+			for (ActivityObject2018 ao : activityObjects)
 			{
 				listOfActIDs.add(ao.getActivityID());
 			}
@@ -1461,7 +1461,7 @@ public class StringCode
 	 * @return List{List of primary dimension vals } in other words, multiple lists(sequences) with single valued
 	 *         elements
 	 */
-	public static ArrayList<ArrayList<Integer>> multiValSeqTo1ValSeqs(ArrayList<ActivityObject> activityObjects,
+	public static ArrayList<ArrayList<Integer>> multiValSeqTo1ValSeqs(ArrayList<ActivityObject2018> activityObjects,
 			PrimaryDimension givenDimension, boolean verbose)
 	{
 		ArrayList<ArrayList<Integer>> words = null;
@@ -1469,7 +1469,7 @@ public class StringCode
 		try
 		{
 			BalancedIntegerTree integerTrie = new BalancedIntegerTree();
-			for (ActivityObject ao : activityObjects)
+			for (ActivityObject2018 ao : activityObjects)
 			{
 				// each act obj can have multiple values for the primary dimension because of merger.
 				ArrayList<Integer> pdValsForThisAO = ao.getGivenDimensionVal(givenDimension);// .getPrimaryDimensionVal();
@@ -1508,7 +1508,7 @@ public class StringCode
 	 * @param verbose
 	 * @return
 	 */
-	public static ArrayList<String> getStringCodeForActivityObjectsV2(ArrayList<ActivityObject> activityObjects,
+	public static ArrayList<String> getStringCodeForActivityObjectsV2(ArrayList<ActivityObject2018> activityObjects,
 			int hierarchyLevelForEDForAO, boolean verbose)
 	{
 
@@ -1537,7 +1537,7 @@ public class StringCode
 
 			BalancedIntegerTree integerTrie = new BalancedIntegerTree();
 
-			for (ActivityObject ao : activityObjects)
+			for (ActivityObject2018 ao : activityObjects)
 			{
 				// extract the corresponding hierarchy level cat id, its a list because there can be more than one. for
 				// example, Vineyard is in Community as well as Food
@@ -1617,7 +1617,7 @@ public class StringCode
 	 *         Note, we have multiple string codes when a cat id has multiple given level cat ids in hierarchy, for
 	 *         example cat ID 157 Vineyard has Community as well as Food as its parent.
 	 */
-	public static String getStringCodeForActivityObjectsV1(ArrayList<ActivityObject> activityObjects,
+	public static String getStringCodeForActivityObjectsV1(ArrayList<ActivityObject2018> activityObjects,
 			int hierarchyLevelForEDForAO)
 	{
 		// System.out.println("Inside getStringCodeForActivityObjects");
@@ -1641,7 +1641,7 @@ public class StringCode
 
 			StringBuilder code = new StringBuilder();
 
-			for (ActivityObject ao : activityObjects)
+			for (ActivityObject2018 ao : activityObjects)
 			{
 				int workingLevelActID = ao.getActivityID();
 				ArrayList<Integer> desiredHierarchyLevelActiIDs = DomainConstants.getGivenLevelCatID(workingLevelActID,

@@ -24,7 +24,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -708,7 +708,7 @@ public class GowallaWeatherPreprocessing
 					Date date = dateEntryForThisUser.getKey();
 					Timeline timeline = dateEntryForThisUser.getValue();
 
-					for (ActivityObject aos : timeline.getActivityObjectsInTimeline())
+					for (ActivityObject2018 aos : timeline.getActivityObjectsInTimeline())
 					{
 						numOfActivityObjectsOverAllUsers += 1;
 						numOfActivityObjectForThisUser += 1;

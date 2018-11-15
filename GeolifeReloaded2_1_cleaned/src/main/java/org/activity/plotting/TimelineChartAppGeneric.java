@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.activity.constants.DomainConstants;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.ui.EpochDoubleStringConverter;
@@ -858,7 +858,7 @@ public class TimelineChartAppGeneric extends Pane
 			{
 				String date = timelineEntry.getKey().toString();
 				Timeline t = timelineEntry.getValue();
-				for (ActivityObject ao : t.getActivityObjectsInTimeline())
+				for (ActivityObject2018 ao : t.getActivityObjectsInTimeline())
 				{
 					// String userID = d.get(0);
 					long startTS = ao.getStartTimestampInms();// Double.valueOf(d.get(1));

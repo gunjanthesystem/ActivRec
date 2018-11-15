@@ -11,7 +11,7 @@ import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
-import org.activity.objects.ActivityObject;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
@@ -70,7 +70,7 @@ public class RecommUtils
 	 * @return
 	 */
 	static LinkedHashMap<String, Double> createRankedTopRecommendedActivityGDVals(
-			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsFromCands, CaseType caseType,
+			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActivityObjectsFromCands, CaseType caseType,
 			LinkedHashMap<String, Double> similarityOfEndPointActObjCands, LookPastType lookPastType,
 			LinkedHashMap<String, Pair<String, Double>> distancesSortedMap, PrimaryDimension givenDimension)
 	{
@@ -120,7 +120,7 @@ public class RecommUtils
 	 * @return
 	 */
 	public static LinkedHashMap<String, Double> createRankedTopRecommendedActivityNamesCaseBasedV1_3(
-			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjsWithDistExceptEnd,
+			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjsWithDistExceptEnd,
 			LinkedHashMap<String, Double> similarityOfEndPointActivityObjectCands)
 	{
 		System.out.println(
@@ -137,7 +137,7 @@ public class RecommUtils
 
 		///
 
-		for (Map.Entry<String, Pair<ActivityObject, Double>> nextActObj : nextActObjsWithDistExceptEnd.entrySet())
+		for (Map.Entry<String, Pair<ActivityObject2018, Double>> nextActObj : nextActObjsWithDistExceptEnd.entrySet())
 		{
 			String candTimelineID = nextActObj.getKey();
 			String nextActivityName = nextActObj.getValue().getFirst().getActivityName();
@@ -245,7 +245,7 @@ public class RecommUtils
 	 * @return {ActivityName,Rankscore} sorted by descending order of rank score
 	 */
 	public static LinkedHashMap<String, Double> createRankedTopRecommendedActivityNamesSimpleV3_3(
-			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsWithDistance)
+			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActivityObjectsWithDistance)
 	{
 		// $$System.out.println("\ninside createRankedTopRecommendedActivityNamesSimpleV3_3:");
 		// <ActivityName,RankScore>
@@ -253,7 +253,7 @@ public class RecommUtils
 
 		StringBuilder rankScoreCalc = new StringBuilder();
 
-		for (Map.Entry<String, Pair<ActivityObject, Double>> nextActObj : nextActivityObjectsWithDistance.entrySet())
+		for (Map.Entry<String, Pair<ActivityObject2018, Double>> nextActObj : nextActivityObjectsWithDistance.entrySet())
 		{ // String candTimelineID = nextActObj.getKey();
 			String nextActivityName = nextActObj.getValue().getFirst().getActivityName();
 			double normEditDistanceVal = nextActObj.getValue().getSecond();
@@ -312,7 +312,7 @@ public class RecommUtils
 	 *        THE NORMALISED EDIT DISTANCE FOR CANDIDATE TIMELINES
 	 */
 	public static LinkedHashMap<String, Double> createRankedTopRecommendedGDValsSimpleV3_3(
-			LinkedHashMap<String, Pair<ActivityObject, Double>> nextActivityObjectsWithDistance,
+			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActivityObjectsWithDistance,
 			PrimaryDimension givenDimension)
 	{
 		// $$System.out.println("\ninside createRankedTopRecommendedActivityNamesSimpleV3_3:");
@@ -321,7 +321,7 @@ public class RecommUtils
 
 		StringBuilder rankScoreCalc = new StringBuilder();
 
-		for (Map.Entry<String, Pair<ActivityObject, Double>> nextActObj : nextActivityObjectsWithDistance.entrySet())
+		for (Map.Entry<String, Pair<ActivityObject2018, Double>> nextActObj : nextActivityObjectsWithDistance.entrySet())
 		{ // String candTimelineID = nextActObj.getKey();
 			double normEditDistanceVal = nextActObj.getValue().getSecond();
 
@@ -374,12 +374,12 @@ public class RecommUtils
 	 * @param candidateTimelines
 	 * @return TimelineID,Pair{Next Activity Object,edit distance}
 	 */
-	public static LinkedHashMap<String, Pair<ActivityObject, Double>> fetchNextActivityObjectsFromNext(
+	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjectsFromNext(
 			LinkedHashMap<String, Pair<String, Double>> editDistanceSortedFullCand,
 			LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		// TimelineID,Pair{Next Activity Object,edit distance}
-		LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs = new LinkedHashMap<>();
+		LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs = new LinkedHashMap<>();
 		// ArrayList<Triple<ActivityObject, Double, String>> topActivityObjects = new ArrayList<>();
 		// Triple <Next Activity Object,edit distance, TimelineID>
 
@@ -402,7 +402,7 @@ public class RecommUtils
 				Double editDistanceForCandidate = candDistEntry.getValue().getSecond();
 
 				TimelineWithNext candidateTimeline = (TimelineWithNext) candidateTimelines.get(candID);
-				ActivityObject nextActivityObjectForCand = candidateTimeline.getNextActivityObject();
+				ActivityObject2018 nextActivityObjectForCand = candidateTimeline.getNextActivityObject();
 
 				if (candidateTimeline.size() <= 0)
 				{
@@ -415,7 +415,7 @@ public class RecommUtils
 				}
 
 				nextActObjs.put(candID,
-						new Pair<ActivityObject, Double>(nextActivityObjectForCand, editDistanceForCandidate));
+						new Pair<ActivityObject2018, Double>(nextActivityObjectForCand, editDistanceForCandidate));
 				// topActivityObjects.add(new Triple<ActivityObject, Double, String>(
 				// simCandidateTimeline.getNextActivityObject(), editDistanceForSimCandidate, simCandidateID));
 				// take the next activity object (next activity object is the valid next activity object)
@@ -441,12 +441,12 @@ public class RecommUtils
 	 * @param dayTimelinesForUser
 	 * @return
 	 */
-	public static LinkedHashMap<String, Pair<ActivityObject, Double>> fetchNextActivityObjectsDaywise(
+	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjectsDaywise(
 			LinkedHashMap<String, Pair<String, Double>> editDistanceSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines, LinkedHashMap<String, Integer> endPointIndices)
 	{
 		// System.out.println("\n-----------------Inside fetchNextActivityObjectsDaywise");
-		LinkedHashMap<String, Pair<ActivityObject, Double>> nextActObjs = new LinkedHashMap<>();
+		LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs = new LinkedHashMap<>();
 
 		if (editDistanceSorted.size() < 5)
 		{
@@ -482,9 +482,9 @@ public class RecommUtils
 					System.exit(-1);
 				}
 
-				ActivityObject nextValidAO = candUserDayTimeline
+				ActivityObject2018 nextValidAO = candUserDayTimeline
 						.getNextValidActivityAfterActivityAtThisPositionPD(endPointIndexInCand);
-				nextActObjs.put(timelineID, new Pair<ActivityObject, Double>(nextValidAO, distanceOfCandTimeline));
+				nextActObjs.put(timelineID, new Pair<ActivityObject2018, Double>(nextValidAO, distanceOfCandTimeline));
 
 				if (VerbosityConstants.verbose)
 				{
@@ -517,7 +517,7 @@ public class RecommUtils
 	 *            only used for daywise approach
 	 * @return TimelineID,Pair{Next Activity Object,edit distance}
 	 */
-	public static LinkedHashMap<String, Pair<ActivityObject, Double>> fetchNextActivityObjects(
+	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjects(
 			LinkedHashMap<String, Pair<String, Double>> editDistanceSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines, Enums.LookPastType lookPastType,
 			LinkedHashMap<String, Integer> endPointIndicesForDaywise)
