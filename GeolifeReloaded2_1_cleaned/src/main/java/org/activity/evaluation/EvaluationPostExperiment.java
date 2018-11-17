@@ -10,12 +10,16 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
+import org.activity.objects.Pair;
+import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
@@ -35,8 +39,335 @@ public class EvaluationPostExperiment
 	public static void main(String args[])
 	{
 		// GowallaEvalCurrentEqualsTargetPerformance();
-		GeolifePostExperimentsNov2018();
+		// GeolifePostExperimentsNov2018();//
+
+		PostExperimentEvaluation2018();
 		PopUps.showMessage("All done");
+	}
+
+	/**
+	 * @since 15 Nov 2018
+	 */
+	public static void PostExperimentEvaluation2018()
+	{
+		// String experimentlabel = "geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED";
+		String commonPathToRead = "/run/media/gunjan/BackupVault/Geolife2018Results/";
+		String commonPathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GeolifeAnalysisNov2018/";
+		String experimentLabels[] = { "geolife1_NOV15ED0.0STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED0.15STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED0.25STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED0.75STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED1.0STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED0.5STimeAllActsFDStFilter0hrsNoTTFilter" };
+		try
+		{
+
+			double[] muArray = Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor.None);
+			String pathToChosenMUBasedOnAlpha1 = "/home/gunjan/RWorkspace/GowallaRWorks/ChosenMU.csv";
+			Pair<Map<String, Integer>, Map<Integer, Integer>> chosenMUPerUser = ResultsDistributionEvaluation
+					.getUserChosenBestMUBasedOnGiveFile(pathToChosenMUBasedOnAlpha1, commonPathToWrite);
+
+			Map<Integer, Integer> chosenMUPerUserIndex = chosenMUPerUser.getSecond();
+
+			extractAndWriteValsForEachUserForChosenMU2(experimentLabels, commonPathToRead, commonPathToWrite,
+					chosenMUPerUserIndex, "ReciprocalRank", false, false, "RRVals");
+			extractAndWriteValsForEachUserForChosenMU3(experimentLabels, commonPathToRead, commonPathToWrite,
+					chosenMUPerUserIndex, "ReciprocalRank", false, false, "RRVals");
+			extractAndWriteValsForEachUserForChosenMU4(experimentLabels, commonPathToRead, commonPathToWrite,
+					chosenMUPerUserIndex, "ReciprocalRank", false, false, "RRVals");
+
+			for (String experimentlabel : experimentLabels)
+			{
+				// Read RR values only for chosen MU for each user
+				{
+					// Map<String, Integer> chosenMUPerUserID = chosenMUPerUser.getFirst();
+					extractAndWriteValsForEachUserForChosenMU(experimentlabel, commonPathToRead, commonPathToWrite,
+							chosenMUPerUserIndex, "ReciprocalRank", false, false, "RRVals");
+
+				} // end of writing RR values for chosen MUs for each user
+					// System.exit(0);
+
+				{
+
+					String valLabel = "MeanReciprocalRank";
+					MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+							commonPathToWrite + experimentlabel + "AllMUs" + valLabel + ".csv",
+							"AlgoStep0All" + valLabel + ".csv", muArray, 1, true);
+
+					valLabel = "NumOfRecommendationTimes";
+					MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+							commonPathToWrite + experimentlabel + "AllMUs" + valLabel + ".csv",
+							"AlgoStep0All" + valLabel + ".csv", muArray, 0, true);
+
+					String valLabels[] = { "AvgRecall", "AvgPrecision", "AvgFMeasure" };
+					for (String vall : valLabels)
+					{
+						for (int top = 1; top <= 5; top++)
+						{
+							MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+									commonPathToWrite + experimentlabel + "AllMUs" + vall + "@Top" + top + ".csv",
+									"AlgoStep0All" + vall + ".csv", muArray, 6 - top, true);
+						}
+					}
+
+					valLabel = "PercentageDirectAgreements";
+					MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+							commonPathToWrite + experimentlabel + "AllMUs" + valLabel + ".csv",
+							"AlgoL1All" + valLabel + ".csv", muArray, 0, false);
+
+					valLabel = "PercentageDirectTopKAgreements";
+					MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+							commonPathToWrite + experimentlabel + "AllMUs" + valLabel + ".csv",
+							"AlgoL1All" + valLabel + ".csv", muArray, 0, false);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.exit(0);
+	}
+
+	/**
+	 * 
+	 * @param experimentlabel
+	 * @param commonPathToRead
+	 * @param commonPathToWrite
+	 * @param chosenMUPerUserIndex
+	 * @param valLabel
+	 * @param readFileHasColHeader
+	 * @param readFileHasRowHeader
+	 * @param headerForVals
+	 * 
+	 * @since 16 Nov 2018
+	 */
+	private static void extractAndWriteValsForEachUserForChosenMU(String experimentlabel, String commonPathToRead,
+			String commonPathToWrite, Map<Integer, Integer> chosenMUPerUserIndex, String valLabel,
+			boolean readFileHasColHeader, boolean readFileHasRowHeader, String headerForVals)
+	{
+		int maxNumOfValsForEachUserMU = 0;// such as multiple RRs for each user-MU
+		StringBuilder sbToWrite2 = new StringBuilder();
+		for (Entry<Integer, Integer> userEntry : chosenMUPerUserIndex.entrySet())
+		{
+			Integer userIndex = userEntry.getKey();
+			Integer chosenMUForThisUSer = userEntry.getValue();
+
+			String fileToRead = commonPathToRead + experimentlabel + "/All/MatchingUnit" + chosenMUForThisUSer
+					+ ".0/AlgoStep0All" + valLabel + ".csv";
+			List<List<String>> vals = ReadingFromFile.readLinesIntoListOfLists(fileToRead, userIndex + 1, 1, ",");
+			if (readFileHasColHeader)
+			{
+				vals.remove(0);
+			}
+
+			Sanity.eq(vals.size(), 1, "Expected size 1");
+
+			if (readFileHasRowHeader)
+			{
+				sbToWrite2.append(userIndex + "," + chosenMUForThisUSer + ","
+						+ vals.get(0).stream().skip(1).collect(Collectors.joining(",")).toString() + "\n");
+			}
+			else
+			{
+				sbToWrite2.append(userIndex + "," + chosenMUForThisUSer + ","
+						+ vals.get(0).stream().collect(Collectors.joining(",")).toString() + "\n");
+			}
+
+			maxNumOfValsForEachUserMU = vals.get(0).size() > maxNumOfValsForEachUserMU ? vals.get(0).size()
+					: maxNumOfValsForEachUserMU;
+			/// run/media/gunjan/BackupVault/Geolife2018Results/geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED/All/MatchingUnit3.0/AlgoStep0AllReciprocalRank.csv
+		}
+
+		String repeatedHeaderString = "";
+
+		for (int i = 0; i < maxNumOfValsForEachUserMU; i++)
+		{
+			repeatedHeaderString += "," + headerForVals;
+		}
+
+		// write header and values
+		WToFile.writeToNewFile("UserIndex,ChosenMU" + repeatedHeaderString + "\n" + sbToWrite2.toString(),
+				commonPathToWrite + experimentlabel + "ChosenMU" + valLabel + ".csv");
+	}
+
+	/**
+	 * 
+	 * @param experimentlabel
+	 * @param commonPathToRead
+	 * @param commonPathToWrite
+	 * @param chosenMUPerUserIndex
+	 * @param valLabel
+	 * @param readFileHasColHeader
+	 * @param readFileHasRowHeader
+	 * @param headerForVals
+	 * 
+	 * @since 16 Nov 2018
+	 */
+	private static void extractAndWriteValsForEachUserForChosenMU2(String[] experimentlabels, String commonPathToRead,
+			String commonPathToWrite, Map<Integer, Integer> chosenMUPerUserIndex, String valLabel,
+			boolean readFileHasColHeader, boolean readFileHasRowHeader, String headerForVals)
+	{
+		int maxNumOfValsForEachUserMU = 0;// such as multiple RRs for each user-MU
+		StringBuilder sbToWrite2 = new StringBuilder();
+		for (Entry<Integer, Integer> userEntry : chosenMUPerUserIndex.entrySet())
+		{
+			Integer userIndex = userEntry.getKey();
+			Integer chosenMUForThisUSer = userEntry.getValue();
+
+			for (String experimentLabel : experimentlabels)
+			{
+				String fileToRead = commonPathToRead + experimentLabel + "/All/MatchingUnit" + chosenMUForThisUSer
+						+ ".0/AlgoStep0All" + valLabel + ".csv";
+				List<List<String>> vals = ReadingFromFile.readLinesIntoListOfLists(fileToRead, userIndex + 1, 1, ",");
+				if (readFileHasColHeader)
+				{
+					vals.remove(0);
+				}
+
+				Sanity.eq(vals.size(), 1, "Expected size 1");
+
+				if (readFileHasRowHeader)
+				{
+					sbToWrite2.append(experimentLabel + "," + userIndex + "," + chosenMUForThisUSer + ","
+							+ vals.get(0).stream().skip(1).collect(Collectors.joining(",")).toString() + "\n");
+				}
+				else
+				{
+					sbToWrite2.append(experimentLabel + "," + userIndex + "," + chosenMUForThisUSer + ","
+							+ vals.get(0).stream().collect(Collectors.joining(",")).toString() + "\n");
+				}
+
+				maxNumOfValsForEachUserMU = vals.get(0).size() > maxNumOfValsForEachUserMU ? vals.get(0).size()
+						: maxNumOfValsForEachUserMU;
+			}
+			/// run/media/gunjan/BackupVault/Geolife2018Results/geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED/All/MatchingUnit3.0/AlgoStep0AllReciprocalRank.csv
+		}
+
+		String repeatedHeaderString = "";
+
+		for (int i = 0; i < maxNumOfValsForEachUserMU; i++)
+		{
+			repeatedHeaderString += "," + headerForVals;
+		}
+
+		// write header and values
+		WToFile.writeToNewFile(
+				"experimentLabel,UserIndex,ChosenMU" + repeatedHeaderString + "\n" + sbToWrite2.toString(),
+				commonPathToWrite + "AllExperiments" + "ChosenMU" + valLabel + ".csv");
+	}
+
+	private static void extractAndWriteValsForEachUserForChosenMU4(String[] experimentlabels, String commonPathToRead,
+			String commonPathToWrite, Map<Integer, Integer> chosenMUPerUserIndex, String valLabel,
+			boolean readFileHasColHeader, boolean readFileHasRowHeader, String headerForVals)
+	{
+
+		StringBuilder sbToWrite2 = new StringBuilder();
+		int sumNumOfValsForAllUsers = 0;
+		for (String experimentLabel : experimentlabels)
+		{
+			sbToWrite2.append(experimentLabel);
+			sumNumOfValsForAllUsers = 0;// such as multiple RRs for each user-MU
+			for (Entry<Integer, Integer> userEntry : chosenMUPerUserIndex.entrySet())
+			{
+				Integer userIndex = userEntry.getKey();
+				Integer chosenMUForThisUSer = userEntry.getValue();
+
+				String fileToRead = commonPathToRead + experimentLabel + "/All/MatchingUnit" + chosenMUForThisUSer
+						+ ".0/AlgoStep0All" + valLabel + ".csv";
+				List<List<String>> vals = ReadingFromFile.readLinesIntoListOfLists(fileToRead, userIndex + 1, 1, ",");
+				if (readFileHasColHeader)
+				{
+					vals.remove(0);
+				}
+
+				Sanity.eq(vals.size(), 1, "Expected size 1");
+
+				if (readFileHasRowHeader)
+				{
+					sbToWrite2.append("," + vals.get(0).stream().skip(1).collect(Collectors.joining(",")).toString());
+				}
+				else
+				{
+					sbToWrite2.append("," + vals.get(0).stream().collect(Collectors.joining(",")).toString());
+				}
+
+				sumNumOfValsForAllUsers += vals.get(0).size();
+			}
+			sbToWrite2.append("\n");
+			/// run/media/gunjan/BackupVault/Geolife2018Results/geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED/All/MatchingUnit3.0/AlgoStep0AllReciprocalRank.csv
+		}
+
+		String repeatedHeaderString = "";
+
+		for (int i = 0; i < sumNumOfValsForAllUsers; i++)
+		{
+			repeatedHeaderString += "," + headerForVals;
+		}
+
+		// write header and values
+		WToFile.writeToNewFile("experimentLabel" + repeatedHeaderString + "\n" + sbToWrite2.toString(),
+				commonPathToWrite + "AllExperiments" + "AllUserConcatChosenMU" + valLabel + ".csv");
+	}
+
+	/**
+	 * 
+	 * @param experimentlabel
+	 * @param commonPathToRead
+	 * @param commonPathToWrite
+	 * @param chosenMUPerUserIndex
+	 * @param valLabel
+	 * @param readFileHasColHeader
+	 * @param readFileHasRowHeader
+	 * @param headerForVals
+	 * 
+	 * @since 16 Nov 2018
+	 */
+	private static void extractAndWriteValsForEachUserForChosenMU3(String[] experimentlabels, String commonPathToRead,
+			String commonPathToWrite, Map<Integer, Integer> chosenMUPerUserIndex, String valLabel,
+			boolean readFileHasColHeader, boolean readFileHasRowHeader, String headerForVals)
+	{
+		int maxNumOfValsForEachUserMU = 0;// such as multiple RRs for each user-MU
+
+		for (Entry<Integer, Integer> userEntry : chosenMUPerUserIndex.entrySet())
+		{
+			StringBuilder sbToWrite2 = new StringBuilder();
+			Integer userIndex = userEntry.getKey();
+			Integer chosenMUForThisUSer = userEntry.getValue();
+
+			for (String experimentLabel : experimentlabels)
+			{
+				String fileToRead = commonPathToRead + experimentLabel + "/All/MatchingUnit" + chosenMUForThisUSer
+						+ ".0/AlgoStep0All" + valLabel + ".csv";
+				List<List<String>> vals = ReadingFromFile.readLinesIntoListOfLists(fileToRead, userIndex + 1, 1, ",");
+				if (readFileHasColHeader)
+				{
+					vals.remove(0);
+				}
+
+				Sanity.eq(vals.size(), 1, "Expected size 1");
+
+				if (readFileHasRowHeader)
+				{
+					sbToWrite2.append(experimentLabel + ","
+							+ vals.get(0).stream().skip(1).collect(Collectors.joining(",")).toString() + "\n");
+				}
+				else
+				{
+					sbToWrite2.append(experimentLabel + ","
+							+ vals.get(0).stream().collect(Collectors.joining(",")).toString() + "\n");
+				}
+
+				maxNumOfValsForEachUserMU = vals.get(0).size() > maxNumOfValsForEachUserMU ? vals.get(0).size()
+						: maxNumOfValsForEachUserMU;
+			}
+			WToFile.writeToNewFile("ExpLabel\n" + sbToWrite2.toString(),
+					commonPathToWrite + "AllExperiments" + "ChosenMU_User" + userIndex + "_" + valLabel + ".csv");
+			/// run/media/gunjan/BackupVault/Geolife2018Results/geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED/All/MatchingUnit3.0/AlgoStep0AllReciprocalRank.csv
+		}
+
+		// write header and values
+
 	}
 
 	/**
@@ -367,24 +698,6 @@ public class EvaluationPostExperiment
 				writePerActivityBestMeanReciprocalRankOverMUs("BaselineDuration", timeCategory);
 			}
 
-		}
-	}
-
-	/**
-	 * @since 15 Nov 2018
-	 */
-	public static void PostExperimentEvaluation2018()
-	{
-
-		String commonPathToRead = "/run/media/gunjan/BackupVault/Geolife2018Results/geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED/All/";
-
-		try
-		{
-
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
 		}
 	}
 

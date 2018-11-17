@@ -364,8 +364,9 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 3, 0, 1, 2, /* 3, */ 4, 6, 8 };// { 0, 1, 2, 3, 4, 6, 8
-																							// };//
+	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 3, 0, 1, 2, /* 3, */ 4, 6, 8
+																					// };// { 0, 1, 2, 3, 4, 6, 8
+																					// };//
 	// 2, 4,6, 8, 1, 3, 10 11, 12,13,14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38,
 	// 40,42 };
 

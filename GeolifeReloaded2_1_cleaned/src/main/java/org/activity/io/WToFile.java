@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
 
 import org.activity.clustering.weka.WekaUtilityBelt;
 import org.activity.constants.Constant;
-import org.activity.constants.Enums;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
+import org.activity.evaluation.MUEvaluationUtils;
 import org.activity.loader.GeolifeDataLoader;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.CheckinEntry;
@@ -67,84 +67,6 @@ public class WToFile
 	// "train", "walk" };
 
 	static int counterEditAllEndPoints = 0;
-
-	/**
-	 * Writes a file with MUs as rows, Users as columns and the MRR as the cell value.
-	 * 
-	 * @param rootPath
-	 *            the path to read, i.e., the root path for all MU results
-	 * @param absFileNameToWrite
-	 *            file name to write for MRR for all user and all MUs result
-	 * @param whichAlgo
-	 *            "Algo", or "BaselineOccurrence", etc
-	 * @param lookPastType
-	 * @return number of users
-	 */
-
-	public static int writeMRRForAllUsersAllMUs(String rootPath, String absFileNameToWrite, String whichAlgo,
-			Enums.LookPastType lookPastType)
-	{
-		double[] matchingUnitArray = null;
-		int numberOfUsers = -1;
-
-		if (rootPath != null)
-		{
-			WToFile.appendLineToFileAbs("MUs/Users\n", absFileNameToWrite);
-
-			if (lookPastType.equals(Enums.LookPastType.NCount))
-			{
-				matchingUnitArray = Constant.matchingUnitAsPastCount;// matchingUnitAsPastCount; //
-																		// PopUps.showMessage(matchingUnitArray.toString());
-			}
-			else if (lookPastType.equals(Enums.LookPastType.NHours))
-			{
-				matchingUnitArray = Constant.matchingUnitHrsArray;// matchingUnitHrsArray; //
-																	// PopUps.showMessage(matchingUnitArray.toString());
-			}
-
-			else if (lookPastType.equals(Enums.LookPastType.Daywise))
-			{
-				matchingUnitArray = Constant.matchingDummy;
-			}
-
-			else if (lookPastType.equals(Enums.LookPastType.ClosestTime))
-			{
-				matchingUnitArray = Constant.matchingDummy;
-			}
-			else
-			{
-				System.err.println("Error: unknown look past type in in setMatchingUnitArray() RecommendationTests()");
-				System.exit(-1);
-			}
-
-			for (double mu : matchingUnitArray)
-			{
-				String fileName = "";
-				if (mu == -1)
-				{
-					fileName = rootPath + whichAlgo + "AllMeanReciprocalRank.csv";
-				}
-				else
-				{
-					fileName = rootPath + "MatchingUnit" + mu + "/" + whichAlgo + "AllMeanReciprocalRank.csv";
-				}
-				List<Double> mrrVals = ReadingFromFile.oneColumnReaderDouble(fileName, ",", 1, true);
-				numberOfUsers = mrrVals.size(); // note we need to do this only once, but no harm done if done multiple
-												// times, overwriting the same value.
-				String mrrValsString = mrrVals.stream().map(Object::toString).collect(Collectors.joining(","));
-
-				WToFile.appendLineToFileAbs("" + mu + "," + mrrValsString + "\n", absFileNameToWrite);
-			}
-
-			// writeMaxOfColumns(absFileNameToWrite, absFileNameToWrite + "MaxOfCols.csv", 1, 18, matchingUnitArray);
-		}
-		else
-		{
-			System.out.println("root path is empty");
-		}
-
-		return numberOfUsers;
-	}
 
 	/**
 	 * 
@@ -353,7 +275,7 @@ public class WToFile
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/Feb4NCount2AllMRR.csv");
 		// writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv");
-		writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
+		MUEvaluationUtils.writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
 				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv", "Algo",
 				Constant.lookPastType);
 

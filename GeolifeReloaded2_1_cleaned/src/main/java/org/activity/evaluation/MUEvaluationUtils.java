@@ -16,6 +16,7 @@ import org.activity.clustering.weka.WekaUtilityBelt.ClustersRangeScheme;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.stats.StatsUtils;
@@ -144,8 +145,8 @@ public class MUEvaluationUtils
 		//////////////////////
 
 		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "AllMRR.csv";
-		int numOfUsers = WToFile.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName, "Algo",
-				lookPastType);
+		int numOfUsers = MUEvaluationUtils.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName,
+				"Algo", lookPastType);
 
 		String MUsByDescendingMRRFileName = rootPathToWriteResults + "MUsByDescendingMRR.csv";
 
@@ -291,7 +292,7 @@ public class MUEvaluationUtils
 		//////////////////////
 
 		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "BOAllMRR.csv";
-		int numOfUsers = WToFile.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName,
+		int numOfUsers = MUEvaluationUtils.writeMRRForAllUsersAllMUs(commonPathToRead, mrrForAllUsersAllMUsFileName,
 				"BaselineOccurrence", lookPastType);
 
 		String MUsByDescendingMRRFileName = rootPathToWriteResults + "BOMUsByDescendingMRR.csv";
@@ -388,8 +389,7 @@ public class MUEvaluationUtils
 
 			StringBuilder sbrr = new StringBuilder();
 			Stream.of(RegexUtils.patternComma.split(rrLine)).forEach(e -> sbrr.append(e + "\n"));
-			WToFile.appendLineToFileAbs(sbrr.toString(),
-					rootPathToWriteResults + "BOrrValsForBestMUCol.csv");
+			WToFile.appendLineToFileAbs(sbrr.toString(), rootPathToWriteResults + "BOrrValsForBestMUCol.csv");
 			///////////
 
 		} // end of iteration over users. }
@@ -443,8 +443,8 @@ public class MUEvaluationUtils
 			String iterationMURootPath = iterationRootPath + "Iteration" + iter + "/";
 
 			String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "Iteration" + iter + "AllMRR.csv";
-			int numOfUsers = WToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName,
-					"Algo", Constant.lookPastType);
+			int numOfUsers = MUEvaluationUtils.writeMRRForAllUsersAllMUs(iterationMURootPath,
+					mrrForAllUsersAllMUsFileName, "Algo", Constant.lookPastType);
 
 			String MUsByDescendingMRRFileName = rootPathToWriteResults + "Iteration" + iter + "MUsByDescendingMRR.csv";
 			// (UserID, Pair( MUs having Max MRR, max MRR))
@@ -518,7 +518,7 @@ public class MUEvaluationUtils
 		String iterationMURootPath = iterationRootPath;// + "Iteration" + iter + "/";
 
 		String mrrForAllUsersAllMUsFileName = rootPathToWriteResults + "AllMRR.csv";
-		int numOfUsers = WToFile.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName,
+		int numOfUsers = MUEvaluationUtils.writeMRRForAllUsersAllMUs(iterationMURootPath, mrrForAllUsersAllMUsFileName,
 				"Algo", Constant.lookPastType);
 
 		String MUsByDescendingMRRFileName = rootPathToWriteResults + "MUsByDescendingMRR.csv";
@@ -573,8 +573,8 @@ public class MUEvaluationUtils
 			String fileNameToWrite)
 
 	{
-		WToFile.appendLineToFileAbs(
-				"User, FirstClusterCount,SecondClusterCount,ThirdClusterCount, ModeCluster\n", fileNameToWrite);
+		WToFile.appendLineToFileAbs("User, FirstClusterCount,SecondClusterCount,ThirdClusterCount, ModeCluster\n",
+				fileNameToWrite);
 
 		int countFirstClusterAsMode = 0, countSecondClusterAsMode = 0, countThirdClusterAsMode = 0;
 
@@ -675,8 +675,7 @@ public class MUEvaluationUtils
 			TreeMap<String, TreeMap<String, Integer>> countsForClusterLabelAccToMinMUHavMaxMRR, String fileNameToWrite)
 
 	{
-		WToFile.appendLineToFileAbs("FirstClusterMode,SecondClusterMode,ThirdClusterMode\n",
-				fileNameToWrite);
+		WToFile.appendLineToFileAbs("FirstClusterMode,SecondClusterMode,ThirdClusterMode\n", fileNameToWrite);
 
 		LinkedHashMap<String, Integer> clusterCounts = new LinkedHashMap<String, Integer>();
 
@@ -769,6 +768,141 @@ public class MUEvaluationUtils
 		System.out.println("Resultant majority cluster: " + resClusterLabel);
 		System.out.println("Exiting getClusterLabelForMajorityMUs()\n");
 		return resClusterLabel;
+	}
+
+	/**
+	 * Writes a file with MUs as rows, Users as columns and the MRR as the cell value.
+	 * 
+	 * @param rootPath
+	 *            the path to read, i.e., the root path for all MU results
+	 * @param absFileNameToWrite
+	 *            file name to write for MRR for all user and all MUs result
+	 * @param whichAlgo
+	 *            "Algo", or "BaselineOccurrence", etc
+	 * @param lookPastType
+	 * @return number of users
+	 */
+
+	public static int writeMRRForAllUsersAllMUs(String rootPath, String absFileNameToWrite, String whichAlgo,
+			Enums.LookPastType lookPastType)
+	{
+		double[] matchingUnitArray = null;
+		int numberOfUsers = -1;
+
+		if (rootPath != null)
+		{
+			WToFile.appendLineToFileAbs("MUs/Users\n", absFileNameToWrite);
+
+			if (lookPastType.equals(Enums.LookPastType.NCount))
+			{
+				matchingUnitArray = Constant.matchingUnitAsPastCount;// matchingUnitAsPastCount; //
+																		// PopUps.showMessage(matchingUnitArray.toString());
+			}
+			else if (lookPastType.equals(Enums.LookPastType.NHours))
+			{
+				matchingUnitArray = Constant.matchingUnitHrsArray;// matchingUnitHrsArray; //
+																	// PopUps.showMessage(matchingUnitArray.toString());
+			}
+
+			else if (lookPastType.equals(Enums.LookPastType.Daywise))
+			{
+				matchingUnitArray = Constant.matchingDummy;
+			}
+
+			else if (lookPastType.equals(Enums.LookPastType.ClosestTime))
+			{
+				matchingUnitArray = Constant.matchingDummy;
+			}
+			else
+			{
+				System.err.println("Error: unknown look past type in in setMatchingUnitArray() RecommendationTests()");
+				System.exit(-1);
+			}
+
+			for (double mu : matchingUnitArray)
+			{
+				String fileName = "";
+				if (mu == -1)
+				{
+					fileName = rootPath + whichAlgo + "AllMeanReciprocalRank.csv";
+				}
+				else
+				{
+					fileName = rootPath + "MatchingUnit" + mu + "/" + whichAlgo + "AllMeanReciprocalRank.csv";
+				}
+				List<Double> mrrVals = ReadingFromFile.oneColumnReaderDouble(fileName, ",", 1, true);
+				numberOfUsers = mrrVals.size(); // note we need to do this only once, but no harm done if done multiple
+												// times, overwriting the same value.
+				String mrrValsString = mrrVals.stream().map(Object::toString).collect(Collectors.joining(","));
+
+				WToFile.appendLineToFileAbs("" + mu + "," + mrrValsString + "\n", absFileNameToWrite);
+			}
+
+			// writeMaxOfColumns(absFileNameToWrite, absFileNameToWrite + "MaxOfCols.csv", 1, 18, matchingUnitArray);
+		}
+		else
+		{
+			System.out.println("root path is empty");
+		}
+
+		return numberOfUsers;
+	}
+
+	/**
+	 * Writes a file with MUs as rows, Users as columns and the MRR as the cell value.
+	 * 
+	 * @param rootPath
+	 *            the path to read, i.e., the root path for all MU results
+	 * @param absFileNameToWrite
+	 *            file name to write for MRR for all user and all MUs result
+	 * @param fileNamePhraseToRead
+	 *            "AlgoStep0AllMeanReciprocalRank.csv", or "BaselineOccurrence", etc
+	 * @param matchingUnitArray
+	 * @param colIndexOfVal
+	 * @param hasColHeader
+	 * @return number of users
+	 * @since 15 Nov 2018
+	 */
+	public static int writeValsForAllUsersAllMUs(String rootPath, String absFileNameToWrite,
+			String fileNamePhraseToRead, double[] matchingUnitArray, int colIndexOfVal, boolean hasColHeader)
+	{
+		int numberOfUsers = -1;
+		if (rootPath != null)
+		{
+			StringBuilder sbToWrite = new StringBuilder("MUs/Users\n");
+
+			for (double mu : matchingUnitArray)
+			{
+				String fileName = "";
+				if (mu == -1)
+				{
+					fileName = rootPath + fileNamePhraseToRead;
+				}
+				else
+				{
+					fileName = rootPath + "MatchingUnit" + mu + "/" + fileNamePhraseToRead;
+				}
+
+				List<Double> valsReadForOneMU = ReadingFromFile.oneColumnReaderDouble(fileName, ",", colIndexOfVal,
+						hasColHeader);
+				numberOfUsers = valsReadForOneMU.size(); // note we need to do this only once, but no harm done if done
+															// multiple
+				// times, overwriting the same value.
+				String valsReadFromOneMUAsString = valsReadForOneMU.stream().map(Object::toString)
+						.collect(Collectors.joining(","));
+				sbToWrite.append("" + mu + "," + valsReadFromOneMUAsString + "\n");//
+
+			}
+
+			WToFile.writeToNewFile(sbToWrite.toString(), absFileNameToWrite);
+			// writeMaxOfColumns(absFileNameToWrite, absFileNameToWrite + "MaxOfCols.csv", 1, 18, matchingUnitArray);
+		}
+		else
+		{
+			System.out.println("root path is empty");
+		}
+
+		return numberOfUsers;
 	}
 
 }
