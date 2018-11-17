@@ -122,7 +122,7 @@ public class ResultsDistributionEvaluation
 			PopUps.showMessage("Finished splitUsersMUZeroNonZeroGroup");
 			// Choose fixed MU for each user based on one given result: resultForUserGroupingMay4
 			Map<String, Integer> userIdentifierChosenMU = getUserChosenBestMUBasedOnGiveFile(resultForUserGroupingMay4,
-					pathToRead + "Concatenated/");
+					pathToRead + "Concatenated/").getFirst();
 
 			String secondPathToRead = "";
 			if (true)
@@ -191,7 +191,7 @@ public class ResultsDistributionEvaluation
 			PopUps.showMessage("Finished splitUsersMUZeroNonZeroGroup");
 			// Choose fixed MU for each user based on one given result: resultForUserGroupingMay4
 			Map<String, Integer> userIdentifierChosenMU = getUserChosenBestMUBasedOnGiveFile(resultForUserGroupingMay4,
-					pathToRead + "Concatenated/");
+					pathToRead + "Concatenated/").getFirst();
 
 			String secondPathToRead = "";
 			if (true)
@@ -221,7 +221,8 @@ public class ResultsDistributionEvaluation
 	 * @param pathToWrite
 	 * @return userIdentifierChosenMU
 	 */
-	private static Map<String, Integer> getUserChosenBestMUBasedOnGiveFile(String fileToRead, String pathToWrite)
+	protected static Pair<Map<String, Integer>, Map<Integer, Integer>> getUserChosenBestMUBasedOnGiveFile(
+			String fileToRead, String pathToWrite)
 	{
 		Map<String, Integer> userIdentifierChosenMU = new LinkedHashMap<>();
 		Map<Integer, Integer> userIndexChosenMU = new LinkedHashMap<>();
@@ -246,7 +247,7 @@ public class ResultsDistributionEvaluation
 		WToFile.writeToNewFile(sb2.toString(), pathToWrite + "userIndexChosenMU.csv");
 		// End of writing
 
-		return userIdentifierChosenMU;
+		return new Pair<>(userIdentifierChosenMU, userIndexChosenMU);
 		// new Pair<LinkedHashMap<Integer, Double>, LinkedHashMap<String,
 		// Double>>(userIndexChosenMU,userIdentifierChosenMU);
 	}

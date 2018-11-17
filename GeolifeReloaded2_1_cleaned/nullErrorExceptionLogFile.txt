@@ -35794,4 +35794,4 @@ org.activity.controller.SuperController.runExperiment(SuperController.java:673)
 org.activity.controller.SuperController.runExperimentForGivenUsersAndConfig(SuperController.java:364)
 org.activity.controller.SuperController.main(SuperController.java:280)
 timestamp:2018-11-14 14:22:50.988--------- ------- ----- ---------
-Error: in setActivityNames: unrecognised database name:geolife1Error: in setActivityNames: unrecognised database name:geolife1Error: in setActivityNames: unrecognised database name:geolife1Error: in setActivityNames: unrecognised database name:geolife1
+Error: in setActivityNames: unrecognised database name:geolife1Error: in setActivityNames: unrecognised database name:geolife1Error: in setActivityNames: unrecognised database name:geolife1Error: in setActivityNames: unrecognised database name:geolife1Exception: java.nio.file.NoSuchFileException: /run/media/gunjan/BackupVault/Geolife2018Results/All/MatchingUnit0.0/AlgoStep0AllReciprocalRankException: java.nio.file.NoSuchFileException: /run/media/gunjan/BackupVault/Geolife2018Results/All/MatchingUnit0.0/AlgoStep0AllReciprocalRank.csvException: java.lang.IllegalArgumentException: -1

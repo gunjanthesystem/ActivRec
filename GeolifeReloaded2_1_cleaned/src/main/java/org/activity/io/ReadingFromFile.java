@@ -156,7 +156,7 @@ public class ReadingFromFile
 	 *            path of fileNameToRead
 	 * @param delimiter
 	 * @param columnIndex
-	 *            starts from o
+	 *            starts from 0
 	 * @param hasHeader
 	 * @return
 	 */
@@ -970,6 +970,7 @@ public class ReadingFromFile
 	 * @param absFileName
 	 * @param startLineNum
 	 * @param endLineNum
+	 *            TODO Nov 2018: CHECK its correctness, seems endLineNum shoule be instea number of lines from start
 	 * @param delimiter
 	 * @return
 	 */
