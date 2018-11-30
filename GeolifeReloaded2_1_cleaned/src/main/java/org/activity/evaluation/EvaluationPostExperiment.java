@@ -41,8 +41,104 @@ public class EvaluationPostExperiment
 		// GowallaEvalCurrentEqualsTargetPerformance();
 		// GeolifePostExperimentsNov2018();//
 
-		PostExperimentEvaluation2018();
+		// PostExperimentEvaluation2018();
+		PostExperimentEvaluation2018V2("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/", null,
+				"geolife1_NOV19ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsNoTTFilter");
+
 		PopUps.showMessage("All done");
+	}
+
+	/**
+	 * @since 19 Nov 2018
+	 */
+	public static void PostExperimentEvaluation2018V2(String commonPathToRead, List<String> listOfExperimentLabels,
+			String experimentLabelForChosenMu)
+	{
+		// String experimentlabel = "geolife1_NOV15ED-1.0STimeAllActsFDStFilter0hrsNoTTFilterNoFED";
+		// String commonPathToRead = "/run/media/gunjan/BackupVault/Geolife2018Results/";
+		String commonPathToWrite = commonPathToRead + "PostExperimentEvaluation/";
+		WToFile.createDirectoryIfNotExists(commonPathToWrite);
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GeolifeAnalysisNov2018/";
+		String experimentLabels[] = { "geolife1_NOV15ED0.0STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED0.15STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED0.25STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED0.75STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED1.0STimeAllActsFDStFilter0hrsNoTTFilter",
+				"geolife1_NOV15ED0.5STimeAllActsFDStFilter0hrsNoTTFilter" };
+
+		try
+		{
+			double[] muArray = Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor.None);
+			String valLabel = "MeanReciprocalRank";
+			MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentLabelForChosenMu + "/All/",
+					commonPathToWrite + experimentLabelForChosenMu + "AllMUs" + valLabel + ".csv",
+					"AlgoStep0All" + valLabel + ".csv", muArray, 1, true);
+			System.exit(0);
+
+			String pathToChosenMUBasedOnAlpha1 = "/home/gunjan/RWorkspace/GowallaRWorks/ChosenMU.csv";
+			Pair<Map<String, Integer>, Map<Integer, Integer>> chosenMUPerUser = ResultsDistributionEvaluation
+					.getUserChosenBestMUBasedOnGiveFile(pathToChosenMUBasedOnAlpha1, commonPathToWrite);
+
+			Map<Integer, Integer> chosenMUPerUserIndex = chosenMUPerUser.getSecond();
+
+			extractAndWriteValsForEachUserForChosenMU2(experimentLabels, commonPathToRead, commonPathToWrite,
+					chosenMUPerUserIndex, "ReciprocalRank", false, false, "RRVals");
+			extractAndWriteValsForEachUserForChosenMU3(experimentLabels, commonPathToRead, commonPathToWrite,
+					chosenMUPerUserIndex, "ReciprocalRank", false, false, "RRVals");
+			extractAndWriteValsForEachUserForChosenMU4(experimentLabels, commonPathToRead, commonPathToWrite,
+					chosenMUPerUserIndex, "ReciprocalRank", false, false, "RRVals");
+
+			for (String experimentlabel : experimentLabels)
+			{
+				// Read RR values only for chosen MU for each user
+				{
+					// Map<String, Integer> chosenMUPerUserID = chosenMUPerUser.getFirst();
+					extractAndWriteValsForEachUserForChosenMU(experimentlabel, commonPathToRead, commonPathToWrite,
+							chosenMUPerUserIndex, "ReciprocalRank", false, false, "RRVals");
+
+				} // end of writing RR values for chosen MUs for each user
+					// System.exit(0);
+
+				{
+
+					valLabel = "MeanReciprocalRank";
+					MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+							commonPathToWrite + experimentlabel + "AllMUs" + valLabel + ".csv",
+							"AlgoStep0All" + valLabel + ".csv", muArray, 1, true);
+
+					valLabel = "NumOfRecommendationTimes";
+					MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+							commonPathToWrite + experimentlabel + "AllMUs" + valLabel + ".csv",
+							"AlgoStep0All" + valLabel + ".csv", muArray, 0, true);
+
+					String valLabels[] = { "AvgRecall", "AvgPrecision", "AvgFMeasure" };
+					for (String vall : valLabels)
+					{
+						for (int top = 1; top <= 5; top++)
+						{
+							MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+									commonPathToWrite + experimentlabel + "AllMUs" + vall + "@Top" + top + ".csv",
+									"AlgoStep0All" + vall + ".csv", muArray, 6 - top, true);
+						}
+					}
+
+					valLabel = "PercentageDirectAgreements";
+					MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+							commonPathToWrite + experimentlabel + "AllMUs" + valLabel + ".csv",
+							"AlgoL1All" + valLabel + ".csv", muArray, 0, false);
+
+					valLabel = "PercentageDirectTopKAgreements";
+					MUEvaluationUtils.writeValsForAllUsersAllMUs(commonPathToRead + experimentlabel + "/All/",
+							commonPathToWrite + experimentlabel + "AllMUs" + valLabel + ".csv",
+							"AlgoL1All" + valLabel + ".csv", muArray, 0, false);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
 
 	/**

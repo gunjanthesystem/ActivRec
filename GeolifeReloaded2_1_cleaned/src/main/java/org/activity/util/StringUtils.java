@@ -33,6 +33,81 @@ public class StringUtils
 		return String.format("%1$" + length + "s", string);
 	}
 
+	/**
+	 * https://www.programcreek.com/2015/04/longest-common-substring-java/
+	 * 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static int getLongestCommonSubstring(String a, String b)
+	{
+		int m = a.length();
+		int n = b.length();
+
+		int max = 0;
+
+		int[][] dp = new int[m][n];
+
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (a.charAt(i) == b.charAt(j))
+				{
+					if (i == 0 || j == 0)
+					{
+						dp[i][j] = 1;
+					}
+					else
+					{
+						dp[i][j] = dp[i - 1][j - 1] + 1;
+					}
+
+					if (max < dp[i][j]) max = dp[i][j];
+				}
+
+			}
+		}
+
+		return max;
+	}
+
+	/**
+	 * src: https://www.programcreek.com/2014/04/longest-common-subsequence-java/
+	 * 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static int getLongestCommonSubsequence(String a, String b)
+	{
+		int m = a.length();
+		int n = b.length();
+		int[][] dp = new int[m + 1][n + 1];
+
+		for (int i = 0; i <= m; i++)
+		{
+			for (int j = 0; j <= n; j++)
+			{
+				if (i == 0 || j == 0)
+				{
+					dp[i][j] = 0;
+				}
+				else if (a.charAt(i - 1) == b.charAt(j - 1))
+				{
+					dp[i][j] = 1 + dp[i - 1][j - 1];
+				}
+				else
+				{
+					dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+				}
+			}
+		}
+
+		return dp[m][n];
+	}
+
 	public static void main0(String[] args)
 	{
 		ArrayList<String> list = new ArrayList<String>();

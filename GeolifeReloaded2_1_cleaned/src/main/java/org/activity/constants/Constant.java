@@ -204,13 +204,12 @@ public final class Constant
 	public static final boolean checkEDSanity = false;// true;// true;// SWITCH_NOV10
 
 	private static double dynamicEDAlpha;// = 1;// 0.8;// 0.5;// SWITCH_NOV10
-	public static boolean noFED = true;// Nov 15 2018
+	public static boolean noFED = false;// Nov 15 2018
 	public static boolean noAED = false;// Nov 15 2018
-	public static final double[] EDAlphas = { -1 };// 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75, 0, 0.25,
-													// 0.35, 0.15
-													// };//
-													// SWITCH_NOV10 added on 12
-	// Sep 2018
+	public static final double[] EDAlphas = { 0.5 };// 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
+	// SWITCH_NOV20
+	// = { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75, 0, 0.25,
+	// 0.35, 0.15};//SWITCH_NOV10 added on 12 Sep 2018
 	// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */
 
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
@@ -219,15 +218,30 @@ public final class Constant
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
 	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
+
+	// Only for gowalla1
 	public static final boolean useLocationInFED = false;// SWITCH_NOV10
 	public static final boolean useHaversineDistInLocationFED = false;// SWITCH_NOV10 //added on Aug 11 2018
 	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = false;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
 
-	public static final boolean useRTVerseNormalisationForED = false;// true; // TODO KEEP IT true, false version
+	// Only for geolife1, added in Nov 18, 2018
+	public static final boolean useDurationInFED = true;// SWITCH_NOV10
+	public static final boolean useDistTravelledInFED = true;// SWITCH_NOV10 //added on Aug 11 2018
+	public static final boolean useStartGeoInFED = true;// SWITCH_NOV10
+	public static final boolean useEndGeoInFED = true;// SWITCH_NOV10
+	public static final boolean useAvgAltitudeInFED = true;// SWITCH_NOV10
+
+	public static final boolean useRTVerseNormalisationForED = true;// true; // TODO KEEP IT true, false version
+
+	public static final boolean computeFEDForEachAOInRTVerse = false;
+	public static final boolean computeFEDForEachFeatureSeqInRTVerse = true;// true;
+
+	public static final boolean useMSDInFEDInRTVerse = false;// false;
+
 	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
-	public static final double percentileForRTVerseMaxForFEDNorm = -1;// 75;// -1// SWITCH_April24
+	public static final double percentileForRTVerseMaxForFEDNorm = 10;// 75;// -1// SWITCH_April24
 	public static final double percentileForRTVerseMaxForAEDNorm = -1;// 75;// SWITCH //added on 15 Aug 2018
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
@@ -240,7 +254,7 @@ public final class Constant
 	 * If enabled, in Edit distance, instead of computing feature level edit distance just for activity objects which
 	 * matchin act name across the compared timelines, computed feature level edit distance over all act objs
 	 */
-	public static final boolean useFeatureDistancesOfAllActs = false;// true;// SWITCH_NOV10
+	public static final boolean useFeatureDistancesOfAllActs = true;// true;// SWITCH_NOV10
 
 	// need to implement it in AlignmentBasedDistance.getFeatureLevelDistanceGowallaPD25Feb2018() before turning true
 	public static final boolean useDistFromNextInFED = false;
@@ -296,6 +310,8 @@ public final class Constant
 	static String DATABASE_NAME = "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1" ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
+	public static final boolean searchForOptimalFeatureWts = false;// true;
+	public static final boolean purelyRandomPredictionNov25 = false;
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -461,7 +477,7 @@ public final class Constant
 	public static final boolean needsToPruneFirstUnknown = false;
 
 	public static final double epsilonForFloatZero = 1.0E-50;// to compare if floating point numbers are equal.
-
+	public static final double epsilonForFloatZeroRelaxed = 1.0E-5;// to compare if floating point numbers are equal.
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////// End of variable declarations //////////////////////////////////
 	//// DO NOT CHANGE THE ABOVE COMMENTED LINE AS IT IS USED AS A MARKER WHEN REFLECTING THIS FILE
@@ -1618,7 +1634,7 @@ public final class Constant
 		s.append("\nrankScoring: " + rankScoring);
 		s.append("\nALPHA:" + ALPHA);
 		s.append("\nWeights of features: "
-				+ (new AlignmentBasedDistance(Constant.primaryDimension)).getAllWeightsOfFeatures());
+				+ (new AlignmentBasedDistance(Constant.primaryDimension)).getAllWeightsOfFeaturesForPrint());
 		s.append("\ndistanceUsed:" + dynamicDistanceUsed);
 
 		s.append("\nuseTolerance:" + useTolerance);
@@ -1691,11 +1707,21 @@ public final class Constant
 
 		s.append("\nuseActivityNameInFED:" + useActivityNameInFED);
 		s.append("\nuseStartTimeInFED:" + useStartTimeInFED);
+
+		// For gowalla1
 		s.append("\nuseLocationInFED:" + useLocationInFED);
-		s.append("\ndistanceScaledLocationFED:" + useHaversineDistInLocationFED);
+		s.append("\nuseHaversineDistInLocationFED:" + useHaversineDistInLocationFED);
 		s.append("\nusePopularityInFED:" + usePopularityInFED);
 		s.append("\nuseDistFromPrevInFED:" + useDistFromPrevInFED);
 		s.append("\nuseDurationFromPrevInFED:" + useDurationFromPrevInFED);
+
+		// for geolife1
+		s.append("\nuseDurationInFED:" + useDurationInFED);
+		s.append("\nuseDistTravelledInFED:" + useDistTravelledInFED);
+		s.append("\nuseStartGeoInFED:" + useStartGeoInFED);
+		s.append("\nuseEndGeoInFED:" + useEndGeoInFED);
+		s.append("\nuseAvgAltitudeInFED:" + useAvgAltitudeInFED);
+
 		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFED);
 		s.append("\nuseTimeDecayInAED:" + useTimeDecayInAED);
 		s.append("\npowerOfTimeDecayInAED:" + powerOfTimeDecayInAED);
@@ -1712,6 +1738,9 @@ public final class Constant
 		s.append("\ncleanTimelinesAgainInsideRecommendationTests:" + cleanTimelinesAgainInsideRecommendationTests);
 		s.append("\ncleanTimelinesAgainInsideTrainTestSplit:" + cleanTimelinesAgainInsideTrainTestSplit);
 		s.append("\nuseRTVerseNormalisationForED:" + useRTVerseNormalisationForED);
+		s.append("\ncomputeFEDForEachAOInRTVerse:" + computeFEDForEachAOInRTVerse);
+		s.append("\ncomputeFEDForEachFeatureSeqInRTVerse:" + computeFEDForEachFeatureSeqInRTVerse);
+		s.append("\nuseMSDInFEDInRTVerse:" + useMSDInFEDInRTVerse);
 		s.append("\npercentileForRTVerseMaxForFEDNorm:" + percentileForRTVerseMaxForFEDNorm);
 		s.append("\npercentileForRTVerseMaxForAEDNorm:" + percentileForRTVerseMaxForAEDNorm);
 		s.append("\nthreshNormAEDForCand:" + threshNormAEDForCand);
@@ -1736,6 +1765,8 @@ public final class Constant
 		s.append("\nsecondaryDimension:" + Constant.secondaryDimension);
 		s.append("\ndoWeightedEditDistanceForSecDim:" + Constant.doWeightedEditDistanceForSecDim);
 		s.append("\nmaxDistanceThresholdForLocGridDissmilarity:" + Constant.maxDistanceThresholdForLocGridDissmilarity);
+		s.append("\nsearchForOptimalFeatureWts:" + Constant.searchForOptimalFeatureWts);
+		s.append("\npurelyRandomPredictionNov25:" + Constant.purelyRandomPredictionNov25);
 		// s.append("\n:" + );
 		if (dynamicDistanceUsed.equals("FeatureWiseEditDistance"))
 		{
@@ -1759,6 +1790,7 @@ public final class Constant
 			}
 		}
 		s.append("\nepsilonForFloatZero:" + epsilonForFloatZero);
+		s.append("\nepsilonForFloatZeroRelaxed:" + epsilonForFloatZeroRelaxed);
 		s.append("\nlengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
 		s.append("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 		return s.toString();

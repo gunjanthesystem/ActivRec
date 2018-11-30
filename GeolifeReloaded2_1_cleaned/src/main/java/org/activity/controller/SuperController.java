@@ -16,16 +16,19 @@ import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
+import org.activity.evaluation.ResultsDistributionEvaluation;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.Triple;
 import org.activity.postfilter.PostFilter1;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.Searcher;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.nd4j.jita.conf.CudaEnvironment;
 //import org.nd4j.jita.conf.Configuration;
 //import org.nd4j.jita.conf.CudaEnvironment;
@@ -199,6 +202,23 @@ public class SuperController
 		return message;
 	}
 
+	public static void mainForFindingWtsForFeatures(String args)
+	{
+		// double minValue = 0, maxValue = 1, stepSize = 0.25;
+		double possibleVals[] = { 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
+		for (int iterationCountFeatWtSearch = 0; iterationCountFeatWtSearch < 5; iterationCountFeatWtSearch++)
+		{// randomly generate index and select from the possibleVals
+			CustodianOfFeatWts.givenWtActivityName = 2d;
+			CustodianOfFeatWts.givenWtStartTime = possibleVals[StatsUtils.randomInRange(0, possibleVals.length)];
+			CustodianOfFeatWts.givenWtDuration = possibleVals[StatsUtils.randomInRange(0, possibleVals.length)];
+			CustodianOfFeatWts.givenWtDistanceTravelled = possibleVals[StatsUtils.randomInRange(0,
+					possibleVals.length)];
+			CustodianOfFeatWts.givenWtEndGeo = possibleVals[StatsUtils.randomInRange(0, possibleVals.length)];
+			CustodianOfFeatWts.givenWtAvgAltitude = possibleVals[StatsUtils.randomInRange(0, possibleVals.length)];
+		}
+		// boolean random = true;
+	}
+
 	/**
 	 * <h2>In this method:</h2>
 	 * 
@@ -355,18 +375,90 @@ public class SuperController
 		// String[] commonPaths = { "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 		// { "./dataWritten/"+ DateTimeUtils.getMonthDateLabel() + labelForExperimentConfig + iterationLabel + "/" };
 
-		String commonPath = // "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
-				"/run/media/gunjan/BackupVault/Geolife2018Results/"
-						// "./dataWritten/"
-						+ Constant.getDatabaseName() + "_" + DateTimeUtils.getMonthDateLabel()
-						+ getLabelForExperimentConfig(sampledUserIndicesSetFile) + iterationLabel + "/";
+		// adding loop to search for best feature weight
+		// start of added on 21 Nov
+		double possibleVals[] = { 0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2 };// 0.2, 0.5 };// 0.1, 0.2, 0.3, 0.4,
+																					// 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
+		// IntStream.range(0, 11).mapToDouble(i -> i * 0.1);
 
-		// for (int i = 0; i <= commonPaths.length - 1; i++){
-		WToFile.createDirectoryIfNotExists(commonPath);
-		// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-		runExperiment(commonPath, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName(), "HJEditDistance");
-		// cleanUpSpace(commonPaths[i], 0.90);
-		System.out.println("finished runExperimentForGivenUsersAndConfig for commonPath = " + commonPath);
+		int iterationCountFeatWtSearchLimit = Constant.searchForOptimalFeatureWts ? 1000 : 1;
+		int repetitionCheckLimit = 10;
+
+		for (int iterationCountFeatWtSearch = 0; iterationCountFeatWtSearch < iterationCountFeatWtSearchLimit; iterationCountFeatWtSearch++)
+		{
+			if (Constant.searchForOptimalFeatureWts)
+			{
+				// randomly generate index and select from the possibleVals
+				int numOfRepetitions = 0;
+				boolean isAlreadyTried = false;
+				do // to avoid repeating same configs
+				{
+					CustodianOfFeatWts.givenWtActivityName = 2d;
+					CustodianOfFeatWts.givenWtStartTime = possibleVals[StatsUtils.randomInRange(0,
+							possibleVals.length - 1)];
+					CustodianOfFeatWts.givenWtDuration = possibleVals[StatsUtils.randomInRange(0,
+							possibleVals.length - 1)];
+					CustodianOfFeatWts.givenWtDistanceTravelled = possibleVals[StatsUtils.randomInRange(0,
+							possibleVals.length - 1)];
+					CustodianOfFeatWts.givenWtStartGeo = possibleVals[StatsUtils.randomInRange(0,
+							possibleVals.length - 1)];
+					CustodianOfFeatWts.givenWtEndGeo = possibleVals[StatsUtils.randomInRange(0,
+							possibleVals.length - 1)];
+					CustodianOfFeatWts.givenWtAvgAltitude = possibleVals[StatsUtils.randomInRange(0,
+							possibleVals.length - 1)];
+					isAlreadyTried = CustodianOfFeatWts.isAlreadyTried(CustodianOfFeatWts.toStringWts());
+					if (isAlreadyTried)
+					{
+						numOfRepetitions += 1;
+						if (numOfRepetitions > repetitionCheckLimit)// probably no more new config of wts possible
+						{
+							iterationCountFeatWtSearch = iterationCountFeatWtSearchLimit + 1;// to make this last
+																								// iteration
+						}
+					}
+				}
+				while (isAlreadyTried);
+				CustodianOfFeatWts.addToAlreadyTriedWts(CustodianOfFeatWts.toStringWts());
+				System.out.println("searchForOptimalFeatureWts is true: feature weight in iteration "
+						+ iterationCountFeatWtSearch + " =" + CustodianOfFeatWts.toStringWts());
+			} // end of added on 21 Nov
+
+			String extraLabel = Constant.searchForOptimalFeatureWts ? "Iter" + iterationCountFeatWtSearch : "";
+
+			String dataWrittenFolder =
+					// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
+					// "/run/media/gunjan/BackupVault/Geolife2018Results/"
+					// "/run/media/gunjan/iiWASDrive/gunjan/GeolifeNov2018/";
+					"/run/media/gunjan/My Passport/GeolifeNov2018/";
+			// "./dataWritten/";
+			String commonPath = dataWrittenFolder + Constant.getDatabaseName() + "_"
+					+ DateTimeUtils.getMonthDateHourMinLabel()// DateTimeUtils.getMonthDateLabel()//
+					+ getLabelForExperimentConfig(sampledUserIndicesSetFile) + iterationLabel + extraLabel + "/";
+			WToFile.createDirectoryIfNotExists(commonPath);
+
+			// for (int i = 0; i <= commonPaths.length - 1; i++){
+
+			// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
+			runExperiment(commonPath, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName(),
+					"HJEditDistance");
+			// cleanUpSpace(commonPaths[i], 0.90);
+			System.out.println("finished runExperimentForGivenUsersAndConfig for commonPath = " + commonPath);
+
+			// start of added on 21 Nov 2018
+			List<List<String>> mrrStatsBestMUs = ReadingFromFile
+					.readLinesIntoListOfLists(commonPath + "mrrStatsOverUsersBestMUs.csv", ":");
+			String meanMRROverUsersBestMU = mrrStatsBestMUs.get(4).get(1);
+			String medianMRROverUsersBestMU = mrrStatsBestMUs.get(6).get(1);
+
+			if (Constant.searchForOptimalFeatureWts)
+			{
+				String custodianFeatWtsInfo = iterationCountFeatWtSearch + "," + CustodianOfFeatWts.toCSVWts() + ","
+						+ meanMRROverUsersBestMU + "," + medianMRROverUsersBestMU + "\n";
+				WToFile.writeToNewFile(custodianFeatWtsInfo, commonPath + "CustodianOfFeatWts.csv");
+				WToFile.appendLineToFileAbs(custodianFeatWtsInfo, dataWrittenFolder + "CustodianOfFeatWts.csv");
+			}
+			// ed of added on 21 Nov 2018
+		}
 		System.out.println("Exiting runExperimentForGivenUsersAndConfig");
 		// PopUps.showMessage("Exiting main0");
 		// End
@@ -384,6 +476,7 @@ public class SuperController
 				StFilterLabel = "", sampledUserSetLabel = "", candThresholdingLabel = "",
 				filterTrainingTimelinesLabel = "", toyTimelinesLabel = "", wtdEditDistanceLabel = "",
 				timeDecayLabel = "", collLabel = "";
+		String databaseName = Constant.getDatabaseName();
 
 		// added on 6 Aug 2018
 		if (Constant.useToyTimelines)
@@ -502,24 +595,48 @@ public class SuperController
 			{
 				featuresUsedLabel += "STime";
 			}
-			if (Constant.useLocationInFED)
-			{
-				featuresUsedLabel += "Loc";
-			}
 
-			if (Constant.usePopularityInFED)
+			if (databaseName.equals("gowalla1"))
 			{
-				featuresUsedLabel += "Pop";
+				if (Constant.useLocationInFED)
+				{
+					featuresUsedLabel += "Loc";
+				}
+				if (Constant.usePopularityInFED)
+				{
+					featuresUsedLabel += "Pop";
+				}
+				if (Constant.useDistFromPrevInFED)
+				{
+					featuresUsedLabel += "DistPrev";
+				}
+				if (Constant.useDurationFromPrevInFED)
+				{
+					featuresUsedLabel += "DurPrev";
+				}
 			}
-
-			if (Constant.useDistFromPrevInFED)
+			if (databaseName.equals("geolife1"))// added on 18 Nov 2018
 			{
-				featuresUsedLabel += "DistPrev";
-			}
-
-			if (Constant.useDurationFromPrevInFED)
-			{
-				featuresUsedLabel += "DurPrev";
+				if (Constant.useDurationInFED)
+				{
+					featuresUsedLabel += "Dur";
+				}
+				if (Constant.useDistTravelledInFED)
+				{
+					featuresUsedLabel += "DistTr";
+				}
+				if (Constant.useStartGeoInFED)
+				{
+					featuresUsedLabel += "StartGeo";
+				}
+				if (Constant.useEndGeoInFED)
+				{
+					featuresUsedLabel += "EndGeo";
+				}
+				if (Constant.useAvgAltitudeInFED)
+				{
+					featuresUsedLabel += "AvgAlt";
+				}
 			}
 
 			if (Constant.useFeatureDistancesOfAllActs)
@@ -529,9 +646,28 @@ public class SuperController
 
 			if (Constant.useRTVerseNormalisationForED)
 			{
+				if (Constant.computeFEDForEachAOInRTVerse)
+				{
+					distNormalisationLabel += "FEDPerAO_";
+				}
+				if (Constant.computeFEDForEachFeatureSeqInRTVerse)
+				{
+					distNormalisationLabel += "FEDPerFS";
+					if (Constant.useMSDInFEDInRTVerse)
+					{
+						distNormalisationLabel += "MSD";
+					}
+					distNormalisationLabel += "_";
+				}
+				if (Constant.computeFEDForEachAOInRTVerse && Constant.computeFEDForEachFeatureSeqInRTVerse)
+				{
+					PopUps.printTracedErrorMsgWithExit(
+							"Error both Constant.computeFEDForEachAOInRTVerse & Constant.computeFEDForEachFeatureSeqInRTVerse should not be true");
+				}
+
 				if (Constant.percentileForRTVerseMaxForFEDNorm > -1)
 				{
-					distNormalisationLabel = (int) Constant.percentileForRTVerseMaxForFEDNorm + "FRTV";
+					distNormalisationLabel += (int) Constant.percentileForRTVerseMaxForFEDNorm + "F_";// RTV
 
 					if (Constant.threshNormFEDForCand != -1)
 					{
@@ -541,13 +677,15 @@ public class SuperController
 				}
 				if (Constant.percentileForRTVerseMaxForAEDNorm > -1)
 				{
-					distNormalisationLabel = distNormalisationLabel + (int) Constant.percentileForRTVerseMaxForAEDNorm
-							+ "ARTV";
+					distNormalisationLabel += distNormalisationLabel + (int) Constant.percentileForRTVerseMaxForAEDNorm
+							+ "A_";
 					if (Constant.threshNormAEDForCand != -1)
 					{
 						distNormalisationLabel += "T";
 					}
 				}
+				distNormalisationLabel += "RTV";
+
 			}
 		}
 
@@ -568,9 +706,16 @@ public class SuperController
 			collLabel = "NoFED";
 		}
 
-		return sampledUserSetLabel + predictorLabel + EDAlphaLabel + featuresUsedLabel + StFilterLabel
-				+ distNormalisationLabel + candThresholdingLabel + filterTrainingTimelinesLabel + toyTimelinesLabel
-				+ wtdEditDistanceLabel + timeDecayLabel + collLabel;
+		if (Constant.purelyRandomPredictionNov25)
+		{
+			return sampledUserSetLabel + predictorLabel + "PurelyRandomly" + toyTimelinesLabel + "";
+		}
+		else
+		{
+			return sampledUserSetLabel + predictorLabel + EDAlphaLabel + featuresUsedLabel + StFilterLabel
+					+ distNormalisationLabel + candThresholdingLabel + filterTrainingTimelinesLabel + toyTimelinesLabel
+					+ wtdEditDistanceLabel + timeDecayLabel + collLabel;
+		}
 	}
 
 	public static void cleanUp(String[] pathsToClean)
@@ -692,6 +837,8 @@ public class SuperController
 
 		Constant.releaseHeavyObjectsNotNeededAfterRecommendation();
 
+		// PopUps.showMessage("Recommendations done");
+
 		if (doEvaluation)
 		{// curtain may 26 2017 start
 			System.out.println("Doing evaluation...");
@@ -710,11 +857,13 @@ public class SuperController
 				if (evalPrimaryDimension)// primary dimension
 				{
 					new EvaluationSeq(lengthOfRecommendedSequence, commonPath, muArray, "", false, true);
+
 					if (evalSecondaryDimension)// secondary dimension
 					{
 						new EvaluationSeq(lengthOfRecommendedSequence, commonPath, muArray, "SecDim", false, true);
 					}
 				}
+				// PopUps.showMessage("Done Evaluation");
 
 				if (doPostFiltering && evalSecondaryDimension)
 				{
@@ -729,6 +878,35 @@ public class SuperController
 						new EvaluationSeq(lengthOfRecommendedSequence, commonPath, muArray, pfPhrase, true, false);
 					}
 				}
+
+				// Start of added on 20 Nov 2018
+				String fileForChosenMU = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/NOV19ResultsDistributionFirstToMax1/FiveDays/geolife1_NOV19ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsNoTTFilter_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+				fileForChosenMU = "";
+				ResultsDistributionEvaluation.runNov20Results(commonPath, 1, "", fileForChosenMU);
+
+				String splitted[] = commonPath.split("/");
+				String resultsLabel = splitted[splitted.length - 1];
+
+				if (false)
+				{
+					List<Double> MRRValsForChosenMU = ReadingFromFile.oneColumnReaderDouble(
+							commonPath + resultsLabel + "_AllMeanReciprocalRank_ChosenMU.csv", ",", 2, true);
+					DescriptiveStatistics mrrStatsOverUsersChosenMUs = StatsUtils
+							.getDescriptiveStatistics(MRRValsForChosenMU);
+
+					WToFile.writeToNewFile(mrrStatsOverUsersChosenMUs.toString(),
+							commonPath + "mrrStatsOverUsersChosenMUs.csv");
+					System.out.println("mrrStatsOverUsersChosenMUs = " + mrrStatsOverUsersChosenMUs);
+				}
+
+				List<Double> MRRValsForBestMU = ReadingFromFile.oneColumnReaderDouble(
+						commonPath + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv", ",", 2, true);
+				DescriptiveStatistics mrrStatsOverUsersBestnMUs = StatsUtils.getDescriptiveStatistics(MRRValsForBestMU);
+				WToFile.writeToNewFile(mrrStatsOverUsersBestnMUs.toString(),
+						commonPath + "mrrStatsOverUsersBestMUs.csv");
+				System.out.println("mrrStatsOverUsersBestMUs = " + mrrStatsOverUsersBestnMUs);
+
+				// End of added on 20 Nov 2018
 				// if (true)
 				// { if (Constant.doSecondaryDimension)
 				// { // for (String pfPhrase : pfFilterNames)

@@ -19,7 +19,7 @@ public class ServerUtils
 	 */
 	public static String getPassWordForHost(String host)
 	{
-		String passwd = null;
+		String passwd = "";
 		switch (host)
 		{
 		case howitzerHost:

@@ -95,7 +95,7 @@ public class ActivityLogReader
 			// System.out.println(sb.toString());
 			WToFile.writeToNewFile(String.join("\n", linesIgnoredWithOnlyTS), "linesIgnoredWithOnlyTS.csv");
 			WToFile.writeToNewFile(String.join("\n", linesWithNoTitle), "linesWithNoTitle.csv");
-			WToFile.writeMapToNewFile(checkins, "TS,Entry", ",", "checkins.csv");
+			WToFile.writeMapToFile(checkins, "TS,Entry", ",", "checkins.csv");
 
 		}
 		catch (Exception e)

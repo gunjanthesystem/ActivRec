@@ -151,6 +151,10 @@ dependencies
     compile 'com.google.maps:google-maps-services:0.2.6'
     compile 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'it.unimi.dsi:fastutil:8.1.1'
+    
+    // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
+    compile group: 'org.graalvm.sdk', name: 'graal-sdk', version: '1.0.0-rc9'
+
       
     //compile fileTree(dir: 'libs', include: ['*.jar','*.zip'])
 	// Declare the dependency for your favourite test framework you want to use in your tests.
