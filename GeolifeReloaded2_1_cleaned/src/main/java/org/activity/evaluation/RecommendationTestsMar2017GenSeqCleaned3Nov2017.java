@@ -40,6 +40,7 @@ import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
 import org.activity.recomm.RecommendationMasterRNN1Jun2018;
 import org.activity.sanityChecks.Sanity;
 import org.activity.spmf.AKOMSeqPredictorLighter;
+import org.activity.stats.FeatureStats;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -489,6 +490,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 							sanityCheckTrainTestSplitSameForCollNonColl(trainTestTimelinesForAllUsersDW, userId,
 									userTrainingTimelines);
+
+							// start of added on Nov 29
+							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelines(userTrainingTimelines,
+									Constant.getCommonPath() + "FeatsOfTrainingTimelines.csv");
+							// end of added on Nov 29
 
 							////// START of build representative activity objects for this user.
 							// if (true)// representativeAOsNotComputed == false) //do this
@@ -1405,8 +1411,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 								Constant.getOutputCoreResultsPath() + "RecommendationTestsTimeTaken.csv");
 						// writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
 
+						// Start of added on 20 Nov 2018
+						if (VerbosityConstants.verboseDistDistribution)
+						{// can do this only if distance distribution files are written.
+							ResultsDistributionEvaluation.writeCorrelationBetweenDistancesOverCands(
+									Constant.getCommonPath(), Constant.useRTVerseNormalisationForED);
+						}
+						// End of added on 20 Nov 2018
 						consoleLogStream.close();
-
 					} // end of loop over matching unit
 				}
 

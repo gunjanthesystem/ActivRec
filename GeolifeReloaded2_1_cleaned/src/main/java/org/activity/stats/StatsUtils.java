@@ -2,6 +2,7 @@ package org.activity.stats;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import org.activity.util.StringUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
+import org.apache.commons.math3.exception.MathIllegalStateException;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
@@ -44,6 +46,15 @@ public final class StatsUtils
 
 	}
 
+	/**
+	 * 
+	 * @param n
+	 * @return
+	 */
+	public static int factorial(int n)
+	{
+		return (n == 0 ? 1 : (n * factorial(n - 1)));
+	}
 	// 5, 15,20, 50, 100, 55, 70,101,-1 . max = 100, min = 0, binSize =10
 	// maxVal is maxValExcluding
 	// bins: [0,10),[10,20), ....... ,[90,100)
@@ -412,6 +423,58 @@ public final class StatsUtils
 		return new DescriptiveStatistics(vals);
 	}
 
+	public static String toStringDescriptiveStats(List<Double> valsReceived, String label)
+	{
+		return toStringDescriptiveStats(getDescriptiveStatistics(valsReceived), label);
+	}
+
+	/**
+	 * 
+	 * @param d
+	 * @param label
+	 * @return
+	 * @since 29 Nov 2018
+	 */
+	public static String toStringDescriptiveStats(DescriptiveStatistics d, String label)
+	{
+
+		String endl = "\n";
+		StringBuilder outBuffer = new StringBuilder("=============== " + label + " ===============" + endl);
+		DecimalFormat df = new DecimalFormat("#");
+		df.setMaximumFractionDigits(5);
+
+		outBuffer.append("DescriptiveStatistics:").append(endl);
+		outBuffer.append("n:\t").append(d.getN()).append(endl);
+		outBuffer.append("min:\t").append(df.format(d.getMin())).append(endl);
+		outBuffer.append("max:\t").append(df.format(d.getMax())).append(endl);
+		outBuffer.append("mean:\t").append(df.format(d.getMean())).append(endl);
+		outBuffer.append("std dev:\t").append(df.format(d.getStandardDeviation())).append(endl);
+		try
+		{
+			// No catch for MIAE because actual parameter is valid below
+			outBuffer.append("25thP:\t").append(df.format(d.getPercentile(25))).append(endl);
+			outBuffer.append("median:\t").append(df.format(d.getPercentile(50))).append(endl);
+			outBuffer.append("75thP:\t").append(df.format(d.getPercentile(75))).append(endl);
+			outBuffer.append("IQR:\t").append(df.format(d.getPercentile(75) - d.getPercentile(25))).append(endl);
+		}
+		catch (MathIllegalStateException ex)
+		{
+			outBuffer.append("median:\tunavailable").append(endl);
+		}
+
+		List<Double> percentilesList = Arrays.asList(1d, 5d, 10d, 20d, 25d, 30d, 40d, 50d, 60d, 70d, 80d, 90d, 100d);
+		percentilesList.stream().forEachOrdered(p -> outBuffer.append(p + "\t"));
+		outBuffer.append(endl);
+		percentilesList.stream().forEachOrdered(p -> outBuffer.append(df.format(d.getPercentile(p)) + "\t"));
+		outBuffer.append(endl);
+
+		outBuffer.append("skewness:\t").append(df.format(d.getSkewness())).append(endl);
+		outBuffer.append("kurtosis:\t").append(df.format(d.getKurtosis())).append(endl);
+
+		return outBuffer.toString();
+
+	}
+
 	public static void checkPercentile()
 	{
 		// compare percentile computation
@@ -452,9 +515,231 @@ public final class StatsUtils
 
 	public static void main(String args[])
 	{
-		// checkBinnning();
-		checkPercentile();
+		analaysePossibleReorderingsNov29_2018();
 	}
+
+	public static void analaysePossibleReorderingsNov29_2018()
+	{
+		// checkBinnning();
+		// checkPercentile();
+		// System.out.println(factorial(10));
+		// checkSeqOfSameScores();
+		// EDAlpha1 String fileToRead =
+		// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_NOV28H17M17ED1.0STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsFEDPerFS_10F_RTVNoTTFilter/All/MatchingUnit1.0/dataRankedRecommendationWithScores0.csv";
+		String commonPathToRead = // "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_NOV28H17M17ED1.0STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsFEDPerFS_10F_RTVNoTTFilter/All/";
+				"/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_NOV28H17M17ED1.0STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsFEDPerFS_10F_RTVNoTTFilter/All/";
+
+		String[] splittedCommonPath = commonPathToRead.split("/");
+		String expLabel = splittedCommonPath[splittedCommonPath.length - 2];
+		// PopUps.showMessage("splittedCommonPath= " + Arrays.asList(splittedCommonPath) + "\nexpLabel= " + expLabel);
+
+		// MatchingUnit8.0/dataRankedRecommendationWithScores0.csv";
+		String commonPathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/PossibleReorderingInvestogationsNov29/";
+		StringBuilder sb = new StringBuilder("mu,NumOfNon1PossibleRorderings,%RTsAffetectedOverAllUsers\n");
+		for (double mu : Constant.matchingUnitAsPastCountFixed)
+		{
+			String fileToRead = commonPathToRead + "/MatchingUnit" + mu + "/dataRankedRecommendationWithScores0.csv";
+			Pair<Long, Double> res = findNumOfPossOrderingForEachRTInDataRankedRecommendationWithScores0(fileToRead,
+					commonPathToWrite + expLabel + "MU" + mu + "PossReorderings");
+			sb.append(mu + "," + res.getFirst() + "," + res.getSecond() + "\n");
+		}
+		WToFile.writeToNewFile(sb.toString(), commonPathToWrite + expLabel + "PossReorderingByMUsOverUsers.csv");
+	}
+
+	/**
+	 * 
+	 * @param absFileNameToRead
+	 * @param absFileToWrite
+	 * @return
+	 * @since Nov 29 2018
+	 */
+	public static Pair<Long, Double> findNumOfPossOrderingForEachRTInDataRankedRecommendationWithScores0(
+			String absFileNameToRead, String absFileToWrite)
+	{
+		// __6:1.1667__5:0.8333__11:0.0__10:0.0__7:0.0__9:0.0
+		List<List<String>> allData = ReadingFromFile.readLinesIntoListOfLists(absFileNameToRead, ",");
+		StringBuilder sb = new StringBuilder();
+		StringBuilder sb2 = new StringBuilder();
+		StringBuilder sbNumOfRts = new StringBuilder(
+				"NumOfRtsAffectedForUser,TotalNumOfRtsForUser,PercentageAffected\n");
+		long totalNumOfNon1ReOrderings = 0;
+		int totalNumOfRtsAffected = 0;
+		int totalNumOfRts = 0;
+		for (List<String> line : allData)
+		{
+			int totalNumOfRTsForThisUser = line.size();
+			totalNumOfRts += totalNumOfRTsForThisUser;
+			int numOfRTsWithReOrderingPossibleForThisUser = 0;
+
+			for (String eachCell : line)
+			{
+				String[] splittedCell = eachCell.split("__");
+				System.out.println("splittedCell= " + Arrays.asList(splittedCell));
+				LinkedHashMap<String, Double> recommScorePairs = new LinkedHashMap<>();
+				for (String s : splittedCell)
+				{
+					if (s.trim().length() == 0)
+					{
+						continue;
+					}
+					else
+					{
+						String[] splittedVals = s.split(":");
+						recommScorePairs.put(splittedVals[0], Double.valueOf(splittedVals[1]));
+					}
+				}
+				System.out.println("cell  = " + eachCell);
+				System.out.println("recommScorePairs  = " + recommScorePairs + "\n");
+
+				List<Integer> seqofSames = seqOfSameScores2(recommScorePairs);
+
+				sb2.append(seqofSames.stream().map(e -> String.valueOf(e)).collect(Collectors.joining("__")) + ",");
+				int n = numOfPossibleOrderings(seqofSames);
+				if (n > 1)
+				{
+					sb.append(n);
+					totalNumOfNon1ReOrderings += n;
+					numOfRTsWithReOrderingPossibleForThisUser += 1;
+				}
+				sb.append(",");
+			}
+
+			sb.append("\n");
+			sb2.append("\n");
+			sbNumOfRts
+					.append(numOfRTsWithReOrderingPossibleForThisUser + "," + totalNumOfRTsForThisUser + ","
+							+ StatsUtils.round(
+									(numOfRTsWithReOrderingPossibleForThisUser * 100.0) / totalNumOfRTsForThisUser, 2)
+							+ "\n");
+			totalNumOfRtsAffected += numOfRTsWithReOrderingPossibleForThisUser;
+		}
+
+		double percentageOfRTsAffected = StatsUtils.round((totalNumOfRtsAffected * 100.0) / totalNumOfRts, 2);
+		sbNumOfRts.append("\n\n" + totalNumOfRtsAffected + "," + totalNumOfRts + "," + percentageOfRTsAffected + "\n");
+
+		WToFile.writeToNewFile(sb.toString() + "\n\n\n,,,,,,,,,,,,,,,Read file=" + absFileNameToRead,
+				absFileToWrite + ".csv");
+		WToFile.writeToNewFile(sb2.toString() + "\n\n\n,,,,,,,,,,,,,,,Read file=" + absFileNameToRead,
+				absFileToWrite + "SequenceOfSamess.csv");
+		WToFile.writeToNewFile(sbNumOfRts.toString() + "\n\n\n,,,,,,,,,,,,,,,Read file=" + absFileNameToRead,
+				absFileToWrite + "NumOfRTsAffected.csv");
+
+		System.out.println(
+				"In result:" + absFileNameToRead + " \ntotalNumOfNon1ReOrderings = " + totalNumOfNon1ReOrderings);
+
+		return new Pair<>(totalNumOfNon1ReOrderings, percentageOfRTsAffected);
+
+	}
+
+	public static void checkSeqOfSameScores()
+	{
+		LinkedHashMap<String, Double> data = new LinkedHashMap<>();
+
+		// - A:2_B:1_C:1_D:1_E:0 _F:0
+		// - A:2_B:1_D:1_C:1_E:0 _F:0
+		// - A:2_D:1_B:1_C:1_E:0 _F:0
+		// - A:2_D:1_C:1_B:1_E:0 _F:0
+		// - A:2_C:1_D:1_B:1_E:0 _F:0
+		// - A:2_C:1_B:1_D:1_E:0 _F:0
+
+		data.put("A", 2d);
+		data.put("B", 1d);
+		data.put("C", 1d);
+		data.put("D", 1d);
+		data.put("E", 0d);
+		data.put("G", 0d);
+		data.put("H", 0d);
+		System.out.println("data = " + data);
+		List<Integer> r = seqOfSameScores2(data);
+		System.out.println("seqOfSameScores2 = " + r);
+		System.out.println(numOfPossibleOrderings(r));
+	}
+
+	// start of Nov 28 2018
+	// public static List<Integer> seqOfSameScores(LinkedHashMap<String, Double> stringScorePairs)
+	// {
+	// List<Integer> seqOfSameScores = new ArrayList<>();
+	// double prevScore = -9999;
+	// int countOfSameInSeq = 1;
+	//
+	// for (Map.Entry<String, Double> entry : stringScorePairs.entrySet())
+	// {
+	// double roundedRankScore = StatsUtils.round(entry.getValue(), 4);
+	//
+	// if (Math.abs(roundedRankScore - prevScore) <= 1.0E-10)
+	// {// same score as previous
+	// countOfSameInSeq += 1;
+	// System.out.println("Same as prev");
+	// }
+	// else
+	// {
+	// System.out.println("NOT same as prev");
+	// seqOfSameScores.add(countOfSameInSeq);
+	// countOfSameInSeq = 1;
+	// }
+	//
+	// System.out.println("seqOfSameScores = " + seqOfSameScores + "\n");
+	// prevScore = roundedRankScore;
+	// }
+	//
+	// return seqOfSameScores;
+	// }
+
+	public static List<Integer> seqOfSameScores2(LinkedHashMap<String, Double> stringScorePairs)
+	{
+		List<Integer> seqOfSameScores = new ArrayList<>();
+		double prevScore = -9999;
+		int countOfSameInSeq = 1;
+		int index = -1;
+
+		for (Map.Entry<String, Double> entry : stringScorePairs.entrySet())
+		{
+			index += 1;
+			double roundedRankScore = StatsUtils.round(entry.getValue(), 4);
+			// System.out.println("index = " + index);
+			if (index == 0)
+			{
+				prevScore = roundedRankScore;
+				continue;
+			}
+			else
+			{
+				if (Math.abs(roundedRankScore - prevScore) <= 1.0E-10)
+				{// same score as previous
+					countOfSameInSeq += 1;
+					// System.out.println("Same as prev");
+				}
+				else
+				{
+					// System.out.println("NOT same as prev");
+					seqOfSameScores.add(countOfSameInSeq);
+					countOfSameInSeq = 1;
+				}
+				prevScore = roundedRankScore;
+				// System.out.println("seqOfSameScores = " + seqOfSameScores + "\n");
+			}
+		}
+		seqOfSameScores.add(countOfSameInSeq);
+
+		return seqOfSameScores;
+	}
+
+	public static int numOfPossibleOrderings(List<Integer> vals)
+	{
+		int res = 1;
+
+		for (int v : vals)
+		{
+			if (v > 1)
+			{
+				res = res * StatsUtils.factorial(v);
+			}
+		}
+
+		return res;
+	}
+
+	// end of Nov 28 2018
 
 	private static void checkBinnning()
 	{
@@ -1192,6 +1477,11 @@ public final class StatsUtils
 	public static int randomInRange(int min, int max)
 	{
 		return (min + (int) (Math.random() * ((max - min) + 1)));
+	}
+
+	public static double randomInRange(double min, double max)
+	{
+		return (min + (Math.random() * ((max - min) + 1)));
 	}
 
 	/**

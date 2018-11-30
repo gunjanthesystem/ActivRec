@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
@@ -34,6 +35,7 @@ import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.Triple;
 import org.activity.sanityChecks.Sanity;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
@@ -599,8 +601,20 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			}
 			// End of added on 20 Feb 2018
 
+			// start of added on Nov 25 2018
+			// for purely random prediction as baseline/
+			if (Constant.purelyRandomPredictionNov25)
+			{
+				this.recommendedActivityNamesWithRankscores = getPurelyRandomlyRankedRecommendedActivityPDvalsWithRankScoresString(
+						new ArrayList<>(DomainConstants.catIDNameDictionary.keySet()), 3);
+				// this.rankedRecommendedActNamesWithRankScoresStr =
+				// getPurelyRandomlyRankedRecommendedActivityPDvalsWithRankScoresString(
+				// new ArrayList<>(DomainConstants.catIDNameDictionary.keySet()), 3);
+			} // end of added on Nov 25 2018
+
 			this.rankedRecommendedActNamesWithRankScoresStr = getRankedRecommendedActivityPDvalsWithRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
+
 			this.rankedRecommendedActNamesWithoutRankScoresStr = getRankedRecommendedActivityPDValsithoutRankScoresString(
 					this.recommendedActivityNamesWithRankscores);
 			//
@@ -1331,6 +1345,31 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 	}
 
 	// /////////////////////////////////////////////////////////////////////
+
+	// /////////////////////////////////////////////////////////////////////
+	/**
+	 * Baseline for random prediction Generate the string:
+	 * '__recommendedActivityName1:simRankScore1__recommendedActivityName2:simRankScore2'
+	 * 
+	 * @param setOfActIDs
+	 * @since 25 Nov 2018
+	 */
+	private static LinkedHashMap<String, Double> getPurelyRandomlyRankedRecommendedActivityPDvalsWithRankScoresString(
+			List<Integer> setOfActIDs, int numOfVals)
+	{
+		LinkedHashMap<String, Double> randomActScores = new LinkedHashMap<>(numOfVals);
+
+		// StringBuilder topRankedString = new StringBuilder();// String topRankedString= new String();
+		// StringBuilder msg = new StringBuilder();
+
+		for (int i = 0; i < numOfVals; i++)
+		{
+			randomActScores.put(String.valueOf(setOfActIDs.get(StatsUtils.randomInRange(0, setOfActIDs.size() - 1))),
+					1.0);
+		}
+
+		return randomActScores;
+	}
 
 	/*
 	 * public String getSingleNextRecommendedActivity() { return this.singleNextRecommendedActivity; }

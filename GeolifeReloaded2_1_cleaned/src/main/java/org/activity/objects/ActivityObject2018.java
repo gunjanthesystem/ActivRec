@@ -938,13 +938,27 @@ public class ActivityObject2018 implements Serializable
 				+ "distPrev" + delimiter + "durPrev" + delimiter + "gridID";
 	}
 
+	/**
+	 * Header for writing activity objc
+	 * 
+	 * @param delimiter
+	 * @return
+	 */
+	public String getHeaderForStringAllGeolifeWithNameForHeaded(String delimiter)
+	{
+
+		return activityName + delimiter + startTimestampInms + delimiter + durationInSeconds + delimiter
+				+ distanceTravelled + delimiter + startLatitude + delimiter + startLongitude + delimiter + endLatitude
+				+ delimiter + endLongitude + delimiter + avgAltitude;
+	}
+
 	public String toString()
 	{
 		if (Constant.getDatabaseName().equals("dcu_data_2"))// // ;"geolife1";// default database name, dcu_data_2";/
 			return activityName + "-" + startTimestampInms + "-" + durationInSeconds;// +" -"+startLatitude+",";
 		else if (Constant.getDatabaseName().equals("geolife1"))
-			return activityName + "-" + startTimestampInms + "-" + durationInSeconds + " -" + startLatitude + ","
-					+ startLongitude + "-" + endLatitude + "," + endLongitude + "-" + avgAltitude;
+			return activityName + "-" + startTimestampInms + "-" + durationInSeconds + " -" + startLatitude + "-"
+					+ startLongitude + "-" + endLatitude + "-" + endLongitude + "-" + avgAltitude;
 		else if (Constant.getDatabaseName().equals("gowalla1"))
 			return this.toStringAllGowalla();
 		else
@@ -960,12 +974,22 @@ public class ActivityObject2018 implements Serializable
 	//
 	// }
 
+	/**
+	 * 
+	 * @param ao2
+	 * @return haversine distance
+	 */
 	public double getDifferenceStartingGeoCoordinates(ActivityObject2018 ao2)
 	{
 		return SpatialUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(), ao2.getStartLongitude());
 
 	}
 
+	/**
+	 * 
+	 * @param ao2
+	 * @return haversine distance
+	 */
 	public double getDifferenceEndingGeoCoordinates(ActivityObject2018 ao2)
 	{
 		return SpatialUtils.haversine(endLatitude, endLongitude, ao2.getEndLatitude(), ao2.getEndLongitude());
@@ -1234,6 +1258,8 @@ public class ActivityObject2018 implements Serializable
 		// System.out.println("Activity Event Create: number of dimensions"+dimensions.size()); // Debug Info: count the
 		// occurence of this in output to see if the number of activity events generated is correct:
 		// checked(on 27 June 1pm) 887 for Tessa and Yakub
+
+		this.timeZoneId = ZoneId.of("UTC");
 		System.out.println("new ao=\n" + this.toString() + "\nagain=\n" + this.toStringAll() + "\n");
 	}
 

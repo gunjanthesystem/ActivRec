@@ -41,7 +41,15 @@ public class VerbosityConstants
 	public static final boolean verboseRankScoreCalcToConsole = false;// false;
 	public static final boolean verboseEvaluationMetricsToConsole = false;// true;// true;// false;
 	public static final boolean verboseCombinedEDist = true;
+	/**
+	 * Primarily for correlated
+	 * <p>
+	 * Make sure written file DistranceDistribution.csv has the following indexOfUserID = 0,indexOfNormAED = 5,
+	 * indexOfNormFED = 6, indexOfTotalDis = 7, indexOfRawAED = 8, indexOfRawFED = 9,
+	 */
+	public static final boolean verboseDistDistribution = true; // SWITCH_Nov20
 	public static final boolean verboseCandFilter = false;
+	public static final boolean verboseMSD = true;
 
 	/**
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv
@@ -57,7 +65,8 @@ public class VerbosityConstants
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
-	public static final boolean WriteRTVerseNormalisationLogs = false;
+	public static final boolean WriteRTVerseNormalisationLogs = true;
+	public static final boolean WriteCandAEDDiffs = false;
 	/**
 	 * Write each cand of each RT in separate line
 	 */

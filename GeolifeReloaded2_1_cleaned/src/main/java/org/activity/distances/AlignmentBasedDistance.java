@@ -12,9 +12,10 @@ import java.util.Map;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
-import org.activity.constants.Enums.GowallaFeatures;
+import org.activity.constants.Enums.GowGeoFeature;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
+import org.activity.controller.CustodianOfFeatWts;
 import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
@@ -46,10 +47,10 @@ public class AlignmentBasedDistance
 	// double costReplaceDuration = 1;//0.2d;
 	// double costReplaceActivityName = 2;
 
-	EnumMap<GowallaFeatures, Double> featureWeightMap;// added on April 17 2018
+	EnumMap<GowGeoFeature, Double> featureWeightMap;// added on April 17 2018
 
 	protected final PrimaryDimension primaryDimension;
-	private boolean shouldComputeFeatureLevelDistance;
+	private Boolean shouldComputeFeatureLevelDistance;// from boolean to Boolean on Nov 2018 so that def val is null
 	double wtActivityName;// = 3d;
 	double wtStartTime;// = 1d;// 0.6d;
 	double wtDuration;// = 0.5d;// 0.2d;
@@ -91,9 +92,16 @@ public class AlignmentBasedDistance
 	double durationFromPrevTolerance;
 	double distanceFromPrevTolerance;
 
+	// Gowalla and Geolife common features
+	Boolean useActivityNameInFED, useStartTimeInFED;
+
 	// Gowalla features to use in feature level of edit distance
-	boolean useActivityNameInFED, useStartTimeInFED, useLocationInFED, usePopularityInFED, useDistFromPrevInFED,
+	Boolean /* useActivityNameInFED, useStartTimeInFED, */ useLocationInFED, usePopularityInFED, useDistFromPrevInFED,
 			useDurationFromPrevInFED, useDistFromNextInFED, useDurationFromNextInFED;
+
+	// Geolife feature to use in feature level of edit distance
+	Boolean useDurationInFED, useDistTravelledInFED, useStartGeoInFED, useEndGeoInFED, useAvgAltitudeInFED;
+	// ActNameF, StartTimeF, DurationF, DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF;
 
 	int numberOfInsertions = 0;
 	int numberOfDeletions = 0;
@@ -118,10 +126,11 @@ public class AlignmentBasedDistance
 	 */
 	public AlignmentBasedDistance(PrimaryDimension primaryDimension)
 	{
-		setGowallaFeaturesToUseInDistance();
+		setFeaturesToUseInDistance();
 		setWeightsAndCosts(); // VERY IMPORTANT
 		this.primaryDimension = primaryDimension;
 		setShouldComputeFeatureLevelDistance();
+
 		if (!Constant.useTolerance)// == false)
 		{
 			setTolerancesToZero();
@@ -136,7 +145,7 @@ public class AlignmentBasedDistance
 	 * 
 	 * @return
 	 */
-	public EnumMap<GowallaFeatures, Double> getFeatureWeightMap()
+	public EnumMap<GowGeoFeature, Double> getFeatureWeightMap()
 	{
 		return featureWeightMap;
 	}
@@ -147,7 +156,7 @@ public class AlignmentBasedDistance
 	private void setShouldComputeFeatureLevelDistance()
 	{
 		shouldComputeFeatureLevelDistance = true;
-		if ((1 - Constant.getDynamicEDAlpha()) == 0)// .dynamicEDAlpha
+		if (Constant.getDynamicEDAlpha() == 1)// .dynamicEDAlpha
 		{
 			shouldComputeFeatureLevelDistance = false;
 		}
@@ -171,18 +180,60 @@ public class AlignmentBasedDistance
 
 	/**
 	 * Uses static values from Constant class
+	 * 
+	 * <p>
+	 * previously names as setGowallaFeaturesToUseInDistance
 	 */
-	private void setGowallaFeaturesToUseInDistance()
+	private void setFeaturesToUseInDistance()
 	{
+		String databaseName = Constant.getDatabaseName();
+
 		useActivityNameInFED = Constant.useActivityNameInFED;
 		useStartTimeInFED = Constant.useStartTimeInFED;
-		useLocationInFED = Constant.useLocationInFED;
-		usePopularityInFED = Constant.usePopularityInFED;
-		useDistFromPrevInFED = Constant.useDistFromPrevInFED;
-		useDurationFromPrevInFED = Constant.useDurationFromPrevInFED;
-		useDistFromNextInFED = Constant.useDistFromNextInFED;
-		useDurationFromNextInFED = Constant.useDurationFromNextInFED;
 
+		if (databaseName.equals("gowalla1"))
+		{
+			useLocationInFED = Constant.useLocationInFED;
+			usePopularityInFED = Constant.usePopularityInFED;
+			useDistFromPrevInFED = Constant.useDistFromPrevInFED;
+			useDurationFromPrevInFED = Constant.useDurationFromPrevInFED;
+			useDistFromNextInFED = Constant.useDistFromNextInFED;
+			useDurationFromNextInFED = Constant.useDurationFromNextInFED;
+		}
+
+		if (databaseName.equals("geolife1"))
+		{
+			useDurationInFED = Constant.useDurationInFED;
+			useDistTravelledInFED = Constant.useDistTravelledInFED;
+			useStartGeoInFED = Constant.useStartGeoInFED;
+			useEndGeoInFED = Constant.useEndGeoInFED;
+			useAvgAltitudeInFED = Constant.useAvgAltitudeInFED;
+		}
+	}
+
+	/**
+	 * 
+	 * @param givenWtActivityName
+	 * @param givenWtStartTime
+	 * @param givenWtDuration
+	 * @param givenWtDistanceTravelled
+	 * @param givenWtStartGeo
+	 * @param givenWtEndGeo
+	 * @param givenWtAvgAltitude
+	 * @since 20 Nov 2018
+	 */
+	public void setGivenWeightsForGeolifeFeatures(double givenWtActivityName, double givenWtStartTime,
+			double givenWtDuration, double givenWtDistanceTravelled, double givenWtStartGeo, double givenWtEndGeo,
+			double givenWtAvgAltitude)
+	{
+		wtActivityName = givenWtActivityName;
+		wtStartTime = givenWtStartTime;
+
+		wtDuration = givenWtDuration;
+		wtDistanceTravelled = givenWtDistanceTravelled;// //1d;
+		wtStartGeo = givenWtStartGeo;
+		wtEndGeo = givenWtEndGeo;
+		wtAvgAltitude = givenWtAvgAltitude;
 	}
 
 	/**
@@ -192,14 +243,52 @@ public class AlignmentBasedDistance
 	public void setWeightsAndCosts()
 	{
 		System.out.println("setWeightsAndCosts()");
-		wtActivityName = 2d;// 3d;//gowalla
-		wtStartTime = 1d;// 0.8d;// 0.6d;//gowalla
 
-		wtDuration = 0.5d;// 0.2d;
-		wtDistanceTravelled = 3d;// //1d;
-		wtStartGeo = 0.3d;
-		wtEndGeo = 0.3d;
-		wtAvgAltitude = 0.2d;
+		if (Constant.searchForOptimalFeatureWts)
+		{
+			wtActivityName = CustodianOfFeatWts.givenWtActivityName;
+			wtStartTime = CustodianOfFeatWts.givenWtStartTime;
+			wtDuration = CustodianOfFeatWts.givenWtDuration;
+			wtDistanceTravelled = CustodianOfFeatWts.givenWtDistanceTravelled;
+			wtStartGeo = CustodianOfFeatWts.givenWtStartGeo;
+			wtEndGeo = CustodianOfFeatWts.givenWtEndGeo;
+			wtAvgAltitude = CustodianOfFeatWts.givenWtAvgAltitude;
+		}
+		else
+		{
+			// Start of temp disabled Nov 21 2018
+			// wtActivityName = 2d;// 3d;//gowalla
+			// wtStartTime = 1d;// 0.8d;// 0.6d;//gowalla
+			//
+			// wtDuration = 0.5d;// 0.2d;
+			// wtDistanceTravelled = 3d;// //1d;
+			// wtStartGeo = 0.3d;
+			// wtEndGeo = 0.3d;
+			// wtAvgAltitude = 0.2d;
+			// End of temp disabled Nov 21 2018
+
+			// temp best wt added Nov 21 2018
+			// wtActivityName = 2d;// 3d;//gowalla
+			// wtStartTime = 1d;// 0.8d;// 0.6d;//gowalla
+			//
+			// wtDuration = 0.5d;// 0.2d;
+			// wtDistanceTravelled = 3d;// //1d;
+			// wtStartGeo = 0.3d;
+			// wtEndGeo = 0.3d;
+			// wtAvgAltitude = 0.2d;
+
+			// start of added on Nov 25
+			wtActivityName = 2d;// 3d;//gowalla
+			wtStartTime = 1d;// 0.8d;// 0.6d;//gowalla
+
+			wtDuration = 1d;// 0.2d;
+			wtDistanceTravelled = 1d;// //1d;
+			wtStartGeo = 1d;
+			wtEndGeo = 1d;
+			wtAvgAltitude = 1d;
+			// end of added on Nov 25
+
+		}
 
 		wtLocation = 1d;// gowalla
 		wtLocPopularity = 1d;// gowalla
@@ -210,12 +299,63 @@ public class AlignmentBasedDistance
 		wtDistanceFromNext = 1d;
 		wtDurationFromNext = 1d;
 
+		EnumMap<GowGeoFeature, Double> featureWeightMap = new EnumMap<>(GowGeoFeature.class);
+
 		switch (Constant.getDatabaseName())
 		{
 		case "geolife1":
-			wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled
-					+ wtStartGeo + wtEndGeo + +wtAvgAltitude, 4);
+			// wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration + wtDistanceTravelled
+			// + wtStartGeo + wtEndGeo + wtAvgAltitude, 4);break;
+			// start of added on 18 Nov 2018
+			wtFullActivityObject = 0;
+
+			if (this.useActivityNameInFED)
+			{
+				wtFullActivityObject += wtActivityName;
+				featureWeightMap.put(GowGeoFeature.ActNameF, wtActivityName);
+			}
+			if (this.useStartTimeInFED)
+			{
+				wtFullActivityObject += wtStartTime;
+				featureWeightMap.put(GowGeoFeature.StartTimeF, wtStartTime);
+			}
+			if (this.useDurationInFED)
+			{
+				wtFullActivityObject += wtDuration;
+				featureWeightMap.put(GowGeoFeature.DurationF, wtDuration);
+			}
+
+			if (this.useDistTravelledInFED)
+			{
+				wtFullActivityObject += wtDistanceTravelled;
+				featureWeightMap.put(GowGeoFeature.DistTravelledF, wtDistanceTravelled);
+			}
+
+			if (this.useStartGeoInFED)
+			{
+				wtFullActivityObject += wtStartGeo;
+				featureWeightMap.put(GowGeoFeature.StartGeoF, wtStartGeo);
+			}
+
+			if (this.useEndGeoInFED)
+			{
+				wtFullActivityObject += wtEndGeo;
+				featureWeightMap.put(GowGeoFeature.EndGeoF, wtEndGeo);
+			}
+
+			if (this.useAvgAltitudeInFED)
+			{
+				wtFullActivityObject += wtAvgAltitude;
+				featureWeightMap.put(GowGeoFeature.AvgAltitudeF, wtAvgAltitude);
+			}
+
+			wtFullActivityObject = StatsUtils.round(wtFullActivityObject, 4);
+			// wtActivityName/* + wtStartTime + wtLocation + wtLocPopularity */ + wtDistanceFromPrev +
+			// wtDurationFromPrev,4);
+			this.featureWeightMap = featureWeightMap;
 			break;
+		// end of added on 18 Nov 2018
+
 		case "dcu_data_2":
 			wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtDuration, 4);
 			break;
@@ -225,50 +365,53 @@ public class AlignmentBasedDistance
 			// $$wtFullActivityObject = StatsUtils.round(wtActivityName + wtStartTime + wtLocation +
 			// wtLocPopularity, 4);
 			wtFullActivityObject = 0;
-			EnumMap<GowallaFeatures, Double> featureWeightMap = new EnumMap<>(GowallaFeatures.class);
+			// EnumMap<GowGeoFeature, Double> featureWeightMap = new EnumMap<>(GowGeoFeature.class);
 
 			if (this.useActivityNameInFED)
 			{
 				wtFullActivityObject += wtActivityName;
-				featureWeightMap.put(GowallaFeatures.ActNameF, wtActivityName);
+				featureWeightMap.put(GowGeoFeature.ActNameF, wtActivityName);
 			}
 			if (this.useStartTimeInFED)
 			{
 				wtFullActivityObject += wtStartTime;
-				featureWeightMap.put(GowallaFeatures.StartTimeF, wtStartTime);
+				featureWeightMap.put(GowGeoFeature.StartTimeF, wtStartTime);
 			}
 			if (this.useLocationInFED)
 			{
 				wtFullActivityObject += wtLocation;
-				featureWeightMap.put(GowallaFeatures.LocationF, wtLocation);
+				featureWeightMap.put(GowGeoFeature.LocationF, wtLocation);
 			}
 
 			if (this.usePopularityInFED)
 			{
 				wtFullActivityObject += wtLocPopularity;
-				featureWeightMap.put(GowallaFeatures.PopularityF, wtLocPopularity);
+				featureWeightMap.put(GowGeoFeature.PopularityF, wtLocPopularity);
 			}
 
 			if (this.useDistFromPrevInFED)
 			{
 				wtFullActivityObject += wtDistanceFromPrev;
-				featureWeightMap.put(GowallaFeatures.DistFromPrevF, wtDistanceFromPrev);
+				featureWeightMap.put(GowGeoFeature.DistFromPrevF, wtDistanceFromPrev);
 			}
 
 			if (this.useDurationFromPrevInFED)
 			{
 				wtFullActivityObject += wtDurationFromPrev;
-				featureWeightMap.put(GowallaFeatures.DurationFromPrevF, wtDurationFromPrev);
+				featureWeightMap.put(GowGeoFeature.DurationFromPrevF, wtDurationFromPrev);
 			}
 
 			if (this.useDistFromNextInFED)
 			{
 				wtFullActivityObject += wtDistanceFromNext;
+				PopUps.printTracedErrorMsgWithExit("Not implemented for useDistFromNextInFED");
+				// featureWeightMap.put(GowGeoFeature.di, wtDurationFromPrev);
 			}
 
 			if (this.useDurationFromNextInFED)
 			{
 				wtFullActivityObject += wtDurationFromNext;
+				PopUps.printTracedErrorMsgWithExit("Not implemented for useDurationFromNextInFED");
 			}
 			wtFullActivityObject = StatsUtils.round(wtFullActivityObject, 4);
 			// wtActivityName/* + wtStartTime + wtLocation + wtLocPopularity */ + wtDistanceFromPrev +
@@ -291,6 +434,11 @@ public class AlignmentBasedDistance
 		costInsertActivityObject = defaultCostInsert * wtFullActivityObject; // 1 cost of insert operation 4.5
 		costDeleteActivityObject = defaultCostDelete * wtFullActivityObject; // 1 cost of delete operation 4.5
 		costReplaceActivityObject = defaultCostReplace * wtFullActivityObject; // 2 cost of replace operation 9
+
+		StringBuilder sb = new StringBuilder("wtFullActivityObject = " + wtFullActivityObject
+				+ "\nfeatureWeightMap.size()" + featureWeightMap.size() + "\n");
+		featureWeightMap.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey() + "--" + e.getValue() + "\n"));
+		System.out.println("Debug18Nov2018: " + sb.toString());
 	}
 
 	/**
@@ -349,7 +497,7 @@ public class AlignmentBasedDistance
 	 * 
 	 * @return
 	 */
-	public String getAllWeightsOfFeatures()
+	public String getAllWeightsOfFeaturesForPrint()
 	{
 		String allWts = "\nWt of Activity Name:" + wtActivityName + "\nWt of Start Time:" + wtStartTime
 				+ "\nWt of Duration:" + wtDuration + "\nWt of Distance Travelled:" + wtDistanceTravelled
@@ -393,8 +541,9 @@ public class AlignmentBasedDistance
 	public void setTolerancesToDefault()
 	{
 		System.out.println("Setting default tolerances");
+		String databaseName = Constant.getDatabaseName();
 
-		if (Constant.getDatabaseName().equals("geolife1"))
+		if (databaseName.equals("geolife1"))
 		{
 			startTimeToleranceInSeconds = 120; // in seconds
 			durationToleranceInSeconds = 120; // in seconds
@@ -404,7 +553,7 @@ public class AlignmentBasedDistance
 			avgAltTolerance = 5d;// feets since raw data is in this unit
 		}
 
-		if (Constant.getDatabaseName().equals("gowalla1"))
+		else if (databaseName.equals("gowalla1"))
 		{
 			startTimeToleranceInSeconds = 3600; // in seconds
 			durationToleranceInSeconds = 3600; // //actually not needed , in seconds
@@ -426,6 +575,10 @@ public class AlignmentBasedDistance
 			// added on Mar 25 2018
 			distanceFromPrevTolerance = 0;// 200;// meters as data in that unit.
 			durationFromPrevTolerance = 0;// 130;// sec
+		}
+		else
+		{
+			PopUps.printTracedErrorMsg("Unknown database:" + databaseName + " Tolerances not set.");
 		}
 	}
 
@@ -539,8 +692,8 @@ public class AlignmentBasedDistance
 	 *            user for which recommendation is being done
 	 * @return (between 0 and 1)
 	 */
-	public final double getCaseBasedV1SimilarityDCUData(ActivityObject2018 activityObject1, ActivityObject2018 activityObject2,
-			int userID)
+	public final double getCaseBasedV1SimilarityDCUData(ActivityObject2018 activityObject1,
+			ActivityObject2018 activityObject2, int userID)
 	{
 		if (VerbosityConstants.verbose)
 		{
@@ -668,18 +821,19 @@ public class AlignmentBasedDistance
 	 *         the two compared act objs ao1 and ao2
 	 * @since April 14 2018
 	 */
-	public EnumMap<GowallaFeatures, Double> getFeatureLevelDifference(ActivityObject2018 ao1, ActivityObject2018 ao2)
+	public EnumMap<GowGeoFeature, Double> getFeatureLevelDiffsBetweenAOs(ActivityObject2018 ao1, ActivityObject2018 ao2)
 	{
 		double dfeat = 0;
-		EnumMap<GowallaFeatures, Double> featureDiffs = null;
+		EnumMap<GowGeoFeature, Double> featureDiffs = null;
+		String databaseName = Constant.getDatabaseName();
 		// if(ao1.getStartTimestamp().getTime() != (ao2.getStartTimestamp().getTime()) )//is wrong since its comparing
 		// timestamps and not time of days...however, results for our
 		// experiments do not show any visible difference in results { dfeat+=costReplaceStartTime; }
-		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
+		if (databaseName.equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
 		{
 			// $$dfeat = getFeatureLevelDistanceGowallaPD(ao1, ao2);//disabled on Feb 23 2018
 			// dfeat = getFeatureLevelDistanceGowallaPD25Feb2018(ao1, ao2);
-			featureDiffs = getFeatureLevelDifferenceGowallaPD13Apr2018(ao1, ao2);
+			featureDiffs = getFeatLevelDiffsGowallaPD13Apr2018(ao1, ao2);
 			//// Sanity Checked pass OK 26 Feb 2018 Start
 			// double dfeatTest = getFeatureLevelDistanceGowallaPD23Feb2018(ao1, ao2);
 			// boolean sanityCheckPassed = Sanity.eq(dfeat, dfeatTest,
@@ -688,10 +842,21 @@ public class AlignmentBasedDistance
 			// Constant.getCommonPath() + "SanityCheck25FebgetFeatureLevelDistanceGowallaPD25Feb2018.txt");
 			// Sanity Checked pass OK 26 Feb 2018 End
 		}
+		else if (databaseName.equals("geolife1"))
+		{
+			featureDiffs = getFeatLevelDiffsGeolifePD18Nov2018(ao1, ao2);
+		}
 		else
 		{
 			PopUps.showError("Error: AlignmentBasedDistance.getFeatureLevelDifference() NOT IMPLEMENTED for database: "
 					+ Constant.getDatabaseName());
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			StringBuilder sb = new StringBuilder("\nfeatureDiffMap=\n");
+			featureDiffs.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey() + "--" + e.getValue() + "\n"));
+			System.out.println(sb.toString());
 		}
 		return featureDiffs;
 	}
@@ -3921,6 +4086,121 @@ public class AlignmentBasedDistance
 		}
 	}
 
+	///
+	/**
+	 * Fork of getFeatureLevelDifferenceGowallaPD13Apr2018() for Geolife
+	 * <p>
+	 * Store differences of each features (instead of normalised computed distances from differences), normalise it
+	 * later when we values for all cands for a given RT
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @return map of differences of Gowalla features
+	 *         <p>
+	 *         EnumMap{GowallaFeatures, Double}, map of Gowalla features and corresonding feature's difference between
+	 *         the two compared act objs ao1 and ao2
+	 * @since November 18 2018
+	 */
+	public EnumMap<GowGeoFeature, Double> getFeatLevelDiffsGeolifePD18Nov2018(ActivityObject2018 ao1,
+			ActivityObject2018 ao2)
+	{
+		EnumMap<GowGeoFeature, Double> featureDiffMap = new EnumMap<>(GowGeoFeature.class);
+		// StringBuilder sbLog = new StringBuilder();
+
+		// useActivityNameInFED
+		// useStartTimeInFED
+		// useDurationInFED
+		// useDistTravelledInFED
+		// useStartGeoInFED
+		// useEndGeoInFED
+		// useAvgAltitudeInFED
+
+		if (Constant.getDatabaseName().equals("geolife1"))
+		{
+			if (useActivityNameInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+				{
+					double diffActID;
+					if (ao1.getActivityID() != ao2.getActivityID())// incorrect version before Mar 21 2018
+					{
+						diffActID = 1;
+					}
+					else
+					{
+						diffActID = 0;
+					}
+					featureDiffMap.put(GowGeoFeature.ActNameF, diffActID);
+				}
+			}
+
+			if (useStartTimeInFED)
+			{
+				// if (primaryDimension.equals(PrimaryDimension.) == false)
+				{
+					featureDiffMap.put(GowGeoFeature.StartTimeF,
+							(double) DateTimeUtils.getTimeDiffInSecondsZoned(ao1.getStartTimestampInms(),
+									ao2.getStartTimestampInms(), ao1.getTimeZoneId(), ao2.getTimeZoneId()));
+
+					if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
+					{
+						WToFile.appendLineToFileAbs("Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+								+ ao2.getLocationIDs(',') + "\n",
+								Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+					}
+				}
+			}
+
+			if (useDurationInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.Duration) == false)
+				{
+					featureDiffMap.put(GowGeoFeature.DurationF,
+							(double) Math.abs(ao2.getDurationInSeconds() - ao1.getDurationInSeconds()));
+				}
+			}
+
+			if (useDistTravelledInFED)
+			{
+
+				featureDiffMap.put(GowGeoFeature.DistTravelledF,
+						(double) Math.abs(ao1.getDistanceTravelled() - ao2.getDistanceTravelled()));
+
+			}
+
+			if (useStartGeoInFED)
+			{
+				featureDiffMap.put(GowGeoFeature.StartGeoF,
+						(double) Math.abs(ao1.getDifferenceStartingGeoCoordinates(ao2)));
+
+			}
+
+			if (useEndGeoInFED)
+			{
+				featureDiffMap.put(GowGeoFeature.EndGeoF,
+						(double) Math.abs(ao1.getDifferenceEndingGeoCoordinates(ao2)));
+
+			}
+
+			if (useAvgAltitudeInFED)
+			{
+
+				featureDiffMap.put(GowGeoFeature.AvgAltitudeF, Math
+						.abs(Double.parseDouble(ao1.getAvgAltitude()) - Double.parseDouble((ao2.getAvgAltitude()))));
+
+			}
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: getFeatureLevelDifferenceGeolifePD18Nov2018() called for database: "
+							+ Constant.getDatabaseName());
+		}
+		return featureDiffMap;
+	}
+
+	///
+
 	/**
 	 * Fork of getFeatureLevelDistanceGowallaPD13Apr2018().
 	 * <p>
@@ -3935,17 +4215,17 @@ public class AlignmentBasedDistance
 	 *         the two compared act objs ao1 and ao2
 	 * @since April 13 2018
 	 */
-	public EnumMap<GowallaFeatures, Double> getFeatureLevelDifferenceGowallaPD13Apr2018(ActivityObject2018 ao1,
+	public EnumMap<GowGeoFeature, Double> getFeatLevelDiffsGowallaPD13Apr2018(ActivityObject2018 ao1,
 			ActivityObject2018 ao2)
 	{
-		EnumMap<GowallaFeatures, Double> featureDiffMap = new EnumMap<>(GowallaFeatures.class);
+		EnumMap<GowGeoFeature, Double> featureDiffMap = new EnumMap<>(GowGeoFeature.class);
 		// StringBuilder sbLog = new StringBuilder();
 
 		if (Constant.getDatabaseName().equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
 		{
 			if (useStartTimeInFED)
 			{
-				featureDiffMap.put(GowallaFeatures.StartTimeF,
+				featureDiffMap.put(GowGeoFeature.StartTimeF,
 						(double) DateTimeUtils.getTimeDiffInSecondsZoned(ao1.getStartTimestampInms(),
 								ao2.getStartTimestampInms(), ao1.getTimeZoneId(), ao2.getTimeZoneId()));
 
@@ -3994,7 +4274,7 @@ public class AlignmentBasedDistance
 							diffLoc = 0;// even if one location matches, location distance is 0
 						}
 					}
-					featureDiffMap.put(GowallaFeatures.LocationF, diffLoc);
+					featureDiffMap.put(GowGeoFeature.LocationF, diffLoc);
 					// End of added on 10 Aug 2018
 				}
 
@@ -4012,27 +4292,27 @@ public class AlignmentBasedDistance
 					{
 						diffActID = 0;
 					}
-					featureDiffMap.put(GowallaFeatures.ActNameF, diffActID);
+					featureDiffMap.put(GowGeoFeature.ActNameF, diffActID);
 				}
 			}
 
 			if (usePopularityInFED)
 			{
-				featureDiffMap.put(GowallaFeatures.PopularityF,
+				featureDiffMap.put(GowGeoFeature.PopularityF,
 						(double) Math.abs(ao1.getCheckins_count() - ao2.getCheckins_count()));
 			}
 
 			if (useDistFromPrevInFED)
 			{
 				double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() - ao2.getDistanceInMFromPrev());
-				featureDiffMap.put(GowallaFeatures.DistFromPrevF, diffOfDistFromPrev);
+				featureDiffMap.put(GowGeoFeature.DistFromPrevF, diffOfDistFromPrev);
 			}
 
 			if (useDurationFromPrevInFED)
 			{
 				double diffOfDurFromPrev = FastMath
 						.abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
-				featureDiffMap.put(GowallaFeatures.DurationFromPrevF, diffOfDurFromPrev);
+				featureDiffMap.put(GowGeoFeature.DurationFromPrevF, diffOfDurFromPrev);
 			}
 		}
 		else

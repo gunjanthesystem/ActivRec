@@ -235,11 +235,11 @@ public class GowallaPreProcessorUtils
 			}
 
 			System.out.println("Num of windows = " + numOfWindows);
-			WToFile.writeMapToNewFile(userNumOfVertFreqEpisodesCount, "User,NumOfVFEpisodes", ",",
+			WToFile.writeMapToFile(userNumOfVertFreqEpisodesCount, "User,NumOfVFEpisodes", ",",
 					pathToWrite + "userNumOfVertFreqEpisodesCount.csv");
-			WToFile.writeMapToNewFile(userNumOfIgnoredWindowsCount, "User,NumOfIgnoredWindows", ",",
+			WToFile.writeMapToFile(userNumOfIgnoredWindowsCount, "User,NumOfIgnoredWindows", ",",
 					pathToWrite + "userNumOfIgnoredWindowsCount.csv");
-			WToFile.writeMapToNewFile(userTotalWindowsCount, "User,TotalNumOfWindows", ",",
+			WToFile.writeMapToFile(userTotalWindowsCount, "User,TotalNumOfWindows", ",",
 					pathToWrite + "userTotalWindowsCount.csv");
 			WToFile.writeMapOfListToNewFileLongFormat(userWindowTimeDiffInMins, "User,TimeDiffInMins", ",",
 					pathToWrite + "userWindowTimeDiff.csv");
@@ -354,7 +354,7 @@ public class GowallaPreProcessorUtils
 			System.out.println("countOfLines=" + countOfLines);
 			br.close();
 
-			WToFile.writeMapToNewFile(userNumOfVertFreqEpisodesCount, "User,VFECount", ",",
+			WToFile.writeMapToFile(userNumOfVertFreqEpisodesCount, "User,VFECount", ",",
 					"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/April11/");
 		}
 

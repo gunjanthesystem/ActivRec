@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
-import org.activity.constants.Enums.GowallaFeatures;
+import org.activity.constants.Enums.GowGeoFeature;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WToFile;
@@ -610,7 +610,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		{
 			distanceTotal = /* dAct + dFeat; */
 					combineActAndFeatLevelDistance(dAct, dFeat, activityObjects1.size(), activityObjects2.size(),
-							EDAlpha);
+							EDAlpha, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
 		}
 		else
 		{
@@ -904,7 +904,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 			}
 			distanceTotal = /* dAct + dFeat; */
 					combineActAndFeatLevelDistance(dAct, dFeat, activityObjects1.size(), activityObjects2.size(),
-							EDAlpha);
+							EDAlpha, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelineId);
 		}
 		else
 		{
@@ -919,6 +919,15 @@ public class HJEditDistance extends AlignmentBasedDistance
 			else
 			{
 				distanceTotal = dAct + dFeat;
+			}
+
+			if (VerbosityConstants.verboseCombinedEDist || VerbosityConstants.verboseDistDistribution)
+			{
+				String infoHeader = userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candidateTimelineId;
+				WToFile.appendLineToFileAbs(
+						infoHeader + "," + dAct + "," + dFeat + "," + distanceTotal + "," + dAct + "," + dFeat + ","
+								+ activityObjects1.size() + "," + activityObjects2.size() + "\n",
+						Constant.getCommonPath() + "DistanceDistribution.csv");// primarily for correlated analysis
 			}
 			// System.out.println("distanceTotal = dAct + dFeat = " + distanceTotal + "=" + dAct + "+" + dFeat);
 		}
@@ -1029,12 +1038,12 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 *         Distance, act level edit distance> /
 	 * @since April 13 2018
 	 */
-	public final Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> getActEditDistWithTrace_FeatDiffs_13April2018(
+	public final Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>> getActEditDistWithTrace_FeatDiffs_13April2018(
 			ArrayList<ActivityObject2018> actObjs1Original, ArrayList<ActivityObject2018> actObjs2Original,
 			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		double actED = 0;
-		List<EnumMap<GowallaFeatures, Double>> featDiffs = new ArrayList<>();
+		List<EnumMap<GowGeoFeature, Double>> featDiffs = new ArrayList<>();
 		boolean shouldComputeFeatureLevelDiffs = this.getShouldComputeFeatureLevelDistance();
 		// max value of feature diff over all AOs (horizontally) for this cand timeline (wrt corresonding AO in current
 		// timeline)EnumMap<GowallaFeatures, Double> maxFeatureDiffs = new EnumMap<>(GowallaFeatures.class);
@@ -1058,7 +1067,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		if (Constant.useFeatureDistancesOfAllActs && shouldComputeFeatureLevelDiffs)
 		{
 			// dFeat = getFeatureLevelEditDistanceAllActsV2(activityObjects1, activityObjects2);
-			featDiffs = getFeatureLevelDiffsAllActsV2(actObjs1, actObjs2);
+			featDiffs = getFeatureLevelDiffsBetweenAllAOsV2(actObjs1, actObjs2);
 		}
 		else
 		{// empty one, which will be filler iteratively over matched AOs
@@ -1112,7 +1121,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 					// i.e., feature distance of only N (matched) act objs
 					// System.out.println("dAct=" + dAct);System.out.println("N matched");
 					// System.out.println("coordOfAO1="+coordOfAO1+" coordOfAO2="+coordOfAO2);
-					featDiffs.add(getFeatureLevelDifference(actObjs1.get(coordOfAO1), actObjs2.get(coordOfAO2)));
+					featDiffs.add(getFeatureLevelDiffsBetweenAOs(actObjs1.get(coordOfAO1), actObjs2.get(coordOfAO2)));
 				}
 			}
 		} // end of for over DINS trace
@@ -1172,7 +1181,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		// Start of temp
 		// System.out.println("levenshteinDistance.getFirst() = " + levenshteinDistance.getFirst() + " actED= " + actED
 		// + " featDiffs.size()=" + featDiffs.size());
-		Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> result = new Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>>(
+		Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>> result = new Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>(
 				levenshteinDistance.getFirst(), actED, featDiffs);
 
 		// if (result == null)
@@ -1353,6 +1362,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 	}
 
 	/**
+	 * Called for each candidate timelines
+	 * <p>
 	 * Summary (e.g. max) of feature diff for each of the GowallaFeature. In other words, max diff value for each
 	 * feature over corresponding pairwise comparison of each act obj of the two timelines.
 	 * <p>
@@ -1362,46 +1373,72 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * 
 	 * @param featureDifferencesList
 	 *            list of enummaps, where each enumMap contains pairs {feature,diffWithCorresondingAOInCurrentTimeline}
+	 * @param userAtRecomm
+	 *            for logging only
+	 * @param dateAtRecomm
+	 *            for logging only
+	 * @param timeAtRecomm
+	 *            for logging only
+	 * @param candId
+	 *            for logging only
+	 * 
 	 * @return one enummap which contains pairs {feature,summaryStatForThatFeature}
 	 * @since April 16 2018
 	 */
-	public static EnumMap<GowallaFeatures, DoubleSummaryStatistics> getSummaryStatsForEachFeatureDiffOverList(
-			List<EnumMap<GowallaFeatures, Double>> featureDifferencesList)
+	public static EnumMap<GowGeoFeature, DoubleSummaryStatistics> getSummaryStatsForEachFeatureDiffOverListOfAOsInACand(
+			List<EnumMap<GowGeoFeature, Double>> featureDifferencesList, String userAtRecomm, String dateAtRecomm,
+			String timeAtRecomm, String candId)
 	{
 		// Max feature diff for each of the GowallaFeature. In other words, max diff value for each feature over
 		// corresponding pairwise comparison of each act obj of the two timelines
-		EnumMap<GowallaFeatures, DoubleSummaryStatistics> summaryFeatureDiffOverAllActs = new EnumMap<>(
-				GowallaFeatures.class);
+		EnumMap<GowGeoFeature, DoubleSummaryStatistics> summaryFeatureDiffOverAllActsInACand = new EnumMap<>(
+				GowGeoFeature.class);
+
+		// added 23 Nov 2018 NOT USED AT THE MOMENT
+		// EnumMap<GowGeoFeature, DoubleSummaryStatistics> summaryOfSquaredFeatDiffOverAllActsInACand = new EnumMap<>(
+		// GowGeoFeature.class);
 		// EnumMap<GowallaFeatures, Double> minFeatureDiffOverAllActs = new EnumMap<>(GowallaFeatures.class);
 
 		// Assuming that all maps in the list contain the same set of keys (i.e., same GowallaFeatures)
-		Set<GowallaFeatures> listOfGowallaFeatures = featureDifferencesList.get(0).keySet();
+		Set<GowGeoFeature> listOfGowallaFeatures = featureDifferencesList.get(0).keySet();
 
-		for (GowallaFeatures gowallaFeature : listOfGowallaFeatures)
+		for (GowGeoFeature gowallaFeature : listOfGowallaFeatures)
 		{
 			DoubleSummaryStatistics summaryStatsForThisFeaturesOverList = featureDifferencesList.stream()
 					.map(listEntry -> listEntry.get(gowallaFeature)).mapToDouble(Double::doubleValue)
 					.summaryStatistics();
 
-			summaryFeatureDiffOverAllActs.put(gowallaFeature, summaryStatsForThisFeaturesOverList);
+			summaryFeatureDiffOverAllActsInACand.put(gowallaFeature, summaryStatsForThisFeaturesOverList);
 			// summaryStatsForThisFeaturesOverList.maxFeatureDiffOverAllActs.put(gowallaFeature,
 			// summaryStatsForThisFeaturesOverList.getMax());
 			// minFeatureDiffOverAllActs.put(gowallaFeature, summaryStatsForThisFeaturesOverList.getMin());
+
+			// DoubleSummaryStatistics summaryStatsForThisSquaredFeaturesOverList = featureDifferencesList.stream()
+			// .map(listEntry -> listEntry.get(gowallaFeature)).mapToDouble(Double::doubleValue)
+			// .map(v -> Math.pow(v, 2)).summaryStatistics();
+			// summaryOfSquaredFeatDiffOverAllActsInACand.put(gowallaFeature,
+			// summaryStatsForThisSquaredFeaturesOverList);
+
 		}
 
 		// Start of sanity check
-		if (false)// Sanity Checked Okay on 22 April 2018
+		if (false)// Sanity Checked Okay on 22 April 2018//sanity checked okay on 25 Nov 2018
 		{
 			String debugFileName = Constant.getCommonPath()
 					+ "DebugApril16_getSummaryStatsForEachFeatureDiffOverList.csv";
-			WToFile.appendLineToFileAbs("\n----------\n", debugFileName);
+			WToFile.appendLineToFileAbs(
+					"\n----------\n" + userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candId + "\n",
+					debugFileName);
 			WToFile.writeListOfMap2(featureDifferencesList, debugFileName, "FeatureDiffsListKey-Value", ",", "-", true);
-			WToFile.appendLineToFileAbs("\n", debugFileName);
-			WToFile.writeMapToNewFile(summaryFeatureDiffOverAllActs, "GowallaFeature,SummaryStat", ",", debugFileName);
+			// WToFile.appendLineToFileAbs("\n", debugFileName);
+			WToFile.writeMapToFile(summaryFeatureDiffOverAllActsInACand, "GowallaFeature,SummaryStat", ",",
+					debugFileName);
+			// WToFile.writeMapToFile(summaryOfSquaredFeatDiffOverAllActsInACand, "GowallaFeature,SummaryStatOfSquared",
+			// ",", debugFileName);
 		}
 		// end of sanity check
 
-		return summaryFeatureDiffOverAllActs;
+		return summaryFeatureDiffOverAllActsInACand;
 		// return new Pair<>(maxFeatureDiffOverAllActs, minFeatureDiffOverAllActs);
 	}
 
@@ -1420,22 +1457,29 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 *            list of enummaps, where each enumMap contains pairs {feature,SummaryStat}
 	 * @param minOrMax
 	 *            0 for min and 1 for max
+	 * @param userAtRecomm
+	 *            for logging only
+	 * @param dateAtRecomm
+	 *            for logging only
+	 * @param timeAtRecomm
+	 *            for logging only
 	 * @return one enummap which contains pairs {feature,maxOfMaxForThatFeature} or {feature,minOfMinForThatFeature}
 	 * @since April 17 2018
 	 */
-	public static EnumMap<GowallaFeatures, Double> getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
-			List<EnumMap<GowallaFeatures, DoubleSummaryStatistics>> featureDifferencesList, int minOrMax)
+	public static EnumMap<GowGeoFeature, Double> getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
+			List<EnumMap<GowGeoFeature, DoubleSummaryStatistics>> featureDifferencesList, int minOrMax,
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm)
 	{
 		// Max feature diff for each of the GowallaFeature. In other words, max diff value for each feature over
 		// corresponding pairwise comparison of each act obj of the two timelines
-		EnumMap<GowallaFeatures, Double> summaryFeatureDiffOverAllActs = new EnumMap<>(GowallaFeatures.class);
+		EnumMap<GowGeoFeature, Double> summaryFeatureDiffOverAllActs = new EnumMap<>(GowGeoFeature.class);
 
 		// Assuming that all maps in the list contain the same set of keys (i.e., same GowallaFeatures)
-		Set<GowallaFeatures> listOfGowallaFeatures = featureDifferencesList.get(0).keySet();
+		Set<GowGeoFeature> listOfGowallaFeatures = featureDifferencesList.get(0).keySet();
 
 		if (minOrMax == 1)
 		{
-			for (GowallaFeatures gowallaFeature : listOfGowallaFeatures)
+			for (GowGeoFeature gowallaFeature : listOfGowallaFeatures)
 			{
 				double maxOfMaxForThisFeature = featureDifferencesList.stream()
 						.map(listEntry -> listEntry.get(gowallaFeature).getMax()).mapToDouble(Double::doubleValue).max()
@@ -1445,7 +1489,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 		}
 		else if (minOrMax == 0)
 		{
-			for (GowallaFeatures gowallaFeature : listOfGowallaFeatures)
+			for (GowGeoFeature gowallaFeature : listOfGowallaFeatures)
 			{
 				double minOfMinForThisFeature = featureDifferencesList.stream()
 						.map(listEntry -> listEntry.get(gowallaFeature).getMin()).mapToDouble(Double::doubleValue).min()
@@ -1465,16 +1509,65 @@ public class HJEditDistance extends AlignmentBasedDistance
 		{
 			String debugFileName = Constant.getCommonPath()
 					+ "DebugApril17_getSummaryStatOfSummaryStatForEachFeatureDiffOverList" + minOrMax + ".csv";
-			WToFile.appendLineToFileAbs("\n--------minOrMax=" + minOrMax + "--\n", debugFileName);
+			WToFile.appendLineToFileAbs("\n--------minOrMax=" + minOrMax + "--\n" + "\n----------\n" + userAtRecomm
+					+ "," + dateAtRecomm + "," + timeAtRecomm + "\n", debugFileName);
 			WToFile.writeListOfMap2(featureDifferencesList, debugFileName, "FeatureDiffsListKey-Value", ",", "-", true);
 			WToFile.appendLineToFileAbs("\n", debugFileName);
-			WToFile.writeMapToNewFile(summaryFeatureDiffOverAllActs, "GowallaFeature,SummaryStat", ",", debugFileName);
+			WToFile.writeMapToFile(summaryFeatureDiffOverAllActs, "GowallaFeature,SummaryStat", ",", debugFileName);
 		}
 		// end of sanity check
 
 		return summaryFeatureDiffOverAllActs;
 		// return new Pair<>(maxFeatureDiffOverAllActs, minFeatureDiffOverAllActs);
 	}
+
+	// Start of added on 23 Nov 2018
+	/**
+	 * Convert list of enummaps for each activity object in a candidate. Size = Num of AOs in Cand (list) X (num of
+	 * features (each enummap in list))
+	 * <p>
+	 * to
+	 * <p>
+	 * enumap of lists , where each list is for a sequence of diff for a feature. Size = Num of features (size of
+	 * enumap) X (num of AO (size of each list))
+	 * 
+	 * @param featureDifferencesList
+	 * @return
+	 */
+	public static EnumMap<GowGeoFeature, List<Double>> convertListOfMapsToMapOfLists(
+			List<EnumMap<GowGeoFeature, Double>> featureDifferencesList, boolean writeToFile, String absFileNameToWrite)
+	{
+		EnumMap<GowGeoFeature, List<Double>> mapOfListOfSequenceForEachFeature = new EnumMap<>(GowGeoFeature.class);
+		StringBuilder sb = new StringBuilder();
+
+		// Assuming that all maps in the list contain the same set of keys (i.e., same GowallaFeatures)
+		Set<GowGeoFeature> listOfGowallaFeatures = featureDifferencesList.get(0).keySet();
+		String featureNamesString = listOfGowallaFeatures.stream().map(e -> e.toString())
+				.collect(Collectors.joining(","));
+
+		for (GowGeoFeature gowallaFeature : listOfGowallaFeatures)
+		{
+			// for each feature we will have a list.
+			List<Double> listOfDiffForThisFeature = featureDifferencesList.stream()
+					.map(listEntry -> listEntry.get(gowallaFeature)).collect(Collectors.toList());
+			mapOfListOfSequenceForEachFeature.put(gowallaFeature, listOfDiffForThisFeature);
+		}
+
+		if (writeToFile)
+		{
+			String debugFileName = Constant.getCommonPath() + "DebugNov23_convertListOfMapsToMapOfLists.csv";
+			WToFile.appendLineToFileAbs("\n----------\n", debugFileName);
+			WToFile.writeListOfMap2(featureDifferencesList, debugFileName, "FeatureDiffsListKey-Value", ",", "-", true);
+			WToFile.appendLineToFileAbs("\n", debugFileName);
+			WToFile.writeMapToFile(mapOfListOfSequenceForEachFeature, "GowallaFeature,FeatureSequence", ",",
+					debugFileName);
+		}
+		// end of sanity check
+
+		return mapOfListOfSequenceForEachFeature;
+	}
+
+	// End of added on 23 Nov 2018
 
 	/**
 	 * <p>
@@ -1486,27 +1579,35 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @return
 	 * @since May 8 2018
 	 */
-	public static EnumMap<GowallaFeatures, Double> getPthPercentileInRTVerseOfDiffs(
-			List<List<EnumMap<GowallaFeatures, Double>>> listOfListOfFeatDiffs, double percentile)
+	public static EnumMap<GowGeoFeature, Double> getPthPercentileInRTVerseOfDiffs(
+			List<List<EnumMap<GowGeoFeature, Double>>> listOfListOfFeatDiffs, double percentile)
 	{
 
 		// Max feature diff for each of the GowallaFeature. In other words, max diff value for each feature over
 		// corresponding pairwise comparison of each act obj of the two timelines
-		EnumMap<GowallaFeatures, Double> summaryFeatureDiffOverAllActs = new EnumMap<>(GowallaFeatures.class);
+		EnumMap<GowGeoFeature, Double> summaryFeatureDiffOverAllActs = new EnumMap<>(GowGeoFeature.class);
 
-		List<EnumMap<GowallaFeatures, Double>> allCollected = listOfListOfFeatDiffs.stream().flatMap(l -> l.stream())
+		List<EnumMap<GowGeoFeature, Double>> allCollected = listOfListOfFeatDiffs.stream().flatMap(l -> l.stream())
 				.collect(Collectors.toList());
 
 		// Assuming that all maps in the list contain the same set of keys (i.e., same GowallaFeatures)
-		Set<GowallaFeatures> listOfGowallaFeatures = allCollected.get(0).keySet();
+		Set<GowGeoFeature> listOfGowallaFeatures = allCollected.get(0).keySet();
 
-		for (GowallaFeatures gowallaFeature : listOfGowallaFeatures)
+		for (GowGeoFeature gowallaFeature : listOfGowallaFeatures)
 		{
 			List<Double> allValsForThisFeature = allCollected.stream().map(listEntry -> listEntry.get(gowallaFeature))
 					.collect(Collectors.toList());
 
 			Double pthPercentileForThisFeature = StatsUtils.getPercentile(allValsForThisFeature, percentile);
 			summaryFeatureDiffOverAllActs.put(gowallaFeature, pthPercentileForThisFeature);
+		}
+
+		if (true)// write the pth percentile of each feature
+		{
+			StringBuilder sb = new StringBuilder("");
+			summaryFeatureDiffOverAllActs.entrySet().stream().forEachOrdered(e -> sb.append(e.getValue() + ","));
+			WToFile.appendLineToFileAbs(sb.toString() + "\n",
+					Constant.getCommonPath() + "PthPercentileOfEachFeature.csv");
 		}
 
 		return summaryFeatureDiffOverAllActs;
@@ -1556,14 +1657,14 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * 
 	 * @since April 14 2018
 	 */
-	public List<EnumMap<GowallaFeatures, Double>> getFeatureLevelDiffsAllActsV2(ArrayList<ActivityObject2018> actObjs1,
-			ArrayList<ActivityObject2018> actObjs2)
+	public List<EnumMap<GowGeoFeature, Double>> getFeatureLevelDiffsBetweenAllAOsV2(
+			ArrayList<ActivityObject2018> actObjs1, ArrayList<ActivityObject2018> actObjs2)
 	{
 
 		int ao1Size = actObjs1.size();
 		int ao2Size = actObjs2.size();
 
-		List<EnumMap<GowallaFeatures, Double>> featureDifferencesList = new ArrayList<>(Math.max(ao1Size, ao2Size));
+		List<EnumMap<GowGeoFeature, Double>> featureDifferencesList = new ArrayList<>(Math.max(ao1Size, ao2Size));
 
 		// here: get max for each feature over these act objsSkerr
 
@@ -1586,7 +1687,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 			// $sbtt1.append(ao1ToCompare.getActivityID() + "--" + ao2ToCompare.getActivityID() + "\n");
 			// Pairwise compare the last minSize AOs
 			// featureDifferencesList.add(getFeatureLevelDifferenceGowallaPD13Apr2018(ao1ToCompare, ao2ToCompare));
-			featureDifferencesList.add(getFeatureLevelDifference(ao1ToCompare, ao2ToCompare));
+			featureDifferencesList.add(getFeatureLevelDiffsBetweenAOs(ao1ToCompare, ao2ToCompare));
 		}
 
 		// if (dFeat == 0)
@@ -1625,7 +1726,25 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * 
 	 * @return
 	 */
-	private double combineActAndFeatLevelDistance(double dAct, double dFeat, int size1, int size2, double alpha)
+	/**
+	 * 
+	 * @param dAct
+	 * @param dFeat
+	 * @param size1
+	 * @param size2
+	 * @param alpha
+	 * @param userAtRecomm
+	 *            just for writing
+	 * @param dateAtRecomm
+	 *            just for writing
+	 * @param timeAtRecomm
+	 *            just for writing
+	 * @param candidateTimelineId
+	 *            just for writing
+	 * @return
+	 */
+	private double combineActAndFeatLevelDistance(double dAct, double dFeat, int size1, int size2, double alpha,
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		double distanceTotal = -9999, normalisedDACt = -9999, normalisedDFeat = -9999;
 		// (length of current timeline-1)*replaceWt*WtObj
@@ -1648,10 +1767,31 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 		if (dAct > maxActLevelDistance || dFeat > maxFeatLevelDistance)
 		{
-			PopUps.printTracedErrorMsg("Error in combineActAndFeatLevelDistance : dAct" + dAct + " maxActLevelDistance="
-					+ maxActLevelDistance + " dFeat=" + dFeat + " maxFeatLevelDistance=" + maxFeatLevelDistance
-					+ " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha);
-			return -1;
+			// tolerate some difference 17.8 vs 17.7999997 etc
+			if (Math.abs(dAct - maxActLevelDistance) <= Constant.epsilonForFloatZeroRelaxed)
+			{
+				maxActLevelDistance = dAct;
+			}
+			else
+			{
+				PopUps.printTracedErrorMsg("Error in combineActAndFeatLevelDistance : dAct" + dAct
+						+ " maxActLevelDistance=" + maxActLevelDistance + " dFeat=" + dFeat + " maxFeatLevelDistance="
+						+ maxFeatLevelDistance + " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha);
+				return -1;
+			}
+
+			if (Math.abs(dFeat - maxFeatLevelDistance) <= Constant.epsilonForFloatZeroRelaxed)
+			{
+				maxFeatLevelDistance = dFeat;
+			}
+			else
+			{
+				PopUps.printTracedErrorMsg("Error in combineActAndFeatLevelDistance : dAct" + dAct
+						+ " maxActLevelDistance=" + maxActLevelDistance + " dFeat=" + dFeat + " maxFeatLevelDistance="
+						+ maxFeatLevelDistance + " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha);
+				return -1;
+			}
+
 		}
 
 		normalisedDACt = (dAct / maxActLevelDistance);
@@ -1665,12 +1805,19 @@ public class HJEditDistance extends AlignmentBasedDistance
 		{
 			distanceTotal = StatsUtils.round(distanceTotal, Constant.RoundingPrecision);
 		}
-		if (VerbosityConstants.verboseCombinedEDist)
+		if (VerbosityConstants.verboseCombinedEDist || VerbosityConstants.verboseDistDistribution)
 		{
+			String infoHeader = userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candidateTimelineId;
 			WToFile.appendLineToFileAbs(
-					distanceTotal + "," + dAct + "," + dFeat + "," + size1 + "," + size2 + "," + normalisedDACt + ","
-							+ normalisedDFeat + "," + distanceTotal + "\n",
-					Constant.getCommonPath() + "DistanceTotalAlpha" + alpha + ".csv");
+					infoHeader + "," + normalisedDACt + "," + normalisedDFeat + "," + distanceTotal + "," + dAct + ","
+							+ dFeat + "," + size1 + "," + size2 + "\n",
+					Constant.getCommonPath() + "DistanceDistribution.csv");// primarily for correlated analysis
+			// indexOfUserID = 0,indexOfNormAED = 5, indexOfNormFED = 6, indexOfTotalDis = 7, indexOfRawAED = 8,
+			// indexOfRawFED = 9,
+			// WToFile.appendLineToFileAbs(
+			// distanceTotal + "," + dAct + "," + dFeat + "," + size1 + "," + size2 + "," + normalisedDACt + ","
+			// + normalisedDFeat + "," + distanceTotal + "\n",
+			// Constant.getCommonPath() + "DistanceTotalAlpha" + alpha + ".csv");
 		}
 		if (VerbosityConstants.verboseDistance)
 		{

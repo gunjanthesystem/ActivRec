@@ -13,10 +13,10 @@ public class Tablesaw
 		double[] numbers = { 1, 2, 3, 4 };
 		// NumberColumn nc = NumberColumn.create("Test", numbers);
 		// out(nc.print());
+		String fileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/GeolifeAnalysisNov2018/geolife1_NOV15ED0.75STimeAllActsFDStFilter0hrsNoTTFilterAllMUsMeanReciprocalRank.csv";
 		try
 		{
-			Table t = Table.read().csv(
-					"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_NOV15ED0.5STimeStFilter0hrsNoTTFilter/AllActObjs.csv");
+			Table t = Table.read().csv(fileToRead);
 			System.out.println("t=" + t.shape() + "\n" + t.toString() + "\n" + t.structure());
 
 		}

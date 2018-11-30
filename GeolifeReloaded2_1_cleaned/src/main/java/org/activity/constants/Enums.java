@@ -11,9 +11,30 @@ public class Enums
 	 * @author gunjan
 	 * @since April 14 2018
 	 */
-	public enum GowallaFeatures
+	public enum GowallaFeature
 	{
 		ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF;
+	}
+
+	/**
+	 * - start time - duration - distance travelled - start geo - end geo - avg altitude
+	 * 
+	 * @author gunjan
+	 * @since November 17, 2018
+	 */
+	public enum GeolifeFeature
+	{
+		ActNameF, StartTimeF, DurationF, DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF;
+	}
+
+	/**
+	 * 
+	 * @author gunjan
+	 * @since Novemeber 18, 2018
+	 */
+	public enum GowGeoFeature
+	{
+		ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF, DurationF, DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF;
 	}
 
 	public enum TypeOfExperiment
@@ -84,6 +105,7 @@ public class Enums
 
 	public enum PrimaryDimension
 	{
-		ActivityID, LocationID, LocationGridID;
+		ActivityID, LocationID, LocationGridID, Duration;// Duration added on Nov18 2018 but not checked to be fully
+															// implemented
 	}
 }

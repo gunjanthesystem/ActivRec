@@ -454,6 +454,12 @@ public class DomainConstants
 			catIDNameDictionary = (TreeMap<Integer, String>) Serializer
 					.kryoDeSerializeThis(pathToSerialisedCatIDNameDictionary);
 
+			StringBuilder sb = new StringBuilder("ActivitID,ActivityName\n");
+			catIDNameDictionary.entrySet().stream()
+					.forEachOrdered(e -> sb.append(e.getKey() + "," + e.getValue() + "\n"));
+			System.out.println(sb.toString());
+			WToFile.writeToNewFile(sb.toString(), Constant.getOutputCoreResultsPath() + "CatIDNameDictionary.csv");
+
 		}
 		catch (Exception e)
 		{
@@ -494,8 +500,14 @@ public class DomainConstants
 		{
 			catIDNameDictionary = r;
 			System.out.println("Inside setCatIDNameDictionary: catIDNameDictionary.size()=" + catIDNameDictionary);
+
+			StringBuilder sb = new StringBuilder("ActivitID,ActivityName\n");
 			catIDNameDictionary.entrySet().stream()
-					.forEachOrdered(e -> System.out.println(e.getKey() + "--" + e.getValue() + "\n"));
+					.forEachOrdered(e -> sb.append(e.getKey() + "," + e.getValue() + "\n"));
+			System.out.println(sb.toString());
+			// PopUps.showMessage("Writing to file:\n" + Constant.getCommonPath() + "CatIDNameDictionary.csv"
+			// + "\nContent=\n" + sb.toString());
+			WToFile.writeToNewFile(sb.toString(), Constant.getOutputCoreResultsPath() + "CatIDNameDictionary.csv");
 
 		}
 		catch (Exception e)

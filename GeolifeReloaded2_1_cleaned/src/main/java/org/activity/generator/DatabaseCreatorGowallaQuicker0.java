@@ -173,7 +173,7 @@ public class DatabaseCreatorGowallaQuicker0
 			//
 			TreeMap<Integer, String> catIDNameDictionary = (TreeMap<Integer, String>) Serializer
 					.kryoDeSerializeThis(catIDNameDictionaryFileName);
-			WToFile.writeMapToNewFile(catIDNameDictionary, "catID,catName", ",",
+			WToFile.writeMapToFile(catIDNameDictionary, "catID,catName", ",",
 					commonPath + "catIDNameDictionary.csv");
 			// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov22/CatIDNameDictionary.kryo");
 			// commonPath + "CatIDNameDictionary.kryo");
@@ -184,7 +184,7 @@ public class DatabaseCreatorGowallaQuicker0
 					catIDNameDictionary, workingCatLevel, rootOfCategoryTree);
 
 			TreeMap<Integer, String> catIDWorkingLevelCatIDsDict = catIDWorkingLevelCatIDsDictResult.getFirst();
-			WToFile.writeMapToNewFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
+			WToFile.writeMapToFile(catIDWorkingLevelCatIDsDict, "catID,WorkingLevelCatID", ",",
 					commonPath + "catIDWorkingLevelCatIDsDict.csv");
 
 			LinkedHashSet<Integer> catIDsInHierarchy = catIDWorkingLevelCatIDsDictResult.getSecond();

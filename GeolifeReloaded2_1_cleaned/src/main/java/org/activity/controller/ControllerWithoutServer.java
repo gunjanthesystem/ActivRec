@@ -218,7 +218,6 @@ public class ControllerWithoutServer
 			if (true)// temporary enabled for verbose writing of user timeline
 			{
 				TimelineWriters.writeAllActObjs(usersCleanedDayTimelines, commonBasePath + "AllActObjs.csv");
-
 				if (databaseName.equals("gowalla1"))
 				{
 					TimelineWriters.writeLocationObjects(Constant.getUniqueLocIDs(),

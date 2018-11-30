@@ -1240,7 +1240,7 @@ public class WToFile
 	 * @param delimiter
 	 * @param absFileNameToWrite
 	 */
-	public static <K, V> void writeMapToNewFile(Map<K, V> map, String headerLine, String delimiter,
+	public static <K, V> void writeMapToFile(Map<K, V> map, String headerLine, String delimiter,
 			String absFileNameToWrite)
 	{
 		StringBuilder sb = new StringBuilder(headerLine + "\n");
