@@ -2,6 +2,7 @@ package org.activity.stats;
 
 import java.sql.Date;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.TimelineTransformers;
 
 /**
  * 
@@ -29,7 +31,7 @@ public class FeatureStats
 		diffs("/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/FeatsOfTrainingTimelines.csv");
 	}
 
-	public static void writeFeatDistributionForEachUsersTrainingTimelines(
+	public static void writeFeatDistributionForEachUsersTrainingTimelines(int userId,
 			LinkedHashMap<Date, Timeline> userTrainingTimelines, String absFileNameToAppend)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -38,8 +40,58 @@ public class FeatureStats
 		{
 			for (ActivityObject2018 ao : entry.getValue().getActivityObjectsInTimeline())
 			{
-				sb.append(ao.getHeaderForStringAllGeolifeWithNameForHeaded(",") + "\n");
+				sb.append(ActivityObject2018.getHeaderForStringAllGeolifeWithNameForHeaded2(ao, ",") + "\n");
 			}
+		}
+		WToFile.appendLineToFileAbs(sb.toString(), absFileNameToAppend);
+	}
+
+	/**
+	 * 
+	 * @param dayTimelines
+	 * @param windowLength
+	 * @return
+	 */
+	public static List<List<ActivityObject2018>> splitDayTimelineToSlidingWindows(
+			LinkedHashMap<Date, Timeline> dayTimelines, int windowLength)
+	{
+		// convert daily timeline to single timeline
+		// converting day timelines into continuous timelines suitable to be used for matching unit views
+		Timeline trainTimeline = TimelineTransformers.dayTimelinesToATimeline(dayTimelines, false, true);
+		// split it into progressive subsequence (sliding windows of width MU
+		int numOfAOS = trainTimeline.size();
+		List<List<ActivityObject2018>> listOfWindows = new ArrayList<>();
+		for (int index = 0; index < (numOfAOS - windowLength); index++)
+		{
+			listOfWindows.add(trainTimeline.getActivityObjectsInTimelineFromToIndex(index, index + windowLength));
+		}
+		return listOfWindows;
+	}
+
+	/**
+	 * 
+	 * @param userID
+	 * @param userTrainingTimelines
+	 * @param absFileNameToAppend
+	 * @param muCount
+	 */
+	public static void writeFeatDistributionForEachUsersTrainingTimelinesSlidingWindowWise(int userID,
+			LinkedHashMap<Date, Timeline> userTrainingTimelines, String absFileNameToAppend, int muCount)
+	{
+		List<List<ActivityObject2018>> listOfWindows = splitDayTimelineToSlidingWindows(userTrainingTimelines, muCount);
+
+		StringBuilder sb = new StringBuilder();
+
+		for (List<ActivityObject2018> window : listOfWindows)
+		{
+			sb.append(userID + "," + window.stream().map(ao -> ao.getActivityName()).collect(Collectors.joining(">"))
+					+ ",");
+			for (ActivityObject2018 ao : window)
+			{
+				sb.append(ActivityObject2018.getHeaderForStringAllGeolifeWithNameForHeaded2(ao, ",") + ",");
+			}
+			// get activity name of last activity object
+			sb.append(window.get(muCount - 1).getActivityName() + "\n");
 		}
 		WToFile.appendLineToFileAbs(sb.toString(), absFileNameToAppend);
 	}

@@ -47,7 +47,7 @@ public class VerbosityConstants
 	 * Make sure written file DistranceDistribution.csv has the following indexOfUserID = 0,indexOfNormAED = 5,
 	 * indexOfNormFED = 6, indexOfTotalDis = 7, indexOfRawAED = 8, indexOfRawFED = 9,
 	 */
-	public static final boolean verboseDistDistribution = true; // SWITCH_Nov20
+	public static final boolean verboseDistDistribution = true; // Correlation, SWITCH_Nov20
 	public static final boolean verboseCandFilter = false;
 	public static final boolean verboseMSD = true;
 
@@ -67,6 +67,8 @@ public class VerbosityConstants
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
 	public static final boolean WriteRTVerseNormalisationLogs = true;
 	public static final boolean WriteCandAEDDiffs = false;
+
+	public static final boolean WriteMInOfMinAndMaxOfMaxRTV = true;// 30 Nov 2018
 	/**
 	 * Write each cand of each RT in separate line
 	 */

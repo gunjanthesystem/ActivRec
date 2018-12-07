@@ -3,6 +3,8 @@ package org.activity.stats;
 import java.util.List;
 import java.util.Locale;
 
+import org.activity.constants.Constant;
+
 import com.google.uzaygezen.core.BitVector;
 import com.google.uzaygezen.core.BitVectorFactories;
 import com.google.uzaygezen.core.CompactHilbertCurve;
@@ -18,6 +20,23 @@ public class HilbertCurveUtils
 {
 
 	static final int precisionInBits = 70; // 2^31 = 2147483648
+
+	/**
+	 * Computes a one dimensional index for a given two dimensional coordinate using Compact Hilbert Space Filled Curve.
+	 * 
+	 * @param lat
+	 * @param lon
+	 * @return
+	 */
+	public static long getCompactHilbertCurveIndex(String lat, String lon)
+	{
+		double latitude1 = Double.parseDouble(lat);
+		double longitude1 = Double.parseDouble(lon);
+
+		long latitude1AsLong = (long) (latitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
+		long longitude1AsLong = (long) (longitude1 * Constant.decimalPlacesInGeocordinatesForComputations);
+		return HilbertCurveUtils.getCompactHilbertCurveIndex(latitude1AsLong, longitude1AsLong);
+	}
 
 	/**
 	 * Computes a one dimensional index for a given two dimensional coordinate using Compact Hilbert Space Filled Curve.

@@ -775,11 +775,14 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 
 		if (distancesMapUnsorted.size() != candidateTimelines.size())
 		{// Constant.nearestNeighbourCandEDThreshold > 0) // not expected when filtering is to be done
-			if (Constant.typeOfCandThresholdPrimDim != Enums.TypeOfCandThreshold.None)
+			if (Constant.typeOfCandThresholdPrimDim != Enums.TypeOfCandThreshold.None
+					|| Constant.threshNormFEDForCand != -1 || Constant.threshNormAEDForCand != -1)
 			{// some cands might have been removed due to thresholding
 				System.out.println("Alert: editDistancesMapUnsorted.size() (" + distancesMapUnsorted.size()
 						+ ") != candidateTimelines.size() (" + candidateTimelines.size() + ") , typeOfCandThreshold="
-						+ Constant.typeOfCandThresholdPrimDim);
+						+ Constant.typeOfCandThresholdPrimDim + " Constant.threshNormFEDForCand = "
+						+ Constant.threshNormFEDForCand + " Constant.threshNormAEDForCand = "
+						+ Constant.threshNormAEDForCand);
 			}
 			else
 			{

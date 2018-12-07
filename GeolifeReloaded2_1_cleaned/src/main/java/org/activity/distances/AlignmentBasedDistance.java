@@ -278,15 +278,35 @@ public class AlignmentBasedDistance
 			// wtAvgAltitude = 0.2d;
 
 			// start of added on Nov 25
-			wtActivityName = 2d;// 3d;//gowalla
-			wtStartTime = 1d;// 0.8d;// 0.6d;//gowalla
-
-			wtDuration = 1d;// 0.2d;
-			wtDistanceTravelled = 1d;// //1d;
-			wtStartGeo = 1d;
-			wtEndGeo = 1d;
-			wtAvgAltitude = 1d;
+			// wtActivityName = 2d;// 3d;//gowalla
+			// wtStartTime = 1d;// 0.8d;// 0.6d;//gowalla
+			//
+			// wtDuration = 1d;// 0.2d;
+			// wtDistanceTravelled = 1d;// //1d;
+			// wtStartGeo = 1d;
+			// wtEndGeo = 1d;
+			// wtAvgAltitude = 1d;
 			// end of added on Nov 25
+
+			// KDDWts;
+			wtActivityName = 3;
+			wtStartTime = 1;
+			wtDuration = 0.5;
+			wtDistanceTravelled = 3;
+			wtStartGeo = 0.3;
+			wtEndGeo = 0.3;
+			wtAvgAltitude = 0.2;
+			////////////////////////
+
+			// Nov28Wts ;
+			// wtActivityName = 3;
+			// wtStartTime = 1;
+			// wtDuration = 2;
+			// wtDistanceTravelled = 3;
+			// wtStartGeo = 1;
+			// wtEndGeo = 1;
+			// wtAvgAltitude = 1;
+			/////
 
 		}
 
