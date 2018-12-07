@@ -18,6 +18,7 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.SanityConstants;
 import org.activity.spatial.SpatialUtils;
+import org.activity.stats.HilbertCurveUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ActivityObject;
 import org.activity.util.DateTimeUtils;
@@ -950,6 +951,24 @@ public class ActivityObject2018 implements Serializable
 		return activityName + delimiter + startTimestampInms + delimiter + durationInSeconds + delimiter
 				+ distanceTravelled + delimiter + startLatitude + delimiter + startLongitude + delimiter + endLatitude
 				+ delimiter + endLongitude + delimiter + avgAltitude;
+	}
+
+	/**
+	 * Header for writing activity objc
+	 * 
+	 * @param delimiter
+	 * @return
+	 */
+	public static String getHeaderForStringAllGeolifeWithNameForHeaded2(ActivityObject2018 ao, String delimiter)
+	{
+		long secsSinceMidnight = DateTimeUtils.getTimeInDayInSecondsZoned(ao.getStartTimestampInms(), ZoneId.of("UTC"));
+		long startGeo = HilbertCurveUtils.getCompactHilbertCurveIndex(ao.getStartLatitude(), ao.getStartLongitude());
+		long endGeo = HilbertCurveUtils.getCompactHilbertCurveIndex(ao.getEndLatitude(), ao.getEndLongitude());
+
+		return secsSinceMidnight + delimiter + ao.getDurationInSeconds() + delimiter + ao.getDistanceTravelled()
+				+ delimiter + /* ao.getStartLatitude() + delimiter + ao.getStartLongitude() + delimiter + */startGeo
+				+ delimiter + /* ao.getEndLatitude() + delimiter + ao.getEndLongitude() + delimiter + */ endGeo
+				+ delimiter + ao.getAvgAltitude() + delimiter + ao.getActivityName();
 	}
 
 	public String toString()

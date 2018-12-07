@@ -44,6 +44,7 @@ import org.activity.objects.TimelineWithNext;
 import org.activity.objects.TrackListenEntry;
 import org.activity.objects.TrajectoryEntry;
 import org.activity.objects.Triple;
+import org.activity.recomm.RecommendationMasterI;
 import org.activity.stats.TimelineStats;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -4808,6 +4809,40 @@ public class WToFile
 		}
 		WToFile.writeToNewFile(sb.toString(), absFileNameToUse);
 
+	}
+
+	/**
+	 * Write some raw data/logs to Raw.csv
+	 * 
+	 * @param userName
+	 * @param dateToRecomm
+	 * @param weekDay
+	 * @param sbsRawToWriteForThisUserDate
+	 * @param timeCategory
+	 * @param recommMaster
+	 * @param recommTimesString
+	 * @param actsActualDoneInSeq
+	 * @param rankedRecommWithScoreForThisRTIter
+	 */
+	public static void writeRawLogs(String userName, String dateToRecomm, String weekDay,
+			StringBuilder sbsRawToWriteForThisUserDate, String timeCategory, RecommendationMasterI recommMaster,
+			String recommTimesString, String actActualDoneInSeq, String rankedRecommWithScoreForThisRTIter)
+	{
+		String currentActName = recommMaster.getActivityObjectAtRecomm().getActivityName();
+		sbsRawToWriteForThisUserDate.append(userName + "," + dateToRecomm + "," + recommTimesString + "," + timeCategory
+				+ "," + recommMaster.getActivityNamesGuidingRecomm()/* withTimestamps */
+				+ "," + currentActName + "," + Integer.toString(recommMaster.getNumOfValidActsInActsGuidingRecomm())
+				+ "," + Integer.toString(recommMaster.getNumOfActsInActsGuidingRecomm()) + ","
+				+ Integer.toString(recommMaster.getNumOfCandTimelinesBelowThresh()) + "," + weekDay + ","
+				+ actActualDoneInSeq + "," + rankedRecommWithScoreForThisRTIter + ","
+				+ Integer.toString(recommMaster.getNumOfDistinctRecommendations()) + ",,,,,,"
+				// recommMasters[2].getActivityNamesGuidingRecomm() ,
+				// recommP1.getRestAndEndSimilaritiesCorrelation() , "," ,
+				// recommP1.getAvgRestSimilarity() , "," ,
+				// recommP1.getSDRestSimilarity() , "," ,
+				// recommP1.getAvgEndSimilarity()
+				// , "," , recommP1.getSDEndSimilarity()
+				+ Boolean.toString((currentActName.equals(actActualDoneInSeq))) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
 	}
 
 	// public static void writeSimpleLinkedHashMapToFileAppendDouble(LinkedHashMap<String, Double> map, String fileName,

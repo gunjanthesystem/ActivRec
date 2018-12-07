@@ -206,7 +206,8 @@ public final class Constant
 	private static double dynamicEDAlpha;// = 1;// 0.8;// 0.5;// SWITCH_NOV10
 	public static boolean noFED = false;// Nov 15 2018
 	public static boolean noAED = false;// Nov 15 2018
-	public static final double[] EDAlphas = { 0.5 };// 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
+	public static final double[] EDAlphas = { 0, 0.3, 0.4, 0.6, 0.5, 0.7, 0.8, 0.9, 1 };
+	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
 	// SWITCH_NOV20
 	// = { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75, 0, 0.25,
 	// 0.35, 0.15};//SWITCH_NOV10 added on 12 Sep 2018
@@ -217,7 +218,7 @@ public final class Constant
 	public static final double wtScoreRecommsByLocProximity = 0.2;// SWITCH_NOV10
 
 	public static final boolean useActivityNameInFED = true; // KEEP ALWAYS TRUE FOR ACT AS PD
-	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
+	public static final boolean useStartTimeInFED = false;// SWITCH_NOV10
 
 	// Only for gowalla1
 	public static final boolean useLocationInFED = false;// SWITCH_NOV10
@@ -227,11 +228,11 @@ public final class Constant
 	public static final boolean useDurationFromPrevInFED = false;// SWITCH_NOV10
 
 	// Only for geolife1, added in Nov 18, 2018
-	public static final boolean useDurationInFED = true;// SWITCH_NOV10
+	public static final boolean useDurationInFED = false;// SWITCH_NOV10
 	public static final boolean useDistTravelledInFED = true;// SWITCH_NOV10 //added on Aug 11 2018
-	public static final boolean useStartGeoInFED = true;// SWITCH_NOV10
-	public static final boolean useEndGeoInFED = true;// SWITCH_NOV10
-	public static final boolean useAvgAltitudeInFED = true;// SWITCH_NOV10
+	public static final boolean useStartGeoInFED = false;// SWITCH_NOV10
+	public static final boolean useEndGeoInFED = false;// SWITCH_NOV10
+	public static final boolean useAvgAltitudeInFED = false;// SWITCH_NOV10
 
 	public static final boolean useRTVerseNormalisationForED = true;// true; // TODO KEEP IT true, false version
 
@@ -239,22 +240,24 @@ public final class Constant
 	public static final boolean computeFEDForEachFeatureSeqInRTVerse = true;// true;
 
 	public static final boolean useMSDInFEDInRTVerse = false;// false;
+	public static final boolean useLog2InFEDInRTVerse = true;// false;
 
 	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
-	public static final double percentileForRTVerseMaxForFEDNorm = 10;// 75;// -1// SWITCH_April24
+	public static final double percentileForRTVerseMaxForFEDNorm = -1;// 75;// -1// SWITCH_April24
+	public static final boolean fixedValPerFeatForRTVerseMaxMinForFEDNorm = false;// 75;// -1// SWITCH_Dec1
 	public static final double percentileForRTVerseMaxForAEDNorm = -1;// 75;// SWITCH //added on 15 Aug 2018
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
 	// reduced.
 
 	public static final double threshNormAEDForCand = -1;// added on 14 Aug 2018
-	public static final double threshNormFEDForCand = -1;// added on 14 Aug 2018
+	public static final double threshNormFEDForCand = -1;// -1;// added on 14 Aug 2018
 
 	public static final boolean normaliseCandDistsAgainAfterFiltering = true;
 	/**
 	 * If enabled, in Edit distance, instead of computing feature level edit distance just for activity objects which
 	 * matchin act name across the compared timelines, computed feature level edit distance over all act objs
 	 */
-	public static final boolean useFeatureDistancesOfAllActs = true;// true;// SWITCH_NOV10
+	public static final boolean useFeatureDistancesOfAllActs = false;// true;// SWITCH_NOV10
 
 	// need to implement it in AlignmentBasedDistance.getFeatureLevelDistanceGowallaPD25Feb2018() before turning true
 	public static final boolean useDistFromNextInFED = false;
@@ -380,7 +383,7 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 0, 1, 2, 3, 4, 6, 8 };// { 3, 0, 1, 2, /* 3, */ 4, 6, 8
+	public static final double matchingUnitAsPastCount[] = { 3, 0, 1, 2, 4, 6, 8 };// { 3, 0, 1, 2, /* 3, */ 4, 6, 8
 																					// };// { 0, 1, 2, 3, 4, 6, 8
 																					// };//
 	// 2, 4,6, 8, 1, 3, 10 11, 12,13,14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38,
@@ -1741,7 +1744,9 @@ public final class Constant
 		s.append("\ncomputeFEDForEachAOInRTVerse:" + computeFEDForEachAOInRTVerse);
 		s.append("\ncomputeFEDForEachFeatureSeqInRTVerse:" + computeFEDForEachFeatureSeqInRTVerse);
 		s.append("\nuseMSDInFEDInRTVerse:" + useMSDInFEDInRTVerse);
+		s.append("\nuseLog2InFEDInRTVerse:" + useLog2InFEDInRTVerse);
 		s.append("\npercentileForRTVerseMaxForFEDNorm:" + percentileForRTVerseMaxForFEDNorm);
+		s.append("\nfixedValPerFeatForRTVerseMaxMinForFEDNorm:" + fixedValPerFeatForRTVerseMaxMinForFEDNorm);
 		s.append("\npercentileForRTVerseMaxForAEDNorm:" + percentileForRTVerseMaxForAEDNorm);
 		s.append("\nthreshNormAEDForCand:" + threshNormAEDForCand);
 		s.append("\nthreshNormFEDForCand:" + threshNormFEDForCand);

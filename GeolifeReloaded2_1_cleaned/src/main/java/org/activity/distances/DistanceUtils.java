@@ -493,13 +493,23 @@ public class DistanceUtils
 				writeCandAEDDiffs(candAEDFeatDiffs, "candAEDFeatDiffsAfterSquaring");
 			}
 		}
+		if (Constant.useMSDInFEDInRTVerse)
+		{// square all the diffs in candAEDFeatDiffs
+			candAEDFeatDiffs = log2AllTheDiffs(candAEDFeatDiffs);
+			// now the minOfMins and maxOfMaxs will also be from the squared values.
+			if (VerbosityConstants.WriteCandAEDDiffs)
+			{
+				writeCandAEDDiffs(candAEDFeatDiffs, "candAEDFeatDiffsAfterSquaring");
+			}
+		}
 		//// end of MSD
 
 		/////////////////// Start of finding min max
 		// combined together for one return statement from abstracted method
 		// note that in the case of Alpha =1, there are no feature diffs in candAEDFeatDiffs
-		Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> minOfMinsAndMaxOfMaxOfDiffs = getMinOfMinsAndMaxOfMaxOfFeatureDiffs(
-				userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance, candAEDFeatDiffs);
+		Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> minOfMinsAndMaxOfMaxOfFeatureDiffs = getMinOfMinsAndMaxOfMaxOfFeatureDiffs(
+				userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance, candAEDFeatDiffs,
+				Constant.fixedValPerFeatForRTVerseMaxMinForFEDNorm);
 
 		//////////////////////////////////////////////////////
 
@@ -520,16 +530,18 @@ public class DistanceUtils
 				System.out
 						.println("Doing computeFEDForEachAOInRTVerse with usingMSD= " + Constant.useMSDInFEDInRTVerse);
 				candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistances(candAEDFeatDiffs,
-						minOfMinsAndMaxOfMaxOfDiffs.getFirst(), minOfMinsAndMaxOfMaxOfDiffs.getSecond(), hjEditDistance,
-						activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelines);
+						minOfMinsAndMaxOfMaxOfFeatureDiffs.getFirst(), minOfMinsAndMaxOfMaxOfFeatureDiffs.getSecond(),
+						hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+						candidateTimelines);
 			}
 			else if (Constant.computeFEDForEachFeatureSeqInRTVerse)
 			{
 				System.out.println(
 						"Doing computeFEDForEachFeatureSeqInRTVerse with usingMSD= " + Constant.useMSDInFEDInRTVerse);
 				candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach(candAEDFeatDiffs,
-						minOfMinsAndMaxOfMaxOfDiffs.getFirst(), minOfMinsAndMaxOfMaxOfDiffs.getSecond(), hjEditDistance,
-						activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelines);
+						minOfMinsAndMaxOfMaxOfFeatureDiffs.getFirst(), minOfMinsAndMaxOfMaxOfFeatureDiffs.getSecond(),
+						hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+						candidateTimelines);
 			}
 
 			// boolean isNoLoggingSane = candEditDistancesNoLogging.equals(candEditDistancesLogging);
@@ -543,9 +555,9 @@ public class DistanceUtils
 		{// NOT VERIFIED for Geolife
 			// <CandidateTimeline ID, Edit distance>
 			LinkedHashMap<String, Pair<String, Double>> candEditDistancesNoLogging = getRTVerseMinMaxNormalisedEditDistancesNoLogging(
-					candAEDFeatDiffs, minOfMinsAndMaxOfMaxOfDiffs.getFirst(), minOfMinsAndMaxOfMaxOfDiffs.getSecond(),
-					hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
-					candidateTimelines);
+					candAEDFeatDiffs, minOfMinsAndMaxOfMaxOfFeatureDiffs.getFirst(),
+					minOfMinsAndMaxOfMaxOfFeatureDiffs.getSecond(), hjEditDistance, activitiesGuidingRecomm,
+					userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelines);
 			candEditDistancesRes = candEditDistancesNoLogging;
 		}
 		return candEditDistancesRes;
@@ -582,6 +594,44 @@ public class DistanceUtils
 				{
 					featureSqdDiffForThisAO.put(featureEntry.getKey(),
 							featureEntry.getValue() * featureEntry.getValue());
+				}
+				listOfEnumMapsWithSqDiffsForThisCand.add(featureSqdDiffForThisAO);
+			}
+			res.put(candEntry.getKey(), new Triple<>(candEntry.getValue().getFirst(), candEntry.getValue().getSecond(),
+					listOfEnumMapsWithSqDiffsForThisCand));
+		}
+		return res;
+	}
+
+	/**
+	 * 
+	 * @param candAEDFeatDiffs
+	 * @return
+	 * @since 7 Dec 2018
+	 */
+	private static LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> log2AllTheDiffs(
+			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candAEDFeatDiffs)
+	{
+		LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> res = new LinkedHashMap<>(
+				candAEDFeatDiffs.size());
+		// StringBuilder sbLog = new StringBuilder();
+
+		// loop over cands
+		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candEntry : candAEDFeatDiffs
+				.entrySet())
+		{
+			List<EnumMap<GowGeoFeature, Double>> listOfEnumMapsWithSqDiffsForThisCand = new ArrayList<>(
+					candEntry.getValue().getThird().size());
+
+			// loop over AOs
+			for (EnumMap<GowGeoFeature, Double> aoEntry : candEntry.getValue().getThird())
+			{
+				EnumMap<GowGeoFeature, Double> featureSqdDiffForThisAO = new EnumMap<>(GowGeoFeature.class);
+
+				// loop over features of each AO.
+				for (Entry<GowGeoFeature, Double> featureEntry : aoEntry.entrySet())
+				{
+					featureSqdDiffForThisAO.put(featureEntry.getKey(), Math.log(featureEntry.getValue()) / Math.log(2));
 				}
 				listOfEnumMapsWithSqDiffsForThisCand.add(featureSqdDiffForThisAO);
 			}
@@ -634,13 +684,17 @@ public class DistanceUtils
 	 * @param hjEditDistance
 	 * @param candAEDFeatDiffs
 	 *            one map entry for each cand, and for each cand, a list of enumaps, one for each AO in the cand
+	 * @param useFixedMaxForEachFeature
+	 *            instead of pth percentils
 	 * @return
 	 * @since 24 Nov 2018
 	 */
 	private static Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> getMinOfMinsAndMaxOfMaxOfFeatureDiffs(
 			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, HJEditDistance hjEditDistance,
-			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candAEDFeatDiffs)
+			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candAEDFeatDiffs,
+			boolean useFixedMaxForEachFeature)
 	{
+		boolean shouldComputeFeatureLevelDistance = hjEditDistance.getShouldComputeFeatureLevelDistance();
 		StringBuilder sbToWrite = new StringBuilder(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm);
 		EnumMap<GowGeoFeature, Double> minOfMinOfDiffs = null;
 		EnumMap<GowGeoFeature, Double> maxOfMaxOfDiffs = null;
@@ -649,7 +703,7 @@ public class DistanceUtils
 		// For each candidate, finding max feature diff for each gowalla feature over all the activity objects in that
 		// candidate timeline. (horizontal aggregations)
 		List<EnumMap<GowGeoFeature, DoubleSummaryStatistics>> summaryStatForEachCand = null;
-		if (hjEditDistance.getShouldComputeFeatureLevelDistance())
+		if (shouldComputeFeatureLevelDistance)
 		{
 			summaryStatForEachCand = candAEDFeatDiffs.entrySet().stream()
 					.map(e -> HJEditDistance.getSummaryStatsForEachFeatureDiffOverListOfAOsInACand(
@@ -660,36 +714,148 @@ public class DistanceUtils
 		// Aggregation (across candidate timelines) of aggregation (across activity objects in each cand
 		// timeline:summaryStatForEachCand)
 
-		if (hjEditDistance.getShouldComputeFeatureLevelDistance())
+		if (shouldComputeFeatureLevelDistance)
 		{ // Compute minOfMinOfDiffs and maxOfMaxOfDiff (pth percentile as max)
-			minOfMinOfDiffs = HJEditDistance.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
-					summaryStatForEachCand, 0, userAtRecomm, dateAtRecomm, timeAtRecomm);
+			minOfMinOfDiffs = new EnumMap<>(GowGeoFeature.class);
 			maxOfMaxOfDiffs = new EnumMap<>(GowGeoFeature.class);
 
-			double percentileForRTVerseMaxForFEDNorm = Constant.percentileForRTVerseMaxForFEDNorm;
-			if (percentileForRTVerseMaxForFEDNorm == -1)
+			if (useFixedMaxForEachFeature)
 			{
-				maxOfMaxOfDiffs = HJEditDistance.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
-						summaryStatForEachCand, 1, userAtRecomm, dateAtRecomm, timeAtRecomm);
-			}
-			/////////////////// End of finding min max
-			// Start of May8 addition
-			else if (percentileForRTVerseMaxForFEDNorm > -1)// then replace maxOfMax by pth percentile val
-			{
-				// list over cands and then list over each AO in that cand
-				List<List<EnumMap<GowGeoFeature, Double>>> listOfListOfFeatDiffs = candAEDFeatDiffs.entrySet().stream()
-						.map(e -> e.getValue().getThird()).collect(Collectors.toList());
+				String databaseName = Constant.getDatabaseName();
+				if (databaseName.equals("geolife1"))
+				{
+					// Nov30MaxMin
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 5d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 5d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 5d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
+					//
 
-				EnumMap<GowGeoFeature, Double> pRTVersePercentileOfDiffs = HJEditDistance
-						.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, percentileForRTVerseMaxForFEDNorm);// 75);
+					// Dec1MaxMin
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 2d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 2d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 40d);
 
-				if (false)// sanity checking percentil implementation and maxOfMax implementation gives same result
-				{// passed ok on May 8 2018
-					sanityCheckRTVersePthPercentileByMinMax(minOfMinOfDiffs, maxOfMaxOfDiffs, listOfListOfFeatDiffs);
+					// Dec2MaxMin
+					// MaxStTimeDiff:- 5 hrs
+					// MaxDuration:- 1 hrs
+					// DistTravelled:- 2km,
+					// StGeoDiff:- 4km
+					// EndGeoDiff:- 4km
+					// AvgAlt:- 60m
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 18000d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 4d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 4d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
+
+					// Dec2MaxMin2
+					// MaxStTimeDiff:- 8 hrs
+					// MaxDuration:- 0.5 hrs
+					// DistTravelled:- 2km,
+					// StGeoDiff:- 10km
+					// EndGeoDiff:- 10km
+					// AvgAlt:- 100m
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 1800d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
+
+					// Dec2MaxMin3
+					// MaxStTimeDiff:- 8 hrs
+					// MaxDuration:- 1 hrs
+					// DistTravelled:- 2km,
+					// StGeoDiff:- 10km
+					// EndGeoDiff:- 10km
+					// AvgAlt:- 100m
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
+
+					// Dec3MaxMin
+					// MaxStTimeDiff:- 1 hr
+					// MaxDuration:- 1 hr
+					// DistTravelled:- 1km,
+					// StGeoDiff:- 1km
+					// EndGeoDiff:- 1km
+					// AvgAlt:- 20m
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 3600d);// secs, 1 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 1 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 1d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 1d);// 1km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 1d);// 1km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 20d);
+
+					// Dec4MaxMin
+					// MaxStTimeDiff:- 5 hrs
+					// MaxDuration:- 20 mins
+					// DistTravelled:- 500m,
+					// StGeoDiff:- 10km
+					// EndGeoDiff:- 10km
+					// AvgAlt:- 60m
+
+					maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, (5d * 60 * 60));// secs, 1 hrs
+					maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 20 * 60d);// sec, 1 hrs
+					maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 0.5d);// 5 km
+					maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 1km
+					maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 1km
+					maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
+
+					minOfMinOfDiffs.put(GowGeoFeature.StartTimeF, 0d);// secs, 3 hrs
+					minOfMinOfDiffs.put(GowGeoFeature.DurationF, 0d);// sec, 3 hrs
+					minOfMinOfDiffs.put(GowGeoFeature.DistTravelledF, 0d);// 5 km
+					minOfMinOfDiffs.put(GowGeoFeature.StartGeoF, 0d);// 5km
+					minOfMinOfDiffs.put(GowGeoFeature.EndGeoF, 0d);// 5km
+					minOfMinOfDiffs.put(GowGeoFeature.AvgAltitudeF, 0d);
 				}
+				else
+				{
+					PopUps.showError(
+							"getMinOfMinsAndMaxOfMaxOfFeatureDiffs not implemented for database" + databaseName);
+				}
+			}
+			else // use the pth percentile max
+			{
+				minOfMinOfDiffs = HJEditDistance.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
+						summaryStatForEachCand, 0, userAtRecomm, dateAtRecomm, timeAtRecomm);
 
-				// replace maxOfMax by pPercentileVal
-				maxOfMaxOfDiffs = pRTVersePercentileOfDiffs;
+				double percentileForRTVerseMaxForFEDNorm = Constant.percentileForRTVerseMaxForFEDNorm;
+				if (percentileForRTVerseMaxForFEDNorm == -1)
+				{
+					maxOfMaxOfDiffs = HJEditDistance.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
+							summaryStatForEachCand, 1, userAtRecomm, dateAtRecomm, timeAtRecomm);
+				}
+				/////////////////// End of finding min max
+				// Start of May8 addition
+				else if (percentileForRTVerseMaxForFEDNorm > -1)// then replace maxOfMax by pth percentile val
+				{
+					// list over cands and then list over each AO in that cand
+					List<List<EnumMap<GowGeoFeature, Double>>> listOfListOfFeatDiffs = candAEDFeatDiffs.entrySet()
+							.stream().map(e -> e.getValue().getThird()).collect(Collectors.toList());
+
+					EnumMap<GowGeoFeature, Double> pRTVersePercentileOfDiffs = HJEditDistance
+							.getPthPercentileInRTVerseOfDiffs(listOfListOfFeatDiffs, percentileForRTVerseMaxForFEDNorm);// 75);
+
+					if (false)// sanity checking percentil implementation and maxOfMax implementation gives same result
+					{// passed ok on May 8 2018
+						sanityCheckRTVersePthPercentileByMinMax(minOfMinOfDiffs, maxOfMaxOfDiffs,
+								listOfListOfFeatDiffs);
+					}
+
+					// replace maxOfMax by pPercentileVal
+					maxOfMaxOfDiffs = pRTVersePercentileOfDiffs;
+				}
 			}
 			// End of May 8 addition
 
@@ -697,6 +863,17 @@ public class DistanceUtils
 			{
 				PopUps.showError("Error: maxOfMaxOfDiffs.size() = " + maxOfMaxOfDiffs.size());
 			}
+		}
+
+		if (shouldComputeFeatureLevelDistance && VerbosityConstants.WriteMInOfMinAndMaxOfMaxRTV)// sanity check
+		{
+			StringBuilder sbMin = new StringBuilder();
+			StringBuilder sbMax = new StringBuilder();
+
+			minOfMinOfDiffs.entrySet().stream().forEachOrdered(e -> sbMin.append(e.getValue() + ","));
+			maxOfMaxOfDiffs.entrySet().stream().forEachOrdered(e -> sbMax.append(e.getValue() + ","));
+			WToFile.appendLineToFileAbs(sbMin.toString() + "\n", Constant.getCommonPath() + "minOfMinOfDiffs.csv");
+			WToFile.appendLineToFileAbs(sbMax.toString() + "\n", Constant.getCommonPath() + "maxOfMaxOfDiffs.csv");
 		}
 		return new Pair<>(minOfMinOfDiffs, maxOfMaxOfDiffs);
 
@@ -1099,8 +1276,8 @@ public class DistanceUtils
 	 * <p>
 	 * 
 	 * @param candAEDFeatDiffs
-	 * @param minOfMinOfDiffs
-	 * @param maxOfMaxOfDiffs
+	 * @param minOfMinOfFeatDiffs
+	 * @param maxOfMaxOfFeatDiffs
 	 * @param hjEditDistance
 	 * @param timeAtRecomm
 	 *            just for logging
@@ -1117,10 +1294,11 @@ public class DistanceUtils
 	 */
 	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach(
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candAEDFeatDiffs,
-			EnumMap<GowGeoFeature, Double> minOfMinOfDiffs, EnumMap<GowGeoFeature, Double> maxOfMaxOfDiffs,
+			EnumMap<GowGeoFeature, Double> minOfMinOfFeatDiffs, EnumMap<GowGeoFeature, Double> maxOfMaxOfFeatDiffs,
 			HJEditDistance hjEditDistance, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
 	{
+		// PopUps.showMessage("Inside getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach");
 		// boolean useMSD = Constant.useMSDInFEDInRTVerse;
 		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
 
@@ -1129,8 +1307,9 @@ public class DistanceUtils
 		double EDAlpha = Constant.getDynamicEDAlpha();// .dynamicEDAlpha;
 		double EDBeta = 1 - EDAlpha;
 
+		boolean shouldComputedFED = hjEditDistance.getShouldComputeFeatureLevelDistance();
 		/////
-		if (hjEditDistance.getShouldComputeFeatureLevelDistance() == false && EDAlpha != 1)
+		if (shouldComputedFED == false && EDAlpha != 1)
 		{
 			System.err
 					.println("Warning: -- Since no features are being used it is suggested to set Constant.EDAlpha=1.\n"
@@ -1188,8 +1367,11 @@ public class DistanceUtils
 		StringBuilder logEachCand = new StringBuilder();// one for each cand
 		// candID,AEDTraceForThisCand,ActDistForThisCand,countOfAOForThisCand,featDiff,featDiff,featDiff,featDiff,featDiff,featDiff,featDiff,featureDistForThisAOForThisCand,featureDistForThisCand,normActDistForThisCand,resultantEditDist
 		StringBuilder logEachAOAllCands = new StringBuilder();// one for each AO of each cand
-		String currentTimeline = activitiesGuidingRecomm.stream().map(ao -> ao.getPrimaryDimensionVal("|"))
+		String currentTimeline = "";// activitiesGuidingRecomm.stream().map(ao -> ao.getPrimaryDimensionVal("|"))
+		// .collect(Collectors.joining(">"));
+		currentTimeline = activitiesGuidingRecomm.stream().map(ao -> ao.getActivityName())
 				.collect(Collectors.joining(">"));
+
 		String rtInfo = userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candAEDFeatDiffs.size() + ","
 				+ currentTimeline;
 		// end of initialising logging
@@ -1226,16 +1408,17 @@ public class DistanceUtils
 			// double[listOfAOsForThisCand.size()];
 			// start of FED computation
 			double normFeatDistForThisCand = -9999;
+			// assuming same features across all AOs
+			Set<GowGeoFeature> listOfFeatures = null;
+			EnumMap<GowGeoFeature, List<Double>> valsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
+					GowGeoFeature.class);
+			EnumMap<GowGeoFeature, List<Double>> normValsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
+					GowGeoFeature.class);
+
 			if (EDAlpha != 1)
 			{
+				listOfFeatures = listOfAOsForThisCand.get(0).keySet();
 				// int indexOfAOForThisCand = -1;
-				// assuming same features across all AOs
-				Set<GowGeoFeature> listOfFeatures = listOfAOsForThisCand.get(0).keySet();
-
-				EnumMap<GowGeoFeature, List<Double>> valsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
-						GowGeoFeature.class);
-				EnumMap<GowGeoFeature, List<Double>> normValsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
-						GowGeoFeature.class);
 				// EnumMap<GowGeoFeature, DoubleSummaryStatistics> summaryOfNormValsForEachFeatureAcrossAOsForThisCand =
 				// new EnumMap<>( GowGeoFeature.class);
 
@@ -1264,33 +1447,13 @@ public class DistanceUtils
 					// loop over val for this feature across each AO
 					List<Double> normalisedDiffValForThisFeatureForAllAOs = diffValsForThisFeature.stream()
 							.map(diffValForThisFeatureForAO -> StatsUtils.minMaxNormWORoundWithUpperBound(
-									diffValForThisFeatureForAO, maxOfMaxOfDiffs.get(featureID),
-									minOfMinOfDiffs.get(featureID), 1.0d, false))
+									diffValForThisFeatureForAO, maxOfMaxOfFeatDiffs.get(featureID),
+									minOfMinOfFeatDiffs.get(featureID), 1.0d, false))
 							.collect(Collectors.toList());
 					normValsForEachFeatDiffAcrossAOsForThisCand.put(featureID,
 							normalisedDiffValForThisFeatureForAllAOs);
 				}
 				// compute the Summary stat of normalised diff val of each feature across all AOs in the cand
-
-				///////////// Start of just for logging Nov25
-				if (VerbosityConstants.WriteRTVerseNormalisationLogs || VerbosityConstants.verboseDistDistribution)// logging
-				{
-					for (int indexOfAO = 0; indexOfAO < listOfAOsForThisCand.size(); indexOfAO++)
-					{
-						logAOsThisCand.append(candInfo + "," + indexOfAO + ",");
-						for (GowGeoFeature feature : listOfFeatures)
-						{
-							logAOsThisCand.append(StatsUtils.roundAsString(
-									valsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
-									+ ","
-									+ StatsUtils.roundAsString(
-											normValsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
-									+ ",");
-						}
-						logAOsThisCand.append(",");
-					}
-				}
-				//////////// End of just for logging Nov25
 
 				// Compute FED for this cand
 				double wtdSumOfFeatDiffForThisCand = 0, sumOfFeatureWts = 0;
@@ -1316,15 +1479,53 @@ public class DistanceUtils
 							+ normValsForEachFeatDiffAcrossAOsForThisCand.get(featureID).stream()
 									.map(v -> String.valueOf(v)).collect(Collectors.joining(",")).toString()
 							+ ",wtForThisFeature=" + wtForThisFeature + ",maxOfMaxOfDiffs="
-							+ maxOfMaxOfDiffs.get(featureID) + ",minOfMinOfDiffs=" + minOfMinOfDiffs.get(featureID));
+							+ maxOfMaxOfFeatDiffs.get(featureID) + ",minOfMinOfDiffs="
+							+ minOfMinOfFeatDiffs.get(featureID));
 				}
 				normFeatDistForThisCand = wtdSumOfFeatDiffForThisCand / sumOfFeatureWts;
 			} // end of FED computation
 
 			logTxt.append(",normFeatDistForThisCand=" + normFeatDistForThisCand + "\n");
+
+			///////////// Start of just for logging Nov25
+			StringBuilder sbFeatureDiffAllAOsInCand = new StringBuilder();// added on Dec 3 2018
 			// rounding forlogging
-			logAOsThisCand.append("|" + "," + StatsUtils.roundAsString(normFeatDistForThisCand, 4) + "\n");
-			// logAOsThisCand.append("|" + "," + StatsUtils.roundAsString(normFDForThisAOForThisCand, 4) + "\n");
+			String normFeatDistForThisCandRounded = StatsUtils.roundAsString(normFeatDistForThisCand, 4);
+			if (VerbosityConstants.WriteRTVerseNormalisationLogs || VerbosityConstants.verboseDistDistribution)// logging
+			{
+				for (int indexOfAO = 0; indexOfAO < listOfAOsForThisCand.size(); indexOfAO++)
+				{
+					logAOsThisCand.append(candInfo + "," + indexOfAO + ",");
+
+					if (shouldComputedFED)
+					{
+						for (GowGeoFeature feature : listOfFeatures)
+						{
+							String s = StatsUtils.roundAsString(
+									valsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
+									+ ","
+									+ StatsUtils.roundAsString(
+											normValsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
+									+ ",";
+							logAOsThisCand.append(s);
+							// sbFeatureDiffAllAOsInCand.append(s);//Disabled on Dec 7 2018. not writingfeat diff of
+							// each AO in cand for each cand was row. This info is already there in log with each AO as
+							// row and adding the info to sbFeatureDiffAllAOsInCand was making the log for each cand of
+							// inconsistent number of cols. Also, this will bring down the size of log file a bit.
+						}
+					}
+					logAOsThisCand.append("|" + "," + normFeatDistForThisCandRounded + "\n"); // written for for each AO
+					// in cand for consistency though it will be same as it is a characteristic of cand and not AO
+					// individually.
+					// sbFeatureDiffAllAOsInCand.append(r);
+					// logAOsThisCand.append("|" + "," + StatsUtils.roundAsString(normFDForThisAOForThisCand, 4) +
+					// "\n");
+					// logAOsThisCand.append("\n");
+				}
+				sbFeatureDiffAllAOsInCand.append("|" + "," + normFeatDistForThisCandRounded);
+			}
+			//////////// End of just for logging Nov25
+
 			double normActDistForThisCand = StatsUtils.minMaxNormWORoundWithUpperBound(actDistForThisCand,
 					maxActEDOverAllCands, minActEDOverAllCands, 1d, false);
 
@@ -1400,7 +1601,8 @@ public class DistanceUtils
 			logEachCand.append(candInfo + "," + normActDistForThisCand + "," + " "/* sumOfNormFDsOverAOsOfThisCand */
 					+ "," + normFeatDistForThisCand/* meanOverAOsNormFDForThisCand */ + "," + " "
 					/* medianOverAOsNormFDForThisCand */ + "," + " "/* stdDevOverAOsNormFDForThisCand */ + ","
-					+ " "/* meanUponStdDev */ + "," + resultantEditDist + "," + thisCandRejectedString + "\n");
+					+ " "/* meanUponStdDev */ + "," + resultantEditDist + "," + thisCandRejectedString + ","
+					+ sbFeatureDiffAllAOsInCand.toString() + "\n");
 
 			// logEachAO.append(",,,,,,,,,,,,,,,," + featureDistForThisCand + "," + normActDistForThisCand + ","
 			// + resultantEditDist + "\n");
@@ -2650,6 +2852,10 @@ public class DistanceUtils
 			candEditDistances = getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV(
 					candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
 					hjEditDistance, editDistancesMemorizer);
+
+			/// Start of added on 2 Dec 2018
+
+			// End of added on 2 Dec 2018
 		}
 		// long t4 = System.currentTimeMillis();
 

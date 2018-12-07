@@ -429,8 +429,8 @@ public class SuperController
 					// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 					// "/run/media/gunjan/BackupVault/Geolife2018Results/"
 					// "/run/media/gunjan/iiWASDrive/gunjan/GeolifeNov2018/";
-					"/run/media/gunjan/My Passport/GeolifeNov2018/";
-			// "./dataWritten/";
+					// "/run/media/gunjan/My Passport/GeolifeNov2018/";
+					"./dataWritten/";
 			String commonPath = dataWrittenFolder + Constant.getDatabaseName() + "_"
 					+ DateTimeUtils.getMonthDateHourMinLabel()// DateTimeUtils.getMonthDateLabel()//
 					+ getLabelForExperimentConfig(sampledUserIndicesSetFile) + iterationLabel + extraLabel + "/";
@@ -657,6 +657,10 @@ public class SuperController
 					{
 						distNormalisationLabel += "MSD";
 					}
+					if (Constant.useLog2InFEDInRTVerse)
+					{
+						distNormalisationLabel += "Log2";
+					}
 					distNormalisationLabel += "_";
 				}
 				if (Constant.computeFEDForEachAOInRTVerse && Constant.computeFEDForEachFeatureSeqInRTVerse)
@@ -665,24 +669,26 @@ public class SuperController
 							"Error both Constant.computeFEDForEachAOInRTVerse & Constant.computeFEDForEachFeatureSeqInRTVerse should not be true");
 				}
 
+				if (Constant.fixedValPerFeatForRTVerseMaxMinForFEDNorm)
+				{
+					distNormalisationLabel += "FixedMaxMinF_";// RTV
+				}
 				if (Constant.percentileForRTVerseMaxForFEDNorm > -1)
 				{
 					distNormalisationLabel += (int) Constant.percentileForRTVerseMaxForFEDNorm + "F_";// RTV
-
-					if (Constant.threshNormFEDForCand != -1)
-					{
-						distNormalisationLabel += "T";
-					}
-
+				}
+				if (Constant.threshNormFEDForCand != -1)
+				{
+					distNormalisationLabel += Constant.threshNormFEDForCand + "FT";
 				}
 				if (Constant.percentileForRTVerseMaxForAEDNorm > -1)
 				{
 					distNormalisationLabel += distNormalisationLabel + (int) Constant.percentileForRTVerseMaxForAEDNorm
 							+ "A_";
-					if (Constant.threshNormAEDForCand != -1)
-					{
-						distNormalisationLabel += "T";
-					}
+				}
+				if (Constant.threshNormAEDForCand != -1)
+				{
+					distNormalisationLabel += Constant.threshNormAEDForCand + "AT";
 				}
 				distNormalisationLabel += "RTV";
 

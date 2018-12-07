@@ -492,8 +492,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									userTrainingTimelines);
 
 							// start of added on Nov 29
-							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelines(userTrainingTimelines,
-									Constant.getCommonPath() + "FeatsOfTrainingTimelines.csv");
+							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelines(userId,
+									userTrainingTimelines, Constant.getCommonPath() + "FeatsOfTrainingTimelines.csv");
+							// added on Dec 3 2018
+							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelinesSlidingWindowWise(userId,
+									userTrainingTimelines,
+									Constant.getCommonPath() + "FeatsOfTrainingTimelinesSlidingWindow3.csv", 4);
+
 							// end of added on Nov 29
 
 							////// START of build representative activity objects for this user.
@@ -1188,7 +1193,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 										if (VerbosityConstants.WriteRaw)
 										{
-											writeRawLogs(userName, dateToRecomm, weekDay,
+											WToFile.writeRawLogs(userName, dateToRecomm, weekDay,
 													sbsRawToWriteForThisUserDate.get(seqI), timeCategory,
 													recommMasters[seqI], recommTimesStrings[seqI],
 													actsActualDoneInSeq.get(seqI),
@@ -1586,40 +1591,6 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			}
 		}
 		numActsInEachCandbw.write(tmpWriter.toString() + "\n");
-	}
-
-	/**
-	 * Write some raw data/logs to Raw.csv
-	 * 
-	 * @param userName
-	 * @param dateToRecomm
-	 * @param weekDay
-	 * @param sbsRawToWriteForThisUserDate
-	 * @param timeCategory
-	 * @param recommMaster
-	 * @param recommTimesString
-	 * @param actsActualDoneInSeq
-	 * @param rankedRecommWithScoreForThisRTIter
-	 */
-	private void writeRawLogs(String userName, String dateToRecomm, String weekDay,
-			StringBuilder sbsRawToWriteForThisUserDate, String timeCategory, RecommendationMasterI recommMaster,
-			String recommTimesString, String actActualDoneInSeq, String rankedRecommWithScoreForThisRTIter)
-	{
-		String currentActName = recommMaster.getActivityObjectAtRecomm().getActivityName();
-		sbsRawToWriteForThisUserDate.append(userName + "," + dateToRecomm + "," + recommTimesString + "," + timeCategory
-				+ "," + recommMaster.getActivityNamesGuidingRecomm()/* withTimestamps */
-				+ "," + currentActName + "," + Integer.toString(recommMaster.getNumOfValidActsInActsGuidingRecomm())
-				+ "," + Integer.toString(recommMaster.getNumOfActsInActsGuidingRecomm()) + ","
-				+ Integer.toString(recommMaster.getNumOfCandTimelinesBelowThresh()) + "," + weekDay + ","
-				+ actActualDoneInSeq + "," + rankedRecommWithScoreForThisRTIter + ","
-				+ Integer.toString(recommMaster.getNumOfDistinctRecommendations()) + ",,,,,,"
-				// recommMasters[2].getActivityNamesGuidingRecomm() ,
-				// recommP1.getRestAndEndSimilaritiesCorrelation() , "," ,
-				// recommP1.getAvgRestSimilarity() , "," ,
-				// recommP1.getSDRestSimilarity() , "," ,
-				// recommP1.getAvgEndSimilarity()
-				// , "," , recommP1.getSDEndSimilarity()
-				+ Boolean.toString((currentActName.equals(actActualDoneInSeq))) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
 	}
 
 	/**
