@@ -4,16 +4,19 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.activity.constants.Constant;
+import org.activity.io.Serializer;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.util.TimelineCreators;
 import org.activity.util.TimelineUtils;
+import org.activity.util.UserDayTimeline;
 
 public class TimelineUtilsChecks
 {
@@ -25,11 +28,33 @@ public class TimelineUtilsChecks
 		Constant.setDefaultTimeZone("UTC");
 	}
 
-	public static void main(String args[])
+	/**
+	 * disabled on 9 Dec 2018
+	 * 
+	 * @param args
+	 */
+	public static void main0(String args[])
 	{
 		setup();
 		check12June(); // All Okay, is following spill over days.
 	}
+
+	public static void main(String args[])
+	{
+		System.out.println("Here in Oct 2014");
+		String pathToData = "./dataToRead/DCULLFromBackup/AllUserTimelines.obj";
+		try
+		{
+			LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>> usersDayTimelinesOct2014 = (LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>) Serializer
+					.deSerializeThis(pathToData);
+			System.out.println("usersDayTimelinesOct2014.size()=" + usersDayTimelinesOct2014);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	//
 
 	/**
 	 * Check the following methods:
@@ -50,8 +75,8 @@ public class TimelineUtilsChecks
 
 		Timestamp startTimestampOfActObjAtRecommPoint = new Timestamp(1900, 1 - 1, 0, 23, 55, 0, 0);
 
-		ArrayList<Timestamp> timestampsToLookInto =
-				TimelineCreators.createTimestampsToLookAt(uniqueDatesInCands, startTimestampOfActObjAtRecommPoint, true);
+		ArrayList<Timestamp> timestampsToLookInto = TimelineCreators.createTimestampsToLookAt(uniqueDatesInCands,
+				startTimestampOfActObjAtRecommPoint, true);
 
 		for (Timestamp tsToLookInto : timestampsToLookInto)
 		{
@@ -61,8 +86,8 @@ public class TimelineUtilsChecks
 			 * For this cand timeline, find the Activity Object with start timestamp nearest to the start timestamp of
 			 * current Activity Object and the distance is diff of their start times
 			 */
-			Triple<Integer, ActivityObject2018, Double> score =
-					timeline1.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, true);
+			Triple<Integer, ActivityObject2018, Double> score = timeline1
+					.getTimeDiffValidAOWithStartTimeNearestTo(tsToLookInto, true);
 
 		}
 	}

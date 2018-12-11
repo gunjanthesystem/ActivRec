@@ -208,6 +208,8 @@ public class AlignmentBasedDistance
 			useStartGeoInFED = Constant.useStartGeoInFED;
 			useEndGeoInFED = Constant.useEndGeoInFED;
 			useAvgAltitudeInFED = Constant.useAvgAltitudeInFED;
+			useDistFromPrevInFED = Constant.useDistFromPrevInFED;
+			useDurationFromPrevInFED = Constant.useDurationFromPrevInFED;
 		}
 	}
 
@@ -367,6 +369,18 @@ public class AlignmentBasedDistance
 			{
 				wtFullActivityObject += wtAvgAltitude;
 				featureWeightMap.put(GowGeoFeature.AvgAltitudeF, wtAvgAltitude);
+			}
+
+			if (this.useDistFromPrevInFED)
+			{
+				wtFullActivityObject += wtDistanceFromPrev;
+				featureWeightMap.put(GowGeoFeature.DistFromPrevF, wtDistanceFromPrev);
+			}
+
+			if (this.useDurationFromPrevInFED)
+			{
+				wtFullActivityObject += wtDurationFromPrev;
+				featureWeightMap.put(GowGeoFeature.DurationFromPrevF, wtDurationFromPrev);
 			}
 
 			wtFullActivityObject = StatsUtils.round(wtFullActivityObject, 4);
@@ -4209,6 +4223,21 @@ public class AlignmentBasedDistance
 						.abs(Double.parseDouble(ao1.getAvgAltitude()) - Double.parseDouble((ao2.getAvgAltitude()))));
 
 			}
+			/// Start of added on 9 Dec 2018
+			if (useDistFromPrevInFED)
+			{
+				double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() - ao2.getDistanceInMFromPrev());
+				featureDiffMap.put(GowGeoFeature.DistFromPrevF, diffOfDistFromPrev);
+			}
+
+			if (useDurationFromPrevInFED)
+			{
+				double diffOfDurFromPrev = FastMath
+						.abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
+				featureDiffMap.put(GowGeoFeature.DurationFromPrevF, diffOfDurFromPrev);
+			}
+			/// End of added on 9 Dec 2018
+
 		}
 		else
 		{

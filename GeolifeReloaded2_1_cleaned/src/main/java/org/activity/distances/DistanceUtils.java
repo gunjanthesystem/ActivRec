@@ -1462,20 +1462,35 @@ public class DistanceUtils
 				{
 					GowGeoFeature featureID = featureEntry.getKey();
 
-					DoubleSummaryStatistics summaryStatForThisFeatAcrossAOsOfThisCand = normValsForEachFeatDiffAcrossAOsForThisCand
-							.get(featureID).stream().mapToDouble(Double::doubleValue).summaryStatistics();
+					List<Double> diffValsForThisFeatAcrossAllAOsInCand = normValsForEachFeatDiffAcrossAOsForThisCand
+							.get(featureID).stream().collect(Collectors.toList());
 
 					double wtForThisFeature = featureWeightMap.get(featureID);
 					// double diffValToUse = summaryStatForThisFeatAcrossAOsOfThisCand.getAverage();
 					// Not doing Root of mean of the squared diffs as min and max in norm is of sqd vals
 					// if (useMSD){diffValToUse = Math.sqrt(summaryStatForThisFeatAcrossAOsOfThisCand.getAverage());}
-					wtdSumOfFeatDiffForThisCand += (wtForThisFeature
-							* summaryStatForThisFeatAcrossAOsOfThisCand.getAverage());
+
+					// $$wtdSumOfFeatDiffForThisCand += (wtForThisFeature
+					// $$ * summaryStatForThisFeatAcrossAOsOfThisCand.getAverage());//disabled on 8 Dec
+					double aggValForFeatureAcrossAllAOsInCand = -9999;
+					if (Constant.takeMeanOrMedianOfFeatDiffsAcrossAllAOsInCandForFeatSeq == 0)
+					{
+						DoubleSummaryStatistics summaryStatForThisFeatAcrossAOsOfThisCand = normValsForEachFeatDiffAcrossAOsForThisCand
+								.get(featureID).stream().mapToDouble(Double::doubleValue).summaryStatistics();
+						aggValForFeatureAcrossAllAOsInCand = summaryStatForThisFeatAcrossAOsOfThisCand.getAverage();
+					}
+					else
+					{
+						aggValForFeatureAcrossAllAOsInCand = StatsUtils
+								.getPercentile(diffValsForThisFeatAcrossAllAOsInCand, 50);
+					}
+					wtdSumOfFeatDiffForThisCand += (wtForThisFeature * aggValForFeatureAcrossAllAOsInCand);
+
 					sumOfFeatureWts += wtForThisFeature;
 
 					//////
 					logTxt.append("\n\t\t\tfeatureID=" + featureID + ",diffValToUse="
-							+ summaryStatForThisFeatAcrossAOsOfThisCand.getAverage() + ",normalisedFeatureDiffVal="
+							+ aggValForFeatureAcrossAllAOsInCand + ",normalisedFeatureDiffVal="
 							+ normValsForEachFeatDiffAcrossAOsForThisCand.get(featureID).stream()
 									.map(v -> String.valueOf(v)).collect(Collectors.joining(",")).toString()
 							+ ",wtForThisFeature=" + wtForThisFeature + ",maxOfMaxOfDiffs="

@@ -912,6 +912,11 @@ public class ActivityObject2018 implements Serializable
 				.collect(Collectors.joining("-"));
 		// .getLocIDLocationObjectDictionary().get(lid).locationName)
 
+		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
+				? delimiter + this.distanceTravelled + delimiter + this.startLongitude + delimiter + this.startLongitude
+						+ delimiter + this.endLatitude + delimiter + this.endLongitude + delimiter + this.avgAltitude
+				: "";
+
 		return activityID + delimiter + this.getLocationIDs('-') + delimiter
 				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter + locationName + delimiter
 				+ workingLevelCatIDs + delimiter + Instant.ofEpochMilli(startTimestampInms).toString()
@@ -920,7 +925,7 @@ public class ActivityObject2018 implements Serializable
 				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
 				+ checkins_count + delimiter + users_count + delimiter + radius_meters + delimiter + highlights_count
 				+ delimiter + items_count + delimiter + max_items_count + delimiter + distInMFromPrev + delimiter
-				+ durInSecFromPrev + delimiter + gridIndex;
+				+ durInSecFromPrev + delimiter + gridIndex + additionalGeolifeFeatures;
 	}
 
 	/**
@@ -931,12 +936,16 @@ public class ActivityObject2018 implements Serializable
 	 */
 	public static String getHeaderForStringAllGowallaTSWithNameForHeaded(String delimiter)
 	{
+		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
+				? delimiter + "distanceTravelled" + delimiter + "startLongitude" + delimiter + "startLongitude"
+						+ delimiter + "endLatitude" + delimiter + "endLongitude" + delimiter + "avgAltitude"
+				: "";
 
 		return "actID" + delimiter + "locID" + delimiter + "activityName" + delimiter + "locationName" + delimiter
 				+ "workLvlCat" + delimiter + "stTS" + delimiter + "stLat" + delimiter + "stLon" + delimiter + "uID"
 				+ delimiter + "photos_c" + delimiter + "cins_c" + delimiter + "users_c" + delimiter + "radius_m"
 				+ delimiter + "highlts_count" + delimiter + "items_c" + delimiter + "max_items_c" + delimiter
-				+ "distPrev" + delimiter + "durPrev" + delimiter + "gridID";
+				+ "distPrev" + delimiter + "durPrev" + delimiter + "gridID" + additionalGeolifeFeatures;
 	}
 
 	/**

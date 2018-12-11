@@ -202,13 +202,13 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadDec6Truncated.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadDec8Truncated.csv";
 		// "ResultsToReadNov28_OnlyED1.csv";// 25_3.csv";
 		getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware", 2);
-		getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 6);
-		getResultsNov21(resultsfileToRead, "AllAvgPrecision_MinMUWithMaxFirst0Aware", 6);
-		getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 5);
-		getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 4);
+		// $$ getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 6);
+		// $$ getResultsNov21(resultsfileToRead, "AllAvgPrecision_MinMUWithMaxFirst0Aware", 6);
+		// $$ getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 5);
+		// $$ getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 4);
 	}
 
 	/**
