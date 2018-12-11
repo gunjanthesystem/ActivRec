@@ -32,6 +32,7 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.evaluation.MUEvaluationUtils;
+import org.activity.generator.DatabaseCreatorDCU;
 import org.activity.loader.GeolifeDataLoader;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.CheckinEntry;
@@ -276,7 +277,8 @@ public class WToFile
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/Feb4NCount2AllMRR.csv");
 		// writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
 		// "/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv");
-		MUEvaluationUtils.writeMRRForAllUsersAllMUs("/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
+		MUEvaluationUtils.writeMRRForAllUsersAllMUs(
+				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/June18HJDistance/Geolife/SimpleV3/",
 				"/run/media/gunjan/Space/GUNJAN/GeolifeSpaceSpace/ComparisonsJan28/June18HJDistanceAllMRR.csv", "Algo",
 				Constant.lookPastType);
 
@@ -2631,8 +2633,8 @@ public class WToFile
 	 * @param candidateTimelineId
 	 */
 	public static void writeEditSimilarityCalculations(ArrayList<ActivityObject2018> ActivityObjects1,
-			ArrayList<ActivityObject2018> ActivityObjects2, double editDistance, String trace, double dAct, double dFeat,
-			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
+			ArrayList<ActivityObject2018> ActivityObjects2, double editDistance, String trace, double dAct,
+			double dFeat, String userAtRecomm, String dateAtRecomm, String timeAtRecomm, String candidateTimelineId)
 	{
 		String commonPath = Constant.getCommonPath();//
 		try
@@ -3073,8 +3075,9 @@ public class WToFile
 	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<String, Pair<String, Double>> editDistancesSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines,
-			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs, ArrayList<ActivityObject2018> currentTimeline,
-			ActivityObject2018 currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
+			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs,
+			ArrayList<ActivityObject2018> currentTimeline, ActivityObject2018 currentActivityObject,
+			boolean writeCandidateTimeline, boolean writeEditOperations,
 			LinkedHashMap<String, Integer> endPointIndicesInCands)
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
 	// Enums.CaseType caseType)
@@ -3186,8 +3189,9 @@ public class WToFile
 	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
 			LinkedHashMap<String, Pair<String, Double>> editDistancesSorted,
 			LinkedHashMap<String, Timeline> candidateTimelines,
-			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs, ArrayList<ActivityObject2018> currentTimeline,
-			ActivityObject2018 currentActivityObject, boolean writeCandidateTimeline, boolean writeEditOperations,
+			LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs,
+			ArrayList<ActivityObject2018> currentTimeline, ActivityObject2018 currentActivityObject,
+			boolean writeCandidateTimeline, boolean writeEditOperations,
 			LinkedHashMap<String, Integer> endPointIndicesInCands, PrimaryDimension givenDimension,
 			String absFileNameToWriteTo)
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
@@ -3333,7 +3337,8 @@ public class WToFile
 	 * @param array
 	 * @return
 	 */
-	public static String getTimelineAsOnlyGivenDimVal(ArrayList<ActivityObject2018> array, PrimaryDimension givenDimension)
+	public static String getTimelineAsOnlyGivenDimVal(ArrayList<ActivityObject2018> array,
+			PrimaryDimension givenDimension)
 	{
 		String s = "";
 
@@ -3387,7 +3392,8 @@ public class WToFile
 			FileWriter fw = new FileWriter(new File(fileName).getAbsoluteFile(), true);
 			BufferedWriter bw = new BufferedWriter(fw);
 
-			for (Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> entry : getDistanceScoresSorted.entrySet())
+			for (Map.Entry<Date, Triple<Integer, ActivityObject2018, Double>> entry : getDistanceScoresSorted
+					.entrySet())
 			{
 				bw.write(entry.getKey() + "," + entry.getValue().getFirst() + "," + entry.getValue().getSecond() + ","
 						+ entry.getValue().getThird());
@@ -4901,5 +4907,143 @@ public class WToFile
 	// e.printStackTrace();
 	// }
 	// }
+
+	/// added from iiWAS code backup for backward compatibility
+	/**
+	 * 
+	 * @param mapForAllDataMergedPlusDuration
+	 *            <UserName, <Timestamp,'activityname||durationInSeconds'>>
+	 */
+	public static void writeTypeOfOthersWithDuration(
+			LinkedHashMap<String, TreeMap<Timestamp, String>> mapForAllDataMergedPlusDuration)
+	{
+		String commonPath = Constant.getCommonPath();//
+		try
+		{
+			String fileName = commonPath + "OtherTypeWithDurationWithArrayList" + ".csv";
+
+			File file = new File(fileName);
+
+			file.delete();
+			if (!file.exists())
+			{
+				file.createNewFile();
+			}
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+			BufferedWriter bw = new BufferedWriter(fw);
+
+			bw.write(
+					"User_Name,Date,Type_of_Other,Duration_in_seconds,Is_Sandwich_Case,Preceeding_Activity,Succeeding_Activity,Timestamp");
+			bw.newLine();
+
+			for (Map.Entry<String, TreeMap<Timestamp, String>> entryForUser : mapForAllDataMergedPlusDuration
+					.entrySet())
+			{
+
+				String userName = entryForUser.getKey();
+				TreeMap<Timestamp, String> mapForEachUser = entryForUser.getValue();
+
+				// <Timestamp,'activityname||durationInSeconds'>
+				String preceedingActivity = "";
+				String succeedingActivity = "";
+				int isSandwichCase = -99;
+
+				ArrayList<String> entriesForUser = DatabaseCreatorDCU.treeMapToArrayList(mapForEachUser);
+
+				for (int i = 0; i < entriesForUser.size(); i++)// String entry: entriesForUser)
+				{
+					System.out.println("Size is:" + entriesForUser.size() + " index is " + i);
+
+					String splitted[] = entriesForUser.get(i).split(Pattern.quote("||"));
+					String dateString = DateTimeUtils.getDateString(new Timestamp(Long.valueOf(splitted[0])));
+					Timestamp timestamp = new Timestamp(Long.valueOf(splitted[0]));
+					String activityName = splitted[1];
+					String activityDurationInSecs = splitted[2];
+
+					if (i == 0)
+					{
+						preceedingActivity = "--";
+					}
+					else if (i != 0)
+					{
+						String splittedP[] = entriesForUser.get(i - 1).split(Pattern.quote("||"));
+						preceedingActivity = splittedP[1];
+					}
+
+					if (i == (entriesForUser.size() - 2))
+					{
+						succeedingActivity = "--";
+					}
+
+					else if (i < (entriesForUser.size() - 2))
+					{
+						String splittedS[] = entriesForUser.get(i + 1).split(Pattern.quote("||"));
+						succeedingActivity = splittedS[1];
+					}
+
+					if (!(succeedingActivity.equals("--") || preceedingActivity.equals("--"))
+							&& succeedingActivity.equals(preceedingActivity))
+					{
+						isSandwichCase = 1;
+					}
+
+					else if (!((!(succeedingActivity.equals("--") || preceedingActivity.equals("--"))
+							&& succeedingActivity.equals(preceedingActivity))))
+					{
+						isSandwichCase = 0;
+					}
+
+					if (activityName.trim().equalsIgnoreCase("badImages"))
+					{
+
+						bw.write(userName + "," + dateString + ",Bad_Images," + activityDurationInSecs + ","
+								+ isSandwichCase + "," + preceedingActivity + "," + succeedingActivity + ","
+								+ timestamp);
+						bw.newLine();
+					}
+
+					else if (activityName.trim().equalsIgnoreCase("Not Available"))
+					{
+
+						bw.write(userName + "," + dateString + ",Not_Annotated," + activityDurationInSecs + ","
+								+ isSandwichCase + "," + preceedingActivity + "," + succeedingActivity + ","
+								+ timestamp);
+						bw.newLine();
+					}
+
+				}
+
+				// for(Map.Entry<Timestamp, String> entry:entryForUser.getValue().entrySet())
+				// {
+				// String activityNameDuration=entry.getValue();
+				//
+				// String activityName=DCU_Data_Loader.getActivityNameFromDataEntry(activityNameDuration);
+				// long activityDurationInSecs=DCU_Data_Loader.getDurationInSecondsFromDataEntry(activityNameDuration);
+				// String dateString= UtilityBelt.getDateString(entry.getKey());
+				//
+				//
+				// if(activityName.trim().equalsIgnoreCase("badImages"))
+				// {
+				// bw.write(userName+","+dateString+",Bad_Images,"+activityDurationInSecs);
+				// bw.newLine();
+				// }
+				//
+				// else if(activityName.trim().equalsIgnoreCase("Not Available"))
+				// {
+				// bw.write(userName+","+dateString+",Not_Annotated,"+activityDurationInSecs);
+				// bw.newLine();
+				// }
+				// }
+
+			}
+			bw.close();
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 }

@@ -808,7 +808,7 @@ public class ControllerWithoutServer
 			{
 				/// Start of Nov 14 2018 for compatibility
 				boolean do2016GeolifeCompatiblity = true;
-				if (do2016GeolifeCompatiblity)
+				if (databaseName.equals("geolife1") && do2016GeolifeCompatiblity)
 				{
 					long totalNumOfAOsOld = 0, totalNumOfAOsNew = 0;
 					TreeMap<Integer, String> actIDNameDict = new TreeMap<>();

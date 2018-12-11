@@ -431,6 +431,7 @@ public class SuperController
 					// "/run/media/gunjan/iiWASDrive/gunjan/GeolifeNov2018/";
 					// "/run/media/gunjan/My Passport/GeolifeNov2018/";
 					"./dataWritten/";
+			// "/run/media/gunjan/MB2016/gunjan/GeolifeNov2018/";
 			String commonPath = dataWrittenFolder + Constant.getDatabaseName() + "_"
 					+ DateTimeUtils.getMonthDateHourMinLabel()// DateTimeUtils.getMonthDateLabel()//
 					+ getLabelForExperimentConfig(sampledUserIndicesSetFile) + iterationLabel + extraLabel + "/";
@@ -636,6 +637,14 @@ public class SuperController
 				if (Constant.useAvgAltitudeInFED)
 				{
 					featuresUsedLabel += "AvgAlt";
+				}
+				if (Constant.useDistFromPrevInFED)
+				{
+					featuresUsedLabel += "DistPrev";
+				}
+				if (Constant.useDurationFromPrevInFED)
+				{
+					featuresUsedLabel += "DurPrev";
 				}
 			}
 
