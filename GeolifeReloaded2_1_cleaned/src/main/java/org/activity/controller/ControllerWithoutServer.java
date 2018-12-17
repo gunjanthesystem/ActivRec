@@ -30,6 +30,7 @@ import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
 import org.activity.io.TimelineWriters;
 import org.activity.io.WToFile;
+import org.activity.loader.DCU_Data_Loader;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.CheckinEntry;
 import org.activity.objects.CheckinEntryV2;
@@ -108,6 +109,11 @@ public class ControllerWithoutServer
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = createAllTimelines(
 					databaseName, Constant.toSerializeJSONArray, Constant.toDeSerializeJSONArray,
 					Constant.toCreateTimelines, Constant.toSerializeTimelines, Constant.toDeSerializeTimelines);
+
+			Constant.initialise(databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
+					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
+					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
+			// added on 16 Dec 2018
 			// PopUps.showMessage("here0");
 			////////// ~~~~~~~~~~~~~~~~~`
 			//////////// for Gowalla start
@@ -161,6 +167,7 @@ public class ControllerWithoutServer
 						+ usersCleanedDayTimelines.size());
 			}
 			System.out.println("usersCleanedDayTimelines.size()= " + usersCleanedDayTimelines.size());
+			// PopUps.showMessage("usersCleanedDayTimelines.size()= " + usersCleanedDayTimelines.size());
 			// end of added on Nov 14 2018
 			// System.exit(0);
 			/////////// start of temp
@@ -210,8 +217,11 @@ public class ControllerWithoutServer
 					commonBasePath);
 			TimelineStats.writeNumOfDaysPerUsersDayTimelinesSameFile(usersCleanedDayTimelines,
 					commonBasePath + "NumOfDaysPerUsersDayTimelines.csv");
-			TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
-			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true, false);
+			if (databaseName.equals("dcu_data_2") == false)
+			{
+				TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
+			}
+			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true, false, databaseName);
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 
 			// System.exit(0);
@@ -305,7 +315,7 @@ public class ControllerWithoutServer
 						commonBasePath + "ToyTimelinesOnly" + secDimTemp + ".csv", secDimTemp);
 
 				// do it again using the toy timelines
-				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true, true);
+				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true, true, databaseName);
 
 				// done especially for toy timelines to avoid writing all activitie in timeline activity stats.
 				Constant.setActivityNames(
@@ -362,6 +372,7 @@ public class ControllerWithoutServer
 						List<Integer> allUserIndices = IntStream.range(0, numOfUsers).boxed()
 								.collect(Collectors.toList());
 						System.out.println("allUserIndices = " + allUserIndices);
+						// PopUps.showMessage("allUserIndices = " + allUserIndices);
 						sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines, "All", allUserIndices,
 								commonBasePath, Constant.lengthOfRecommendedSequence);
 						ResultsSanityChecks.assertSameNumOfRTsAcrossAllMUsForUsers(commonBasePath, false);
@@ -487,28 +498,40 @@ public class ControllerWithoutServer
 	 * @param labelPhrase
 	 * @param setConstantVariables
 	 * @param skipNonEssentials
+	 * @param databaseName
 	 */
 	public static void setDataVarietyConstants(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> givenDayTimelines,
-			boolean write, String labelPhrase, boolean setConstantVariables, boolean skipNonEssentials)
+			boolean write, String labelPhrase, boolean setConstantVariables, boolean skipNonEssentials,
+			String databaseName)
 	{
-		TimelineUtils.getUniqueLocGridIDsPerActID(givenDayTimelines, true, labelPhrase);
+
+		if (!databaseName.equals("dcu_data_2")) // dcu data does not have locations
+		{
+			TimelineUtils.getUniqueLocGridIDsPerActID(givenDayTimelines, true, labelPhrase);
+		}
 		// System.exit(0);
 
 		if (setConstantVariables)
 		{
-			Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(givenDayTimelines, write, labelPhrase));
-			Constant.setUniqueLocationIDsPerActID(
-					TimelineUtils.getUniqueLocIDsPerActID(givenDayTimelines, write, labelPhrase));
-			Constant.setUserIDActIDLocIDsMap(
-					TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write, labelPhrase));
+			if (!databaseName.equals("dcu_data_2"))
+			{
+				Constant.setUniqueLocIDs(TimelineUtils.getUniqueLocIDs(givenDayTimelines, write, labelPhrase));
+				Constant.setUniqueLocationIDsPerActID(
+						TimelineUtils.getUniqueLocIDsPerActID(givenDayTimelines, write, labelPhrase));
+				Constant.setUserIDActIDLocIDsMap(
+						TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write, labelPhrase));
+			}
 			Constant.setUniqueActivityIDs(TimelineUtils.getUniqueActivityIDs(givenDayTimelines, write, labelPhrase));
 			Constant.setUniquePDValsPerUser(TimelineUtils.getUniquePDValPerUser(givenDayTimelines, write, labelPhrase));
 		}
 		else
 		{
-			TimelineUtils.getUniqueLocIDs(givenDayTimelines, write, labelPhrase);
-			TimelineUtils.getUniqueLocIDsPerActID(givenDayTimelines, write, labelPhrase);
-			TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write, labelPhrase);
+			if (!databaseName.equals("dcu_data_2"))
+			{
+				TimelineUtils.getUniqueLocIDs(givenDayTimelines, write, labelPhrase);
+				TimelineUtils.getUniqueLocIDsPerActID(givenDayTimelines, write, labelPhrase);
+				TimelineUtils.getUserIDActIDLocIDMap(givenDayTimelines, write, labelPhrase);
+			}
 			TimelineUtils.getUniqueActivityIDs(givenDayTimelines, write, labelPhrase);
 			TimelineUtils.getUniquePDValPerUser(givenDayTimelines, write, labelPhrase);
 		}
@@ -780,7 +803,7 @@ public class ControllerWithoutServer
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = null;
 		// new LinkedHashMap<String, LinkedHashMap<Date, UserDayTimeline>>();
 		System.out.println("Before createTimelines\n" + PerformanceAnalytics.getHeapInformation());
-		System.out.println("TEMPORARY EXIT");// TODO CAN BE DELETE
+		// System.out.println("TEMPORARY EXIT");// TODO CAN BE DELETE
 		if (toCreateTimelines)
 		{
 			usersDayTimelinesOriginal = createTimelines(databaseName, jsonArrayD,
@@ -800,6 +823,11 @@ public class ControllerWithoutServer
 		if (toDeSerializeTimelines)
 		{
 			if (databaseName.equals("gowalla1"))
+			{
+				usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+						.kryoDeSerializeThis(pathToLatestSerialisedTimelines);
+			}
+			if (databaseName.equals("dcu_data_2"))
 			{
 				usersDayTimelinesOriginal = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 						.kryoDeSerializeThis(pathToLatestSerialisedTimelines);
@@ -1026,10 +1054,14 @@ public class ControllerWithoutServer
 			List<Integer> userIndicesToSelect, String commonBasePath, int lengthOfRecommendedSequence)
 			throws IOException
 	{
+		// PopUps.showMessage("sampleUsersByIndicesExecuteRecommendationTests: usersCleanedDayTimelines.size()= "
+		// + usersCleanedDayTimelines.size());
 		// LinkedHashMap<Integer, String> indexOfBlackListedUsers = new LinkedHashMap<>();
 		System.out.println(
 				"Inside sampleUsersByIndicesExecuteRecommendationTests: usersCleanedDayTimelines received size="
 						+ usersCleanedDayTimelines.size());
+		// PopUps.showMessage("sampleUsersByIndicesExecuteRecommendationTests :usersCleanedDayTimelines.size() = "
+		// + usersCleanedDayTimelines.size());
 
 		System.out.println("-- iteration start for groupOf100UsersLabel = " + groupOf100UsersLabel);
 		// important so as to wipe the previously assigned user ids
@@ -1467,7 +1499,9 @@ public class ControllerWithoutServer
 			pathForLatestSerialisedJSONArray = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/JSONArray"
 					+ DateTimeUtils.getShortDateLabel(currentDateTime) + "obj";
 
-			pathToLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";
+			pathToLatestSerialisedTimelines = "./dataToRead/DCULLDec15/DCULLTimelineDEC16.kryo";
+			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
+			// Works/WorkingSet7July/DCUUserTimelinesJUN19.lmap";//disabled on 15 Dec 2018
 			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
 			// Works/WorkingSet7July/DCUUserTimelinesJUN15.lmap";
 			// "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data
@@ -1475,7 +1509,9 @@ public class ControllerWithoutServer
 			pathForLatestSerialisedTimelines = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/DCUUserTimelines"
 					+ DateTimeUtils.getShortDateLabel(currentDateTime) + ".lmap";
 
-			commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
+			// commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";//disabled on
+			// 15 Dec 2018
+			commonPath = Constant.getOutputCoreResultsPath();// since 15 Dec 2018
 			break;
 
 		default:
@@ -1578,6 +1614,16 @@ public class ControllerWithoutServer
 				usersDayTimelinesOriginal = TimelineCreators.createUserTimelinesFromCheckinEntriesGowallaFaster1(
 						mapForAllCheckinData, mapForAllLocationData);
 			}
+		}
+		else if (databaseName.equals("dcu_data_2"))
+		{// added on 15 Dec 2018, direct timeline creation instead of using databases
+			Triple<LinkedHashMap<String, LinkedHashMap<Date, Timeline>>, TreeMap<Integer, String>, LinkedHashMap<Integer, String>> res = DCU_Data_Loader
+					.createTimelinesForDCUData(Constant.getCommonPath(),
+							"/home/gunjan/Documents/UCD/Projects/Gowalla/DCUDataWorksDec2018/");
+
+			usersDayTimelinesOriginal = res.getFirst();
+			DomainConstants.setCatIDNameDictionary(res.getSecond(), true);
+			DomainConstants.setLocIDNameDictionary(res.getThird(), true);// dummy
 		}
 		else // When databaseName is not gowalla1
 		{

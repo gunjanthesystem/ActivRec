@@ -211,7 +211,8 @@ public class Timeline implements Serializable
 
 	public ActivityObject2018 getNextValidActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
-		// System.out.println("To find next activity object at :"+timestamp);
+		System.out
+				.println("getNextValidActivityAfterActivityAtThisTime: To find next activity object at :" + timestamp);
 		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectAtTime(timestamp);
 		return getNextValidActivityAfterActivityAtThisPositionPD(indexOfActivityObjectAtGivenTimestamp);
 	}
@@ -853,8 +854,8 @@ public class Timeline implements Serializable
 	 */
 	public ArrayList<ActivityObject2018> getActivityObjectsBetweenTime(Timestamp st, Timestamp et)
 	{
-		ArrayList<ActivityObject2018> activityObjectsIn = (ArrayList<ActivityObject2018>) activityObjectsInTimeline.stream()
-				.filter(ao -> ao.doesOverlap(st, et)).collect(Collectors.toList());
+		ArrayList<ActivityObject2018> activityObjectsIn = (ArrayList<ActivityObject2018>) activityObjectsInTimeline
+				.stream().filter(ao -> ao.doesOverlap(st, et)).collect(Collectors.toList());
 
 		// ArrayList<ActivityObject> activityObjectsIn2 = new ArrayList<>();
 
@@ -1196,8 +1197,8 @@ public class Timeline implements Serializable
 	 * 
 	 * @since 12 June 2017
 	 */
-	public Triple<Integer, ActivityObject2018, Double> getTimeDiffValidAOWithStartTimeNearestTo(Timestamp givenTimestamp,
-			boolean verbose)
+	public Triple<Integer, ActivityObject2018, Double> getTimeDiffValidAOWithStartTimeNearestTo(
+			Timestamp givenTimestamp, boolean verbose)
 	{
 		long givenTimestampLong = givenTimestamp.getTime();
 		// if (this.isShouldBelongToSingleDay())

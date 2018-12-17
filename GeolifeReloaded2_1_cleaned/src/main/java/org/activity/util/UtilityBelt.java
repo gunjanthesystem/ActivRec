@@ -330,6 +330,8 @@ public class UtilityBelt
 	 */
 	public static boolean isValidActivityObject(ActivityObject2018 ao)
 	{
+		// PopUps.showMessage("Constant.INVALID_ACTIVITY1_ID = " + Constant.INVALID_ACTIVITY1_ID
+		// + "\nConstant.INVALID_ACTIVITY2_ID = " + Constant.INVALID_ACTIVITY2_ID);
 		if (Constant.getDatabaseName().equals("gowalla1")) // gowalla has no invalid activity names
 		{// to speed up
 			return true;

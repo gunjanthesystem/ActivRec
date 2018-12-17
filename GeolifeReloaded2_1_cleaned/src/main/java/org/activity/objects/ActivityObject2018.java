@@ -908,13 +908,22 @@ public class ActivityObject2018 implements Serializable
 	public String toStringAllGowallaTSWithNameForHeaded(String delimiter)
 	{
 
-		String locationName = locationIDs.stream().map(lid -> DomainConstants.getLocationIDNameDictionary().get(lid))
-				.collect(Collectors.joining("-"));
+		// PopUps.showMessage("locationIDs = " + locationIDs);
+		// PopUps.showMessage(
+		// "DomainConstants.getLocationIDNameDictionary() = " + DomainConstants.getLocationIDNameDictionary());
+		String locationName = locationIDs == null ? ""
+				: locationIDs.stream().map(lid -> DomainConstants.getLocationIDNameDictionary().get(lid))
+						.collect(Collectors.joining("-"));
 		// .getLocIDLocationObjectDictionary().get(lid).locationName)
 
 		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
-				? delimiter + this.distanceTravelled + delimiter + this.startLongitude + delimiter + this.startLongitude
-						+ delimiter + this.endLatitude + delimiter + this.endLongitude + delimiter + this.avgAltitude
+				? delimiter + this.durationInSeconds + delimiter + this.distanceTravelled + delimiter
+						+ this.startLongitude + delimiter + this.startLongitude + delimiter + this.endLatitude
+						+ delimiter + this.endLongitude + delimiter + this.avgAltitude
+				: "";
+
+		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
+				? delimiter + this.durationInSeconds
 				: "";
 
 		return activityID + delimiter + this.getLocationIDs('-') + delimiter
@@ -925,7 +934,7 @@ public class ActivityObject2018 implements Serializable
 				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
 				+ checkins_count + delimiter + users_count + delimiter + radius_meters + delimiter + highlights_count
 				+ delimiter + items_count + delimiter + max_items_count + delimiter + distInMFromPrev + delimiter
-				+ durInSecFromPrev + delimiter + gridIndex + additionalGeolifeFeatures;
+				+ durInSecFromPrev + delimiter + gridIndex + additionalGeolifeFeatures + additionalDCUFeatures;
 	}
 
 	/**
@@ -937,15 +946,20 @@ public class ActivityObject2018 implements Serializable
 	public static String getHeaderForStringAllGowallaTSWithNameForHeaded(String delimiter)
 	{
 		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
-				? delimiter + "distanceTravelled" + delimiter + "startLongitude" + delimiter + "startLongitude"
-						+ delimiter + "endLatitude" + delimiter + "endLongitude" + delimiter + "avgAltitude"
+				? delimiter + "durationInSeconds" + delimiter + "distanceTravelled" + delimiter + "startLongitude"
+						+ delimiter + "startLongitude" + delimiter + "endLatitude" + delimiter + "endLongitude"
+						+ delimiter + "avgAltitude"
+				: "";
+
+		String additionalDCUFeatures = Constant.getDatabaseName().equals("geolife1") ? delimiter + "durationInSeconds"
 				: "";
 
 		return "actID" + delimiter + "locID" + delimiter + "activityName" + delimiter + "locationName" + delimiter
 				+ "workLvlCat" + delimiter + "stTS" + delimiter + "stLat" + delimiter + "stLon" + delimiter + "uID"
 				+ delimiter + "photos_c" + delimiter + "cins_c" + delimiter + "users_c" + delimiter + "radius_m"
 				+ delimiter + "highlts_count" + delimiter + "items_c" + delimiter + "max_items_c" + delimiter
-				+ "distPrev" + delimiter + "durPrev" + delimiter + "gridID" + additionalGeolifeFeatures;
+				+ "distPrev" + delimiter + "durPrev" + delimiter + "gridID" + additionalGeolifeFeatures
+				+ additionalDCUFeatures;
 	}
 
 	/**
@@ -971,8 +985,10 @@ public class ActivityObject2018 implements Serializable
 	public static String getHeaderForStringAllGeolifeWithNameForHeaded2(ActivityObject2018 ao, String delimiter)
 	{
 		long secsSinceMidnight = DateTimeUtils.getTimeInDayInSecondsZoned(ao.getStartTimestampInms(), ZoneId.of("UTC"));
-		long startGeo = HilbertCurveUtils.getCompactHilbertCurveIndex(ao.getStartLatitude(), ao.getStartLongitude());
-		long endGeo = HilbertCurveUtils.getCompactHilbertCurveIndex(ao.getEndLatitude(), ao.getEndLongitude());
+		long startGeo = ao.getStartLatitude() == null ? -9999
+				: HilbertCurveUtils.getCompactHilbertCurveIndex(ao.getStartLatitude(), ao.getStartLongitude());
+		long endGeo = ao.getEndLatitude() == null ? -9999
+				: HilbertCurveUtils.getCompactHilbertCurveIndex(ao.getEndLatitude(), ao.getEndLongitude());
 
 		return secsSinceMidnight + delimiter + ao.getDurationInSeconds() + delimiter + ao.getDistanceTravelled()
 				+ delimiter + /* ao.getStartLatitude() + delimiter + ao.getStartLongitude() + delimiter + */startGeo
@@ -1292,6 +1308,44 @@ public class ActivityObject2018 implements Serializable
 	}
 
 	/// End of Nov 14 2018
+
+	// Start of Dec 15 2018 for DCU Lifelog dataset
+	/**
+	 * For DCU lifelog dataset to be directly created from serialised maps.
+	 * 
+	 * 
+	 * @param userID
+	 * @param activityName
+	 * @param activityID
+	 * @param workingLevelCatIDs
+	 * @param startTimestampInms
+	 * @param endTimestampInms
+	 * @param durationInSeconds
+	 * @param durInSecFromPrev
+	 * @param timeZoneId
+	 * 
+	 * @since 15 December 2018
+	 */
+	public ActivityObject2018(String userID, String activityName, int activityID, String workingLevelCatIDs,
+			long startTimestampInms, long endTimestampInms, long durationInSeconds, long durInSecFromPrev,
+			ZoneId timeZoneId)
+	{
+		this.userID = userID;
+		this.activityName = activityName;
+		this.activityID = activityID;
+		this.workingLevelCatIDs = workingLevelCatIDs;
+		this.startTimestampInms = startTimestampInms;
+		this.endTimestampInms = endTimestampInms;
+		this.durationInSeconds = durationInSeconds;
+		this.durInSecFromPrev = durInSecFromPrev;
+		this.timeZoneId = timeZoneId;
+		ArrayList<Integer> dummyLocIDs = new ArrayList<>();
+		dummyLocIDs.add(-1);
+		this.locationIDs = dummyLocIDs;
+
+	}
+	// End of Dec 15 2018 for DCU Lifelog dataset
+
 	/**
 	 * @return the distanceTravelled
 	 */

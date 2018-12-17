@@ -112,8 +112,9 @@ public class StringCode
 	 * @until 16 JUly 2018
 	 * @deprecated
 	 */
-	public static HashMap<Integer, Character> getLocallyUniqueCharCodeMap(ArrayList<ActivityObject2018> activityObjects1,
-			ArrayList<ActivityObject2018> activityObjects2, PrimaryDimension primaryDimension)
+	public static HashMap<Integer, Character> getLocallyUniqueCharCodeMap(
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2,
+			PrimaryDimension primaryDimension)
 	{
 		LinkedHashSet<Integer> uniquePrimaryDimensionVals = new LinkedHashSet<>();
 
@@ -243,28 +244,28 @@ public class StringCode
 	{
 		switch (featureName)
 		{
-			case "StartTime":
-				return getStringCodesForStartTime(activityObjects1, activityObjects2);
+		case "StartTime":
+			return getStringCodesForStartTime(activityObjects1, activityObjects2);
 
-			case "Duration":
-				return getStringCodesForDuration(activityObjects1, activityObjects2);
+		case "Duration":
+			return getStringCodesForDuration(activityObjects1, activityObjects2);
 
-			case "DistanceTravelled":
-				return getStringCodesForDistanceTravelled(activityObjects1, activityObjects2);
+		case "DistanceTravelled":
+			return getStringCodesForDistanceTravelled(activityObjects1, activityObjects2);
 
-			case "StartGeoCoordinates":
-				return getStringCodesForStartGeoCoordinates(activityObjects1, activityObjects2);
+		case "StartGeoCoordinates":
+			return getStringCodesForStartGeoCoordinates(activityObjects1, activityObjects2);
 
-			case "EndGeoCoordinates":
-				return getStringCodesForEndGeoCoordinates(activityObjects1, activityObjects2);
+		case "EndGeoCoordinates":
+			return getStringCodesForEndGeoCoordinates(activityObjects1, activityObjects2);
 
-			case "AvgAltitude":
-				return getStringCodesForAvgAltitudes(activityObjects1, activityObjects2);
+		case "AvgAltitude":
+			return getStringCodesForAvgAltitudes(activityObjects1, activityObjects2);
 
-			default:
-				System.err.println(
-						"Error in org.activity.util.StringCode.getStringCodeForFeature(ArrayList<ActivityObject>, String): unsuitable feature name"
-								+ featureName);
+		default:
+			System.err.println(
+					"Error in org.activity.util.StringCode.getStringCodeForFeature(ArrayList<ActivityObject>, String): unsuitable feature name"
+							+ featureName);
 		}
 		System.err.println(
 				"Error in org.activity.util.StringCode.getStringCodeForFeature(ArrayList<ActivityObject>, String): reached unreachable code.");
@@ -446,8 +447,8 @@ public class StringCode
 			{
 				return (char) 65;// A
 			}
-
-			else if (invalidActivityName.equals(Constant.INVALID_ACTIVITY1))
+			else if (invalidActivityName.equals(Constant.INVALID_ACTIVITY2)) // to remove Bug16Dec2018 on 16 Dec 2018
+			// else if (invalidActivityName.equals(Constant.INVALID_ACTIVITY1))// disabled on 16 Dec 2018
 			{
 				return (char) 66;// B
 			}

@@ -177,6 +177,22 @@ public class PathConstants
 
 			}
 		}
+		else if (databaseName.equals("dcu_data_2"))
+		{
+
+			pathToSerialisedCatIDNameDictionary = "";
+			pathToSerialisedLocationObjects = "";
+			pathToSerialisedLevelWiseCatIDsDict = "";
+			pathToSerialisedCatIDsHierDist = "";
+			pathToSerialisedMergedCheckinData = "./dataToRead/DCULLDec15/mapForAllDataMergedPlusDuration.map";
+			pathToSerialisedUserObjects = "";
+			// Irrelvant but included for conformity.
+			pathToLocationTimezoneInfo = "";
+			pathToSerialisedGowallaLocZoneIdMap = "";
+			System.out.println(""
+					+ "Warning :setting empty paths in org.activity.constants.PathConstants.intialise(boolean, String) for unknown database: "
+					+ Constant.getDatabaseName());
+		}
 		else
 		{
 
@@ -193,6 +209,7 @@ public class PathConstants
 					+ "Warning :setting empty paths in org.activity.constants.PathConstants.intialise(boolean, String) for unknown database: "
 					+ Constant.getDatabaseName());
 		}
+		// pathToSerialisedMergedCheckinData
 		// //start of curtain April 9 2018
 		// else
 		// {
