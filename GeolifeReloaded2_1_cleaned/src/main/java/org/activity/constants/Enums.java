@@ -34,7 +34,8 @@ public class Enums
 	 */
 	public enum GowGeoFeature
 	{
-		ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF, DurationF, DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF;
+		ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF, DurationF, DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF;// ,
+																																					// EndTimeF;
 	}
 
 	public enum TypeOfExperiment

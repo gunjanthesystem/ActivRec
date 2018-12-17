@@ -109,7 +109,8 @@ public class Dashboard3 extends Application
 		{
 			usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 					.kryoDeSerializeThis(PathConstants.pathToToyTimelines12AUG);
-			ControllerWithoutServer.setDataVarietyConstants(usersCleanedDayToyTimelines, true, "ToyTs_", true, true);
+			ControllerWithoutServer.setDataVarietyConstants(usersCleanedDayToyTimelines, true, "ToyTs_", true, true,
+					Constant.getDatabaseName());
 
 			List<Integer> uniqueActIDs = new ArrayList<>(Constant.getUniqueActivityIDs());
 			ColorPalette.setColors("Paired", uniqueActIDs.size());

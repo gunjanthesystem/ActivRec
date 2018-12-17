@@ -129,6 +129,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			double percentageInTraining, int lengthOfRecommendedSequence,
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersTimelines)
 	{
+		// PopUps.showMessage("RecommendationTestsMar2017GenSeqCleaned3Nov2017: sampledUsersTimelines.size() ="
+		// + sampledUsersTimelines.size());
 		System.out.println("\n\n **********Entering RecommendationTestsMar2017GenSeqCleaned2********** " + lookPastType
 				+ " " + caseType + " lengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
 		// PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
@@ -712,7 +714,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 										continue;
 									}
 									if (activityNameInTestDay.equals(Constant.INVALID_ACTIVITY2))
-									{// ("Others"/"Not// Available"))
+									{// ("Others"/"Not Available"))
 										System.out.println("Skipping because " + Constant.INVALID_ACTIVITY2);
 										continue;
 									}

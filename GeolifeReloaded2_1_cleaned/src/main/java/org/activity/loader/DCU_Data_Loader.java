@@ -7,22 +7,28 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.activity.constants.Constant;
+import org.activity.controller.SuperController;
 import org.activity.generator.DatabaseCreatorDCU;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
+import org.activity.objects.ActivityObject2018;
 import org.activity.objects.FlatActivityLogEntry;
 import org.activity.objects.LocationObject;
 import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 import org.activity.util.ConnectDatabase;
+import org.activity.util.DateTimeUtils;
 
 /**
  * Taken from iiWAS backup.
@@ -38,7 +44,8 @@ public class DCU_Data_Loader
 	static final String[] userNames = { "Stefan", "Tengqi", "Cathal", "Zaher", "Rami" };
 	// public static String commonPath = "/run/media/gunjan/OS/Users/gunjan/Documents/DCU Data Works/WorkingSet7July/";
 	public static String pathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/DCUDataWorksDec2018/";
-	public static String commonPathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/DCUDataWorksDec2018/TimelineCreation/";
+	public static String commonPathToWrite = "";
+	// "/home/gunjan/Documents/UCD/Projects/Gowalla/DCUDataWorksDec2018/TimelineCreation/";
 	// static final String databaseTableName = "Image2_Table";
 
 	static final String[] activityNames = { "Others", "Commuting", "Computer", "Eating", "Exercising", "Housework",
@@ -48,27 +55,48 @@ public class DCU_Data_Loader
 	static LinkedHashMap<String, TreeMap<Timestamp, String>> mapForAllDataMergedPlusDuration;
 	// <UserName, <Timestamp,'activityName||durationInSeconds'>>
 
+	public static void main(String args[])
+	{
+		createTimelinesForDCUData("/home/gunjan/Documents/UCD/Projects/Gowalla/DCUDataWorksDec2018/TimelineCreation/",
+				"/home/gunjan/Documents/UCD/Projects/Gowalla/DCUDataWorksDec2018/");
+	}
+
 	/**
+	 * Convert serialize map to user day timelines
+	 * <p>
 	 * Fork of orignal main to bypass creation of database and directly create ActivityObjects
 	 * <p>
 	 * We want timeline as LinkedHashMap<String, LinkedHashMap<Date, Timeline>>
 	 * 
-	 * @param args
+	 * 
+	 * @param commonPathToWriteGiven
+	 * @param pathToRead
+	 * @return userDayTimeline and actIDNameDictionary
+	 * @since 14 Dec 2018
 	 */
-	public static void main(String[] args)
+	public static Triple<LinkedHashMap<String, LinkedHashMap<Date, Timeline>>, TreeMap<Integer, String>, LinkedHashMap<Integer, String>> createTimelinesForDCUData(
+			String commonPathToWriteGiven, String pathToReadGiven)
 	{
-		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDayTimelines = new LinkedHashMap<>();
+		commonPathToWrite = commonPathToWriteGiven;// .trim().length() > 0 ? commonPathToWriteGiven
+		pathToRead = pathToReadGiven;
+		TreeMap<Integer, String> actIDNameDict = new TreeMap<>();
+		LinkedHashMap<Integer, String> locIDNameDict = new LinkedHashMap<>();
+		// : commonPathToWrite;
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDayTimelines = null;
+
+		String databaseName = Constant.getDatabaseName();
+		SuperController.initializeConstants("SuperController", Constant.For9kUsers, databaseName);
 
 		try
 		{
-			File loadLog = new File(commonPathToWrite + "dataLoadingLog.txt");
+			File loadLog = new File(commonPathToWrite + "dataLoadingLog" + DateTimeUtils.getMonthDateLabel() + ".txt");
 			loadLog.delete();
 			loadLog.createNewFile();
-
 			PrintStream loadLogStream = new PrintStream(loadLog);
 			System.setOut(loadLogStream);
 			System.setErr(loadLogStream);
 
+			// LinkedHashMap<String, TreeMap<Timestamp, String>>
 			mapForAllDataMergedPlusDuration = (LinkedHashMap<String, TreeMap<Timestamp, String>>) (Serializer
 					.deSerializeThis(pathToRead + "mapForAllDataMergedPlusDuration.map"));
 			// traverseMapForAllData(testSerializer);;
@@ -84,179 +112,127 @@ public class DCU_Data_Loader
 
 			traverseMapForAllData(mapForAllDataMergedPlusDuration);
 			writeMapForAllData(mapForAllDataMergedPlusDuration, commonPathToWrite);// added on 10 Dec
+
 			// Uncomment below to load data in database
-			long timeId = -1;
-			int dateId = -1;
+			// long timeId = -1;
+			// int dateId = -1;
 
-			ArrayList<Integer> uniqueActivityIds = new ArrayList<Integer>();
-			ArrayList<Integer> uniqueDateIds = new ArrayList<Integer>();
-			ArrayList<Integer> uniqueLocationIds = new ArrayList<Integer>();
-			ArrayList<Long> uniqueTimeIds = new ArrayList<Long>();
+			// ArrayList<Integer> uniqueDateIds = new ArrayList<Integer>();
+			// ArrayList<Integer> uniqueLocationIds = new ArrayList<Integer>();
+			// ArrayList<Long> uniqueTimeIds = new ArrayList<Long>();
 
-			ArrayList<FlatActivityLogEntry> listOfActivityEntries = new ArrayList<FlatActivityLogEntry>();
+			// ArrayList<FlatActivityLogEntry> listOfActivityEntries = new ArrayList<FlatActivityLogEntry>();
 
 			// added on 10 Dec 2018
-			LinkedHashMap<String, List<FlatActivityLogEntry>> mapOfListOfActivityEntries = new LinkedHashMap<>();
+			// LinkedHashMap<String, List<FlatActivityLogEntry>> mapOfListOfActivityEntries = new LinkedHashMap<>();
+			LinkedHashMap<String, LinkedHashMap<Date, ArrayList<ActivityObject2018>>> userDaywiseActivityObjects = new LinkedHashMap<>();
 
+			// start of loop over users
 			for (Map.Entry<String, TreeMap<Timestamp, String>> entry : mapForAllDataMergedPlusDuration.entrySet())
 			{
-				ArrayList<FlatActivityLogEntry> listOfActivityEntriesForThisUser = new ArrayList<FlatActivityLogEntry>();
+				// added on 15 Dec 2018
+				LinkedHashMap<Date, ArrayList<ActivityObject2018>> daywiseAOsForThisUser = new LinkedHashMap<>();
+				// ArrayList<ActivityObject2018> listOfAOsForThisUser = new ArrayList<>();// added on 15 Dec 2018
+				// ArrayList<FlatActivityLogEntry> listOfActivityEntriesForThisUser = new
+				// ArrayList<FlatActivityLogEntry>();
 				String userName = entry.getKey();
 				System.out.println("\nUser =" + userName);
-
 				int userId = getUserIdFromName(userName);
-
-				int userAge = getUserAge(userId);
-				String ageCategory = getAgeCategory(userAge);
-				String profession = getProfession(userId);
-				String personality = getPersonality(profession);
-
+				Timestamp prevEndTimestamp = null;
 				// System.out.println("User id = "+userId);
-				// ConnectDatabase.insertIntoUserDimension(userId, userName, userAge, personality, profession,
-				// ageCategory);
-
-				Timestamp timeSanityCheck = new Timestamp(0, 0, 0, 0, 0, 0, 0);
+				// Timestamp timeSanityCheck = new Timestamp(0, 0, 0, 0, 0, 0, 0);
+				Date currentDate = null;// added on 15 Dec 2018
 
 				for (Map.Entry<Timestamp, String> dataForAUser : entry.getValue().entrySet())
 				{
-					int year = dataForAUser.getKey().getYear() + 1900;
-					int month = dataForAUser.getKey().getMonth() + 1;
+					int year = dataForAUser.getKey().getYear();// + 1900;
+					int month = dataForAUser.getKey().getMonth();// + 1;
 					int day = dataForAUser.getKey().getDate();
+					currentDate = new Date(year, month, day);// added on 15 Dec 2018
 
 					Timestamp startTimestamp = dataForAUser.getKey();
-					int startHour = dataForAUser.getKey().getHours();
-					int startMinute = dataForAUser.getKey().getMinutes();
-					int startSecond = dataForAUser.getKey().getSeconds();
-
+					// int startHour = dataForAUser.getKey().getHours();
+					// int startMinute = dataForAUser.getKey().getMinutes();
+					// int startSecond = dataForAUser.getKey().getSeconds();
 					// Timestamp endTimestamp = new Timestamp(dataForAUser.getKey().getTime()+
 					// getDurationInSecondsFromDataEntry(dataForAUser.getValue())*1000);
 					// endTimestamp = new Timestamp(endTimestamp.getTime()-1000);
 					// int endHour= endTimestamp.getHours();
 					// int endMinute= endTimestamp.getMinutes();
 					// int endSecond= endTimestamp.getSeconds();//-1; // Be careful of the propagation of its affect
-					//
 					long duration = getDurationInSecondsFromDataEntry(dataForAUser.getValue());
-
-					Timestamp endTimestamp = new Timestamp(startTimestamp.getTime() + (duration * 1000) - 1000); // decrementing
-																													// 1
-																													// second
-																													// to
-																													// keep
-																													// consecutive
-																													// activities
-																													// separated
-																													// by
-																													// 1
-																													// seconds
-					int endHour = endTimestamp.getHours();
-					int endMinute = endTimestamp.getMinutes();
-					int endSecond = endTimestamp.getSeconds();
-
+					Timestamp endTimestamp = new Timestamp(startTimestamp.getTime() + (duration * 1000) - 1000);
+					// decrementing 1 second to keep consecutive activities separated by 1 seconds
+					// int endHour = endTimestamp.getHours();
+					// int endMinute = endTimestamp.getMinutes();
+					// int endSecond = endTimestamp.getSeconds();
 					// if(((endTimestamp.getTime()-startTimestamp.getTime()) /1000) != (duration-1))
-					// {
-					// System.err.println("Error in data loading wrt: starttime-endtime != duration,
+					// {System.err.println("Error in data loading wrt: starttime-endtime != duration,
 					// starttime="+startTimestamp+" endtime="+endTimestamp+" duration="+duration);
 					// System.err.println("(endTimestamp.getTime()-startTimestamp.getTime()/1000)"+((endTimestamp.getTime()-startTimestamp.getTime())/1000));//+"
-					// endtime"+endTimestamp+" duration="+duration);
-					//
-					// }
-
+					// endtime"+endTimestamp+" duration="+duration);}
 					// else System.out.println("\nstarttime="+startTimestamp+" endtime="+endTimestamp+"
 					// duration="+duration+" endHourminutesseconds="+endHour+":"+endMinute+":"+endSecond);
-
-					dateId = Integer.parseInt(Integer.toString(day) + Integer.toString(month) + Integer.toString(year));
-
+					// dateId = Integer.parseInt(Integer.toString(day) + Integer.toString(month) +
+					// Integer.toString(year));
 					String activityName = getActivityNameFromDataEntry(dataForAUser.getValue());
 					int activityId = getActivityIdFromActivityName(activityName);
 					String activityCategory = getActivityCategoryFromActivityName(activityName);
-
-					if (!(uniqueActivityIds.contains(activityId)))
-					{
-						System.out.println("inserting in activity dimension:" + activityId + " " + activityName + " "
-								+ activityCategory);
-						ConnectDatabase.insertIntoActivityDimension(activityId, activityName, activityCategory);
-						uniqueActivityIds.add(activityId);
-					}
-
-					LocationObject locationObject = LocationObject.getSyntheticLocationObjectInstance(userId, 99);
-
+					actIDNameDict.put(activityId, activityName);
+					// if (!(uniqueActivityIds.contains(activityId)))
+					// { // System.out.println("inserting in activity dimension:" + activityId + " " + activityName + "
+					// "+ activityCategory);
+					// ConnectDatabase.insertIntoActivityDimension(activityId, activityName, activityCategory);}
+					// LocationObject locationObject = LocationObject.getSyntheticLocationObjectInstance(userId, 99);
 					// //timeId=Long.parseLong(
 					// Long.toString(startHour)+Long.toString(startMinute)+Long.toString(startSecond)+
-					// Long.toString(endHour)+Long.toString(endMinute)+Long.toString(endSecond)
-					// );
+					// Long.toString(endHour)+Long.toString(endMinute)+Long.toString(endSecond));
+					// timeId = timeId + 1;
+					// System.out.println("timeid is" + timeId);
+					// String timeCategory = getTimeCategory(startHour);
+					// String weekDay = getWeekDay(startTimestamp);
+					// String weekOfYear = getWeekOfYear(startTimestamp);
+					// FlatActivityLogEntry activityLogEntry = new FlatActivityLogEntry(); // represents a row of all
+					long durationFromPrevInSecs = prevEndTimestamp == null ? -9999
+							: startTimestamp.getTime() - (prevEndTimestamp.getTime() + 1000);
 
-					timeId = timeId + 1;
+					if (durationFromPrevInSecs != -9999 & durationFromPrevInSecs < 0)
+					{
+						PopUps.showError("Error: durationFromPrevInSecs = " + durationFromPrevInSecs);
+						PopUps.printTracedErrorMsgWithExit("Error: durationFromPrevInSecs = " + durationFromPrevInSecs);
+					}
+					ActivityObject2018 ao = new ActivityObject2018(String.valueOf(userId), activityName, activityId,
+							String.valueOf(activityId), startTimestamp.getTime(), endTimestamp.getTime(), duration,
+							durationFromPrevInSecs, ZoneId.of("GMT"));
 
-					System.out.println("timeid is" + timeId);
-					String timeCategory = getTimeCategory(startHour);
-					String weekDay = getWeekDay(startTimestamp);
-					String weekOfYear = getWeekOfYear(startTimestamp);
+					ArrayList<ActivityObject2018> listOfAOsForCurrentDate = null;
+					if (daywiseAOsForThisUser.containsKey(currentDate))
+					{// there is already an entry for this date
+						listOfAOsForCurrentDate = daywiseAOsForThisUser.get(currentDate);
+					}
+					else
+					{// create a new empty list for this date.
+						listOfAOsForCurrentDate = new ArrayList<>();
+					}
 
-					FlatActivityLogEntry activityLogEntry = new FlatActivityLogEntry(); // represents a row of all
-																						// combined table
+					listOfAOsForCurrentDate.add(ao);
+					daywiseAOsForThisUser.put(currentDate, listOfAOsForCurrentDate);
 
-					activityLogEntry.setUser_ID(userId);
-					activityLogEntry.setActitivity_ID(activityId);
-					activityLogEntry.setTime_ID(timeId);
-					activityLogEntry.setDate_ID(dateId);
-					activityLogEntry.setLocation_ID(locationObject.getLocationId());
-					activityLogEntry.setDuration(safeLongToInt(duration));
-					activityLogEntry.setFrequency(1);
-					activityLogEntry.setUser_Name(userName);
-					activityLogEntry.setPersonality_Tags(personality);
-					activityLogEntry.setProfession(profession);
-					activityLogEntry.setAge_Category(ageCategory);
-					activityLogEntry.setUser_Age(userAge);
-					activityLogEntry.setActivity_Name(activityName);
-					activityLogEntry.setActivity_Category(activityCategory);
-					activityLogEntry.setStart_Time(startHour, startMinute, startSecond);
-					// activityLogEntry.setStart_Time(startTimestamp);
-					activityLogEntry.setEnd_Time(endHour, endMinute, endSecond);
-					// activityLogEntry.setEnd_Time(endTimestamp);
-					activityLogEntry.setTime_Category(timeCategory);
-					activityLogEntry.setStart_Date(year, month, day);
-					activityLogEntry.setWeek_Day(weekDay);
-					activityLogEntry.setMonth(month);
-					activityLogEntry.setQuarter(month);
-					activityLogEntry.setWeek(Integer.parseInt(weekOfYear));
-					activityLogEntry.setYear(year);
-					activityLogEntry.setStartLatitude(locationObject.getLatitude());
-					activityLogEntry.setStartLongitude(locationObject.getLongitude());
-					activityLogEntry.setLocation_Name(locationObject.locationName);
-					activityLogEntry.setLocation_Category(locationObject.locationCategory);
-					activityLogEntry.setCity(locationObject.city);
-					activityLogEntry.setCounty(locationObject.county);
-					activityLogEntry.setCountry(locationObject.country);
-					activityLogEntry.setContinent(locationObject.continent);
-
-					// ConnectDatabase.insertIntoActivityFact(activityLogEntry);
-					//
-					// if (!(uniqueTimeIds.contains(timeId)))
-					// {
-					// ConnectDatabase.insertIntoTimeDimension(activityLogEntry);
-					// uniqueTimeIds.add(timeId);
-					// }
-					//
-					// if (!(uniqueDateIds.contains(dateId)))
-					// {
-					// ConnectDatabase.insertIntoDateDimension(activityLogEntry);
-					// uniqueDateIds.add(dateId);
-					// }
-					//
-					// if (!(uniqueLocationIds.contains(locationObject.getLocationId())))
-					// {
-					// ConnectDatabase.insertIntoLocationDimension(activityLogEntry);
-					// uniqueLocationIds.add(locationObject.getLocationId());
-					// }
-					listOfActivityEntries.add(activityLogEntry);
-					listOfActivityEntriesForThisUser.add(activityLogEntry);
+					prevEndTimestamp = endTimestamp;
+					// listOfActivityEntries.add(activityLogEntry);
+					// listOfActivityEntriesForThisUser.add(activityLogEntry);
 				} // end of iteration over data for single user
-				mapOfListOfActivityEntries.put(userName, listOfActivityEntriesForThisUser);
+				userDaywiseActivityObjects.put(String.valueOf(userId), daywiseAOsForThisUser);
+				// mapOfListOfActivityEntries.put(userName, listOfActivityEntriesForThisUser);
 			} // end of iteration over all users
 
-			Serializer.serializeAllLogEntries(listOfActivityEntries, "listOfActivityEntries.list");
+			userDayTimelines = convertDaywiseActivityObjectsToDayTimelines(userDaywiseActivityObjects);
+
+			Serializer.kryoSerializeThis(userDayTimelines,
+					commonPathToWrite + "DCULLTimeline" + DateTimeUtils.getMonthDateLabel() + ".kryo");
+			// Serializer.serializeAllLogEntries(listOfActivityEntries, "listOfActivityEntries.list");
 			System.out.println("Data loading finished");
-			PopUps.showMessage("Data loading finished");
+			// PopUps.showMessage("Data loading finished");
 
 			loadLogStream.close();
 		}
@@ -264,7 +240,52 @@ public class DCU_Data_Loader
 		{
 			e.printStackTrace();
 		}
+		finally
+		{
+			// loadLogStream.close();
+		}
 
+		locIDNameDict.put(-1, "NotAvailable");
+		return new Triple<LinkedHashMap<String, LinkedHashMap<Date, Timeline>>, TreeMap<Integer, String>, LinkedHashMap<Integer, String>>(
+				userDayTimelines, actIDNameDict, locIDNameDict);
+	}
+
+	/**
+	 * 
+	 * @param userDaywiseActivityObjects
+	 * @return
+	 * @since 15 Dec 2018
+	 */
+	private static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> convertDaywiseActivityObjectsToDayTimelines(
+			LinkedHashMap<String, LinkedHashMap<Date, ArrayList<ActivityObject2018>>> userDaywiseActivityObjects)
+	{
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> userDayTimelines = new LinkedHashMap<>(
+				userDaywiseActivityObjects.size());
+
+		StringBuilder sb = new StringBuilder();
+
+		for (Entry<String, LinkedHashMap<Date, ArrayList<ActivityObject2018>>> userEntry : userDaywiseActivityObjects
+				.entrySet())
+		{
+
+			LinkedHashMap<Date, ArrayList<ActivityObject2018>> daywiseAOsForThisUser = userEntry.getValue();
+			LinkedHashMap<Date, Timeline> dayTimelinesForThisUser = new LinkedHashMap<>(daywiseAOsForThisUser.size());
+
+			sb.append("\nUser :" + userEntry.getKey() + " #days = " + daywiseAOsForThisUser.size() + "\n");
+
+			for (Entry<Date, ArrayList<ActivityObject2018>> dateEntry : daywiseAOsForThisUser.entrySet())
+			{
+				dayTimelinesForThisUser.put(dateEntry.getKey(), new Timeline(dateEntry.getValue(), true, true));
+
+				sb.append(dateEntry.getKey() + " --\n");
+				dateEntry.getValue().stream().forEachOrdered(ao -> sb.append(">>" + ao.getActivityName()));
+				sb.append("\n");
+			}
+			userDayTimelines.put(userEntry.getKey(), dayTimelinesForThisUser);
+		}
+
+		System.out.println("------------Debug15Dec--------------\n" + sb.toString() + "\n--------------------\n");
+		return userDayTimelines;
 	}
 
 	public static LinkedHashMap<String, TreeMap<Timestamp, String>> checkForGapsInTimeInterval(
@@ -320,6 +341,8 @@ public class DCU_Data_Loader
 
 	public static void mainOriginal(String[] args)
 	{
+		String commonPathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/DCUDataWorksDec2018/TimelineCreation/";
+		;
 		try
 		{
 			File loadLog = new File(commonPathToWrite + "dataLoadingLog.txt");

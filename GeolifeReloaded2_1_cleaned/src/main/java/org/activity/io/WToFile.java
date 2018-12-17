@@ -3502,6 +3502,9 @@ public class WToFile
 
 			StringBuilder toWrite = new StringBuilder();
 			String fileName = commonPath + userName + "DayTimelines" + timelinesPhrase + ".csv";
+
+			// PopUps.showMessage(
+			// "Writing day timelines to" + fileName + "\n userTimelines.size() =" + userTimelines.size());
 			// PopUps.showMessage("Writing day timelines to" + fileName);
 
 			// File file = new File(fileName);

@@ -128,6 +128,10 @@ public class EvalMetrics
 				// }
 				// }
 
+				// Start of Dec 16 debugging
+				System.out.println("catIDNameDict = " + catIDNameDict);
+				// End of Dec 16 debugging
+
 				for (Entry<Integer, String> cEntry : catIDNameDict.entrySet())
 				{
 					if (UtilityBelt.isValidActivityName(cEntry.getValue()))
@@ -142,6 +146,14 @@ public class EvalMetrics
 				{
 					String actualActName = dataActualForThisUser.get(tokenI);// dataActualValuesForThisUser[tokenI];
 					Double rrValue = Double.valueOf(rrValuesForThisUser[tokenI]);
+
+					// Start of Dec 16 debugging
+					System.out.println("dataActualForThisUser = " + dataActualForThisUser);
+					System.out.println("actualActName = " + actualActName);
+					System.out.println("rrValue = " + rrValue);
+					System.out.println("perActMRR = " + perActMRR);
+					// End of Dec 16 debugging
+
 					perActMRR.get(actualActName).add(rrValue);
 				}
 

@@ -94,7 +94,7 @@ public final class Constant
 
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;// .NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
@@ -181,8 +181,8 @@ public final class Constant
 	/**
 	 * Select top n candidate by (unnormalised) edit distance,
 	 */
-	public static final int nearestNeighbourCandEDThresholdPrimDim = 500;// 750;// 500;// 500;/// -1;// 100;//
-																			// 1500;// 100;//
+	public static final int nearestNeighbourCandEDThresholdPrimDim = -1;// 500;// 750;// 500;// 500;/// -1;// 100;//
+																		// 1500;// 100;//
 	public static final double candEDValThresholdPrimDim = -1;
 	// -1 for no filter//SWITCH_NOV10
 	// added on 23 July 2018 to keep it separate from the threshold used for primary dimension
@@ -206,7 +206,7 @@ public final class Constant
 	private static double dynamicEDAlpha;// = 1;// 0.8;// 0.5;// SWITCH_NOV10
 	public static boolean noFED = false;// Nov 15 2018
 	public static boolean noAED = false;// Nov 15 2018
-	public static final double[] EDAlphas = { 0, 0.1, 0.2, 0.3, 0.4, 0.6, 0.5, 0.7, 0.8, 0.9, 1 };
+	public static final double[] EDAlphas = { 0.5 };// 0, 0.1, 0.2, 0.3, 0.4, 0.6, 0.5, 0.7, 0.8, 0.9, 1 };
 	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
 	// SWITCH_NOV20
 	// = { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75, 0, 0.25,
@@ -234,6 +234,9 @@ public final class Constant
 	public static final boolean useEndGeoInFED = true;// SWITCH_NOV10
 	public static final boolean useAvgAltitudeInFED = true;// SWITCH_NOV10
 
+	// Only for dcu_data_2, added in Dec 15, 2018
+	// public static final boolean useEndTimeInFED = true;// SWITCH_NOV10
+
 	public static final boolean useRTVerseNormalisationForED = true;// true; // TODO KEEP IT true, false version
 
 	public static final boolean computeFEDForEachAOInRTVerse = false;
@@ -244,7 +247,7 @@ public final class Constant
 	public static final boolean useLog2InFEDInRTVerse = false;// false;
 
 	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
-	public static final double percentileForRTVerseMaxForFEDNorm = 10;// 75;// -1// SWITCH_April24
+	public static final double percentileForRTVerseMaxForFEDNorm = -1;// 10;// 75;// -1// SWITCH_April24
 	public static final boolean fixedValPerFeatForRTVerseMaxMinForFEDNorm = false;// 75;// -1// SWITCH_Dec1
 	public static final double percentileForRTVerseMaxForAEDNorm = -1;// 75;// SWITCH //added on 15 Aug 2018
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
@@ -311,7 +314,8 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1" ,"fsny1"// default
+	static String DATABASE_NAME = "dcu_data_2";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
 	public static final boolean searchForOptimalFeatureWts = false;// true;
@@ -343,18 +347,23 @@ public final class Constant
 	// true, // false,
 	// toSerializeTimelines = false, toDeSerializeTimelines = false;
 
-	// since 14 Nov 2018
-	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = false, // false,
-			toSerializeTimelines = false, toDeSerializeTimelines = true;
+	// since 14 Nov 2018 //for geolife
+	// public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines =
+	// false, // false,
+	// toSerializeTimelines = false, toDeSerializeTimelines = true;
 
-	public static final boolean hasInvalidActivityNames = false;
+	// since 14 Nov 2018 //for dcu_data_2
+	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = true, // false,
+			toSerializeTimelines = false, toDeSerializeTimelines = false;
+
+	public static boolean hasInvalidActivityNames;// = false;
 
 	public static String INVALID_ACTIVITY1 = "";// "Unknown";
 	public static String INVALID_ACTIVITY2 = "";// "Not Available";
 
 	// Added on 11 July 2017
-	public static final Integer INVALID_ACTIVITY1_ID = -997;// "Unknown";
-	public static final Integer INVALID_ACTIVITY2_ID = -998;// "Not Available";
+	public static Integer INVALID_ACTIVITY1_ID = null;// -997;// "Unknown";
+	public static Integer INVALID_ACTIVITY2_ID = null;// -998;// "Not Available";
 	// end of Added on 11 July 2017
 
 	public static final double maxForNorm = 9999999; // assuming unnormalised edit distance is never greater than this
@@ -802,7 +811,13 @@ public final class Constant
 
 	/**
 	 * 
-	 * /**
+	 * Note on 15 Dec 2018:
+	 * <p>
+	 * setInvalidActIDs() onlycalled when org.activity.constants.DomainConstants.catIDNameDictionary is not null. Hence,
+	 * setInvalidActIDs will not be called while DCU timelines are being created, hence, it is important to call this
+	 * method again org.activity.constants.Constant.initialise(String, String, String, String, String, String, boolean)
+	 * after creation of DCU timelines.
+	 * <p>
 	 * 
 	 * @param givenCommonpath
 	 * @param databaseName
@@ -858,6 +873,21 @@ public final class Constant
 			// gdDistProvider = new GridDistancesProvider(PathConstants.pathToSerialisedGridIndexPairDist,
 			// PathConstants.pathToSerialisedGridIndexPairDistConverter);
 		}
+
+		if (databaseName.equals("dcu_data_2"))
+		{
+			Constant.hasInvalidActivityNames = true;
+		}
+		else
+		{
+			Constant.hasInvalidActivityNames = false;
+		}
+
+		if (DomainConstants.catIDNameDictionary != null)
+		{
+			setInvalidActIDs();
+		}
+
 	}
 
 	/**
@@ -916,7 +946,7 @@ public final class Constant
 	{
 		Map<String, Integer> res = new LinkedHashMap<>(activityNames.length);
 
-		if (databaseName.equals("gowalla1") || databaseName.equals("geolife1"))
+		if (databaseName.equals("gowalla1") || databaseName.equals("geolife1") || databaseName.equals("dcu_data_2"))
 		{
 			int index = 0;
 			for (String activityName : activityNames)
@@ -1208,11 +1238,27 @@ public final class Constant
 				throw new Exception();
 				// break;
 			}
+			// Constant.INVALID_ACTIVITY1_ID = DomainConstants.getCatIDForCatName(INVALID_ACTIVITY1);
+			// Constant.INVALID_ACTIVITY2_ID = DomainConstants.getCatIDForCatName(INVALID_ACTIVITY2);
+			System.out.println("Inside setInvalidNames(): INVALID_ACTIVITY1 = " + INVALID_ACTIVITY1
+					+ " INVALID_ACTIVITY2 = " + INVALID_ACTIVITY2);
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @since 16 Dec 2018
+	 */
+	public static void setInvalidActIDs()
+	{
+		Constant.INVALID_ACTIVITY1_ID = DomainConstants.getCatIDForCatName(INVALID_ACTIVITY1);
+		Constant.INVALID_ACTIVITY2_ID = DomainConstants.getCatIDForCatName(INVALID_ACTIVITY2);
+		System.out.println("Inside setInvalidActIDs(): INVALID_ACTIVITY1 = " + INVALID_ACTIVITY1
+				+ " INVALID_ACTIVITY1_ID = " + INVALID_ACTIVITY1_ID + " INVALID_ACTIVITY2 = " + INVALID_ACTIVITY2_ID);
+
 	}
 
 	public static void setActivityNames()
@@ -1362,6 +1408,9 @@ public final class Constant
 				break;
 			case "geolife1":
 				uniqueActivityIDs = activityIDs;// ADDED NOV 2018, NOT TESTED
+				break;
+			case "dcu_data_2":
+				uniqueActivityIDs = activityIDs;// ADDED DEC 2018, NOT TESTED
 				break;
 			default:
 				PopUps.printTracedErrorMsgWithExit(
@@ -1725,6 +1774,9 @@ public final class Constant
 		s.append("\nuseStartGeoInFED:" + useStartGeoInFED);
 		s.append("\nuseEndGeoInFED:" + useEndGeoInFED);
 		s.append("\nuseAvgAltitudeInFED:" + useAvgAltitudeInFED);
+
+		// for dcu_data_2
+		// s.append("\nuseEndTimeInFED:" + useEndTimeInFED);
 
 		s.append("\nuseDecayInFeatureLevelED:" + useDecayInFED);
 		s.append("\nuseTimeDecayInAED:" + useTimeDecayInAED);

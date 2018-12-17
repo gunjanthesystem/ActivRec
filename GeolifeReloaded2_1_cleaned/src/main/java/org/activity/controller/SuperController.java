@@ -648,6 +648,18 @@ public class SuperController
 				}
 			}
 
+			if (databaseName.equals("dcu_data_2"))// added on 18 Nov 2018
+			{
+				if (Constant.useDurationInFED)
+				{
+					featuresUsedLabel += "Dur";
+				}
+				// if (Constant.useEndTimeInFED)
+				// {
+				// featuresUsedLabel += "ET";
+				// }
+			}
+
 			if (Constant.useFeatureDistancesOfAllActs)
 			{
 				featuresUsedLabel += "AllActsFD";
