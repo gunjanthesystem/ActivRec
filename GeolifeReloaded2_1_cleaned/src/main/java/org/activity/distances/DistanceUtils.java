@@ -128,12 +128,23 @@ public class DistanceUtils
 
 		if (lookPastType.equals(Enums.LookPastType.Daywise))
 		{
-			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes = TimelineUtils
-					.getEditDistancesForDaywiseCandidateTimelines(candidateTimelines, activitiesGuidingRecomm,
-							userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
-							Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
-							distanceUsed, hjEditDistance);
+			// if (Constant.useRTVerseNormalisationForED)
+			// {System.err.println(PopUps.getTracedErrorMsg("Error: RTVerse normalisation not implemented for Daywise
+			// approach"));}
+			Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> editDistancesRes =
+					// TimelineUtils
+					// .getEditDistancesForDaywiseCandidateTimelines17Dec2018(candidateTimelines,
+					// activitiesGuidingRecomm,
+					// userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+					// Constant.hasInvalidActivityNames, Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2,
+					// distanceUsed, hjEditDistance);
+					TimelineUtils.getEditDistancesForDaywiseCandidateTimelines17Dec2018(candidateTimelines,
+							activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
+							timeAtRecomm.toString(), distanceUsed, hjEditDistance, featureWiseEditDistance,
+							featureWiseWeightedEditDistance, OTMDSAMEditDistance, editDistancesMemorizer, lookPastType);
 
+			// probably no need of normalising over the set again, because since 17 Dec 2018 implementation, the
+			// distance returned are already normalised
 			LinkedHashMap<String, Pair<String, Double>> candEditDistances = editDistancesRes.getFirst();
 			normalisedDistanceForCandTimelines = normalisedDistancesOverTheSet(candEditDistances, userIDAtRecomm,
 					dateAtRecomm.toString(), timeAtRecomm.toString());
@@ -146,13 +157,13 @@ public class DistanceUtils
 			normalisedDistanceForCandTimelines = getNormalisedDistancesForCandidateTimelinesFullCand(candidateTimelines,
 					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
 					distanceUsed, hjEditDistance, featureWiseEditDistance, featureWiseWeightedEditDistance,
-					OTMDSAMEditDistance, editDistancesMemorizer);
+					OTMDSAMEditDistance, editDistancesMemorizer, lookPastType);
 
-			// for SeqNCount and SeqNHours approach, tne end point index considered in the candidate is the last
+			// for SeqNCount and SeqNHours approach, the end point index considered in the candidate is the last
 			// activity object in that cand
-			// endIndexSubseqConsideredInCand = (LinkedHashMap<String, Integer>) candidateTimelines.entrySet().stream()
+			// endIndexSubseqConsideredInCand = (LinkedHashMap<String, Integer>)
+			// candidateTimelines.entrySet().stream()
 			// .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1));
-
 			endIndexSubseqConsideredInCand = candidateTimelines.entrySet().stream()
 					.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size() - 1, (v1, v2) -> v1,
 							LinkedHashMap<String, Integer>::new));
@@ -422,15 +433,20 @@ public class DistanceUtils
 	 *            used only for writing to file
 	 * 
 	 * @param hjEditDistance
+	 * @param editDistancesMemorizer
+	 * @param lookPastType
+	 *            added on 17 Dec 2018
 	 * 
-	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}},
 	 * @since April 13 2018
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV(
 			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
 	{
+		// LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;// added on 17 Dec 2018 for daywise
+		// approach
 		if (Constant.memorizeEditDistance)
 		{
 			PopUps.showError("Error: memorizeEditDistance not implemented here");
@@ -471,12 +487,25 @@ public class DistanceUtils
 			}
 		}
 		else
-		{ // use this when null issue is resolved: resolved
-			candAEDFeatDiffs = candidateTimelines.entrySet()/* .parallelStream() */.stream().collect(Collectors.toMap(
-					e -> (String) e.getKey(),
-					e -> getActEditDistancesFeatDiffs(e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm,
-							timeAtRecomm, e.getKey(), caseType, hjEditDistance, editDistancesMemorizer),
-					(oldValue, newValue) -> newValue, LinkedHashMap::new));
+		{
+			// use this when null issue is resolved: resolved
+			// if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
+			{// consider the full cand
+				candAEDFeatDiffs = candidateTimelines.entrySet()/* .parallelStream() */.stream()
+						.collect(Collectors.toMap(e -> (String) e.getKey(),
+								e -> getActEditDistancesFeatDiffs(e.getValue(), activitiesGuidingRecomm, userAtRecomm,
+										dateAtRecomm, timeAtRecomm, e.getKey(), caseType, hjEditDistance,
+										editDistancesMemorizer),
+								(oldValue, newValue) -> newValue, LinkedHashMap::new));
+			}
+			// else if (lookPastType.equals(Enums.LookPastType.Daywise))// added on 17 Dec 2018 to use RTV for daywise
+			// {// consider the least distant subcandidate
+			// candAEDFeatDiffs = getLeastDistCandActEditDistancesFeatDiffs();
+			// } //was trying to implement RTV normalisation for daywise approach but found this approach unsuitable.
+			// else
+			// {System.err.println(PopUps.getTracedErrorMsg("Error: Unrecognised lookPastType = " + lookPastType));
+			// System.exit(-1);}
+
 		}
 		// end of code to be parallelised
 		if (VerbosityConstants.WriteCandAEDDiffs)
@@ -2764,6 +2793,9 @@ public class DistanceUtils
 	 * @param featureWiseEditDistance
 	 * @param featureWiseWeightedEditDistance
 	 * @param OTMDSAMEditDistance
+	 * @param editDistancesMemorizer
+	 * @param lookPastType
+	 *            added on 17 Dec 2018
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedDistancesForCandidateTimelinesFullCand(
@@ -2771,7 +2803,7 @@ public class DistanceUtils
 			Enums.CaseType caseType, String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			String distanceUsed, HJEditDistance hjEditDistance, FeatureWiseEditDistance featureWiseEditDistance,
 			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance,
-			EditDistanceMemorizer editDistancesMemorizer)
+			EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
 	{
 
 		switch (distanceUsed)
@@ -2779,7 +2811,7 @@ public class DistanceUtils
 		case "HJEditDistance":
 			return getNormalisedHJEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
 					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
-					hjEditDistance, editDistancesMemorizer);
+					hjEditDistance, editDistancesMemorizer, lookPastType);
 		case "FeatureWiseEditDistance":
 			return getNormalisedFeatureWiseEditDistancesForCandidateTimelinesFullCand(candidateTimelines,
 					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
@@ -2835,14 +2867,18 @@ public class DistanceUtils
 	 * @param hjEditDistance
 	 *            the primary dimension for hjEditDistance is the given dimension (i.e., the dimension used to extract
 	 *            the candidate timelines)
-	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 * @param editDistancesMemorizer
+	 * @param lookPastType
+	 *            added on 17 Dec 2018
+	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}},
 	 */
 
 	public static LinkedHashMap<String, Pair<String, Double>> getNormalisedHJEditDistancesForCandidateTimelinesFullCand(
 			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
 	{
+		LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;// added on 17 Dec 2018 for daywise
 		// {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
 
 		// CurtainA start
@@ -2866,8 +2902,10 @@ public class DistanceUtils
 		{ /* Parallel */
 			candEditDistances = getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV(
 					candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
-					hjEditDistance, editDistancesMemorizer);
+					hjEditDistance, editDistancesMemorizer, lookPastType);
 
+			// candEditDistances = candEditDistancesRes.getFirst();
+			// endIndexSubseqConsideredInCand = candEditDistancesRes.getSecond();
 			/// Start of added on 2 Dec 2018
 
 			// End of added on 2 Dec 2018
@@ -3369,6 +3407,10 @@ public class DistanceUtils
 
 		for (Map.Entry<String, Pair<String, Double>> distEntry : setOfDistances.entrySet())
 		{
+			if (Constant.doMaxNormalisationWhenNormalisationEDsOverCandSet)// TODO: doing max normalisation TEMPORARY
+			{
+				min = 0;
+			}
 			Double normalisedEditDistanceVal = Double
 					.valueOf(StatsUtils.minMaxNorm(distEntry.getValue().getSecond(), max, min));
 

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.GowGeoFeature;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
@@ -304,6 +306,46 @@ public class ComparatorUtils
 	 * 
 	 * note: In case the Value 'V' is a Pair<String,Double>, the comparison is done on the second component (Double)
 	 * 
+	 * @param distanceScoresForEachSubsequence
+	 * @return NOT USED AS OF 17 DEC 2018
+	 */
+	public static LinkedHashMap<Integer, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> sortByValueAscending17Dec2018(
+			LinkedHashMap<Integer, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> distanceScoresForEachSubsequence)
+	{
+		List<Map.Entry<Integer, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>>> list = new LinkedList<>(
+				distanceScoresForEachSubsequence.entrySet());
+
+		if (Constant.breakTiesWithShuffle)
+		{
+			Collections.shuffle(list);
+		}
+		Collections.sort(list,
+				new Comparator<Map.Entry<Integer, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>>>()
+					{
+						@Override
+						public int compare(
+								Map.Entry<Integer, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> o1,
+								Map.Entry<Integer, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> o2)
+						{
+							return (o1.getValue().getSecond()).compareTo(o2.getValue().getSecond());
+						}
+					});
+
+		LinkedHashMap<Integer, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> result = new LinkedHashMap<>();
+		for (Map.Entry<Integer, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> entry : list)
+		{
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
+
+	/**
+	 * Sorts a map in increasing order of value
+	 * 
+	 * It is an unstable sort (forced by shuffle) to randomly break ties
+	 * 
+	 * note: In case the Value 'V' is a Pair<String,Double>, the comparison is done on the second component (Double)
+	 * 
 	 * @param map
 	 * @return
 	 */
@@ -531,7 +573,8 @@ public class ComparatorUtils
 		return lastTimestamp;
 	}
 
-	public static Timestamp getEarliestOfAllTimestamp(HashMap<String, ArrayList<ActivityObject2018>> timelinesToAggregate)
+	public static Timestamp getEarliestOfAllTimestamp(
+			HashMap<String, ArrayList<ActivityObject2018>> timelinesToAggregate)
 	{
 
 		Iterator timelinesIterator = timelinesToAggregate.entrySet().iterator();

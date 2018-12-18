@@ -218,8 +218,16 @@ public class EvaluationSeq
 				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
 				{
 					double mu = matchingUnitAsPastCount[muIndex];
-					commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/MatchingUnit" + String.valueOf(mu)
-							+ "/";
+
+					if (matchingUnitAsPastCount.length == 1)// daywise i.e. no MUs
+					{
+						commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
+					}
+					else
+					{
+						commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/MatchingUnit"
+								+ String.valueOf(mu) + "/";
+					}
 					Constant.setCommonPath(commonPath);
 					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
 
