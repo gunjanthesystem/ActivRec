@@ -58,6 +58,24 @@ public class Timeline implements Serializable
 		activityObjectsInTimeline = new ArrayList<>();
 	}
 
+	// /**
+	// * Create Timeline from given Activity Objects
+	// *
+	// *
+	// * @param activityObjects
+	// * @param shouldBelongToSingleDay
+	// * it also checks if all ao belong to same day
+	// * @param shouldBelongToSingleUser
+	// * <font color = orange>currently, not checking if the ao's belong to same user</font>
+	// * @since 17 Dec 2018
+	// */
+	// public Timeline(ArrayList<ActivityObject2018> activityObjects, boolean shouldBelongToSingleDay,
+	// boolean shouldBelongToSingleUser, String timelineID)
+	// {
+	// this(activityObjects, shouldBelongToSingleDay, shouldBelongToSingleUser);
+	// this.setTimelineID(timelineID);
+	// }
+
 	/**
 	 * Create Timeline from given Activity Objects
 	 * 

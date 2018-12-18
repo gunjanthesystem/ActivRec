@@ -25,7 +25,7 @@ public class VerbosityConstants
 	/**
 	 * Controlling the verbosity of console log output
 	 */
-	public static final boolean verbose = true;// false;// false;// false;// true;// false;// false;//
+	public static final boolean verbose = false;// false;// false;// false;// true;// false;// false;//
 	public static final boolean verboseAKOM = false;// false;// false;// false;// true;// false;// false;//
 	public static final boolean tempVerbose = false;// false;// true;// true;// false;// false;// true;
 	public static final boolean verboseTimelineCleaning = false;// true;// false;// false; // verbosity level 2: if
@@ -72,7 +72,7 @@ public class VerbosityConstants
 	/**
 	 * Write each cand of each RT in separate line
 	 */
-	public static final boolean WriteNormalisationsSeparateLines = false;// false;// false;
+	public static final boolean WriteNormalisationsSeparateLines = true;// false;// false;// false;
 	/**
 	 * This is a useful file to write, disable it only when faster experiments are needed.
 	 */

@@ -617,7 +617,7 @@ public class AlignmentBasedDistance
 			endGeoTolerance = 0.2d;
 			avgAltTolerance = 5d;// feets since raw data is in this unit
 		}
-		if (databaseName.equals("dcu_data_2"))
+		else if (databaseName.equals("dcu_data_2"))
 		{
 			startTimeToleranceInSeconds = 120; // in seconds
 			durationToleranceInSeconds = 120; // in seconds

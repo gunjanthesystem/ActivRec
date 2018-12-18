@@ -1626,7 +1626,6 @@ public final class StatsUtils
 			// val = 0.25, max = 0.25, min =0.25, max-min = 0;
 			return 0;
 		}
-
 	}
 
 	/**

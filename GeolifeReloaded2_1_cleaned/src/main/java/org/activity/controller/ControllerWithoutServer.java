@@ -103,9 +103,12 @@ public class ControllerWithoutServer
 			// PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 			// PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
 			// String commonBasePath = Constant.getCommonPath();
-			commonPath = Constant.getCommonPath();
+			// PopUps.showMessage("commonPath = " + commonPath);
+			commonPath = Constant.getOutputCoreResultsPath();// .getCommonPath();
+			Constant.setCommonPath(commonPath);
 			////////// ~~~~~~~~~~~~~~~~~`
 			long dt1 = System.currentTimeMillis();
+
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal = createAllTimelines(
 					databaseName, Constant.toSerializeJSONArray, Constant.toDeSerializeJSONArray,
 					Constant.toCreateTimelines, Constant.toSerializeTimelines, Constant.toDeSerializeTimelines);
@@ -113,6 +116,7 @@ public class ControllerWithoutServer
 			Constant.initialise(databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
+
 			// added on 16 Dec 2018
 			// PopUps.showMessage("here0");
 			////////// ~~~~~~~~~~~~~~~~~`
@@ -122,7 +126,7 @@ public class ControllerWithoutServer
 			System.out.println("Before reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
 
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = null;
-
+			// PopUps.showMessage("commonPath = " + commonPath);
 			if (Constant.reduceAndCleanTimelinesBeforeRecomm)
 			{
 
@@ -776,12 +780,12 @@ public class ControllerWithoutServer
 			boolean toSerializeTimelines, boolean toDeSerializeTimelines) throws SQLException
 	{
 		long dt1 = System.currentTimeMillis();
-
+		// PopUps.showMessage("commonPath12 = " + commonPath);
 		if (toSerializeJSONArray)
 		{
 			fetchAndSerializeJSONArray(databaseName);
 		}
-
+		// PopUps.showMessage("commonP:=" + Constant.getCommonPath());
 		// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		SerializableJSONArray jsonArrayD = null;
 		long dt2 = System.currentTimeMillis();
@@ -895,9 +899,9 @@ public class ControllerWithoutServer
 
 		if (!Constant.checkAllParametersSet())
 		{
-			System.err.println("All essential paramaters in Constant not set. Exiting");
 			PopUps.showError("All essential paramaters in Constant not set. Exiting");
-			System.exit(-162);
+			PopUps.printTracedErrorMsgWithExit("All essential paramaters in Constant not set. Exiting");
+			// System.exit(-162);
 		}
 
 		Pair<Boolean, String> hasDuplicateDates = TimelineUtils.hasDuplicateDates(usersDayTimelinesOriginal);

@@ -2752,6 +2752,31 @@ public class WToFile
 		}
 	}
 
+	public static void writeEditDistancesOfAllEndPoints2(ArrayList<ActivityObject2018> activitiesGuidingRecomm,
+			Timeline userDayTimeline, LinkedHashMap<String, Pair<String, Double>> distanceScoresForEachSubsequence)// String
+	{
+		try
+		{
+			StringBuilder sbToWrite = new StringBuilder();
+			counterEditAllEndPoints++;
+			for (Map.Entry<String, Pair<String, Double>> entry : distanceScoresForEachSubsequence.entrySet())
+			{
+
+				sbToWrite.append(counterEditAllEndPoints + "," + userDayTimeline.getUserID() + ","
+						+ ActivityObject2018.getArrayListOfActivityObjectsAsString(activitiesGuidingRecomm) + ","
+						+ userDayTimeline.getActivityObjectNamesInSequenceWithFeatures() + "," + entry.getKey() + ","
+						+ entry.getValue().getSecond() + "\n");
+			}
+			sbToWrite.append("\n");
+			WToFile.appendLineToFileAbs(sbToWrite.toString(),
+					Constant.getCommonPath() + "EditDistancesForAllEndPoints.csv");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public static void writeEndPoinIndexCheck24Oct(String currentAct, String cand, ArrayList<Integer> arr1,
 			ArrayList<Integer> arr2)
 	{

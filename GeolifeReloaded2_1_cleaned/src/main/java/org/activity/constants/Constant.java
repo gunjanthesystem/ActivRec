@@ -94,7 +94,7 @@ public final class Constant
 
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;// .NCount;// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NHours;// .NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
@@ -206,7 +206,9 @@ public final class Constant
 	private static double dynamicEDAlpha;// = 1;// 0.8;// 0.5;// SWITCH_NOV10
 	public static boolean noFED = false;// Nov 15 2018
 	public static boolean noAED = false;// Nov 15 2018
-	public static final double[] EDAlphas = { 0.5 };// 0, 0.1, 0.2, 0.3, 0.4, 0.6, 0.5, 0.7, 0.8, 0.9, 1 };
+	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
+	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
+	public static final double[] EDAlphas = { 0.7 };// 0.5 };// 0, 0.1, 0.2, 0.3, 0.4, 0.6, 0.5, 0.7, 0.8, 0.9, 1 };
 	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
 	// SWITCH_NOV20
 	// = { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75, 0, 0.25,
@@ -353,8 +355,11 @@ public final class Constant
 	// toSerializeTimelines = false, toDeSerializeTimelines = true;
 
 	// since 14 Nov 2018 //for dcu_data_2
-	public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines = true, // false,
-			toSerializeTimelines = false, toDeSerializeTimelines = false;
+	// public static final boolean toSerializeJSONArray = false, toDeSerializeJSONArray = false, toCreateTimelines =
+	// true, // false,
+	// toSerializeTimelines = false, toDeSerializeTimelines = false;
+	public static Boolean toSerializeJSONArray = null, toDeSerializeJSONArray = null, toCreateTimelines = null,
+			toSerializeTimelines = null, toDeSerializeTimelines = null;
 
 	public static boolean hasInvalidActivityNames;// = false;
 
@@ -400,8 +405,9 @@ public final class Constant
 	// 40,42 };
 
 	public static final double matchingUnitAsPastCountFixed[] = { 0, 1, 2, 3, 4, 6, 8 };
-	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-			17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
+	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 6, 8 };
+	// { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+	// 17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
 
 	public static final double matchingDummy[] = { -1 };
 	// public static final double matchingUnitHrsArray[] = { 24, 26, 28, 30, 32, 34, 36, 38, 40, 42 };
@@ -487,10 +493,11 @@ public final class Constant
 	public static final boolean memorizeEditDistance = false;
 	final static int editDistancesMemorizerBufferSize = 1;// 000000;
 
-	public static final boolean needsToPruneFirstUnknown = false;
+	public static final boolean needsToPruneFirstUnknown = true;// true for dcu_data_2 false;
 
 	public static final double epsilonForFloatZero = 1.0E-50;// to compare if floating point numbers are equal.
 	public static final double epsilonForFloatZeroRelaxed = 1.0E-5;// to compare if floating point numbers are equal.
+	public static final boolean doMaxNormalisationWhenNormalisationEDsOverCandSet = false;//
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////// End of variable declarations //////////////////////////////////
 	//// DO NOT CHANGE THE ABOVE COMMENTED LINE AS IT IS USED AS A MARKER WHEN REFLECTING THIS FILE
@@ -840,6 +847,7 @@ public final class Constant
 		Constant.setUserIDs();
 		Constant.setInvalidNames();
 		Constant.setActivityNames();
+		Constant.setConstantsForTimelineCreation(databaseName);
 		// Constant.setCommonPath(givenCommonpath);
 		if (databaseName.equals("gowalla1"))
 		{
@@ -877,15 +885,49 @@ public final class Constant
 		if (databaseName.equals("dcu_data_2"))
 		{
 			Constant.hasInvalidActivityNames = true;
+			if (DomainConstants.catIDNameDictionary != null)
+			{
+				setInvalidActIDs();
+			}
 		}
 		else
 		{
 			Constant.hasInvalidActivityNames = false;
 		}
 
-		if (DomainConstants.catIDNameDictionary != null)
+	}
+
+	private static void setConstantsForTimelineCreation(String databaseName)
+	{
+		switch (databaseName)
 		{
-			setInvalidActIDs();
+		case "dcu_data_2":
+			toSerializeJSONArray = false;
+			toDeSerializeJSONArray = false;
+			toCreateTimelines = true;
+			toSerializeTimelines = false;
+			toDeSerializeTimelines = false;
+			break;
+
+		case "geolife1":
+			toSerializeJSONArray = false;
+			toDeSerializeJSONArray = false;
+			toCreateTimelines = false;
+			toSerializeTimelines = false;
+			toDeSerializeTimelines = true;
+			break;
+
+		case "gowalla1":
+			toSerializeJSONArray = false;
+			toDeSerializeJSONArray = false;
+			toCreateTimelines = true;
+			toSerializeTimelines = false;
+			toDeSerializeTimelines = false;
+			break;
+		default:
+			PopUps.printTracedErrorMsgWithExit(
+					"setConstantsForTimelineCreation: Error: unknown database :" + databaseName);
+
 		}
 
 	}
@@ -1748,6 +1790,8 @@ public final class Constant
 		s.append("\neditDistancesMemorizerBufferSize:" + editDistancesMemorizerBufferSize);
 		s.append("\nmemorizeEditDistance:" + memorizeEditDistance);
 		s.append("\nneedsToPruneFirstUnknown:" + needsToPruneFirstUnknown);
+		s.append("\ndoMaxNormalisationWhenNormalisationEDsOverCandSet:"
+				+ doMaxNormalisationWhenNormalisationEDsOverCandSet);
 		s.append("\nFor9kUsers:" + For9kUsers);
 
 		s.append("\nuseMedianCinsForRepesentationAO:" + useMedianCinsForRepesentationAO);
@@ -1885,6 +1929,11 @@ public final class Constant
 			System.err.println("ALPHA  is less than 0 (not set) for Sum-based Rank Scoring");
 			allSet = false;
 		}
+		// if (commonPath == null)// .length() == 0)
+		// {
+		// System.err.println("commonPath name is null");
+		// allSet = false;
+		// }
 		return allSet;
 	}
 

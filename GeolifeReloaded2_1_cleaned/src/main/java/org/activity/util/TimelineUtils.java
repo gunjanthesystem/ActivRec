@@ -21,9 +21,16 @@ import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums;
+import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
+import org.activity.distances.DistanceUtils;
+import org.activity.distances.FeatureWiseEditDistance;
+import org.activity.distances.FeatureWiseWeightedEditDistance;
 import org.activity.distances.HJEditDistance;
+import org.activity.distances.OTMDSAMEditDistance;
+import org.activity.io.EditDistanceMemorizer;
 import org.activity.io.Serializer;
 import org.activity.io.TimelineWriters;
 import org.activity.io.WToFile;
@@ -66,8 +73,6 @@ public class TimelineUtils
 		ArrayList<Integer> l = new ArrayList<Integer>();
 		System.out.println("max num of elemens in arraylist = " + Integer.MAX_VALUE);
 	}
-
-	
 
 	// /**
 	// * Creates user day timelines from the given list of Activity Objects.
@@ -793,7 +798,8 @@ public class TimelineUtils
 			Timeline givenTimelineToCheckIn)
 	{
 		boolean isNoValidAfter = true;
-		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn
+				.getActivityObjectsInTimeline();
 
 		// Date dateOfAOAtGivenIndex = DateTimeUtils.getDate(
 		// givenTimelineToCheckIn.getActivityObjectAtPosition(givenActivityObjectIndex).getEndTimestamp());
@@ -880,7 +886,8 @@ public class TimelineUtils
 	{
 		List<ActivityObject2018> validAOsAfter = new ArrayList<>();
 
-		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn
+				.getActivityObjectsInTimeline();
 
 		LocalDate dateOfAOAtGivenIndex = givenTimelineToCheckIn.getActivityObjectAtPosition(givenActivityObjectIndex)
 				.getEndTimestamp().toLocalDateTime().toLocalDate();
@@ -941,7 +948,8 @@ public class TimelineUtils
 	public static boolean hasAtleastNValidAOsAfterItInTheDay(int givenActivityObjectIndex,
 			Timeline givenTimelineToCheckIn, int N)
 	{
-		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn.getActivityObjectsInTimeline();
+		ArrayList<ActivityObject2018> aosInGivenTimelineToCheckIn = givenTimelineToCheckIn
+				.getActivityObjectsInTimeline();
 
 		// abcde: len=5, if N = 3, valid indices = 0,1 invalid indices = 2,3,4 >(5-1-3) > 1
 		// trivial case
@@ -1093,8 +1101,6 @@ public class TimelineUtils
 		}
 	}
 
-	
-
 	//
 
 	/**
@@ -1184,6 +1190,74 @@ public class TimelineUtils
 			Triple<Integer, String, Double> distance = getEditDistanceLeastDistantSubcand(candidateTimeline,
 					activitiesGuidingRecomm2, userIDAtRecomm, dateAtRecomm, timeAtRecomm, candidate.getKey(),
 					hasInvalidActivityNames, invalidActName1, invalidActName2, distanceUsed, hjEditDistance);
+
+			distancesRes.put(candidate.getKey(), new Pair<String, Double>(distance.getSecond(), distance.getThird()));
+			endIndicesOfLeastDistantSubcand.put(candidate.getKey(), distance.getFirst());
+			// System.out.println("now we put "+entry.getKey()+" and score="+score);
+		}
+
+		return new Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>>(distancesRes,
+				endIndicesOfLeastDistantSubcand);
+	}
+
+	/**
+	 * Fork of getEditDistancesForDaywiseCandidateTimelines
+	 * 
+	 * @param candidateTimelines
+	 * @param activitiesGuidingRecomm
+	 * @param caseType
+	 * @param userIDAtRecomm
+	 * @param dateAtRecomm
+	 *            only used for writing to file
+	 * @param timeAtRecomm
+	 *            only used for writing to file
+	 * @param distanceUsed
+	 * @param hjEditDistance
+	 * @param featureWiseEditDistance
+	 * @param featureWiseWeightedEditDistance
+	 * @param OTMDSAMEditDistance
+	 * @param editDistancesMemorizer
+	 * @param lookPastType
+	 * @return
+	 * @since 17 Dec 2018
+	 */
+	public static Pair<LinkedHashMap<String, Pair<String, Double>>, LinkedHashMap<String, Integer>> getEditDistancesForDaywiseCandidateTimelines17Dec2018(
+			// LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018>
+			// activitiesGuidingRecomm,String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm, boolean
+			// hasInvalidActivityNames, String invalidActName1, String invalidActName2, String distanceUsed,
+			// HJEditDistance hjEditDistance)
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
+			Enums.CaseType caseType, String userIDAtRecomm, String dateAtRecomm, String timeAtRecomm,
+			String distanceUsed, HJEditDistance hjEditDistance, FeatureWiseEditDistance featureWiseEditDistance,
+			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance,
+			EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
+	{
+		// <Date of CandidateTimeline, (End point index of least distant subsequence, String containing the trace of
+		// edit operations performed, edit distance of
+		// least distant subsequence)>
+		/**
+		 * {Date of CandidateTimeline as string, Pair {trace of edit operations performed, edit distance of least
+		 * distant subsequence}}
+		 */
+		LinkedHashMap<String, Pair<String, Double>> distancesRes = new LinkedHashMap<>();
+
+		/**
+		 * {Date of CandidateTimeline as string, End point index of least distant subsequence}}
+		 */
+		LinkedHashMap<String, Integer> endIndicesOfLeastDistantSubcand = new LinkedHashMap<>();
+
+		for (Map.Entry<String, Timeline> candidate : candidateTimelines.entrySet())
+		{
+			Timeline candidateTimeline = candidate.getValue();
+			// similarityScores.put(entry.getKey(), getSimilarityScore(entry.getValue(),activitiesGuidingRecomm));
+			// (Activity Events in Candidate Day, activity events on or before recomm on recomm day)
+			// Long candTimelineID = candidate.getKey().getTime();// used as dummy, not exactly useful right now
+			Triple<Integer, String, Double> distance = getEditDistanceLeastDistantSubcand17Dec2018(candidateTimeline,
+					// activitiesGuidingRecomm, userIDAtRecomm, dateAtRecomm, timeAtRecomm, candidate.getKey(),
+					// hasInvalidActivityNames, invalidActName1, invalidActName2, distanceUsed, hjEditDistance);
+					activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(), timeAtRecomm.toString(),
+					distanceUsed, hjEditDistance, featureWiseEditDistance, featureWiseWeightedEditDistance,
+					OTMDSAMEditDistance, editDistancesMemorizer, lookPastType);
 
 			distancesRes.put(candidate.getKey(), new Pair<String, Double>(distance.getSecond(), distance.getThird()));
 			endIndicesOfLeastDistantSubcand.put(candidate.getKey(), distance.getFirst());
@@ -1333,6 +1407,199 @@ public class TimelineUtils
 				distanceScoreForSubsequenceWithHighestSimilarity);
 	}
 
+	//// start of added on 17 Dec 2018
+	/**
+	 * Fork of getEditDistanceLeastDistantSubcand Get distance scores using modified edit distance.
+	 * 
+	 * <end point index, edit operations trace, edit distance> The distance score is the distance between the activities
+	 * guiding recommendation and the least distant subcandidate (which has a valid activity after it) from the
+	 * candidate timeline. (subcandidate is a subsequence from candidate timeline, from the start of the candidate
+	 * timeline to any occurrence of the ActivityGuiding Recomm or current activity).
+	 * 
+	 * 
+	 * @param candidateDayTimeline
+	 *            currently a day timeline. It should not be TimelineWithNext, because instead of timeline 'with next'
+	 *            here the subsequence must have a valid act after it or else not considered. This valid act after the
+	 *            subsequence essentially served as "the next" activity to recommend.
+	 * @param activitiesGuidingRecomm
+	 * @param caseType
+	 * @param userAtRecomm
+	 * @param dateAtRecomm
+	 *            only used for writing to file
+	 * @param timeAtRecomm
+	 *            only used for writing to file
+	 * @param distanceUsed
+	 * @param hjEditDistance
+	 * @param featureWiseEditDistance
+	 * @param featureWiseWeightedEditDistance
+	 * @param OTMDSAMEditDistance
+	 * @param editDistancesMemorizer
+	 * @param lookPastType
+	 * @return Triple{EndIndexOfLeastDistantSubCand,TraceOfEditOperation,EditDistance}
+	 * @since 17 Dec 2018
+	 */
+	public static Triple<Integer, String, Double> getEditDistanceLeastDistantSubcand17Dec2018(
+			Timeline candidateDayTimeline,
+			// ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
+			// String dateAtRecomm, String timeAtRecomm, String candidateID, boolean hasInvalidActivityNames,
+			// String invalidActName1, String invalidActName2, String distanceUsed, HJEditDistance hjEditDistance)
+			ArrayList<ActivityObject2018> activitiesGuidingRecomm, Enums.CaseType caseType, String userIDAtRecomm,
+			String dateAtRecomm, String timeAtRecomm, String distanceUsed, HJEditDistance hjEditDistance,
+			FeatureWiseEditDistance featureWiseEditDistance,
+			FeatureWiseWeightedEditDistance featureWiseWeightedEditDistance, OTMDSAMEditDistance OTMDSAMEditDistance,
+			EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
+	{
+		String separatorForCandIDAndEndPointForThisSubCand = "~~";
+		// String invalidActName1 = Constant.getInvalidActivity1();
+		// String invalidActName2 = Constant.getInvalidActivity2();
+		// System.out.println(
+		// "Inside getEditDistancesLeastDistantSubcands: indicesOfEndPointActivityInDayButNotLastValid.size() ="
+		// + indicesOfEndPointActivityInDayButNotLastValid.size());
+		// $$WritingToFile.writeEndPoinIndexCheck24Oct(activityAtRecommPointAsStringCode,userDayTimelineAsStringCode,indicesOfEndPointActivityInDay1,indicesOfEndPointActivityInDay);
+
+		// find the end points in the userDayTimeline
+		char activityAtRecommPointAsStringCode = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1)
+				.getCharCodeFromActID();
+		String activitiesGuidingAsStringCode = StringCode
+				.getStringCodeForActivityObjectsFromActID(activitiesGuidingRecomm);
+		String userDayTimelineAsStringCode = candidateDayTimeline.getActivityObjectsAsStringCode();
+
+		ArrayList<Integer> indicesOfEndPointActivityInDayButNotLastValid = getIndicesOfEndPointActivityInDayButNotLastValid(
+				userDayTimelineAsStringCode, activityAtRecommPointAsStringCode, Constant.hasInvalidActivityNames,
+				Constant.INVALID_ACTIVITY1, Constant.INVALID_ACTIVITY2);
+
+		// start of added on 17 Dec 2018
+		// Consider the set of subcandidates as a set of candidate timelines
+		// Extract set of subcandidate timelines
+		LinkedHashMap<String, Timeline> subCandTimelinesForGivenTimelines = new LinkedHashMap(
+				indicesOfEndPointActivityInDayButNotLastValid.size());
+		for (Integer indexOfEndPointWithValidAfterIt : indicesOfEndPointActivityInDayButNotLastValid)
+		{// subcandID = <timelineID>$$<indexOfEndPointWithValidAfterIt>;//SCAND for Sub Candidate
+			String subCandTimelineID = candidateDayTimeline.getTimelineID()
+					+ separatorForCandIDAndEndPointForThisSubCand + indexOfEndPointWithValidAfterIt;
+			Timeline subCandTimelines = new Timeline(candidateDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
+					indexOfEndPointWithValidAfterIt + 1), true, true);
+			subCandTimelines.setTimelineID(subCandTimelineID);
+			subCandTimelinesForGivenTimelines.put(subCandTimelineID, subCandTimelines);
+		}
+		// finished creation of subcanndidates
+
+		// get edit distances for each subcandidate
+		/** index of end point, edit operations trace, edit distance **/
+		// LinkedHashMap<Integer, Pair<String, Double>> distanceScoresForEachSubcandidate = new LinkedHashMap<>();
+		// {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+		LinkedHashMap<String, Pair<String, Double>> normalisedDistanceForSubcandTimelines = DistanceUtils
+				.getNormalisedDistancesForCandidateTimelinesFullCand(subCandTimelinesForGivenTimelines,
+						activitiesGuidingRecomm, caseType, userIDAtRecomm, dateAtRecomm.toString(),
+						timeAtRecomm.toString(), distanceUsed, hjEditDistance, featureWiseEditDistance,
+						featureWiseWeightedEditDistance, OTMDSAMEditDistance, editDistancesMemorizer, lookPastType);
+		// end of added on 17 Dec 2018
+
+		// getting distance scores for each subcandidate
+		// switch (distanceUsed)
+		// {
+		// case "HJEditDistance":
+		// {
+		// // HJEditDistance editSimilarity = new HJEditDistance();
+		// for (Integer indexOfEndPointWithValidAfterIt : indicesOfEndPointActivityInDayButNotLastValid)
+		// {
+		// // long t1 = System.currentTimeMillis();
+		// Pair<String, Double> distance = hjEditDistance.getHJEditDistanceWithTrace(
+		// candidateDayTimeline.getActivityObjectsInTimelineFromToIndex(0,
+		// indexOfEndPointWithValidAfterIt + 1),
+		// activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, candidateID);
+		// // System.out.println(
+		// // "getHJEditDistanceWithTrace computed in: " + (System.currentTimeMillis() - t1) + " ms");
+		// distanceScoresForEachSubsequence.put(indexOfEndPointWithValidAfterIt, distance);
+		// // System.out.println("Distance between:\n
+		// // activitiesGuidingRecomm:"+UtilityBelt.getActivityNamesFromArrayList(activitiesGuidingRecomm)+
+		// // "\n and subsequence of
+		// //
+		// Cand:"+UtilityBelt.getActivityNamesFromArrayList(userDayTimeline.getActivityObjectsInDayFromToIndex(0,indicesOfEndPointActivityInDay1.get(i)+1)));
+		// }
+		// break;
+		// }
+		// default:
+		// System.err.println(PopUps.getTracedErrorMsg("Error unknown distance:" + distanceUsed));
+		// System.exit(-1);
+		// }
+
+		// sort by each subcand by edit distance
+		// distanceScoresForEachSubcandidate = (LinkedHashMap<Integer, Pair<String, Double>>) ComparatorUtils
+		// .sortByValueAscendingIntStrDoub(distanceScoresForEachSubcandidate);
+		normalisedDistanceForSubcandTimelines = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
+				.sortByValueAscendingStrStrDoub(normalisedDistanceForSubcandTimelines);
+
+		if (normalisedDistanceForSubcandTimelines.size() == 0)
+		{
+			System.err.println(PopUps.getTracedErrorMsg(
+					"Error no subsequence to be considered for distance,normalisedDistanceForSubcandTimelines.size() = "
+							+ normalisedDistanceForSubcandTimelines.size()));
+		}
+
+		// we only consider the most similar subsequence . i.e. the first entry in this Map
+		// List<Entry<Integer, Pair<String, Double>>> subseqWithLeastEditDist = distanceScoresForEachSubcandidate
+		// .entrySet().stream().limit(1).collect(Collectors.toList());
+		List<Entry<String, Pair<String, Double>>> subseqWithLeastEditDist = normalisedDistanceForSubcandTimelines
+				.entrySet().stream().limit(1).collect(Collectors.toList());
+
+		// from subcandID = <timelineID>$$<indexOfEndPointWithValidAfterIt>;
+		int endPointIndexForSubsequenceWithHighestSimilarity = Integer
+				.valueOf(subseqWithLeastEditDist.get(0).getKey().split(separatorForCandIDAndEndPointForThisSubCand)[1]);// -1;
+		String traceEditOperationsForSubsequenceWithHighestSimilarity = subseqWithLeastEditDist.get(0).getValue()
+				.getFirst();
+		double distanceScoreForSubsequenceWithHighestSimilarity = subseqWithLeastEditDist.get(0).getValue().getSecond();// -9999;
+		distanceScoreForSubsequenceWithHighestSimilarity = StatsUtils
+				.round(distanceScoreForSubsequenceWithHighestSimilarity, Constant.RoundingPrecision);
+
+		// finding the end point index with highest similarity WHICH HAS A VALID ACTIVITY AFTER IT
+		// removed some legacy code from here since we have already checked if there exists valid act after every of the
+		// considered index of subcand. the legacy code can be found:
+		// org.activity.recomm.RecommendationMasterDayWise2FasterMar2017.getDistanceScoreModifiedEdit()
+
+		// /////
+		//
+		if (VerbosityConstants.verbose)
+		{
+			// PopUps.showMessage("Here1");
+			StringBuilder sb = new StringBuilder(
+					"---Debug17Dec2018: getEditDistancesLeastDistantSubcand---- \nactivitiesGuidingAsStringCode="
+							+ activitiesGuidingAsStringCode + "\nactivityAtRecommPointAsStringCode="
+							+ activityAtRecommPointAsStringCode + "\nuserDayTimelineAsStringCode="
+							+ userDayTimelineAsStringCode + "\n");
+
+			// for sanity check that subcand timelines are correctly created from timelines
+			// checked OKAY on 17 Dec 2018
+			sb.append("candidateDayTimeline (id:" + candidateDayTimeline.getTimelineID() + ")= --\n"
+					+ candidateDayTimeline.getActivityObjectNamesInSequence() + "\nSubCands = \n");
+			subCandTimelinesForGivenTimelines.entrySet().stream().forEachOrdered(e -> sb.append(
+					e.getValue().getTimelineID() + " -- " + e.getValue().getActivityObjectNamesInSequence() + "\n"));
+			//////////////////////////////////////
+
+			for (Map.Entry<String, Pair<String, Double>> entry1 : normalisedDistanceForSubcandTimelines.entrySet())
+			{
+				sb.append("SubCandID= " + entry1.getKey() + " distance=" + entry1.getValue().getSecond() + "trace="
+						+ entry1.getValue().getFirst() + "\n");
+			}
+			sb.append("endPointIndexForSubsequenceWithHighestSimilarity="
+					+ endPointIndexForSubsequenceWithHighestSimilarity
+					+ "\ndistanceScoreForSubsequenceWithHighestSimilarity="
+					+ distanceScoreForSubsequenceWithHighestSimilarity);
+			System.out.println(sb.toString());
+		}
+		if (VerbosityConstants.WriteEditDistancesOfAllEndPoints)
+		{
+			WToFile.writeEditDistancesOfAllEndPoints2(activitiesGuidingRecomm, candidateDayTimeline,
+					normalisedDistanceForSubcandTimelines);
+		}
+
+		// Triple{EndIndexOfLestDistantSubCand,TraceOfEditOperation,EditDistance}
+		return new Triple<Integer, String, Double>(endPointIndexForSubsequenceWithHighestSimilarity,
+				traceEditOperationsForSubsequenceWithHighestSimilarity,
+				distanceScoreForSubsequenceWithHighestSimilarity);
+	}
+	//// end of added on 17 Dec 2018
+
 	/**
 	 * 
 	 * @param userDayActivitiesAsStringCode
@@ -1458,7 +1725,8 @@ public class TimelineUtils
 		 */
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
-		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm
+				.get(activitiesGuidingRecomm.size() - 1);
 		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
 		for (Map.Entry<String, Timeline> entry : candidateTimelines.entrySet())
@@ -1518,10 +1786,12 @@ public class TimelineUtils
 		 */
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
-		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm
+				.get(activitiesGuidingRecomm.size() - 1);
 		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
-		Timeline candidateTimelinesAsOne = TimelineTransformers.dayTimelinesToATimeline2(candidateTimelines, false, true);
+		Timeline candidateTimelinesAsOne = TimelineTransformers.dayTimelinesToATimeline2(candidateTimelines, false,
+				true);
 
 		// find how many times this time occurs in the candidate timelines.
 		LinkedHashSet<LocalDate> uniqueDatesInCands = TimelineUtils.getUniqueDates(candidateTimelinesAsOne, verbose);
@@ -1621,7 +1891,8 @@ public class TimelineUtils
 		 */
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
-		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm
+				.get(activitiesGuidingRecomm.size() - 1);
 		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
 		LinkedHashMap<String, LinkedHashMap<String, Timeline>> userWiseCandidateTimelines = toUserwiseTimelines(
@@ -1757,7 +2028,8 @@ public class TimelineUtils
 		 */
 		LinkedHashMap<String, Integer> indicesOfActObjsWithNearestST = new LinkedHashMap<>();
 
-		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm.get(activitiesGuidingRecomm.size() - 1);
+		ActivityObject2018 activityObjectAtRecommPoint = activitiesGuidingRecomm
+				.get(activitiesGuidingRecomm.size() - 1);
 		Timestamp startTimestampOfActObjAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 
 		LinkedHashMap<String, LinkedHashMap<String, Timeline>> userWiseCandidateTimelines = toUserwiseTimelines(

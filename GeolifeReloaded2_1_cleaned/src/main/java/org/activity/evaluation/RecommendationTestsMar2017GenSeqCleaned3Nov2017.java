@@ -1419,7 +1419,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
 
 						// Start of added on 20 Nov 2018
-						if (VerbosityConstants.verboseDistDistribution)
+						if (VerbosityConstants.verboseDistDistribution && Constant.useRTVerseNormalisationForED)
 						{// can do this only if distance distribution files are written.
 							ResultsDistributionEvaluation.writeCorrelationBetweenDistancesOverCands(
 									Constant.getCommonPath(), Constant.useRTVerseNormalisationForED);

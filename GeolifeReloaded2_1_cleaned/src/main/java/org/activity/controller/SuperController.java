@@ -722,15 +722,35 @@ public class SuperController
 		}
 		if (Constant.collaborativeCandidates)
 		{
-			collLabel = "coll";
+			collLabel += "coll";
 		}
 		if (Constant.noAED)
 		{
-			collLabel = "NoAED";
+			collLabel += "NoAED";
 		}
 		if (Constant.noFED)
 		{
-			collLabel = "NoFED";
+			collLabel += "NoFED";
+		}
+		if (Constant.lookPastType.equals(Enums.LookPastType.NCount))
+		{
+			collLabel += "NC";
+		}
+		if (Constant.lookPastType.equals(Enums.LookPastType.NHours))
+		{
+			collLabel += "NH";
+		}
+		if (Constant.lookPastType.equals(Enums.LookPastType.Daywise))
+		{
+			collLabel += "DY";
+		}
+		if (Constant.lookPastType.equals(Enums.LookPastType.ClosestTime))
+		{
+			collLabel += "CT";
+		}
+		if (Constant.lookPastType.equals(Enums.LookPastType.NGram))
+		{
+			collLabel += "NG";
 		}
 
 		if (Constant.purelyRandomPredictionNov25)
