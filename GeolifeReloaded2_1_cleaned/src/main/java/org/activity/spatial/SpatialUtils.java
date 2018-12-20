@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -16,6 +17,7 @@ import org.activity.constants.SanityConstants;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
+import org.activity.objects.LeakyBucket;
 import org.activity.objects.LocationGowalla;
 import org.activity.objects.LocationSlim;
 import org.activity.objects.Pair;
@@ -26,6 +28,10 @@ import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.apache.commons.math3.util.FastMath;
+
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ShortOpenHashMap;
 
 public final class SpatialUtils
 {
@@ -295,7 +301,16 @@ public final class SpatialUtils
 	// spatialDistanceDatabaseController
 	public static void main(String args[])
 	{
-		compareHaversines();
+		// compareHaversines();
+
+		// start of added on 19 Dec 2018
+		// slimTheSerialisedGridDistances();// add
+		// sanityCheckSlimedTheSerialisedGridDistances();
+		// sanityCheckSlimedTheSerialisedGridDistances2();
+		// findRange();
+		slimAgainTheSerialisedGridDistances();
+		compareDeserialisationTime();
+		// end of added on 19 Dec 2018
 		// spatialDistanceDatabaseController(
 		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/UniqueLocationObjects5DaysTrainTest.csv",
 		// "/run/media/gunjan/BufferVault/GowallaResults/Feb23/");
@@ -304,6 +319,141 @@ public final class SpatialUtils
 		// "./dataWritten/Feb23/");
 
 		// getDistanceBetweenAllLocations10July2018();
+	}
+
+	public static void findRange()
+	{
+		List<Long> dataRead = ReadingFromFile.oneColumnReaderLong(
+				"/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/AUG2GridIndexDistances/Dec19Leaner/gridIndexPairHaversineDist.csv",
+				",", 1, true);
+
+		System.out.println(dataRead.stream().mapToLong(e -> e.longValue()).summaryStatistics().toString());
+	}
+
+	/**
+	 * to reduce the size of serialize object "gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo " by reducing
+	 * precision of stored distances
+	 * 
+	 * @since 19 Dec 2018
+	 */
+	public static void slimTheSerialisedGridDistances()
+	{
+		String commonPath = "./dataWritten/AUG2GridIndexDistances/";
+		String pathToSerialisedHaversineDistOnEngine = commonPath
+				+ "gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
+
+		// 1D index, haversine dist
+		HashMap<Integer, Double> gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
+				.kryoDeSerializeThis(pathToSerialisedHaversineDistOnEngine);
+		// gridIndexPairHaversineDistIntDoubleWith1DConverter
+		System.out.println("deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
+
+		Int2IntOpenHashMap gridIndexPairHaversineDistLeaner1 = new Int2IntOpenHashMap(
+				gridIndexPairHaversineDist.size());
+
+		/// int a = (int) Math.round(6.14);
+		for (Entry<Integer, Double> e : gridIndexPairHaversineDist.entrySet())
+		{
+			gridIndexPairHaversineDistLeaner1.put(e.getKey().intValue(), (int) Math.round(e.getValue()));
+		}
+
+		System.out.println("gridIndexPairHaversineDistLeaner1.size() = " + gridIndexPairHaversineDistLeaner1.size());
+		Serializer.kryoSerializeThis(gridIndexPairHaversineDistLeaner1,
+				commonPath + "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2IntOpenHashMap.kryo");
+	}
+
+	public static void compareDeserialisationTime()
+	{
+		String commonPath = "./dataWritten/AUG2GridIndexDistances/";
+		Int2IntOpenHashMap slimmed = (Int2IntOpenHashMap) Serializer.kryoDeSerializeThis(
+				commonPath + "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2IntOpenHashMap.kryo");
+		System.out.println("deserialised slimmed.size()= " + slimmed.size());
+
+		Int2ShortOpenHashMap slimmed2 = (Int2ShortOpenHashMap) Serializer.kryoDeSerializeThis(
+				commonPath + "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2ShortOpenHashMap.kryo");
+		System.out.println("deserialised slimmed2.size()= " + slimmed2.size());
+
+	}
+
+	/**
+	 * Use short instead of int for values
+	 */
+	public static void slimAgainTheSerialisedGridDistances()
+	{
+		String commonPath = "./dataWritten/AUG2GridIndexDistances/";
+		Int2IntOpenHashMap slimmed = (Int2IntOpenHashMap) Serializer.kryoDeSerializeThis(
+				commonPath + "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2IntOpenHashMap.kryo");
+		System.out.println("deserialised slimmed.size()= " + slimmed.size());
+
+		Int2ShortOpenHashMap slimmedShort = new Int2ShortOpenHashMap(slimmed.size());
+
+		for (Int2IntMap.Entry e : slimmed.int2IntEntrySet())
+		{
+			int val = e.getIntValue();
+			if (val > 32767)
+			{
+				PopUps.printTracedErrorMsgWithExit(
+						"Error in slimAgainTheSerialisedGridDistances val " + val + " exceeding range ");
+			}
+			slimmedShort.put(e.getIntKey(), (short) val);
+		}
+
+		System.out.println("slimmedShort.size()= " + slimmedShort.size());
+		Serializer.kryoSerializeThis(slimmedShort,
+				commonPath + "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2ShortOpenHashMap.kryo");
+
+		LeakyBucket lb = new LeakyBucket(5000, commonPath + "Dec19Leaner/SanityCheckSlimmedShort.csv", false);
+		lb.addToLeakyBucketWithNewline("1DIndex,SlimmedDist,SlimmedShortDist");
+		for (Int2IntMap.Entry e : slimmed.int2IntEntrySet())
+		{
+			lb.addToLeakyBucketWithNewline(
+					e.getIntKey() + "," + e.getIntValue() + "," + slimmedShort.get(e.getIntKey()));
+		}
+		lb.flushLeakyBucket();
+		System.out.println("Done");
+	}
+
+	public static void sanityCheckSlimedTheSerialisedGridDistances()
+	{
+		String commonPath = "./dataWritten/AUG2GridIndexDistances/";
+		String pathToSerialisedHaversineDistOnEngine = commonPath
+				+ "gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
+
+		Int2IntOpenHashMap slimmed = (Int2IntOpenHashMap) Serializer.kryoDeSerializeThis(
+				commonPath + "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2IntOpenHashMap.kryo");
+		System.out.println("deserialised slimmed.size()= " + slimmed.size());
+
+		HashMap<Integer, Double> gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
+				.kryoDeSerializeThis(pathToSerialisedHaversineDistOnEngine);
+		System.out.println("deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
+
+		LeakyBucket lb = new LeakyBucket(5000, commonPath + "Dec19Leaner/SanityCheckComparison.csv", false);
+		lb.addToLeakyBucketWithNewline("1DIndex,OriginalDist,SlimmedDist");
+		for (Entry<Integer, Double> e : gridIndexPairHaversineDist.entrySet())
+		{
+			lb.addToLeakyBucketWithNewline(e.getKey() + "," + e.getValue() + "," + slimmed.get(e.getKey().intValue()));
+		}
+		lb.flushLeakyBucket();
+		System.out.println("Done");
+	}
+
+	public static void sanityCheckSlimedTheSerialisedGridDistances2()
+	{
+		String commonPath = "./dataWritten/AUG2GridIndexDistances/";
+
+		Int2ShortOpenHashMap a;
+		Int2IntOpenHashMap slimmed = (Int2IntOpenHashMap) Serializer.kryoDeSerializeThis(
+				commonPath + "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2IntOpenHashMap.kryo");
+		System.out.println("deserialised slimmed.size()= " + slimmed.size());
+
+		LeakyBucket lb = new LeakyBucket(5000, commonPath + "Dec19Leaner/gridIndexPairHaversineDist.csv", false);
+		lb.addToLeakyBucketWithNewline("1DIndex,OriginalDist,SlimmedDist");
+		for (Int2IntMap.Entry e : slimmed.int2IntEntrySet())
+		{
+			lb.addToLeakyBucketWithNewline(e.getIntKey() + "," + e.getIntValue());
+		}
+		lb.flushLeakyBucket();
+		System.out.println("Done");
 	}
 
 	public static void compareHaversines()

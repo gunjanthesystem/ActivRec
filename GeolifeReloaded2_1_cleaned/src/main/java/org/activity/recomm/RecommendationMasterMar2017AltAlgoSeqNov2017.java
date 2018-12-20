@@ -175,7 +175,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 		try
 		{
 			System.out.println("\n-----------Starting RecommendationMasterMar2017AltAlgoSeqNov2017 " + lookPastType
-					+ "-------------");
+					+ "-------------\ntrainTimelinesAllUsersContinuous.size() = "
+					+ trainTimelinesAllUsersContinuous.size());
 
 			String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 			long recommMasterT0 = System.currentTimeMillis();
@@ -271,17 +272,37 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			// || Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 			{
 				System.out.println("NO CAND EXTRACTION!");
-				this.candidateTimelines = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
-				// Only removing the current user's data from candidate.
-				Timeline removedCandCurrUser = candidateTimelines.remove(userIDAtRecomm);
-				if (removedCandCurrUser != null)
+				if (Constant.collaborativeCandidates)
 				{
-					System.out.println("Removed userIDAtRecomm from cand");
+					this.candidateTimelines = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
+					// Only removing the current user's data from candidate.
+					Timeline removedCandCurrUser = candidateTimelines.remove(userIDAtRecomm);
+					if (removedCandCurrUser != null)
+					{
+						System.out.println("Removed userIDAtRecomm from cand");
+					}
+					else
+					{
+						if (Constant.getDatabaseName().equals("gowalla1")
+								&& Constant.useRandomlySampled100Users == false)
+						{
+							PopUps.showError("userIDAtRecomm:" + userIDAtRecomm
+									+ " supposed to be removed from cands was not in cands or had null value.");
+						}
+						else
+						{
+							System.out.println("Warning: userIDAtRecomm:" + userIDAtRecomm
+									+ " supposed to be removed from cands was not in cands or had null value.");
+						}
+					}
 				}
 				else
 				{
-					PopUps.showError("userIDAtRecomm:" + userIDAtRecomm
-							+ " supposed to be removed from cands was not in cands or had null value.");
+					this.candidateTimelines = new LinkedHashMap<>();
+					for (Entry<Date, Timeline> e : trainingTimelines.entrySet())
+					{
+						candidateTimelines.put(e.getKey().toString(), e.getValue());
+					}
 				}
 				// trainTimelinesAllUsersContinuous;//
 			}
@@ -295,11 +316,10 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			}
 			// if (VerbosityConstants.verbose)
 			{
-				String s1 = "Inside recomm master :trainTestTimelinesForAllUsers.size()= "
+				System.out.println("Inside recomm master :trainTestTimelinesForAllUsers.size()= "
 						+ trainTestTimelinesForAllUsers.size() + " trainTimelinesAllUsersContinuous.size()="
 						+ trainTimelinesAllUsersContinuous.size() + "candTimelines.size()= "
-						+ candidateTimelines.size();
-				System.out.println(s1);
+						+ candidateTimelines.size());
 			}
 
 			// if (true)

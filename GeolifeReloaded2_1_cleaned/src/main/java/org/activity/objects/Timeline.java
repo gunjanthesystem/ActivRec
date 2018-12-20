@@ -920,14 +920,16 @@ public class Timeline implements Serializable
 
 		if (res.size() == 0)
 		{
-			System.err.println(PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts));
+			System.err.println(PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: No AO at ts:" + ts
+					+ "\n timeline: " + this.getActivityObjectNamesWithTimestampsInSequence()));
 			return -99;
 		}
 
 		if (res.size() > 1)
 		{
-			System.err.println(PopUps
-					.getTracedErrorMsg("Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts));
+			System.err.println(
+					PopUps.getTracedErrorMsg("Error in getActivityObjectAtTime: " + res.size() + " AOs (>1) at ts:" + ts
+							+ "\n timeline: " + this.getActivityObjectNamesWithTimestampsInSequence()));
 			return -99;
 		}
 		else

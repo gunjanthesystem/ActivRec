@@ -66,8 +66,8 @@ public class TimelineExtractors
 		// //////////////////
 		if (lookPastType2.equals(Enums.LookPastType.Daywise) || lookPastType2.equals(Enums.LookPastType.ClosestTime))
 		{
-			extractedCurrentTimeline = TimelineExtractors.getCurrentTimelineFromLongerTimelineDaywise(testTimelinesDaywise,
-					dateAtRecomm, timeAtRecomm, userIDAtRecomm);
+			extractedCurrentTimeline = TimelineExtractors.getCurrentTimelineFromLongerTimelineDaywise(
+					testTimelinesDaywise, dateAtRecomm, timeAtRecomm, userIDAtRecomm);
 			// for closest-time approach, only the current activity name is important, we do not actually need the
 			// complete current timeline
 		}
@@ -329,8 +329,8 @@ public class TimelineExtractors
 			else
 			{
 				// converting day timelines into continuous timelines suitable to be used for matching unit views
-				Timeline trainingTimeline = TimelineTransformers.dayTimelinesToATimeline(trainingTimelinesDaywise, false,
-						true);
+				Timeline trainingTimeline = TimelineTransformers.dayTimelinesToATimeline(trainingTimelinesDaywise,
+						false, true);
 				// Obtain {String,TimelineWithNext}
 
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMU(trainingTimeline,
@@ -603,8 +603,8 @@ public class TimelineExtractors
 			{
 				// sb.append("For NCount NHours: Non collaborative\n");
 				// converting day timelines into continuous timelines suitable to be used for matching unit views
-				Timeline trainingTimeline = TimelineTransformers.dayTimelinesToATimeline(trainingTimelinesDaywise, false,
-						true);
+				Timeline trainingTimeline = TimelineTransformers.dayTimelinesToATimeline(trainingTimelinesDaywise,
+						false, true);
 				// Obtain {String,TimelineWithNext}
 
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMU(trainingTimeline,
@@ -1223,8 +1223,9 @@ public class TimelineExtractors
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUColl(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
-			double matchingUnit, LookPastType lookPastType, ActivityObject2018 activityAtRecommPoint, String userIDAtRecomm,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
+			double matchingUnit, LookPastType lookPastType, ActivityObject2018 activityAtRecommPoint,
+			String userIDAtRecomm, LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous,
+			PrimaryDimension dimensionToMatch)
 	{
 		System.out.println("Inside extractCandidateTimelinesMUColl :trainTestTimelinesForAllUsers.size()= "
 				+ trainTestTimelinesForAllUsers.size() + " mu=" + matchingUnit + " dimensionToMatch="
@@ -1752,17 +1753,28 @@ public class TimelineExtractors
 		int count = 0;
 		LinkedHashMap<String, TimelineWithNext> candidateTimelines = new LinkedHashMap<>();
 
-		System.out.println("\nInside getCandidateTimelines()");// for creating timelines");
+		System.out.println("\nInside extractCandidateTimelinesMUHours()");// for creating timelines");
 		// totalNumberOfProbableCands=0;
 		// numCandsRejectedDueToNoCurrentActivityAtNonLast=0;
 		int numCandsRejectedDueToNoValidNextActivity = 0;
 		ArrayList<ActivityObject2018> activityObjectsInTraining = trainingTimeline.getActivityObjectsInTimeline();
 		System.out.println("Number of activity objects in training timeline=" + activityObjectsInTraining.size());
-		System.out.println("Current activity (activityAtRecommPoint)=" + activityAtRecommPoint.getActivityName());
+		System.out.println(
+				"Current activity (activityAtRecommPoint)=" + activityAtRecommPoint.getPrimaryDimensionVal("__"));
+
+		if (VerbosityConstants.verbose)// sanity check Dec 18 2018
+		{
+			// Timeline trainingTimeline,double matchingUnitInHours, ActivityObject2018 activityAtRecommPoint
+			StringBuilder sb = new StringBuilder();
+			sb.append("Debug18Dec2018: Timeline:\n" + trainingTimeline.getActivityObjectNamesWithTimestampsInSequence()
+					+ "\nmatchingUnitInHours=" + matchingUnitInHours + "\nactivityAtRecommPoint="
+					+ activityAtRecommPoint.getPrimaryDimensionVal("_") + "CandTimelines=\n");
+			System.out.println(sb.toString() + "\n");
+		}
 		// trainingTimeline.printActivityObjectNamesWithTimestampsInSequence();
 
-		for (int i = 1; i < activityObjectsInTraining.size() - 1; i++) // starting from the second activity and goes
-																		// until second last activity.
+		// starting from the second activity and goes until second last activity.
+		for (int i = 1; i < activityObjectsInTraining.size() - 1; i++)
 		{
 			ActivityObject2018 ae = activityObjectsInTraining.get(i);
 
@@ -1781,10 +1793,17 @@ public class TimelineExtractors
 			// if (ae.getActivityName().equals(activityAtRecommPoint.getActivityName())) // same name as current
 			// activity
 			{
-				Timestamp newCandEndTimestamp = new Timestamp(
-						ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
-				// decreasing 1 second (because this convention followed in data generation (not for Gowalla IMHO)
-
+				Timestamp newCandEndTimestamp = null;
+				if (Constant.getDatabaseName().equals("dcu_data_2") || Constant.getDatabaseName().equals("geolife1"))
+				{// decreasing 1 second (because this convention followed in data generation (not for Gowalla IMHO)
+					newCandEndTimestamp = new Timestamp(
+							ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
+				}
+				else
+				{
+					newCandEndTimestamp = new Timestamp(
+							ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000);// added on 18 Dec 2018
+				}
 				// NOTE: going back matchingUnitHours FROM THE START TIMESTAMP and not the end timestamp.
 
 				// this cast is safe because in this case number of milliseconds won't be in decimals
@@ -1817,9 +1836,30 @@ public class TimelineExtractors
 				// $$System.out.println("\tActivity names:" + newCandidate.getActivityObjectNamesInSequence());
 				// $$System.out.println("\tNext activity:" + newCandidate.getNextActivityObject().getActivityName());
 				candidateTimelines.put(newCandidate.getTimelineID(), newCandidate);
+
+				if (VerbosityConstants.verbose)// sanity check Dec 18 2018
+				{
+					System.out.println("\n index in timeline = " + i + "\nae= " + ae.getPrimaryDimensionVal("__") + ":"
+							+ ae.getStartTimestamp() + "--" + ae.getEndTimestamp() + "\nnewCandStartTimestamp="
+							+ newCandStartTimestamp + "\nmatchingUnitInMilliSeconds= " + matchingUnitInMilliSeconds
+							+ "\nCandidateTimeline\n" + newCandidate.getActivityObjectNamesWithTimestampsInSequence());
+				}
 			}
 		}
 
+		// Start of sanity check Dec 18 2018
+		// if (VerbosityConstants.verbose || true)
+		// {
+		// // Timeline trainingTimeline,double matchingUnitInHours, ActivityObject2018 activityAtRecommPoint
+		// StringBuilder sb = new StringBuilder();
+		// sb.append("Debug18Dec2018: Timeline:\n" + trainingTimeline.getActivityObjectNamesWithTimestampsInSequence()
+		// + "\nmatchingUnitInHours=" + matchingUnitInHours + "\nactivityAtRecommPoint="
+		// + activityAtRecommPoint.getPrimaryDimensionVal("_") + "CandTimelines=\n");
+		// candidateTimelines.entrySet().stream().forEachOrdered(e -> sb.append(
+		// "\n\n" + e.getKey() + "----" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
+		// System.out.println(sb.toString() + "\n");
+		// }
+		// End of sanity check Dec 18 2018
 		return candidateTimelines;
 	}
 
@@ -1841,14 +1881,14 @@ public class TimelineExtractors
 		// $$System.out.println("------Inside getCurrentTimelineFromLongerTimelineMUCount");
 		double reductionInMU = 0;
 		int matchingUnitInCounts = (int) matchingUnitInCountsD;
-	
+
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
 				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
 				0);
 		// long currentEndTime=currentEndTimestamp.getTime();
-	
+
 		int indexOfCurrentEnd = longerTimeline.getIndexOfActivityObjectAtTime(currentEndTimestamp);
-	
+
 		if (indexOfCurrentEnd - matchingUnitInCounts < 0)
 		{
 			reductionInMU = matchingUnitInCounts - indexOfCurrentEnd;
@@ -1856,14 +1896,14 @@ public class TimelineExtractors
 					+ ", muInCounts=" + matchingUnitInCounts + ", new MU=" + indexOfCurrentEnd);
 			matchingUnitInCounts = indexOfCurrentEnd;
 		}
-	
+
 		// this is a safe cast in this case
 		// long matchingUnitInMilliSeconds= (long)(matchingUnitInHours*60*60*1000);//multiply(new
 		// BigDecimal(60*60*1000))).longValue();
 		// Timestamp currentStartTimestamp = new Timestamp(currentEndTime- matchingUnitInMilliSeconds);
-	
+
 		int indexOfCurrentStart = indexOfCurrentEnd - matchingUnitInCounts;
-	
+
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("longer timeline=" + longerTimeline.getActivityObjectNamesWithTimestampsInSequence());// getActivityObjectNamesInSequence());
@@ -1871,23 +1911,23 @@ public class TimelineExtractors
 			System.out.println("Start index of current timeline=" + indexOfCurrentStart
 					+ "\nEnd index of current timeline=" + indexOfCurrentEnd + "\nAdjusted MU:" + matchingUnitInCounts);
 		}
-	
+
 		// identify the recommendation point in longer timeline
 		ArrayList<ActivityObject2018> activityObjectsInCurrentTimeline = longerTimeline
 				.getActivityObjectsInTimelineFromToIndex(indexOfCurrentStart, indexOfCurrentEnd + 1);
-	
+
 		System.out.println("AOsInCurrTimeline.size()=" + activityObjectsInCurrentTimeline.size());
-	
+
 		ActivityObject2018 nextValidActivityObject = longerTimeline
 				.getNextValidActivityAfterActivityAtThisPositionPD(indexOfCurrentEnd);
 		ActivityObject2018 nextActivityObject = longerTimeline
 				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
-	
+
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
 		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
 				nextValidActivityObject, false, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
-	
+
 		// System.out.println("Current timeline="+currentTimeline.getActivityObjectNamesInSequence());
 		if (currentTimeline.getActivityObjectsInTimeline().size() != (matchingUnitInCounts + 1))
 		// note: this is matching unit in counts reduced
@@ -1895,7 +1935,7 @@ public class TimelineExtractors
 			System.err.println(PopUps.getTracedErrorMsg(
 					"Error: the current timeline does not have #activity objs = adjusted matching unit"));
 		}
-	
+
 		// $$System.out.println("------Exiting getCurrentTimelineFromLongerTimelineMUCount");
 		return new Pair<>(currentTimeline, reductionInMU);
 	}
@@ -1916,29 +1956,30 @@ public class TimelineExtractors
 			Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm, double matchingUnitInHours)
 	{
 		System.out.println("------- Inside getCurrentTimelineFromLongerTimelineMUHours");
-	
+
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
 				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
 				0);
 		long currentEndTime = currentEndTimestamp.getTime();
-	
+
 		// this is a safe cast in this case
 		long matchingUnitInMilliSeconds = (long) (matchingUnitInHours * 60 * 60 * 1000);// multiply(new
 																						// BigDecimal(60*60*1000))).longValue();
-	
+
 		Timestamp currentStartTimestamp = new Timestamp(currentEndTime - matchingUnitInMilliSeconds);
-	
+
 		System.out.println("Starttime of current timeline=" + currentStartTimestamp + "\nEndtime of current timeline="
 				+ currentEndTimestamp);
-	
+
 		// identify the recommendation point in longer timeline
 		ArrayList<ActivityObject2018> activityObjectsInCurrentTimeline = longerTimeline
 				.getActivityObjectsBetweenTime(currentStartTimestamp, currentEndTimestamp);
-	
+
 		ActivityObject2018 nextValidActivityObject = longerTimeline
 				.getNextValidActivityAfterActivityAtThisTime(currentEndTimestamp);
-		ActivityObject2018 nextActivityObject = longerTimeline.getNextActivityAfterActivityAtThisTime(currentEndTimestamp);
-	
+		ActivityObject2018 nextActivityObject = longerTimeline
+				.getNextActivityAfterActivityAtThisTime(currentEndTimestamp);
+
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
 		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
 				nextValidActivityObject, false, true);
@@ -1963,7 +2004,7 @@ public class TimelineExtractors
 			LinkedHashMap<Date, Timeline> testDayTimelines, Date dateAtRecomm, Time timeAtRecomm, String userIDAtRecomm)
 	{
 		// $$System.out.println("------Inside getCurrentTimelineFromLongerTimelineDaywise");
-	
+
 		///////////////////////////////////////////////////////////////////
 		Timestamp currentEndTimestamp = new Timestamp(dateAtRecomm.getYear(), dateAtRecomm.getMonth(),
 				dateAtRecomm.getDate(), timeAtRecomm.getHours(), timeAtRecomm.getMinutes(), timeAtRecomm.getSeconds(),
@@ -1976,7 +2017,7 @@ public class TimelineExtractors
 		// + "currentEndTimestamp = " + currentEndTimestamp);
 		///////////////////////////////////////////////////////////////////
 		Timeline currentDayTimeline = testDayTimelines.get(dateAtRecomm);
-	
+
 		if (VerbosityConstants.verbose)
 		{
 			LocalDate dateOfFetchedDayTimeline = currentDayTimeline.getActivityObjectsInTimeline().get(0).getEndDate();
@@ -1989,32 +2030,32 @@ public class TimelineExtractors
 					PopUps.getTracedErrorMsg("Error: currentDayTimeline.size() =" + currentDayTimeline.size()));
 		}
 		///////////////////////////////////////////////////////////////////
-	
+
 		int indexOfCurrentEnd = currentDayTimeline.getIndexOfActivityObjectAtTime(currentEndTimestamp);
-	
+
 		// identify the recommendation point in longer timeline
 		ArrayList<ActivityObject2018> activityObjectsInCurrentTimeline = currentDayTimeline
 				.getActivityObjectsInTimelineFromToIndex(0, indexOfCurrentEnd + 1);
-	
+
 		ActivityObject2018 nextValidActivityObject = currentDayTimeline
 				.getNextValidActivityAfterActivityAtThisPositionPD(indexOfCurrentEnd);
 		ActivityObject2018 nextActivityObject = currentDayTimeline
 				.getNextActivityAfterActivityAtThisPosition(indexOfCurrentEnd);
-	
+
 		int isInvalid = nextActivityObject.isInvalidActivityName() ? 1 : -1;
-	
+
 		TimelineWithNext currentTimeline = new TimelineWithNext(activityObjectsInCurrentTimeline,
 				nextValidActivityObject, true, true);
 		currentTimeline.setImmediateNextActivityIsInvalid(isInvalid);
-	
+
 		// if (VerbosityConstants.verbose)
 		// System.out.println("Current timeline=" + currentTimeline.getActivityObjectNamesInSequence());
-	
+
 		if (!(currentTimeline.size() > 0))
 		{
 			System.err.println(PopUps.getTracedErrorMsg("Error: currentTimeline.size() =" + currentTimeline.size()));
 		}
-	
+
 		// $$System.out.println("------Exiting getCurrentTimelineFromLongerTimelineDaywise");
 		return currentTimeline;
 	}

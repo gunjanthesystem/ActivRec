@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
+import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.SummaryStat;
 import org.activity.constants.PathConstants;
 import org.activity.io.CSVUtils;
@@ -170,7 +171,7 @@ public class EvaluationSeq
 	 * 
 	 * @param seqLength
 	 * @param outputCoreResultsPath
-	 * @param matchingUnitAsPastCount
+	 * @param matchingUnitArray
 	 * @param dimensionPhrase
 	 *            only if necessary, not essential for primary dimension, e.g. SecDim for secondary dimension
 	 *            <p>
@@ -178,9 +179,10 @@ public class EvaluationSeq
 	 * @param evaluatePostFiltering
 	 * @param evaluatedSequencePrediction
 	 */
-	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitAsPastCount,
+	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitArray,
 			String dimensionPhrase, boolean evaluatePostFiltering, boolean evaluatedSequencePrediction)// sdsd
 	{
+		// PopUps.showMessage("EvaluationSeq muArray = " + Arrays.toString(matchingUnitArray));
 		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
 
 		this.evaluatePostFiltering = evaluatePostFiltering;
@@ -192,7 +194,7 @@ public class EvaluationSeq
 		{
 			groupsOf100UsersLabels = new String[] { DomainConstants.gowalla100RandomUsersLabel };
 		}
-		if (Constant.runForAllUsersAtOnce)
+		else if (Constant.runForAllUsersAtOnce)
 		{
 			groupsOf100UsersLabels = new String[] { "All" };
 		}
@@ -202,7 +204,7 @@ public class EvaluationSeq
 		WToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
 				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
 
-		intialiseListOfFilenames(matchingUnitAsPastCount);
+		intialiseListOfFilenames(matchingUnitArray);
 		int totalNumOfUsersComputedFor = 0;
 		try
 		{
@@ -215,12 +217,17 @@ public class EvaluationSeq
 						PathConstants.pathToSerialisedLocationObjects, PathConstants.pathToSerialisedUserObjects,
 						PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
 
-				for (int muIndex = 0; muIndex < matchingUnitAsPastCount.length; muIndex++)
+				for (int muIndex = 0; muIndex < matchingUnitArray.length; muIndex++)
 				{
-					double mu = matchingUnitAsPastCount[muIndex];
+					double mu = matchingUnitArray[muIndex];
 
-					if (matchingUnitAsPastCount.length == 1)// daywise i.e. no MUs
-					{
+					// if (matchingUnitArray.length == 1)// daywise i.e. no MUs
+					// {
+					// commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
+					// }
+
+					if (Constant.lookPastType.equals(LookPastType.Daywise) && matchingUnitArray.length == 1)
+					{// daywise i.e. no MUs
 						commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 					}
 					else
@@ -295,20 +302,20 @@ public class EvaluationSeq
 			System.out.println("Debug: listOfNumTopKAgreementsFiles = \n" + listOfNumTopKAgreementsFiles.toString());
 			System.out.println("Now will concatenate files: ");
 			// PopUps.showMessage("BREAKING");
-			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitAsPastCount,
+			ArrayList<String> listOfWrittenFiles = concatenateFiles(outputCoreResultsPath, matchingUnitArray,
 					listOfNumAgreementsFiles, listOfPerAgreementsFiles, listOfNumAgreementsFilesL1,
 					listOfPerAgreementsFilesL1, dimensionPhrase);
 
-			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath,
-					matchingUnitAsPastCount, listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles,
-					listOfNumTopKAgreementsFilesL1, listOfPerTopKAgreementsFilesL1, dimensionPhrase);
+			ArrayList<String> listOfTopKWrittenFiles = concatenateTopKFiles(outputCoreResultsPath, matchingUnitArray,
+					listOfNumTopKAgreementsFiles, listOfPerTopKAgreementsFiles, listOfNumTopKAgreementsFilesL1,
+					listOfPerTopKAgreementsFilesL1, dimensionPhrase);
 
 			ArrayList<String> listOfMRR_P_R_F_PerActMRRFiles = concatenateMRRPrecisonRecallFMeasurePerActMRRFiles(
-					outputCoreResultsPath, matchingUnitAsPastCount, listOfStep0MeanReciprocalRankFiles,
+					outputCoreResultsPath, matchingUnitArray, listOfStep0MeanReciprocalRankFiles,
 					listOfStep0AvgPrecisionFiles, listOfStep0AvgRecallFiles, listOfStep0AvgFMeasureFiles,
 					listOfStep0PerActMRRFiles, dimensionPhrase);
 
-			ArrayList<String> listOfCountFiles = concatenateCountFiles(outputCoreResultsPath, matchingUnitAsPastCount,
+			ArrayList<String> listOfCountFiles = concatenateCountFiles(outputCoreResultsPath, matchingUnitArray,
 					listOfStep0AvgRecallCountValidRTFiles, listOfStep0EmptyRecommsCountFiles, dimensionPhrase);
 
 			// end of file condatenation from different user groups
@@ -323,10 +330,10 @@ public class EvaluationSeq
 			System.out.println("Now will write summary stats: ");
 			SummaryStat[] summaryStats = { SummaryStat.Mean, SummaryStat.Median };
 
-			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrases, summaryStats,
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitArray, fileNamePhrases, summaryStats,
 					"SummaryLog", dimensionPhrase);
-			summariseResults(seqLength, outputCoreResultsPath, matchingUnitAsPastCount, fileNamePhrasesTopK,
-					summaryStats, "SummaryTopKLog", dimensionPhrase);
+			summariseResults(seqLength, outputCoreResultsPath, matchingUnitArray, fileNamePhrasesTopK, summaryStats,
+					"SummaryTopKLog", dimensionPhrase);
 			WToFile.appendLineToFileAbs("Finishing: ",
 					Constant.getOutputCoreResultsPath() + "Debug1" + dimensionPhrase + ".txt\n");
 		}

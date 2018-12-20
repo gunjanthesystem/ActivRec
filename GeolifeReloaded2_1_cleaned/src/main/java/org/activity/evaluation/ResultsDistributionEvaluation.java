@@ -1164,7 +1164,8 @@ public class ResultsDistributionEvaluation
 		String statFileNamesPRF[] = { "AllAvgPrecision_", "AllAvgRecall_", "AllAvgFMeasure_" };
 		String statFileNamesMRR[] = { "AllMeanReciprocalRank_" };
 
-		double muArray[] = Constant.matchingUnitAsPastCountFixed;// { 0 }
+		double muArray[] = Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor);// Constant.matchingUnitAsPastCountFixed;//
+																											// { 0 }
 		// String pathToRead = "", resultsLabel = "", host = "";
 
 		//// for fixed chosen MU

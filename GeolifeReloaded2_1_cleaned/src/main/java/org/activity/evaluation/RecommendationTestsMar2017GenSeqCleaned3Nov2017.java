@@ -7,7 +7,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,11 +15,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
-import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
+import org.activity.constants.Enums.AltSeqPredictor;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
@@ -46,7 +44,6 @@ import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.PerformanceAnalytics;
 import org.activity.util.RegexUtils;
-import org.activity.util.StringUtils;
 import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineTrimmers;
 import org.activity.util.TimelineUtils;
@@ -193,8 +190,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						Constant.setCurrentMatchingUnit(matchingUnit); // used for sanity checks
 						System.out.println("Executing RecommendationTests for matching unit: " + matchingUnit);
 
-						commonPath = computeCommonPath(matchingUnit, lookPastType, Constant.getOutputCoreResultsPath(),
-								thresholdValue);
+						commonPath = RecommendationTestsUtils.computeCommonPath(matchingUnit, lookPastType,
+								Constant.getOutputCoreResultsPath(), thresholdValue);
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());
 
@@ -376,13 +373,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 							if (Constant.filterTrainingTimelinesByRecentDays)
 							{
-								trainTimelinesAllUsersContinuousFiltrd = getContinousTrainingTimelinesWithFilterByRecentDaysV2(
-										trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines());
+								trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+										.getContinousTrainingTimelinesWithFilterByRecentDaysV2(
+												trainTestTimelinesForAllUsersDW,
+												Constant.getRecentDaysInTrainingTimelines());
 							}
 							else
 							{ // sampledUsersTimelines
-								trainTimelinesAllUsersContinuousFiltrd = getContinousTrainingTimelines(
-										trainTestTimelinesForAllUsersDW);
+								trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+										.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
 							}
 							StringBuilder sbT1 = new StringBuilder();
 							trainTimelinesAllUsersContinuousFiltrd.entrySet().stream()
@@ -398,21 +397,32 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// take out the train-test splitting of timelines out of the loop, however that can be done
 						// as well
 						// Start of curtain: incomplete: motive: faster speed
-						if (Constant.collaborativeCandidates && lengthOfRecommendedSequence > 1) // added on14Nov2018
-						{// collaborative approach
-							// disabled on 1 Aug 2017, will do just-in-time computation of representative act object
-							// based only on candidate timelines
-							if (Constant.preBuildRepAOGenericUser && Constant.lengthOfRecommendedSequence > 1)
-							{
-								repAOResultGenericUser = buildRepresentativeAOsAllUsersPDVCOllAllUsers(
-										trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
-										Constant.getUniqueActivityIDs());
+						if (Constant.lengthOfRecommendedSequence > 1)
+						{
+							if (Constant.preBuildRepAOGenericUser)
+							{// collaborative approach
+								// disabled on 1 Aug 2017, will do just-in-time computation of representative act object
+								// based only on candidate timelines
+								// added on14Nov2018
+								if (Constant.collaborativeCandidates)
+								{
+									repAOResultGenericUser = buildRepresentativeAOsAllUsersPDVCOllAllUsers(
+											trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
+											Constant.getUniqueActivityIDs());
+								}
+								// end of curtain
+								////// END of build representative activity objects for this user.
+								/// temp end
+								// start of added on 20 Dec 2018
+								else
+								{
+									repAOResultGenericUser = buildRepresentativeAOsAllUsersPDVCOllAllUsers(
+											trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
+											Constant.getUniqueActivityIDs());
+								}
+								// end of added on 20 Dec 2018
 							}
-							// end of curtain
-							////// END of build representative activity objects for this user.
-							/// temp end
 						}
-
 						System.out.println(
 								"\nWill now loop over users in RecommTests: num of userIDs.length= " + userIDs.length);
 						if (Constant.collaborativeCandidates)
@@ -424,7 +434,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						{ // int numberOfValidRTs = 0;// userCount += 1;
 
 							System.out.println("\nUser id=" + userId);// PopUps.showMessage("\nUser id=" + userId);
-							String userName = getUserNameFromUserID(userId, this.databaseName);
+							String userName = RecommendationTestsUtils.getUserNameFromUserID(userId, this.databaseName);
 
 							// Start of Added on 21 Dec 2017
 							if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
@@ -437,7 +447,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							// End of Added on 21 Dec 2017
 
 							// PopUps.showMessage("before blacklisting");
-							if (Constant.blacklistingUsersWithLargeMaxActsPerDay && isBlackListedUser(userId))
+							if (Constant.blacklistingUsersWithLargeMaxActsPerDay
+									&& RecommendationTestsUtils.isBlackListedUser(userId))
 							{
 								WToFile.appendLineToFileAbs("UserRejectedSinceInBlacklist:" + userId,
 										this.commonPath + "UserRejectedSinceInBlacklist.csv");
@@ -446,19 +457,19 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							// PopUps.showMessage("after blacklisting");
 
 							// replacing iterative write with StringBuilder for better performance
-							ArrayList<StringBuilder> sbsMaxNumOfDistinctRecommendations = createListOfStringBuilders(
-									this.recommSeqLength);
+							ArrayList<StringBuilder> sbsMaxNumOfDistinctRecommendations = RecommendationTestsUtils
+									.createListOfStringBuilders(this.recommSeqLength);
 							sbsMaxNumOfDistinctRecommendations.parallelStream().forEach(sb -> sb.append(
 									"DateOfRecomm ,TimeOfRecomm ,Week_Day,MaxNumOfDistictRecommendation,NumOfCandidateTimelines(after applying Threshold)\n"));
 
 							// replacing iterative write with StringBuilder for better performance
-							ArrayList<StringBuilder> sbsNumOfCandTimelinesBelowThreshold = createListOfStringBuilders(
-									this.recommSeqLength);
+							ArrayList<StringBuilder> sbsNumOfCandTimelinesBelowThreshold = RecommendationTestsUtils
+									.createListOfStringBuilders(this.recommSeqLength);
 							sbsNumOfCandTimelinesBelowThreshold.parallelStream().forEach(sb -> sb.append(
 									"DateOfRecomm ,TimeOfRecomm ,Week_Day,ThresholdAsDistance,NumOfCandidateTimelinesBelowThreshold,\n"));
 
-							ArrayList<StringBuilder> sbsRecommTimesWithEditDistances = createListOfStringBuilders(
-									this.recommSeqLength);
+							ArrayList<StringBuilder> sbsRecommTimesWithEditDistances = RecommendationTestsUtils
+									.createListOfStringBuilders(this.recommSeqLength);
 							sbsRecommTimesWithEditDistances.parallelStream().forEach(sb -> sb.append("DateOfRecomm"
 									+ ",TimeOfRecomm,CandidateTimelineID,TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,EndIndexOf(Sub)Cand,CandidateTimeline,WeekDayOfRecomm\n"));
 
@@ -490,7 +501,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							LinkedHashMap<Date, Timeline> userTrainingTimelines = trainTestTimelines.get(0);
 							LinkedHashMap<Date, Timeline> userTestTimelines = trainTestTimelines.get(1);
 
-							sanityCheckTrainTestSplitSameForCollNonColl(trainTestTimelinesForAllUsersDW, userId,
+							RecommendationTestsUtils.sanityCheckTrainTestSplitSameForCollNonColl(trainTestTimelinesForAllUsersDW, userId,
 									userTrainingTimelines);
 
 							// start of added on Nov 29
@@ -653,15 +664,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 										.getActivityObjectsInDay();
 
 								////////// added to improve write speed
-								ArrayList<StringBuilder> sbsRawToWriteForThisUserDate = createListOfStringBuilders(
-										recommSeqLength);
+								ArrayList<StringBuilder> sbsRawToWriteForThisUserDate = RecommendationTestsUtils
+										.createListOfStringBuilders(recommSeqLength);
 
 								StringBuilder metaToWriteForThisUserDate = new StringBuilder();
 								StringBuilder recommSequenceWithScoreForThisUserDate = new StringBuilder();
 								StringBuilder recommSequenceWithoutScoreForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> sbsDataActualToWriteForThisUserDate = createListOfStringBuilders(
-										recommSeqLength);
+								ArrayList<StringBuilder> sbsDataActualToWriteForThisUserDate = RecommendationTestsUtils
+										.createListOfStringBuilders(recommSeqLength);
 
 								// Added on June 5 2018
 								// ArrayList<StringBuilder> sbsCurrentActivityToWriteForThisUserDate =
@@ -671,17 +682,17 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 								StringBuilder dataActualSeqActsToWriteForThisUserDate = new StringBuilder();
 								StringBuilder metaIfCurrentTargetSameToWriteForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> sbsNumOfCandTimelinesForThisUserDate = createListOfStringBuilders(
-										recommSeqLength);
+								ArrayList<StringBuilder> sbsNumOfCandTimelinesForThisUserDate = RecommendationTestsUtils
+										.createListOfStringBuilders(recommSeqLength);
 
 								StringBuilder topNextActsWithoutDistToWriteForThisUserDate = new StringBuilder();
 								StringBuilder topNextActsWithDistToWriteForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> rankedRecommWithScoreToWriteForThisUserDate = createListOfStringBuilders(
-										recommSeqLength);
+								ArrayList<StringBuilder> rankedRecommWithScoreToWriteForThisUserDate = RecommendationTestsUtils
+										.createListOfStringBuilders(recommSeqLength);
 
-								ArrayList<StringBuilder> rankedRecommWithoutScoreToWriteForThisUserDate = createListOfStringBuilders(
-										recommSeqLength);
+								ArrayList<StringBuilder> rankedRecommWithoutScoreToWriteForThisUserDate = RecommendationTestsUtils
+										.createListOfStringBuilders(recommSeqLength);
 
 								StringBuilder baseLineOccurrenceToWriteForThisUserDate = new StringBuilder();
 								StringBuilder baseLineDurationToWriteForThisUserDate = new StringBuilder();
@@ -1032,7 +1043,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													mapOfMedianPreSuccDurationInms, repAOResultGenericUser, userId,
 													recommendationTimes[seqIndex],
 													topRecommendedPrimaryDimensionVal[seqIndex], recommMaster,
-													this.primaryDimension);
+													this.primaryDimension, trainTimelinesAllUsersContinuousFiltrd);
 
 											// PopUps.showMessage("here12_3");
 											repAOsFromPrevRecomms.add(repAOForTopRecommActName);
@@ -1067,7 +1078,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 									if (VerbosityConstants.WriteNumActsPerRTPerCand)
 									{
-										writeNumOfActsInEachCand(numActsInEachCandbw, userId, dateToRecomm,
+										RecommendationTestsUtils.writeNumOfActsInEachCand(numActsInEachCandbw, userId, dateToRecomm,
 												recommMasters, recommTimesStrings);
 									}
 
@@ -1377,20 +1388,23 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						} // end of for over userID
 						numActsInEachCandbw.close();
 
-						closeBWs(metaBw, recommSeqWithoutScoreBw, recommSeqWithScoreBw, actualSeqBw);
-						closeBWs(topNextActsWithoutDistance, topNextActsWithDistance);
-						closeBWs(rtsAllUsingRecommMasterWriter, rtsRejNoValidActAfterWriter, rtsRejWithNoCandsWriter,
-								rtsRejWithNoCandsBelowThreshWriter, rtsRejWithNoDWButMUCandsCands,
-								rtsRejBlackListedWriter);
-						closeBWs(baseLineOccurrence, baseLineDuration);
-						closeBWs(bwNumOfWeekendsInTraining, bwNumOfWeekendsInAll, bwCountTimeCategoryOfRecomm);
-						closeBWs(metaIfCurrentTargetSameWriter, bwNextActInvalid);
-						closeBWs(bwWriteNormalisationOfDistance, bwNumOfValidAOsAfterRTInDay);
+						RecommendationTestsUtils.closeBWs(metaBw, recommSeqWithoutScoreBw, recommSeqWithScoreBw,
+								actualSeqBw);
+						RecommendationTestsUtils.closeBWs(topNextActsWithoutDistance, topNextActsWithDistance);
+						RecommendationTestsUtils.closeBWs(rtsAllUsingRecommMasterWriter, rtsRejNoValidActAfterWriter,
+								rtsRejWithNoCandsWriter, rtsRejWithNoCandsBelowThreshWriter,
+								rtsRejWithNoDWButMUCandsCands, rtsRejBlackListedWriter);
+						RecommendationTestsUtils.closeBWs(baseLineOccurrence, baseLineDuration);
+						RecommendationTestsUtils.closeBWs(bwNumOfWeekendsInTraining, bwNumOfWeekendsInAll,
+								bwCountTimeCategoryOfRecomm);
+						RecommendationTestsUtils.closeBWs(metaIfCurrentTargetSameWriter, bwNextActInvalid);
+						RecommendationTestsUtils.closeBWs(bwWriteNormalisationOfDistance, bwNumOfValidAOsAfterRTInDay);
 
 						for (int i = 0; i < this.recommSeqLength; i++)
 						{
-							closeBWs(bwsRankedRecommWithScore.get(i), bwRankedRecommWithoutScore.get(i),
-									bwsDataActual.get(i), bwsRaw.get(i), numOfCandidateTimelinesWriter.get(i));
+							RecommendationTestsUtils.closeBWs(bwsRankedRecommWithScore.get(i),
+									bwRankedRecommWithoutScore.get(i), bwsDataActual.get(i), bwsRaw.get(i),
+									numOfCandidateTimelinesWriter.get(i));
 						}
 
 						// $$new Evaluation();
@@ -1419,7 +1433,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
 
 						// Start of added on 20 Nov 2018
-						if (VerbosityConstants.verboseDistDistribution && Constant.useRTVerseNormalisationForED)
+						if (Constant.altSeqPredictor.equals(AltSeqPredictor.None)
+								&& VerbosityConstants.verboseDistDistribution && Constant.useRTVerseNormalisationForED)
 						{// can do this only if distance distribution files are written.
 							ResultsDistributionEvaluation.writeCorrelationBetweenDistancesOverCands(
 									Constant.getCommonPath(), Constant.useRTVerseNormalisationForED);
@@ -1447,36 +1462,6 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 	}
 
-	private String getUserNameFromUserID(int userId, String databaseName)
-	{
-		String userName = "";
-		// if (databaseName.equals("gowalla1"))
-		{
-			userName = String.valueOf(userId);
-		}
-		// else
-		// {
-		// userName = ConnectDatabase.getUserName(userId);// ConnectDatabase.getUserNameFromDatabase(userId);
-		// }
-		return userName;
-	}
-
-	/**
-	 * Closes multiple BufferedReaders
-	 * 
-	 * @param br1
-	 * @param brs
-	 * @throws IOException
-	 */
-	public static void closeBWs(BufferedWriter br1, BufferedWriter... brs) throws IOException
-	{
-		br1.close();
-		for (BufferedWriter br : brs)
-		{
-			br.close();
-		}
-	}
-
 	/**
 	 * 
 	 * @param preBuildRepAOGenericUser
@@ -1490,6 +1475,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	 * @param topRecommendedPrimarDimensionVal
 	 * @param recommMaster
 	 * @param primaryDimension
+	 * @param trainTimelinesAllUsersContinuousFiltrd
+	 *            added on 20 Dec 2018
 	 * @return
 	 */
 	private ActivityObject2018 getRepresentativeAOForActName(boolean preBuildRepAOGenericUser,
@@ -1498,7 +1485,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDurationInms,
 			Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser,
 			int userId, Timestamp recommendationTimestamp, String topRecommendedPrimarDimensionVal,
-			RecommendationMasterI recommMaster, PrimaryDimension primaryDimension)
+			RecommendationMasterI recommMaster, PrimaryDimension primaryDimension,
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd)
 	{
 		ActivityObject2018 repAOForTopRecommActName = null;
 
@@ -1537,8 +1525,21 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			}
 			else
 			{
-				repAOForTopRecommActName = getRepresentativeAO(Integer.valueOf(topRecommendedPrimarDimensionVal),
-						mapOfRepAOs, mapOfMedianPreSuccDurationInms, userId, recommendationTimestamp, primaryDimension);
+				if (Constant.getDatabaseName().equals("gowalla1"))
+				{
+					repAOForTopRecommActName = getRepresentativeAO(Integer.valueOf(topRecommendedPrimarDimensionVal),
+							mapOfRepAOs, mapOfMedianPreSuccDurationInms, userId, recommendationTimestamp,
+							primaryDimension);
+				}
+				else
+				{
+					repAOForTopRecommActName = null;
+					// TODO here RecommendationTestsUtils.getRepresentativeAODec2018(
+					// Integer.valueOf(topRecommendedPrimarDimensionVal), mapOfRepAOs,
+					// mapOfMedianPreSuccDurationInms, userId, recommendationTimestamp, primaryDimension,
+					// trainTimelinesAllUsersContinuousFiltrd, collaborativeCandidates);
+
+				}
 				// also use this for collaborative approach when using prebuilt
 				// representative AOs created from training timelines of other users.
 			}
@@ -1548,205 +1549,6 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		repAOForTopRecommActName.setTimeZoneId(recommMaster.getActivityObjectAtRecomm().getTimeZoneId());
 
 		return repAOForTopRecommActName;
-	}
-
-	/**
-	 * Return a new ArrayList with 'recommSeqLength number of new StringBuilders
-	 * 
-	 * @param recommSeqLength
-	 * @return
-	 */
-	private static ArrayList<StringBuilder> createListOfStringBuilders(int recommSeqLength)
-	{
-		ArrayList<StringBuilder> sbsRawToWriteForThisUserDate = new ArrayList<>(recommSeqLength);
-		IntStream.range(0, recommSeqLength).forEachOrdered(i -> sbsRawToWriteForThisUserDate.add(new StringBuilder()));
-		return sbsRawToWriteForThisUserDate;
-	}
-
-	/**
-	 * 
-	 * @param numActsInEachCandbw
-	 * @param userId
-	 * @param dateToRecomm
-	 * @param recommMasters
-	 * @param recommTimesStrings
-	 * @throws IOException
-	 */
-	private void writeNumOfActsInEachCand(BufferedWriter numActsInEachCandbw, int userId, String dateToRecomm,
-			RecommendationMasterI[] recommMasters, String[] recommTimesStrings) throws IOException
-	{
-		StringBuilder tmpWriter = new StringBuilder();
-		// System.out.println("\tIterating over candidate timelines:");
-		for (int i = 0; i < recommMasters.length; i++)
-		{
-			RecommendationMasterI recommMaster = recommMasters[i];
-			for (Timeline candtt1 : recommMaster.getOnlyCandidateTimeslines())// candidateTimelines.entrySet())
-			{
-				// Timeline candtt1 = entryAjooba.getValue(); ArrayList<ActivityObject>
-				// aa1=candtt1.getActivityObjectsInTimeline();
-				// excluding the current activity at the end of the candidate timeline
-				// System.out.println("Number of activity Objects in this timeline
-				// (except the end current activity) is: "+sizez1);
-				tmpWriter = StringUtils.fCat(tmpWriter, String.valueOf(candtt1.countNumberOfValidActivities() - 1), ",",
-						candtt1.getTimelineID(), ",", Integer.toString(userId), ",", dateToRecomm, ",",
-						recommTimesStrings[i], ",", candtt1.getActivityObjectNamesWithTimestampsInSequence(), ",");
-			}
-		}
-		numActsInEachCandbw.write(tmpWriter.toString() + "\n");
-	}
-
-	/**
-	 * 
-	 * @param trainTestTimelinesForAllUsersDW
-	 * @return
-	 */
-	public final static LinkedHashMap<String, Timeline> getContinousTrainingTimelines(
-			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW)
-	{
-		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
-
-		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsersDW
-				.entrySet())
-		{
-			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
-
-			Timeline trainingTimelineForThisUser = TimelineTransformers
-					.dayTimelinesToATimeline(trainingTimelineForThisUserDate, false, true);
-			// convert datetime to continouse timeline
-			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), trainingTimelineForThisUser);
-		}
-
-		return trainTimelineForAllUsers;
-	}
-
-	/**
-	 * Take only recent numOfRecentDays days for each user
-	 * 
-	 * 
-	 * @param trainTestTimelinesForAllUsersDW
-	 * @param numOfRecentDays
-	 * @return
-	 */
-	private final static LinkedHashMap<String, Timeline> getContinousTrainingTimelinesWithFilterByRecentDays(
-			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
-			int numOfRecentDays)
-	{
-		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
-
-		StringBuilder sb = new StringBuilder("Debug 10 Dec\t");
-
-		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsersDW
-				.entrySet())
-		{
-			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
-
-			TreeMap<Date, Timeline> trainingTimelineForThisUserDateDescByDate = new TreeMap<Date, Timeline>(
-					Collections.reverseOrder());
-
-			trainingTimelineForThisUserDateDescByDate.putAll(trainingTimelineForThisUserDate);
-
-			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDateDescByDate
-					.entrySet().stream().limit(numOfRecentDays)
-					.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
-
-			Timeline filteredTrainingTimelineForThisUser = TimelineTransformers
-					.dayTimelinesToATimeline(filteredDayTrainingTimelineForThisUser, false, true);
-			// convert datetime to continouse timeline
-			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredTrainingTimelineForThisUser);
-
-			// start of debug print
-			if (VerbosityConstants.WriteFilterTrainTimelinesByRecentDays)
-			{
-				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. original day timelines:");
-				trainingTimelineForThisUserDate.entrySet().stream().forEachOrdered(e -> sb.append(
-						"\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
-				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. sorted day timelines:");
-				trainingTimelineForThisUserDateDescByDate.entrySet().stream().forEachOrdered(e -> sb.append(
-						"\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
-				sb.append("\\n-->User =" + trainTestForAUser.getKey() + "\n. filtered day timelines:");
-				sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence()
-						+ "\n--\n");
-			}
-			// end of debug print
-
-		}
-		WToFile.appendLineToFileAbs(sb.toString() + "\n--\n", Constant.getCommonPath() + "FilteringOfTrainingDays.csv");
-
-		return trainTimelineForAllUsers;
-	}
-
-	/**
-	 * Take only recent numOfRecentDays days for each user
-	 * 
-	 * <p>
-	 * Sanity checked
-	 * 
-	 * @param trainTestTimelinesForAllUsersDW
-	 * @param numOfRecentDays
-	 * @return map of {userID, filteredTrainingTimelineForThisUser}
-	 */
-	public final static LinkedHashMap<String, Timeline> getContinousTrainingTimelinesWithFilterByRecentDaysV2(
-			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
-			int numOfRecentDays)
-	{
-		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
-		System.out.println("----- Filtering by recent " + numOfRecentDays + " Days");
-		StringBuilder sb = new StringBuilder("Debug 10 Dec\t");
-
-		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsersDW
-				.entrySet())
-		{
-			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
-
-			// Get most recent numOfRecentDays dates
-			List<Date> trainingDatesForThisUserList = new ArrayList<>();
-			trainingDatesForThisUserList.addAll(trainingTimelineForThisUserDate.keySet());
-			Collections.sort(trainingDatesForThisUserList, Collections.reverseOrder());
-
-			Set<Date> setOfSelectedDatesForThisUser = trainingDatesForThisUserList.stream().limit(numOfRecentDays)
-					.collect(Collectors.toSet());
-
-			if (VerbosityConstants.verbose)// added on 29 June 2018 to reduce verbosity of output
-			{
-				System.out.println("UserID=" + trainTestForAUser.getKey() + " numOfTrainingDays="
-						+ trainingDatesForThisUserList.size() + "\ttrainingDatesForThisUserList= \n"
-						+ trainingDatesForThisUserList);
-				System.out.println("numOfSelectedTrainingDays= " + setOfSelectedDatesForThisUser.size()
-						+ "\t\tsetOfSelectedDatesForThisUser= \n" + setOfSelectedDatesForThisUser);
-			}
-
-			// filter by date in setOfSelectedDatesForThisUser
-			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate
-					.entrySet().stream().filter(e -> setOfSelectedDatesForThisUser.contains(e.getKey()))
-					.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
-
-			// convert datetime to continouse timeline
-			Timeline filteredTrainingTimelineForThisUser = TimelineTransformers
-					.dayTimelinesToATimeline(filteredDayTrainingTimelineForThisUser, false, true);
-
-			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredTrainingTimelineForThisUser);
-
-			// start of debug print
-			if (VerbosityConstants.WriteFilterTrainTimelinesByRecentDays)
-			{
-				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. original day timelines: size = "
-						+ trainingTimelineForThisUserDate.size());
-				trainingTimelineForThisUserDate.entrySet().stream().forEachOrdered(e -> sb.append(
-						"\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
-				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. selected dates:");
-				setOfSelectedDatesForThisUser.stream().forEachOrdered(e -> sb.append("\n" + e.toString() + "--"));
-				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. filtered day timelines: size= "
-						+ filteredTrainingTimelineForThisUser.size());
-				sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence()
-						+ "\n--\n");
-				// System.out.println(sb.toString() + "\n--\n");
-			}
-			// end of debug print
-			WToFile.appendLineToFileAbs(sb.toString() + "\n--\n",
-					Constant.getCommonPath() + "FilteringOfTrainingDays.csv");
-		}
-
-		return trainTimelineForAllUsers;
 	}
 
 	/**
@@ -2212,94 +2014,217 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 	}
 
+	// Start of added on 20 Dec 2018
 	/**
+	 * NOT USED AT THE MOMENT
 	 * 
-	 * @param userId
-	 * @param databaseName
+	 * @param trainTestTimelinesForAllUsers
+	 * @param uniqueLocIDs
+	 * @param uniqueActivityIDs
 	 * @return
 	 */
-	private static boolean isBlackListedUser(int userId)
+	private Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> buildRepresentativeAOsAllUsersPDVAllUsersDec2018(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
+			Set<Integer> uniqueLocIDs, Set<Integer> uniqueActivityIDs)
 	{
-		boolean isBlackListed = false;
-		if (Constant.getDatabaseName().equals("gowalla1"))
+		boolean sanityCheck = false;
+		System.out.println("Inside buildRepresentativeAOsAllUsersPDVAllUsersDec2018 using all users ");
+		// LinkedHashMap<Integer, ActivityObject> repAOsForThisUser = null;
+		// LinkedHashMap<Integer, Pair<Double, Double>> actMedianPreSuccDuration = null;
+		Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> result = null;
+		// LinkedHashMap<String,LinkedHashMap<Integer,ActivityObject2018>>
+
+		LinkedHashMap<String, Timeline> collTrainingTimelines = new LinkedHashMap<>();
+
+		long t1 = System.currentTimeMillis();
+		try
 		{
-			if (Arrays.asList(DomainConstants.gowallaUserIDsWithGT553MaxActsPerDay).contains(userId))
+			// if (this.databaseName.equals("gowalla1") == false)
+			// {
+			// PopUps.printTracedErrorMsgWithExit("Error: database is not gowalla1:" + this.databaseName);
+			// }
+			// if (mapOfRepAOs.containsKey(userId)) // USEFUL when we keep mapOfRepAOs as class variable
+			// { System.err.println("Error: the user is already in mapOfRepAOs, this shouldn't have happened");
+			// System.exit(-1); }
+			// else
 			{
-				System.out.println("Skipping user: " + userId + " as in gowallaUserIDsWithGT553MaxActsPerDay");
-				// PopUps.showMessage("Skipping user: " + userId + " as in gowallaUserIDsWithGT553MaxActsPerDay");
-				isBlackListed = true;
+				LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal = new LinkedHashMap<>();
+				/**
+				 * Could be useful for deciding upon the start timestamp from representative AO
+				 */
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromPrevForEachPDValInms = new LinkedHashMap<>();
+				LinkedHashMap<Integer, ArrayList<Long>> durationFromNextForEachPDValInms = new LinkedHashMap<>();
+
+				// earlier version was using all possible vals fro PD but now using only those in training data.
+				LinkedHashSet<Integer> distinctPDValsEncounteredInTraining = new LinkedHashSet<>();
+
+				for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsers
+						.entrySet())
+				{
+					Timeline userTrainingTimeline = TimelineTransformers
+							.dayTimelinesToATimeline(trainTestForAUser.getValue().get(0), false, true);
+
+					for (ActivityObject2018 ao : userTrainingTimeline.getActivityObjectsInTimeline())
+					{
+						distinctPDValsEncounteredInTraining.addAll(ao.getPrimaryDimensionVal());
+					}
+					collTrainingTimelines.put(trainTestForAUser.getKey(), userTrainingTimeline);
+				}
+
+				System.out.println("distinctPDValsEncounteredInCOllTraining.size() = "
+						+ distinctPDValsEncounteredInTraining.size());
+
+				// iterate over all possible primary dimension vals to initialise to preserve order.
+				for (Integer pdVal : distinctPDValsEncounteredInTraining)
+				{
+					aosForEachPDVal.put(pdVal, new ArrayList<>());
+					durationFromPrevForEachPDValInms.put(pdVal, new ArrayList<>());
+					durationFromNextForEachPDValInms.put(pdVal, new ArrayList<>());
+				}
+
+				// populate the map for list of aos for each act name
+				int countAOs = 0;
+				for (Entry<String, Timeline> trainingTimelineEntry : collTrainingTimelines.entrySet())
+				{
+					String userID = trainingTimelineEntry.getKey();
+
+					// long durationFromPreviousInSecs = 0;
+					long prevTimestampInms = 0;
+					Set<Integer> prevPDValEncountered = null;
+
+					for (ActivityObject2018 ao : trainingTimelineEntry.getValue().getActivityObjectsInTimeline())
+					{
+						countAOs += 1;
+						Set<Integer> uniquePdValsInAO = new LinkedHashSet<>(ao.getPrimaryDimensionVal());
+						for (Integer pdVal : uniquePdValsInAO)
+						{
+							// add this act object to the correct map entry in map of aos for given act names
+							ArrayList<ActivityObject2018> aosStored = aosForEachPDVal.get(pdVal);
+							if (aosStored == null)
+							{
+								PopUps.printTracedErrorMsg("Error: encountered pdval '" + pdVal
+										+ "' is not in the list of pd vals from training data");
+							}
+							aosStored.add(ao); // add the new AO encountered to the map's list. So map is updated
+						}
+
+						// store the preceeding and succeeding durations
+						long currentTimestampInms = ao.getStartTimestamp().getTime();
+
+						if (prevTimestampInms != 0)
+						{ // add the preceeding duration for this AO
+							for (Integer pdVal : uniquePdValsInAO)
+							{
+								durationFromPrevForEachPDValInms.get(pdVal)
+										.add(currentTimestampInms - prevTimestampInms);
+							}
+						}
+
+						if (prevPDValEncountered != null)
+						{
+							// add the succeeding duration for the previous AO
+							for (Integer prevPDVal : prevPDValEncountered)
+							{
+								durationFromNextForEachPDValInms.get(prevPDVal)
+										.add(currentTimestampInms - prevTimestampInms);
+							}
+						}
+
+						prevTimestampInms = currentTimestampInms;
+						prevPDValEncountered = uniquePdValsInAO;
+					}
+				}
+				/////////////
+
+				// $$ analyseActNameNotInTraining(userId, allPossibleActivityNames,
+				// distinctActNamesEncounteredInTraining,
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/" + "ActNamesNotInTraining.csv",
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/"
+				// + "ActNamesInTestButNotInTraining.csv",
+				// userTestTimelines);
+
+				/////////////
+
+				////////////////////////// sanity check
+				if (sanityCheck)
+				{
+					System.out.println("Timeline of AOs");
+
+					// userTrainingTimelines.getActivityObjectsInTimeline().stream().forEachOrdered(ao -> System.out
+					// .print(ao.getPrimaryDimensionVal("/") + "-" + ao.getStartTimestampInms() + ">>"));
+
+					System.out.println("durationFromPrevForEachPDValue:");
+					durationFromPrevForEachPDValInms.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
+
+					System.out.println("durationFromNextForEachPDValue:");
+					durationFromNextForEachPDValInms.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().toString()));
+					// SANITY CHECK OK for durationFromPrevForEachActName durationFromNextForEachActName
+
+					////////////////////////// sanity check
+					System.out.println("Count of aos for each pd value:");
+					aosForEachPDVal.entrySet().stream()
+							.forEach(e -> System.out.println(e.getKey() + "--" + e.getValue().size()));
+				}
+
+				long sumOfCountOfAOsFroMap = aosForEachPDVal.entrySet().stream().flatMap(e -> e.getValue().stream())
+						.count();
+				long sumOfCountOfAOsFromTimeline = countAOs;// userTrainingTimelines.getActivityObjectsInTimeline().stream()
+				// .count();
+
+				// .map(e -> e.getValue().getActivityObjectsInTimeline().size()).count();
+				System.out.println("sumOfCountOfAOsFroMap= " + sumOfCountOfAOsFroMap);
+				System.out.println("sumOfCountOfAOsFromTimeline= " + sumOfCountOfAOsFromTimeline);
+
+				// This sanity check below is relevant only for activity id as primary dimension, since it is in that
+				// case each activity object has only one primary dimension val (activity id). It won't hold in case of
+				// location ids since one activity object can have multiple location ids because of mergers, i.e,
+				// sumOfCountOfAOsFroMap>sumOfCountOfAOsFromTimeline
+				if (primaryDimension.equals(PrimaryDimension.ActivityID))
+				{
+					if (sumOfCountOfAOsFroMap != sumOfCountOfAOsFromTimeline)
+					{
+						PopUps.printTracedErrorMsg(
+								"Sanity check failed in buildRepresentativeAOsForUserPDV2\n(sumOfCountOfAOsFroMap) != "
+										+ sumOfCountOfAOsFroMap + " (sumOfCountOfAOsFromTimeline)"
+										+ sumOfCountOfAOsFromTimeline);
+					}
+				}
+				else// (primaryDimension.equals(PrimaryDimension.LocationID))
+				{
+					if (sumOfCountOfAOsFroMap < sumOfCountOfAOsFromTimeline)
+					{
+						PopUps.printTracedErrorMsg(
+								"Sanity check failed in buildRepresentativeAOsForUserPDV2\n(sumOfCountOfAOsFroMap) != "
+										+ sumOfCountOfAOsFroMap + " (sumOfCountOfAOsFromTimeline)"
+										+ sumOfCountOfAOsFromTimeline);
+					}
+				}
+				// SANITY CHECK OK for daosForEachActName
+
+				////////////////////////// sanity check end
+
+				result = computeRepresentativeActivityObjectForUserPDV2GenericUser(aosForEachPDVal,
+						durationFromPrevForEachPDValInms, durationFromNextForEachPDValInms);
+
+				// repAOsForThisUser = result.getFirst();
+				// actMedianPreSuccDuration = result.getSecond();
 			}
 		}
-		else
+		catch (Exception e)
 		{
-			System.err.println("Warning: Constant.blacklistingUsersWithLargeMaxActsPerDay= "
-					+ Constant.blacklistingUsersWithLargeMaxActsPerDay
-					+ " but blacklisted user not defined for this database, hence returning isBlacklister = false");
+			e.printStackTrace();
 		}
-		return isBlackListed;
+		long t2 = System.currentTimeMillis();
+		System.out.println("Exiting buildRepresentativeAOsAllUsersPDVCOllAllUsers for all users  time taken = "
+				+ ((t2 - t1) * 1.0 / 1000) + "secs");
+
+		return result;
+
 	}
 
-	/**
-	 * 
-	 * @param matchingUnit
-	 * @param lookPastType
-	 * @param outputCoreResultsPath
-	 */
-	private static String computeCommonPath(double matchingUnit, Enums.LookPastType lookPastType,
-			String outputCoreResultsPath)
-	{
-		String commonPath = null;
-		// matching unit is only relevant if it is not daywise
-		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
-		{
-			String dirToCreate = outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit);
-			WToFile.createDirectory(dirToCreate);// Creating the directory for that matching unit
-			commonPath = dirToCreate + "/";
-		}
-		else // daywise //baseline closest time
-		{
-			commonPath = outputCoreResultsPath;
-		}
-		return commonPath;
-	}
-
-	/**
-	 * 
-	 * @param matchingUnit
-	 * @param lookPastType
-	 * @param outputCoreResultsPath
-	 */
-	private static String computeCommonPath(double matchingUnit, Enums.LookPastType lookPastType,
-			String outputCoreResultsPath, int thresholdVal)
-	{
-		String commonPath = null;
-		// matching unit is only relevant if it is not daywise
-		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
-		{
-			String dirToCreate;
-			if (Constant.useiiWASThreshold)
-			{
-				dirToCreate = outputCoreResultsPath + thresholdVal + "/MatchingUnit" + String.valueOf(matchingUnit);
-				WToFile.createDirectory(outputCoreResultsPath + thresholdVal);
-				WToFile.createDirectory(
-						outputCoreResultsPath + thresholdVal + "/MatchingUnit" + String.valueOf(matchingUnit));
-			}
-			else
-			{
-				dirToCreate = outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit);
-				WToFile.createDirectory(outputCoreResultsPath + "/MatchingUnit" + String.valueOf(matchingUnit));
-
-			}
-
-			// Creating the directory for that matching unit
-			commonPath = dirToCreate + "/";
-		}
-		else // daywise //baseline closest time
-		{
-			commonPath = outputCoreResultsPath;
-		}
-		return commonPath;
-	}
+	// End of added on 20 Dec 2018
 
 	/**
 	 * 
@@ -2754,147 +2679,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 	//
 
-	/**
-	 * 
-	 * @param mapOfRepAOs
-	 * @param mapOfMedianPreSuccDuration
-	 */
-	private void writeRepAOs(LinkedHashMap<Integer, LinkedHashMap<String, ActivityObject2018>> mapOfRepAOs,
-			LinkedHashMap<Integer, LinkedHashMap<String, Pair<Double, Double>>> mapOfMedianPreSuccDuration,
-			String commonPath)
-	{
-
-		StringBuilder sbTemp = new StringBuilder();
-
-		WToFile.appendLineToFileAbs("UserID,ActID,RepAO\n", commonPath + "RepAO.txt");
-
-		for (Entry<Integer, LinkedHashMap<String, ActivityObject2018>> uEntry : mapOfRepAOs.entrySet())
-		{
-			// sbTemp.append("\nUser:" + uEntry.getKey()).append("Rep AOs:\n");
-			uEntry.getValue().entrySet().stream().forEachOrdered(e -> sbTemp
-					.append(uEntry.getKey() + "," + e.getKey() + "," + e.getValue().toStringAllGowallaTS() + "\n"));
-		}
-		WToFile.appendLineToFileAbs(sbTemp.toString(), commonPath + "RepAO.txt");
-
-		StringBuilder sbTemp2 = new StringBuilder();
-		WToFile.appendLineToFileAbs("UserID,ActID,PreceedingMedian,SuceedingMedian",
-				commonPath + "PreSucMedianDuration.txt");
-		for (Entry<Integer, LinkedHashMap<String, Pair<Double, Double>>> uEntry : mapOfMedianPreSuccDuration.entrySet())
-		{
-			// sbTemp2.append("\nUser:" + uEntry.getKey()).append("\nMedian Prec Succeeding durations:\n");
-			uEntry.getValue().entrySet().stream().forEachOrdered(e -> sbTemp2.append(uEntry.getKey() + "," + e.getKey()
-					+ "," + e.getValue().getFirst() + "," + e.getValue().getSecond() + "\n"));
-
-		}
-		WToFile.appendLineToFileAbs(sbTemp2.toString(), commonPath + "PreSucMedianDuration.txt");
-
-	}
-
-	/**
-	 * 
-	 * @param dateToRecomm
-	 * @param weekDay
-	 * @param endTimeStamp
-	 * @param recommP1
-	 * @param actActualDone
-	 * @param activityAtRecommPoint
-	 * @return
-	 * 
-	 * @deprecated Not writing this anymore as similar information is written by:
-	 *             org.activity.io.WritingToFile.writeEditDistancesPerRtPerCand()
-	 */
-	private static String getRTsWithDistancesToWrite(String dateToRecomm, String weekDay, Timestamp endTimeStamp,
-			RecommendationMasterI recommP1, String actActualDone, ActivityObject2018 activityAtRecommPoint)
-	{
-		StringBuilder rtsWithEditDistancesMsg = new StringBuilder();
-
-		for (Map.Entry<String, Pair<String, Double>> entryDistance : recommP1.getDistancesSortedMap().entrySet())
-		{
-			String candidateTimelineID = entryDistance.getKey();
-
-			Timeline candidateTimeline = recommP1.getCandidateTimeline(candidateTimelineID);
-			// recommP1.getCandidateTimeslines() .get(candidateTimelineID);
-
-			int endPointIndexThisCandidate = candidateTimeline.getActivityObjectsInTimeline().size() - 1;
-			ActivityObject2018 endPointActivityInCandidate = candidateTimeline.getActivityObjectsInTimeline()
-					.get(endPointIndexThisCandidate);
-
-			// difference in start time of end point activity of candidate and start
-			// time of current activity
-			long diffStartTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint.getStartTimestamp().getTime()
-					- endPointActivityInCandidate.getStartTimestamp().getTime()) / 1000;
-			// difference in end time of end point activity of candidate and end time of
-			// current activity
-			long diffEndTimeForEndPointsCand_n_GuidingInSecs = (activityAtRecommPoint.getEndTimestamp().getTime()
-					- endPointActivityInCandidate.getEndTimestamp().getTime()) / 1000;
-
-			// ("DateOfRecomm"+",TimeOfRecomm,"+"TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,CandidateTimeline,WeekDayOfRecomm");
-			// bwRecommTimesWithEditDistances.write
-			rtsWithEditDistancesMsg.append(dateToRecomm + "," + endTimeStamp.getHours() + ":"
-					+ endTimeStamp.getMinutes() + ":" + endTimeStamp.getSeconds() + "," + candidateTimelineID + ","
-					+ actActualDone + "," + entryDistance.getValue().getSecond() + ","
-					// +dateOfCand+","
-					+ diffStartTimeForEndPointsCand_n_GuidingInSecs + "," + diffEndTimeForEndPointsCand_n_GuidingInSecs
-					+ "," + endPointIndexThisCandidate + "," + candidateTimeline.getActivityObjectNamesInSequence()
-					+ "," + weekDay + "\n");
-			// UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())
-			// +"," +UtilityBelt.getWeekDayFromWeekDayInt(entryScore.getKey().getDay())
-			// bwRecommTimesWithEditDistances.newLine();
-		}
-
-		return rtsWithEditDistancesMsg.toString();// +"\n"
-	}
-
-	public static String getActivityNameCountPairsWithCount(LinkedHashMap<String, Long> nameCountPairsSorted)
-	{
-		// String result = "";
-		StringBuilder result = new StringBuilder();
-
-		for (Map.Entry<String, Long> entry : nameCountPairsSorted.entrySet())
-		{
-			result.append("__").append(entry.getKey()).append(":").append(entry.getValue());
-			// result += "__" + entry.getKey() + ":" + entry.getValue();
-		}
-		return result.toString();
-	}
-
-	public static String getActivityNameCountPairsWithoutCount(LinkedHashMap<String, Long> nameCountPairsSorted)
-	{
-		// String result = "";
-		StringBuilder result = new StringBuilder();
-
-		for (Map.Entry<String, Long> entry : nameCountPairsSorted.entrySet())
-		{
-			result.append("__").append(entry.getKey());
-			// result += "__" + entry.getKey();
-		}
-		return result.toString();
-	}
-
-	public static String getActivityNameDurationPairsWithDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
-	{
-		// String result = "";
-		StringBuilder result = new StringBuilder();
-		for (Map.Entry<String, Long> entry : nameDurationPairsSorted.entrySet())
-		{
-			result.append("__").append(entry.getKey()).append(":").append(entry.getValue());
-			// result += "__" + entry.getKey() + ":" + entry.getValue();
-		}
-		return result.toString();
-	}
-
-	public static String getActivityNameDurationPairsWithoutDuration(
-			LinkedHashMap<String, Long> nameDurationPairsSorted)
-	{
-		// String result = "";
-		StringBuilder result = new StringBuilder();
-		for (Map.Entry<String, Long> entry : nameDurationPairsSorted.entrySet())
-		{
-			result.append("__").append(entry.getKey());
-			// result += "__" + entry.getKey();
-		}
-		return result.toString();
-	}
+	
 
 	/**
 	 * Sets the matching unit array to be used depending on the lookPastType argument and matching unit values in Class
@@ -3513,54 +3298,6 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 	}
 
 	/**
-	 * Analyse activity names which are not in training timelines for each user.
-	 * 
-	 * @param userId
-	 * @param allPossibleActivityNames
-	 * @param distinctActNamesEncounteredInTraining
-	 * @param fileNameToWrite
-	 * @param userTestTimelines
-	 */
-	private static void analyseActNameNotInTraining(int userId, String[] allPossibleActivityNames,
-			LinkedHashSet<String> distinctActNamesEncounteredInTraining, String fileNameToWrite,
-			String fileNameToWrite2, Timeline userTestTimelines)
-	{
-		System.out.println("#Distinct act names encountered in training for this user = "
-				+ distinctActNamesEncounteredInTraining.size());
-		System.out.println("#All possible act names = " + allPossibleActivityNames.length);
-
-		int numOfActNamesNotInTraining = (allPossibleActivityNames.length
-				- distinctActNamesEncounteredInTraining.size());
-		System.out.println("#act names not in training timelines for this user = " + numOfActNamesNotInTraining);
-		System.out.println("Acts not in trainings: ");
-		LinkedHashSet<String> actNamesNotInTraining = new LinkedHashSet<String>(
-				Arrays.asList(allPossibleActivityNames));
-		actNamesNotInTraining.removeAll(distinctActNamesEncounteredInTraining);
-
-		String actNameNotInTrainingSB = actNamesNotInTraining.stream().collect(Collectors.joining("__"));
-		WToFile.appendLineToFileAbs(
-				"U:" + userId + "," + numOfActNamesNotInTraining + "," + actNameNotInTrainingSB.toString() + "\n",
-				fileNameToWrite);
-
-		////////////// Look at act names in Test set and see if they were in training timelines or not.
-		LinkedHashSet<String> actNamesInTestSet = new LinkedHashSet<String>();
-		userTestTimelines.getActivityObjectsInTimeline().stream()
-				.forEach(ao -> actNamesInTestSet.add(ao.getActivityName()));
-
-		LinkedHashSet<String> actNamesInTestButNotInTraining = new LinkedHashSet<String>(actNamesInTestSet);
-		actNamesInTestButNotInTraining.removeAll(distinctActNamesEncounteredInTraining);
-		System.out.println(
-				"#act names in test but not in training  for this user = " + actNamesInTestButNotInTraining.size());
-
-		String actNamesInTestButNotInTrainingS = actNamesInTestButNotInTraining.stream()
-				.collect(Collectors.joining("__"));
-
-		WToFile.appendLineToFileAbs("U:" + userId + "," + actNamesInTestButNotInTraining.size() + ","
-				+ actNamesInTestButNotInTrainingS + "\n", fileNameToWrite2);
-
-	}
-
-	/**
 	 * 
 	 * @param userID
 	 * @param aosForEachActName
@@ -3606,7 +3343,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						.getPercentile(50);
 
 				// double medianSecondsFromMidnight =
-				Timestamp mediaStartTS = getMedianSecondsSinceMidnightTimestamp(
+				Timestamp mediaStartTS = RecommendationTestsUtils.getMedianSecondsSinceMidnightTimestamp(
 						aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID, actName);
 
 				double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
@@ -3827,26 +3564,6 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 	/**
 	 * 
-	 * @param aosForEachPDVal
-	 * @param PDVal
-	 * @return
-	 */
-	public Integer getMedianCheckinsCountForGivePDVal(
-			LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal, Integer PDVal)
-	{
-		int res = -1;
-		ArrayList<ActivityObject2018> aos = aosForEachPDVal.get(PDVal);
-
-		ArrayList<Double> cinCounts = (ArrayList<Double>) aos.stream().map(ao -> (double) ao.getCheckins_count())
-				.collect(Collectors.toList());
-
-		res = (int) StatsUtils.getDescriptiveStatistics(cinCounts).getPercentile(50);
-		System.out.println("Inside getMedianCheckinsCountForGivePDVal: median cin for PDVal:" + PDVal + " = " + res);
-		return res;
-	}
-
-	/**
-	 * 
 	 * @param userID
 	 * @param aosForEachPDVal
 	 * @param durationFromPrevForEachPDValInms
@@ -3942,7 +3659,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 				if (Constant.useMedianCinsForRepesentationAO)
 				{
-					cins_count = getMedianCheckinsCountForGivePDVal(aosForEachPDVal, pdVal);
+					cins_count = RecommendationTestsUtils.getMedianCheckinsCountForGivePDVal(aosForEachPDVal, pdVal);
 				}
 
 				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs,
@@ -3963,99 +3680,6 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		System.out.println("Exiting computeRepresentativeActivityObjectForUserPDV2genericUser for generic user");
 		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(
 				repAOs, actMedPreSuccDuration);
-	}
-
-	/**
-	 * Returns the median seconds since midnight for the given timestamps
-	 * 
-	 * @param tss
-	 * @param userID
-	 * @param actName
-	 *            just used for nameing the filename to write the result to
-	 * @return
-	 */
-	private static double getMedianSeconds(List<Timestamp> tss, int userID, String actName)
-	{
-		double medianSecsSinceMidnight = -1;
-		try
-		{
-			double[] secsSinceMidnight = tss.stream()
-					.mapToDouble(t -> t.getHours() * 60 * 60 + t.getMinutes() * 60 + t.getSeconds()).toArray();
-
-			medianSecsSinceMidnight = StatsUtils.getDescriptiveStatistics(secsSinceMidnight, "secsSinceMidnight",
-					userID + "__" + actName + "secsSinceMidnight.txt", false).getPercentile(50);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return medianSecsSinceMidnight;
-	}
-
-	/**
-	 * Computes the median of the seconds since midnight for the given timestamps and returns a Timestamp with dummy
-	 * year, month, date while hours, mins, seconds extracted from the median.
-	 * 
-	 * @param tss
-	 * @param userID
-	 * @param actName
-	 *            just used for naming the filename to write result to
-	 * @return
-	 */
-	private static Timestamp getMedianSecondsSinceMidnightTimestamp(List<Timestamp> tss, int userID, String actName)
-	{
-		Timestamp ts = null;
-		try
-		{
-			double secs = getMedianSeconds(tss, userID, actName);
-
-			int hours = (int) secs / 3600;
-			secs = secs - (hours * 3600);
-			int minutes = (int) secs / 60;
-			secs = secs - (minutes * 60);
-			ts = new Timestamp(1900, 0, 1, hours, minutes, (int) secs, 0);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return ts;
-	}
-
-	/**
-	 * Make sure train test split for current user is same for both approaches
-	 * <p>
-	 * Check OKAY as of April 11 2018
-	 * 
-	 * @param trainTestTimelinesForAllUsersDW
-	 * @param userId
-	 * @param userTrainingTimelines
-	 */
-	private void sanityCheckTrainTestSplitSameForCollNonColl(
-			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW, int userId,
-			LinkedHashMap<Date, Timeline> userTrainingTimelines)
-	{
-		long t1 = System.currentTimeMillis();
-		if (Constant.collaborativeCandidates)
-		{// start of sanity check
-			// make sure train test split for current user is same for both approaches
-			List<LinkedHashMap<Date, Timeline>> trainTestTimelinesCollForThisUser = trainTestTimelinesForAllUsersDW
-					.get(Integer.toString(userId));
-			// get the training test timelines for current user
-			LinkedHashMap<Date, Timeline> userTrainingTimelinesColl = trainTestTimelinesCollForThisUser.get(0);
-			// LinkedHashMap<Date, Timeline> userTestTimelinesColl =
-			// trainTestTimelinesCollForThisUser.get(1);
-			if (!userTrainingTimelinesColl.equals(userTrainingTimelines))
-			{
-				System.err.println("Error: !userTrainingTimelinesColl.equals(userTrainingTimelines) for user:" + userId
-						+ " userTrainingTimelinesColl.size()=" + userTrainingTimelinesColl.size()
-						+ "userTestTimelinesColl.size()=" + trainTestTimelinesCollForThisUser.get(1).size());
-			}
-			else
-			{
-				System.out.println("Timesplit OK. timetaken (secs) = " + (System.currentTimeMillis() - t1) / 1000);
-			}
-		} // end of sanity check
 	}
 
 }
