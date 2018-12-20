@@ -1409,7 +1409,7 @@ public class DistanceUtils
 
 		/** {CandID, candInfo, NormAED, NormFED} **/
 		Map<String, String> rejectedCandsDueToAEDFEDThreshold = new LinkedHashMap<>();
-
+		ArrayList<GowGeoFeature> listOfFeatures = null;
 		// Loop over cands
 		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candEntry : candAEDFeatDiffs
 				.entrySet())
@@ -1438,7 +1438,8 @@ public class DistanceUtils
 			// start of FED computation
 			double normFeatDistForThisCand = -9999;
 			// assuming same features across all AOs
-			Set<GowGeoFeature> listOfFeatures = null;
+			// Set<GowGeoFeature> listOfFeatures = null;
+			// ArrayList<GowGeoFeature> listOfFeatures = null;
 			EnumMap<GowGeoFeature, List<Double>> valsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
 					GowGeoFeature.class);
 			EnumMap<GowGeoFeature, List<Double>> normValsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
@@ -1446,7 +1447,7 @@ public class DistanceUtils
 
 			if (EDAlpha != 1)
 			{
-				listOfFeatures = listOfAOsForThisCand.get(0).keySet();
+				listOfFeatures = new ArrayList<GowGeoFeature>(listOfAOsForThisCand.get(0).keySet());
 				// int indexOfAOForThisCand = -1;
 				// EnumMap<GowGeoFeature, DoubleSummaryStatistics> summaryOfNormValsForEachFeatureAcrossAOsForThisCand =
 				// new EnumMap<>( GowGeoFeature.class);
@@ -1543,8 +1544,10 @@ public class DistanceUtils
 
 					if (shouldComputedFED)
 					{
+						// String nameOfFeaturesInSeq = "";
 						for (GowGeoFeature feature : listOfFeatures)
 						{
+							// nameOfFeaturesInSeq += feature.toString() + ",";
 							String s = StatsUtils.roundAsString(
 									valsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
 									+ ","
@@ -1693,6 +1696,7 @@ public class DistanceUtils
 					Constant.getCommonPath() + "DebugNov23getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach.txt");
 		}
 
+		System.out.println("INFO: orderOfFeatureDiffs = " + listOfFeatures);
 		return res;
 
 	}

@@ -714,40 +714,43 @@ public class SuperController
 				distNormalisationLabel += "RTV";
 
 			}
+
+			if (Constant.useTimeDecayInAED)
+			{
+				timeDecayLabel = "decayA";
+			}
+
+			if (Constant.noAED)
+			{
+				collLabel += "NoAED";
+			}
+			if (Constant.noFED)
+			{
+				collLabel += "NoFED";
+			}
+			if (Constant.lookPastType.equals(Enums.LookPastType.NCount))
+			{
+				collLabel += "NC";
+			}
+			if (Constant.lookPastType.equals(Enums.LookPastType.NHours))
+			{
+				collLabel += "NH";
+			}
+			if (Constant.lookPastType.equals(Enums.LookPastType.Daywise))
+			{
+				collLabel += "DY";
+			}
+			if (Constant.lookPastType.equals(Enums.LookPastType.ClosestTime))
+			{
+				collLabel += "CT";
+			}
 		}
 
-		if (Constant.useTimeDecayInAED)
-		{
-			timeDecayLabel = "decayA";
-		}
 		if (Constant.collaborativeCandidates)
 		{
 			collLabel += "coll";
 		}
-		if (Constant.noAED)
-		{
-			collLabel += "NoAED";
-		}
-		if (Constant.noFED)
-		{
-			collLabel += "NoFED";
-		}
-		if (Constant.lookPastType.equals(Enums.LookPastType.NCount))
-		{
-			collLabel += "NC";
-		}
-		if (Constant.lookPastType.equals(Enums.LookPastType.NHours))
-		{
-			collLabel += "NH";
-		}
-		if (Constant.lookPastType.equals(Enums.LookPastType.Daywise))
-		{
-			collLabel += "DY";
-		}
-		if (Constant.lookPastType.equals(Enums.LookPastType.ClosestTime))
-		{
-			collLabel += "CT";
-		}
+
 		if (Constant.lookPastType.equals(Enums.LookPastType.NGram))
 		{
 			collLabel += "NG";
@@ -897,6 +900,7 @@ public class SuperController
 			if (hasMUs)
 			{
 				double[] muArray = Constant.getMatchingUnitArray(lookPastType, altSeqPredictor);
+				// PopUps.showMessage("SuperController muArray = " + Arrays.toString(muArray));
 				// boolean evalPostFiltering = false;// boolean evalSeqPrediction = true;
 				// String dimensionPhrase = "SecDim";
 				// TODO Why running all three at once is resultsing in empty files. Has it got something to do with

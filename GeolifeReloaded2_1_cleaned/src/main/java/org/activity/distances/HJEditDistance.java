@@ -1768,7 +1768,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 		if (dAct > maxActLevelDistance || dFeat > maxFeatLevelDistance)
 		{
 			// tolerate some difference 17.8 vs 17.7999997 etc
-			if (Math.abs(dAct - maxActLevelDistance) <= Constant.epsilonForFloatZeroRelaxed)
+			double epsilon = Constant.epsilonForFloatZeroRelaxed;
+			if (Math.abs(dAct - maxActLevelDistance) <= epsilon)
 			{
 				maxActLevelDistance = dAct;
 			}
@@ -1776,11 +1777,12 @@ public class HJEditDistance extends AlignmentBasedDistance
 			{
 				PopUps.printTracedErrorMsg("Error in combineActAndFeatLevelDistance : dAct" + dAct
 						+ " maxActLevelDistance=" + maxActLevelDistance + " dFeat=" + dFeat + " maxFeatLevelDistance="
-						+ maxFeatLevelDistance + " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha);
+						+ maxFeatLevelDistance + " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha
+						+ "(dAct - maxActLevelDistance) = " + (dAct - maxActLevelDistance) + " epsilon = " + epsilon);
 				return -1;
 			}
 
-			if (Math.abs(dFeat - maxFeatLevelDistance) <= Constant.epsilonForFloatZeroRelaxed)
+			if (Math.abs(dFeat - maxFeatLevelDistance) <= epsilon)
 			{
 				maxFeatLevelDistance = dFeat;
 			}
@@ -1788,7 +1790,8 @@ public class HJEditDistance extends AlignmentBasedDistance
 			{
 				PopUps.printTracedErrorMsg("Error in combineActAndFeatLevelDistance : dAct" + dAct
 						+ " maxActLevelDistance=" + maxActLevelDistance + " dFeat=" + dFeat + " maxFeatLevelDistance="
-						+ maxFeatLevelDistance + " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha);
+						+ maxFeatLevelDistance + " size1=" + size1 + " size2=" + size2 + " alpha=" + alpha
+						+ "(dAct - maxActLevelDistance) = " + (dAct - maxActLevelDistance) + " epsilon = " + epsilon);
 				return -1;
 			}
 

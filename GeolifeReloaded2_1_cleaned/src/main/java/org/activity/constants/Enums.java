@@ -1,5 +1,8 @@
 package org.activity.constants;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Enums
 {
 	public Enums()
@@ -24,7 +27,31 @@ public class Enums
 	 */
 	public enum GeolifeFeature
 	{
-		ActNameF, StartTimeF, DurationF, DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF;
+		ActNameF, StartTimeF, DurationF, DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF, DistFromPrevF, DurationFromPrevF;
+	}
+
+	public enum DCUFeature
+	{
+		ActNameF, StartTimeF, DurationF;
+	}
+
+	/**
+	 * 
+	 * @param databaseName
+	 * @return
+	 */
+	public static List<?> getFeaturesForDatabase(String databaseName)
+	{
+		switch (databaseName)
+		{
+		case ("gowalla1"):
+			return Arrays.asList(GowallaFeature.values());
+		case ("geolife1"):
+			return Arrays.asList(GeolifeFeature.values());
+		case ("dcu_data_2"):
+			return Arrays.asList(DCUFeature.values());
+		}
+		return null;
 	}
 
 	/**

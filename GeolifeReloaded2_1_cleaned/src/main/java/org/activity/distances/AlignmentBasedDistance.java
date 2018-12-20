@@ -323,14 +323,14 @@ public class AlignmentBasedDistance
 
 		}
 
-		wtLocation = 1d;// gowalla
+		wtLocation = 2d;// gowalla
 		wtLocPopularity = 1d;// gowalla
 
 		wtDistanceFromPrev = 1d;// gowalla
 		wtDurationFromPrev = 1d;// gowalla
 
-		wtDistanceFromNext = 1d;
-		wtDurationFromNext = 1d;
+		// wtDistanceFromNext = 1d;
+		// wtDurationFromNext = 1d;
 
 		EnumMap<GowGeoFeature, Double> featureWeightMap = new EnumMap<>(GowGeoFeature.class);
 
@@ -4428,6 +4428,9 @@ public class AlignmentBasedDistance
 					}
 					else
 					{
+						// start of added on 19 Dec 2018
+
+						// end of added on 19 Dec 2018
 						if (UtilityBelt.getIntersection(ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID),
 								ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID)).size() == 0)
 						{ // if no matching locationIDs then add wt to dfeat

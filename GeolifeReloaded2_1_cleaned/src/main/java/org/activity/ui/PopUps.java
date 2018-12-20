@@ -55,10 +55,12 @@ public class PopUps
 			JFrame frame = new JFrame();
 			JOptionPane.showMessageDialog(frame, msg, "Error Encountered", JOptionPane.ERROR_MESSAGE);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			System.err.println("\nError Encountered\n" + msg);
+			WToFile.appendLineToFileAbs(msg, Constant.getCommonPath() + Constant.errorFileName);
 		}
 		catch (HeadlessException e)
 		{
-			System.err.println("\n Headless: hence printing error msg instead of PopUp.\n" + msg);
+			System.err.println("\nError: Headless: hence printing error msg instead of PopUp.\n" + msg);
 			WToFile.appendLineToFileAbs(msg, Constant.getCommonPath() + Constant.errorFileName);
 		}
 	}

@@ -94,11 +94,12 @@ public final class Constant
 
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NHours;// .NCount;// SWITCH_NOV10
+	// SWITCH_DEC20
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;// .NCount;// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
-
+	// SWITCH_DEC20
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;// SWITCH_NOV10
 	// .RNN1;AKOM
 
@@ -152,7 +153,7 @@ public final class Constant
 
 	// --------------------------------------------------------------------------//
 	// Start of parameters for Candidate timelines
-	public static final boolean collaborativeCandidates = false;
+	public static final boolean collaborativeCandidates = false;// SWITCH_DEC20
 
 	// Number of candidate timelines extracted from each user in collaborative approach
 	public static final boolean only1CandFromEachCollUser = false; // SWITCH_NOV10
@@ -161,7 +162,8 @@ public final class Constant
 	/** the dates for each cand from the neighbours must be < the current date **/
 	public static final boolean onlyPastFromRecommDateInCandInColl = false;// true;// false;
 
-	public static final boolean filterTrainingTimelinesByRecentDays = false;// true;// TODO MANALI true;// SWITCH_NOV10
+	public static final boolean filterTrainingTimelinesByRecentDays = true;// SWITCH_DEC20 true;// TODO MANALI true;//
+																			// SWITCH_NOV10
 	private static int recentDaysInTrainingTimelines = 5;// 5;// SWITCH_NOV10
 
 	// Filtering the candidate timeline ..
@@ -208,7 +210,7 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 0.7 };// 0.5 };// 0, 0.1, 0.2, 0.3, 0.4, 0.6, 0.5, 0.7, 0.8, 0.9, 1 };
+	public static final double[] EDAlphas = { 0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
 	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
 	// SWITCH_NOV20
 	// = { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75, 0, 0.25,
@@ -223,9 +225,9 @@ public final class Constant
 	public static final boolean useStartTimeInFED = true;// SWITCH_NOV10
 
 	// Only for gowalla1
-	public static final boolean useLocationInFED = false;// SWITCH_NOV10
-	public static final boolean useHaversineDistInLocationFED = false;// SWITCH_NOV10 //added on Aug 11 2018
-	public static final boolean usePopularityInFED = false;// SWITCH_NOV10
+	public static final boolean useLocationInFED = true;// SWITCH_NOV10
+	public static final boolean useHaversineDistInLocationFED = true;// SWITCH_NOV10 //added on Aug 11 2018
+	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
 
@@ -249,7 +251,7 @@ public final class Constant
 	public static final boolean useLog2InFEDInRTVerse = false;// false;
 
 	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
-	public static final double percentileForRTVerseMaxForFEDNorm = -1;// 10;// 75;// -1// SWITCH_April24
+	public static final double percentileForRTVerseMaxForFEDNorm = 50;// 10;// 75;// -1// SWITCH_April24
 	public static final boolean fixedValPerFeatForRTVerseMaxMinForFEDNorm = false;// 75;// -1// SWITCH_Dec1
 	public static final double percentileForRTVerseMaxForAEDNorm = -1;// 75;// SWITCH //added on 15 Aug 2018
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
@@ -263,7 +265,7 @@ public final class Constant
 	 * If enabled, in Edit distance, instead of computing feature level edit distance just for activity objects which
 	 * matchin act name across the compared timelines, computed feature level edit distance over all act objs
 	 */
-	public static final boolean useFeatureDistancesOfAllActs = false;// true;// SWITCH_NOV10
+	public static final boolean useFeatureDistancesOfAllActs = true;// true;// SWITCH_NOV10
 
 	// need to implement it in AlignmentBasedDistance.getFeatureLevelDistanceGowallaPD25Feb2018() before turning true
 	public static final boolean useDistFromNextInFED = false;
@@ -273,7 +275,7 @@ public final class Constant
 	public static final boolean useTimeDecayInAED = false; /// added on 20 Aug 2018
 	public static final double powerOfTimeDecayInAED = -1.5; /// added on 20 Aug 2018
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
-	public static final boolean useRandomlySampled100Users = false;// toySwitch// SWITCH_NOV10
+	public static final boolean useRandomlySampled100Users = true;// toySwitch// SWITCH_NOV10
 	// runForAllUsersAtOnce and useRandomlySampled100Users to be changed simultaneously
 	/**
 	 * Use only subset of the users from the randomly sampled users (useful for running small sample experiments for
@@ -316,7 +318,7 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "dcu_data_2";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+	static String DATABASE_NAME = "gowalla1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
 												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
@@ -736,6 +738,7 @@ public final class Constant
 					"Error: unknown look past type in in setMatchingUnitArray() RecommendationTests():" + lookPastType);
 			System.exit(-1);
 		}
+		// PopUps.showMessage("matchingUnitArray = " + Arrays.toString(matchingUnitArray));
 		return matchingUnitArray;
 	}
 
@@ -874,12 +877,15 @@ public final class Constant
 
 		setActIDNameIndexMap(databaseName, Constant.getActivityNames());
 
-		if (Constant.doWeightedEditDistanceForSecDim
-				|| (Constant.useHaversineDistInLocationFED && Constant.useLocationInFED))
+		if (databaseName.equals("gowalla1"))
 		{
-			DomainConstants.setGridIndexPairHaversineDistMaps();
-			// gdDistProvider = new GridDistancesProvider(PathConstants.pathToSerialisedGridIndexPairDist,
-			// PathConstants.pathToSerialisedGridIndexPairDistConverter);
+			if (Constant.doWeightedEditDistanceForSecDim
+					|| (Constant.useHaversineDistInLocationFED && Constant.useLocationInFED))
+			{
+				DomainConstants.setGridIndexPairHaversineDistMaps();
+				// gdDistProvider = new GridDistancesProvider(PathConstants.pathToSerialisedGridIndexPairDist,
+				// PathConstants.pathToSerialisedGridIndexPairDistConverter);
+			}
 		}
 
 		if (databaseName.equals("dcu_data_2"))

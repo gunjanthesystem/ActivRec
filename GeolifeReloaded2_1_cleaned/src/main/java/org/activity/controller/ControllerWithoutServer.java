@@ -25,6 +25,7 @@ import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018;
+import org.activity.evaluation.RecommendationTestsUtils;
 import org.activity.generator.ToyTimelineUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
@@ -127,9 +128,10 @@ public class ControllerWithoutServer
 
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = null;
 			// PopUps.showMessage("commonPath = " + commonPath);
-			if (Constant.reduceAndCleanTimelinesBeforeRecomm)
-			{
 
+			// disabling reduce and clean for gowalla as they have already been reduced and clean in April 24 subset.
+			if (databaseName.equals("gowalla1") == false && Constant.reduceAndCleanTimelinesBeforeRecomm)
+			{
 				if (databaseName.equals("gowalla1") && Constant.For9kUsers)// For 9k users
 				{
 					usersCleanedDayTimelines = reduceAndCleanTimelines2(databaseName, usersDayTimelinesOriginal, true,
@@ -244,7 +246,7 @@ public class ControllerWithoutServer
 
 				Serializer.kryoSerializeThis(usersCleanedDayTimelines,
 						commonBasePath + "usersCleanedDayTimelines.kryo");
-				// $$System.exit(0);
+				// System.exit(0);
 			}
 
 			if (false)// temporary for 22 feb 2018,
@@ -683,14 +685,14 @@ public class ControllerWithoutServer
 
 			if (Constant.filterTrainingTimelinesByRecentDays)
 			{
-				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
 						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
 								Constant.getRecentDaysInTrainingTimelines());
 			}
 			else
 			{
 				// sampledUsersTimelines
-				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsMar2017GenSeqCleaned3Nov2017
+				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
 						.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
 			}
 		}
@@ -1145,6 +1147,7 @@ public class ControllerWithoutServer
 		System.out.println("num of sampled users for this iteration = " + sampledUsers.size());
 		System.out.println("num of allUsers users for this iteration = " + allUsers.size());
 		System.out.println(" -- Users = " + sampledUsers.keySet().toString());
+		System.out.println(" -- All Users for collaboration.size() = " + allUsers.size());
 		System.out.println(" -- All Users for collaboration = " + allUsers.keySet().toString());
 
 		WToFile.writeToNewFile(String.join("\n", sampledUsers.keySet()), Constant.getCommonPath() + "sampledUsers.csv");

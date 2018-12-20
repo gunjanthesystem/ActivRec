@@ -26,6 +26,8 @@ import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+
 /**
  * 
  * @author gunjan
@@ -140,7 +142,7 @@ public class DomainConstants
 	 */
 	static Map<Integer, double[]> javaGridIndexRGridLatRGridLon;
 
-	static HashMap<Integer, Double> gridIndexPairHaversineDist;// added on 3 Aug 2018
+	static Int2IntOpenHashMap/* HashMap<Integer, Double> */ gridIndexPairHaversineDist;// added on 3 Aug 2018
 	static PairedIndicesTo1DArrayConverter pairedIndicesTo1DArrayConverter;// added on 3 Aug 2018
 
 	/////////////////////////////////////////////////////////////
@@ -193,9 +195,24 @@ public class DomainConstants
 			}
 			else
 			{
-				gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
+
+				// disabled on 20 Dec 2018
+				// gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
+				// .kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
+				// + "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
+
+				//// Start of added on 20 Dec 2018
+				gridIndexPairHaversineDist = (Int2IntOpenHashMap) Serializer
 						.kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
-								+ "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
+								+ "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2IntOpenHashMap.kryo");
+				System.out.println(
+						"deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
+				/// End of added on 20 Dec 2018
+
+				// gridIndexPairHaversineDist = (HashMap<Integer, Double>) Serializer
+				// .kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
+				// + "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
+
 				System.out.println(
 						"deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
 
@@ -251,6 +268,12 @@ public class DomainConstants
 						minHaversineDist = haversineDist;
 					}
 				}
+				// start of added on 20 Dec 201
+				else
+				{// gridIndices match exactly
+					return 0;
+				}
+				/// end of added on 20 Dec 2018
 			}
 		}
 
@@ -287,9 +310,9 @@ public class DomainConstants
 		}
 
 		int oneDIndex = pairedIndicesTo1DArrayConverter.pairedIndicesTo1DArrayIndex(gridIndex1, gridIndex2);
-		Double dist = gridIndexPairHaversineDist.get(oneDIndex);
+		int dist = gridIndexPairHaversineDist.get(oneDIndex);
 
-		if (dist == null)
+		if (dist == gridIndexPairHaversineDist.defaultReturnValue())
 		{
 			PopUps.showError(
 					"Error: dist not available for gridIndex1=" + gridIndex1 + " gridIndex2=" + gridIndex2 + " !!");
