@@ -234,6 +234,16 @@ public class HilbertCurveUtils
 
 		System.out
 				.println(String.format(Locale.ROOT, "index([%s, %s])=%s", 12, 57, getCompactHilbertCurveIndex(12, 57)));
+		System.out
+				.println(String.format(Locale.ROOT, "index([%s, %s])=%s", 12, 54, getCompactHilbertCurveIndex(12, 54)));
+		System.out.println(
+				String.format(Locale.ROOT, "index([%s, %s])=%s", 12, 100, getCompactHilbertCurveIndex(12, 100)));
+		System.out.println(
+				String.format(Locale.ROOT, "index([%s, %s])=%s", 13, 100, getCompactHilbertCurveIndex(13, 100)));
+		System.out.println(
+				String.format(Locale.ROOT, "index([%s, %s])=%s", 13, 200, getCompactHilbertCurveIndex(13, 200)));
+		System.out.println(
+				String.format(Locale.ROOT, "index([%s, %s])=%s", 13, 201, getCompactHilbertCurveIndex(13, 201)));
 	}
 
 }

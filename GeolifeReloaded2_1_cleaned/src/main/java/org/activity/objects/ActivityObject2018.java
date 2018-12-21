@@ -642,6 +642,7 @@ public class ActivityObject2018 implements Serializable
 	}
 
 	/**
+	 * USED AS OF DEC 2018
 	 * 
 	 * @param activityID
 	 * @param locationIDs
@@ -1168,14 +1169,68 @@ public class ActivityObject2018 implements Serializable
 
 	/// Start of Nov 14 2018
 	/**
-	 * NOT FOUND TO BE OF USE
-	 * <P>
-	 * Creates an Activity Object given the values for the dimension Id in the form of Map of <DimensionID Name,
-	 * correspoding dimensions's value></br>
-	 * <font color="orange"> Note: used for creating Activity Objects for Timeline from raw data. </font>
+	 * Created to instantiate RepAO for Geolife
 	 * 
-	 * @param dimensionIDNameValues
+	 * @param userID1
+	 * @param activityID1
+	 * @param activityName1
+	 * @param workingLevelCatIDs1
+	 * @param locationIDs1
+	 * @param locationName1
+	 * @param startLatitude1
+	 * @param endLatitude1
+	 * @param startLongitude1
+	 * @param endLongitude1
+	 * @param avgAltitude1
+	 * @param distanceTravelled1
+	 * @param startTimestampInms1
+	 * @param endTimestampInms1
+	 * @param durationInSeconds1
+	 * @since 21 Dec 2018
 	 */
+	public ActivityObject2018(String userID1, int activityID1, String activityName1, String workingLevelCatIDs1,
+			ArrayList<Integer> locationIDs1, String locationName1, String startLatitude1, String endLatitude1,
+			String startLongitude1, String endLongitude1, String avgAltitude1, double distanceTravelled1,
+			long startTimestampInms1, long endTimestampInms1, long durationInSeconds1)
+	{
+		this.userID = userID1;
+		this.activityID = activityID1;
+
+		this.activityName = activityName1;
+		this.workingLevelCatIDs = workingLevelCatIDs1;
+		this.locationIDs = locationIDs1;
+		this.locationName = locationName1;
+		this.startLatitude = startLatitude1;
+		this.endLatitude = endLatitude1;
+
+		this.startLongitude = startLongitude1;
+		this.endLongitude = endLongitude1;
+
+		// this.startAltitude = startAltitude1;
+		// this.endAltitude = endAltitude1;
+
+		this.avgAltitude = avgAltitude1;
+
+		this.distanceTravelled = distanceTravelled1;
+
+		this.startTimestampInms = startTimestampInms1;
+		// DateTimeUtils.getTimestampAsLongms(startTimeString, startDateString); // in iiWAS ver,
+		// dateString
+		// is used here instead of
+		// startDateString
+		this.endTimestampInms = endTimestampInms1;
+
+		// DateTimeUtils.getTimestampAsLongms(endTimeString, endDateString);// in iiWAS ver,
+		// dateString is
+		// used
+		// here instead of
+		// endDateString
+
+		this.durationInSeconds = durationInSeconds1;
+		this.timeZoneId = ZoneId.of("UTC");
+
+	}
+
 	public ActivityObject2018(ActivityObject oldAO) // (User_ID, 0),
 	// (Location_ID,
 	// 10100), ...
