@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,7 +29,6 @@ import org.activity.objects.Timeline;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMultiDI;
 import org.activity.stats.StatsUtils;
-import org.activity.ui.PopUps;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineTransformers;
 
@@ -46,21 +43,6 @@ import org.activity.util.TimelineTransformers;
 public class RecommendationTestsUtils
 {
 
-	public static void getListOfFeatureVals()
-	{
-
-	}
-
-	public static Pair<String, String> getStartGeocoordinates(ActivityObject2018 ao)
-	{
-		return new Pair<>(ao.getStartLatitude(), ao.getStartLongitude());
-	}
-
-	public static Pair<String, String> getEndGeocoordinates(ActivityObject2018 ao)
-	{
-		return new Pair<>(ao.getEndLatitude(), ao.getEndLongitude());
-	}
-
 	// public static ActivityObject2018 computeRepresentativeAOsDec2018(Integer topPrimaryDimensionVal, int userId,
 	// Timestamp recommendationTimestamp, PrimaryDimension primaryDimension,
 	// LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd, boolean isCollaborative)
@@ -74,260 +56,6 @@ public class RecommendationTestsUtils
 	 * @return
 	 * @since 20 Dec 2018
 	 */
-	/**
-	 * 
-	 * can i create repAO, for each user, for each AO, - computing only once - pre-computing and not just-in-time -
-	 * handling both collaborative and non-collaborative cases.
-	 * 
-	 * @param userId
-	 * @param primaryDimension
-	 * @param trainTimelinesAllUsersContinuousFiltrd
-	 * @param isCollaborative
-	 * @return
-	 * @since 20 Dec 2018
-	 */
-	public static void computeRepresentativeAOsDec2018(int userId, PrimaryDimension primaryDimension,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd, boolean isCollaborative)
-	{
-		List<?> listOfFeats = Enums.getFeaturesForDatabase(Constant.getDatabaseName());
-		// LinkedHashMap<String, Map<Integer, ArrayList<T>>> mapOfEachFeatForEachPDVal = new LinkedHashMap<>(
-		// listOfFeats.size());
-
-		// Duration from prev is essential for all datasets
-		Map<Integer, ArrayList<Long>> mapOfEachFeatForEachPDValDurFromPrev = getListOfFeatureVals(userId,
-				trainTimelinesAllUsersContinuousFiltrd, isCollaborative,
-				ActivityObject2018::getDurationInSecondsFromPrev);
-		Map<Integer, ArrayList<Long>> mapOfEachFeatForEachPDValDuration = new HashMap<>();
-		Map<Integer, ArrayList<Double>> mapOfEachFeatForEachPDValDistTrav = new HashMap<>();
-		Map<Integer, ArrayList<String>> mapOfEachFeatForEachPDValStartLat = new HashMap<>();
-		Map<Integer, ArrayList<String>> mapOfEachFeatForEachPDValStartLon = new HashMap<>();
-		Map<Integer, ArrayList<String>> mapOfEachFeatForEachPDValEndLat = new HashMap<>();
-		Map<Integer, ArrayList<String>> mapOfEachFeatForEachPDValEndLon = new HashMap<>();
-		Map<Integer, ArrayList<String>> mapOfEachFeatForEachPDValAvgAlt = new HashMap<>();
-		Map<Integer, ArrayList<Double>> mapOfEachFeatForEachPDValDistFromPrev = new HashMap<>();
-
-		for (Entry<Integer, ArrayList<Long>> e : mapOfEachFeatForEachPDValDurFromPrev.entrySet())
-		{
-			StatsUtils.getPercentileL(e.getValue(), 50);
-		}
-
-		Map<Integer, Double> aggValOfEachFeatForEachPDValDurationFromPrev = mapOfEachFeatForEachPDValDurFromPrev
-				.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentileL(e.getValue(), 50)));
-
-		Map<Integer, Double> aggValOfEachFeatForEachPDValDuration = mapOfEachFeatForEachPDValDuration.entrySet()
-				.stream().collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentileL(e.getValue(), 50)));
-
-		Map<Integer, Double> aggValOfEachFeatForEachPDValDistTrav = mapOfEachFeatForEachPDValDistTrav.entrySet()
-				.stream().collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentile(e.getValue(), 50)));
-
-		Map<Integer, String> aggValOfEachFeatForEachPDValStartLat = new HashMap<>();
-		Map<Integer, String> aggValOfEachFeatForEachPDValStartLon = new HashMap<>();
-		Map<Integer, String> aggValOfEachFeatForEachPDValEndLat = new HashMap<>();
-		Map<Integer, String> aggValOfEachFeatForEachPDValEndLon = new HashMap<>();
-
-		Map<Integer, Double> aggValOfEachFeatForEachPDValAvgAlt = mapOfEachFeatForEachPDValAvgAlt.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentileS(e.getValue(), 50)));
-
-		Map<Integer, Double> aggValOfEachFeatForEachPDValDistFromPrev = mapOfEachFeatForEachPDValDistFromPrev.entrySet()
-				.stream().collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentile(e.getValue(), 50)));
-
-		for (Object f : listOfFeats)
-		{
-			switch (f.toString())
-			{
-			case "DurationF":
-			{
-				mapOfEachFeatForEachPDValDuration = getListOfFeatureVals(userId, trainTimelinesAllUsersContinuousFiltrd,
-						isCollaborative, ActivityObject2018::getDurationInSeconds);
-				break;
-			}
-
-			case "DistTravelledF":
-			{
-				mapOfEachFeatForEachPDValDistTrav = getListOfFeatureVals(userId, trainTimelinesAllUsersContinuousFiltrd,
-						isCollaborative, ActivityObject2018::getDistanceTravelled);
-				break;
-			}
-			case "StartGeoF":
-			{
-				mapOfEachFeatForEachPDValStartLat = getListOfFeatureVals(userId, trainTimelinesAllUsersContinuousFiltrd,
-						isCollaborative, ActivityObject2018::getStartLatitude);
-				mapOfEachFeatForEachPDValStartLon = getListOfFeatureVals(userId, trainTimelinesAllUsersContinuousFiltrd,
-						isCollaborative, ActivityObject2018::getStartLongitude);
-				break;
-			}
-			case "LocationF":
-			{
-				if (mapOfEachFeatForEachPDValStartLat.size() == 0)
-				{
-					mapOfEachFeatForEachPDValStartLat = getListOfFeatureVals(userId,
-							trainTimelinesAllUsersContinuousFiltrd, isCollaborative,
-							ActivityObject2018::getStartLatitude);
-					mapOfEachFeatForEachPDValStartLon = getListOfFeatureVals(userId,
-							trainTimelinesAllUsersContinuousFiltrd, isCollaborative,
-							ActivityObject2018::getStartLongitude);
-				}
-				break;
-			}
-			case "EndGeoF":
-			{
-				mapOfEachFeatForEachPDValEndLat = getListOfFeatureVals(userId, trainTimelinesAllUsersContinuousFiltrd,
-						isCollaborative, ActivityObject2018::getEndLatitude);
-				mapOfEachFeatForEachPDValEndLon = getListOfFeatureVals(userId, trainTimelinesAllUsersContinuousFiltrd,
-						isCollaborative, ActivityObject2018::getEndLongitude);
-				break;
-			}
-			case "AvgAltitudeF":
-			{
-				mapOfEachFeatForEachPDValAvgAlt = getListOfFeatureVals(userId, trainTimelinesAllUsersContinuousFiltrd,
-						isCollaborative, ActivityObject2018::getAvgAltitude);
-				break;
-			}
-			case "DistFromPrevF":
-			{
-				mapOfEachFeatForEachPDValDistFromPrev = getListOfFeatureVals(userId,
-						trainTimelinesAllUsersContinuousFiltrd, isCollaborative,
-						ActivityObject2018::getDistanceInMFromPrev);
-				break;
-			}
-			default:
-				PopUps.printTracedErrorMsgWithExit("Error: unknown feature: " + f.toString());
-			}
-		}
-
-		//////////////////////////
-		// ActivityObject2018 repAO = mapOfRepAOs.get(userId).get(topPrimaryDimensionVal);
-		// if (repAO == null)
-		// {
-		// PopUps.printTracedErrorMsgWithExit("Error in getRepresentativeAO: topRecommActName:"
-		// + topPrimaryDimensionVal + " not found in mapOfRepAo");
-		// }
-		//
-		// double medianPreceedingDurationInms = mapOfMedianPreSuccDurationInms.get(userId).get(topPrimaryDimensionVal)
-		// .getFirst();
-		// if (medianPreceedingDurationInms <= 0)
-		// {
-		// PopUps.printTracedErrorMsgWithExit(
-		// "Error in getRepresentativeAO: medianPreceedingDuration = " + medianPreceedingDurationInms);
-		// }
-		//
-		// long recommTimeInms = recommendationTimestamp.getTime();
-		//
-		// Timestamp newRecommTimestamp = new Timestamp((long) (recommTimeInms + medianPreceedingDurationInms));
-		//
-		// if (!DateTimeUtils.isSameDate(recommendationTimestamp, newRecommTimestamp))
-		// {
-		// System.err.println("recommendationTime = " + recommendationTimestamp + " newRecommTimestamp= "
-		// + newRecommTimestamp + " are not same day. medianPreceedingDuration = "
-		// + medianPreceedingDurationInms + " for topRecommActName =" + topPrimaryDimensionVal);
-		// }
-		//
-		// if (VerbosityConstants.verbose)
-		// {
-		// System.out.println("Debug: getRepresentativeAO: old recommendationTime="
-		// + recommendationTimestamp.toLocalDateTime().toString() + "medianPreceedingDuration="
-		// + medianPreceedingDurationInms + " new recommendationTime="
-		// + newRecommTimestamp.toLocalDateTime().toString());
-		// }
-		// repAO.setEndTimestamp(newRecommTimestamp); // only end timestamp used, make sure there is no start timestamp,
-		// // since we are making recommendation at end timestamps and gowalla act objs are points in time.
-		// repAO.setStartTimestamp(newRecommTimestamp);
-		//
-		// // {
-		// // System.err.println("Debug1357: inside getRepresentativeAO: recommendationTime = " + recommendationTime
-		// // + " newRecommTimestamp= " + newRecommTimestamp + ". medianPreceedingDuration = "
-		// // + medianPreceedingDuration + " for topRecommActName =" + topRecommActName);
-		// // System.out.println("repAO = " + repAO.toStringAllGowallaTS());
-		// // }
-
-		// return null;// repAO;
-	}
-
-	/**
-	 * 
-	 * @param userId
-	 * @param trainTimelinesAllUsersContinuousFiltrd
-	 * @param isCollaborative
-	 * @param getter
-	 * @return
-	 * @since 20 Dec 2018
-	 */
-	public static <T> Map<Integer, ArrayList<T>> getListOfFeatureVals(int userId,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd, boolean isCollaborative,
-			Function<ActivityObject2018, T> getter)
-	{
-		Map<Integer, ArrayList<T>> mapOfDurationFromPrevForEachPDVal = new HashMap<>();
-		for (Entry<String, Timeline> e : trainTimelinesAllUsersContinuousFiltrd.entrySet())
-		{
-			int currUserID = Integer.parseInt(e.getKey());
-
-			if ((isCollaborative && currUserID != userId) || (!isCollaborative && currUserID == userId))
-			{
-				for (ActivityObject2018 ao : e.getValue().getActivityObjectsInTimeline())
-				{
-					ArrayList<Integer> pdVals = ao.getPrimaryDimensionVal();
-					for (Integer pdVal : pdVals)
-					{
-						ArrayList<T> listOfFeatureVals = mapOfDurationFromPrevForEachPDVal.get(pdVal);
-
-						if (listOfFeatureVals == null)
-						{
-							listOfFeatureVals = new ArrayList<>();
-						}
-						listOfFeatureVals.add(getter.apply(ao));
-						// listOfDurationFromPrev.add(ao.getDurationInSecondsFromPrev());
-						mapOfDurationFromPrevForEachPDVal.put(pdVal, listOfFeatureVals);
-					}
-				}
-			}
-		}
-		return mapOfDurationFromPrevForEachPDVal;
-	}
-
-	/**
-	 * 
-	 * @param userId
-	 * @param trainTimelinesAllUsersContinuousFiltrd
-	 * @param isCollaborative
-	 * @param getter
-	 * @return
-	 * @since 20 Dec 2018
-	 */
-	public static <T> Map<Integer, ArrayList<T>> getListOfFeatureValsV2(int userId,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd, boolean isCollaborative,
-			Function<ActivityObject2018, T> getter)
-	{
-		Map<Integer, ArrayList<T>> mapOfDurationFromPrevForEachPDVal = new HashMap<>();
-		for (Entry<String, Timeline> e : trainTimelinesAllUsersContinuousFiltrd.entrySet())
-		{
-			int currUserID = Integer.parseInt(e.getKey());
-
-			if ((isCollaborative && currUserID != userId) || (!isCollaborative && currUserID == userId))
-			{
-				for (ActivityObject2018 ao : e.getValue().getActivityObjectsInTimeline())
-				{
-					ArrayList<Integer> pdVals = ao.getPrimaryDimensionVal();
-
-					for (Integer pdVal : pdVals)
-					{
-						ArrayList<T> listOfFeatureVals = mapOfDurationFromPrevForEachPDVal.get(pdVal);
-
-						if (listOfFeatureVals == null)
-						{
-							listOfFeatureVals = new ArrayList<>();
-						}
-
-						T val = getter.apply(ao);
-						listOfFeatureVals.add(val);
-						// listOfDurationFromPrev.add(ao.getDurationInSecondsFromPrev());
-						mapOfDurationFromPrevForEachPDVal.put(pdVal, listOfFeatureVals);
-					}
-				}
-			}
-		}
-		return mapOfDurationFromPrevForEachPDVal;
-	}
 
 	/**
 	 * 

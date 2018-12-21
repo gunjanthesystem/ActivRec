@@ -303,6 +303,10 @@ public class DomainConstants
 			System.exit(-1);
 		}
 
+		if (gridIndex1 == -1 || gridIndex2 == -1)
+		{// added on 20 Dec 2018, because repAO do not have grid indices
+			return 0;
+		}
 		if (gridIndex1 == gridIndex2)
 		{
 			PopUps.showError("Error: gridIndex1 = gridIndex2 (NOT allowed for pairedIndicesTo1DArrayConverter");
