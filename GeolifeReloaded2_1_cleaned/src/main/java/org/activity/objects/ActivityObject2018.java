@@ -1,7 +1,9 @@
 package org.activity.objects;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -90,7 +92,7 @@ public class ActivityObject2018 implements Serializable
 	/**
 	 * Not available in DCU_dataset. Available in Geolife dataset
 	 */
-	double distanceTravelled;
+	double distanceTravelledInKm;
 
 	/**
 	 * Gowalla dataset
@@ -839,10 +841,10 @@ public class ActivityObject2018 implements Serializable
 				+ ", durationInSeconds=" + durationInSeconds + ", startLatitude=" + startLatitude + ", endLatitude="
 				+ endLatitude + ", startLongitude=" + startLongitude + ", endLongitude=" + endLongitude
 				+ ", startAltitude=" + startAltitude + ", endAltitude=" + endAltitude + ", avgAltitude=" + avgAltitude
-				+ ", distanceTravelled=" + distanceTravelled + ", userID=" + userID + ", photos_count=" + photos_count
-				+ ", checkins_count=" + checkins_count + ", users_count=" + users_count + ", radius_meters="
-				+ radius_meters + ", highlights_count=" + highlights_count + ", items_count=" + items_count
-				+ ", max_items_count=" + max_items_count + "]";
+				+ ", distanceTravelled=" + distanceTravelledInKm + ", userID=" + userID + ", photos_count="
+				+ photos_count + ", checkins_count=" + checkins_count + ", users_count=" + users_count
+				+ ", radius_meters=" + radius_meters + ", highlights_count=" + highlights_count + ", items_count="
+				+ items_count + ", max_items_count=" + max_items_count + "]";
 	}
 
 	public String toStringAllGowalla()
@@ -918,7 +920,7 @@ public class ActivityObject2018 implements Serializable
 		// .getLocIDLocationObjectDictionary().get(lid).locationName)
 
 		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
-				? delimiter + this.durationInSeconds + delimiter + this.distanceTravelled + delimiter
+				? delimiter + this.durationInSeconds + delimiter + this.distanceTravelledInKm + delimiter
 						+ this.startLongitude + delimiter + this.startLongitude + delimiter + this.endLatitude
 						+ delimiter + this.endLongitude + delimiter + this.avgAltitude
 				: "";
@@ -939,6 +941,55 @@ public class ActivityObject2018 implements Serializable
 	}
 
 	/**
+	 * 
+	 * @param delimiter
+	 * @return
+	 * @since 24 Dec 2018
+	 */
+	public String toStringAllGowallaTSWithNameForHeaded24Dec(String delimiter)
+	{
+		DecimalFormat df = new DecimalFormat("#");
+		df.setMaximumFractionDigits(4);
+		// System.out.println(df.format(myvalue));
+
+		// PopUps.showMessage("locationIDs = " + locationIDs);
+		// PopUps.showMessage(
+		// "DomainConstants.getLocationIDNameDictionary() = " + DomainConstants.getLocationIDNameDictionary());
+		String locationName = locationIDs == null ? ""
+				: locationIDs.stream().map(lid -> DomainConstants.getLocationIDNameDictionary().get(lid))
+						.collect(Collectors.joining("-"));
+		// .getLocIDLocationObjectDictionary().get(lid).locationName)
+
+		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
+				? delimiter + this.durationInSeconds + delimiter + df.format(this.distanceTravelledInKm) + delimiter
+						+ this.startLatitude + delimiter + this.startLongitude + delimiter + this.endLatitude
+						+ delimiter + this.endLongitude + delimiter + this.avgAltitude
+				: "";
+
+		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
+				? delimiter + this.durationInSeconds
+				: "";
+		Timestamp startTS = new Timestamp(startTimestampInms);
+		int hourOfDay = startTS.getHours();
+		int weekDay = startTS.getDay();
+		// String tsISOString = startTS.toInstant().toString();
+		String dateOnly = new Date(startTimestampInms).toString();
+
+		String brokenDownTS = weekDay + delimiter + dateOnly + delimiter + hourOfDay;
+
+		return brokenDownTS + delimiter + activityID + delimiter + this.getLocationIDs('-') + delimiter
+				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter + locationName + delimiter
+				+ workingLevelCatIDs + delimiter + Instant.ofEpochMilli(startTimestampInms).toString()
+				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
+				+ delimiter + startLatitude + delimiter + startLongitude
+				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
+				+ checkins_count + delimiter + users_count + delimiter + radius_meters + delimiter + highlights_count
+				+ delimiter + items_count + delimiter + max_items_count + delimiter + df.format(distInMFromPrev)
+				+ delimiter + durInSecFromPrev + delimiter + gridIndex + additionalGeolifeFeatures
+				+ additionalDCUFeatures;
+	}
+
+	/**
 	 * Header for writing activity objc
 	 * 
 	 * @param delimiter
@@ -952,7 +1003,7 @@ public class ActivityObject2018 implements Serializable
 						+ delimiter + "avgAltitude"
 				: "";
 
-		String additionalDCUFeatures = Constant.getDatabaseName().equals("geolife1") ? delimiter + "durationInSeconds"
+		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2") ? delimiter + "durationInSeconds"
 				: "";
 
 		return "actID" + delimiter + "locID" + delimiter + "activityName" + delimiter + "locationName" + delimiter
@@ -969,12 +1020,39 @@ public class ActivityObject2018 implements Serializable
 	 * @param delimiter
 	 * @return
 	 */
+	public static String getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(String delimiter)
+	{
+		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
+				? delimiter + "durationInSeconds" + delimiter + "distanceTravelledInKm" + delimiter + "startLatitude"
+						+ delimiter + "startLongitude" + delimiter + "endLatitude" + delimiter + "endLongitude"
+						+ delimiter + "avgAltitude"
+				: "";
+
+		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2") ? delimiter + "durationInSeconds"
+				: "";
+
+		String brokenDownTS = "weekDay" + delimiter + "dateOnly" + delimiter + "hourOfDay";
+
+		return brokenDownTS + delimiter + "actID" + delimiter + "locID" + delimiter + "activityName" + delimiter
+				+ "locationName" + delimiter + "workLvlCat" + delimiter + "stTS" + delimiter + "stLat" + delimiter
+				+ "stLon" + delimiter + "uID" + delimiter + "photos_c" + delimiter + "cins_c" + delimiter + "users_c"
+				+ delimiter + "radius_m" + delimiter + "highlts_count" + delimiter + "items_c" + delimiter
+				+ "max_items_c" + delimiter + "distInMPrev" + delimiter + "durInSecPrev" + delimiter + "gridID"
+				+ additionalGeolifeFeatures + additionalDCUFeatures;
+	}
+
+	/**
+	 * Header for writing activity objc
+	 * 
+	 * @param delimiter
+	 * @return
+	 */
 	public String getHeaderForStringAllGeolifeWithNameForHeaded(String delimiter)
 	{
 
 		return activityName + delimiter + startTimestampInms + delimiter + durationInSeconds + delimiter
-				+ distanceTravelled + delimiter + startLatitude + delimiter + startLongitude + delimiter + endLatitude
-				+ delimiter + endLongitude + delimiter + avgAltitude;
+				+ distanceTravelledInKm + delimiter + startLatitude + delimiter + startLongitude + delimiter
+				+ endLatitude + delimiter + endLongitude + delimiter + avgAltitude;
 	}
 
 	/**
@@ -1129,11 +1207,13 @@ public class ActivityObject2018 implements Serializable
 
 			this.avgAltitude = getDimensionAttributeValue("Location_Dimension", "Avg_Altitude").toString();
 
-			this.distanceTravelled = SpatialUtils.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
+			this.distanceTravelledInKm = SpatialUtils.haversine(startLatitude, startLongitude, endLatitude,
+					endLongitude);
 
-			if (distanceTravelled > Constant.distanceTravelledAlert && SanityConstants.checkForDistanceTravelledAnomaly)
+			if (distanceTravelledInKm > Constant.distanceTravelledAlert
+					&& SanityConstants.checkForDistanceTravelledAnomaly)
 			{
-				System.out.println("Notice: distance travelled (high) = " + distanceTravelled
+				System.out.println("Notice: distance travelled (high) = " + distanceTravelledInKm
 						+ " for transportation mode = " + activityName);
 			}
 		}
@@ -1211,7 +1291,7 @@ public class ActivityObject2018 implements Serializable
 
 		this.avgAltitude = avgAltitude1;
 
-		this.distanceTravelled = distanceTravelled1;
+		this.distanceTravelledInKm = distanceTravelled1;
 
 		this.startTimestampInms = startTimestampInms1;
 		// DateTimeUtils.getTimestampAsLongms(startTimeString, startDateString); // in iiWAS ver,
@@ -1308,12 +1388,13 @@ public class ActivityObject2018 implements Serializable
 
 			this.avgAltitude = oldAO.getAvgAltitude();
 
-			this.distanceTravelled = oldAO.getDistanceTravelled();
+			this.distanceTravelledInKm = oldAO.getDistanceTravelled();
 			// SpatialUtils.haversine(startLatitude, startLongitude, endLatitude, endLongitude);
 
-			if (distanceTravelled > Constant.distanceTravelledAlert && SanityConstants.checkForDistanceTravelledAnomaly)
+			if (distanceTravelledInKm > Constant.distanceTravelledAlert
+					&& SanityConstants.checkForDistanceTravelledAnomaly)
 			{
-				System.out.println("Notice: distance travelled (high) = " + distanceTravelled
+				System.out.println("Notice: distance travelled (high) = " + distanceTravelledInKm
 						+ " for transportation mode = " + activityName);
 			}
 		}
@@ -1406,7 +1487,7 @@ public class ActivityObject2018 implements Serializable
 	 */
 	public double getDistanceTravelled()
 	{
-		return distanceTravelled;
+		return distanceTravelledInKm;
 	}
 
 	/**
@@ -1415,7 +1496,7 @@ public class ActivityObject2018 implements Serializable
 	 */
 	public void setDistanceTravelled(double distanceTravelled)
 	{
-		this.distanceTravelled = distanceTravelled;
+		this.distanceTravelledInKm = distanceTravelled;
 	}
 
 	/**
@@ -2010,7 +2091,7 @@ public class ActivityObject2018 implements Serializable
 		long temp;
 		temp = Double.doubleToLongBits(distInMFromPrev);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(distanceTravelled);
+		temp = Double.doubleToLongBits(distanceTravelledInKm);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + (int) (durationInSeconds ^ (durationInSeconds >>> 32));
 		result = prime * result + (int) (durInSecFromPrev ^ (durInSecFromPrev >>> 32));
@@ -2068,7 +2149,7 @@ public class ActivityObject2018 implements Serializable
 		}
 		else if (!dimensions.equals(other.dimensions)) return false;
 		if (Double.doubleToLongBits(distInMFromPrev) != Double.doubleToLongBits(other.distInMFromPrev)) return false;
-		if (Double.doubleToLongBits(distanceTravelled) != Double.doubleToLongBits(other.distanceTravelled))
+		if (Double.doubleToLongBits(distanceTravelledInKm) != Double.doubleToLongBits(other.distanceTravelledInKm))
 			return false;
 		if (durationInSeconds != other.durationInSeconds) return false;
 		if (durInSecFromPrev != other.durInSecFromPrev) return false;

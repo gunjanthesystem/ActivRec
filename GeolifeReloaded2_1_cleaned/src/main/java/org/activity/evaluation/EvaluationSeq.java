@@ -189,7 +189,7 @@ public class EvaluationSeq
 		this.evaluateSeqPrediction = evaluatedSequencePrediction;
 
 		// commonPath = "./dataWritten/";
-		PopUps.showMessage("Starting EvaluationSeq for dimensionPhrase = " + dimensionPhrase);
+		// $$PopUps.showMessage("Starting EvaluationSeq for dimensionPhrase = " + dimensionPhrase);
 		if (Constant.useRandomlySampled100Users)
 		{
 			groupsOf100UsersLabels = new String[] { DomainConstants.gowalla100RandomUsersLabel };

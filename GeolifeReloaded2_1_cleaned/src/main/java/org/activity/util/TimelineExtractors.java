@@ -500,22 +500,24 @@ public class TimelineExtractors
 		// StringBuilder sb = new StringBuilder("Inside extractCandidateTimelinesV2
 		// :trainTestTimelinesForAllUsers.size()= "+ trainTestTimelinesForAllUsers.size() + "\n");
 
-		if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
+		if (true)// disabled on 21 Dec for speed
 		{
-			if (Constant.hasInvalidActivityNames)
+			if (Constant.EXPUNGE_INVALIDS_B4_RECOMM_PROCESS)
 			{
-				trainingTimelinesDaywise = TimelineTrimmers.expungeInvalidsDayTimelines(trainingTimelineOrig);
-				trainTestTimelinesForAllUsers = TimelineTrimmers
-						.expungeInvalidsDayTimelinesAllUsers(trainTestTimelinesForAllUsersOrig);
-				// sb.append("Expunging invalids before recommendation process: expunging training timelines");
-			}
-			else
-			{
-				// $$System.out.println("Data assumed to have no invalid act names to be expunged from training
-				// timelines");
+				if (Constant.hasInvalidActivityNames)
+				{
+					trainingTimelinesDaywise = TimelineTrimmers.expungeInvalidsDayTimelines(trainingTimelineOrig);
+					trainTestTimelinesForAllUsers = TimelineTrimmers
+							.expungeInvalidsDayTimelinesAllUsers(trainTestTimelinesForAllUsersOrig);
+					// sb.append("Expunging invalids before recommendation process: expunging training timelines");
+				}
+				else
+				{
+					// $$System.out.println("Data assumed to have no invalid act names to be expunged from training
+					// timelines");
+				}
 			}
 		}
-
 		// //////////////////
 		if (lookPastType.equals(Enums.LookPastType.Daywise))
 		{

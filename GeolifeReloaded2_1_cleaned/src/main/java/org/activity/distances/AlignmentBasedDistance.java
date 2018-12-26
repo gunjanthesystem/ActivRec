@@ -323,7 +323,7 @@ public class AlignmentBasedDistance
 
 		}
 
-		wtLocation = 2d;// gowalla
+		wtLocation = 1d;// gowalla
 		wtLocPopularity = 1d;// gowalla
 
 		wtDistanceFromPrev = 1d;// gowalla

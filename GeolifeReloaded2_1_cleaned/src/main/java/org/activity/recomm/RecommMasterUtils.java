@@ -11,10 +11,12 @@ import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
+import org.activity.evaluation.Evaluation;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
+import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 
@@ -27,7 +29,7 @@ import org.activity.util.ComparatorUtils;
  * @author gunjan
  *
  */
-public class RecommUtils
+public class RecommMasterUtils
 {
 
 	static LinkedHashMap<String, String> extractCandUserIDs(LinkedHashMap<String, Timeline> candidateTimelines)
@@ -630,6 +632,94 @@ public class RecommUtils
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public static String getStringCodeOfActivityObjects(ArrayList<ActivityObject2018> activityObjects)
+	{
+		StringBuilder code = new StringBuilder();
+		for (ActivityObject2018 ao : activityObjects)
+		{
+			code.append(ao.getCharCodeFromActID());
+		}
+		return code.toString();
+	}
+
+	// /////////////////////////////////////////////////////////////////////
+	/**
+	 * Generate the string: '__recommendedActivityName1:simRankScore1__recommendedActivityName2:simRankScore2'
+	 * 
+	 * @param recommendedActivityPDValRankscorePairs
+	 */
+	protected static String getRankedRecommendedActivityPDvalsWithRankScoresString(
+			LinkedHashMap<String, Double> recommendedActivityPDValRankscorePairs)
+	{
+		StringBuilder topRankedString = new StringBuilder();// String topRankedString= new String();
+		StringBuilder msg = new StringBuilder();
+		for (Map.Entry<String, Double> entry : recommendedActivityPDValRankscorePairs.entrySet())
+		{
+			String recommAct = entry.getKey();
+			double roundedRankScore = Evaluation.round(entry.getValue(), 4);
+			topRankedString.append("__" + recommAct + ":" + roundedRankScore);
+			msg.append("recomm act:" + recommAct + ", rank score: " + roundedRankScore + "\n");
+			// topRankedString+= "__"+entry.getKey()+":"+TestStats.round(entry.getValue(),4);
+		}
+		if (VerbosityConstants.verboseRankScoreCalcToConsole)
+		{
+			System.out.println(msg.toString() + "\n");
+		}
+		return topRankedString.toString();
+	}
+
+	// /////////////////////////////////////////////////////////////////////
+	/**
+	 * Generate string as '__recommendedActivityName1__recommendedActivityName2'
+	 * 
+	 * @param recommendedActivityNameRankscorePairs
+	 * @return
+	 */
+	protected static String getRankedRecommendedActivityPDValsithoutRankScoresString(
+			LinkedHashMap<String, Double> recommendedActivityNameRankscorePairs)
+	{
+		StringBuilder rankedRecommendationWithoutRankScores = new StringBuilder();
+		for (Map.Entry<String, Double> entry : recommendedActivityNameRankscorePairs.entrySet())
+		{
+			rankedRecommendationWithoutRankScores.append("__" + entry.getKey());
+		}
+		return rankedRecommendationWithoutRankScores.toString();
+	}
+
+	/**
+	 * 
+	 * @param normalisedCandEditDistances
+	 * @return
+	 */
+	public static LinkedHashMap<String, Pair<String, Double>> aggregatedFeatureWiseDistancesForCandidateTimelinesFullCand(
+			LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedCandEditDistances)
+	{
+		LinkedHashMap<String, Pair<String, Double>> aggregatedFeatureWiseDistances = new LinkedHashMap<>();
+	
+		for (Map.Entry<String, LinkedHashMap<String, Pair<String, Double>>> entry : normalisedCandEditDistances
+				.entrySet()) // iterating over cands
+		{
+			String candID = entry.getKey();
+			LinkedHashMap<String, Pair<String, Double>> normalisedFeatureWiseDistances = entry.getValue();
+	
+			int featureIndex = 0;
+			double distanceAggregatedOverFeatures = 0;
+	
+			for (Map.Entry<String, Pair<String, Double>> distEntry : normalisedFeatureWiseDistances.entrySet())
+			// iterating over distance for each feature
+			{
+				double normalisedDistanceValue = distEntry.getValue().getSecond();
+				distanceAggregatedOverFeatures += normalisedDistanceValue;
+				featureIndex++;
+			}
+	
+			distanceAggregatedOverFeatures = StatsUtils
+					.round(distanceAggregatedOverFeatures / Constant.getNumberOfFeatures(), 4);
+			aggregatedFeatureWiseDistances.put(candID, new Pair("", distanceAggregatedOverFeatures));
+		}
+		return aggregatedFeatureWiseDistances;
 	}
 
 }

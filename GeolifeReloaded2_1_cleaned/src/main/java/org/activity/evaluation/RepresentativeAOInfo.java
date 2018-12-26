@@ -53,6 +53,23 @@ public class RepresentativeAOInfo
 	Map<Integer, Integer> aggValOfEachFeatForEachPDValActivityID;// = new HashMap<>();
 	String userId;
 
+	@Override
+	public String toString()
+	{
+		return "RepresentativeAOInfo [aggValOfEachFeatForEachPDValDurationInSecsFromPrev="
+				+ aggValOfEachFeatForEachPDValDurationInSecsFromPrev + ", aggValOfEachFeatForEachPDValDurationFromNext="
+				+ aggValOfEachFeatForEachPDValDurationFromNext + ", aggStartLatLongEndLatLong_="
+				+ aggStartLatLongEndLatLong_ + ", aggStartLatLongEndLatLongAsHSC=" + aggStartLatLongEndLatLongAsHSC
+				+ ", aggValOfEachFeatForEachPDValDuration=" + aggValOfEachFeatForEachPDValDuration
+				+ ", aggValOfEachFeatForEachPDValDistTrav=" + aggValOfEachFeatForEachPDValDistTrav
+				+ ", aggValOfEachFeatForEachPDValAvgAlt=" + aggValOfEachFeatForEachPDValAvgAlt
+				+ ", aggValOfEachFeatForEachPDValDistFromPrev=" + aggValOfEachFeatForEachPDValDistFromPrev
+				+ ", aggValOfEachFeatForEachPDValPopularity=" + aggValOfEachFeatForEachPDValPopularity
+				+ ", aggValOfEachFeatForEachPDValLocationID=" + aggValOfEachFeatForEachPDValLocationID
+				+ ", aggValOfEachFeatForEachPDValActivityID=" + aggValOfEachFeatForEachPDValActivityID + ", userId="
+				+ userId + "]";
+	}
+
 	/**
 	 * 
 	 * @param topPrimaryDimensionVal
@@ -126,15 +143,25 @@ public class RepresentativeAOInfo
 		switch (databaseName)
 		{
 		case "geolife1":
-			durationInSecs = Long
-					.valueOf(aggValOfEachFeatForEachPDValDuration.get(topPrimaryDimensionValInt).toString());
+			ArrayList<String> startLatLonEndLatLon_ = aggStartLatLongEndLatLong_.get(topPrimaryDimensionValInt);
+			String mostCommon = StatsUtils.mostCommon(startLatLonEndLatLon_);
+			String splitted[] = mostCommon.split("_");
+			String startLat = splitted[0];
+			String startLon = splitted[1];
+			String endLat = splitted[2];
+			String endLon = splitted[3];
+
+			durationInSecs = aggValOfEachFeatForEachPDValDuration.get(topPrimaryDimensionValInt).longValue();
+			Double avgAlt = aggValOfEachFeatForEachPDValAvgAlt.get(topPrimaryDimensionValInt);
+			// durationInSecs = Long
+			// .valueOf(aggValOfEachFeatForEachPDValDuration.get(topPrimaryDimensionValInt).toString());
 			// ActivityObject2018(String userID1, int activityID1, String activityName1, String workingLevelCatIDs1,
 			// ArrayList<Integer> locationIDs1, String locationName1, String startLatitude1, String endLatitude1,
 			// String startLongitude1, String endLongitude1, String avgAltitude1, double distanceTravelled1,
 			// long startTimestampInms1, long endTimestampInms1, long durationInSeconds1)
 
 			repAOForThisActNameForThisUser2 = new ActivityObject2018(userId, activityID, activityName,
-					workingLevelCatIDs, locationIDs, "", "", "", "", "", "",
+					workingLevelCatIDs, locationIDs, "", startLat, endLat, startLon, endLon, avgAlt.toString(),
 					aggValOfEachFeatForEachPDValDistTrav.get(topPrimaryDimensionValInt), (long) newRecommTimestampInMs,
 					(long) newRecommTimestampInMs + (durationInSecs * 1000), durationInSecs);
 			break;
@@ -144,14 +171,15 @@ public class RepresentativeAOInfo
 					new Timestamp(newRecommTimestampInMs), "", "", "", userId, -1,
 					aggValOfEachFeatForEachPDValPopularity.get(topPrimaryDimensionValInt), -1, -1, -1, -1, -1,
 					workingLevelCatIDs, aggValOfEachFeatForEachPDValDistFromPrev.get(topPrimaryDimensionValInt),
-					Long.valueOf(aggValOfEachFeatForEachPDValDurationInSecsFromPrev.get(topPrimaryDimensionValInt)
-							.toString()),
+					aggValOfEachFeatForEachPDValDurationInSecsFromPrev.get(topPrimaryDimensionValInt).longValue(),
 					ZoneId.of("UTC"), -1, -1, -1);
 			repAOForThisActNameForThisUser2.setUserID(userId);
 			break;
 		case "dcu_data_2":
-			durationInSecs = Long
-					.valueOf(aggValOfEachFeatForEachPDValDuration.get(topPrimaryDimensionValInt).toString());
+
+			durationInSecs = aggValOfEachFeatForEachPDValDuration.get(topPrimaryDimensionValInt).longValue();
+			// durationInSecs = Long
+			// .valueOf(aggValOfEachFeatForEachPDValDuration.get(topPrimaryDimensionValInt).toString());
 			// repAOForThisActNameForThisUser2= new ActivityObject2018(String.(userId), activityName, activityId,
 			// String.valueOf(activityId),
 			// startTimestamp.getTime(), endTimestamp.getTime(), duration, durationFromPrevInSecs,
@@ -159,8 +187,7 @@ public class RepresentativeAOInfo
 			repAOForThisActNameForThisUser2 = new ActivityObject2018(userId, activityName, activityID,
 					String.valueOf(activityID), (long) newRecommTimestampInMs,
 					(long) newRecommTimestampInMs + (durationInSecs * 1000), durationInSecs,
-					(long) Long.valueOf(aggValOfEachFeatForEachPDValDurationInSecsFromPrev
-							.get(topPrimaryDimensionValInt).toString()),
+					aggValOfEachFeatForEachPDValDurationInSecsFromPrev.get(topPrimaryDimensionValInt).longValue(),
 					ZoneId.of("GMT"));
 			break;
 
@@ -212,6 +239,7 @@ public class RepresentativeAOInfo
 	public RepresentativeAOInfo(String userId, PrimaryDimension primaryDimension,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd, boolean isCollaborative)
 	{
+		long t1 = System.currentTimeMillis();
 		this.userId = userId;
 		List<?> listOfFeats = Enums.getFeaturesForDatabase(Constant.getDatabaseName());
 		// LinkedHashMap<String, Map<Integer, ArrayList<T>>> mapOfEachFeatForEachPDVal = new LinkedHashMap<>(
@@ -233,20 +261,20 @@ public class RepresentativeAOInfo
 		Map<Integer, ArrayList<Integer>> mapOfEachFeatForEachPDValLocationsIDs = new HashMap<>();
 		Map<Integer, ArrayList<Integer>> mapOfEachFeatForEachPDValActivityIDs = new HashMap<>();
 
-		aggValOfEachFeatForEachPDValDurationInSecsFromPrev = mapOfEachFeatForEachPDValDurFromPrev.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentileL(e.getValue(), 50)));
-		aggValOfEachFeatForEachPDValDurationFromNext = mapOfEachFeatForEachPDValDurInSecFromNext.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentileL(e.getValue(), 50)));
+		this.aggValOfEachFeatForEachPDValDurationInSecsFromPrev = mapOfEachFeatForEachPDValDurFromPrev.entrySet()
+				.stream().collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentileL(e.getValue(), 50)));
+		this.aggValOfEachFeatForEachPDValDurationFromNext = mapOfEachFeatForEachPDValDurInSecFromNext.entrySet()
+				.stream().collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentileL(e.getValue(), 50)));
 
-		aggStartLatLongEndLatLong_ = new HashMap<>();
-		aggStartLatLongEndLatLongAsHSC = new HashMap<>();
-		aggValOfEachFeatForEachPDValDuration = new HashMap<>();
-		aggValOfEachFeatForEachPDValDistTrav = new HashMap<>();
-		aggValOfEachFeatForEachPDValAvgAlt = new HashMap<>();
-		aggValOfEachFeatForEachPDValDistFromPrev = new HashMap<>();
-		aggValOfEachFeatForEachPDValPopularity = new HashMap<>();
-		aggValOfEachFeatForEachPDValLocationID = new HashMap<>();
-		aggValOfEachFeatForEachPDValActivityID = new HashMap<>();
+		this.aggStartLatLongEndLatLong_ = new HashMap<>();
+		this.aggStartLatLongEndLatLongAsHSC = new HashMap<>();
+		this.aggValOfEachFeatForEachPDValDuration = new HashMap<>();
+		this.aggValOfEachFeatForEachPDValDistTrav = new HashMap<>();
+		this.aggValOfEachFeatForEachPDValAvgAlt = new HashMap<>();
+		this.aggValOfEachFeatForEachPDValDistFromPrev = new HashMap<>();
+		this.aggValOfEachFeatForEachPDValPopularity = new HashMap<>();
+		this.aggValOfEachFeatForEachPDValLocationID = new HashMap<>();
+		this.aggValOfEachFeatForEachPDValActivityID = new HashMap<>();
 
 		// ActivityObject2018 ao;
 		// ao.getLocationIDs()
@@ -265,6 +293,15 @@ public class RepresentativeAOInfo
 				break;
 			}
 
+			case "StartTimeF":
+			{
+				break;
+			}
+
+			case "DurationFromPrevF":
+			{
+				break;
+			}
 			case "DurationF":
 			{
 				mapOfEachFeatForEachPDValDuration = getListOfFeatureVals(userId, trainTimelinesAllUsersContinuousFiltrd,
@@ -357,6 +394,8 @@ public class RepresentativeAOInfo
 				PopUps.printTracedErrorMsgWithExit("Error: unknown feature: " + f.toString());
 			}
 		}
+		System.out.println(
+				"Time taken by  RepresentativeAOInfo= " + ((System.currentTimeMillis() - t1) / 1000) + " secs");
 	}
 	//////////////////////////
 	// ActivityObject2018 repAO = mapOfRepAOs.get(userId).get(topPrimaryDimensionVal);
@@ -411,8 +450,8 @@ public class RepresentativeAOInfo
 	 * @param trainTimelinesAllUsersContinuousFiltrd
 	 * @param isCollaborative
 	 * @param delimiter
-	 * @return actID, list of Pairs {Pair{StartLat,StartLon}, Pair{EndLat,EndLon}}
-	 *         ArrayList<Pair<Pair<String,String>,Pair<String,String>>>
+	 * @return actID, list of Pairs {ao.getStartLatitude() + delimiter + ao.getStartLongitude() + delimiter +
+	 *         ao.getEndLatitude() + delimiter + ao.getEndLongitude();>
 	 * @since 20 Dec 2018
 	 */
 	private static Map<Integer, ArrayList<String>> getStartAndEndGeoCoordinatesForEachPDVal(String userId,
@@ -1895,6 +1934,8 @@ public class RepresentativeAOInfo
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd, PrimaryDimension primaryDimension,
 			String databaseName, boolean collaborativecandidates)
 	{
+		// PopUps.showMessage("Inside buildRepresentativeAOInfosDec2018 trainTimelinesAllUsersContinuousFiltrd.size()="
+		// + trainTimelinesAllUsersContinuousFiltrd.size());
 		LinkedHashMap<String, RepresentativeAOInfo> representativeAOInfosForAllUsers = new LinkedHashMap<>();
 
 		for (Entry<String, Timeline> userEntry : trainTimelinesAllUsersContinuousFiltrd.entrySet())
@@ -1902,6 +1943,8 @@ public class RepresentativeAOInfo
 			representativeAOInfosForAllUsers.put(userEntry.getKey(), new RepresentativeAOInfo(userEntry.getKey(),
 					primaryDimension, trainTimelinesAllUsersContinuousFiltrd, collaborativecandidates));
 		}
+		// PopUps.showMessage("Inside buildRepresentativeAOInfosDec2018: representativeAOInfosForAllUsers.size()= "
+		// + representativeAOInfosForAllUsers.size() + "keySet = " + representativeAOInfosForAllUsers.keySet());
 		return representativeAOInfosForAllUsers;
 	}
 

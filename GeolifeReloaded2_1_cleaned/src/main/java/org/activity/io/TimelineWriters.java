@@ -73,8 +73,8 @@ public class TimelineWriters
 			String abFileNameToWrite)
 	{
 		String delimiter = ",";
-		WToFile.appendLineToFileAbs(
-				"User" + delimiter + ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+		WToFile.appendLineToFileAbs("User" + delimiter
+				+ ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(delimiter) + "\n",
 				abFileNameToWrite);
 
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userData : usersCleanedDayTimelines.entrySet())
@@ -87,7 +87,7 @@ public class TimelineWriters
 				for (ActivityObject2018 ao : timeline.getValue().getActivityObjectsInTimeline())
 				{
 					sbForThisTimeline
-							.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded(delimiter) + "\n");
+							.append(user + delimiter + ao.toStringAllGowallaTSWithNameForHeaded24Dec(delimiter) + "\n");
 				}
 				WToFile.appendLineToFileAbs(sbForThisTimeline.toString(), abFileNameToWrite);
 			}
@@ -107,8 +107,8 @@ public class TimelineWriters
 	public static void writeAllActObjs(Map<String, Timeline> usersTimelines, String abFileNameToWrite)
 	{
 		String delimiter = ",";
-		WToFile.appendLineToFileAbs(
-				"User" + delimiter + ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+		WToFile.appendLineToFileAbs("User" + delimiter
+				+ ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
 				abFileNameToWrite);
 
 		for (Entry<String, Timeline> userData : usersTimelines.entrySet())
@@ -138,8 +138,8 @@ public class TimelineWriters
 			String abFileNameToWrite)
 	{
 		String delimiter = ",";
-		WToFile.appendLineToFileAbs(
-				"User" + delimiter + ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
+		WToFile.appendLineToFileAbs("User" + delimiter
+				+ ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded(delimiter) + "\n",
 				abFileNameToWrite);
 
 		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> userData : trainTestTimelinesForAllUsersDW.entrySet())
@@ -531,10 +531,10 @@ public class TimelineWriters
 			LinkedHashMap<Date, Timeline> userTestTimelines, LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
 		StringBuilder sbTraining = new StringBuilder(String.valueOf(userID) + ",");
-	
-		userTrainingTimelines.entrySet().stream()
-				.forEachOrdered(tl -> sbTraining.append(TimelineTransformers.timelineToSeqOfActNames(tl.getValue(), ",")));
-	
+
+		userTrainingTimelines.entrySet().stream().forEachOrdered(
+				tl -> sbTraining.append(TimelineTransformers.timelineToSeqOfActNames(tl.getValue(), ",")));
+
 		sbTraining.append("\n");
 		WToFile.appendLineToFileAbs(sbTraining.toString(),
 				Constant.getCommonPath() + "TrainingTimelinesAsSeqOfCodes.csv");
@@ -551,7 +551,7 @@ public class TimelineWriters
 		{
 			System.out.println("User ID =" + userEntry.getKey());
 			System.out.println("Number of day timelines for this user=" + userEntry.getValue().size());
-	
+
 			for (Map.Entry<Date, Timeline> dayTimelineEntry : userEntry.getValue().entrySet())
 			{
 				System.out.println("Date: " + dayTimelineEntry.getKey());
@@ -560,54 +560,54 @@ public class TimelineWriters
 				// System.out.println();
 			}
 		}
-	
+
 	}
 
 	public static void traverseTimelines(HashMap<String, ArrayList<ActivityObject2018>> timeLines)
 	{
 		System.out.println("----------------Traversing Timelines----------");
-	
+
 		Iterator it = timeLines.entrySet().iterator();
 		while (it.hasNext())
 		{
 			Map.Entry pairs = (Map.Entry) it.next();
-	
+
 			String id = pairs.getKey().toString();
 			ArrayList<ActivityObject2018> activityEvents = (ArrayList<ActivityObject2018>) pairs.getValue();
-	
+
 			System.out.println("Timeline for id = " + id);
-	
+
 			System.out.println("Number of Activity Events =" + activityEvents.size());
-	
+
 			for (ActivityObject2018 ae : activityEvents)
 			{
 				System.out.print("Activity Name= " + ae.getActivityName());
 				System.out.print("Start Time= " + ae.getStartTimestamp());
 				System.out.print("End Time= " + ae.getEndTimestamp());
-	
+
 			}
 			System.out.println();
 			// it.remove(); // avoids a ConcurrentModificationException
 		}
-	
+
 	}
 
 	public static void traverseSplittedTimelines(HashMap<String, ArrayList<String>> timeLines)
 	{
 		System.out.println("----------------Traversing Splitted Timelines----------");
-	
+
 		Iterator it = timeLines.entrySet().iterator();
 		while (it.hasNext())
 		{
 			Map.Entry pairs = (Map.Entry) it.next();
-	
+
 			String id = pairs.getKey().toString();
 			ArrayList<String> activityNames = (ArrayList<String>) pairs.getValue();
-	
+
 			System.out.println("Splitted Timeline id = " + id);
-	
+
 			System.out.println("zz Number of Activity Names =" + activityNames.size());
-	
+
 			System.out.println("b");
 			for (int i = 0; i < activityNames.size(); i++)
 			{
@@ -619,7 +619,7 @@ public class TimelineWriters
 			System.out.println("c");
 			// it.remove(); // avoids a ConcurrentModificationException
 		}
-	
+
 	}
 
 	public static void traverseSingleSplittedTimeline(String timelineId, ArrayList<String> splittedTimeline)
@@ -651,7 +651,7 @@ public class TimelineWriters
 	public static void traverseMapOfTimelines(LinkedHashMap<String, Timeline> map)
 	{
 		System.out.println("traversing map of day timelines");
-	
+
 		for (Map.Entry<String, Timeline> entry : map.entrySet())
 		{
 			System.out.print("ID: " + entry.getKey());
@@ -664,7 +664,7 @@ public class TimelineWriters
 	public static void traverseMapOfTimelinesWithNext(LinkedHashMap<Integer, TimelineWithNext> map)
 	{
 		System.out.println("traversing map of timelines");
-	
+
 		for (Map.Entry<Integer, TimelineWithNext> entry : map.entrySet())
 		{
 			System.out.print("ID: " + entry.getKey());
