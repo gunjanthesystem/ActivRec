@@ -33,14 +33,14 @@ public class VerbosityConstants
 	// minimises verbosity
 	public static final boolean verboseSAX = false;// false;
 	public static boolean verboseLevenstein = false;// true;// false;// false;// false;// false;
-	public static final boolean verboseNormalisation = true;// false;// false;
+	public static final boolean verboseNormalisation = false;// false;// false;
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;
 	public static final boolean verboseOTMDSAM = false;
 	public static final boolean verboseDistance = false;// false;// true;// false;// false;
 	public static final boolean verboseRankScoreCalcToConsole = false;// false;
 	public static final boolean verboseEvaluationMetricsToConsole = false;// true;// true;// false;
-	public static final boolean verboseCombinedEDist = true;
+	public static final boolean verboseCombinedEDist = false;
 	/**
 	 * Primarily for correlated
 	 * <p>

@@ -34,7 +34,7 @@ public class TimelineTrimmers
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<>(); // changed from ArrayList to LinkedHashSet on 17
 																	// Mar 2017
-	
+
 		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getKey().getDay() == 0 || entry.getKey().getDay() == 6)
@@ -42,19 +42,19 @@ public class TimelineTrimmers
 				datesToRemove.add(entry.getKey());
 			}
 		}
-	
+
 		for (Date dateToRemove : datesToRemove)
 		{
 			datesTimelinesPruned.remove(dateToRemove);
 		}
-	
+
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.print("Weekends to remove:");
 			datesToRemove.stream().forEach(d -> System.out.println("," + d.toString()));
 			System.out.println("Num of days removed for removeWeekendDayTimelines =" + datesToRemove.size());
 		}
-	
+
 		// System.out.println("Count of weekends removed ="+datesToRemove.size()); //THERE IS SOME BUG, THE ARRAY HAS
 		// DUPLICATE ENTRIES, UNCOMMENT TO SEE, HOWEVER IT DOES NOT
 		// AFFECT OUR PURPORSE // probably this has been resolved by using set but not verified
@@ -77,7 +77,7 @@ public class TimelineTrimmers
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
 		StringBuilder log = new StringBuilder();
-	
+
 		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getKey().getDay() == 0 || entry.getKey().getDay() == 6)
@@ -86,12 +86,12 @@ public class TimelineTrimmers
 				log.append(user + "," + entry.getKey() + "," + (entry.getKey().getDay()) + "\n");
 			}
 		}
-	
+
 		for (Date dateToRemove : datesToRemove)
 		{
 			datesTimelinesPruned.remove(dateToRemove);
 		}
-	
+
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("Num of days removed for removeWeekendDayTimelines =" + datesToRemove.size());
@@ -113,7 +113,7 @@ public class TimelineTrimmers
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
-	
+
 		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (!(entry.getKey().getDay() == 0 || entry.getKey().getDay() == 6))
@@ -121,18 +121,18 @@ public class TimelineTrimmers
 				datesToRemove.add(entry.getKey());
 			}
 		}
-	
+
 		for (Date dateToRemove : datesToRemove)
 		{
 			datesTimelinesPruned.remove(dateToRemove);
 		}
-	
+
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("Weekdays to remove=");
 			datesToRemove.stream().forEach(d -> System.out.println("," + d.toString()));
 		}
-	
+
 		return datesTimelinesPruned;
 	}
 
@@ -147,7 +147,7 @@ public class TimelineTrimmers
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
-	
+
 		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().containsAtLeastOneValidActivity() == false)
@@ -155,19 +155,19 @@ public class TimelineTrimmers
 				datesToRemove.add(entry.getKey());
 			}
 		}
-	
+
 		for (Date dateToRemove : datesToRemove)
 		{
 			datesTimelinesPruned.remove(dateToRemove);
 		}
-	
+
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.print("Invalid days to remove for no valid activities in the day:");
 			datesToRemove.stream().forEach(d -> System.out.println("," + d.toString()));
 			System.out.println("Num of days removed for removeDayTimelinesWithNoValidAct =" + datesToRemove.size());
 		}
-	
+
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
 		// ="+datesToRemove.size());
 		return datesTimelinesPruned;
@@ -187,7 +187,7 @@ public class TimelineTrimmers
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
-	
+
 		StringBuilder log = new StringBuilder("User,DateToRemove\n");
 		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
@@ -197,20 +197,20 @@ public class TimelineTrimmers
 				log.append(user + "," + entry.getKey() + "\n");
 			}
 		}
-	
+
 		for (Date dateToRemove : datesToRemove)
 		{
 			// System.out.print(datesToRemove.toString()+",");
 			datesTimelinesPruned.remove(dateToRemove);
 		}
-	
+
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println("Num of days removed for removeDayTimelinesWithNoValidAct =" + datesToRemove.size());
 		}
 		// System.out.println("Total number of days="+userAllDatesTimeslines.size()+", Count of invalid days removed
 		// ="+datesToRemove.size());//THERE IS SOME BUG, THE ARRAY HAS
-	
+
 		WToFile.appendLineToFileAbs(log.toString(), logFileName);
 		return datesTimelinesPruned;
 	}
@@ -227,7 +227,7 @@ public class TimelineTrimmers
 		// boolean verbose = VerbosityConstants.verboseTimelineCleaning;
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
-	
+
 		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().countNumberOfValidDistinctActivities() <= 1)
@@ -235,12 +235,12 @@ public class TimelineTrimmers
 				datesToRemove.add(entry.getKey());
 			}
 		}
-	
+
 		for (Date dateToRemove : datesToRemove)
 		{
 			datesTimelinesPruned.remove(dateToRemove);
 		}
-	
+
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.print("Invalid days to remove for TimelinesWithLessThanOneDistinctValidAct:");
@@ -269,9 +269,9 @@ public class TimelineTrimmers
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
-	
+
 		StringBuilder log = new StringBuilder("User,date\n");
-	
+
 		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().countNumberOfValidDistinctActivities() <= 1)
@@ -281,12 +281,12 @@ public class TimelineTrimmers
 						+ "\n");
 			}
 		}
-	
+
 		for (Date dateToRemove : datesToRemove)
 		{
 			datesTimelinesPruned.remove(dateToRemove);
 		}
-	
+
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.println(
@@ -309,7 +309,7 @@ public class TimelineTrimmers
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
 		LinkedHashSet<Date> datesToRemove = new LinkedHashSet<Date>();
-	
+
 		for (Map.Entry<Date, Timeline> entry : userAllDatesTimeslines.entrySet())
 		{
 			if (entry.getValue().countNumberOfValidDistinctActivities() < lowerLimit)
@@ -317,12 +317,12 @@ public class TimelineTrimmers
 				datesToRemove.add(entry.getKey());
 			}
 		}
-	
+
 		for (Date dateToRemove : datesToRemove)
 		{
 			datesTimelinesPruned.remove(dateToRemove);
 		}
-	
+
 		if (VerbosityConstants.verboseTimelineCleaning)
 		{
 			System.out.print("Invalid days to remove for removeDayTimelinesLessDistinctValidAct:");
@@ -350,7 +350,7 @@ public class TimelineTrimmers
 			PopUps.printTracedErrorMsgWithExit("removeBlackListedUsers(): Only implemented for Gowalla dataset");
 			return null;
 		}
-	
+
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> timelinesForSelectedUser = new LinkedHashMap<>();
 		WToFile.writeToNewFile("IndexOfUser,userID\n", absFileNameForLog);
 		int indexOfUser = -1, numOfUsersSkippedGT553MaxActsPerDay = 0;
@@ -372,7 +372,7 @@ public class TimelineTrimmers
 			}
 		}
 		System.out.println("numOfUsersSkippedGT553MaxActsPerDay= " + numOfUsersSkippedGT553MaxActsPerDay);
-	
+
 		return timelinesForSelectedUser;
 	}
 
@@ -396,12 +396,12 @@ public class TimelineTrimmers
 		StringBuilder log = new StringBuilder();
 		ArrayList datesRemoved = new ArrayList<>();
 		log.append("User, #days(daytimelines) removed\n");
-	
+
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
 		{
 			String user = userEntry.getKey();
 			LinkedHashMap<Date, Timeline> toKeepTimelines = new LinkedHashMap<>();
-	
+
 			int countOfDatesRemovedForThisUser = 0;
 			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
 			{
@@ -416,7 +416,7 @@ public class TimelineTrimmers
 					// datesRemoved.append(dateEntry.getKey().toString() + "_");
 				}
 			}
-	
+
 			if (countOfDatesRemovedForThisUser > 0)
 			{
 				if (writeLog)
@@ -427,13 +427,13 @@ public class TimelineTrimmers
 					// + lowerLimit + " aos per day)");
 				}
 			}
-	
+
 			if (toKeepTimelines.size() > 0)
 			{
 				result.put(user, toKeepTimelines);
 			}
 		}
-	
+
 		WToFile.writeToNewFile(log.toString(), fileNameForLog);
 		System.out.println("Exiting removeDayTimelinesWithGreaterAct");
 		return result;
@@ -459,12 +459,12 @@ public class TimelineTrimmers
 		StringBuilder log = new StringBuilder();
 		ArrayList datesRemoved = new ArrayList<>();
 		log.append("User, #days(daytimelines) removed\n");
-	
+
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
 		{
 			String user = userEntry.getKey();
 			LinkedHashMap<Date, Timeline> toKeepTimelines = new LinkedHashMap<>();
-	
+
 			int countOfDatesRemovedForThisUser = 0;
 			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
 			{
@@ -479,7 +479,7 @@ public class TimelineTrimmers
 					// datesRemoved.append(dateEntry.getKey().toString() + "_");
 				}
 			}
-	
+
 			if (countOfDatesRemovedForThisUser > 0)
 			{
 				if (writeLog)
@@ -490,13 +490,13 @@ public class TimelineTrimmers
 					// + lowerLimit + " aos per day)");
 				}
 			}
-	
+
 			if (toKeepTimelines.size() > 0)
 			{
 				result.put(user, toKeepTimelines);
 			}
 		}
-	
+
 		WToFile.writeToNewFile(log.toString(), fileNameForLog);
 		System.out.println("Exiting removeDayTimelinesWithLessValidAct");
 		return result;
@@ -518,7 +518,7 @@ public class TimelineTrimmers
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> result = new LinkedHashMap<>();
 		StringBuffer log = new StringBuffer();
 		log.append("UsersRemoved, NumOfDays\n");
-	
+
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersDayTimelinesOriginal.entrySet())
 		{
 			String user = userEntry.getKey();
@@ -531,7 +531,7 @@ public class TimelineTrimmers
 				log.append(user + "," + userEntry.getValue().size() + "\n");
 			}
 		}
-	
+
 		WToFile.writeToNewFile(log.toString(), fileNameForLog);
 		System.out.println("Exiting removeUsersWithLessDays");
 		return result;
@@ -548,7 +548,7 @@ public class TimelineTrimmers
 			double threshold)
 	{
 		LinkedHashMap<Date, Double> pruned = new LinkedHashMap<Date, Double>();
-	
+
 		System.out.println("Inside removeAboveThreshold");
 		for (Map.Entry<Date, Double> entry : distanceScoresSorted.entrySet()) // Iterate over Users
 		{
@@ -578,24 +578,24 @@ public class TimelineTrimmers
 			LinkedHashMap<Date, Triple<Integer, String, Double>> distanceScoresSorted, double threshold)
 	{
 		LinkedHashMap<Date, Triple<Integer, String, Double>> pruned = new LinkedHashMap<Date, Triple<Integer, String, Double>>();
-	
+
 		System.out.println("Inside removeAboveThreshold");
 		for (Map.Entry<Date, Triple<Integer, String, Double>> entry : distanceScoresSorted.entrySet()) // Iterate over
 																										// Users
 		{
 			System.out.print(" __reading:" + entry.getValue());
-	
+
 			if (entry.getValue().getThird() <= threshold)
 			{
 				pruned.put(entry.getKey(), entry.getValue());
 				System.out.print(" keeping entry for:" + entry.getValue().toString());
 			}
-	
+
 			else
 			{
 				System.out.print(" removing entry for:" + entry.getValue().toString());
 			}
-	
+
 			System.out.print("~~~~~~~~");
 		}
 		return pruned;
@@ -628,7 +628,7 @@ public class TimelineTrimmers
 				numberOfTimelinesRemoved += 1;
 			}
 		}
-	
+
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Number of timelines removeAboveThreshold2=" + numberOfTimelinesRemoved);
@@ -647,19 +647,19 @@ public class TimelineTrimmers
 			LinkedHashMap<String, Pair<Integer, Double>> distanceScoresSorted, double threshold)
 	{
 		LinkedHashMap<String, Pair<Integer, Double>> pruned = new LinkedHashMap<String, Pair<Integer, Double>>();
-	
+
 		int numberOfTimelinesRemoved = 0;
-	
+
 		System.out.println("Inside removeAboveThreshold3");
-	
+
 		for (Map.Entry<String, Pair<Integer, Double>> entry : distanceScoresSorted.entrySet())
 		{
 			String timelineID = entry.getKey();
 			Pair<Integer, Double> editDistancePair = entry.getValue();
 			double editDistanceEntry = editDistancePair.getSecond();
-	
+
 			System.out.print(" __reading:" + editDistanceEntry);
-	
+
 			if (editDistanceEntry <= threshold)
 			{
 				pruned.put(timelineID, editDistancePair);
@@ -691,18 +691,18 @@ public class TimelineTrimmers
 			LinkedHashMap<Integer, Double> distanceScoresSortedFullCand, double threshold)
 	{
 		LinkedHashMap<Integer, Double> pruned = new LinkedHashMap<Integer, Double>();
-	
+
 		int numberOfTimelinesRemoved = 0;
-	
+
 		System.out.println("Inside removeAboveThreshold3");
-	
+
 		for (Map.Entry<Integer, Double> entry : distanceScoresSortedFullCand.entrySet())
 		{
 			Integer timelineID = entry.getKey();
 			double editDistanceEntry = entry.getValue();
-	
+
 			System.out.print(" __reading:" + editDistanceEntry);
-	
+
 			if (editDistanceEntry <= threshold)
 			{
 				pruned.put(timelineID, editDistanceEntry);
@@ -733,18 +733,18 @@ public class TimelineTrimmers
 			LinkedHashMap<Integer, Pair<String, Double>> distanceScoresSortedFullCand, double threshold)
 	{
 		LinkedHashMap<Integer, Pair<String, Double>> pruned = new LinkedHashMap<>();
-	
+
 		int numberOfTimelinesRemoved = 0;
-	
+
 		System.out.println("Inside removeAboveThreshold4FullCandISD");
-	
+
 		for (Map.Entry<Integer, Pair<String, Double>> entry : distanceScoresSortedFullCand.entrySet())
 		{
 			Integer timelineID = entry.getKey();
 			double editDistanceEntry = entry.getValue().getSecond();
-	
+
 			// $$System.out.print(" __reading:" + editDistanceEntry);
-	
+
 			if (editDistanceEntry <= threshold)
 			{
 				pruned.put(timelineID, entry.getValue());
@@ -794,19 +794,19 @@ public class TimelineTrimmers
 			LinkedHashMap<Integer, Pair<Integer, Double>> distanceScoresSorted, double threshold)
 	{
 		LinkedHashMap<Integer, Pair<Integer, Double>> pruned = new LinkedHashMap<Integer, Pair<Integer, Double>>();
-	
+
 		int numberOfTimelinesRemoved = 0;
-	
+
 		System.out.println("Inside removeAboveThreshold3");
-	
+
 		for (Map.Entry<Integer, Pair<Integer, Double>> entry : distanceScoresSorted.entrySet())
 		{
 			Integer timelineID = entry.getKey();
 			Pair<Integer, Double> editDistancePair = entry.getValue();
 			double editDistanceEntry = editDistancePair.getSecond();
-	
+
 			System.out.print(" __reading:" + editDistanceEntry);
-	
+
 			if (editDistanceEntry <= threshold)
 			{
 				pruned.put(timelineID, editDistancePair);
@@ -818,7 +818,7 @@ public class TimelineTrimmers
 				numberOfTimelinesRemoved += 1;
 			}
 		}
-	
+
 		if (VerbosityConstants.verbose)
 		{
 			System.out.println("Number of timelines removed=" + numberOfTimelinesRemoved);
@@ -838,7 +838,7 @@ public class TimelineTrimmers
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reducedTimelines = new LinkedHashMap<>();
 		System.out.println("number of users before reducing users timeline = " + usersTimelines.size());
 		System.out.println("Users to remove = " + userIDsToExpunge.toString());
-	
+
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
 			String userID = usersTimelinesEntry.getKey();
@@ -866,7 +866,7 @@ public class TimelineTrimmers
 	public static LinkedHashMap<String, Timeline> expungeInvalids(LinkedHashMap<String, Timeline> usersTimelines)
 	{
 		LinkedHashMap<String, Timeline> expungedTimelines = new LinkedHashMap<>();
-	
+
 		for (Map.Entry<String, Timeline> entry : usersTimelines.entrySet())
 		{
 			expungedTimelines.put(entry.getKey(), TimelineTrimmers.expungeInvalids(entry.getValue()));
@@ -882,8 +882,9 @@ public class TimelineTrimmers
 	public static LinkedHashMap<Date, Timeline> expungeInvalidsDayTimelines(
 			LinkedHashMap<Date, Timeline> usersDayTimelines)
 	{
-		return usersDayTimelines.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(),
-				e -> TimelineTrimmers.expungeInvalids(e.getValue()), (v1, v2) -> v1, LinkedHashMap<Date, Timeline>::new));
+		return usersDayTimelines.entrySet().stream()
+				.collect(Collectors.toMap(e -> e.getKey(), e -> TimelineTrimmers.expungeInvalids(e.getValue()),
+						(v1, v2) -> v1, LinkedHashMap<Date, Timeline>::new));
 	}
 
 	/**
@@ -895,14 +896,14 @@ public class TimelineTrimmers
 	public static LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> expungeInvalidsDayTimelinesAllUsers(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersOrig)
 	{
-		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers = null;
-	
+		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers = new LinkedHashMap<>();
+
 		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> entry : trainTestTimelinesForAllUsersOrig.entrySet())
 		{
 			List<LinkedHashMap<Date, Timeline>> list = new ArrayList<>();
 			list.add(expungeInvalidsDayTimelines(entry.getValue().get(0)));// trainingTimelinesForThisUser
 			list.add(expungeInvalidsDayTimelines(entry.getValue().get(1)));// testTimelinesForThisUser
-	
+
 			trainTestTimelinesForAllUsers.put(entry.getKey(), list);
 		}
 		return trainTestTimelinesForAllUsers;
@@ -922,11 +923,11 @@ public class TimelineTrimmers
 			System.err.println(
 					PopUps.getTracedErrorMsg("Error inside UtulityBelt.expungeInvalids: timelineToPrune is null"));
 		}
-	
+
 		ArrayList<ActivityObject2018> arrayToPrune = timelineToPrune.getActivityObjectsInTimeline();
 		ArrayList<ActivityObject2018> arrPruned = (ArrayList<ActivityObject2018>) arrayToPrune.stream()
 				.filter(ao -> ao.isInvalidActivityName() == false).collect(Collectors.toList());
-	
+
 		Timeline prunedTimeline = new Timeline(arrPruned, timelineToPrune.isShouldBelongToSingleDay(),
 				timelineToPrune.isShouldBelongToSingleUser());
 		prunedTimeline.setTimelineID(timelineToPrune.getTimelineID());
@@ -947,26 +948,26 @@ public class TimelineTrimmers
 		System.out.println("Inside cleanDayTimelines(): total num of users before cleaning = " + usersTimelines.size());
 		long ct = System.currentTimeMillis();
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> cleanedUserDayTimelines = new LinkedHashMap<>();
-	
+
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
 			LinkedHashMap<Date, Timeline> cleanedDayTimelines = TimelineTrimmers.cleanUserDayTimelines(
 					usersTimelinesEntry.getValue(), Constant.getCommonPath() + "LogCleanedDayTimelines_",
 					usersTimelinesEntry.getKey());
-	
+
 			if (VerbosityConstants.verboseTimelineCleaning)
 			{
 				System.out.println("for user: " + usersTimelinesEntry.getKey() + "#cleanedDayTimeline = "
 						+ cleanedDayTimelines.size() + "\n");
 			}
-	
+
 			if (cleanedDayTimelines.size() > 0)
 			{
 				cleanedUserDayTimelines.put(usersTimelinesEntry.getKey(), cleanedDayTimelines);
 			}
 		}
 		System.out.println("\ttotal num of users after cleaning = " + cleanedUserDayTimelines.size());
-	
+
 		long ct2 = System.currentTimeMillis();
 		System.out.println("Exiting cleanDayTimelines(): total num of users after cleaning = "
 				+ cleanedUserDayTimelines.size() + " time taken: " + ((ct2 - ct) / 1000) + " secs");
@@ -986,7 +987,7 @@ public class TimelineTrimmers
 		userDayTimelines = removeDayTimelinesWithNoValidAct(userDayTimelines);
 		userDayTimelines = removeDayTimelinesWithOneOrLessDistinctValidAct(userDayTimelines);
 		userDayTimelines = removeWeekendDayTimelines(userDayTimelines);
-	
+
 		return userDayTimelines;
 	}
 
@@ -1009,14 +1010,14 @@ public class TimelineTrimmers
 			String logFileNamePhrase, String user)
 	{
 		String removeDayTimelinesWithNoValidActLog = logFileNamePhrase + "RemoveDayTimelinesWithNoValidAct.csv";
-	
-		userDayTimelines = removeDayTimelinesWithNoValidAct(userDayTimelines,
-				removeDayTimelinesWithNoValidActLog, user);
+
+		userDayTimelines = removeDayTimelinesWithNoValidAct(userDayTimelines, removeDayTimelinesWithNoValidActLog,
+				user);
 		userDayTimelines = removeDayTimelinesWithOneOrLessDistinctValidAct(userDayTimelines,
 				logFileNamePhrase + "RemoveDayTimelinesWithOneOrLessDistinctValidAct.csv", user);
 		userDayTimelines = removeWeekendDayTimelines(userDayTimelines,
 				logFileNamePhrase + "RemoveWeekendDayTimelines.csv", user);
-	
+
 		return userDayTimelines;
 	}
 

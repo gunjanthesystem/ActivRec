@@ -705,7 +705,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	{
 		LinkedHashMap<String, Double> res = new LinkedHashMap<>();
 
-		if (lookPastType.equals(Enums.LookPastType.Daywise) || lookPastType.equals(Enums.LookPastType.NCount))
+		if (lookPastType.equals(Enums.LookPastType.Daywise) || lookPastType.equals(Enums.LookPastType.NCount)
+				|| lookPastType.equals(Enums.LookPastType.NHours))
 		{
 			// System.out.println("Current timeline:");
 			// Convert current timeline to a seq of integers
@@ -772,7 +773,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @return
 	 * @throws Exception
 	 */
-	private int getAKOMPredictedSymbol(int highestOrder, String userID, ArrayList<Integer> currSeq,
+	protected static int getAKOMPredictedSymbol(int highestOrder, String userID, ArrayList<Integer> currSeq,
 			LinkedHashMap<String, Timeline> candidateTimelinesWithNextAppended,
 			Enums.AltSeqPredictor alternateSeqPredictor) throws Exception// ArrayList<ArrayList<Integer>>
 	// candTimelinesAsSeq

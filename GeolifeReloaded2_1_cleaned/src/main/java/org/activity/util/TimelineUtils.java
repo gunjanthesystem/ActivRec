@@ -584,7 +584,6 @@ public class TimelineUtils
 		catch (Exception e)
 		{
 			e.printStackTrace();
-
 		}
 
 		if (VerbosityConstants.writeTrainTestTimelinesAOsPerUser)

@@ -21,6 +21,7 @@ import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.ReadingFromFile;
+import org.activity.io.Serializer;
 import org.activity.io.WToFile;
 import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.ActivityObject2018;
@@ -185,6 +186,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(allUsersTimelines,
 				percentageInTraining, Constant.cleanTimelinesAgainInsideTrainTestSplit);
 
+		// PopUps.showMessage("allUsersTimelines.size() = "+allUsersTimelines.size());
+
 		if (Constant.filterTrainingTimelinesByRecentDays)
 		{
 			trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
@@ -196,6 +199,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
 					.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
 		}
+
+		if (false)
+		{
+			Serializer.kryoSerializeThis(trainTimelinesAllUsersContinuousFiltrd,
+					Constant.getCommonPath() + "trainTimelinesAllUsersContinuousFiltrd.kryo");
+			System.exit(0);
+		}
+
 		StringBuilder sbT1 = new StringBuilder("User,NumOfAOsInTraining");
 		trainTimelinesAllUsersContinuousFiltrd.entrySet().stream()
 				.forEachOrdered(e -> sbT1.append(e.getKey() + "," + e.getValue().size() + "\n"));
@@ -205,12 +216,18 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		LinkedHashMap<String, RepresentativeAOInfo> repAOInfoForEachUser = new LinkedHashMap<>();// new approach
 
 		// Start of curtain: incomplete: motive: faster speed
+		// PopUps.showMessage("repAOInfoForEachUser.keySet() empty =" + repAOInfoForEachUser.keySet()
+		// + " trainTestTimelinesForAllUsersDW.size()=" + trainTestTimelinesForAllUsersDW.size()
+		// + " trainTimelinesAllUsersContinuousFiltrd.size() = " + trainTimelinesAllUsersContinuousFiltrd.size());
 		if (Constant.lengthOfRecommendedSequence > 1)
 		{
 			repAOInfoForEachUser = RepresentativeAOInfo.buildRepresentativeAOInfosDec2018(
 					trainTimelinesAllUsersContinuousFiltrd, primaryDimension, databaseName,
 					Constant.collaborativeCandidates);
 
+			// PopUps.showMessage("repAOInfoForEachUser.keySet() empty =" + repAOInfoForEachUser.keySet());
+
+			System.out.println("repAOInfoForEachUser.keySet() =" + repAOInfoForEachUser.keySet());
 			// if (Constant.preBuildRepAOGenericUser)
 			// {// collaborative approach
 			// // disabled on 1 Aug 2017, will do just-in-time computation of representative act object
@@ -1123,8 +1140,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 											// this.primaryDimension,
 											// trainTimelinesAllUsersContinuousFiltrd);
 
-											ActivityObject2018 repAOForTopRecommActName = repAOInfoForEachUser
-													.get(String.valueOf(userId))
+											RepresentativeAOInfo ree1 = repAOInfoForEachUser
+													.get(String.valueOf(userId));
+											// System.out.println("String.valueOf(userId) = " + String.valueOf(userId));
+											// System.out.println("ree1 = " + ree1.toString());
+
+											ActivityObject2018 repAOForTopRecommActName = ree1
 													.getRepresentativeAOForActName(recommendationTimes[seqIndex],
 															Integer.valueOf(
 																	topRecommendedPrimaryDimensionVal[seqIndex]),
@@ -1134,6 +1155,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 											repAOsFromPrevRecomms.add(repAOForTopRecommActName);
 											recommendationTimes[seqIndex + 1] = repAOForTopRecommActName
 													.getEndTimestamp();
+
+											System.out.println("repAOForTopRecommActName = " + repAOForTopRecommActName
+													.toStringAllGowallaTSWithNameForHeaded(","));
 										} // PopUps.showMessage("here12_4");
 									} // END of loop over iterative recommendation for each seq index
 

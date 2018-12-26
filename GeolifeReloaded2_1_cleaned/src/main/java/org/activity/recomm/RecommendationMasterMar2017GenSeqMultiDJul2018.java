@@ -421,7 +421,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			long recommMasterT2 = System.currentTimeMillis();
 			long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
 
-			candUserIDsPrimaryDim = RecommUtils.extractCandUserIDs(candidateTimelinesPrimDim);
+			candUserIDsPrimaryDim = RecommMasterUtils.extractCandUserIDs(candidateTimelinesPrimDim);
 			// ///////////////////////////
 			if (VerbosityConstants.verbose)
 			{
@@ -594,11 +594,11 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 						this.dateAtRecomm.toString(), this.timeAtRecomm.toString(), alignmentBasedDistance);// getDistanceScoresforCandidateTimelines(candidateTimelines,activitiesGuidingRecomm);
 			}
 
-			this.nextActivityObjectsFromPrimaryCands = RecommUtils.fetchNextActivityObjects(
+			this.nextActivityObjectsFromPrimaryCands = RecommMasterUtils.fetchNextActivityObjects(
 					primaryDimDistancesSortedMap, candidateTimelinesPrimDim, this.lookPastType,
 					endPointIndicesConsideredInPDCands);
 
-			this.nextActivityObjectsFromSecondaryCands = RecommUtils.fetchNextActivityObjects(
+			this.nextActivityObjectsFromSecondaryCands = RecommMasterUtils.fetchNextActivityObjects(
 					secondaryDimDistancesSortedMap, candidateTimelinesSecDim, this.lookPastType,
 					endPointIndicesConsideredInSDCands);// added 17 July 2018
 
@@ -677,12 +677,12 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			}
 
 			//////// Create ranked recommended act names
-			this.recommendedActivityNamesWithRankscores = RecommUtils.createRankedTopRecommendedActivityGDVals(
+			this.recommendedActivityNamesWithRankscores = RecommMasterUtils.createRankedTopRecommendedActivityGDVals(
 					this.nextActivityObjectsFromPrimaryCands, this.caseType, similarityOfEndPointActivityObjectCand,
 					this.lookPastType, this.primaryDimDistancesSortedMap, this.primaryDimension);
 
 			//////// Create ranked secondary dimension vals. Added on 18 July 2018
-			this.recommendedSecondaryDimValsWithRankscores = RecommUtils.createRankedTopRecommendedActivityGDVals(
+			this.recommendedSecondaryDimValsWithRankscores = RecommMasterUtils.createRankedTopRecommendedActivityGDVals(
 					this.nextActivityObjectsFromSecondaryCands, this.caseType, null, this.lookPastType,
 					this.secondaryDimDistancesSortedMap, this.secondaryDimension);
 

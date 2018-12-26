@@ -390,7 +390,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			long recommMasterT2 = System.currentTimeMillis();
 			long timeTakenToFetchCandidateTimelines = recommMasterT2 - recommMasterT1;
 
-			candUserIDs = RecommUtils.extractCandUserIDs(candidateTimelines);
+			candUserIDs = RecommMasterUtils.extractCandUserIDs(candidateTimelines);
 			// ///////////////////////////
 			if (VerbosityConstants.verbose)
 			{
@@ -517,7 +517,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 						this.dateAtRecomm.toString(), this.timeAtRecomm.toString(), alignmentBasedDistance);// getDistanceScoresforCandidateTimelines(candidateTimelines,activitiesGuidingRecomm);
 			}
 
-			this.nextActivityObjectsFromCands = RecommUtils.fetchNextActivityObjects(distancesSortedMap,
+			this.nextActivityObjectsFromCands = RecommMasterUtils.fetchNextActivityObjects(distancesSortedMap,
 					candidateTimelines, this.lookPastType, endPointIndicesConsideredInCands);
 
 			if (!this.lookPastType.equals(Enums.LookPastType.ClosestTime))
@@ -589,7 +589,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 			}
 
 			//////// Create ranked recommended act names
-			this.recommendedActivityNamesWithRankscores = RecommUtils.createRankedTopRecommendedActivityGDVals(
+			this.recommendedActivityNamesWithRankscores = RecommMasterUtils.createRankedTopRecommendedActivityGDVals(
 					this.nextActivityObjectsFromCands, this.caseType, similarityOfEndPointActivityObjectCand,
 					this.lookPastType, this.distancesSortedMap, Constant.primaryDimension);
 

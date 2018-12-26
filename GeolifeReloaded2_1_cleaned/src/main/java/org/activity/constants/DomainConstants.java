@@ -62,6 +62,7 @@ public class DomainConstants
 			163, 65, 91, 82, 139, 108 };
 	public static final int gowallaWorkingCatLevel = 2; // -1 indicates original working cat
 	static int[] gowallaUserIDs = null;
+	static int[] fsny1UserIDs = null;
 	public static String[] featureNames = { "ActivityName", "StartTime", "Duration", "DistanceTravelled",
 			"StartGeoCoordinates", "EndGeoCoordinates", "AvgAltitude" };
 
@@ -202,9 +203,11 @@ public class DomainConstants
 				// + "gridIndexPairHaversineDist" + fileNamePhrase + ".kryo");
 
 				//// Start of added on 20 Dec 2018
+				/// dataWritten/AUG2GridIndexDistances/Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2IntOpenHashMap.kryo
 				gridIndexPairHaversineDist = (Int2IntOpenHashMap) Serializer
 						.kryoDeSerializeThis(PathConstants.pathToSerialisedHaversineDistOnEngine
 								+ "Dec19Leaner/gridIndexPairHaversineDistIntDoubleWith1DConverterInt2IntOpenHashMap.kryo");
+
 				System.out.println(
 						"deserialised gridIndexPairHaversineDist.size()= " + gridIndexPairHaversineDist.size());
 				/// End of added on 20 Dec 2018

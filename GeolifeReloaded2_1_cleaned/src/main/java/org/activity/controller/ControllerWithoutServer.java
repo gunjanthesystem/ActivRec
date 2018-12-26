@@ -130,7 +130,7 @@ public class ControllerWithoutServer
 			// PopUps.showMessage("commonPath = " + commonPath);
 
 			// disabling reduce and clean for gowalla as they have already been reduced and clean in April 24 subset.
-			if (databaseName.equals("gowalla1") == false && Constant.reduceAndCleanTimelinesBeforeRecomm)
+			if ((databaseName.equals("gowalla1") == false && Constant.reduceAndCleanTimelinesBeforeRecomm))
 			{
 				if (databaseName.equals("gowalla1") && Constant.For9kUsers)// For 9k users
 				{
@@ -993,7 +993,7 @@ public class ControllerWithoutServer
 			// start of get timelines for all users for collaborative approach
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsers = new LinkedHashMap<>(1000);
 			int numOfAllUsersSkippedGT553MaxActsPerDay = 0;
-			if (Constant.collaborativeCandidates)
+			if (true)// Constant.collaborativeCandidates)
 			{
 				for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
 				{
@@ -1115,7 +1115,7 @@ public class ControllerWithoutServer
 		// start of get timelines for all users for collaborative approach
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsers = new LinkedHashMap<>(1000);
 		int numOfAllUsersSkippedGT553MaxActsPerDay = 0;
-		if (Constant.collaborativeCandidates)
+		if (true)// Constant.collaborativeCandidates)
 		{
 			if (Constant.getDatabaseName().equals("gowalla1"))
 			{
