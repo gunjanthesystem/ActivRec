@@ -95,12 +95,13 @@ public final class Constant
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
 	// SWITCH_DEC20
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NHours;//// TODO .NCount;// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.ClosestTime;//// TODO .NCount;//
+																							//// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 	// SWITCH_DEC20
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;//// TODO SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.ClosestTime;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
@@ -455,7 +456,7 @@ public final class Constant
 
 	public static final boolean blacklistingUsersWithLargeMaxActsPerDay = true;
 
-	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = false, DoBaselineNGramSeq = false;
+	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = true, DoBaselineNGramSeq = false;
 
 	///////////////////////////// End of parameters less likely to change ///////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////

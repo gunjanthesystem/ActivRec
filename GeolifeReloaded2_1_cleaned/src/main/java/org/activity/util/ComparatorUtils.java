@@ -490,6 +490,42 @@ public class ComparatorUtils
 	}
 
 	/**
+	 * @todo to make it for generic Triples sorted by the third value /** Sorts a map in increasing order of value
+	 * 
+	 *       It is an unstable sort (forced by shuffle) to randomly break ties
+	 * 
+	 *       note: In case the Value 'V' is a Pair<Integer,Double>, the comparison is done on the second component
+	 *       (Double)
+	 * @param map
+	 * @return
+	 */
+	public static LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>> sortByValueAscending5String(
+			LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>> map)
+	{
+		List<Map.Entry<String, Triple<Integer, ActivityObject2018, Double>>> list = new LinkedList<>(map.entrySet());
+		if (Constant.breakTiesWithShuffle)
+		{
+			Collections.shuffle(list);
+		}
+		Collections.sort(list, new Comparator<Map.Entry<String, Triple<Integer, ActivityObject2018, Double>>>()
+			{
+				@Override
+				public int compare(Map.Entry<String, Triple<Integer, ActivityObject2018, Double>> o1,
+						Map.Entry<String, Triple<Integer, ActivityObject2018, Double>> o2)
+				{
+					return (o1.getValue()).compareTo(o2.getValue());
+				}
+			});
+
+		LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>> result = new LinkedHashMap<>();
+		for (Map.Entry<String, Triple<Integer, ActivityObject2018, Double>> entry : list)
+		{
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
+
+	/**
 	 * Sorts a map in increasing order of value
 	 * 
 	 * It is an unstable sort (forced by shuffle) to randomly break ties

@@ -60,7 +60,7 @@ import org.activity.util.TimelineUtils;
  * @since 16 Feb 2018
  * @deprecated
  */
-public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
+public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 {
 	// String typeOfMatching; //"Daywise","
 	double percentageInTraining;// = 0.8;
@@ -122,7 +122,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 *            for collaborative approach, all neighbours
 	 */
 	// @SuppressWarnings("unused")
-	public RecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed(
+	public ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> sampledUsersTimelines, Enums.LookPastType lookPastType,
 			Enums.CaseType caseType, Enums.TypeOfThreshold[] typeOfThresholds, int[] userIDs,
 			double percentageInTraining, int lengthOfRecommendedSequence,
