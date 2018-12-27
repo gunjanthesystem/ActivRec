@@ -37,6 +37,7 @@ import org.activity.sanityChecks.Sanity;
 import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.stats.FeatureStats;
 import org.activity.ui.PopUps;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.TimelineTrimmers;
@@ -120,6 +121,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			double percentageInTraining, int lengthOfRecommendedSequence,
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersTimelines)
 	{
+
 		// PopUps.showMessage("RecommendationTestsMar2017GenSeqCleaned3Nov2017: sampledUsersTimelines.size() ="
 		// + sampledUsersTimelines.size());
 		System.out.println("\n\n **********Entering RecommendationTestsMar2017GenSeqCleaned2********** " + lookPastType
@@ -127,6 +129,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		// PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
 		long recommTestsStarttime = System.currentTimeMillis();
 
+		AltSeqPredictor altSeqPredictor = Constant.altSeqPredictor;// added on 26 Dec 2018
 		this.primaryDimension = Constant.primaryDimension;
 		this.databaseName = Constant.getDatabaseName();
 		this.lookPastType = lookPastType;
@@ -161,7 +164,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		// System.exit(-1);}
 
 		// setMatchingUnitArray(lookPastType);
-		this.matchingUnitArray = Constant.getMatchingUnitArray(lookPastType, Constant.altSeqPredictor);
+		this.matchingUnitArray = Constant.getMatchingUnitArray(lookPastType, altSeqPredictor);
 
 		// buildRepresentativeActivityObjectsForUsers()
 
@@ -526,9 +529,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							String userName = RecommendationTestsUtils.getUserNameFromUserID(userId, this.databaseName);
 
 							// Start of Added on 21 Dec 2017
-							if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
-									|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
-									|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
+							if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
+									|| altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+									|| altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 							{
 								AKOMSeqPredictorLighter.clearSeqPredictorsForEachUserStored();
 								LSTMCharModelling_SeqRecJun2018.clearLSTMPredictorsForEachUserStored();
@@ -687,24 +690,24 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							String actNamesDurationsWithoutDurationOverTrain = "";
 
 							// START OF Curtain disable trivial baselines
-							// if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
-							// {
-							// mapsForCountDurationBaselines = WritingToFile.writeBasicActivityStatsAndGetBaselineMaps(
-							// userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
-							// LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays =
-							// (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-							// .get("activityNameCountPairsOverAllTrainingDays");
-							// ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
-							// actNamesCountsWithoutCountOverTrain = getActivityNameCountPairsWithoutCount(
-							// activityNameCountPairsOverAllTrainingDays);
-							//
-							// LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays =
-							// (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-							// .get("activityNameDurationPairsOverAllTrainingDays");
-							// ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
-							// actNamesDurationsWithoutDurationOverTrain = getActivityNameDurationPairsWithoutDuration(
-							// activityNameDurationPairsOverAllTrainingDays);
-							// }
+							if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
+							{
+								mapsForCountDurationBaselines = WToFile.writeBasicActivityStatsAndGetBaselineMaps(
+										userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
+								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+										.get("activityNameCountPairsOverAllTrainingDays");
+								ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
+								actNamesCountsWithoutCountOverTrain = RecommendationTestsUtils
+										.getActivityNameCountPairsWithoutCount(
+												activityNameCountPairsOverAllTrainingDays);
+
+								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+										.get("activityNameDurationPairsOverAllTrainingDays");
+								ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
+								actNamesDurationsWithoutDurationOverTrain = RecommendationTestsUtils
+										.getActivityNameDurationPairsWithoutDuration(
+												activityNameDurationPairsOverAllTrainingDays);
+							}
 							// END OF Curtain disable trivial baselines
 
 							// else if (matchingUnitIterator == 0) // do this only for one matching unit as it does not
@@ -947,9 +950,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													recommTimesStrings[0], userId, repAOsFromPrevRecomms);
 										}
 										// Alternative algorithm
-										// else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.PureAKOM)
-										else if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
-												|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM))
+										// else if (altSeqPredictor == Enums.AltSeqPredictor.PureAKOM)
+										else if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
+												|| altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+												|| altSeqPredictor.equals(Enums.AltSeqPredictor.ClosestTime))
 										// && (this.lookPastType.equals(Enums.LookPastType.Daywise)
 										{
 											recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeqNov2017(
@@ -957,10 +961,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
 													matchingUnit, caseType, this.lookPastType, false,
 													repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-													trainTimelinesAllUsersContinuousFiltrd, Constant.altSeqPredictor);
+													trainTimelinesAllUsersContinuousFiltrd, altSeqPredictor);
 										}
 
-										else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1)
+										else if (altSeqPredictor == Enums.AltSeqPredictor.RNN1)
 										// Alternative algorithm
 										{// recommMasters[seqIndex]
 											RecommendationMasterRNN1Jun2018 rnnMaster = null;
@@ -971,8 +975,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 														userTestTimelines, dateToRecomm, recommTimesStrings[0], userId,
 														thresholdValue, typeOfThreshold, caseType, this.lookPastType,
 														false, repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-														trainTimelinesAllUsersContinuousFiltrd,
-														Constant.altSeqPredictor, recommSeqLength);
+														trainTimelinesAllUsersContinuousFiltrd, altSeqPredictor,
+														recommSeqLength);
 											}
 											else
 											{
@@ -1542,8 +1546,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// writeRepAOs(mapOfRepAOs, mapOfMedianPreSuccDuration, Constant.getCommonPath());
 
 						// Start of added on 20 Nov 2018
-						if (Constant.altSeqPredictor.equals(AltSeqPredictor.None)
-								&& VerbosityConstants.verboseDistDistribution && Constant.useRTVerseNormalisationForED)
+						if (altSeqPredictor.equals(AltSeqPredictor.None) && VerbosityConstants.verboseDistDistribution
+								&& Constant.useRTVerseNormalisationForED)
 						{// can do this only if distance distribution files are written.
 							ResultsDistributionEvaluation.writeCorrelationBetweenDistancesOverCands(
 									Constant.getCommonPath(), Constant.useRTVerseNormalisationForED);

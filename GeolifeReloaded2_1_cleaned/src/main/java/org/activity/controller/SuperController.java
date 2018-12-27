@@ -429,8 +429,8 @@ public class SuperController
 					// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 					// "/run/media/gunjan/BackupVault/Geolife2018Results/"
 					// "/run/media/gunjan/iiWASDrive/gunjan/GeolifeNov2018/";
-					"/run/media/gunjan/My Passport/GeolifeNov2018/";
-			// "./dataWritten/";
+					// "/run/media/gunjan/My Passport/GeolifeNov2018/";
+					"./dataWritten/";
 			// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/";
 			// "/run/media/gunjan/MB2016/gunjan/GeolifeNov2018/";
 			String commonPath = dataWrittenFolder + Constant.getDatabaseName() + "_"

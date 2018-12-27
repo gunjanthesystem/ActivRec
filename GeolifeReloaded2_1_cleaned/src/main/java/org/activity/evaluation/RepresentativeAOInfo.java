@@ -1834,7 +1834,7 @@ public class RepresentativeAOInfo
 				PerformanceAnalytics.getHeapInformation() + "\n" + PerformanceAnalytics.getHeapPercentageFree());
 		try
 		{
-			if (databaseName.equals("gowalla1"))
+			if (!databaseName.equals("gowalla1"))
 			{
 				PopUps.printTracedErrorMsgWithExit("Error: this method is currently only suitable for gowalla dataset");
 			}
@@ -2433,6 +2433,84 @@ public class RepresentativeAOInfo
 		return repAO;
 	}
 
+	// /**
+	// *
+	// * Created to create rep AO from repAOResultGenericUser which has been created using training timelines of all
+	// * users. (need to call only once for a test)
+	// *
+	// * <p>
+	// * Fork of getRepresentativeAOCollGeneric. Instead of recreating a new ActivityObject, it just fetches the generic
+	// * rep AO for this PD Val and modifies the relevant features accordingly.
+	// *
+	// * @param topPrimaryDimensionVal
+	// * @param userId
+	// * @param recommendationTime
+	// * @param primaryDimension
+	// * @param repAOResultGenericUser
+	// * {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
+	// * @return
+	// * @since 8 Feb 2018
+	// */
+	// public static ActivityObject2018 getRepresentativeAOCollGenericV2(Integer topPrimaryDimensionVal, int userId,
+	// Timestamp recommendationTime, PrimaryDimension primaryDimension,
+	// Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>
+	// repAOResultGenericUser)
+	// {
+	// if (Constant.getDatabaseName().equals("gowalla1") == false)
+	// {
+	// PopUps.printTracedErrorMsgWithExit(
+	// "Error: not implemented this (getRepresentativeAOCollGenericV2() for besides gowalla1");
+	// }
+	// // StringBuilder verboseMsg = new StringBuilder();
+	// // System.out.println("Inside getRepresentativeAOColl(): topPrimaryDimensionVal=" + topPrimaryDimensionVal +
+	// // "\n");
+	// // ArrayList<Long> durationPreceeding = new ArrayList<>();
+	// // ArrayList<ActivityObject> aosWithSamePDVal = new ArrayList<>();
+	//
+	// // StringBuilder sb = new StringBuilder();
+	// // System.out.println("durationPreceeding= " + durationPreceeding.toString());
+	// // System.out.println("aosWithSamePDVal= ");
+	// // aosWithSamePDVal.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
+	// // System.out.println(sb.toString());
+	//
+	// double medianPreceedingDuration = repAOResultGenericUser.getSecond().get(topPrimaryDimensionVal).getFirst();
+	//
+	// // double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
+	// // int medianCinsCount = (int) StatsUtils
+	// // .getDescriptiveStatistics(cinsCount, "cinsCount", userID + "__" + actName + "cinsCount.txt")
+	// // .getPercentile(50);
+	//
+	// // NOTE: we only need to take care of feature which are used for edit distance computation.
+	// // Instantiate the representative activity object.
+	//
+	// Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
+	//
+	// ActivityObject2018 repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst()
+	// .get(topPrimaryDimensionVal);
+	//
+	// repAOForThisActNameForThisUser.setStartTimestamp(newRecommTimestamp);
+	// repAOForThisActNameForThisUser.setEndTimestamp(newRecommTimestamp);
+	// repAOForThisActNameForThisUser.setUserID(String.valueOf(userId));
+	//
+	// if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
+	// {
+	// System.out.print("Warning: recommendationTime = " + recommendationTime + " newRecommTimestamp= "
+	// + newRecommTimestamp + " are not same day. medianPreceedingDuration = " + medianPreceedingDuration
+	// + " for topRecommActName =" + topPrimaryDimensionVal);
+	// }
+	// //
+	// if (VerbosityConstants.verbose)
+	// {
+	// System.out.println("Debug getRepresentativeAOCollGeneric: getRepresentativeAO: old recommendationTime="
+	// + recommendationTime.toLocalDateTime().toString() + "medianPreceedingDuration="
+	// + medianPreceedingDuration + " new recommendationTime="
+	// + newRecommTimestamp.toLocalDateTime().toString());
+	// }
+	// System.out.println("repAOV2=" + repAOForThisActNameForThisUser.toStringAllGowallaTS());
+	//
+	// return repAOForThisActNameForThisUser;
+	// }
+
 	/**
 	 * 
 	 * Created to create rep AO from repAOResultGenericUser which has been created using training timelines of all
@@ -2472,7 +2550,14 @@ public class RepresentativeAOInfo
 		// aosWithSamePDVal.stream().forEachOrdered(ao -> sb.append(ao.toStringAllGowallaTS() + ">>"));
 		// System.out.println(sb.toString());
 
-		double medianPreceedingDuration = repAOResultGenericUser.getSecond().get(topPrimaryDimensionVal).getFirst();
+		// changed from double to Double on 6 Aug 2018
+		Double medianPreceedingDuration = repAOResultGenericUser.getSecond().get(topPrimaryDimensionVal).getFirst();
+		if (medianPreceedingDuration == null)
+		{
+			PopUps.printTracedErrorMsg(
+					"Error in getRepresentativeAOCollGenericV2(): medianPreceedingDuration not available for topPrimaryDimensionVal="
+							+ topPrimaryDimensionVal);
+		}
 
 		// double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();
 		// int medianCinsCount = (int) StatsUtils

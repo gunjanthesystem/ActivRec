@@ -226,15 +226,22 @@ public class EvaluationSeq
 					// commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 					// }
 
-					if (Constant.lookPastType.equals(LookPastType.Daywise) && matchingUnitArray.length == 1)
+					if (Constant.lookPastType.equals(LookPastType.NCount)
+							|| Constant.lookPastType.equals(LookPastType.NHours))
+					{
+						commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/MatchingUnit"
+								+ String.valueOf(mu) + "/";
+					}
+					else if (matchingUnitArray.length == 1)
 					{// daywise i.e. no MUs
 						commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/";
 					}
 					else
 					{
-						commonPath = outputCoreResultsPath + groupsOf100UsersLabel + "/MatchingUnit"
-								+ String.valueOf(mu) + "/";
+						PopUps.showError("Error: Unknown case: matchingUnitArray = "
+								+ Arrays.toString(matchingUnitArray) + " lookPastType =" + Constant.lookPastType);
 					}
+
 					Constant.setCommonPath(commonPath);
 					System.out.println("For mu: " + mu + "\nCommon path=" + Constant.getCommonPath());
 

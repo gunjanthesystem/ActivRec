@@ -88,7 +88,7 @@ public class Enums
 
 	public enum AltSeqPredictor
 	{
-		None, AKOM, PureAKOM, RNN1;
+		None, AKOM, PureAKOM, RNN1, ClosestTime;
 		// PureAKOM: not matching , i.e., no candidate generation using any matching approach, feeding the complete (or
 		// truncated) training timeline as a single timeline
 	}

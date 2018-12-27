@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -334,7 +333,7 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 			// }
 
 			long recommMasterT2 = System.currentTimeMillis();
-			candUserIDsPrimaryDim = extractCandUserIDs(candidateTimelinesPrimDim);
+			candUserIDsPrimaryDim = RecommMasterUtils.extractCandUserIDs(candidateTimelinesPrimDim);
 			// ///////////////////////////
 			if (VerbosityConstants.verbose)
 			{
@@ -649,10 +648,12 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 				return;
 			}
 
-			this.rankedRecommendedActNamesWithRankScoresStr = RecommMasterUtils.getRankedRecommendedActivityPDvalsWithRankScoresString(
-					this.recommendedActivityNamesWithRankscores);
-			this.rankedRecommendedSecDimValsWithRankScoresStr = RecommMasterUtils.getRankedRecommendedActivityPDvalsWithRankScoresString(
-					this.recommendedSecondaryDimValsWithRankscores);
+			this.rankedRecommendedActNamesWithRankScoresStr = RecommMasterUtils
+					.getRankedRecommendedActivityPDvalsWithRankScoresString(
+							this.recommendedActivityNamesWithRankscores);
+			this.rankedRecommendedSecDimValsWithRankScoresStr = RecommMasterUtils
+					.getRankedRecommendedActivityPDvalsWithRankScoresString(
+							this.recommendedSecondaryDimValsWithRankscores);
 
 			if (VerbosityConstants.verbose)
 			{
@@ -662,10 +663,12 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 						+ rankedRecommendedSecDimValsWithRankScoresStr);
 			}
 
-			this.rankedRecommendedActNamesWithoutRankScoresStr = RecommMasterUtils.getRankedRecommendedActivityPDValsithoutRankScoresString(
-					this.recommendedActivityNamesWithRankscores);
-			this.rankedRecommendedSecDimValsWithoutRankScoresStr = RecommMasterUtils.getRankedRecommendedActivityPDValsithoutRankScoresString(
-					this.recommendedSecondaryDimValsWithRankscores);
+			this.rankedRecommendedActNamesWithoutRankScoresStr = RecommMasterUtils
+					.getRankedRecommendedActivityPDValsithoutRankScoresString(
+							this.recommendedActivityNamesWithRankscores);
+			this.rankedRecommendedSecDimValsWithoutRankScoresStr = RecommMasterUtils
+					.getRankedRecommendedActivityPDValsithoutRankScoresString(
+							this.recommendedSecondaryDimValsWithRankscores);
 			//
 			// // Non relevant Curtain start
 			// this.normEditSimilarity = (ArrayList<Double>) this.nextActivityObjectsFromCands.entrySet().stream()
@@ -740,37 +743,6 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 		}
 
 		System.out.println("\n^^^^^^^^^^^^^^^^Exiting Recommendation Master");
-	}
-
-	/**
-	 * 
-	 * @param candidateTimelines
-	 * @return
-	 */
-	protected static LinkedHashMap<String, String> extractCandUserIDs(
-			LinkedHashMap<String, Timeline> candidateTimelines) throws Exception
-	{
-		LinkedHashMap<String, String> candUserIDs = new LinkedHashMap<>();
-		try
-		{
-			for (Entry<String, Timeline> candE : candidateTimelines.entrySet())
-			{
-				if (candE.getValue().isShouldBelongToSingleUser())
-				{
-					candUserIDs.put(candE.getKey(), candE.getValue().getUserID());
-				}
-				else
-				{
-					PopUps.printTracedErrorMsgWithExit("Error: not taking care of this case");
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		return candUserIDs;
 	}
 
 	// /**
@@ -1040,11 +1012,7 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 
 	// /////////////////////////////////////////////////////////////////////
 
-	
-
 	// /////////////////////////////////////////////////////////////////////
-
-	
 
 	// /////////////////////////////////////////////////////////////////////
 
@@ -1064,179 +1032,186 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 	 */
 	// //
 
-	/**
-	 * Fetches the next Activity Objects with their edit distance from the candidate timelines (wrt Current Timeline)
-	 * <p>
-	 * <font color = orange> casts Timeline to TimelineWithNext, this should be the case for non-daywise,i.e. NCount and
-	 * NHours approaches.
-	 * 
-	 * @param editDistanceSortedFullCand
-	 * @param candidateTimelines
-	 * @return TimelineID,Pair{Next Activity Object,edit distance}
-	 */
-	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjectsFromNext(
-			LinkedHashMap<String, Pair<String, Double>> editDistanceSortedFullCand,
-			LinkedHashMap<String, Timeline> candidateTimelines)
-	{
-		// TimelineID,Pair{Next Activity Object,edit distance}
-		LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs = new LinkedHashMap<>();
-		// ArrayList<Triple<ActivityObject, Double, String>> topActivityObjects = new ArrayList<>();
-		// Triple <Next Activity Object,edit distance, TimelineID>
+	// Disabled on 26 Dec 2018 as it is no being called and probably (needs to be checked) a duplicate method exists in
+	// other classes.
+	// /**
+	// * Fetches the next Activity Objects with their edit distance from the candidate timelines (wrt Current Timeline)
+	// * <p>
+	// * <font color = orange> casts Timeline to TimelineWithNext, this should be the case for non-daywise,i.e. NCount
+	// and
+	// * NHours approaches.
+	// *
+	// * @param editDistanceSortedFullCand
+	// * @param candidateTimelines
+	// * @return TimelineID,Pair{Next Activity Object,edit distance}
+	// */
+	// public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjectsFromNext(
+	// LinkedHashMap<String, Pair<String, Double>> editDistanceSortedFullCand,
+	// LinkedHashMap<String, Timeline> candidateTimelines)
+	// {
+	// // TimelineID,Pair{Next Activity Object,edit distance}
+	// LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs = new LinkedHashMap<>();
+	// // ArrayList<Triple<ActivityObject, Double, String>> topActivityObjects = new ArrayList<>();
+	// // Triple <Next Activity Object,edit distance, TimelineID>
+	//
+	// try
+	// {
+	// // Disabled on Aug 2 2017 as its just logging
+	// if (VerbosityConstants.verbose)
+	// {
+	// if (editDistanceSortedFullCand.size() < 5)
+	// {
+	// System.err.println("\nWarning: #cands = editDistanceSortedFullCand.size() ="
+	// + editDistanceSortedFullCand.size() + "<5");
+	// // errorExists = true;
+	// }
+	// }
+	//
+	// for (Map.Entry<String, Pair<String, Double>> candDistEntry : editDistanceSortedFullCand.entrySet())
+	// {
+	// String candID = candDistEntry.getKey();
+	// Double editDistanceForCandidate = candDistEntry.getValue().getSecond();
+	//
+	// TimelineWithNext candidateTimeline = (TimelineWithNext) candidateTimelines.get(candID);
+	// ActivityObject2018 nextActivityObjectForCand = candidateTimeline.getNextActivityObject();
+	//
+	// if (candidateTimeline.size() <= 0)
+	// {
+	// System.err.println(PopUps.getTracedErrorMsg("Error :candID=" + candID
+	// + " not found, thus candidateTimeline.size=" + candidateTimeline.size()));
+	// }
+	// else if (nextActivityObjectForCand == null)
+	// {
+	// System.err.println(PopUps.getTracedErrorMsg("Error nextActivityObjectForCand == null"));
+	// }
+	//
+	// nextActObjs.put(candID,
+	// new Pair<ActivityObject2018, Double>(nextActivityObjectForCand, editDistanceForCandidate));
+	// // topActivityObjects.add(new Triple<ActivityObject, Double, String>(
+	// // simCandidateTimeline.getNextActivityObject(), editDistanceForSimCandidate, simCandidateID));
+	// // take the next activity object (next activity object is the valid next activity object)
+	// }
+	// }
+	// catch (Exception e)
+	// {
+	// e.printStackTrace();
+	// }
+	//
+	// if (nextActObjs == null || nextActObjs.size() == 0)
+	// {
+	// System.err.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
+	// }
+	// // this.topNextActivityObjects = topActivityObjects;
+	// return nextActObjs;
+	// }
 
-		try
-		{
-			// Disabled on Aug 2 2017 as its just logging
-			if (VerbosityConstants.verbose)
-			{
-				if (editDistanceSortedFullCand.size() < 5)
-				{
-					System.err.println("\nWarning: #cands = editDistanceSortedFullCand.size() ="
-							+ editDistanceSortedFullCand.size() + "<5");
-					// errorExists = true;
-				}
-			}
+	// Disabled on 26 Dec 2018 as it is no being called and probably (needs to be checked) a duplicate method exists in
+	// other classes.
+	// /**
+	// *
+	// * @param activitiesGuidingRecomm
+	// * @param distanceScoresSorted
+	// * @param dayTimelinesForUser
+	// * @return
+	// */
+	// public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjectsDaywise(
+	// LinkedHashMap<String, Pair<String, Double>> editDistanceSorted,
+	// LinkedHashMap<String, Timeline> candidateTimelines, LinkedHashMap<String, Integer> endPointIndices)
+	// {
+	// // System.out.println("\n-----------------Inside fetchNextActivityObjectsDaywise");
+	// LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs = new LinkedHashMap<>();
+	//
+	// if (editDistanceSorted.size() < 5)
+	// {
+	// System.err.println("\nWarning: # candidate timelines =" + editDistanceSorted.size() + "<5");
+	// }
+	//
+	// try
+	// {
+	// for (Map.Entry<String, Pair<String, Double>> candDistEntry : editDistanceSorted.entrySet())
+	// {
+	// String timelineID = candDistEntry.getKey();
+	// Double distanceOfCandTimeline = candDistEntry.getValue().getSecond();
+	//
+	// Timeline candUserDayTimeline = candidateTimelines.get(timelineID);
+	// int endPointIndexInCand = endPointIndices.get(timelineID);
+	// // TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfCandTimeline);
+	// if (candUserDayTimeline == null)
+	// {
+	// System.err.println(PopUps.getTracedErrorMsg("Error: candUserDayTimeline is null"));
+	// System.exit(-1);
+	// }
+	// if (!candUserDayTimeline.isShouldBelongToSingleDay())
+	// {
+	// System.err.println(PopUps.getTracedErrorMsg(
+	// "Error: for daytimeline candUserDayTimeline.isShouldBelongToSingleDay()= "
+	// + candUserDayTimeline.isShouldBelongToSingleDay()));
+	// System.exit(-1);
+	// }
+	// if (endPointIndexInCand < 0)
+	// {
+	// System.err.println(PopUps
+	// .getTracedErrorMsg("Error: for daytimeline endPointIndexInCand=" + endPointIndexInCand));
+	// System.exit(-1);
+	// }
+	//
+	// ActivityObject2018 nextValidAO = candUserDayTimeline
+	// .getNextValidActivityAfterActivityAtThisPositionPD(endPointIndexInCand);
+	// nextActObjs.put(timelineID, new Pair<ActivityObject2018, Double>(nextValidAO, distanceOfCandTimeline));
+	//
+	// if (VerbosityConstants.verbose)
+	// {
+	// System.out.println("timelineID=" + timelineID + " endPointIndexInCand =" + endPointIndexInCand);
+	// }
+	// }
+	// }
+	// catch (Exception e)
+	// {
+	// e.printStackTrace();
+	// }
+	//
+	// if (nextActObjs == null || nextActObjs.size() == 0)
+	// {
+	// System.err.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
+	// }
+	//
+	// // System.out.println("-------exiting fetchNextActivityObjectsDaywise\n");
+	// return nextActObjs;
+	// }
 
-			for (Map.Entry<String, Pair<String, Double>> candDistEntry : editDistanceSortedFullCand.entrySet())
-			{
-				String candID = candDistEntry.getKey();
-				Double editDistanceForCandidate = candDistEntry.getValue().getSecond();
-
-				TimelineWithNext candidateTimeline = (TimelineWithNext) candidateTimelines.get(candID);
-				ActivityObject2018 nextActivityObjectForCand = candidateTimeline.getNextActivityObject();
-
-				if (candidateTimeline.size() <= 0)
-				{
-					System.err.println(PopUps.getTracedErrorMsg("Error :candID=" + candID
-							+ " not found, thus candidateTimeline.size=" + candidateTimeline.size()));
-				}
-				else if (nextActivityObjectForCand == null)
-				{
-					System.err.println(PopUps.getTracedErrorMsg("Error nextActivityObjectForCand == null"));
-				}
-
-				nextActObjs.put(candID,
-						new Pair<ActivityObject2018, Double>(nextActivityObjectForCand, editDistanceForCandidate));
-				// topActivityObjects.add(new Triple<ActivityObject, Double, String>(
-				// simCandidateTimeline.getNextActivityObject(), editDistanceForSimCandidate, simCandidateID));
-				// take the next activity object (next activity object is the valid next activity object)
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		if (nextActObjs == null || nextActObjs.size() == 0)
-		{
-			System.err.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
-		}
-		// this.topNextActivityObjects = topActivityObjects;
-		return nextActObjs;
-	}
-
-	/**
-	 * 
-	 * @param activitiesGuidingRecomm
-	 * @param distanceScoresSorted
-	 * @param dayTimelinesForUser
-	 * @return
-	 */
-	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjectsDaywise(
-			LinkedHashMap<String, Pair<String, Double>> editDistanceSorted,
-			LinkedHashMap<String, Timeline> candidateTimelines, LinkedHashMap<String, Integer> endPointIndices)
-	{
-		// System.out.println("\n-----------------Inside fetchNextActivityObjectsDaywise");
-		LinkedHashMap<String, Pair<ActivityObject2018, Double>> nextActObjs = new LinkedHashMap<>();
-
-		if (editDistanceSorted.size() < 5)
-		{
-			System.err.println("\nWarning: # candidate timelines =" + editDistanceSorted.size() + "<5");
-		}
-
-		try
-		{
-			for (Map.Entry<String, Pair<String, Double>> candDistEntry : editDistanceSorted.entrySet())
-			{
-				String timelineID = candDistEntry.getKey();
-				Double distanceOfCandTimeline = candDistEntry.getValue().getSecond();
-
-				Timeline candUserDayTimeline = candidateTimelines.get(timelineID);
-				int endPointIndexInCand = endPointIndices.get(timelineID);
-				// TimelineUtils.getUserDayTimelineByDateFromMap(dayTimelinesForUser, dateOfCandTimeline);
-				if (candUserDayTimeline == null)
-				{
-					System.err.println(PopUps.getTracedErrorMsg("Error: candUserDayTimeline is null"));
-					System.exit(-1);
-				}
-				if (!candUserDayTimeline.isShouldBelongToSingleDay())
-				{
-					System.err.println(PopUps.getTracedErrorMsg(
-							"Error: for daytimeline candUserDayTimeline.isShouldBelongToSingleDay()= "
-									+ candUserDayTimeline.isShouldBelongToSingleDay()));
-					System.exit(-1);
-				}
-				if (endPointIndexInCand < 0)
-				{
-					System.err.println(PopUps
-							.getTracedErrorMsg("Error: for daytimeline endPointIndexInCand=" + endPointIndexInCand));
-					System.exit(-1);
-				}
-
-				ActivityObject2018 nextValidAO = candUserDayTimeline
-						.getNextValidActivityAfterActivityAtThisPositionPD(endPointIndexInCand);
-				nextActObjs.put(timelineID, new Pair<ActivityObject2018, Double>(nextValidAO, distanceOfCandTimeline));
-
-				if (VerbosityConstants.verbose)
-				{
-					System.out.println("timelineID=" + timelineID + " endPointIndexInCand =" + endPointIndexInCand);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		if (nextActObjs == null || nextActObjs.size() == 0)
-		{
-			System.err.println(PopUps.getTracedErrorMsg("Error: nextActObjs.size() = ") + nextActObjs.size());
-		}
-
-		// System.out.println("-------exiting fetchNextActivityObjectsDaywise\n");
-		return nextActObjs;
-	}
-
-	/**
-	 * Fetches the next Activity Objects with their edit distance from the candidate timelines (wrt Current Timeline)
-	 * 
-	 * @param editDistanceSorted
-	 * @param candidateTimelines
-	 * @return TimelineID,Pair{Next Activity Object,edit distance}
-	 */
-	public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjects(
-			LinkedHashMap<String, Pair<String, Double>> editDistanceSorted,
-			LinkedHashMap<String, Timeline> candidateTimelines, Enums.LookPastType lookPastType,
-			LinkedHashMap<String, Integer> endPointIndicesForDaywise)
-	{
-
-		switch (lookPastType)
-		{
-		case Daywise:
-			return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines, endPointIndicesForDaywise);
-		case NCount:
-			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-		case NHours:
-			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-		case ClosestTime:
-			return null;
-		case NGram:
-			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-		default:
-			System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
-			return null;
-		}
-
-	}
+	// Disabled on 26 Dec 2018 as it is no being called and probably (needs to be checked) a duplicate method exists in
+	// other classes.
+	// /**
+	// * Fetches the next Activity Objects with their edit distance from the candidate timelines (wrt Current Timeline)
+	// *
+	// * @param editDistanceSorted
+	// * @param candidateTimelines
+	// * @return TimelineID,Pair{Next Activity Object,edit distance}
+	// */
+	// public static LinkedHashMap<String, Pair<ActivityObject2018, Double>> fetchNextActivityObjects(
+	// LinkedHashMap<String, Pair<String, Double>> editDistanceSorted,
+	// LinkedHashMap<String, Timeline> candidateTimelines, Enums.LookPastType lookPastType,
+	// LinkedHashMap<String, Integer> endPointIndicesForDaywise)
+	// {
+	//
+	// switch (lookPastType)
+	// {
+	// case Daywise:
+	// return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines, endPointIndicesForDaywise);
+	// case NCount:
+	// return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+	// case NHours:
+	// return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+	// case ClosestTime:
+	// return null;
+	// case NGram:
+	// return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+	// default:
+	// System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
+	// return null;
+	// }
+	//
+	// }
 
 	/// End of added on 9 Aug 2017
 
@@ -1340,80 +1315,87 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 
 	////
 
-	public static LinkedHashMap<String, Double> removeRecommPointActivityFromRankedRecomm(
-			LinkedHashMap<String, Double> recommendedActivityNamesWithRankscores, String activityNameAtRecommPoint)
-	{
-		// String activityNameAtRecommPoint = activityAtRecommPoint.getActivityName();
-		System.out.println("removeRecommPointActivityFromRankedRecomm called");
-		Double d = recommendedActivityNamesWithRankscores.remove(activityNameAtRecommPoint);
-		if (d == null)
-		{
-			System.out.println("Note: removeRecommPointActivityFromRankedRecomm: curr act not in recommendation");
-		}
-		return recommendedActivityNamesWithRankscores;
-	}
+	// public static LinkedHashMap<String, Double> removeRecommPointActivityFromRankedRecomm(
+	// LinkedHashMap<String, Double> recommendedActivityNamesWithRankscores, String activityNameAtRecommPoint)
+	// {
+	// // String activityNameAtRecommPoint = activityAtRecommPoint.getActivityName();
+	// System.out.println("removeRecommPointActivityFromRankedRecomm called");
+	// Double d = recommendedActivityNamesWithRankscores.remove(activityNameAtRecommPoint);
+	// if (d == null)
+	// {
+	// System.out.println("Note: removeRecommPointActivityFromRankedRecomm: curr act not in recommendation");
+	// }
+	// return recommendedActivityNamesWithRankscores;
+	// }
 
-	public static ArrayList<Integer> getIndicesOfEndPointActivityInDayButNotAsLast(String userDayActivitiesAsStringCode,
-			String codeOfEndPointActivity)
-	{
-		// System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast:
-		// userDayActivitiesAsStringCode="+userDayActivitiesAsStringCode+" and
-		// codeOfEndPointActivity="+codeOfEndPointActivity);
-		ArrayList<Integer> indicesOfEndPointActivityInDay = new ArrayList<Integer>();
+	// Disabled on 26 Dec 2018 as it is no being called and probably (needs to be checked) a duplicate method exists in
+	// other classes.
+	// public static ArrayList<Integer> getIndicesOfEndPointActivityInDayButNotAsLast(String
+	// userDayActivitiesAsStringCode,
+	// String codeOfEndPointActivity)
+	// {
+	// // System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast:
+	// // userDayActivitiesAsStringCode="+userDayActivitiesAsStringCode+" and
+	// // codeOfEndPointActivity="+codeOfEndPointActivity);
+	// ArrayList<Integer> indicesOfEndPointActivityInDay = new ArrayList<Integer>();
+	//
+	// int index = userDayActivitiesAsStringCode.indexOf(codeOfEndPointActivity);
+	//
+	// while (index >= 0)
+	// {
+	// // System.out.println(index);
+	// if (index != (userDayActivitiesAsStringCode.length() - 1)) // not last index
+	// {
+	// indicesOfEndPointActivityInDay.add(index);
+	// }
+	// index = userDayActivitiesAsStringCode.indexOf(codeOfEndPointActivity, index + 1);
+	// }
+	// return indicesOfEndPointActivityInDay;
+	// }
 
-		int index = userDayActivitiesAsStringCode.indexOf(codeOfEndPointActivity);
+	// Disabled on 26 Dec 2018 as it is no being called and probably (needs to be checked) a duplicate method exists in
+	// other classes.
+	// public static ArrayList<Integer> getIndicesOfEndPointActivityInTimeline(String userActivitiesAsStringCode,
+	// String codeOfEndPointActivity)
+	// {
+	// // System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast:
+	// // userDayActivitiesAsStringCode="+userDayActivitiesAsStringCode+" and
+	// // codeOfEndPointActivity="+codeOfEndPointActivity);
+	// ArrayList<Integer> indicesOfEndPointActivityInTimeline = new ArrayList<Integer>();
+	//
+	// int index = userActivitiesAsStringCode.indexOf(codeOfEndPointActivity);
+	//
+	// while (index >= 0)
+	// {
+	// indicesOfEndPointActivityInTimeline.add(index);
+	// index = userActivitiesAsStringCode.indexOf(codeOfEndPointActivity, index + 1);
+	// }
+	// return indicesOfEndPointActivityInTimeline;
+	// }
 
-		while (index >= 0)
-		{
-			// System.out.println(index);
-			if (index != (userDayActivitiesAsStringCode.length() - 1)) // not last index
-			{
-				indicesOfEndPointActivityInDay.add(index);
-			}
-			index = userDayActivitiesAsStringCode.indexOf(codeOfEndPointActivity, index + 1);
-		}
-		return indicesOfEndPointActivityInDay;
-	}
-
-	public static ArrayList<Integer> getIndicesOfEndPointActivityInTimeline(String userActivitiesAsStringCode,
-			String codeOfEndPointActivity)
-	{
-		// System.out.println("\nDebug getIndicesOfEndPointActivityInDayButNotAsLast:
-		// userDayActivitiesAsStringCode="+userDayActivitiesAsStringCode+" and
-		// codeOfEndPointActivity="+codeOfEndPointActivity);
-		ArrayList<Integer> indicesOfEndPointActivityInTimeline = new ArrayList<Integer>();
-
-		int index = userActivitiesAsStringCode.indexOf(codeOfEndPointActivity);
-
-		while (index >= 0)
-		{
-			indicesOfEndPointActivityInTimeline.add(index);
-			index = userActivitiesAsStringCode.indexOf(codeOfEndPointActivity, index + 1);
-		}
-		return indicesOfEndPointActivityInTimeline;
-	}
-
-	/**
-	 */
-	public static long getSumOfActivityObjects(LinkedHashMap<Integer, Timeline> map)
-	{
-		long count = 0;
-
-		for (Map.Entry<Integer, Timeline> entry : map.entrySet())
-		{
-			int a = entry.getValue().countNumberOfValidActivities();
-			int b = entry.getValue().size();
-
-			if (a != b)
-			{
-				PopUps.showError(
-						"Error in getSumOfActivityObjects a should be equal to be since we removed invalid aos beforehand but a = "
-								+ a + " and b=" + b);
-			}
-			count += a;
-		}
-		return count;
-	}
+	// Disabled on 26 Dec 2018 as it is no being called and probably (needs to be checked) a duplicate method exists in
+	// other classes.
+	// /**
+	// */
+	// public static long getSumOfActivityObjects(LinkedHashMap<Integer, Timeline> map)
+	// {
+	// long count = 0;
+	//
+	// for (Map.Entry<Integer, Timeline> entry : map.entrySet())
+	// {
+	// int a = entry.getValue().countNumberOfValidActivities();
+	// int b = entry.getValue().size();
+	//
+	// if (a != b)
+	// {
+	// PopUps.showError(
+	// "Error in getSumOfActivityObjects a should be equal to be since we removed invalid aos beforehand but a = "
+	// + a + " and b=" + b);
+	// }
+	// count += a;
+	// }
+	// return count;
+	// }
 
 	public boolean hasError()
 	{
