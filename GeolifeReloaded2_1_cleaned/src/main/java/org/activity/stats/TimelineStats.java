@@ -39,6 +39,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.stats.entropy.SampleEntropyG;
+import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.ConnectDatabase;
 import org.activity.util.DateTimeUtils;
@@ -148,7 +149,8 @@ public class TimelineStats
 			// //////////////////
 
 			usersDayTimelinesCleaned = TimelineTrimmers.cleanUsersDayTimelines(usersDayTimelinesGiven);
-			usersDayTimelinesCleaned = TimelineTransformers.rearrangeDayTimelinesOrderForDataset(usersDayTimelinesCleaned);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
+			usersDayTimelinesCleaned = TimelineTransformers
+					.rearrangeDayTimelinesOrderForDataset(usersDayTimelinesCleaned);// UtilityBelt.dayTimelinesToCleanedExpungedRearrangedTimelines(usersDayTimelines);
 			System.out.println("ALERT: CLEANING AND REARRANGING USERS DAY TIMELINES !!");
 
 			WToFile.writeUsersDayTimelines(usersDayTimelinesCleaned, "users", true, true, true);// users
@@ -162,136 +164,136 @@ public class TimelineStats
 
 		writeTimelineStats(usersDayTimelinesCleaned, databaseName, pathToWrite, "Cleaned");
 
-		writeActivityStats(usersDayTimelinesCleaned, "ActivityStats", pathToWrite);
+		writeActivityStats(usersDayTimelinesCleaned, "ActivityStats", pathToWrite, Constant.primaryDimension);
 
 		switch (typeOfAnalysis)
 		{
-			/**
-			 * For each user, for sequence of each features, get Sample Entropy vs m (segment length)
-			 */
-			case "TimeSeriesCorrelationAnalysis":
+		/**
+		 * For each user, for sequence of each features, get Sample Entropy vs m (segment length)
+		 */
+		case "TimeSeriesCorrelationAnalysis":
+		{
+			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned));
+			performTimeSeriesCorrelationAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned));
+			break;
+		}
+
+		case "SampleEntropyPerMAnalysis":
+		{
+			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned));
+			// String pathForStoredTimelines
+			performSampleEntropyVsMAnalysis2(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned), 2, 3);
+			break;
+		}
+		case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
+		{
+			LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers
+					.dayTimelinesToTimelines(usersDayTimelinesCleaned);
+			LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineTrimmers
+					.expungeInvalids(usersTimelines);
+
+			applyKCentroidsTimelinesTwoLevel(usersTimelinesInvalidsExpunged);
+			break;
+		}
+
+		case "ActivityRegularityAnalysisOneLevel":
+		{
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
+					.transformToSequenceDayWise(usersDayTimelinesCleaned);
+			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
+					.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+
+			System.out.println(traverseHashMapStringString(sequenceCharInvalidsExpungedNoTS));
+
+			// < User, ActivityName, MU, Avg pairwise distance of back-segments>
+			LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityOne = applyActivityRegularityAnalysisOneLevel(
+					sequenceCharInvalidsExpungedNoTS);
+
+			writeActivityRegularity(regularityForEachTargetActivityOne, typeOfAnalysis);
+			break;
+		}
+
+		case "ActivityRegularityAnalysisTwoLevel":
+		{
+			LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityTwo = applyActivityRegularityAnalysisTwoLevel(
+					usersDayTimelinesCleaned);
+			// < User, ActivityName, MU, Avg pairwise distance of back-segments>
+			writeActivityRegularity(regularityForEachTargetActivityTwo, typeOfAnalysis);
+			break;
+		}
+		case "TimeSeriesAnalysis":
+		{
+			transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned));// UtilityBelt.reformatUserIDs(usersDayTimelines)
+			break;
+		}
+		case "TimeSeriesEntropyAnalysis":// TimeSeriesAnalysis2
+		{
+			performTimeSeriesEntropyAnalysis(usersDayTimelinesCleaned);
+			break;
+		}
+
+		case "Clustering":
+		{
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
+					.transformToSequenceDayWise(usersDayTimelinesCleaned);// , false);
+			LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged = TimelineTransformers
+					.toCharsFromActivityObjects(sequenceAll, true);
+			LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
+					.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+
+			applyKCentroids(sequenceCharInvalidsExpungedNoTS);
+			break;
+		}
+
+		case "NGramAnalysis":
+		{
+			LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
+					.dayTimelinesToTimelines(usersDayTimelinesCleaned);
+
+			if (Constant.hasInvalidActivityNames)
 			{
-				transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned));
-				performTimeSeriesCorrelationAnalysis(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned));
-				break;
-			}
-
-			case "SampleEntropyPerMAnalysis":
-			{
-				transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned));
-				// String pathForStoredTimelines
-				performSampleEntropyVsMAnalysis2(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned), 2, 3);
-				break;
-			}
-			case "ClusteringTimelineHolistic": // applying Kcentroids with two-level edit distance
-			{
-				LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers
-						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
-				LinkedHashMap<String, Timeline> usersTimelinesInvalidsExpunged = TimelineTrimmers
-						.expungeInvalids(usersTimelines);
-
-				applyKCentroidsTimelinesTwoLevel(usersTimelinesInvalidsExpunged);
-				break;
-			}
-
-			case "ActivityRegularityAnalysisOneLevel":
-			{
-				LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
-						.transformToSequenceDayWise(usersDayTimelinesCleaned);
-				LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
-						.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
-
-				System.out.println(traverseHashMapStringString(sequenceCharInvalidsExpungedNoTS));
-
-				// < User, ActivityName, MU, Avg pairwise distance of back-segments>
-				LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityOne = applyActivityRegularityAnalysisOneLevel(
-						sequenceCharInvalidsExpungedNoTS);
-
-				writeActivityRegularity(regularityForEachTargetActivityOne, typeOfAnalysis);
-				break;
-			}
-
-			case "ActivityRegularityAnalysisTwoLevel":
-			{
-				LinkedHashMap<String, LinkedHashMap<String, TreeMap<Double, Double>>> regularityForEachTargetActivityTwo = applyActivityRegularityAnalysisTwoLevel(
-						usersDayTimelinesCleaned);
-				// < User, ActivityName, MU, Avg pairwise distance of back-segments>
-				writeActivityRegularity(regularityForEachTargetActivityTwo, typeOfAnalysis);
-				break;
-			}
-			case "TimeSeriesAnalysis":
-			{
-				transformAndWriteAsTimeseries(UtilityBelt.reformatUserIDs(usersDayTimelinesCleaned));// UtilityBelt.reformatUserIDs(usersDayTimelines)
-				break;
-			}
-			case "TimeSeriesEntropyAnalysis":// TimeSeriesAnalysis2
-			{
-				performTimeSeriesEntropyAnalysis(usersDayTimelinesCleaned);
-				break;
-			}
-
-			case "Clustering":
-			{
-				LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
-						.transformToSequenceDayWise(usersDayTimelinesCleaned);// , false);
-				LinkedHashMap<String, LinkedHashMap<Timestamp, String>> sequenceCharInvalidsExpunged = TimelineTransformers
-						.toCharsFromActivityObjects(sequenceAll, true);
-				LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS = TimelineTransformers
-						.toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
-
-				applyKCentroids(sequenceCharInvalidsExpungedNoTS);
-				break;
-			}
-
-			case "NGramAnalysis":
-			{
-				LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
-						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
-
-				if (Constant.hasInvalidActivityNames)
-				{
-					userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
-				}
-
-				WToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
-						pathToWrite + "UserNumOfActivityObjects.csv", "UserID", "NumOfActivityObjects");
-
-				performNGramAnalysis(userTimelines, 1, 5/* 20 */, (pathToWrite));
-				break;
-			}
-
-			case "AlgorithmicAnalysis":
-			{
-				LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
-						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
 				userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
-
-				performAlgorithmicAnalysis(userTimelines, 1, 20, (pathToWrite));
-				break;
-			}
-			case "AlgorithmicAnalysis2":
-			{
-				LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
-						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
-				userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
-
-				performAlgorithmicAnalysis2(userTimelines, 1, 20, (pathToWrite));
-				break;
-			}
-			case "FeatureAnalysis":
-			{
-				LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
-						.dayTimelinesToTimelines(usersDayTimelinesCleaned);
-
-				userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
-				writeAllFeaturesValues(userTimelines, pathToWrite);
-				break;
 			}
 
-			default:
-			{
-				System.err.println("Unknown typeOfAnalysis =" + typeOfAnalysis);
-			}
+			WToFile.writeSimpleLinkedHashMapToFile(getNumOfActivityObjectsInTimeline(userTimelines),
+					pathToWrite + "UserNumOfActivityObjects.csv", "UserID", "NumOfActivityObjects");
+
+			performNGramAnalysis(userTimelines, 1, 5/* 20 */, (pathToWrite));
+			break;
+		}
+
+		case "AlgorithmicAnalysis":
+		{
+			LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
+					.dayTimelinesToTimelines(usersDayTimelinesCleaned);
+			userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
+
+			performAlgorithmicAnalysis(userTimelines, 1, 20, (pathToWrite));
+			break;
+		}
+		case "AlgorithmicAnalysis2":
+		{
+			LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
+					.dayTimelinesToTimelines(usersDayTimelinesCleaned);
+			userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
+
+			performAlgorithmicAnalysis2(userTimelines, 1, 20, (pathToWrite));
+			break;
+		}
+		case "FeatureAnalysis":
+		{
+			LinkedHashMap<String, Timeline> userTimelines = TimelineTransformers
+					.dayTimelinesToTimelines(usersDayTimelinesCleaned);
+
+			userTimelines = TimelineTrimmers.expungeInvalids(userTimelines);
+			writeAllFeaturesValues(userTimelines, pathToWrite);
+			break;
+		}
+
+		default:
+		{
+			System.err.println("Unknown typeOfAnalysis =" + typeOfAnalysis);
+		}
 		}
 		consoleLogStream.close();
 		WToFile.resetConsoleOutput();
@@ -896,7 +898,8 @@ public class TimelineStats
 		LinkedHashMap<String, Timeline> allTimelines = new LinkedHashMap<String, Timeline>();
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
-			Timeline allDatesTimelineCombined = TimelineTransformers.dayTimelinesToATimeline(entry.getValue(), false, true);
+			Timeline allDatesTimelineCombined = TimelineTransformers.dayTimelinesToATimeline(entry.getValue(), false,
+					true);
 			Timeline newTimeline = TimelineTrimmers.expungeInvalids(allDatesTimelineCombined);
 			// new Timeline(entry.getValue()));
 			allTimelines.put(entry.getKey(), newTimeline);
@@ -2449,7 +2452,8 @@ public class TimelineStats
 
 		toWrite += "Num of users = " + usersDayTimelines.size();
 
-		LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers.dayTimelinesToTimelines(usersDayTimelines);
+		LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers
+				.dayTimelinesToTimelines(usersDayTimelines);
 
 		StringBuilder s = new StringBuilder();
 		s.append("User, User, NumOfActivityObjects");
@@ -2471,7 +2475,8 @@ public class TimelineStats
 	public static void writeNumOfAOsInTimelines(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
 			String absFileNameToWrite)
 	{
-		LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers.dayTimelinesToTimelines(usersDayTimelines);
+		LinkedHashMap<String, Timeline> usersTimelines = TimelineTransformers
+				.dayTimelinesToTimelines(usersDayTimelines);
 
 		StringBuilder s = new StringBuilder();
 		s.append("User, User, NumOfActivityObjects, NumOfDistinctActIDsForThisUser");
@@ -2498,28 +2503,30 @@ public class TimelineStats
 	 * @param usersDayTimelines
 	 * @param fileNamePhrase
 	 * @param pathToWrite
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
 	 */
 	public static void writeActivityStats(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines,
-			String fileNamePhrase, String pathToWrite)
+			String fileNamePhrase, String pathToWrite, PrimaryDimension givenDimension)
 	{
 		ArrayList<String> actCountUserFilesToConcatenate = new ArrayList<>(usersDayTimelines.size());
 		ArrayList<String> actDurationUserFilesToConcatenate = new ArrayList<>(usersDayTimelines.size());
 		ArrayList<String> actOccuPerFilesToConcatenate = new ArrayList<>(usersDayTimelines.size());
 		ArrayList<String> rowHeaderForEachUser = new ArrayList<>(usersDayTimelines.size());
-
+		boolean doWrite = true;
 		for (Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userName = entry.getKey();
 			TimelineStats.writeActivityCountsInGivenDayTimelines(userName, entry.getValue(), "AllTimelines",
-					pathToWrite);
+					pathToWrite, givenDimension, doWrite);
 
 			if (!Constant.getDatabaseName().equals("gowalla1"))
 			{// since gowalla data does not have duration
 				TimelineStats.writeActivityDurationInGivenDayTimelines(userName, entry.getValue(), "AllTimelines",
-						pathToWrite);
+						pathToWrite, givenDimension, doWrite);
 			}
-			TimelineStats.writeActivityOccPercentageOfTimelines(userName, entry.getValue(), "AllTimelines",
-					pathToWrite);
+			TimelineStats.writeActivityOccPercentageOfTimelines(userName, entry.getValue(), "AllTimelines", pathToWrite,
+					givenDimension, doWrite);
 
 			// list of user files to concatenate to get results over all users in same file
 			actCountUserFilesToConcatenate.add(pathToWrite + userName + "ActivityCountsAllTimelines.csv");
@@ -3092,7 +3099,7 @@ public class TimelineStats
 	 * @param timelinesPhrase
 	 */
 	public static void writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String timelinesPhrase)
+			LinkedHashMap<?, Timeline> userTimelines, String timelinesPhrase)
 	{
 		String commonPath = Constant.getCommonPath();//
 		StringBuilder toWrite = new StringBuilder();
@@ -3110,7 +3117,7 @@ public class TimelineStats
 
 			bw.write("Date, Num_of_Distict_Valid_Activities\n");// bw.newLine();
 
-			for (Map.Entry<Date, Timeline> entry : userTimelines.entrySet())
+			for (Map.Entry<?, Timeline> entry : userTimelines.entrySet())
 			{
 				int numOfDistinctValidActivities = entry.getValue().countNumberOfValidDistinctActivities();
 				toWrite.append(entry.getKey() + "," + numOfDistinctValidActivities + "\n");
@@ -3340,10 +3347,13 @@ public class TimelineStats
 	 * @param userTimelines
 	 * @param fileNamePhrase
 	 * @param commonPathToWrite
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
 	 * @return count of activities over all days of given timelines
 	 */
 	public static LinkedHashMap<String, Long> writeActivityCountsInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase, String commonPathToWrite)
+			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase, String commonPathToWrite,
+			PrimaryDimension givenDimension, boolean doWrite)
 	{
 		String commonPath = commonPathToWrite;//
 
@@ -3352,7 +3362,26 @@ public class TimelineStats
 		/* <Activity Name, count over all days> */
 		LinkedHashMap<String, Long> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<>();
 		// count over all the days
-		String[] activityNames = Constant.getActivityNames();// .activityNames;
+
+		// String[] activityNames = Constant.getActivityNames();// .activityNames;
+		List<String> uniquePDVals = null;
+		ArrayList<Integer> uniquePDValsInt = null;
+		if (givenDimension.equals(PrimaryDimension.ActivityID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueActivityIDs());
+		}
+		else if (givenDimension.equals(PrimaryDimension.LocationGridID)
+				|| givenDimension.equals(PrimaryDimension.LocationID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueLocIDs());
+
+		}
+		else
+		{
+			PopUps.printTracedErrorMsg("Error: unrecognised PD " + givenDimension);
+		}
+		uniquePDVals = (List<String>) uniquePDValsInt.stream().map(i -> String.valueOf(i)).collect(Collectors.toList());
+
 		try
 		{
 			// String userName=entryForUser.getKey();
@@ -3369,16 +3398,19 @@ public class TimelineStats
 			bwString.append(",");
 			// bw.write(",");
 
-			for (String activityName : activityNames)
+			// for (String activityName : activityNames)
+			for (String pdVal : uniquePDVals)
 			{
-				if (UtilityBelt.isValidActivityName(activityName) == false)
+				// if (UtilityBelt.isValidActivityName(activityName) == false)
+				if (givenDimension.equals(PrimaryDimension.ActivityID)
+						&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
 				{
 					continue;
 				}
 				// bw.write("," + activityName);
-				bwString.append("," + activityName);
+				bwString.append("," + pdVal);
 				// System.out.println("ajooba:activityName = " + activityName + " bwString" + bwString.toString());
-				activityNameCountPairsOverAllDayTimelines.put(activityName, new Long(0));
+				activityNameCountPairsOverAllDayTimelines.put(pdVal, new Long(0));
 			}
 			// bw.newLine();
 			bwString.append("\n");
@@ -3398,51 +3430,69 @@ public class TimelineStats
 				LinkedHashMap<String, Integer> activityNameCountPairs = new LinkedHashMap<String, Integer>();
 
 				// written beforehand to maintain the same order of activity names
-				for (String activityName : activityNames)
+				for (String pdVal : uniquePDVals)
 				{
-					if (UtilityBelt.isValidActivityName(activityName))
+					if (givenDimension.equals(PrimaryDimension.ActivityID)
+							&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+					{
+					}
+					// if (UtilityBelt.isValidActivityName(activityName))
 					// if((activityName.equalsIgnoreCase("Not
 					// Available")||activityName.equalsIgnoreCase("Unknown"))==false)
+					else
 					{
 						// System.out.println(" putting down -" + activityName + "- in activityNameCountPairs");
-						activityNameCountPairs.put(activityName, 0);
+						activityNameCountPairs.put(pdVal, 0);
 					}
 				}
 
 				for (ActivityObject2018 actEvent : activitiesInDay)
 				{
-					if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
-					// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
-					// actEvent.getActivityName().equalsIgnoreCase("Not Available") ) ==false)
+					ArrayList<Integer> aoPDValsInt = actEvent.getGivenDimensionVal(givenDimension);
+					ArrayList<String> aoPDVals = (ArrayList<String>) aoPDValsInt.stream().map(i -> String.valueOf(i))
+							.collect(Collectors.toList());
+
+					for (String aoPDVal : aoPDVals)
 					{
-						String actName = actEvent.getActivityName();
-						// System.out.println(activityNameCountPairs.size());
-
-						// Integer val;
-						// if (activityNameCountPairs.get(actName) == null)
-						// {
-						// val = 0;
-						// }
-						// else
-						// {
-						// val = activityNameCountPairs.get(actName);
-						// }
-						Integer val = activityNameCountPairs.get(actName);
-						if (val == null)
+						if (givenDimension.equals(PrimaryDimension.ActivityID)
+								&& UtilityBelt.isValidActivityID(Integer.valueOf(aoPDVal)) == false)
 						{
-							new Exception(
-									"Exception in org.activity.io.WritingToFile.writeActivityCountsInGivenDayTimelines(String, LinkedHashMap<Date, Timeline>, String) : actName = "
-											+ actName + " has null val");// System.out.println("actName = " + actName);
 						}
+						// if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
+						// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
+						// actEvent.getActivityName().equalsIgnoreCase("Not Available") ) ==false)
+						else
+						{
+							// String actName = actEvent.getActivityName();
+							// System.out.println(activityNameCountPairs.size());
 
-						// System.out.println("val:" + val);
-						Integer newVal = new Integer(val.intValue() + 1);
-						// count for current day
-						activityNameCountPairs.put(actName, newVal);
+							// Integer val;
+							// if (activityNameCountPairs.get(actName) == null)
+							// {
+							// val = 0;
+							// }
+							// else
+							// {
+							// val = activityNameCountPairs.get(actName);
+							// }
+							Integer val = activityNameCountPairs.get(aoPDVal);
+							if (val == null)
+							{
+								new Exception(
+										"Exception in org.activity.io.WritingToFile.writeActivityCountsInGivenDayTimelines(String, LinkedHashMap<Date, Timeline>, String) : actName = "
+												+ aoPDVal + " has null val");// System.out.println("actName = " +
+																				// actName);
+							}
 
-						// accumulative count over all days
-						activityNameCountPairsOverAllDayTimelines.put(actEvent.getActivityName(),
-								activityNameCountPairsOverAllDayTimelines.get(actEvent.getActivityName()) + 1);
+							// System.out.println("val:" + val);
+							Integer newVal = new Integer(val.intValue() + 1);
+							// count for current day
+							activityNameCountPairs.put(aoPDVal, newVal);
+
+							// accumulative count over all days
+							activityNameCountPairsOverAllDayTimelines.put(aoPDVal,
+									activityNameCountPairsOverAllDayTimelines.get(aoPDVal) + 1);
+						}
 					}
 				}
 
@@ -3466,8 +3516,205 @@ public class TimelineStats
 			System.exit(-5);
 		}
 
-		WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
-				commonPath + "ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count");
+		if (doWrite)
+		{
+			WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
+					commonPath + "ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count", false);
+		}
+		// TODO check if it indeed should be an append
+
+		if (VerbosityConstants.verbose) System.out.println("Exiting writeActivityCountsInGivenDayTimelines");
+
+		return activityNameCountPairsOverAllDayTimelines;
+
+	}
+
+	/**
+	 * Fork of org.activity.stats.TimelineStats.writeActivityCountsInGivenDayTimelines() to allow String keys
+	 * <p>
+	 * Counts activities for each of the days of given day timelines and writes it to a file and counts activities over
+	 * all days of given timelines and return it as a LinkedHashMap (fileName = commonPath + userName + "ActivityCounts"
+	 * + fileNamePhrase + ".csv")
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param fileNamePhrase
+	 * @param commonPathToWrite
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
+	 * @return count of activities over all days of given timelines
+	 * @since 27 Dec 2018
+	 */
+	public static LinkedHashMap<String, Long> writeActivityCountsInGivenDayTimelinesStringKeys(String userName,
+			LinkedHashMap<String, Timeline> userTimelines, String fileNamePhrase, String commonPathToWrite,
+			PrimaryDimension givenDimension, boolean doWrite)
+	{
+		String commonPath = commonPathToWrite;//
+
+		if (VerbosityConstants.verbose) System.out.println("Inside writeActivityCountsInGivenDayTimelines");
+
+		/* <Activity Name, count over all days> */
+		LinkedHashMap<String, Long> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<>();
+		// count over all the days
+
+		// String[] activityNames = Constant.getActivityNames();// .activityNames;
+		List<String> uniquePDVals = null;
+		ArrayList<Integer> uniquePDValsInt = null;
+		if (givenDimension.equals(PrimaryDimension.ActivityID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueActivityIDs());
+		}
+		else if (givenDimension.equals(PrimaryDimension.LocationGridID)
+				|| givenDimension.equals(PrimaryDimension.LocationID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueLocIDs());
+
+		}
+		else
+		{
+			PopUps.printTracedErrorMsg("Error: unrecognised PD " + givenDimension);
+		}
+		uniquePDVals = (List<String>) uniquePDValsInt.stream().map(i -> String.valueOf(i)).collect(Collectors.toList());
+
+		try
+		{
+			// String userName=entryForUser.getKey();
+			// System.out.println("\nUser ="+entryForUser.getKey());
+			String fileName = commonPath + userName + "ActivityCounts" + fileNamePhrase + ".csv";
+
+			if (VerbosityConstants.verbose)
+			{
+				System.out.println("writing " + userName + "ActivityCounts" + fileNamePhrase + ".csv");
+			}
+			// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileName);// new BufferedWriter(fw);
+
+			StringBuilder bwString = new StringBuilder();
+			bwString.append(",");
+			// bw.write(",");
+
+			// for (String activityName : activityNames)
+			for (String pdVal : uniquePDVals)
+			{
+				// if (UtilityBelt.isValidActivityName(activityName) == false)
+				if (givenDimension.equals(PrimaryDimension.ActivityID)
+						&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+				{
+					continue;
+				}
+				// bw.write("," + activityName);
+				bwString.append("," + pdVal);
+				// System.out.println("ajooba:activityName = " + activityName + " bwString" + bwString.toString());
+				activityNameCountPairsOverAllDayTimelines.put(pdVal, new Long(0));
+			}
+			// bw.newLine();
+			bwString.append("\n");
+
+			for (Map.Entry<String, Timeline> entry : userTimelines.entrySet())
+			{
+				// System.out.println("Date =" + entry.getKey());
+				// bw.write(entry.getKey().toString());
+				// bw.write("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
+
+				bwString.append(entry.getKey().toString());
+				// bwString.append("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
+
+				ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
+
+				/* <Activity Name, count for the current day> */
+				LinkedHashMap<String, Integer> activityNameCountPairs = new LinkedHashMap<String, Integer>();
+
+				// written beforehand to maintain the same order of activity names
+				for (String pdVal : uniquePDVals)
+				{
+					if (givenDimension.equals(PrimaryDimension.ActivityID)
+							&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+					{
+					}
+					// if (UtilityBelt.isValidActivityName(activityName))
+					// if((activityName.equalsIgnoreCase("Not
+					// Available")||activityName.equalsIgnoreCase("Unknown"))==false)
+					else
+					{
+						// System.out.println(" putting down -" + activityName + "- in activityNameCountPairs");
+						activityNameCountPairs.put(pdVal, 0);
+					}
+				}
+
+				for (ActivityObject2018 actEvent : activitiesInDay)
+				{
+					ArrayList<Integer> aoPDValsInt = actEvent.getGivenDimensionVal(givenDimension);
+					ArrayList<String> aoPDVals = (ArrayList<String>) aoPDValsInt.stream().map(i -> String.valueOf(i))
+							.collect(Collectors.toList());
+
+					for (String aoPDVal : aoPDVals)
+					{
+						if (givenDimension.equals(PrimaryDimension.ActivityID)
+								&& UtilityBelt.isValidActivityID(Integer.valueOf(aoPDVal)) == false)
+						{
+						}
+						// if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
+						// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
+						// actEvent.getActivityName().equalsIgnoreCase("Not Available") ) ==false)
+						else
+						{
+							// String actName = actEvent.getActivityName();
+							// System.out.println(activityNameCountPairs.size());
+
+							// Integer val;
+							// if (activityNameCountPairs.get(actName) == null)
+							// {
+							// val = 0;
+							// }
+							// else
+							// {
+							// val = activityNameCountPairs.get(actName);
+							// }
+							Integer val = activityNameCountPairs.get(aoPDVal);
+							if (val == null)
+							{
+								new Exception(
+										"Exception in org.activity.io.WritingToFile.writeActivityCountsInGivenDayTimelines(String, LinkedHashMap<Date, Timeline>, String) : actName = "
+												+ aoPDVal + " has null val");// System.out.println("actName = " +
+																				// actName);
+							}
+
+							// System.out.println("val:" + val);
+							Integer newVal = new Integer(val.intValue() + 1);
+							// count for current day
+							activityNameCountPairs.put(aoPDVal, newVal);
+
+							// accumulative count over all days
+							activityNameCountPairsOverAllDayTimelines.put(aoPDVal,
+									activityNameCountPairsOverAllDayTimelines.get(aoPDVal) + 1);
+						}
+					}
+				}
+
+				// write the activityNameCountPairs to the file
+				for (Map.Entry<String, Integer> entryWrite : activityNameCountPairs.entrySet())
+				{
+					// bw.write("," + entryWrite.getValue());
+					bwString.append("," + entryWrite.getValue());
+				}
+
+				bwString.append("\n");
+				// bw.newLine();
+			}
+			WToFile.writeToNewFile(bwString.toString(), fileName);
+			// bw.write(bwString.toString());
+			// bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+
+		if (doWrite)
+		{
+			WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
+					commonPath + "ActivityNameCountPairsOver" + fileNamePhrase + ".csv", "Activity", "Count", false);
+		}
 		// TODO check if it indeed should be an append
 
 		if (VerbosityConstants.verbose) System.out.println("Exiting writeActivityCountsInGivenDayTimelines");
@@ -3485,14 +3732,35 @@ public class TimelineStats
 	 * @param userTimelines
 	 * @param fileNamePhrase
 	 * @param pathToWrite
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
 	 * @return count of activities over all days of given timelines
 	 */
 	public static LinkedHashMap<String, Double> writeActivityOccPercentageOfTimelines(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase, String pathToWrite)
+			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase, String pathToWrite,
+			PrimaryDimension givenDimension, boolean doWrite)
 	{
 		String commonPath = pathToWrite;/// Constant.getCommonPath();//
 		LinkedHashMap<String, Double> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Double>();
-		String[] activityNames = Constant.getActivityNames();// .activityNames;
+		// String[] activityNames = Constant.getActivityNames();// .activityNames;
+		List<String> uniquePDVals = null;
+		ArrayList<Integer> uniquePDValsInt = null;
+		if (givenDimension.equals(PrimaryDimension.ActivityID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueActivityIDs());
+		}
+		else if (givenDimension.equals(PrimaryDimension.LocationGridID)
+				|| givenDimension.equals(PrimaryDimension.LocationID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueLocIDs());
+
+		}
+		else
+		{
+			PopUps.printTracedErrorMsg("Error: unrecognised PD " + givenDimension);
+		}
+		uniquePDVals = (List<String>) uniquePDValsInt.stream().map(i -> String.valueOf(i)).collect(Collectors.toList());
+
 		try
 		{
 			// String userName=entryForUser.getKey();
@@ -3508,41 +3776,48 @@ public class TimelineStats
 			// bw.write(",");
 
 			int actIndex = -1;
-			for (String activityName : activityNames)
+			for (String pdVal : uniquePDVals)
 			{
 				actIndex += 1;
-				if (UtilityBelt.isValidActivityName(activityName) == false)
+				if (givenDimension.equals(PrimaryDimension.ActivityID)
+						&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+				// if (UtilityBelt.isValidActivityName(activityName) == false)
 				// if(activityName.equals("Unknown")|| activityName.equals("Not Available"))
 				{
 					continue;
 				}
 
-				if (Constant.getDatabaseName().equals("gowalla1"))
-				{
-					// bw.write("," + activityName);
-					// $$disabled on 18 May //toWrite.append("," + Constant.activityNamesGowallaLabels.get(actIndex));
-					toWrite.append("," + activityName);
-				}
-				else
-				{
-					// bw.write("," + activityName);
-					toWrite.append("," + activityName);
+				// if (Constant.getDatabaseName().equals("gowalla1"))
+				// {
+				// bw.write("," + activityName);
+				// $$disabled on 18 May //toWrite.append("," + Constant.activityNamesGowallaLabels.get(actIndex));
+				// toWrite.append("," + activityName);
+				// }
+				// else
+				// {
+				// bw.write("," + activityName);
+				toWrite.append("," + pdVal);
 
-				}
+				// }
 
-				activityNameCountPairsOverAllDayTimelines.put(activityName, new Double(0));
+				activityNameCountPairsOverAllDayTimelines.put(pdVal, new Double(0));
 			}
 			// bw.newLine();
 			toWrite.append("\n");
 
 			double numOfTimelines = userTimelines.size();
 
-			for (String activityName : activityNames) // written beforehand to maintain the same order of activity names
+			for (String pdVal : uniquePDVals) // written beforehand to maintain the same order of activity names
 			{
-				if (UtilityBelt.isValidActivityName(activityName))
-				// if((activityName.equalsIgnoreCase("Not Available")||activityName.equalsIgnoreCase("Unknown"))==false)
+				if (givenDimension.equals(PrimaryDimension.ActivityID)
+						&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
 				{
-					activityNameCountPairsOverAllDayTimelines.put(activityName, new Double(0));
+				}
+				// if (UtilityBelt.isValidActivityName(activityName))
+				// if((activityName.equalsIgnoreCase("Not Available")||activityName.equalsIgnoreCase("Unknown"))==false)
+				else
+				{
+					activityNameCountPairsOverAllDayTimelines.put(pdVal, new Double(0));
 				}
 			}
 
@@ -3552,17 +3827,23 @@ public class TimelineStats
 				// bw.write(entry.getKey().toString());
 				// bw.write("," + (UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
 
-				ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
+				// ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
 
 				// written beforehand to maintain the same order of activity names
-				for (String activityName : activityNames)
+				for (String pdVal : uniquePDVals)
 				{
-					if (UtilityBelt.isValidActivityName(activityName))
+					if (givenDimension.equals(PrimaryDimension.ActivityID)
+							&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
 					{
-						if (entry.getValue().hasActivityName(activityName) == true)
+					}
+					// if (UtilityBelt.isValidActivityName(activityName))
+					else
+					{
+						// if (entry.getValue().hasActivityName(activityName) == true)
+						if (entry.getValue().hasPDVal(Integer.valueOf(pdVal), givenDimension))
 						{
-							activityNameCountPairsOverAllDayTimelines.put(activityName,
-									activityNameCountPairsOverAllDayTimelines.get(activityName) + 1);
+							activityNameCountPairsOverAllDayTimelines.put(pdVal,
+									activityNameCountPairsOverAllDayTimelines.get(pdVal) + 1);
 						}
 					}
 				}
@@ -3596,10 +3877,176 @@ public class TimelineStats
 			System.exit(-5);
 		}
 
-		WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
-				commonPath + "ActivityOccPerTimelines" + fileNamePhrase + ".csv", "Activity", "Count");// TODO check if
-																										// it indeed
-		// should be an append
+		if (doWrite)
+		{
+			WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
+					commonPath + "ActivityOccPerTimelines" + fileNamePhrase + ".csv", "Activity", "Count", false);
+		} // TODO check if it indeed should be an append
+
+		return activityNameCountPairsOverAllDayTimelines;
+
+	}
+
+	/**
+	 * Fork of org.activity.stats.TimelineStats.writeActivityOccPercentageOfTimelines() to allow String keys.
+	 * <p>
+	 * percentage of timelines in which the activity occurrs and counts activities over all days of given timelines and
+	 * return it as a LinkedHashMap
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param fileNamePhrase
+	 * @param pathToWrite
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
+	 * @return count of activities over all days of given timelines
+	 */
+	public static LinkedHashMap<String, Double> writeActivityOccPercentageOfTimelinesStringKeys(String userName,
+			LinkedHashMap<String, Timeline> userTimelines, String fileNamePhrase, String pathToWrite,
+			PrimaryDimension givenDimension, boolean doWrite)
+	{
+		String commonPath = pathToWrite;/// Constant.getCommonPath();//
+		LinkedHashMap<String, Double> activityNameCountPairsOverAllDayTimelines = new LinkedHashMap<String, Double>();
+		// String[] activityNames = Constant.getActivityNames();// .activityNames;
+		List<String> uniquePDVals = null;
+		ArrayList<Integer> uniquePDValsInt = null;
+		if (givenDimension.equals(PrimaryDimension.ActivityID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueActivityIDs());
+		}
+		else if (givenDimension.equals(PrimaryDimension.LocationGridID)
+				|| givenDimension.equals(PrimaryDimension.LocationID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueLocIDs());
+
+		}
+		else
+		{
+			PopUps.printTracedErrorMsg("Error: unrecognised PD " + givenDimension);
+		}
+		uniquePDVals = (List<String>) uniquePDValsInt.stream().map(i -> String.valueOf(i)).collect(Collectors.toList());
+
+		try
+		{
+			// String userName=entryForUser.getKey();
+			// System.out.println("\nUser ="+entryForUser.getKey());
+			String fileName = commonPath + userName + "ActivityOccPerTimelines" + fileNamePhrase + ".csv";
+
+			if (VerbosityConstants.verbose)
+			{
+				System.out.println("writing " + userName + "ActivityOccPerTimelines" + fileNamePhrase + ".csv");
+			}
+
+			StringBuilder toWrite = new StringBuilder();
+			// bw.write(",");
+
+			int actIndex = -1;
+			for (String pdVal : uniquePDVals)
+			{
+				actIndex += 1;
+				if (givenDimension.equals(PrimaryDimension.ActivityID)
+						&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+				// if (UtilityBelt.isValidActivityName(activityName) == false)
+				// if(activityName.equals("Unknown")|| activityName.equals("Not Available"))
+				{
+					continue;
+				}
+
+				// if (Constant.getDatabaseName().equals("gowalla1"))
+				// {
+				// bw.write("," + activityName);
+				// $$disabled on 18 May //toWrite.append("," + Constant.activityNamesGowallaLabels.get(actIndex));
+				// toWrite.append("," + activityName);
+				// }
+				// else
+				// {
+				// bw.write("," + activityName);
+				toWrite.append("," + pdVal);
+
+				// }
+
+				activityNameCountPairsOverAllDayTimelines.put(pdVal, new Double(0));
+			}
+			// bw.newLine();
+			toWrite.append("\n");
+
+			double numOfTimelines = userTimelines.size();
+
+			for (String pdVal : uniquePDVals) // written beforehand to maintain the same order of activity names
+			{
+				if (givenDimension.equals(PrimaryDimension.ActivityID)
+						&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+				{
+				}
+				// if (UtilityBelt.isValidActivityName(activityName))
+				// if((activityName.equalsIgnoreCase("Not Available")||activityName.equalsIgnoreCase("Unknown"))==false)
+				else
+				{
+					activityNameCountPairsOverAllDayTimelines.put(pdVal, new Double(0));
+				}
+			}
+
+			for (Map.Entry<String, Timeline> entry : userTimelines.entrySet())
+			{
+				// System.out.println("Date =" + entry.getKey());
+				// bw.write(entry.getKey().toString());
+				// bw.write("," + (UtilityBelt.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
+
+				// ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
+
+				// written beforehand to maintain the same order of activity names
+				for (String pdVal : uniquePDVals)
+				{
+					if (givenDimension.equals(PrimaryDimension.ActivityID)
+							&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+					{
+					}
+					// if (UtilityBelt.isValidActivityName(activityName))
+					else
+					{
+						// if (entry.getValue().hasActivityName(activityName) == true)
+						if (entry.getValue().hasPDVal(Integer.valueOf(pdVal), givenDimension))
+						{
+							activityNameCountPairsOverAllDayTimelines.put(pdVal,
+									activityNameCountPairsOverAllDayTimelines.get(pdVal) + 1);
+						}
+					}
+				}
+			}
+
+			// write the activityNameCountPairs to the file
+			for (Map.Entry<String, Double> entryWrite : activityNameCountPairsOverAllDayTimelines.entrySet())
+			{
+				String actName = entryWrite.getKey();
+				Double val = entryWrite.getValue();
+				double percentageOccurrenceOverTimeline = ((double) activityNameCountPairsOverAllDayTimelines
+						.get(actName) / (double) numOfTimelines) * 100;
+				activityNameCountPairsOverAllDayTimelines.put(actName, percentageOccurrenceOverTimeline);
+				// bw.write("," + percentageOccurrenceOverTimeline);
+				toWrite.append("," + percentageOccurrenceOverTimeline);
+			}
+			// bw.newLine();
+			toWrite.append("\n");
+
+			// File file = new File(fileName);
+			// file.delete();
+			// FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+			// BufferedWriter bw = new BufferedWriter(fw);
+			WToFile.writeToNewFile(toWrite.toString(), fileName);
+			// bw.close();
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+
+		if (doWrite)
+		{
+			WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameCountPairsOverAllDayTimelines,
+					commonPath + "ActivityOccPerTimelines" + fileNamePhrase + ".csv", "Activity", "Count", false);
+		} // TODO check if it indeed should be an append
 
 		return activityNameCountPairsOverAllDayTimelines;
 
@@ -3614,13 +4061,35 @@ public class TimelineStats
 	 * @param userTimelines
 	 * @param fileNamePhrase
 	 * @param pathToWrite
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
 	 * @return duration of activities over all days of given timelines
 	 */
 	public static LinkedHashMap<String, Long> writeActivityDurationInGivenDayTimelines(String userName,
-			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase, String pathToWrite)
+			LinkedHashMap<Date, Timeline> userTimelines, String fileNamePhrase, String pathToWrite,
+			PrimaryDimension givenDimension, boolean doWrite)
 	{
 		String commonPath = pathToWrite;// Constant.getCommonPath();//
-		String[] activityNames = Constant.getActivityNames();// activityNames;
+
+		// String[] activityNames = Constant.getActivityNames();// activityNames;
+		List<String> uniquePDVals = null;
+		ArrayList<Integer> uniquePDValsInt = null;
+		if (givenDimension.equals(PrimaryDimension.ActivityID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueActivityIDs());
+		}
+		else if (givenDimension.equals(PrimaryDimension.LocationGridID)
+				|| givenDimension.equals(PrimaryDimension.LocationID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueLocIDs());
+
+		}
+		else
+		{
+			PopUps.printTracedErrorMsg("Error: unrecognised PD " + givenDimension);
+		}
+		uniquePDVals = (List<String>) uniquePDValsInt.stream().map(i -> String.valueOf(i)).collect(Collectors.toList());
+
 		LinkedHashMap<String, Long> activityNameDurationPairsOverAllDayTimelines = new LinkedHashMap<String, Long>();
 		// count over all the days
 
@@ -3640,16 +4109,18 @@ public class TimelineStats
 			toWrite.append(",");
 			// bw.write(",");
 
-			for (String activityName : activityNames)
+			for (String pdVal : uniquePDVals)
 			{
-				if (UtilityBelt.isValidActivityName(activityName) == false)
+				// if (UtilityBelt.isValidActivityName(activityName) == false)
 				// (activityName.equals("Unknown")|| activityName.equals("Others"))
+				if (givenDimension.equals(PrimaryDimension.ActivityID)
+						&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
 				{
 					continue;
 				}
-				toWrite.append("," + activityName);
+				toWrite.append("," + pdVal);
 				// bw.write("," + activityName);
-				activityNameDurationPairsOverAllDayTimelines.put(activityName, new Long(0));
+				activityNameDurationPairsOverAllDayTimelines.put(pdVal, new Long(0));
 			}
 			toWrite.append("\n");
 			// bw.newLine();
@@ -3666,32 +4137,47 @@ public class TimelineStats
 				ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
 				LinkedHashMap<String, Long> activityNameDurationPairs = new LinkedHashMap<String, Long>();
 
-				for (String activityName : activityNames) // written beforehand to maintain the same order of activity
-															// names
+				for (String pdVal : uniquePDVals) // written beforehand to maintain the same order of activity
+													// names
 				{
-					if (UtilityBelt.isValidActivityName(activityName))
-					// if((activityName.equalsIgnoreCase("Others")||activityName.equalsIgnoreCase("Unknown"))==false)
+					if (givenDimension.equals(PrimaryDimension.ActivityID)
+							&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
 					{
-						activityNameDurationPairs.put(activityName, new Long(0));
+					}
+					// if (UtilityBelt.isValidActivityName(activityName))
+					// if((activityName.equalsIgnoreCase("Others")||activityName.equalsIgnoreCase("Unknown"))==false)
+					else
+					{
+						activityNameDurationPairs.put(pdVal, new Long(0));
 					}
 				}
 
 				for (ActivityObject2018 actEvent : activitiesInDay)
 				{
-					if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
-					// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
-					// actEvent.getActivityName().equalsIgnoreCase("Others") ) ==false)
+					ArrayList<Integer> aoPDValsInt = actEvent.getGivenDimensionVal(givenDimension);
+					ArrayList<String> aoPDVals = (ArrayList<String>) aoPDValsInt.stream().map(i -> String.valueOf(i))
+							.collect(Collectors.toList());
+					for (String aoPDVal : aoPDVals)
 					{
-						Long durationInSecondsForActivity = actEvent.getDurationInSeconds();
-						// summing of duration for current day
-						activityNameDurationPairs.put(actEvent.getActivityName(),
-								activityNameDurationPairs.get(actEvent.getActivityName())
-										+ durationInSecondsForActivity);
+						if (givenDimension.equals(PrimaryDimension.ActivityID)
+								&& UtilityBelt.isValidActivityID(Integer.valueOf(aoPDVal)) == false)
+						{
+						}
+						// if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
+						// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
+						// actEvent.getActivityName().equalsIgnoreCase("Others") ) ==false)
+						else
+						{
+							Long durationInSecondsForActivity = actEvent.getDurationInSeconds();
+							// summing of duration for current day
+							activityNameDurationPairs.put(aoPDVal,
+									activityNameDurationPairs.get(aoPDVal) + durationInSecondsForActivity);
 
-						// accumulative duration over all days
-						activityNameDurationPairsOverAllDayTimelines.put(actEvent.getActivityName(),
-								activityNameDurationPairsOverAllDayTimelines.get(actEvent.getActivityName())
-										+ durationInSecondsForActivity);
+							// accumulative duration over all days
+							activityNameDurationPairsOverAllDayTimelines.put(aoPDVal,
+									activityNameDurationPairsOverAllDayTimelines.get(aoPDVal)
+											+ durationInSecondsForActivity);
+						}
 					}
 				}
 
@@ -3717,8 +4203,176 @@ public class TimelineStats
 			System.exit(-5);
 		}
 
-		WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameDurationPairsOverAllDayTimelines,
-				commonPath + "ActivityNameDurationPairsOver" + fileNamePhrase + ".csv", "Activity", "Duration");
+		if (doWrite)
+		{
+			WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameDurationPairsOverAllDayTimelines,
+					commonPath + "ActivityNameDurationPairsOver" + fileNamePhrase + ".csv", "Activity", "Duration",
+					false);
+		}
+		// TODO check if it indeed should be an append
+
+		return activityNameDurationPairsOverAllDayTimelines;
+
+	}
+
+	/**
+	 * Fork of org.activity.stats.TimelineStats.writeActivityDurationInGivenDayTimelines() to allow for String keys.
+	 * <p>
+	 * Sums the duration in seconds of activities for each of the days of given day timelines and writes it to a file
+	 * and sums the duration activities over all days of given timelines and return it as a LinkedHashMap
+	 * 
+	 * @param userName
+	 * @param userTimelines
+	 * @param fileNamePhrase
+	 * @param pathToWrite
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
+	 * @return duration of activities over all days of given timelines
+	 */
+	public static LinkedHashMap<String, Long> writeActivityDurationInGivenDayTimelinesStringKeys(String userName,
+			LinkedHashMap<String, Timeline> userTimelines, String fileNamePhrase, String pathToWrite,
+			PrimaryDimension givenDimension, boolean doWrite)
+	{
+		String commonPath = pathToWrite;// Constant.getCommonPath();//
+
+		// String[] activityNames = Constant.getActivityNames();// activityNames;
+		List<String> uniquePDVals = null;
+		ArrayList<Integer> uniquePDValsInt = null;
+		if (givenDimension.equals(PrimaryDimension.ActivityID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueActivityIDs());
+		}
+		else if (givenDimension.equals(PrimaryDimension.LocationGridID)
+				|| givenDimension.equals(PrimaryDimension.LocationID))
+		{
+			uniquePDValsInt = new ArrayList<>(Constant.getUniqueLocIDs());
+
+		}
+		else
+		{
+			PopUps.printTracedErrorMsg("Error: unrecognised PD " + givenDimension);
+		}
+		uniquePDVals = (List<String>) uniquePDValsInt.stream().map(i -> String.valueOf(i)).collect(Collectors.toList());
+
+		LinkedHashMap<String, Long> activityNameDurationPairsOverAllDayTimelines = new LinkedHashMap<String, Long>();
+		// count over all the days
+
+		try
+		{
+			// String userName=entryForUser.getKey();
+			// System.out.println("\nUser ="+entryForUser.getKey());
+			String fileName = commonPath + userName + "ActivityDuration" + fileNamePhrase + ".csv";
+
+			if (VerbosityConstants.verbose)
+			{
+				System.out.println("writing " + userName + "ActivityDuration" + fileNamePhrase + ".csv");
+			}
+
+			StringBuilder toWrite = new StringBuilder();
+
+			toWrite.append(",");
+			// bw.write(",");
+
+			for (String pdVal : uniquePDVals)
+			{
+				// if (UtilityBelt.isValidActivityName(activityName) == false)
+				// (activityName.equals("Unknown")|| activityName.equals("Others"))
+				if (givenDimension.equals(PrimaryDimension.ActivityID)
+						&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+				{
+					continue;
+				}
+				toWrite.append("," + pdVal);
+				// bw.write("," + activityName);
+				activityNameDurationPairsOverAllDayTimelines.put(pdVal, new Long(0));
+			}
+			toWrite.append("\n");
+			// bw.newLine();
+
+			for (Map.Entry<String, Timeline> entry : userTimelines.entrySet())
+			{
+				// System.out.println("Date =" + entry.getKey());
+				// bw.write(entry.getKey().toString());
+				// bw.write("," + (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
+
+				toWrite.append(entry.getKey().toString());
+				// + ","+ (DateTimeUtils.getWeekDayFromWeekDayInt(entry.getKey().getDay())));
+
+				ArrayList<ActivityObject2018> activitiesInDay = entry.getValue().getActivityObjectsInDay();
+				LinkedHashMap<String, Long> activityNameDurationPairs = new LinkedHashMap<String, Long>();
+
+				for (String pdVal : uniquePDVals) // written beforehand to maintain the same order of activity
+													// names
+				{
+					if (givenDimension.equals(PrimaryDimension.ActivityID)
+							&& UtilityBelt.isValidActivityID(Integer.valueOf(pdVal)) == false)
+					{
+					}
+					// if (UtilityBelt.isValidActivityName(activityName))
+					// if((activityName.equalsIgnoreCase("Others")||activityName.equalsIgnoreCase("Unknown"))==false)
+					else
+					{
+						activityNameDurationPairs.put(pdVal, new Long(0));
+					}
+				}
+
+				for (ActivityObject2018 actEvent : activitiesInDay)
+				{
+					ArrayList<Integer> aoPDValsInt = actEvent.getGivenDimensionVal(givenDimension);
+					ArrayList<String> aoPDVals = (ArrayList<String>) aoPDValsInt.stream().map(i -> String.valueOf(i))
+							.collect(Collectors.toList());
+					for (String aoPDVal : aoPDVals)
+					{
+						if (givenDimension.equals(PrimaryDimension.ActivityID)
+								&& UtilityBelt.isValidActivityID(Integer.valueOf(aoPDVal)) == false)
+						{
+						}
+						// if (UtilityBelt.isValidActivityName(actEvent.getActivityName()))
+						// if((actEvent.getActivityName().equalsIgnoreCase("Unknown") ||
+						// actEvent.getActivityName().equalsIgnoreCase("Others") ) ==false)
+						else
+						{
+							Long durationInSecondsForActivity = actEvent.getDurationInSeconds();
+							// summing of duration for current day
+							activityNameDurationPairs.put(aoPDVal,
+									activityNameDurationPairs.get(aoPDVal) + durationInSecondsForActivity);
+
+							// accumulative duration over all days
+							activityNameDurationPairsOverAllDayTimelines.put(aoPDVal,
+									activityNameDurationPairsOverAllDayTimelines.get(aoPDVal)
+											+ durationInSecondsForActivity);
+						}
+					}
+				}
+
+				// write the activityNameDurationPairs to the file
+				for (Map.Entry<String, Long> entryWrite : activityNameDurationPairs.entrySet())
+				{
+					// bw.write("," + entryWrite.getValue());
+					toWrite.append("," + entryWrite.getValue());
+				}
+				toWrite.append("\n");
+				// bw.newLine();
+			}
+			// File file = new File(fileName);
+			// file.delete();
+			// FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+			// BufferedWriter bw = new BufferedWriter(fw);
+			WToFile.writeToNewFile(toWrite.toString(), fileName);
+			// bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.exit(-5);
+		}
+
+		if (doWrite)
+		{
+			WToFile.writeSimpleLinkedHashMapToFileAppend(activityNameDurationPairsOverAllDayTimelines,
+					commonPath + "ActivityNameDurationPairsOver" + fileNamePhrase + ".csv", "Activity", "Duration",
+					false);
+		}
 		// TODO check if it indeed should be an append
 
 		return activityNameDurationPairsOverAllDayTimelines;

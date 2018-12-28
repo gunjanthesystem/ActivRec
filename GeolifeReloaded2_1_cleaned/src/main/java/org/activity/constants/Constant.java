@@ -95,13 +95,13 @@ public final class Constant
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
 	// SWITCH_DEC20
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.ClosestTime;//// TODO .NCount;//
-																							//// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;//// TODO .NCount;//
+																						//// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 	// SWITCH_DEC20
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.ClosestTime;//// TODO SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.HighDur;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
@@ -456,7 +456,7 @@ public final class Constant
 
 	public static final boolean blacklistingUsersWithLargeMaxActsPerDay = true;
 
-	public static final boolean DoBaselineDuration = false, DoBaselineOccurrence = true, DoBaselineNGramSeq = false;
+	public static final boolean DoBaselineDuration = true, DoBaselineOccurrence = true, DoBaselineNGramSeq = false;
 
 	///////////////////////////// End of parameters less likely to change ///////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -471,8 +471,10 @@ public final class Constant
 	 */
 	static String outputCoreResultsPath = "";
 
+	// @Deprecated
 	static String[] activityNames;
 	// static Map<Integer, Integer> actIDNameIndexMap;// <actID, index of actID in activityNames array>
+	@Deprecated
 	static Map<String, Integer> actIDNameIndexMap;// <actID, index of actID in activityNames array>
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1516,6 +1518,19 @@ public final class Constant
 	public static Set<Integer> getUniqueActivityIDs()
 	{
 		return uniqueActivityIDs;
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @since 27 Dec 2018
+	 */
+	public static Set<Integer> getUniqueValidActivityIDs()
+	{
+		return uniqueActivityIDs.stream()
+				.filter(v -> (v != Constant.INVALID_ACTIVITY1_ID && v != Constant.INVALID_ACTIVITY2_ID))
+				.collect(Collectors.toSet());
+		// return uniqueActivityIDs;
 	}
 
 	public static void setUniqueActivityIDs(Set<Integer> activityIDs)

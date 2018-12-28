@@ -348,11 +348,13 @@ public class RecommendationTestsUtils
 	 * 
 	 * @param trainTestTimelinesForAllUsersDW
 	 * @param numOfRecentDays
+	 * @param doFilter
+	 *            added on 27 Dec 2018
 	 * @return map of {userID, filteredTrainingTimelineForThisUser}
 	 */
 	public final static LinkedHashMap<String, Timeline> getContinousTrainingTimelinesWithFilterByRecentDaysV2(
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
-			int numOfRecentDays)
+			int numOfRecentDays, boolean doFilter)
 	{
 		LinkedHashMap<String, Timeline> trainTimelineForAllUsers = new LinkedHashMap<>();
 		System.out.println("----- Filtering by recent " + numOfRecentDays + " Days");
@@ -381,10 +383,17 @@ public class RecommendationTestsUtils
 			}
 
 			// filter by date in setOfSelectedDatesForThisUser
-			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate
-					.entrySet().stream().filter(e -> setOfSelectedDatesForThisUser.contains(e.getKey()))
-					.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
-
+			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = null;
+			if (doFilter)
+			{
+				filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate.entrySet().stream()
+						.filter(e -> setOfSelectedDatesForThisUser.contains(e.getKey()))
+						.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
+			}
+			else
+			{
+				filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate;
+			}
 			// convert datetime to continouse timeline
 			Timeline filteredTrainingTimelineForThisUser = TimelineTransformers
 					.dayTimelinesToATimeline(filteredDayTrainingTimelineForThisUser, false, true);
@@ -404,6 +413,97 @@ public class RecommendationTestsUtils
 						+ filteredTrainingTimelineForThisUser.size());
 				sb.append("\n" + filteredTrainingTimelineForThisUser.getActivityObjectNamesWithTimestampsInSequence()
 						+ "\n--\n");
+				// System.out.println(sb.toString() + "\n--\n");
+			}
+			// end of debug print
+			WToFile.appendLineToFileAbs(sb.toString() + "\n--\n",
+					Constant.getCommonPath() + "FilteringOfTrainingDays.csv");
+		}
+
+		return trainTimelineForAllUsers;
+	}
+
+	/**
+	 * Fork of org.activity.evaluation.RecommendationTestsUtils.getContinousTrainingTimelinesWithFilterByRecentDaysV2()
+	 * <p>
+	 * Only filtering and not converting to continuous timelines
+	 * <p>
+	 * Take only recent numOfRecentDays days for each user
+	 * 
+	 * <p>
+	 * Sanity checked
+	 * 
+	 * @param trainTestTimelinesForAllUsersDW
+	 * @param numOfRecentDays
+	 * @param doFilter
+	 *            added on 27 Dec 2018
+	 * @return map of {userID, filteredTrainingTimelineForThisUser}
+	 * @since 27 Dec 2018
+	 */
+	public final static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> getTrainingTimelinesWithFilterByRecentDaysV3(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
+			int numOfRecentDays, boolean doFilter)
+	{
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelineForAllUsers = new LinkedHashMap<>();
+		System.out.println("----- Filtering by recent " + numOfRecentDays + " Days");
+		StringBuilder sb = new StringBuilder("Debug 27 Dec\t");
+
+		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> trainTestForAUser : trainTestTimelinesForAllUsersDW
+				.entrySet())
+		{
+			LinkedHashMap<Date, Timeline> trainingTimelineForThisUserDate = trainTestForAUser.getValue().get(0);
+
+			// Get most recent numOfRecentDays dates
+			List<Date> trainingDatesForThisUserList = new ArrayList<>();
+			trainingDatesForThisUserList.addAll(trainingTimelineForThisUserDate.keySet());
+			Collections.sort(trainingDatesForThisUserList, Collections.reverseOrder());
+
+			Set<Date> setOfSelectedDatesForThisUser = trainingDatesForThisUserList.stream().limit(numOfRecentDays)
+					.collect(Collectors.toSet());
+
+			if (VerbosityConstants.verbose)// added on 29 June 2018 to reduce verbosity of output
+			{
+				System.out.println("UserID=" + trainTestForAUser.getKey() + " numOfTrainingDays="
+						+ trainingDatesForThisUserList.size() + "\ttrainingDatesForThisUserList= \n"
+						+ trainingDatesForThisUserList);
+				System.out.println("numOfSelectedTrainingDays= " + setOfSelectedDatesForThisUser.size()
+						+ "\t\tsetOfSelectedDatesForThisUser= \n" + setOfSelectedDatesForThisUser);
+			}
+
+			// filter by date in setOfSelectedDatesForThisUser
+			LinkedHashMap<Date, Timeline> filteredDayTrainingTimelineForThisUser = null;
+			if (doFilter)
+			{
+				filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate.entrySet().stream()
+						.filter(e -> setOfSelectedDatesForThisUser.contains(e.getKey()))
+						.collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
+			}
+			else
+			{
+				filteredDayTrainingTimelineForThisUser = trainingTimelineForThisUserDate;
+			}
+			// convert datetime to continouse timeline
+			// Timeline filteredTrainingTimelineForThisUser = TimelineTransformers
+			// .dayTimelinesToATimeline(filteredDayTrainingTimelineForThisUser, false, true);
+
+			trainTimelineForAllUsers.put(trainTestForAUser.getKey(), filteredDayTrainingTimelineForThisUser);
+			// filteredTrainingTimelineForThisUser);
+
+			// start of debug print
+			if (VerbosityConstants.WriteFilterTrainTimelinesByRecentDays)
+			{
+				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. original day timelines: size = "
+						+ trainingTimelineForThisUserDate.size());
+				trainingTimelineForThisUserDate.entrySet().stream().forEachOrdered(e -> sb.append(
+						"\n" + e.getKey() + "--" + e.getValue().getActivityObjectNamesWithTimestampsInSequence()));
+				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. selected dates:");
+				setOfSelectedDatesForThisUser.stream().forEachOrdered(e -> sb.append("\n" + e.toString() + "--"));
+				sb.append("\n-->User =" + trainTestForAUser.getKey() + "\n. filtered day timelines: size= "
+						+ filteredDayTrainingTimelineForThisUser.size());
+				sb.append("\n" + filteredDayTrainingTimelineForThisUser.entrySet().stream()
+						.map(e -> e.getKey().toString() + "--"
+								+ e.getValue().getActivityObjectNamesWithTimestampsInSequence())
+						.collect(Collectors.joining("\n")) + "\n--\n");
 				// System.out.println(sb.toString() + "\n--\n");
 			}
 			// end of debug print

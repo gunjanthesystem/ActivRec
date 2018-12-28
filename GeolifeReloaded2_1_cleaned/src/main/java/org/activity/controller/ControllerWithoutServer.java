@@ -687,7 +687,8 @@ public class ControllerWithoutServer
 			{
 				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
 						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
-								Constant.getRecentDaysInTrainingTimelines());
+								Constant.getRecentDaysInTrainingTimelines(),
+								Constant.filterTrainingTimelinesByRecentDays);
 			}
 			else
 			{

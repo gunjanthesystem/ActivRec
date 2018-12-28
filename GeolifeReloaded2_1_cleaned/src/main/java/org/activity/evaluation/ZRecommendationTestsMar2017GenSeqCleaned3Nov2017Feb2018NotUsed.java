@@ -636,7 +636,8 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 				String weekDay = DateTimeUtils.getWeekDayFromWeekDayInt(testDate.getDay());
 
-				ArrayList<ActivityObject2018> activityObjectsInTestDay = testDayTimelineForUser.getActivityObjectsInDay();
+				ArrayList<ActivityObject2018> activityObjectsInTestDay = testDayTimelineForUser
+						.getActivityObjectsInDay();
 
 				////////// added to improve write speed
 				ArrayList<StringBuilder> sbsRawToWriteForThisUserDate = createListOfStringBuilders(recommSeqLength);
@@ -823,7 +824,7 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 									userTrainingTimelines, userTestTimelines, dateToRecomm, recommTimesStrings[0],
 									userId, thresholdValue, typeOfThreshold, matchingUnit, caseType, this.lookPastType,
 									false, repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-									trainTimelinesAllUsersContinuous, Constant.altSeqPredictor);
+									trainTimelinesAllUsersContinuous, Constant.altSeqPredictor, null);
 						}
 
 						else if (Constant.altSeqPredictor == Enums.AltSeqPredictor.RNN1)
@@ -1638,8 +1639,8 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		// Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs()); } else {
 		repAOResult = buildRepresentativeAOsForUserPDV2(userId,
 				TimelineTransformers.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-				TimelineTransformers.dayTimelinesToATimeline(userTestTimelines, false, true), Constant.getUniqueLocIDs(),
-				Constant.getUniqueActivityIDs());
+				TimelineTransformers.dayTimelinesToATimeline(userTestTimelines, false, true),
+				Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs());
 
 		// Start of Sanity Check for buildRepresentativeAOsForUserPD()
 		if (VerbosityConstants.checkSanityPDImplementn && Constant.primaryDimension.equals(PrimaryDimension.ActivityID))
@@ -1649,7 +1650,8 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 			// (except data type)
 			Pair<LinkedHashMap<String, ActivityObject2018>, LinkedHashMap<String, Pair<Double, Double>>> repAOResultActName = buildRepresentativeAOsForUser(
 					userId, TimelineTransformers.dayTimelinesToATimeline(userTrainingTimelines, false, true),
-					Constant.getActivityNames(), TimelineTransformers.dayTimelinesToATimeline(userTestTimelines, false, true));
+					Constant.getActivityNames(),
+					TimelineTransformers.dayTimelinesToATimeline(userTestTimelines, false, true));
 			Sanity.compareOnlyNonEmpty(repAOResult, repAOResultActName);
 		}
 		// end of Sanity Check for buildRepresentativeAOsForUserPD()
@@ -2409,9 +2411,9 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
 
-		ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs, activityName, "",
-				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,
-				-1, -1, new String[] { "" });
+		ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs,
+				activityName, "", newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1,
+				workingLevelCatIDs, -1, -1, new String[] { "" });
 
 		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
 		{
@@ -2513,9 +2515,9 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
 
-		ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs, activityName, "",
-				newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1, workingLevelCatIDs,
-				-1, -1, new String[] { "" });
+		ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs,
+				activityName, "", newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1,
+				workingLevelCatIDs, -1, -1, new String[] { "" });
 
 		if (!DateTimeUtils.isSameDate(recommendationTime, newRecommTimestamp))
 		{
@@ -2587,7 +2589,8 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 
 		Timestamp newRecommTimestamp = new Timestamp((long) (recommendationTime.getTime() + medianPreceedingDuration));
 
-		ActivityObject2018 repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst().get(topPrimaryDimensionVal);
+		ActivityObject2018 repAOForThisActNameForThisUser = repAOResultGenericUser.getFirst()
+				.get(topPrimaryDimensionVal);
 
 		repAOForThisActNameForThisUser.setStartTimestamp(newRecommTimestamp);
 		repAOForThisActNameForThisUser.setEndTimestamp(newRecommTimestamp);
@@ -3473,9 +3476,10 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 						userID + "__" + actName + "cinsCount.txt", false).getPercentile(50);
 
 				// NOTE: we only need to take care of feature which are used for edit distance computation.
-				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018((int) Integer.valueOf(actName),
-						new ArrayList<Integer>(), actName, "", mediaStartTS, "", "", "", String.valueOf(userID), -1,
-						medianCinsCount, -1, -1, -1, -1, -1, actName + "__", -1, -1, new String[] { "" });
+				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(
+						(int) Integer.valueOf(actName), new ArrayList<Integer>(), actName, "", mediaStartTS, "", "", "",
+						String.valueOf(userID), -1, medianCinsCount, -1, -1, -1, -1, -1, actName + "__", -1, -1,
+						new String[] { "" });
 
 				repAOs.put(actName, repAOForThisActNameForThisUser);
 				actMedPreSuccDuration.put(actName,
@@ -3553,9 +3557,10 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 				// .getPercentile(50);
 
 				// NOTE: we only need to take care of feature which are used for edit distance computation.
-				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018((int) Integer.valueOf(actName),
-						new ArrayList<Integer>(), actName, "", dummyMedianStartTS, "", "", "", String.valueOf(userID),
-						-1, -1, -1, -1, -1, -1, -1, actName + "__", -1, -1, new String[] { "" });
+				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(
+						(int) Integer.valueOf(actName), new ArrayList<Integer>(), actName, "", dummyMedianStartTS, "",
+						"", "", String.valueOf(userID), -1, -1, -1, -1, -1, -1, -1, actName + "__", -1, -1,
+						new String[] { "" });
 
 				repAOs.put(actName, repAOForThisActNameForThisUser);
 				actMedPreSuccDuration.put(actName,
@@ -3678,8 +3683,8 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		}
 
 		System.out.println("Exiting computeRepresentativeActivityObjectForUserPDV2 for userID" + userID);
-		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(repAOs,
-				actMedPreSuccDuration);
+		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(
+				repAOs, actMedPreSuccDuration);
 	}
 
 	/**
@@ -3688,8 +3693,8 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 	 * @param PDVal
 	 * @return
 	 */
-	public Integer getMedianCheckinsCountForGivePDVal(LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal,
-			Integer PDVal)
+	public Integer getMedianCheckinsCountForGivePDVal(
+			LinkedHashMap<Integer, ArrayList<ActivityObject2018>> aosForEachPDVal, Integer PDVal)
 	{
 		int res = -1;
 		ArrayList<ActivityObject2018> aos = aosForEachPDVal.get(PDVal);
@@ -3818,8 +3823,8 @@ public class ZRecommendationTestsMar2017GenSeqCleaned3Nov2017Feb2018NotUsed
 		}
 
 		System.out.println("Exiting computeRepresentativeActivityObjectForUserPDV2genericUser for generic user");
-		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(repAOs,
-				actMedPreSuccDuration);
+		return new Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>(
+				repAOs, actMedPreSuccDuration);
 	}
 
 	/**

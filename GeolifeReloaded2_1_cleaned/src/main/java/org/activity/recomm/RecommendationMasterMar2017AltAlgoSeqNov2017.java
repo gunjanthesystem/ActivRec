@@ -167,6 +167,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param trainTestTimelinesForAllUsers
 	 * @param trainTimelinesAllUsersContinuous
 	 * @param altSeqPredictor
+	 * @param mapsForCountDurationBaselines
+	 *            added on 27 Dec 2018 for baseline HighOccurrence and HighDuration
 	 */
 	public RecommendationMasterMar2017AltAlgoSeqNov2017(LinkedHashMap<Date, Timeline> trainingTimelines,
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
@@ -174,7 +176,8 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
 			ArrayList<ActivityObject2018> actObjsToAddToCurrentTimeline,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor)
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor,
+			LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines)
 	{
 		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
 		if (Constant.getDatabaseName().equals("dcu_data_2")) // added on 26 Dec 2018 for Baseline closest time
@@ -612,6 +615,51 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 						this.activitiesGuidingRecomm, this.caseType, this.lookPastType, this.candidateTimelines, 1,
 						false, Constant.getAKOMHighestOrder(), this.userIDAtRecomm, altSeqPredictor);
 			}
+			else if (altSeqPredictor.equals(AltSeqPredictor.HighDur))
+			{// added on 27 Dec 2018
+				LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+						.get("activityNameCountPairsOverAllTrainingDays");
+				ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
+				recommendedActivityNamesWithRankscores = new LinkedHashMap<>(
+						activityNameCountPairsOverAllTrainingDays.size());
+				for (Map.Entry<String, Long> e : activityNameCountPairsOverAllTrainingDays.entrySet())
+				{
+					recommendedActivityNamesWithRankscores.put(e.getKey(), Double.valueOf(e.getValue()));
+				}
+
+				// this.recommendedActivityNamesWithRankscores = (LinkedHashMap<String, Double>)
+				// activityNameCountPairsOverAllTrainingDays
+				// .entrySet().stream()
+				// .collect(Collectors.toMap(e -> e.getKey(), e -> Double.valueOf(e.getValue())));
+
+				// actNamesCountsWithoutCountOverTrain = RecommendationTestsUtils
+				// .getActivityNameCountPairsWithoutCount(activityNameCountPairsOverAllTrainingDays);
+				// this.recommendedActivityNamesWithRankscores = RecommendationTestsUtils
+				// .getActivityNameCountPairsWithCount(activityNameCountPairsOverAllTrainingDays);
+
+				// LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String,
+				// Long>) mapsForCountDurationBaselines
+				// .get("activityNameDurationPairsOverAllTrainingDays");
+				// ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
+				// actNamesDurationsWithoutDurationOverTrain = RecommendationTestsUtils
+				// .getActivityNameDurationPairsWithoutDuration(activityNameDurationPairsOverAllTrainingDays);
+				// actNamesDurationsWithDurationOverTrain = RecommendationTestsUtils
+				// .getActivityNameDurationPairsWithDuration(activityNameDurationPairsOverAllTrainingDays);
+			}
+			else if (altSeqPredictor.equals(AltSeqPredictor.HighOccur))
+			{// added on 27 Dec 2018
+				LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+						.get("activityNameDurationPairsOverAllTrainingDays");
+				ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
+
+				recommendedActivityNamesWithRankscores = new LinkedHashMap<>(
+						activityNameDurationPairsOverAllTrainingDays.size());
+				for (Map.Entry<String, Long> e : activityNameDurationPairsOverAllTrainingDays.entrySet())
+				{
+					recommendedActivityNamesWithRankscores.put(e.getKey(), Double.valueOf(e.getValue()));
+				}
+			}
+
 			else if (altSeqPredictor.equals(AltSeqPredictor.ClosestTime))// added on 26 Dec 2018
 			{
 				////////////////////////////// Start of added on 26 Dec 2018
@@ -741,7 +789,9 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			//////////////
 		}
 
-		catch (Exception e)
+		catch (
+
+		Exception e)
 		{
 			e.printStackTrace();
 			// PopUps.getTracedErrorMsg("Exception in recommendation master");
@@ -1734,7 +1784,9 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 		if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
 				|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
-				|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.ClosestTime))
+				|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.ClosestTime)
+				|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.HighDur)
+				|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.HighOccur))
 		{
 			return candidateTimelines.size();
 		}

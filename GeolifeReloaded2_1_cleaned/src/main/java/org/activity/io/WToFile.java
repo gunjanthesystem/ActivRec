@@ -4145,13 +4145,15 @@ public class WToFile
 	 * @param absFileNameToWrite
 	 * @param headerKey
 	 * @param headerValue
+	 * @param checkActNameOrder
+	 *            added on 27 Dec 2018
 	 */
 	public static void writeSimpleLinkedHashMapToFileAppend(LinkedHashMap<String, ?> map, String absFileNameToWrite,
-			String headerKey, String headerValue)
+			String headerKey, String headerValue, boolean checkActNameOrder)
 	{
 		// commonPath = Constant.getCommonPath();//
-
-		if (Constant.areActivityNamesInCorrectOrder(map) == false)
+		// String header = valsForHeader.stream().map(v -> String.valueOf(v)).collect(Collectors.joining(","));
+		if (checkActNameOrder && Constant.areActivityNamesInCorrectOrder(map) == false)
 		{
 			System.err.println(
 					"Debug Feb24: Error inside writeSimpleLinkedHashMapToFileAppend: is correct order of activity names = "
@@ -4169,14 +4171,91 @@ public class WToFile
 
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fileToWrite, true));// ,true));
 
-			// bw.write(headerKey+","+headerValue);
+			// bw.write(header);// headerKey+","+headerValue);
 			bw.newLine();
+			int index = -1;
 
+			// System.out.println("Debug27Dec: valsForHeader = " + valsForHeader + " map.keySet = " + map.keySet());
 			for (Map.Entry<String, ?> entry : map.entrySet())
 			{
 				// bw.write(entry.getKey()+","+entry.getValue());
 				// bw.append(entry.getValue().toString() + ",");
 				toWrite.append(entry.getValue().toString() + ",");
+
+				// Sanity check of order start
+				// if (entry.getKey().equals(String.valueOf(valsForHeader.get(index))) == false)
+				// {
+				// PopUps.printTracedErrorMsg("Error: pdVals not in current order: index = " + index
+				// + " entry.getValue() = " + entry.getValue() + " while valsForHeader.get(index) = "
+				// + valsForHeader.get(index));
+				// }
+				// Sanity check of order end
+			}
+
+			bw.append(toWrite.toString());
+			bw.close();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Write a LinkedHashMap to file modified for append
+	 * 
+	 * @param map
+	 * @param absFileNameToWrite
+	 * @param headerKey
+	 * @param headerValue
+	 * @param checkActNameOrder
+	 *            added on 27 Dec 2018
+	 * @param valsForHeader
+	 *            added on 27 Dec 2018
+	 */
+	public static void writeSimpleLinkedHashMapToFileAppend(LinkedHashMap<String, ?> map, String absFileNameToWrite,
+			String headerKey, String headerValue, boolean checkActNameOrder, ArrayList<Integer> valsForHeader)
+	{
+		// commonPath = Constant.getCommonPath();//
+		String header = valsForHeader.stream().map(v -> String.valueOf(v)).collect(Collectors.joining(","));
+		if (checkActNameOrder && Constant.areActivityNamesInCorrectOrder(map) == false)
+		{
+			System.err.println(
+					"Debug Feb24: Error inside writeSimpleLinkedHashMapToFileAppend: is correct order of activity names = "
+							+ Constant.areActivityNamesInCorrectOrder(map));
+		}
+		// Constant.areActivityNamesInCorrectOrder(map);
+
+		StringBuilder toWrite = new StringBuilder();
+
+		try
+		{
+			File fileToWrite = new File(absFileNameToWrite);
+			// fileToWrite.delete();
+			// fileToWrite.createNewFile();
+
+			BufferedWriter bw = new BufferedWriter(new FileWriter(fileToWrite, true));// ,true));
+
+			bw.write(header);// headerKey+","+headerValue);
+			bw.newLine();
+			int index = -1;
+
+			// System.out.println("Debug27Dec: valsForHeader = " + valsForHeader + " map.keySet = " + map.keySet());
+			for (Map.Entry<String, ?> entry : map.entrySet())
+			{
+				index += 1;
+				// bw.write(entry.getKey()+","+entry.getValue());
+				// bw.append(entry.getValue().toString() + ",");
+				toWrite.append(entry.getValue().toString() + ",");
+
+				// Sanity check of order start
+				if (entry.getKey().equals(String.valueOf(valsForHeader.get(index))) == false)
+				{
+					PopUps.printTracedErrorMsg("Error: pdVals not in current order: index = " + index
+							+ " entry.getValue() = " + entry.getValue() + " while valsForHeader.get(index) = "
+							+ valsForHeader.get(index));
+				}
+				// Sanity check of order end
 			}
 
 			bw.append(toWrite.toString());
@@ -4198,17 +4277,32 @@ public class WToFile
 	 * @param userAllDatesTimeslines
 	 * @param userTrainingTimelines
 	 * @param userTestTimelines
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
+	 * @param doWrite
+	 *            added on 27 Dec 2018
+	 * @param isCollaborative
+	 *            added on 27 Dec 2018
 	 * @return linkedhashmap contain two maps for training timelines, one for baseline count and other for baseline
 	 *         duration. Here, map for baseline count contains {ActivityNames,count over all days in training
 	 *         timelines}, similarly for count of baseline duration
 	 */
 	public static LinkedHashMap<String, LinkedHashMap<String, ?>> writeBasicActivityStatsAndGetBaselineMaps(
 			String userName, LinkedHashMap<Date, Timeline> userAllDatesTimeslines,
-			LinkedHashMap<Date, Timeline> userTrainingTimelines, LinkedHashMap<Date, Timeline> userTestTimelines)
+			LinkedHashMap<Date, Timeline> userTrainingTimelines, LinkedHashMap<Date, Timeline> userTestTimelines,
+			PrimaryDimension givenDimension, boolean doWrite, boolean isCollaborative)
 	{
 		String commonPath = Constant.getCommonPath();
 
-		String timelinesSets[] = { "AllTimelines", "TrainingTimelines", "TestTimelines" };
+		// String timelinesSets[] = null;
+		ArrayList<String> timelinesSets = new ArrayList<>();
+		timelinesSets.add("TrainingTimelines");
+		if (!isCollaborative)
+		{
+			timelinesSets.add("AllTimelines");
+			timelinesSets.add("TestTimelines");
+		}
+
 		LinkedHashMap<Date, Timeline> timelinesCursor = null;
 
 		// the thing to return, contains two hashmaps used for count and duration baselines
@@ -4242,39 +4336,212 @@ public class WToFile
 
 			if (timelinesSet.equals("TrainingTimelines"))
 			{
+				activityNameCountPairsOverAllTrainingDays = TimelineStats.writeActivityCountsInGivenDayTimelines(
+						userName, timelinesCursor, timelinesSet, commonPath, givenDimension, doWrite);
+				activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
+						.sortByValueDesc(activityNameCountPairsOverAllTrainingDays);
+				resultsToReturn.put("activityNameCountPairsOverAllTrainingDays",
+						activityNameCountPairsOverAllTrainingDays);
+
+				activityNameDurationPairsOverAllTrainingDays = TimelineStats.writeActivityDurationInGivenDayTimelines(
+						userName, timelinesCursor, timelinesSet, commonPath, givenDimension, doWrite);
+				activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
+						.sortByValueDesc(activityNameDurationPairsOverAllTrainingDays);
+				resultsToReturn.put("activityNameDurationPairsOverAllTrainingDays",
+						activityNameDurationPairsOverAllTrainingDays);
+
+				activityNameOccPercentageOverAllTrainingDays = TimelineStats.writeActivityOccPercentageOfTimelines(
+						userName, timelinesCursor, timelinesSet, commonPath, givenDimension, doWrite);
+			}
+			// else//disabled on 27 Dec 2018
+			{
+				LinkedHashMap<String, Long> actCountRes1 = TimelineStats.writeActivityCountsInGivenDayTimelines(
+						userName, timelinesCursor, timelinesSet, commonPath, givenDimension, doWrite);
+				LinkedHashMap<String, Long> actDurationRes1 = TimelineStats.writeActivityDurationInGivenDayTimelines(
+						userName, timelinesCursor, timelinesSet, commonPath, givenDimension, doWrite);
+				LinkedHashMap<String, Double> actOccPercentageRes1 = TimelineStats
+						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet, commonPath,
+								givenDimension, doWrite);
+				/////////
+				// for writing header
+				// ArrayList<Integer> uniquePDValsInt = new ArrayList<>(Constant.getUniqueActivityIDs());
+				List<String> uniquePDVals = null;
+				ArrayList<Integer> uniquePDValsInt = null;
+				if (givenDimension.equals(PrimaryDimension.ActivityID))
+				{
+					uniquePDValsInt = new ArrayList<>(Constant.getUniqueValidActivityIDs());
+				}
+				else if (givenDimension.equals(PrimaryDimension.LocationGridID)
+						|| givenDimension.equals(PrimaryDimension.LocationID))
+				{
+					uniquePDValsInt = new ArrayList<>(Constant.getUniqueLocIDs());
+				}
+				else
+				{
+					PopUps.printTracedErrorMsg("Error: unrecognised PD " + givenDimension);
+				}
+				uniquePDVals = (List<String>) uniquePDValsInt.stream().map(i -> String.valueOf(i))
+						.collect(Collectors.toList());
+				/////////////////
+
+				boolean checkActNamesOrder = false;
+				writeSimpleLinkedHashMapToFileAppend(actCountRes1,
+						commonPath + "ActivityCounts" + timelinesSet + ".csv", "dummy", "dummy", checkActNamesOrder,
+						uniquePDValsInt);
+				writeSimpleLinkedHashMapToFileAppend(actDurationRes1,
+						commonPath + "ActivityDurations" + timelinesSet + ".csv", "dummy", "dummy", checkActNamesOrder,
+						uniquePDValsInt);
+				writeSimpleLinkedHashMapToFileAppend(actOccPercentageRes1,
+						commonPath + "ActivityPerOccur" + timelinesSet + ".csv", "dummy", "dummy", checkActNamesOrder,
+						uniquePDValsInt);
+				// writeSimpleLinkedHashMapToFileAppend(LinkedHashMap<String, ?> map, String fileName, String headerKey,
+				// String headerValue)
+				// writeSimpleLinkedHashMapToFile(LinkedHashMap<String, ?> map, String absFileName, String headerKey,
+				// String headerValue)
+			}
+			TimelineStats.writeNumOfDistinctValidActivitiesPerDayInGivenDayTimelines(userName, timelinesCursor,
+					timelinesSet);
+		}
+
+		return resultsToReturn;
+	}
+
+	/**
+	 * Fork of org.activity.io.WToFile.writeBasicActivityStatsAndGetBaselineMaps() to have String Keys for Day timelines
+	 * since in collaboartive approach day timelines from multiple user can have same Date and should be allowed.
+	 * <p>
+	 * Writes the following for All, Train and Test timelines ActivityCountsInGivenDayTimelines,
+	 * ActivityDurationInGivenDayTimelines, ActivityOccPercentageOfTimelines,
+	 * NumOfDistinctValidActivitiesPerDayInGivenDayTimelines and returns two maps (each sorted by decreasing order of
+	 * values), one for baseline count and other for baseline duration for training timelines.
+	 * 
+	 * @param userName
+	 * @param userAllDatesTimeslines
+	 * @param userTrainingTimelines
+	 * @param userTestTimelines
+	 * @param givenDimension
+	 *            added on 27 Dec 2018
+	 * @param doWrite
+	 *            added on 27 Dec 2018
+	 * @param isCollaborative
+	 *            added on 27 Dec 2018
+	 * @return linkedhashmap contain two maps for training timelines, one for baseline count and other for baseline
+	 *         duration. Here, map for baseline count contains {ActivityNames,count over all days in training
+	 *         timelines}, similarly for count of baseline duration
+	 * @since 27 Dec 2018
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<String, ?>> writeBasicActivityStatsAndGetBaselineMapsStringKeys(
+			String userName, LinkedHashMap<String, Timeline> userAllDatesTimeslines,
+			LinkedHashMap<String, Timeline> userTrainingTimelines, LinkedHashMap<String, Timeline> userTestTimelines,
+			PrimaryDimension givenDimension, boolean doWrite, boolean isCollaborative)
+	{
+		String commonPath = Constant.getCommonPath();
+
+		// String timelinesSets[] = null;
+		ArrayList<String> timelinesSets = new ArrayList<>();
+		timelinesSets.add("TrainingTimelines");
+		if (!isCollaborative)
+		{
+			timelinesSets.add("AllTimelines");
+			timelinesSets.add("TestTimelines");
+		}
+		// <Date as String Key,
+		LinkedHashMap<String, Timeline> timelinesCursor = null;
+
+		// the thing to return, contains two hashmaps used for count and duration baselines
+		LinkedHashMap<String, LinkedHashMap<String, ?>> resultsToReturn = new LinkedHashMap<String, LinkedHashMap<String, ?>>();
+
+		// Needed for base line recommendations (based on training set only)
+		LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays;
+		// Needed for base line recommendations (based on training set only)
+		LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays;
+		// not used currently
+		LinkedHashMap<String, Double> activityNameOccPercentageOverAllTrainingDays;
+
+		for (String timelinesSet : timelinesSets)
+		{
+			switch (timelinesSet)
+			{
+			case "AllTimelines":
+				timelinesCursor = userAllDatesTimeslines;
+				break;
+			case "TrainingTimelines":
+				timelinesCursor = userTrainingTimelines;
+				break;
+			case "TestTimelines":
+				timelinesCursor = userTestTimelines;
+				break;
+			default:
+				PopUps.showError(
+						"Error in org.activity.tests.RecommendationTestsDaywiseJan2016: Unrecognised timelinesSet");
+				break;
+			}
+
+			if (timelinesSet.equals("TrainingTimelines"))
+			{
 				activityNameCountPairsOverAllTrainingDays = TimelineStats
-						.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet, commonPath);
+						.writeActivityCountsInGivenDayTimelinesStringKeys(userName, timelinesCursor, timelinesSet,
+								commonPath, givenDimension, doWrite);
 				activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 						.sortByValueDesc(activityNameCountPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameCountPairsOverAllTrainingDays",
 						activityNameCountPairsOverAllTrainingDays);
 
 				activityNameDurationPairsOverAllTrainingDays = TimelineStats
-						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet, commonPath);
+						.writeActivityDurationInGivenDayTimelinesStringKeys(userName, timelinesCursor, timelinesSet,
+								commonPath, givenDimension, doWrite);
 				activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) ComparatorUtils
 						.sortByValueDesc(activityNameDurationPairsOverAllTrainingDays);
 				resultsToReturn.put("activityNameDurationPairsOverAllTrainingDays",
 						activityNameDurationPairsOverAllTrainingDays);
 
 				activityNameOccPercentageOverAllTrainingDays = TimelineStats
-						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet, commonPath);
+						.writeActivityOccPercentageOfTimelinesStringKeys(userName, timelinesCursor, timelinesSet,
+								commonPath, givenDimension, doWrite);
 			}
-
-			else
+			// else//disabled on 27 Dec 2018
 			{
 				LinkedHashMap<String, Long> actCountRes1 = TimelineStats
-						.writeActivityCountsInGivenDayTimelines(userName, timelinesCursor, timelinesSet, commonPath);
+						.writeActivityCountsInGivenDayTimelinesStringKeys(userName, timelinesCursor, timelinesSet,
+								commonPath, givenDimension, doWrite);
 				LinkedHashMap<String, Long> actDurationRes1 = TimelineStats
-						.writeActivityDurationInGivenDayTimelines(userName, timelinesCursor, timelinesSet, commonPath);
+						.writeActivityDurationInGivenDayTimelinesStringKeys(userName, timelinesCursor, timelinesSet,
+								commonPath, givenDimension, doWrite);
 				LinkedHashMap<String, Double> actOccPercentageRes1 = TimelineStats
-						.writeActivityOccPercentageOfTimelines(userName, timelinesCursor, timelinesSet, commonPath);
+						.writeActivityOccPercentageOfTimelinesStringKeys(userName, timelinesCursor, timelinesSet,
+								commonPath, givenDimension, doWrite);
+				/////////
+				// for writing header
+				// ArrayList<Integer> uniquePDValsInt = new ArrayList<>(Constant.getUniqueActivityIDs());
+				List<String> uniquePDVals = null;
+				ArrayList<Integer> uniquePDValsInt = null;
+				if (givenDimension.equals(PrimaryDimension.ActivityID))
+				{
+					uniquePDValsInt = new ArrayList<>(Constant.getUniqueValidActivityIDs());
+				}
+				else if (givenDimension.equals(PrimaryDimension.LocationGridID)
+						|| givenDimension.equals(PrimaryDimension.LocationID))
+				{
+					uniquePDValsInt = new ArrayList<>(Constant.getUniqueLocIDs());
+				}
+				else
+				{
+					PopUps.printTracedErrorMsg("Error: unrecognised PD " + givenDimension);
+				}
+				uniquePDVals = (List<String>) uniquePDValsInt.stream().map(i -> String.valueOf(i))
+						.collect(Collectors.toList());
+				/////////////////
 
+				boolean checkActNamesOrder = false;
 				writeSimpleLinkedHashMapToFileAppend(actCountRes1,
-						commonPath + "ActivityCounts" + timelinesSet + ".csv", "dummy", "dummy");
+						commonPath + "ActivityCounts" + timelinesSet + ".csv", "dummy", "dummy", checkActNamesOrder,
+						uniquePDValsInt);
 				writeSimpleLinkedHashMapToFileAppend(actDurationRes1,
-						commonPath + "ActivityDurations" + timelinesSet + ".csv", "dummy", "dummy");
+						commonPath + "ActivityDurations" + timelinesSet + ".csv", "dummy", "dummy", checkActNamesOrder,
+						uniquePDValsInt);
 				writeSimpleLinkedHashMapToFileAppend(actOccPercentageRes1,
-						commonPath + "ActivityPerOccur" + timelinesSet + ".csv", "dummy", "dummy");
+						commonPath + "ActivityPerOccur" + timelinesSet + ".csv", "dummy", "dummy", checkActNamesOrder,
+						uniquePDValsInt);
 				// writeSimpleLinkedHashMapToFileAppend(LinkedHashMap<String, ?> map, String fileName, String headerKey,
 				// String headerValue)
 				// writeSimpleLinkedHashMapToFile(LinkedHashMap<String, ?> map, String absFileName, String headerKey,

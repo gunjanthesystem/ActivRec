@@ -1,10 +1,14 @@
 package org.activity.sanityChecks;
 
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.OptionalLong;
 
 import org.activity.objects.ActivityObject2018;
+import org.activity.objects.Timeline;
 import org.activity.ui.PopUps;
+import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineUtils;
 
 public class TimelineSanityChecks
@@ -23,8 +27,8 @@ public class TimelineSanityChecks
 
 		if (TimelineUtils.isChronological(listOfActObjs1) == false)
 		{
-			System.err.println(PopUps.getTracedErrorMsg(
-					"Error in checkIfChronoLogicalOrder: listOfActObjs1 isChronological false"));
+			System.err.println(PopUps
+					.getTracedErrorMsg("Error in checkIfChronoLogicalOrder: listOfActObjs1 isChronological false"));
 			listOfActObjs1.stream().forEachOrdered(ao -> System.err.println(">>" + ao.toStringAllGowallaTS()));
 			inOrder = false;
 		}
@@ -61,6 +65,30 @@ public class TimelineSanityChecks
 		}
 		return inOrder;
 
+	}
+
+	/**
+	 * To check if daywise and continuous timelines are same wrt to sequence of act names with their timestamps
+	 * 
+	 * @param dayTimelines
+	 * @param timeline
+	 * @return
+	 */
+	public static boolean isDaywiseAndContinousTimelinesSameWRTAoNameTS(LinkedHashMap<Date, Timeline> dayTimelines,
+			Timeline timeline, boolean verbose)
+	{
+		Timeline dayTimelineAsContinuous = TimelineTransformers.dayTimelinesToATimeline(dayTimelines, false, true);
+		String dayTimelineAsContinuousStringOfAONamesTS = dayTimelineAsContinuous
+				.getActivityObjectNamesInSequenceWithFeatures();
+		String timelineAsStringOfAONamesTS = timeline.getActivityObjectNamesInSequenceWithFeatures();
+
+		if (verbose)
+		{
+			System.out
+					.println("dayTimelineAsContinuousStringOfAONamesTS=\n" + dayTimelineAsContinuousStringOfAONamesTS);
+			System.out.println("timelineAsStringOfAONamesTS=\n" + timelineAsStringOfAONamesTS);
+		}
+		return dayTimelineAsContinuousStringOfAONamesTS.equals(timelineAsStringOfAONamesTS);
 	}
 
 }
