@@ -353,7 +353,9 @@ public class TimelineWriters
 			{
 				trainTimelinesAllUsersContinuous = RecommendationTestsUtils
 						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
-								Constant.getRecentDaysInTrainingTimelines());
+								Constant.getRecentDaysInTrainingTimelines(),
+								Constant.filterTrainingTimelinesByRecentDays);
+				// TODO: probably if else cases can be combined together, check later
 			}
 			else
 			{

@@ -754,6 +754,20 @@ public class Timeline implements Serializable
 	}
 
 	/**
+	 * 
+	 * @param activityNameToCheck
+	 * @return
+	 * @since 27 Dec 2018
+	 */
+	public boolean hasPDVal(Integer pdValToCheck, PrimaryDimension givenDimension)
+	{
+		// return this.activityObjectsInTimeline.stream().anyMatch(ao ->
+		// ao.getActivityName().equals(activityNameToCheck));
+		return this.activityObjectsInTimeline.stream()
+				.anyMatch(ao -> ao.getGivenDimensionVal(givenDimension).stream().anyMatch(p -> p.equals(pdValToCheck)));
+	}
+
+	/**
 	 * TODO: Make sure the new change ,i.e. running until <size() is compatible with implemention of both Daywise and
 	 * start time approach.
 	 * 

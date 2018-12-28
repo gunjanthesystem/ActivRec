@@ -569,10 +569,17 @@ public class SuperController
 			}
 		}
 		// End of adding on 25 July 2018
-
-		if (Constant.altSeqPredictor.equals(AltSeqPredictor.PureAKOM))
+		if (Constant.altSeqPredictor.equals(AltSeqPredictor.HighOccur))
 		{
-			predictorLabel = AltSeqPredictor.PureAKOM.toString();
+			predictorLabel += "HighOccur";
+		}
+		else if (Constant.altSeqPredictor.equals(AltSeqPredictor.HighDur))
+		{
+			predictorLabel += "HighDur";
+		}
+		else if (Constant.altSeqPredictor.equals(AltSeqPredictor.PureAKOM))
+		{
+			predictorLabel += AltSeqPredictor.PureAKOM.toString();
 			predictorLabel += "Order" + Constant.getAKOMHighestOrder();
 		}
 

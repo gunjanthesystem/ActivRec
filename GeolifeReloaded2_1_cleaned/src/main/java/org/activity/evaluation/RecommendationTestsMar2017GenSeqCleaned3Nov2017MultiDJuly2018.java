@@ -418,7 +418,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 								trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
 										.getContinousTrainingTimelinesWithFilterByRecentDaysV2(
 												trainTestTimelinesForAllUsersDW,
-												Constant.getRecentDaysInTrainingTimelines());
+												Constant.getRecentDaysInTrainingTimelines(),
+												Constant.filterTrainingTimelinesByRecentDays);
 							}
 							else
 							{ // sampledUsersTimelines

@@ -327,6 +327,28 @@ public class UtilityBelt
 	 * 
 	 * @param toCheck
 	 * @return
+	 * @since 27 Dec 2018
+	 */
+	public static boolean isValidActivityID(Integer toCheck)
+	{
+		if (Constant.getDatabaseName().equals("gowalla1")) // gowalla has no invalid activity names
+		{// to speed up
+			return true;
+		}
+		if ((toCheck == (Constant.INVALID_ACTIVITY1_ID)) || (toCheck == (Constant.INVALID_ACTIVITY2_ID)))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
+	 * 
+	 * @param toCheck
+	 * @return
 	 */
 	public static boolean isValidActivityObject(ActivityObject2018 ao)
 	{

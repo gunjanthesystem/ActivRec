@@ -34,6 +34,7 @@ import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
 import org.activity.recomm.RecommendationMasterRNN1Jun2018;
 import org.activity.sanityChecks.Sanity;
+import org.activity.sanityChecks.TimelineSanityChecks;
 import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.stats.FeatureStats;
 import org.activity.ui.PopUps;
@@ -179,6 +180,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 		// training test timelines for all users continuous
 		LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd = null;
+		// added on 27 Dec 2018, needed for baseline coll high occur and high dur
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelinesAllUsersDWFiltrd = null;
 
 		// {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
 		// $$Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>
@@ -191,17 +194,36 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 		// PopUps.showMessage("allUsersTimelines.size() = "+allUsersTimelines.size());
 
-		if (Constant.filterTrainingTimelinesByRecentDays)
+		trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+				.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
+						Constant.getRecentDaysInTrainingTimelines(), Constant.filterTrainingTimelinesByRecentDays);
+
+		// start of added on 27 Dec 2018
+		// added on 27 Dec 2018, needed for baseline coll high occur and high dur
+		trainTimelinesAllUsersDWFiltrd = RecommendationTestsUtils.getTrainingTimelinesWithFilterByRecentDaysV3(
+				trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines(),
+				Constant.filterTrainingTimelinesByRecentDays);
+
+		if (true)// can be disabled after initial run for speed
 		{
-			trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
-					.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
-							Constant.getRecentDaysInTrainingTimelines());
+			// start of sanity check // System.out.println("Sanity check 27 Dec 2018");
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> e : trainTimelinesAllUsersDWFiltrd.entrySet())
+			{ // compare daywise and continuous timelines
+				// System.out.println
+				if ((TimelineSanityChecks.isDaywiseAndContinousTimelinesSameWRTAoNameTS(e.getValue(),
+						trainTimelinesAllUsersContinuousFiltrd.get(e.getKey()), false)) == false)
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: isDaywiseAndContinousTimelinesSameWRTAoNameTS = false");
+				}
+			}
 		}
-		else
-		{ // sampledUsersTimelines
-			trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
-					.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
-		}
+		// end of sanity check OKAY.// System.exit(0);
+		// end of added on 27 Dec 2018
+		// else
+		// { // sampledUsersTimelines
+		// trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+		// .getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
+		// }
 
 		if (false)
 		{
@@ -352,6 +374,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 								.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
 						BufferedWriter baseLineDuration = WToFile
 								.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
+						// added 27 Dec 2018
+						BufferedWriter baseLineOccurrenceWithScore = WToFile
+								.getBWForNewFile(commonPath + "dataBaseLineOccurrenceWithScore.csv");
+						BufferedWriter baseLineDurationWithScore = WToFile
+								.getBWForNewFile(commonPath + "dataBaseLineDurationWithScore.csv");
 
 						BufferedWriter bwNumOfWeekendsInTraining = WToFile
 								.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
@@ -688,24 +715,70 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines = null;
 							String actNamesCountsWithoutCountOverTrain = "";
 							String actNamesDurationsWithoutDurationOverTrain = "";
+							String actNamesCountsWithCountOverTrain = "";
+							String actNamesDurationsWithDurationOverTrain = "";
 
 							// START OF Curtain disable trivial baselines
 							if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
 							{
-								mapsForCountDurationBaselines = WToFile.writeBasicActivityStatsAndGetBaselineMaps(
-										userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines);
+								// this is content based approach
+								if (Constant.collaborativeCandidates == false)
+								{
+									// Okay but disabled on 27 Dec 2018 in favour of method with String keys which is
+									// also used for collaborative approach.
+									// mapsForCountDurationBaselines =
+									// WToFile.writeBasicActivityStatsAndGetBaselineMaps(
+									// userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines,
+									// Constant.primaryDimension, true, false);
+									mapsForCountDurationBaselines = WToFile
+											.writeBasicActivityStatsAndGetBaselineMapsStringKeys(userName,
+													TimelineUtils.toStringKeys(userAllDatesTimeslines),
+													TimelineUtils.toStringKeys(userTrainingTimelines),
+													TimelineUtils.toStringKeys(userTestTimelines),
+													Constant.primaryDimension, true, false);
+								}
+								else
+								{
+									// give training timelines of other users except current user (as daywise timeline)
+									LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelinesDWForAllExceptCurrUser = new LinkedHashMap<>(
+											trainTimelinesAllUsersDWFiltrd);
+
+									LinkedHashMap<Date, Timeline> removedSuccess = trainTimelinesDWForAllExceptCurrUser
+											.remove(String.valueOf(userId));
+									if (removedSuccess == null)
+									{
+										PopUps.printTracedErrorMsgWithExit(
+												"Error: remove curr user unsuccessful. userId = " + userId
+														+ " while keySet to match to :"
+														+ trainTimelinesDWForAllExceptCurrUser.keySet());
+									}
+
+									LinkedHashMap<String, Timeline> trainTimelinesDWForAllExceptCurrUserStringKeys = TimelineUtils
+											.toTogetherWithUserIDStringKeys(trainTimelinesDWForAllExceptCurrUser);
+
+									mapsForCountDurationBaselines = WToFile
+											.writeBasicActivityStatsAndGetBaselineMapsStringKeys(userName, null,
+													trainTimelinesDWForAllExceptCurrUserStringKeys, null,
+													Constant.primaryDimension, true, true);
+								}
+
 								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
 										.get("activityNameCountPairsOverAllTrainingDays");
 								ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
 								actNamesCountsWithoutCountOverTrain = RecommendationTestsUtils
 										.getActivityNameCountPairsWithoutCount(
 												activityNameCountPairsOverAllTrainingDays);
+								actNamesCountsWithCountOverTrain = RecommendationTestsUtils
+										.getActivityNameCountPairsWithCount(activityNameCountPairsOverAllTrainingDays);
 
 								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
 										.get("activityNameDurationPairsOverAllTrainingDays");
 								ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
 								actNamesDurationsWithoutDurationOverTrain = RecommendationTestsUtils
 										.getActivityNameDurationPairsWithoutDuration(
+												activityNameDurationPairsOverAllTrainingDays);
+								actNamesDurationsWithDurationOverTrain = RecommendationTestsUtils
+										.getActivityNameDurationPairsWithDuration(
 												activityNameDurationPairsOverAllTrainingDays);
 							}
 							// END OF Curtain disable trivial baselines
@@ -791,6 +864,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 								StringBuilder baseLineOccurrenceToWriteForThisUserDate = new StringBuilder();
 								StringBuilder baseLineDurationToWriteForThisUserDate = new StringBuilder();
+								// added 27 Dec 2018
+								StringBuilder baseLineOccurrenceWithScoreToWriteForThisUserDate = new StringBuilder();
+								StringBuilder baseLineDurationWithScoreToWriteForThisUserDate = new StringBuilder();
 								///////////
 
 								// loop over the activity objects for this day
@@ -953,7 +1029,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 										// else if (altSeqPredictor == Enums.AltSeqPredictor.PureAKOM)
 										else if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
 												|| altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
-												|| altSeqPredictor.equals(Enums.AltSeqPredictor.ClosestTime))
+												|| altSeqPredictor.equals(Enums.AltSeqPredictor.ClosestTime)
+												|| altSeqPredictor.equals(Enums.AltSeqPredictor.HighDur)
+												|| altSeqPredictor.equals(Enums.AltSeqPredictor.HighOccur))
 										// && (this.lookPastType.equals(Enums.LookPastType.Daywise)
 										{
 											recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeqNov2017(
@@ -961,7 +1039,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
 													matchingUnit, caseType, this.lookPastType, false,
 													repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-													trainTimelinesAllUsersContinuousFiltrd, altSeqPredictor);
+													trainTimelinesAllUsersContinuousFiltrd, altSeqPredictor,
+													mapsForCountDurationBaselines);
 										}
 
 										else if (altSeqPredictor == Enums.AltSeqPredictor.RNN1)
@@ -1352,11 +1431,17 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									{
 										baseLineOccurrenceToWriteForThisUserDate
 												.append(actNamesCountsWithoutCountOverTrain).append(",");
+										// Added on 27 Dec 2018
+										baseLineOccurrenceWithScoreToWriteForThisUserDate
+												.append(actNamesCountsWithCountOverTrain).append(",");
 									}
 									if (Constant.DoBaselineDuration)
 									{
 										baseLineDurationToWriteForThisUserDate
 												.append(actNamesDurationsWithoutDurationOverTrain).append(",");
+										// Added on 27 Dec 2018
+										baseLineDurationWithScoreToWriteForThisUserDate
+												.append(actNamesDurationsWithDurationOverTrain).append(",");
 									}
 
 									/*
@@ -1400,10 +1485,16 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 								if (Constant.DoBaselineOccurrence)
 								{
 									baseLineOccurrence.write(baseLineOccurrenceToWriteForThisUserDate.toString());
+									// added 27 Dec 2018
+									baseLineOccurrenceWithScore
+											.write(baseLineOccurrenceWithScoreToWriteForThisUserDate.toString());
 								}
 								if (Constant.DoBaselineDuration)
 								{
 									baseLineDuration.write(baseLineDurationToWriteForThisUserDate.toString());
+									// added 27 Dec 2018
+									baseLineDurationWithScore
+											.write(baseLineDurationWithScoreToWriteForThisUserDate.toString());
 								}
 
 								metaIfCurrentTargetSameWriter
@@ -1473,6 +1564,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 							baseLineOccurrence.newLine();
 							baseLineDuration.newLine();
+							// added 27 Dec 2017
+							baseLineOccurrenceWithScore.newLine();
+							baseLineDurationWithScore.newLine();
 
 							if (VerbosityConstants.WriteMaxNumberOfDistinctRecommendation)
 							{
@@ -1507,7 +1601,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						RecommendationTestsUtils.closeBWs(rtsAllUsingRecommMasterWriter, rtsRejNoValidActAfterWriter,
 								rtsRejWithNoCandsWriter, rtsRejWithNoCandsBelowThreshWriter,
 								rtsRejWithNoDWButMUCandsCands, rtsRejBlackListedWriter);
-						RecommendationTestsUtils.closeBWs(baseLineOccurrence, baseLineDuration);
+						// changed 27 Dec 2018
+						RecommendationTestsUtils.closeBWs(baseLineOccurrence, baseLineDuration,
+								baseLineOccurrenceWithScore, baseLineDurationWithScore);
 						RecommendationTestsUtils.closeBWs(bwNumOfWeekendsInTraining, bwNumOfWeekendsInAll,
 								bwCountTimeCategoryOfRecomm);
 						RecommendationTestsUtils.closeBWs(metaIfCurrentTargetSameWriter, bwNextActInvalid);

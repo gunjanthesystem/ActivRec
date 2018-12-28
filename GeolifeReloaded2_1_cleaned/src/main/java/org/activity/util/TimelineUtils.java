@@ -2961,6 +2961,53 @@ public class TimelineUtils
 		return GDValCountPerUser;
 	}
 
+	/**
+	 * Convert Date keys to String keys with userID appended i.e. new key = userID_(DateAsString)
+	 * 
+	 * @param trainTimelinesDWForAllExceptCurrUser
+	 * @return
+	 * @since 27 Dec 2018
+	 */
+	public static LinkedHashMap<String, Timeline> toTogetherWithUserIDStringKeys(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> mapOfMapWithDateKeys)
+	{
+		LinkedHashMap<String, Timeline> res = new LinkedHashMap<>();
+		int expectedSize = 0;
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> outerEntry : mapOfMapWithDateKeys.entrySet())
+		{
+			String userID = outerEntry.getKey();
+			expectedSize += outerEntry.getValue().size();
+
+			for (Entry<Date, Timeline> innerE : outerEntry.getValue().entrySet())
+			{
+				res.put(userID + "_" + innerE.getKey().toString(), innerE.getValue());
+			}
+		}
+		Sanity.eq(expectedSize, res.size(), "Error in toTogetherWithUserIDStringKeys(): expectedSize = " + expectedSize
+				+ " while res.size() = " + res.size());
+		return res;
+	}
+
+	/**
+	 * Convert Date keys to String keys with userID appended i.e. new key = userID_(DateAsString)
+	 * 
+	 * @param trainTimelinesDWForAllExceptCurrUser
+	 * @return
+	 * @since 27 Dec 2018
+	 */
+	public static LinkedHashMap<String, Timeline> toStringKeys(LinkedHashMap<Date, Timeline> mapWithDateKeys)
+	{
+		LinkedHashMap<String, Timeline> res = new LinkedHashMap<>();
+		for (Entry<Date, Timeline> innerE : mapWithDateKeys.entrySet())
+		{
+			res.put(innerE.getKey().toString(), innerE.getValue());
+		}
+		Sanity.eq(mapWithDateKeys.size(), res.size(), "Error in toStringKeys(): mapWithDateKeys.size() = "
+				+ mapWithDateKeys.size() + " while res.size() = " + res.size());
+		return res;
+	}
+
 }
 /////////////// UNUSED CODE
 
