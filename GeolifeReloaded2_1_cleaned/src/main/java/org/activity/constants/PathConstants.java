@@ -1,9 +1,14 @@
 package org.activity.constants;
 
+import java.sql.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.activity.io.ReadingFromFile;
+import org.activity.io.Serializer;
+import org.activity.objects.Timeline;
+import org.activity.ui.PopUps;
 
 /**
  * To centralise paths which need to be set for experiments
@@ -75,6 +80,39 @@ public class PathConstants
 
 	public static String pathToJavaGridIndexRGridLatRGridLon;// =
 																// "./dataToRead/July30RGridIDJavaGridIndex/javaGridIndexRGridLatRGridLon.kryo";
+
+	// start of added on 28 Dec 2018
+	public static final String pathToSerializedDCUCleanedTimelines28Dec = "./dataToRead/SerializedTimelines28Dec2018/dcu_data_2_DEC28H19M26HighDurNoTTFilter/usersCleanedDayTimelines.kryo";
+	public static final String pathToSerializedDCUCleanedInvalidsExpungedTimelines28Dec = "./dataToRead/SerializedTimelines28Dec2018/dcu_data_2_DEC28H19M26HighDurNoTTFilter/usersCleanedInvalidsExpungedDayTimelines.kryo";
+	public static final String pathToSerializedGeolifeCleanedTimelines28Dec = "./dataToRead/SerializedTimelines28Dec2018/geolife1_DEC28H19M28HighDurPNN500NoTTFilter/usersCleanedDayTimelines.kryo";
+	public static final String pathToSerializedGowallaCleanedTimelines28Dec = "./dataToRead/SerializedTimelines28Dec2018/gowalla1_DEC28H19M28HighDurPNN500coll/usersCleanedDayTimelines.kryo";
+	// end of added on 28 Dec 2018
+
+	/**
+	 * 
+	 * @param databaseName
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> deserializeAndGetCleanedTimelines28Dec(
+			String databaseName)
+	{
+		switch (databaseName)
+		{
+		case "dcu_data_2":
+			System.err.println("Warning: using invalids expunged timelines: ");
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+					.kryoDeSerializeThis(pathToSerializedDCUCleanedTimelines28Dec);// pathToSerializedDCUCleanedInvalidsExpungedTimelines28Dec);
+		case "geolife1":
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+					.kryoDeSerializeThis(pathToSerializedGeolifeCleanedTimelines28Dec);
+		case "gowalla1":
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+					.kryoDeSerializeThis(pathToSerializedGowallaCleanedTimelines28Dec);
+		default:
+			PopUps.printTracedErrorMsgWithExit("Error: unknown databaseName: " + databaseName);
+			return null;
+		}
+	}
 
 	/**
 	 * Set paths to serialised datasets

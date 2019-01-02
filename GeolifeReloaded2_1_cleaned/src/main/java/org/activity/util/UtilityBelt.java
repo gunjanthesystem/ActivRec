@@ -1583,7 +1583,7 @@ public class UtilityBelt
 	public static int getIndexOfUserID(int userID)
 	{
 		int res = -99;
-		int userIDs[] = Constant.userIDs;
+		int userIDs[] = Constant.getUserIDs();// userIDs;
 		for (int i = 0; i < userIDs.length; i++)
 		{
 			if (userIDs[i] == userID)

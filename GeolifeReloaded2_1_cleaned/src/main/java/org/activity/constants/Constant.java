@@ -95,16 +95,16 @@ public final class Constant
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
 	// SWITCH_DEC20
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;//// TODO .NCount;//
-																						//// SWITCH_NOV10
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;//// TODO .NCount;//
+	//// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 	// SWITCH_DEC20
-	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.HighDur;//// TODO SWITCH_NOV10
+	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
-	private static int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
+	private static int AKOMHighestOrder = 5;// 1;// 3;// SWITCH_NOV10
 	private static int RNNCurrentActivitityLength = 1;
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
@@ -212,10 +212,12 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 0.5 };// , 0.6, 0.8, 0.9 };// 0.7, 0.5, 0, 1, 0.3 };// , 0.7, };// 1, 0.5
-													// };//
-													// 0, 0.2, 0.4, 0.6, 0.7,
-													// 0.8, 0.9, 1 };//
+	public static final double[] EDAlphas = { 0.5 };// 0.4, 0.5, 0.8, 0.9, 1 };// 0.7, 0.5, 0, 1, 0.3 };// , 0.7, };//
+													// 1,
+													// 0.5
+	// };//
+	// 0, 0.2, 0.4, 0.6, 0.7,
+	// 0.8, 0.9, 1 };//
 	// TODO
 	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
 	// SWITCH_NOV20
@@ -331,6 +333,7 @@ public final class Constant
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
 	public static final boolean searchForOptimalFeatureWts = false;// true;
 	public static final boolean purelyRandomPredictionNov25 = false;
+	public static final boolean doForJupyterBaselines = false;// addded on 31 Dec 2018
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -478,7 +481,7 @@ public final class Constant
 	static Map<String, Integer> actIDNameIndexMap;// <actID, index of actID in activityNames array>
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	private static Set<Integer> uniqueActivityIDs;
+	private static TreeSet<Integer> uniqueActivityIDs; // changed to TreeSet on 31 Dec 2018
 	private static LinkedHashMap<String, TreeSet<Integer>> uniquePDValsPerUser;
 
 	private static Set<Integer> uniqueLocationIDs;
@@ -922,8 +925,8 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = false;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.None;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = -1;// TODO 500;// 750;// 500;// 500;/// -1;//
-			percentileForRTVerseMaxForFEDNorm = 75;//// TODO 10;// 75;// -1// SWITCH_April24
-			useFeatureDistancesOfAllActs = false;//// TODO true;// SWITCH_NOV10
+			percentileForRTVerseMaxForFEDNorm = 20;//// TODO 10;// 75;// -1// SWITCH_April24
+			useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = false;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = true;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = true; // false for gowalla// true for others;//
@@ -1174,7 +1177,7 @@ public final class Constant
 		considerAvgAltitudeInFeatureWiseEditDistance = avgAltitude;
 	}
 
-	public static int userIDs[];
+	private static int userIDs[];
 
 	// public static void setWriteAllDayTimelinesPerUser(boolean value)
 	// {
@@ -1525,11 +1528,12 @@ public final class Constant
 	 * @return
 	 * @since 27 Dec 2018
 	 */
-	public static Set<Integer> getUniqueValidActivityIDs()
+	public static TreeSet<Integer> getUniqueValidActivityIDs()
 	{
-		return uniqueActivityIDs.stream()
+		Set<Integer> s = uniqueActivityIDs.stream()
 				.filter(v -> (v != Constant.INVALID_ACTIVITY1_ID && v != Constant.INVALID_ACTIVITY2_ID))
 				.collect(Collectors.toSet());
+		return new TreeSet<>(s);
 		// return uniqueActivityIDs;
 	}
 
@@ -1546,13 +1550,13 @@ public final class Constant
 			// activityNames = DomainConstants.DCUDataActivityNames;
 			// break;
 			case "gowalla1":
-				uniqueActivityIDs = activityIDs;
+				uniqueActivityIDs = (TreeSet<Integer>) activityIDs;
 				break;
 			case "geolife1":
-				uniqueActivityIDs = activityIDs;// ADDED NOV 2018, NOT TESTED
+				uniqueActivityIDs = (TreeSet<Integer>) activityIDs;// ADDED NOV 2018, NOT TESTED
 				break;
 			case "dcu_data_2":
-				uniqueActivityIDs = activityIDs;// ADDED DEC 2018, NOT TESTED
+				uniqueActivityIDs = (TreeSet<Integer>) activityIDs;// ADDED DEC 2018, NOT TESTED
 				break;
 			default:
 				PopUps.printTracedErrorMsgWithExit(
@@ -1971,6 +1975,7 @@ public final class Constant
 		s.append("\nmaxDistanceThresholdForLocGridDissmilarity:" + Constant.maxDistanceThresholdForLocGridDissmilarity);
 		s.append("\nsearchForOptimalFeatureWts:" + Constant.searchForOptimalFeatureWts);
 		s.append("\npurelyRandomPredictionNov25:" + Constant.purelyRandomPredictionNov25);
+		s.append("\ndoForJupyterBaselines:" + Constant.doForJupyterBaselines);
 		// s.append("\n:" + );
 		if (dynamicDistanceUsed.equals("FeatureWiseEditDistance"))
 		{

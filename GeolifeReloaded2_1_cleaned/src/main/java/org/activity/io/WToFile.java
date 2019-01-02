@@ -4251,9 +4251,10 @@ public class WToFile
 				// Sanity check of order start
 				if (entry.getKey().equals(String.valueOf(valsForHeader.get(index))) == false)
 				{
-					PopUps.printTracedErrorMsg("Error: pdVals not in current order: index = " + index
-							+ " entry.getValue() = " + entry.getValue() + " while valsForHeader.get(index) = "
-							+ valsForHeader.get(index));
+					PopUps.printTracedErrorMsg(
+							"Error: pdVals not in current order: index = " + index + " entry.getValue() = "
+									+ entry.getValue() + " while valsForHeader.get(index) = " + valsForHeader.get(index)
+									+ " map.keySet() = " + map.keySet() + " valsForHeader = " + valsForHeader);
 				}
 				// Sanity check of order end
 			}
