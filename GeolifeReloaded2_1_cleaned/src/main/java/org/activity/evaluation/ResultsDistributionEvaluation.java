@@ -2,6 +2,7 @@ package org.activity.evaluation;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -202,7 +203,7 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadDec25Truncated.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadDec25Truncated6.csv";
 		// "ResultsToReadDec21Truncated2.csv";
 		// ResultsToReadDec8Truncated.csv";
 		// "ResultsToReadNov28_OnlyED1.csv";// 25_3.csv";
@@ -1147,6 +1148,10 @@ public class ResultsDistributionEvaluation
 	public static void runNov20Results(String pathToRead, int firstToMax, String dimensionPhrase,
 			String chosenFixedMUForEachUserFile)
 	{
+		// PopUps.showMessage("Inside runNov20Results");
+		// added on 1 Jan 2018
+		PrintStream debugLog = WToFile.redirectConsoleOutput(pathToRead + "runNov20ResultsgLog.txt");
+
 		DescriptiveStatistics mrrStatsOverUsers = null;
 		String pathToWrite = pathToRead;
 		boolean doLevel1 = false;
@@ -1239,7 +1244,7 @@ public class ResultsDistributionEvaluation
 			// PopUps.showError("Error: resEntry.size() = " + resEntry.size() + " <3");
 			// }
 			// }
-
+			debugLog.close();// added on 1 Jan 2018
 		}
 		catch (Exception e)
 		{
@@ -2673,6 +2678,8 @@ public class ResultsDistributionEvaluation
 			{
 				String[] splitted = pathToRead.split("Order");
 				String[] splitted2 = splitted[1].split("/");
+
+				splitted2[0] = splitted2[0].replace("NoTTFilter", "");// added on 1 Jan 2018
 				double muForOrder = Double.valueOf(splitted2[0]);
 				muArray = new double[] { muForOrder - 1 };
 			}

@@ -74,7 +74,7 @@ public class ControllerWithoutServer
 	 * @param databaseName
 	 * @param commonBasePath
 	 */
-	public ControllerWithoutServer(String databaseName, String commonBasePath)
+	public ControllerWithoutServer(String databaseName, String commonBasePath, boolean noRecommendations)
 	{
 		try
 		{
@@ -158,20 +158,41 @@ public class ControllerWithoutServer
 			// start of added on Nov 14 2018
 			if (databaseName.equals("geolife1"))
 			{ // Only include the selected userIDs
+				// and in that order //added on 31 Dec 2018
 				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> selectedUsersCleanedDayTimelines = new LinkedHashMap<>();
-				for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+
+				// for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+				// {
+				// boolean validUser = IntStream.of(Constant.getUserIDs())
+				// .anyMatch(x -> x == Integer.valueOf(e.getKey()));
+				// if (validUser)
+				// {
+				// System.out.println("Selecting user: " + e.getKey());
+				// selectedUsersCleanedDayTimelines.put(e.getKey(), e.getValue());
+				// }
+				// }
+				for (int selectedUserID : Constant.getUserIDs())
 				{
-					boolean validUser = IntStream.of(Constant.userIDs).anyMatch(x -> x == Integer.valueOf(e.getKey()));
-					if (validUser)
+					LinkedHashMap<Date, Timeline> timelinesForSelectedUser = usersCleanedDayTimelines
+							.get(String.valueOf(selectedUserID));
+					if (timelinesForSelectedUser == null || timelinesForSelectedUser.size() == 0)
 					{
-						System.out.println("Selecting user: " + e.getKey());
-						selectedUsersCleanedDayTimelines.put(e.getKey(), e.getValue());
+						PopUps.printTracedErrorMsgWithExit("Error: expected day timeline for user: " + selectedUserID
+								+ " but not found in usersCleanedDayTimelines.keySet() = "
+								+ usersCleanedDayTimelines.keySet());
 					}
+					System.out.println("selectedUserID: " + selectedUserID);
+					selectedUsersCleanedDayTimelines.put(String.valueOf(selectedUserID), timelinesForSelectedUser);
+
 				}
 				usersCleanedDayTimelines = selectedUsersCleanedDayTimelines;
 				System.out.println("Only selected users for geolife usersCleanedDayTimelines.size()= "
 						+ usersCleanedDayTimelines.size());
 			}
+
+			// PopUps.showMessage("Constant.getUserIDs() = " + Arrays.toString(Constant.getUserIDs()));
+			// PopUps.showMessage("usersCleanedDayTimelines.keySet() = " + usersCleanedDayTimelines.keySet());
+
 			System.out.println("usersCleanedDayTimelines.size()= " + usersCleanedDayTimelines.size());
 			// PopUps.showMessage("usersCleanedDayTimelines.size()= " + usersCleanedDayTimelines.size());
 			// end of added on Nov 14 2018
@@ -244,8 +265,35 @@ public class ControllerWithoutServer
 							DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
 				}
 
-				Serializer.kryoSerializeThis(usersCleanedDayTimelines,
-						commonBasePath + "usersCleanedDayTimelines.kryo");
+				if (true)
+				{
+					if (true)// only for Jupyter baselines
+					{
+						// expunge invalids
+						LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedInvalidsExpungedDayTimelines = new LinkedHashMap<>();
+						if (databaseName.equals("dcu_data_2"))
+						{
+							for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines
+									.entrySet())
+							{
+								usersCleanedInvalidsExpungedDayTimelines.put(userEntry.getKey(),
+										TimelineTrimmers.expungeInvalidsDayTimelines(userEntry.getValue()));
+							}
+						}
+						else
+						{
+							usersCleanedInvalidsExpungedDayTimelines = usersCleanedDayTimelines;
+						}
+						Serializer.kryoSerializeThis(usersCleanedInvalidsExpungedDayTimelines,
+								commonBasePath + "usersCleanedInvalidsExpungedDayTimelines.kryo");
+						// DataTransformerForSessionBasedRecAlgos.convertToMQInputFormat(
+						// usersCleanedInvalidsExpungedDayTimelines, Constant.getCommonPath(),
+						// Constant.getCommonPath() + databaseName + "InMQFormat.csv");
+						// System.exit(0);
+					}
+					Serializer.kryoSerializeThis(usersCleanedDayTimelines,
+							commonBasePath + "usersCleanedDayTimelines.kryo");
+				}
 				// System.exit(0);
 			}
 
@@ -255,6 +303,10 @@ public class ControllerWithoutServer
 				System.exit(0);
 			}
 
+			if (noRecommendations)
+			{
+				return;
+			}
 			// Curtain 8 Feb 2018 start
 			// $$TimelineUtils.writeAllActObjs(usersCleanedDayTimelines, Constant.getCommonPath() + "AllActObjs.csv");
 

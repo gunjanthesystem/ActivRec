@@ -30,6 +30,7 @@ import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineExtractors;
 import org.activity.util.TimelineTransformers;
+import org.activity.util.TimelineTrimmers;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -322,6 +323,16 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 					}
 				}
 				// trainTimelinesAllUsersContinuous;//
+
+				// start of added on 28 Dec 2018
+				// need to remove invalid for dcu dataset
+				if (Constant.hasInvalidActivityNames)
+				{
+					candidateTimelines = TimelineTrimmers.expungeInvalids(candidateTimelines);
+					activitiesGuidingRecomm = (ArrayList<ActivityObject2018>) activitiesGuidingRecomm.stream()
+							.filter(ao -> ao.isInvalidActivityName() == false).collect(Collectors.toList());
+				}
+				// end of added on 28 Dec 2018
 			}
 			else
 			{

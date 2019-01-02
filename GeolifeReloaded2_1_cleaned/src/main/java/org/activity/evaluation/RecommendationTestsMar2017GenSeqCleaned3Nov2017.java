@@ -20,6 +20,7 @@ import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
+import org.activity.generator.DataTransformerForSessionBasedRecAlgos;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
 import org.activity.io.WToFile;
@@ -27,6 +28,7 @@ import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeqNov2017;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqMultiDJul2018;
@@ -130,6 +132,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		// PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
 		long recommTestsStarttime = System.currentTimeMillis();
 
+		// start of added on 31 Dec 2018 for Jupyter baseline
+		if (Constant.doForJupyterBaselines)
+		{
+			DataTransformerForSessionBasedRecAlgos.convertToMQInputFormat(allUsersTimelines, Constant.getCommonPath(),
+					Constant.getCommonPath() + Constant.getDatabaseName() + "InMQFormat.csv",
+					sampledUsersTimelines.keySet());
+		}
+		// end of added on 31 Dec 2018
+
 		AltSeqPredictor altSeqPredictor = Constant.altSeqPredictor;// added on 26 Dec 2018
 		this.primaryDimension = Constant.primaryDimension;
 		this.databaseName = Constant.getDatabaseName();
@@ -148,6 +159,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			userIDs = sampledUsersTimelines.keySet().stream().mapToInt(userID -> Integer.valueOf(userID)).toArray();
 			System.out.println("UserIDs not set in Constant, hence extracted" + userIDs.length
 					+ " user ids from usersTimelines keyset");
+			PopUps.showMessage("userIDs = " + Arrays.toString(userIDs));
 			Constant.setUserIDs(userIDs);
 		}
 		// System.out.println("User ids = " + Arrays.toString(userIDs));
@@ -225,6 +237,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		// .getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
 		// }
 
+		// start of added on 29 Dec 2018
+		if (Constant.doForJupyterBaselines)
+		{
+			DataTransformerForSessionBasedRecAlgos.writeSessionIDsForFilteredTrainAndTestDays(
+					trainTimelinesAllUsersDWFiltrd, trainTestTimelinesForAllUsersDW, Constant.getCommonPath());
+		}
+		// UserID,Date,IndexInDay
+		ArrayList<Triple<Integer, Date, Integer>> validRtsAsUserIdDateIndexInDay = new ArrayList<>();
+		// end of added on 29 Dec 2018
 		if (false)
 		{
 			Serializer.kryoSerializeThis(trainTimelinesAllUsersContinuousFiltrd,
@@ -721,6 +742,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							// START OF Curtain disable trivial baselines
 							if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
 							{
+								boolean doWrite = true;
+								if (databaseName.equals("gowalla1"))
+								{
+									doWrite = false;
+								}
 								// this is content based approach
 								if (Constant.collaborativeCandidates == false)
 								{
@@ -735,7 +761,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 													TimelineUtils.toStringKeys(userAllDatesTimeslines),
 													TimelineUtils.toStringKeys(userTrainingTimelines),
 													TimelineUtils.toStringKeys(userTestTimelines),
-													Constant.primaryDimension, true, false);
+													Constant.primaryDimension, doWrite, false);
 								}
 								else
 								{
@@ -759,7 +785,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									mapsForCountDurationBaselines = WToFile
 											.writeBasicActivityStatsAndGetBaselineMapsStringKeys(userName, null,
 													trainTimelinesDWForAllExceptCurrUserStringKeys, null,
-													Constant.primaryDimension, true, true);
+													Constant.primaryDimension, doWrite, true);
 								}
 
 								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
@@ -1343,6 +1369,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									metaToWriteForThisUserDate.append(userId).append("_").append(dateToRecomm)
 											.append("_").append(recommTimesStrings[0]).append(",");
 
+									// start of added on 28 Dec 2018
+									validRtsAsUserIdDateIndexInDay.add(
+											new Triple<Integer, Date, Integer>(userId, testDate, indexOfAOInTestDay));// activityObjectInTestDay.getStartTimestamp()));
+									// end of added on 28 Dec 2018
+
 									recommSequenceWithScoreForThisUserDate.append(topRankedRecommSequenceWithScore)
 											.append(",");
 									recommSequenceWithoutScoreForThisUserDate
@@ -1666,7 +1697,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				// /////////////////////core
 			} // end of loop over threshold
 		}
-		// PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
+
+		// added on 28 Dec 2018
+		if (Constant.doForJupyterBaselines)
+		{
+			DataTransformerForSessionBasedRecAlgos.writeValidRTs2(validRtsAsUserIdDateIndexInDay,
+					Constant.getOutputCoreResultsPath());
+		} // PopUps.showMessage("ALL TESTS DONE... u can shutdown the server");// +msg);
 		System.out.println("**********Exiting Recommendation Tests**********");
 
 	}

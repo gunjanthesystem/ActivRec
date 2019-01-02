@@ -89,6 +89,7 @@ public class Enums
 	public enum AltSeqPredictor
 	{
 		None, AKOM, PureAKOM, RNN1, ClosestTime, HighOccur, HighDur;
+		// Note: when using PureAKOM, keep LookPastType as NCount
 		// Note: when using HighOccur, HighDur keep LookPastType as Daywise
 		// Note: when using HClosestTime keep LookPastType as ClosestTime
 		// PureAKOM: not matching , i.e., no candidate generation using any matching approach, feeding the complete (or
