@@ -203,7 +203,10 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadDec25Truncated6.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan4FEDInvesitgation.csv";
+		// + "ResultsToReadJan3Gowalla1.csv";
+		// "Geolife.csv";
+		// "ResultsToReadDec25Truncated6.csv";
 		// "ResultsToReadDec21Truncated2.csv";
 		// ResultsToReadDec8Truncated.csv";
 		// "ResultsToReadNov28_OnlyED1.csv";// 25_3.csv";
@@ -2680,6 +2683,9 @@ public class ResultsDistributionEvaluation
 				String[] splitted2 = splitted[1].split("/");
 
 				splitted2[0] = splitted2[0].replace("NoTTFilter", "");// added on 1 Jan 2018
+				splitted2[0] = splitted2[0].replace("PNN500", "");// added on 1 Jan 2018
+				//
+
 				double muForOrder = Double.valueOf(splitted2[0]);
 				muArray = new double[] { muForOrder - 1 };
 			}

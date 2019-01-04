@@ -4597,6 +4597,11 @@ public class WToFile
 			e.printStackTrace();
 		}
 	}
+
+	public static void deleteNonEmptyDirectory(String absRootPath)
+	{
+		deleteNonEmptyDirectory(Paths.get(absRootPath));
+	}
 	// /**
 	// * Headerless
 	// *
@@ -4712,6 +4717,21 @@ public class WToFile
 			directory.mkdirs();// If you require it to make the entire directory path including parents,
 			// use directory.mkdirs(); here instead.
 		}
+	}
+
+	/**
+	 * 
+	 * @param pathToCreate
+	 */
+	public static void createDirectoryDeleteFormerIfExists(String pathToCreate)
+	{
+		File directory = new File(pathToCreate);
+		if (directory.exists())
+		{
+			deleteNonEmptyDirectory(pathToCreate);
+		}
+		directory.mkdirs();// If you require it to make the entire directory path including parents,
+		// use directory.mkdirs(); here instead.
 	}
 
 	public static boolean isDirectoryEmpty(String path)

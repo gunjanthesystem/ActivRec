@@ -104,7 +104,7 @@ public final class Constant
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
-	private static int AKOMHighestOrder = 5;// 1;// 3;// SWITCH_NOV10
+	private static int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
 	private static int RNNCurrentActivitityLength = 1;
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
@@ -212,9 +212,14 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 0.5 };// 0.4, 0.5, 0.8, 0.9, 1 };// 0.7, 0.5, 0, 1, 0.3 };// , 0.7, };//
-													// 1,
-													// 0.5
+	public static final double[] EDAlphas = { 0 };// 0.5, 1 };// 0.4, 0.5, 0.7, 1 };// 0.5 };// 0.4, 0.5, 0.6, 0.7, 0.8,
+													// 0.9, 1
+													// };// 0.7,
+													// 0.5, 0, 1, 0.3
+	// };// ,
+	// 0.7, };//
+	// 1,
+	// 0.5
 	// };//
 	// 0, 0.2, 0.4, 0.6, 0.7,
 	// 0.8, 0.9, 1 };//
@@ -235,7 +240,7 @@ public final class Constant
 
 	// Only for gowalla1
 	public static final boolean useLocationInFED = true;// SWITCH_NOV10
-	public static final boolean useHaversineDistInLocationFED = false;// SWITCH_NOV10 //added on Aug 11 2018
+	public static boolean useHaversineDistInLocationFED = false;// SWITCH_NOV10 //added on Aug 11 2018
 	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
 	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
 	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
@@ -327,7 +332,7 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "dcu_data_2";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+	static String DATABASE_NAME = "geolife1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
 												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
@@ -925,7 +930,7 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = false;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.None;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = -1;// TODO 500;// 750;// 500;// 500;/// -1;//
-			percentileForRTVerseMaxForFEDNorm = 20;//// TODO 10;// 75;// -1// SWITCH_April24
+			percentileForRTVerseMaxForFEDNorm = 100;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = false;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = true;// //TODO toySwitch // SWITCH_April8
@@ -937,8 +942,8 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = false;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = 500;// TODO 500;// 750;// 500;// 500;/// -1;//
-			percentileForRTVerseMaxForFEDNorm = -1;//// TODO 10;// 75;// -1// SWITCH_April24
-			useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
+			percentileForRTVerseMaxForFEDNorm = 100;//// TODO 10;// 75;// -1// SWITCH_April24
+			useFeatureDistancesOfAllActs = false;// TEMP// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = false;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = true;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = true; // false for gowalla// true for others;//
@@ -949,11 +954,12 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = true;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = 500;// TODO 500;// 750;// 500;// 500;/// -1;//
-			percentileForRTVerseMaxForFEDNorm = 50;//// TODO 10;// 75;// -1// SWITCH_April24
+			percentileForRTVerseMaxForFEDNorm = 100;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = true;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = false;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = false; // false for gowalla// true for others;//
+			useHaversineDistInLocationFED = true;
 
 			break;
 
