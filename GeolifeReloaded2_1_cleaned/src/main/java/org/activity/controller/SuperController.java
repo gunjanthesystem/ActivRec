@@ -429,8 +429,8 @@ public class SuperController
 					// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/"
 					// "/run/media/gunjan/BackupVault/Geolife2018Results/"
 					// "/run/media/gunjan/iiWASDrive/gunjan/GeolifeNov2018/";
-					"/run/media/gunjan/My Passport/GeolifeNov2018/";
-			// "./dataWritten/";
+					// "/run/media/gunjan/My Passport/GeolifeNov2018/";
+					"./dataWritten/";
 			// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/";
 			// "/run/media/gunjan/MB2016/gunjan/GeolifeNov2018/";
 			String commonPath = dataWrittenFolder + Constant.getDatabaseName() + "_"
@@ -440,9 +440,14 @@ public class SuperController
 
 			// for (int i = 0; i <= commonPaths.length - 1; i++){
 			// start of added on 31 Dec 2018 to eval Jupyter baseline results
-			if (true)// evaluate jupyter baselines
+			if (false)// evaluate jupyter baselines
 			{
-				String commonJupyterPath = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/";
+				String commonJupyterPath = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/";
+				String dcuFolder = "dcu_data_2_DEC31H20M25HighDurNoTTFilter/";
+				String geolifeFolder = "geolife1_DEC31H20M15HighDurPNN500NoTTFilter/";
+				String gowallaFolder = "/gowalla1_DEC31H20M29HighDurPNN500coll/";
+				// TODO: SET CORRECT DATABASE NAME IN CONSTANT
+				commonJupyterPath += gowallaFolder;
 				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/";
 				String[] jupyterBaselineLabels = { "PopularityRecommender/", "Prod2VecRecommender/", "FPMCRecommender/",
 						"GRU4RecRecommender/", "MixedMarkovRecommender/", "HGRU4RecRecommender/" };
@@ -937,9 +942,11 @@ public class SuperController
 
 		if (doEvaluation)
 		{
-			ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer(Constant.getDatabaseName(),
-					commonPath, true);// added on 1 Jan as needed to set catIDNameDict needed for standalone eval for
-										// dcu and geolife
+			if (!Constant.getDatabaseName().equals("gowalla1"))
+			{// added on 1 Jan as needed to set catIDNameDict needed for standalone eval for dcu and geolife
+				ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer(
+						Constant.getDatabaseName(), commonPath, true);
+			}
 
 			// curtain may 26 2017 start
 			System.out.println("Doing evaluation...");

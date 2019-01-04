@@ -182,7 +182,8 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitArray,
 			String dimensionPhrase, boolean evaluatePostFiltering, boolean evaluatedSequencePrediction)// sdsd
 	{
-		// PopUps.showMessage("EvaluationSeq muArray = " + Arrays.toString(matchingUnitArray));
+		PopUps.showMessage("EvaluationSeq muArray = " + Arrays.toString(matchingUnitArray) + " outputCoreResultsPath= "
+				+ outputCoreResultsPath);
 		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
 
 		this.evaluatePostFiltering = evaluatePostFiltering;

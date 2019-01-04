@@ -1079,6 +1079,9 @@ public class DistanceUtils
 		/** {CandID, candInfo, NormAED, NormFED} **/
 		Map<String, String> rejectedCandsDueToAEDFEDThreshold = new LinkedHashMap<>();
 
+		StringBuilder logAOsThisCandHeader = new StringBuilder(
+				"\nuserAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,");
+
 		// Loop over cands
 		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candEntry : candAEDFeatDiffs
 				.entrySet())
@@ -1091,12 +1094,14 @@ public class DistanceUtils
 
 			/////////
 			StringBuilder logAOsThisCand = new StringBuilder();
+			// StringBuilder logAOsThisCandHeader = new StringBuilder();
 			String candTimelineAsString = candidateTimelines.get(candID).getActivityObjectsInTimeline().stream()
 					.map(ao -> ao.getActivityName()).collect(Collectors.joining(">"));
 			logTxt.append("\n\tcandID=" + candID + " AEDTraceForThisCand=" + AEDTraceForThisCand
 					+ " ActDistForThisCand=" + actDistForThisCand + " will now loop over list of AOs for this cand:");
 			String candInfo = rtInfo + "," + candID + "," + indexOfCandForThisRT + "," + candTimelineAsString + ","
 					+ AEDTraceForThisCand + "," + actDistForThisCand;
+
 			String candInfoLeaner = rtInfo + "," + candID + "," + indexOfCandForThisRT;
 			////////////
 
@@ -1118,6 +1123,10 @@ public class DistanceUtils
 						"\n\t\tcountOfAOForThisCand=" + indexOfAOForThisCand + " now loop over features for this AO");
 				// logEachAO
 				logAOsThisCand.append(candInfo + "," + indexOfAOForThisCand + ",");
+				if (indexOfAOForThisCand == 1)
+				{
+					logAOsThisCandHeader.append("indexOfAOForThisCand,");
+				}
 				////////
 
 				// loop over each of the Gowalla Feature
@@ -1143,6 +1152,11 @@ public class DistanceUtils
 							+ minOfMinOfDiffs.get(featureID));
 					logAOsThisCand.append(StatsUtils.roundAsString(diffEntry.getValue(), 4) + ","
 							+ StatsUtils.roundAsString(normalisedFeatureDiffVal, 4) + ",");// rounding for logging
+
+					if (indexOfAOForThisCand == 1)
+					{
+						logAOsThisCandHeader.append(featureID.toString() + "," + featureID.toString() + "Normalised,");
+					}
 					////// sanityCheckFeatureWtSum += wtForThisFeature;
 				} // end of loop over Gowalla features
 
@@ -1158,6 +1172,10 @@ public class DistanceUtils
 				/////////
 				logTxt.append("\n\t\tfeatDistForThisAOForThisCand=" + featDistForThisAOForThisCand);
 				logAOsThisCand.append("|" + "," + StatsUtils.roundAsString(normFDForThisAOForThisCand, 4) + "\n");
+				if (indexOfAOForThisCand == 1)
+				{
+					logAOsThisCandHeader.append("|,normFDForThisAOForThisCand,");
+				}
 				////////
 			} // end of loop over the list of AOs for this cand
 
@@ -1252,19 +1270,22 @@ public class DistanceUtils
 			/////////
 		} // end of loop over cands
 
+		String commonPath = Constant.getCommonPath();
 		if (VerbosityConstants.WriteRTVerseNormalisationLogs || VerbosityConstants.verboseDistDistribution)// logging
 		{
 			// WToFile.appendLineToFileAbs(logTxt.toString() + "\n",
 			// Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances.txt");
 			WToFile.appendLineToFileAbs(logEachCand.toString(),
-					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv");
+					commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv");
 
 			if (VerbosityConstants.WriteRTVerseNormalisationLogs)
 			{
 				// header:
 				// userAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,normActDistForThisCand,sumOfNormFDsOverAOsOfThisCand,meanOverAOsNormFDForThisCand,medianOverAOsNormFDForThisCand,stdDevOverAOsNormFDForThisCand,meanUponStdDev,resultantEditDist
 				WToFile.appendLineToFileAbs(logEachAOAllCands.toString(),
-						Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
+						commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
+				WToFile.appendLineToFileAbs(logAOsThisCandHeader.toString(),
+						commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAOHeader.csv");
 			}
 		}
 
@@ -1274,13 +1295,12 @@ public class DistanceUtils
 			StringBuilder sb1 = new StringBuilder();
 			rejectedCandsDueToAEDFEDThreshold.entrySet().stream()
 					.forEachOrdered(e -> sb1.append(e.getKey() + "," + e.getValue() + "\n"));
-			WToFile.appendLineToFileAbs(sb1.toString(), Constant.getCommonPath() + "LogOfRejectedCands.csv");
+			WToFile.appendLineToFileAbs(sb1.toString(), commonPath + "LogOfRejectedCands.csv");
 		}
 
 		if (res.size() == 0)// all candidates filtered out due to AED FED Threshold
 		{
-			WToFile.appendLineToFileAbs(rtInfo + "\n",
-					Constant.getCommonPath() + "recommPointsRejAllCandFiltrdAEDFEDThresh.csv");
+			WToFile.appendLineToFileAbs(rtInfo + "\n", commonPath + "recommPointsRejAllCandFiltrdAEDFEDThresh.csv");
 		}
 
 		logTxt.append("\n---------End  getRTVerseMinMaxNormalisedEditDistances()\n");
@@ -1410,6 +1430,8 @@ public class DistanceUtils
 		/** {CandID, candInfo, NormAED, NormFED} **/
 		Map<String, String> rejectedCandsDueToAEDFEDThreshold = new LinkedHashMap<>();
 		ArrayList<GowGeoFeature> listOfFeatures = null;
+		StringBuilder logAOsThisCandHeader = new StringBuilder(
+				"\nuserAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,");
 		// Loop over cands
 		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candEntry : candAEDFeatDiffs
 				.entrySet())
@@ -1428,6 +1450,7 @@ public class DistanceUtils
 					+ " ActDistForThisCand=" + actDistForThisCand + " will now loop over list of AOs for this cand:");
 			String candInfo = rtInfo + "," + candID + "," + indexOfCandForThisRT + "," + candTimelineAsString + ","
 					+ AEDTraceForThisCand + "," + actDistForThisCand;
+
 			String candInfoLeaner = rtInfo + "," + candID + "," + indexOfCandForThisRT;
 			////////////
 
@@ -1541,7 +1564,10 @@ public class DistanceUtils
 				for (int indexOfAO = 0; indexOfAO < listOfAOsForThisCand.size(); indexOfAO++)
 				{
 					logAOsThisCand.append(candInfo + "," + indexOfAO + ",");
-
+					if (indexOfAO == 0 && indexOfCandForThisRT == 1)
+					{
+						logAOsThisCandHeader.append("indexOfAO,");
+					}
 					if (shouldComputedFED)
 					{
 						// String nameOfFeaturesInSeq = "";
@@ -1555,6 +1581,11 @@ public class DistanceUtils
 											normValsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
 									+ ",";
 							logAOsThisCand.append(s);
+							if (indexOfAO == 0 && indexOfCandForThisRT == 1)
+							{
+								logAOsThisCandHeader
+										.append(feature.toString() + "," + feature.toString() + "Normalised,");
+							}
 							// sbFeatureDiffAllAOsInCand.append(s);//Disabled on Dec 7 2018. not writingfeat diff of
 							// each AO in cand for each cand was row. This info is already there in log with each AO as
 							// row and adding the info to sbFeatureDiffAllAOsInCand was making the log for each cand of
@@ -1562,6 +1593,10 @@ public class DistanceUtils
 						}
 					}
 					logAOsThisCand.append("|" + "," + normFeatDistForThisCandRounded + "\n"); // written for for each AO
+					if (indexOfAO == 0 && indexOfCandForThisRT == 1)
+					{
+						logAOsThisCandHeader.append("|,normFDForThisAOForThisCand");
+					}
 					// in cand for consistency though it will be same as it is a characteristic of cand and not AO
 					// individually.
 					// sbFeatureDiffAllAOsInCand.append(r);
@@ -1658,18 +1693,21 @@ public class DistanceUtils
 			/////////
 		} // end of loop over cands
 
+		String commonPath = Constant.getCommonPath();
 		if (VerbosityConstants.WriteRTVerseNormalisationLogs || VerbosityConstants.verboseDistDistribution)// logging
 		{
 			// WToFile.appendLineToFileAbs(logTxt.toString() + "\n",
 			// Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances.txt");
 			WToFile.appendLineToFileAbs(logEachCand.toString(),
-					Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv");
+					commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv");
 			if (VerbosityConstants.WriteRTVerseNormalisationLogs)
 			{
 				// header:
 				// userAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,normActDistForThisCand,sumOfNormFDsOverAOsOfThisCand,meanOverAOsNormFDForThisCand,medianOverAOsNormFDForThisCand,stdDevOverAOsNormFDForThisCand,meanUponStdDev,resultantEditDist
 				WToFile.appendLineToFileAbs(logEachAOAllCands.toString(),
-						Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
+						commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
+				WToFile.appendLineToFileAbs(logAOsThisCandHeader.toString(),
+						commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAOHeader.csv");
 			}
 		}
 
@@ -1679,13 +1717,12 @@ public class DistanceUtils
 			StringBuilder sb1 = new StringBuilder();
 			rejectedCandsDueToAEDFEDThreshold.entrySet().stream()
 					.forEachOrdered(e -> sb1.append(e.getKey() + "," + e.getValue() + "\n"));
-			WToFile.appendLineToFileAbs(sb1.toString(), Constant.getCommonPath() + "LogOfRejectedCands.csv");
+			WToFile.appendLineToFileAbs(sb1.toString(), commonPath + "LogOfRejectedCands.csv");
 		}
 
 		if (res.size() == 0)// all candidates filtered out due to AED FED Threshold
 		{
-			WToFile.appendLineToFileAbs(rtInfo + "\n",
-					Constant.getCommonPath() + "recommPointsRejAllCandFiltrdAEDFEDThresh.csv");
+			WToFile.appendLineToFileAbs(rtInfo + "\n", commonPath + "recommPointsRejAllCandFiltrdAEDFEDThresh.csv");
 		}
 
 		if (VerbosityConstants.verbose)// true
@@ -1693,7 +1730,7 @@ public class DistanceUtils
 			logTxt.append("\n---------End  getRTVerseMinMaxNormalisedEditDistancesFS()\n");
 			System.out.println(logTxt.toString());
 			WToFile.appendLineToFileAbs(logTxt.toString(),
-					Constant.getCommonPath() + "DebugNov23getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach.txt");
+					commonPath + "DebugNov23getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach.txt");
 		}
 
 		System.out.println("INFO: orderOfFeatureDiffs = " + listOfFeatures);

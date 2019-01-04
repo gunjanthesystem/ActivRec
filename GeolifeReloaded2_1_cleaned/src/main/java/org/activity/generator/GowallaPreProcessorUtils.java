@@ -37,6 +37,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
+import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.HTTPUtils;
 import org.activity.util.RegexUtils;
@@ -125,10 +126,264 @@ public class GowallaPreProcessorUtils
 
 	}
 
-	public static void main1(String[] args)
+	public static void main(String[] args)
 	{
 		// findNumVeryFrequentEpisodesForEachUserApril8();
-		findNumVeryFrequentEpisodesForEachUserSlidingWindow8April();
+
+		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24_5_5VFELT1.csv";
+		int userIDColIndex = 0;
+		int tsColIndex = 2;
+		int firstStartLatColIndex = 14;
+		int firstStartLonColIndex = 15;
+		int actIDIndex = 5;
+		///////////////////
+
+		int windowSize = 3;
+		int uniqueActsWindowSize = windowSize;
+		int windowDurationDifThresholdInMins = (windowSize - 1) * 180;// 120,30;// 5;
+		int windowDistDifThresholdInKms = ((windowSize - 1) * 1000) / 1000;
+
+		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan2VFAnalysis/Acts"
+				+ windowSize + "len_" + windowDurationDifThresholdInMins + "mins/";
+		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite);
+
+		String pathToWrite3 = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan2VFAnalysis/UniqueActs"
+				+ uniqueActsWindowSize + "len_" + windowDurationDifThresholdInMins + "mins/";
+		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite3);
+
+		String pathToWrite2 = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan2VFAnalysis/Acts"
+				+ windowSize + "len_" + windowDistDifThresholdInKms + "kms/";
+		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite2);
+
+		String pathToWrite4 = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan2VFAnalysis/UniqueActs"
+				+ uniqueActsWindowSize + "len_" + windowDistDifThresholdInKms + "kms/";
+		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite4);
+
+		findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilUniqueActs(checkinFileNameToRead, uniqueActsWindowSize,
+				windowDurationDifThresholdInMins, pathToWrite3, userIDColIndex, tsColIndex, actIDIndex);
+
+		findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilDistanceUniqueActs(checkinFileNameToRead, windowSize,
+				windowDistDifThresholdInKms, pathToWrite4, userIDColIndex, firstStartLatColIndex, firstStartLonColIndex,
+				actIDIndex);
+
+		if (true)
+		{
+			findNumVeryFrequentEpisodesForEachUserSlidingWindow8April(checkinFileNameToRead, windowSize,
+					windowDurationDifThresholdInMins, pathToWrite, userIDColIndex, tsColIndex);
+
+			findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilDistance(checkinFileNameToRead, windowSize,
+					windowDistDifThresholdInKms, pathToWrite2, userIDColIndex, firstStartLatColIndex,
+					firstStartLonColIndex);
+		}
+		System.exit(0);
+	}
+
+	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilUniqueActs(String checkinFileNameToRead,
+			int windowSize, int windowDurationDifThresholdInMins, String pathToWrite, int userIDColIndex,
+			int tsColIndex, int actIDIndex)
+	{
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
+		// String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April13VFAnalysis/";
+
+		// start of disabled on 2 Jan 2018
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24.csv";
+		// String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April24VFAnalysis/min5_5/";
+		// end of disabled on 2 jan 2018
+
+		// Start of added on 2 Jan 2018
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24_5_5VFELT1.csv";
+		// int windowSize = 5;
+		// int windowDurationDifThresholdInMins = (windowSize - 1) * 60;// 120,30;// 5;
+		int windowDurationDifThresholdInSecs = windowDurationDifThresholdInMins * 60;
+		//
+		// String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan2VFAnalysis/min"
+		// + windowSize + "len_" + windowDurationDifThresholdInMins + "mins/";
+		WToFile.createDirectoryIfNotExists(pathToWrite);
+		// End of added on 2 Jan 2018
+
+		List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
+				checkinFileNameToRead, ",", true, false, new int[] { userIDColIndex, tsColIndex, actIDIndex });// 0, 2
+																												// });
+		Map<String, ArrayList<Integer>> userWindowLengths = new LinkedHashMap<>();
+		Map<String, Integer> userNumOfVertFreqEpisodesCount = new LinkedHashMap<>();
+		Map<String, Integer> userNumOfIgnoredWindowsCount = new LinkedHashMap<>();
+		Map<String, Integer> userTotalWindowsCount = new LinkedHashMap<>();
+		Map<String, List<Integer>> userWindowTimeDiffInMins = new LinkedHashMap();
+
+		System.out.println("Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilUniqueActs:\nwindowSize="
+				+ windowSize + "\nwindowDurationDifThresholdInMins=" + windowDurationDifThresholdInMins + " ("
+				+ windowDurationDifThresholdInSecs / 60 + " mins)");
+
+		int numOfWindows = 0;
+		try
+		{
+			System.out.println("here");
+			linesRead.remove(0);
+
+			// temp start
+			// linesRead = linesRead.subList(0, 5000);
+			// temp end
+
+			System.out.println("linesRead.size()= " + linesRead.size());
+			String windowEndUserID = "", windowStartUserID = "";
+
+			for (int windowStartIndex = 0; windowStartIndex < (linesRead.size() - windowSize); windowStartIndex++)
+			{
+				numOfWindows++;
+				// System.out.println("Num of windows = " + numOfWindows);
+				// int windowEndIndex = windowStartIndex + windowSize;
+
+				///////////////////////////////////////////////
+				LinkedHashSet<String> uniqueActIDsInWindow = new LinkedHashSet<>();
+				ArrayList<String> actIDsInWindow = new ArrayList<>();
+				int windowCursorIndex = windowStartIndex;
+				// System.out.println("windowStartIndex = " + windowStartIndex);
+				// System.out.println("linesRead = " + linesRead);
+				// System.out.println("linesRead = " + linesRead.get(windowCursorIndex).get(actIDIndex));
+
+				while (uniqueActIDsInWindow.size() < windowSize && windowCursorIndex < (linesRead.size() - windowSize))
+				{
+					// PopUps.showMessage("Inside while, windowCursorIndex= " + windowCursorIndex
+					// + " \nlinesRead.get(windowCursorIndex) = " + linesRead.get(windowCursorIndex));
+					String currActID = linesRead.get(windowCursorIndex).get(2);
+					// PopUps.showMessage("currActID = " + currActID);
+					uniqueActIDsInWindow.add(currActID);
+					actIDsInWindow.add(currActID);
+					// System.out.println("-->windowCursorIndex = " + windowCursorIndex + " uniqueActIDsInWindow.size()=
+					// "+ uniqueActIDsInWindow.size());
+					windowCursorIndex += 1;
+				}
+
+				int windowEndIndex = windowStartIndex + (actIDsInWindow.size() - 1);
+				// System.out.println("windowStartIndex = " + windowStartIndex + " windowEndIndex = " + windowEndIndex);
+
+				/////////////////////////////////////////////
+
+				List<String> startWindowLine = linesRead.get(windowStartIndex);
+				windowStartUserID = startWindowLine.get(0);
+				Timestamp windowStartTS = java.sql.Timestamp.valueOf(startWindowLine.get(1));
+				// $$System.out.println(
+				// $$ "\nwindowStartUserID=" + windowStartUserID + " windowStartTS=" + windowStartTS.toString());
+
+				List<String> endWindowLine = linesRead.get(windowEndIndex);
+				windowEndUserID = endWindowLine.get(0);
+				Timestamp windowEndTS = java.sql.Timestamp.valueOf(endWindowLine.get(1));
+				// $$ System.out.println("windowEndUserID=" + windowEndUserID + " windowEndTS=" +
+				// windowEndTS.toString());
+
+				if (windowStartUserID.equals(windowEndUserID))
+				{
+					///////////////////////////
+					ArrayList<Integer> windowLengthsForThisUser = userWindowLengths.get(windowStartUserID);
+					if (windowLengthsForThisUser == null)
+					{
+						windowLengthsForThisUser = new ArrayList<Integer>();
+					}
+					// System.out.println("actIDsInWindow = " + actIDsInWindow);
+					windowLengthsForThisUser.add(actIDsInWindow.size());
+					userWindowLengths.put(windowStartUserID, windowLengthsForThisUser);
+					///////////////////////////
+
+					long timeDurationOfWindowInSecs = (windowEndTS.getTime() - windowStartTS.getTime()) / 1000;
+					// $$System.out.println("\t timeDurationOfWindowIn min= " + timeDurationOfWindowInSecs / 60);
+
+					if (userWindowTimeDiffInMins.containsKey(windowStartUserID) == false)
+					{
+						userWindowTimeDiffInMins.put(windowStartUserID, new ArrayList<Integer>());
+					}
+					userWindowTimeDiffInMins.get(windowStartUserID).add((int) timeDurationOfWindowInSecs / 60);
+
+					int windowsCount = 1;
+					if (userTotalWindowsCount.containsKey(windowStartUserID))
+					{
+						windowsCount = userTotalWindowsCount.get(windowStartUserID) + 1;
+					}
+					userTotalWindowsCount.put(windowStartUserID, windowsCount);
+
+					if (timeDurationOfWindowInSecs < windowDurationDifThresholdInSecs)
+					{
+						// $$System.out.println("******> VFE as timeDurationOfWindowInSecs= " +
+						// timeDurationOfWindowInSecs
+						// $$ + " in mins =" + timeDurationOfWindowInSecs / 60);
+						// Encountered a window which is a very frequent episode.
+						int countOfVFEForThisUser = 0;
+						if (userNumOfVertFreqEpisodesCount.containsKey(windowStartUserID))
+						{
+							countOfVFEForThisUser = userNumOfVertFreqEpisodesCount.get(windowStartUserID);
+						}
+						userNumOfVertFreqEpisodesCount.put(windowStartUserID, countOfVFEForThisUser + 1);
+					}
+				}
+				else
+				{
+					int numOfIgnoredWindowsForThisUser = 0;
+					if (userNumOfIgnoredWindowsCount.containsKey(windowStartUserID))
+					{
+						numOfIgnoredWindowsForThisUser = userNumOfIgnoredWindowsCount.get(windowStartUserID);
+					}
+					userNumOfIgnoredWindowsCount.put(windowStartUserID, numOfIgnoredWindowsForThisUser + 1);
+					// System.out.println("Ignoring window different users at end");
+				}
+			}
+
+			System.out.println("Num of windows = " + numOfWindows);
+			WToFile.writeMapToFile(userNumOfVertFreqEpisodesCount, "User,NumOfVFEpisodes", ",",
+					pathToWrite + "userNumOfVeryFreqEpisodesCount.csv");
+			WToFile.writeMapToFile(userNumOfIgnoredWindowsCount, "User,NumOfIgnoredWindows", ",",
+					pathToWrite + "userNumOfIgnoredWindowsCount.csv");
+			WToFile.writeMapToFile(userTotalWindowsCount, "User,TotalNumOfWindows", ",",
+					pathToWrite + "userTotalWindowsCount.csv");
+			WToFile.writeMapOfListToNewFileLongFormat(userWindowTimeDiffInMins, "User,TimeDiffInMins", ",",
+					pathToWrite + "userWindowTimeDiff.csv");
+
+			// Map<String, ArrayList<Integer>> userWindowLengths
+			////////////////////////
+			StringBuilder sb1 = new StringBuilder("User,NumOfActIDsInWindows\n");
+			for (Entry<String, ArrayList<Integer>> e : userWindowLengths.entrySet())
+			{
+				e.getValue().stream().forEachOrdered(v -> sb1.append(e.getKey() + "," + v + "\n"));
+			}
+			WToFile.writeToNewFile(sb1.toString(), pathToWrite + "userNumOfActIDsInWindows.csv");
+			/////////////////////
+
+			StringBuilder sb = new StringBuilder("User,NumOfVFEpisodes,TotalNumOfWindows,%OfVFE,NumOfIgnoredWindows\n");
+			ArrayList<Double> percentageVFEPerUser = new ArrayList<>();
+			for (Entry<String, Integer> e : userNumOfVertFreqEpisodesCount.entrySet())
+			{
+				String user = e.getKey();
+				double perVFE = StatsUtils
+						.round(100.0 * userNumOfVertFreqEpisodesCount.get(user) / userTotalWindowsCount.get(user), 4);
+				percentageVFEPerUser.add(perVFE);
+				sb.append(user + "," + userNumOfVertFreqEpisodesCount.get(user) + "," + userTotalWindowsCount.get(user)
+						+ "," + perVFE + "," + userNumOfIgnoredWindowsCount.get(user) + "\n");
+			}
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + "userVFEPercentage.csv");
+
+			StringBuilder consoleLog = new StringBuilder();
+			consoleLog.append("Ran at:" + LocalDateTime.now() + "\n");
+			consoleLog.append("checkinFileNameToRead=" + checkinFileNameToRead + "\n");
+			consoleLog.append("pathToWrite=" + pathToWrite + "\n");
+			consoleLog.append("Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8April:\nwindowSize="
+					+ windowSize + "\nwindowDurationDifThresholdInSecs=" + windowDurationDifThresholdInSecs + " ("
+					+ windowDurationDifThresholdInSecs / 60 + " mins)" + "\n");
+
+			consoleLog.append("percentageVFEPerUser.summarry() = "
+					+ StatsUtils.getDescriptiveStatistics(percentageVFEPerUser).toString() + "\n");
+
+			PopUps.showMessage("percentageVFEPerUser.summarry() = "
+					+ StatsUtils.getDescriptiveStatistics(percentageVFEPerUser).toString() + "\n");
+			WToFile.writeToNewFile(consoleLog.toString(), pathToWrite + "consoleLog.txt");
+			// .writeMapOfArrayListToNewFile(userWindowTimeDiff, "User", "TimeDiff", ",", ",",
+			// pathToWrite + "userWindowTimeDiff.csv");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -137,26 +392,52 @@ public class GowallaPreProcessorUtils
 	 * @param userIDColIndex
 	 * @param tsColIndex
 	 */
-	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8April()
+
+	/**
+	 * 
+	 * @param checkinFileNameToRead
+	 * @param windowSize
+	 * @param windowDurationDifThresholdInMins
+	 * @param pathToWrite
+	 * @param userIDColIndex
+	 * @param tsColIndex
+	 */
+	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8April(String checkinFileNameToRead,
+			int windowSize, int windowDurationDifThresholdInMins, String pathToWrite, int userIDColIndex,
+			int tsColIndex)
 	{
 		// String checkinFileNameToRead =
 		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
 		// String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April13VFAnalysis/";
-		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24.csv";
-		String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April24VFAnalysis/min5_5/";
+
+		// start of disabled on 2 Jan 2018
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24.csv";
+		// String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April24VFAnalysis/min5_5/";
+		// end of disabled on 2 jan 2018
+
+		// Start of added on 2 Jan 2018
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24_5_5VFELT1.csv";
+		// int windowSize = 5;
+		// int windowDurationDifThresholdInMins = (windowSize - 1) * 60;// 120,30;// 5;
+		int windowDurationDifThresholdInSecs = windowDurationDifThresholdInMins * 60;
+		//
+		// String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan2VFAnalysis/min"
+		// + windowSize + "len_" + windowDurationDifThresholdInMins + "mins/";
+		WToFile.createDirectoryIfNotExists(pathToWrite);
+		// End of added on 2 Jan 2018
 
 		List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
-				checkinFileNameToRead, ",", true, false, new int[] { 0, 2 });
+				checkinFileNameToRead, ",", true, false, new int[] { userIDColIndex, tsColIndex });// 0, 2 });
 
 		Map<String, Integer> userNumOfVertFreqEpisodesCount = new LinkedHashMap<>();
 		Map<String, Integer> userNumOfIgnoredWindowsCount = new LinkedHashMap<>();
 		Map<String, Integer> userTotalWindowsCount = new LinkedHashMap<>();
 		Map<String, List<Integer>> userWindowTimeDiffInMins = new LinkedHashMap();
 
-		int windowSize = 5;
-		int windowDurationDifThresholdInSecs = 5 * 60;
 		System.out.println("Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8April:\nwindowSize=" + windowSize
-				+ "\nwindowDurationDifThresholdInSecs=" + windowDurationDifThresholdInSecs + " ("
+				+ "\nwindowDurationDifThresholdInMins=" + windowDurationDifThresholdInMins + " ("
 				+ windowDurationDifThresholdInSecs / 60 + " mins)");
 
 		int numOfWindows = 0;
@@ -236,13 +517,26 @@ public class GowallaPreProcessorUtils
 
 			System.out.println("Num of windows = " + numOfWindows);
 			WToFile.writeMapToFile(userNumOfVertFreqEpisodesCount, "User,NumOfVFEpisodes", ",",
-					pathToWrite + "userNumOfVertFreqEpisodesCount.csv");
+					pathToWrite + "userNumOfVeryFreqEpisodesCount.csv");
 			WToFile.writeMapToFile(userNumOfIgnoredWindowsCount, "User,NumOfIgnoredWindows", ",",
 					pathToWrite + "userNumOfIgnoredWindowsCount.csv");
 			WToFile.writeMapToFile(userTotalWindowsCount, "User,TotalNumOfWindows", ",",
 					pathToWrite + "userTotalWindowsCount.csv");
 			WToFile.writeMapOfListToNewFileLongFormat(userWindowTimeDiffInMins, "User,TimeDiffInMins", ",",
 					pathToWrite + "userWindowTimeDiff.csv");
+
+			StringBuilder sb = new StringBuilder("User,NumOfVFEpisodes,TotalNumOfWindows,%OfVFE,NumOfIgnoredWindows\n");
+			ArrayList<Double> percentageVFEPerUser = new ArrayList<>();
+			for (Entry<String, Integer> e : userNumOfVertFreqEpisodesCount.entrySet())
+			{
+				String user = e.getKey();
+				double perVFE = StatsUtils
+						.round(100.0 * userNumOfVertFreqEpisodesCount.get(user) / userTotalWindowsCount.get(user), 4);
+				percentageVFEPerUser.add(perVFE);
+				sb.append(user + "," + userNumOfVertFreqEpisodesCount.get(user) + "," + userTotalWindowsCount.get(user)
+						+ "," + perVFE + "," + userNumOfIgnoredWindowsCount.get(user) + "\n");
+			}
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + "userVFEPercentage.csv");
 
 			StringBuilder consoleLog = new StringBuilder();
 			consoleLog.append("Ran at:" + LocalDateTime.now() + "\n");
@@ -252,7 +546,388 @@ public class GowallaPreProcessorUtils
 					+ windowSize + "\nwindowDurationDifThresholdInSecs=" + windowDurationDifThresholdInSecs + " ("
 					+ windowDurationDifThresholdInSecs / 60 + " mins)" + "\n");
 
-			WToFile.writeToNewFile(consoleLog.toString(), pathToWrite + "consoleLog.csv");
+			consoleLog.append("percentageVFEPerUser.summarry() = "
+					+ StatsUtils.getDescriptiveStatistics(percentageVFEPerUser).toString() + "\n");
+
+			PopUps.showMessage("percentageVFEPerUser.summarry() = "
+					+ StatsUtils.getDescriptiveStatistics(percentageVFEPerUser).toString() + "\n");
+			WToFile.writeToNewFile(consoleLog.toString(), pathToWrite + "consoleLog.txt");
+			// .writeMapOfArrayListToNewFile(userWindowTimeDiff, "User", "TimeDiff", ",", ",",
+			// pathToWrite + "userWindowTimeDiff.csv");
+		}
+		catch (Exception e)
+		{
+
+		}
+	}
+
+	/**
+	 * 
+	 * @param checkinFileNameToRead
+	 * @param windowSize
+	 * @param windowDistDifThresholdInKms
+	 * @param pathToWrite
+	 * @param userIDColIndex
+	 * @param firstStartLatColIndex
+	 * @param firstStartLonColIndex
+	 * @param actIDIndex
+	 */
+	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilDistanceUniqueActs(
+			String checkinFileNameToRead, int windowSize, int windowDistDifThresholdInKms, String pathToWrite,
+			int userIDColIndex, int firstStartLatColIndex, int firstStartLonColIndex, int actIDIndex)
+	{
+		List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
+				checkinFileNameToRead, ",", true, false,
+				new int[] { userIDColIndex, firstStartLatColIndex, firstStartLonColIndex, actIDIndex });
+
+		Map<String, ArrayList<Integer>> userWindowLengths = new LinkedHashMap<>();
+		Map<String, Integer> userNumOfVertFreqEpisodesCount = new LinkedHashMap<>();
+		Map<String, Integer> userNumOfIgnoredWindowsCount = new LinkedHashMap<>();
+		Map<String, Integer> userTotalWindowsCount = new LinkedHashMap<>();
+		Map<String, List<Integer>> userWindowDistDiffInKms = new LinkedHashMap();
+
+		System.out.println(
+				"Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilDistanceUniqueActs:\nwindowSize="
+						+ windowSize + " (" + windowDistDifThresholdInKms + " kms)");
+
+		int numOfWindows = 0;
+		try
+		{
+			System.out.println("here");
+			linesRead.remove(0);
+
+			// temp start
+			// linesRead = linesRead.subList(0, 5000);
+			// temp end
+
+			System.out.println("linesRead.size()= " + linesRead.size());
+			String windowEndUserID = "", windowStartUserID = "";
+
+			for (int windowStartIndex = 0; windowStartIndex < (linesRead.size() - windowSize); windowStartIndex++)
+			{
+				numOfWindows++;
+				// System.out.println("Num of windows = " + numOfWindows);
+				// int windowEndIndex = windowStartIndex + windowSize;
+				///////////////////////////////////////////////
+				LinkedHashSet<String> uniqueActIDsInWindow = new LinkedHashSet<>();
+				ArrayList<String> actIDsInWindow = new ArrayList<>();
+				int windowCursorIndex = windowStartIndex;
+				// System.out.println("windowStartIndex = " + windowStartIndex);
+				// System.out.println("linesRead = " + linesRead);
+				// System.out.println("linesRead = " + linesRead.get(windowCursorIndex).get(actIDIndex));
+
+				while (uniqueActIDsInWindow.size() < windowSize && windowCursorIndex < (linesRead.size() - windowSize))
+				{
+					// PopUps.showMessage("Inside while, windowCursorIndex= " + windowCursorIndex
+					// + " \nlinesRead.get(windowCursorIndex) = " + linesRead.get(windowCursorIndex));
+					String currActID = linesRead.get(windowCursorIndex).get(2);
+					// PopUps.showMessage("currActID = " + currActID);
+					uniqueActIDsInWindow.add(currActID);
+					actIDsInWindow.add(currActID);
+					// System.out.println("-->windowCursorIndex = " + windowCursorIndex + " uniqueActIDsInWindow.size()=
+					// "+ uniqueActIDsInWindow.size());
+					windowCursorIndex += 1;
+				}
+
+				int windowEndIndex = windowStartIndex + (actIDsInWindow.size() - 1);
+				// System.out.println("windowStartIndex = " + windowStartIndex + " windowEndIndex = " + windowEndIndex);
+
+				/////////////////////////////////////////////
+
+				List<String> startWindowLine = linesRead.get(windowStartIndex);
+				windowStartUserID = startWindowLine.get(0);
+				// Timestamp windowStartTS = java.sql.Timestamp.valueOf(startWindowLine.get(1));
+				String startLat = startWindowLine.get(1);
+				String startLon = startWindowLine.get(2);
+				// $$System.out.println(
+				// $$ "\nwindowStartUserID=" + windowStartUserID + " windowStartTS=" + windowStartTS.toString());
+
+				List<String> endWindowLine = linesRead.get(windowEndIndex);
+				windowEndUserID = endWindowLine.get(0);
+				// Timestamp windowEndTS = java.sql.Timestamp.valueOf(endWindowLine.get(1));
+				String endLat = endWindowLine.get(1);
+				String endLon = endWindowLine.get(2);
+				// $$ System.out.println("windowEndUserID=" + windowEndUserID + " windowEndTS=" +
+				// windowEndTS.toString());
+
+				if (windowStartUserID.equals(windowEndUserID))
+				{
+					///////////////////////////
+					ArrayList<Integer> windowLengthsForThisUser = userWindowLengths.get(windowStartUserID);
+					if (windowLengthsForThisUser == null)
+					{
+						windowLengthsForThisUser = new ArrayList<Integer>();
+					}
+					// System.out.println("actIDsInWindow = " + actIDsInWindow);
+					windowLengthsForThisUser.add(actIDsInWindow.size());
+					userWindowLengths.put(windowStartUserID, windowLengthsForThisUser);
+					///////////////////////////
+
+					double distLengthOfWindowInKms = StatsUtils
+							.round(SpatialUtils.haversineFastMathV3NoRound(startLat, startLon, endLat, endLon), 4);
+					// (windowEndTS.getTime() - windowStartTS.getTime()) / 1000;
+
+					// $$System.out.println("\t timeDurationOfWindowIn min= " + timeDurationOfWindowInSecs / 60);
+
+					if (userWindowDistDiffInKms.containsKey(windowStartUserID) == false)
+					{
+						userWindowDistDiffInKms.put(windowStartUserID, new ArrayList<Integer>());
+					}
+					userWindowDistDiffInKms.get(windowStartUserID).add((int) distLengthOfWindowInKms / 60);
+
+					int windowsCount = 1;
+					if (userTotalWindowsCount.containsKey(windowStartUserID))
+					{
+						windowsCount = userTotalWindowsCount.get(windowStartUserID) + 1;
+					}
+					userTotalWindowsCount.put(windowStartUserID, windowsCount);
+
+					if (distLengthOfWindowInKms < windowDistDifThresholdInKms)
+					{
+						// $$System.out.println("******> VFE as timeDurationOfWindowInSecs= " +
+						// timeDurationOfWindowInSecs
+						// $$ + " in mins =" + timeDurationOfWindowInSecs / 60);
+						// Encountered a window which is a very frequent episode.
+						int countOfVFEForThisUser = 0;
+						if (userNumOfVertFreqEpisodesCount.containsKey(windowStartUserID))
+						{
+							countOfVFEForThisUser = userNumOfVertFreqEpisodesCount.get(windowStartUserID);
+						}
+						userNumOfVertFreqEpisodesCount.put(windowStartUserID, countOfVFEForThisUser + 1);
+					}
+				}
+				else
+				{
+					int numOfIgnoredWindowsForThisUser = 0;
+					if (userNumOfIgnoredWindowsCount.containsKey(windowStartUserID))
+					{
+						numOfIgnoredWindowsForThisUser = userNumOfIgnoredWindowsCount.get(windowStartUserID);
+					}
+					userNumOfIgnoredWindowsCount.put(windowStartUserID, numOfIgnoredWindowsForThisUser + 1);
+					// System.out.println("Ignoring window different users at end");
+				}
+			}
+
+			System.out.println("Num of windows = " + numOfWindows);
+			WToFile.writeMapToFile(userNumOfVertFreqEpisodesCount, "User,NumOfVFEpisodes", ",",
+					pathToWrite + "userNumOfVeryFreqEpisodesCount.csv");
+			WToFile.writeMapToFile(userNumOfIgnoredWindowsCount, "User,NumOfIgnoredWindows", ",",
+					pathToWrite + "userNumOfIgnoredWindowsCount.csv");
+			WToFile.writeMapToFile(userTotalWindowsCount, "User,TotalNumOfWindows", ",",
+					pathToWrite + "userTotalWindowsCount.csv");
+			WToFile.writeMapOfListToNewFileLongFormat(userWindowDistDiffInKms, "User,DistDiffInKmd", ",",
+					pathToWrite + "userWindowDistDiff.csv");
+
+			////////////////////////
+			StringBuilder sb1 = new StringBuilder("User,NumOfActIDsInWindows\n");
+			for (Entry<String, ArrayList<Integer>> e : userWindowLengths.entrySet())
+			{
+				e.getValue().stream().forEachOrdered(v -> sb1.append(e.getKey() + "," + v + "\n"));
+			}
+			WToFile.writeToNewFile(sb1.toString(), pathToWrite + "userNumOfActIDsInWindows.csv");
+			/////////////////////
+
+			StringBuilder sb = new StringBuilder("User,NumOfVFEpisodes,TotalNumOfWindows,%OfVFE,NumOfIgnoredWindows\n");
+			ArrayList<Double> percentageVFEPerUser = new ArrayList<>();
+			for (Entry<String, Integer> e : userNumOfVertFreqEpisodesCount.entrySet())
+			{
+				String user = e.getKey();
+				double perVFE = StatsUtils
+						.round(100.0 * userNumOfVertFreqEpisodesCount.get(user) / userTotalWindowsCount.get(user), 4);
+				percentageVFEPerUser.add(perVFE);
+				sb.append(user + "," + userNumOfVertFreqEpisodesCount.get(user) + "," + userTotalWindowsCount.get(user)
+						+ "," + perVFE + "," + userNumOfIgnoredWindowsCount.get(user) + "\n");
+			}
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + "userVFEPercentage.csv");
+
+			StringBuilder consoleLog = new StringBuilder();
+			consoleLog.append("Ran at:" + LocalDateTime.now() + "\n");
+			consoleLog.append("checkinFileNameToRead=" + checkinFileNameToRead + "\n");
+			consoleLog.append("pathToWrite=" + pathToWrite + "\n");
+			consoleLog.append("Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8April:\nwindowSize="
+					+ windowSize + "\nwindowDistDifThresholdInKms=" + windowDistDifThresholdInKms + "\n");
+
+			consoleLog.append("percentageVFEPerUser.summarry() = "
+					+ StatsUtils.getDescriptiveStatistics(percentageVFEPerUser).toString() + "\n");
+
+			PopUps.showMessage("percentageVFEPerUser.summarry() = "
+					+ StatsUtils.getDescriptiveStatistics(percentageVFEPerUser).toString() + "\n");
+			WToFile.writeToNewFile(consoleLog.toString(), pathToWrite + "consoleLog.txt");
+			// .writeMapOfArrayListToNewFile(userWindowTimeDiff, "User", "TimeDiff", ",", ",",
+			// pathToWrite + "userWindowTimeDiff.csv");
+		}
+		catch (Exception e)
+		{
+
+		}
+	}
+
+	/**
+	 * 
+	 * @param checkinFileNameToRead
+	 * @param windowSize
+	 * @param windowDistDifThresholdInKms
+	 * @param pathToWrite
+	 * @param userIDColIndex
+	 * @param firstStartLatColIndex
+	 * @param firstStartLonColIndex
+	 */
+	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilDistance(String checkinFileNameToRead,
+			int windowSize, int windowDistDifThresholdInKms, String pathToWrite, int userIDColIndex,
+			int firstStartLatColIndex, int firstStartLonColIndex)
+	{
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
+		// String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April13VFAnalysis/";
+
+		// start of disabled on 2 Jan 2018
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24.csv";
+		// String pathToWrite = "/run/media/gunjan/BackupVault/GOWALLA/GowallaDataWorks/April24VFAnalysis/min5_5/";
+		// end of disabled on 2 jan 2018
+
+		// Start of added on 2 Jan 2018
+		// String checkinFileNameToRead =
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24_5_5VFELT1.csv";
+		// int windowSize = 5;
+		// int windowDistDifThresholdInKms = 1;// 120,30;// 5;
+		// int windowDurationDifThresholdInSecs = windowDistDifThresholdInKms * 60;
+
+		// String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan2VFAnalysis/min"
+		// + windowSize + "len_" + windowDistDifThresholdInKms + "kms/";
+		WToFile.createDirectoryIfNotExists(pathToWrite);
+		// End of added on 2 Jan 2018
+
+		List<List<String>> linesRead = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(
+				checkinFileNameToRead, ",", true, false,
+				new int[] { userIDColIndex, firstStartLatColIndex, firstStartLonColIndex });
+
+		Map<String, Integer> userNumOfVertFreqEpisodesCount = new LinkedHashMap<>();
+		Map<String, Integer> userNumOfIgnoredWindowsCount = new LinkedHashMap<>();
+		Map<String, Integer> userTotalWindowsCount = new LinkedHashMap<>();
+		Map<String, List<Integer>> userWindowDistDiffInKms = new LinkedHashMap();
+
+		System.out.println("Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilDistance:\nwindowSize="
+				+ windowSize + " (" + windowDistDifThresholdInKms + " mins)");
+
+		int numOfWindows = 0;
+		try
+		{
+			System.out.println("here");
+			linesRead.remove(0);
+
+			// temp start
+			// linesRead = linesRead.subList(0, 5000);
+			// temp end
+
+			System.out.println("linesRead.size()= " + linesRead.size());
+			String windowEndUserID = "", windowStartUserID = "";
+
+			for (int windowStartIndex = 0; windowStartIndex < (linesRead.size() - windowSize); windowStartIndex++)
+			{
+				numOfWindows++;
+				// System.out.println("Num of windows = " + numOfWindows);
+				int windowEndIndex = windowStartIndex + windowSize;
+
+				List<String> startWindowLine = linesRead.get(windowStartIndex);
+				windowStartUserID = startWindowLine.get(0);
+				// Timestamp windowStartTS = java.sql.Timestamp.valueOf(startWindowLine.get(1));
+				String startLat = startWindowLine.get(1);
+				String startLon = startWindowLine.get(2);
+				// $$System.out.println(
+				// $$ "\nwindowStartUserID=" + windowStartUserID + " windowStartTS=" + windowStartTS.toString());
+
+				List<String> endWindowLine = linesRead.get(windowEndIndex);
+				windowEndUserID = endWindowLine.get(0);
+				// Timestamp windowEndTS = java.sql.Timestamp.valueOf(endWindowLine.get(1));
+				String endLat = endWindowLine.get(1);
+				String endLon = endWindowLine.get(2);
+				// $$ System.out.println("windowEndUserID=" + windowEndUserID + " windowEndTS=" +
+				// windowEndTS.toString());
+
+				if (windowStartUserID.equals(windowEndUserID))
+				{
+					double distLengthOfWindowInKms = StatsUtils
+							.round(SpatialUtils.haversineFastMathV3NoRound(startLat, startLon, endLat, endLon), 4);
+					// (windowEndTS.getTime() - windowStartTS.getTime()) / 1000;
+
+					// $$System.out.println("\t timeDurationOfWindowIn min= " + timeDurationOfWindowInSecs / 60);
+
+					if (userWindowDistDiffInKms.containsKey(windowStartUserID) == false)
+					{
+						userWindowDistDiffInKms.put(windowStartUserID, new ArrayList<Integer>());
+					}
+					userWindowDistDiffInKms.get(windowStartUserID).add((int) distLengthOfWindowInKms / 60);
+
+					int windowsCount = 1;
+					if (userTotalWindowsCount.containsKey(windowStartUserID))
+					{
+						windowsCount = userTotalWindowsCount.get(windowStartUserID) + 1;
+					}
+					userTotalWindowsCount.put(windowStartUserID, windowsCount);
+
+					if (distLengthOfWindowInKms < windowDistDifThresholdInKms)
+					{
+						// $$System.out.println("******> VFE as timeDurationOfWindowInSecs= " +
+						// timeDurationOfWindowInSecs
+						// $$ + " in mins =" + timeDurationOfWindowInSecs / 60);
+						// Encountered a window which is a very frequent episode.
+						int countOfVFEForThisUser = 0;
+						if (userNumOfVertFreqEpisodesCount.containsKey(windowStartUserID))
+						{
+							countOfVFEForThisUser = userNumOfVertFreqEpisodesCount.get(windowStartUserID);
+						}
+						userNumOfVertFreqEpisodesCount.put(windowStartUserID, countOfVFEForThisUser + 1);
+					}
+				}
+				else
+				{
+					int numOfIgnoredWindowsForThisUser = 0;
+					if (userNumOfIgnoredWindowsCount.containsKey(windowStartUserID))
+					{
+						numOfIgnoredWindowsForThisUser = userNumOfIgnoredWindowsCount.get(windowStartUserID);
+					}
+					userNumOfIgnoredWindowsCount.put(windowStartUserID, numOfIgnoredWindowsForThisUser + 1);
+					// System.out.println("Ignoring window different users at end");
+				}
+			}
+
+			System.out.println("Num of windows = " + numOfWindows);
+			WToFile.writeMapToFile(userNumOfVertFreqEpisodesCount, "User,NumOfVFEpisodes", ",",
+					pathToWrite + "userNumOfVeryFreqEpisodesCount.csv");
+			WToFile.writeMapToFile(userNumOfIgnoredWindowsCount, "User,NumOfIgnoredWindows", ",",
+					pathToWrite + "userNumOfIgnoredWindowsCount.csv");
+			WToFile.writeMapToFile(userTotalWindowsCount, "User,TotalNumOfWindows", ",",
+					pathToWrite + "userTotalWindowsCount.csv");
+			WToFile.writeMapOfListToNewFileLongFormat(userWindowDistDiffInKms, "User,DistDiffInKmd", ",",
+					pathToWrite + "userWindowDistDiff.csv");
+
+			StringBuilder sb = new StringBuilder("User,NumOfVFEpisodes,TotalNumOfWindows,%OfVFE,NumOfIgnoredWindows\n");
+			ArrayList<Double> percentageVFEPerUser = new ArrayList<>();
+			for (Entry<String, Integer> e : userNumOfVertFreqEpisodesCount.entrySet())
+			{
+				String user = e.getKey();
+				double perVFE = StatsUtils
+						.round(100.0 * userNumOfVertFreqEpisodesCount.get(user) / userTotalWindowsCount.get(user), 4);
+				percentageVFEPerUser.add(perVFE);
+				sb.append(user + "," + userNumOfVertFreqEpisodesCount.get(user) + "," + userTotalWindowsCount.get(user)
+						+ "," + perVFE + "," + userNumOfIgnoredWindowsCount.get(user) + "\n");
+			}
+			WToFile.writeToNewFile(sb.toString(), pathToWrite + "userVFEPercentage.csv");
+
+			StringBuilder consoleLog = new StringBuilder();
+			consoleLog.append("Ran at:" + LocalDateTime.now() + "\n");
+			consoleLog.append("checkinFileNameToRead=" + checkinFileNameToRead + "\n");
+			consoleLog.append("pathToWrite=" + pathToWrite + "\n");
+			consoleLog.append("Inside findNumVeryFrequentEpisodesForEachUserSlidingWindow8April:\nwindowSize="
+					+ windowSize + "\nwindowDistDifThresholdInKms=" + windowDistDifThresholdInKms + "\n");
+
+			consoleLog.append("percentageVFEPerUser.summarry() = "
+					+ StatsUtils.getDescriptiveStatistics(percentageVFEPerUser).toString() + "\n");
+
+			PopUps.showMessage("percentageVFEPerUser.summarry() = "
+					+ StatsUtils.getDescriptiveStatistics(percentageVFEPerUser).toString() + "\n");
+			WToFile.writeToNewFile(consoleLog.toString(), pathToWrite + "consoleLog.txt");
 			// .writeMapOfArrayListToNewFile(userWindowTimeDiff, "User", "TimeDiff", ",", ",",
 			// pathToWrite + "userWindowTimeDiff.csv");
 		}

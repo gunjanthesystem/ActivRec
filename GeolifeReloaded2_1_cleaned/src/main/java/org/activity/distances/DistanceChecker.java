@@ -88,10 +88,10 @@ public class DistanceChecker
 		}
 		WToFile.writeToNewFile(sb.toString(), commonPath + "allDayTimelinesFromList.csv");
 
-		DistMetricI jaccardDistance = new JaccardDistance1();
+		// DistMetricI jaccardDistance = new JaccardDistance1();
 
-		computeDistances(givenDimension, commonPath, allDayTimelines, jaccardDistance,
-				commonPath + "JaccardDistance.csv");
+		// computeDistances(givenDimension, commonPath, allDayTimelines, jaccardDistance,
+		// commonPath + "JaccardDistance.csv");
 	}
 
 	/**
