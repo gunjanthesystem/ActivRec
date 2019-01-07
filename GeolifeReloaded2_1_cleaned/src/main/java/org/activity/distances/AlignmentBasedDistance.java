@@ -4,10 +4,12 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
@@ -879,6 +881,69 @@ public class AlignmentBasedDistance
 		return dfeat;
 	}
 
+	////
+	/**
+	 * Selects the right feature level values method to call for the current database.
+	 * <p>
+	 * Return the feature level differences between the two given Activity Objects. (note: this is NOT case-based)
+	 * (note: DCU data has only two features while Geolife Data has 4 additional features. Alert: this method needs to
+	 * be modified for different datasets.
+	 * <p>
+	 * DONE To make it generic, store the feature names in a data structure at the start of experiments.) NOT GENERIC
+	 * 
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @return EnumMap{GowallaFeatures, {Val of corr feat from ao1, val of corr feat from ao2}}, map of Gowalla features
+	 *         and corresonding feature's val pairs between the two compared act objs ao1 and ao2
+	 * @since 5 Jan 2019
+	 */
+	public EnumMap<GowGeoFeature, Pair<String, String>> getFeatureLevelValPairsBetweenAOs(ActivityObject2018 ao1,
+			ActivityObject2018 ao2)
+	{
+		double dfeat = 0;
+		EnumMap<GowGeoFeature, Pair<String, String>> featureDiffs = null;
+		String databaseName = Constant.getDatabaseName();
+		// if(ao1.getStartTimestamp().getTime() != (ao2.getStartTimestamp().getTime()) )//is wrong since its comparing
+		// timestamps and not time of days...however, results for our
+		// experiments do not show any visible difference in results { dfeat+=costReplaceStartTime; }
+		if (databaseName.equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
+		{
+			// $$dfeat = getFeatureLevelDistanceGowallaPD(ao1, ao2);//disabled on Feb 23 2018
+			// dfeat = getFeatureLevelDistanceGowallaPD25Feb2018(ao1, ao2);
+			featureDiffs = getFeatLevelPairsGowallaPD5Jan2019V2(ao1, ao2, databaseName);
+			//// Sanity Checked pass OK 26 Feb 2018 Start
+			// double dfeatTest = getFeatureLevelDistanceGowallaPD23Feb2018(ao1, ao2);
+			// boolean sanityCheckPassed = Sanity.eq(dfeat, dfeatTest,
+			// "Sanity Check Failed Error:'ndfeat= " + dfeat + " dfeatTest=" + dfeatTest);
+			// WritingToFile.appendLineToFileAbsolute(sanityCheckPassed + "\n",
+			// Constant.getCommonPath() + "SanityCheck25FebgetFeatureLevelDistanceGowallaPD25Feb2018.txt");
+			// Sanity Checked pass OK 26 Feb 2018 End
+		}
+		else if (databaseName.equals("geolife1"))
+		{
+			featureDiffs = getFeatLevelPairsGeolifePD5Jan2019(ao1, ao2, databaseName);
+		}
+		else if (databaseName.equals("dcu_data_2"))
+		{
+			featureDiffs = getFeatLevelPairsDCUPD5Jan2019(ao1, ao2, databaseName);
+		}
+		else
+		{
+			PopUps.showError("Error: AlignmentBasedDistance.getFeatureLevelDifference() NOT IMPLEMENTED for database: "
+					+ databaseName);
+		}
+
+		if (VerbosityConstants.verbose)
+		{
+			StringBuilder sb = new StringBuilder("\nfeatureDiffMap=\n");
+			featureDiffs.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey() + "--" + e.getValue() + "\n"));
+			System.out.println(sb.toString());
+		}
+		return featureDiffs;
+	}
+
+	////
 	/**
 	 * Selects the right feature level difference method to call for the current database.
 	 * <p>
@@ -886,7 +951,7 @@ public class AlignmentBasedDistance
 	 * (note: DCU data has only two features while Geolife Data has 4 additional features. Alert: this method needs to
 	 * be modified for different datasets.
 	 * <p>
-	 * TODO To make it generic, store the feature names in a data structure at the start of experiments.) NOT GENERIC
+	 * DONE To make it generic, store the feature names in a data structure at the start of experiments.) NOT GENERIC
 	 * 
 	 * 
 	 * @param ao1
@@ -4164,6 +4229,161 @@ public class AlignmentBasedDistance
 		}
 	}
 
+	// start of added on 5 Jan 2019
+	/**
+	 * Fork of getFeatLevelDiffsGeolifePD18Nov2018() for Geolife
+	 * <p>
+	 * Store vals of of each features (instead of normalised computed distances from differences), normalise it later
+	 * when we values for all cands for a given RT
+	 * <p>
+	 * IMPORTANT: StartGeoF and EndGeoF have lat and lon separated by "|"
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @param databaseName
+	 * @return map of differences of Gowalla features
+	 *         <p>
+	 *         EnumMap{GowallaFeatures, Double}, map of Gowalla features and corresonding feature's difference between
+	 *         the two compared act objs ao1 and ao2
+	 * @since November 18 2018
+	 */
+	public EnumMap<GowGeoFeature, Pair<String, String>> getFeatLevelPairsGeolifePD5Jan2019(ActivityObject2018 ao1,
+			ActivityObject2018 ao2, String databaseName)
+	{
+		EnumMap<GowGeoFeature, Pair<String, String>> featureDiffMap = new EnumMap<>(GowGeoFeature.class);
+		// StringBuilder sbLog = new StringBuilder();
+
+		// useActivityNameInFED
+		// useStartTimeInFED
+		// useDurationInFED
+		// useDistTravelledInFED
+		// useStartGeoInFED
+		// useEndGeoInFED
+		// useAvgAltitudeInFED
+
+		if (databaseName.equals("geolife1"))
+		{
+			if (useActivityNameInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+				{
+					// double diffActID;
+					// if (ao1.getActivityID() != ao2.getActivityID())// incorrect version before Mar 21 2018
+					// {
+					// diffActID = 1;
+					// }
+					// else
+					// {
+					// diffActID = 0;
+					// }
+					// featureDiffMap.put(GowGeoFeature.ActNameF, diffActID);
+					featureDiffMap.put(GowGeoFeature.ActNameF, new Pair<String, String>(
+							String.valueOf(ao1.getActivityID()), String.valueOf(ao2.getActivityID())));
+				}
+			}
+
+			if (useStartTimeInFED)
+			{
+				// if (primaryDimension.equals(PrimaryDimension.) == false)
+				{
+					long ao1TimeInDay = DateTimeUtils.getTimeInDayInSecondsZoned(ao1.getStartTimestampInms(),
+							ao1.getTimeZoneId());
+					long ao2TimeInDay = DateTimeUtils.getTimeInDayInSecondsZoned(ao2.getStartTimestampInms(),
+							ao2.getTimeZoneId());
+
+					// featureDiffMap.put(GowGeoFeature.StartTimeF,
+					// (double) DateTimeUtils.getTimeDiffInSecondsZoned(ao1.getStartTimestampInms(),
+					// ao2.getStartTimestampInms(), ao1.getTimeZoneId(), ao2.getTimeZoneId()));
+					featureDiffMap.put(GowGeoFeature.StartTimeF,
+							new Pair<String, String>(String.valueOf(ao1TimeInDay), String.valueOf(ao2TimeInDay)));
+
+					if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
+					{
+						WToFile.appendLineToFileAbs("Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+								+ ao2.getLocationIDs(',') + "\n",
+								Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+					}
+				}
+			}
+
+			if (useDurationInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.Duration) == false)
+				{
+					// featureDiffMap.put(GowGeoFeature.DurationF,
+					// (double) Math.abs(ao2.getDurationInSeconds() - ao1.getDurationInSeconds()));
+					featureDiffMap.put(GowGeoFeature.DurationF, new Pair<String, String>(
+							String.valueOf(ao1.getDurationInSeconds()), String.valueOf(ao2.getDurationInSeconds())));
+				}
+			}
+
+			if (useDistTravelledInFED)
+			{
+
+				// featureDiffMap.put(GowGeoFeature.DistTravelledF,
+				// (double) Math.abs(ao1.getDistanceTravelled() - ao2.getDistanceTravelled()));
+				featureDiffMap.put(GowGeoFeature.DistTravelledF, new Pair<String, String>(
+						String.valueOf(ao1.getDistanceTravelled()), String.valueOf(ao2.getDistanceTravelled())));
+
+			}
+
+			if (useStartGeoInFED)
+			{
+				featureDiffMap.put(GowGeoFeature.StartGeoF,
+						new Pair<String, String>(String.valueOf(ao1.getStartLatitude() + "|" + ao1.getStartLongitude()),
+								String.valueOf(ao2.getStartLatitude() + "|" + ao2.getStartLongitude())));
+				// featureDiffMap.put(GowGeoFeature.StartGeoF,
+				// (double) Math.abs(ao1.getDifferenceStartingGeoCoordinates(ao2)));
+
+			}
+
+			if (useEndGeoInFED)
+			{
+				// featureDiffMap.put(GowGeoFeature.EndGeoF,
+				// (double) Math.abs(ao1.getDifferenceEndingGeoCoordinates(ao2)));
+				featureDiffMap.put(GowGeoFeature.EndGeoF,
+						new Pair<String, String>(String.valueOf(ao1.getEndLatitude() + "|" + ao1.getEndLongitude()),
+								String.valueOf(ao2.getEndLatitude() + "|" + ao2.getEndLongitude())));
+
+			}
+
+			if (useAvgAltitudeInFED)
+			{
+				// featureDiffMap.put(GowGeoFeature.AvgAltitudeF, Math
+				// .abs(Double.parseDouble(ao1.getAvgAltitude()) - Double.parseDouble((ao2.getAvgAltitude()))));
+				featureDiffMap.put(GowGeoFeature.AvgAltitudeF, new Pair<String, String>(
+						String.valueOf(ao1.getAvgAltitude()), String.valueOf(ao2.getAvgAltitude())));
+
+			}
+			/// Start of added on 9 Dec 2018
+			if (useDistFromPrevInFED)
+			{
+				// double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() -
+				// ao2.getDistanceInMFromPrev());
+				featureDiffMap.put(GowGeoFeature.DistFromPrevF, new Pair<String, String>(
+						String.valueOf(ao1.getDistanceInMFromPrev()), String.valueOf(ao2.getDistanceInMFromPrev())));
+			}
+
+			if (useDurationFromPrevInFED)
+			{
+				// double diffOfDurFromPrev = FastMath
+				// .abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
+				featureDiffMap.put(GowGeoFeature.DurationFromPrevF,
+						new Pair<String, String>(String.valueOf(ao1.getDurationInSecondsFromPrev()),
+								String.valueOf(ao2.getDurationInSecondsFromPrev())));
+			}
+			/// End of added on 9 Dec 2018
+
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: getFeatureLevelDifferenceGeolifePD18Nov2018() called for database: " + databaseName);
+		}
+		return featureDiffMap;
+	}
+	// end of added on 5 Jan 2019
+
 	///
 	/**
 	 * Fork of getFeatureLevelDifferenceGowallaPD13Apr2018() for Geolife
@@ -4293,6 +4513,86 @@ public class AlignmentBasedDistance
 	}
 
 	///
+
+	/**
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @param databaseName
+	 * @return
+	 * @since 15 Dec 2018
+	 */
+	public EnumMap<GowGeoFeature, Pair<String, String>> getFeatLevelPairsDCUPD5Jan2019(ActivityObject2018 ao1,
+			ActivityObject2018 ao2, String databaseName)
+	{
+		EnumMap<GowGeoFeature, Pair<String, String>> featureDiffMap = new EnumMap<>(GowGeoFeature.class);
+		// StringBuilder sbLog = new StringBuilder();
+
+		if (databaseName.equals("dcu_data_2"))
+		{
+			if (useActivityNameInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+				{
+					double diffActID;
+					if (ao1.getActivityID() != ao2.getActivityID())// incorrect version before Mar 21 2018
+					{
+						diffActID = 1;
+					}
+					else
+					{
+						diffActID = 0;
+					}
+					// featureDiffMap.put(GowGeoFeature.ActNameF, diffActID);
+					featureDiffMap.put(GowGeoFeature.ActNameF, new Pair<String, String>(
+							String.valueOf(ao1.getActivityID()), String.valueOf(ao2.getActivityID())));
+				}
+			}
+
+			if (useStartTimeInFED)
+			{
+				// if (primaryDimension.equals(PrimaryDimension.) == false)
+				{
+					// featureDiffMap.put(GowGeoFeature.StartTimeF,
+					// (double) DateTimeUtils.getTimeDiffInSecondsZoned(ao1.getStartTimestampInms(),
+					// ao2.getStartTimestampInms(), ao1.getTimeZoneId(), ao2.getTimeZoneId()));
+
+					long ao1TimeInDay = DateTimeUtils.getTimeInDayInSecondsZoned(ao1.getStartTimestampInms(),
+							ao1.getTimeZoneId());
+					long ao2TimeInDay = DateTimeUtils.getTimeInDayInSecondsZoned(ao2.getStartTimestampInms(),
+							ao2.getTimeZoneId());
+					// sNumber.v
+					featureDiffMap.put(GowGeoFeature.StartTimeF,
+							new Pair<String, String>(String.valueOf(ao1TimeInDay), String.valueOf(ao2TimeInDay)));
+
+					if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
+					{
+						WToFile.appendLineToFileAbs("Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+								+ ao2.getLocationIDs(',') + "\n",
+								Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+					}
+				}
+			}
+
+			if (useDurationInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.Duration) == false)
+				{
+					// featureDiffMap.put(GowGeoFeature.DurationF,
+					// (double) Math.abs(ao2.getDurationInSeconds() - ao1.getDurationInSeconds()));
+					featureDiffMap.put(GowGeoFeature.DurationF, new Pair<String, String>(
+							String.valueOf(ao1.getDurationInSeconds()), String.valueOf(ao2.getDurationInSeconds())));
+				}
+			}
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: getFeatLevelDiffsDCUPD15Dec2018() called for database: " + databaseName);
+		}
+		return featureDiffMap;
+	}
+
 	/// Start of added on 15 Dec 2018
 	/**
 	 * 
@@ -4364,6 +4664,265 @@ public class AlignmentBasedDistance
 	///
 
 	/// End of added on 15 Dec 2018
+
+	/////////// start of added on 5 Jan 2018
+	/**
+	 * Fork of getFeatLevelDiffsGowallaPD13Apr2018().
+	 * <p>
+	 * Store absolute values of each features
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @param databaseName
+	 * @return map of differences of Gowalla features
+	 *         <p>
+	 *         EnumMap{GowallaFeatures, {Double feat val of ao1,Double feat val of ao2}}, map of Gowalla features and
+	 *         corresonding feature vals the corresponding two compared act objs ao1 and ao2
+	 * @since April 13 2018
+	 */
+	public EnumMap<GowGeoFeature, Pair<List<Number>, List<Number>>> getFeatLevelPairsGowallaPD5Jan2019(
+			ActivityObject2018 ao1, ActivityObject2018 ao2, String databaseName)
+	{
+		EnumMap<GowGeoFeature, Pair<List<Number>, List<Number>>> featureDiffMap = new EnumMap<>(GowGeoFeature.class);
+		// StringBuilder sbLog = new StringBuilder();
+
+		if (databaseName.equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
+		{
+			if (useStartTimeInFED)
+			{
+				long ao1TimeInDay = DateTimeUtils.getTimeInDayInSecondsZoned(ao1.getStartTimestampInms(),
+						ao1.getTimeZoneId());
+				long ao2TimeInDay = DateTimeUtils.getTimeInDayInSecondsZoned(ao2.getStartTimestampInms(),
+						ao2.getTimeZoneId());
+				// sNumber.v
+				featureDiffMap.put(GowGeoFeature.StartTimeF, new Pair<List<Number>, List<Number>>(
+						Collections.singletonList((ao1TimeInDay)), Collections.singletonList((ao2TimeInDay))));
+
+				if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
+				{
+					WToFile.appendLineToFileAbs("Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+							+ ao2.getLocationIDs(',') + "\n",
+							Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+				}
+			}
+
+			if (useLocationInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.LocationID) == false)
+				{
+					// double diffLoc;
+					// if (Constant.useHaversineDistInLocationFED)
+					// {
+					// diffLoc = DomainConstants.getMinHaversineDistForGridIndicesPairs(
+					// ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID),
+					// ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID));
+					// }
+					// else
+					// {
+					// if (UtilityBelt.getIntersection(ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID),
+					// ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID)).size() == 0)
+					// { // if no matching locationIDs then add wt to dfeat
+					// diffLoc = 1;
+					// }
+					// else
+					// {
+					// diffLoc = 0;// even if one location matches, location distance is 0
+					// }
+					// }
+					featureDiffMap.put(GowGeoFeature.LocationF,
+							new Pair<List<Number>, List<Number>>(
+									ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID).stream()
+											.map(i -> (Number) i).collect(Collectors.toList()),
+									ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID).stream()
+											.map(i -> (Number) i).collect(Collectors.toList())));
+				}
+			}
+			if (useActivityNameInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+				{
+					// double diffActID;
+					// if (ao1.getActivityID() != ao2.getActivityID())// incorrect version before Mar 21 2018
+					// {
+					// diffActID = 1;
+					// }
+					// else
+					// {
+					// diffActID = 0;
+					// }
+					featureDiffMap.put(GowGeoFeature.ActNameF,
+							new Pair<List<Number>, List<Number>>(Collections.singletonList(ao1.getActivityID()),
+									Collections.singletonList(ao2.getActivityID())));
+				}
+			}
+
+			if (usePopularityInFED)
+			{
+				// featureDiffMap.put(GowGeoFeature.PopularityF,
+				// (double) Math.abs(ao1.getCheckins_count() - ao2.getCheckins_count()));
+				featureDiffMap.put(GowGeoFeature.PopularityF,
+						new Pair<List<Number>, List<Number>>(Collections.singletonList(ao1.getCheckins_count()),
+								Collections.singletonList(ao2.getCheckins_count())));
+			}
+
+			if (useDistFromPrevInFED)
+			{
+				// double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() -
+				// ao2.getDistanceInMFromPrev());
+				// featureDiffMap.put(GowGeoFeature.DistFromPrevF, diffOfDistFromPrev);
+				featureDiffMap.put(GowGeoFeature.DistFromPrevF,
+						new Pair<List<Number>, List<Number>>(Collections.singletonList(ao1.getDistanceInMFromPrev()),
+								Collections.singletonList(ao2.getDistanceInMFromPrev())));
+			}
+
+			if (useDurationFromPrevInFED)
+			{
+				// double diffOfDurFromPrev = FastMath
+				// .abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
+				// featureDiffMap.put(GowGeoFeature.DurationFromPrevF, diffOfDurFromPrev);
+				featureDiffMap.put(GowGeoFeature.DurationFromPrevF,
+						new Pair<List<Number>, List<Number>>(
+								Collections.singletonList(ao1.getDurationInSecondsFromPrev()),
+								Collections.singletonList(ao2.getDurationInSecondsFromPrev())));
+			}
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: getFeatureLevelDistanceGowallaPD() called for database: " + databaseName);
+		}
+
+		return featureDiffMap;
+	}
+
+	/**
+	 * Fork of getFeatLevelDiffsGowallaPD13Apr2018().
+	 * <p>
+	 * Store absolute values of each features
+	 * <p>
+	 * IMPORTANT: LocationF has multiple values separated by |
+	 * 
+	 * @param ao1
+	 * @param ao2
+	 * @param databaseName
+	 * @return map of differences of Gowalla features
+	 *         <p>
+	 *         EnumMap{GowallaFeatures, {Double feat val of ao1,Double feat val of ao2}}, map of Gowalla features and
+	 *         corresonding feature vals the corresponding two compared act objs ao1 and ao2
+	 * @since April 13 2018
+	 */
+	public EnumMap<GowGeoFeature, Pair<String, String>> getFeatLevelPairsGowallaPD5Jan2019V2(ActivityObject2018 ao1,
+			ActivityObject2018 ao2, String databaseName)
+	{
+		EnumMap<GowGeoFeature, Pair<String, String>> featureDiffMap = new EnumMap<>(GowGeoFeature.class);
+		// StringBuilder sbLog = new StringBuilder();
+
+		if (databaseName.equals("gowalla1"))// (Constant.DATABASE_NAME.equals("geolife1"))
+		{
+			if (useStartTimeInFED)
+			{
+				long ao1TimeInDay = DateTimeUtils.getTimeInDayInSecondsZoned(ao1.getStartTimestampInms(),
+						ao1.getTimeZoneId());
+				long ao2TimeInDay = DateTimeUtils.getTimeInDayInSecondsZoned(ao2.getStartTimestampInms(),
+						ao2.getTimeZoneId());
+				// sNumber.v
+				featureDiffMap.put(GowGeoFeature.StartTimeF,
+						new Pair<String, String>(String.valueOf(ao1TimeInDay), String.valueOf(ao2TimeInDay)));
+
+				if (ao1.getTimeZoneId() == null || ao2.getTimeZoneId() == null)
+				{
+					WToFile.appendLineToFileAbs("Null timezone for locid" + ao1.getLocationIDs(',') + " or "
+							+ ao2.getLocationIDs(',') + "\n",
+							Constant.getOutputCoreResultsPath() + "NullTimeZoneLog.txt");
+				}
+			}
+
+			if (useLocationInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.LocationID) == false)
+				{
+					// double diffLoc;
+					// if (Constant.useHaversineDistInLocationFED)
+					// {
+					// diffLoc = DomainConstants.getMinHaversineDistForGridIndicesPairs(
+					// ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID),
+					// ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID));
+					// }
+					// else
+					// {
+					// if (UtilityBelt.getIntersection(ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID),
+					// ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID)).size() == 0)
+					// { // if no matching locationIDs then add wt to dfeat
+					// diffLoc = 1;
+					// }
+					// else
+					// {
+					// diffLoc = 0;// even if one location matches, location distance is 0
+					// }
+					// }
+					featureDiffMap.put(GowGeoFeature.LocationF,
+							new Pair<String, String>(
+									ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID).stream()
+											.map(i -> String.valueOf(i)).collect(Collectors.joining("|")),
+									ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID).stream()
+											.map(i -> String.valueOf(i)).collect(Collectors.joining("|"))));
+				}
+			}
+			if (useActivityNameInFED)
+			{
+				if (primaryDimension.equals(PrimaryDimension.ActivityID) == false)
+				{
+					// double diffActID;
+					// if (ao1.getActivityID() != ao2.getActivityID())// incorrect version before Mar 21 2018
+					// {
+					// diffActID = 1;
+					// }
+					// else
+					// {
+					// diffActID = 0;
+					// }
+					featureDiffMap.put(GowGeoFeature.ActNameF, new Pair<String, String>(
+							String.valueOf(ao1.getActivityID()), String.valueOf(ao2.getActivityID())));
+				}
+			}
+
+			if (usePopularityInFED)
+			{
+				// featureDiffMap.put(GowGeoFeature.PopularityF,
+				// (double) Math.abs(ao1.getCheckins_count() - ao2.getCheckins_count()));
+				featureDiffMap.put(GowGeoFeature.PopularityF, new Pair<String, String>(
+						String.valueOf(ao1.getCheckins_count()), String.valueOf(ao2.getCheckins_count())));
+			}
+
+			if (useDistFromPrevInFED)
+			{
+				// double diffOfDistFromPrev = FastMath.abs(ao1.getDistanceInMFromPrev() -
+				// ao2.getDistanceInMFromPrev());
+				// featureDiffMap.put(GowGeoFeature.DistFromPrevF, diffOfDistFromPrev);
+				featureDiffMap.put(GowGeoFeature.DistFromPrevF, new Pair<String, String>(
+						String.valueOf(ao1.getDistanceInMFromPrev()), String.valueOf(ao2.getDistanceInMFromPrev())));
+			}
+
+			if (useDurationFromPrevInFED)
+			{
+				// double diffOfDurFromPrev = FastMath
+				// .abs(ao1.getDurationInSecondsFromPrev() - ao2.getDurationInSecondsFromPrev());
+				// featureDiffMap.put(GowGeoFeature.DurationFromPrevF, diffOfDurFromPrev);
+				featureDiffMap.put(GowGeoFeature.DurationFromPrevF,
+						new Pair<String, String>(String.valueOf(ao1.getDurationInSecondsFromPrev()),
+								String.valueOf(ao2.getDurationInSecondsFromPrev())));
+			}
+		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: getFeatureLevelDistanceGowallaPD() called for database: " + databaseName);
+		}
+
+		return featureDiffMap;
+	}
+
+	/////////// end of added on 5 Jan 2018
 	/**
 	 * Fork of getFeatureLevelDistanceGowallaPD13Apr2018().
 	 * <p>

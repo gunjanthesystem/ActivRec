@@ -95,7 +95,7 @@ public final class Constant
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
 	// SWITCH_DEC20
-	public static final Enums.LookPastType lookPastType = Enums.LookPastType.NCount;//// TODO .NCount;//
+	public static final Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;//// TODO .NCount;//
 	//// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
@@ -212,17 +212,7 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 0 };// 0.5, 1 };// 0.4, 0.5, 0.7, 1 };// 0.5 };// 0.4, 0.5, 0.6, 0.7, 0.8,
-													// 0.9, 1
-													// };// 0.7,
-													// 0.5, 0, 1, 0.3
-	// };// ,
-	// 0.7, };//
-	// 1,
-	// 0.5
-	// };//
-	// 0, 0.2, 0.4, 0.6, 0.7,
-	// 0.8, 0.9, 1 };//
+	public static final double[] EDAlphas = { 0.5, 1 };// 0.5, 1 };// 0.4, 0.5, 0.7, 1 };// 0.5 };// 0.4, 0.5, 0.6, 0.7,
 	// TODO
 	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
 	// SWITCH_NOV20
@@ -242,8 +232,8 @@ public final class Constant
 	public static final boolean useLocationInFED = true;// SWITCH_NOV10
 	public static boolean useHaversineDistInLocationFED = false;// SWITCH_NOV10 //added on Aug 11 2018
 	public static final boolean usePopularityInFED = true;// SWITCH_NOV10
-	public static final boolean useDistFromPrevInFED = true;// SWITCH_NOV10
-	public static final boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
+	public static boolean useDistFromPrevInFED = true;// SWITCH_NOV10
+	public static boolean useDurationFromPrevInFED = true;// SWITCH_NOV10
 
 	// Only for geolife1, added in Nov 18, 2018
 	public static final boolean useDurationInFED = true;// SWITCH_NOV10
@@ -942,11 +932,13 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = false;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = 500;// TODO 500;// 750;// 500;// 500;/// -1;//
-			percentileForRTVerseMaxForFEDNorm = 100;//// TODO 10;// 75;// -1// SWITCH_April24
+			percentileForRTVerseMaxForFEDNorm = 10;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = false;// TEMP// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = false;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = true;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = true; // false for gowalla// true for others;//
+			useDistFromPrevInFED = false;
+			useDurationFromPrevInFED = false;
 			break;
 
 		case "gowalla1":
