@@ -13,7 +13,6 @@ import org.activity.io.Serializer;
 import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
-import org.activity.stats.StatsUtils;
 import org.activity.util.DateTimeUtils;
 import org.apache.commons.text.similarity.HammingDistance;
 import org.apache.commons.text.similarity.JaccardDistance;
@@ -103,26 +102,27 @@ public class DistanceChecker
 	 * @param distMetric
 	 * @param absFileNameToWrite
 	 */
-	private static void computeDistances(PrimaryDimension givenDimension, String commonPath,
-			List<ArrayList<ActivityObject2018>> allDayTimelines, DistMetricI distMetric, String absFileNameToWrite)
-	{
-		StringBuilder sb2 = new StringBuilder("timeline1Length, timeline2Length, distance,timeline1,timeline2\n");
-		for (ArrayList<ActivityObject2018> timeline1 : allDayTimelines)
-		{
-			String timeline1String = timeline1.stream().map(ao -> ao.getGivenDimensionVal("_", givenDimension))
-					.collect(Collectors.joining(">>"));
-
-			for (ArrayList<ActivityObject2018> timeline2 : allDayTimelines)
-			{
-				String timeline2String = timeline2.stream().map(ao -> ao.getGivenDimensionVal("_", givenDimension))
-						.collect(Collectors.joining(">>"));
-
-				double jd = StatsUtils.round(distMetric.getDistance(timeline1, timeline2, givenDimension), 4);
-				sb2.append(timeline1.size() + "," + timeline2.size() + "," + jd + "," + timeline1String + ","
-						+ timeline2String + "\n");
-			}
-		}
-		WToFile.writeToNewFile(sb2.toString(), absFileNameToWrite);
-	}
+	// private static void computeDistances(PrimaryDimension givenDimension, String commonPath,
+	// List<ArrayList<ActivityObject2018>> allDayTimelines, StringDistanceMeasure distMetric, String absFileNameToWrite)
+	// {
+	// StringBuilder sb2 = new StringBuilder("timeline1Length, timeline2Length, distance,timeline1,timeline2\n");
+	// for (ArrayList<ActivityObject2018> timeline1 : allDayTimelines)
+	// {
+	// String timeline1String = timeline1.stream().map(ao -> ao.getGivenDimensionVal("_", givenDimension))
+	// .collect(Collectors.joining(">>"));
+	//
+	// for (ArrayList<ActivityObject2018> timeline2 : allDayTimelines)
+	// {
+	// String timeline2String = timeline2.stream().map(ao -> ao.getGivenDimensionVal("_", givenDimension))
+	// .collect(Collectors.joining(">>"));
+	//
+	// // $$double jd = StatsUtils.round(distMetric.getDistance(timeline1, timeline2, givenDimension), 4);
+	// double jd = -1;// commented out in response to later refactorings.
+	// sb2.append(timeline1.size() + "," + timeline2.size() + "," + jd + "," + timeline1String + ","
+	// + timeline2String + "\n");
+	// }
+	// }
+	// WToFile.writeToNewFile(sb2.toString(), absFileNameToWrite);
+	// }
 
 }

@@ -9,6 +9,16 @@ public class Enums
 	{
 	}
 
+	public enum ActDistType
+	{
+		HJEditDist, HammingDist, JaccardDist
+	}
+
+	public enum FeatDistType
+	{
+
+	}
+
 	/**
 	 * 
 	 * @author gunjan
