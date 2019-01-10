@@ -9,11 +9,13 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
+import org.activity.constants.Enums.ActDistType;
 import org.activity.constants.Enums.GowGeoFeature;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
@@ -3486,6 +3488,322 @@ public class AlignmentBasedDistance
 
 	///// end of faster v4
 
+	// start of added on 9 Jan 2019
+	// ~~~~~~~~~~~~~`
+	/**
+	 * faster v5: minimising splits to improve performance
+	 * <p>
+	 * Fork of org.activity.distances.AlignmentBasedDistance.getMySimpleLevenshteinDistance(String, String, int, int,
+	 * int, Map<String, Double>)
+	 * <p>
+	 * Computes Levenshtein distance between the given strings.</br>
+	 * 
+	 * Weight of insertion = insertWt * abs(diff(insertedVal - medianValOfOtherString)) </br>
+	 * Weight of deletion = deleteWt * abs(diff(deletedVal - medianValOfOtherString)) </br>
+	 * Weight of replacement = replaceWt * abs(diff(replaceVal - original))
+	 * 
+	 * right to left: insertion? top to down: deletion
+	 * 
+	 * -------------------------------------------------------------------------------------
+	 * <p>
+	 * Foreign body awareness</br>
+	 * delete cost = 0.5 , if present in other </br>
+	 * = 1, otherwise</br>
+	 * 
+	 * insert cost = 0.5, if present in same, </br>
+	 * = 1, otherwise</br>
+	 * 
+	 * (idea is to keep replacement cost inline with deletion and insertion cost).</br>
+	 * 
+	 * replacement cost = 0.5 + 0.5 if deleted item present in other and inserted item present in same</br>
+	 * 
+	 * replacement cost = 1+1 , if deleted item NOT present in other and inserted item NOT present in same</br>
+	 * 
+	 * replacement cost = 1 + 0.5, if deleted item NOT present in other and inserted item present in same</br>
+	 * 
+	 * replacement cost = 0.5 + 1, if deleted item NOT present in other and inserted item present in same</br>
+	 * 
+	 * @param word1
+	 * @param word2
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @param replaceWtMultiplierMap
+	 * @return Triple{resultantTrace, resultantDistance, Triple{DISNTrace,coordTraces.getFirst(),
+	 *         coordTraces.getSecond()}}
+	 *         <p>
+	 *         Trace =_I(0-1)_I(0-2)_I(0-3)_D(1-3)_D(2-3)_D(3-3)_N(4-4) <br/>
+	 *         simpleLevenshteinDistance112=6.0<br/>
+	 *         DINSTrace=IIIDDDN <br/>
+	 *         third_second=[0, 0, 0, 1, 2, 3, 4] <br/>
+	 *         third_third=[1, 2, 3, 3, 3, 3, 4]
+	 * @since 9 Jan 2019
+	 */
+	public static Triple<String, Double, Triple<char[], int[], int[]>> getMySimpleForeignBodyAwareLevenshteinDistance_9Jan(
+			String word1, String word2, int insertWt, int deleteWt, int replaceWt,
+			Map<String, Double> replaceWtMultiplierMap)
+	{
+		Set<Character> word1CharsSet = word1.chars().mapToObj(e -> (char) e).collect(Collectors.toSet());
+		Set<Character> word2CharsSet = word2.chars().mapToObj(e -> (char) e).collect(Collectors.toSet());
+
+		boolean useTimeDecay = Constant.useTimeDecayInAED;// added on 20 Aug 2018
+		double timeDecayPower = Constant.powerOfTimeDecayInAED;// added on 20 Aug 2018
+		boolean useForeignAwareLevenshtein = Constant.useForeignAwareLevenshtein;// added on 9 Jan 2019
+		// boolean useHierarchicalDistance = Constant.useHierarchicalDistance;
+		// HashMap<String, Double> catIDsHierarchicalDistance = null;
+		// if (useHierarchicalDistance){ catIDsHierarchicalDistance = DomainConstants.catIDsHierarchicalDistance;}
+		boolean hasReplaceWtModifierMap = replaceWtMultiplierMap == null ? false : true;
+
+		TraceMatrixLeaner1 traceMatrix = new TraceMatrixLeaner1(word1.length(), word2.length());
+
+		// long performanceTime1 = System.currentTimeMillis();
+		if (VerbosityConstants.verboseLevenstein)// Constant.verbose ||
+		{
+			System.out.println("inside getMySimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2
+					+ " with insertWt=" + insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt);
+		}
+		int len1 = word1.length();
+		int len2 = word2.length();
+
+		// len1+1, len2+1, because finally return dp[len1][len2]
+		double[][] dist = new double[len1 + 1][len2 + 1];
+		// StringBuilder[][] traceMatrix = new StringBuilder[len1 + 1][len2 + 1];
+
+		traceMatrix.resetLengthOfCells();
+		// for (int i = 0; i <= len1; i++){ for (int j = 0; j <= len2; j++){traceMatrix[i][j] = new StringBuilder();}}
+
+		dist[0][0] = 0;
+
+		for (int i = 1; i <= len1; i++)
+		{
+			///// start of added on 9 Jan 2019
+			double deleteFWMultiplier = 1;
+			if (useForeignAwareLevenshtein)
+			{
+				char charToDeleteInWord1 = word1.charAt(i - 1);// added 9 Jan 2019
+				if (word2CharsSet.contains(charToDeleteInWord1))
+				{
+					deleteFWMultiplier = 0.5;
+				}
+			}
+			dist[i][0] = dist[i - 1][0] + deleteFWMultiplier * deleteWt;
+			///// end of added on 9 Jan 2019
+			// dist[i][0] = deleteFWMultiplier * i;
+			// traceMatrix.addCharsToCell(i, 0, traceMatrix.getCellAtIndex(i - 1, 0), '_', 'D', '(', (char) (i + '0'),
+			// '-', '0', ')');
+			// (char)(i+'0') converts i to char i safely and not disturbed by ascii value;
+			traceMatrix.addCharsToCell(i, 0, traceMatrix.getCellAtIndex(i - 1, 0), '_', 'D', '(', i, '-', 0, ')');
+			// traceMatrix[i][0].append(traceMatrix[i - 1][0] + "_D(" + (i) + "-" + "0)");
+		}
+
+		for (int j = 1; j <= len2; j++)
+		{
+			// start of added on 9 Jan 2019
+			double insertFWMultiplier = 1;
+			if (useForeignAwareLevenshtein)
+			{
+				char charToInsertInWord1 = word2.charAt(j - 1);// added 9 Jan 2019
+				if (word1CharsSet.contains(charToInsertInWord1))
+				{
+					insertFWMultiplier = 0.5;
+				}
+			}
+			dist[0][j] = dist[0][j - 1] + insertFWMultiplier * insertWt;
+			// end of added on 9 Jan 2019
+			// dist[0][j] = insertFWMultiplier * j;
+			// traceMatrix.addCharsToCell(0, j, traceMatrix.getCellAtIndex(0, j - 1), '_', 'I', '(', '0', '-',
+			// (char) (j + '0'), ')');
+			traceMatrix.addCharsToCell(0, j, traceMatrix.getCellAtIndex(0, j - 1), '_', 'I', '(', 0, '-', j, ')');
+			// traceMatrix[0][j].append(traceMatrix[0][j - 1] + "_I(0" + "-" + j + ")");
+		}
+
+		// iterate though, and check last char
+		for (int i = 0; i < len1; i++)
+		{
+			char c1 = word1.charAt(i);
+			for (int j = 0; j < len2; j++)
+			{
+				char c2 = word2.charAt(j);
+
+				// System.out.println("\nComparing " + c1 + " and " + c2);
+				// if last two chars equal
+				if (c1 == c2)
+				{
+					// update dp value for +1 length
+					dist[i + 1][j + 1] = dist[i][j];
+
+					traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j), '_', 'N', '(', i + 1,
+							'-', j + 1, ')');
+					// traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j), '_', 'N', '(',
+					// (char) (i + 1 + '0'), '-', (char) (j + 1 + '0'), ')');
+					// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_N(" + (i + 1) + "-" + (j + 1) + ")");
+					// System.out.println("Equal" + " Trace " + traceMatrix[i + 1][j + 1]);// "_N(" + (i + 1) + "-" + (j
+					// + 1) + ")");
+				}
+				else
+				{
+					double replaceWtMultiplier = 1;
+					// Start of added on 3 Aug 2018
+					if (hasReplaceWtModifierMap)
+					{
+						Double res = replaceWtMultiplierMap.get(c1 + "_" + c2);
+						if (res == null)
+						{
+							PopUps.printTracedErrorMsgWithExit("Error: no entry found in replaceWtMultiplierMap for :"
+									+ String.valueOf(c1) + "_" + String.valueOf(c2));
+						}
+						replaceWtMultiplier = res;
+					}
+					// End of added on 3 Aug 2018
+
+					// start of added on 20 Aug 2018
+					double timeDecayMultiplier = 1;
+					if (useTimeDecay)
+					{
+						int valTemp = len2 - (j + 1) + 1;
+						timeDecayMultiplier = Math.pow(valTemp, timeDecayPower);
+						// $$System.out.println("valTemp = " + valTemp + " timeDecayMultiplier = " +
+						// timeDecayMultiplier);
+					}
+					// end of added on 20 Aug 2018
+
+					// start of added on 9 Jan 2019
+
+					double deleteFWMultiplier = 1;
+					double insertFWMultiplier = 1;
+					double replaceFWMultiplier = 1;
+
+					if (useForeignAwareLevenshtein)
+					{
+
+						char charToDeleteInWord1 = word1.charAt(i);// added 9 Jan 2019
+						char charToInsertInWord1 = word2.charAt(j);// added 9 Jan 2019
+
+						if (word2CharsSet.contains(charToDeleteInWord1))
+						{
+							deleteFWMultiplier = 0.5;
+						}
+						if (word1CharsSet.contains(charToInsertInWord1))
+						{
+							insertFWMultiplier = 0.5;
+						}
+						replaceFWMultiplier = (deleteFWMultiplier / 2) + (insertFWMultiplier / 2);
+						// System.out.println("i= " + i + " j = " + j);
+						// System.out.println("word1= " + word1 + " word2 = " + word2 + "\ncharToDeleteInWord1= "
+						// + charToDeleteInWord1 + "\ncharToInsertInWord1=" + charToInsertInWord1);
+						// System.out.println("deleteFWMultiplier= " + deleteFWMultiplier + " insertFWMultiplier= "
+						// + insertFWMultiplier);
+					}
+					// end of added on 9 Jan 2019
+
+					// diagonally previous, see slides from STANFORD NLP on // min edit distance
+					double replace = dist[i][j]
+							+ (replaceWtMultiplier * timeDecayMultiplier * replaceFWMultiplier * replaceWt);// 2;
+					// deletion --previous row, i.e, cell above
+					double delete = dist[i][j + 1] + (timeDecayMultiplier * deleteFWMultiplier * deleteWt);// 1;
+					// insertion --previous column, i.e, cell on left
+					double insert = dist[i + 1][j] + (timeDecayMultiplier * insertFWMultiplier * insertWt);// 1;
+
+					// System.out.println("replace =" + replace + " insert =" + insert + " deleteWt =" + delete);
+					// int min = replace > insert ? insert : replace;
+					// min = delete > min ? min : delete;
+					double min = -9999;
+
+					if (isMinimum(delete, delete, insert, replace))
+					{
+						traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j + 1), '_', 'D', '(',
+								i + 1, '-', j + 1, ')');
+						// traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j + 1), '_', 'D', '(',
+						// (char) (i + 1 + '0'), '-', (char) (j + 1 + '0'), ')');
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j + 1] + "_D(" + (i + 1) + "-" + (j + 1) +
+						// ")");
+						min = delete;
+						// System.out.println("Delete is min:" + delete + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_D(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+					else if (isMinimum(insert, delete, insert, replace))
+					{
+						traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i + 1, j), '_', 'I', '(',
+								i + 1, '-', j + 1, ')');
+						// traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i + 1, j), '_', 'I', '(',
+						// (char) (i + 1 + '0'), '-', (char) (j + 1 + '0'), ')');
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i + 1][j] + "_I(" + (i + 1) + "-" + (j + 1) +
+						// ")");
+						min = insert;
+						// System.out.println("Insert is min:" + insert + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_I(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+					else if (isMinimum(replace, delete, insert, replace))
+					{
+						traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j), '_', 'S', '(', i + 1,
+								'-', j + 1, ')');
+						// traceMatrix.addCharsToCell(i + 1, j + 1, traceMatrix.getCellAtIndex(i, j), '_', 'S', '(',
+						// (char) (i + 1 + '0'), '-', (char) (j + 1 + '0'), ')');
+						// traceMatrix[i + 1][j + 1].append(traceMatrix[i][j] + "_S(" + (i + 1) + "-" + (j + 1) + ")");
+						min = replace;
+						// System.out.println("replace is min:" + replace + " Trace " + traceMatrix[i + 1][j + 1]);// "
+						// Trace added= " + "_S(" + (i + 1) + "-" + (j + 1) + ")");
+					}
+
+					if (min == -9999)
+					{
+						System.out.println(PopUps.getTracedErrorMsg("Error in minDistance"));
+					}
+
+					dist[i + 1][j + 1] = min;
+				}
+			}
+		}
+
+		String resultantTrace = String.valueOf(traceMatrix.getCellAtIndex(len1, len2));
+		char[] DISNTrace = traceMatrix.getCellAtIndexOnlyDISN(len1, len2);
+		Pair<int[], int[]> coordTraces = traceMatrix.getCellAtIndexOnlyCoordinates(len1, len2);
+
+		Double resultantDistance = Double.valueOf(dist[len1][len2]);
+
+		if (VerbosityConstants.verboseLevenstein)
+		// iterate though, and check last char
+		{
+			System.out.println(" Trace Matrix here--: \n" + traceMatrix.toString());
+			// for (int i = 0; i <= len1; i++)
+			// {
+			// for (int j = 0; j <= len2; j++)
+			// {
+			// System.out.print(traceMatrix[i][j] + "|");
+			// }
+			// System.out.println();
+			// }
+			// int fieldLength = 7 * Math.max(len1, len2);// added on 9 Jan 2019
+
+			System.out.println("  Distance Matrix: ");
+			for (int i = 0; i <= len1; i++)
+			{
+				for (int j = 0; j <= len2; j++)
+				{
+					// System.out.print(dist[i][j] + "|");
+					// added on 9 Jan 2019 for printing fixed width cell for readability
+					System.out.print(String.format("%6s", dist[i][j] + "|"));
+				}
+				System.out.println();
+			}
+
+			System.out.println("Resultant Distance = " + resultantDistance);// new Double(dist[len1][len2]));
+			System.out.println("Resultant Trace = " + resultantTrace);// traceMatrix[len1][len2].toString());
+			System.out.println(" -------- ");
+		}
+
+		// long performanceTime2 = System.currentTimeMillis();
+		// WritingToFile.appendLineToFileAbsolute(
+		// Integer.toString(word1.length()) + "," + Integer.toString(word2.length()) + ","
+		// + Long.toString(performanceTime2 - performanceTime1) + "\n",
+		// Constant.getCommonPath() + "MySimpleLevenshteinDistanceTimeTakenInms.csv");
+		return new Triple<>(resultantTrace, resultantDistance,
+				new Triple<char[], int[], int[]>(DISNTrace, coordTraces.getFirst(), coordTraces.getSecond()));
+
+	}
+	// ~~~~~~~~~~~~`
+	// end of added on 9 Jan 2019
+
 	// ~~~~~~~~~~~~~`
 	/**
 	 * faster v4: minimising splits to improve performance
@@ -3516,6 +3834,10 @@ public class AlignmentBasedDistance
 	 *         third_second=[0, 0, 0, 1, 2, 3, 4] <br/>
 	 *         third_third=[1, 2, 3, 3, 3, 3, 4]
 	 * @since Aug 3, 2018
+	 * @until 9 Jan 2019
+	 *        <p>
+	 *        Superceeded by AlignmentBasedDistance.getMySimpleForeignBodyAwareLevenshteinDistance_9Jan(String, String,
+	 *        int, int, int, Map<String, Double>) which can also do the foreign aware version.
 	 */
 	public static Triple<String, Double, Triple<char[], int[], int[]>> getMySimpleLevenshteinDistance(String word1,
 			String word2, int insertWt, int deleteWt, int replaceWt, Map<String, Double> replaceWtMultiplierMap)
@@ -3692,13 +4014,16 @@ public class AlignmentBasedDistance
 			// }
 			// System.out.println();
 			// }
+			// int fieldLength = 7 * Math.max(len1, len2);// added on 9 Jan 2019
 
 			System.out.println("  Distance Matrix: ");
 			for (int i = 0; i <= len1; i++)
 			{
 				for (int j = 0; j <= len2; j++)
 				{
-					System.out.print(dist[i][j] + "|");
+					// System.out.print(dist[i][j] + "|");
+					// added on 9 Jan 2019 for printing fixed width cell for readability
+					System.out.print(String.format("%6s", dist[i][j] + "|"));
 				}
 				System.out.println();
 			}
@@ -3768,6 +4093,113 @@ public class AlignmentBasedDistance
 		}
 
 		return lowestRes;
+	}
+
+	/**
+	 * Fork of AlignmentBasedDistance.getLowestMySimpleLevenshteinDistance(ArrayList<ActivityObject2018>,
+	 * ArrayList<ActivityObject2018>, PrimaryDimension, int, int, int) to allow for different distance types to be used.
+	 * <p>
+	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
+	 * <p>
+	 * uses getLocallyUniqueCharCodeMap()
+	 * <p>
+	 * (This method abstracted some code from the method
+	 * HJEditDistance.getHJEditDistanceWithTrace_CleanedApril13_2018())
+	 * 
+	 * @param activityObjects1
+	 * @param activityObjects2
+	 * @param givenDimension
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @param distanceType
+	 * @return Triple{resultantTrace, resultantDistance, Triple{DISNTrace,coordTraces.getFirst(),
+	 *         coordTraces.getSecond()}}
+	 *         <p>
+	 *         Trace =_I(0-1)_I(0-2)_I(0-3)_D(1-3)_D(2-3)_D(3-3)_N(4-4) <br/>
+	 *         simpleLevenshteinDistance112=6.0<br/>
+	 *         DINSTrace=IIIDDDN <br/>
+	 *         third_second=[0, 0, 0, 1, 2, 3, 4] <br/>
+	 *         third_third=[1, 2, 3, 3, 3, 3, 4]
+	 * 
+	 * @since 7 Jan 2019
+	 */
+	public static Triple<String, Double, Triple<char[], int[], int[]>> getLowestDistanceOfGivenType(
+			ArrayList<ActivityObject2018> activityObjects1, ArrayList<ActivityObject2018> activityObjects2,
+			PrimaryDimension givenDimension, int insertWt, int deleteWt, int replaceWt, ActDistType distanceType)
+	{
+		// long t0, t2, t3, t4, t5, t6;t0 = t2 = t3 = t4 = t5 = t6 = Long.MIN_VALUE;t0 = System.nanoTime();
+		// HashMap<Integer, Character> uniqueCharCodes = StringCode.getLocallyUniqueCharCodeMap(activityObjects1,
+		// activityObjects2, primaryDimension);
+		HashMap<Integer, Character> uniqueCharCodes = StringCode.getLocallyUniqueCharCodeMap17July2018(activityObjects1,
+				activityObjects2, givenDimension);
+
+		Map<String, Double> replaceWtMultiplierMap = null;
+
+		// Start of added on 3 Aug 2018
+		if (givenDimension.equals(PrimaryDimension.LocationGridID) && Constant.doWeightedEditDistanceForSecDim)
+		{
+			// disabled the print on Aug 7 to decrease size of consoleLogs
+			// $$System.out.println("DebugAug3: will createReplaceWtModifierMapForDistSensitiveLocGrids!!");
+			replaceWtMultiplierMap = createReplaceWtModifierMapForDistSensitiveLocGrids(uniqueCharCodes);
+		}
+		// End of added on 3 Aug 2018
+
+		// Start of added on 26 July 2018
+		// if (givenDimension.equals(PrimaryDimension.LocationGridID) && Constant.doWeightedEditDistanceForSecDim)
+		// {
+		// double maxDistanceBetweeenPairs = getMaxDistance(activityObjects1, activityObjects2, givenDimension);
+		// }
+		// End of added on 26 July 2018
+		// t2 = System.nanoTime();
+		// Int2CharOpenHashMap uniqueCharCodesFU = StringCode.getLocallyUniqueCharCodeMapFU(activityObjects1,
+		// activityObjects2, primaryDimension);
+		// t3 = System.nanoTime();
+		// multiple string codes when an AO in the list has act name which at desired level can have multiple ids. For
+		// example Vineyards is under Community as well as Food
+		ArrayList<String> stringCodesForActivityObjects1, stringCodesForActivityObjects2;
+
+		// //start of curtain 17 July 2017
+		// if (Constant.HierarchicalCatIDLevelForEditDistance > 0)
+		// {// TODO: need to implement this for multi dimensional case, e.g., recommending location
+		// // PopUps.printTracedErrorMsgWithExit("Constant.HierarchicalLevelForEditDistance > 0) not implemented yet");
+		// stringCodesForActivityObjects1 = StringCode.getStringCodeForActivityObjectsV2(activityObjects1,
+		// Constant.HierarchicalCatIDLevelForEditDistance, false);
+		// stringCodesForActivityObjects2 = StringCode.getStringCodeForActivityObjectsV2(activityObjects2,
+		// Constant.HierarchicalCatIDLevelForEditDistance, false);
+		// }
+		// else
+		// {
+		// //end of curtain 17 July 2017
+		// t4 = System.nanoTime();
+		//// temp start
+		// ArrayList<String> stringCodesForActivityObjects1FU = StringCode.getStringCodesForActivityObjectsFU(
+		// activityObjects1, primaryDimension, uniqueCharCodesFU, VerbosityConstants.verbose);
+		// ArrayList<String> stringCodesForActivityObjects2FU = StringCode.getStringCodesForActivityObjectsFU(
+		// activityObjects2, primaryDimension, uniqueCharCodesFU, VerbosityConstants.verbose);
+		// t6 = System.nanoTime();
+
+		// String debug9Mar = (t2 - t0) + "," + (t3 - t2) + "," + (t5 - t4) + "," + (t6 - t5) + ","
+		// + stringCodesForActivityObjects1.equals(stringCodesForActivityObjects1FU) + ","
+		// + stringCodesForActivityObjects2.equals(stringCodesForActivityObjects2FU) + ","
+		// + stringCodesForActivityObjects1 + "," + (stringCodesForActivityObjects1FU) + ","
+		// + stringCodesForActivityObjects2 + "," + (stringCodesForActivityObjects2FU) + "\n";
+		// WritingToFile.appendLineToFileAbsolute(debug9Mar.toString(),
+		// Constant.getOutputCoreResultsPath() + "DebugMar9_2018.csv");
+		/// temp end
+		// }
+		stringCodesForActivityObjects1 = StringCode.getStringCodesForActivityObjects17July2018(activityObjects1,
+				givenDimension, uniqueCharCodes, VerbosityConstants.verbose);
+		stringCodesForActivityObjects2 = StringCode.getStringCodesForActivityObjects17July2018(activityObjects2,
+				givenDimension, uniqueCharCodes, VerbosityConstants.verbose);
+		// t5 = System.nanoTime();
+
+		// return getLowestMySimpleLevenshteinDistance(stringCodesForActivityObjects1, stringCodesForActivityObjects2,
+		// insertWt, deleteWt, replaceWt, replaceWtMultiplierMap);
+		return getLowestDistance(stringCodesForActivityObjects1, stringCodesForActivityObjects2, insertWt, deleteWt,
+				replaceWt, replaceWtMultiplierMap, distanceType);
+		// Map<String, Double> replaceWtModifierMap
+		// getMySimpleLevenshteinDistance
 	}
 
 	/**
@@ -3970,6 +4402,90 @@ public class AlignmentBasedDistance
 	}
 
 	/**
+	 * Fork of AlignmentBasedDistance.getLowestMySimpleLevenshteinDistance() to make it applicable for other kinds of
+	 * distances
+	 * <p>
+	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
+	 * 
+	 * @param word1
+	 * @param word2
+	 * @param insertWt
+	 * @param deleteWt
+	 * @param replaceWt
+	 * @param replaceWtMultiplierMap
+	 *            {String, Double} {id1_id2,wt}
+	 * @param distanceType
+	 * @return Triple{resultantTrace, resultantDistance, Triple{DISNTrace,coordTraces.getFirst(),
+	 *         coordTraces.getSecond()}}
+	 *         <p>
+	 *         Trace =_I(0-1)_I(0-2)_I(0-3)_D(1-3)_D(2-3)_D(3-3)_N(4-4) <br/>
+	 *         simpleLevenshteinDistance112=6.0<br/>
+	 *         DINSTrace=IIIDDDN <br/>
+	 *         third_second=[0, 0, 0, 1, 2, 3, 4] <br/>
+	 *         third_third=[1, 2, 3, 3, 3, 3, 4]
+	 * @since 7 Jan 2018
+	 */
+	public static Triple<String, Double, Triple<char[], int[], int[]>> getLowestDistance(ArrayList<String> word1s,
+			ArrayList<String> word2s, int insertWt, int deleteWt, int replaceWt,
+			Map<String, Double> replaceWtMultiplierMap, ActDistType distanceType)
+	{
+		Triple<String, Double, Triple<char[], int[], int[]>> lowestRes = new Triple<>();
+
+		ArrayList<Triple<String, Double, Triple<char[], int[], int[]>>> dists = new ArrayList<>();
+
+		for (String word1 : word1s)
+		{
+			for (String word2 : word2s)
+			{
+				dists.add(ManyDistancesUtils.getGivenDistanceCompatibility(word1, word2, distanceType, insertWt,
+						deleteWt, replaceWt, replaceWtMultiplierMap));
+				// levenshteinDists.add(getMySimpleLevenshteinDistance(word1, word2, insertWt, deleteWt, replaceWt,
+				// replaceWtMultiplierMap));
+			}
+		}
+
+		double min = Double.MAX_VALUE;
+		for (Triple<String, Double, Triple<char[], int[], int[]>> p : dists)
+		{
+			double val = p.getSecond();
+			if (val < min)
+			{
+				lowestRes = p;
+				min = val;
+			}
+		}
+
+		if (VerbosityConstants.verboseLevenstein)
+		{
+			System.out.println("Word1s: " + word1s.toString() + "  Word2s:" + word2s.toString());
+			if (word1s.size() > 1 || word2s.size() > 1)
+			{
+				System.out.println("more than one word!");
+			}
+			// $$ System.out.println("levenshteinDists = " + levenshteinDists);
+
+			StringBuilder sb = new StringBuilder();
+			for (Triple<String, Double, Triple<char[], int[], int[]>> s : dists)
+			{
+				Triple<char[], int[], int[]> third = s.getThird();
+
+				sb.append("trace= " + s.getFirst() + ", dist=" + s.getSecond() + ", { DISNTrace="
+						+ Arrays.toString(third.getFirst()) + ", coordTraces=" + Arrays.toString(third.getSecond())
+						+ ", coordTraces=" + Arrays.toString(third.getThird()) + "}");
+
+			}
+
+			System.out.println("distanceType = " + distanceType + "\nlevenshteinDists = " + sb.toString());
+			// System.out.println("lowestRes = " + lowestRes.toString());
+			System.out.println("lowestRes = " + lowestRes.getFirst() + ", " + lowestRes.getSecond() + " , {"
+					+ lowestRes.getThird().getFirst() + "," + Arrays.toString(lowestRes.getThird().getSecond()) + ","
+					+ Arrays.toString(lowestRes.getThird().getThird()));
+		}
+
+		return lowestRes;
+	}
+
+	/**
 	 * Compute levenshtein dist between the words in two lists and return the result for the least dist.
 	 * 
 	 * @since Mar 1, 2018
@@ -4001,8 +4517,12 @@ public class AlignmentBasedDistance
 		{
 			for (String word2 : word2s)
 			{
+
 				levenshteinDists.add(getMySimpleLevenshteinDistance(word1, word2, insertWt, deleteWt, replaceWt,
-						replaceWtMultiplierMap));
+						replaceWtMultiplierMap));// disabled on 9 Jan 2019
+				// levenshteinDists.add(getMySimpleForeignBodyAwareLevenshteinDistance_9Jan(word1, word2, insertWt,
+				// deleteWt, replaceWt, replaceWtMultiplierMap));// added on 9 Jan 2019
+
 			}
 		}
 

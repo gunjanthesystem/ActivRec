@@ -2671,6 +2671,18 @@ public class WToFile
 							+ +ActivityObjects2.get(i).getDurationInSeconds()));
 				}
 			}
+			else if (VerbosityConstants.WriteActivityObjectsInEditSimilarityCalculationsTrimmed)
+			{
+				for (int i = 0; i < ActivityObjects1.size(); i++)
+				{
+					activityObjects1String.append(">>" + (ActivityObjects1.get(i).getActivityName()));
+				}
+
+				for (int i = 0; i < ActivityObjects2.size(); i++)
+				{
+					activityObjects2String.append(">>" + (ActivityObjects2.get(i).getActivityName()));
+				}
+			}
 			msgToWrite.append(activityObjects1String.toString() + "," + activityObjects2String.toString() + ","
 					+ ActivityObjects1.size() + "," + ActivityObjects2.size() + "\n");
 
@@ -3209,6 +3221,8 @@ public class WToFile
 	 * @param writeEditOperations
 	 * @param endPointIndicesInCands
 	 * @param givenDimension
+	 * @param nextValidActAfterCurrTimeline
+	 *            Target of recommendation added on 10 Jan 2019
 	 * @param absFileNameToWriteTo
 	 */
 	public static void writeEditDistancesPerRtPerCand(String userAtRecomm, Date dateAtRecomm, Time timeAtRecomm,
@@ -3218,7 +3232,7 @@ public class WToFile
 			ArrayList<ActivityObject2018> currentTimeline, ActivityObject2018 currentActivityObject,
 			boolean writeCandidateTimeline, boolean writeEditOperations,
 			LinkedHashMap<String, Integer> endPointIndicesInCands, PrimaryDimension givenDimension,
-			String absFileNameToWriteTo)
+			ActivityObject2018 nextValidActAfterCurrTimeline, String absFileNameToWriteTo)
 	// LinkedHashMap<String, Integer> endPointsOfLeastDisSubseq, Enums.LookPastType lookPastType,
 	// Enums.CaseType caseType)
 	{
@@ -3244,6 +3258,14 @@ public class WToFile
 				// //.getPrimaryDimensionVal().stream()
 				// .map(e -> e.toString()).collect(Collectors.joining("/"));// .getActivityName();//
 				// "null";
+
+				// Start of added on 10 Jan 2019
+				// Sanity check start
+				Double distInNextActObj = nextActObjs.get(candTimelineID).getSecond();
+				// Double scoreInNextActObj = nextActObjs.get(candTimelineID).getSecond();
+				// if(nextActObjs.get(candTimelineID))
+				// Sanity check end
+				// End of added on 10 Jan 2019
 
 				String candidateTimelineAsString = " ";
 				String candidateTimelineAsStringGDOnly = " ";
@@ -3301,7 +3323,8 @@ public class WToFile
 						+ editOperationsString + "," + editDist + "," + countOfL1Ops + "," + countOfL2Ops + ","
 						+ nextAOGDVals + "," + diffStartTimeForEndPointsCand_n_GuidingInSecs + ","
 						+ diffEndTimeForEndPointsCand_n_GuidingInSecs + "," + candidateTimelineAsString + ","
-						+ currentTimelineString + "\n");
+						+ currentTimelineString + "," + distInNextActObj + ","
+						+ nextValidActAfterCurrTimeline.getGivenDimensionVal("|", givenDimension) + "\n");
 
 				// sbToWrite.append(userString + "," + dateString + "," + timeString + "," + candTimelineID + "," + " "
 				// + "," + editOperationsString + "," + editDist + "," + countOfL1Ops + "," + countOfL2Ops + ","

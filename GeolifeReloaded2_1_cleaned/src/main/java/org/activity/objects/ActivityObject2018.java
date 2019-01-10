@@ -969,6 +969,15 @@ public class ActivityObject2018 implements Serializable
 		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
 				? delimiter + this.durationInSeconds
 				: "";
+
+		String additionalGowallaFeatures = Constant.getDatabaseName().equals("gowalla1")
+				? delimiter + workingLevelCatIDs + delimiter + startLatitude + delimiter + startLongitude + delimiter
+						+ photos_count + delimiter + checkins_count + delimiter + users_count + delimiter
+						+ radius_meters + delimiter + highlights_count + delimiter + items_count + delimiter
+						+ max_items_count + delimiter + gridIndex + delimiter + this.getLocationIDs('-') + delimiter
+						+ locationName
+				: "";
+
 		Timestamp startTS = new Timestamp(startTimestampInms);
 		int hourOfDay = startTS.getHours();
 		int weekDay = startTS.getDay();
@@ -977,16 +986,12 @@ public class ActivityObject2018 implements Serializable
 
 		String brokenDownTS = weekDay + delimiter + dateOnly + delimiter + hourOfDay;
 
-		return brokenDownTS + delimiter + activityID + delimiter + this.getLocationIDs('-') + delimiter
-				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter + locationName + delimiter
-				+ workingLevelCatIDs + delimiter + Instant.ofEpochMilli(startTimestampInms).toString()
+		return userID + delimiter + brokenDownTS + delimiter + activityID + delimiter
+				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter
+				+ Instant.ofEpochMilli(startTimestampInms).toString()
 				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
-				+ delimiter + startLatitude + delimiter + startLongitude
-				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
-				+ checkins_count + delimiter + users_count + delimiter + radius_meters + delimiter + highlights_count
-				+ delimiter + items_count + delimiter + max_items_count + delimiter + df.format(distInMFromPrev)
-				+ delimiter + durInSecFromPrev + delimiter + gridIndex + additionalGeolifeFeatures
-				+ additionalDCUFeatures;
+				+ additionalGowallaFeatures + delimiter + df.format(distInMFromPrev) + delimiter + durInSecFromPrev
+				+ additionalGeolifeFeatures + additionalDCUFeatures;
 	}
 
 	/**
@@ -1031,14 +1036,23 @@ public class ActivityObject2018 implements Serializable
 		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2") ? delimiter + "durationInSeconds"
 				: "";
 
+		String additionalGowallaFeatures = Constant.getDatabaseName().equals("gowalla1")
+				? delimiter + "workLvlCat" + delimiter + "stLat" + delimiter + "stLon" + delimiter + "photos_c"
+						+ delimiter + "cins_c" + delimiter + "users_c" + delimiter + "radius_m" + delimiter
+						+ "highlts_count" + delimiter + "items_c" + delimiter + "max_items_c" + delimiter + "gridID"
+						+ delimiter + "locID" + delimiter + "locationName"
+
+				// + "startLatitude" + delimiter + "startLongitude" + delimiter + "userID" + delimiter
+				// + "photos_count" + delimiter + "checkins_count" + delimiter + "users_count" + delimiter
+				// + "radius_meters" + delimiter + "highlights_count" + delimiter + "items_count" + delimiter
+				// + "max_items_count"
+				: "";
+
 		String brokenDownTS = "weekDay" + delimiter + "dateOnly" + delimiter + "hourOfDay";
 
-		return brokenDownTS + delimiter + "actID" + delimiter + "locID" + delimiter + "activityName" + delimiter
-				+ "locationName" + delimiter + "workLvlCat" + delimiter + "stTS" + delimiter + "stLat" + delimiter
-				+ "stLon" + delimiter + "uID" + delimiter + "photos_c" + delimiter + "cins_c" + delimiter + "users_c"
-				+ delimiter + "radius_m" + delimiter + "highlts_count" + delimiter + "items_c" + delimiter
-				+ "max_items_c" + delimiter + "distInMPrev" + delimiter + "durInSecPrev" + delimiter + "gridID"
-				+ additionalGeolifeFeatures + additionalDCUFeatures;
+		return "uID" + delimiter + brokenDownTS + delimiter + "actID" + delimiter + "activityName" + delimiter + "stTS"
+				+ delimiter + "distInMPrev" + delimiter + "durInSecPrev" + additionalGeolifeFeatures
+				+ additionalDCUFeatures;
 	}
 
 	/**
