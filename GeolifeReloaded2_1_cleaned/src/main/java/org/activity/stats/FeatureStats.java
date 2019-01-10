@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
@@ -89,6 +90,38 @@ public class FeatureStats
 			for (ActivityObject2018 ao : window)
 			{
 				sb.append(ActivityObject2018.getHeaderForStringAllGeolifeWithNameForHeaded2(ao, ",") + ",");
+			}
+			// get activity name of last activity object
+			sb.append(window.get(muCount - 1).getActivityName() + "\n");
+		}
+		WToFile.appendLineToFileAbs(sb.toString(), absFileNameToAppend);
+	}
+
+	/**
+	 * 
+	 * @param userID
+	 * @param userTrainingTimelines
+	 * @param absFileNameToAppend
+	 * @param muCount
+	 */
+	public static void writeFeatDistributionForEachUsersTrainingTimelinesSlidingWindowWiseV2(int userID,
+			LinkedHashMap<Date, Timeline> userTrainingTimelines, String absFileNameToAppend, int muCount)
+	{
+		List<List<ActivityObject2018>> listOfWindows = splitDayTimelineToSlidingWindows(userTrainingTimelines, muCount);
+
+		String featHeader = IntStream.range(0, muCount)
+				.mapToObj(i -> ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(","))
+				.collect(Collectors.joining(","));
+		StringBuilder sb = new StringBuilder("UserID,ActWindow," + featHeader + ",ActAfterWindow\n");
+
+		for (List<ActivityObject2018> window : listOfWindows)
+		{
+			sb.append(userID + "," + window.stream().map(ao -> ao.getActivityName()).collect(Collectors.joining(">"))
+					+ ",");
+			for (ActivityObject2018 ao : window)
+			{
+				sb.append(ao.toStringAllGowallaTSWithNameForHeaded24Dec(",") + ",");
+				// ActivityObject2018.getHeaderForStringAllGeolifeWithNameForHeaded2(ao, ",") + ",");
 			}
 			// get activity name of last activity object
 			sb.append(window.get(muCount - 1).getActivityName() + "\n");

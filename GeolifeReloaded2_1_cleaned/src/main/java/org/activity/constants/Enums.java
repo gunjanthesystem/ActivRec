@@ -11,7 +11,7 @@ public class Enums
 
 	public enum ActDistType
 	{
-		HJEditDist, HammingDist, JaccardDist
+		Jaccard, Jaro, Hamming, LongestCommonSubsequence, MyLevenshtein, AllZeroDistance, RandomDistance;
 	}
 
 	public enum FeatDistType

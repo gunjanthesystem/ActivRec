@@ -460,7 +460,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						// for org.activity.io.WritingToFile.writeEditDistancesPerRtPerCand() which is called in recomm
 						// master
 						WToFile.writeToNewFile(
-								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand,CurrTimeline,CandTimeline, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline\n",
+								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand,CurrTimeline,CandTimeline, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline,distInNextActObj,NextValidAfterCurr\n",
 								commonPath + "EditDistancePerRtPerCand.csv");
 
 						System.out.println(Constant.getCommonPath() + "\n" + Constant.getAllGlobalConstants());
@@ -648,9 +648,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelines(userId,
 									userTrainingTimelines, Constant.getCommonPath() + "FeatsOfTrainingTimelines.csv");
 							// added on Dec 3 2018
-							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelinesSlidingWindowWise(userId,
+							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelinesSlidingWindowWiseV2(userId,
 									userTrainingTimelines,
-									Constant.getCommonPath() + "FeatsOfTrainingTimelinesSlidingWindow3.csv", 4);
+									Constant.getCommonPath() + "FeatsOfTrainingTimelinesSlidingWindow3.csv", 3);
 
 							// end of added on Nov 29
 
@@ -1674,7 +1674,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 						// Start of added on 20 Nov 2018
 						if (altSeqPredictor.equals(AltSeqPredictor.None) && VerbosityConstants.verboseDistDistribution
-								&& Constant.useRTVerseNormalisationForED)
+								&& Constant.useRTVerseNormalisationForED
+								&& Constant.useJan7DistanceComputations == false)// TODO
 						{// can do this only if distance distribution files are written.
 							ResultsDistributionEvaluation.writeCorrelationBetweenDistancesOverCands(
 									Constant.getCommonPath(), Constant.useRTVerseNormalisationForED);

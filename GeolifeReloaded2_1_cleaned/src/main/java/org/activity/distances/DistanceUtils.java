@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
+import org.activity.constants.Enums.ActDistType;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.GowGeoFeature;
 import org.activity.constants.Enums.LookPastType;
@@ -28,6 +29,7 @@ import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
+import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
@@ -406,6 +408,244 @@ public class DistanceUtils
 	}
 
 	/**
+	 * TODO: INCOMPLETE AS OF 8 JAN 2019
+	 * <p>
+	 * Fork of
+	 * org.activity.distances.DistanceUtils.getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV() to
+	 * use feat pairs instead of feat diffs for more flexibility of FED and allowing plugging of different distance
+	 * types for AED.
+	 * <p>
+	 * 
+	 * IMPORTANT POINT: THE CANDIDATE TIMELINE IS THE DIRECT CANDIDATE TIMELINE AND NOT THE LEAST DISTANT SUBCANDIDATE.
+	 * <p>
+	 * Returns a map where each entry corresponds to a candidate timeline. The value of an entry is the edit distance of
+	 * that candidate timeline with the current timeline.
+	 * <p>
+	 * For RTVerse normalisation
+	 * 
+	 * @param candidateTimelines
+	 * 
+	 * @param activitiesGuidingRecomm
+	 * 
+	 * @param caseType
+	 *            can be 'SimpleV3' or 'CaseBasedV1'
+	 * 
+	 * @param userAtRecomm
+	 *            used only for writing to file
+	 * 
+	 * @param dateAtRecomm
+	 *            used only for writing to file
+	 * 
+	 * @param timeAtRecomm
+	 *            used only for writing to file
+	 * 
+	 * @param hjEditDistance
+	 * @param editDistancesMemorizer
+	 * @param lookPastType
+	 *            added on 17 Dec 2018
+	 * 
+	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}},
+	 * @since 7 Jan 2018
+	 */
+	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistsByDiffsForCandsFullCandParallelWithMemory7Jan2019RTV(
+			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
+			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
+	{
+		// PopUps.showMessage("Inside getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV");// TODO
+		// LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;// added on 17 Dec 2018 for daywise
+		// approach
+		if (Constant.memorizeEditDistance)
+		{
+			PopUps.showError("Error: memorizeEditDistance not implemented here");
+		}
+
+		// // <CandidateTimeline ID, Edit distance>
+		// LinkedHashMap<String, Pair<String, Double>> candEditDistances = new LinkedHashMap<>();
+
+		// CandTimelineID,{EDTrace,ActED, list of differences of Gowalla feature for each ActObj in this cand timeline}
+		// CandTimelineID,Triple{TraceAsString,ActLevelEditDistance,List of EnumMap of {GowallaFeatures,
+		// DiffForThatFeature} one for each correspnding AO comparison}}
+		// LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candAEDFeatDiffs = new
+		// LinkedHashMap<>(candidateTimelines.size());
+
+		// Start of added on 26 July 2018
+		// getListOfUniqueGivenDimensionValsInRTVerse(candidateTimelines, activitiesGuidingRecomm,
+		// hjEditDistance.primaryDimension);
+		// End of added on 26 July 2018
+
+		// Start of code to be parallelised
+		// for (Entry<String, Timeline> e : candidateTimelines.entrySet())
+		// {// loop over candidates
+		// Triple<String, Double, List<EnumMap<GowallaFeatures, Double>>> res = getActEditDistancesFeatDiffs(
+		// e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
+		// caseType, hjEditDistance, editDistancesMemorizer);//candAEDFeatDiffs.put(e.getKey(), res);}
+		// Alternatively
+		// TODO: TEMPORARILY DISABLE PARALLEL
+
+		// use this when null issue is resolved: resolved
+		// if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
+		// consider the full cand
+		LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs = candidateTimelines
+				.entrySet()/* .parallelStream() */.stream()
+				.collect(Collectors.toMap(e -> (String) e.getKey(),
+						e -> getActEditDistancesFeatValPairs(e.getValue(), activitiesGuidingRecomm, userAtRecomm,
+								dateAtRecomm, timeAtRecomm, e.getKey(), caseType, hjEditDistance,
+								editDistancesMemorizer, Constant.actLevelDistType),
+						(oldValue, newValue) -> newValue, LinkedHashMap::new));
+		// else if (lookPastType.equals(Enums.LookPastType.Daywise))// added on 17 Dec 2018 to use RTV for daywise
+		// {// consider the least distant subcandidate
+		// candAEDFeatDiffs = getLeastDistCandActEditDistancesFeatDiffs();
+		// } //was trying to implement RTV normalisation for daywise approach but found this approach unsuitable.
+		// else
+		// {System.err.println(PopUps.getTracedErrorMsg("Error: Unrecognised lookPastType = " + lookPastType));
+		// System.exit(-1);}
+
+		// end of code to be parallelised
+		if (VerbosityConstants.WriteCandAEDDiffs)
+		{
+			writeCandAEDFeatValPairs(candAEDFeatValPairs, "candAEDFeatDiffsFromDistanceComputation");
+		}
+		//// start of MSD
+		// if (Constant.useMSDInFEDInRTVerse)
+		// {// square all the diffs in candAEDFeatDiffs
+		// candAEDFeatDiffs = squareAllTheDiffs(candAEDFeatDiffs);
+		// // now the minOfMins and maxOfMaxs will also be from the squared values.
+		// if (VerbosityConstants.WriteCandAEDDiffs)
+		// {
+		// writeCandAEDDiffs(candAEDFeatDiffs, "candAEDFeatDiffsAfterSquaring");
+		// }
+		// }
+		// if (Constant.useMSDInFEDInRTVerse)
+		// {// square all the diffs in candAEDFeatDiffs
+		// candAEDFeatDiffs = log2AllTheDiffs(candAEDFeatDiffs);
+		// // now the minOfMins and maxOfMaxs will also be from the squared values.
+		// if (VerbosityConstants.WriteCandAEDDiffs)
+		// {
+		// writeCandAEDDiffs(candAEDFeatDiffs, "candAEDFeatDiffsAfterSquaring");
+		// }
+		// }
+		//// end of MSD
+
+		/////////////////// Start of finding min max
+		// combined together for one return statement from abstracted method
+		// note that in the case of Alpha =1, there are no feature diffs in candAEDFeatDiffs
+		Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> minOfMinsAndMaxOfMaxOfFeatureVals = getMinOfMinsAndMaxOfMaxOfFeatureValPairs(
+				userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance, candAEDFeatValPairs,
+				Constant.fixedValPerFeatForRTVerseMaxMinForFEDNorm);
+
+		//////////////////////////////////////////////////////
+
+		LinkedHashMap<String, Pair<String, Double>> candEditDistancesRes = null;
+		// Start of Sanity Check if no logging version is giving identical output as logging version:
+
+		if (true)
+		{// TODO INCOMPLETED AS OF 8 JAN 2019
+			if (Constant.getDynamicEDAlpha() == 1)
+			{
+				// normalise AED
+				candEditDistancesRes = minMaxNormalisedAED8Jan2019(candAEDFeatValPairs,
+						Constant.percentileForRTVerseMaxForAEDNorm);
+			}
+			else
+			{
+				PopUps.printTracedErrorMsgWithExit(
+						"Error: not implemented for Alpha!=1, Constant.getDynamicEDAlpha() = "
+								+ Constant.getDynamicEDAlpha());
+			}
+			// // Start of Jan 7 2019 curtain
+			// LinkedHashMap<String, Pair<String, Double>> candEditDistancesLogging = null;
+			//
+			// // Option 1: AO-wise FED
+			// // - Compute FED for each AO and then takes the mead FED over all AOs in that cand as the FED for that
+			// cand.
+			// // - implementation: DistanceUtils.getRTVerseMinMaxNormalisedEditDistances()
+			// // Option 2: Feat-wise FED
+			// // - Compute FED for each candidate by using mean feature diff for each feature across all AOs in that
+			// cand
+			// // - implementation:.DistanceUtils.getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach()
+			// if (Constant.computeFEDForEachAOInRTVerse)
+			// {
+			// // System.out
+			// // .println("Doing computeFEDForEachAOInRTVerse with usingMSD= " + Constant.useMSDInFEDInRTVerse);
+			// candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistances(candAEDFeatDiffs,
+			// minOfMinsAndMaxOfMaxOfFeatureVals.getFirst(), minOfMinsAndMaxOfMaxOfFeatureVals.getSecond(),
+			// hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+			// candidateTimelines);
+			// }
+			// else if (Constant.computeFEDForEachFeatureSeqInRTVerse)
+			// {
+			// // System.out.println(
+			// // "Doing computeFEDForEachFeatureSeqInRTVerse with usingMSD= " + Constant.useMSDInFEDInRTVerse);
+			// candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach(candAEDFeatDiffs,
+			// minOfMinsAndMaxOfMaxOfFeatureVals.getFirst(), minOfMinsAndMaxOfMaxOfFeatureVals.getSecond(),
+			// hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+			// candidateTimelines);
+			// }
+			//
+			// // boolean isNoLoggingSane = candEditDistancesNoLogging.equals(candEditDistancesLogging);
+			// // System.out.println("candEditDistancesNoLogging.equals(candEditDistancesLogging) = " +
+			// isNoLoggingSane);
+			// // WToFile.appendLineToFileAbs(String.valueOf(isNoLoggingSane) + "\n",
+			// // Constant.getCommonPath() + "DebugApr25RTVerseNoLogSanity.csv");
+			// candEditDistancesRes = candEditDistancesLogging;
+			// // End of Jan 7 2019 curtain
+		}
+
+		if (VerbosityConstants.WriteCandAEDDiffs)
+		{
+			writeCandAEDDists(candEditDistancesRes, "candNormalisedEditDistancesRes");
+		}
+		return candEditDistancesRes;
+	}
+
+	/**
+	 * 
+	 * @param candAEDFeatValPairs
+	 * @param percentileForRTVerseMaxForAEDNorm
+	 * @return
+	 * @since 8 Jan 2019
+	 */
+	private static LinkedHashMap<String, Pair<String, Double>> minMaxNormalisedAED8Jan2019(
+			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs,
+			double percentileForRTVerseMaxForAEDNorm)
+	{
+
+		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatValPairs.size());
+
+		double maxActEDOverAllCands = Double.MIN_VALUE;
+		// candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond()).max().getAsDouble();
+
+		// Start of added on 15 Aug 2018
+		// double percentileForRTVerseMaxForAEDNorm = Constant.percentileForRTVerseMaxForAEDNorm;
+		if (percentileForRTVerseMaxForAEDNorm == -1)
+		{
+			maxActEDOverAllCands = candAEDFeatValPairs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
+					.max().getAsDouble();
+		}
+		else
+		{
+			List<Double> listOfAEDs = candAEDFeatValPairs.entrySet().stream().map(e -> e.getValue().getSecond())
+					.collect(Collectors.toList());
+			maxActEDOverAllCands = StatsUtils.getPercentile(listOfAEDs, percentileForRTVerseMaxForAEDNorm);
+		}
+
+		double minActEDOverAllCands = candAEDFeatValPairs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
+				.min().getAsDouble();
+
+		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> e : candAEDFeatValPairs
+				.entrySet())
+		{
+			double actDistForThisCand = e.getValue().getSecond();
+			double normActDistForThisCand = StatsUtils.minMaxNormWORoundWithUpperBound(actDistForThisCand,
+					maxActEDOverAllCands, minActEDOverAllCands, 1d, false);
+			res.put(e.getKey(), new Pair<>(e.getValue().getFirst(), normActDistForThisCand));
+		}
+
+		return res;
+	}
+
+	/**
 	 * Fork of getHJEditDistsForCandsFullCandParallelWithMemory()
 	 * <p>
 	 * 
@@ -445,6 +685,7 @@ public class DistanceUtils
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
 	{
+		// PopUps.showMessage("Inside getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV");// TODO
 		// LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;// added on 17 Dec 2018 for daywise
 		// approach
 		if (Constant.memorizeEditDistance)
@@ -702,6 +943,268 @@ public class DistanceUtils
 	}
 
 	/**
+	 * 
+	 * @param candAEDFeatDiffs
+	 * @since 7 Jan 2019
+	 */
+	private static void writeCandAEDFeatValPairs(
+			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs,
+			String fileNamePhrase)
+	{
+		StringBuilder sb = new StringBuilder();
+
+		// loop over each cand
+		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> e : candAEDFeatValPairs
+				.entrySet())
+		{
+			sb.append(e.getKey() + "," + e.getValue().getFirst() + "," + e.getValue().getSecond());
+
+			// loop over Feature enum maps for each AO
+			for (EnumMap<GowGeoFeature, Pair<String, String>> listEntry : e.getValue().getThird())
+			{
+				// loop over features of each AO.
+				for (Entry<GowGeoFeature, Pair<String, String>> q : listEntry.entrySet())
+				{
+					sb.append("," + q.getValue().getFirst() + "__" + q.getValue().getSecond());
+				}
+			}
+			sb.append("\n");
+		}
+		WToFile.appendLineToFileAbs(sb.toString(), Constant.getCommonPath() + fileNamePhrase + ".csv");
+	}
+
+	/**
+	 * 
+	 * @param candAEDFeatDiffs
+	 * @since 7 Jan 2019
+	 */
+	private static void writeCandAEDDists(LinkedHashMap<String, Pair<String, Double>> res, String fileNamePhrase)
+	{
+		StringBuilder sb = new StringBuilder();
+
+		// loop over each cand
+		for (Entry<String, Pair<String, Double>> e : res.entrySet())
+		{
+			sb.append(e.getKey() + "," + e.getValue().getFirst() + "," + e.getValue().getSecond());
+
+			sb.append("\n");
+		}
+		WToFile.appendLineToFileAbs(sb.toString(), Constant.getCommonPath() + fileNamePhrase + ".csv");
+	}
+
+	/////////
+	/**
+	 * Fork of DistanceUtils.getMinOfMinsAndMaxOfMaxOfFeatureDiffs()
+	 * <p>
+	 * To find max of max of feature diffs and min of min of feature val pairs for RTVerse normalisation.
+	 * 
+	 * @param userAtRecomm
+	 *            only for logging
+	 * @param dateAtRecomm
+	 *            only for logging
+	 * @param timeAtRecomm
+	 *            only for logging
+	 * @param hjEditDistance
+	 * @param candAEDFeatDiffs
+	 *            one map entry for each cand, and for each cand, a list of enumaps, one for each AO in the cand
+	 * @param useFixedMaxForEachFeature
+	 *            instead of pth percentils
+	 * @return
+	 * @since 7 Jan 2019
+	 */
+	private static Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> getMinOfMinsAndMaxOfMaxOfFeatureValPairs(
+			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, HJEditDistance hjEditDistance,
+			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs,
+			boolean useFixedMaxForEachFeature)
+	{
+		boolean shouldComputeFeatureLevelDistance = hjEditDistance.getShouldComputeFeatureLevelDistance();
+		StringBuilder sbToWrite = new StringBuilder(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm);
+		EnumMap<GowGeoFeature, Double> minOfMinOfVals = null;
+		EnumMap<GowGeoFeature, Double> maxOfMaxOfVals = null;
+
+		// loop over all res to find max and min for normalisation
+		// For each candidate, finding max feature diff for each gowalla feature over all the activity objects in that
+		// candidate timeline. (horizontal aggregations)
+		List<EnumMap<GowGeoFeature, DoubleSummaryStatistics>> summaryStatForEachCand = null;
+		if (shouldComputeFeatureLevelDistance)
+		{
+			summaryStatForEachCand = candAEDFeatValPairs.entrySet().stream()
+					.map(e -> HJEditDistance.getSummaryStatsForEachFeatureValsPairsOverListOfAOsInACand(
+							e.getValue().getThird(), userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey()))
+					.collect(Collectors.toList());
+		}
+
+		// Aggregation (across candidate timelines) of aggregation (across activity objects in each cand
+		// timeline:summaryStatForEachCand)
+
+		if (shouldComputeFeatureLevelDistance)
+		{ // Compute minOfMinOfDiffs and maxOfMaxOfDiff (pth percentile as max)
+			minOfMinOfVals = new EnumMap<>(GowGeoFeature.class);
+			maxOfMaxOfVals = new EnumMap<>(GowGeoFeature.class);
+
+			if (useFixedMaxForEachFeature)
+			{
+				String databaseName = Constant.getDatabaseName();
+				if (databaseName.equals("geolife1"))
+				{
+					// Nov30MaxMin
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 5d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 5d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 5d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
+					//
+
+					// Dec1MaxMin
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 2d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 2d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 40d);
+
+					// Dec2MaxMin
+					// MaxStTimeDiff:- 5 hrs
+					// MaxDuration:- 1 hrs
+					// DistTravelled:- 2km,
+					// StGeoDiff:- 4km
+					// EndGeoDiff:- 4km
+					// AvgAlt:- 60m
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 18000d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 4d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 4d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
+
+					// Dec2MaxMin2
+					// MaxStTimeDiff:- 8 hrs
+					// MaxDuration:- 0.5 hrs
+					// DistTravelled:- 2km,
+					// StGeoDiff:- 10km
+					// EndGeoDiff:- 10km
+					// AvgAlt:- 100m
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 1800d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
+
+					// Dec2MaxMin3
+					// MaxStTimeDiff:- 8 hrs
+					// MaxDuration:- 1 hrs
+					// DistTravelled:- 2km,
+					// StGeoDiff:- 10km
+					// EndGeoDiff:- 10km
+					// AvgAlt:- 100m
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
+
+					// Dec3MaxMin
+					// MaxStTimeDiff:- 1 hr
+					// MaxDuration:- 1 hr
+					// DistTravelled:- 1km,
+					// StGeoDiff:- 1km
+					// EndGeoDiff:- 1km
+					// AvgAlt:- 20m
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 3600d);// secs, 1 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 1 hrs
+					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 1d);// 5 km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 1d);// 1km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 1d);// 1km
+					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 20d);
+
+					// Dec4MaxMin
+					// MaxStTimeDiff:- 5 hrs
+					// MaxDuration:- 20 mins
+					// DistTravelled:- 500m,
+					// StGeoDiff:- 10km
+					// EndGeoDiff:- 10km
+					// AvgAlt:- 60m
+
+					maxOfMaxOfVals.put(GowGeoFeature.StartTimeF, (5d * 60 * 60));// secs, 1 hrs
+					maxOfMaxOfVals.put(GowGeoFeature.DurationF, 20 * 60d);// sec, 1 hrs
+					maxOfMaxOfVals.put(GowGeoFeature.DistTravelledF, 0.5d);// 5 km
+					maxOfMaxOfVals.put(GowGeoFeature.StartGeoF, 10d);// 1km
+					maxOfMaxOfVals.put(GowGeoFeature.EndGeoF, 10d);// 1km
+					maxOfMaxOfVals.put(GowGeoFeature.AvgAltitudeF, 60d);
+
+					minOfMinOfVals.put(GowGeoFeature.StartTimeF, 0d);// secs, 3 hrs
+					minOfMinOfVals.put(GowGeoFeature.DurationF, 0d);// sec, 3 hrs
+					minOfMinOfVals.put(GowGeoFeature.DistTravelledF, 0d);// 5 km
+					minOfMinOfVals.put(GowGeoFeature.StartGeoF, 0d);// 5km
+					minOfMinOfVals.put(GowGeoFeature.EndGeoF, 0d);// 5km
+					minOfMinOfVals.put(GowGeoFeature.AvgAltitudeF, 0d);
+				}
+				else
+				{
+					PopUps.showError(
+							"getMinOfMinsAndMaxOfMaxOfFeatureDiffs not implemented for database" + databaseName);
+				}
+			}
+			else // use the pth percentile max
+			{
+				minOfMinOfVals = HJEditDistance.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
+						summaryStatForEachCand, 0, userAtRecomm, dateAtRecomm, timeAtRecomm);
+
+				double percentileForRTVerseMaxForFEDNorm = Constant.percentileForRTVerseMaxForFEDNorm;
+				if (percentileForRTVerseMaxForFEDNorm == -1)
+				{
+					maxOfMaxOfVals = HJEditDistance.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
+							summaryStatForEachCand, 1, userAtRecomm, dateAtRecomm, timeAtRecomm);
+				}
+				/////////////////// End of finding min max
+				// Start of May8 addition
+				else if (percentileForRTVerseMaxForFEDNorm > -1)// then replace maxOfMax by pth percentile val
+				{
+					// list over cands and then list over each AO in that cand
+					List<List<EnumMap<GowGeoFeature, Pair<String, String>>>> listOfListOfFeatValPairs = candAEDFeatValPairs
+							.entrySet().stream().map(e -> e.getValue().getThird()).collect(Collectors.toList());
+
+					EnumMap<GowGeoFeature, Double> pRTVersePercentileOfDiffs = HJEditDistance
+							.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs,
+									percentileForRTVerseMaxForFEDNorm);// 75);
+
+					if (true)// sanity checking percentil implementation and maxOfMax implementation gives same result
+					{
+						sanityCheckRTVersePthPercentileByMinMaxFeatValPairs(minOfMinOfVals, maxOfMaxOfVals,
+								listOfListOfFeatValPairs);
+					}
+
+					// replace maxOfMax by pPercentileVal
+					maxOfMaxOfVals = pRTVersePercentileOfDiffs;
+				}
+			}
+			// End of May 8 addition
+
+			if (maxOfMaxOfVals.size() == 0)
+			{
+				PopUps.showError("Error: maxOfMaxOfDiffs.size() = " + maxOfMaxOfVals.size());
+			}
+		}
+
+		if (shouldComputeFeatureLevelDistance && VerbosityConstants.WriteMInOfMinAndMaxOfMaxRTV)// sanity check
+		{
+			StringBuilder sbMin = new StringBuilder();
+			StringBuilder sbMax = new StringBuilder();
+
+			minOfMinOfVals.entrySet().stream().forEachOrdered(e -> sbMin.append(e.getValue() + ","));
+			maxOfMaxOfVals.entrySet().stream().forEachOrdered(e -> sbMax.append(e.getValue() + ","));
+			WToFile.appendLineToFileAbs(sbMin.toString() + "\n", Constant.getCommonPath() + "minOfMinOfDiffs.csv");
+			WToFile.appendLineToFileAbs(sbMax.toString() + "\n", Constant.getCommonPath() + "maxOfMaxOfDiffs.csv");
+		}
+		return new Pair<>(minOfMinOfVals, maxOfMaxOfVals);
+	}
+
+	/////////
+
+	/**
 	 * To find max of max of feature diffs and min of min of feature diffs for RTVerse normalisation.
 	 * 
 	 * @param userAtRecomm
@@ -932,6 +1435,44 @@ public class DistanceUtils
 		}
 		uniqueLocGridIDInRTVerseList.addAll(uniqueLocGridIDInRTVerse);
 		System.out.println("uniqueLocGridIDInRTVerseList.size() = " + uniqueLocGridIDInRTVerse);
+	}
+
+	/**
+	 * Fork oorg.activity.distances.DistanceUtils.sanityCheckRTVersePthPercentileByMinMax()
+	 * 
+	 * @param minOfMinOfDiffs
+	 * @param maxOfMaxOfDiffs
+	 * @param listOfListOfFeatDiffs
+	 * @return
+	 */
+	private static boolean sanityCheckRTVersePthPercentileByMinMaxFeatValPairs(
+			EnumMap<GowGeoFeature, Double> minOfMinOfDiffs, EnumMap<GowGeoFeature, Double> maxOfMaxOfDiffs,
+			List<List<EnumMap<GowGeoFeature, Pair<String, String>>>> listOfListOfFeatValPairs)
+	{
+		boolean sane = true;
+		EnumMap<GowGeoFeature, Double> p100RTVersePercentileOfDiffs = HJEditDistance
+				.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs, 100);
+
+		EnumMap<GowGeoFeature, Double> p1RTVersePercentileOfDiffs = HJEditDistance
+				.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs, 1e-55);
+
+		if (p100RTVersePercentileOfDiffs.equals(maxOfMaxOfDiffs) == false)
+		{
+			PopUps.showError("Error p100RTVersePercentileOfDiffs.equals(maxOfMaxOfDiffs)==false");
+			sane = false;
+		}
+		if (p1RTVersePercentileOfDiffs.equals(minOfMinOfDiffs) == false)
+		{
+			PopUps.showError("Error p1RTVersePercentileOfDiffs.equals(minOfMinOfDiffs)==false");
+			sane = false;
+		}
+		WToFile.appendLineToFileAbs(
+				"p100RTVersePercentileOfDiffs=\n" + p100RTVersePercentileOfDiffs.toString() + "\n"
+						+ "maxOfMaxOfDiffs=\n" + maxOfMaxOfDiffs.toString() + "\n" + "p1RTVersePercentileOfDiffs=\n"
+						+ p1RTVersePercentileOfDiffs.toString() + "\n" + "minOfMinOfDiffs=\n"
+						+ minOfMinOfDiffs.toString() + "\nsane=" + sane + "\n\n",
+				Constant.getCommonPath() + "Debug9Jan2019PthPercentileInRTVerseSanityLog.csv");
+		return sane;
 	}
 
 	/**
@@ -2469,6 +3010,117 @@ public class DistanceUtils
 		return editDistanceForThisCandidate;
 	}
 
+	/**
+	 * Fork of DistanceUtils.getActEditDistancesFeatDiffs() to have feat val pairs instead of feat diffs
+	 * <p>
+	 * Select the correct Edit Dist, Feature difference method for the given case type
+	 * 
+	 * @param candTimeline
+	 * @param activitiesGuidingRecomm
+	 * @param userAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
+	 * @param candTimelineID
+	 * @param caseType
+	 * @param hjEditDistance
+	 * @param editDistancesMemorizer
+	 * @return Triple{TraceAsString,ActLevelEditDistance,List of EnumMap of {GowallaFeatures, FeatValPairs of
+	 *         correspondins AOs for that feat} one for each correspnding AO comparison}}
+	 * @since Jan 7 2019
+	 */
+	public static Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>> getActEditDistancesFeatValPairs(
+			Timeline candTimeline, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
+			String dateAtRecomm, String timeAtRecomm, String candTimelineID, CaseType caseType,
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer,
+			ActDistType actLevelDistanceType)
+	{
+		// PopUps.showMessage("Inside getActEditDistancesFeatDiffs");//
+		// Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>> actEDFeatDiffsForThisCandidate = null;
+		Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>> actEDFeatDiffsForThisCandidateV2 = null;
+
+		switch (caseType)
+		{
+		case SimpleV3:// "SimpleV3":
+			long t1 = System.nanoTime();
+			// editDistanceForThisCandidate = hjEditDistance.getHJEditDistanceWithTrace(
+			// candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm,
+			// dateAtRecomm, timeAtRecomm, candTimeline.getTimelineID());
+			if (true)// temp
+			{
+				if (hjEditDistance == null)
+				{
+					System.out.println("hjEditDistance==null");
+				}
+				if (candTimeline == null)
+				{
+					System.out.println("candTimeline==null");
+				}
+				if (candTimeline.getActivityObjectsInTimeline() == null)
+				{
+					System.out.println("candTimeline.getActivityObjectsInTimeline()==null");
+				}
+				if (activitiesGuidingRecomm == null)
+				{
+					System.out.println("activitiesGuidingRecomm==null");
+				}
+				if (userAtRecomm == null)
+				{
+					System.out.println("userAtRecomm==null");
+				}
+				if (dateAtRecomm == null)
+				{
+					System.out.println("dateAtRecomm==null");
+				}
+				if (timeAtRecomm == null)
+				{
+					System.out.println("timeAtRecomm==null");
+				}
+				if (candTimeline.getTimelineID() == null)
+				{
+					System.out.println(" candTimeline.getTimelineID()m==null");
+				}
+			}
+
+			actEDFeatDiffsForThisCandidateV2 = hjEditDistance.getActEditDistWithTrace_FeatValPairs_5Jan2019(
+					candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm,
+					timeAtRecomm, candTimeline.getTimelineID(), actLevelDistanceType);
+
+			// Start of added on 7 Jan 2019
+			if (false)// SANITY CHECKING CORRECTNESS OF getActEditDistWithTrace_FeatValPairs_5Jan2019 by matching
+						// actLevel distances with MySimpleLevenshtein
+			{
+				Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>> actEDFeatDiffsForThisCandidate = hjEditDistance
+						.getActEditDistWithTrace_FeatDiffs_13April2018(candTimeline.getActivityObjectsInTimeline(),
+								activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+								candTimeline.getTimelineID());
+				Sanity.eq(actEDFeatDiffsForThisCandidate.getFirst(), actEDFeatDiffsForThisCandidateV2.getFirst(),
+						"Error checkJan7_2019");
+				Sanity.eq(actEDFeatDiffsForThisCandidate.getSecond(), actEDFeatDiffsForThisCandidateV2.getSecond(),
+						"Error checkJan7_2019");
+				Sanity.checkJan7_2019(actEDFeatDiffsForThisCandidate, actEDFeatDiffsForThisCandidateV2, true,
+						Constant.getCommonPath() + "SanityCheck9Jan2019.txt");
+				// SANITY CHECK OKAY on 8 Jan 2019
+			}
+			// End of added on 7 Jan 2019
+
+			long t2 = System.nanoTime();
+			break;
+
+		default:
+			System.err.println(PopUps.getTracedErrorMsg("Error in getEditDistances_FeatDiffs: unidentified case type"
+					+ caseType + "\nNOTE: this method has not been implemented yet for all case types"));
+			break;
+		}
+
+		// editDistancesMemorizer.addToMemory(candTimelineID, Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm),
+		// editDistanceForThisCandidate);
+
+		// Constant.addToEditDistanceMemorizer(candTimelineID, Timeline.getTimelineIDFromAOs(activitiesGuidingRecomm),
+		// editDistanceForThisCandidate);
+
+		return actEDFeatDiffsForThisCandidateV2;
+	}
+
 	//
 	/**
 	 * Select the correct Edit Dist, Feature difference method for the given case type
@@ -2491,6 +3143,7 @@ public class DistanceUtils
 			String dateAtRecomm, String timeAtRecomm, String candTimelineID, CaseType caseType,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer)
 	{
+		// PopUps.showMessage("Inside getActEditDistancesFeatDiffs");// TODO
 		Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>> actEDFeatDiffsForThisCandidate = null;
 
 		switch (caseType)
@@ -2540,6 +3193,27 @@ public class DistanceUtils
 					candTimeline.getActivityObjectsInTimeline(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm,
 					timeAtRecomm, candTimeline.getTimelineID());
 			// getActEditDistWithTrace_FeatDiffs_13April2018
+
+			// Start of added on 7 Jan 2019
+			if (false)// SANITY CHECKING CORRECTNESS OF getActEditDistWithTrace_FeatValPairs_5Jan2019 by matching
+						// actLevel distances with MySimpleLevenshtein
+			{
+				Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>> actEDFeatDiffsForThisCandidateV2 = hjEditDistance
+						.getActEditDistWithTrace_FeatValPairs_5Jan2019(candTimeline.getActivityObjectsInTimeline(),
+								activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+								candTimeline.getTimelineID(), Constant.actLevelDistType);
+
+				Sanity.eq(actEDFeatDiffsForThisCandidate.getFirst(), actEDFeatDiffsForThisCandidateV2.getFirst(),
+						"Error checkJan7_2019");
+				Sanity.eq(actEDFeatDiffsForThisCandidate.getSecond(), actEDFeatDiffsForThisCandidateV2.getSecond(),
+						"Error checkJan7_2019");
+
+				Sanity.checkJan7_2019(actEDFeatDiffsForThisCandidate, actEDFeatDiffsForThisCandidateV2, true,
+						Constant.getCommonPath() + "SanityCheck9Jan2019.txt");
+				// SANITY CHECK OKAY on 8 Jan 2019
+			}
+			// End of added on 7 Jan 2019
+
 			long t2 = System.nanoTime();
 			break;
 
@@ -2919,6 +3593,7 @@ public class DistanceUtils
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
 	{
+		// PopUps.showMessage("Inside getNormalisedHJEditDistancesForCandidateTimelinesFullCand\n");
 		LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;// added on 17 Dec 2018 for daywise
 		// {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
 
@@ -2933,23 +3608,32 @@ public class DistanceUtils
 
 		// long t3 = System.currentTimeMillis();
 		LinkedHashMap<String, Pair<String, Double>> candEditDistances;
-		if (Constant.useRTVerseNormalisationForED == false)
-		{ /* Parallel */
-			candEditDistances = getHJEditDistsForCandsFullCandParallelWithMemory(candidateTimelines,
+		if (Constant.useJan7DistanceComputations)
+		{// as of Jan 8 2019, finished implementation only for AED
+			candEditDistances = getHJEditDistsByDiffsForCandsFullCandParallelWithMemory7Jan2019RTV(candidateTimelines,
 					activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance,
-					editDistancesMemorizer);
+					editDistancesMemorizer, lookPastType);
 		}
-		else // use RT verse normalisation
-		{ /* Parallel */
-			candEditDistances = getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV(
-					candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
-					hjEditDistance, editDistancesMemorizer, lookPastType);
+		else
+		{
+			if (Constant.useRTVerseNormalisationForED == false)
+			{ /* Parallel */
+				candEditDistances = getHJEditDistsForCandsFullCandParallelWithMemory(candidateTimelines,
+						activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance,
+						editDistancesMemorizer);
+			}
+			else // use RT verse normalisation
+			{ /* Parallel */
+				candEditDistances = getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV(
+						candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
+						hjEditDistance, editDistancesMemorizer, lookPastType);
 
-			// candEditDistances = candEditDistancesRes.getFirst();
-			// endIndexSubseqConsideredInCand = candEditDistancesRes.getSecond();
-			/// Start of added on 2 Dec 2018
+				// candEditDistances = candEditDistancesRes.getFirst();
+				// endIndexSubseqConsideredInCand = candEditDistancesRes.getSecond();
+				/// Start of added on 2 Dec 2018
 
-			// End of added on 2 Dec 2018
+				// End of added on 2 Dec 2018
+			}
 		}
 		// long t4 = System.currentTimeMillis();
 

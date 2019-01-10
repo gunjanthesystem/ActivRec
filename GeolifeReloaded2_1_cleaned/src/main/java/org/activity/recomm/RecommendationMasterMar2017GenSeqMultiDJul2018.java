@@ -657,7 +657,9 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 						activityObjectAtRecommPoint, VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
 						VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand,
 						this.endPointIndicesConsideredInPDCands, this.primaryDimension,
+						currentTimeline.getNextActivityObject(),
 						Constant.getCommonPath() + "EditDistancePerRtPerPrimaryCand.csv");
+
 				// added on 17 July 2018
 				WToFile.writeEditDistancesPerRtPerCand(this.userAtRecomm, this.dateAtRecomm, this.timeAtRecomm,
 						this.secondaryDimDistancesSortedMap, this.candidateTimelinesSecDim,
@@ -665,6 +667,7 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 						activityObjectAtRecommPoint, VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
 						VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand,
 						this.endPointIndicesConsideredInSDCands, this.secondaryDimension,
+						currentTimeline.getNextActivityObject(),
 						Constant.getCommonPath() + "EditDistancePerRtPerSecondaryCand.csv");
 			}
 

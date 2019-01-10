@@ -1,12 +1,17 @@
 package org.activity.sanityChecks;
 
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.activity.constants.Constant;
+import org.activity.constants.Enums.GowGeoFeature;
 import org.activity.constants.Enums.PrimaryDimension;
+import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
+import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
 
 public class Sanity
@@ -77,6 +82,29 @@ public class Sanity
 	public static boolean eq(double a, double b, String errorMsgConsole)
 	{
 		if (a == b)
+		{
+			return true;
+		}
+		else
+		{
+			errorMsgConsole += "a = " + a + "!= b=" + b;
+			System.err.println(PopUps.getTracedErrorMsg(errorMsgConsole));
+			System.out.println(PopUps.getTracedErrorMsg(errorMsgConsole));// TODO may be redundant added on 20 July 2018
+			PopUps.showError(errorMsgConsole);
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 * @param a
+	 * @param b
+	 * @param errorMsg
+	 * @return true if equal
+	 */
+	public static boolean eq(Double a, Double b, String errorMsgConsole)
+	{
+		if (a.equals(b))
 		{
 			return true;
 		}
@@ -355,5 +383,53 @@ public class Sanity
 			}
 		}
 
+	}
+
+	/**
+	 * 
+	 * @param actEDFeatDiffsForThisCandidate
+	 * @param actEDFeatDiffsForThisCandidateV2
+	 * 
+	 * @since 7 Jan 2019
+	 */
+	public static void checkJan7_2019(
+			Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>> actEDFeatDiffsForThisCandidate,
+			Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>> actEDFeatDiffsForThisCandidateV2,
+			boolean verbose, String absFileNameForLog)
+	{
+		// PopUps.showMessage("Inside checkJan7_2019");
+		StringBuilder sbLog = new StringBuilder();
+
+		sbLog.append("\nfirst: " + actEDFeatDiffsForThisCandidate.getFirst() + "  ---  "
+				+ actEDFeatDiffsForThisCandidateV2.getFirst() + " equals = "
+				+ actEDFeatDiffsForThisCandidate.getFirst().equals(actEDFeatDiffsForThisCandidateV2.getFirst()));
+
+		sbLog.append("\nsecond: " + actEDFeatDiffsForThisCandidate.getSecond() + "  ---  "
+				+ actEDFeatDiffsForThisCandidateV2.getSecond() + " equals = "
+				+ actEDFeatDiffsForThisCandidate.getSecond().equals(actEDFeatDiffsForThisCandidateV2.getSecond()));
+
+		sbLog.append("\nthird: \n actEDFeatDiffsForThisCandidate = \n");
+		for (EnumMap<GowGeoFeature, Double> e : actEDFeatDiffsForThisCandidate.getThird())
+		{
+			for (Entry<GowGeoFeature, Double> f : e.entrySet())
+			{
+				sbLog.append(f.getKey() + "--" + f.getValue() + "\n");
+			}
+		}
+
+		sbLog.append("\nthird: \n actEDFeatDiffsForThisCandidateV2 = \n");
+		for (EnumMap<GowGeoFeature, Pair<String, String>> e : actEDFeatDiffsForThisCandidateV2.getThird())
+		{
+			for (Entry<GowGeoFeature, Pair<String, String>> f : e.entrySet())
+			{
+				sbLog.append(f.getKey() + "--" + f.getValue() + "\n");
+			}
+		}
+
+		sbLog.append("\nthird: " + actEDFeatDiffsForThisCandidate.getThird() + "  ---  "
+				+ actEDFeatDiffsForThisCandidateV2.getThird());
+
+		WToFile.appendLineToFileAbs(sbLog.toString(), absFileNameForLog);
+		// actEDFeatDiffsForThisCandidate
 	}
 }

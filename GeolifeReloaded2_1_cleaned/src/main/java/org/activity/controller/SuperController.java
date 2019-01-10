@@ -643,72 +643,76 @@ public class SuperController
 			// {
 			// featuresUsedLabel += "ActName";
 			// }
-			if (Constant.useStartTimeInFED)
-			{
-				featuresUsedLabel += "STime";
-			}
 
-			if (databaseName.equals("gowalla1"))
+			if (Constant.getDynamicEDAlpha() != 1)
 			{
-				if (Constant.useLocationInFED)
+				if (Constant.useStartTimeInFED)
 				{
-					featuresUsedLabel += "Loc";
+					featuresUsedLabel += "STime";
 				}
-				if (Constant.usePopularityInFED)
-				{
-					featuresUsedLabel += "Pop";
-				}
-				if (Constant.useDistFromPrevInFED)
-				{
-					featuresUsedLabel += "DistPrev";
-				}
-				if (Constant.useDurationFromPrevInFED)
-				{
-					featuresUsedLabel += "DurPrev";
-				}
-			}
-			if (databaseName.equals("geolife1"))// added on 18 Nov 2018
-			{
-				if (Constant.useDurationInFED)
-				{
-					featuresUsedLabel += "Dur";
-				}
-				if (Constant.useDistTravelledInFED)
-				{
-					featuresUsedLabel += "DistTr";
-				}
-				if (Constant.useStartGeoInFED)
-				{
-					featuresUsedLabel += "StartGeo";
-				}
-				if (Constant.useEndGeoInFED)
-				{
-					featuresUsedLabel += "EndGeo";
-				}
-				if (Constant.useAvgAltitudeInFED)
-				{
-					featuresUsedLabel += "AvgAlt";
-				}
-				if (Constant.useDistFromPrevInFED)
-				{
-					featuresUsedLabel += "DistPrev";
-				}
-				if (Constant.useDurationFromPrevInFED)
-				{
-					featuresUsedLabel += "DurPrev";
-				}
-			}
 
-			if (databaseName.equals("dcu_data_2"))// added on 18 Nov 2018
-			{
-				if (Constant.useDurationInFED)
+				if (databaseName.equals("gowalla1"))
 				{
-					featuresUsedLabel += "Dur";
+					if (Constant.useLocationInFED)
+					{
+						featuresUsedLabel += "Loc";
+					}
+					if (Constant.usePopularityInFED)
+					{
+						featuresUsedLabel += "Pop";
+					}
+					if (Constant.useDistFromPrevInFED)
+					{
+						featuresUsedLabel += "DistPrev";
+					}
+					if (Constant.useDurationFromPrevInFED)
+					{
+						featuresUsedLabel += "DurPrev";
+					}
 				}
-				// if (Constant.useEndTimeInFED)
-				// {
-				// featuresUsedLabel += "ET";
-				// }
+				if (databaseName.equals("geolife1"))// added on 18 Nov 2018
+				{
+					if (Constant.useDurationInFED)
+					{
+						featuresUsedLabel += "Dur";
+					}
+					if (Constant.useDistTravelledInFED)
+					{
+						featuresUsedLabel += "DistTr";
+					}
+					if (Constant.useStartGeoInFED)
+					{
+						featuresUsedLabel += "StartGeo";
+					}
+					if (Constant.useEndGeoInFED)
+					{
+						featuresUsedLabel += "EndGeo";
+					}
+					if (Constant.useAvgAltitudeInFED)
+					{
+						featuresUsedLabel += "AvgAlt";
+					}
+					if (Constant.useDistFromPrevInFED)
+					{
+						featuresUsedLabel += "DistPrev";
+					}
+					if (Constant.useDurationFromPrevInFED)
+					{
+						featuresUsedLabel += "DurPrev";
+					}
+				}
+
+				if (databaseName.equals("dcu_data_2"))// added on 18 Nov 2018
+				{
+					if (Constant.useDurationInFED)
+					{
+						featuresUsedLabel += "Dur";
+					}
+					// if (Constant.useEndTimeInFED)
+					// {
+					// featuresUsedLabel += "ET";
+					// }
+				}
 			}
 
 			if (Constant.useFeatureDistancesOfAllActs)
@@ -718,41 +722,45 @@ public class SuperController
 
 			if (Constant.useRTVerseNormalisationForED)
 			{
-				if (Constant.computeFEDForEachAOInRTVerse)
+				if (Constant.getDynamicEDAlpha() != 1)
 				{
-					distNormalisationLabel += "FEDPerAO_";
-				}
-				if (Constant.computeFEDForEachFeatureSeqInRTVerse)
-				{
-					distNormalisationLabel += "FEDPerFS";
-					if (Constant.useMSDInFEDInRTVerse)
+					if (Constant.computeFEDForEachAOInRTVerse)
 					{
-						distNormalisationLabel += "MSD";
+						distNormalisationLabel += "FEDPerAO_";
 					}
-					if (Constant.useLog2InFEDInRTVerse)
+					if (Constant.computeFEDForEachFeatureSeqInRTVerse)
 					{
-						distNormalisationLabel += "Log2";
+						distNormalisationLabel += "FEDPerFS";
+						if (Constant.useMSDInFEDInRTVerse)
+						{
+							distNormalisationLabel += "MSD";
+						}
+						if (Constant.useLog2InFEDInRTVerse)
+						{
+							distNormalisationLabel += "Log2";
+						}
+						distNormalisationLabel += "_";
 					}
-					distNormalisationLabel += "_";
-				}
-				if (Constant.computeFEDForEachAOInRTVerse && Constant.computeFEDForEachFeatureSeqInRTVerse)
-				{
-					PopUps.printTracedErrorMsgWithExit(
-							"Error both Constant.computeFEDForEachAOInRTVerse & Constant.computeFEDForEachFeatureSeqInRTVerse should not be true");
+					if (Constant.computeFEDForEachAOInRTVerse && Constant.computeFEDForEachFeatureSeqInRTVerse)
+					{
+						PopUps.printTracedErrorMsgWithExit(
+								"Error both Constant.computeFEDForEachAOInRTVerse & Constant.computeFEDForEachFeatureSeqInRTVerse should not be true");
+					}
+
+					if (Constant.fixedValPerFeatForRTVerseMaxMinForFEDNorm)
+					{
+						distNormalisationLabel += "FixedMaxMinF_";// RTV
+					}
+					if (Constant.percentileForRTVerseMaxForFEDNorm > -1)
+					{
+						distNormalisationLabel += (int) Constant.percentileForRTVerseMaxForFEDNorm + "F_";// RTV
+					}
+					if (Constant.threshNormFEDForCand != -1)
+					{
+						distNormalisationLabel += Constant.threshNormFEDForCand + "FT";
+					}
 				}
 
-				if (Constant.fixedValPerFeatForRTVerseMaxMinForFEDNorm)
-				{
-					distNormalisationLabel += "FixedMaxMinF_";// RTV
-				}
-				if (Constant.percentileForRTVerseMaxForFEDNorm > -1)
-				{
-					distNormalisationLabel += (int) Constant.percentileForRTVerseMaxForFEDNorm + "F_";// RTV
-				}
-				if (Constant.threshNormFEDForCand != -1)
-				{
-					distNormalisationLabel += Constant.threshNormFEDForCand + "FT";
-				}
 				if (Constant.percentileForRTVerseMaxForAEDNorm > -1)
 				{
 					distNormalisationLabel += distNormalisationLabel + (int) Constant.percentileForRTVerseMaxForAEDNorm
@@ -805,6 +813,16 @@ public class SuperController
 		if (Constant.lookPastType.equals(Enums.LookPastType.NGram))
 		{
 			collLabel += "NG";
+		}
+
+		if (Constant.useJan7DistanceComputations)
+		{
+			collLabel += Constant.actLevelDistType.toString();
+
+			if (Constant.useForeignAwareLevenshtein)
+			{
+				collLabel += "FW";
+			}
 		}
 
 		if (Constant.purelyRandomPredictionNov25)

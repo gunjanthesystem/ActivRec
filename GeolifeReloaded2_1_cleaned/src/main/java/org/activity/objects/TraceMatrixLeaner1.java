@@ -480,13 +480,17 @@ public class TraceMatrixLeaner1
 	{
 		StringBuilder sb = new StringBuilder(
 				"----- nRows:" + nRows + ", nCols:" + nCols + ", maxSizeOfCell:" + maxSizeOfCell + " -----\n");
+		int fixedWidth = Math.max(nCols, nRows) * maxSizeOfCell;// added on 9 Jan 2019 for printing fixed width
+
 		for (int rowIndex = 0; rowIndex < nRows; rowIndex++)
 		{
 			for (int colIndex = 0; colIndex < nCols; colIndex++)
 			{
 				String cellAtIndex = String.valueOf(getCellAtIndexFixedLength(rowIndex, colIndex));
 				// System.out.println(">> cellAtIndex = [" + cellAtIndex + "] >> cellLength=" + cellAtIndex.length());
-				sb.append("|").append(cellAtIndex);
+				// sb.append(String.format("%6s", dist[i][j] + "|"));// added on 9 Jan 2019 for printing fixed width
+				sb.append("|").append(String.format("%" + fixedWidth + "s", cellAtIndex));
+				// sb.append("|").append(cellAtIndex);//disabled on 9 Jan 2019
 			}
 			sb.append("\n");
 		}

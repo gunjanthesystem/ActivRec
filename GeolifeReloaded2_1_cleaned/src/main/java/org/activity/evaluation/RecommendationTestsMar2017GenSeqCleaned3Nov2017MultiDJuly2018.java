@@ -365,11 +365,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 						// for org.activity.io.WritingToFile.writeEditDistancesPerRtPerCand() which is called in recomm
 						// master
 						WToFile.writeToNewFile(
-								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand,CurrTimeline,CandTimeline, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline\n",
+								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand,CurrTimeline,CandTimeline, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline,distInNextActObj,NextValidAfterCurr\n",
 								commonPath + "EditDistancePerRtPerCand.csv");
 
 						WToFile.writeToNewFile(
-								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand,CurrTimeline,CandTimeline, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline\n",
+								"UserAtRecomm,DateAtRecomm,TimeAtRecomm,CandID,EndPointIndexOfCand,CurrTimeline,CandTimeline, EditOpsTraceOfCand,EditDistOfCand,#L1_EditOps, #ObjInSameOrder_#L2EditOps,NextActivityForRecomm, diffSTEndPointsCand_n_CurrActInSecs,diffETEndPointsCand_n_CurrActInSecs,CandidateTimeline,CurrentTimeline,distInNextActObj,NextValidAfterCurr\n",
 								commonPath + "EditDistancePerRtPerCandSecDim.csv");
 
 						System.out.println(Constant.getCommonPath() + "\n" + Constant.getAllGlobalConstants());

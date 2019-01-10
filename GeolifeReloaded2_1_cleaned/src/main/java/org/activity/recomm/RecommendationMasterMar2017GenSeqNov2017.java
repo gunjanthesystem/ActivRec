@@ -578,6 +578,7 @@ public class RecommendationMasterMar2017GenSeqNov2017 implements RecommendationM
 						VerbosityConstants.WriteCandInEditDistancePerRtPerCand,
 						VerbosityConstants.WriteEditOperatationsInEditDistancePerRtPerCand,
 						this.endPointIndicesConsideredInCands, Constant.primaryDimension,
+						currentTimeline.getNextActivityObject(),
 						Constant.getCommonPath() + "EditDistancePerRtPerCand.csv");
 			}
 

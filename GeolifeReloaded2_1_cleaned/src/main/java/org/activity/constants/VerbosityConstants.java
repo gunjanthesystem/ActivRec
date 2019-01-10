@@ -25,14 +25,14 @@ public class VerbosityConstants
 	/**
 	 * Controlling the verbosity of console log output
 	 */
-	public static final boolean verbose = false;// false;// false;// false;// true;// false;// false;//
+	public static boolean verbose = false;// false;// false;// false;// true;// false;// false;//
 	public static final boolean verboseAKOM = false;// false;// false;// false;// true;// false;// false;//
 	public static final boolean tempVerbose = false;// false;// true;// true;// false;// false;// true;
 	public static final boolean verboseTimelineCleaning = false;// true;// false;// false; // verbosity level 2: if
 	// false it further
 	// minimises verbosity
 	public static final boolean verboseSAX = false;// false;
-	public static boolean verboseLevenstein = false;// true;// false;// false;// false;// false;
+	public static boolean verboseLevenstein = false;// false;// true;// false;// false;// false;// false;
 	public static final boolean verboseNormalisation = false;// false;// false;
 	// public static boolean debuggingMessageEditDistance = false;
 	public static final boolean verboseHilbert = false;
@@ -55,20 +55,22 @@ public class VerbosityConstants
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv
 	 * and EditDistancePerRtPerCand.csv have some similar information and have corresponding records.
 	 */
-	public static final boolean WriteEditDistancePerRtPerCand = false;// false;// true;// false;// false;// false; //
+	public static final boolean WriteEditDistancePerRtPerCand = true;// false;// true;// false;// false;// false; //
 	public static final boolean WriteCandInEditDistancePerRtPerCand = false;// false;// false;// false;
 	public static boolean WriteNumActsPerRTPerCand = false;// true;// false; // this information is redundant as well
 
-	public static final boolean WriteRedundant = false;
+	public static final boolean WriteRedundant = true;
 	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = true;// false;// true;
-	public static final boolean WriteEditSimilarityCalculations = false;// true;// true;//false;// false;// false;
+	public static final boolean WriteEditSimilarityCalculations = true;// false;// true;// true;//false;// false;//
+																		// false;
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;// false;
+	public static final boolean WriteActivityObjectsInEditSimilarityCalculationsTrimmed = true;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
-	public static final boolean WriteRTVerseNormalisationLogs = true;
-	public static final boolean WriteCandAEDDiffs = false;
+	public static final boolean WriteRTVerseNormalisationLogs = false;// Jan8_2019_disabled true;
+	public static final boolean WriteCandAEDDiffs = false;//// Jan8_2019_disabled true;
 
-	public static final boolean WriteMInOfMinAndMaxOfMaxRTV = true;// 30 Nov 2018
+	public static final boolean WriteMInOfMinAndMaxOfMaxRTV = false;//// Jan8_2019_disabled 30 Nov 2018
 	/**
 	 * Write each cand of each RT in separate line
 	 */
