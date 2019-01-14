@@ -55,16 +55,16 @@ public class VerbosityConstants
 	 * Whether to write the file EditDistancePerRtPerCand.csv (note: the files 'UserId'RecommTimesWithEditDistance.csv
 	 * and EditDistancePerRtPerCand.csv have some similar information and have corresponding records.
 	 */
-	public static final boolean WriteEditDistancePerRtPerCand = true;// false;// true;// false;// false;// false; //
+	public static final boolean WriteEditDistancePerRtPerCand = false;// false;// true;// false;// false;// false; //
 	public static final boolean WriteCandInEditDistancePerRtPerCand = false;// false;// false;// false;
 	public static boolean WriteNumActsPerRTPerCand = false;// true;// false; // this information is redundant as well
 
-	public static final boolean WriteRedundant = true;
-	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = true;// false;// true;
-	public static final boolean WriteEditSimilarityCalculations = true;// false;// true;// true;//false;// false;//
+	public static final boolean WriteRedundant = false;
+	public static final boolean WriteEditOperatationsInEditDistancePerRtPerCand = false;// false;// true;
+	public static final boolean WriteEditSimilarityCalculations = false;// false;// true;// true;//false;// false;//
 																		// false;
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculations = false;// false;// false;
-	public static final boolean WriteActivityObjectsInEditSimilarityCalculationsTrimmed = true;// false;// false;
+	public static final boolean WriteActivityObjectsInEditSimilarityCalculationsTrimmed = false;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
 	public static final boolean WriteRTVerseNormalisationLogs = false;// Jan8_2019_disabled true;
@@ -94,7 +94,7 @@ public class VerbosityConstants
 	public static final boolean WriteTopNextActivitiesWithoutDistance = false;
 	public static final boolean WriteTopNextActivitiesWithDistance = false;
 
-	public static final boolean WriteRaw = true;// SWITCH
+	public static final boolean WriteRaw = false;// SWITCH
 
 	public static final boolean writeRankedRecommsWOScoreForEachSeqIndex = true;// false;
 	public static final boolean writeDataActualForEachSeqIndex = true;

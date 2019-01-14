@@ -1093,6 +1093,7 @@ public class TimelineExtractors
 			// Check if the timeline contains the activityAtRecomm point at non-last and the timeline is not same for
 			// the day to be recommended (this should not be the case because test and training set are diffferent)
 			// and there is atleast one valid activity after this activityAtRecomm point
+			// Constant.ensureCandEndWithCurrAct == false ||
 			if (dayTimeline
 					.countContainsPrimaryDimensionValButNotAsLast(activityAtRecommPoint.getPrimaryDimensionVal()) > 0)
 			// disabled on 11 Jul'16
@@ -1355,8 +1356,11 @@ public class TimelineExtractors
 			}
 			// end sanity check
 
-			if (ae.equalsWrtPrimaryDimension(activityAtRecommPoint)) // same name as current activity)
-			// ae.getActivityName().equals(activityAtRecommPoint.getActivityName())) // same name as current activity
+			// same name as current activity)//added 11 Jan2019
+			if (Constant.ensureCandEndWithCurrAct == false || ae.equalsWrtPrimaryDimension(activityAtRecommPoint))
+			// if (ae.equalsWrtPrimaryDimension(activityAtRecommPoint)) // same name as current activity)
+			// ae.getActivityName().equals(activityAtRecommPoint.getActivityName())) // same name as current
+			// activity
 			{
 				// Timestamp newCandEndTimestamp= new
 				// Timestamp(ae.getStartTimestamp().getTime()+ae.getDurationInSeconds()*1000-1000); //decreasing 1
@@ -1481,7 +1485,8 @@ public class TimelineExtractors
 					// end sanity check
 
 					// if (ae.equalsWrtPrimaryDimension(activityAtRecommPoint)) // same name as current activity)
-					if (ae.equalsWrtGivenDimension(activityAtRecommPoint, dimensionToMatch))
+					if (Constant.ensureCandEndWithCurrAct == false
+							|| ae.equalsWrtGivenDimension(activityAtRecommPoint, dimensionToMatch))
 					{
 						// Timestamp newCandEndTimestamp= new
 						// Timestamp(ae.getStartTimestamp().getTime()+ae.getDurationInSeconds()*1000-1000); //decreasing

@@ -102,12 +102,17 @@ public final class Constant
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
 	// PureAKOM has no cand extraction
 	// SWITCH_DEC20
-	public static final ActDistType actLevelDistType = ActDistType.Jaccard;// MySimpleLevenshtein;//
+	public static final ActDistType actLevelDistType = ActDistType.MyLevenshtein;// MySimpleLevenshtein;//
 	// TODO
 
 	public static final boolean useForeignAwareLevenshtein = false; /// added on 9 Jan 2019//TODO
 
-	public static final boolean useJan7DistanceComputations = true;// TODO
+	public static final boolean useJan7DistanceComputations = false;// TODO
+
+	// ensureCandEndWithCurrAct ONLY IMPLEMENTED YET FOR NCOUNT
+	public static final boolean ensureCandEndWithCurrAct = true;// TEMP TODO
+
+	public static final boolean ensureHasDaywiseCandsForEvalCompatibility = false;// TODO //added 14 Jan 2018
 
 	public static final Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
@@ -195,7 +200,7 @@ public final class Constant
 	public static int nearestNeighbourCandEDThresholdPrimDim = -1;// TODO 500;// 750;// 500;// 500;/// -1;//
 																	// 100;//
 																	// 1500;// 100;//
-	public static final double candEDValThresholdPrimDim = -1;
+	public static double candEDValThresholdPrimDim = -1;
 	// -1 for no filter//SWITCH_NOV10
 	// added on 23 July 2018 to keep it separate from the threshold used for primary dimension
 	public static final int nearestNeighbourCandEDThresholdSecDim = 500;// 0;
@@ -220,17 +225,11 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 1 };// 0.5, 1 };// 0.5 };// , 1 };// 0.5, 1 };// 0.4, 0.5, 0.7, 1 };// 0.5
-													// };//
-													// 0.4,
-													// 0.5,
-													// 0.6, 0.7,
-	// TODO
-	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };
-	// SWITCH_NOV20
-	// = { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75, 0, 0.25,
-	// 0.35, 0.15};//SWITCH_NOV10 added on 12 Sep 2018
-	// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/* 0.35, 0.75, 1, 0.15, 0, */
+	public static final double[] EDAlphas = { 1 };// 0.5, 1 };// 0.5 };// , 1 };// 0.5, 1 };// 0.4, 0.5, 0.7, 1
+	// TODO // SWITCH_NOV20
+	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };= { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75,
+	// 0, 0.25, 0.35, 0.15};//SWITCH_NOV10 added on 12 Sep 2018// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/*
+	// 0.35, 0.75, 1, 0.15, 0, */
 
 	public static final boolean disableRoundingEDCompute = true; // SWITCH_NOV10
 	public static final boolean scoreRecommsByLocProximity = false;// SWITCH_NOV10
@@ -259,8 +258,8 @@ public final class Constant
 
 	public static final boolean useRTVerseNormalisationForED = true;// true; // TODO KEEP IT true, false version
 
-	public static final boolean computeFEDForEachAOInRTVerse = true;// TODO
-	public static final boolean computeFEDForEachFeatureSeqInRTVerse = false;// true;TODO
+	public static final boolean computeFEDForEachAOInRTVerse = false;// TODO
+	public static final boolean computeFEDForEachFeatureSeqInRTVerse = true;// true;TODO
 	public static final int takeMeanOrMedianOfFeatDiffsAcrossAllAOsInCandForFeatSeq = 1;// 0 for mean, 1 for median
 
 	public static final boolean useMSDInFEDInRTVerse = false;// false;
@@ -407,7 +406,8 @@ public final class Constant
 	 */
 	public static final int decimalPlacesInGeocordinatesForComputations = 100000;// 1000000;
 
-	public static String howManyUsers = "UsersAbove10RTs";// "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
+	public static String geolife1howManyUsers = "UsersAbove10RTs";// "UsersAbove10RTs";
+	// "AllUsers";// "TenUsers";// "AllUsers" "UsersAbove10RTs"
 
 	public static final String errorFileName = "ErrorExceptionLogFile.txt";
 	public static final String warningFileName = "WarniningLogFile.txt";
@@ -942,8 +942,10 @@ public final class Constant
 		case "geolife1":
 			collaborativeCandidates = false;
 			filterTrainingTimelinesByRecentDays = false;
-			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
-			nearestNeighbourCandEDThresholdPrimDim = 500;// TODO 500;// 750;// 500;// 500;/// -1;//
+			// typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
+			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TEMP TODO
+			nearestNeighbourCandEDThresholdPrimDim = 500;// TEMP 500;// TODO 500;// 750;// 500;// 500;/// -1;//
+			// candEDValThresholdPrimDim = 0.5; // TEMP TODO
 			percentileForRTVerseMaxForFEDNorm = 10;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = true;// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = false;// //TODO toySwitch// SWITCH_NOV10
@@ -958,12 +960,12 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = true;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = 500;// TODO 500;// 750;// 500;// 500;/// -1;//
-			percentileForRTVerseMaxForFEDNorm = 100;//// TODO 10;// 75;// -1// SWITCH_April24
+			percentileForRTVerseMaxForFEDNorm = 10;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = true;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = false;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = false; // false for gowalla// true for others;//
-			useHaversineDistInLocationFED = true;
+			useHaversineDistInLocationFED = false;// TEMP TODO
 
 			break;
 
@@ -1302,7 +1304,7 @@ public final class Constant
 			switch (DATABASE_NAME)
 			{
 			case "geolife1":
-				switch (Constant.howManyUsers)
+				switch (Constant.geolife1howManyUsers)
 				{
 				case "AllUsers":
 					userIDs = DomainConstants.allUserIDsGeolifeData;
@@ -1314,7 +1316,8 @@ public final class Constant
 					userIDs = DomainConstants.above10RTsUserIDsGeolifeData;
 					break;
 				default:
-					UtilityBelt.showErrorExceptionPopup("unknown Constant.howManyUsers =" + Constant.howManyUsers);
+					UtilityBelt
+							.showErrorExceptionPopup("unknown Constant.howManyUsers =" + Constant.geolife1howManyUsers);
 					break;
 				}
 				// userIDs = userIDsGeolifeData;
@@ -1832,6 +1835,8 @@ public final class Constant
 		s.append("\nactLevelDistType:" + actLevelDistType);
 		s.append("\nuseForeignAwareLevenshtein:" + useForeignAwareLevenshtein);
 		s.append("\nuseJan7DistanceComputations:" + useJan7DistanceComputations);
+		s.append("\nensureCandEndWithCurrAct:" + ensureCandEndWithCurrAct);
+		s.append("\nensureHasDaywiseCandsForEvalCompatibility:" + ensureHasDaywiseCandsForEvalCompatibility);
 		s.append("\naltSeqPredictor:" + altSeqPredictor);
 		s.append("\nAKOMHighestOrder:" + AKOMHighestOrder);
 		s.append("\nRNNCurrentActivitityLength:" + RNNCurrentActivitityLength);

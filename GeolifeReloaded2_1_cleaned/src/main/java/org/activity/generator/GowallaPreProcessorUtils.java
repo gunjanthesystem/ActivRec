@@ -141,7 +141,7 @@ public class GowallaPreProcessorUtils
 		int windowSize = 5;
 		int uniqueActsWindowSize = windowSize;
 		int windowDurationDifThresholdInMins = (windowSize - 1) * 30;// 120,30;// 5;
-		int windowDistDifThresholdInKms = ((windowSize - 1) * 300) / 1000;
+		int windowDistDifThresholdInKms = ((windowSize - 1) * 500) / 1000;
 
 		String pathToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Jan2VFAnalysis/Acts"
 				+ windowSize + "len_" + windowDurationDifThresholdInMins + "mins/";

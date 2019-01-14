@@ -410,6 +410,9 @@ public class DistanceUtils
 	/**
 	 * TODO: INCOMPLETE AS OF 8 JAN 2019
 	 * <p>
+	 * Renamed from getHJEditDistsByDiffsForCandsFullCandParallelWithMemory7Jan2019RTV() to
+	 * getHJEditDistsByFValPairsForCandsFullCandParallelWithMemory7Jan2019RTV()
+	 * <p>
 	 * Fork of
 	 * org.activity.distances.DistanceUtils.getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV() to
 	 * use feat pairs instead of feat diffs for more flexibility of FED and allowing plugging of different distance
@@ -452,7 +455,7 @@ public class DistanceUtils
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
 	{
-		// PopUps.showMessage("Inside getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV");// TODO
+		// PopUps.showMessage("Inside getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV");//
 		// LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;// added on 17 Dec 2018 for daywise
 		// approach
 		if (Constant.memorizeEditDistance)
@@ -481,7 +484,7 @@ public class DistanceUtils
 		// e.getValue(), activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
 		// caseType, hjEditDistance, editDistancesMemorizer);//candAEDFeatDiffs.put(e.getKey(), res);}
 		// Alternatively
-		// TODO: TEMPORARILY DISABLE PARALLEL
+		// TEMPORARILY DISABLE PARALLEL
 
 		// use this when null issue is resolved: resolved
 		// if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
@@ -553,43 +556,48 @@ public class DistanceUtils
 						"Error: not implemented for Alpha!=1, Constant.getDynamicEDAlpha() = "
 								+ Constant.getDynamicEDAlpha());
 			}
-			// // Start of Jan 7 2019 curtain
-			// LinkedHashMap<String, Pair<String, Double>> candEditDistancesLogging = null;
-			//
-			// // Option 1: AO-wise FED
-			// // - Compute FED for each AO and then takes the mead FED over all AOs in that cand as the FED for that
+			// Start of Jan 7 2019 curtain
+			LinkedHashMap<String, Pair<String, Double>> candEditDistancesLogging = null;
+
+			// Option 1: AO-wise FED
+			// - Compute FED for each AO and then takes the mead FED over all AOs in that cand as the FED for that
 			// cand.
-			// // - implementation: DistanceUtils.getRTVerseMinMaxNormalisedEditDistances()
-			// // Option 2: Feat-wise FED
-			// // - Compute FED for each candidate by using mean feature diff for each feature across all AOs in that
+			// - implementation: DistanceUtils.getRTVerseMinMaxNormalisedEditDistances()
+			// Option 2: Feat-wise FED
+			// - Compute FED for each candidate by using mean feature diff for each feature across all AOs in that
 			// cand
-			// // - implementation:.DistanceUtils.getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach()
-			// if (Constant.computeFEDForEachAOInRTVerse)
-			// {
-			// // System.out
-			// // .println("Doing computeFEDForEachAOInRTVerse with usingMSD= " + Constant.useMSDInFEDInRTVerse);
-			// candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistances(candAEDFeatDiffs,
-			// minOfMinsAndMaxOfMaxOfFeatureVals.getFirst(), minOfMinsAndMaxOfMaxOfFeatureVals.getSecond(),
-			// hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
-			// candidateTimelines);
-			// }
-			// else if (Constant.computeFEDForEachFeatureSeqInRTVerse)
-			// {
-			// // System.out.println(
-			// // "Doing computeFEDForEachFeatureSeqInRTVerse with usingMSD= " + Constant.useMSDInFEDInRTVerse);
-			// candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach(candAEDFeatDiffs,
-			// minOfMinsAndMaxOfMaxOfFeatureVals.getFirst(), minOfMinsAndMaxOfMaxOfFeatureVals.getSecond(),
-			// hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
-			// candidateTimelines);
-			// }
-			//
-			// // boolean isNoLoggingSane = candEditDistancesNoLogging.equals(candEditDistancesLogging);
-			// // System.out.println("candEditDistancesNoLogging.equals(candEditDistancesLogging) = " +
+			// - implementation:.DistanceUtils.getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach()
+			if (Constant.computeFEDForEachAOInRTVerse)
+			{
+				// System.out
+				// .println("Doing computeFEDForEachAOInRTVerse with usingMSD= " + Constant.useMSDInFEDInRTVerse);
+				/**
+				 * $$TEMP12jAN candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistances(candAEDFeatDiffs,
+				 * minOfMinsAndMaxOfMaxOfFeatureVals.getFirst(), minOfMinsAndMaxOfMaxOfFeatureVals.getSecond(),
+				 * hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+				 * candidateTimelines);
+				 **/
+			}
+			else if (Constant.computeFEDForEachFeatureSeqInRTVerse)
+			{
+				// System.out.println(
+				// "Doing computeFEDForEachFeatureSeqInRTVerse with usingMSD= " + Constant.useMSDInFEDInRTVerse);
+				/**
+				 * $$TEMP12jAN candEditDistancesLogging =
+				 * getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach(candAEDFeatDiffs,
+				 * minOfMinsAndMaxOfMaxOfFeatureVals.getFirst(), minOfMinsAndMaxOfMaxOfFeatureVals.getSecond(),
+				 * hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+				 * candidateTimelines);
+				 **/
+			}
+
+			// boolean isNoLoggingSane = candEditDistancesNoLogging.equals(candEditDistancesLogging);
+			// System.out.println("candEditDistancesNoLogging.equals(candEditDistancesLogging) = " +
 			// isNoLoggingSane);
-			// // WToFile.appendLineToFileAbs(String.valueOf(isNoLoggingSane) + "\n",
-			// // Constant.getCommonPath() + "DebugApr25RTVerseNoLogSanity.csv");
-			// candEditDistancesRes = candEditDistancesLogging;
-			// // End of Jan 7 2019 curtain
+			// WToFile.appendLineToFileAbs(String.valueOf(isNoLoggingSane) + "\n",
+			// Constant.getCommonPath() + "DebugApr25RTVerseNoLogSanity.csv");
+			candEditDistancesRes = candEditDistancesLogging;
+			// End of Jan 7 2019 curtain
 		}
 
 		if (VerbosityConstants.WriteCandAEDDiffs)
@@ -685,7 +693,7 @@ public class DistanceUtils
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
 			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
 	{
-		// PopUps.showMessage("Inside getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV");// TODO
+		// PopUps.showMessage("Inside getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV");//
 		// LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;// added on 17 Dec 2018 for daywise
 		// approach
 		if (Constant.memorizeEditDistance)
@@ -2280,6 +2288,434 @@ public class DistanceUtils
 	}
 
 	// end of added on 23 Nov 2018
+
+	// start of added on 12 Jan 2018
+	/**
+	 * Fork of org.activity.distances.DistanceUtils.getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach()
+	 * <p>
+	 * Aggregate across AO first, i.e. mean over each featureDiff sequence. FED = wtd sum of mean of eeach featureDiff
+	 * sequence.
+	 * <p>
+	 * Min-max normalise each feature difference to obtain feature level distance, where min/max for each featureDiff is
+	 * the min/max feature diff over all (compared to current) activity objects of all (compared) candidates.
+	 * <p>
+	 * 
+	 * @param candAEDFeatDiffs
+	 * @param minOfMinOfFeatDiffs
+	 * @param maxOfMaxOfFeatDiffs
+	 * @param hjEditDistance
+	 * @param timeAtRecomm
+	 *            just for logging
+	 * @param dateAtRecomm
+	 *            just for logging
+	 * @param userAtRecomm
+	 *            just for logging
+	 * @param activitiesGuidingRecomm
+	 *            just for logging
+	 * @param candidateTimelines
+	 *            just for logging
+	 * @since Jan 12 2019
+	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
+	 */
+	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistancesValPairsApproach(
+			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candAEDFeatDiffs,
+			EnumMap<GowGeoFeature, Double> minOfMinOfFeatDiffs, EnumMap<GowGeoFeature, Double> maxOfMaxOfFeatDiffs,
+			HJEditDistance hjEditDistance, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
+			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
+	{
+		// PopUps.showMessage("Inside getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach");
+		// boolean useMSD = Constant.useMSDInFEDInRTVerse;
+		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
+
+		EnumMap<GowGeoFeature, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
+
+		double EDAlpha = Constant.getDynamicEDAlpha();// .dynamicEDAlpha;
+		double EDBeta = 1 - EDAlpha;
+
+		boolean shouldComputedFED = hjEditDistance.getShouldComputeFeatureLevelDistance();
+		/////
+		if (shouldComputedFED == false && EDAlpha != 1)
+		{
+			System.err
+					.println("Warning: -- Since no features are being used it is suggested to set Constant.EDAlpha=1.\n"
+							+ "so that the computed values for dAct are not multiplied by EDAlpha and reduced.");
+		}
+		/////
+
+		// double EDGamma;
+		double sumOfWtOfFeaturesUsedExceptPD = hjEditDistance.getSumOfWeightOfFeaturesExceptPrimaryDimension();
+
+		// Start of Get max of ActED over all cand
+		double maxActEDOverAllCands = Double.MIN_VALUE;
+		// candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond()).max().getAsDouble();
+
+		// Start of added on 15 Aug 2018
+		double percentileForRTVerseMaxForAEDNorm = Constant.percentileForRTVerseMaxForAEDNorm;
+		if (percentileForRTVerseMaxForAEDNorm == -1)
+		{
+			maxActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond()).max()
+					.getAsDouble();
+		}
+		else
+		{
+			List<Double> listOfAEDs = candAEDFeatDiffs.entrySet().stream().map(e -> e.getValue().getSecond())
+					.collect(Collectors.toList());
+			maxActEDOverAllCands = StatsUtils.getPercentile(listOfAEDs, percentileForRTVerseMaxForAEDNorm);
+		}
+		// End of added on 15 Aug 2018
+
+		if (true)// sanity check
+		{
+			if (maxActEDOverAllCands < Constant.epsilonForFloatZero)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("Debug18July:maxActEDOverAllCands= " + maxActEDOverAllCands + "\n");
+				candAEDFeatDiffs.entrySet().stream()// .mapToDouble(e -> e.getValue().getSecond())
+						.forEachOrdered(
+								e -> sb.append(" " + e.getValue().getFirst() + "--" + e.getValue().getSecond() + ","));
+				System.out.println(sb.toString());
+			}
+		}
+
+		double minActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
+				.min().getAsDouble();
+		// End of Get max of ActED over all cand
+
+		// Start of initialsing logging
+		StringBuilder logTxt = new StringBuilder(
+				"\n--------- START OF getRTVerseMinMaxNormalisedEditDistances() with EDAlpha=" + EDAlpha + " EDBeta="
+						+ EDBeta + " sumOfWtOfFeaturesUsedExceptPD=" + sumOfWtOfFeaturesUsedExceptPD
+						+ " maxActEDOverAllCands" + maxActEDOverAllCands + " minActEDOverAllCands="
+						+ minActEDOverAllCands + '\n');
+		featureWeightMap.entrySet().stream()
+				.forEachOrdered(e -> logTxt.append(" " + e.getKey().toString() + "-" + e.getValue()));
+		StringBuilder logEachCand = new StringBuilder();// one for each cand
+		// candID,AEDTraceForThisCand,ActDistForThisCand,countOfAOForThisCand,featDiff,featDiff,featDiff,featDiff,featDiff,featDiff,featDiff,featureDistForThisAOForThisCand,featureDistForThisCand,normActDistForThisCand,resultantEditDist
+		StringBuilder logEachAOAllCands = new StringBuilder();// one for each AO of each cand
+		String currentTimeline = "";// activitiesGuidingRecomm.stream().map(ao -> ao.getPrimaryDimensionVal("|"))
+		// .collect(Collectors.joining(">"));
+		currentTimeline = activitiesGuidingRecomm.stream().map(ao -> ao.getActivityName())
+				.collect(Collectors.joining(">"));
+
+		String rtInfo = userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candAEDFeatDiffs.size() + ","
+				+ currentTimeline;
+		// end of initialising logging
+
+		int indexOfCandForThisRT = -1;
+
+		/** {CandID, candInfo, NormAED, NormFED} **/
+		Map<String, String> rejectedCandsDueToAEDFEDThreshold = new LinkedHashMap<>();
+		ArrayList<GowGeoFeature> listOfFeatures = null;
+		StringBuilder logAOsThisCandHeader = new StringBuilder(
+				"\nuserAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,");
+		// Loop over cands
+		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candEntry : candAEDFeatDiffs
+				.entrySet())
+		{
+			indexOfCandForThisRT += 1;
+			String candID = candEntry.getKey();
+
+			String AEDTraceForThisCand = candEntry.getValue().getFirst();
+			double actDistForThisCand = candEntry.getValue().getSecond();
+
+			/////////
+			StringBuilder logAOsThisCand = new StringBuilder();
+			String candTimelineAsString = candidateTimelines.get(candID).getActivityObjectsInTimeline().stream()
+					.map(ao -> ao.getActivityName()).collect(Collectors.joining(">"));
+			logTxt.append("\n\tcandID=" + candID + " AEDTraceForThisCand=" + AEDTraceForThisCand
+					+ " ActDistForThisCand=" + actDistForThisCand + " will now loop over list of AOs for this cand:");
+			String candInfo = rtInfo + "," + candID + "," + indexOfCandForThisRT + "," + candTimelineAsString + ","
+					+ AEDTraceForThisCand + "," + actDistForThisCand;
+
+			String candInfoLeaner = rtInfo + "," + candID + "," + indexOfCandForThisRT;
+			////////////
+
+			List<EnumMap<GowGeoFeature, Double>> listOfAOsForThisCand = candEntry.getValue().getThird();
+			// note: list in in intial order, i.e., least recent AO to most recent AO by time.
+			// double sumOfNormFDsOverAOsOfThisCand = 0;double[] normFDsOverAOsOfThisCand = new
+			// double[listOfAOsForThisCand.size()];
+			// start of FED computation
+			double normFeatDistForThisCand = -9999;
+			// assuming same features across all AOs
+			// Set<GowGeoFeature> listOfFeatures = null;
+			// ArrayList<GowGeoFeature> listOfFeatures = null;
+			EnumMap<GowGeoFeature, List<Double>> valsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
+					GowGeoFeature.class);
+			EnumMap<GowGeoFeature, List<Double>> normValsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
+					GowGeoFeature.class);
+
+			if (EDAlpha != 1)
+			{
+				listOfFeatures = new ArrayList<GowGeoFeature>(listOfAOsForThisCand.get(0).keySet());
+				// int indexOfAOForThisCand = -1;
+				// EnumMap<GowGeoFeature, DoubleSummaryStatistics> summaryOfNormValsForEachFeatureAcrossAOsForThisCand =
+				// new EnumMap<>( GowGeoFeature.class);
+
+				// loop over each feature
+				for (GowGeoFeature feature : listOfFeatures)
+				{
+					// loop over AOs in this cand
+					List<Double> valsForThisFeatureAcrossAllAOsInThisCand = listOfAOsForThisCand.stream()
+							.map(e -> e.get(feature)).collect(Collectors.toList());
+					// // loop over AOs in this cand
+					// DoubleSummaryStatistics summaryStatForThisFeatAcrossAllAOInThisCand =
+					// listOfAOsForThisCand.stream()
+					// .map(e -> e.get(feature)).mapToDouble(Double::doubleValue).summaryStatistics();
+					// summaryStatForEachFeatureAcrossAOsForThisCand.put(feature,
+					// summaryStatForThisFeatAcrossAllAOInThisCand);
+					valsForEachFeatDiffAcrossAOsForThisCand.put(feature, valsForThisFeatureAcrossAllAOsInThisCand);
+				}
+
+				// RTVerse normalise each val for each feature across AOs for this cand
+				// loop over each feature
+				for (Entry<GowGeoFeature, List<Double>> featureEntry : valsForEachFeatDiffAcrossAOsForThisCand
+						.entrySet())
+				{
+					GowGeoFeature featureID = featureEntry.getKey();
+					List<Double> diffValsForThisFeature = featureEntry.getValue();
+					// loop over val for this feature across each AO
+					List<Double> normalisedDiffValForThisFeatureForAllAOs = diffValsForThisFeature.stream()
+							.map(diffValForThisFeatureForAO -> StatsUtils.minMaxNormWORoundWithUpperBound(
+									diffValForThisFeatureForAO, maxOfMaxOfFeatDiffs.get(featureID),
+									minOfMinOfFeatDiffs.get(featureID), 1.0d, false))
+							.collect(Collectors.toList());
+					normValsForEachFeatDiffAcrossAOsForThisCand.put(featureID,
+							normalisedDiffValForThisFeatureForAllAOs);
+				}
+				// compute the Summary stat of normalised diff val of each feature across all AOs in the cand
+
+				// Compute FED for this cand
+				double wtdSumOfFeatDiffForThisCand = 0, sumOfFeatureWts = 0;
+				for (Entry<GowGeoFeature, List<Double>> featureEntry : valsForEachFeatDiffAcrossAOsForThisCand
+						.entrySet())
+				{
+					GowGeoFeature featureID = featureEntry.getKey();
+
+					List<Double> diffValsForThisFeatAcrossAllAOsInCand = normValsForEachFeatDiffAcrossAOsForThisCand
+							.get(featureID).stream().collect(Collectors.toList());
+
+					double wtForThisFeature = featureWeightMap.get(featureID);
+					// double diffValToUse = summaryStatForThisFeatAcrossAOsOfThisCand.getAverage();
+					// Not doing Root of mean of the squared diffs as min and max in norm is of sqd vals
+					// if (useMSD){diffValToUse = Math.sqrt(summaryStatForThisFeatAcrossAOsOfThisCand.getAverage());}
+
+					// $$wtdSumOfFeatDiffForThisCand += (wtForThisFeature
+					// $$ * summaryStatForThisFeatAcrossAOsOfThisCand.getAverage());//disabled on 8 Dec
+					double aggValForFeatureAcrossAllAOsInCand = -9999;
+					if (Constant.takeMeanOrMedianOfFeatDiffsAcrossAllAOsInCandForFeatSeq == 0)
+					{
+						DoubleSummaryStatistics summaryStatForThisFeatAcrossAOsOfThisCand = normValsForEachFeatDiffAcrossAOsForThisCand
+								.get(featureID).stream().mapToDouble(Double::doubleValue).summaryStatistics();
+						aggValForFeatureAcrossAllAOsInCand = summaryStatForThisFeatAcrossAOsOfThisCand.getAverage();
+					}
+					else
+					{
+						aggValForFeatureAcrossAllAOsInCand = StatsUtils
+								.getPercentile(diffValsForThisFeatAcrossAllAOsInCand, 50);
+					}
+					wtdSumOfFeatDiffForThisCand += (wtForThisFeature * aggValForFeatureAcrossAllAOsInCand);
+
+					sumOfFeatureWts += wtForThisFeature;
+
+					//////
+					logTxt.append("\n\t\t\tfeatureID=" + featureID + ",diffValToUse="
+							+ aggValForFeatureAcrossAllAOsInCand + ",normalisedFeatureDiffVal="
+							+ normValsForEachFeatDiffAcrossAOsForThisCand.get(featureID).stream()
+									.map(v -> String.valueOf(v)).collect(Collectors.joining(",")).toString()
+							+ ",wtForThisFeature=" + wtForThisFeature + ",maxOfMaxOfDiffs="
+							+ maxOfMaxOfFeatDiffs.get(featureID) + ",minOfMinOfDiffs="
+							+ minOfMinOfFeatDiffs.get(featureID));
+				}
+				normFeatDistForThisCand = wtdSumOfFeatDiffForThisCand / sumOfFeatureWts;
+			} // end of FED computation
+
+			logTxt.append(",normFeatDistForThisCand=" + normFeatDistForThisCand + "\n");
+
+			///////////// Start of just for logging Nov25
+			StringBuilder sbFeatureDiffAllAOsInCand = new StringBuilder();// added on Dec 3 2018
+			// rounding forlogging
+			String normFeatDistForThisCandRounded = StatsUtils.roundAsString(normFeatDistForThisCand, 4);
+			if (VerbosityConstants.WriteRTVerseNormalisationLogs || VerbosityConstants.verboseDistDistribution)// logging
+			{
+				for (int indexOfAO = 0; indexOfAO < listOfAOsForThisCand.size(); indexOfAO++)
+				{
+					logAOsThisCand.append(candInfo + "," + indexOfAO + ",");
+					if (indexOfAO == 0 && indexOfCandForThisRT == 1)
+					{
+						logAOsThisCandHeader.append("indexOfAO,");
+					}
+					if (shouldComputedFED)
+					{
+						// String nameOfFeaturesInSeq = "";
+						for (GowGeoFeature feature : listOfFeatures)
+						{
+							// nameOfFeaturesInSeq += feature.toString() + ",";
+							String s = StatsUtils.roundAsString(
+									valsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
+									+ ","
+									+ StatsUtils.roundAsString(
+											normValsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
+									+ ",";
+							logAOsThisCand.append(s);
+							if (indexOfAO == 0 && indexOfCandForThisRT == 1)
+							{
+								logAOsThisCandHeader
+										.append(feature.toString() + "," + feature.toString() + "Normalised,");
+							}
+							// sbFeatureDiffAllAOsInCand.append(s);//Disabled on Dec 7 2018. not writingfeat diff of
+							// each AO in cand for each cand was row. This info is already there in log with each AO as
+							// row and adding the info to sbFeatureDiffAllAOsInCand was making the log for each cand of
+							// inconsistent number of cols. Also, this will bring down the size of log file a bit.
+						}
+					}
+					logAOsThisCand.append("|" + "," + normFeatDistForThisCandRounded + "\n"); // written for for each AO
+					if (indexOfAO == 0 && indexOfCandForThisRT == 1)
+					{
+						logAOsThisCandHeader.append("|,normFDForThisAOForThisCand");
+					}
+					// in cand for consistency though it will be same as it is a characteristic of cand and not AO
+					// individually.
+					// sbFeatureDiffAllAOsInCand.append(r);
+					// logAOsThisCand.append("|" + "," + StatsUtils.roundAsString(normFDForThisAOForThisCand, 4) +
+					// "\n");
+					// logAOsThisCand.append("\n");
+				}
+				sbFeatureDiffAllAOsInCand.append("|" + "," + normFeatDistForThisCandRounded);
+			}
+			//////////// End of just for logging Nov25
+
+			double normActDistForThisCand = StatsUtils.minMaxNormWORoundWithUpperBound(actDistForThisCand,
+					maxActEDOverAllCands, minActEDOverAllCands, 1d, false);
+
+			// double meanOverAOsNormFDForThisCand = sumOfNormFDsOverAOsOfThisCand / listOfAOsForThisCand.size();
+			// double medianOverAOsNormFDForThisCand = StatUtils.percentile(normFDsOverAOsOfThisCand, 50);
+			// double varianceOverAOsNormFDForThisCand = StatUtils.variance(normFDsOverAOsOfThisCand);
+			// double stdDevOverAOsNormFDForThisCand = Math.sqrt(varianceOverAOsNormFDForThisCand);
+			// double meanUponStdDev = meanOverAOsNormFDForThisCand / stdDevOverAOsNormFDForThisCand;
+
+			// IMPORTANT
+			double resultantEditDist = -999999;
+			boolean thisCandRejected = false;
+			String thisCandRejectedString = "NR";
+
+			double threshNormAEDForCand = Constant.threshNormAEDForCand;
+			double threshNormFEDForCand = Constant.threshNormFEDForCand;
+
+			if (EDBeta == 0)
+			{// since 0*NaN is NaN
+				if (threshNormAEDForCand != -1 && normActDistForThisCand >= threshNormAEDForCand)// added on 14 Aug 2018
+				{
+					thisCandRejected = true;// reject this cand
+					thisCandRejectedString = "AR";
+				}
+				else
+				{
+					resultantEditDist = (EDAlpha) * normActDistForThisCand;
+				}
+			}
+			else
+			{
+				if (threshNormAEDForCand != -1 && normActDistForThisCand >= threshNormAEDForCand)// added on 14 Aug 2018
+				{
+					thisCandRejected = true;// reject this cand
+					thisCandRejectedString = "AR";
+				}
+				else if (threshNormFEDForCand != -1 && normFeatDistForThisCand >= threshNormFEDForCand)
+				{
+					thisCandRejected = true;// reject this cand
+					thisCandRejectedString = "FR";
+				}
+				else
+				{
+					resultantEditDist = (EDAlpha) * normActDistForThisCand + (EDBeta) * normFeatDistForThisCand;//
+					// resultantEditDist = (EDAlpha) * normActDistForThisCand + (EDBeta) * 1;//baseline
+				}
+			}
+
+			if (thisCandRejected == false)
+			{
+				res.put(candEntry.getKey(), new Pair<>(AEDTraceForThisCand, resultantEditDist));
+			}
+			else
+			{
+				if (VerbosityConstants.WriteRTVerseNormalisationLogs)
+				{
+					rejectedCandsDueToAEDFEDThreshold.put(candID,
+							candInfo + "," + normActDistForThisCand + "," + normFeatDistForThisCand);
+				}
+				// else
+				// {// less expensive for writing
+				// rejectedCandsDueToAEDFEDThreshold.put(candID, candInfo);//}
+			}
+
+			/////////
+			logTxt.append("\n\tnormActDistForThisCand=" + normActDistForThisCand + ", normFDForThisCand="
+					+ normFeatDistForThisCand + "\n\t-->resultantEditDist=" + resultantEditDist);
+
+			// logEachCand.append(candInfo + "," + normActDistForThisCand + "," + normFeatDistForThisCand + ","
+			// + resultantEditDist + "," + thisCandRejectedString + "\n");
+			// keeping this same order even with empty values because this file will be read later for finding
+			// correlated between distance
+			logEachCand.append(candInfo + "," + normActDistForThisCand + "," + " "/* sumOfNormFDsOverAOsOfThisCand */
+					+ "," + normFeatDistForThisCand/* meanOverAOsNormFDForThisCand */ + "," + " "
+					/* medianOverAOsNormFDForThisCand */ + "," + " "/* stdDevOverAOsNormFDForThisCand */ + ","
+					+ " "/* meanUponStdDev */ + "," + resultantEditDist + "," + thisCandRejectedString + ","
+					+ sbFeatureDiffAllAOsInCand.toString() + "\n");
+
+			// logEachAO.append(",,,,,,,,,,,,,,,," + featureDistForThisCand + "," + normActDistForThisCand + ","
+			// + resultantEditDist + "\n");
+
+			logEachAOAllCands.append(logAOsThisCand.toString());
+			/////////
+		} // end of loop over cands
+
+		String commonPath = Constant.getCommonPath();
+		if (VerbosityConstants.WriteRTVerseNormalisationLogs || VerbosityConstants.verboseDistDistribution)// logging
+		{
+			// WToFile.appendLineToFileAbs(logTxt.toString() + "\n",
+			// Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances.txt");
+			WToFile.appendLineToFileAbs(logEachCand.toString(),
+					commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv");
+			if (VerbosityConstants.WriteRTVerseNormalisationLogs)
+			{
+				// header:
+				// userAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,normActDistForThisCand,sumOfNormFDsOverAOsOfThisCand,meanOverAOsNormFDForThisCand,medianOverAOsNormFDForThisCand,stdDevOverAOsNormFDForThisCand,meanUponStdDev,resultantEditDist
+				WToFile.appendLineToFileAbs(logEachAOAllCands.toString(),
+						commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
+				WToFile.appendLineToFileAbs(logAOsThisCandHeader.toString(),
+						commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAOHeader.csv");
+			}
+		}
+
+		// write rejected cands for AED FED Threshold, added on 14 Aug 2018
+		if (VerbosityConstants.WriteRTVerseNormalisationLogs || VerbosityConstants.verboseDistDistribution)
+		{
+			StringBuilder sb1 = new StringBuilder();
+			rejectedCandsDueToAEDFEDThreshold.entrySet().stream()
+					.forEachOrdered(e -> sb1.append(e.getKey() + "," + e.getValue() + "\n"));
+			WToFile.appendLineToFileAbs(sb1.toString(), commonPath + "LogOfRejectedCands.csv");
+		}
+
+		if (res.size() == 0)// all candidates filtered out due to AED FED Threshold
+		{
+			WToFile.appendLineToFileAbs(rtInfo + "\n", commonPath + "recommPointsRejAllCandFiltrdAEDFEDThresh.csv");
+		}
+
+		if (VerbosityConstants.verbose)// true
+		{
+			logTxt.append("\n---------End  getRTVerseMinMaxNormalisedEditDistancesFS()\n");
+			System.out.println(logTxt.toString());
+			WToFile.appendLineToFileAbs(logTxt.toString(),
+					commonPath + "DebugNov23getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach.txt");
+		}
+
+		System.out.println("INFO: orderOfFeatureDiffs = " + listOfFeatures);
+		return res;
+
+	}
+
+	// end of added on 12 Jan 2018
+
 	/**
 	 * TODO modified the following method with shouldComputeFeatureLevelDiffs
 	 * <P>

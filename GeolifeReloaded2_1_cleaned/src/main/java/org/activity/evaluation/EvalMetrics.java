@@ -461,6 +461,8 @@ public class EvalMetrics
 		// String commonPath = Constant.getCommonPath();
 		BufferedWriter bwRR = null;
 		BufferedWriter bwEmptyRecomms = null;
+		StringBuilder sbUnrolledRes = new StringBuilder("UserID,RTDate,RTTime,ActualAct,RR\n");// added on 14 Jan 2019
+
 		try
 		{
 			String metaCurrentLine, topKCurrentLine, actualCurrentLine;
@@ -523,8 +525,10 @@ public class EvalMetrics
 								RR = 0; // assuming the rank is at infinity
 							}
 						}
-						bwRR.write(RR + ",");
 
+						bwRR.write(RR + ",");
+						sbUnrolledRes
+								.append(currentLineArray.get(j).replaceAll("_", ",") + "," + actual + "," + RR + "\n");
 						if (VerbosityConstants.verbose)
 						{
 							System.out.println("topKString=arrayTopK.get(i).get(j)=" + arrayTopK.get(i).get(j));
@@ -538,6 +542,9 @@ public class EvalMetrics
 			}
 			bwRR.close();
 			bwEmptyRecomms.close();
+
+			WToFile.writeToNewFile(sbUnrolledRes.toString(),
+					commonPath + fileNamePhrase + timeCategory + "ReciprocalRankUnrolled" + dimensionPhrase + ".csv");
 		}
 		catch (Exception e)
 		{
@@ -574,6 +581,11 @@ public class EvalMetrics
 		// String commonPath = Constant.getCommonPath();
 		BufferedWriter bwTopKPrecision = null, bwTopKRecall = null, bwTopKF = null,
 				bwNumberOfRecommendationTimes = null;
+
+		// added on 14 Jan 2019
+		StringBuilder sbUnrolledPrecision = new StringBuilder("UserID,RTDate,RTTime,ActualAct,Precision\n");
+		StringBuilder sbUnrolledRecall = new StringBuilder("UserID,RTDate,RTTime,ActualAct,Recall\n");
+		StringBuilder sbUnrolledF = new StringBuilder("UserID,RTDate,RTTime,ActualAct,F\n");// added on 14 Jan 2019
 
 		int theK = theKOriginal;
 		try
@@ -740,6 +752,14 @@ public class EvalMetrics
 						bwTopKPrecision.write(topKPrecisionVal + ",");
 						bwTopKRecall.write(topKRecallVal + ",");
 						bwTopKF.write(topKFVal + ",");
+
+						sbUnrolledPrecision.append(currentLineArray.get(j).replaceAll("_", ",") + "," + actual + ","
+								+ topKPrecisionVal + "\n");
+						sbUnrolledRecall.append(currentLineArray.get(j).replaceAll("_", ",") + "," + actual + ","
+								+ topKRecallVal + "\n");
+						sbUnrolledF.append(
+								currentLineArray.get(j).replaceAll("_", ",") + "," + actual + "," + topKFVal + "\n");
+
 						// bwAccuracy.write(accuracy+",");
 						if (VerbosityConstants.verboseEvaluationMetricsToConsole)
 						{
@@ -764,6 +784,14 @@ public class EvalMetrics
 				// bwAccuracy.write("\n");
 
 			}
+
+			WToFile.writeToNewFile(sbUnrolledPrecision.toString(),
+					commonPath + fileNamePhrase + timeCategory + "top" + theK + "PrecisionUnrolled.csv");
+			WToFile.writeToNewFile(sbUnrolledRecall.toString(),
+					commonPath + fileNamePhrase + timeCategory + "top" + theK + "RecallUnrolled.csv");
+			WToFile.writeToNewFile(sbUnrolledF.toString(),
+					commonPath + fileNamePhrase + timeCategory + "top" + theK + "FMeasureUnrolled.csv");
+
 			System.out.println(consoleLogBuilder.toString());
 		}
 		catch (Exception e)
