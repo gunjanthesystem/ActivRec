@@ -203,7 +203,8 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan3Geolife.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan11Gowalla1.csv";
+		// + "ResultsToReadJan3Geolife.csv";
 		// + "ResultsToReadJan4FEDInvesitgation.csv";
 		// + "ResultsToReadJan3Gowalla1.csv";
 		// "Geolife.csv";

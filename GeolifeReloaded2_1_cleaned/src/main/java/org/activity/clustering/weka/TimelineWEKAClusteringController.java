@@ -214,7 +214,7 @@ public class TimelineWEKAClusteringController
 						// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/"//
 						// TimelinesClustering/"
 						+ Constant.getDatabaseName() + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + "_" + Constant.howManyUsers + "_" + groundTruthLabel;
+						+ LocalDateTime.now().getDayOfMonth() + "_" + Constant.geolife1howManyUsers + "_" + groundTruthLabel;
 				new File(directoryToWrite).mkdir();
 				pathToWrite = directoryToWrite + "/";
 				// PopUps.showMessage("Path to write = " + pathToWrite);

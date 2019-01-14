@@ -960,14 +960,17 @@ public class ActivityObject2018 implements Serializable
 						.collect(Collectors.joining("-"));
 		// .getLocIDLocationObjectDictionary().get(lid).locationName)
 
+		String brokenDownStartTS = ActivityObject2018.brokenDownTSString(delimiter, this.startTimestampInms);
+		String brokenDownEndTS = ActivityObject2018.brokenDownTSString(delimiter, this.endTimestampInms);
+
+		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
+				? delimiter + this.durationInSeconds + delimiter + brokenDownEndTS
+				: "";
+
 		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
 				? delimiter + this.durationInSeconds + delimiter + df.format(this.distanceTravelledInKm) + delimiter
 						+ this.startLatitude + delimiter + this.startLongitude + delimiter + this.endLatitude
-						+ delimiter + this.endLongitude + delimiter + this.avgAltitude
-				: "";
-
-		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
-				? delimiter + this.durationInSeconds
+						+ delimiter + this.endLongitude + delimiter + this.avgAltitude + delimiter + brokenDownEndTS
 				: "";
 
 		String additionalGowallaFeatures = Constant.getDatabaseName().equals("gowalla1")
@@ -978,20 +981,23 @@ public class ActivityObject2018 implements Serializable
 						+ locationName
 				: "";
 
+		return /* userID + delimiter + */ brokenDownStartTS + delimiter + activityID + delimiter
+				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter
+				+ Instant.ofEpochMilli(startTimestampInms).toString()
+				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
+				+ additionalGowallaFeatures + delimiter + df.format(distInMFromPrev) + delimiter + durInSecFromPrev
+				+ additionalGeolifeFeatures + delimiter + additionalDCUFeatures;
+	}
+
+	private static String brokenDownTSString(String delimiter, long startTimestampInms)
+	{
 		Timestamp startTS = new Timestamp(startTimestampInms);
 		int hourOfDay = startTS.getHours();
 		int weekDay = startTS.getDay();
 		// String tsISOString = startTS.toInstant().toString();
 		String dateOnly = new Date(startTimestampInms).toString();
-
-		String brokenDownTS = weekDay + delimiter + dateOnly + delimiter + hourOfDay;
-
-		return userID + delimiter + brokenDownTS + delimiter + activityID + delimiter
-				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter
-				+ Instant.ofEpochMilli(startTimestampInms).toString()
-				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
-				+ additionalGowallaFeatures + delimiter + df.format(distInMFromPrev) + delimiter + durInSecFromPrev
-				+ additionalGeolifeFeatures + additionalDCUFeatures;
+		String brokenDownStartTS = weekDay + delimiter + dateOnly + delimiter + hourOfDay;
+		return brokenDownStartTS;
 	}
 
 	/**
@@ -1027,13 +1033,18 @@ public class ActivityObject2018 implements Serializable
 	 */
 	public static String getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(String delimiter)
 	{
+
+		String brokenDownTS = "STweekDay" + delimiter + "STdateOnly" + delimiter + "SThourOfDay";
+		String brokenDownET = "ETweekDay" + delimiter + "ETdateOnly" + delimiter + "EThourOfDay";
+
+		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
+				? delimiter + "durationInSeconds" + delimiter + brokenDownET
+				: "";
+
 		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
 				? delimiter + "durationInSeconds" + delimiter + "distanceTravelledInKm" + delimiter + "startLatitude"
 						+ delimiter + "startLongitude" + delimiter + "endLatitude" + delimiter + "endLongitude"
-						+ delimiter + "avgAltitude"
-				: "";
-
-		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2") ? delimiter + "durationInSeconds"
+						+ delimiter + "avgAltitude" + delimiter + brokenDownET
 				: "";
 
 		String additionalGowallaFeatures = Constant.getDatabaseName().equals("gowalla1")
@@ -1048,11 +1059,9 @@ public class ActivityObject2018 implements Serializable
 				// + "max_items_count"
 				: "";
 
-		String brokenDownTS = "weekDay" + delimiter + "dateOnly" + delimiter + "hourOfDay";
-
-		return "uID" + delimiter + brokenDownTS + delimiter + "actID" + delimiter + "activityName" + delimiter + "stTS"
-				+ delimiter + "distInMPrev" + delimiter + "durInSecPrev" + additionalGeolifeFeatures
-				+ additionalDCUFeatures;
+		return /* "uID" + delimiter + */brokenDownTS + delimiter + "actID" + delimiter + "activityName" + delimiter
+				+ "stTS" + delimiter + "distInMPrev" + delimiter + "durInSecPrev" + additionalGeolifeFeatures
+				+ delimiter + additionalDCUFeatures;
 	}
 
 	/**

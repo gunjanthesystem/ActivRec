@@ -107,7 +107,7 @@ public class TimelineStats
 		// PopUps.showMessage("Inside timelineStats controller");
 		String directoryToWrite = Constant.getOutputCoreResultsPath() + Constant.getDatabaseName() + "_"
 				+ LocalDateTime.now().getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
-				+ typeOfAnalysis + "_" + Constant.howManyUsers;
+				+ typeOfAnalysis + "_" + Constant.geolife1howManyUsers;
 
 		//////////////////////////////
 		int[] userIDs = Constant.getUserIDs();

@@ -1049,12 +1049,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										////////////////////////////////////////////////////////////////////////
 										// check if all seq recomms for this RT will have daywise candidate timelines
 										// checking only wrt to primary dimension at the moment
-										boolean hasDayWiseCandidateTimelines = TimelineUtils
-												.hasDaywiseCandidateTimelines(userTrainingTimelines,
-														recommMaster.getDateAtRecomm(),
-														recommMaster.getActivityObjectAtRecomm(),
-														Constant.collaborativeCandidates, String.valueOf(userId),
-														trainTestTimelinesForAllUsersDW);
+										boolean hasDayWiseCandidateTimelines = true;
+										if (Constant.ensureHasDaywiseCandsForEvalCompatibility)// added on 14 Jan 2019
+										{
+											hasDayWiseCandidateTimelines = TimelineUtils.hasDaywiseCandidateTimelines(
+													userTrainingTimelines, recommMaster.getDateAtRecomm(),
+													recommMaster.getActivityObjectAtRecomm(),
+													Constant.collaborativeCandidates, String.valueOf(userId),
+													trainTestTimelinesForAllUsersDW);
+										}
 
 										if (hasDayWiseCandidateTimelines == false)
 										{

@@ -645,13 +645,24 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									trainTestTimelinesForAllUsersDW, userId, userTrainingTimelines);
 
 							// start of added on Nov 29
-							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelines(userId,
-									userTrainingTimelines, Constant.getCommonPath() + "FeatsOfTrainingTimelines.csv");
-							// added on Dec 3 2018
-							FeatureStats.writeFeatDistributionForEachUsersTrainingTimelinesSlidingWindowWiseV2(userId,
-									userTrainingTimelines,
-									Constant.getCommonPath() + "FeatsOfTrainingTimelinesSlidingWindow3.csv", 3);
+							if (true) // TODO
+							{
+								FeatureStats.writeFeatDistributionForEachUsersTrainingTimelines(userId,
+										userTrainingTimelines,
+										Constant.getCommonPath() + "FeatsOfTrainingTimelines.csv");
+								// added on Dec 3 2018
+								FeatureStats.writeFeatDistributionForEachUsersTrainingTimelinesSlidingWindowWiseV2(
+										userId, userTrainingTimelines,
+										Constant.getCommonPath() + "FeatsOfTrainingTimelinesSlidingWindow3.csv", 3);
 
+								/////////////////////
+								FeatureStats.writeFeatDistributionForEachUsersTrainingTimelines(userId,
+										userTestTimelines, Constant.getCommonPath() + "FeatsOfTestTimelines.csv");
+								// added on Dec 3 2018
+								FeatureStats.writeFeatDistributionForEachUsersTrainingTimelinesSlidingWindowWiseV2(
+										userId, userTestTimelines,
+										Constant.getCommonPath() + "FeatsOfTestTimelinesSlidingWindow3.csv", 3);
+							}
 							// end of added on Nov 29
 
 							////// START of build representative activity objects for this user.
@@ -740,7 +751,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							String actNamesDurationsWithDurationOverTrain = "";
 
 							// START OF Curtain disable trivial baselines
-							if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
+							// Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
+							if (Constant.altSeqPredictor.equals(altSeqPredictor.HighOccur)
+									|| Constant.altSeqPredictor.equals(altSeqPredictor.HighDur))
 							{
 								boolean doWrite = true;
 								if (databaseName.equals("gowalla1"))
@@ -1167,12 +1180,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 										////////////////////////////////////////////////////////////////////////
 										// check if all seq recomms for this RT will have daywise candidate timelines
-										boolean hasDayWiseCandidateTimelines = TimelineUtils
-												.hasDaywiseCandidateTimelines(userTrainingTimelines,
-														recommMaster.getDateAtRecomm(),
-														recommMaster.getActivityObjectAtRecomm(),
-														Constant.collaborativeCandidates, String.valueOf(userId),
-														trainTestTimelinesForAllUsersDW);
+										boolean hasDayWiseCandidateTimelines = true;
+										if (Constant.ensureHasDaywiseCandsForEvalCompatibility)// added on 14 Jan 2019
+										{
+											hasDayWiseCandidateTimelines = TimelineUtils.hasDaywiseCandidateTimelines(
+													userTrainingTimelines, recommMaster.getDateAtRecomm(),
+													recommMaster.getActivityObjectAtRecomm(),
+													Constant.collaborativeCandidates, String.valueOf(userId),
+													trainTestTimelinesForAllUsersDW);
+										}
 
 										if (hasDayWiseCandidateTimelines == false)
 										{

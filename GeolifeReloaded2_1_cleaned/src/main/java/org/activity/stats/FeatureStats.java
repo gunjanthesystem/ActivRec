@@ -1,5 +1,6 @@
 package org.activity.stats;
 
+import java.io.File;
 import java.sql.Date;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -36,12 +37,17 @@ public class FeatureStats
 			LinkedHashMap<Date, Timeline> userTrainingTimelines, String absFileNameToAppend)
 	{
 		StringBuilder sb = new StringBuilder();
+		if (new File(absFileNameToAppend).isFile() == false)
+		{
+			sb.append(ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(",") + "\n");
+		}
 
 		for (Entry<Date, Timeline> entry : userTrainingTimelines.entrySet())
 		{
 			for (ActivityObject2018 ao : entry.getValue().getActivityObjectsInTimeline())
 			{
-				sb.append(ActivityObject2018.getHeaderForStringAllGeolifeWithNameForHeaded2(ao, ",") + "\n");
+				// sb.append(ActivityObject2018.getHeaderForStringAllGeolifeWithNameForHeaded2(ao, ",") + "\n");
+				sb.append(ao.toStringAllGowallaTSWithNameForHeaded24Dec(",") + "\n");
 			}
 		}
 		WToFile.appendLineToFileAbs(sb.toString(), absFileNameToAppend);
@@ -110,16 +116,24 @@ public class FeatureStats
 		List<List<ActivityObject2018>> listOfWindows = splitDayTimelineToSlidingWindows(userTrainingTimelines, muCount);
 
 		String featHeader = IntStream.range(0, muCount)
-				.mapToObj(i -> ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(","))
+				.mapToObj(i -> ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(i + ","))
 				.collect(Collectors.joining(","));
-		StringBuilder sb = new StringBuilder("UserID,ActWindow," + featHeader + ",ActAfterWindow\n");
+		StringBuilder sb = new StringBuilder();
+
+		if (new File(absFileNameToAppend).isFile() == false)
+		{
+			sb.append("UserID,ActWindow," + featHeader + ",ActAfterWindow\n");
+		}
 
 		for (List<ActivityObject2018> window : listOfWindows)
 		{
 			sb.append(userID + "," + window.stream().map(ao -> ao.getActivityName()).collect(Collectors.joining(">"))
 					+ ",");
+
+			int indexOfAOInWindow = -1;
 			for (ActivityObject2018 ao : window)
 			{
+				indexOfAOInWindow += 1;
 				sb.append(ao.toStringAllGowallaTSWithNameForHeaded24Dec(",") + ",");
 				// ActivityObject2018.getHeaderForStringAllGeolifeWithNameForHeaded2(ao, ",") + ",");
 			}

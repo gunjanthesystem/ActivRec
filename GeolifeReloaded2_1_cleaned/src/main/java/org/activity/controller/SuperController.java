@@ -825,6 +825,11 @@ public class SuperController
 			}
 		}
 
+		if (Constant.ensureCandEndWithCurrAct == false)
+		{
+			collLabel += "NotEnsurEndCA";
+		}
+
 		if (Constant.purelyRandomPredictionNov25)
 		{
 			return sampledUserSetLabel + predictorLabel + "PurelyRandomly" + toyTimelinesLabel + "";
