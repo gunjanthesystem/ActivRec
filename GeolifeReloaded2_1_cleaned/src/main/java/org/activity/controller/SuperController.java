@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
@@ -1012,7 +1013,8 @@ public class SuperController
 				}
 
 				// Start of added on 20 Nov 2018
-				String fileForChosenMU = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/NOV19ResultsDistributionFirstToMax1/FiveDays/geolife1_NOV19ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsNoTTFilter_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+				String fileForChosenMU = "";
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/NOV19ResultsDistributionFirstToMax1/FiveDays/geolife1_NOV19ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsNoTTFilter_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
 				fileForChosenMU = "";
 				ResultsDistributionEvaluation.runNov20Results(commonPath, 1, "", fileForChosenMU);
 
@@ -1038,8 +1040,33 @@ public class SuperController
 				WToFile.writeToNewFile(mrrStatsOverUsersBestnMUs.toString(),
 						commonPath + "mrrStatsOverUsersBestMUs.csv");
 				System.out.println("mrrStatsOverUsersBestMUs = " + mrrStatsOverUsersBestnMUs);
-
 				// End of added on 20 Nov 2018
+
+				// Start of added on 15 Jan 2019
+				List<List<String>> MRRValsForBestMULines = ReadingFromFile.readLinesIntoListOfLists(
+						commonPath + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv", ",");
+				MRRValsForBestMULines.remove(0);// remove header
+
+				List<List<String>> RRForOptimalMUAllUsers = new ArrayList<>();
+				for (List<String> l : MRRValsForBestMULines)
+				{
+					String userIndex = l.get(0);
+					String bestMU = l.get(1);
+					bestMU = bestMU.contains(".") ? bestMU : bestMU + ".0";
+					/// /All/MatchingUnit3.0/AlgoStep0AllReciprocalRankUnrolled.csv
+					String RRFileForBestMUForThisUser = commonPath + "All/MatchingUnit" + bestMU
+							+ "/AlgoStep0AllReciprocalRankUnrolled.csv";
+
+					List<List<String>> RRForOptimalMU = ReadingFromFile
+							.readLinesIntoListOfLists(RRFileForBestMUForThisUser, ",");
+					RRForOptimalMU.remove(0);// remove header
+					RRForOptimalMUAllUsers.addAll(RRForOptimalMU);
+				}
+				WToFile.writeToNewFile("UserID,RTDate,RTTime,ActualAct,RR\n" + RRForOptimalMUAllUsers.stream()
+						.map(v -> (v.stream().collect(Collectors.joining(",")))).collect(Collectors.joining("\n")),
+						commonPath + resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware.csv");
+				// End of added on 15 Jan 2019
+
 				// if (true)
 				// { if (Constant.doSecondaryDimension)
 				// { // for (String pfPhrase : pfFilterNames)

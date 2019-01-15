@@ -10,13 +10,17 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.activity.constants.DomainConstants;
 import org.activity.constants.VerbosityConstants;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -545,11 +549,53 @@ public class EvalMetrics
 
 			WToFile.writeToNewFile(sbUnrolledRes.toString(),
 					commonPath + fileNamePhrase + timeCategory + "ReciprocalRankUnrolled" + dimensionPhrase + ".csv");
+
+			/////////// start of added on 15 Jan 2019
+			// fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
+			String metricName = "ReciprocalRank";
+			groupByUserAndActual(fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase, commonPath,
+					metricName);
+			/////////// end of added on 15 Jan 2019
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * 
+	 * @param fileNamePhrase
+	 * @param commonPath
+	 * @param metricName
+	 * @since 15 jan 2019
+	 */
+	private static void groupByUserAndActual(String fileNamePhrase, String commonPath, String metricName)
+	{
+		// fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
+		List<List<String>> allRRRead = ReadingFromFile.readLinesIntoListOfLists(commonPath + fileNamePhrase + ".csv",
+				",");
+
+		LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByUser = allRRRead.stream().skip(1)
+				.collect(Collectors.groupingBy(e -> String.valueOf(e.get(0)), LinkedHashMap::new,
+						Collectors.summarizingDouble(e -> Double.valueOf(e.get(4)))));
+		LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByTargetAct = allRRRead.stream().skip(1)
+				.collect(Collectors.groupingBy(e -> String.valueOf(e.get(3)), LinkedHashMap::new,
+						Collectors.summarizingDouble(e -> Double.valueOf(e.get(4)))));
+
+		WToFile.writeToNewFile(
+				"User,MRR,Count\n" + allRRGrpByUser.entrySet().stream()
+						.map(e -> e.getKey() + "," + StatsUtils.round(e.getValue().getAverage(), 4) + ","
+								+ e.getValue().getCount())
+						.collect(Collectors.joining("\n")),
+				commonPath + fileNamePhrase + "MeanPerUser .csv");
+
+		WToFile.writeToNewFile(
+				"Actual,MRR,Count\n" + allRRGrpByTargetAct.entrySet().stream()
+						.map(e -> e.getKey() + "," + StatsUtils.round(e.getValue().getAverage(), 4) + ","
+								+ e.getValue().getCount())
+						.collect(Collectors.joining("\n")),
+				commonPath + fileNamePhrase + "MeanPerActual .csv");
 	}
 
 	/**
@@ -792,6 +838,14 @@ public class EvalMetrics
 			WToFile.writeToNewFile(sbUnrolledF.toString(),
 					commonPath + fileNamePhrase + timeCategory + "top" + theK + "FMeasureUnrolled.csv");
 
+			// ReadingFromFile.readLinesIntoListOfLists(absFileName, ",");
+			// groupByUserAndActual(fileNamePhrase, timeCategory, dimensionPhrase, commonPath, "ReciprocalRank");
+			String[] metricNames = { "Precision", "Recall", "FMeasure" };
+			for (String metricName : metricNames)
+			{
+				groupByUserAndActual(fileNamePhrase + timeCategory + "top" + theK + metricName + "Unrolled", commonPath,
+						metricName);
+			}
 			System.out.println(consoleLogBuilder.toString());
 		}
 		catch (Exception e)
