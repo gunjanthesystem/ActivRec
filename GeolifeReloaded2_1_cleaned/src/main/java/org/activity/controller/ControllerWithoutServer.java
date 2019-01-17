@@ -73,6 +73,7 @@ public class ControllerWithoutServer
 	 * 
 	 * @param databaseName
 	 * @param commonBasePath
+	 * @param noRecommendations
 	 */
 	public ControllerWithoutServer(String databaseName, String commonBasePath, boolean noRecommendations)
 	{

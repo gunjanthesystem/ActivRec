@@ -13,9 +13,6 @@ apply plugin: 'eclipse'
 apply plugin: 'application'
 //apply plugin: 'fatJar'
 
-jar.enabled = false
-distTar.enabled = false
-distZip.enabled = false
 
 ///////////////////////////////////////////////////
 sourceCompatibility = 1.8
@@ -25,27 +22,53 @@ version = '1.0'
 
 
 // In this section you declare where to find the dependencies of your project
+
+
+
 repositories {
-//:wq
-//	maven { url "https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-core"} //for tablesaw
-    maven { url "http://maven.geotoolkit.org/" }
-    maven { url "http://download.osgeo.org/webdav/geotools/" }
-    maven { url "https://repo.boundlessgeo.com/release" }
-    maven { url "https://jitpack.io" }
-	//maven { url "https://raw.github.com/amidst/toolbox/mvn-repo/"}
-    maven { url "https://plugins.gradle.org/m2/"}
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots"}
-    maven { url "https://nexus.bedatadriven.com/content/groups/public"} //for renjin
-	jcenter()
     mavenCentral()
-	
-// Use 'jcenter' for resolving your dependencies.
-	// You can declare any Maven/Ivy/file repository here.
-   //	 flatDir {
-  //     dirs '/home/gunjan/Immovables/amidsttoolbox/'
-       //'/home/gunjan/git/GeolifeReloaded2_1_cleaned/resources/'
-  // }
+    maven {
+        url "https://repository.mulesoft.org/nexus/content/repositories/public/"
+    }
+    maven {
+        url "http://maven.geotoolkit.org/"
+    }
+    maven {
+        url "https://repo.boundlessgeo.com/release"
+    }
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+    maven {
+        url "https://nexus.bedatadriven.com/content/groups/public"
+    }
+     maven {
+        url "http://download.osgeo.org/webdav/geotools/"
+    }
 }
+
+// repositories {
+// //:wq
+// //	maven { url "https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-core"} //for tablesaw
+//    
+//     maven { url "http://maven.geotoolkit.org/" }
+//     maven { url "http://download.osgeo.org/webdav/geotools/" }
+//     maven { url "https://repo.boundlessgeo.com/release" }
+//    // maven { url "https://jitpack.io" }
+// 	//maven { url "https://raw.github.com/amidst/toolbox/mvn-repo/"}
+//     maven { url "https://plugins.gradle.org/m2/"}
+//     maven { url "https://oss.sonatype.org/content/repositories/snapshots"}
+//     maven { url "https://nexus.bedatadriven.com/content/groups/public"} //for renjin
+//     mavenCentral()
+//     jcenter()
+//     
+// 	// Use 'jcenter' for resolving your dependencies.
+// 	// You can declare any Maven/Ivy/file repository here.
+//    //	 flatDir {
+//   //     dirs '/home/gunjan/Immovables/amidsttoolbox/'
+//        //'/home/gunjan/git/GeolifeReloaded2_1_cleaned/resources/'
+//   // }
+// }
 
 
 
@@ -66,6 +89,7 @@ dependencies
 	compile 'com.esotericsoftware:kryo:4.0.0'
 	//compile 'org.mapdb:mapdb:3.0.2'
 	compile 'nz.ac.waikato.cms.weka:weka-stable:3.8.0'
+	
 	//compile '::  iqm'
 	compile 'org.jgrapht:jgrapht-core:1.2.0'
 	compile 'org.json:json:20160810'
@@ -79,25 +103,33 @@ dependencies
 	compile 'com.google.uzaygezen:uzaygezen-core:0.2'
 	compile group: 'com.github.mgunlogson', name: 'cuckoofilter4j', version: '1.0.1'
 	compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
+	
 	//executing processes in java
 	compile group:'com.zaxxer',name:'nuprocess',version:'1.1.0'
 	compile group:'org.zeroturnaround',name:'zt-exec',version:'1.9'
-	
+
 	//JavaFX UI controls
    	compile 'org.controlsfx:controlsfx:8.40.13'
 	// compile 'org.controlsfx:controlsfx-samples:8.40.13'
+
 	// material design for javafx
     compile 'com.jfoenix:jfoenix:8.0.7'//1'
+	
 	//Icon packs for Java applications
 	compile 'org.kordamp.ikonli:ikonli-javafx:2.1.1'
 	//for amidst toolkit
 	//compile 'eu.amidst:module-all:0.6.1'
     //compile 'com.hugin:hugin:1.0.0'
 	//compile name: 'hgapi83_amidst-64'
+	
+	
 	//for shadow jar- http://imperceptiblethoughts.com/shadow/#running_the_shadow_jar
     //compile 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
 	//compile 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+	
 	//compile name: 'spmf'
+	
+    
     //compile "org.deeplearning4j:deeplearning4j-core:0.9.1"//0.8.0
     compile 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta'   
     //1.0.0-alpha'
@@ -108,13 +140,21 @@ dependencies
     compile 'org.deeplearning4j:deeplearning4j-ui_2.11:1.0.0-beta'
     //compile "org.deeplearning4j:deeplearning4j-ui-components:0.9.1"
     //compile 'org.deeplearning4j:deeplearning4j-ui-parent:1.0.0-alpha'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/arbiter-core
     compile group: 'org.deeplearning4j', name: 'arbiter-core', version: '1.0.0-beta'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/arbiter-deeplearning4j
     compile group: 'org.deeplearning4j', name: 'arbiter-deeplearning4j', version: '1.0.0-beta'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/arbiter-server
     compile group: 'org.deeplearning4j', name: 'arbiter-server', version: '1.0.0-beta'
+    // https://mvnrepository.com/artifact/org.deeplearning4j/arbiter-ui
     compile group: 'org.deeplearning4j', name: 'arbiter-ui_2.11', version: '1.0.0-beta'
 
+    
+    // https://mvnrepository.com/artifact/com.vividsolutions/jts-core
     //required by geo-grid, though to self: can i replace it with more updated:  https://mvnrepository.com/artifact/org.locationtech.jts/jts-core/1.15.1
     compile group: 'com.vividsolutions', name: 'jts-core', version: '1.14.0'
+
+    
 
     compile "org.renjin:renjin-script-engine:0.8.2527"
     compile "org.moeaframework:moeaframework:2.12"
@@ -123,22 +163,29 @@ dependencies
     compile group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.25.2'
     compile group: 'xerces', name: 'xercesImpl', version: '2.11.0'
 
-    //compile group: 'com.lynden', name: 'GMapsFX', version: '2.12.0'
-    //compile 'com.github.Username:Reponame:Tag
+    // compile group: 'com.lynden', name: 'GMapsFX', version: '2.12.0'
+    // compile 'com.github.Username:Reponame:Tag
     compile 'com.github.rterp:GMapsFX:d4f4765'
     compile 'com.github.gluonhq:maps:21f09e8'
     // compile "org.geotools:gt-shapefile:${geoToolsVersion}"
     // compile "org.geotools:gt-swing:${geoToolsVersion}"
     compile group: 'org.geotools', name: 'gt-brewer', version: '19.0'
     //For geotoolss
-    //compile group: 'javax.media', name: 'jai_core', version: '1.1.3'
-
+    // compile group: 'javax.media', name: 'jai_core', version: '1.1.3'
+    // compile group: 'javax.media', name: 'jai_core', version: '1.1.3'
+    // https://mvnrepository.com/artifact/javax.media/jai_core
+    
     compile 'com.google.maps:google-maps-services:0.2.6'
     compile 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'it.unimi.dsi:fastutil:8.1.1'
     
+    // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
     compile group: 'org.graalvm.sdk', name: 'graal-sdk', version: '1.0.0-rc9'
-    compile group: 'de.lmu.ifi.dbs.elki', name: 'elki', version: '0.7.1'  
+    
+    
+    compile group: 'de.lmu.ifi.dbs.elki', name: 'elki', version: '0.7.1'
+
+      
     //compile fileTree(dir: 'libs', include: ['*.jar','*.zip'])
 	// Declare the dependency for your favourite test framework you want to use in your tests.
 	// TestNG is also supported by the Gradle Test task. Just change the
@@ -160,6 +207,9 @@ dependencies
 // }
 
 // apply plugin: 'com.github.johnrengelman.shadow'
+
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -187,9 +237,11 @@ mainClassName = 'org.activity.controller.SuperController'
 //'org.activity.generator.DatabaseCreatorGowallaQuicker1'
 //'org.activity.controller.SuperController'
 //'org.activity.generator.GowallaPreProcessorUtils'
+
 // task fatCapsule(type: FatCapsule) {
 //   applicationClass 'org.activity.controller.SuperController'
 // }
+
 //////////////
 /*jar { //shadowJar
 	 manifest {
@@ -199,6 +251,7 @@ mainClassName = 'org.activity.controller.SuperController'
     }
 }*/
 /////////////
+
 /// Disabled as not needed at the moment
 // task fatJar(type: Jar) {
 // 	manifest {

@@ -203,7 +203,8 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan11Gowalla1.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15GeolifeSubset3.csv";
+		// + "ResultsToReadJan11Gowalla1.csv";
 		// + "ResultsToReadJan3Geolife.csv";
 		// + "ResultsToReadJan4FEDInvesitgation.csv";
 		// + "ResultsToReadJan3Gowalla1.csv";
@@ -212,6 +213,8 @@ public class ResultsDistributionEvaluation
 		// "ResultsToReadDec21Truncated2.csv";
 		// ResultsToReadDec8Truncated.csv";
 		// "ResultsToReadNov28_OnlyED1.csv";// 25_3.csv";
+		// dcu_data_2_JAN15H10M31ED1.0AllActsFDStFilter0hrsRTVPNN50NoTTFilterNC_AllReciprocalRank_MinMUWithMaxFirst0Aware.csv
+		getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
 		getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware", 2);
 		getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 6);
 		// $$ getResultsNov21(resultsfileToRead, "AllAvgPrecision_MinMUWithMaxFirst0Aware", 6);
@@ -1147,15 +1150,23 @@ public class ResultsDistributionEvaluation
 	 * @param getDesStatsOverChosenFixedMU
 	 * @param statFileNames
 	 *            e..g, { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
+	 * @param doFirstToMax
+	 * @param doFirstToMaxZeroAware
+	 * @param doChosenMUForEachUser
 	 * @return
 	 * @since Nov 20 2018
 	 */
 	public static void runNov20Results(String pathToRead, int firstToMax, String dimensionPhrase,
-			String chosenFixedMUForEachUserFile)
+			String chosenFixedMUForEachUserFile, boolean doFirstToMax, boolean doFirstToMaxZeroAware,
+			boolean doChosenMUForEachUser)
 	{
 		// PopUps.showMessage("Inside runNov20Results");
 		// added on 1 Jan 2018
 		PrintStream debugLog = WToFile.redirectConsoleOutput(pathToRead + "runNov20ResultsgLog.txt");
+
+		// doChosenMUForEachUser = chosenFixedMUForEachUserFile.trim().length() > 0 ? true : false;
+		// boolean doFirstToMax = true;
+		// boolean doFirstToMaxZeroAware = true;
 
 		DescriptiveStatistics mrrStatsOverUsers = null;
 		String pathToWrite = pathToRead;
@@ -1178,13 +1189,10 @@ public class ResultsDistributionEvaluation
 
 		double muArray[] = Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor);// Constant.matchingUnitAsPastCountFixed;//
 																											// { 0 }
+		// PopUps.showMessage("muArray in runNov20 =" + Arrays.toString(muArray));
 		// String pathToRead = "", resultsLabel = "", host = "";
 
 		//// for fixed chosen MU
-
-		boolean doChosenMUForEachUser = chosenFixedMUForEachUserFile.trim().length() > 0 ? true : false;
-		boolean doFirstToMax = true;
-		boolean doFirstToMaxZeroAware = true;
 		// Choose fixed MU for each user based on one given result: resultForUserGroupingMay4
 		Map<String, Integer> userIdentifierChosenMuMap = null;
 		if (doChosenMUForEachUser)

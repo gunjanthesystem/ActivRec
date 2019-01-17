@@ -1,5 +1,6 @@
 package org.activity.controller;
 
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,6 +12,7 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.AltSeqPredictor;
 import org.activity.constants.Enums.LookPastType;
@@ -304,7 +306,13 @@ public class SuperController
 				}
 			}
 		}
-		// $$PopUps.showMessage("Exiting main");
+
+		// if (new File("").isFile())
+		{
+
+		}
+
+		// PopUps.showMessage("Exiting main");
 		System.exit(0);
 	}
 
@@ -439,28 +447,145 @@ public class SuperController
 					+ getLabelForExperimentConfig(sampledUserIndicesSetFile) + iterationLabel + extraLabel + "/";
 			WToFile.createDirectoryIfNotExists(commonPath);
 
-			// for (int i = 0; i <= commonPaths.length - 1; i++){
-			// start of added on 31 Dec 2018 to eval Jupyter baseline results
-			if (false)// evaluate jupyter baselines
+			if (false)// TEMP 15 Jan 2019 TODO
 			{
-				String commonJupyterPath = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/";
-				String dcuFolder = "dcu_data_2_DEC31H20M25HighDurNoTTFilter/";
-				String geolifeFolder = "geolife1_DEC31H20M15HighDurPNN500NoTTFilter/";
-				String gowallaFolder = "/gowalla1_DEC31H20M29HighDurPNN500coll/";
-				// TODO: SET CORRECT DATABASE NAME IN CONSTANT
-				commonJupyterPath += gowallaFolder;
-				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/";
-				String[] jupyterBaselineLabels = { "PopularityRecommender/", "Prod2VecRecommender/", "FPMCRecommender/",
-						"GRU4RecRecommender/", "MixedMarkovRecommender/", "HGRU4RecRecommender/" };
-				// "FSMRecommender","MixedMarkovRecommender", "FPMCRecommender", "GRU4RecRecommender",
-				// "HGRU4RecRecommender" };
-				doRecommendation = false;
+				// commonPath = //
+				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/dcu_data_2_JAN11H14M48ED1.0AllActsFDStFilter0hrsRTVNoTTFilterNC/";
+				// "/run/media/gunjan/My
+				// Passport/GeolifeNov2018/dcu_data_2_DEC26H1M14ED0.5STimeDurStFilter0hrsFEDPerFS_RTVNoTTFilterDY/";
 				doRecommendation = false;
 				doEvaluation = true;
 
-				for (String jupyterBaselineLabel : jupyterBaselineLabels)
+				List<String> pathsToRead = ReadingFromFile.oneColumnReaderString(
+						// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15DCUSubset3.csv",
+						"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15GeolifeSubset3.csv",
+						// "./dataToRead/ResultsToReadJan15GeolifeSubset3.csv"
+						",", 2, false);
+				Constant.setDatabaseName("geolife1");
+
+				String[] pathsToReadPython = {
+						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/",
+						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/GRU4RecRecommender/",
+						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/FPMCRecommender/",
+						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/Prod2VecRecommender/",
+						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/PopularityRecommender/" };
+
+				// for (String commonPath1 : pathsToRead)
 				{
-					commonPath = commonJupyterPath + jupyterBaselineLabel;
+					String commonPath1 = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/PopularityRecommender/";
+					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/";
+					// hasMUS = false;
+					// if (commonPath1.contains("PythonWorkspace") == false)
+					// {
+					// continue;
+					// }
+
+					// Popups.showMessage("commonPath1 = " + commonPath1);
+					if (commonPath1.contains("NC/") || commonPath1.contains("PureAKOM")
+							|| commonPath1.contains("PythonWorkspace"))
+					{
+						Constant.lookPastType = LookPastType.NCount;
+						/// run/media/gunjan/My Passport/GeolifeNov2018/dcu_data_2_JAN2H2M36PureAKOMOrder3NoTTFilter/
+						if (commonPath1.contains("PureAKOM"))
+						{
+							Constant.altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;
+							String[] splitted1 = commonPath1.split("Order");
+							Constant.setAKOMHighestOrder(Integer.valueOf(splitted1[1].subSequence(0, 1).toString()));
+						}
+						// hasMUS = true;
+					}
+					else if (commonPath1.contains("NH/"))
+					{
+						Constant.lookPastType = LookPastType.NHours;
+						// hasMUS = true;
+					}
+					else if (commonPath1.contains("DY/") || commonPath1.contains("HighDur")
+							|| commonPath1.contains("HighOccur"))
+					{
+						Constant.lookPastType = LookPastType.Daywise;
+					}
+
+					else if (commonPath1.contains("CT/"))
+					{
+						Constant.lookPastType = LookPastType.ClosestTime;
+					}
+					//
+					hasMUS = true;
+					// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
+
+					runExperiment(commonPath1, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName(),
+							"HJEditDistance");
+					// cleanUpSpace(commonPaths[i], 0.90);
+					System.out.println("finished runExperimentForGivenUsersAndConfig for commonPath = " + commonPath1);
+
+					// start of added on 21 Nov 2018
+					List<List<String>> mrrStatsBestMUs = ReadingFromFile
+							.readLinesIntoListOfLists(commonPath1 + "mrrStatsOverUsersBestMUs.csv", ":");
+					String meanMRROverUsersBestMU = mrrStatsBestMUs.get(4).get(1);
+					String medianMRROverUsersBestMU = mrrStatsBestMUs.get(6).get(1);
+
+					if (Constant.searchForOptimalFeatureWts)
+					{
+						String custodianFeatWtsInfo = iterationCountFeatWtSearch + "," + CustodianOfFeatWts.toCSVWts()
+								+ "," + meanMRROverUsersBestMU + "," + medianMRROverUsersBestMU + "\n";
+						WToFile.writeToNewFile(custodianFeatWtsInfo, commonPath1 + "CustodianOfFeatWts.csv");
+						WToFile.appendLineToFileAbs(custodianFeatWtsInfo, dataWrittenFolder + "CustodianOfFeatWts.csv");
+					}
+					// break;
+				}
+			}
+			else
+			{
+				// for (int i = 0; i <= commonPaths.length - 1; i++){
+				// start of added on 31 Dec 2018 to eval Jupyter baseline results
+				if (false)// evaluate jupyter baselines
+				{
+					String commonJupyterPath = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/";
+					String dcuFolder = "dcu_data_2_DEC31H20M25HighDurNoTTFilter/";
+					String geolifeFolder = "geolife1_DEC31H20M15HighDurPNN500NoTTFilter/";
+					String gowallaFolder = "/gowalla1_DEC31H20M29HighDurPNN500coll/";
+					// TODO: SET CORRECT DATABASE NAME IN CONSTANT
+					commonJupyterPath += gowallaFolder;
+					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/";
+					String[] jupyterBaselineLabels = { "PopularityRecommender/", "Prod2VecRecommender/",
+							"FPMCRecommender/", "GRU4RecRecommender/", "MixedMarkovRecommender/",
+							"HGRU4RecRecommender/" };
+					// "FSMRecommender","MixedMarkovRecommender", "FPMCRecommender", "GRU4RecRecommender",
+					// "HGRU4RecRecommender" };
+
+					doRecommendation = false;
+					doEvaluation = true;
+
+					for (String jupyterBaselineLabel : jupyterBaselineLabels)
+					{
+						commonPath = commonJupyterPath + jupyterBaselineLabel;
+						runExperiment(commonPath, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName(),
+								"HJEditDistance");
+						// cleanUpSpace(commonPaths[i], 0.90);
+						System.out
+								.println("finished runExperimentForGivenUsersAndConfig for commonPath = " + commonPath);
+
+						// start of added on 21 Nov 2018
+						List<List<String>> mrrStatsBestMUs = ReadingFromFile
+								.readLinesIntoListOfLists(commonPath + "mrrStatsOverUsersBestMUs.csv", ":");
+						String meanMRROverUsersBestMU = mrrStatsBestMUs.get(4).get(1);
+						String medianMRROverUsersBestMU = mrrStatsBestMUs.get(6).get(1);
+
+						if (Constant.searchForOptimalFeatureWts)
+						{
+							String custodianFeatWtsInfo = iterationCountFeatWtSearch + ","
+									+ CustodianOfFeatWts.toCSVWts() + "," + meanMRROverUsersBestMU + ","
+									+ medianMRROverUsersBestMU + "\n";
+							WToFile.writeToNewFile(custodianFeatWtsInfo, commonPath + "CustodianOfFeatWts.csv");
+							WToFile.appendLineToFileAbs(custodianFeatWtsInfo,
+									dataWrittenFolder + "CustodianOfFeatWts.csv");
+						}
+					}
+				}
+				// end of added on 31 Dec 2018
+				else
+				{
+					// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
 					runExperiment(commonPath, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName(),
 							"HJEditDistance");
 					// cleanUpSpace(commonPaths[i], 0.90);
@@ -479,31 +604,8 @@ public class SuperController
 						WToFile.writeToNewFile(custodianFeatWtsInfo, commonPath + "CustodianOfFeatWts.csv");
 						WToFile.appendLineToFileAbs(custodianFeatWtsInfo, dataWrittenFolder + "CustodianOfFeatWts.csv");
 					}
-				}
+				} // ed of added on 21 Nov 2018
 			}
-			// end of added on 31 Dec 2018
-			else
-			{
-				// Constant.numOfCandsFromEachCollUser = numOfCandsPerUser[i];
-				runExperiment(commonPath, doRecommendation, doEvaluation, hasMUS, Constant.getDatabaseName(),
-						"HJEditDistance");
-				// cleanUpSpace(commonPaths[i], 0.90);
-				System.out.println("finished runExperimentForGivenUsersAndConfig for commonPath = " + commonPath);
-
-				// start of added on 21 Nov 2018
-				List<List<String>> mrrStatsBestMUs = ReadingFromFile
-						.readLinesIntoListOfLists(commonPath + "mrrStatsOverUsersBestMUs.csv", ":");
-				String meanMRROverUsersBestMU = mrrStatsBestMUs.get(4).get(1);
-				String medianMRROverUsersBestMU = mrrStatsBestMUs.get(6).get(1);
-
-				if (Constant.searchForOptimalFeatureWts)
-				{
-					String custodianFeatWtsInfo = iterationCountFeatWtSearch + "," + CustodianOfFeatWts.toCSVWts() + ","
-							+ meanMRROverUsersBestMU + "," + medianMRROverUsersBestMU + "\n";
-					WToFile.writeToNewFile(custodianFeatWtsInfo, commonPath + "CustodianOfFeatWts.csv");
-					WToFile.appendLineToFileAbs(custodianFeatWtsInfo, dataWrittenFolder + "CustodianOfFeatWts.csv");
-				}
-			} // ed of added on 21 Nov 2018
 		}
 		System.out.println("Exiting runExperimentForGivenUsersAndConfig");
 		// PopUps.showMessage("Exiting main0");
@@ -873,7 +975,7 @@ public class SuperController
 	{
 		long at = System.currentTimeMillis();
 		boolean doPostFiltering = (doEvaluation == false) ? false : true;
-
+		// PopUps.showMessage("hasMUs = " + hasMUs);
 		// $$TimeZone.setDefault(TimeZone.getTimeZone("UTC"y)); // added on April 21, 2016
 		System.out.println("Beginning runExperiments:\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ PerformanceAnalytics.getHeapPercentageFree());
@@ -966,10 +1068,11 @@ public class SuperController
 
 		if (doEvaluation)
 		{
-			if (!Constant.getDatabaseName().equals("gowalla1"))
+			// if (!Constant.getDatabaseName().equals("gowalla1"))
 			{// added on 1 Jan as needed to set catIDNameDict needed for standalone eval for dcu and geolife
 				ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer(
 						Constant.getDatabaseName(), commonPath, true);
+				// Popups.showMessage("Before starting evaluation: " + DomainConstants.catIDNameDictionary.toString());
 			}
 
 			// curtain may 26 2017 start
@@ -982,7 +1085,8 @@ public class SuperController
 			if (hasMUs)
 			{
 				double[] muArray = Constant.getMatchingUnitArray(lookPastType, altSeqPredictor);
-				// PopUps.showMessage("SuperController muArray = " + Arrays.toString(muArray));
+				// PopUps.showMessage(
+				// "SuperController muArray = " + Arrays.toString(muArray) + "\n lookPastType = " + lookPastType);
 				// boolean evalPostFiltering = false;// boolean evalSeqPrediction = true;
 				// String dimensionPhrase = "SecDim";
 				// TODO Why running all three at once is resultsing in empty files. Has it got something to do with
@@ -1012,61 +1116,11 @@ public class SuperController
 					}
 				}
 
-				// Start of added on 20 Nov 2018
-				String fileForChosenMU = "";
-				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/NOV19ResultsDistributionFirstToMax1/FiveDays/geolife1_NOV19ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsNoTTFilter_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
-				fileForChosenMU = "";
-				ResultsDistributionEvaluation.runNov20Results(commonPath, 1, "", fileForChosenMU);
-
-				String splitted[] = commonPath.split("/");
-				String resultsLabel = splitted[splitted.length - 1];
-
-				if (false)
+				extractAggregateEvalResultsOverMUs(commonPath, "");// for primary dimension
+				if (evalSecondaryDimension)// secondary dimension
 				{
-					List<Double> MRRValsForChosenMU = ReadingFromFile.oneColumnReaderDouble(
-							commonPath + resultsLabel + "_AllMeanReciprocalRank_ChosenMU.csv", ",", 2, true);
-					DescriptiveStatistics mrrStatsOverUsersChosenMUs = StatsUtils
-							.getDescriptiveStatistics(MRRValsForChosenMU);
-
-					WToFile.writeToNewFile(mrrStatsOverUsersChosenMUs.toString(),
-							commonPath + "mrrStatsOverUsersChosenMUs.csv");
-					System.out.println("mrrStatsOverUsersChosenMUs = " + mrrStatsOverUsersChosenMUs);
+					extractAggregateEvalResultsOverMUs(commonPath, "SecDim");// for primary dimension
 				}
-
-				List<Double> MRRValsForBestMU = ReadingFromFile.oneColumnReaderDouble(
-						commonPath + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv", ",", 2, true);
-
-				DescriptiveStatistics mrrStatsOverUsersBestnMUs = StatsUtils.getDescriptiveStatistics(MRRValsForBestMU);
-				WToFile.writeToNewFile(mrrStatsOverUsersBestnMUs.toString(),
-						commonPath + "mrrStatsOverUsersBestMUs.csv");
-				System.out.println("mrrStatsOverUsersBestMUs = " + mrrStatsOverUsersBestnMUs);
-				// End of added on 20 Nov 2018
-
-				// Start of added on 15 Jan 2019
-				List<List<String>> MRRValsForBestMULines = ReadingFromFile.readLinesIntoListOfLists(
-						commonPath + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv", ",");
-				MRRValsForBestMULines.remove(0);// remove header
-
-				List<List<String>> RRForOptimalMUAllUsers = new ArrayList<>();
-				for (List<String> l : MRRValsForBestMULines)
-				{
-					String userIndex = l.get(0);
-					String bestMU = l.get(1);
-					bestMU = bestMU.contains(".") ? bestMU : bestMU + ".0";
-					/// /All/MatchingUnit3.0/AlgoStep0AllReciprocalRankUnrolled.csv
-					String RRFileForBestMUForThisUser = commonPath + "All/MatchingUnit" + bestMU
-							+ "/AlgoStep0AllReciprocalRankUnrolled.csv";
-
-					List<List<String>> RRForOptimalMU = ReadingFromFile
-							.readLinesIntoListOfLists(RRFileForBestMUForThisUser, ",");
-					RRForOptimalMU.remove(0);// remove header
-					RRForOptimalMUAllUsers.addAll(RRForOptimalMU);
-				}
-				WToFile.writeToNewFile("UserID,RTDate,RTTime,ActualAct,RR\n" + RRForOptimalMUAllUsers.stream()
-						.map(v -> (v.stream().collect(Collectors.joining(",")))).collect(Collectors.joining("\n")),
-						commonPath + resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware.csv");
-				// End of added on 15 Jan 2019
-
 				// if (true)
 				// { if (Constant.doSecondaryDimension)
 				// { // for (String pfPhrase : pfFilterNames)
@@ -1087,6 +1141,30 @@ public class SuperController
 			{
 				new EvaluationSeq(lengthOfRecommendedSequence, commonPath);
 				// , Constant.matchingUnitAsPastCount, new int[] { 30, 50, 60, 70, 90});
+				// Start of added on 15 Jan 2019
+				String splitted[] = commonPath.split("/");
+				String resultsLabel = splitted[splitted.length - 1];
+				List<List<String>> MRRValsForBestMULines = ReadingFromFile.readLinesIntoListOfLists(
+						commonPath + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv", ",");
+				MRRValsForBestMULines.remove(0);// remove header
+
+				List<List<String>> RRForOptimalMUAllUsers = new ArrayList<>();
+				for (List<String> l : MRRValsForBestMULines)
+				{
+					String userIndex = l.get(0);
+					// String bestMU = l.get(1);
+					// bestMU = bestMU.contains(".") ? bestMU : bestMU + ".0";
+					/// /All/MatchingUnit3.0/AlgoStep0AllReciprocalRankUnrolled.csv
+					String RRFileForBestMUForThisUser = commonPath + "All/" + "AlgoStep0AllReciprocalRankUnrolled.csv";
+					List<List<String>> RRForOptimalMU = ReadingFromFile
+							.readLinesIntoListOfLists(RRFileForBestMUForThisUser, ",");
+					RRForOptimalMU.remove(0);// remove header
+					RRForOptimalMUAllUsers.addAll(RRForOptimalMU);
+				}
+				WToFile.writeToNewFile("UserID,RTDate,RTTime,ActualAct,RR\n" + RRForOptimalMUAllUsers.stream()
+						.map(v -> (v.stream().collect(Collectors.joining(",")))).collect(Collectors.joining("\n")),
+						commonPath + resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware.csv");
+				// End of added on 15 Jan 2019
 			} // //curtain may 26 2017 end
 		}
 		// **************************************************************************************************************//
@@ -1306,7 +1384,124 @@ public class SuperController
 
 		String msg = "runExperiment All done in " + ((System.currentTimeMillis() - at) / 1000) + " seconds";
 		System.out.println(msg);
-		// $$PopUps.showMessage(msg);
+		// Popups.showMessage(msg);
+	}
+
+	/**
+	 * 
+	 * @param commonPath
+	 * @param dimensionPhrase
+	 */
+	private static void extractAggregateEvalResultsOverMUs(String commonPath, String dimensionPhrase)
+	{
+		// Start of added on 20 Nov 2018
+		String fileForChosenMU = "";
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/NOV19ResultsDistributionFirstToMax1/FiveDays/geolife1_NOV19ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsNoTTFilter_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+
+		PrintStream debugLog = WToFile.redirectConsoleOutput(commonPath + "extractAggregateEvalResultsOverMUsLog.txt");
+		try
+		{
+			// Parse and aggregate results for multiple MUs, find optimal MUs for each user for each metric.
+			ResultsDistributionEvaluation.runNov20Results(commonPath, 1, dimensionPhrase, fileForChosenMU, true, true,
+					false);
+
+			String splitted[] = commonPath.split("/");
+			String resultsLabel = splitted[splitted.length - 1];
+
+			fileForChosenMU = commonPath + resultsLabel + "_" + "AllMeanReciprocalRank_" + "MinMUWithMaxFirst0Aware"
+					+ dimensionPhrase + ".csv";// added on 17 Jan 2019
+			// use the optimal MU for MRR as fixed MU to get corresponding values for other metrics,
+			ResultsDistributionEvaluation.runNov20Results(commonPath, 1, dimensionPhrase, fileForChosenMU, false, false,
+					true);// added on 17 Jan 2019
+
+			String[] groupsOf100UserLabels = DomainConstants.getGroupsOf100UsersLabels();
+
+			for (String groupOf100User : groupsOf100UserLabels)
+			{
+				// PopUps.showMessage("commonPath = " + commonPath);
+				// TODO: for more than 1 user groups, check this if this works correctly
+				String commonPathToUse = groupOf100User.equals("All") ? commonPath : commonPath + groupOf100User;
+				// PopUps.showMessage("commonPath = " + commonPath);
+				// for reading earlier results in All/ or 100R folders
+				String commonPathWithUserGroupLabel = commonPath + groupOf100User;
+				if (false)
+				{
+					// List<Double> MRRValsForChosenMU = ReadingFromFile.oneColumnReaderDouble(
+					// commonPathToUse + resultsLabel + "_AllMeanReciprocalRank_ChosenMU.csv", ",", 2, true);
+					// DescriptiveStatistics mrrStatsOverUsersChosenMUs = StatsUtils
+					// .getDescriptiveStatistics(MRRValsForChosenMU);
+					// WToFile.writeToNewFile(mrrStatsOverUsersChosenMUs.toString(),
+					// commonPathToUse + "mrrStatsOverUsersChosenMUs.csv");
+					// System.out.println("mrrStatsOverUsersChosenMUs = " + mrrStatsOverUsersChosenMUs);
+				}
+
+				////////////////////////////////////////////////////////////////////////////////////////////////////
+				// Read optimal MUs as per highest Mean RR (per user)
+				List<Double> MRRValsForBestMU = ReadingFromFile.oneColumnReaderDouble(fileForChosenMU, ",", 2, true);
+				MRRValsForBestMU.remove(0);// remove header
+				// commonPathToUse + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv",
+
+				DescriptiveStatistics mrrStatsOverUsersBestnMUs = StatsUtils.getDescriptiveStatistics(MRRValsForBestMU);
+				PopUps.showMessage("commonPathToUse = " + commonPathToUse);
+				WToFile.writeToNewFile(mrrStatsOverUsersBestnMUs.toString(),
+						commonPathToUse + "mrrStatsOverUsersBestMUs.csv");
+
+				System.out.println("mrrStatsOverUsersBestMUs = " + mrrStatsOverUsersBestnMUs);
+				// End of added on 20 Nov 2018
+
+				// Start of added on 15 Jan 2019
+				List<List<String>> MRRValsForBestMULines = ReadingFromFile.readLinesIntoListOfLists(fileForChosenMU,
+						",");
+				MRRValsForBestMULines.remove(0);// remove header
+				////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				List<List<String>> RRForOptimalMUAllUsers = new ArrayList<>();
+				// PopUps.showMessage("here1_1");
+				for (List<String> l : MRRValsForBestMULines)
+				{
+					String userIndex = l.get(0);
+					String bestMU = l.get(1);
+					bestMU = bestMU.contains(".") ? bestMU : bestMU + ".0";
+
+					String RRFileForBestMUForThisUser = commonPathWithUserGroupLabel + "/MatchingUnit" + bestMU
+							+ "/AlgoStep0AllReciprocalRankUnrolled" + dimensionPhrase + ".csv";
+
+					if (bestMU.contains("999"))
+					{
+						RRFileForBestMUForThisUser = commonPathWithUserGroupLabel
+								+ "/AlgoStep0AllReciprocalRankUnrolled.csv";
+					}
+					if (Constant.lookPastType.equals(LookPastType.NHours))
+					{
+						if (bestMU.trim().equals("0.0"))
+						{
+							RRFileForBestMUForThisUser = commonPathWithUserGroupLabel + "/MatchingUnit0.5"
+									+ "/AlgoStep0AllReciprocalRankUnrolled" + dimensionPhrase + ".csv";
+						}
+					}
+					// PopUps.showMessage("here1_2: RRFileForBestMUForThisUser=\n" + RRFileForBestMUForThisUser
+					// + "\nbestMU=" + bestMU);
+					// PopUps.showMessage("RRFileForBestMUForThisUse=\n" + RRFileForBestMUForThisUser);
+					List<List<String>> RRForOptimalMU = ReadingFromFile
+							.readLinesIntoListOfLists(RRFileForBestMUForThisUser, ",");
+					RRForOptimalMU.remove(0);// remove header
+					RRForOptimalMUAllUsers.addAll(RRForOptimalMU);
+				}
+				// PopUps.showMessage("here1_3");
+				WToFile.writeToNewFile("UserID,RTDate,RTTime,ActualAct,RR\n" + RRForOptimalMUAllUsers.stream()
+						.map(v -> (v.stream().collect(Collectors.joining(",")))).collect(Collectors.joining("\n")),
+						commonPathToUse + resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase
+								+ ".csv");
+				// PopUps.showMessage("here1_4");
+				// End of added on 15 Jan 2019
+			}
+		}
+		catch (Exception e)
+		{
+			PopUps.showException(e, "org.activity.controller.SuperController.extractAggregateEvalResultsOverMUs()");
+		}
+		debugLog.close();
+
 	}
 
 	/**
