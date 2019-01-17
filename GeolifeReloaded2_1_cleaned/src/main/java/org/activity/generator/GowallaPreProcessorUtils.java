@@ -39,6 +39,7 @@ import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.DateTimeUtils;
 import org.activity.util.HTTPUtils;
 import org.activity.util.RegexUtils;
 import org.apache.commons.io.IOUtils;
@@ -128,15 +129,26 @@ public class GowallaPreProcessorUtils
 
 	public static void main(String[] args)
 	{
+		String databaseName = "geolife1";
 		// findNumVeryFrequentEpisodesForEachUserApril8();
-
+		boolean ISOTS = false;
 		String checkinFileNameToRead = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TarUDSubBOnly_April24_5_5VFELT1.csv";
 		int userIDColIndex = 0;
 		int tsColIndex = 2;
 		int firstStartLatColIndex = 14;
 		int firstStartLonColIndex = 15;
 		int actIDIndex = 5;
-		///////////////////
+
+		if (databaseName.equals("geolife1"))
+		{
+			ISOTS = true;
+			checkinFileNameToRead = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_JAN15H2M41ED1.0AllActsFDStFilter0hrsRTVPNN500NoTTFilterNC/AllActObjs.csv";
+			userIDColIndex = 0;
+			tsColIndex = 6;// 2;
+			firstStartLatColIndex = 11;// 14;
+			firstStartLonColIndex = 12;// 5;
+			actIDIndex = 4;
+		} ///////////////////
 
 		int windowSize = 5;
 		int uniqueActsWindowSize = windowSize;
@@ -160,7 +172,7 @@ public class GowallaPreProcessorUtils
 		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite4);
 
 		findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilUniqueActs(checkinFileNameToRead, uniqueActsWindowSize,
-				windowDurationDifThresholdInMins, pathToWrite3, userIDColIndex, tsColIndex, actIDIndex);
+				windowDurationDifThresholdInMins, pathToWrite3, userIDColIndex, tsColIndex, actIDIndex, ISOTS);
 
 		findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilDistanceUniqueActs(checkinFileNameToRead, windowSize,
 				windowDistDifThresholdInKms, pathToWrite4, userIDColIndex, firstStartLatColIndex, firstStartLonColIndex,
@@ -169,7 +181,7 @@ public class GowallaPreProcessorUtils
 		if (true)
 		{
 			findNumVeryFrequentEpisodesForEachUserSlidingWindow8April(checkinFileNameToRead, windowSize,
-					windowDurationDifThresholdInMins, pathToWrite, userIDColIndex, tsColIndex);
+					windowDurationDifThresholdInMins, pathToWrite, userIDColIndex, tsColIndex, ISOTS);
 
 			findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilDistance(checkinFileNameToRead, windowSize,
 					windowDistDifThresholdInKms, pathToWrite2, userIDColIndex, firstStartLatColIndex,
@@ -180,7 +192,7 @@ public class GowallaPreProcessorUtils
 
 	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8AprilUniqueActs(String checkinFileNameToRead,
 			int windowSize, int windowDurationDifThresholdInMins, String pathToWrite, int userIDColIndex,
-			int tsColIndex, int actIDIndex)
+			int tsColIndex, int actIDIndex, boolean ISOTS)
 	{
 		// String checkinFileNameToRead =
 		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
@@ -264,13 +276,17 @@ public class GowallaPreProcessorUtils
 
 				List<String> startWindowLine = linesRead.get(windowStartIndex);
 				windowStartUserID = startWindowLine.get(0);
-				Timestamp windowStartTS = java.sql.Timestamp.valueOf(startWindowLine.get(1));
+				Timestamp windowStartTS = ISOTS ? DateTimeUtils.getTimestampFromISOString(startWindowLine.get(1))
+						: java.sql.Timestamp.valueOf(startWindowLine.get(1));
+				// java.sql.Timestamp.valueOf(startWindowLine.get(1));
+
 				// $$System.out.println(
 				// $$ "\nwindowStartUserID=" + windowStartUserID + " windowStartTS=" + windowStartTS.toString());
 
 				List<String> endWindowLine = linesRead.get(windowEndIndex);
 				windowEndUserID = endWindowLine.get(0);
-				Timestamp windowEndTS = java.sql.Timestamp.valueOf(endWindowLine.get(1));
+				Timestamp windowEndTS = ISOTS ? DateTimeUtils.getTimestampFromISOString(endWindowLine.get(1))
+						: java.sql.Timestamp.valueOf(endWindowLine.get(1));
 				// $$ System.out.println("windowEndUserID=" + windowEndUserID + " windowEndTS=" +
 				// windowEndTS.toString());
 
@@ -404,7 +420,7 @@ public class GowallaPreProcessorUtils
 	 */
 	public static void findNumVeryFrequentEpisodesForEachUserSlidingWindow8April(String checkinFileNameToRead,
 			int windowSize, int windowDurationDifThresholdInMins, String pathToWrite, int userIDColIndex,
-			int tsColIndex)
+			int tsColIndex, boolean ISOTS)
 	{
 		// String checkinFileNameToRead =
 		// "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_April8.csv";
@@ -461,13 +477,18 @@ public class GowallaPreProcessorUtils
 
 				List<String> startWindowLine = linesRead.get(windowStartIndex);
 				windowStartUserID = startWindowLine.get(0);
-				Timestamp windowStartTS = java.sql.Timestamp.valueOf(startWindowLine.get(1));
+				Timestamp windowStartTS = ISOTS ? DateTimeUtils.getTimestampFromISOString(startWindowLine.get(1))
+						: java.sql.Timestamp.valueOf(startWindowLine.get(1));
+
 				// $$System.out.println(
 				// $$ "\nwindowStartUserID=" + windowStartUserID + " windowStartTS=" + windowStartTS.toString());
 
 				List<String> endWindowLine = linesRead.get(windowEndIndex);
 				windowEndUserID = endWindowLine.get(0);
-				Timestamp windowEndTS = java.sql.Timestamp.valueOf(endWindowLine.get(1));
+				Timestamp windowEndTS = ISOTS ? DateTimeUtils.getTimestampFromISOString(endWindowLine.get(1))
+						: java.sql.Timestamp.valueOf(endWindowLine.get(1));
+
+				// java.sql.Timestamp.valueOf(endWindowLine.get(1));
 				// $$ System.out.println("windowEndUserID=" + windowEndUserID + " windowEndTS=" +
 				// windowEndTS.toString());
 

@@ -545,7 +545,8 @@ public class TimelineExtractors
 
 		/// aaaaaaa
 		else if (lookPastType.equals(Enums.LookPastType.ClosestTime) && Constant.ClosestTimeFilterCandidates)
-		{
+		{// comment on 16 Jan 2019
+			// probably this should be completely same as Daywise approach. Need to think about it later. TODO
 			if (Constant.collaborativeCandidates)
 			{
 				candidateTimelines = extractCandidateTimelinesClosestTimeColl(activityAtRecommPoint, userIDAtRecomm,
@@ -569,9 +570,8 @@ public class TimelineExtractors
 			}
 		}
 		// aaaaaaa
-
 		// take all training day timelines as candidate timelines, i.e., no filtering of candidate timelines for closest
-		// time approach
+		// time approach. Decided on 16 Jan 2019 that this is more apt for baseline
 		else if (lookPastType.equals(Enums.LookPastType.ClosestTime) && !Constant.ClosestTimeFilterCandidates)
 		{
 			if (Constant.collaborativeCandidates)
@@ -848,6 +848,9 @@ public class TimelineExtractors
 	////
 	///
 	/**
+	 * For each ocurrence of current act in training timeline, one candidate is formed including all AOs in
+	 * hoursExtension before and after it.
+	 * <p>
 	 * Create and fetch candidate timelines from the training timelines of other users. Finding Candidate timelines: for
 	 * each other user, iterate through the training timelines for the occurence of the Current Activity Name in the
 	 * candidate timeline, extract the sequence of activity objects from that occurrence_index until hoursExtension on

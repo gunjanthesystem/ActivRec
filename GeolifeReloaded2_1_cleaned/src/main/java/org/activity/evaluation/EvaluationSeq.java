@@ -33,9 +33,9 @@ public class EvaluationSeq
 	static String commonPath;// =Constant.commonPath;
 	static final int theKOriginal = 5;
 	static final String[] timeCategories = { "All" };// }, "Morning", "Afternoon", "Evening" };
-	static String groupsOf100UsersLabels[] = DomainConstants.gowallaUserGroupsLabelsFixed;// { "1", "101", "201",
-	// "301", "401", "501",
-	// "601", "701", "801","901" };
+	static String groupsOf100UsersLabels[] = null;
+	// DomainConstants.gowallaUserGroupsLabelsFixed;// { "1", "101", "201",
+	// "301", "401", "501", "601", "701", "801","901" };
 
 	// List of filenames from different user groups (i.e., 100 users group) which need to be concenated to get results
 	// for all (500) users in single file
@@ -65,13 +65,16 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath)
 	{
 		// commonPath = "./dataWritten/";
+		// PopUps.showMessage("here1");
 		System.out.println("Inside EvaluationSeq for NO MU");
 		System.out.println("groupsOf100UsersLabels= " + Arrays.asList(groupsOf100UsersLabels).toString());
 		WToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
 				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
-
+		// PopUps.showMessage("here1_11");
 		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
+		// PopUps.showMessage("here1_21");
 		intialiseListOfFilenamesNoMU();
+		// PopUps.showMessage("here1_31");
 		int totalNumOfUsersComputedFor = 0;
 		try
 		{
@@ -100,10 +103,11 @@ public class EvaluationSeq
 
 				// PrintStream consoleLogStream =
 				// WritingToFile.redirectConsoleOutput(outputCoreResultsPath + "EvaluationLog.txt");
-
+				// Popups.show.showMessage("here1_2");
 				int numOfUsersComputerFor = doEvaluationSeq(seqLength, commonPath, commonPath, commonPath, true, "");
 				totalNumOfUsersComputedFor += numOfUsersComputerFor;
 				System.out.println("numOfUsersComputerFor = " + numOfUsersComputerFor);
+				// Popups.showMessage("here2");
 				System.out.println("totalNumOfUsersComputedFor = " + totalNumOfUsersComputedFor);
 				// PopUps.showMessage("FINISHED EVAL FOR mu = " + mu + " USERGROUP=" + groupsOf100UsersLabel);
 
@@ -182,8 +186,9 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitArray,
 			String dimensionPhrase, boolean evaluatePostFiltering, boolean evaluatedSequencePrediction)// sdsd
 	{
-		PopUps.showMessage("EvaluationSeq muArray = " + Arrays.toString(matchingUnitArray) + " outputCoreResultsPath= "
-				+ outputCoreResultsPath);
+		// PopUps.showMessage("EvaluationSeq muArray = " + Arrays.toString(matchingUnitArray) + " outputCoreResultsPath=
+		// "
+		// + outputCoreResultsPath);
 		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
 
 		this.evaluatePostFiltering = evaluatePostFiltering;
@@ -191,14 +196,7 @@ public class EvaluationSeq
 
 		// commonPath = "./dataWritten/";
 		// $$PopUps.showMessage("Starting EvaluationSeq for dimensionPhrase = " + dimensionPhrase);
-		if (Constant.useRandomlySampled100Users)
-		{
-			groupsOf100UsersLabels = new String[] { DomainConstants.gowalla100RandomUsersLabel };
-		}
-		else if (Constant.runForAllUsersAtOnce)
-		{
-			groupsOf100UsersLabels = new String[] { "All" };
-		}
+		groupsOf100UsersLabels = DomainConstants.getGroupsOf100UsersLabels();
 
 		System.out.println("outputCoreResultsPath= " + Constant.getOutputCoreResultsPath());
 		System.out.println("groupsOf100UsersLabels= " + Arrays.asList(groupsOf100UsersLabels).toString());
@@ -634,6 +632,7 @@ public class EvaluationSeq
 	 */
 	private void intialiseListOfFilenamesNoMU()
 	{
+		// Popups.showMessage("here2_1");
 		// Initialise list of list of filenames
 		// we need to concated results for different user groups, 1-100,102-200, and so on
 		listOfNumAgreementsFiles = new ArrayList<>();
@@ -645,7 +644,9 @@ public class EvaluationSeq
 		listOfPerTopKAgreementsFiles = new ArrayList<>();
 		listOfNumTopKAgreementsFilesL1 = new ArrayList<>();
 		listOfPerTopKAgreementsFilesL1 = new ArrayList<>();
+		listOfStep0PerActMRRFiles = new ArrayList<>();
 
+		// Popups.showMessage("here2_2");
 		// we concatenate results for each mu over all users (groups)
 		int muIndex = 0;
 		listOfNumAgreementsFiles.add(muIndex, new ArrayList<String>());
@@ -659,6 +660,7 @@ public class EvaluationSeq
 		listOfPerTopKAgreementsFilesL1.add(muIndex, new ArrayList<String>());
 
 		listOfStep0PerActMRRFiles.add(muIndex, new ArrayList<String>());
+		// Popups.showMessage("here2_3");
 	}
 
 	/**
@@ -848,6 +850,7 @@ public class EvaluationSeq
 			WToFile.writeToNewFile(sbQ44.toString(), pathToWrite + "PerAgreementMedianL1.csv");
 			consoleLogStream.close();
 		}
+		// WToFile.appendLineToFileAbs(msg, fullPathfileNameToUse);
 	}
 
 	/**
@@ -1096,6 +1099,7 @@ public class EvaluationSeq
 		Set<Integer> numOfUsersSanityCheck = new LinkedHashSet<>();
 
 		System.out.println("Inside doEvaluationSeq dimensionPhrase=" + dimensionPhrase);
+		// PopUps.showMessage("here1_3");
 		try
 		{
 			// if (evaluatePostFiltering == false)// temp on 20 July 2018, remove
@@ -1180,7 +1184,7 @@ public class EvaluationSeq
 		}
 
 		System.out.println("Exiting  doEvaluationSeq");
-
+		// PopUps.showMessage("here1_4");
 		// System.out.println("All test stats done");
 		// PopUps.showMessage("All test stats done");
 		return numOfUsersComputedForSeqPred;

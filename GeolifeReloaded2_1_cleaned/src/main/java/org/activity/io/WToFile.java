@@ -897,6 +897,7 @@ public class WToFile
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			PopUps.showException(e, "org.activity.io.WToFile.writeToNewFile(String, String)");
 		}
 	}
 

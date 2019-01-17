@@ -1016,4 +1016,28 @@ public class DomainConstants
 	{
 	}
 
+	/**
+	 * 
+	 * @return
+	 * @since 16 Jan 2019 (refactored code to separate method_
+	 */
+	public static String[] getGroupsOf100UsersLabels()
+	{
+		if (Constant.useRandomlySampled100Users)
+		{
+			return new String[] { gowalla100RandomUsersLabel };
+		}
+		else if (Constant.runForAllUsersAtOnce)
+		{
+			return new String[] { "All" };
+		}
+		else
+		{
+			PopUps.showError("Unrecognized case for GroupsOf100UsersLabels");
+			return null;
+		}
+
+		// return groupsOf100UsersLabels;
+	}
+
 }

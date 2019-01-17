@@ -60,7 +60,8 @@ public class PopUps
 		}
 		catch (HeadlessException e)
 		{
-			System.err.println("\nError: Headless: hence printing error msg instead of PopUp.\n" + msg);
+			msg = "\nError: Headless: hence printing error msg instead of PopUp.\n" + msg;
+			System.err.println(msg);
 			WToFile.appendLineToFileAbs(msg, Constant.getCommonPath() + Constant.errorFileName);
 		}
 	}
@@ -86,7 +87,9 @@ public class PopUps
 		}
 		catch (HeadlessException ex)
 		{
-			System.err.println("\n Headless: hence printing exeception msg instead of PopUp.\n" + exceptionMsg);
+
+			exceptionMsg = "\n Headless: hence printing exeception msg instead of PopUp.\n" + exceptionMsg;
+			System.err.println(exceptionMsg);
 			WToFile.appendLineToFileAbs(exceptionMsg, Constant.getCommonPath() + Constant.errorFileName);
 		}
 	}

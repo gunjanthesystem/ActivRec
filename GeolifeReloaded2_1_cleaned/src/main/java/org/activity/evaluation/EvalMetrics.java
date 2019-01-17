@@ -73,6 +73,7 @@ public class EvalMetrics
 
 			bw.write("User");
 			bwDistri.write("User");
+			// PopUps.showMessage("catIDNameDict = " + catIDNameDict.toString());
 			// for (String s : activityNames)
 			for (Entry<Integer, String> cEntry : catIDNameDict.entrySet())
 			{
@@ -185,6 +186,7 @@ public class EvalMetrics
 		catch (IOException e)
 		{
 			e.printStackTrace();
+			PopUps.showException(e, "writePerActMRRV2");
 		}
 	}
 
