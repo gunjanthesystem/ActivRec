@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -458,10 +459,16 @@ public class SuperController
 
 				List<String> pathsToRead = ReadingFromFile.oneColumnReaderString(
 						// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15DCUSubset3.csv",
+						// "./dataToRead/ResultsToReadJan15GeolifeSubset3Engine.csv",
 						"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15GeolifeSubset3.csv",
-						// "./dataToRead/ResultsToReadJan15GeolifeSubset3.csv"
+						// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15DCUSubset3.csv",
+						// "./dataToRead/ResultsToReadJan11Gowalla1ForEngineEval.csv",
+						// ResultsToReadJan15GeolifeSubset3.csv"
 						",", 2, false);
-				Constant.setDatabaseName("geolife1");
+				String databaseName = "gowalla1";
+				Constant.setDatabaseName(databaseName);
+				Constant.setDatabaseSpecificConstants(databaseName);
+				Constant.setConstantsForTimelineCreation(databaseName);
 
 				String[] pathsToReadPython = {
 						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/",
@@ -472,7 +479,12 @@ public class SuperController
 
 				// for (String commonPath1 : pathsToRead)
 				{
-					String commonPath1 = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/PopularityRecommender/";
+					// PopUps.showMessage(commonPath1);
+					String commonPath1 = "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/AUG12ED1.0LocAllActsFDStFilter0hrs100RTVPNN500SNN500 (copy 1)/";
+					// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/AUG17ED0.5STimeLocDistPrevDurPrevAllActsFDStFilter0hrs75FRTV75ARTVPNN500SNN500
+					// (copy 1)/";
+					// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_JAN3H13M33ED0.5STimeDurDistTrStartGeoEndGeoAvgAltDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NoTTFilterNC/";
+					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/PopularityRecommender/";
 					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/";
 					// hasMUS = false;
 					// if (commonPath1.contains("PythonWorkspace") == false)
@@ -480,9 +492,9 @@ public class SuperController
 					// continue;
 					// }
 
-					// Popups.showMessage("commonPath1 = " + commonPath1);
-					if (commonPath1.contains("NC/") || commonPath1.contains("PureAKOM")
-							|| commonPath1.contains("PythonWorkspace"))
+					PopUps.showMessage(commonPath1);
+					if (commonPath1.contains("NC/") || commonPath1.contains("PureAKOM")// NCcoll/
+							|| commonPath1.contains("PythonWorkspace") || commonPath1.contains("NCcoll/"))
 					{
 						Constant.lookPastType = LookPastType.NCount;
 						/// run/media/gunjan/My Passport/GeolifeNov2018/dcu_data_2_JAN2H2M36PureAKOMOrder3NoTTFilter/
@@ -494,18 +506,18 @@ public class SuperController
 						}
 						// hasMUS = true;
 					}
-					else if (commonPath1.contains("NH/"))
+					else if (commonPath1.contains("NH/") || commonPath1.contains("NHcoll/"))
 					{
 						Constant.lookPastType = LookPastType.NHours;
 						// hasMUS = true;
 					}
-					else if (commonPath1.contains("DY/") || commonPath1.contains("HighDur")
-							|| commonPath1.contains("HighOccur"))
+					else if (commonPath1.contains("DY/") || commonPath1.contains("DYcoll/")
+							|| commonPath1.contains("HighDur") || commonPath1.contains("HighOccur"))
 					{
 						Constant.lookPastType = LookPastType.Daywise;
 					}
 
-					else if (commonPath1.contains("CT/"))
+					else if (commonPath1.contains("CT/") || commonPath1.contains("CTcoll/"))
 					{
 						Constant.lookPastType = LookPastType.ClosestTime;
 					}
@@ -543,7 +555,7 @@ public class SuperController
 					String commonJupyterPath = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/";
 					String dcuFolder = "dcu_data_2_DEC31H20M25HighDurNoTTFilter/";
 					String geolifeFolder = "geolife1_DEC31H20M15HighDurPNN500NoTTFilter/";
-					String gowallaFolder = "/gowalla1_DEC31H20M29HighDurPNN500coll/";
+					String gowallaFolder = "gowalla1_DEC31H20M29HighDurPNN500coll/";
 					// TODO: SET CORRECT DATABASE NAME IN CONSTANT
 					commonJupyterPath += gowallaFolder;
 					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/";
@@ -1068,7 +1080,7 @@ public class SuperController
 
 		if (doEvaluation)
 		{
-			// if (!Constant.getDatabaseName().equals("gowalla1"))
+			if (!Constant.getDatabaseName().equals("gowalla1"))
 			{// added on 1 Jan as needed to set catIDNameDict needed for standalone eval for dcu and geolife
 				ControllerWithoutServer controllerWithoutServer = new ControllerWithoutServer(
 						Constant.getDatabaseName(), commonPath, true);
@@ -1420,7 +1432,8 @@ public class SuperController
 			{
 				// PopUps.showMessage("commonPath = " + commonPath);
 				// TODO: for more than 1 user groups, check this if this works correctly
-				String commonPathToUse = groupOf100User.equals("All") ? commonPath : commonPath + groupOf100User;
+				String commonPathToUse = commonPath;// groupOf100User.equals("All") ? commonPath : commonPath +
+													// groupOf100User;
 				// PopUps.showMessage("commonPath = " + commonPath);
 				// for reading earlier results in All/ or 100R folders
 				String commonPathWithUserGroupLabel = commonPath + groupOf100User;
@@ -1442,7 +1455,7 @@ public class SuperController
 				// commonPathToUse + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv",
 
 				DescriptiveStatistics mrrStatsOverUsersBestnMUs = StatsUtils.getDescriptiveStatistics(MRRValsForBestMU);
-				PopUps.showMessage("commonPathToUse = " + commonPathToUse);
+				// PopUps.showMessage("commonPathToUse = " + commonPathToUse);
 				WToFile.writeToNewFile(mrrStatsOverUsersBestnMUs.toString(),
 						commonPathToUse + "mrrStatsOverUsersBestMUs.csv");
 
@@ -1471,13 +1484,10 @@ public class SuperController
 						RRFileForBestMUForThisUser = commonPathWithUserGroupLabel
 								+ "/AlgoStep0AllReciprocalRankUnrolled.csv";
 					}
-					if (Constant.lookPastType.equals(LookPastType.NHours))
+					if (Constant.lookPastType.equals(LookPastType.NHours) && (bestMU.trim().equals("0.0")))
 					{
-						if (bestMU.trim().equals("0.0"))
-						{
-							RRFileForBestMUForThisUser = commonPathWithUserGroupLabel + "/MatchingUnit0.5"
-									+ "/AlgoStep0AllReciprocalRankUnrolled" + dimensionPhrase + ".csv";
-						}
+						RRFileForBestMUForThisUser = commonPathWithUserGroupLabel + "/MatchingUnit0.5"
+								+ "/AlgoStep0AllReciprocalRankUnrolled" + dimensionPhrase + ".csv";
 					}
 					// PopUps.showMessage("here1_2: RRFileForBestMUForThisUser=\n" + RRFileForBestMUForThisUser
 					// + "\nbestMU=" + bestMU);
@@ -1485,7 +1495,26 @@ public class SuperController
 					List<List<String>> RRForOptimalMU = ReadingFromFile
 							.readLinesIntoListOfLists(RRFileForBestMUForThisUser, ",");
 					RRForOptimalMU.remove(0);// remove header
-					RRForOptimalMUAllUsers.addAll(RRForOptimalMU);
+
+					// keep RR row only for current user //start of added 24 Jan 2019
+					List<List<String>> RRForOptimalMUOnlyCurrUser = new ArrayList<>();
+					int numOfUsersToSkip = Integer.valueOf(userIndex);
+					LinkedHashSet<String> uniqueUsersInSeq = new LinkedHashSet<>();
+					for (List<String> rrline : RRForOptimalMU)
+					{
+						uniqueUsersInSeq.add(rrline.get(0));
+						if (uniqueUsersInSeq.size() <= numOfUsersToSkip)
+						{
+							continue;
+						}
+						if (uniqueUsersInSeq.size() >= (numOfUsersToSkip + 2))
+						{
+							break;
+						}
+						RRForOptimalMUOnlyCurrUser.add(rrline);
+					}
+					// end of added 24 Jan 2019
+					RRForOptimalMUAllUsers.addAll(RRForOptimalMUOnlyCurrUser);// RRForOptimalMU);
 				}
 				// PopUps.showMessage("here1_3");
 				WToFile.writeToNewFile("UserID,RTDate,RTTime,ActualAct,RR\n" + RRForOptimalMUAllUsers.stream()

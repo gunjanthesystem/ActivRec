@@ -611,6 +611,7 @@ public class Serializer
 			obj = kryo.readClassAndObject(kryoInput);// , Object.class);
 			raf.close();
 			kryoInput.close();
+			fis.close();
 			// kryoInput.close();
 
 			long lt = System.currentTimeMillis();

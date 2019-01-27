@@ -16,8 +16,29 @@ import org.apache.commons.text.similarity.LongestCommonSubsequenceDistance;
 
 public class ManyDistancesUtils
 {
-
 	public static void main(String args[])
+	{
+		String target = "ABC";
+		String[] candStrings = { "ABC", "ABZ", "AZC", "ACB", "ZBC", "CBA", "BAC", "CAB", "BCA", "AZZ", "ZBZ", "ZZC",
+				"ZZZ" };
+
+		Enums.ActDistType[] distTypes = { ActDistType.MyLevenshtein };// , ActDistType.Jaccard };
+		// ActDistType.Jaccard, ActDistType.Jaro, ActDistType.Hamming,
+		// ActDistType.LongestCommonSubsequence, ActDistType.MyLevenshtein };
+
+		for (ActDistType distType : distTypes)
+		{
+			System.out.println("Target = " + target);
+			for (String candString : candStrings)
+			{
+				Triple<String, Double, Triple<char[], int[], int[]>> res = getGivenDistanceCompatibility(target,
+						candString, distType, 1, 1, 2, null);
+				System.out.println("candString = " + candString + " = " + res.getSecond());
+			}
+		}
+	}
+
+	public static void main0(String args[])
 	{
 		System.out.println("test");
 		// de.lmu.ifi.dbs.elki.distance.distancefunction.ClarkDistanceFunction d;

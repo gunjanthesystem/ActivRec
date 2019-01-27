@@ -293,9 +293,10 @@ public class ReadingFromFile
 
 	/**
 	 * 
-	 * @param inputStream
+	 * @param absFileNameToRead
 	 * @param delimiter
-	 * @param hasHeader
+	 * @param hasColHeader
+	 * @param hasRowHeader
 	 * @return
 	 */
 	public static List<List<Double>> nColumnReaderDouble(String absFileNameToRead, String delimiter,

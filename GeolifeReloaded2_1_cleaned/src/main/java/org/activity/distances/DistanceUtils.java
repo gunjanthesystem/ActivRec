@@ -30,9 +30,11 @@ import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.sanityChecks.Sanity;
+import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
+import org.activity.util.RegexUtils;
 import org.activity.util.TimelineUtils;
 import org.activity.util.UtilityBelt;
 import org.apache.commons.math3.stat.StatUtils;
@@ -489,6 +491,8 @@ public class DistanceUtils
 		// use this when null issue is resolved: resolved
 		// if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NHours))
 		// consider the full cand
+		// {CandID,Triple{TraceAsString,AED,List of EnumMap of {GowallaFeatures, FeatValPairs of correspondins AOs for
+		// that feat} one for each correspnding AO comparison}}}
 		LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs = candidateTimelines
 				.entrySet()/* .parallelStream() */.stream()
 				.collect(Collectors.toMap(e -> (String) e.getKey(),
@@ -544,17 +548,20 @@ public class DistanceUtils
 
 		if (true)
 		{// TODO INCOMPLETED AS OF 8 JAN 2019
-			if (Constant.getDynamicEDAlpha() == 1)
+			if (false)
 			{
-				// normalise AED
-				candEditDistancesRes = minMaxNormalisedAED8Jan2019(candAEDFeatValPairs,
-						Constant.percentileForRTVerseMaxForAEDNorm);
-			}
-			else
-			{
-				PopUps.printTracedErrorMsgWithExit(
-						"Error: not implemented for Alpha!=1, Constant.getDynamicEDAlpha() = "
-								+ Constant.getDynamicEDAlpha());
+				if (Constant.getDynamicEDAlpha() == 1)
+				{
+					// normalise AED
+					candEditDistancesRes = minMaxNormalisedAED8Jan2019(candAEDFeatValPairs,
+							Constant.percentileForRTVerseMaxForAEDNorm);
+				}
+				else
+				{
+					PopUps.printTracedErrorMsgWithExit(
+							"Error: not implemented for Alpha!=1, Constant.getDynamicEDAlpha() = "
+									+ Constant.getDynamicEDAlpha());
+				}
 			}
 			// Start of Jan 7 2019 curtain
 			LinkedHashMap<String, Pair<String, Double>> candEditDistancesLogging = null;
@@ -577,6 +584,7 @@ public class DistanceUtils
 				 * hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
 				 * candidateTimelines);
 				 **/
+				PopUps.printTracedErrorMsgWithExit("Error: not implemented computeFEDForEachAOInRTVerse");
 			}
 			else if (Constant.computeFEDForEachFeatureSeqInRTVerse)
 			{
@@ -589,6 +597,11 @@ public class DistanceUtils
 				 * hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
 				 * candidateTimelines);
 				 **/
+				candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistancesValPairsApproach(candAEDFeatValPairs,
+						minOfMinsAndMaxOfMaxOfFeatureVals.getFirst(), minOfMinsAndMaxOfMaxOfFeatureVals.getSecond(),
+						hjEditDistance, activitiesGuidingRecomm, userAtRecomm, dateAtRecomm, timeAtRecomm,
+						candidateTimelines);
+
 			}
 
 			// boolean isNoLoggingSane = candEditDistancesNoLogging.equals(candEditDistancesLogging);
@@ -1179,7 +1192,7 @@ public class DistanceUtils
 							.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs,
 									percentileForRTVerseMaxForFEDNorm);// 75);
 
-					if (true)// sanity checking percentil implementation and maxOfMax implementation gives same result
+					if (false)// sanity checking percentil implementation and maxOfMax implementation gives same result
 					{
 						sanityCheckRTVersePthPercentileByMinMaxFeatValPairs(minOfMinOfVals, maxOfMaxOfVals,
 								listOfListOfFeatValPairs);
@@ -2300,7 +2313,9 @@ public class DistanceUtils
 	 * the min/max feature diff over all (compared to current) activity objects of all (compared) candidates.
 	 * <p>
 	 * 
-	 * @param candAEDFeatDiffs
+	 * @param candAEDFeatValPairs
+	 *            {CandID,Triple{TraceAsString,AED,List of EnumMap of {GowallaFeatures, FeatValPairs of correspondins
+	 *            AOs for that feat} one for each correspnding AO comparison}}}
 	 * @param minOfMinOfFeatDiffs
 	 * @param maxOfMaxOfFeatDiffs
 	 * @param hjEditDistance
@@ -2318,14 +2333,15 @@ public class DistanceUtils
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
 	 */
 	private static LinkedHashMap<String, Pair<String, Double>> getRTVerseMinMaxNormalisedEditDistancesValPairsApproach(
-			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candAEDFeatDiffs,
+			// LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>>
+			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs,
 			EnumMap<GowGeoFeature, Double> minOfMinOfFeatDiffs, EnumMap<GowGeoFeature, Double> maxOfMaxOfFeatDiffs,
 			HJEditDistance hjEditDistance, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
 			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
 	{
 		// PopUps.showMessage("Inside getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach");
 		// boolean useMSD = Constant.useMSDInFEDInRTVerse;
-		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatDiffs.size());
+		LinkedHashMap<String, Pair<String, Double>> res = new LinkedHashMap<>(candAEDFeatValPairs.size());
 
 		EnumMap<GowGeoFeature, Double> featureWeightMap = hjEditDistance.getFeatureWeightMap();
 
@@ -2353,12 +2369,12 @@ public class DistanceUtils
 		double percentileForRTVerseMaxForAEDNorm = Constant.percentileForRTVerseMaxForAEDNorm;
 		if (percentileForRTVerseMaxForAEDNorm == -1)
 		{
-			maxActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond()).max()
-					.getAsDouble();
+			maxActEDOverAllCands = candAEDFeatValPairs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
+					.max().getAsDouble();
 		}
 		else
 		{
-			List<Double> listOfAEDs = candAEDFeatDiffs.entrySet().stream().map(e -> e.getValue().getSecond())
+			List<Double> listOfAEDs = candAEDFeatValPairs.entrySet().stream().map(e -> e.getValue().getSecond())
 					.collect(Collectors.toList());
 			maxActEDOverAllCands = StatsUtils.getPercentile(listOfAEDs, percentileForRTVerseMaxForAEDNorm);
 		}
@@ -2370,14 +2386,14 @@ public class DistanceUtils
 			{
 				StringBuilder sb = new StringBuilder();
 				sb.append("Debug18July:maxActEDOverAllCands= " + maxActEDOverAllCands + "\n");
-				candAEDFeatDiffs.entrySet().stream()// .mapToDouble(e -> e.getValue().getSecond())
+				candAEDFeatValPairs.entrySet().stream()// .mapToDouble(e -> e.getValue().getSecond())
 						.forEachOrdered(
 								e -> sb.append(" " + e.getValue().getFirst() + "--" + e.getValue().getSecond() + ","));
 				System.out.println(sb.toString());
 			}
 		}
 
-		double minActEDOverAllCands = candAEDFeatDiffs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
+		double minActEDOverAllCands = candAEDFeatValPairs.entrySet().stream().mapToDouble(e -> e.getValue().getSecond())
 				.min().getAsDouble();
 		// End of Get max of ActED over all cand
 
@@ -2397,7 +2413,7 @@ public class DistanceUtils
 		currentTimeline = activitiesGuidingRecomm.stream().map(ao -> ao.getActivityName())
 				.collect(Collectors.joining(">"));
 
-		String rtInfo = userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candAEDFeatDiffs.size() + ","
+		String rtInfo = userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + candAEDFeatValPairs.size() + ","
 				+ currentTimeline;
 		// end of initialising logging
 
@@ -2409,7 +2425,7 @@ public class DistanceUtils
 		StringBuilder logAOsThisCandHeader = new StringBuilder(
 				"\nuserAtRecomm,dateAtRecomm,timeAtRecomm,candAEDFeatDiffs.size(),currentTimeline,candID,indexOfCandForThisRT,candTimelineAsString,AEDTraceForThisCand,actDistForThisCand,");
 		// Loop over cands
-		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Double>>>> candEntry : candAEDFeatDiffs
+		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candEntry : candAEDFeatValPairs
 				.entrySet())
 		{
 			indexOfCandForThisRT += 1;
@@ -2430,7 +2446,7 @@ public class DistanceUtils
 			String candInfoLeaner = rtInfo + "," + candID + "," + indexOfCandForThisRT;
 			////////////
 
-			List<EnumMap<GowGeoFeature, Double>> listOfAOsForThisCand = candEntry.getValue().getThird();
+			List<EnumMap<GowGeoFeature, Pair<String, String>>> listOfAOsForThisCand = candEntry.getValue().getThird();
 			// note: list in in intial order, i.e., least recent AO to most recent AO by time.
 			// double sumOfNormFDsOverAOsOfThisCand = 0;double[] normFDsOverAOsOfThisCand = new
 			// double[listOfAOsForThisCand.size()];
@@ -2439,9 +2455,9 @@ public class DistanceUtils
 			// assuming same features across all AOs
 			// Set<GowGeoFeature> listOfFeatures = null;
 			// ArrayList<GowGeoFeature> listOfFeatures = null;
-			EnumMap<GowGeoFeature, List<Double>> valsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
+			EnumMap<GowGeoFeature, List<Pair<String, String>>> valsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
 					GowGeoFeature.class);
-			EnumMap<GowGeoFeature, List<Double>> normValsForEachFeatDiffAcrossAOsForThisCand = new EnumMap<>(
+			EnumMap<GowGeoFeature, List<Pair<Double, Double>>> normValsForEachFeatValPairsAcrossAOsForThisCand = new EnumMap<>(
 					GowGeoFeature.class);
 
 			if (EDAlpha != 1)
@@ -2455,7 +2471,7 @@ public class DistanceUtils
 				for (GowGeoFeature feature : listOfFeatures)
 				{
 					// loop over AOs in this cand
-					List<Double> valsForThisFeatureAcrossAllAOsInThisCand = listOfAOsForThisCand.stream()
+					List<Pair<String, String>> valsForThisFeatureAcrossAllAOsInThisCand = listOfAOsForThisCand.stream()
 							.map(e -> e.get(feature)).collect(Collectors.toList());
 					// // loop over AOs in this cand
 					// DoubleSummaryStatistics summaryStatForThisFeatAcrossAllAOInThisCand =
@@ -2468,31 +2484,93 @@ public class DistanceUtils
 
 				// RTVerse normalise each val for each feature across AOs for this cand
 				// loop over each feature
-				for (Entry<GowGeoFeature, List<Double>> featureEntry : valsForEachFeatDiffAcrossAOsForThisCand
-						.entrySet())
-				{
-					GowGeoFeature featureID = featureEntry.getKey();
-					List<Double> diffValsForThisFeature = featureEntry.getValue();
-					// loop over val for this feature across each AO
-					List<Double> normalisedDiffValForThisFeatureForAllAOs = diffValsForThisFeature.stream()
-							.map(diffValForThisFeatureForAO -> StatsUtils.minMaxNormWORoundWithUpperBound(
-									diffValForThisFeatureForAO, maxOfMaxOfFeatDiffs.get(featureID),
-									minOfMinOfFeatDiffs.get(featureID), 1.0d, false))
-							.collect(Collectors.toList());
-					normValsForEachFeatDiffAcrossAOsForThisCand.put(featureID,
-							normalisedDiffValForThisFeatureForAllAOs);
-				}
+				// //Start of curtain Jan 25
+				// for (Entry<GowGeoFeature, List<Pair<String, String>>> featureEntry :
+				// valsForEachFeatDiffAcrossAOsForThisCand
+				// .entrySet())
+				// {
+				// GowGeoFeature featureID = featureEntry.getKey();
+				// List<Pair<String, String>> valPairsForThisFeature = featureEntry.getValue();// TEMP TODO
+				// // featureEntry.getValue();
+				// double maxForThisFeature = maxOfMaxOfFeatDiffs.get(featureID);
+				// double minForThisFeature = minOfMinOfFeatDiffs.get(featureID);
+				//
+				// List<Pair<Double, Double>> normalisedValPairsForThisFeatureForAllAOs = new ArrayList<>();
+				// // loop over val for this feature across each AO
+				// for (Pair<String, String> valPair : valPairsForThisFeature)
+				// {
+				// double v1 = Double.valueOf(valPair.getFirst());
+				// double v2 = Double.valueOf(valPair.getSecond());
+				//
+				// double normV1 = v1;
+				// double normV2 = v2;
+				// if (!(featureID.equals(GowGeoFeature.StartGeoF) || featureID.equals(GowGeoFeature.EndGeoF)))
+				// {
+				// normV1 = StatsUtils.minMaxNormWORoundWithUpperBound(v1, maxForThisFeature,
+				// minForThisFeature, 1.0d, false);
+				// normV2 = StatsUtils.minMaxNormWORoundWithUpperBound(v2, maxForThisFeature,
+				// minForThisFeature, 1.0d, false);
+				// }
+				// normalisedValPairsForThisFeatureForAllAOs.add(new Pair<>(normV1, normV2));
+				// }
+				//
+				// // List<Double> normalisedDiffValForThisFeatureForAllAOs = valPairsForThisFeature.stream()
+				// // .map(diffValForThisFeatureForAO -> StatsUtils.minMaxNormWORoundWithUpperBound(
+				// // diffValForThisFeatureForAO, maxOfMaxOfFeatDiffs.get(featureID),
+				// // minOfMinOfFeatDiffs.get(featureID), 1.0d, false))
+				// // .collect(Collectors.toList());
+				// normValsForEachFeatValPairsAcrossAOsForThisCand.put(featureID,
+				// normalisedValPairsForThisFeatureForAllAOs);
+				// }
+				// //End of curtain Jan 25
 				// compute the Summary stat of normalised diff val of each feature across all AOs in the cand
 
 				// Compute FED for this cand
 				double wtdSumOfFeatDiffForThisCand = 0, sumOfFeatureWts = 0;
-				for (Entry<GowGeoFeature, List<Double>> featureEntry : valsForEachFeatDiffAcrossAOsForThisCand
+				for (Entry<GowGeoFeature, List<Pair<String, String>>> featureEntry : valsForEachFeatDiffAcrossAOsForThisCand// valsForEachFeatDiffAcrossAOsForThisCand
 						.entrySet())
 				{
 					GowGeoFeature featureID = featureEntry.getKey();
 
-					List<Double> diffValsForThisFeatAcrossAllAOsInCand = normValsForEachFeatDiffAcrossAOsForThisCand
-							.get(featureID).stream().collect(Collectors.toList());
+					List<Double> diffValsForThisFeatAcrossAllAOsInCand = new ArrayList<>(
+							featureEntry.getValue().size());
+					// featureEntry.getValue().stream().map(p -> Math.abs(p.getFirst() - p.getSecond()))
+					// .collect(Collectors.toList());
+
+					if (featureID.equals(GowGeoFeature.StartGeoF) || featureID.equals(GowGeoFeature.EndGeoF))
+					{
+						for (Pair<String, String> e : featureEntry.getValue())
+						{
+							String[] splitted1 = RegexUtils.patternPipe.split(e.getFirst());
+							String[] splitted2 = RegexUtils.patternPipe.split(e.getSecond());
+							// SpatialUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(),
+							// ao2.getStartLongitude());
+							diffValsForThisFeatAcrossAllAOsInCand.add(
+									SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1]));
+						}
+					}
+					else
+					{
+						double maxForThisFeature = maxOfMaxOfFeatDiffs.get(featureID);
+						double minForThisFeature = minOfMinOfFeatDiffs.get(featureID);
+
+						for (Pair<String, String> e : featureEntry.getValue())
+						{
+							double v1 = Double.valueOf(e.getFirst());
+							double v2 = Double.valueOf(e.getSecond());
+
+							double normV1 = StatsUtils.minMaxNormWORoundWithUpperBound(v1, maxForThisFeature,
+									minForThisFeature, 1.0d, false);
+							double normV2 = StatsUtils.minMaxNormWORoundWithUpperBound(v2, maxForThisFeature,
+									minForThisFeature, 1.0d, false);
+
+							String[] splitted2 = RegexUtils.patternPipe.split(e.getSecond());
+							// SpatialUtils.haversine(startLatitude, startLongitude, ao2.getStartLatitude(),
+							// ao2.getStartLongitude());
+							diffValsForThisFeatAcrossAllAOsInCand.add(Math.abs(normV2 - normV1));
+						}
+					}
+					// normValsForEachFeatValPairsAcrossAOsForThisCand.get(featureID).stream().collect(Collectors.toList());
 
 					double wtForThisFeature = featureWeightMap.get(featureID);
 					// double diffValToUse = summaryStatForThisFeatAcrossAOsOfThisCand.getAverage();
@@ -2504,8 +2582,10 @@ public class DistanceUtils
 					double aggValForFeatureAcrossAllAOsInCand = -9999;
 					if (Constant.takeMeanOrMedianOfFeatDiffsAcrossAllAOsInCandForFeatSeq == 0)
 					{
-						DoubleSummaryStatistics summaryStatForThisFeatAcrossAOsOfThisCand = normValsForEachFeatDiffAcrossAOsForThisCand
-								.get(featureID).stream().mapToDouble(Double::doubleValue).summaryStatistics();
+						DoubleSummaryStatistics summaryStatForThisFeatAcrossAOsOfThisCand =
+								// normValsForEachFeatValPairsAcrossAOsForThisCand.get(featureID)
+								diffValsForThisFeatAcrossAllAOsInCand.stream().mapToDouble(Double::doubleValue)
+										.summaryStatistics();
 						aggValForFeatureAcrossAllAOsInCand = summaryStatForThisFeatAcrossAOsOfThisCand.getAverage();
 					}
 					else
@@ -2520,8 +2600,8 @@ public class DistanceUtils
 					//////
 					logTxt.append("\n\t\t\tfeatureID=" + featureID + ",diffValToUse="
 							+ aggValForFeatureAcrossAllAOsInCand + ",normalisedFeatureDiffVal="
-							+ normValsForEachFeatDiffAcrossAOsForThisCand.get(featureID).stream()
-									.map(v -> String.valueOf(v)).collect(Collectors.joining(",")).toString()
+							+ normValsForEachFeatValPairsAcrossAOsForThisCand.getOrDefault(featureID, new ArrayList<>())
+									.stream().map(v -> v.toString()).collect(Collectors.joining(",")).toString()
 							+ ",wtForThisFeature=" + wtForThisFeature + ",maxOfMaxOfDiffs="
 							+ maxOfMaxOfFeatDiffs.get(featureID) + ",minOfMinOfDiffs="
 							+ minOfMinOfFeatDiffs.get(featureID));
@@ -2549,13 +2629,20 @@ public class DistanceUtils
 						// String nameOfFeaturesInSeq = "";
 						for (GowGeoFeature feature : listOfFeatures)
 						{
+							String normVal = "-9999";
+
+							if (!(feature.equals(GowGeoFeature.StartGeoF) || feature.equals(GowGeoFeature.EndGeoF)))
+							{
+								normVal = String.valueOf(
+										normValsForEachFeatValPairsAcrossAOsForThisCand.get(feature).get(indexOfAO));
+							}
 							// nameOfFeaturesInSeq += feature.toString() + ",";
-							String s = StatsUtils.roundAsString(
-									valsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
-									+ ","
-									+ StatsUtils.roundAsString(
-											normValsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO), 4)
-									+ ",";
+							String s = // StatsUtils.roundAsString(
+									valsForEachFeatDiffAcrossAOsForThisCand.get(feature).get(indexOfAO)// , 4)
+											+ "," + // StatsUtils.roundAsString(
+											normVal
+											// 4)
+											+ ",";
 							logAOsThisCand.append(s);
 							if (indexOfAO == 0 && indexOfCandForThisRT == 1)
 							{

@@ -96,7 +96,7 @@ public final class Constant
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
 	// SWITCH_DEC20
-	public static Enums.LookPastType lookPastType = Enums.LookPastType.ClosestTime;//// TODO .NCount;//
+	public static Enums.LookPastType lookPastType = Enums.LookPastType.NCount;//// TODO .NCount;//
 	//// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
@@ -107,17 +107,17 @@ public final class Constant
 
 	public static final boolean useForeignAwareLevenshtein = false; /// added on 9 Jan 2019//TODO
 
-	public static final boolean useJan7DistanceComputations = false;// TODO
+	public static final boolean useJan7DistanceComputations = true;// TODO
 
 	// ensureCandEndWithCurrAct ONLY IMPLEMENTED YET FOR NCOUNT
-	public static final boolean ensureCandEndWithCurrAct = true;// TEMP TODO
+	public static final boolean ensureCandEndWithCurrAct = true;// true;// TEMP TODO
 
 	public static final boolean ensureHasDaywiseCandsForEvalCompatibility = true;// TODO //added 14 Jan 2018
 
-	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.ClosestTime;//// TODO SWITCH_NOV10
+	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
-	private static int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
+	private static int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
 	private static int RNNCurrentActivitityLength = 1;
 
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
@@ -225,7 +225,11 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 1 };// 0.6 };// 0.5, 1 };// 0.5 };// , 1 };// 0.5, 1 };// 0.4, 0.5, 0.7, 1
+	public static final double[] EDAlphas = { 1 };// 0.5, 0.4, 0.6, 1, 0.8, 0.7 };// 0.6 };// 0.5, 1 };// 0.5 };//
+													// , 1
+													// };//
+													// 0.5, 1 };// 0.4, 0.5, 0.7,
+	// 1
 	// TODO // SWITCH_NOV20
 	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };= { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75,
 	// 0, 0.25, 0.35, 0.15};//SWITCH_NOV10 added on 12 Sep 2018// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/*
@@ -288,7 +292,7 @@ public final class Constant
 
 	public static final boolean useDecayInFED = false;// SWITCH_NOV10
 	public static final boolean useTimeDecayInAED = false; /// added on 20 Aug 2018//TODO
-	public static final double powerOfTimeDecayInAED = -1.5; /// added on 20 Aug 2018
+	public static final double powerOfTimeDecayInAED = -1; /// added on 20 Aug 2018
 	public static final boolean assignFallbackZoneIdWhenConvertCinsToAO = false;// true;//// SWITCH_NOV10
 	public static boolean useRandomlySampled100Users = false;// //TODO toySwitch// SWITCH_NOV10
 	// runForAllUsersAtOnce and useRandomlySampled100Users to be changed simultaneously
@@ -333,7 +337,7 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "dcu_data_2";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+	static String DATABASE_NAME = "geolife1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
 												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
@@ -923,7 +927,7 @@ public final class Constant
 
 	}
 
-	private static void setDatabaseSpecificConstants(String databaseName)
+	public static void setDatabaseSpecificConstants(String databaseName)
 	{
 		switch (databaseName)
 		{
@@ -945,7 +949,7 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = false;
 			// typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TEMP TODO
-			nearestNeighbourCandEDThresholdPrimDim = 500;// TEMP 500;// TODO 500;// 750;// 500;// 500;/// -1;//
+			nearestNeighbourCandEDThresholdPrimDim = 50;// 500;// TEMP 500;// TODO 500;// 750;// 500;// 500;/// -1;//
 			// candEDValThresholdPrimDim = 0.5; // TEMP TODO
 			percentileForRTVerseMaxForFEDNorm = 10;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = true;// TODO true;// SWITCH_NOV10
@@ -961,12 +965,12 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = true;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = 500;// TODO 500;// 750;// 500;// 500;/// -1;//
-			percentileForRTVerseMaxForFEDNorm = 10;//// TODO 10;// 75;// -1// SWITCH_April24
+			percentileForRTVerseMaxForFEDNorm = 75;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = true;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = false;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = false; // false for gowalla// true for others;//
-			useHaversineDistInLocationFED = false;// TEMP TODO
+			useHaversineDistInLocationFED = true;// true;// TEMP TODO
 
 			break;
 
@@ -990,7 +994,7 @@ public final class Constant
 
 	}
 
-	private static void setConstantsForTimelineCreation(String databaseName)
+	public static void setConstantsForTimelineCreation(String databaseName)
 	{
 		switch (databaseName)
 		{

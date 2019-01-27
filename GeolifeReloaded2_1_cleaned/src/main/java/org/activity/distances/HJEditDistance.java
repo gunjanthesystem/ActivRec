@@ -1626,6 +1626,10 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 		for (GowGeoFeature gowallaFeature : listOfGowallaFeatures)
 		{
+			if (gowallaFeature.equals(GowGeoFeature.StartGeoF) || gowallaFeature.equals(GowGeoFeature.EndGeoF))
+			{
+				continue;// as "startLat|startLon"
+			}
 			ArrayList<Double> allValsForThisFeatureOverList = new ArrayList<Double>();
 
 			for (EnumMap<GowGeoFeature, Pair<String, String>> eForEachAOInCand : featureValPairList)
@@ -1908,8 +1912,13 @@ public class HJEditDistance extends AlignmentBasedDistance
 		{
 			// List<Double> allValsForThisFeature = allCollected.stream().map(listEntry ->
 			// listEntry.get(gowallaFeature)).collect(Collectors.toList());
+			if (gowallaFeature.equals(GowGeoFeature.StartGeoF) || gowallaFeature.equals(GowGeoFeature.EndGeoF))
+			{
+				continue;
+			}
 
 			List<Double> allValsForThisFeatureV2 = new ArrayList<>();
+
 			for (EnumMap<GowGeoFeature, Pair<String, String>> listEntry : allCollected)
 			{
 				allValsForThisFeatureV2.add(Double.valueOf(listEntry.get(gowallaFeature).getFirst()));
@@ -2016,9 +2025,9 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * 
 	 * @param actObjs1
 	 * @param actObjs2
-	 * @return List{EnumMap{GowallaFeatures, Double}} featureDifferences
+	 * @return List{EnumMap{GowallaFeatures, pairs of Doubles}} featureDifferences
 	 *         <p>
-	 *         List of EnumMap of {GowallaFeatures, DiffForThatFeature} one for each corresponding AO comparison}
+	 *         List of EnumMap of {GowallaFeatures, Val pairs for ThatFeature} one for each corresponding AO comparison}
 	 *         <p>
 	 * 
 	 * @since Jan 5 2019

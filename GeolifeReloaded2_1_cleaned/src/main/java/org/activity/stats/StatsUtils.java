@@ -1324,7 +1324,7 @@ public final class StatsUtils
 
 	public static double meanOfArrayList(ArrayList<Double> arr, int roundOffToPlaces)
 	{
-		if (arr.size() == 0) return 0;
+		if (arr.size() == 0) return -9999;// changed to -9999 on 17 Jan 2019
 
 		double[] vals = new double[arr.size()];
 
@@ -1339,7 +1339,7 @@ public final class StatsUtils
 
 	public static double meanOfArrayListInt(ArrayList<Integer> arr, int roundOffToPlaces)
 	{
-		if (arr.size() == 0) return 0;
+		if (arr.size() == 0) return -9999;// changed to -9999 on 17 Jan 2019
 
 		double[] vals = new double[arr.size()];
 
@@ -1359,7 +1359,7 @@ public final class StatsUtils
 	 */
 	public static double medianOfArrayListInt(ArrayList<Integer> arr, int roundOffToPlaces)
 	{
-		if (arr.size() == 0) return 0;
+		if (arr.size() == 0) return -9999;// changed to -9999 on 17 Jan 2019
 
 		double[] vals = new double[arr.size()];
 
@@ -1379,7 +1379,7 @@ public final class StatsUtils
 	 */
 	public static double medianOfArrayList(ArrayList<Double> arr, int roundOffToPlaces)
 	{
-		if (arr.size() == 0) return 0;
+		if (arr.size() == 0) return -9999;// changed to -9999 on 17 Jan 2019
 
 		double[] vals = new double[arr.size()];
 
@@ -1820,8 +1820,8 @@ public final class StatsUtils
 			SummaryStat stat)
 	{
 		int[] columnIndicesToRead = IntStream.range(0, numOfColumns).toArray();
-		ArrayList<ArrayList<Double>> columnWiseVals = ReadingFromFile.allColumnsReaderDouble(fileToRead, ",",
-				columnIndicesToRead, false);
+		ArrayList<ArrayList<Double>> columnWiseVals = ReadingFromFile.allColumnsReaderDouble(fileToRead, ",", columnIndicesToRead,
+				false);
 
 		ArrayList<Double> columnWiseSummary = new ArrayList<>();
 

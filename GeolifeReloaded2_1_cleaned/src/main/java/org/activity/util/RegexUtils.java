@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 public class RegexUtils
 {
 	public static final Pattern patternHyphen = Pattern.compile("-");
+	public static final Pattern patternPipe = Pattern.compile("|");
 	public static final Pattern patternUnderScore = Pattern.compile("_");
 	public static final Pattern patternDoubleUnderScore = Pattern.compile("__");
 	public static final Pattern patternColon = Pattern.compile(":");
