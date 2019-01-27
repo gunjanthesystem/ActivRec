@@ -203,7 +203,13 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15GeolifeSubset3.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15GeolifeSubset3_4.csv";
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15DCUSubset3.csv";
+
+		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan24ImprovED0.csv";
+		// + "ResultsToReadJan15Gowalla1_5Investigating_2.csv";
+		// + "ResultsToReadJan11Gowalla1_2.csv";
+		// "ResultsToReadJan15GeolifeSubset3.csv";
 		// + "ResultsToReadJan11Gowalla1.csv";
 		// + "ResultsToReadJan3Geolife.csv";
 		// + "ResultsToReadJan4FEDInvesitgation.csv";
@@ -214,12 +220,21 @@ public class ResultsDistributionEvaluation
 		// ResultsToReadDec8Truncated.csv";
 		// "ResultsToReadNov28_OnlyED1.csv";// 25_3.csv";
 		// dcu_data_2_JAN15H10M31ED1.0AllActsFDStFilter0hrsRTVPNN50NoTTFilterNC_AllReciprocalRank_MinMUWithMaxFirst0Aware.csv
-		getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
 		getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware", 2);
-		getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 6);
-		// $$ getResultsNov21(resultsfileToRead, "AllAvgPrecision_MinMUWithMaxFirst0Aware", 6);
-		// $$ getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 5);
-		getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 4);
+		// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
+		if (false)
+		{
+			getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_MinMUWithMaxFirst0Aware", 2);
+
+			getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 6);
+			// $$ getResultsNov21(resultsfileToRead, "AllAvgPrecision_MinMUWithMaxFirst0Aware", 6);
+			// $$ getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 5);
+			getResultsNov21(resultsfileToRead, "AllAvgRecall_MinMUWithMaxFirst0Aware", 4);
+		}
+		// PopUps.showMessage("Finished AllReciprocalRank_MinMUWithMaxFirst0Aware");
+
+		PopUps.showMessage("End of main");
+		System.exit(0);
 	}
 
 	/**
@@ -252,6 +267,7 @@ public class ResultsDistributionEvaluation
 				// String splitted2[] = splitted[splitted.length - 1].split("_");
 				String expLabel = splitted[splitted.length - 1];
 				System.out.println(expLabel);
+				// PopUps.showMessage(expLabel);
 				String fileToRead = path + expLabel + "_" + resultLabel + ".csv";
 				List<Double> valsRead = new ArrayList<>();
 
@@ -281,12 +297,14 @@ public class ResultsDistributionEvaluation
 							+ DateTimeUtils.getMonthDateHourMinLabel() + resultLabel + colIndexToRead + ".csv");
 
 			System.out.println("valsFromAllExperiments.size() = " + valsFromAllExperiments.size());
-			System.out.println("\nvalsFromAllExperiments = " + valsFromAllExperiments);
+			// System.out.println("\nvalsFromAllExperiments = " + valsFromAllExperiments);
 		}
 		catch (Exception e)
 		{
+			System.out.println("resultsfileToRead = " + resultsfileToRead + " resultLabel = " + resultLabel);
 			e.printStackTrace();
 		}
+		// PopUps.showMessage("End of getResultsNov21");
 	}
 
 	/**
@@ -1186,6 +1204,8 @@ public class ResultsDistributionEvaluation
 		String statFileNames[] = statFileNamesList.toArray(new String[0]);
 		String statFileNamesPRF[] = { "AllAvgPrecision_", "AllAvgRecall_", "AllAvgFMeasure_" };
 		String statFileNamesMRR[] = { "AllMeanReciprocalRank_" };
+		// added 17 Jan 2019
+		String statFileNamesPerUserPerActMRR[] = { "AllPerActivityMeanReciprocalRank_" };// , "AllNumOfRTsPerAct_"
 
 		double muArray[] = Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor);// Constant.matchingUnitAsPastCountFixed;//
 																											// { 0 }
@@ -1241,10 +1261,16 @@ public class ResultsDistributionEvaluation
 					statFileNamesMRR, host, 1, doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser,
 					userIdentifierChosenMuMap, dimensionPhrase);
 
+			int resSize4 = getResultsForEachStatFile_generic(pathToWrite, resultsLabel, pathToRead, muArray,
+					statFileNamesPerUserPerActMRR, host, -9999, false, false, doChosenMUForEachUser,
+					userIdentifierChosenMuMap, new int[] {}, true, true, dimensionPhrase);
+			// firstToMax as empty, only for chosen MU
+
 			if (!tempDisable20July2018)
 			{
 				Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
 				Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
+				Sanity.eq(resSize, resSize4, "Error resSize != resSize4");
 			}
 
 			// if (resSize2 < 0)
@@ -1559,6 +1585,57 @@ public class ResultsDistributionEvaluation
 			res = getResultChosenMU(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
 					doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap,
 					dimensionPhrase, true, new int[] { 1 }, true, "MRR");
+			// res = getResult19July2018_MRR_PRF(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, 1,
+			// dimensionPhrase, true, new int[] { 1 }, true, "MRR");
+		}
+		// if (res.size() >= 100)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "GTE100UserLabels.csv");
+		// }
+		// if (res.size() == 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "E916UserLabels.csv");
+		// }
+		//
+		// if (res.size() < 916)
+		// {
+		// WToFile.appendLineToFileAbs(resultsLabel + "\n", pathToWrite + "LT916UserLabels.csv");
+		// }
+		return res.size();
+	}
+
+	/**
+	 * 
+	 * @param pathToWrite
+	 * @param resultsLabel
+	 * @param pathToRead
+	 * @param muArray
+	 * @param statFileNames
+	 * @param host
+	 * @param firstToMax
+	 * @param doFirstToMax
+	 * @param doFirstToMaxZeroAware
+	 * @param doChosenMUForEachUser
+	 * @param userIdentifierChosenMuMap
+	 * @param firstToMaxInOrder
+	 * @param statFileHasColHeader
+	 * @param statFileHasRowHeader
+	 * @param dimensionPhrase
+	 * @return
+	 */
+	public static int getResultsForEachStatFile_generic(String pathToWrite, String resultsLabel, String pathToRead,
+			double[] muArray, String[] statFileNames, String host, int firstToMax, boolean doFirstToMax,
+			boolean doFirstToMaxZeroAware, boolean doChosenMUForEachUser,
+			Map<String, Integer> userIdentifierChosenMuMap, int[] firstToMaxInOrder, boolean statFileHasColHeader,
+			boolean statFileHasRowHeader, String dimensionPhrase)
+	{
+		Map<Integer, Map<Integer, List<Double>>> res = null;
+
+		for (String statFileName : statFileNames)
+		{
+			res = getResultChosenMU(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, firstToMax,
+					doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser, userIdentifierChosenMuMap,
+					dimensionPhrase, statFileHasColHeader, firstToMaxInOrder, statFileHasRowHeader, "");
 			// res = getResult19July2018_MRR_PRF(pathToWrite, resultsLabel, pathToRead, muArray, statFileName, host, 1,
 			// dimensionPhrase, true, new int[] { 1 }, true, "MRR");
 		}
@@ -2664,6 +2741,13 @@ public class ResultsDistributionEvaluation
 	 * @param doFirstToMaxZeroAware
 	 * @param doChosenMUForEachUser
 	 * @param userIdentifierChosenMuMap
+	 * @param dimensionPhrase
+	 * @param statFileHasColHeader
+	 * @param firstToMaxInOrder
+	 * @param statFileHasRowHeader
+	 * @param valColHeader
+	 *            header for values columns. if valColHeader is empty then extract valColHeader from file being read
+	 *            (modification 17 Jan 2019)
 	 * @return
 	 * @since 19 July 2018
 	 */
@@ -2673,6 +2757,14 @@ public class ResultsDistributionEvaluation
 			Map<String, Integer> userIdentifierChosenMuMap, String dimensionPhrase, boolean statFileHasColHeader,
 			int[] firstToMaxInOrder, boolean statFileHasRowHeader, String valColHeader)
 	{
+		if (firstToMaxInOrder.length == 0)
+		{
+			System.out.println("Warning: since firstToMaxInOrder is of length: " + firstToMaxInOrder.length
+					+ " setting doFirstToMax and doFirstToMaxZeroAware to false");
+			doFirstToMax = false;
+			doFirstToMaxZeroAware = false;
+		}
+
 		String passwd = ServerUtils.getPassWordForHost(host);
 		String user = ServerUtils.getUserForHost(host);
 
@@ -2709,6 +2801,9 @@ public class ResultsDistributionEvaluation
 				userSetLabel = pathToRead.substring(i, i + 4);
 			}
 
+			// will be same of all MUs, hence should do it only once
+			// valColHeader = valColHeader.length() == 0 ? "" : valColHeader;// added on 17 Jan 2019,
+
 			for (double muD : muArray)
 			{
 				int mu = (int) muD;
@@ -2716,19 +2811,39 @@ public class ResultsDistributionEvaluation
 
 				// String statFileForThisMU = pathToRead + statFileName + mu + ".csv";
 				String statFileForThisMU = pathToRead + statFileName + mu + dimensionPhrase + ".csv";
+				List<String> valColHeaderList = null;
 
 				if (host.contains("local"))
 				{// each row corresponds to a user
 					readResFromFile = ReadingFromFile.nColumnReaderDouble(statFileForThisMU, ",", statFileHasColHeader,
 							statFileHasRowHeader);
+
+					if (valColHeader.length() == 0)
+					{
+						valColHeaderList = ReadingFromFile.nColumnReaderString(statFileForThisMU, ",", false).get(0);
+					}
 				}
 				else
 				{
 					Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, port,
 							statFileForThisMU, user, passwd);
+
 					readResFromFile = ReadingFromFile.nColumnReaderDouble(inputAndSession.getFirst(), ",",
 							statFileHasColHeader, statFileHasRowHeader);
+
+					if (valColHeader.length() == 0)
+					{
+						valColHeaderList = ReadingFromFile.nColumnReaderString(inputAndSession.getFirst(), ",", false)
+								.get(0);
+					}
 				}
+
+				if (valColHeaderList != null && statFileHasColHeader)
+				{
+					valColHeaderList.remove(0);
+					valColHeader = valColHeaderList.stream().collect(Collectors.joining(","));
+				}
+
 				// System.out.println("mu= " + mu + " res=" + res);
 				muKeyAllValsMap.put(mu, readResFromFile);
 				// inputAndSession.getSecond().disconnect();
@@ -2822,7 +2937,7 @@ public class ResultsDistributionEvaluation
 			WToFile.writeToNewFile(host + ":" + pathToRead,
 					pathToWrite + "ReadMe/" + resultsLabel + "_" + statFileName + "ReadMe" + dimensionPhrase + ".txt");
 		}
-		catch (NullPointerException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			String s = "pathToRead=" + pathToRead + "\nresultsLabel=" + resultsLabel + "\nstatFileNameToRead="

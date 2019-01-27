@@ -73,7 +73,9 @@ public class TimelineWriters
 			String abFileNameToWrite)
 	{
 		String delimiter = ",";
-		WToFile.appendLineToFileAbs("User" + delimiter
+
+		// WToFile.writeToNewFile(msg, absFileNameToUse);
+		WToFile.writeToNewFile("User" + delimiter
 				+ ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(delimiter) + "\n",
 				abFileNameToWrite);
 

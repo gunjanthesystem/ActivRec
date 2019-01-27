@@ -1640,8 +1640,11 @@ public class ControllerWithoutServer
 			// Feb2/DatabaseCreated/";
 			System.out.println("gowallaDataFolder = " + gowallaDataFolder);
 
-			LinkedHashMap<String, UserGowalla> mapForAllUserData = (LinkedHashMap<String, UserGowalla>) Serializer
-					.kryoDeSerializeThis(gowallaDataFolder + "mapForAllUserData.kryo");
+			if (false)// TODO temporarily disabled on 18 Jan 2019
+			{
+				LinkedHashMap<String, UserGowalla> mapForAllUserData = (LinkedHashMap<String, UserGowalla>) Serializer
+						.kryoDeSerializeThis(gowallaDataFolder + "mapForAllUserData.kryo");
+			}
 			// "/run/media/gunjan/BoX2/GowallaSpaceSpace/Sep16DatabaseGenerationJava/mapForAllUserData.kryo");
 			// LinkedHashMap<Integer, LocationGowalla> mapForAllLocationData = (LinkedHashMap<Integer,
 			// LocationGowalla>)//Serializer.kryoDeSerializeThis(gowallaDataFolder + "mapForAllLocationData.kryo");
@@ -1680,7 +1683,8 @@ public class ControllerWithoutServer
 		{// added on 15 Dec 2018, direct timeline creation instead of using databases
 			Triple<LinkedHashMap<String, LinkedHashMap<Date, Timeline>>, TreeMap<Integer, String>, LinkedHashMap<Integer, String>> res = DCU_Data_Loader
 					.createTimelinesForDCUData(Constant.getCommonPath(),
-							"/home/gunjan/Documents/UCD/Projects/Gowalla/DCUDataWorksDec2018/");
+							// "/home/gunjan/Documents/UCD/Projects/Gowalla/"
+							"./dataToRead/DCUDataWorksDec2018/");
 
 			usersDayTimelinesOriginal = res.getFirst();
 			DomainConstants.setCatIDNameDictionary(res.getSecond(), true);

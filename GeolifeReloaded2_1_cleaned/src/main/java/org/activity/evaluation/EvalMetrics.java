@@ -68,7 +68,8 @@ public class EvalMetrics
 
 			BufferedWriter bw = WToFile.getBWForNewFile(commonPath + fileNamePhrase + timeCategory
 					+ "PerActivityMeanReciprocalRank" + dimensionPhrase + ".csv");
-			BufferedWriter bwDistri = WToFile.getBWForNewFile(commonPath + "NumOfRTsPerAct" + dimensionPhrase + ".csv");
+			BufferedWriter bwDistri = WToFile.getBWForNewFile(
+					commonPath + fileNamePhrase + timeCategory + "NumOfRTsPerAct" + dimensionPhrase + ".csv");
 			// String[] activityNames = Constant.getActivityNames();
 
 			bw.write("User");
@@ -575,8 +576,7 @@ public class EvalMetrics
 	private static void groupByUserAndActual(String fileNamePhrase, String commonPath, String metricName)
 	{
 		// fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
-		List<List<String>> allRRRead = ReadingFromFile.readLinesIntoListOfLists(commonPath + fileNamePhrase + ".csv",
-				",");
+		List<List<String>> allRRRead = ReadingFromFile.readLinesIntoListOfLists(commonPath + fileNamePhrase + ".csv", ",");
 
 		LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByUser = allRRRead.stream().skip(1)
 				.collect(Collectors.groupingBy(e -> String.valueOf(e.get(0)), LinkedHashMap::new,
@@ -896,7 +896,8 @@ public class EvalMetrics
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
-
+			bw.write("User");
+			bwValidRTCount.write("User");
 			for (int K = EvaluationSeq.theKOriginal; K > 0; K--)
 			{
 				bw.write(",Avg_Recall_Top" + K + "");
@@ -1014,7 +1015,8 @@ public class EvalMetrics
 
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-
+			bw.write("User");
+			bwValidRTCount.write("User");
 			for (int K = EvaluationSeq.theKOriginal; K > 0; K--)
 			{
 				bw.write(",Avg_Precision_Top" + K + "");
@@ -1145,7 +1147,8 @@ public class EvalMetrics
 			validRTCountFile.delete();
 			validRTCountFile.createNewFile();
 			BufferedWriter bwValidRTCount = new BufferedWriter(new FileWriter(validRTCountFile.getAbsoluteFile()));
-
+			bw.write("User");
+			bwValidRTCount.write("User");
 			for (int K = EvaluationSeq.theKOriginal; K > 0; K--)
 			{
 				bw.write(",Avg_FMeasure_Top" + K + "");

@@ -3560,7 +3560,8 @@ public class AlignmentBasedDistance
 		if (VerbosityConstants.verboseLevenstein)// Constant.verbose ||
 		{
 			System.out.println("inside getMySimpleLevenshteinDistance  for word1=" + word1 + "  word2=" + word2
-					+ " with insertWt=" + insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt);
+					+ " with insertWt=" + insertWt + " with deleteWt=" + deleteWt + " with replaceWt=" + replaceWt
+					+ "  useForeignAwareLevenshtein= " + useForeignAwareLevenshtein);
 		}
 		int len1 = word1.length();
 		int len2 = word2.length();
@@ -3660,8 +3661,8 @@ public class AlignmentBasedDistance
 					double timeDecayMultiplier = 1;
 					if (useTimeDecay)
 					{
-						int valTemp = len2 - (j + 1) + 1;
-						timeDecayMultiplier = Math.pow(valTemp, timeDecayPower);
+						int posFromEnd = len2 - (j + 1) + 1;
+						timeDecayMultiplier = Math.pow(posFromEnd, timeDecayPower);
 						// $$System.out.println("valTemp = " + valTemp + " timeDecayMultiplier = " +
 						// timeDecayMultiplier);
 					}
