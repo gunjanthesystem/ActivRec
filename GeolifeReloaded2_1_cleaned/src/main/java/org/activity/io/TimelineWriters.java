@@ -75,8 +75,9 @@ public class TimelineWriters
 		String delimiter = ",";
 
 		// WToFile.writeToNewFile(msg, absFileNameToUse);
-		WToFile.writeToNewFile("User" + delimiter
-				+ ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(delimiter) + "\n",
+		WToFile.writeToNewFile(
+				"User" + delimiter
+						+ ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec("", delimiter) + "\n",
 				abFileNameToWrite);
 
 		for (Entry<String, LinkedHashMap<Date, Timeline>> userData : usersCleanedDayTimelines.entrySet())

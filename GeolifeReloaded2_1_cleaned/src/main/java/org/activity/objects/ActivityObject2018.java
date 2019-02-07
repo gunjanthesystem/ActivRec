@@ -1031,11 +1031,12 @@ public class ActivityObject2018 implements Serializable
 	 * @param delimiter
 	 * @return
 	 */
-	public static String getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(String delimiter)
+	public static String getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(String delim1, String delim2)// String
+																											// delimiter)
 	{
-
+		String delimiter = delim1 + delim2;
 		String brokenDownTS = "STweekDay" + delimiter + "STdateOnly" + delimiter + "SThourOfDay";
-		String brokenDownET = "ETweekDay" + delimiter + "ETdateOnly" + delimiter + "EThourOfDay";
+		String brokenDownET = "ETweekDay" + delimiter + "ETdateOnly" + delimiter + "EThourOfDay" + delim1;
 
 		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
 				? delimiter + "durationInSeconds" + delimiter + brokenDownET

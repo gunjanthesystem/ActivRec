@@ -5188,7 +5188,7 @@ public class WToFile
 				// recommP1.getSDRestSimilarity() , "," ,
 				// recommP1.getAvgEndSimilarity()
 				// , "," , recommP1.getSDEndSimilarity()
-				+ Boolean.toString((currentActName.equals(actActualDoneInSeq))) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
+				+ (currentActName.equals(actActualDoneInSeq) ? 1 : 0) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
 	}
 
 	// public static void writeSimpleLinkedHashMapToFileAppendDouble(LinkedHashMap<String, Double> map, String fileName,

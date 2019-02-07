@@ -130,12 +130,12 @@ public class CSVUtils
 
 	public static void main(String[] args)
 	{
-		removeDuplicateRowsFromRawFoursquareNY();
+		// ##removeDuplicateRowsFromRawFoursquareNY();
 		// $$ concatenateFetchedTimezones();
 		// splitCSVRowise("/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv", ",", true,
 		// 10, "/home/gunjan/JupyterWorkspace/data/", "gowalla_spots_subset1_fromRaw28Feb2018smallerFile");
 		// temp();
-		// testSideConcat();
+		testSideConcat();
 		// removeDuplicateRowsGowalla();
 		// $$removeDuplicateRowsFromRawGowalla();// IMPORTANT
 		// //$$removeDuplicationRowsUsingCuckoo(
@@ -177,7 +177,10 @@ public class CSVUtils
 		fileNamesToConcat.add("/home/gunjan/test/manali.csv");
 		fileNamesToConcat.add("/home/gunjan/test/galadriel.csv");
 
-		concatenateCSVFilesSideways(fileNamesToConcat, true, "/home/gunjan/test/concat.csv");
+		// fileNamesToConcat.add("/home/gunjan/tempConcat1.csv");
+		// fileNamesToConcat.add("/home/gunjan/tempConcat2.csv");
+
+		concatenateCSVFilesSideways(fileNamesToConcat, false, "/home/gunjan/test/concat.csv");
 	}
 
 	public static void removeDuplicateRowsGowalla()
@@ -774,6 +777,20 @@ public class CSVUtils
 	public static void concatenateCSVFilesSideways(ArrayList<String> listOfAbsFileNames, boolean hasRowHeader,
 			String absfileToWrite)
 	{
+		concatenateCSVFilesSideways(listOfAbsFileNames, hasRowHeader, absfileToWrite, "", false);
+	}
+
+	/**
+	 * 
+	 * @param listOfAbsFileNames
+	 * @param hasRowHeader
+	 * @param absfileToWrite
+	 * @param interFileDelimiter
+	 * @param writeNewFile
+	 */
+	public static void concatenateCSVFilesSideways(ArrayList<String> listOfAbsFileNames, boolean hasRowHeader,
+			String absfileToWrite, String interFileDelimiter, boolean writeNewFile)
+	{
 		// read each file
 		// store all lines in a list, size of list = num of rows
 		// read new file. add string from corresponding lines
@@ -812,7 +829,7 @@ public class CSVUtils
 					if (finalLines.containsKey(lineIndex))
 					{
 						String prev = finalLines.get(lineIndex);
-						res = prev + currentLine;
+						res = prev + interFileDelimiter + currentLine;
 					}
 					else
 					{
@@ -825,7 +842,8 @@ public class CSVUtils
 				br.close();
 			}
 
-			BufferedWriter bw = WToFile.getBufferedWriterForExistingFile(absfileToWrite);
+			BufferedWriter bw = writeNewFile ? WToFile.getBWForNewFile(absfileToWrite)
+					: WToFile.getBufferedWriterForExistingFile(absfileToWrite);
 			for (Entry<Integer, String> l : finalLines.entrySet())
 			{
 				bw.write(l.getValue().toString() + "\n");
@@ -873,9 +891,7 @@ public class CSVUtils
 		// }
 		// }
 
-		catch (
-
-		Exception e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}

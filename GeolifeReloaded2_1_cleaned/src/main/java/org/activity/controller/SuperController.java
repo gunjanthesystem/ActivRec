@@ -480,7 +480,10 @@ public class SuperController
 				// for (String commonPath1 : pathsToRead)
 				{
 					// PopUps.showMessage(commonPath1);
-					String commonPath1 = "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/AUG12ED1.0LocAllActsFDStFilter0hrs100RTVPNN500SNN500 (copy 1)/";
+					String commonPath1 = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender/";
+					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/HGRU4RecRecommender/";
+					// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/AUG12ED1.0LocAllActsFDStFilter0hrs100RTVPNN500SNN500
+					// (copy 1)/";
 					// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/AUG17ED0.5STimeLocDistPrevDurPrevAllActsFDStFilter0hrs75FRTV75ARTVPNN500SNN500
 					// (copy 1)/";
 					// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_JAN3H13M33ED0.5STimeDurDistTrStartGeoEndGeoAvgAltDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NoTTFilterNC/";

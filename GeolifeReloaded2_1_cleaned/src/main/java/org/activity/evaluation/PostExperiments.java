@@ -1,5 +1,6 @@
 package org.activity.evaluation;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 
@@ -20,9 +22,59 @@ public class PostExperiments
 {
 	public static void main(String args[])
 	{
-		main14Jan2019();
+		// main14Jan2019();//disabled on Feb 6 2019
+		mainFeb6_2019();
 	}
 
+	/////////////////////// START OF FEB 6
+	public static void mainFeb6_2019()
+	{
+		addMoreFieldsToLogsFromRaw(
+				"/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/dcu_data_2_FEB6H22M52ED0.5STimeDurAllActsFDStFilter0hrsFEDPerFS_20F_RTVPNN500NoTTFilterNCMyLevenshtein/All/MatchingUnit3.0/");
+		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/dcu_data_2_FEB6H16M6ED0.5STimeDurAllActsFDStFilter0hrsFEDPerFS_20F_RTVPNN100NoTTFilterNCMyLevenshtein/All/MatchingUnit3.0/");
+	}
+
+	public static void addMoreFieldsToLogsFromRaw(String commonPath)
+	{
+		String pathToRawFile = commonPath + "Raw0.csv";
+		String pathToLogFileToAddFieldsTo = commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv";
+		int rawIndexForUser = 0;
+		int rawIndexForDate = 1;
+		int rawIndexForTime = 2;
+		int rawIndexForNumOfCands = 8;
+		int rawIndexForTargetAct = 10;
+		int rawIndexForRecommList = 11;
+
+		List<List<String>> res = ReadingFromFile.nColumnReaderStringLargeFileSelectedColumns(pathToRawFile, ",", true,
+				false, new int[] { rawIndexForNumOfCands, rawIndexForTargetAct, rawIndexForRecommList, rawIndexForUser,
+						rawIndexForDate, rawIndexForTime });
+		res.remove(0);
+		StringBuilder sb = new StringBuilder("TargetAct,RecommList,User,Date,Time\n");
+		for (List<String> line : res)
+		{
+			System.out.println("line = " + line);
+			int numOfCandsForThisRT = Integer.valueOf(line.get(0));
+			String targetActForThisRT = line.get(1);
+			String recommListForThisRT = line.get(2);
+
+			for (int i = 0; i < numOfCandsForThisRT; i++)
+			{
+				sb.append(targetActForThisRT + "," + recommListForThisRT + "," + line.get(3) + "," + line.get(4) + ","
+						+ line.get(5) + "\n");
+			}
+		}
+		WToFile.writeToNewFile(sb.toString(), commonPath + "TargetRecommTemp.csv");
+
+		ArrayList<String> filesToConcatenate = new ArrayList<>();
+		filesToConcatenate.add(pathToLogFileToAddFieldsTo);
+		filesToConcatenate.add(commonPath + "TargetRecommTemp.csv");
+		CSVUtils.concatenateCSVFilesSideways(filesToConcatenate, false,
+				commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCandWithExtras.csv", "", true);
+	}
+
+	//////////////////////// END OF FEB 6
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * looking into distribution of target activity per RT
 	 */
