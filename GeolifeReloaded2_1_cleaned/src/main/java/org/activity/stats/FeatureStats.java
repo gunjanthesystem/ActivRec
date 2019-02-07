@@ -39,7 +39,7 @@ public class FeatureStats
 		StringBuilder sb = new StringBuilder();
 		if (new File(absFileNameToAppend).isFile() == false)
 		{
-			sb.append(ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(",") + "\n");
+			sb.append(ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec("", ",") + "\n");
 		}
 
 		for (Entry<Date, Timeline> entry : userTrainingTimelines.entrySet())
@@ -115,8 +115,8 @@ public class FeatureStats
 	{
 		List<List<ActivityObject2018>> listOfWindows = splitDayTimelineToSlidingWindows(userTrainingTimelines, muCount);
 
-		String featHeader = IntStream.range(0, muCount)
-				.mapToObj(i -> ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(i + ","))
+		String featHeader = IntStream.range(0, muCount).mapToObj(
+				i -> ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(String.valueOf(i), ","))
 				.collect(Collectors.joining(","));
 		StringBuilder sb = new StringBuilder();
 

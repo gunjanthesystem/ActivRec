@@ -569,7 +569,7 @@ public class RecommendationTestsUtils
 				// recommP1.getSDRestSimilarity() , "," ,
 				// recommP1.getAvgEndSimilarity()
 				// , "," , recommP1.getSDEndSimilarity()
-				+ Boolean.toString((currentActName.equals(actActualDoneInSeq))) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
+				+ (currentActName.equals(actActualDoneInSeq) ? 1 : 0) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
 	}
 
 	/**
@@ -608,7 +608,7 @@ public class RecommendationTestsUtils
 				// recommP1.getSDRestSimilarity() , "," ,
 				// recommP1.getAvgEndSimilarity()
 				// , "," , recommP1.getSDEndSimilarity()
-				+ Boolean.toString((currentActName.equals(actActualDoneInSeq))) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
+				+ (currentActName.equals(actActualDoneInSeq) ? 1 : 0) + "\n");// ,",",recommP1.getActivitiesGuidingRecomm());
 
 		if (Constant.debug18July2018)
 		{

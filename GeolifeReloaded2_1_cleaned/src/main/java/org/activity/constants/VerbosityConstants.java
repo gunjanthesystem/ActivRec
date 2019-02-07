@@ -67,7 +67,7 @@ public class VerbosityConstants
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculationsTrimmed = false;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
-	public static final boolean WriteRTVerseNormalisationLogs = true;// Jan8_2019_disabled true;
+	public static final boolean WriteRTVerseNormalisationLogs = false;// true;// Jan8_2019_disabled true;
 	public static final boolean WriteCandAEDDiffs = true;//// Jan8_2019_disabled true;
 
 	public static final boolean WriteMInOfMinAndMaxOfMaxRTV = false;//// Jan8_2019_disabled 30 Nov 2018
@@ -94,7 +94,7 @@ public class VerbosityConstants
 	public static final boolean WriteTopNextActivitiesWithoutDistance = false;
 	public static final boolean WriteTopNextActivitiesWithDistance = false;
 
-	public static final boolean WriteRaw = true;// SWITCH
+	public static final boolean WriteRaw = false;// true;// SWITCH
 
 	public static final boolean writeRankedRecommsWOScoreForEachSeqIndex = true;// false;
 	public static final boolean writeDataActualForEachSeqIndex = true;
