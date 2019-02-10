@@ -91,7 +91,7 @@ public class Dashboard3 extends Application
 	public void start(Stage stage)
 	{
 		long t0 = System.currentTimeMillis();
-
+		Constant.setDatabaseName("gowalla1");
 		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
 		Constant.initialise("./", "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
@@ -105,7 +105,7 @@ public class Dashboard3 extends Application
 		// disabled on 24 July 2018, as i getting deserialisation error, perhaps because ActivityObject class
 		// has changes this serialised toy timelines being read were created. remedy to do later, create toy
 		// timelines again.
-		if (true)
+		if (false)
 		{
 			usersCleanedDayToyTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 					.kryoDeSerializeThis(PathConstants.pathToToyTimelines12AUG);
@@ -213,19 +213,19 @@ public class Dashboard3 extends Application
 		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = toOnlySeqOfActIDs(
 		// usersCleanedDayToyTimelines);
 		System.out.println("Entered createTabs()");
-		final boolean doSyntheticDataCircleTimelines = false;
-		final boolean doGivenDataCircleTimelines = true;
-		final boolean doGivenDataOnlyActIDSeq = true;
+		final boolean doSyntheticDataCircleTimelines = true;
+		final boolean doGivenDataCircleTimelines = false;
+		final boolean doGivenDataOnlyActIDSeq = false;
 		final boolean doSyntheticDataCanvasTimelines = false;
 		final boolean doSyntheticDataBoxTimelines = false;
 		final boolean doSyntheticDataLineTimelines = false;
-		final boolean doMapPlot = true;
+		final boolean doMapPlot = false;
 
 		try
 		{
 			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
 			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 50, 12, 5, 864000, 60 * 20, 10800);
-
+			System.out.println("timelineData.size() = " + timelineData.size());
 			if (doSyntheticDataCircleTimelines)
 			{
 				long tTimeline0 = System.currentTimeMillis();

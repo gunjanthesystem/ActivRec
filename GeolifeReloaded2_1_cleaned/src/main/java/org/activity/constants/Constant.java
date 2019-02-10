@@ -337,7 +337,7 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "geolife1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+	static String DATABASE_NAME = "dcu_data_2";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
 												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
