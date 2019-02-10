@@ -94,7 +94,14 @@ public class ActivityCircle extends Group
 		// circle.setFill(ColorPalette.getColors269Color(Constant.getIndexOfActIDInActNames(actID)));// only works for
 		// real data
 		// circle.setFill(ColorPalette.getInsightSecondaryColor(Dashboard3.actIDIndexMap.get(actID)));// only
-		circle.setFill(ColorPalette.getColor(Dashboard3.actIDIndexMap.get(actID)));// only
+		if (Dashboard3.actIDIndexMap != null)
+		{
+			circle.setFill(ColorPalette.getColor(Dashboard3.actIDIndexMap.get(actID)));// only
+		}
+		else
+		{
+			circle.setFill(ColorPalette.getColors269Color(actID));
+		}
 		// works for real
 	}
 

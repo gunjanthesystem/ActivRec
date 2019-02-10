@@ -224,6 +224,15 @@ public class SuperController
 	}
 
 	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String args[])
+	{
+		superControllerMain(args);
+	}
+
+	/**
 	 * <h2>In this method:</h2>
 	 * 
 	 * <ul>
@@ -236,7 +245,7 @@ public class SuperController
 	 * 
 	 * @param args
 	 */
-	public static void main(String args[])// _importantMay10
+	public static void superControllerMain(String args[])// _importantMay10
 	{
 		String databaseName = Constant.getDatabaseName();
 		initializeConstants("SuperController", Constant.For9kUsers, databaseName);
