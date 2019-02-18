@@ -77,14 +77,12 @@ public class ControllerWithoutServer
 	 */
 	public ControllerWithoutServer(String databaseName, String commonBasePath, boolean noRecommendations)
 	{
+		System.out.println("Starting ControllerWithoutServer>>>>\n" + PerformanceAnalytics.getHeapInformation() + "\n"
+				+ "currentDateTime: " + LocalDateTime.now() + "\nRunning experiments for database: " + databaseName);
+		System.out.println(
+				PerformanceAnalytics.getHeapInformation() + "\n" + PerformanceAnalytics.getHeapPercentageFree());
 		try
 		{
-			System.out.println("Starting ControllerWithoutServer>>>>\n" + PerformanceAnalytics.getHeapInformation()
-					+ "\n" + "currentDateTime: " + LocalDateTime.now() + "\nRunning experiments for database: "
-					+ databaseName);
-			System.out.println(
-					PerformanceAnalytics.getHeapInformation() + "\n" + PerformanceAnalytics.getHeapPercentageFree());
-
 			// TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 			// Constant.setDefaultTimeZone("UTC"); Moved to org.activity.controller.SuperController.starterKit()
 			// String pathToLatestSerialisedJSONArray = "", pathForLatestSerialisedJSONArray = "",
@@ -131,66 +129,8 @@ public class ControllerWithoutServer
 			// PopUps.showMessage("commonPath = " + commonPath);
 
 			// disabling reduce and clean for gowalla as they have already been reduced and clean in April 24 subset.
-			if ((databaseName.equals("gowalla1") == false && Constant.reduceAndCleanTimelinesBeforeRecomm))
-			{
-				if (databaseName.equals("gowalla1") && Constant.For9kUsers)// For 9k users
-				{
-					usersCleanedDayTimelines = reduceAndCleanTimelines2(databaseName, usersDayTimelinesOriginal, true,
-							commonBasePath, 10, 7, 500);
-				}
-				else // For 916 users
-				{
-					usersCleanedDayTimelines = reduceAndCleanTimelines(databaseName, usersDayTimelinesOriginal, true,
-							commonBasePath);
-				}
-
-			}
-			else// in this case, we are expecting the data is already subsetting and cleaned
-			{
-				System.out.println("Alert! Not reducing and cleaning data !!");
-				usersCleanedDayTimelines = usersDayTimelinesOriginal;
-			}
-
-			usersDayTimelinesOriginal = null; // null this out so as to be ready for garbage collection.
-			System.out.println("After reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
-			long dt3 = System.currentTimeMillis();
-			System.out.println("Time taken = " + (dt3 - dt1) + " ms");
-
-			// start of added on Nov 14 2018
-			if (databaseName.equals("geolife1"))
-			{ // Only include the selected userIDs
-				// and in that order //added on 31 Dec 2018
-				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> selectedUsersCleanedDayTimelines = new LinkedHashMap<>();
-
-				// for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
-				// {
-				// boolean validUser = IntStream.of(Constant.getUserIDs())
-				// .anyMatch(x -> x == Integer.valueOf(e.getKey()));
-				// if (validUser)
-				// {
-				// System.out.println("Selecting user: " + e.getKey());
-				// selectedUsersCleanedDayTimelines.put(e.getKey(), e.getValue());
-				// }
-				// }
-				for (int selectedUserID : Constant.getUserIDs())
-				{
-					LinkedHashMap<Date, Timeline> timelinesForSelectedUser = usersCleanedDayTimelines
-							.get(String.valueOf(selectedUserID));
-					if (timelinesForSelectedUser == null || timelinesForSelectedUser.size() == 0)
-					{
-						PopUps.printTracedErrorMsgWithExit("Error: expected day timeline for user: " + selectedUserID
-								+ " but not found in usersCleanedDayTimelines.keySet() = "
-								+ usersCleanedDayTimelines.keySet());
-					}
-					System.out.println("selectedUserID: " + selectedUserID);
-					selectedUsersCleanedDayTimelines.put(String.valueOf(selectedUserID), timelinesForSelectedUser);
-
-				}
-				usersCleanedDayTimelines = selectedUsersCleanedDayTimelines;
-				System.out.println("Only selected users for geolife usersCleanedDayTimelines.size()= "
-						+ usersCleanedDayTimelines.size());
-			}
-
+			usersCleanedDayTimelines = reduceCleanSelectTimelines(databaseName, commonBasePath,
+					usersDayTimelinesOriginal, Constant.reduceAndCleanTimelinesBeforeRecomm, Constant.For9kUsers);
 			// PopUps.showMessage("Constant.getUserIDs() = " + Arrays.toString(Constant.getUserIDs()));
 			// PopUps.showMessage("usersCleanedDayTimelines.keySet() = " + usersCleanedDayTimelines.keySet());
 
@@ -229,8 +169,7 @@ public class ControllerWithoutServer
 			// System.out.println("List of all users:\n" + usersCleanedDayTimelines.keySet().toString() + "\n");
 			// String commonBasePath = Constant.getCommonPath();
 			// PopUps.showMessage("here01");
-
-			System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
+			// System.out.println("Before sampleUsersExec\n" + PerformanceAnalytics.getHeapInformation());
 			// PopUps.showMessage("here02");
 			///
 
@@ -255,46 +194,7 @@ public class ControllerWithoutServer
 			// System.exit(0);
 			if (true)// temporary enabled for verbose writing of user timeline
 			{
-				TimelineWriters.writeAllActObjs(usersCleanedDayTimelines, commonBasePath + "AllActObjs.csv");
-				if (databaseName.equals("gowalla1"))
-				{
-					TimelineWriters.writeLocationObjects(Constant.getUniqueLocIDs(),
-							DomainConstants.getLocIDLocationObjectDictionary(),
-							commonBasePath + "UniqueLocationObjects.csv");
-					// SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
-					TimelineWriters.writeUserObjects(usersCleanedDayTimelines.keySet(),
-							DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
-				}
-
-				if (true)
-				{
-					if (true)// only for Jupyter baselines
-					{
-						// expunge invalids
-						LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedInvalidsExpungedDayTimelines = new LinkedHashMap<>();
-						if (databaseName.equals("dcu_data_2"))
-						{
-							for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines
-									.entrySet())
-							{
-								usersCleanedInvalidsExpungedDayTimelines.put(userEntry.getKey(),
-										TimelineTrimmers.expungeInvalidsDayTimelines(userEntry.getValue()));
-							}
-						}
-						else
-						{
-							usersCleanedInvalidsExpungedDayTimelines = usersCleanedDayTimelines;
-						}
-						Serializer.kryoSerializeThis(usersCleanedInvalidsExpungedDayTimelines,
-								commonBasePath + "usersCleanedInvalidsExpungedDayTimelines.kryo");
-						// DataTransformerForSessionBasedRecAlgos.convertToMQInputFormat(
-						// usersCleanedInvalidsExpungedDayTimelines, Constant.getCommonPath(),
-						// Constant.getCommonPath() + databaseName + "InMQFormat.csv");
-						// System.exit(0);
-					}
-					Serializer.kryoSerializeThis(usersCleanedDayTimelines,
-							commonBasePath + "usersCleanedDayTimelines.kryo");
-				}
+				writeDataObjects(databaseName, commonBasePath, usersCleanedDayTimelines);
 				// System.exit(0);
 			}
 
@@ -331,128 +231,13 @@ public class ControllerWithoutServer
 
 			if (Constant.useToyTimelines)
 			{
-				// PopUps.showMessage("Here in Controller for toytimelines\n");
-				// disabled on Aug 6 2018 to created toy timelines again
-				// boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;//
-				boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;// strue;
-				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines = null;
-				if (createToyTimelines)
-				{
-					// Create Toy timelines by sampling
-					// $$ ToyTimelineUtils.createToyTimelinesSamplingCinEntriesGowalla(usersCleanedDayTimelines);
-					// creating toy timelines manually
-					usersToyDayTimelines = ToyTimelineUtils.createToyTimelinesManuallyGowalla(
-							usersCleanedDayTimelines.keySet(), Constant.getUniqueActivityIDs(),
-							Constant.getUniqueLocationIDsPerActID(), Constant.getUniqueLocIDs(),
-							PathConstants.commonPathToGowallaPreProcessedData);
-				}
-				if (serialiseToyTimelines)
-				{
-					Serializer.kryoSerializeThis(usersToyDayTimelines,
-							commonBasePath + "ToyTimelinesManually" + DateTimeUtils.getMonthDateLabel() + ".kryo");
-				}
-				if (deserialiseToyTimelines)
-				{
-					usersToyDayTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-							.kryoDeSerializeThis(PathConstants.pathToToyTimelines12AUG);// .pathToToyTimelines6JUN);
-					// System.exit(0);
-				}
-
-				// didnt work because the previously serialised toytimeline didnt had gridIndex as field.
-				// if (!createToyTimelines)// add locGrid to AOs in timelines, because the previously (before Aug
-				// 2018)// // created toy timelines did not had locGridIndices assigned to AOs
-				// {usersToyDayTimelines = TimelineUtils.assignLocGridIndices(usersToyDayTimelines);}
-				ToyTimelineUtils.writeOnlyActIDs(usersToyDayTimelines, commonBasePath + "ToyTimelinesOnlyActIDs.csv");
-				ToyTimelineUtils.writeOnlyActIDs2(usersToyDayTimelines, commonBasePath + "ToyTimelinesOnlyActIDs2.csv");
-				ToyTimelineUtils.writeActIDTS(usersToyDayTimelines, commonBasePath + "ToyTimelinesActIDTS.csv");
-
-				PrimaryDimension primDimTemp = Constant.primaryDimension;
-				PrimaryDimension secDimTemp = Constant.secondaryDimension;
-				ToyTimelineUtils.writeOnlyGivenDimensionVals(usersToyDayTimelines,
-						commonBasePath + "ToyTimelinesOnly" + primDimTemp + ".csv", primDimTemp);
-				ToyTimelineUtils.writeOnlyGivenDimensionVals(usersToyDayTimelines,
-						commonBasePath + "ToyTimelinesOnly" + secDimTemp + ".csv", secDimTemp);
-
-				// do it again using the toy timelines
-				setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true, true, databaseName);
-
-				// done especially for toy timelines to avoid writing all activitie in timeline activity stats.
-				Constant.setActivityNames(
-						Constant.getUniqueActivityIDs().stream().map(i -> String.valueOf(i)).toArray(String[]::new));
-
-				writeActIDNamesInFixedOrder(commonBasePath + "ToyCatIDNameMap.csv");
-
-				// PopUps.showMessage("After toy timelines creation!!");
-				// $$Disabled on May29 2018 TimelineStats.timelineStatsController(usersCleanedDayToyTimelines);
-				// PopUps.showMessage("here");
-				WToFile.writeUsersDayTimelinesSameFile(usersToyDayTimelines, "usersToyDayTimelines", false, false,
-						false, "GowallaUserDayToyTimelines.csv", commonBasePath);
-				// PopUps.showMessage("here2");
-				// $TimelineStats.timelineStatsController(usersToyDayTimelines);
-				// System.exit(0);
-				// End of Moved here on 18 May 2018
-
+				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines = createToyTimelines(
+						databaseName, commonBasePath, usersCleanedDayTimelines);
 				// make the usersCleanedDayTimelines point to the toy timelines
 				usersCleanedDayTimelines = usersToyDayTimelines;
-			} // end of Toy timelines block
-
-			if (Constant.For9kUsers)
-			{
-				System.out.println("For9kUsers :");
-				sampleUsersExecuteExperimentsFor9kUsers(commonBasePath, usersCleanedDayTimelines,
-						Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor));
-				// System.exit(0);
 			}
-			else
-			{
-				if (Constant.useRandomlySampled100Users)
-				{
-					System.out.println("useRandomlySampled100Users :");
-					String pathToRandomlySampled100Users = Constant.getDynamicPathToRandomlySampledUserIndices();
 
-					List<String> sampledUserIndicesStr = ReadingFromFile
-							// .oneColumnReaderString("./dataToRead/RandomlySample100Users/Mar1_2018.csv", ",", 0,
-							// .oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
-							.oneColumnReaderString(pathToRandomlySampled100Users, ",", 0, false);
-					System.out.println("pathToRandomlySampled100Users=" + pathToRandomlySampled100Users);
-					List<Integer> sampledUserIndices = sampledUserIndicesStr.stream().map(i -> Integer.valueOf(i))
-							.collect(Collectors.toList());
-
-					sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines,
-							DomainConstants.gowalla100RandomUsersLabel, sampledUserIndices, commonBasePath,
-							Constant.lengthOfRecommendedSequence);
-				}
-				else if (Constant.runForAllUsersAtOnce)
-				{
-					System.out.println("runForAllUsersAtOnce :");
-					if (true)
-					{
-						int numOfUsers = usersCleanedDayTimelines.size();
-						List<Integer> allUserIndices = IntStream.range(0, numOfUsers).boxed()
-								.collect(Collectors.toList());
-						System.out.println("allUserIndices = " + allUserIndices);
-						// PopUps.showMessage("allUserIndices = " + allUserIndices);
-						sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines, "All", allUserIndices,
-								commonBasePath, Constant.lengthOfRecommendedSequence);
-						ResultsSanityChecks.assertSameNumOfRTsAcrossAllMUsForUsers(commonBasePath, false);
-					}
-					if (false)// temporary sanity check
-					{
-						List<String> sampledUserIDsStr = ReadingFromFile.oneColumnReaderString(
-								"/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/APR11ED1.0AllActsFDStFilter0hrs_debugging/All/MatchingUnit3.0/UsersWithNoValidRTs.csv",
-								",", 0, false);
-
-						sampleUsersByIDsExecuteRecommendationTests(usersCleanedDayTimelines, "All", sampledUserIDsStr,
-								commonBasePath);
-					}
-				}
-				else
-				{ // Start of curtain Aug 11 2017
-					sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines,
-							DomainConstants.gowallaUserGroupsLabels, commonBasePath);
-				}
-				// End of curtain Aug 11 2017
-			}
+			sampleUsersAndExectuteRecommendationExperiments(commonBasePath, commonPath, usersCleanedDayTimelines);
 			// $$// important curtain 1 end 21 Dec 2017 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017
@@ -549,6 +334,280 @@ public class ControllerWithoutServer
 	}
 
 	/**
+	 * @param commonBasePath
+	 * @param usersCleanedDayTimelines
+	 * @throws IOException
+	 */
+	// Extracted from ControllerWithoutServer() on 14 Feb 2019
+	private static void sampleUsersAndExectuteRecommendationExperiments(String commonBasePath, String commonPath,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines) throws IOException
+	{
+		if (Constant.For9kUsers)
+		{
+			System.out.println("For9kUsers :");
+			sampleUsersExecuteExperimentsFor9kUsers(commonBasePath, usersCleanedDayTimelines,
+					Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor));
+			// System.exit(0);
+		}
+		else
+		{
+			if (Constant.useRandomlySampled100Users)
+			{
+				System.out.println("useRandomlySampled100Users :");
+				String pathToRandomlySampled100Users = Constant.getDynamicPathToRandomlySampledUserIndices();
+
+				List<String> sampledUserIndicesStr = ReadingFromFile
+						// .oneColumnReaderString("./dataToRead/RandomlySample100Users/Mar1_2018.csv", ",", 0,
+						// .oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
+						.oneColumnReaderString(pathToRandomlySampled100Users, ",", 0, false);
+				System.out.println("pathToRandomlySampled100Users=" + pathToRandomlySampled100Users);
+				List<Integer> sampledUserIndices = sampledUserIndicesStr.stream().map(i -> Integer.valueOf(i))
+						.collect(Collectors.toList());
+
+				sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines,
+						DomainConstants.gowalla100RandomUsersLabel, sampledUserIndices, commonBasePath,
+						Constant.lengthOfRecommendedSequence, commonPath);
+			}
+			else if (Constant.runForAllUsersAtOnce)
+			{
+				System.out.println("runForAllUsersAtOnce :");
+				if (true)
+				{
+					int numOfUsers = usersCleanedDayTimelines.size();
+					List<Integer> allUserIndices = IntStream.range(0, numOfUsers).boxed().collect(Collectors.toList());
+					System.out.println("allUserIndices = " + allUserIndices);
+					// PopUps.showMessage("allUserIndices = " + allUserIndices);
+					sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines, "All", allUserIndices,
+							commonBasePath, Constant.lengthOfRecommendedSequence, commonPath);
+					ResultsSanityChecks.assertSameNumOfRTsAcrossAllMUsForUsers(commonBasePath, false);
+				}
+				if (false)// temporary sanity check
+				{
+					List<String> sampledUserIDsStr = ReadingFromFile.oneColumnReaderString(
+							"/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/APR11ED1.0AllActsFDStFilter0hrs_debugging/All/MatchingUnit3.0/UsersWithNoValidRTs.csv",
+							",", 0, false);
+
+					sampleUsersByIDsExecuteRecommendationTests(usersCleanedDayTimelines, "All", sampledUserIDsStr,
+							commonBasePath, commonPath);
+				}
+			}
+			else
+			{ // Start of curtain Aug 11 2017
+				sampleUsersExecuteRecommendationTests(usersCleanedDayTimelines, DomainConstants.gowallaUserGroupsLabels,
+						commonBasePath);
+			}
+			// End of curtain Aug 11 2017
+		}
+	}
+
+	/**
+	 * <p>
+	 * 
+	 * @param databaseName
+	 * @param commonBasePath
+	 * @param usersCleanedDayTimelines
+	 */
+	// Extracted from ControllerWithoutServer() on 14 Feb 2019
+	private static void writeDataObjects(String databaseName, String commonBasePath,
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
+	{
+		TimelineWriters.writeAllActObjs(usersCleanedDayTimelines, commonBasePath + "AllActObjs.csv");
+		if (databaseName.equals("gowalla1"))
+		{
+			TimelineWriters.writeLocationObjects(Constant.getUniqueLocIDs(),
+					DomainConstants.getLocIDLocationObjectDictionary(), commonBasePath + "UniqueLocationObjects.csv");
+			// SpatialUtils.createLocationDistanceDatabase(DomainConstants.getLocIDLocationObjectDictionary());
+			TimelineWriters.writeUserObjects(usersCleanedDayTimelines.keySet(),
+					DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
+		}
+
+		if (true)
+		{
+			if (false)// only for Jupyter baselines
+			{
+				// expunge invalids
+				LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedInvalidsExpungedDayTimelines = new LinkedHashMap<>();
+				if (databaseName.equals("dcu_data_2"))
+				{
+					for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+					{
+						usersCleanedInvalidsExpungedDayTimelines.put(userEntry.getKey(),
+								TimelineTrimmers.expungeInvalidsDayTimelines(userEntry.getValue()));
+					}
+				}
+				else
+				{
+					usersCleanedInvalidsExpungedDayTimelines = usersCleanedDayTimelines;
+				}
+				Serializer.kryoSerializeThis(usersCleanedInvalidsExpungedDayTimelines,
+						commonBasePath + "usersCleanedInvalidsExpungedDayTimelines.kryo");
+				// DataTransformerForSessionBasedRecAlgos.convertToMQInputFormat(
+				// usersCleanedInvalidsExpungedDayTimelines, Constant.getCommonPath(),
+				// Constant.getCommonPath() + databaseName + "InMQFormat.csv");
+				// System.exit(0);
+			}
+			Serializer.kryoSerializeThis(usersCleanedDayTimelines, commonBasePath + "usersCleanedDayTimelines.kryo");
+		}
+	}
+
+	/**
+	 * If asked for, reduce and clean timeline and subset to selected user in case of Geolife dataset.
+	 * <p>
+	 * Extracted from ControllerWithoutServer() on Feb 14 2019
+	 * 
+	 * @param databaseName
+	 * @param commonBasePath
+	 * @param usersDayTimelinesOriginal
+	 * @param reduceAndCleanTimelinesBeforeRecomm
+	 * @return
+	 */
+	private static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> reduceCleanSelectTimelines(String databaseName,
+			String commonBasePath, LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesOriginal,
+			boolean reduceAndCleanTimelinesBeforeRecomm, boolean for9kUsers)
+	{
+		long dt1 = System.currentTimeMillis();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = null;
+
+		// disabling reduce and clean for gowalla as they have already been reduced and clean in April 24 subset.
+		if ((databaseName.equals("gowalla1") == false && reduceAndCleanTimelinesBeforeRecomm))
+		{
+			if (databaseName.equals("gowalla1") && for9kUsers)// For 9k users
+			{
+				usersCleanedDayTimelines = reduceAndCleanTimelines2(databaseName, usersDayTimelinesOriginal, true,
+						commonBasePath, 10, 7, 500);
+			}
+			else // For 916 users
+			{
+				usersCleanedDayTimelines = reduceAndCleanTimelines(databaseName, usersDayTimelinesOriginal, true,
+						commonBasePath);
+			}
+		}
+		else// in this case, we are expecting the data is already subsetted and cleaned
+		{
+			System.out.println("Alert! Not reducing and cleaning data !!");
+			usersCleanedDayTimelines = usersDayTimelinesOriginal;
+		}
+
+		usersDayTimelinesOriginal = null; // null this out so as to be ready for garbage collection.
+		System.out.println("After reduceAndCleanTimelines\n" + PerformanceAnalytics.getHeapInformation());
+
+		// start of added on Nov 14 2018
+		if (databaseName.equals("geolife1"))
+		{ // Only include the selected userIDs
+			// and in that order //added on 31 Dec 2018
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> selectedUsersCleanedDayTimelines = new LinkedHashMap<>();
+
+			// for (Entry<String, LinkedHashMap<Date, Timeline>> e : usersCleanedDayTimelines.entrySet())
+			// {
+			// boolean validUser = IntStream.of(Constant.getUserIDs())
+			// .anyMatch(x -> x == Integer.valueOf(e.getKey()));
+			// if (validUser)
+			// {
+			// System.out.println("Selecting user: " + e.getKey());
+			// selectedUsersCleanedDayTimelines.put(e.getKey(), e.getValue());
+			// }
+			// }
+			for (int selectedUserID : Constant.getUserIDs())
+			{
+				LinkedHashMap<Date, Timeline> timelinesForSelectedUser = usersCleanedDayTimelines
+						.get(String.valueOf(selectedUserID));
+				if (timelinesForSelectedUser == null || timelinesForSelectedUser.size() == 0)
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: expected day timeline for user: " + selectedUserID
+							+ " but not found in usersCleanedDayTimelines.keySet() = "
+							+ usersCleanedDayTimelines.keySet());
+				}
+				System.out.println("selectedUserID: " + selectedUserID);
+				selectedUsersCleanedDayTimelines.put(String.valueOf(selectedUserID), timelinesForSelectedUser);
+
+			}
+			usersCleanedDayTimelines = selectedUsersCleanedDayTimelines;
+			System.out.println("Only selected users for geolife usersCleanedDayTimelines.size()= "
+					+ usersCleanedDayTimelines.size());
+		}
+		System.out.println("Time taken = " + (System.currentTimeMillis() - dt1) + " ms");
+
+		return usersCleanedDayTimelines;
+	}
+
+	/**
+	 * Create Toy timelines.
+	 * <p>
+	 * Extracted from ControllerWithoutServer() on 14 Feb 2019
+	 * 
+	 * @param databaseName
+	 * @param commonBasePath
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 * 
+	 */
+	private static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> createToyTimelines(String databaseName,
+			String commonBasePath, LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
+	{
+		// PopUps.showMessage("Here in Controller for toytimelines\n");
+		// disabled on Aug 6 2018 to created toy timelines again
+		// boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;//
+		boolean createToyTimelines = false, serialiseToyTimelines = false, deserialiseToyTimelines = true;// strue;
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersToyDayTimelines = null;
+
+		if (createToyTimelines)
+		{
+			// Create Toy timelines by sampling
+			// $$ ToyTimelineUtils.createToyTimelinesSamplingCinEntriesGowalla(usersCleanedDayTimelines);
+			// creating toy timelines manually
+			usersToyDayTimelines = ToyTimelineUtils.createToyTimelinesManuallyGowalla(usersCleanedDayTimelines.keySet(),
+					Constant.getUniqueActivityIDs(), Constant.getUniqueLocationIDsPerActID(),
+					Constant.getUniqueLocIDs(), PathConstants.commonPathToGowallaPreProcessedData);
+		}
+		if (serialiseToyTimelines)
+		{
+			Serializer.kryoSerializeThis(usersToyDayTimelines,
+					commonBasePath + "ToyTimelinesManually" + DateTimeUtils.getMonthDateLabel() + ".kryo");
+		}
+		if (deserialiseToyTimelines)
+		{
+			usersToyDayTimelines = (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+					.kryoDeSerializeThis(PathConstants.pathToToyTimelines12AUG);// .pathToToyTimelines6JUN);
+			// System.exit(0);
+		}
+
+		// didnt work because the previously serialised toytimeline didnt had gridIndex as field.
+		// if (!createToyTimelines)// add locGrid to AOs in timelines, because the previously (before Aug
+		// 2018)// // created toy timelines did not had locGridIndices assigned to AOs
+		// {usersToyDayTimelines = TimelineUtils.assignLocGridIndices(usersToyDayTimelines);}
+		ToyTimelineUtils.writeOnlyActIDs(usersToyDayTimelines, commonBasePath + "ToyTimelinesOnlyActIDs.csv");
+		ToyTimelineUtils.writeOnlyActIDs2(usersToyDayTimelines, commonBasePath + "ToyTimelinesOnlyActIDs2.csv");
+		ToyTimelineUtils.writeActIDTS(usersToyDayTimelines, commonBasePath + "ToyTimelinesActIDTS.csv");
+
+		PrimaryDimension primDimTemp = Constant.primaryDimension;
+		PrimaryDimension secDimTemp = Constant.secondaryDimension;
+		ToyTimelineUtils.writeOnlyGivenDimensionVals(usersToyDayTimelines,
+				commonBasePath + "ToyTimelinesOnly" + primDimTemp + ".csv", primDimTemp);
+		ToyTimelineUtils.writeOnlyGivenDimensionVals(usersToyDayTimelines,
+				commonBasePath + "ToyTimelinesOnly" + secDimTemp + ".csv", secDimTemp);
+
+		// do it again using the toy timelines
+		setDataVarietyConstants(usersToyDayTimelines, true, "ToyTs_", true, true, databaseName);
+
+		// done especially for toy timelines to avoid writing all activitie in timeline activity stats.
+		Constant.setActivityNames(
+				Constant.getUniqueActivityIDs().stream().map(i -> String.valueOf(i)).toArray(String[]::new));
+
+		writeActIDNamesInFixedOrder(commonBasePath + "ToyCatIDNameMap.csv");
+
+		// PopUps.showMessage("After toy timelines creation!!");
+		// $$Disabled on May29 2018 TimelineStats.timelineStatsController(usersCleanedDayToyTimelines);
+		// PopUps.showMessage("here");
+		WToFile.writeUsersDayTimelinesSameFile(usersToyDayTimelines, "usersToyDayTimelines", false, false, false,
+				"GowallaUserDayToyTimelines.csv", commonBasePath);
+		// PopUps.showMessage("here2");
+		// $TimelineStats.timelineStatsController(usersToyDayTimelines);
+		// System.exit(0);
+		// End of Moved here on 18 May 2018
+		return usersToyDayTimelines;
+	}
+
+	/**
 	 * Set and/or write UniqueLocIDs, UniqueLocIDsPerActID, UserIDActIDLocIDMap, UniqueActivityIDs, UniquePDValPerUser
 	 * in the given timelines
 	 * 
@@ -622,7 +681,7 @@ public class ControllerWithoutServer
 	 * 
 	 * @param absFileNameToWrite
 	 */
-	private void writeActIDNamesInFixedOrder(String absFileNameToWrite)
+	private static void writeActIDNamesInFixedOrder(String absFileNameToWrite)
 	{
 		String[] activityNames = Constant.getActivityNames();
 		StringBuilder sb = new StringBuilder("ActID,ActName\n");
@@ -1101,18 +1160,18 @@ public class ControllerWithoutServer
 	/**
 	 * 
 	 * @param usersCleanedDayTimelines
-	 * @param groupsOf100UsersLabel
+	 * @param groupOf100UsersLabel
 	 * @param userIndicesToSelect
 	 * @param commonBasePath
 	 * @param lengthOfRecommendedSequence
+	 * @param commonPath
 	 * @throws IOException
-	 * 
 	 * @since Mar 2 2018
 	 */
-	private void sampleUsersByIndicesExecuteRecommendationTests(
+	private static void sampleUsersByIndicesExecuteRecommendationTests(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String groupOf100UsersLabel,
-			List<Integer> userIndicesToSelect, String commonBasePath, int lengthOfRecommendedSequence)
-			throws IOException
+			List<Integer> userIndicesToSelect, String commonBasePath, int lengthOfRecommendedSequence,
+			String commonPath) throws IOException
 	{
 		// PopUps.showMessage("sampleUsersByIndicesExecuteRecommendationTests: usersCleanedDayTimelines.size()= "
 		// + usersCleanedDayTimelines.size());
@@ -1248,12 +1307,13 @@ public class ControllerWithoutServer
 	 * @param groupsOf100UsersLabel
 	 * @param userIndicesToSelect
 	 * @param commonBasePath
+	 * @param commonPath
 	 * @throws IOException
 	 * @since April 11 2018
 	 */
-	private void sampleUsersByIDsExecuteRecommendationTests(
+	private static void sampleUsersByIDsExecuteRecommendationTests(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String groupOf100UsersLabel,
-			List<String> userIndicesToSelect, String commonBasePath) throws IOException
+			List<String> userIndicesToSelect, String commonBasePath, String commonPath) throws IOException
 	{
 		// LinkedHashMap<Integer, String> indexOfBlackListedUsers = new LinkedHashMap<>();
 		System.out.println("Inside sampleUsersByIDsExecuteRecommendationTests: usersCleanedDayTimelines received size="

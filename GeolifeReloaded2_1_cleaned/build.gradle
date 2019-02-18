@@ -139,7 +139,13 @@ dependencies
     
     compile group: 'org.graalvm.sdk', name: 'graal-sdk', version: '1.0.0-rc9'
     compile group: 'de.lmu.ifi.dbs.elki', name: 'elki', version: '0.7.1'  
-    //compile fileTree(dir: 'libs', include: ['*.jar','*.zip'])
+    
+
+
+	// https://mvnrepository.com/artifact/com.github.haifengl/smile-plot
+	compile group: 'com.github.haifengl', name: 'smile-plot', version: '1.5.2'
+
+	//compile fileTree(dir: 'libs', include: ['*.jar','*.zip'])
 	// Declare the dependency for your favourite test framework you want to use in your tests.
 	// TestNG is also supported by the Gradle Test task. Just change the
 	// testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add

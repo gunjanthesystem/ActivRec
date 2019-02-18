@@ -345,6 +345,7 @@ public class RepresentativeAOInfo
 				{
 					aggStartLatLongEndLatLong_ = getStartAndEndGeoCoordinatesForEachPDVal(userId,
 							trainTimelinesAllUsersContinuousFiltrd, isCollaborative, "_");
+
 					aggStartLatLongEndLatLongAsHSC = getStartAndEndGeoCoordASHSCIndexForEachPDVal(userId,
 							trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
 					// mapOfEachFeatForEachPDValStartLat = getListOfFeatureVals(userId,

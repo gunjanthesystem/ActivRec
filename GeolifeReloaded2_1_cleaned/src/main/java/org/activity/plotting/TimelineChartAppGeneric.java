@@ -99,20 +99,20 @@ public class TimelineChartAppGeneric extends Pane
 
 		switch (typeOfTimelineChart)
 		{
-			case "ActivityBox":
-				timelineChart = new TimelineChart2(xAxis, yAxis);
-				break;
-			case "ActivityCircle":
-				timelineChart = new TimelineChartCircle(xAxis, yAxis);
-				break;
-			case "LineChart":
-				timelineChart = new LineChart<Number, String>(xAxis, yAxis);
-				break;
-			case "ScatterChart":
-				timelineChart = new ScatterChart<Number, String>(xAxis, yAxis);
-				break;
-			default:
-				PopUps.showError("Unrecognised typeOfTimelineChart = " + typeOfTimelineChart);
+		case "ActivityBox":
+			timelineChart = new TimelineChart2(xAxis, yAxis);
+			break;
+		case "ActivityCircle":
+			timelineChart = new TimelineChartCircle(xAxis, yAxis);
+			break;
+		case "LineChart":
+			timelineChart = new LineChart<Number, String>(xAxis, yAxis);
+			break;
+		case "ScatterChart":
+			timelineChart = new ScatterChart<Number, String>(xAxis, yAxis);
+			break;
+		default:
+			PopUps.showError("Unrecognised typeOfTimelineChart = " + typeOfTimelineChart);
 		}
 
 		Triple<ObservableList<Series<Number, String>>, Long, Long> seriesForAllUsersRes = actDataToSeries(dataReceived);
@@ -154,20 +154,21 @@ public class TimelineChartAppGeneric extends Pane
 
 		switch (typeOfTimelineChart)
 		{
-			case "ActivityBox":
-				timelineChart = new TimelineChart2(xAxis, yAxis);
-				break;
-			case "ActivityCircle":
-				timelineChart = new TimelineChartCircle(xAxis, yAxis);
-				break;
-			case "LineChart":
-				timelineChart = new LineChart<Number, String>(xAxis, yAxis);
-				break;
-			case "ScatterChart":
-				timelineChart = new ScatterChart<Number, String>(xAxis, yAxis);
-				break;
-			default:
-				PopUps.showError("Unrecognised typeOfTimelineChart = " + typeOfTimelineChart);
+		case "ActivityBox":
+			timelineChart = new TimelineChart2(xAxis, yAxis);
+			break;
+		case "ActivityCircle":
+			timelineChart = new TimelineChartCircle(xAxis, yAxis);
+			// timelineChart = new TimelineChartCircle2(xAxis, yAxis);
+			break;
+		case "LineChart":
+			timelineChart = new LineChart<Number, String>(xAxis, yAxis);
+			break;
+		case "ScatterChart":
+			timelineChart = new ScatterChart<Number, String>(xAxis, yAxis);
+			break;
+		default:
+			PopUps.showError("Unrecognised typeOfTimelineChart = " + typeOfTimelineChart);
 		}
 		// Triple{seriesForAllUsers, maxXAxis, minXAxis}//dataToSeries(dataReceived);
 		Triple<ObservableList<Series<Number, String>>, Long, Long> seriesForAllUsers = userDayTimelinesToSeries20May(
@@ -865,7 +866,7 @@ public class TimelineChartAppGeneric extends Pane
 					long endTS = ao.getEndTimestampInms();// Double.valueOf(d.get(2));
 					String locName = ao.getLocationIDs(',');// d.get(3);
 					Integer actID = ao.getActivityID();// Integer.valueOf(d.get(5));
-					String actName = catIdNameDictioary.getOrDefault(actID, "ID:" + actID);
+					String actName = "ActName";// TODO catIdNameDictioary.getOrDefault(actID, "ID:" + actID);
 					String startLat = ao.getStartLatitude();
 					// String endLat = ao.getEndLatitude();
 

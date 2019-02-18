@@ -46,7 +46,8 @@ public class EpochDoubleStringConverter extends DoubleStringConverter
 		{
 			Long longValue = Long.parseLong(String.format("%.0f", value));
 			// String pattern = "dd-MM-yy HH:mm:ss";
-			String pattern = "dd-MM HH:mm:ss";
+			// String pattern = "dd-MM HH:mm:ss";//E
+			String pattern = "dd-M HH:mm E";
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
 			// StringConverter<LocalDateTime> converter = new LocalDateTimeStringConverter(formatter, null);
 			// // assertEquals("12 January 1985, 12:34:56", converter.toString(VALID_LDT_WITH_SECONDS));
