@@ -450,14 +450,18 @@ public class DistanceUtils
 	 * @param editDistancesMemorizer
 	 * @param lookPastType
 	 *            added on 17 Dec 2018
+	 * @param considerValOrValDiff
+	 *            TRUE: take summary stat of each feature val, FALSE: take summary stat of diff of feature val pairs
+	 *            (added on 15 Feb 2019)
 	 * 
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}},
-	 * @since 7 Jan 2018
+	 * @since 7 Jan 2019
 	 */
 	public static LinkedHashMap<String, Pair<String, Double>> getHJEditDistsByDiffsForCandsFullCandParallelWithMemory7Jan2019RTV(
 			LinkedHashMap<String, Timeline> candidateTimelines, ArrayList<ActivityObject2018> activitiesGuidingRecomm,
 			Enums.CaseType caseType, String userAtRecomm, String dateAtRecomm, String timeAtRecomm,
-			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType)
+			HJEditDistance hjEditDistance, EditDistanceMemorizer editDistancesMemorizer, LookPastType lookPastType,
+			boolean considerValOrValDiff)
 	{
 		// PopUps.showMessage("Inside getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV");//
 		// LinkedHashMap<String, Integer> endIndexSubseqConsideredInCand = null;// added on 17 Dec 2018 for daywise
@@ -513,7 +517,7 @@ public class DistanceUtils
 		// end of code to be parallelised
 		if (VerbosityConstants.WriteCandAEDDiffs)
 		{
-			writeCandAEDFeatValPairs(candAEDFeatValPairs, "candAEDFeatDiffsFromDistanceComputation");
+			writeCandAEDFeatValPairs(candAEDFeatValPairs, "candAEDFeatDiffsFromDistanceComputation7Jan");
 		}
 		//// start of MSD
 		// if (Constant.useMSDInFEDInRTVerse)
@@ -541,7 +545,7 @@ public class DistanceUtils
 		// note that in the case of Alpha =1, there are no feature diffs in candAEDFeatDiffs
 		Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> minOfMinsAndMaxOfMaxOfFeatureVals = getMinOfMinsAndMaxOfMaxOfFeatureValPairs(
 				userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance, candAEDFeatValPairs,
-				Constant.fixedValPerFeatForRTVerseMaxMinForFEDNorm);
+				Constant.fixedValPerFeatForRTVerseMaxMinForFEDNorm, considerValOrValDiff);
 
 		//////////////////////////////////////////////////////
 
@@ -602,7 +606,7 @@ public class DistanceUtils
 				candEditDistancesLogging = getRTVerseMinMaxNormalisedEditDistancesValPairsApproach5Feb(
 						candAEDFeatValPairs, minOfMinsAndMaxOfMaxOfFeatureVals.getFirst(),
 						minOfMinsAndMaxOfMaxOfFeatureVals.getSecond(), hjEditDistance, activitiesGuidingRecomm,
-						userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelines);
+						userAtRecomm, dateAtRecomm, timeAtRecomm, candidateTimelines, considerValOrValDiff);
 
 			}
 
@@ -617,7 +621,7 @@ public class DistanceUtils
 
 		if (VerbosityConstants.WriteCandAEDDiffs)
 		{
-			writeCandAEDDists(candEditDistancesRes, "candNormalisedEditDistancesRes");
+			writeCandAEDDists(candEditDistancesRes, "candNormalisedEditDistancesResJan7");
 		}
 		return candEditDistancesRes;
 	}
@@ -962,6 +966,11 @@ public class DistanceUtils
 			}
 			sb.append("\n");
 		}
+
+		// if (new File("path/to/file.txt").isFile() == false)// create header
+		// {
+		//
+		// }
 		WToFile.appendLineToFileAbs(sb.toString(), Constant.getCommonPath() + fileNamePhrase + ".csv");
 	}
 
@@ -1032,13 +1041,16 @@ public class DistanceUtils
 	 *            one map entry for each cand, and for each cand, a list of enumaps, one for each AO in the cand
 	 * @param useFixedMaxForEachFeature
 	 *            instead of pth percentils
+	 * @param considerValOrValDiff
+	 *            TRUE: take summary stat of each feature val, FALSE: take summary stat of diff of feature val pairs
+	 *            (added on 15 Feb 2019)
 	 * @return
 	 * @since 7 Jan 2019
 	 */
 	private static Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> getMinOfMinsAndMaxOfMaxOfFeatureValPairs(
 			String userAtRecomm, String dateAtRecomm, String timeAtRecomm, HJEditDistance hjEditDistance,
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs,
-			boolean useFixedMaxForEachFeature)
+			boolean useFixedMaxForEachFeature, boolean considerValOrValDiff)
 	{
 		boolean shouldComputeFeatureLevelDistance = hjEditDistance.getShouldComputeFeatureLevelDistance();
 		StringBuilder sbToWrite = new StringBuilder(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm);
@@ -1053,7 +1065,8 @@ public class DistanceUtils
 		{
 			summaryStatForEachCand = candAEDFeatValPairs.entrySet().stream()
 					.map(e -> HJEditDistance.getSummaryStatsForEachFeatureValsPairsOverListOfAOsInACand(
-							e.getValue().getThird(), userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey()))
+							e.getValue().getThird(), userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
+							considerValOrValDiff))
 					.collect(Collectors.toList());
 		}
 
@@ -1192,12 +1205,12 @@ public class DistanceUtils
 
 					EnumMap<GowGeoFeature, Double> pRTVersePercentileOfDiffs = HJEditDistance
 							.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs,
-									percentileForRTVerseMaxForFEDNorm);// 75);
+									percentileForRTVerseMaxForFEDNorm, considerValOrValDiff);// 75);
 
 					if (false)// sanity checking percentil implementation and maxOfMax implementation gives same result
 					{
 						sanityCheckRTVersePthPercentileByMinMaxFeatValPairs(minOfMinOfVals, maxOfMaxOfVals,
-								listOfListOfFeatValPairs);
+								listOfListOfFeatValPairs, considerValOrValDiff);
 					}
 
 					// replace maxOfMax by pPercentileVal
@@ -1219,8 +1232,8 @@ public class DistanceUtils
 
 			minOfMinOfVals.entrySet().stream().forEachOrdered(e -> sbMin.append(e.getValue() + ","));
 			maxOfMaxOfVals.entrySet().stream().forEachOrdered(e -> sbMax.append(e.getValue() + ","));
-			WToFile.appendLineToFileAbs(sbMin.toString() + "\n", Constant.getCommonPath() + "minOfMinOfDiffs.csv");
-			WToFile.appendLineToFileAbs(sbMax.toString() + "\n", Constant.getCommonPath() + "maxOfMaxOfDiffs.csv");
+			WToFile.appendLineToFileAbs(sbMin.toString() + "\n", Constant.getCommonPath() + "minOfMinOfDiffsJan7.csv");
+			WToFile.appendLineToFileAbs(sbMax.toString() + "\n", Constant.getCommonPath() + "maxOfMaxOfDiffsJan7.csv");
 		}
 		return new Pair<>(minOfMinOfVals, maxOfMaxOfVals);
 	}
@@ -1424,11 +1437,28 @@ public class DistanceUtils
 		{
 			StringBuilder sbMin = new StringBuilder();
 			StringBuilder sbMax = new StringBuilder();
+			String minMinFile = Constant.getCommonPath() + "minOfMinOfDiffs.csv";
+			String maxMaxFile = Constant.getCommonPath() + "maxOfMaxOfDiffs.csv";
+
+			if (new File(minMinFile).isFile() == false)
+			{
+				String minMinHeader = minOfMinOfDiffs.entrySet().stream().map(e -> e.getKey().toString())
+						.collect(Collectors.joining(","));
+				WToFile.appendLineToFileAbs(minMinHeader + ",\n", minMinFile);
+
+			}
+			if (new File(maxMaxFile).isFile() == false)
+			{
+				String maxMaxHeader = maxOfMaxOfDiffs.entrySet().stream().map(e -> e.getKey().toString())
+						.collect(Collectors.joining(","));
+				WToFile.appendLineToFileAbs(maxMaxHeader + ",\n", maxMaxFile);
+			}
 
 			minOfMinOfDiffs.entrySet().stream().forEachOrdered(e -> sbMin.append(e.getValue() + ","));
 			maxOfMaxOfDiffs.entrySet().stream().forEachOrdered(e -> sbMax.append(e.getValue() + ","));
-			WToFile.appendLineToFileAbs(sbMin.toString() + "\n", Constant.getCommonPath() + "minOfMinOfDiffs.csv");
-			WToFile.appendLineToFileAbs(sbMax.toString() + "\n", Constant.getCommonPath() + "maxOfMaxOfDiffs.csv");
+
+			WToFile.appendLineToFileAbs(sbMin.toString() + "\n", minMinFile);
+			WToFile.appendLineToFileAbs(sbMax.toString() + "\n", maxMaxFile);
 		}
 		return new Pair<>(minOfMinOfDiffs, maxOfMaxOfDiffs);
 
@@ -1470,14 +1500,15 @@ public class DistanceUtils
 	 */
 	private static boolean sanityCheckRTVersePthPercentileByMinMaxFeatValPairs(
 			EnumMap<GowGeoFeature, Double> minOfMinOfDiffs, EnumMap<GowGeoFeature, Double> maxOfMaxOfDiffs,
-			List<List<EnumMap<GowGeoFeature, Pair<String, String>>>> listOfListOfFeatValPairs)
+			List<List<EnumMap<GowGeoFeature, Pair<String, String>>>> listOfListOfFeatValPairs,
+			boolean considerValOrValDiff)
 	{
 		boolean sane = true;
 		EnumMap<GowGeoFeature, Double> p100RTVersePercentileOfDiffs = HJEditDistance
-				.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs, 100);
+				.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs, 100, considerValOrValDiff);
 
 		EnumMap<GowGeoFeature, Double> p1RTVersePercentileOfDiffs = HJEditDistance
-				.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs, 1e-55);
+				.getPthPercentileInRTVerseOfValPairs(listOfListOfFeatValPairs, 1e-55, considerValOrValDiff);
 
 		if (p100RTVersePercentileOfDiffs.equals(maxOfMaxOfDiffs) == false)
 		{
@@ -2864,6 +2895,10 @@ public class DistanceUtils
 	 *            just for logging
 	 * @param candidateTimelines
 	 *            just for logging
+	 * @param considerValOrValDiff
+	 *            (added on 15 Feb 2019) if TRUE consider vals of features else consider difference of values of
+	 *            features diff for computing min max for RTV normalisation and also whether to normalise the feature
+	 *            val or normalise the feature diffs
 	 * @since Feb 5 2019
 	 * @return {CanditateTimelineID, Pair{Trace,Edit distance of this candidate}}
 	 */
@@ -2872,7 +2907,8 @@ public class DistanceUtils
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs,
 			EnumMap<GowGeoFeature, Double> minOfMinOfFeatDiffs, EnumMap<GowGeoFeature, Double> maxOfMaxOfFeatDiffs,
 			HJEditDistance hjEditDistance, ArrayList<ActivityObject2018> activitiesGuidingRecomm, String userAtRecomm,
-			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines)
+			String dateAtRecomm, String timeAtRecomm, LinkedHashMap<String, Timeline> candidateTimelines,
+			boolean considerValOrValDiff)
 	{
 		// PopUps.showMessage("Inside getRTVerseMinMaxNormalisedEditDistancesFeatSeqApproach");
 		// boolean useMSD = Constant.useMSDInFEDInRTVerse;
@@ -3156,8 +3192,9 @@ public class DistanceUtils
 		{
 			// WToFile.appendLineToFileAbs(logTxt.toString() + "\n",
 			// Constant.getCommonPath() + "LogOfgetRTVerseMinMaxNormalisedEditDistances.txt");
-			String fileNameForLogOfEachCand = commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv";
-			String fileNameForLogOfEachAO = commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv";
+			String fileNameForLogOfEachCand = commonPath
+					+ "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCandJan7.csv";
+			String fileNameForLogOfEachAO = commonPath + "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAOJan7.csv";
 
 			if (new File(fileNameForLogOfEachCand).isFile() == false)
 			{
@@ -3195,12 +3232,12 @@ public class DistanceUtils
 			StringBuilder sb1 = new StringBuilder();
 			rejectedCandsDueToAEDFEDThreshold.entrySet().stream()
 					.forEachOrdered(e -> sb1.append(e.getKey() + "," + e.getValue() + "\n"));
-			WToFile.appendLineToFileAbs(sb1.toString(), commonPath + "LogOfRejectedCands.csv");
+			WToFile.appendLineToFileAbs(sb1.toString(), commonPath + "LogOfRejectedCandsJan7.csv");
 		}
 
 		if (res.size() == 0)// all candidates filtered out due to AED FED Threshold
 		{
-			WToFile.appendLineToFileAbs(rtInfo + "\n", commonPath + "recommPointsRejAllCandFiltrdAEDFEDThresh.csv");
+			WToFile.appendLineToFileAbs(rtInfo + "\n", commonPath + "recommPointsRejAllCandFiltrdAEDFEDThreshJan7.csv");
 		}
 		///////// End of log
 		// if (VerbosityConstants.verbose)// true
@@ -4621,7 +4658,24 @@ public class DistanceUtils
 		{// as of Jan 8 2019, finished implementation only for AED
 			candEditDistances = getHJEditDistsByDiffsForCandsFullCandParallelWithMemory7Jan2019RTV(candidateTimelines,
 					activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm, hjEditDistance,
-					editDistancesMemorizer, lookPastType);
+					editDistancesMemorizer, lookPastType, Constant.considerFeatureValOrValDiff);
+
+			if (false)// sanity check with former FED RTV version
+			{
+				LinkedHashMap<String, Pair<String, Double>> candEditDistances2Temp = getHJEditDistsByDiffsForCandsFullCandParallelWithMemory13April2018RTV(
+						candidateTimelines, activitiesGuidingRecomm, caseType, userAtRecomm, dateAtRecomm, timeAtRecomm,
+						hjEditDistance, editDistancesMemorizer, lookPastType);
+
+				StringBuilder sbTemp = new StringBuilder();
+				for (Entry<String, Pair<String, Double>> e : candEditDistances2Temp.entrySet())
+				{
+					String candID = e.getKey();
+					Pair<String, Double> newPair = candEditDistances.get(candID);
+					sbTemp.append(candID + "," + e.getValue().getFirst() + "," + e.getValue().getSecond() + ","
+							+ newPair.getFirst() + "," + newPair.getSecond() + "\n");
+				}
+				WToFile.appendLineToFileAbs(sbTemp.toString(), Constant.getCommonPath() + "DebuggingFED13Feb2019.csv");
+			}
 		}
 		else
 		{

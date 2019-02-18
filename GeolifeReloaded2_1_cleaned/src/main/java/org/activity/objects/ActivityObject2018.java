@@ -985,8 +985,8 @@ public class ActivityObject2018 implements Serializable
 				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter
 				+ Instant.ofEpochMilli(startTimestampInms).toString()
 				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
-				+ additionalGowallaFeatures + delimiter + df.format(distInMFromPrev) + delimiter + durInSecFromPrev
-				+ additionalGeolifeFeatures + delimiter + additionalDCUFeatures;
+				/* additionalGowallaFeatures */ + delimiter + df.format(distInMFromPrev) + delimiter + durInSecFromPrev
+				+ additionalDCUFeatures + additionalGeolifeFeatures + additionalGowallaFeatures;
 	}
 
 	private static String brokenDownTSString(String delimiter, long startTimestampInms)
@@ -1061,8 +1061,9 @@ public class ActivityObject2018 implements Serializable
 				: "";
 
 		return /* "uID" + delimiter + */brokenDownTS + delimiter + "actID" + delimiter + "activityName" + delimiter
-				+ "stTS" + delimiter + "distInMPrev" + delimiter + "durInSecPrev" + additionalGeolifeFeatures
-				+ delimiter + additionalDCUFeatures;
+				+ "stTS" + delimiter + "distInMPrev" + delimiter + "durInSecPrev"
+				// + delimiter
+				+ additionalDCUFeatures + additionalGeolifeFeatures + additionalGowallaFeatures;
 	}
 
 	/**

@@ -64,17 +64,24 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 /**
- * Fork of Dashboard2
+ * Fork of Dashboard3
  * 
- * @since 12 March 2018
+ * @since 15 Feb 2019
  * @author gunjan
  *
  */
-public class Dashboard3 extends Application
+public class Dashboard4 extends Application
 {
 	public static Map<Integer, Integer> actIDIndexMap;
 	Stage stage;
 	ReusableElements reuse;
+
+	// String pathToSerialisedDCUTimelines =
+	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/dcu_data_2_written/";
+	// String pathToSerialisedGeolfieTimelines =
+	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_written/";
+	// String pathToSerialisedGowallaTimelines =
+	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_written/";
 	// String pathToToyTimelines = ;
 	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY21ED0.35STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTV/ToyTimelines21May.kryo";
 	// MenuBar menuBar;
@@ -91,17 +98,48 @@ public class Dashboard3 extends Application
 	public void start(Stage stage)
 	{
 		long t0 = System.currentTimeMillis();
-		Constant.setDatabaseName("gowalla1");
-		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
-		Constant.initialise("./", "gowalla1", PathConstants.pathToSerialisedCatIDsHierDist,
-				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
-				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);
+		String databaseName = "geolife1";
 
 		ScreenDetails.printScreensDetails();
 		reuse = new ReusableElements();
 
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines = null;
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = null;
 
+		////////////////////////////////////////////////////////
+		if (true)
+		{
+			if (databaseName.equals("gowalla1"))
+			{
+				UIConstants.haveTooltip = false;
+			}
+			else
+			{
+				UIConstants.haveTooltip = true;
+			}
+			Constant.setDatabaseName(databaseName);
+			PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
+			Constant.initialise("./", databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
+					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
+					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap,
+					false);
+
+			usersCleanedDayTimelines = PathConstants.deserializeAndGetCleanedTimelinesFeb2019(databaseName);
+			// (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+			// .kryoDeSerializeThis(pathToSerialisedGeolfieTimelines + "usersCleanedDayTimelines.kryo");
+
+			/////////////////
+			ControllerWithoutServer.setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true,
+					false, databaseName);
+			// writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
+			List<Integer> uniqueActIDs = new ArrayList<>(Constant.getUniqueActivityIDs());
+			ColorPalette.setColors("InsightSecondary", uniqueActIDs.size());// Insight //Paired//InsightSecondary
+			actIDIndexMap = IntStream.range(0, uniqueActIDs.size()).boxed()
+					.collect(Collectors.toMap(i -> uniqueActIDs.get(i), Function.identity()));
+			System.out.println("actIDIndexMap=\n" + actIDIndexMap);
+			/////////////////
+		}
+		////////////////////////////////////////////////////////
 		// disabled on 24 July 2018, as i getting deserialisation error, perhaps because ActivityObject class
 		// has changes this serialised toy timelines being read were created. remedy to do later, create toy
 		// timelines again.
@@ -136,7 +174,8 @@ public class Dashboard3 extends Application
 
 		HBox hBoxMenus = new HBox(generateMenuBar());
 
-		TabPane tabPane = createTabs(false, usersCleanedDayToyTimelines);
+		TabPane tabPane = createTabs(true, usersCleanedDayTimelines, databaseName);// usersCleanedDayToyTimelines);
+		usersCleanedDayTimelines.clear();// To save memory
 		// tabPane.setPrefHeight(getHeight());
 
 		// VBox mainPane = new VBox();
@@ -201,21 +240,22 @@ public class Dashboard3 extends Application
 
 	/**
 	 * 
-	 * @param usersCleanedDayToyTimelines
+	 * @param usersCleanedDayTimelines
 	 * @param useSyntheticData
+	 * @param databaseName
 	 * @return
 	 */
 	private TabPane createTabs(boolean useSyntheticData,
-			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, String databaseName)
 	{
 		TabPane tabPane = new TabPane();
 		List<Tab> tabsToAdd = new ArrayList<>();
 		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = toOnlySeqOfActIDs(
 		// usersCleanedDayToyTimelines);
 		System.out.println("Entered createTabs()");
-		final boolean doSyntheticDataCircleTimelines = true;
+		final boolean doSyntheticDataCircleTimelines = false;// true;
 		final boolean doGivenDataCircleTimelines = false;
-		final boolean doGivenDataOnlyActIDSeq = false;
+		final boolean doGivenDataOnlyActIDSeq = true;
 		final boolean doSyntheticDataCanvasTimelines = false;
 		final boolean doSyntheticDataBoxTimelines = false;
 		final boolean doSyntheticDataLineTimelines = false;
@@ -224,7 +264,7 @@ public class Dashboard3 extends Application
 		try
 		{
 			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
-			List<List<List<String>>> timelineData = DataGenerator.getData3(20, 2000, 12, 5, 864000, 60 * 20, 10800);
+			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 864000, 60 * 20, 10800);
 			System.out.println("timelineData.size() = " + timelineData.size());
 			if (doSyntheticDataCircleTimelines)
 			{
@@ -241,8 +281,8 @@ public class Dashboard3 extends Application
 			if (doGivenDataCircleTimelines)
 			{
 				long tTimelineReal0 = System.currentTimeMillis();
-				Tab timelineTabCircleReal = new Tab("(Toy-Circle) Historical Timelines All Users");
-				TimelineChartAppGeneric tcCReal = new TimelineChartAppGeneric(usersCleanedDayToyTimelines, true,
+				Tab timelineTabCircleReal = new Tab(databaseName + ": All users Timelines");// (Toy-Circle)
+				TimelineChartAppGeneric tcCReal = new TimelineChartAppGeneric(usersCleanedDayTimelines, true,
 						"ActivityCircle");
 				timelineTabCircleReal.setContent(tcCReal.getVBox());// timelinesVBox2);
 				timelineTabCircleReal.setClosable(true);
@@ -254,7 +294,7 @@ public class Dashboard3 extends Application
 			if (doGivenDataOnlyActIDSeq)
 			{
 				Tab onlyActIDsAsRects = new Tab("Only ActIDs Sequence");
-				onlyActIDsAsRects.setContent(createOnlyActIDsAsRects(usersCleanedDayToyTimelines));
+				onlyActIDsAsRects.setContent(createOnlyActIDsAsRects(usersCleanedDayTimelines));
 				onlyActIDsAsRects.setClosable(true);
 				tabsToAdd.add(onlyActIDsAsRects);
 			}
@@ -262,7 +302,7 @@ public class Dashboard3 extends Application
 			if (doGivenDataOnlyActIDSeq)
 			{
 				Tab onlyActIDsAsRects = new Tab("Only ActIDs Sequence2");
-				onlyActIDsAsRects.setContent(createOnlyActIDsAsRectsV2(usersCleanedDayToyTimelines));
+				onlyActIDsAsRects.setContent(createOnlyActIDsAsRectsV2(usersCleanedDayTimelines));
 				onlyActIDsAsRects.setClosable(true);
 				tabsToAdd.add(onlyActIDsAsRects);
 			}
@@ -574,7 +614,7 @@ public class Dashboard3 extends Application
 
 			for (ActivityObject2018 ao : userEntry.getValue().getActivityObjectsInTimeline())
 			{
-				Color actColor = ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID()));
+				Color actColor = ColorPalette.getColor(Dashboard4.actIDIndexMap.get(ao.getActivityID()));
 				hBox.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
 						widthOfActRect, getTooltipFromAO(ao), "circle", null));
 			}
@@ -625,7 +665,7 @@ public class Dashboard3 extends Application
 
 				for (ActivityObject2018 ao : dateEntry.getValue().getActivityObjectsInTimeline())
 				{
-					Color actColor = ColorPalette.getColor(Dashboard3.actIDIndexMap.get(ao.getActivityID()));
+					Color actColor = ColorPalette.getColor(Dashboard4.actIDIndexMap.get(ao.getActivityID()));
 					hBox.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
 							widthOfActRect, getTooltipFromAO(ao), "rectangle", borderForDay));
 				}

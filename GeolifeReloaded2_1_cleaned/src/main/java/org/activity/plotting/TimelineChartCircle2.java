@@ -1,8 +1,13 @@
 
 package org.activity.plotting;
 
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.stream.IntStream;
+
+import org.activity.ui.Dashboard4;
+import org.activity.ui.UIConstants;
+import org.activity.ui.UIUtilityBox;
+import org.activity.ui.colors.ColorPalette;
 
 import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
@@ -10,15 +15,21 @@ import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Tooltip;
+import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
 /**
+ * Fork of TimelineChartCircle for better performance by directly using Circle object but seems to not improve
+ * performance, hence deprecated
+ * <p>
  * TODO: make it scrollable if smaller screen height causes overlapping of activity boxes.
  * 
  * @author gunjan
- *
+ * @since 18 Feb 2019
  */
-public class TimelineChart2 extends XYChart<Number, String>
+@Deprecated
+public class TimelineChartCircle2 extends XYChart<Number, String>
 {
 
 	// double heightOfActivityBox;
@@ -32,11 +43,12 @@ public class TimelineChart2 extends XYChart<Number, String>
 	 * @param yAxis
 	 *            The y axis to use
 	 */
-	public TimelineChart2(Axis<Number> xAxis, Axis<String> yAxis)
+	public TimelineChartCircle2(Axis<Number> xAxis, Axis<String> yAxis)
 	{
 		super(xAxis, yAxis);
+
 		if (false)
-		{// disabled on 17 Feb 2019
+		{// disabled on 17 Feb 2019, signficantlt improves performance
 			final String timelineChartCss = getClass().getResource("TimelineChart.css").toExternalForm();
 			getStylesheets().add(timelineChartCss); // disabled on 13 March 2018
 			setAnimated(true);
@@ -45,6 +57,24 @@ public class TimelineChart2 extends XYChart<Number, String>
 		}
 		this.setCache(true);
 
+	}
+
+	private static void setBackGround(int actID, Circle circle)
+	{
+		// circle.setFill(ColorPalette.getInsightSecondaryColor(actID % 11));
+		// circle.setFill(ColorPalette.getColors269Color(actID));
+		// circle.setFill(ColorPalette.getColors269Color(Constant.getIndexOfActIDInActNames(actID)));// only works for
+		// real data
+		// circle.setFill(ColorPalette.getInsightSecondaryColor(Dashboard3.actIDIndexMap.get(actID)));// only
+		if (Dashboard4.actIDIndexMap != null)
+		{
+			circle.setFill(ColorPalette.getColor(Dashboard4.actIDIndexMap.get(actID)));// only
+		}
+		else
+		{
+			circle.setFill(ColorPalette.getColors269Color(actID));
+		}
+		// works for real
 	}
 
 	/**
@@ -57,16 +87,10 @@ public class TimelineChart2 extends XYChart<Number, String>
 	 * @param data
 	 *            The actual data list to use so changes will be reflected in the chart.
 	 */
-	public TimelineChart2(Axis<Number> xAxis, Axis<String> yAxis, ObservableList<Series<Number, String>> data)
+	public TimelineChartCircle2(Axis<Number> xAxis, Axis<String> yAxis, ObservableList<Series<Number, String>> data)
 	{
 		this(xAxis, yAxis);
 		setData(data);
-		final String timelineChartCss = getClass().getResource("TimelineChart.css").toExternalForm();
-		getStylesheets().add(timelineChartCss); // disabled on 13 March 2018
-		setAnimated(true);
-		xAxis.setAnimated(true);
-		yAxis.setAnimated(true);
-		this.setCache(true);
 	}
 
 	/**
@@ -77,16 +101,20 @@ public class TimelineChart2 extends XYChart<Number, String>
 	@Override
 	protected void layoutPlotChildren()
 	{
-		System.out.println("\nTimelineChart2.layoutPlotChildren() called");
-
+		if (verbose)
+		{
+			System.out.println("\nTimelineChartCircle.layoutPlotChildren() called");
+		}
 		// we have nothing to layout if no data is present
 		if (getData() == null)
 		{
 			return;
 		}
 
-		double heightOfActBox = this.getHeight() / (getData().size() * 1.5);
-		heightOfActBox = Math.min(Math.max(heightOfActBox, 5), 30);// bound between 5 and 30
+		double radiusOfCircle = this.getHeight() / (getData().size() * 3);
+		radiusOfCircle = Math.min(Math.max(radiusOfCircle, 5), 15);// bound between 5 and 30
+		// radiusOfCircle = 5;
+		// double radiusOfCircle
 
 		Axis<String> yAxis = getYAxis();
 		Axis<Number> xAxis = getXAxis();
@@ -109,21 +137,16 @@ public class TimelineChart2 extends XYChart<Number, String>
 
 				// to find best height start
 				// System.out.println("item= " + item);
-				if (verbose)
-				{
-					System.out.println("displayedXVal= " + displayedXVal);
-					System.out.println("displayedYVal= " + displayedYVal);
-
-					System.out.println("xDispPosition= " + xDispPosition);
-					System.out.println("yDispPosition= " + yDispPosition);
-					// System.out.println("--> yAxis.getMaxHeight() =" + yAxis.getMaxHeight());
-					// System.out.println("--> yAxis.getMinHeight() =" + yAxis.getMinHeight());
-					// System.out.println("--> yAxis.getPrefHeight() =" + yAxis.getPrefHeight());
-					// System.out.println("--> yAxis.autoRangingProperty() =" + yAxis.autoRangingProperty());//true
-					// $$ System.out.println("--> this.height() =" + this.getHeight());
-					// $$ System.out.println("--> heightOfActBox = " + heightOfActBox);
-				}
-
+				// System.out.println("displayedXVal= " + displayedXVal);
+				// System.out.println("displayedYVal= " + displayedYVal);
+				// System.out.println("xDispPosition= " + xDispPosition);
+				// System.out.println("yDispPosition= " + yDispPosition);
+				// System.out.println("--> yAxis.getMaxHeight() =" + yAxis.getMaxHeight());
+				// System.out.println("--> yAxis.getMinHeight() =" + yAxis.getMinHeight());
+				// System.out.println("--> yAxis.getPrefHeight() =" + yAxis.getPrefHeight());
+				// System.out.println("--> yAxis.autoRangingProperty() =" + yAxis.autoRangingProperty());//true
+				// $$ System.out.println("--> this.height() =" + this.getHeight());
+				// $$ System.out.println("--> heightOfActBox = " + heightOfActBox);
 				// heightOfActBox+emptySpaceAboveActBox+emptySpaceBelowActBox = (heightOfChart/numOfUsers)
 				// heightOfActBox+0.25*heightOfActBox+0.25*heightOfActBox = (heightOfChart/numOfUsers)
 				// to find best height end
@@ -134,29 +157,29 @@ public class TimelineChart2 extends XYChart<Number, String>
 				Node itemNode = item.getNode();
 				ActivityBoxExtraValues extra = (ActivityBoxExtraValues) item.getExtraValue();
 
-				if (itemNode instanceof ActivityBox2 && extra != null)
+				// if (itemNode instanceof ActivityCircle && extra != null)
+				if (itemNode instanceof Circle && extra != null)
 				{
 					double endTS = xAxis.getDisplayPosition(extra.getEndTimestamp());
 
-					if (verbose)
-					{
-						System.out.println("extra.getEndTimestamp()= " + extra.getEndTimestamp());
-						System.out.println("endTS= " + endTS);
-
-						StringBuilder sb = new StringBuilder();
-
-						IntStream.rangeClosed(1, 10).map(i -> i * 5)
-								.forEachOrdered(i -> sb.append("\nxval= " + i + " pos=" + xAxis.getDisplayPosition(i)));
-						System.out.println(sb.toString());
-					}
+					// System.out.println("extra.getEndTimestamp()= " + extra.getEndTimestamp());
+					// System.out.println("endTS= " + endTS);
+					// StringBuilder sb = new StringBuilder();
+					// IntStream.rangeClosed(1, 10).map(i -> i * 5)
+					// .forEachOrdered(i -> sb.append("\nxval= " + i + " pos=" + xAxis.getDisplayPosition(i)));
+					// System.out.println(sb.toString());
 					// double high = xAxis.getDisplayPosition(extra.getHigh());
 					// double low = xAxis.getDisplayPosition(extra.getLow());
 					// calculate activity box width
 					// double activityBoxWidth = -1;
 
 					// update activity box
-					ActivityBox2 activityBox = (ActivityBox2) itemNode;
-					activityBox.update(xDispPosition, endTS, heightOfActBox);
+					// ActivityCircle activityCircle = (ActivityCircle) itemNode;
+					Circle activityCircle = (Circle) itemNode;
+					// activityCircle.update(xDispPosition, yDispPosition, radiusOfCircle);
+					activityCircle.setCenterX(xDispPosition);
+					activityCircle.setCenterY(yDispPosition);
+					activityCircle.setRadius(radiusOfCircle);
 					// extra.getClose());// , 0, 0);// // close - y, high - y, low - y,activityBoxWidth);
 
 					// moved to series added to improve performance by reducing calls to updateTooltip
@@ -165,17 +188,53 @@ public class TimelineChart2 extends XYChart<Number, String>
 					// $$String.valueOf(extra.getActivityID()));
 
 					// position the activity box
-					activityBox.setLayoutX(xDispPosition);
-					activityBox.setLayoutY(yDispPosition);
+					// $activityCircle.setLayoutX(xDispPosition);
+					// $activityCircle.setLayoutY(yDispPosition);
 
 					// System.out.println("\nxDispPosition= " + xDispPosition);
 					// System.out.println("endTS= " + endTS);
 					// System.out.println("displayedXVal= " + displayedXVal);
 					// System.out.println("displayedYVal= " + displayedYVal);
+
+					///////////////////////////
+					if (true)
+					{
+						if (UIConstants.haveTooltip)// TODO
+						{
+							Tooltip tooltip = new Tooltip();
+							if (UIConstants.useLightweightTooltip)
+							{
+								tooltip.setText("TooltipText");
+							}
+							else
+							{
+								tooltip.setGraphic(new GTooltipContent(
+										Arrays.asList("EndTime:", "ActivityName:", "ActivityID:", "Location:")));
+							}
+							// long t1 = System.nanoTime();
+							UIUtilityBox.hackTooltipStartTiming(tooltip);
+							// timeTakeByTooltipHack += (System.nanoTime() - t1);
+							// System.out.println("time taken by tooltip hack" + timeTakeByTooltipHack / 1000000.0 + "
+							// ms");
+							Tooltip.install(activityCircle, tooltip);
+						}
+						// regionBar.setShape(new Circle());
+
+						/// Start of moved from updateStyleClasses() to avoid repeated calls
+						if (false)// disabled on 17 Feb 2019
+						{
+							// getStyleClass().setAll("activitybox-box", seriesStyleClass, dataStyleClass);
+						}
+						// System.out.println("actExtraVals= " + actExtraVals.toString());
+						setBackGround(extra.getActivityID(), activityCircle);
+					}
 				}
 
+				////////////////////////////
 			}
+
 		}
+
 	}
 
 	@Override
@@ -236,7 +295,7 @@ public class TimelineChart2 extends XYChart<Number, String>
 	protected void seriesAdded(Series<Number, String> series, int seriesIndex)
 	{
 		// handle any data already in series
-		System.out.println("seriesAdded() called for seriesIndex= " + seriesIndex);
+		// $$ System.out.println("seriesAdded() called for seriesIndex= " + seriesIndex);
 		// PopUps.printTracedWarningMsg("who calls me:");
 
 		int numOfSeriesAlreadyAdded = this.getData().size();
@@ -251,9 +310,13 @@ public class TimelineChart2 extends XYChart<Number, String>
 			// moving update tooltip from update layout to here so tooltips are not updated (updateTooltip()) everytime
 			/// the windows is resized
 			ActivityBoxExtraValues extra = (ActivityBoxExtraValues) item.getExtraValue();
-			((ActivityBox2) actBox).updateTooltip(String.valueOf(extra.getEndTimestamp()),
-					String.valueOf(extra.getActivityName()), String.valueOf(extra.getActivityID()),
-					String.valueOf(extra.getActivityID()));
+			// if (false)
+			{
+				// ((ActivityCircle) actBox).updateTooltip(String.valueOf(extra.getEndTimestamp()),
+				// String.valueOf(extra.getActivityName()), String.valueOf(extra.getActivityID()),
+				// String.valueOf(extra.getActivityID()));
+
+			}
 			/// End
 
 			if (shouldAnimate())
@@ -310,19 +373,22 @@ public class TimelineChart2 extends XYChart<Number, String>
 	 * @param heightOfActivityBox
 	 * @return New ActivityBox node to represent the give data item
 	 */
-	private Node createActivityBox(int seriesIndex, final XYChart.Data item, int itemIndex, int heightOfActivityBox)
+	private Node createActivityBox(int seriesIndex, final XYChart.Data<Number, String> item, int itemIndex,
+			int heightOfActivityBox)
 	{
 		// System.out.println("createActivityBox() called");
 		Node actBox = item.getNode();
 		// check if ActivityBox has already been created
-		if (actBox instanceof ActivityBox2)
+		// if (actBox instanceof ActivityCircle)
+		if (actBox instanceof Circle)
 		{
-			((ActivityBox2) actBox).setSeriesAndDataStyleClasses("series" + seriesIndex, "data" + itemIndex);
+			// ((Circle) actBox).setSeriesAndDataStyleClasses("series" + seriesIndex, "data" + itemIndex);
 		}
 		else
 		{
-			actBox = new ActivityBox2("series" + seriesIndex, "data" + itemIndex,
-					(ActivityBoxExtraValues) item.getExtraValue());
+			actBox = new Circle();
+			// ActivityCircle("series" + seriesIndex, "data" + itemIndex,
+			// (ActivityBoxExtraValues) item.getExtraValue());
 			item.setNode(actBox);
 		}
 		return actBox;

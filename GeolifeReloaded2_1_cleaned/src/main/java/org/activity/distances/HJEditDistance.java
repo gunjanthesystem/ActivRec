@@ -1603,13 +1603,16 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 *            for logging only
 	 * @param candId
 	 *            for logging only
+	 * @param considerValOrValDiff
+	 *            TRUE: take summary stat of each feature val, FALSE: take summary stat of diff of feature val pairs
+	 *            (added on 15 Feb 2019)
 	 * 
 	 * @return one enummap which contains pairs {feature,summaryStatForThatFeature}
-	 * @since April 16 2018
+	 * 
 	 */
 	public static EnumMap<GowGeoFeature, DoubleSummaryStatistics> getSummaryStatsForEachFeatureValsPairsOverListOfAOsInACand(
 			List<EnumMap<GowGeoFeature, Pair<String, String>>> featureValPairList, String userAtRecomm,
-			String dateAtRecomm, String timeAtRecomm, String candId)
+			String dateAtRecomm, String timeAtRecomm, String candId, boolean considerValOrValDiff)
 	{
 		// Max feature diff for each of the GowallaFeature. In other words, max diff value for each feature over
 		// corresponding pairwise comparison of each act obj of the two timelines
@@ -1635,8 +1638,17 @@ public class HJEditDistance extends AlignmentBasedDistance
 			for (EnumMap<GowGeoFeature, Pair<String, String>> eForEachAOInCand : featureValPairList)
 			{
 				Pair<String, String> valPairForThisFeatForThisAO = eForEachAOInCand.get(gowallaFeature);
-				allValsForThisFeatureOverList.add(Double.valueOf(valPairForThisFeatForThisAO.getFirst()));
-				allValsForThisFeatureOverList.add(Double.valueOf(valPairForThisFeatForThisAO.getSecond()));
+
+				if (considerValOrValDiff)
+				{
+					allValsForThisFeatureOverList.add(Double.valueOf(valPairForThisFeatForThisAO.getFirst()));
+					allValsForThisFeatureOverList.add(Double.valueOf(valPairForThisFeatForThisAO.getSecond()));
+				}
+				else
+				{
+					allValsForThisFeatureOverList.add(Math.abs(Double.valueOf(valPairForThisFeatForThisAO.getFirst())
+							- Double.valueOf(valPairForThisFeatForThisAO.getSecond())));
+				}
 			}
 
 			DoubleSummaryStatistics summaryStatsForThisFeaturesOverList = allValsForThisFeatureOverList.stream()
@@ -1891,13 +1903,16 @@ public class HJEditDistance extends AlignmentBasedDistance
 	 * @param listOfListOfFeatDiffs
 	 * @param percentile
 	 *            in range (0,100]
+	 * @param considerValOrValDiff
+	 *            TRUE: take summary stat of each feature val, FALSE: take summary stat of diff of feature val pairs
+	 *            (added on 15 Feb 2019)
 	 * @return
 	 * @since 7 Jan 2019
 	 */
 	public static EnumMap<GowGeoFeature, Double> getPthPercentileInRTVerseOfValPairs(
-			List<List<EnumMap<GowGeoFeature, Pair<String, String>>>> listOfListOfFeatValPairs, double percentile)
+			List<List<EnumMap<GowGeoFeature, Pair<String, String>>>> listOfListOfFeatValPairs, double percentile,
+			boolean considerValOrValDiff)
 	{
-
 		// Max feature diff for each of the GowallaFeature. In other words, max diff value for each feature over
 		// corresponding pairwise comparison of each act obj of the two timelines
 		EnumMap<GowGeoFeature, Double> summaryFeatureDiffOverAllActs = new EnumMap<>(GowGeoFeature.class);
@@ -1921,8 +1936,16 @@ public class HJEditDistance extends AlignmentBasedDistance
 
 			for (EnumMap<GowGeoFeature, Pair<String, String>> listEntry : allCollected)
 			{
-				allValsForThisFeatureV2.add(Double.valueOf(listEntry.get(gowallaFeature).getFirst()));
-				allValsForThisFeatureV2.add(Double.valueOf(listEntry.get(gowallaFeature).getSecond()));
+				if (considerValOrValDiff)
+				{
+					allValsForThisFeatureV2.add(Double.valueOf(listEntry.get(gowallaFeature).getFirst()));
+					allValsForThisFeatureV2.add(Double.valueOf(listEntry.get(gowallaFeature).getSecond()));
+				}
+				else
+				{
+					allValsForThisFeatureV2.add(Math.abs(Double.valueOf(listEntry.get(gowallaFeature).getFirst())
+							- Double.valueOf(listEntry.get(gowallaFeature).getSecond())));
+				}
 			}
 			// allCollected.stream().map(listEntry -> listEntry.get(gowallaFeature))
 			// .collect(Collectors.toList());

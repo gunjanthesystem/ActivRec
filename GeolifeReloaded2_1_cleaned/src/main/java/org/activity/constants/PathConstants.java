@@ -88,6 +88,13 @@ public class PathConstants
 	public static final String pathToSerializedGowallaCleanedTimelines28Dec = "./dataToRead/SerializedTimelines28Dec2018/gowalla1_DEC28H19M28HighDurPNN500coll/usersCleanedDayTimelines.kryo";
 	// end of added on 28 Dec 2018
 
+	///
+	public static final String pathToSerialisedDCUCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline17Feb2019/dcu_data_2_written/usersCleanedDayTimelines.kryo";
+	/// home/gunjan/git/GeolifeReloaded2_1_cleaned/dataToRead/SerializedTimeline17Feb2019/gowalla1_written/usersCleanedDayTimelines.kryo
+	public static final String pathToSerialisedGeolifeCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline17Feb2019/geolife1_written/usersCleanedDayTimelines.kryo";
+	public static final String pathToSerialisedGowallaCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline17Feb2019/gowalla1_written/usersCleanedDayTimelines.kryo";
+	///
+
 	/**
 	 * 
 	 * @param databaseName
@@ -108,6 +115,27 @@ public class PathConstants
 		case "gowalla1":
 			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
 					.kryoDeSerializeThis(pathToSerializedGowallaCleanedTimelines28Dec);
+		default:
+			PopUps.printTracedErrorMsgWithExit("Error: unknown databaseName: " + databaseName);
+			return null;
+		}
+	}
+
+	public static LinkedHashMap<String, LinkedHashMap<Date, Timeline>> deserializeAndGetCleanedTimelinesFeb2019(
+			String databaseName)
+	{
+		switch (databaseName)
+		{
+		case "dcu_data_2":
+			System.err.println("Warning: using invalids expunged timelines: ");
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedDCUCleanedTimelines12Feb2019);// pathToSerializedDCUCleanedInvalidsExpungedTimelines28Dec);
+		case "geolife1":
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedGeolifeCleanedTimelines12Feb2019);
+		case "gowalla1":
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
+					.kryoDeSerializeThis(pathToSerialisedGowallaCleanedTimelines12Feb2019);
 		default:
 			PopUps.printTracedErrorMsgWithExit("Error: unknown databaseName: " + databaseName);
 			return null;

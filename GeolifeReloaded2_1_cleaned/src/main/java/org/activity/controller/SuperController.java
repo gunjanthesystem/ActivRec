@@ -19,6 +19,7 @@ import org.activity.constants.Enums.AltSeqPredictor;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.constants.PathConstants;
+import org.activity.evaluation.EvalMetrics;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.evaluation.ResultsDistributionEvaluation;
 import org.activity.io.CSVUtils;
@@ -1434,7 +1435,7 @@ public class SuperController
 
 			fileForChosenMU = commonPath + resultsLabel + "_" + "AllMeanReciprocalRank_" + "MinMUWithMaxFirst0Aware"
 					+ dimensionPhrase + ".csv";// added on 17 Jan 2019
-			// use the optimal MU for MRR as fixed MU to get corresponding values for other metrics,
+			// use the optimal MU for MRR as fixed (chosen) MU to get corresponding values for other metrics,
 			ResultsDistributionEvaluation.runNov20Results(commonPath, 1, dimensionPhrase, fileForChosenMU, false, false,
 					true);// added on 17 Jan 2019
 
@@ -1535,7 +1536,21 @@ public class SuperController
 								+ ".csv");
 				// PopUps.showMessage("here1_4");
 				// End of added on 15 Jan 2019
+
+				// Start of added on 13 Feb 2019
+				// aggregated RR results (which have been extracted for best MU for each user) by target activity and by
+				// users (note: the user wise aggregation
+				// should be identical to ".._AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv" which was obtained
+				// through
+				// an alternative approach. This can be used as a sanity check).
+				// ReadingFromFile.readLinesIntoListOfLists(commonPathToUse + resultsLabel +
+				// "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase
+				// + ".csv", ",");
+				EvalMetrics.groupByUserAndActual(
+						resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase, commonPathToUse);
+				// End of added on 13 Feb 2019
 			}
+
 		}
 		catch (Exception e)
 		{

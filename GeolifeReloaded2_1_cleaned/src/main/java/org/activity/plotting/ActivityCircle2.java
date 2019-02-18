@@ -3,25 +3,28 @@ package org.activity.plotting;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
-import org.activity.ui.Dashboard4;
-import org.activity.ui.UIConstants;
+import org.activity.ui.Dashboard3;
 import org.activity.ui.UIUtilityBox;
 import org.activity.ui.colors.ColorPalette;
 
 import javafx.scene.CacheHint;
-import javafx.scene.Group;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Circle;
 
+/**
+ * Fork from ActivityCircle to see if performance would improve if extending Circle directly without going through Group.
+ * @since 17 Feb 2019, found no improvement over ActivityCircle, hence deprecated.
+ */
 /** Candle node used for drawing a candle */
-public class ActivityCircle extends Group
+@Deprecated
+public class ActivityCircle2 extends Circle
 {
 	// private Line highLowLine = new Line();
-	private Circle circle;// = new Circle();
+	// private Circle circle;// = new Circle();
 	// private Rectangle regionBar = new Rectangle();
 	private int actID;
-	private String seriesStyleClass;
-	private String dataStyleClass;
+	// private String seriesStyleClass;
+	// private String dataStyleClass;
 	// private boolean openAboveClose = true;
 	private Tooltip tooltip; // = new Tooltip();
 
@@ -48,43 +51,36 @@ public class ActivityCircle extends Group
 	 * @param actExtraVals
 	 * @param height
 	 */
-	ActivityCircle(String seriesStyleClass, String dataStyleClass, ActivityBoxExtraValues actExtraVals)
+	ActivityCircle2(String seriesStyleClass, String dataStyleClass, ActivityBoxExtraValues actExtraVals)
 	{
-		circle = new Circle();
+		super();
 
-		setAutoSizeChildren(false);
+		// setAutoSizeChildren(false);
 		// System.out.println("this.isResizable()=" + this.isResizable());
 
 		if (false)
 		{
 			this.setCache(true);
 			this.setCacheHint(CacheHint.SPEED);
-			circle.setCache(true);
-			circle.setCacheHint(CacheHint.SPEED);
+			this.setCache(true);
+			this.setCacheHint(CacheHint.SPEED);
 		}
 
-		getChildren().addAll(circle);
-		this.seriesStyleClass = seriesStyleClass;
-		this.dataStyleClass = dataStyleClass;
+		// getChildren().addAll(circle);
+		// this.seriesStyleClass = seriesStyleClass;
+		// this.dataStyleClass = dataStyleClass;
 		// updateStyleClasses();// disabled for performance
-		if (UIConstants.haveTooltip)// TODO
+		if (true)
 		{
 			tooltip = new Tooltip();
+			tooltip.setGraphic(
+					new GTooltipContent(Arrays.asList("EndTime:", "ActivityName:", "ActivityID:", "Location:")));
 
-			if (UIConstants.useLightweightTooltip)
-			{
-				tooltip.setText("TooltipText");
-			}
-			else
-			{
-				tooltip.setGraphic(
-						new GTooltipContent(Arrays.asList("EndTime:", "ActivityName:", "ActivityID:", "Location:")));
-			}
 			// long t1 = System.nanoTime();
 			UIUtilityBox.hackTooltipStartTiming(tooltip);
 			// timeTakeByTooltipHack += (System.nanoTime() - t1);
 			// System.out.println("time taken by tooltip hack" + timeTakeByTooltipHack / 1000000.0 + " ms");
-			Tooltip.install(circle, tooltip);
+			Tooltip.install(this, tooltip);
 		}
 		// regionBar.setShape(new Circle());
 
@@ -105,13 +101,13 @@ public class ActivityCircle extends Group
 		// circle.setFill(ColorPalette.getColors269Color(Constant.getIndexOfActIDInActNames(actID)));// only works for
 		// real data
 		// circle.setFill(ColorPalette.getInsightSecondaryColor(Dashboard3.actIDIndexMap.get(actID)));// only
-		if (Dashboard4.actIDIndexMap != null)
+		if (Dashboard3.actIDIndexMap != null)
 		{
-			circle.setFill(ColorPalette.getColor(Dashboard4.actIDIndexMap.get(actID)));// only
+			this.setFill(ColorPalette.getColor(Dashboard3.actIDIndexMap.get(actID)));// only
 		}
 		else
 		{
-			circle.setFill(ColorPalette.getColors269Color(actID));
+			this.setFill(ColorPalette.getColors269Color(actID));
 		}
 		// works for real
 	}
@@ -125,16 +121,13 @@ public class ActivityCircle extends Group
 	 */
 	public void updateTooltip(String endTimestamp, String actName, String high, String low)
 	{
-		if (this.hasTooltip() && UIConstants.useLightweightTooltip == false)
-		{
-			// System.out.println("updateTooltip() called");
-			GTooltipContent tooltipContent = (GTooltipContent) tooltip.getGraphic();
-			String endTSString = new Timestamp(Double.valueOf(endTimestamp).longValue()).toString();
-			// System.out.println("endTimestamp = " + endTimestamp);
-			// System.out.println("endTimestamp = " + endTSString);
-			//
-			tooltipContent.update(endTSString, actName, high, low);
-		}
+		// System.out.println("updateTooltip() called");
+		GTooltipContent tooltipContent = (GTooltipContent) tooltip.getGraphic();
+		String endTSString = new Timestamp(Double.valueOf(endTimestamp).longValue()).toString();
+		// System.out.println("endTimestamp = " + endTimestamp);
+		// System.out.println("endTimestamp = " + endTSString);
+		//
+		tooltipContent.update(endTSString, actName, high, low);
 	}
 
 	/**
@@ -145,8 +138,8 @@ public class ActivityCircle extends Group
 	public void setSeriesAndDataStyleClasses(String seriesStyleClass, String dataStyleClass)
 	{
 		// System.out.println("setSeriesAndDataStyleClasses() called");
-		this.seriesStyleClass = seriesStyleClass;
-		this.dataStyleClass = dataStyleClass;
+		// this.seriesStyleClass = seriesStyleClass;
+		// this.dataStyleClass = dataStyleClass;
 		// updateStyleClasses();
 	}
 
@@ -186,9 +179,9 @@ public class ActivityCircle extends Group
 		// circle/
 		// circle.relocate(0, -(height / 2));
 
-		circle.setCenterX(xCenter);
-		circle.setCenterY(yCenter);
-		circle.setRadius(radius);
+		this.setCenterX(xCenter);
+		this.setCenterY(yCenter);
+		this.setRadius(radius);
 
 		// System.out.println("Circle center()=" + circle.getCenterX() + "," + circle.getCenterY());
 		// System.out.println("Circle layout()=" + circle.getLayoutX() + "," + circle.getLayoutY());

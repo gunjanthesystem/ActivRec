@@ -50,7 +50,7 @@ public final class Constant
 	public static final boolean removeCurrentActivityNameFromRecommendations = false;// false;// true;
 
 	// addded as constant on 19 July 2018
-	public static final int lengthOfRecommendedSequence = 3;// TODO
+	public static final int lengthOfRecommendedSequence = 1;// TODO
 	/**
 	 * whether there threshold should be applied on candidate timelines based on edit distance
 	 */
@@ -108,13 +108,14 @@ public final class Constant
 	public static final boolean useForeignAwareLevenshtein = false; /// added on 9 Jan 2019//TODO
 
 	public static final boolean useJan7DistanceComputations = false;// TODO
+	public static final boolean considerFeatureValOrValDiff = true;// TODO true for val, false for val diff
 
 	// ensureCandEndWithCurrAct ONLY IMPLEMENTED YET FOR NCOUNT
 	public static final boolean ensureCandEndWithCurrAct = true;// true;// TEMP TODO
 
 	public static final boolean ensureHasDaywiseCandsForEvalCompatibility = true;// TODO //added 14 Jan 2018
 
-	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;//// TODO SWITCH_NOV10
+	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
@@ -337,7 +338,7 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "dcu_data_2";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+	static String DATABASE_NAME = "gowalla1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
 												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
@@ -935,9 +936,9 @@ public final class Constant
 			collaborativeCandidates = false;
 			filterTrainingTimelinesByRecentDays = false;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
-			nearestNeighbourCandEDThresholdPrimDim = 100;// 100;// 100;// TODO 500;// 750;// 500;// 500;/// -1;//
+			nearestNeighbourCandEDThresholdPrimDim = 500;// 100;// 100;// TODO 500;// 750;// 500;// 500;/// -1;//
 			// candEDValThresholdPrimDim = 0.5; // TEMP TODO
-			percentileForRTVerseMaxForFEDNorm = 20;// 20;//// TODO 10;// 75;// -1// SWITCH_April24
+			percentileForRTVerseMaxForFEDNorm = -1;// 10;// 20;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = false;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = true;// //TODO toySwitch // SWITCH_April8
@@ -966,7 +967,7 @@ public final class Constant
 			filterTrainingTimelinesByRecentDays = true;
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = 500;// TODO 500;// 750;// 500;// 500;/// -1;//
-			percentileForRTVerseMaxForFEDNorm = 75;//// TODO 10;// 75;// -1// SWITCH_April24
+			percentileForRTVerseMaxForFEDNorm = 10;//// TODO 10;// 75;// -1// SWITCH_April24
 			useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = true;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = false;// //TODO toySwitch // SWITCH_April8
@@ -1841,6 +1842,7 @@ public final class Constant
 		s.append("\nactLevelDistType:" + actLevelDistType);
 		s.append("\nuseForeignAwareLevenshtein:" + useForeignAwareLevenshtein);
 		s.append("\nuseJan7DistanceComputations:" + useJan7DistanceComputations);
+		s.append("\nconsiderFeatureValOrValDiff:" + considerFeatureValOrValDiff);
 		s.append("\nensureCandEndWithCurrAct:" + ensureCandEndWithCurrAct);
 		s.append("\nensureHasDaywiseCandsForEvalCompatibility:" + ensureHasDaywiseCandsForEvalCompatibility);
 		s.append("\naltSeqPredictor:" + altSeqPredictor);

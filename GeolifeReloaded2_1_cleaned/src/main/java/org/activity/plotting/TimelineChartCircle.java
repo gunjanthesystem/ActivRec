@@ -34,11 +34,15 @@ public class TimelineChartCircle extends XYChart<Number, String>
 	public TimelineChartCircle(Axis<Number> xAxis, Axis<String> yAxis)
 	{
 		super(xAxis, yAxis);
-		final String timelineChartCss = getClass().getResource("TimelineChart.css").toExternalForm();
-		getStylesheets().add(timelineChartCss); // disabled on 13 March 2018
-		setAnimated(true);
-		xAxis.setAnimated(true);
-		yAxis.setAnimated(true);
+
+		if (false)
+		{// disabled on 17 Feb 2019, signficantlt improves performance
+			final String timelineChartCss = getClass().getResource("TimelineChart.css").toExternalForm();
+			getStylesheets().add(timelineChartCss); // disabled on 13 March 2018
+			setAnimated(true);
+			xAxis.setAnimated(true);
+			yAxis.setAnimated(true);
+		}
 		this.setCache(true);
 
 	}

@@ -65,7 +65,10 @@ public class ActivityBox2 extends Group
 		// regionBar.setShape(new Circle());
 
 		/// Start of moved from updateStyleClasses() to avoid repeated calls
-		getStyleClass().setAll("activitybox-box", seriesStyleClass, dataStyleClass);
+		if (false)// dsiabled on 18 Feb 2019
+		{
+			getStyleClass().setAll("activitybox-box", seriesStyleClass, dataStyleClass);
+		}
 		// highLowLine.getStyleClass().setAll("candlestick-line", seriesStyleClass, dataStyleClass, aboveClose);
 		// $$regionBar.getStyleClass().setAll("candlestick-bar", seriesStyleClass, dataStyleClass);// , aboveClose);
 		/// End of moved from updateStyleClasses() to avoid repeated calls

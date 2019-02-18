@@ -556,8 +556,8 @@ public class EvalMetrics
 			/////////// start of added on 15 Jan 2019
 			// fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
 			String metricName = "ReciprocalRank";
-			groupByUserAndActual(fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase, commonPath,
-					metricName);
+			groupByUserAndActual(fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase, commonPath);
+			// metricName);
 			/////////// end of added on 15 Jan 2019
 		}
 		catch (Exception e)
@@ -570,13 +570,13 @@ public class EvalMetrics
 	 * 
 	 * @param fileNamePhrase
 	 * @param commonPath
-	 * @param metricName
 	 * @since 15 jan 2019
 	 */
-	private static void groupByUserAndActual(String fileNamePhrase, String commonPath, String metricName)
+	public static void groupByUserAndActual(String fileNamePhrase, String commonPath)// , String metricName)
 	{
 		// fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
-		List<List<String>> allRRRead = ReadingFromFile.readLinesIntoListOfLists(commonPath + fileNamePhrase + ".csv", ",");
+		List<List<String>> allRRRead = ReadingFromFile.readLinesIntoListOfLists(commonPath + fileNamePhrase + ".csv",
+				",");
 
 		LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByUser = allRRRead.stream().skip(1)
 				.collect(Collectors.groupingBy(e -> String.valueOf(e.get(0)), LinkedHashMap::new,
@@ -590,14 +590,14 @@ public class EvalMetrics
 						.map(e -> e.getKey() + "," + StatsUtils.round(e.getValue().getAverage(), 4) + ","
 								+ e.getValue().getCount())
 						.collect(Collectors.joining("\n")),
-				commonPath + fileNamePhrase + "MeanPerUser .csv");
+				commonPath + fileNamePhrase + "MeanPerUser.csv");
 
 		WToFile.writeToNewFile(
 				"Actual,MRR,Count\n" + allRRGrpByTargetAct.entrySet().stream()
 						.map(e -> e.getKey() + "," + StatsUtils.round(e.getValue().getAverage(), 4) + ","
 								+ e.getValue().getCount())
 						.collect(Collectors.joining("\n")),
-				commonPath + fileNamePhrase + "MeanPerActual .csv");
+				commonPath + fileNamePhrase + "MeanPerActual.csv");
 	}
 
 	/**
@@ -845,8 +845,8 @@ public class EvalMetrics
 			String[] metricNames = { "Precision", "Recall", "FMeasure" };
 			for (String metricName : metricNames)
 			{
-				groupByUserAndActual(fileNamePhrase + timeCategory + "top" + theK + metricName + "Unrolled", commonPath,
-						metricName);
+				groupByUserAndActual(fileNamePhrase + timeCategory + "top" + theK + metricName + "Unrolled",
+						commonPath);// metricName);
 			}
 			System.out.println(consoleLogBuilder.toString());
 		}

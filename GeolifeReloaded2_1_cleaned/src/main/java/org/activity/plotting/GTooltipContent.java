@@ -100,6 +100,7 @@ public class GTooltipContent extends GridPane
 		// label3.setText(high);
 		// label4.setText(low);
 	}
+
 	// /**
 	// *
 	// * @param endTS
