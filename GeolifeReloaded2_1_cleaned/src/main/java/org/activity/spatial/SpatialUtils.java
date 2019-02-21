@@ -1,6 +1,7 @@
 package org.activity.spatial;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
+import org.activity.util.RegexUtils;
 import org.apache.commons.math3.util.FastMath;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -308,8 +310,8 @@ public final class SpatialUtils
 		// sanityCheckSlimedTheSerialisedGridDistances();
 		// sanityCheckSlimedTheSerialisedGridDistances2();
 		// findRange();
-		slimAgainTheSerialisedGridDistances();
-		compareDeserialisationTime();
+		// $slimAgainTheSerialisedGridDistances();//disabled on 20 Feb 2019
+		// $compareDeserialisationTime();//disabled on 20 Feb 2019
 		// end of added on 19 Dec 2018
 		// spatialDistanceDatabaseController(
 		// "/run/media/gunjan/BufferVault/GowallaResults/Feb22/UniqueLocationObjects5DaysTrainTest.csv",
@@ -317,6 +319,8 @@ public final class SpatialUtils
 
 		// $$ spatialDistanceDatabaseController2("./dataWritten/Feb22/UniqueLocationObjects5DaysTrainTest.csv",
 		// "./dataWritten/Feb23/");
+		System.out.println(Arrays.asList(RegexUtils.patternPipe.split("39.990617|116.305042")));
+		// System.out.println(haversine("39.990617", "116.305042", "39.986292", "116.304267"));
 
 		// getDistanceBetweenAllLocations10July2018();
 	}

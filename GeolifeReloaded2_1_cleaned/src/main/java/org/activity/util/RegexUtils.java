@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 public class RegexUtils
 {
 	public static final Pattern patternHyphen = Pattern.compile("-");
-	public static final Pattern patternPipe = Pattern.compile("|");
 	public static final Pattern patternUnderScore = Pattern.compile("_");
 	public static final Pattern patternDoubleUnderScore = Pattern.compile("__");
 	public static final Pattern patternColon = Pattern.compile(":");
@@ -21,6 +20,7 @@ public class RegexUtils
 	public static final Pattern patternOpeningRoundBrace = Pattern.compile("\\(");
 	public static final Pattern patternClosingRoundBrace = Pattern.compile("\\)");
 	public static final Pattern patternGreaterThan = Pattern.compile(">");
+	public static final Pattern patternPipe = Pattern.compile("\\|");
 
 	/**
 	 * to find out how many times this method is being called when a variable in declaration calls it.

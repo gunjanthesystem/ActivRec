@@ -131,13 +131,12 @@ public class GluonOSMMap extends Application
 		if (colorByLabel)
 		{
 			view.addLayer(positionLayerV3_colorByLabelScaled(listOfLocs, sizeOfIcon));
-
 		}
 		else
 		{
 			view.addLayer(positionLayerV3(listOfLocs, sizeOfIcon, colorOfIcon));
 		}
-		listOfLocs.clear();
+		// $listOfLocs.clear();
 		// view.setZoom(4);
 		// Scene scene;
 
@@ -480,6 +479,70 @@ public class GluonOSMMap extends Application
 			Circle c = new Circle(sizeOfIcon, fillColor);
 			// c.setStroke(Color.BLACK);
 			answer.addPoint(new MapPoint(locEntry.getFirst(), locEntry.getSecond()), c);
+		}
+
+		return answer;
+
+	}
+
+	/**
+	 * Fork of positionLayerV3_colorByLabelScaled for hops, showing line segments instead of lines. Incomplete as of 18
+	 * Feb 2019
+	 * 
+	 * @param listOfLocs
+	 * @param sizeOfIcon
+	 * @return
+	 * @since 18 Feb 2019
+	 */
+	private MapLayer positionLayerV3_colorByLabelScaledForHops(
+			List<Pair<Triple<Double, Double, String>, Triple<Double, Double, String>>> listOfLocs, int sizeOfIcon)
+	{
+		PoiLayer2Faster answer = new PoiLayer2Faster(listOfLocs.size());
+
+		List<Double> listOfValsForScaledColourFill = new ArrayList<>();
+
+		for (Pair<Triple<Double, Double, String>, Triple<Double, Double, String>> locEntry : listOfLocs)
+		{
+			listOfValsForScaledColourFill.add(Double.valueOf(locEntry.getFirst().getThird()));
+			listOfValsForScaledColourFill.add(Double.valueOf(locEntry.getSecond().getThird()));
+		}
+
+		//////////////////
+		int numOfBins = 100;
+		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
+				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
+		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst();
+		Color[] colors = ColorPalette
+				.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
+		System.out.println("color.length=" + colors.length);
+
+		/////////////////
+
+		for (int i = 0; i < listOfLocs.size(); i++)// MapPoint mp : mapPoints)
+		{
+			Pair<Triple<Double, Double, String>, Triple<Double, Double, String>> locEntry = listOfLocs.get(i);
+			// Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+
+			Pair<Double, Integer> valBinIndex = valBinIndexList.get(i);
+
+			Double fillValFromLocEntry1 = Double.valueOf(locEntry.getFirst().getThird());
+
+			if (valBinIndex.getFirst().equals(fillValFromLocEntry1) == false)
+			{
+				PopUps.printTracedErrorMsg("Error: valBinIndex.getFirst().equals(fillValFromLocEntry)==false");
+			}
+
+			int binIndex = valBinIndex.getSecond();// valBinIndexMap.get(Double.valueOf(locEntry.getThird()));
+
+			// Color fillColor = colors[binIndex];
+			Color fillColor = colors[colors.length - 1 - binIndex];// reversing colors
+			// System.out.println("binIndex= " + binIndex + " Color= " + fillColor + " red " + fillColor.getRed());
+
+			Circle c = new Circle(sizeOfIcon, fillColor);
+			// c.setStroke(Color.BLACK);
+			answer.addPoint(new MapPoint(locEntry.getFirst().getFirst(), locEntry.getFirst().getSecond()), c);
+			answer.addPoint(new MapPoint(locEntry.getSecond().getFirst(), locEntry.getSecond().getSecond()), c);
+			// adding two circles temporarily, instead it should be a line segment from one geo-location to the other.
 		}
 
 		return answer;

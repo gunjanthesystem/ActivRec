@@ -67,10 +67,11 @@ public class VerbosityConstants
 	public static final boolean WriteActivityObjectsInEditSimilarityCalculationsTrimmed = false;// false;// false;
 	public static final boolean WriteNormalisation = false;// false;// false;
 	public static final boolean WriteEditDistancesOfAllEndPoints = false;// false;
-	public static final boolean WriteRTVerseNormalisationLogs = true;// true;// Jan8_2019_disabled true;
+	public static final boolean WriteRTVerseNormalisationLogs = false;// true;// Jan8_2019_disabled true;
+	public static final boolean WriteRTVerseNormalisationLogsPerAO = false;
 	public static final boolean WriteCandAEDDiffs = false;//// Jan8_2019_disabled true;
 
-	public static final boolean WriteMInOfMinAndMaxOfMaxRTV = true;//// Jan8_2019_disabled 30 Nov 2018
+	public static final boolean WriteMInOfMinAndMaxOfMaxRTV = false;//// Jan8_2019_disabled 30 Nov 2018
 	/**
 	 * Write each cand of each RT in separate line
 	 */

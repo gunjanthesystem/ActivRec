@@ -517,7 +517,8 @@ public class DistanceUtils
 		// end of code to be parallelised
 		if (VerbosityConstants.WriteCandAEDDiffs)
 		{
-			writeCandAEDFeatValPairs(candAEDFeatValPairs, "candAEDFeatDiffsFromDistanceComputation7Jan");
+			writeCandAEDFeatValPairs(candAEDFeatValPairs, "candAEDFeatDiffsFromDistanceComputation7Jan", userAtRecomm,
+					dateAtRecomm, timeAtRecomm);
 		}
 		//// start of MSD
 		// if (Constant.useMSDInFEDInRTVerse)
@@ -619,8 +620,8 @@ public class DistanceUtils
 			// End of Jan 7 2019 curtain
 		}
 
-		if (VerbosityConstants.WriteCandAEDDiffs)
-		{
+		if (VerbosityConstants.WriteRTVerseNormalisationLogs == false && VerbosityConstants.WriteCandAEDDiffs)
+		{// redundant with WriteRTVerseNormalisationLogs per cand
 			writeCandAEDDists(candEditDistancesRes, "candNormalisedEditDistancesResJan7");
 		}
 		return candEditDistancesRes;
@@ -976,12 +977,16 @@ public class DistanceUtils
 
 	/**
 	 * 
-	 * @param candAEDFeatDiffs
+	 * @param candAEDFeatValPairs
+	 * @param fileNamePhrase
+	 * @param userAtRecomm
+	 * @param dateAtRecomm
+	 * @param timeAtRecomm
 	 * @since 7 Jan 2019
 	 */
 	private static void writeCandAEDFeatValPairs(
 			LinkedHashMap<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> candAEDFeatValPairs,
-			String fileNamePhrase)
+			String fileNamePhrase, String userAtRecomm, String dateAtRecomm, String timeAtRecomm)
 	{
 		StringBuilder sb = new StringBuilder();
 
@@ -989,7 +994,8 @@ public class DistanceUtils
 		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> e : candAEDFeatValPairs
 				.entrySet())
 		{
-			sb.append(e.getKey() + "," + e.getValue().getFirst() + "," + e.getValue().getSecond());
+			sb.append(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + e.getKey() + ","
+					+ e.getValue().getFirst() + "," + e.getValue().getSecond());
 
 			// loop over Feature enum maps for each AO
 			for (EnumMap<GowGeoFeature, Pair<String, String>> listEntry : e.getValue().getThird())
@@ -1083,100 +1089,9 @@ public class DistanceUtils
 				String databaseName = Constant.getDatabaseName();
 				if (databaseName.equals("geolife1"))
 				{
-					// Nov30MaxMin
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 5d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 5d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 5d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
-					//
-
-					// Dec1MaxMin
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 2d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 2d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 40d);
-
-					// Dec2MaxMin
-					// MaxStTimeDiff:- 5 hrs
-					// MaxDuration:- 1 hrs
-					// DistTravelled:- 2km,
-					// StGeoDiff:- 4km
-					// EndGeoDiff:- 4km
-					// AvgAlt:- 60m
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 18000d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 4d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 4d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
-
-					// Dec2MaxMin2
-					// MaxStTimeDiff:- 8 hrs
-					// MaxDuration:- 0.5 hrs
-					// DistTravelled:- 2km,
-					// StGeoDiff:- 10km
-					// EndGeoDiff:- 10km
-					// AvgAlt:- 100m
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 1800d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
-
-					// Dec2MaxMin3
-					// MaxStTimeDiff:- 8 hrs
-					// MaxDuration:- 1 hrs
-					// DistTravelled:- 2km,
-					// StGeoDiff:- 10km
-					// EndGeoDiff:- 10km
-					// AvgAlt:- 100m
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
-
-					// Dec3MaxMin
-					// MaxStTimeDiff:- 1 hr
-					// MaxDuration:- 1 hr
-					// DistTravelled:- 1km,
-					// StGeoDiff:- 1km
-					// EndGeoDiff:- 1km
-					// AvgAlt:- 20m
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 3600d);// secs, 1 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 1 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 1d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 1d);// 1km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 1d);// 1km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 20d);
-
-					// Dec4MaxMin
-					// MaxStTimeDiff:- 5 hrs
-					// MaxDuration:- 20 mins
-					// DistTravelled:- 500m,
-					// StGeoDiff:- 10km
-					// EndGeoDiff:- 10km
-					// AvgAlt:- 60m
-
-					maxOfMaxOfVals.put(GowGeoFeature.StartTimeF, (5d * 60 * 60));// secs, 1 hrs
-					maxOfMaxOfVals.put(GowGeoFeature.DurationF, 20 * 60d);// sec, 1 hrs
-					maxOfMaxOfVals.put(GowGeoFeature.DistTravelledF, 0.5d);// 5 km
-					maxOfMaxOfVals.put(GowGeoFeature.StartGeoF, 10d);// 1km
-					maxOfMaxOfVals.put(GowGeoFeature.EndGeoF, 10d);// 1km
-					maxOfMaxOfVals.put(GowGeoFeature.AvgAltitudeF, 60d);
-
-					minOfMinOfVals.put(GowGeoFeature.StartTimeF, 0d);// secs, 3 hrs
-					minOfMinOfVals.put(GowGeoFeature.DurationF, 0d);// sec, 3 hrs
-					minOfMinOfVals.put(GowGeoFeature.DistTravelledF, 0d);// 5 km
-					minOfMinOfVals.put(GowGeoFeature.StartGeoF, 0d);// 5km
-					minOfMinOfVals.put(GowGeoFeature.EndGeoF, 0d);// 5km
-					minOfMinOfVals.put(GowGeoFeature.AvgAltitudeF, 0d);
+					Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> fixedMaxMin = setFixedMaxMinForGeolife();
+					maxOfMaxOfVals = fixedMaxMin.getFirst();
+					minOfMinOfVals = fixedMaxMin.getSecond();
 				}
 				else
 				{
@@ -1227,13 +1142,13 @@ public class DistanceUtils
 
 		if (shouldComputeFeatureLevelDistance && VerbosityConstants.WriteMInOfMinAndMaxOfMaxRTV)// sanity check
 		{
-			StringBuilder sbMin = new StringBuilder();
-			StringBuilder sbMax = new StringBuilder();
-
-			minOfMinOfVals.entrySet().stream().forEachOrdered(e -> sbMin.append(e.getValue() + ","));
-			maxOfMaxOfVals.entrySet().stream().forEachOrdered(e -> sbMax.append(e.getValue() + ","));
-			WToFile.appendLineToFileAbs(sbMin.toString() + "\n", Constant.getCommonPath() + "minOfMinOfDiffsJan7.csv");
-			WToFile.appendLineToFileAbs(sbMax.toString() + "\n", Constant.getCommonPath() + "maxOfMaxOfDiffsJan7.csv");
+			DistanceUtils.writeMaxOfMaxAndMinOfMinToFile(minOfMinOfVals, maxOfMaxOfVals);
+			// minOfMinOfVals.entrySet().stream().forEachOrdered(e -> sbMin.append(e.getValue() + ","));
+			// maxOfMaxOfVals.entrySet().stream().forEachOrdered(e -> sbMax.append(e.getValue() + ","));
+			// WToFile.appendLineToFileAbs(sbMin.toString() + "\n", Constant.getCommonPath() +
+			// "minOfMinOfDiffsJan7.csv");
+			// WToFile.appendLineToFileAbs(sbMax.toString() + "\n", Constant.getCommonPath() +
+			// "maxOfMaxOfDiffsJan7.csv");
 		}
 		return new Pair<>(minOfMinOfVals, maxOfMaxOfVals);
 	}
@@ -1292,100 +1207,9 @@ public class DistanceUtils
 				String databaseName = Constant.getDatabaseName();
 				if (databaseName.equals("geolife1"))
 				{
-					// Nov30MaxMin
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 5d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 5d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 5d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
-					//
-
-					// Dec1MaxMin
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 2d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 2d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 40d);
-
-					// Dec2MaxMin
-					// MaxStTimeDiff:- 5 hrs
-					// MaxDuration:- 1 hrs
-					// DistTravelled:- 2km,
-					// StGeoDiff:- 4km
-					// EndGeoDiff:- 4km
-					// AvgAlt:- 60m
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 18000d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 4d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 4d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
-
-					// Dec2MaxMin2
-					// MaxStTimeDiff:- 8 hrs
-					// MaxDuration:- 0.5 hrs
-					// DistTravelled:- 2km,
-					// StGeoDiff:- 10km
-					// EndGeoDiff:- 10km
-					// AvgAlt:- 100m
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 1800d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
-
-					// Dec2MaxMin3
-					// MaxStTimeDiff:- 8 hrs
-					// MaxDuration:- 1 hrs
-					// DistTravelled:- 2km,
-					// StGeoDiff:- 10km
-					// EndGeoDiff:- 10km
-					// AvgAlt:- 100m
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
-
-					// Dec3MaxMin
-					// MaxStTimeDiff:- 1 hr
-					// MaxDuration:- 1 hr
-					// DistTravelled:- 1km,
-					// StGeoDiff:- 1km
-					// EndGeoDiff:- 1km
-					// AvgAlt:- 20m
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 3600d);// secs, 1 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 1 hrs
-					// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 1d);// 5 km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 1d);// 1km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 1d);// 1km
-					// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 20d);
-
-					// Dec4MaxMin
-					// MaxStTimeDiff:- 5 hrs
-					// MaxDuration:- 20 mins
-					// DistTravelled:- 500m,
-					// StGeoDiff:- 10km
-					// EndGeoDiff:- 10km
-					// AvgAlt:- 60m
-
-					maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, (5d * 60 * 60));// secs, 1 hrs
-					maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 20 * 60d);// sec, 1 hrs
-					maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 0.5d);// 5 km
-					maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 1km
-					maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 1km
-					maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
-
-					minOfMinOfDiffs.put(GowGeoFeature.StartTimeF, 0d);// secs, 3 hrs
-					minOfMinOfDiffs.put(GowGeoFeature.DurationF, 0d);// sec, 3 hrs
-					minOfMinOfDiffs.put(GowGeoFeature.DistTravelledF, 0d);// 5 km
-					minOfMinOfDiffs.put(GowGeoFeature.StartGeoF, 0d);// 5km
-					minOfMinOfDiffs.put(GowGeoFeature.EndGeoF, 0d);// 5km
-					minOfMinOfDiffs.put(GowGeoFeature.AvgAltitudeF, 0d);
+					Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> fixedMaxMin = setFixedMaxMinForGeolife();
+					maxOfMaxOfDiffs = fixedMaxMin.getFirst();
+					minOfMinOfDiffs = fixedMaxMin.getSecond();
 				}
 				else
 				{
@@ -1435,33 +1259,43 @@ public class DistanceUtils
 
 		if (shouldComputeFeatureLevelDistance && VerbosityConstants.WriteMInOfMinAndMaxOfMaxRTV)// sanity check
 		{
-			StringBuilder sbMin = new StringBuilder();
-			StringBuilder sbMax = new StringBuilder();
-			String minMinFile = Constant.getCommonPath() + "minOfMinOfDiffs.csv";
-			String maxMaxFile = Constant.getCommonPath() + "maxOfMaxOfDiffs.csv";
-
-			if (new File(minMinFile).isFile() == false)
-			{
-				String minMinHeader = minOfMinOfDiffs.entrySet().stream().map(e -> e.getKey().toString())
-						.collect(Collectors.joining(","));
-				WToFile.appendLineToFileAbs(minMinHeader + ",\n", minMinFile);
-
-			}
-			if (new File(maxMaxFile).isFile() == false)
-			{
-				String maxMaxHeader = maxOfMaxOfDiffs.entrySet().stream().map(e -> e.getKey().toString())
-						.collect(Collectors.joining(","));
-				WToFile.appendLineToFileAbs(maxMaxHeader + ",\n", maxMaxFile);
-			}
-
-			minOfMinOfDiffs.entrySet().stream().forEachOrdered(e -> sbMin.append(e.getValue() + ","));
-			maxOfMaxOfDiffs.entrySet().stream().forEachOrdered(e -> sbMax.append(e.getValue() + ","));
-
-			WToFile.appendLineToFileAbs(sbMin.toString() + "\n", minMinFile);
-			WToFile.appendLineToFileAbs(sbMax.toString() + "\n", maxMaxFile);
+			writeMaxOfMaxAndMinOfMinToFile(minOfMinOfDiffs, maxOfMaxOfDiffs);
 		}
 		return new Pair<>(minOfMinOfDiffs, maxOfMaxOfDiffs);
 
+	}
+
+	/**
+	 * @param minOfMinOfDiffs
+	 * @param maxOfMaxOfDiffs
+	 */
+	private static void writeMaxOfMaxAndMinOfMinToFile(EnumMap<GowGeoFeature, Double> minOfMinOfDiffs,
+			EnumMap<GowGeoFeature, Double> maxOfMaxOfDiffs)
+	{
+		StringBuilder sbMin = new StringBuilder();
+		StringBuilder sbMax = new StringBuilder();
+		String minMinFile = Constant.getCommonPath() + "minOfMinOfDiffs.csv";
+		String maxMaxFile = Constant.getCommonPath() + "maxOfMaxOfDiffs.csv";
+
+		if (new File(minMinFile).isFile() == false)
+		{
+			String minMinHeader = minOfMinOfDiffs.entrySet().stream().map(e -> e.getKey().toString())
+					.collect(Collectors.joining(","));
+			WToFile.appendLineToFileAbs(minMinHeader + ",\n", minMinFile);
+
+		}
+		if (new File(maxMaxFile).isFile() == false)
+		{
+			String maxMaxHeader = maxOfMaxOfDiffs.entrySet().stream().map(e -> e.getKey().toString())
+					.collect(Collectors.joining(","));
+			WToFile.appendLineToFileAbs(maxMaxHeader + ",\n", maxMaxFile);
+		}
+
+		minOfMinOfDiffs.entrySet().stream().forEachOrdered(e -> sbMin.append(e.getValue() + ","));
+		maxOfMaxOfDiffs.entrySet().stream().forEachOrdered(e -> sbMax.append(e.getValue() + ","));
+
+		WToFile.appendLineToFileAbs(sbMin.toString() + "\n", minMinFile);
+		WToFile.appendLineToFileAbs(sbMax.toString() + "\n", maxMaxFile);
 	}
 
 	/**
@@ -2916,9 +2750,9 @@ public class DistanceUtils
 
 		double EDAlpha = Constant.getDynamicEDAlpha();// .dynamicEDAlpha;// double EDBeta = 1 - EDAlpha;
 
-		boolean shouldComputedFED = hjEditDistance.getShouldComputeFeatureLevelDistance();
+		boolean shouldComputeFED = hjEditDistance.getShouldComputeFeatureLevelDistance();
 		/////
-		if (shouldComputedFED == false && EDAlpha != 1)
+		if (shouldComputeFED == false && EDAlpha != 1)
 		{
 			System.err
 					.println("Warning: -- Since no features are being used it is suggested to set Constant.EDAlpha=1.\n"
@@ -3005,7 +2839,9 @@ public class DistanceUtils
 
 			EnumMap<GowGeoFeature, List<Pair<String, String>>> valsPairsForEachFeatAcrossAOsForThisCand = new EnumMap<>(
 					GowGeoFeature.class);
-			EnumMap<GowGeoFeature, List<Pair<String, String>>> normValPairsForEachFeatAcrossAOsForThisCand = new EnumMap<>(
+			// if considerValOrValDiff is true: contains normalised val of each val in each val pair,
+			// ...........................else: contains normalised of diff vals in each val pair. (Pair.second empty)
+			EnumMap<GowGeoFeature, List<Pair<String, String>>> normValPairsOrDiffForEachFeatAcrossAOsForThisCand = new EnumMap<>(
 					GowGeoFeature.class);
 
 			if (EDAlpha != 1)
@@ -3013,41 +2849,65 @@ public class DistanceUtils
 				// assuming same features across all AOs
 				listOfFeatures = new ArrayList<GowGeoFeature>(listOfFeatValPairsOverAOsForThisCand.get(0).keySet());
 
-				///// Start of convery AO-wise feat val pairs to feat-wise feat val pair
+				///// Start of convert AO-wise feat val pairs to feat-wise feat val pair
 				for (GowGeoFeature feature : listOfFeatures)// loop over each feature
 				{ // loop over AOs in this cand
 					List<Pair<String, String>> valsForThisFeatureAcrossAllAOsInThisCand = listOfFeatValPairsOverAOsForThisCand
 							.stream().map(e -> e.get(feature)).collect(Collectors.toList());
 					valsPairsForEachFeatAcrossAOsForThisCand.put(feature, valsForThisFeatureAcrossAllAOsInThisCand);
 				}
-				///// End of convery AO-wise feat val pairs to feat-wise feat val pair
+				///// End of convert AO-wise feat val pairs to feat-wise feat val pair
 
 				////// Start of RTVerse normalise each val for each feature across AOs for this cand
 				for (GowGeoFeature feature : listOfFeatures)
 				{
-					if (feature.equals(GowGeoFeature.StartGeoF) || feature.equals(GowGeoFeature.EndGeoF))
+					if (considerValOrValDiff
+							&& (feature.equals(GowGeoFeature.StartGeoF) || feature.equals(GowGeoFeature.EndGeoF)))
 					{ // no notion of normalisation for geo-coordinates
-						normValPairsForEachFeatAcrossAOsForThisCand.put(feature,
+						normValPairsOrDiffForEachFeatAcrossAOsForThisCand.put(feature,
 								valsPairsForEachFeatAcrossAOsForThisCand.get(feature));
 						sbMinMaxLog.append("-1,-1,");
 					}
 					else
 					{
 						List<Pair<String, String>> normalisedValPairs = new ArrayList<>();
+						// max val or max val diff depending on considerValOrValDiff
 						double maxForThisFeature = maxOfMaxOfFeatDiffs.get(feature);
 						double minForThisFeature = minOfMinOfFeatDiffs.get(feature);
 
 						for (Pair<String, String> valPair : valsPairsForEachFeatAcrossAOsForThisCand.get(feature))
 						{
-							double normV1 = StatsUtils.minMaxNormWORoundWithUpperBound(
-									Double.valueOf(valPair.getFirst()), maxForThisFeature, minForThisFeature, 1.0d,
-									false);
-							double normV2 = StatsUtils.minMaxNormWORoundWithUpperBound(
-									Double.valueOf(valPair.getSecond()), maxForThisFeature, minForThisFeature, 1.0d,
-									false);
-							normalisedValPairs.add(new Pair<>(String.valueOf(normV1), String.valueOf(normV2)));
+							if (considerValOrValDiff)
+							{// normalise each feature value
+								double normV1 = StatsUtils.minMaxNormWORoundWithUpperBound(
+										Double.valueOf(valPair.getFirst()), maxForThisFeature, minForThisFeature, 1.0d,
+										false);
+								double normV2 = StatsUtils.minMaxNormWORoundWithUpperBound(
+										Double.valueOf(valPair.getSecond()), maxForThisFeature, minForThisFeature, 1.0d,
+										false);
+								normalisedValPairs.add(new Pair<>(String.valueOf(normV1), String.valueOf(normV2)));
+							}
+							else
+							{// normalise diff of each pairs of feat values
+								Double diff = null;
+								if (feature.equals(GowGeoFeature.StartGeoF) || feature.equals(GowGeoFeature.EndGeoF))
+								{
+									String[] splitted1 = RegexUtils.patternPipe.split(valPair.getFirst());
+									String[] splitted2 = RegexUtils.patternPipe.split(valPair.getSecond());
+									diff = SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0],
+											splitted2[1]);
+								}
+								else
+								{
+									diff = Math.abs(
+											Double.valueOf(valPair.getFirst()) - Double.valueOf(valPair.getSecond()));
+								}
+								double normDiff = StatsUtils.minMaxNormWORoundWithUpperBound(diff, maxForThisFeature,
+										minForThisFeature, 1.0d, false);
+								normalisedValPairs.add(new Pair<>(String.valueOf(normDiff), ""));
+							}
 						}
-						normValPairsForEachFeatAcrossAOsForThisCand.put(feature, normalisedValPairs);
+						normValPairsOrDiffForEachFeatAcrossAOsForThisCand.put(feature, normalisedValPairs);
 						sbMinMaxLog.append(maxForThisFeature + "," + minForThisFeature + ",");
 					}
 
@@ -3056,7 +2916,8 @@ public class DistanceUtils
 
 				//////// Start of compute FED for this cand
 				normFeatDistForThisCand = computeNormalisedFEDForThisCand(listOfFeatures,
-						normValPairsForEachFeatAcrossAOsForThisCand, hjEditDistance.getFeatureWeightMap());
+						normValPairsOrDiffForEachFeatAcrossAOsForThisCand, hjEditDistance.getFeatureWeightMap(),
+						considerValOrValDiff);
 				//////// End of compute FED for this cand
 			}
 
@@ -3074,7 +2935,7 @@ public class DistanceUtils
 					{
 						logAOsThisCandHeader.append("indexOfAO,");
 					}
-					if (shouldComputedFED)
+					if (shouldComputeFED)
 					{
 						for (GowGeoFeature feature : listOfFeatures)
 						{
@@ -3083,8 +2944,8 @@ public class DistanceUtils
 							// normValPairsForEachFeatAcrossAOsForThisCand);
 							Pair<String, String> valPair = valsPairsForEachFeatAcrossAOsForThisCand.get(feature)
 									.get(indexOfAO);
-							Pair<String, String> normValPair = normValPairsForEachFeatAcrossAOsForThisCand.get(feature)
-									.get(indexOfAO);
+							Pair<String, String> normValPair = normValPairsOrDiffForEachFeatAcrossAOsForThisCand
+									.get(feature).get(indexOfAO);
 							logAOsThisCand.append(valPair.getFirst() + "," + valPair.getSecond() + ","
 									+ normValPair.getFirst() + "," + normValPair.getSecond() + ",");
 							if (indexOfAO == 0 && indexOfCandForThisRT == 1)
@@ -3129,7 +2990,7 @@ public class DistanceUtils
 				}
 				else
 				{
-					resultantEditDist = (EDAlpha) * normActDistForThisCand;
+					resultantEditDist = EDAlpha * normActDistForThisCand;
 				}
 			}
 			else
@@ -3212,7 +3073,8 @@ public class DistanceUtils
 			}
 			WToFile.appendLineToFileAbs(logEachCand.toString(), fileNameForLogOfEachCand);
 
-			if (VerbosityConstants.WriteRTVerseNormalisationLogs)
+			if (VerbosityConstants.WriteRTVerseNormalisationLogs
+					&& VerbosityConstants.WriteRTVerseNormalisationLogsPerAO)
 			{
 				if (new File(fileNameForLogOfEachAO).isFile() == false)
 				{
@@ -3253,43 +3115,59 @@ public class DistanceUtils
 	/**
 	 * 
 	 * @param listOfFeatures
-	 * @param normValPairsForEachFeatAcrossAOsForThisCand
+	 * @param normValPairsOrDiffForEachFeatAcrossAOsForThisCand
 	 * @param featureWeightMap
+	 * @param considerValOrValDiff
+	 *            (added on 19 Feb 2019) if TRUE normValPairsForEachFeatAcrossAOsForThisCand contains normalised feature
+	 *            values, else normValPairsForEachFeatAcrossAOsForThisCand contains normalised diff of each feature
+	 *            value in each pair.
 	 * @return
 	 * 
 	 * @since 5 Feb 2019 (extracted out as method)
 	 */
 	private static double computeNormalisedFEDForThisCand(ArrayList<GowGeoFeature> listOfFeatures,
-			EnumMap<GowGeoFeature, List<Pair<String, String>>> normValPairsForEachFeatAcrossAOsForThisCand,
-			EnumMap<GowGeoFeature, Double> featureWeightMap)
+			EnumMap<GowGeoFeature, List<Pair<String, String>>> normValPairsOrDiffForEachFeatAcrossAOsForThisCand,
+			EnumMap<GowGeoFeature, Double> featureWeightMap, boolean considerValOrValDiff)
 	{
 		double normFeatDistForThisCand = -9999;
 		double wtdSumOfFeatDiffForThisCand = 0, sumOfFeatureWts = 0;
+
 		for (GowGeoFeature featureID : listOfFeatures)
 		{
 			List<Double> diffOfNormValPairsForThisFeatAcrossAllAOsInCand = new ArrayList<>(
-					normValPairsForEachFeatAcrossAOsForThisCand.get(featureID).size());
+					normValPairsOrDiffForEachFeatAcrossAOsForThisCand.get(featureID).size());
 
-			if (featureID.equals(GowGeoFeature.StartGeoF) || featureID.equals(GowGeoFeature.EndGeoF))
-			{
-				for (Pair<String, String> valPair : normValPairsForEachFeatAcrossAOsForThisCand.get(featureID))// featureEntry.getValue())
+			if (considerValOrValDiff)
+			{// Need to diff as normValPairsForEachFeatAcrossAOsForThisCand contains normalised feature values
+				if (featureID.equals(GowGeoFeature.StartGeoF) || featureID.equals(GowGeoFeature.EndGeoF))
 				{
-					String[] splitted1 = RegexUtils.patternPipe.split(valPair.getFirst());
-					String[] splitted2 = RegexUtils.patternPipe.split(valPair.getSecond());
-					diffOfNormValPairsForThisFeatAcrossAllAOsInCand
-							.add(SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1]));
+					for (Pair<String, String> valPair : normValPairsOrDiffForEachFeatAcrossAOsForThisCand
+							.get(featureID))// featureEntry.getValue())
+					{
+						String[] splitted1 = RegexUtils.patternPipe.split(valPair.getFirst());
+						String[] splitted2 = RegexUtils.patternPipe.split(valPair.getSecond());
+						diffOfNormValPairsForThisFeatAcrossAllAOsInCand
+								.add(SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1]));
+					}
+				}
+				else
+				{
+					for (Pair<String, String> valPair : normValPairsOrDiffForEachFeatAcrossAOsForThisCand
+							.get(featureID))
+					{
+						diffOfNormValPairsForThisFeatAcrossAllAOsInCand.add(
+								Math.abs(Double.valueOf(valPair.getSecond()) - Double.valueOf(valPair.getFirst())));
+					}
 				}
 			}
 			else
-			{
-				for (Pair<String, String> valPair : normValPairsForEachFeatAcrossAOsForThisCand.get(featureID))
-				{
-					diffOfNormValPairsForThisFeatAcrossAllAOsInCand
-							.add(Math.abs(Double.valueOf(valPair.getSecond()) - Double.valueOf(valPair.getFirst())));
-				}
+			{ // no need to diff as normValPairsForEachFeatAcrossAOsForThisCand contains normalised feature diffs
+				diffOfNormValPairsForThisFeatAcrossAllAOsInCand = normValPairsOrDiffForEachFeatAcrossAOsForThisCand
+						.get(featureID).stream().map(pair -> Double.valueOf(pair.getFirst()))
+						.collect(Collectors.toList());
 			}
 
-			double aggValForFeatureAcrossAllAOsInCand = -9999;
+			Double aggValForFeatureAcrossAllAOsInCand = null;
 			if (Constant.takeMeanOrMedianOfFeatDiffsAcrossAllAOsInCandForFeatSeq == 0)
 			{
 				DoubleSummaryStatistics summaryStatForThisFeatAcrossAOsOfThisCand = diffOfNormValPairsForThisFeatAcrossAllAOsInCand
@@ -5295,4 +5173,111 @@ public class DistanceUtils
 		}
 		return aggregatedFeatureWiseDistances;
 	}
+
+	/**
+	 * @return
+	 */
+	private static Pair<EnumMap<GowGeoFeature, Double>, EnumMap<GowGeoFeature, Double>> setFixedMaxMinForGeolife()
+	{
+		EnumMap<GowGeoFeature, Double> minOfMinOfVals = new EnumMap<>(GowGeoFeature.class);
+		EnumMap<GowGeoFeature, Double> maxOfMaxOfVals = new EnumMap<>(GowGeoFeature.class);
+
+		// Nov30MaxMin
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 5d);// 5 km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 5d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 5d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
+		//
+
+		// Dec1MaxMin
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 10800d);// secs, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 10800d);// sec, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 2d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 2d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 40d);
+
+		// Dec2MaxMin
+		// MaxStTimeDiff:- 5 hrs
+		// MaxDuration:- 1 hrs
+		// DistTravelled:- 2km,
+		// StGeoDiff:- 4km
+		// EndGeoDiff:- 4km
+		// AvgAlt:- 60m
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 18000d);// secs, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 4d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 4d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 60d);
+
+		// Dec2MaxMin2
+		// MaxStTimeDiff:- 8 hrs
+		// MaxDuration:- 0.5 hrs
+		// DistTravelled:- 2km,
+		// StGeoDiff:- 10km
+		// EndGeoDiff:- 10km
+		// AvgAlt:- 100m
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 1800d);// sec, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
+
+		// Dec2MaxMin3
+		// MaxStTimeDiff:- 8 hrs
+		// MaxDuration:- 1 hrs
+		// DistTravelled:- 2km,
+		// StGeoDiff:- 10km
+		// EndGeoDiff:- 10km
+		// AvgAlt:- 100m
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 28800d);// secs, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 3 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 2d);// 5 km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 10d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 10d);// 5km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 100d);
+
+		// Dec3MaxMin
+		// MaxStTimeDiff:- 1 hr
+		// MaxDuration:- 1 hr
+		// DistTravelled:- 1km,
+		// StGeoDiff:- 1km
+		// EndGeoDiff:- 1km
+		// AvgAlt:- 20m
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartTimeF, 3600d);// secs, 1 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DurationF, 3600d);// sec, 1 hrs
+		// maxOfMaxOfDiffs.put(GowGeoFeature.DistTravelledF, 1d);// 5 km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.StartGeoF, 1d);// 1km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.EndGeoF, 1d);// 1km
+		// maxOfMaxOfDiffs.put(GowGeoFeature.AvgAltitudeF, 20d);
+
+		// Dec4MaxMin
+		// MaxStTimeDiff:- 5 hrs
+		// MaxDuration:- 20 mins
+		// DistTravelled:- 500m,
+		// StGeoDiff:- 10km
+		// EndGeoDiff:- 10km
+		// AvgAlt:- 60m
+
+		maxOfMaxOfVals.put(GowGeoFeature.StartTimeF, (5d * 60 * 60));// secs, 1 hrs
+		maxOfMaxOfVals.put(GowGeoFeature.DurationF, 20 * 60d);// sec, 1 hrs
+		maxOfMaxOfVals.put(GowGeoFeature.DistTravelledF, 0.5d);// 5 km
+		maxOfMaxOfVals.put(GowGeoFeature.StartGeoF, 10d);// 1km
+		maxOfMaxOfVals.put(GowGeoFeature.EndGeoF, 10d);// 1km
+		maxOfMaxOfVals.put(GowGeoFeature.AvgAltitudeF, 60d);
+
+		minOfMinOfVals.put(GowGeoFeature.StartTimeF, 0d);// secs, 3 hrs
+		minOfMinOfVals.put(GowGeoFeature.DurationF, 0d);// sec, 3 hrs
+		minOfMinOfVals.put(GowGeoFeature.DistTravelledF, 0d);// 5 km
+		minOfMinOfVals.put(GowGeoFeature.StartGeoF, 0d);// 5km
+		minOfMinOfVals.put(GowGeoFeature.EndGeoF, 0d);// 5km
+		minOfMinOfVals.put(GowGeoFeature.AvgAltitudeF, 0d);
+
+		return new Pair<>(maxOfMaxOfVals, minOfMinOfVals);
+	}
+
 }

@@ -30,7 +30,6 @@ public class PoiLayer2Faster extends MapLayer
 	{
 		points = new ArrayList<>(numOfPoints);
 		latPrecomputedValForRendering = new Double2DoubleOpenHashMap(numOfPoints);
-
 	}
 
 	public void addPoint(MapPoint p, Node icon)
@@ -48,7 +47,6 @@ public class PoiLayer2Faster extends MapLayer
 				- (FastMath.log(FastMath.tan(lat_rad) + 1 / FastMath.cos(lat_rad)) / Math.PI)) / 2;
 		latPrecomputedValForRendering.put(latitude, preCompLatValForUpdating);
 		////
-
 	}
 
 	@Override

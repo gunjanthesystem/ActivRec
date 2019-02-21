@@ -98,7 +98,7 @@ public class Dashboard4 extends Application
 	public void start(Stage stage)
 	{
 		long t0 = System.currentTimeMillis();
-		String databaseName = "geolife1";
+		String databaseName = "gowalla1";
 
 		ScreenDetails.printScreensDetails();
 		reuse = new ReusableElements();
@@ -107,7 +107,7 @@ public class Dashboard4 extends Application
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = null;
 
 		////////////////////////////////////////////////////////
-		if (true)
+		if (false)
 		{
 			if (databaseName.equals("gowalla1"))
 			{
@@ -175,7 +175,7 @@ public class Dashboard4 extends Application
 		HBox hBoxMenus = new HBox(generateMenuBar());
 
 		TabPane tabPane = createTabs(true, usersCleanedDayTimelines, databaseName);// usersCleanedDayToyTimelines);
-		usersCleanedDayTimelines.clear();// To save memory
+		// usersCleanedDayTimelines.clear();// To save memory
 		// tabPane.setPrefHeight(getHeight());
 
 		// VBox mainPane = new VBox();
@@ -253,13 +253,16 @@ public class Dashboard4 extends Application
 		// LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toyTimelines = toOnlySeqOfActIDs(
 		// usersCleanedDayToyTimelines);
 		System.out.println("Entered createTabs()");
-		final boolean doSyntheticDataCircleTimelines = false;// true;
+
 		final boolean doGivenDataCircleTimelines = false;
-		final boolean doGivenDataOnlyActIDSeq = true;
+		final boolean doGivenDataOnlyActIDSeq = false;
+
+		final boolean doSyntheticDataCircleTimelines = false;// true;
 		final boolean doSyntheticDataCanvasTimelines = false;
 		final boolean doSyntheticDataBoxTimelines = false;
 		final boolean doSyntheticDataLineTimelines = false;
-		final boolean doMapPlot = false;
+
+		final boolean doMapPlot = true;
 
 		try
 		{
@@ -482,26 +485,9 @@ public class Dashboard4 extends Application
 				Tab osmMapTab = new Tab("Locations OSM Map");
 				GluonOSMMap osmapPane = new GluonOSMMap();
 
-				String absFileNameForLatLonToReadAsMarker2 = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
-				String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
-				String absFileNameForLatLonToReadAsMarkerTargetLocs = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicNWLA_ByPids_Mar31.csv";
-				String absFileNameForLatLonToReadAsMarkerTargetLocsApril6 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
-				String pathToLocationAnalysis = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUL10ForLocationAnalysis2/";
-				String absFileNameForLatLon5MostRecenTrainTestJul10 = pathToLocationAnalysis
-						+ "UniqueLocationObjects5DaysTrainTest.csv";
-				String absFileNameForLatLonAllJul10 = pathToLocationAnalysis + "UniqueLocationObjects.csv";
-				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
-				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_SlimmedForMap.csv";//
-				// gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
-				// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago.csv";
-				// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
-				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
-				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
-				int latColIndex2 = 9, lonColIndex2 = 10, labelColIndex2 = 12;
-				BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(absFileNameForLatLon5MostRecenTrainTestJul10,
-						",", latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false,
-						"\t\tShowing UniqueLocationObjects5DaysTrainTest");
-
+				BorderPane bp2 = showGeolifeAOStartLocationsFeb18(osmapPane);
+				// $$ showGowallaAOLocationsFeb18(osmapPane);
+				// $$showGowallaLocations(osmapPane);//disabled on 18 Feb 2019
 				// Color.rgb(193, 49, 34, 0.3));
 				// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
 				// latColIndex2, lonColIndex2, labelColIndex2, fillIndex, 6);// , Color.rgb(0, 105, 106, 0.3));
@@ -559,6 +545,60 @@ public class Dashboard4 extends Application
 			e.printStackTrace();
 		}
 		return tabPane;
+	}
+
+	/**
+	 * @param osmapPane
+	 * @return
+	 */
+	private static BorderPane showGowallaLocations(GluonOSMMap osmapPane)
+	{
+		String absFileNameForLatLonToReadAsMarker2 = "./dataToRead/Mar12/gowalla_spots_subset1_fromRaw28Feb2018smallerFileWithSampleWithTZ1.csv";
+		String absFileNameForLatLonToReadAsMarkerAll = "/home/gunjan/JupyterWorkspace/data/gowalla_spots_subset1_fromRaw28Feb2018.csv";
+		String absFileNameForLatLonToReadAsMarkerTargetLocs = "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicNWLA_ByPids_Mar31.csv";
+		String absFileNameForLatLonToReadAsMarkerTargetLocsApril6 = "/home/gunjan/RWorkspace/GowallaRWorks/gwCinsTarUDOnly_Merged_TarUDOnly_ChicagoTZ_TargetUsersDatesOnly_NVFUsers_ByPids_April6_DistFromChicago.csv";
+		String pathToLocationAnalysis = "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUL10ForLocationAnalysis2/";
+		String absFileNameForLatLon5MostRecenTrainTestJul10 = pathToLocationAnalysis
+				+ "UniqueLocationObjects5DaysTrainTest.csv";
+		String absFileNameForLatLonAllJul10 = pathToLocationAnalysis + "UniqueLocationObjects.csv";
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_SlimmedForMap.csv";//
+		// gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_Mar30.csv";
+		// "/home/gunjan/RWorkspace/GowallaRWorks/gw2CheckinsAllTargetUsersDatesOnly_ChicagoTZ_OnlyUsersWith_GTE75C_GTE54Pids_ByPids_uniquePid_Mar29_DistFromChicago.csv";
+		// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
+		// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
+		// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
+		int latColIndex2 = 9, lonColIndex2 = 10, labelColIndex2 = 12;
+		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(absFileNameForLatLon5MostRecenTrainTestJul10, ",",
+				latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false,
+				"\t\tShowing UniqueLocationObjects5DaysTrainTest");
+		return bp2;
+	}
+
+	/**
+	 * @param osmapPane
+	 * @return
+	 */
+	private static BorderPane showGowallaAOLocationsFeb18(GluonOSMMap osmapPane)
+	{
+		String fileToRead = PathConstants.pathToSerialisedGowallaCleanedTimelines12Feb2019 + "AllActObjs.csv";
+		int latColIndex2 = 10, lonColIndex2 = 11, labelColIndex2 = 4;
+		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(fileToRead, ",", latColIndex2, lonColIndex2,
+				labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false, "\t\tShowing Gowalla AO Locations");
+		return bp2;
+	}
+
+	/**
+	 * @param osmapPane
+	 * @return
+	 */
+	private static BorderPane showGeolifeAOStartLocationsFeb18(GluonOSMMap osmapPane)
+	{
+		String fileToRead = PathConstants.pathToSerialisedGeolifeCleanedTimelines12Feb2019 + "AllActObjs.csv";
+		int latColIndex2 = 11, lonColIndex2 = 12, labelColIndex2 = 4;
+		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(fileToRead, ",", latColIndex2, lonColIndex2,
+				labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false, "\t\tShowing Geolife Start Locations");
+		return bp2;
 	}
 
 	// private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> toOnlySeqOfActIDs(
