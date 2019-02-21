@@ -18,6 +18,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.activity.clustering.weka.TimelineWEKAClusteringController;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.PrimaryDimension;
@@ -77,6 +78,10 @@ public class ControllerWithoutServer
 	 */
 	public ControllerWithoutServer(String databaseName, String commonBasePath, boolean noRecommendations)
 	{
+		boolean runRecommendationExperiments = false;
+		boolean runWekaClusteringExperiments = true;
+		boolean runTimelineStats = false;
+
 		System.out.println("Starting ControllerWithoutServer>>>>\n" + PerformanceAnalytics.getHeapInformation() + "\n"
 				+ "currentDateTime: " + LocalDateTime.now() + "\nRunning experiments for database: " + databaseName);
 		System.out.println(
@@ -237,7 +242,10 @@ public class ControllerWithoutServer
 				usersCleanedDayTimelines = usersToyDayTimelines;
 			}
 
-			sampleUsersAndExectuteRecommendationExperiments(commonBasePath, commonPath, usersCleanedDayTimelines);
+			if (runRecommendationExperiments)
+			{
+				sampleUsersAndExectuteRecommendationExperiments(commonBasePath, commonPath, usersCleanedDayTimelines);
+			}
 			// $$// important curtain 1 end 21 Dec 2017 10 Feb 2017
 
 			// // important curtain 2 start 2 June 2017
@@ -304,6 +312,11 @@ public class ControllerWithoutServer
 			// UtilityBelt.rearrangeDayTimelinesOrderForDataset(usersCleanedRearrangedDayTimelines);
 
 			/** CURRENT **/
+			if (runWekaClusteringExperiments)
+			{
+				TimelineWEKAClusteringController clustering = new TimelineWEKAClusteringController(
+						usersCleanedDayTimelines, null);
+			}
 			// $$TimelineWEKAClusteringController clustering = new
 			// TimelineWEKAClusteringController(usersCleanedDayTimelines,
 			// $$ null);

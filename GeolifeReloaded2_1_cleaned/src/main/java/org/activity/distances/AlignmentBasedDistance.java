@@ -5188,6 +5188,8 @@ public class AlignmentBasedDistance
 
 	/////////// start of added on 5 Jan 2018
 	/**
+	 * Superceeded by getFeatLevelPairsGowallaPD5Jan2019V2()
+	 * <p>
 	 * Fork of getFeatLevelDiffsGowallaPD13Apr2018().
 	 * <p>
 	 * Store absolute values of each features
@@ -5201,6 +5203,7 @@ public class AlignmentBasedDistance
 	 *         corresonding feature vals the corresponding two compared act objs ao1 and ao2
 	 * @since April 13 2018
 	 */
+	@Deprecated
 	public EnumMap<GowGeoFeature, Pair<List<Number>, List<Number>>> getFeatLevelPairsGowallaPD5Jan2019(
 			ActivityObject2018 ao1, ActivityObject2018 ao2, String databaseName)
 	{
@@ -5509,7 +5512,6 @@ public class AlignmentBasedDistance
 					else
 					{
 						// start of added on 19 Dec 2018
-
 						// end of added on 19 Dec 2018
 						if (UtilityBelt.getIntersection(ao1.getGivenDimensionVal(PrimaryDimension.LocationGridID),
 								ao2.getGivenDimensionVal(PrimaryDimension.LocationGridID)).size() == 0)

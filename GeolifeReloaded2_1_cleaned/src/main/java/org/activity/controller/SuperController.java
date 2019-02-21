@@ -467,30 +467,60 @@ public class SuperController
 				doRecommendation = false;
 				doEvaluation = true;
 
-				List<String> pathsToRead = ReadingFromFile.oneColumnReaderString(
-						// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15DCUSubset3.csv",
-						// "./dataToRead/ResultsToReadJan15GeolifeSubset3Engine.csv",
-						"/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15GeolifeSubset3.csv",
-						// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15DCUSubset3.csv",
-						// "./dataToRead/ResultsToReadJan11Gowalla1ForEngineEval.csv",
-						// ResultsToReadJan15GeolifeSubset3.csv"
-						",", 2, false);
-				String databaseName = "gowalla1";
+				// $List<String> pathsToRead = ReadingFromFile.oneColumnReaderString(
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15DCUSubset3.csv",
+				// "./dataToRead/ResultsToReadJan15GeolifeSubset3Engine.csv",
+				// $
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15GeolifeSubset3.csv",
+				// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadJan15DCUSubset3.csv",
+				// "./dataToRead/ResultsToReadJan11Gowalla1ForEngineEval.csv",
+				// ResultsToReadJan15GeolifeSubset3.csv"
+				// $ ",", 2, false);
+				String databaseName = "dcu_data_2";// dcu_data_2
 				Constant.setDatabaseName(databaseName);
 				Constant.setDatabaseSpecificConstants(databaseName);
 				Constant.setConstantsForTimelineCreation(databaseName);
 
 				String[] pathsToReadPython = {
-						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/",
-						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/GRU4RecRecommender/",
-						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/FPMCRecommender/",
-						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/Prod2VecRecommender/",
-						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/PopularityRecommender/" };
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/GRU4RecRecommender/",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/FPMCRecommender/",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/Prod2VecRecommender/",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/PopularityRecommender/"
+						// };
 
-				// for (String commonPath1 : pathsToRead)
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/MixedMarkovRecommender"
+						// };
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/PopularityRecommender",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/Prod2VecRecommender",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/FPMCRecommender",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/GRU4RecRecommender",
+						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/MixedMarkovRecommender"
+						// };
+
+						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender/",
+						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/PopularityRecommender/",
+						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/Prod2VecRecommender/",
+						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/FPMCRecommender/",
+						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/GRU4RecRecommender/",
+						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/MixedMarkovRecommender/"
+						// };
+
+						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/HGRU4RecRecommender/",
+						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/PopularityRecommender/",
+						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/Prod2VecRecommender/",
+						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/FPMCRecommender/",
+						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/GRU4RecRecommender/",
+						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/MixedMarkovRecommender/" };
+
+				// geolife1_DEC31H20M15HighDurPNN500NoTTFilter
+
+				// for (String commonPath1 : pathsToReadPython)// pathsToRead)
 				{
 					// PopUps.showMessage(commonPath1);
-					String commonPath1 = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender/";
+					String commonPath1 = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/MixedMarkovRecommender/";
+					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender/";
 					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/HGRU4RecRecommender/";
 					// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/AUG12ED1.0LocAllActsFDStFilter0hrs100RTVPNN500SNN500
 					// (copy 1)/";

@@ -963,6 +963,9 @@ public class ActivityObject2018 implements Serializable
 		String brokenDownStartTS = ActivityObject2018.brokenDownTSString(delimiter, this.startTimestampInms);
 		String brokenDownEndTS = ActivityObject2018.brokenDownTSString(delimiter, this.endTimestampInms);
 
+		String startMinsSinceMidnight = String
+				.valueOf(DateTimeUtils.getTimeInDayInSecondsZoned(this.startTimestampInms, this.timeZoneId) / 60);
+
 		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
 				? delimiter + this.durationInSeconds + delimiter + brokenDownEndTS
 				: "";
@@ -986,7 +989,8 @@ public class ActivityObject2018 implements Serializable
 				+ Instant.ofEpochMilli(startTimestampInms).toString()
 				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
 				/* additionalGowallaFeatures */ + delimiter + df.format(distInMFromPrev) + delimiter + durInSecFromPrev
-				+ additionalDCUFeatures + additionalGeolifeFeatures + additionalGowallaFeatures;
+				+ delimiter + startMinsSinceMidnight + additionalDCUFeatures + additionalGeolifeFeatures
+				+ additionalGowallaFeatures;
 	}
 
 	private static String brokenDownTSString(String delimiter, long startTimestampInms)
@@ -994,6 +998,7 @@ public class ActivityObject2018 implements Serializable
 		Timestamp startTS = new Timestamp(startTimestampInms);
 		int hourOfDay = startTS.getHours();
 		int weekDay = startTS.getDay();
+
 		// String tsISOString = startTS.toInstant().toString();
 		String dateOnly = new Date(startTimestampInms).toString();
 		String brokenDownStartTS = weekDay + delimiter + dateOnly + delimiter + hourOfDay;
@@ -1061,7 +1066,7 @@ public class ActivityObject2018 implements Serializable
 				: "";
 
 		return /* "uID" + delimiter + */brokenDownTS + delimiter + "actID" + delimiter + "activityName" + delimiter
-				+ "stTS" + delimiter + "distInMPrev" + delimiter + "durInSecPrev"
+				+ "stTS" + delimiter + "distInMPrev" + delimiter + "durInSecPrev" + delimiter + "SMinsSinceMidnight"
 				// + delimiter
 				+ additionalDCUFeatures + additionalGeolifeFeatures + additionalGowallaFeatures;
 	}

@@ -1804,6 +1804,20 @@ public class UtilityBelt
 	 * @param s2
 	 * @return
 	 */
+	public static Set<Integer> getIntersection(List<Integer> s1, List<Integer> s2)
+	{
+		Set<Integer> intersection = new HashSet<Integer>(s1);
+		intersection.retainAll(s2);
+		// System.out.println("Inside checkIntersection\ns1=" + s1 + "\ns2=" + s2 + "\nintersection=" + intersection);
+		return intersection;
+	}
+
+	/**
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
 	public static <T> Set<T> getIntersection2(ArrayList<T> s1, ArrayList<T> s2)
 	{
 		Set<T> intersection = new HashSet<>(s1);
