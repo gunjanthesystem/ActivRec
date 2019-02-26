@@ -368,7 +368,7 @@ public class SuperController
 	 * 
 	 * @param sampledUserIndicesSetFile
 	 * @param EDAlphaForThisExperiment
-	 *            >-1 if we want to set in here instead of hardcoding it in the Constant class.
+	 *            &gt;-1 if we want to set in here instead of hardcoding it in the Constant class.
 	 * @param iterationLabel
 	 * @param doRecommendation
 	 * @param doEvaluation
@@ -458,7 +458,7 @@ public class SuperController
 					+ getLabelForExperimentConfig(sampledUserIndicesSetFile) + iterationLabel + extraLabel + "/";
 			WToFile.createDirectoryIfNotExists(commonPath);
 
-			if (false)// TEMP 15 Jan 2019 TODO
+			if (true)// TEMP 15 Jan 2019 TODO
 			{
 				// commonPath = //
 				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/dcu_data_2_JAN11H14M48ED1.0AllActsFDStFilter0hrsRTVNoTTFilterNC/";
@@ -476,50 +476,55 @@ public class SuperController
 				// "./dataToRead/ResultsToReadJan11Gowalla1ForEngineEval.csv",
 				// ResultsToReadJan15GeolifeSubset3.csv"
 				// $ ",", 2, false);
-				String databaseName = "dcu_data_2";// dcu_data_2
+				String databaseName = "gowalla1";// dcu_data_2
 				Constant.setDatabaseName(databaseName);
 				Constant.setDatabaseSpecificConstants(databaseName);
 				Constant.setConstantsForTimelineCreation(databaseName);
 
 				String[] pathsToReadPython = {
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/GRU4RecRecommender/",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/FPMCRecommender/",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/Prod2VecRecommender/",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/PopularityRecommender/"
-						// };
+						// "///home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_JAN11H13M52HighOccurPNN500collMyLevenshtein/"
 
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/MixedMarkovRecommender"
-						// };
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/PopularityRecommender",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/Prod2VecRecommender",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/FPMCRecommender",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/GRU4RecRecommender",
-						// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/MixedMarkovRecommender"
-						// };
+				};
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/GRU4RecRecommender/",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/FPMCRecommender/",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/Prod2VecRecommender/",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/PopularityRecommender/"
+				// };
 
-						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender/",
-						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/PopularityRecommender/",
-						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/Prod2VecRecommender/",
-						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/FPMCRecommender/",
-						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/GRU4RecRecommender/",
-						// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/MixedMarkovRecommender/"
-						// };
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/MixedMarkovRecommender"
+				// };
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/PopularityRecommender",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/Prod2VecRecommender",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/FPMCRecommender",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/GRU4RecRecommender",
+				// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/MixedMarkovRecommender"
+				// };
 
-						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/HGRU4RecRecommender/",
-						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/PopularityRecommender/",
-						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/Prod2VecRecommender/",
-						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/FPMCRecommender/",
-						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/GRU4RecRecommender/",
-						"/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/MixedMarkovRecommender/" };
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/PopularityRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/Prod2VecRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/FPMCRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/GRU4RecRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/MixedMarkovRecommender/"
+				// };
+
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/HGRU4RecRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/PopularityRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/Prod2VecRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/FPMCRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/GRU4RecRecommender/",
+				// "/home/gunjan/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/MixedMarkovRecommender/"
+				// };
 
 				// geolife1_DEC31H20M15HighDurPNN500NoTTFilter
 
-				// for (String commonPath1 : pathsToReadPython)// pathsToRead)
+				for (String commonPath1 : pathsToReadPython)// pathsToRead)
 				{
 					// PopUps.showMessage(commonPath1);
-					String commonPath1 = "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/MixedMarkovRecommender/";
+					// String commonPath1 =
+					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/MixedMarkovRecommender/";
 					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/gowalla1_DEC31H20M29HighDurPNN500coll/HGRU4RecRecommender/";
 					// "/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/geolife1_DEC31H20M15HighDurPNN500NoTTFilter/HGRU4RecRecommender/";
 					// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/AUG12ED1.0LocAllActsFDStFilter0hrs100RTVPNN500SNN500

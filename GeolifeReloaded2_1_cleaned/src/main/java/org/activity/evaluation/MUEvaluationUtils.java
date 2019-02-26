@@ -78,7 +78,53 @@ public class MUEvaluationUtils
 		// After UMAP corrected TZ experiments start
 	}
 
+	/**
+	 * 
+	 * @param args
+	 * 
+	 */
 	public static void main(String args[])
+	{
+		forGowallaClassification21Feb2019();
+	}
+
+	public static void forGowallaClassification21Feb2019()
+	{
+		// String commonPathToRead = "./DD/Target/";// "./dataWritten/Target/";
+		// // "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";
+		// String s[] = { "1", "101", "201", "301", "401", "501", "601", "701", "801", "901" };// , "1001" };
+		try
+		{
+			String pathToRead = "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_FEB21H4M0ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NCcoll/";
+			String clustersRangeSchemeTitle = "CLUSTERING2";
+			String pathToWrite = pathToRead + clustersRangeSchemeTitle;
+
+			WToFile.deleteNonEmptyDirectory(Paths.get(pathToWrite));
+			Files.createDirectories(Paths.get(pathToWrite));
+			pathToWrite += "/";
+
+			gowallaEvals(pathToRead, pathToWrite, ClustersRangeScheme.CLUSTERING2, "", Constant.lookPastType);
+
+		}
+		catch (
+
+		FileAlreadyExistsException e)
+		{
+			System.err.println("Exception : FileAlreadyExistsException thrown");
+			e.printStackTrace();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * was main method before 21 Feb 2019
+	 * 
+	 * @param args
+	 */
+	public static void mainBefore21Feb2019(String args[])
 	{
 		String commonPathToRead = "./DD/Target/";// "./dataWritten/Target/";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/Usable3MUButDWCompatibleRS_";

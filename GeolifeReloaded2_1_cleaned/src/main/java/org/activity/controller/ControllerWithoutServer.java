@@ -18,7 +18,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.activity.clustering.weka.TimelineWEKAClusteringController;
+import org.activity.clustering.weka.TimelineWEKAClusteringController2019;
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.PrimaryDimension;
@@ -314,7 +314,13 @@ public class ControllerWithoutServer
 			/** CURRENT **/
 			if (runWekaClusteringExperiments)
 			{
-				TimelineWEKAClusteringController clustering = new TimelineWEKAClusteringController(
+				if (Constant.useRandomlySampled100Users)
+				{
+					LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelinesOnlySampledUsers = subsetTimelinesToSampledUsers(
+							usersCleanedDayTimelines);
+					usersCleanedDayTimelines = usersCleanedDayTimelinesOnlySampledUsers;
+				}
+				TimelineWEKAClusteringController2019 clustering = new TimelineWEKAClusteringController2019(
 						usersCleanedDayTimelines, null);
 			}
 			// $$TimelineWEKAClusteringController clustering = new
@@ -344,6 +350,42 @@ public class ControllerWithoutServer
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 * @since 22 Feb 2019
+	 */
+	private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> subsetTimelinesToSampledUsers(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines)
+	{
+		System.out.println("useRandomlySampled100Users :");
+		String pathToRandomlySampled100Users = Constant.getDynamicPathToRandomlySampledUserIndices();
+
+		List<String> sampledUserIndicesStr = ReadingFromFile
+				// .oneColumnReaderString("./dataToRead/RandomlySample100Users/Mar1_2018.csv", ",", 0,
+				// .oneColumnReaderString("./dataToRead/RandomlySample100UsersApril24_2018.csv", ",", 0,
+				.oneColumnReaderString(pathToRandomlySampled100Users, ",", 0, false);
+		System.out.println("pathToRandomlySampled100Users=" + pathToRandomlySampled100Users);
+		List<Integer> sampledUserIndices = sampledUserIndicesStr.stream().map(i -> Integer.valueOf(i))
+				.collect(Collectors.toList());
+
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelinesOnlySampledUsers = new LinkedHashMap<>();
+
+		Integer index = -1;
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayTimelines.entrySet())
+		{
+			index += 1;
+			if (sampledUserIndices.contains(index))
+			{
+				usersCleanedDayTimelinesOnlySampledUsers.put(userEntry.getKey(), userEntry.getValue());
+			}
+		}
+		// sampleUsersByIndicesExecuteRecommendationTests(usersCleanedDayTimelines,
+		// DomainConstants.gowalla100RandomUsersLabel, sampledUserIndices, commonBasePath,
+		// Constant.lengthOfRecommendedSequence, commonPath);
+		return usersCleanedDayTimelinesOnlySampledUsers;
 	}
 
 	/**
