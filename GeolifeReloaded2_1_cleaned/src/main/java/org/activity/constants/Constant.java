@@ -338,7 +338,7 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "dcu_data_2";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+	static String DATABASE_NAME = "gowalla1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
 												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
@@ -972,7 +972,7 @@ public final class Constant
 			useRandomlySampled100Users = true;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = false;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = false; // false for gowalla// true for others;//
-			useHaversineDistInLocationFED = false;// true;// TEMP TODO
+			useHaversineDistInLocationFED = false;// true;// TEMP TODO IMPORTANT TODO TODO TODO
 
 			break;
 
@@ -1639,6 +1639,12 @@ public final class Constant
 	 */
 	public static String[] getFeatureNames()
 	{
+		String databaseName = Constant.getDatabaseName();
+		if (databaseName.equals("gowalla1"))
+		{
+			return Arrays.stream(Enums.GowallaFeature.values()).map(e -> e.toString()).toArray(String[]::new);
+		}
+
 		if ((Constant.getDatabaseName().equals("geolife1") || Constant.getDatabaseName().equals("dcu_data_2")
 				|| Constant.getDatabaseName().equals("gowalla1")) == false)
 		{
@@ -2125,9 +2131,12 @@ public final class Constant
 			String line;
 			while ((line = br.readLine()) != null)
 			{
-				if (line.contains("/ End of variable declarations /"))
+				if (false)
 				{
-					break;
+					if (line.contains("/ End of variable declarations /"))
+					{
+						break;
+					}
 				}
 				sb.append(line + "\n");
 			}

@@ -375,6 +375,8 @@ public class DatabaseCreatorFSQuicker1
 	 * Convert alphanumeric place and cat ID to integer IDs.
 	 * <p>
 	 * Create catID name dictionary
+	 * 
+	 * @deprecated on 25 Feb 2019 as we are now assigning catIDs when processing JSON category hierarchy data.
 	 */
 	public static void mapAlphaNumericPlaceCatIDToInts()
 	{

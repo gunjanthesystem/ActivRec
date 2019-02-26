@@ -20,12 +20,14 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
 import org.activity.constants.Constant;
-import org.activity.featureExtraction.TimelinesAttributesExtractionCleaned1;
+import org.activity.featureExtraction.TimelinesAttributesExtractionCleaned22Feb2019;
 import org.activity.io.CSVUtils;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
@@ -56,16 +58,18 @@ import weka.gui.treevisualizer.PlaceNode2;
 import weka.gui.treevisualizer.TreeVisualizer;
 
 /**
+ * Fork of TimelineWEKAClusteringController
+ * <p>
  * For clustering or classification of users based on attributes extracted from their timelines
  * 
  * @author gunjan
- *
+ * @since 21 Feb 2019
  */
-public class TimelineWEKAClusteringController
+public class TimelineWEKAClusteringController2019
 {
 	private String pathToWrite;
 	private Classifier usedClassifier;
-	private TimelinesAttributesExtractionCleaned1 attributeExtraction;
+	private TimelinesAttributesExtractionCleaned22Feb2019 attributeExtraction;
 	// private Instances allInstances;
 	/**
 	 * (raw user id, predicted class)
@@ -173,7 +177,8 @@ public class TimelineWEKAClusteringController
 	 * @param usersDayTimelinesAll
 	 * @param trainingTestUsers
 	 */
-	public TimelineWEKAClusteringController(LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll,
+	public TimelineWEKAClusteringController2019(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll,
 			Pair<ArrayList<String>, ArrayList<String>> trainingTestUsers)
 	{
 		String nameOfFeatureFile = "";
@@ -201,71 +206,179 @@ public class TimelineWEKAClusteringController
 
 		try
 		{
+			////////// Start of added 22 Feb 2019///////////////////////////////////////////////////////////
+			String commonPath = "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb21GowallaNoHaversine/"
+					+ "gowalla1_FEB21H3M25ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NCcoll/";
+			String fileToRead = commonPath
+					+ "gowalla1_FEB21H3M25ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NCcoll_"
+					+ "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+			int colIndexUser = 0, colIndexMinMUWithMaxMRR = 1;
+			String groundTruthLabel = "GowallaFeb21Clustering";
+
+			// create the clustering ranges
+			Map<String, Pair<Integer, Integer>> gowallaClusteringRanges = new LinkedHashMap<>(3);
+			gowallaClusteringRanges.put("FirstCluster__", new Pair<>(0, 0));
+			gowallaClusteringRanges.put("SecondCluster__", new Pair<>(1, 4));
+			gowallaClusteringRanges.put("ThirdCluster__", new Pair<>(5, 100));
+
+			LinkedHashMap<String, String> userIDIndex_ClusterLabel = createGroundTruthForData(fileToRead, colIndexUser,
+					colIndexMinMUWithMaxMRR, gowallaClusteringRanges);
+
+			String clusterLabelToWrite = userIDIndex_ClusterLabel.entrySet().stream()
+					.map(e -> e.getKey() + "," + e.getValue()).collect(Collectors.joining("\n"));
+			WToFile.writeToNewFile("UserIndex,ClusterLabel\n" + clusterLabelToWrite,
+					commonPath + "WekaClusteringLabels.csv");
+			////////// End of added 22 Feb 2019///////////////////////////////////////////////////////////
+
 			// PopUps.showMessage("Num of user timelnes recieved in weka clustering = " + usersDayTimelinesAll.size());
-			ArrayList<Pair<String, String>> groundTruthFileNames = getGroundTruthFileNames();
+			// ArrayList<Pair<String, String>> groundTruthFileNames = getGroundTruthFileNames();
+			//
+			// for (Pair<String, String> gtEntry : groundTruthFileNames)
+			// {
+			// String groundTruthLabel = "GowallaGroundTruth21Feb2019";// gtEntry.getFirst();
+			// String groundTruthFileName = gtEntry.getSecond();
+			// createGroundTruthForData();
 
-			for (Pair<String, String> gtEntry : groundTruthFileNames)
+			String directoryToWrite = commonPath// Constant.getOutputCoreResultsPath()
+					// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/WekaCLustering/"
+					// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/"//
+					// TimelinesClustering/"
+					+ Constant.getDatabaseName() + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+					+ LocalDateTime.now().getDayOfMonth() + "_" + Constant.geolife1howManyUsers + "_"
+					+ groundTruthLabel;
+			new File(directoryToWrite).mkdir();
+			pathToWrite = directoryToWrite + "/";
+			// PopUps.showMessage("Path to write = " + pathToWrite);
+			PrintStream consoleLogStream = WToFile
+					.redirectConsoleOutput(pathToWrite + typeOfDataMining + "ConsoleLog.txt");
+			// System.out.println();
+
+			if (trainingTestUsers == null)
 			{
-				String groundTruthLabel = gtEntry.getFirst();
-				String groundTruthFileName = gtEntry.getSecond();
-
-				String directoryToWrite = Constant.getOutputCoreResultsPath()
-						// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/WekaCLustering/"
-						// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/"//
-						// TimelinesClustering/"
-						+ Constant.getDatabaseName() + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
-						+ LocalDateTime.now().getDayOfMonth() + "_" + Constant.geolife1howManyUsers + "_"
-						+ groundTruthLabel;
-				new File(directoryToWrite).mkdir();
-				pathToWrite = directoryToWrite + "/";
-				// PopUps.showMessage("Path to write = " + pathToWrite);
-				PrintStream consoleLogStream = WToFile
-						.redirectConsoleOutput(pathToWrite + typeOfDataMining + "ConsoleLog.txt");
-				// System.out.println();
-
-				if (trainingTestUsers == null)
-				{
-					System.out.println("Inside TimelineWEKAClusteringController: NOT USING TRAINING TEST SPLIT");
-				}
-
-				// ///////////////////////// MAIN LOGIC STARTS////////////////////////////////////////////////////
-				// (Absolute path to file containing ground truth, column in which ground truth is there, has column
-				// headers or not)
-
-				Triple<String, Integer, Boolean> groundTruth = new Triple(groundTruthFileName, 4, true);
-
-				attributeExtraction = new TimelinesAttributesExtractionCleaned1(usersDayTimelinesAll, pathToWrite,
-						groundTruth);
-				nameOfFeatureFile = attributeExtraction.getAttributeFilenameAbs();
-
-				DataLoader dl = new DataLoader(nameOfFeatureFile,
-						nameOfFeatureFile.substring(0, nameOfFeatureFile.length() - 4) + ".arff");
-				String outputArffFile = dl.getArffFileName();
-				System.out.println("Output arff file is:" + outputArffFile);
-
-				// $$ performClassification(outputArffFile, trainingTestUsers, "SetOf25", gtEntry);
-
-				// switch (typeOfClustering)
-				// {
-				// case "KMeans":
-				// KMeans kmeans = new KMeans(outputArffFile, pathToWrite + typeOfClustering + "Results.txt", 3);
-				// break;
-				// case "EMClustering":
-				// EMClustering emClustering = new EMClustering(outputArffFile, pathToWrite + typeOfClustering +
-				// "Results");
-				// break;
-				// default:
-				// System.err.println("Unknown clustering type: " + typeOfClustering);
-				// PopUps.showError("Unknown clustering type: " + typeOfClustering);
-				// }
-				consoleLogStream.close();
+				System.out.println("Inside TimelineWEKAClusteringController: NOT USING TRAINING TEST SPLIT");
 			}
+
+			// ///////////////////////// MAIN LOGIC STARTS////////////////////////////////////////////////////
+			// (Absolute path to file containing ground truth, column in which ground truth is there, has column
+			// headers or not)
+
+			// Triple<String, Integer, Boolean> groundTruth = new Triple(groundTruthFileName, 4, true);
+
+			attributeExtraction = new TimelinesAttributesExtractionCleaned22Feb2019(usersDayTimelinesAll, pathToWrite,
+					userIDIndex_ClusterLabel);
+			nameOfFeatureFile = attributeExtraction.getAttributeFilenameAbs();
+
+			DataLoader dl = new DataLoader(nameOfFeatureFile,
+					nameOfFeatureFile.substring(0, nameOfFeatureFile.length() - 4) + ".arff");
+			String outputArffFile = dl.getArffFileName();
+			System.out.println("Output arff file is:" + outputArffFile);
+
+			// $$ performClassification(outputArffFile, trainingTestUsers, "SetOf25", gtEntry);
+
+			// switch (typeOfClustering)
+			// {
+			// case "KMeans":
+			// KMeans kmeans = new KMeans(outputArffFile, pathToWrite + typeOfClustering + "Results.txt", 3);
+			// break;
+			// case "EMClustering":
+			// EMClustering emClustering = new EMClustering(outputArffFile, pathToWrite + typeOfClustering +
+			// "Results");
+			// break;
+			// default:
+			// System.err.println("Unknown clustering type: " + typeOfClustering);
+			// PopUps.showError("Unknown clustering type: " + typeOfClustering);
+			// }
+			consoleLogStream.close();
+			// }
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 
+	}
+
+	public static void main(String args[])
+	{
+		temp22Feb2019();
+	}
+
+	private static void temp22Feb2019()
+	{
+		String commonPath = "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_FEB21H4M0ED0.5STimeLocPop"
+				+ "DistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NCcoll/";
+		String fileToRead = commonPath + "/gowalla1_FEB21H4M0ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPer"
+				+ "FS_10F_RTVPNN100NCcoll_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+		int colIndexUser = 0, colIndexMinMUWithMaxMRR = 1;
+
+		// create the clustering ranges
+		Map<String, Pair<Integer, Integer>> gowallaClusteringRanges = new LinkedHashMap<>(3);
+		gowallaClusteringRanges.put("FirstCluster__", new Pair<>(0, 0));
+		gowallaClusteringRanges.put("SecondCluster__", new Pair<>(1, 4));
+		gowallaClusteringRanges.put("ThirdCluster__", new Pair<>(5, 100));
+
+		LinkedHashMap<String, String> userIDIndex_ClusterLabel = createGroundTruthForData(fileToRead, colIndexUser,
+				colIndexMinMUWithMaxMRR, gowallaClusteringRanges);
+
+		String clusterLabelToWrite = userIDIndex_ClusterLabel.entrySet().stream()
+				.map(e -> e.getKey() + "," + e.getValue()).collect(Collectors.joining("\n"));
+		WToFile.writeToNewFile("UserIndex,ClusterLabel\n" + clusterLabelToWrite,
+				commonPath + "WekaClusteringLabels.csv");
+	}
+
+	/**
+	 * 
+	 * @param minMUWithMaxMRR
+	 * @param gowallaClusteringRanges
+	 * @return
+	 * @since 22 Feb 2019
+	 */
+	private static String getGowallaClusterLabelFeb2019(int minMUWithMaxMRR,
+			Map<String, Pair<Integer, Integer>> gowallaClusteringRanges)
+	{
+		String clusterLabel = null;
+
+		for (Entry<String, Pair<Integer, Integer>> e : gowallaClusteringRanges.entrySet())
+		{
+			int minMU = e.getValue().getFirst();
+			int maxMU = e.getValue().getSecond();
+			if (minMUWithMaxMRR >= minMU && minMUWithMaxMRR <= maxMU)
+			{
+				return (e.getKey());
+			}
+		}
+		return clusterLabel;
+	}
+
+	/**
+	 * 
+	 * @param fileNameToRead
+	 * @param colIndexUser
+	 * @param colIndexMinMUWithMaxMRR
+	 * @param gowallaClusteringRanges
+	 * @return
+	 * @since 21 Feb 2019
+	 */
+	private static LinkedHashMap<String, String> createGroundTruthForData(String fileNameToRead, int colIndexUser,
+			int colIndexMinMUWithMaxMRR, Map<String, Pair<Integer, Integer>> gowallaClusteringRanges)
+	{
+		LinkedHashMap<String, String> userIDIndex_ClusterLabel = new LinkedHashMap<String, String>();
+		try
+		{
+			List<List<String>> groundTruthData = ReadingFromFile.readLinesIntoListOfLists(fileNameToRead, ",");
+			groundTruthData.remove(0);
+			for (List<String> line : groundTruthData)
+			{
+				int minMUWithMaxMRR = Integer.valueOf(line.get(colIndexMinMUWithMaxMRR));
+				String clusterLabel = getGowallaClusterLabelFeb2019(minMUWithMaxMRR, gowallaClusteringRanges);
+				userIDIndex_ClusterLabel.put(line.get(colIndexUser), clusterLabel);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return userIDIndex_ClusterLabel;
 	}
 
 	/**
@@ -2324,7 +2437,7 @@ public class TimelineWEKAClusteringController
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args)
+	public static void mainBefore21Feb2019(String[] args)
 	{
 		int[] indicesSelected = null;
 		AttributeSelection attsel = new AttributeSelection(); // package weka.attributeSelection

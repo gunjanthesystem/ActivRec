@@ -235,6 +235,44 @@ public class TimelineTransformers
 		return r;
 	}
 
+	/**
+	 * 
+	 * @param ts
+	 * @param validsOnly
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toStartTimeFromActivityObjectsDummyTime2(
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
+	{
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Long>>();
+		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
+		{
+			LinkedHashMap<Timestamp, Long> dataToPut = new LinkedHashMap<Timestamp, Long>();
+
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
+			{
+				long value = -99;
+				ActivityObject2018 ao = dataEntry.getValue();
+
+				if (!validsOnly || (ao.isInvalidActivityName() == false))
+				{
+					value = DateTimeUtils.getTimeInDayInSecondsZoned(dataEntry.getValue().getStartTimestampInms(),
+							dataEntry.getValue().getTimeZoneId());
+					// DateTimeUtils.getTimeInDayInSeconds(dataEntry.getValue().getStartTimestamp());
+					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
+					// value, "ActivityCodeForSeries");
+					dataToPut.put(time, value);
+					time = new Timestamp(time.getTime() + 1000 * 60 * 60);
+				}
+
+			}
+			// r.put(String.valueOf(Constant.getIndexOfUserID(Integer.valueOf(entry.getKey()))) + 1, dataToPut);
+			r.put(entry.getKey(), dataToPut);
+		}
+		return r;
+	}
+
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toDistanceTravelledFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
@@ -425,6 +463,126 @@ public class TimelineTransformers
 		return r;
 	}
 
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toLocationGridsFromActivityObjectsDummyTime(
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
+	{
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<>();
+		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
+		{
+			LinkedHashMap<Timestamp, Long> dataToPut = new LinkedHashMap<>();
+
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
+			{
+				Long value = -99L;
+				ActivityObject2018 ao = dataEntry.getValue();
+
+				if (!validsOnly || (ao.isInvalidActivityName() == false))
+				{
+					value = dataEntry.getValue().getGridID();
+					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
+					// value, "ActivityCodeForSeries");
+					dataToPut.put(time, value);
+					time = new Timestamp(time.getTime() + 1000 * 60 * 60);
+				}
+
+			}
+			// r.put(String.valueOf(Constant.getIndexOfUserID(Integer.valueOf(entry.getKey()))) + 1, dataToPut);
+			r.put(entry.getKey(), dataToPut);
+		}
+		return r;
+	}
+
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toPopularityFromActivityObjectsDummyTime(
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
+	{
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<>();
+		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
+		{
+			LinkedHashMap<Timestamp, Integer> dataToPut = new LinkedHashMap<>();
+
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
+			{
+				Integer value = -99;
+				ActivityObject2018 ao = dataEntry.getValue();
+
+				if (!validsOnly || (ao.isInvalidActivityName() == false))
+				{
+					value = dataEntry.getValue().getCheckins_count();
+					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
+					// value, "ActivityCodeForSeries");
+					dataToPut.put(time, value);
+					time = new Timestamp(time.getTime() + 1000 * 60 * 60);
+				}
+
+			}
+			// r.put(String.valueOf(Constant.getIndexOfUserID(Integer.valueOf(entry.getKey()))) + 1, dataToPut);
+			r.put(entry.getKey(), dataToPut);
+		}
+		return r;
+	}
+
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> toDistInMFromPrevActivityObjectsDummyTime(
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
+	{
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> r = new LinkedHashMap<>();
+		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
+		{
+			LinkedHashMap<Timestamp, Double> dataToPut = new LinkedHashMap<>();
+
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
+			{
+				Double value = -99d;
+				ActivityObject2018 ao = dataEntry.getValue();
+
+				if (!validsOnly || (ao.isInvalidActivityName() == false))
+				{
+					value = dataEntry.getValue().getDistanceInMFromPrev();
+					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
+					// value, "ActivityCodeForSeries");
+					dataToPut.put(time, value);
+					time = new Timestamp(time.getTime() + 1000 * 60 * 60);
+				}
+
+			}
+			// r.put(String.valueOf(Constant.getIndexOfUserID(Integer.valueOf(entry.getKey()))) + 1, dataToPut);
+			r.put(entry.getKey(), dataToPut);
+		}
+		return r;
+	}
+
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toDurInSecFromPrevActivityObjectsDummyTime(
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
+	{
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> r = new LinkedHashMap<>();
+		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
+		{
+			LinkedHashMap<Timestamp, Long> dataToPut = new LinkedHashMap<>();
+
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
+			{
+				Long value = -99L;
+				ActivityObject2018 ao = dataEntry.getValue();
+
+				if (!validsOnly || (ao.isInvalidActivityName() == false))
+				{
+					value = dataEntry.getValue().getDurationInSecondsFromPrev();
+					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
+					// value, "ActivityCodeForSeries");
+					dataToPut.put(time, value);
+					time = new Timestamp(time.getTime() + 1000 * 60 * 60);
+				}
+
+			}
+			// r.put(String.valueOf(Constant.getIndexOfUserID(Integer.valueOf(entry.getKey()))) + 1, dataToPut);
+			r.put(entry.getKey(), dataToPut);
+		}
+		return r;
+	}
+
 	/**
 	 * Transform sequence of Activity Objects to sequence of character(as String) codes
 	 * 
@@ -591,14 +749,19 @@ public class TimelineTransformers
 
 				while (cursorTimestamp.before(endTimestamp))
 				{
-					ActivityObject2018 aoToPut = dayTimeline.getActivityObjectAtTime(cursorTimestamp); // aoToPut is null if
-																									// there is no ao at
-																									// that time, will
-																									// happen when an
-																									// invalid
-																									// was remove from
-																									// that
-																									// position
+					ActivityObject2018 aoToPut = dayTimeline.getActivityObjectAtTime(cursorTimestamp); // aoToPut is
+																										// null if
+																										// there is no
+																										// ao at
+																										// that time,
+																										// will
+																										// happen when
+																										// an
+																										// invalid
+																										// was remove
+																										// from
+																										// that
+																										// position
 					dataPoints.put(cursorTimestamp, aoToPut);
 					cursorTimestamp = new Timestamp(cursorTimestamp.getTime() + intervalSizeInSeconds * 1000); // increment
 																												// by a
@@ -806,7 +969,8 @@ public class TimelineTransformers
 	 *         given delimiter
 	 * @since 15 Dec 2017
 	 */
-	public static ArrayList<Integer> listOfActObjsToListOfActIDs(ArrayList<ActivityObject2018> givenAOs, boolean verbose)
+	public static ArrayList<Integer> listOfActObjsToListOfActIDs(ArrayList<ActivityObject2018> givenAOs,
+			boolean verbose)
 	{
 		ArrayList<Integer> seqOfActIDs2 = new ArrayList<>(givenAOs.size());
 		// ArrayList<Integer> seqOfActIDs = new ArrayList<>(givenAOs.size());
@@ -987,19 +1151,19 @@ public class TimelineTransformers
 	{
 		LinkedHashMap<String, Timeline> cleanedERTimelines = new LinkedHashMap<>();
 		System.out.println("inside dayTimelinesToCleanedExpungedRearrangedTimelines()");
-	
+
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> usersTimelinesEntry : usersTimelines.entrySet())
 		{
 			String userID = usersTimelinesEntry.getKey();
 			LinkedHashMap<Date, Timeline> userDayTimelines = usersTimelinesEntry.getValue();
-	
+
 			userDayTimelines = TimelineTrimmers.cleanUserDayTimelines(userDayTimelines);
-	
+
 			// converts the day time to continuous dayless //// new Timeline(userDayTimelines);
 			Timeline timelineForUser = dayTimelinesToATimeline(userDayTimelines, false, true);
-	
+
 			timelineForUser = TimelineTrimmers.expungeInvalids(timelineForUser); // expunges invalid activity objects
-	
+
 			cleanedERTimelines.put(userID, timelineForUser);
 		}
 		System.out.println("\t" + cleanedERTimelines.size() + " timelines created");
@@ -1053,10 +1217,10 @@ public class TimelineTransformers
 	{
 		long dt = System.currentTimeMillis();
 		Timeline concatenatedTimeline = null;
-	
+
 		ArrayList<ActivityObject2018> allActivityObjects = new ArrayList<>();
 		// ArrayList<ActivityObject> allActivityObjectsDummy = new ArrayList<>();
-	
+
 		// long t1 = System.nanoTime();
 		// TODO: this method is a signficant performance eater, find way to optimise it.
 		for (Map.Entry<Date, Timeline> entryOneDayTimeline : dayTimelines.entrySet())
@@ -1064,7 +1228,7 @@ public class TimelineTransformers
 			allActivityObjects.addAll(entryOneDayTimeline.getValue().getActivityObjectsInTimeline());
 		}
 		// long t2 = System.nanoTime();
-	
+
 		// Start of dummy: was trying Collections.addAll if it gave better performance but it wasnt better
 		// for (Map.Entry<Date, Timeline> entryOneDayTimeline : dayTimelines.entrySet())
 		// {
@@ -1074,21 +1238,21 @@ public class TimelineTransformers
 		// aosInThisDayTimeline.toArray(new ActivityObject[aosInThisDayTimeline.size()]));
 		// }
 		// long t3 = System.nanoTime();
-	
+
 		// System.out.println("Approach original: " + (t2 - t1) + " ns");
 		// System.out.println("Approach new : " + (t3 - t2) + " ns");
 		// System.out.println("% change : " + 100.0 * ((t3 - t2) - (t2 - t1)) / (t2 - t1));
 		// System.out.println("allActivityObjectsDummy.equals(allActivityObjects) = "
 		// + allActivityObjectsDummy.equals(allActivityObjects));
 		// end of dummy
-	
+
 		if (allActivityObjects.size() == 0)
 		{
 			System.err.println(PopUps.getTracedErrorMsg(
 					"Error in 'dayTimelinesToATimeline' creating Timeline: Empty Activity Objects provided"));
 			System.exit(-1);
 		}
-	
+
 		else
 		{
 			concatenatedTimeline = new Timeline(allActivityObjects, shouldBelongToSingleDay, shouldBelongToSingleUser);
@@ -1122,19 +1286,19 @@ public class TimelineTransformers
 	{
 		long dt = System.currentTimeMillis();
 		Timeline concatenatedTimeline = null;
-	
+
 		ArrayList<ActivityObject2018> allActivityObjects = new ArrayList<>();
-	
+
 		for (Map.Entry<String, Timeline> entry : dayTimelines.entrySet())
 		{
 			allActivityObjects.addAll(entry.getValue().getActivityObjectsInTimeline());
 		}
-	
+
 		if (allActivityObjects.size() == 0)
 		{
 			PopUps.printTracedErrorMsgWithExit("creating Timeline: Empty Activity Objects provided");
 		}
-	
+
 		else
 		{
 			concatenatedTimeline = new Timeline(allActivityObjects, shouldBelongToSingleDay, shouldBelongToSingleUser);
@@ -1157,37 +1321,37 @@ public class TimelineTransformers
 	{
 		LinkedHashMap<String, TreeMap<Timestamp, Integer>> timewiseMap = new LinkedHashMap<>();
 		LinkedHashMap<String, TreeMap<Date, ArrayList<Integer>>> dateWiseMap = new LinkedHashMap<>();
-	
+
 		for (int i = 0; i <= 5; i++)
 		{
 			TreeMap<Timestamp, Integer> timeMap = new TreeMap<>();
-	
+
 			Instant instant = Instant.now();
 			Timestamp ts = Timestamp.from(instant);
-	
+
 			for (int j = 0; j <= 6; j++)
 			{
 				timeMap.put(new Timestamp(ts.getTime() + (j * 60000000)), j);
 			}
 			timewiseMap.put("User" + i, timeMap);
 		}
-	
+
 		for (Entry<String, TreeMap<Timestamp, Integer>> userW : timewiseMap.entrySet())
 		{
 			System.out.println("timewise:\nUser = " + userW.getKey());
-	
+
 			for (Entry<Timestamp, Integer> timeW : userW.getValue().entrySet())
 			{
 				System.out.println(" timew entry:" + timeW.getKey() + "-" + timeW.getValue());
 			}
 		}
-	
+
 		dateWiseMap = convertTimewiseMapToDatewiseMap2(timewiseMap, tz);
-	
+
 		for (Entry<String, TreeMap<Date, ArrayList<Integer>>> userW : dateWiseMap.entrySet())
 		{
 			System.out.println("Datewise:\nUser = " + userW.getKey());
-	
+
 			for (Entry<Date, ArrayList<Integer>> timeW : userW.getValue().entrySet())
 			{
 				System.out.println("Date = " + timeW.getKey().toString());
@@ -1195,7 +1359,7 @@ public class TimelineTransformers
 				System.out.println(" datew entry:" + timeW.getKey() + "-" + timeW.getValue().toString());
 			}
 		}
-	
+
 	}
 
 	/**
@@ -1208,37 +1372,37 @@ public class TimelineTransformers
 	{
 		LinkedHashMap<String, TreeMap<Timestamp, Integer>> timewiseMap = new LinkedHashMap<>();
 		LinkedHashMap<String, TreeMap<LocalDate, ArrayList<Integer>>> dateWiseMap = new LinkedHashMap<>();
-	
+
 		for (int i = 0; i <= 5; i++)
 		{
 			TreeMap<Timestamp, Integer> timeMap = new TreeMap<>();
-	
+
 			Instant instant = Instant.now();
 			Timestamp ts = Timestamp.from(instant);
-	
+
 			for (int j = 0; j <= 6; j++)
 			{
 				timeMap.put(new Timestamp(ts.getTime() + (j * 60000000)), j);
 			}
 			timewiseMap.put("User" + i, timeMap);
 		}
-	
+
 		for (Entry<String, TreeMap<Timestamp, Integer>> userW : timewiseMap.entrySet())
 		{
 			System.out.println("timewise:\nUser = " + userW.getKey());
-	
+
 			for (Entry<Timestamp, Integer> timeW : userW.getValue().entrySet())
 			{
 				System.out.println(" timew entry:" + timeW.getKey() + "-" + timeW.getValue());
 			}
 		}
-	
+
 		dateWiseMap = convertTimewiseMapToDatewiseMap(timewiseMap, dft);
-	
+
 		for (Entry<String, TreeMap<LocalDate, ArrayList<Integer>>> userW : dateWiseMap.entrySet())
 		{
 			System.out.println("Datewise:\nUser = " + userW.getKey());
-	
+
 			for (Entry<LocalDate, ArrayList<Integer>> timeW : userW.getValue().entrySet())
 			{
 				System.out.println("Date = " + timeW.getKey().toString());
@@ -1246,7 +1410,7 @@ public class TimelineTransformers
 				System.out.println(" datew entry:" + timeW.getKey() + "-" + timeW.getValue().toString());
 			}
 		}
-	
+
 	}
 
 	/**
@@ -1259,37 +1423,37 @@ public class TimelineTransformers
 	{
 		LinkedHashMap<String, TreeMap<Timestamp, Integer>> timewiseMap = new LinkedHashMap<>();
 		LinkedHashMap<String, TreeMap<Date, ArrayList<Integer>>> dateWiseMap = new LinkedHashMap<>();
-	
+
 		for (int i = 0; i <= 5; i++)
 		{
 			TreeMap<Timestamp, Integer> timeMap = new TreeMap<>();
-	
+
 			Instant instant = Instant.now();
 			Timestamp ts = Timestamp.from(instant);
-	
+
 			for (int j = 0; j <= 6; j++)
 			{
 				timeMap.put(new Timestamp(ts.getTime() + (j * 60000000)), j);
 			}
 			timewiseMap.put("User" + i, timeMap);
 		}
-	
+
 		for (Entry<String, TreeMap<Timestamp, Integer>> userW : timewiseMap.entrySet())
 		{
 			System.out.println("timewise:\nUser = " + userW.getKey());
-	
+
 			for (Entry<Timestamp, Integer> timeW : userW.getValue().entrySet())
 			{
 				System.out.println(" timew entry:" + timeW.getKey() + "-" + timeW.getValue());
 			}
 		}
-	
+
 		dateWiseMap = convertTimewiseMapToDatewiseMap(timewiseMap);
-	
+
 		for (Entry<String, TreeMap<Date, ArrayList<Integer>>> userW : dateWiseMap.entrySet())
 		{
 			System.out.println("Datewise:\nUser = " + userW.getKey());
-	
+
 			for (Entry<Date, ArrayList<Integer>> timeW : userW.getValue().entrySet())
 			{
 				System.out.println("Date = " + timeW.getKey().toString());
@@ -1297,7 +1461,7 @@ public class TimelineTransformers
 				System.out.println(" datew entry:" + timeW.getKey() + "-" + timeW.getValue().toString());
 			}
 		}
-	
+
 	}
 
 	// public static String traverserMapofMaps(Map<T,Map<>>)
@@ -1319,15 +1483,15 @@ public class TimelineTransformers
 	{
 		LinkedHashMap<String, TreeMap<LocalDate, ArrayList<T>>> daywiseMap = new LinkedHashMap<>();
 		System.out.println("starting convertTimewiseMapToDatewiseMap");
-	
+
 		for (Map.Entry<String, TreeMap<Timestamp, T>> perUserCheckinEntry : timewiseMap.entrySet()) // Iterate over
 																									// Users
 		{
 			String userID = perUserCheckinEntry.getKey();
 			TreeMap<Timestamp, T> checkinEntriesForThisUser = perUserCheckinEntry.getValue();
-	
+
 			TreeMap<LocalDate, ArrayList<T>> daywiseForThisUser = new TreeMap<>();
-	
+
 			for (Map.Entry<Timestamp, T> checkin : checkinEntriesForThisUser.entrySet()) // iterare over activity events
 																							// for this user
 			{
@@ -1335,14 +1499,14 @@ public class TimelineTransformers
 				// activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension", "Date"); // start
 				// date
 				LocalDate ldate = DateTimeUtils.getLocalDate(checkin.getKey(), dft);
-	
+
 				if ((daywiseForThisUser.containsKey(ldate)) == false)
 				{
 					daywiseForThisUser.put(ldate, new ArrayList<T>());
 				}
 				daywiseForThisUser.get(ldate).add(checkin.getValue());
 			}
-	
+
 			daywiseMap.put(userID, daywiseForThisUser);
 		}
 		return daywiseMap;
@@ -1364,15 +1528,15 @@ public class TimelineTransformers
 	{
 		LinkedHashMap<String, TreeMap<Date, ArrayList<T>>> daywiseMap = new LinkedHashMap<>();
 		System.out.println("starting convertTimewiseMapToDatewiseMap");
-	
+
 		for (Map.Entry<String, TreeMap<Timestamp, T>> perUserCheckinEntry : timewiseMap.entrySet()) // Iterate over
 																									// Users
 		{
 			String userID = perUserCheckinEntry.getKey();
 			TreeMap<Timestamp, T> checkinEntriesForThisUser = perUserCheckinEntry.getValue();
-	
+
 			TreeMap<Date, ArrayList<T>> daywiseForThisUser = new TreeMap<>();
-	
+
 			for (Map.Entry<Timestamp, T> checkin : checkinEntriesForThisUser.entrySet()) // iterare over activity events
 																							// for this user
 			{
@@ -1380,14 +1544,14 @@ public class TimelineTransformers
 				// (Date) activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension", "Date"); //
 				// start date
 				// Date ldate = DateTimeUtils.getLocalDate(checkin.getKey(), dft);
-	
+
 				if ((daywiseForThisUser.containsKey(date)) == false)
 				{
 					daywiseForThisUser.put(date, new ArrayList<T>());
 				}
 				daywiseForThisUser.get(date).add(checkin.getValue());
 			}
-	
+
 			daywiseMap.put(userID, daywiseForThisUser);
 		}
 		return daywiseMap;
@@ -1412,15 +1576,15 @@ public class TimelineTransformers
 	{
 		LinkedHashMap<String, TreeMap<Date, ArrayList<T>>> daywiseMap = new LinkedHashMap<>();
 		System.out.println("starting convertTimewiseMapToDatewiseMap");
-	
+
 		for (Map.Entry<String, TreeMap<Timestamp, T>> perUserCheckinEntry : timewiseMap.entrySet())
 		{ // Iterate over Users
-	
+
 			String userID = perUserCheckinEntry.getKey();
 			TreeMap<Timestamp, T> checkinEntriesForThisUser = perUserCheckinEntry.getValue();
-	
+
 			TreeMap<Date, ArrayList<T>> daywiseForThisUser = new TreeMap<>();
-	
+
 			for (Map.Entry<Timestamp, T> checkin : checkinEntriesForThisUser.entrySet())
 			{
 				// iterare over activity events for this user
@@ -1430,7 +1594,7 @@ public class TimelineTransformers
 												// activityEventsForThisUser.get(i).getDimensionAttributeValue("Date_Dimension",
 												// "Date"); // start date
 				// Date ldate = DateTimeUtils.getLocalDate(checkin.getKey(), dft);
-	
+
 				if ((daywiseForThisUser.containsKey(date)) == false)
 				{
 					daywiseForThisUser.put(date, new ArrayList<T>());
@@ -1459,42 +1623,42 @@ public class TimelineTransformers
 						+ Constant.assignFallbackZoneIdWhenConvertCinsToAO);
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject2018>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
-	
+
 		Set<Integer> uniqueActIDs = new LinkedHashSet<>();// added on April 6 2018
 		Set<String> uniqueWorkingLevelActIDs = new LinkedHashSet<>();// added on April 6 2018
 		List<Integer> actIDs = new ArrayList<>();// added on April 6 2018
 		List<String> workingLevelActIDs = new ArrayList<>();// added on April 6 2018
-	
+
 		System.out.println("starting convertCheckinEntriesToActivityObjectsGowalla");
 		System.out.println("Num of locationObjects received = " + locationObjects.size() + " with keys as follows");
-	
+
 		if (VerbosityConstants.WriteLocationMap)
 		{// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
 			StringBuilder locInfo = new StringBuilder();
-	
+
 			// locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
 			locationObjects.values().forEach(e -> locInfo.append(e.toString() + "\n"));
-	
+
 			WToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
-	
+
 		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0,
 				numOfCInsWithMultipleWorkingLevelCatIDs = 0, numOfCIns = 0;
 		HashMap<String, String> actsOfCinsWithMultipleWorkLevelCatIDs = new HashMap<>();
 		IntSortedSet locIDsWithNoTZ = new IntRBTreeSet();
 		IntSortedSet locIDsWithNoFallbackTZ = new IntRBTreeSet();
 		int numOfCinsWithNullZoneIDs = 0, numOfCinsWithEvenFallbackNullZoneIds = 0;
-	
+
 		// {userid, locids, num of null zone ids for this user id locid}
 		Map<String, Map<List<Integer>, Long>> userIdLocIdNumOfNullZoneCInsMap = new LinkedHashMap<>();
 		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
-	
+
 		// convert checkinentries to activity objects
 		for (Entry<String, TreeMap<Date, ArrayList<CheckinEntry>>> userEntry : checkinEntriesDatewise.entrySet())
 		{// over users
 			ZoneId fallbackZoneId = null;
 			int numOfCinsForThisUser = 0;
-	
+
 			String userID = userEntry.getKey();
 			TreeMap<Date, ArrayList<ActivityObject2018>> dayWiseForThisUser = new TreeMap<>();
 			// System.out.print("\nuser: " + userID);
@@ -1503,19 +1667,19 @@ public class TimelineTransformers
 				// Date date = dateEntry.getKey();
 				ArrayList<ActivityObject2018> activityObjectsForThisUserThisDate = new ArrayList<>(
 						dateEntry.getValue().size());
-	
+
 				// System.out.println(
 				// "--* user:" + userID + " date:" + date.toString() + " has " + dateEntry.getValue().size() + "
 				// checkinentries");
-	
+
 				for (CheckinEntry cin : dateEntry.getValue())// over checkins
 				{
 					numOfCIns += 1;
 					numOfCinsForThisUser += 1;
-	
+
 					int activityID = Integer.valueOf(cin.getActivityID());
 					String activityName = String.valueOf(cin.getActivityID());// "";
-	
+
 					Timestamp startTimestamp = cin.getTimestamp(); // timestamp of first cin with its a merged one
 					String startLatitude = cin.getStartLatitude(); // of first cin if its a merged one
 					String startLongitude = cin.getStartLongitude();// of first cin if its a merged one
@@ -1524,7 +1688,7 @@ public class TimelineTransformers
 					double distaneInMFromPrev = cin.getDistanceInMetersFromPrev();// of first cin if its a merged one
 					long durationInSecFromPrev = cin.getDurationInSecsFromPrev();// getDurInSecsFromNext();// of first
 																					// cin if its a merged one
-	
+
 					String[] levelWiseCatIDs = cin.getLevelWiseCatIDs();
 					// int locationID = Integer.valueOf(e.getLocationID());
 					ArrayList<Integer> locIDs = cin.getLocationIDs();// e.getLocationIDs());
@@ -1541,7 +1705,7 @@ public class TimelineTransformers
 								"Error: sanity check failed in createUserTimelinesFromCheckinEntriesGowalla()");
 					}
 					// sanity check end
-	
+
 					int numOfLocIDs = locIDs.size();
 					int photos_count = 0, checkins_count = 0, users_count = 0, radius_meters = 0, highlights_count = 0,
 							items_count = 0, max_items_count = 0;
@@ -1557,7 +1721,7 @@ public class TimelineTransformers
 									"Error in convertCheckinEntriesToActivityObjectsGowalla: No LocationGowalla object found for locationID="
 											+ String.valueOf(locationID));
 						}
-	
+
 						photos_count += loc.getPhotos_count();
 						checkins_count += loc.getCheckins_count();
 						users_count += loc.getUsers_count();
@@ -1566,7 +1730,7 @@ public class TimelineTransformers
 						items_count += loc.getItems_count();
 						max_items_count += loc.getMax_items_count();
 					}
-	
+
 					if (numOfLocIDs > 1)
 					{
 						numOfCInsWithMultipleLocIDs += 1;
@@ -1578,7 +1742,7 @@ public class TimelineTransformers
 						items_count = items_count / numOfLocIDs;
 						max_items_count = max_items_count / numOfLocIDs;
 					}
-	
+
 					if (new HashSet<Integer>(locIDs).size() > 1) // if more than 1 distinct locations
 					{
 						numOfCInsWithMultipleDistinctLocIDs += 1;
@@ -1616,7 +1780,7 @@ public class TimelineTransformers
 						/////
 						numOfCinsWithNullZoneIDs += 1;
 						locIDsWithNoTZ.addAll(locIDs);
-	
+
 						if (Constant.assignFallbackZoneIdWhenConvertCinsToAO)
 						{
 							currentZoneId = fallbackZoneId;
@@ -1633,13 +1797,13 @@ public class TimelineTransformers
 							// "FallbackNullZoneIDs.csv");
 						}
 					}
-	
+
 					ActivityObject2018 ao = new ActivityObject2018(activityID, locIDs, activityName, locationName,
 							startTimestamp, startLatitude, startLongitude, startAltitude, userID, photos_count,
 							checkins_count, users_count, radius_meters, highlights_count, items_count, max_items_count,
 							cin.getWorkingLevelCatIDs(), distaneInMFromPrev, durationInSecFromPrev, levelWiseCatIDs,
 							currentZoneId);
-	
+
 					// Start of April 6
 					uniqueActIDs.add(ao.getActivityID());
 					actIDs.add(ao.getActivityID());
@@ -1647,36 +1811,36 @@ public class TimelineTransformers
 							Arrays.asList(RegexUtils.patternDoubleUnderScore.split(ao.getWorkingLevelCatIDs())));
 					workingLevelActIDs.add(ao.getWorkingLevelCatIDs());
 					// End of April 6
-	
+
 					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
-	
+
 					fallbackZoneId = currentZoneId;
 				}
 				dayWiseForThisUser.put(dateEntry.getKey(), activityObjectsForThisUserThisDate);
 			}
 			activityObjectsDatewise.put(userID, dayWiseForThisUser);
 		}
-	
+
 		System.out.println("locIDsWithNoTZ.size()= " + locIDsWithNoTZ.size());
 		System.out.println("locIDsWithNoFallbackTZ.size()= " + locIDsWithNoFallbackTZ.size());
-	
+
 		WToFile.writeToNewFile(locIDsWithNoTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoTZ.csv");
-	
+
 		WToFile.writeToNewFile(locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoFallbackTZ.csv");
-	
+
 		// find loc ids in gowalla 5 days train test data which is known to have no TZ is found to have no fallback tz
 		// as well.
 		locIDsWithNoFallbackTZ.retainAll(DomainConstants.locIDsIn5DaysTrainTestDataWithNullTZ);
 		WToFile.writeToNewFile(locIDsWithNoFallbackTZ.stream().map(String::valueOf).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "UniqueLocIDsWithNoFallbackTZIn5DaysTrainTestNoTZ.csv");
-	
+
 		System.out.println(
 				"\n loc ids in Gowalla5daysTrainTest data which is known to have no TZ is found to have no fallback tz as well="
 						+ locIDsWithNoFallbackTZ.toString());
-	
+
 		System.out.println(" numOfCinsWithNullZoneIDs= " + numOfCinsWithNullZoneIDs + "  "
 				+ ((numOfCinsWithNullZoneIDs * 1.0) / numOfCIns) + "% of total cins");
 		System.out.println(" numOfCinsWithEvenFallbackNullZoneIds= " + numOfCinsWithEvenFallbackNullZoneIds + "  "
@@ -1686,11 +1850,11 @@ public class TimelineTransformers
 		System.out.println(" numOfCInsWithMultipleDistinctLocIDs = " + numOfCInsWithMultipleDistinctLocIDs);
 		System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfCInsWithMultipleWorkingLevelCatIDs
 				+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
-	
+
 		// Start of added on April 6 2018
 		System.out.println(" num of unique actIDs = " + uniqueActIDs.size());
 		System.out.println(" num of unique uniqueWorkingLevelActIDs = " + uniqueWorkingLevelActIDs.size());
-	
+
 		WToFile.writeToNewFile(uniqueActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZuniqueActIDs.csv");
 		WToFile.writeToNewFile(
@@ -1701,18 +1865,18 @@ public class TimelineTransformers
 		WToFile.writeToNewFile(workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "ZZworkingLevelActIDs.csv");
 		// End of added on April 6 2018
-	
+
 		WToFile.writeToNewFile(
 				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
 						.collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
-	
+
 		WToFile.writeMapOfMap(userIdLocIdNumOfNullZoneCInsMap, "UserID;LocID;NumOfNullTZCins\n", ";",
 				Constant.getOutputCoreResultsPath() + "userIdLocIdNumOfNullZoneCInsMap.csv");
-	
+
 		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
 		return activityObjectsDatewise;
-	
+
 	}
 
 	/**
@@ -1737,29 +1901,29 @@ public class TimelineTransformers
 		System.out.println("Inside convertCheckinEntriesToActivityObjectsGowallaV2():");
 		// DomainConstants.setGridIDLocIDGowallaMaps();
 		Map<Long, Integer> locIDGridIndexMap = DomainConstants.getLocIDGridIndexGowallaMap();
-	
+
 		LinkedHashMap<String, TreeMap<Date, ArrayList<ActivityObject2018>>> activityObjectsDatewise = new LinkedHashMap<>(
 				(int) (Math.ceil(checkinEntriesDatewise.size() / 0.75)));
-	
+
 		Set<Integer> uniqueActIDs = new LinkedHashSet<>();// added on April 6 2018
 		Set<String> uniqueWorkingLevelActIDs = new LinkedHashSet<>();// added on April 6 2018
 		List<Integer> actIDs = new ArrayList<>();// added on April 6 2018
 		List<String> workingLevelActIDs = new ArrayList<>();// added on April 6 2018
 		Set<ZoneId> uniqueZoneIDs = new HashSet<>();
-	
+
 		System.out.println("starting convertCheckinEntriesToActivityObjectsGowalla");
 		System.out.println("Num of locationObjects received = " + locationObjects.size() + " with keys as follows");
-	
+
 		if (VerbosityConstants.WriteLocationMap)
 		{// locationObjects.keySet().stream().forEach(e -> System.out.print(String.valueOf(e) + "||"));
 			StringBuilder locInfo = new StringBuilder();
-	
+
 			// locationObjects.entrySet().forEach(e -> locInfo.append(e.getValue().toString() + "\n"));
 			locationObjects.values().forEach(e -> locInfo.append(e.toString() + "\n"));
-	
+
 			WToFile.writeToNewFile(locInfo.toString(), Constant.getOutputCoreResultsPath() + "LocationMap.csv");
 		} // System.out.println("Num of locationObjects received = " + locationObjects.size());
-	
+
 		int numOfCInsWithMultipleLocIDs = 0, numOfCInsWithMultipleDistinctLocIDs = 0,
 				numOfCInsWithMultipleWorkingLevelCatIDs = 0, numOfCIns = 0;
 		HashMap<String, String> actsOfCinsWithMultipleWorkLevelCatIDs = new HashMap<>();
@@ -1769,13 +1933,13 @@ public class TimelineTransformers
 		// {userid, locids, num of null zone ids for this user id locid}
 		// Map<String, Map<List<Integer>, Long>> userIdLocIdNumOfNullZoneCInsMap = new LinkedHashMap<>();
 		// Set<String> setOfCatIDsofAOs = new TreeSet<String>();
-	
+
 		// convert checkinentries to activity objects
 		for (Entry<String, TreeMap<Date, ArrayList<CheckinEntryV2>>> userEntry : checkinEntriesDatewise.entrySet())
 		{// over users
 			// ZoneId fallbackZoneId = null;
 			int numOfCinsForThisUser = 0;
-	
+
 			String userID = userEntry.getKey();
 			TreeMap<Date, ArrayList<ActivityObject2018>> dayWiseForThisUser = new TreeMap<>();
 			// System.out.print("\nuser: " + userID);
@@ -1784,18 +1948,18 @@ public class TimelineTransformers
 				// Date date = dateEntry.getKey();
 				ArrayList<ActivityObject2018> activityObjectsForThisUserThisDate = new ArrayList<>(
 						dateEntry.getValue().size());
-	
+
 				// System.out.println( "--* user:" + userID + " date:" + date.toString() + " has " +
 				// dateEntry.getValue().size() + "checkinentries");
-	
+
 				for (CheckinEntryV2 cin : dateEntry.getValue())// over checkins
 				{
 					numOfCIns += 1;
 					numOfCinsForThisUser += 1;
-	
+
 					int activityID = Integer.valueOf(cin.getActivityID());
 					String activityName = String.valueOf(cin.getActivityID());// "";
-	
+
 					Timestamp startTimestamp = cin.getTimestamp(); // timestamp of first cin with its a merged one
 					String startLatitude = cin.getStartLatitude(); // of first cin if its a merged one
 					String startLongitude = cin.getStartLongitude();// of first cin if its a merged one
@@ -1804,15 +1968,15 @@ public class TimelineTransformers
 					double distaneInMFromPrev = cin.getDistanceInMetersFromPrev();// of first cin if its a merged one
 					long durationInSecFromPrev = cin.getDurationInSecsFromPrev();// getDurInSecsFromNext();// of first
 																					// cin if its a merged one
-	
+
 					double distanceInMFromNext = cin.getDistanceInMeterFromNextCheckin();// added on April 8 2018
 					long durationInSecFromNext = cin.getDurationInSecsFromNextCheckin();// added on April 8 2018
 					// ZoneId currentZoneId = ZoneId.of(cin.getTz());// added on April 8 2018
-	
+
 					// All actObject assigned a dummy UTC timezone, as timestamps have been normalised to local
 					// timstamps in respective timezones,
 					ZoneId currentZoneId = ZoneId.of("UTC");// added on April 8 2018
-	
+
 					String[] levelWiseCatIDs = cin.getLevelWiseCatIDs();// NOT USED in ActivityObject
 					// int locationID = Integer.valueOf(e.getLocationID());
 					ArrayList<Integer> locIDs = cin.getLocationIDs();// e.getLocationIDs());
@@ -1829,7 +1993,7 @@ public class TimelineTransformers
 								"Error: sanity check failed in createUserTimelinesFromCheckinEntriesGowalla()");
 					}
 					// sanity check end
-	
+
 					int numOfLocIDs = locIDs.size();
 					int photos_count = 0, checkins_count = 0, users_count = 0, radius_meters = 0, highlights_count = 0,
 							items_count = 0, max_items_count = 0;
@@ -1845,7 +2009,7 @@ public class TimelineTransformers
 									"Error in convertCheckinEntriesToActivityObjectsGowalla: No LocationGowalla object found for locationID="
 											+ String.valueOf(locationID));
 						}
-	
+
 						photos_count += loc.getPhotos_count();
 						checkins_count += loc.getCheckins_count();
 						users_count += loc.getUsers_count();
@@ -1854,7 +2018,7 @@ public class TimelineTransformers
 						items_count += loc.getItems_count();
 						max_items_count += loc.getMax_items_count();
 					}
-	
+
 					if (numOfLocIDs > 1)
 					{
 						numOfCInsWithMultipleLocIDs += 1;
@@ -1866,12 +2030,12 @@ public class TimelineTransformers
 						items_count = items_count / numOfLocIDs;
 						max_items_count = max_items_count / numOfLocIDs;
 					}
-	
+
 					if (new HashSet<Integer>(locIDs).size() > 1) // if more than 1 distinct locations
 					{
 						numOfCInsWithMultipleDistinctLocIDs += 1;
 					}
-	
+
 					int gridIndex = TimelineUtils.getGridIndex(locIDs, locIDGridIndexMap, userID, startTimestamp);
 					// ZoneId currentZoneId = DomainConstants.getGowallaLocZoneId(locIDs);
 					ActivityObject2018 ao = new ActivityObject2018(
@@ -1880,7 +2044,7 @@ public class TimelineTransformers
 							radius_meters, highlights_count, items_count, max_items_count, cin.getWorkingLevelCatIDs(),
 							distaneInMFromPrev, durationInSecFromPrev, /* levelWiseCatIDs, */
 							currentZoneId, distanceInMFromNext, durationInSecFromNext, gridIndex);
-	
+
 					// Start of sanity check of April 6
 					uniqueActIDs.add(ao.getActivityID());
 					actIDs.add(ao.getActivityID());
@@ -1889,7 +2053,7 @@ public class TimelineTransformers
 					workingLevelActIDs.add(ao.getWorkingLevelCatIDs());
 					uniqueZoneIDs.add(ao.getTimeZoneId());
 					// End of sanity check of April 6
-	
+
 					// setOfCatIDsofAOs.add(ao.getActivityID());
 					activityObjectsForThisUserThisDate.add(ao);
 					// fallbackZoneId = currentZoneId;
@@ -1898,13 +2062,13 @@ public class TimelineTransformers
 			}
 			activityObjectsDatewise.put(userID, dayWiseForThisUser);
 		}
-	
+
 		System.out.println(" numOfCIns = " + numOfCIns);
 		System.out.println(" numOfCInsWithMultipleLocIDs = " + numOfCInsWithMultipleLocIDs);
 		System.out.println(" numOfCInsWithMultipleDistinctLocIDs = " + numOfCInsWithMultipleDistinctLocIDs);
 		System.out.println(" numOfCInsWithMultipleWorkingLevelCatIDs = " + numOfCInsWithMultipleWorkingLevelCatIDs
 				+ " for working level = " + DomainConstants.gowallaWorkingCatLevel);
-	
+
 		// Start of added on April 6 2018
 		String phrase = "CinToAOConv_";
 		System.out.println(" num of unique zoneIDs = " + uniqueZoneIDs.size());
@@ -1920,28 +2084,28 @@ public class TimelineTransformers
 		WToFile.writeToNewFile(workingLevelActIDs.stream().map(e -> e.toString()).collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + phrase + "WorkingLevelActIDs.csv");
 		// End of added on April 6 2018
-	
+
 		WToFile.writeToNewFile(
 				actsOfCinsWithMultipleWorkLevelCatIDs.entrySet().stream().map(e -> e.getKey() + "-" + e.getValue())
 						.collect(Collectors.joining("\n")),
 				Constant.getOutputCoreResultsPath() + "MapActsOfCinsWithMultipleWorkLevelCatIDs.csv");
-	
+
 		System.out.println("exiting convertCheckinEntriesToActivityObjectsGowalla");
 		return activityObjectsDatewise;
-	
+
 	}
 
 	public static LinkedHashMap<String, Timeline> rearrangeTimelinesByGivenOrder(LinkedHashMap<String, Timeline> map,
 			int[] orderKeys)
 	{
 		LinkedHashMap<String, Timeline> rearranged = new LinkedHashMap<String, Timeline>();
-	
+
 		for (int key : orderKeys)
 		{
 			String keyString = Integer.toString(key);
 			rearranged.put(keyString, map.get(keyString));
 		}
-	
+
 		return rearranged;
 	}
 
@@ -1955,7 +2119,7 @@ public class TimelineTransformers
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> map, int[] orderKeys)
 	{
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> rearranged = new LinkedHashMap<>();
-	
+
 		for (int key : orderKeys)
 		{
 			String keyString = Integer.toString(key);

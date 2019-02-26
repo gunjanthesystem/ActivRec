@@ -128,14 +128,14 @@ public class PathConstants
 		{
 		case "dcu_data_2":
 			System.err.println("Warning: using invalids expunged timelines: ");
-			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-					.kryoDeSerializeThis(pathToSerialisedDCUCleanedTimelines12Feb2019);// pathToSerializedDCUCleanedInvalidsExpungedTimelines28Dec);
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer.kryoDeSerializeThis(
+					pathToSerialisedDCUCleanedTimelines12Feb2019 + "usersCleanedDayTimelines.kryo");// pathToSerializedDCUCleanedInvalidsExpungedTimelines28Dec);
 		case "geolife1":
-			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-					.kryoDeSerializeThis(pathToSerialisedGeolifeCleanedTimelines12Feb2019);
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer.kryoDeSerializeThis(
+					pathToSerialisedGeolifeCleanedTimelines12Feb2019 + "usersCleanedDayTimelines.kryo");
 		case "gowalla1":
-			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer
-					.kryoDeSerializeThis(pathToSerialisedGowallaCleanedTimelines12Feb2019);
+			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer.kryoDeSerializeThis(
+					pathToSerialisedGowallaCleanedTimelines12Feb2019 + "usersCleanedDayTimelines.kryo");
 		default:
 			PopUps.printTracedErrorMsgWithExit("Error: unknown databaseName: " + databaseName);
 			return null;

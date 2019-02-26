@@ -98,7 +98,7 @@ public class Dashboard4 extends Application
 	public void start(Stage stage)
 	{
 		long t0 = System.currentTimeMillis();
-		String databaseName = "gowalla1";
+		String databaseName = "geolife1";
 
 		ScreenDetails.printScreensDetails();
 		reuse = new ReusableElements();
@@ -107,7 +107,7 @@ public class Dashboard4 extends Application
 		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines = null;
 
 		////////////////////////////////////////////////////////
-		if (false)
+		if (true)
 		{
 			if (databaseName.equals("gowalla1"))
 			{
@@ -485,8 +485,27 @@ public class Dashboard4 extends Application
 				Tab osmMapTab = new Tab("Locations OSM Map");
 				GluonOSMMap osmapPane = new GluonOSMMap();
 
-				BorderPane bp2 = showGeolifeAOStartLocationsFeb18(osmapPane);
-				// $$ showGowallaAOLocationsFeb18(osmapPane);
+				BorderPane bp2 = null;
+				/// home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/FSDataWorks/DataProcessingFeb25_2019/placeIDLatLonMap.csv
+				if (true)
+				{
+					bp2 = showFSNYAOLocationsFeb18(osmapPane);
+				}
+				else
+				{
+					if (databaseName.equals("geolife1"))
+					{
+						bp2 = showGeolifeAOStartLocationsFeb18(osmapPane);
+					}
+					else if (databaseName.equals("gowalla1"))
+					{
+						bp2 = showGowallaAOLocationsFeb18(osmapPane);
+					}
+					else
+					{
+						PopUps.showError("Uknown database: " + databaseName);
+					}
+				}
 				// $$showGowallaLocations(osmapPane);//disabled on 18 Feb 2019
 				// Color.rgb(193, 49, 34, 0.3));
 				// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
@@ -585,6 +604,20 @@ public class Dashboard4 extends Application
 		int latColIndex2 = 10, lonColIndex2 = 11, labelColIndex2 = 4;
 		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(fileToRead, ",", latColIndex2, lonColIndex2,
 				labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false, "\t\tShowing Gowalla AO Locations");
+		return bp2;
+	}
+
+	/**
+	 * @param osmapPane
+	 * @return
+	 */
+	private static BorderPane showFSNYAOLocationsFeb18(GluonOSMMap osmapPane)
+	{
+		String fileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/FSDataWorks/DataProcessingFeb25_2019/FSNY2018-10-04AllTargetUsersDatesOnlyReplaceCatIDNamesReplacePlaceID.csv";
+		int latColIndex2 = 4, lonColIndex2 = 5, labelColIndex2 = 2;
+		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(fileToRead, ",", latColIndex2, lonColIndex2,
+				labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false,
+				"\t\tShowing Foursquare NY  AO Locations");
 		return bp2;
 	}
 

@@ -492,7 +492,10 @@ public class TimelineStats
 
 					double r;
 
-					if (featureName.equalsIgnoreCase("ActivityName"))
+					// ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF, DurationF,
+					// DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF;// ,
+					if (featureName.equalsIgnoreCase("ActivityName") || featureName.equalsIgnoreCase("ActNameF")
+							|| featureName.equalsIgnoreCase("LocationF"))
 						r = 0d;
 					else
 						r = rOriginal;
@@ -835,6 +838,111 @@ public class TimelineStats
 					"AvgAltitudeSequenceIntInvalidsExpungedDummyTime");
 
 		}
+		// WritingToFile.writeAllTimeSeriesOnlyIntValue(sequenceIntInvalidsExpunged, "SequenceIntInvalidsExpunged");
+		// WritingToFile.writeLinkedHashMap(sequenceCharInvalidsExpungedNoTS, "SequenceAsString");
+		// traverse(transformToEqualIntervalTimeSeries(userTimelines, 1));
+	}
+
+	/**
+	 * Fork of transformAndWriteAsTimeseries() for gowalla Convert timelines into timeseries of activities and features,
+	 * also with equally spaced dummy time interval and write to files.
+	 * <p>
+	 * ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF;
+	 * <p>
+	 * formely this method as called performTimeSeriesAnalysis()
+	 * 
+	 * @param usersDayTimelines
+	 *            already cleaned and rearranged
+	 */
+	public static void transformAndWriteAsTimeseriesGowalla(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
+	{
+		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines); relocated to when calling this method
+		// LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries =
+		// transformToEqualIntervalTimeSeriesDayWise(usersDayTimelines, intervalInSecs);
+		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesInt =
+		// toIntsFromActivityObjects(timeSeries, false);
+		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesIntZeroValuedInvalids =
+		// toTimeSeriesIntWithZeroValuedInvalids(timeSeries);
+		// LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> timeSeriesIntInvalidsExpunged =
+		// toIntsFromActivityObjects(timeSeries, true);
+		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
+				.transformToSequenceDayWise(usersDayTimelines);// , false);
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceInt = TimelineTransformers
+				.toIntsFromActivityObjects(sequenceAll, false);
+
+		// start of relevant if invalids exists in the dataset
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntZeroValuedInvalids = null;
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceIntInvalidsExpunged = null;
+		if (Constant.hasInvalidActivityNames)
+		{
+			sequenceIntZeroValuedInvalids = TimelineTransformers.toTimeSeriesIntWithZeroValuedInvalids(sequenceAll);
+			sequenceIntInvalidsExpunged = TimelineTransformers.toIntsFromActivityObjects(sequenceAll, true);
+		}
+		// end of relevant if invalids exists in the dataset
+
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> ActNameFSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
+				.toIntsFromActivityObjectsDummyTime(sequenceAll, true);
+
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> StartTimeFSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
+				.toStartTimeFromActivityObjectsDummyTime2(sequenceAll, true);
+
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> LocationFSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
+				.toLocationGridsFromActivityObjectsDummyTime(sequenceAll, true);
+
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> PopularityFSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
+				.toPopularityFromActivityObjectsDummyTime(sequenceAll, true);
+
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Double>> DistFromPrevFSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
+				.toDistInMFromPrevActivityObjectsDummyTime(sequenceAll, true);
+
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> DurationFromPrevFSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
+				.toDurInSecFromPrevActivityObjectsDummyTime(sequenceAll, true);
+		// TODO later: probably toDurInSecFromPrevActivityObjectsDummyTime() can be made generic to work for given
+		// feature
+		// durationFromPrevIntInvalidsExpungedDummyTime = null;
+		// , endAltitudeIntInvalidsExpungedDummyTime = null,
+		// avgAltitudeIntInvalidsExpungedDummyTime = null;
+
+		// LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS =
+		// toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+		// LinkedHashMap<String, String> sequenceCharInvalidsExpungedNoTS =
+		// toCharsFromActivityObjectsNoTimestamp(sequenceAll, true);
+
+		// WritingToFile.writeAllTimestampedActivityObjects(timeSeries, "Time" + intervalInSecs + "Series");
+		// WritingToFile.writeAllTimeSeriesInt(timeSeriesInt, "Time" + intervalInSecs + "SeriesInt");
+		// WritingToFile.writeAllTimeSeriesInt(timeSeriesIntZeroValuedInvalids, "Time" + intervalInSecs +
+		// "SeriesIntZeroValuedInvalids");
+		// WritingToFile.writeAllTimeSeriesInt(timeSeriesIntInvalidsExpunged, "Time" + intervalInSecs +
+		// "SeriesIntInvalidsExpunged");
+
+		WToFile.writeAllTimestampedActivityObjects(sequenceAll, "Sequence");
+		WToFile.writeAllTimeSeriesInt(sequenceInt, "SequenceInt");
+
+		if (Constant.hasInvalidActivityNames)
+		{
+			WToFile.writeAllTimeSeriesInt(sequenceIntZeroValuedInvalids, "SequenceIntZeroValuedInvalids ");
+			WToFile.writeAllTimeSeriesInt(sequenceIntInvalidsExpunged, "SequenceIntInvalidsExpunged");
+		}
+
+		WToFile.writeAllTimeSeriesInt(ActNameFSequenceIntInvalidsExpungedDummyTime,
+				"ActNameFSequenceIntInvalidsExpungedDummyTime");
+
+		WToFile.writeAllTimeSeriesLong(StartTimeFSequenceIntInvalidsExpungedDummyTime,
+				"StartTimeFSequenceIntInvalidsExpungedDummyTime");
+
+		WToFile.writeAllTimeSeriesLong(LocationFSequenceIntInvalidsExpungedDummyTime,
+				"LocationFSequenceIntInvalidsExpungedDummyTime");
+
+		WToFile.writeAllTimeSeriesInt(PopularityFSequenceIntInvalidsExpungedDummyTime,
+				"PopularityFSequenceIntInvalidsExpungedDummyTime");
+
+		WToFile.writeAllTimeSeriesDouble(DistFromPrevFSequenceIntInvalidsExpungedDummyTime,
+				"DistFromPrevFSequenceIntInvalidsExpungedDummyTime");
+
+		WToFile.writeAllTimeSeriesLong(DurationFromPrevFSequenceIntInvalidsExpungedDummyTime,
+				"DurationFromPrevFSequenceIntInvalidsExpungedDummyTime");
 		// WritingToFile.writeAllTimeSeriesOnlyIntValue(sequenceIntInvalidsExpunged, "SequenceIntInvalidsExpunged");
 		// WritingToFile.writeLinkedHashMap(sequenceCharInvalidsExpungedNoTS, "SequenceAsString");
 		// traverse(transformToEqualIntervalTimeSeries(userTimelines, 1));
