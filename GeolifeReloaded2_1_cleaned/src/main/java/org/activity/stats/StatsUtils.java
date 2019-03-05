@@ -74,11 +74,11 @@ public final class StatsUtils
 	 * @param vals
 	 * @param binSize
 	 * @param verbose
-	 * @return {Pair{val,binIndex} map, numOfBins}
+	 * @return {Pair{Triple {valToBinIndex, binIndexBoundary, binIndexListOfVals}}, numOfBins}
 	 * @since 1 April 2018
 	 */
-	public static Pair<List<Pair<Double, Integer>>, Integer> binValuesByBinSize(List<Double> vals, double binSize,
-			boolean verbose)
+	public static Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Integer> binValuesByBinSize(
+			List<Double> vals, double binSize, boolean verbose)
 	{
 		// 100, 101, 100.5,100.99
 		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
@@ -89,7 +89,9 @@ public final class StatsUtils
 		Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> res = binVals(
 				vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose);
 		List<Pair<Double, Integer>> valToBinIndex = res.getFirst();
-		return new Pair<List<Pair<Double, Integer>>, Integer>(valToBinIndex, numOfBins);
+		// return new Pair<List<Pair<Double, Integer>>, Integer>(valToBinIndex, numOfBins);
+		return new Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Integer>(
+				res, numOfBins);
 	}
 
 	/**
@@ -99,11 +101,11 @@ public final class StatsUtils
 	 * @param binSize
 	 * @param verbose
 	 * @param minValueFixed
-	 * @return {Pair{val,binIndex} map, numOfBins}
+	 * @return {Pair{Triple {valToBinIndex, binIndexBoundary, binIndexListOfVals}, numOfBins}
 	 *
 	 */
-	public static Pair<List<Pair<Double, Integer>>, Integer> binValuesByBinSize(List<Double> vals, double binSize,
-			boolean verbose, double minValueFixed, String title)
+	public static Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Integer> binValuesByBinSize(
+			List<Double> vals, double binSize, boolean verbose, double minValueFixed, String title)
 	{
 		// 100, 101, 100.5,100.99
 		if (verbose)
@@ -125,7 +127,9 @@ public final class StatsUtils
 		}
 
 		List<Pair<Double, Integer>> valToBinIndex = res.getFirst();
-		return new Pair<List<Pair<Double, Integer>>, Integer>(valToBinIndex, numOfBins);
+		// return new Pair<List<Pair<Double, Integer>>, Integer>(valToBinIndex, numOfBins);
+		return new Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Integer>(
+				res, numOfBins);
 	}
 
 	/**
@@ -167,11 +171,11 @@ public final class StatsUtils
 	 * @param vals
 	 * @param numOfBins
 	 * @param verbose
-	 * @return {Pair{val,binIndex} map, binSize}
+	 * @return {Pair{Triple {valToBinIndex, binIndexBoundary, binIndexListOfVals}}, binSize}
 	 * @since 1 April 2018
 	 */
-	public static Pair<List<Pair<Double, Integer>>, Double> binValuesByNumOfBins(List<Double> vals, int numOfBins,
-			boolean verbose)
+	public static Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Double> binValuesByNumOfBins(
+			List<Double> vals, int numOfBins, boolean verbose)
 	{
 
 		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
@@ -182,7 +186,10 @@ public final class StatsUtils
 		Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> res = binVals(
 				vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose);
 		List<Pair<Double, Integer>> valToBinIndex = res.getFirst();
-		return new Pair<List<Pair<Double, Integer>>, Double>(valToBinIndex, binSize);
+
+		return new Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Double>(
+				res, binSize);
+		// return new Pair<List<Pair<Double, Integer>>, Double>(valToBinIndex, binSize);
 	}
 
 	/**
@@ -192,11 +199,11 @@ public final class StatsUtils
 	 * @param numOfBins
 	 * @param verbose
 	 * @param minValueFixed
-	 * @return {Pair{val,binIndex} map, binSize}
+	 * @return {Pair{Triple {valToBinIndex, binIndexBoundary, binIndexListOfVals}}, binSize}
 	 * @since 11 July 2018
 	 */
-	public static Pair<List<Pair<Double, Integer>>, Double> binValuesByNumOfBins(List<Double> vals, int numOfBins,
-			boolean verbose, int minValueFixed)
+	public static Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Double> binValuesByNumOfBins(
+			List<Double> vals, int numOfBins, boolean verbose, int minValueFixed)
 	{
 
 		double maxVal = vals.stream().mapToDouble(e -> Double.valueOf(e)).max().getAsDouble();
@@ -207,7 +214,10 @@ public final class StatsUtils
 		Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> res = binVals(
 				vals, numOfBins, binSize, maxVal, minVal, maxValExcluding, verbose);
 		List<Pair<Double, Integer>> valToBinIndex = res.getFirst();
-		return new Pair<List<Pair<Double, Integer>>, Double>(valToBinIndex, binSize);
+
+		return new Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Double>(
+				res, binSize);
+		// return new Pair<List<Pair<Double, Integer>>, Double>(valToBinIndex, binSize);
 	}
 
 	/**
@@ -241,7 +251,7 @@ public final class StatsUtils
 	 * @param minVal
 	 * @param maxValExcluding
 	 * @param verbose
-	 * @return
+	 * @return Triple {valToBinIndex, binIndexBoundary, binIndexListOfVals}
 	 */
 	private static Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>> binVals(
 			List<Double> vals, int numOfBins, double binSize, double maxVal, double minVal, double maxValExcluding,
@@ -515,15 +525,16 @@ public final class StatsUtils
 
 	public static void main(String args[])
 	{
-		analaysePossibleReorderingsNov29_2018();
+		checkBinnning();
+		// checkPercentile();
+		// System.out.println(factorial(10));
+		// checkSeqOfSameScores();
+		// analaysePossibleReorderingsNov29_2018();
 	}
 
 	public static void analaysePossibleReorderingsNov29_2018()
 	{
-		// checkBinnning();
-		// checkPercentile();
-		// System.out.println(factorial(10));
-		// checkSeqOfSameScores();
+
 		// EDAlpha1 String fileToRead =
 		// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_NOV28H17M17ED1.0STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsFEDPerFS_10F_RTVNoTTFilter/All/MatchingUnit1.0/dataRankedRecommendationWithScores0.csv";
 		String commonPathToRead = // "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_NOV28H17M17ED1.0STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsFEDPerFS_10F_RTVNoTTFilter/All/";
@@ -745,11 +756,18 @@ public final class StatsUtils
 	{
 
 		double[] intArr = new double[] { 5, 10, 15, 20, 50, 100, 55, 70, 98 };// , 101, -1 };
-
 		Double[] doubleArray = ArrayUtils.toObject(intArr);
 		List<Double> doubleList = Arrays.asList(doubleArray);
-		Pair<List<Pair<Double, Integer>>, Double> res = binValuesByNumOfBins(doubleList, 10, true);
-		Pair<List<Pair<Double, Integer>>, Integer> res2 = binValuesByBinSize(doubleList, 10, true);
+		System.out.println("Vals  = " + Arrays.asList(doubleList));
+
+		// Triple{valToBinIndex, binIndexBoundary, binIndexListOfVals}
+
+		// public static Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer,
+		// List<Double>>>
+		Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Double> res = binValuesByNumOfBins(
+				doubleList, 10, true);
+		Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Integer> res2 = binValuesByBinSize(
+				doubleList, 10, true);
 
 		// 5, 15,20, 50, 100, 55, 70,101,-1 . max = 100, min = 0, binSize =10
 		// maxVal is maxValExcluding
@@ -1820,8 +1838,8 @@ public final class StatsUtils
 			SummaryStat stat)
 	{
 		int[] columnIndicesToRead = IntStream.range(0, numOfColumns).toArray();
-		ArrayList<ArrayList<Double>> columnWiseVals = ReadingFromFile.allColumnsReaderDouble(fileToRead, ",", columnIndicesToRead,
-				false);
+		ArrayList<ArrayList<Double>> columnWiseVals = ReadingFromFile.allColumnsReaderDouble(fileToRead, ",",
+				columnIndicesToRead, false);
 
 		ArrayList<Double> columnWiseSummary = new ArrayList<>();
 

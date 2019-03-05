@@ -54,6 +54,44 @@ public class CSV2Arff
 		}
 	}
 
+	/**
+	 * 
+	 * @param inputFileName
+	 * @param outputFileName
+	 * @param fieldSeparator
+	 * @since 28 Feb 2019
+	 */
+	public CSV2Arff(String inputFileName, String outputFileName, String fieldSeparator)
+	{
+		this.inputFileName = inputFileName;
+		this.outputfileName = outputFileName;
+		// String inputFileName = "./SampleDatasets/Mine/Sample1.csv", outputFileName =
+		// "./SampleDatasets/Mine/Sample1.arff";
+		// load CSV
+		CSVLoader loader = new CSVLoader();
+		loader.setFieldSeparator(fieldSeparator);
+
+		// PopUps.showMessage("entering csv loader with " + inputFileName + " and " + outputFileName);
+		try
+		{
+			loader.setSource(new File(inputFileName));
+
+			Instances data = loader.getDataSet();
+
+			// save ARFF
+			WekaUtilityBelt.writeArffAbsolute(data, outputFileName);
+			// ArffSaver saver = new ArffSaver();
+			// saver.setInstances(data);
+			// saver.setFile(new File(outputFileName));
+			// saver.setDestination(new File(outputFileName));
+			// saver.writeBatch();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String args[])
 	{
 		String inputFileName = "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/geolife1_JUN25/TimelineFeatureVectors.csv";

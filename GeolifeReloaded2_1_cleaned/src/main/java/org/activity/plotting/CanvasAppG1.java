@@ -22,7 +22,7 @@ public class CanvasAppG1 extends Application
 		 */
 		ObservableList<TimelineEntry> observableData = FXCollections.observableArrayList();
 
-		List<List<List<String>>> dataReceived = DataGenerator.getData3(10, 50, 12, 5, 864000, 60 * 20, 10800);
+		List<List<List<String>>> dataReceived = DataGenerator.getData3(50, 500, 12, 5, 864000, 60 * 20, 10800);
 
 		// Fill up the obervable data by creating TimelineEntries from the dataReceived
 		for (List<List<String>> eachUserData : dataReceived)

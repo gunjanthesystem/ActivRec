@@ -14,12 +14,17 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.PathConstants;
 import org.activity.controller.ControllerWithoutServer;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
 import org.activity.objects.ActivityObject2018;
+import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
 import org.activity.plotting.DataGenerator;
+import org.activity.plotting.ResizeableCanvasForLinePlot;
 import org.activity.plotting.TimelineChartAppCanvas;
 import org.activity.plotting.TimelineChartAppGeneric;
+import org.activity.plotting0.FXUtils;
 import org.activity.ui.colors.ColorPalette;
 import org.activity.util.TimelineTransformers;
 
@@ -28,8 +33,16 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.CacheHint;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -46,6 +59,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
@@ -61,6 +75,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Popup;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
@@ -206,14 +221,15 @@ public class Dashboard4 extends Application
 		// $$scene.getStylesheets().add("./org/activity/ui/resources/css/gsheetNative.css");
 		// System.out.println("Working Directory = " + System.getProperty("user.dir"));
 		// System.out.println("Dashboard3.class=" + Dashboard3.class);
-
-		final ObservableList<String> stylesheets = scene.getStylesheets();
-		stylesheets.addAll(// "./org/activity/ui/resources/css/jfoenix-main-demo.css",
-				// "./org/activity/ui/resources/css/gsheetNative.css",
-				"./org/activity/ui/resources/css/jfoenix-design.css", // jfoenix-design.css",
-				"./org/activity/ui/resources/css/jfoenix-components.css",
-				"./org/activity/ui/resources/css/gsheetNative01.css");
-
+		if (true)
+		{
+			final ObservableList<String> stylesheets = scene.getStylesheets();
+			stylesheets.addAll(// "./org/activity/ui/resources/css/jfoenix-main-demo.css",
+					// "./org/activity/ui/resources/css/gsheetNative.css",
+					// $"./org/activity/ui/resources/css/jfoenix-design.css", // jfoenix-design.css",
+					// $"./org/activity/ui/resources/css/jfoenix-components.css",
+					"./org/activity/ui/resources/css/gsheetNative01.css");
+		}
 		// scene.getStylesheets().add("./org/activity/ui/resources/css/gsheetNative01.css");
 		// URL cssURL = Dashboard3.class.getResource("/css/gsheetNative.css");// .toExternalForm();
 		// System.out.println("cssURL=" + cssURL);
@@ -255,32 +271,19 @@ public class Dashboard4 extends Application
 		System.out.println("Entered createTabs()");
 
 		final boolean doGivenDataCircleTimelines = false;
+		final boolean doGivenDataLineTimelines = false;
+		// final boolean doGivenDataCanvasTimelines = true;//not implemented
 		final boolean doGivenDataOnlyActIDSeq = false;
+		final boolean doGivenDataLinePlotFeatures = false;
+		final boolean doGivenDataMapPlot = false;
 
 		final boolean doSyntheticDataCircleTimelines = false;// true;
-		final boolean doSyntheticDataCanvasTimelines = false;
+		final boolean doSyntheticDataCanvasTimelines = true;
 		final boolean doSyntheticDataBoxTimelines = false;
 		final boolean doSyntheticDataLineTimelines = false;
 
-		final boolean doMapPlot = true;
-
 		try
 		{
-			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
-			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 864000, 60 * 20, 10800);
-			System.out.println("timelineData.size() = " + timelineData.size());
-			if (doSyntheticDataCircleTimelines)
-			{
-				long tTimeline0 = System.currentTimeMillis();
-				Tab timelineTabCircle = new Tab("(Synth-Circle) Historical Timelines All Users");
-				TimelineChartAppGeneric tcC = new TimelineChartAppGeneric(timelineData, true, "ActivityCircle");
-				timelineTabCircle.setContent(tcC.getVBox());// timelinesVBox2);
-				timelineTabCircle.setClosable(true);
-				tabsToAdd.add(timelineTabCircle);
-				long tTimelinen = System.currentTimeMillis();
-				System.out.println("Time taken TimelineChartAppGeneric = " + (tTimelinen - tTimeline0) + " ms");
-
-			}
 			if (doGivenDataCircleTimelines)
 			{
 				long tTimelineReal0 = System.currentTimeMillis();
@@ -294,6 +297,22 @@ public class Dashboard4 extends Application
 				System.out.println(
 						"Time taken TimelineChartAppGeneric real = " + (tTimelineRealn - tTimelineReal0) + " ms");
 			}
+			if (doGivenDataLineTimelines)
+			{
+				Tab timelineTabE = new Tab("timelineTabE Historical Timelines All Users");
+				TimelineChartAppGeneric tcE = new TimelineChartAppGeneric(usersCleanedDayTimelines, true, "LineChart");
+				timelineTabE.setContent(tcE.getVBox());// timelinesVBox2);
+				timelineTabE.setClosable(true);
+				tabsToAdd.add(timelineTabE);
+
+				Tab timelineTabScattter = new Tab("timelineTabScattter Historical Timelines All Users");
+				TimelineChartAppGeneric tcScattter = new TimelineChartAppGeneric(usersCleanedDayTimelines, true,
+						"ScatterChart");
+				timelineTabScattter.setContent(tcScattter.getVBox());// timelinesVBox2);
+				timelineTabScattter.setClosable(true);
+				tabsToAdd.add(timelineTabScattter);
+			}
+
 			if (doGivenDataOnlyActIDSeq)
 			{
 				Tab onlyActIDsAsRects = new Tab("Only ActIDs Sequence");
@@ -308,6 +327,47 @@ public class Dashboard4 extends Application
 				onlyActIDsAsRects.setContent(createOnlyActIDsAsRectsV2(usersCleanedDayTimelines));
 				onlyActIDsAsRects.setClosable(true);
 				tabsToAdd.add(onlyActIDsAsRects);
+			}
+
+			if (doGivenDataLinePlotFeatures)
+			{
+				// String dirToWrite = "./dataWritten/Temp" + DateTimeUtils.getMonthDateLabel() + databaseName + "/";
+				// WToFile.createDirectoryIfNotExists(dirToWrite);
+				// Constant.setCommonPath(dirToWrite);
+				//
+				// if (databaseName.equals("gowalla1"))
+				// {
+				// TimelineStats.transformAndWriteAsTimeseriesGowalla(usersCleanedDayTimelines);//
+				// }
+				// else if (databaseName.equals("geolife1"))
+				// {
+				// TimelineStats.transformAndWriteAsTimeseries(usersCleanedDayTimelines);//
+				// }
+				// else
+				// {
+				// PopUps.printTracedErrorMsgWithExit("Unknown database: " + databaseName);
+				// }
+				ScrollPane multiSeriesPlots = createMultiSeriesChartsFromAllAOs(databaseName);
+				Tab timelineTabMultiSeries = new Tab("multiSeriesPlots");
+				timelineTabMultiSeries.setContent(multiSeriesPlots);
+				timelineTabMultiSeries.setClosable(true);
+				tabsToAdd.add(timelineTabMultiSeries);
+			}
+			/////////////////////////////////////////////////////////////////
+			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
+			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 864000, 60 * 20, 10800);
+			System.out.println("timelineData.size() = " + timelineData.size());
+			if (doSyntheticDataCircleTimelines)
+			{
+				long tTimeline0 = System.currentTimeMillis();
+				Tab timelineTabCircle = new Tab("(Synth-Circle) Historical Timelines All Users");
+				TimelineChartAppGeneric tcC = new TimelineChartAppGeneric(timelineData, true, "ActivityCircle");
+				timelineTabCircle.setContent(tcC.getVBox());// timelinesVBox2);
+				timelineTabCircle.setClosable(true);
+				tabsToAdd.add(timelineTabCircle);
+				long tTimelinen = System.currentTimeMillis();
+				System.out.println("Time taken TimelineChartAppGeneric = " + (tTimelinen - tTimeline0) + " ms");
+
 			}
 
 			if (doSyntheticDataCanvasTimelines)
@@ -347,6 +407,8 @@ public class Dashboard4 extends Application
 				timelineTabScattter.setClosable(true);
 				tabsToAdd.add(timelineTabScattter);
 			}
+			/////////////////////////////////////////////////////////////////
+
 			///
 			// long tTimeline0 = System.currentTimeMillis();
 			// Tab timelineTab = new Tab("Historical Timelines All Users");
@@ -479,7 +541,7 @@ public class Dashboard4 extends Application
 			/***********************************************/
 			// $$ Start of disabled on Mar 17 2018
 
-			if (doMapPlot)
+			if (doGivenDataMapPlot)
 			{
 				long ttOSMmap1 = System.currentTimeMillis();
 				Tab osmMapTab = new Tab("Locations OSM Map");
@@ -489,13 +551,13 @@ public class Dashboard4 extends Application
 				/// home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/FSDataWorks/DataProcessingFeb25_2019/placeIDLatLonMap.csv
 				if (true)
 				{
-					bp2 = showFSNYAOLocationsFeb18(osmapPane);
+					bp2 = showFSNYAllAOsLocationsFeb18(osmapPane);
 				}
 				else
 				{
 					if (databaseName.equals("geolife1"))
 					{
-						bp2 = showGeolifeAOStartLocationsFeb18(osmapPane);
+						bp2 = showGeolifeAllAOsStartLocationsFeb18(osmapPane);
 					}
 					else if (databaseName.equals("gowalla1"))
 					{
@@ -588,9 +650,12 @@ public class Dashboard4 extends Application
 		// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
 		// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
 		int latColIndex2 = 9, lonColIndex2 = 10, labelColIndex2 = 12;
-		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(absFileNameForLatLon5MostRecenTrainTestJul10, ",",
-				latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false,
-				"\t\tShowing UniqueLocationObjects5DaysTrainTest");
+
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
+				absFileNameForLatLon5MostRecenTrainTestJul10, ",", latColIndex2, lonColIndex2, labelColIndex2);
+
+		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(listOfLocs, 5, Color.rgb(0, 105, 106, 0.75), false,
+				false, "\t\tShowing UniqueLocationObjects5DaysTrainTest");
 		return bp2;
 	}
 
@@ -602,8 +667,12 @@ public class Dashboard4 extends Application
 	{
 		String fileToRead = PathConstants.pathToSerialisedGowallaCleanedTimelines12Feb2019 + "AllActObjs.csv";
 		int latColIndex2 = 10, lonColIndex2 = 11, labelColIndex2 = 4;
-		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(fileToRead, ",", latColIndex2, lonColIndex2,
-				labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false, "\t\tShowing Gowalla AO Locations");
+
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(fileToRead, ",",
+				latColIndex2, lonColIndex2, labelColIndex2);
+
+		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(listOfLocs, 5, Color.rgb(0, 105, 106, 0.75), false,
+				false, "\t\tShowing Gowalla AO Locations");
 		return bp2;
 	}
 
@@ -611,13 +680,16 @@ public class Dashboard4 extends Application
 	 * @param osmapPane
 	 * @return
 	 */
-	private static BorderPane showFSNYAOLocationsFeb18(GluonOSMMap osmapPane)
+	private static BorderPane showFSNYAllAOsLocationsFeb18(GluonOSMMap osmapPane)
 	{
 		String fileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/FSDataWorks/DataProcessingFeb25_2019/FSNY2018-10-04AllTargetUsersDatesOnlyReplaceCatIDNamesReplacePlaceID.csv";
 		int latColIndex2 = 4, lonColIndex2 = 5, labelColIndex2 = 2;
-		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(fileToRead, ",", latColIndex2, lonColIndex2,
-				labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false,
-				"\t\tShowing Foursquare NY  AO Locations");
+
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(fileToRead, ",",
+				latColIndex2, lonColIndex2, labelColIndex2);
+
+		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(listOfLocs, 5, Color.rgb(0, 105, 106, 0.75), false,
+				false, "\t\tShowing Foursquare NY  AO Locations");
 		return bp2;
 	}
 
@@ -625,12 +697,16 @@ public class Dashboard4 extends Application
 	 * @param osmapPane
 	 * @return
 	 */
-	private static BorderPane showGeolifeAOStartLocationsFeb18(GluonOSMMap osmapPane)
+	private static BorderPane showGeolifeAllAOsStartLocationsFeb18(GluonOSMMap osmapPane)
 	{
 		String fileToRead = PathConstants.pathToSerialisedGeolifeCleanedTimelines12Feb2019 + "AllActObjs.csv";
 		int latColIndex2 = 11, lonColIndex2 = 12, labelColIndex2 = 4;
-		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(fileToRead, ",", latColIndex2, lonColIndex2,
-				labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false, "\t\tShowing Geolife Start Locations");
+
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(fileToRead, ",",
+				latColIndex2, lonColIndex2, labelColIndex2);
+
+		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(listOfLocs, 5, Color.rgb(0, 105, 106, 0.75), false,
+				false, "\t\tShowing Geolife Start Locations");
 		return bp2;
 	}
 
@@ -1186,4 +1262,290 @@ public class Dashboard4 extends Application
 		return menuBar;
 	}
 
+	public static ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>> getSequenceForChosenVariable(
+			List<List<String>> allAOData, List<String> header, String featureHeader)
+	{
+
+		ArrayList<Pair<String, ArrayList<Pair<Double, Double>>>> listOfListOfPairData = new ArrayList<>();// singleton
+		listOfListOfPairData
+				.add(new Pair<>(featureHeader, getSequenceForChosenVariable(header.indexOf(featureHeader), allAOData)));
+		return listOfListOfPairData;
+	}
+
+	public static ArrayList<Pair<String, ArrayList<Pair<Double, String>>>> getSequenceForChosenVariableString(
+			List<List<String>> allAOData, List<String> header, String featureHeader)
+	{
+
+		ArrayList<Pair<String, ArrayList<Pair<Double, String>>>> listOfListOfPairData = new ArrayList<>();// singleton
+		listOfListOfPairData.add(new Pair<>(featureHeader,
+				getSequenceForChosenVariableString(header.indexOf(featureHeader), allAOData)));
+		return listOfListOfPairData;
+	}
+
+	/**
+	 * 
+	 * @param indexOfChosenVariable
+	 * @param allAOData
+	 * @return
+	 */
+	private static ArrayList<Pair<Double, Double>> getSequenceForChosenVariable(int indexOfChosenVariable,
+			List<List<String>> allAOData)
+	{
+		int rowIndex = 0;
+		ArrayList<Pair<Double, Double>> seriesForChosenVariable = new ArrayList<>(allAOData.size());
+		for (List<String> rowEntry : allAOData)
+		{
+			seriesForChosenVariable
+					.add(new Pair<>((double) rowIndex, Double.valueOf(rowEntry.get(indexOfChosenVariable))));
+			rowIndex += 1;
+		}
+		return seriesForChosenVariable;
+
+	}
+
+	/**
+	 * 
+	 * @param indexOfChosenVariable
+	 * @param allAOData
+	 * @return
+	 */
+	private static ArrayList<Pair<Double, String>> getSequenceForChosenVariableString(int indexOfChosenVariable,
+			List<List<String>> allAOData)
+	{
+		int rowIndex = 0;
+		ArrayList<Pair<Double, String>> seriesForChosenVariable = new ArrayList<>(allAOData.size());
+		for (List<String> rowEntry : allAOData)
+		{
+			seriesForChosenVariable.add(new Pair<>((double) rowIndex, (rowEntry.get(indexOfChosenVariable))));
+			rowIndex += 1;
+		}
+		return seriesForChosenVariable;
+	}
+
+	public ScrollPane createMultiSeriesChartsFromAllAOs(String databaseName)
+	{
+		List<List<String>> allAOData = ReadingFromFile.readLinesIntoListOfLists(
+				PathConstants.getPathToCleanedTimelinesFeb2019(databaseName) + "AllActObjs.csv", ",");
+		List<String> header = allAOData.remove(0);
+		System.out.println("allAOData.size() = " + allAOData.size());
+
+		System.out.println("List of headers = " + header.toString());
+		Map<String, String> colNameType = new LinkedHashMap<>(header.size());
+
+		VBox vboxOfCharts = new VBox();
+		// vboxOfCharts.getChildren().add((chart_SThourOfDay));
+		// vboxOfCharts.getChildren().add((chart_durationInSeconds));
+		// vboxOfCharts.getChildren().add((chart_distanceTravelledInKm));
+		// vboxOfCharts.setAlignment(Pos.BASELINE_RIGHT);
+
+		int testRowIndex = 5;
+
+		// sizeOfData*maxX/desiredPointInOneScreen
+
+		double maxX = Screen.getPrimary().getVisualBounds().getMaxX();
+		double maxY = Screen.getPrimary().getVisualBounds().getMaxY();
+		int numOfDesiredDataPointsInOneScreen = 250;
+
+		double prefHeight = maxY / 3;
+		double prefWidth = allAOData.size() * maxX / numOfDesiredDataPointsInOneScreen;
+		// Screen.getPrimary().getVisualBounds().getMaxX() * 3;
+
+		for (int i = 1; i < 4; /* header.size(); */ i++)
+		{
+			try
+			{
+				NumberAxis xAxis = new NumberAxis();//
+
+				if (true)
+				{
+					xAxis.setTickMarkVisible(true);
+					// xAxis.setTickUnit(100);
+					xAxis.setAutoRanging(false);
+					int maxXToShow = ((allAOData.size() + 99) / 100) * 100;
+					xAxis.setUpperBound(maxXToShow);
+					int tickUnit = maxXToShow / 100;
+					xAxis.setTickUnit(5);// Math.max(tickUnit, 1));
+					xAxis.setMinorTickCount(5);
+					System.out.println("xAxis.getTickUnit() = " + xAxis.getTickUnit());
+				}
+
+				Double.parseDouble(allAOData.get(testRowIndex).get(i));// to see if it is a number
+				// is double
+				ObservableList<Series<Double, Double>> listOfSeries_SThourOfDay = FXUtils
+						.toObservableListOfSeriesOfPairData(
+								getSequenceForChosenVariable(allAOData, header, header.get(i)));
+
+				NumberAxis yAxis = new NumberAxis();//
+				yAxis.setLabel(header.get(i));
+				yAxis.setTickLabelRotation(270);
+
+				LineChart chart = new LineChart(xAxis, yAxis, listOfSeries_SThourOfDay);
+				chart.setLegendVisible(false);
+				// chart.setLegendSide(Side.LEFT);
+				// chart.lege
+				// chart.setCreateSymbols(false); // this part is the one that consumes more time
+				// chart.setPrefSize(prefWidth, prefHeight);
+				chart.setMinSize(prefWidth, prefHeight);
+				chart.setCache(true);
+				chart.setCacheHint(CacheHint.SPEED);
+				chart.setAnimated(false);
+				chart.setVerticalGridLinesVisible(true);
+
+				// chart.setStyle(value);
+				// chart.setStyle("-fx-background-color: slateblue; -fx-text-fill: white;");
+				// .chart-vertical-grid-lines {
+				// -fx-stroke: #3278fa;
+				// }
+
+				// chart.snapshot(callback, params, image);
+				// chart.setLegendVisible(false);
+
+				if (false) //
+				{
+					// Not able to implement/finish the following javafx task for high performance charts:
+					// JavaFX charts --> WritableImage --> Canvas
+
+					// Create an ImageView with the URL of the image source
+					// ImageView imageView = new ImageView(
+					// // "https://cdn.emojidex.com/emoji/px128/rhinoceros.png?1449235185");
+					// "OTE_WebsiteHeader.jpg");
+					// SnapshotParameters snapshotParameters = new SnapshotParameters();
+					// snapshotParameters.setTransform(new Scale(10, 10));
+
+					// take snap for performance
+					SnapshotParameters snP = new SnapshotParameters();
+					// Create a viewport located at (0, 0) and of isze 200
+					Rectangle2D viewport = new Rectangle2D(100, 100, 1000, 1000);
+					snP.setViewport(viewport);// Screen.getPrimary().getVisualBounds());
+					// WritableImage wi = new WritableImage((int) maxX, (int) maxY);
+					// wi = chart.snapshot(null, null);
+					//
+
+					final Canvas cv = new Canvas(maxX, maxY);
+					GraphicsContext gc = cv.getGraphicsContext2D();
+					// gc.setFill(Color.BLUE);
+					// gc.fillRect(75, 75, 100, 100);
+					gc.drawImage(chart.snapshot(snP, null), 0, 0);
+					// ImageView unscaled = new ImageView(chart.snapshot(snP, null));
+					vboxOfCharts.getChildren().add(cv);// cv);
+				}
+				else if (true)
+				{
+					ResizeableCanvasForLinePlot canvas = new ResizeableCanvasForLinePlot();
+					canvas.setData(listOfSeries_SThourOfDay);
+
+					final Canvas cv = new Canvas(maxX, maxY);
+					GraphicsContext gc = cv.getGraphicsContext2D();
+
+					// double width = getWidth();
+					// double height = getHeight();
+					//
+					// gc.clearRect(0, 0, width, height);
+					gc.strokeRoundRect(10, 10, 50, 50, 10, 10);
+					// gc.setFill(Color.BLUE);
+					// gc.fillRect(75, 75, 100, 100);
+
+					vboxOfCharts.getChildren().add(cv);// d(cv);
+				}
+				else
+				{
+					// HBox hboxOfSingleChart = new HBox();
+					// hboxOfSingleChart.getChildren().add(chart);
+					// hboxOfSingleChart.setAlignment(Pos.BASELINE_RIGHT);
+					vboxOfCharts.getChildren().add(chart);
+				}
+			}
+			catch (NumberFormatException n)
+			{
+				System.out.println(header.get(i) + " is not double");
+				// is String
+				// ObservableList<Series<Double, String>> listOfSeries_SThourOfDay = FXUtils
+				// .toObservableListOfSeriesOfPairDataString(
+				// getSequenceForChosenVariableString(allAOData, header, header.get(i)));
+				// LineChart chart = new LineChart(new NumberAxis(), new NumberAxis(), listOfSeries_SThourOfDay);
+				// vboxOfCharts.getChildren().add(chart);
+			}
+
+		}
+
+		// ObservableList<Series<Double, Double>> listOfSeries_SThourOfDay = FXUtils
+		// .toObservableListOfSeriesOfPairData(getSequenceForChosenVariable(allAOData, header, "SThourOfDay"));
+		// // System.out.println("listOfSeries.size() = " + listOfSeries.size());
+		//
+		// ObservableList<Series<Double, Double>> listOfSeries_durationInSeconds = FXUtils
+		// .toObservableListOfSeriesOfPairData(
+		// getSequenceForChosenVariable(allAOData, header, "durationInSeconds"));
+		// // System.out.println("listOfSeries.size() = " + listOfSeries.size());
+		//
+		// ObservableList<Series<Double, Double>> listOfSeries_distanceTravelledInKm = FXUtils
+		// .toObservableListOfSeriesOfPairData(
+		// getSequenceForChosenVariable(allAOData, header, "distanceTravelledInKm"));
+		//
+		// // vbox.setPadding(new Insets(10));
+		// // vbox.setSpacing(8);
+		//
+		// LineChart chart_SThourOfDay = new LineChart(new NumberAxis(), new NumberAxis(), listOfSeries_SThourOfDay);
+		// // HBox hbox_SThourOfDay = new HBox(chart_SThourOfDay);
+		// // hbox_SThourOfDay.getChildren().add();
+		//
+		// LineChart chart_durationInSeconds = new LineChart(new NumberAxis(), new NumberAxis(),
+		// listOfSeries_durationInSeconds);
+		// LineChart chart_distanceTravelledInKm = new LineChart(new NumberAxis(), new NumberAxis(),
+		// listOfSeries_distanceTravelledInKm);
+
+		// distanceTravelledInKm
+
+		// VBox vboxOfCharts = new VBox();
+		// vboxOfCharts.getChildren().add((chart_SThourOfDay));
+		// vboxOfCharts.getChildren().add((chart_durationInSeconds));
+		// vboxOfCharts.getChildren().add((chart_distanceTravelledInKm));
+		// vboxOfCharts.setAlignment(Pos.CENTER);
+
+		ScrollPane s1 = new ScrollPane();
+		// s1.setStyle("-fx-rotate:90");
+
+		if (false)
+		{
+			WritableImage vboxOfChartsImage = vboxOfCharts.snapshot(null, null);
+			final Canvas cv = new Canvas(1000, 1000);
+			GraphicsContext gc = cv.getGraphicsContext2D();
+			gc.setFill(Color.BLUE);
+			// gc.fillRect(75, 75, 100, 100);
+			gc.drawImage(vboxOfChartsImage, 0, 0);
+			s1.setContent(cv);
+		}
+		else
+		{
+			s1.setContent(vboxOfCharts);
+		}
+		s1.setFitToHeight(true);
+		s1.setFitToWidth(true);
+
+		return s1;
+	}
+
+	// /**
+	// * Converts charts to Java {@link WritableImage}s
+	// *
+	// * @param charts
+	// * the charts to be converted to {@link WritableImage}s
+	// * @return a {@link List} of {@link WritableImage}s
+	// */
+	// private List<WritableImage> chartsToImages(List<Chart> charts)
+	// {
+	// List<WritableImage> chartImages = new ArrayList<>();
+	//
+	// // Scaling the chart image gives it a higher resolution
+	// // which results in a better image quality when the
+	// // image is exported to the pdf
+	// SnapshotParameters snapshotParameters = new SnapshotParameters();
+	// snapshotParameters.setTransform(new Scale(2, 2));
+	//
+	// for (Chart chart : charts)
+	// {
+	// chartImages.add(chart.snapshot(snapshotParameters, null));
+	// }
+	//
+	// return chartImages;
+	// }
 }

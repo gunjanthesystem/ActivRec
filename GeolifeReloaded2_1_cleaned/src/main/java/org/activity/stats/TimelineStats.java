@@ -471,14 +471,15 @@ public class TimelineStats
 		// String[] inputFileNamePhrases =
 		// {"activityNameSequenceIntInvalidsExpungedDummyTime","startTimeSequenceIntInvalidsExpungedDummyTime","durationSequenceIntInvalidsExpungedDummyTime","startGeoCoordinatesSequenceIntInvalidsExpungedDummyTime","endGeoCoordinatesSequenceIntInvalidsExpungedDummyTime","distanceTravelledSequenceIntInvalidsExpungedDummyTime","avgAltitudeSequenceIntInvalidsExpungedDummyTime"};
 		String[] featureNames = Constant.getFeatureNames();
-		System.out.println("featureNames = " + Arrays.asList(featureNames).toString());
+		System.out.println(
+				"Inside performSampleEntropyVsMAnalysis2:\nfeatureNames = " + Arrays.asList(featureNames).toString());
 
 		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> userLevelSampEn = new LinkedHashMap<>();
 
 		for (Map.Entry<String, LinkedHashMap<Date, Timeline>> entry : usersDayTimelines.entrySet())
 		{
 			String userIDN = entry.getKey(); // user id here is the user id formatted to be from 1 to Num of users
-
+			System.out.println("userIDN = " + userIDN);
 			LinkedHashMap<Integer, LinkedHashMap<String, Double>> mLevelSampEn = new LinkedHashMap<>();
 
 			for (int m = mMin; m <= mMax; m += mStep)
@@ -489,19 +490,25 @@ public class TimelineStats
 				{
 					String absfileNameToRead = path + userIDN + featureName
 							+ "SequenceIntInvalidsExpungedDummyTime.csv";
-
-					double r;
-
+					double valsTS[] = UtilityBelt.getTimeSeriesVals(absfileNameToRead);
+					Double r = null, sampleEntropy = null;
 					// ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF, DurationF,
 					// DistTravelledF, StartGeoF, EndGeoF, AvgAltitudeF;// ,
 					if (featureName.equalsIgnoreCase("ActivityName") || featureName.equalsIgnoreCase("ActNameF")
 							|| featureName.equalsIgnoreCase("LocationF"))
+					{
 						r = 0d;
+						sampleEntropy = SampleEntropyG.getSampleEntropyGReplaceInfinityNaN(valsTS, m,
+								r * StatsUtils.getSD(valsTS), 10, 10);
+					}
 					else
+					{
 						r = rOriginal;
-
-					double valsTS[] = UtilityBelt.getTimeSeriesVals(absfileNameToRead);
-					double sampleEntropy = SampleEntropyG.getSampleEntropyG(valsTS, m, r * StatsUtils.getSD(valsTS));
+						// sampleEntropy = SampleEntropyG.getSampleEntropyG(valsTS, m, r * StatsUtils.getSD(valsTS));
+						sampleEntropy = SampleEntropyG.getSampleEntropyGReplaceInfinityNaN(valsTS, m,
+								r * StatsUtils.getSD(valsTS), 10, 10);
+						// getSampleEntropyGReplaceInfinityNaN
+					}
 
 					if (Double.isInfinite(sampleEntropy) || Double.isNaN(sampleEntropy))
 					{
@@ -857,6 +864,9 @@ public class TimelineStats
 	public static void transformAndWriteAsTimeseriesGowalla(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelines)
 	{
+		// $$EnumMap<GowGeoFeature, LinkedHashMap<String, LinkedHashMap<Timestamp, Number>>>
+		// timeseriesForFeatsWithDummyTime = new EnumMap<>(
+		// $$ GowGeoFeature.class);
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines); relocated to when calling this method
 		// LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject>> timeSeries =
 		// transformToEqualIntervalTimeSeriesDayWise(usersDayTimelines, intervalInSecs);
@@ -869,6 +879,7 @@ public class TimelineStats
 		// usersDayTimelines = UtilityBelt.reformatUserIDs(usersDayTimelines);
 		LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> sequenceAll = TimelineTransformers
 				.transformToSequenceDayWise(usersDayTimelines);// , false);
+
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> sequenceInt = TimelineTransformers
 				.toIntsFromActivityObjects(sequenceAll, false);
 
@@ -884,6 +895,11 @@ public class TimelineStats
 
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> ActNameFSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
 				.toIntsFromActivityObjectsDummyTime(sequenceAll, true);
+		// $$ timeseriesForFeatsWithDummyTime.put(GowallaFeature.ActNameF,ActNameFSequenceIntInvalidsExpungedDummyTime);
+
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> ActNameLevel1FSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
+				.toIntsFromActivityObjectsDummyTimeGivenLevel(sequenceAll, true, 1);
+		// org.activity.stats.TimelineStats.getMagnifiedIntCodeForActivityObject(ActivityObject2018, int)
 
 		LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> StartTimeFSequenceIntInvalidsExpungedDummyTime = TimelineTransformers
 				.toStartTimeFromActivityObjectsDummyTime2(sequenceAll, true);
@@ -928,6 +944,9 @@ public class TimelineStats
 
 		WToFile.writeAllTimeSeriesInt(ActNameFSequenceIntInvalidsExpungedDummyTime,
 				"ActNameFSequenceIntInvalidsExpungedDummyTime");
+
+		WToFile.writeAllTimeSeriesInt(ActNameLevel1FSequenceIntInvalidsExpungedDummyTime,
+				"ActNameLevel1FSequenceIntInvalidsExpungedDummyTime");
 
 		WToFile.writeAllTimeSeriesLong(StartTimeFSequenceIntInvalidsExpungedDummyTime,
 				"StartTimeFSequenceIntInvalidsExpungedDummyTime");
@@ -1685,10 +1704,23 @@ public class TimelineStats
 	 * @param ao
 	 * @return
 	 */
-	public static int getMagnifiedIntCodeForActivityObject(ActivityObject2018 ao)
+	public static int getMagnifiedIntActIDForActivityObject(ActivityObject2018 ao)
 	{
 		int r = (ConnectDatabase.getActivityID(ao.getActivityName()) + 0) * 100;
 		return r;
+	}
+
+	/**
+	 * 
+	 * @param ao
+	 * @return
+	 * @since 28 Feb 2019
+	 */
+	public static int getMagnifiedIntCodeForActivityObject(ActivityObject2018 ao, int levelForActID)
+	{
+		int givenLevelActID = DomainConstants.getGivenLevelCatID(ao.getActivityID(), levelForActID).get(0);
+		// if multiple actIDs for given level, choose first one
+		return (givenLevelActID + 0) * 100;
 	}
 
 	/**

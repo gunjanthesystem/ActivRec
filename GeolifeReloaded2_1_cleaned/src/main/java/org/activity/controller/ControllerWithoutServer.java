@@ -78,8 +78,9 @@ public class ControllerWithoutServer
 	 */
 	public ControllerWithoutServer(String databaseName, String commonBasePath, boolean noRecommendations)
 	{
-		boolean runRecommendationExperiments = false;
-		boolean runWekaClusteringExperiments = true;
+		// PopUps.showMessage("Inside ControllerWithoutServer");
+		boolean runRecommendationExperiments = true;
+		boolean runWekaClusteringExperiments = false;
 		boolean runTimelineStats = false;
 
 		System.out.println("Starting ControllerWithoutServer>>>>\n" + PerformanceAnalytics.getHeapInformation() + "\n"
@@ -314,14 +315,18 @@ public class ControllerWithoutServer
 			/** CURRENT **/
 			if (runWekaClusteringExperiments)
 			{
-				if (Constant.useRandomlySampled100Users)
+				if (Constant.useRandomlySampled100Users && databaseName.equals("gowalla1"))
 				{
 					LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelinesOnlySampledUsers = subsetTimelinesToSampledUsers(
 							usersCleanedDayTimelines);
 					usersCleanedDayTimelines = usersCleanedDayTimelinesOnlySampledUsers;
 				}
+
+				String commonPathForClassification = "./dataWritten/geolife1_MAR1H1M51ED1.0AllActsFDStFilter0hrsRTVPNN100NoTTFilterNC/";
+				// "./dataWritten/gowalla1_FEB28H13M42ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC/";
 				TimelineWEKAClusteringController2019 clustering = new TimelineWEKAClusteringController2019(
-						usersCleanedDayTimelines, null);
+						subsetTimelineToOnlyTrainingDays(usersCleanedDayTimelines), null, commonPathForClassification);
+				System.exit(0);
 			}
 			// $$TimelineWEKAClusteringController clustering = new
 			// TimelineWEKAClusteringController(usersCleanedDayTimelines,
@@ -350,6 +355,35 @@ public class ControllerWithoutServer
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * Subset timelines to only training days
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @return
+	 * @since 28 Feb 2019
+	 */
+	private LinkedHashMap<String, LinkedHashMap<Date, Timeline>> subsetTimelineToOnlyTrainingDays(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll)
+	{
+		// training test DAY timelines for all users
+		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
+
+		// added on 27 Dec 2018, needed for baseline coll high occur and high dur
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelinesAllUsersDWFiltrd = null;
+
+		// Split timelines into training-test for each user to be used collaboratively
+		trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(usersDayTimelinesAll,
+				Constant.percentageInTraining, Constant.cleanTimelinesAgainInsideTrainTestSplit);
+
+		// PopUps.showMessage("allUsersTimelines.size() = "+allUsersTimelines.size());
+
+		trainTimelinesAllUsersDWFiltrd = RecommendationTestsUtils.getTrainingTimelinesWithFilterByRecentDaysV3(
+				trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines(),
+				Constant.filterTrainingTimelinesByRecentDays);
+
+		return trainTimelinesAllUsersDWFiltrd;
 	}
 
 	/**

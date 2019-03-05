@@ -89,10 +89,10 @@ public class PathConstants
 	// end of added on 28 Dec 2018
 
 	///
-	public static final String pathToSerialisedDCUCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline17Feb2019/dcu_data_2_written/";// usersCleanedDayTimelines.kryo";
+	public static final String pathToSerialisedDCUCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline20Feb2019/dcu_data_2_written/";// usersCleanedDayTimelines.kryo";
 	/// home/gunjan/git/GeolifeReloaded2_1_cleaned/dataToRead/SerializedTimeline17Feb2019/gowalla1_written/usersCleanedDayTimelines.kryo
-	public static final String pathToSerialisedGeolifeCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline17Feb2019/geolife1_written/";// usersCleanedDayTimelines.kryo";
-	public static final String pathToSerialisedGowallaCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline17Feb2019/gowalla1_written/";// usersCleanedDayTimelines.kryo";
+	public static final String pathToSerialisedGeolifeCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline20Feb2019/geolife1_written/";// usersCleanedDayTimelines.kryo";
+	public static final String pathToSerialisedGowallaCleanedTimelines12Feb2019 = "./dataToRead/SerializedTimeline20Feb2019/gowalla1_written/";// usersCleanedDayTimelines.kryo";
 	///
 
 	/**
@@ -115,6 +115,27 @@ public class PathConstants
 		case "gowalla1":
 			return (LinkedHashMap<String, LinkedHashMap<Date, Timeline>>) Serializer.kryoDeSerializeThis(
 					pathToSerializedGowallaCleanedTimelines28Dec + "usersCleanedDayTimelines.kryo");
+		default:
+			PopUps.printTracedErrorMsgWithExit("Error: unknown databaseName: " + databaseName);
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * @param databaseName
+	 * @return
+	 */
+	public static String getPathToCleanedTimelinesFeb2019(String databaseName)
+	{
+		switch (databaseName)
+		{
+		case "dcu_data_2":
+			return pathToSerialisedDCUCleanedTimelines12Feb2019;
+		case "geolife1":
+			return pathToSerialisedGeolifeCleanedTimelines12Feb2019;
+		case "gowalla1":
+			return pathToSerialisedGowallaCleanedTimelines12Feb2019;
 		default:
 			PopUps.printTracedErrorMsgWithExit("Error: unknown databaseName: " + databaseName);
 			return null;

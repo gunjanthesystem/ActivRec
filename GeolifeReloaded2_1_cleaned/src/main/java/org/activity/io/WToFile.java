@@ -930,6 +930,7 @@ public class WToFile
 
 		catch (Exception e)
 		{
+			PopUps.printTracedErrorMsg("Error generated for appendLineToFile() for fileNameToUse = " + fileNameToUse);
 			e.printStackTrace();
 		}
 	}

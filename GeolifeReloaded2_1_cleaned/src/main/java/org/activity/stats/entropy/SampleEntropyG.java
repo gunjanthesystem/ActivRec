@@ -12,6 +12,34 @@ public class SampleEntropyG
 	int m;
 
 	/**
+	 * 
+	 * @param input
+	 * @param m
+	 * @param tolerance
+	 * @param infinityReplacement
+	 *            if sample entropy is infinity, replace with this value.
+	 * @param naNReplacement
+	 * @return
+	 */
+	public static double getSampleEntropyGReplaceInfinityNaN(double[] input, int m, double tolerance,
+			double infinityReplacement, double naNReplacement)
+	{
+		Double res = getSampleEntropyG(input, m, tolerance);
+		if (res.isInfinite())
+		{
+			return (infinityReplacement);
+		}
+		else if (res.isNaN())
+		{
+			return (naNReplacement);
+		}
+		else
+		{
+			return res;
+		}
+	}
+
+	/**
 	 * Correct Based on Costa's definition which is equivalent to Richman's definition
 	 * 
 	 * @param input
@@ -20,13 +48,14 @@ public class SampleEntropyG
 	 * @param tolerance
 	 * @return Sample Entropy
 	 */
-	public static double getSampleEntropyG(double[] input, int m, double tolerance)
+	public static Double getSampleEntropyG(double[] input, int m, double tolerance)
 	{
 		// System.out.println("Inside getSampleEntropy ");
-		double sampEn = -9999, A = 0, B = 0;
+		Double sampEn = null;/*-9999,*/
+		double numOfCloseMPlusOneLenVectors = 0, numOfCloseMLenVectors = 0;
 		int N = input.length;
 
-		// System.out.println(" N = " + N);
+		// System.out.println("\n N = " + N);
 		// System.out.println(" m = " + m);
 		// System.out.println(" N-m+1 =" + (N - m + 1));
 
@@ -38,12 +67,15 @@ public class SampleEntropyG
 
 		for (int i = 0; i < N - m; i++)
 		{
-			B += getNumOfCloseVectors(i, mLengthVectors, N - m, tolerance);
-			A += getNumOfCloseVectors(i, mPlusOneLengthVectors, N - m, tolerance);
+			numOfCloseMLenVectors += getNumOfCloseVectors(i, mLengthVectors, N - m, tolerance);// B
+			numOfCloseMPlusOneLenVectors += getNumOfCloseVectors(i, mPlusOneLengthVectors, N - m, tolerance);// A
 		}
 
-		// System.out.println("\n\t\t A = " + A + " B = " + B + " A/B = " + A / B);
-		sampEn = -Math.log(A / B);
+		// System.out.println(
+		// "\n\t\t numOfCloseMPlusOneLenVectors = " + numOfCloseMPlusOneLenVectors + " numOfCloseMLenVectors = "
+		// + numOfCloseMLenVectors + " numOfCloseMPlusOneLenVectors/numOfCloseMLenVectors = "
+		// + numOfCloseMPlusOneLenVectors / numOfCloseMLenVectors);
+		sampEn = -Math.log(numOfCloseMPlusOneLenVectors / numOfCloseMLenVectors);// A/B
 
 		// System.out.println("Sample entropy Gunjan = " + sampEn);
 
@@ -85,13 +117,16 @@ public class SampleEntropyG
 	public static int getNumOfCloseVectors(int indexOfReferenceVector, double[][] segmentVectors, int NMinusM,
 			double tolerance)
 	{
+		StringBuilder sbLog = new StringBuilder("Inside getNumOfCloseVectors");
 		int numOfCloseVectors = 0;
 		// System.out.println("Inside getNumOfCloseVectors: segmentVectors.length =" + segmentVectors.length);
 		int countSelfRef = -1;
 		for (int i = 0; i < NMinusM; i++)
 		{
+			sbLog.append("\ni = " + i);
 			if (i == indexOfReferenceVector)
 			{
+				sbLog.append("\nskipping self reference");
 				countSelfRef += 1;
 				continue; // no self matches
 			}
@@ -100,6 +135,7 @@ public class SampleEntropyG
 				if (isClose(segmentVectors[indexOfReferenceVector], segmentVectors[i], tolerance))
 				{
 					numOfCloseVectors += 1;
+					sbLog.append("\nIs close");
 				}
 			}
 		}
@@ -108,6 +144,14 @@ public class SampleEntropyG
 			System.err.print("Error in getNumOfCloseVectors: more than one self reference");
 		}
 		// System.out.println("Exiting getNumOfCloseVectors");
+
+		sbLog.append(
+				"\nindexOfReferenceVector = " + indexOfReferenceVector + " numOfCloseVectors = " + numOfCloseVectors);
+
+		if (false)
+		{
+			System.out.println(sbLog.toString() + "\n\n");
+		}
 		return numOfCloseVectors;
 	}
 
@@ -159,14 +203,14 @@ public class SampleEntropyG
 	 */
 	public static void printSegmentVectors(double[][] segmentVectors)
 	{
-		System.out.println("Printing " + segmentVectors[0].length + " length vectors:");
+		System.out.println("\nPrinting " + segmentVectors[0].length + " length vectors:");
 
 		int nRows = segmentVectors.length;
 		int nCols = segmentVectors[0].length;
 
 		for (int i = 0; i < nRows; i++)
 		{
-			System.out.print((i + 1) + ") -->  ");
+			System.out.print((i /* + 1 */) + ") -->  ");
 			for (int j = 0; j < nCols; j++)
 			{
 				System.out.print(segmentVectors[i][j] + " ,");

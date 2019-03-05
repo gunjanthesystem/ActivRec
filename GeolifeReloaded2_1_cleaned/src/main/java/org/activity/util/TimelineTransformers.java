@@ -86,7 +86,7 @@ public class TimelineTransformers
 				}
 				else
 				{
-					value = TimelineStats.getMagnifiedIntCodeForActivityObject(dataEntry.getValue());
+					value = TimelineStats.getMagnifiedIntActIDForActivityObject(dataEntry.getValue());
 				}
 				dataToPut.put(dataEntry.getKey(), value);
 			}
@@ -119,7 +119,7 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = TimelineStats.getMagnifiedIntCodeForActivityObject(dataEntry.getValue());
+					value = TimelineStats.getMagnifiedIntActIDForActivityObject(dataEntry.getValue());
 					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
 					// value, "ActivityCodeForSeries");
 					dataToPut.put(dataEntry.getKey(), value);
@@ -155,7 +155,45 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = TimelineStats.getMagnifiedIntCodeForActivityObject(dataEntry.getValue());
+					value = TimelineStats.getMagnifiedIntActIDForActivityObject(dataEntry.getValue());
+					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
+					// value, "ActivityCodeForSeries");
+					dataToPut.put(time, value);
+					time = new Timestamp(time.getTime() + 1000 * 60 * 60);
+				}
+
+			}
+			// r.put(String.valueOf(Constant.getIndexOfUserID(Integer.valueOf(entry.getKey()))) + 1, dataToPut);
+			r.put(entry.getKey(), dataToPut);
+		}
+		return r;
+	}
+
+	/**
+	 * Putting at equally spaced time intervals
+	 * 
+	 * @param ts
+	 * @param validsOnly
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> toIntsFromActivityObjectsDummyTimeGivenLevel(
+			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly, int givenLevel)
+	{
+		LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>> r = new LinkedHashMap<String, LinkedHashMap<Timestamp, Integer>>();
+		Timestamp time = new Timestamp(9, 1, 1, 1, 1, 1, 0);
+
+		for (Map.Entry<String, LinkedHashMap<Timestamp, ActivityObject2018>> entry : ts.entrySet())
+		{
+			LinkedHashMap<Timestamp, Integer> dataToPut = new LinkedHashMap<Timestamp, Integer>();
+
+			for (Map.Entry<Timestamp, ActivityObject2018> dataEntry : entry.getValue().entrySet())
+			{
+				int value = -99;
+				ActivityObject2018 ao = dataEntry.getValue();
+
+				if (!validsOnly || (ao.isInvalidActivityName() == false))
+				{
+					value = TimelineStats.getMagnifiedIntCodeForActivityObject(dataEntry.getValue(), givenLevel);
 					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
 					// value, "ActivityCodeForSeries");
 					dataToPut.put(time, value);

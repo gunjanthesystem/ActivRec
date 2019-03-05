@@ -203,7 +203,8 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadGeolifeImproveEDFeb14.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadTestGeoMar1.csv";
+		// + "ResultsToReadGeolifeImproveEDFeb14.csv";
 		// + "ResultsToReadJan15Gowalla1_2.csv";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadDCUInevstigating7Feb.csv";
 		// + "ResultsToReadJan15GeolifeSubset3_4.csv";
@@ -223,10 +224,28 @@ public class ResultsDistributionEvaluation
 		// ResultsToReadDec8Truncated.csv";
 		// "ResultsToReadNov28_OnlyED1.csv";// 25_3.csv";
 		// dcu_data_2_JAN15H10M31ED1.0AllActsFDStFilter0hrsRTVPNN50NoTTFilterNC_AllReciprocalRank_MinMUWithMaxFirst0Aware.csv
-		getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware", 2);
-		getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
-		getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
-		//
+		if (true)
+		{
+			//
+
+			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 1);
+			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
+			getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware", 2);
+			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
+
+			getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 2);
+			getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
+			getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 6);
+			// getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
+
+		}
+
+		if (false)
+		{
+			getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware", 2);
+			getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
+			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
+		} //
 
 		// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
 		if (false)

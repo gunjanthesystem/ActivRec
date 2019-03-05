@@ -104,7 +104,20 @@
      -fx-stroke-width: 7;
 } */
 
+.axis-tick-mark {
+    -fx-stroke: #333333;
+    -fx-stroke-width: 5; 
+}
+.axis-minor-tick-mark {
+    -fx-stroke: #737373;
+}
 
+.chart-vertical-grid-lines {
+    -fx-stroke: #737373;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: #737373;
+}
 
 
 

@@ -2259,6 +2259,7 @@ final public class ConnectDatabase
 			return Integer.valueOf(activityName);// because in gowalla dataset, we consider activity id as activity name
 													// as of 19 Sep 2016
 		}
+
 		if (activityNameIDMap.size() == 0)
 		{
 			new Exception("activityNameIDMap.size()==0");
