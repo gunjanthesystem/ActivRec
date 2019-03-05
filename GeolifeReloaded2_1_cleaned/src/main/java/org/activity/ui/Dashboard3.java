@@ -14,9 +14,11 @@ import org.activity.constants.Constant;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.PathConstants;
 import org.activity.controller.ControllerWithoutServer;
+import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
 import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartAppCanvas;
 import org.activity.plotting.TimelineChartAppGeneric;
@@ -458,9 +460,12 @@ public class Dashboard3 extends Application
 				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
 				// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
 				int latColIndex2 = 9, lonColIndex2 = 10, labelColIndex2 = 12;
-				BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(absFileNameForLatLon5MostRecenTrainTestJul10,
-						",", latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.75), false, false,
-						"\t\tShowing UniqueLocationObjects5DaysTrainTest");
+
+				List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
+						absFileNameForLatLon5MostRecenTrainTestJul10, ",", latColIndex2, lonColIndex2, labelColIndex2);
+
+				BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(listOfLocs, 5, Color.rgb(0, 105, 106, 0.75),
+						false, false, "\t\tShowing UniqueLocationObjects5DaysTrainTest");
 
 				// Color.rgb(193, 49, 34, 0.3));
 				// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,

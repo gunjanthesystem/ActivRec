@@ -458,7 +458,7 @@ public class SuperController
 					+ getLabelForExperimentConfig(sampledUserIndicesSetFile) + iterationLabel + extraLabel + "/";
 			WToFile.createDirectoryIfNotExists(commonPath);
 
-			if (true)// TEMP 15 Jan 2019 TODO
+			if (false)// TEMP 15 Jan 2019 TODO
 			{
 				// commonPath = //
 				// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/dcu_data_2_JAN11H14M48ED1.0AllActsFDStFilter0hrsRTVNoTTFilterNC/";
@@ -1499,7 +1499,7 @@ public class SuperController
 				////////////////////////////////////////////////////////////////////////////////////////////////////
 				// Read optimal MUs as per highest Mean RR (per user)
 				List<Double> MRRValsForBestMU = ReadingFromFile.oneColumnReaderDouble(fileForChosenMU, ",", 2, true);
-				MRRValsForBestMU.remove(0);// remove header
+				// MRRValsForBestMU.remove(0);// remove header
 				// commonPathToUse + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv",
 
 				DescriptiveStatistics mrrStatsOverUsersBestnMUs = StatsUtils.getDescriptiveStatistics(MRRValsForBestMU);

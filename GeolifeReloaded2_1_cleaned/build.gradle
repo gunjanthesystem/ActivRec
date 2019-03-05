@@ -120,8 +120,12 @@ dependencies
     compile "org.moeaframework:moeaframework:2.12"
     compile "com.jcraft:jsch:0.1.54"
 	// compile "tech.tablesaw:tablesaw-core:0.25.2"
-    compile group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.25.2'
-    compile group: 'xerces', name: 'xercesImpl', version: '2.11.0'
+    compile group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.30.4'
+	compile group: 'tech.tablesaw', name: 'tablesaw-jsplot', version: '0.30.4'
+	compile group: 'org.knowm.xchart', name: 'xchart', version: '3.5.4'
+    compile group: 'org.jfree', name: 'jfreechart', version: '1.5.0'
+
+	compile group: 'xerces', name: 'xercesImpl', version: '2.11.0'
 
     //compile group: 'com.lynden', name: 'GMapsFX', version: '2.12.0'
     //compile 'com.github.Username:Reponame:Tag

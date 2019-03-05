@@ -79,12 +79,12 @@ public class LineChartApp2 extends Application
 	{
 		ObservableList<Series<Double, Double>> listOfSeries = FXUtils
 				.toObservableListOfSeriesOfPairData(FXUtils.getSyntheticData(3, 10));
-
 		NumberAxis xAxis = new NumberAxis();// "Values for X-Axis", 0, 3, 1);
 		NumberAxis yAxis = new NumberAxis();// "Values for Y-Axis", 0, 3, 1);
 
-		primaryStage.setScene(new Scene(new LineChart(xAxis, yAxis, listOfSeries)));
-		// primaryStage.setScene(new Scene(createLineChart()));
+		// primaryStage.setScene(new Scene(new LineChart(xAxis, yAxis, listOfSeries)));
+
+		primaryStage.setScene(new Scene(createLineChart()));
 		primaryStage.show();
 	}
 

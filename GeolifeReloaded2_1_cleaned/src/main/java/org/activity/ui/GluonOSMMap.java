@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -84,8 +85,11 @@ public class GluonOSMMap extends Application
 		String delimiter = ",";
 		int latColIndex = 3, lonColIndex = 2, labelColIndex = 1;
 
-		BorderPane bp = getMapPaneForListOfLocations(absFileNameForLatLonToReadAsMarker, delimiter, latColIndex,
-				lonColIndex, labelColIndex, 3, Color.rgb(193, 49, 34, 0.65), false, false, "Info label test");
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
+				absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex, labelColIndex);
+
+		BorderPane bp = getMapPaneForListOfLocations(listOfLocs, 3, Color.rgb(193, 49, 34, 0.65), false, false,
+				"Info label test");
 
 		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
 		Scene scene = new Scene(bp, bounds.getWidth(), bounds.getHeight());
@@ -97,23 +101,22 @@ public class GluonOSMMap extends Application
 
 	/**
 	 * 
-	 * @param absFileNameForLatLonToReadAsMarker
-	 * @param delimiter
-	 * @param latColIndex
-	 * @param lonColIndex
-	 * @param labelColIndex
+	 * @param listOfLocs
 	 * @param sizeOfIcon
 	 * @param colorOfIcon
 	 * @param colorByLabel
 	 * @param clearMapCache
+	 * @param infoLabelText
 	 * @return
 	 */
-	public BorderPane getMapPaneForListOfLocations(String absFileNameForLatLonToReadAsMarker, String delimiter,
-			int latColIndex, int lonColIndex, int labelColIndex, int sizeOfIcon, Color colorOfIcon,
-			boolean colorByLabel, boolean clearMapCache, String infoLabelText)
+	public BorderPane getMapPaneForListOfLocations(List<Triple<Double, Double, String>> listOfLocs, int sizeOfIcon,
+			Color colorOfIcon, boolean colorByLabel, boolean clearMapCache, String infoLabelText)
 	// String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
 	// int lonColIndex, int labelColIndex, boolean useCustomMarker) throws Exception
 	{
+		// List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
+		// absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex, labelColIndex);
+
 		MapView view = new MapView();
 
 		if (clearMapCache)
@@ -122,9 +125,6 @@ public class GluonOSMMap extends Application
 		}
 		view.setCenter(42.472309, 6.897996);
 		view.setZoom(4);
-
-		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
-				absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex, labelColIndex);
 
 		System.out.println("listOfLocs.size() = " + listOfLocs.size());
 		// view.addLayer(positionLayerV2(listOfLocs, sizeOfIcon, colorOfIcon));
@@ -449,9 +449,10 @@ public class GluonOSMMap extends Application
 
 		//////////////////
 		int numOfBins = 100;
-		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
+		Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Double> binningRes = StatsUtils
 				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
-		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst();
+		// Pair<List<Pair<Double, Integer>>, Double>
+		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst().getFirst();
 		Color[] colors = ColorPalette
 				.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
 		System.out.println("color.length=" + colors.length);
@@ -509,9 +510,10 @@ public class GluonOSMMap extends Application
 
 		//////////////////
 		int numOfBins = 100;
-		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
+
+		Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Double> binningRes = StatsUtils
 				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
-		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst();
+		List<Pair<Double, Integer>> valBinIndexList = binningRes.getFirst().getFirst();
 		Color[] colors = ColorPalette
 				.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));
 		System.out.println("color.length=" + colors.length);
@@ -594,9 +596,9 @@ public class GluonOSMMap extends Application
 		// ColorBrewer.
 
 		int numOfBins = 10;
-		Pair<List<Pair<Double, Integer>>, Double> binningRes = StatsUtils
+		Pair<Triple<List<Pair<Double, Integer>>, Map<Integer, Pair<Double, Double>>, Map<Integer, List<Double>>>, Double> binningRes = StatsUtils
 				.binValuesByNumOfBins(listOfValsForScaledColourFill, numOfBins, true);
-		List<Pair<Double, Integer>> valBinIndexMap = binningRes.getFirst();
+		List<Pair<Double, Integer>> valBinIndexMap = binningRes.getFirst().getFirst();
 
 		Color[] colors = ColorPalette
 				.awtColorToJavaFXColor(ColorMap.getInstance(ColorMap.VIRIDIS).getColorPalette(numOfBins));

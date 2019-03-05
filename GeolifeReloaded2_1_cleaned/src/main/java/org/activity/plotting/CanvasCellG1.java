@@ -1,7 +1,5 @@
 package org.activity.plotting;
 
-import java.util.Collections;
-
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -44,9 +42,11 @@ public class CanvasCellG1 extends ListCell<TimelineEntry>
 	{
 		if (empty || entry == null)
 		{
-			userLabel.setText("");
-			canvas.setData(Collections.emptyList());
-			canvas.draw();
+			// userLabel.setText("");
+			// canvas.setData(Collections.emptyList());
+			// canvas.draw();
+			// setText(null);
+			// setGraphic(null);
 		}
 		else
 		{

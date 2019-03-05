@@ -179,11 +179,12 @@ public class TimelineWEKAClusteringController2019
 	 */
 	public TimelineWEKAClusteringController2019(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersDayTimelinesAll,
-			Pair<ArrayList<String>, ArrayList<String>> trainingTestUsers)
+			Pair<ArrayList<String>, ArrayList<String>> trainingTestUsers, String commonPath)
 	{
+		PopUps.showMessage("Inside TimelineWEKAClusteringController2019\ncommonPathToRead = " + commonPath);
 		String nameOfFeatureFile = "";
 		String typeOfDataMining = "Classification";// "KMeans";// EMClustering KMeans
-
+		String databaseName = Constant.getDatabaseName();
 		//////////////////////////////
 		int[] userIDs = Constant.getUserIDs();
 
@@ -206,20 +207,54 @@ public class TimelineWEKAClusteringController2019
 
 		try
 		{
+
 			////////// Start of added 22 Feb 2019///////////////////////////////////////////////////////////
-			String commonPath = "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb21GowallaNoHaversine/"
-					+ "gowalla1_FEB21H3M25ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NCcoll/";
-			String fileToRead = commonPath
-					+ "gowalla1_FEB21H3M25ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NCcoll_"
-					+ "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+			// String commonPath = // "/mnt/sshServers/theengine/"
+			// "/home/gunjan/"
+			// +
+			// "GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb21GowallaNoHaversine/"
+			// +
+			// "gowalla1_FEB21H3M25ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NCcoll/";
+			// $$"./dataWritten/gowalla1_FEB28H13M42ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC/";
+			// String fileToRead = commonPath
+			// +
+			// "gowalla1_FEB21H3M25ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NCcoll_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+			// +
+			// "gowalla1_FEB28H13M42ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+			// +
+			// "gowalla1_FEB28H13M42ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+			String[] splittedCommonPath = commonPath.split("/");
+			String fileToRead = commonPath + splittedCommonPath[splittedCommonPath.length - 1]
+					+ "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+			/////
+
 			int colIndexUser = 0, colIndexMinMUWithMaxMRR = 1;
-			String groundTruthLabel = "GowallaFeb21Clustering";
+			String groundTruthLabel = databaseName + "Feb21Clustering";
+
+			Map<String, Pair<Integer, Integer>> clusteringRanges = null;
 
 			// create the clustering ranges
 			Map<String, Pair<Integer, Integer>> gowallaClusteringRanges = new LinkedHashMap<>(3);
 			gowallaClusteringRanges.put("FirstCluster__", new Pair<>(0, 0));
 			gowallaClusteringRanges.put("SecondCluster__", new Pair<>(1, 4));
 			gowallaClusteringRanges.put("ThirdCluster__", new Pair<>(5, 100));
+
+			Map<String, Pair<Integer, Integer>> geolifeClusteringRanges = new LinkedHashMap<>(3);
+			geolifeClusteringRanges.put("FirstCluster__", new Pair<>(0, 1));
+			geolifeClusteringRanges.put("SecondCluster__", new Pair<>(2, 4));
+			geolifeClusteringRanges.put("ThirdCluster__", new Pair<>(5, 100));
+
+			switch (databaseName)
+			{
+			case "gowalla1":
+				clusteringRanges = gowallaClusteringRanges;
+				break;
+			case "geolife1":
+				clusteringRanges = geolifeClusteringRanges;
+				break;
+			default:
+				PopUps.printTracedErrorMsgWithExit("Unknown database name");
+			}
 
 			LinkedHashMap<String, String> userIDIndex_ClusterLabel = createGroundTruthForData(fileToRead, colIndexUser,
 					colIndexMinMUWithMaxMRR, gowallaClusteringRanges);
@@ -243,7 +278,7 @@ public class TimelineWEKAClusteringController2019
 					// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Nov30_2/WekaCLustering/"
 					// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/"//
 					// TimelinesClustering/"
-					+ Constant.getDatabaseName() + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
+					+ databaseName + "_" + LocalDateTime.now().getMonth().toString().substring(0, 3)
 					+ LocalDateTime.now().getDayOfMonth() + "_" + Constant.geolife1howManyUsers + "_"
 					+ groundTruthLabel;
 			new File(directoryToWrite).mkdir();
@@ -269,11 +304,12 @@ public class TimelineWEKAClusteringController2019
 			nameOfFeatureFile = attributeExtraction.getAttributeFilenameAbs();
 
 			DataLoader dl = new DataLoader(nameOfFeatureFile,
-					nameOfFeatureFile.substring(0, nameOfFeatureFile.length() - 4) + ".arff");
+					nameOfFeatureFile.substring(0, nameOfFeatureFile.length() - 4) + ".arff", "\t");
+
 			String outputArffFile = dl.getArffFileName();
 			System.out.println("Output arff file is:" + outputArffFile);
 
-			// $$ performClassification(outputArffFile, trainingTestUsers, "SetOf25", gtEntry);
+			// $ performClassification(outputArffFile, trainingTestUsers, "SetOf25", gtEntry);
 
 			// switch (typeOfClustering)
 			// {

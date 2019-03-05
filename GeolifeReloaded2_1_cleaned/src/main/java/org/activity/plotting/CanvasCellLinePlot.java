@@ -6,27 +6,33 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.BorderPane;
 
-public class CanvasCellG2 extends ListCell<TimelineEntry>
+/**
+ * MIGHT NOT BE COMPLETED
+ * 
+ * @author gunjan
+ *
+ */
+public class CanvasCellLinePlot extends ListCell<LinePlotEntry>
 {
+	// ObservableList<Series<Double, Double>> data
+	private Label titleLabel;
+	private ResizeableCanvasForLinePlot canvas;
 
-	private Label userLabel;
-	private ResizableCanvasG1 canvas;
-
-	public CanvasCellG2()
+	public CanvasCellLinePlot()
 	{
 		/*
 		 * Important, otherwise we will keep seeing a horizontal scrollbar.
 		 */
 		setStyle("-fx-padding: 10px;");
 
-		userLabel = new Label();
-		userLabel.setStyle("-fx-padding: 10px; -fx-font-size: 1em; -fx-font-weight: bold;");
+		titleLabel = new Label();
+		titleLabel.setStyle("-fx-padding: 10px; -fx-font-size: 1em; -fx-font-weight: bold;");
 		// StackPane.setAlignment(userLabel, Pos.CENTER_LEFT);
 
 		/*
 		 * Create a resizable canvas and bind its width and height to the width and height of the table cell.
 		 */
-		canvas = new ResizableCanvasG1();
+		canvas = new ResizeableCanvasForLinePlot();
 		canvas.widthProperty().bind(widthProperty());
 		canvas.heightProperty().bind(heightProperty());
 
@@ -36,9 +42,9 @@ public class CanvasCellG2 extends ListCell<TimelineEntry>
 		// pane.setB
 		pane.setStyle("-fx-border-color : seashell;-fx-border-width : 10 10 10 10");// " + borderWidth + " 0 " +
 																					// borderWidth + " 0 ");//
-		pane.setLeft(userLabel);
+		pane.setLeft(titleLabel);
 		pane.setCenter(canvas);
-		BorderPane.setAlignment(userLabel, Pos.CENTER);
+		BorderPane.setAlignment(titleLabel, Pos.CENTER);
 		// pane.getChildren().addAll(userLabel, canvas);
 
 		setGraphic(pane);
@@ -46,32 +52,19 @@ public class CanvasCellG2 extends ListCell<TimelineEntry>
 	}
 
 	@Override
-	protected void updateItem(TimelineEntry entry, boolean empty)
+	protected void updateItem(LinePlotEntry entry, boolean empty)
 	{
-		// TODO THIS METHOD NEED TO BE CONFIRMED FOR CORRECTNESS and might be responsible for rendering issues.
-		// super.updateItem(entry, empty);
-		// System.out.println("entry userID = " + entry.getUserID());
 		if (empty || entry == null)
 		{
-			if (entry == null)
-			{
-				System.out.println("entry is null");
-			}
-			else
-			{
-				System.out.println("empty = " + empty);
-			}
-			// userLabel.setText("");
-			// canvas.setData(Collections.emptyList());
+			// titleLabel.setText("");
+			// canvas.setData(null);// Collections.emptyList());
 			// canvas.draw();
-
-			// setText(null);
-			// setGraphic(null);
-
+			setText(null);
+			setGraphic(null);
 		}
 		else
 		{
-			userLabel.setText(entry.getUserID());
+			titleLabel.setText(entry.getUserID());
 			canvas.setData(entry.getValues());
 			canvas.draw();
 		}

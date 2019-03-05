@@ -341,7 +341,7 @@ public class TestExperiments
 		// "/run/media/gunjan/HOME/gunjan/Geolife Data
 		// Works/stats/wekaResults/SampEnExperiments/10ActivityNameSequenceIntInvalidsExpungedDummyTimeTimes10.csv";
 
-		int m = 2;
+		int m = 3;
 
 		double[] valsTS = getTimeSeriesVals(timeSeriesFile);// getPureRegularSeries(400);//
 		double sd = getSD(valsTS);
@@ -495,7 +495,25 @@ public class TestExperiments
 	public static void main(String args[])
 	{
 		// checkEditDistancePerformance();
-		checkEditDistancePerformanceWithTraceMatrix();
+		// $$checkEditDistancePerformanceWithTraceMatrix();//disabled on 26 Feb 2019
+		sanityCheckSampEn26Feb2019();
+	}
+
+	public static void sanityCheckSampEn26Feb2019()
+	{
+		try
+		{
+			sampleEntropyOnSymbolicSeqExperiment(
+					// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/Temp/AllRandom1.csv");
+					"/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb21GowallaNoHaversine/gowalla1_FEB21H3M25ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NCcoll/gowalla1_FEB27_UsersAbove10RTs_GowallaFeb21Clustering/221ActNameFSequenceIntInvalidsExpungedDummyTime.csv");
+			// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/Feb21GowallaNoHaversine/gowalla1_FEB21H3M25ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN500NCcoll/gowalla1_FEB22_UsersAbove10RTs_GowallaFeb21Clustering/221ActNameFSequenceIntInvalidsExpungedDummyTime.csv");
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 	public static void checkEditDistancePerformance()

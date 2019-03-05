@@ -26,7 +26,7 @@ public class Enums
 	 */
 	public enum GowallaFeature
 	{
-		ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF;
+		ActNameF, StartTimeF, LocationF, PopularityF, DistFromPrevF, DurationFromPrevF, ActNameLevel1F;
 	}
 
 	/**

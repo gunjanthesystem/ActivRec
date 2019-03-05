@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.activity.constants.Enums.ActDistType;
+import org.activity.constants.Enums.EditDistanceTimeDistanceType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.Enums.TypeOfCandThreshold;
 import org.activity.distances.AlignmentBasedDistance;
@@ -113,14 +114,13 @@ public final class Constant
 	// ensureCandEndWithCurrAct ONLY IMPLEMENTED YET FOR NCOUNT
 	public static final boolean ensureCandEndWithCurrAct = true;// true;// TEMP TODO
 
-	public static final boolean ensureHasDaywiseCandsForEvalCompatibility = true;// TODO //added 14 Jan 2018
+	public static final boolean ensureHasDaywiseCandsForEvalCompatibility = false;// TODO //added 14 Jan 2018
 
 	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
 	private static int RNNCurrentActivitityLength = 1;
-
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	public static final boolean sameRNNForAllRTsOfAUser = true;// SWITCH_NOV10
 	public static final boolean sameRNNForALLUsers = true;// SWITCH_JUN
@@ -142,7 +142,7 @@ public final class Constant
 	 */
 	public static final boolean ClosestTimeFilterCandidates = false;// false; TODO
 
-	public static final Enums.EditDistanceTimeDistanceType editDistTimeDistType = Enums.EditDistanceTimeDistanceType.NearerScaled;
+	public static final EditDistanceTimeDistanceType editDistTimeDistType = EditDistanceTimeDistanceType.NearerScaled;
 	// .FurtherScaled;
 
 	private static String dynamicDistanceUsed = "HJEditDistance"; // "FeatureWiseEditDistance",FeatureWiseEditDistance,
@@ -226,11 +226,8 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 1, 0.5 };// 0.5, 0.4, 0.6, 1, 0.8, 0.7 };// 0.6 };// 0.5, 1 };// 0.5 };//
-														// , 1
-														// };//
-														// 0.5, 1 };// 0.4, 0.5, 0.7,
-	// 1
+	public static final double[] EDAlphas = { -1 };// 1/* , 0.5 */ };// 0.5, 0.4, 0.6, 1, 0.8, 0.7 };// 0.6 };// 0.5, 1
+	// , 1};// 0.5, 1 };// 0.4, 0.5, 0.7,1
 	// TODO // SWITCH_NOV20
 	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };= { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75,
 	// 0, 0.25, 0.35, 0.15};//SWITCH_NOV10 added on 12 Sep 2018// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/*
@@ -261,7 +258,7 @@ public final class Constant
 	// Only for dcu_data_2, added in Dec 15, 2018
 	// public static final boolean useEndTimeInFED = true;// SWITCH_NOV10
 
-	public static final boolean useRTVerseNormalisationForED = true;// true; // TODO KEEP IT true, false version
+	public static final boolean useRTVerseNormalisationForED = false;// true; // TEMP TODO KEEP IT true, false version
 
 	public static final boolean computeFEDForEachAOInRTVerse = false;// TODO
 	public static final boolean computeFEDForEachFeatureSeqInRTVerse = true;// true;TODO
@@ -271,7 +268,7 @@ public final class Constant
 	public static final boolean useLog2InFEDInRTVerse = false;// false;
 
 	// may not have following process up to date (Aug 3, 2018)// SWITCH_April24
-	public static double percentileForRTVerseMaxForFEDNorm = 10;//// TODO 10;// 75;// -1// SWITCH_April24
+	public static double percentileForRTVerseMaxForFEDNorm = -1;// 10;//// TODO 10;// 75;// -1// SWITCH_April24
 	public static final boolean fixedValPerFeatForRTVerseMaxMinForFEDNorm = false;// 75;// -1// SWITCH_Dec1
 	public static final double percentileForRTVerseMaxForAEDNorm = -1;// //TODO 75;// SWITCH //added on 15 Aug 2018
 	// For no features used, also set EDAlpha=1, so that the computed values for dAct are not multiplied by EDAlpha and
@@ -285,7 +282,7 @@ public final class Constant
 	 * If enabled, in Edit distance, instead of computing feature level edit distance just for activity objects which
 	 * matchin act name across the compared timelines, computed feature level edit distance over all act objs
 	 */
-	public static boolean useFeatureDistancesOfAllActs = true;//// TODO true;// SWITCH_NOV10
+	public static boolean useFeatureDistancesOfAllActs = false;// true;//// TODO true;// SWITCH_NOV10
 
 	// need to implement it in AlignmentBasedDistance.getFeatureLevelDistanceGowallaPD25Feb2018() before turning true
 	public static final boolean useDistFromNextInFED = false;
@@ -338,7 +335,7 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "gowalla1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+	static String DATABASE_NAME = "geolife1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
 												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
@@ -422,11 +419,9 @@ public final class Constant
 	/**
 	 * Number of past activities to look excluding the current activity
 	 */
-	public static final double matchingUnitAsPastCount[] = { 3, 0, 1, 2, 4, 6, 8 };// { 3, 0, 1, 2, /* 3, */ 4, 6, 8
-																					// };// { 0, 1, 2, 3, 4, 6, 8
-																					// };//
-	// 2, 4,6, 8, 1, 3, 10 11, 12,13,14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28, 30 };// , 32,// 34,36, 38,
-	// 40,42 };
+	public static final double matchingUnitAsPastCount[] = { 3, 0, 1, 2, 4, 6, 8, 5, 7 };// { 3, 0, 1, 2, /* 3, */ 4, 6,
+	// 8;// { 0, 1, 2, 3, 4,// 6,};//2, 4,6, 8, 1, 3, 10 11, 12,13,14, 15,// 16,// 17, 18, 19, 20,21, 22, 23, 24,26, 28,
+	// 30 };// , 32,// 34,36, 38,40,42 };
 
 	public static final double matchingUnitAsPastCountFixed[] = { 0, 1, 2, 3, 4, 6, 8 };
 	public static final double matchingUnitHrsArray[] = { 0.5, 1, 2, 3, 4, 6, 8 };
@@ -949,12 +944,11 @@ public final class Constant
 			collaborativeCandidates = false;
 			filterTrainingTimelinesByRecentDays = false;
 			// typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
-			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TEMP TODO
-			nearestNeighbourCandEDThresholdPrimDim = 500;// 50;// 500;// TEMP 500;// TODO 500;// 750;// 500;// 500;///
-															// -1;//
+			typeOfCandThresholdPrimDim = TypeOfCandThreshold.None;// .NearestNeighbour;// TEMP TODO
+			nearestNeighbourCandEDThresholdPrimDim = -1;// 100;// 50;// 500;// TEMP 500;// TODO 500;// 750;// 500;//
 			// candEDValThresholdPrimDim = 0.5; // TEMP TODO
-			percentileForRTVerseMaxForFEDNorm = 10;// 10;//// TODO 10;// 75;// -1// SWITCH_April24
-			useFeatureDistancesOfAllActs = true;// TODO true;// SWITCH_NOV10
+			percentileForRTVerseMaxForFEDNorm = -1;// 75;// 10;//// TODO 10;// 75;// -1// SWITCH_April24
+			useFeatureDistancesOfAllActs = false;// TEMP true;// TODO true;// SWITCH_NOV10
 			useRandomlySampled100Users = false;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = true;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = true; // false for gowalla// true for others;//
@@ -963,8 +957,8 @@ public final class Constant
 			break;
 
 		case "gowalla1":
-			collaborativeCandidates = true;
-			filterTrainingTimelinesByRecentDays = true;
+			collaborativeCandidates = false;// true; TODO TEMP ALERT ALERT
+			filterTrainingTimelinesByRecentDays = false;// true; TODO TEMP ALERT ALERT
 			typeOfCandThresholdPrimDim = TypeOfCandThreshold.NearestNeighbour;// TODO
 			nearestNeighbourCandEDThresholdPrimDim = 500;// TODO 500;// 750;// 500;// 500;/// -1;//
 			percentileForRTVerseMaxForFEDNorm = 10;//// TODO 10;// 75;// -1// SWITCH_April24

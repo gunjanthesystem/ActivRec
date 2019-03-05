@@ -3,6 +3,8 @@ package org.activity.desktop;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activity.io.ReadingFromFile;
+import org.activity.objects.Triple;
 import org.activity.plotting.DataGenerator;
 import org.activity.plotting.TimelineChartAppCanvas;
 import org.activity.plotting.TimelineChartAppGeneric;
@@ -334,8 +336,12 @@ public class DesktopActivityDashBoard extends Application
 
 			// int latColIndex2 = 3, lonColIndex2 = 2, labelColIndex2 = 1, labelColIndex3 = 0;
 			int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 3, fillIndex = 3;
-			BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(absFileNameForLatLonToReadAsMarkerTargetLocs,
-					delimiter2, latColIndex2, lonColIndex2, labelColIndex2, 5, Color.rgb(0, 105, 106, 0.3), false,
+
+			List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
+					absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2, latColIndex2, lonColIndex2,
+					labelColIndex2);
+
+			BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(listOfLocs, 5, Color.rgb(0, 105, 106, 0.3), false,
 					false, "showing locations from absFileNameForLatLonToReadAsMarkerTargetLocs");// Color.rgb(193,
 			// 49,
 			// 34, 0.3));

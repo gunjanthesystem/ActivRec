@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.activity.constants.Constant;
 import org.activity.io.ReadingFromFile;
@@ -31,7 +32,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 public class TimelinesAttributesExtractionCleaned22Feb2019
 {
 	String absoluteNameOfAttributesFile;
-	LinkedHashMap<String, ArrayList<String>> timelineAttributeVectors;
+	LinkedHashMap<String, ArrayList<String>> timelineAttributeVectors; // one per user
 	ArrayList<String> attributeLabels;
 	/**
 	 * User ID to to serial number of corresponding instance in atribute vectors
@@ -46,6 +47,8 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 	{
 		return userIDInstanceID;
 	}
+
+	// String commonPath;
 
 	/**
 	 * Extracts features and write the corresponding csv file
@@ -101,21 +104,29 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 		// PopUps.showMessage("Reached breakpoint, Will exit!");
 		// System.exit(0);
 		//// curtian 1
-		if (Constant.getDatabaseName().equals("gowalla1"))
+		String databaseName = Constant.getDatabaseName();
+		if (databaseName.equals("gowalla1"))
 		{
 			TimelineStats.transformAndWriteAsTimeseriesGowalla((usersDayTimelines));//
 		}
-		else
+		else if (databaseName.equals("geolife1"))
 		{
 			TimelineStats.transformAndWriteAsTimeseries((usersDayTimelines));//
 		}
+		else
+		{
+			PopUps.printTracedErrorMsgWithExit("Unknown database: " + databaseName);
+		}
+		PopUps.showMessage("Just before performSampleEntropyVsMAnalysis2");
 		TimelineStats.performSampleEntropyVsMAnalysis2(usersDayTimelines, minEpochSampEn, maxEpochSampEn);//
 		// UtilityBelt.reformatUserIDs
 
 		System.out.println("Just after performSampleEntropyVsMAnalysis2");
+		PopUps.showMessage("Just after performSampleEntropyVsMAnalysis2");
 		for (int m = minEpochSampEn; m <= maxEpochSampEn; m++)
 		{
 			System.out.println(" m = " + m);
+			PopUps.showMessage(" m = " + m);
 			for (String featureName : Constant.getFeatureNames())
 			{
 				System.out.println("featureName = " + featureName);
@@ -148,7 +159,7 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 			// if (featureName.equals("ActivityName")) // not a numerical feature, hence derivative based metric is not
 			// suitable i think
 			if (featureName.equalsIgnoreCase("ActivityName") || featureName.equalsIgnoreCase("ActNameF")
-					|| featureName.equalsIgnoreCase("LocationF"))
+					|| featureName.equalsIgnoreCase("LocationF") || featureName.equalsIgnoreCase("ActNameLevel1F"))
 			{
 				continue;
 			}
@@ -161,7 +172,7 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
 						"" + featureName + "Mobility");
 				addDoubleAttributeToAttributeVectors(
-						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 1),
+						getHjorthParametersAfterExpungingInvalids((usersDayTimelines), featureName, 2),
 						"" + featureName + "Complexity");
 			}
 		}
@@ -172,7 +183,7 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 		// addStringFeatureToFeatureVectors(getManualClustering(2), "ManualClustering2");
 		// manualClustering = WekaUtilityBelt.getManualClustering(9, UtilityBelt.getListOfUsers(usersDayTimelines),
 		// "/run/media/gunjan/HOME/gunjan/Geolife Data Works/stats/wekaResults/ManualClustersUserAbove10RTs.csv", true);
-
+		addStringAttributeToAttributeVectors(groundTruth, "ManualClustering2");// added on 27 Feb 2019
 		if (false)// Dsiabled on 21 Dec 2017
 		{
 			// if (Constant.getDatabaseName().equals("gowalla1"))
@@ -268,10 +279,14 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 	 */
 	private String writeTimelineAttributeVectors(String fileNamePhrase)
 	{
-		WToFile.appendLineToFile("UserID", fileNamePhrase); // first column wil be user name
+		// Disabled on 27Feb2019 WToFile.appendLineToFile("UserID", fileNamePhrase); // first column wil be user name
+		// WToFile.appendLineToFileAbs("UserID", fileNamePhrase);
+
+		// StringBuilder sbToWrite = new StringBuilder();
+
 		String separator = "\t";
 
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("UserID");
 		for (String label : attributeLabels)
 		{
 			sb.append(separator + label);
@@ -313,7 +328,8 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 		}
 
 		WToFile.writeToNewFile(sb.toString(), fileNamePhrase);
-		return Constant.getCommonPath() + fileNamePhrase;
+		// return Constant.getCommonPath() + fileNamePhrase;
+		return fileNamePhrase;
 	}
 
 	/**
@@ -830,7 +846,7 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 	 */
 	public String getAttributeFilenameAbs()
 	{
-		return this.absoluteNameOfAttributesFile + ".csv";
+		return this.absoluteNameOfAttributesFile;// + ".csv";
 	}
 
 	/**
@@ -840,6 +856,17 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 	 */
 	public void addStringAttributeToAttributeVectors(LinkedHashMap<String, String> toAdd, String featureLabel)
 	{
+		LinkedHashMap<String, Integer> userIDInstanceID = this.getUserIDInstanceID();
+
+		// added on 28 Feb 2019
+		// for gowalla: timelineAttributeVectors have userID as key, while toAdd from groundtruth has userIndex as key
+		LinkedHashMap<Integer, String> instanceIDUserID = new LinkedHashMap<>(userIDInstanceID.size());
+		for (Entry<String, Integer> e : userIDInstanceID.entrySet())
+		{
+			instanceIDUserID.put(e.getValue(), e.getKey());
+		}
+		////////////////
+
 		if (toAdd == null || toAdd.size() == 0)
 		{
 			new Exception("Error in addStringFeatureToFeatureVectors: toAdd.size = " + toAdd.size());
@@ -849,7 +876,10 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 		{
 			try
 			{
-				this.timelineAttributeVectors.get(entry.getKey()).add(entry.getValue());
+				// this.timelineAttributeVectors.get(entry.getKey()).add(entry.getValue());//disabled on 28 Feb 2019
+				// Integer userIndex = Integer.valueOf(entry.getKey());
+				String userID = instanceIDUserID.get(Integer.valueOf(entry.getKey()) + 1);
+				this.timelineAttributeVectors.get(userID).add(entry.getValue());
 			}
 			catch (Exception e)
 			{
