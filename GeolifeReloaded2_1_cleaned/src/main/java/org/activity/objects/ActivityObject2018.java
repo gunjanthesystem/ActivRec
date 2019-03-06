@@ -911,27 +911,28 @@ public class ActivityObject2018 implements Serializable
 	public String toStringAllGowallaTSWithNameForHeaded(String delimiter)
 	{
 
+		String databaseName = Constant.getDatabaseName();
 		// PopUps.showMessage("locationIDs = " + locationIDs);
 		// PopUps.showMessage(
 		// "DomainConstants.getLocationIDNameDictionary() = " + DomainConstants.getLocationIDNameDictionary());
-		String locationName = locationIDs == null ? ""
+		String locationName = (locationIDs == null || DomainConstants.getLocationIDNameDictionary() == null) ? ""
 				: locationIDs.stream().map(lid -> DomainConstants.getLocationIDNameDictionary().get(lid))
 						.collect(Collectors.joining("-"));
 		// .getLocIDLocationObjectDictionary().get(lid).locationName)
 
-		String additionalGeolifeFeatures = Constant.getDatabaseName().equals("geolife1")
+		String additionalGeolifeFeatures = databaseName.equals("geolife1")
 				? delimiter + this.durationInSeconds + delimiter + this.distanceTravelledInKm + delimiter
 						+ this.startLongitude + delimiter + this.startLongitude + delimiter + this.endLatitude
 						+ delimiter + this.endLongitude + delimiter + this.avgAltitude
 				: "";
 
-		String additionalDCUFeatures = Constant.getDatabaseName().equals("dcu_data_2")
-				? delimiter + this.durationInSeconds
-				: "";
+		String additionalDCUFeatures = databaseName.equals("dcu_data_2") ? delimiter + this.durationInSeconds : "";
 
-		return activityID + delimiter + this.getLocationIDs('-') + delimiter
-				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter + locationName + delimiter
-				+ workingLevelCatIDs + delimiter + Instant.ofEpochMilli(startTimestampInms).toString()
+		String actName = DomainConstants.catIDNameDictionary == null ? this.getActivityName()
+				: DomainConstants.catIDNameDictionary.get(activityID);
+
+		return activityID + delimiter + this.getLocationIDs('-') + delimiter + actName + delimiter + locationName
+				+ delimiter + workingLevelCatIDs + delimiter + Instant.ofEpochMilli(startTimestampInms).toString()
 				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
 				+ delimiter + startLatitude + delimiter + startLongitude
 				/* + "__ startAlt=" + startAltitude */ + delimiter + userID + delimiter + photos_count + delimiter
@@ -955,7 +956,7 @@ public class ActivityObject2018 implements Serializable
 		// PopUps.showMessage("locationIDs = " + locationIDs);
 		// PopUps.showMessage(
 		// "DomainConstants.getLocationIDNameDictionary() = " + DomainConstants.getLocationIDNameDictionary());
-		String locationName = locationIDs == null ? ""
+		String locationName = locationIDs == null || DomainConstants.getLocationIDNameDictionary() == null ? ""
 				: locationIDs.stream().map(lid -> DomainConstants.getLocationIDNameDictionary().get(lid))
 						.collect(Collectors.joining("-"));
 		// .getLocIDLocationObjectDictionary().get(lid).locationName)
@@ -984,8 +985,10 @@ public class ActivityObject2018 implements Serializable
 						+ locationName
 				: "";
 
-		return /* userID + delimiter + */ brokenDownStartTS + delimiter + activityID + delimiter
-				+ DomainConstants.catIDNameDictionary.get(activityID) + delimiter
+		String actName = DomainConstants.catIDNameDictionary == null ? this.getActivityName()
+				: DomainConstants.catIDNameDictionary.get(activityID);
+
+		return /* userID + delimiter + */ brokenDownStartTS + delimiter + activityID + delimiter + actName + delimiter
 				+ Instant.ofEpochMilli(startTimestampInms).toString()
 				// + LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimestampInms), ZoneId.systemDefault())
 				/* additionalGowallaFeatures */ + delimiter + df.format(distInMFromPrev) + delimiter + durInSecFromPrev

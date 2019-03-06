@@ -183,7 +183,7 @@ public class LineChartApp3 extends Application
 		// fun1();
 	}
 
-	private static void fun1()
+	private static void tryingTableSaw()
 	{
 		Builder builder = CsvReadOptions
 				.builder(PathConstants.getPathToCleanedTimelinesFeb2019("geolife1") + "AllActObjs.csv").separator(',')

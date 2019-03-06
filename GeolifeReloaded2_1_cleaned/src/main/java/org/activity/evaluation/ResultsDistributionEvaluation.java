@@ -203,7 +203,8 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadTestGeoMar1.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar6Temp2.csv";
+		// + "ResultsToReadTestGeoMar1.csv";
 		// + "ResultsToReadGeolifeImproveEDFeb14.csv";
 		// + "ResultsToReadJan15Gowalla1_2.csv";
 		// "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadDCUInevstigating7Feb.csv";
@@ -236,7 +237,8 @@ public class ResultsDistributionEvaluation
 			getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 2);
 			getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
 			getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 6);
-			// getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
+			getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
+			getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 6);
 
 		}
 

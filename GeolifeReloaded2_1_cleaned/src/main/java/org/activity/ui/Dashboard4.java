@@ -4,14 +4,15 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.activity.constants.Constant;
-import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.PathConstants;
 import org.activity.controller.ControllerWithoutServer;
 import org.activity.io.ReadingFromFile;
@@ -274,11 +275,11 @@ public class Dashboard4 extends Application
 		final boolean doGivenDataLineTimelines = false;
 		// final boolean doGivenDataCanvasTimelines = true;//not implemented
 		final boolean doGivenDataOnlyActIDSeq = false;
-		final boolean doGivenDataLinePlotFeatures = false;
+		final boolean doGivenDataLinePlotFeatures = true;
 		final boolean doGivenDataMapPlot = false;
 
 		final boolean doSyntheticDataCircleTimelines = false;// true;
-		final boolean doSyntheticDataCanvasTimelines = true;
+		final boolean doSyntheticDataCanvasTimelines = false;
 		final boolean doSyntheticDataBoxTimelines = false;
 		final boolean doSyntheticDataLineTimelines = false;
 
@@ -329,6 +330,14 @@ public class Dashboard4 extends Application
 				tabsToAdd.add(onlyActIDsAsRects);
 			}
 
+			if (doGivenDataOnlyActIDSeq)
+			{
+				Tab onlyActIDsAsRects = new Tab("Only ActIDs Sequence3");
+				onlyActIDsAsRects.setContent(createOnlyActIDsAsRectsV3(usersCleanedDayTimelines));
+				onlyActIDsAsRects.setClosable(true);
+				tabsToAdd.add(onlyActIDsAsRects);
+			}
+
 			if (doGivenDataLinePlotFeatures)
 			{
 				// String dirToWrite = "./dataWritten/Temp" + DateTimeUtils.getMonthDateLabel() + databaseName + "/";
@@ -355,7 +364,7 @@ public class Dashboard4 extends Application
 			}
 			/////////////////////////////////////////////////////////////////
 			// List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 200, 10, 50);
-			List<List<List<String>>> timelineData = DataGenerator.getData3(10, 1000, 12, 5, 864000, 60 * 20, 10800);
+			List<List<List<String>>> timelineData = DataGenerator.getData3(50, 5000, 12, 5, 864000, 60 * 20, 10800);
 			System.out.println("timelineData.size() = " + timelineData.size());
 			if (doSyntheticDataCircleTimelines)
 			{
@@ -829,19 +838,110 @@ public class Dashboard4 extends Application
 		return s1;
 	}
 
+	/**
+	 * Fork of org.activity.ui.Dashboard3.createOnlyActIDsAsRectsV2() to also indicate days
+	 * 
+	 * @param usersCleanedDayToyTimelines
+	 * @return
+	 * @since 6 March 2019
+	 */
+	private Node createOnlyActIDsAsRectsV3(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
+	{
+		double widthOfActRect = 50/* 50 */, widthOfUserRect = 150;
+
+		ScrollPane s1 = new ScrollPane();
+
+		VBox vBox = new VBox();
+		vBox.setSpacing(10);
+		vBox.setAlignment(Pos.CENTER);
+
+		HBox hBoxActIDs = new HBox();
+		// hBox.setSpacing(6);
+		hBoxActIDs.setAlignment(Pos.CENTER_LEFT);// Pos.CENTER_LEFT);
+		hBoxActIDs.getChildren()
+				.add(createStackPane(Color.WHITE, null, "ActIDs: ", widthOfUserRect, "", "rectangle", null));
+
+		HBox hBoxDuration = new HBox();
+		hBoxDuration.setAlignment(Pos.CENTER_LEFT);
+		hBoxDuration.getChildren()
+				.add(createStackPane(Color.WHITE, null, "Duration: ", widthOfUserRect, "", "rectangle", null));
+
+		Stream<ActivityObject2018> streamOfAOs = usersCleanedDayToyTimelines.entrySet().parallelStream()
+				.flatMap(e -> e.getValue().entrySet().parallelStream()
+						.flatMap(f -> f.getValue().getActivityObjectsInTimeline().parallelStream()));
+
+		LongSummaryStatistics durInSecsStats = streamOfAOs.mapToLong(ao -> ao.getDurationInSeconds())
+				.summaryStatistics();
+
+		for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : usersCleanedDayToyTimelines.entrySet())
+		{
+
+			boolean altDayToggle = false;
+
+			for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+			{
+				altDayToggle = !altDayToggle; // to identify days by differently colored border
+
+				Date date = dateEntry.getKey();
+				String dateString = date.toString();
+				Border borderForDay = null;
+
+				borderForDay = altDayToggle ? reuse.getBottomBorder1() : reuse.getBottomBorder2();
+
+				for (ActivityObject2018 ao : dateEntry.getValue().getActivityObjectsInTimeline())
+				{
+					Color actColor = ColorPalette.getColor(Dashboard4.actIDIndexMap.get(ao.getActivityID()));
+					hBoxActIDs.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
+							widthOfActRect, getTooltipFromAO(ao), "rectangle", borderForDay));
+
+					///////////////////////
+					long durInMins = ao.getDurationInSeconds();
+					hBoxDuration.getChildren()
+							.add(createStackPane2(actColor, null, String.valueOf(durInMins), widthOfActRect,
+									getTooltipFromAO(ao), "rectangle", borderForDay, (double) durInSecsStats.getMax(),
+									(double) durInSecsStats.getMin(), 200));
+				}
+			}
+
+			/////////////
+
+		}
+		vBox.getChildren().add(hBoxActIDs);
+		vBox.getChildren().add(hBoxDuration);
+		s1.setContent(vBox);
+		s1.setFitToHeight(true);
+		s1.setFitToWidth(true);
+		return s1;
+	}
+
 	public static String getTooltipFromAO(ActivityObject2018 ao)
 	{
-		String toolTipText = "st: " + ao.getStartTimestamp().toString() + "\nlocG: "
-				+ ao.getGivenDimensionVal("|", PrimaryDimension.LocationGridID) + "\ndistP (km): "
-				+ (ao.getDistanceInMFromPrev() / 1000) + "\ndurP (min): " + (ao.getDurationInSecondsFromPrev() / 60)
-				+ "\nphotos: " + ao.getPhotos_count();
+		// String toolTipText = "st: " + ao.getStartTimestamp().toString() + "\nlocG: "
+		// + ao.getGivenDimensionVal("|", PrimaryDimension.LocationGridID) + "\ndistP (km): "
+		// + (ao.getDistanceInMFromPrev() / 1000) + "\ndurP (min): " + (ao.getDurationInSecondsFromPrev() / 60)
+		// + "\nphotos: " + ao.getPhotos_count();
 
-		return toolTipText;
+		return ao.toStringAllGowallaTSWithNameForHeaded24Dec("\n");
+
+		// return toolTipText;
 	}
 
 	private Rectangle createRectangle(Color fillColor, Color strokeColor, double width)
 	{
 		Rectangle rect1 = new Rectangle(0, 45, width, 50);
+		if (strokeColor != null)
+		{
+			rect1.setStroke(strokeColor);
+			rect1.setStrokeWidth(2);
+		}
+		rect1.setFill(fillColor);
+		return rect1;
+	}
+
+	private Rectangle createRectangle2(Color fillColor, Color strokeColor, double width, double height)
+	{
+		Rectangle rect1 = new Rectangle(0, 45, width, height);
 		if (strokeColor != null)
 		{
 			rect1.setStroke(strokeColor);
@@ -923,6 +1023,59 @@ public class Dashboard4 extends Application
 		}
 
 		stack.getChildren().addAll(shapedNode, createText(labelText));
+		Tooltip.install(stack, createTooltip(tooltipText));
+		return stack;
+	}
+
+	/**
+	 * 
+	 * @param fillColor
+	 * @param strokeColor
+	 * @param labelText
+	 * @param width
+	 * @param tooltipText
+	 * @param shape
+	 * @param minVal
+	 * @param maxVal,
+	 * @return
+	 * @since 6 March 2019
+	 */
+	private StackPane createStackPane2(Color fillColor, Color strokeColor, String labelText, double width,
+			String tooltipText, String shape, Border border, double maxVal, double minVal, double maxHeight)
+	{
+		final StackPane stack = new StackPane();
+		stack.setAlignment(Pos.BOTTOM_CENTER);
+		Node shapedNode = null;
+		// double maxHeight = 500;
+
+		double normHeight = maxHeight * ((maxVal - Double.valueOf(labelText)) / (maxVal - minVal));
+
+		if (border != null)
+		{
+			// stack.setBackground(bg);
+			stack.setBorder(border);
+			// stack.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+		}
+		switch (shape.toLowerCase())
+		{
+		case "rectangle":
+			shapedNode = createRectangle2(fillColor, strokeColor, width, normHeight);
+			break;
+		case "circle":
+			shapedNode = createCircle(fillColor, strokeColor, width);
+			break;
+		default:
+			PopUps.showError("Error: unkown shape " + shape);
+		}
+
+		Text t = new Text();
+		// t.setFont(new Font(20));
+		Font f = Font.font(null, FontWeight.BOLD, 10);
+		t.setFont(f);
+		t.setRotate(-90);
+		t.setText(labelText);
+
+		stack.getChildren().addAll(shapedNode, t);
 		Tooltip.install(stack, createTooltip(tooltipText));
 		return stack;
 	}
@@ -1380,6 +1533,7 @@ public class Dashboard4 extends Application
 				yAxis.setTickLabelRotation(270);
 
 				LineChart chart = new LineChart(xAxis, yAxis, listOfSeries_SThourOfDay);
+				// ScatterChart chart = new ScatterChart(xAxis, yAxis, listOfSeries_SThourOfDay);
 				chart.setLegendVisible(false);
 				// chart.setLegendSide(Side.LEFT);
 				// chart.lege
@@ -1389,8 +1543,9 @@ public class Dashboard4 extends Application
 				chart.setCache(true);
 				chart.setCacheHint(CacheHint.SPEED);
 				chart.setAnimated(false);
-				chart.setVerticalGridLinesVisible(true);
-
+				chart.setVerticalGridLinesVisible(false);// for performance
+				chart.setHorizontalGridLinesVisible(false);// for performance
+				// chart.setScaleShape(false);
 				// chart.setStyle(value);
 				// chart.setStyle("-fx-background-color: slateblue; -fx-text-fill: white;");
 				// .chart-vertical-grid-lines {
@@ -1429,7 +1584,7 @@ public class Dashboard4 extends Application
 					// ImageView unscaled = new ImageView(chart.snapshot(snP, null));
 					vboxOfCharts.getChildren().add(cv);// cv);
 				}
-				else if (true)
+				else if (false)
 				{
 					ResizeableCanvasForLinePlot canvas = new ResizeableCanvasForLinePlot();
 					canvas.setData(listOfSeries_SThourOfDay);
@@ -1520,6 +1675,7 @@ public class Dashboard4 extends Application
 		}
 		s1.setFitToHeight(true);
 		s1.setFitToWidth(true);
+		// s1.setAnimated(false);
 
 		return s1;
 	}

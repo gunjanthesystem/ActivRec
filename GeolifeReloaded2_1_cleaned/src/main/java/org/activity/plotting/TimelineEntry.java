@@ -8,7 +8,7 @@ public class TimelineEntry
 
 	private String userID;
 	/**
-	 * {For this time, a list of actEntries, where each actEntry is a long of Strings
+	 * {For this time, a list of actEntries, where each actEntry is a list of Strings
 	 */
 	private List<List<String>> values;
 

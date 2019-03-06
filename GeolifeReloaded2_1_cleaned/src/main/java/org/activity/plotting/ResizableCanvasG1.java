@@ -16,12 +16,13 @@ import javafx.scene.control.Tooltip;
  */
 class ResizableCanvasG1 extends Canvas
 {
-
 	private List<List<String>> data = Collections.emptyList();
+	int indexOfStartTSInEachDataPoint;
+	int indexOfEndTSInEachDataPoint;
+	int indexOfActIDInEachDataPoint;
 
 	public ResizableCanvasG1()
 	{
-
 		final Tooltip tooltip = new Tooltip();
 		tooltip.setText("data.size()=" + data.size());
 		Tooltip.install(this, tooltip);
@@ -49,6 +50,17 @@ class ResizableCanvasG1 extends Canvas
 	public void setData(List<List<String>> data)
 	{
 		this.data = data;
+		this.indexOfStartTSInEachDataPoint = 1;
+		this.indexOfEndTSInEachDataPoint = 2;
+		this.indexOfActIDInEachDataPoint = 5;
+	}
+
+	public void setData(List<List<String>> data, int indexOfStartTS, int indexOfEndTS, int indexOfActID)
+	{
+		this.data = data;
+		this.indexOfStartTSInEachDataPoint = indexOfStartTS;
+		this.indexOfEndTSInEachDataPoint = indexOfEndTS;
+		this.indexOfActIDInEachDataPoint = indexOfActID;
 	}
 
 	/*
@@ -70,7 +82,7 @@ class ResizableCanvasG1 extends Canvas
 
 		// Color emptyColor = Color.WHITE;
 
-		double cursorStartTS = Integer.valueOf(data.get(0).get(1));
+		double cursorStartTS = Integer.valueOf(data.get(0).get(indexOfStartTSInEachDataPoint));
 
 		double barHeight = (availableHeight);// * 100) / 100;
 		double y = (height - barHeight) / 2;
@@ -83,10 +95,10 @@ class ResizableCanvasG1 extends Canvas
 		for (List<String> actDetails : data)
 		{
 			// System.out.println("2-data.size()= " + data.size());
-			double startTSInSec = Double.valueOf(actDetails.get(1));
-			double endTSInSecs = Double.valueOf(actDetails.get(2));
+			double startTSInSec = Double.valueOf(actDetails.get(indexOfStartTSInEachDataPoint));
+			double endTSInSecs = Double.valueOf(actDetails.get(indexOfEndTSInEachDataPoint));
 			// if (cursorStartTS < startTS){}
-			int actID = Integer.valueOf(actDetails.get(5));
+			int actID = Integer.valueOf(actDetails.get(indexOfActIDInEachDataPoint));
 
 			// double x = width / /* 365 */ counter;
 			// double barWidth = width / 365 + 1;
