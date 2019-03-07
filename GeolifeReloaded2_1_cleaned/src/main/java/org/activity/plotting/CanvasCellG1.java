@@ -10,7 +10,7 @@ public class CanvasCellG1 extends ListCell<TimelineEntry>
 {
 
 	private Label userLabel;
-	private ResizableCanvasG1 canvas;
+	private ResizeableCanvasG1 canvas;
 
 	public CanvasCellG1()
 	{
@@ -26,7 +26,7 @@ public class CanvasCellG1 extends ListCell<TimelineEntry>
 		/*
 		 * Create a resizable canvas and bind its width and height to the width and height of the table cell.
 		 */
-		canvas = new ResizableCanvasG1();
+		canvas = new ResizeableCanvasG1();
 		canvas.widthProperty().bind(widthProperty());
 		canvas.heightProperty().bind(heightProperty());
 

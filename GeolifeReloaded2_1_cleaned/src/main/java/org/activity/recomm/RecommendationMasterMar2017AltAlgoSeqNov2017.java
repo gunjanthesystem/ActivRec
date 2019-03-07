@@ -800,9 +800,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			//////////////
 		}
 
-		catch (
-
-		Exception e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			// PopUps.getTracedErrorMsg("Exception in recommendation master");

@@ -21,6 +21,7 @@ import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
+import org.activity.objects.Triple;
 import org.activity.sanityChecks.Sanity;
 import org.activity.sanityChecks.TimelineSanityChecks;
 import org.activity.ui.PopUps;
@@ -323,8 +324,8 @@ public class TimelineExtractors
 			if (Constant.collaborativeCandidates)
 			{
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
-						trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType, activityAtRecommPoint,
-						userIDAtRecomm, trainTimelinesAllUsersContinuous, dimensionToMatch);
+						/* trainTestTimelinesForAllUsers, */ matchingUnitInCountsOrHours, lookPastType,
+						activityAtRecommPoint, userIDAtRecomm, trainTimelinesAllUsersContinuous, dimensionToMatch);
 			}
 			else
 			{
@@ -350,7 +351,7 @@ public class TimelineExtractors
 			if (Constant.collaborativeCandidates)
 			{
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
-						trainTestTimelinesForAllUsers, 0, lookPastType, activityAtRecommPoint, userIDAtRecomm,
+						/* trainTestTimelinesForAllUsers, */ 0, lookPastType, activityAtRecommPoint, userIDAtRecomm,
 						trainTimelinesAllUsersContinuous, dimensionToMatch);
 			}
 			else
@@ -598,8 +599,8 @@ public class TimelineExtractors
 			{
 				// sb.append("For NCount NHours: collaborative\n");
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
-						trainTestTimelinesForAllUsers, matchingUnitInCountsOrHours, lookPastType, activityAtRecommPoint,
-						userIDAtRecomm, trainTimelinesAllUsersContinuous, dimensionToMatch);
+						/* trainTestTimelinesForAllUsers, */ matchingUnitInCountsOrHours, lookPastType,
+						activityAtRecommPoint, userIDAtRecomm, trainTimelinesAllUsersContinuous, dimensionToMatch);
 			}
 			else
 			{
@@ -627,7 +628,7 @@ public class TimelineExtractors
 			{
 				// sb.append("For NGram: collaborative\n");
 				candidateTimelinesWithNext = TimelineExtractors.extractCandidateTimelinesMUColl(/* trainingTimeline, */
-						trainTestTimelinesForAllUsers, 0, lookPastType, activityAtRecommPoint, userIDAtRecomm,
+						/* trainTestTimelinesForAllUsers, */ 0, lookPastType, activityAtRecommPoint, userIDAtRecomm,
 						trainTimelinesAllUsersContinuous, dimensionToMatch);
 			}
 			else
@@ -655,6 +656,11 @@ public class TimelineExtractors
 			// this.errorExists = true;
 		}
 
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println("Inside extractCandidateTimelinesV2(): trainTestTimelinesForAllUsers.size() = "
+					+ trainTestTimelinesForAllUsers.size());
+		}
 		// if (VerbosityConstants.tempVerbose)
 		// {
 		// System.out.println(sb.toString());
@@ -1218,7 +1224,6 @@ public class TimelineExtractors
 
 	/**
 	 * 
-	 * @param trainTestTimelinesForAllUsers
 	 * @param matchingUnit
 	 * @param lookPastType
 	 * @param activityAtRecommPoint
@@ -1228,14 +1233,14 @@ public class TimelineExtractors
 	 * @return
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUColl(
-			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
+			// LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
 			double matchingUnit, LookPastType lookPastType, ActivityObject2018 activityAtRecommPoint,
 			String userIDAtRecomm, LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous,
 			PrimaryDimension dimensionToMatch)
 	{
-		System.out.println("Inside extractCandidateTimelinesMUColl :trainTestTimelinesForAllUsers.size()= "
-				+ trainTestTimelinesForAllUsers.size() + " mu=" + matchingUnit + " dimensionToMatch="
+		System.out.println("Inside extractCandidateTimelinesMUColl : mu=" + matchingUnit + " dimensionToMatch="
 				+ dimensionToMatch);
+		// trainTestTimelinesForAllUsers.size()= "+ trainTestTimelinesForAllUsers.size() + "
 
 		if (lookPastType.equals(Enums.LookPastType.NCount) || lookPastType.equals(Enums.LookPastType.NGram))// IgnoreCase("Count"))
 		{
@@ -1248,15 +1253,18 @@ public class TimelineExtractors
 			// return extractCandidateTimelinesMUCountColl(trainingTimeline, trainTestTimelinesForAllUsers,
 			// new Double(matchingUnit).intValue(), activityAtRecommPoint, userIDAtRecomm);
 
-			return extractCandidateTimelinesMUCountColl(/* trainingTimeline, trainTestTimelinesForAllUsers, */
+			return extractCandidateTimelinesMUCountHoursColl(/* trainingTimeline, trainTestTimelinesForAllUsers, */
 					new Double(matchingUnit).intValue(), activityAtRecommPoint, userIDAtRecomm,
-					trainTimelinesAllUsersContinuous, dimensionToMatch);
+					trainTimelinesAllUsersContinuous, dimensionToMatch, true);
 		}
 		// TODO: implement MU hours
-		// else if (lookPastType.equals(Enums.LookPastType.NHours))// .equalsIgnoreCase("Hrs"))
-		// {
-		// return extractCandidateTimelinesMUHours(trainingTimeline, matchingUnit, activityAtRecommPoint);
-		// }
+		else if (lookPastType.equals(Enums.LookPastType.NHours))// .equalsIgnoreCase("Hrs"))
+		{
+			// return extractCandidateTimelinesMUHours(trainingTimeline, matchingUnit, activityAtRecommPoint);
+			return extractCandidateTimelinesMUCountHoursColl(/* trainingTimeline, trainTestTimelinesForAllUsers, */
+					new Double(matchingUnit).intValue(), activityAtRecommPoint, userIDAtRecomm,
+					trainTimelinesAllUsersContinuous, dimensionToMatch, false);
+		}
 		// if (lookPastType.equals(Enums.LookPastType.ClosestTime))// IgnoreCase("Count"))
 		// {
 		// return extractCandidateTimelinesClosestTimeColl(/* trainingTimeline, trainTestTimelinesForAllUsers, */
@@ -1281,6 +1289,7 @@ public class TimelineExtractors
 	 * @param lookPastType
 	 * @param activityAtRecommPoint
 	 * @return
+	 * @deprecated (most probably (realized on 7 March 2019))
 	 */
 	public static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUColl(Timeline trainingTimeline,
 			double matchingUnit, Enums.LookPastType lookPastType, ActivityObject2018 activityAtRecommPoint)
@@ -1407,29 +1416,33 @@ public class TimelineExtractors
 	 * candidate timeline, extract the sequence of activity objects from that occurrence_index back until the matching
 	 * unit number of activity objects this forms a candidate timeline for that user. In this way, we will have a NUMBER
 	 * OF or only 1 (if Constant.only1CandFromEachCollUser is true) candidate timelines from each user who have atleast
-	 * one non-last occurrence of Current Activity Names in their training timelines
+	 * one non-last occurrence of Current Activity Names in their training timelines. Extended to also work for NHours
+	 * approach.
 	 * 
-	 * @param matchingUnitInCounts
+	 * @param matchingUnitInCountsOrHours
 	 * @param activityAtRecommPoint
 	 * @param userIDAtRecomm
 	 * @param trainTimelinesAllUsersContinuous
 	 * @param dimensionToMatch
 	 *            (added on 16 July 2018) which dimension to match, initially it was activity name/id, later extended to
 	 *            allow location/gridID
+	 * @param NCountOrNHours
+	 *            true for NCount, false for NHours (added on 7 Mar 2019)
 	 * @return
 	 * @since 3 Aug 2017
 	 */
-	static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUCountColl(
+	static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUCountHoursColl(
 			// Timeline trainingTimelineqqq,
 			// LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersZZ,
-			int matchingUnitInCounts, ActivityObject2018 activityAtRecommPoint, String userIDAtRecomm,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch)
+			int matchingUnitInCountsOrHours, ActivityObject2018 activityAtRecommPoint, String userIDAtRecomm,
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, PrimaryDimension dimensionToMatch,
+			boolean NCountOrNHours)
 	{
 		LinkedHashMap<String, TimelineWithNext> candidateTimelines = new LinkedHashMap<>();
 		long tS = System.nanoTime();
 
 		System.out.println("\nInside extractCandidateTimelinesMUCountColl(): userIDAtRecomm=" + userIDAtRecomm + "mu = "
-				+ matchingUnitInCounts);//
+				+ matchingUnitInCountsOrHours);//
 		// for creating timelines");
 		// System.out.println("Inside extractCandidateTimelinesMUCountColl :trainTestTimelinesForAllUsers.size()= "
 		// + trainTestTimelinesForAllUsers.size());
@@ -1491,26 +1504,35 @@ public class TimelineExtractors
 					if (Constant.ensureCandEndWithCurrAct == false
 							|| ae.equalsWrtGivenDimension(activityAtRecommPoint, dimensionToMatch))
 					{
-						// Timestamp newCandEndTimestamp= new
-						// Timestamp(ae.getStartTimestamp().getTime()+ae.getDurationInSeconds()*1000-1000); //decreasing
-						// 1 second (because this is convention followed in data generation)
-						int newCandEndIndex = i;
-						// NOTE: going back matchingUnitCounts FROM THE index.
-						int newCandStartIndex = (newCandEndIndex - matchingUnitInCounts) >= 0
-								? (newCandEndIndex - matchingUnitInCounts)
-								: 0;
+						ArrayList<ActivityObject2018> activityObjectsForCandidate = null;
+						ActivityObject2018 nextValidActivityForCandidate = null;
 
-						// $$System.out.println("\n\tStart index of candidate timeline=" + newCandStartIndex);
-						// $$System.out.println("\tEnd index of candidate timeline=" + newCandEndIndex);
-						// System.out.println("\tmatchingUnitInCounts=" + matchingUnitInCounts);
-						// System.out.println( "\tnewCandEndIndex - matchingUnitInCounts=" + (newCandEndIndex -
-						// matchingUnitInCounts));
-
-						ArrayList<ActivityObject2018> activityObjectsForCandidate = trainingTimelineForThisUser
-								.getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandEndIndex + 1);
-						ActivityObject2018 nextValidActivityForCandidate;
-						nextValidActivityForCandidate = trainingTimelineForThisUser
-								.getNextValidActivityAfterActivityAtThisPositionPD(newCandEndIndex);
+						if (NCountOrNHours)
+						{ ////// FOR NCOUNT/////////////////////////////////////////////////////
+							int matchingUnitInCounts = matchingUnitInCountsOrHours;
+							int newCandEndIndex = i;
+							// NOTE: going back matchingUnitCounts FROM THE index.
+							int newCandStartIndex = (newCandEndIndex - matchingUnitInCounts) >= 0
+									? (newCandEndIndex - matchingUnitInCounts)
+									: 0;
+							// $$System.out.println("\n\tStart index of candidate timeline=" + newCandStartIndex);
+							// $$System.out.println("\tEnd index of candidate timeline=" + newCandEndIndex);
+							// System.out.println("\tmatchingUnitInCounts=" + matchingUnitInCounts);
+							// System.out.println( "\tnewCandEndIndex - matchingUnitInCounts=" + (newCandEndIndex -
+							// matchingUnitInCounts));
+							activityObjectsForCandidate = trainingTimelineForThisUser
+									.getActivityObjectsInTimelineFromToIndex(newCandStartIndex, newCandEndIndex + 1);
+							nextValidActivityForCandidate = trainingTimelineForThisUser
+									.getNextValidActivityAfterActivityAtThisPositionPD(newCandEndIndex);
+						}
+						else
+						{ ////// FOR NHours///////////////////////////////////////////////////// added on 7 Mar 2019,
+							////// needs to be sanity checked TODO
+							Triple<ArrayList<ActivityObject2018>, ActivityObject2018, Pair<Long, Long>> MUHoursCand = getAOsForNewCandidateTimelineMUHours(
+									trainingTimelineForThisUser, matchingUnitInCountsOrHours, ae);
+							activityObjectsForCandidate = MUHoursCand.getFirst();
+							nextValidActivityForCandidate = MUHoursCand.getSecond();
+						}
 
 						if (nextValidActivityForCandidate == null)
 						{
@@ -1596,8 +1618,8 @@ public class TimelineExtractors
 	 * @param userIDAtRecomm
 	 * @return
 	 * @since 26 July 2017
+	 * @deprecated (most probably, realized on 7 Mar 2019)
 	 */
-
 	private static LinkedHashMap<String, TimelineWithNext> extractCandidateTimelinesMUCountColl(
 			Timeline trainingTimelineqqq,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
@@ -1803,36 +1825,12 @@ public class TimelineExtractors
 			// if (ae.getActivityName().equals(activityAtRecommPoint.getActivityName())) // same name as current
 			// activity
 			{
-				Timestamp newCandEndTimestamp = null;
-				if (Constant.getDatabaseName().equals("dcu_data_2") || Constant.getDatabaseName().equals("geolife1"))
-				{// decreasing 1 second (because this convention followed in data generation (not for Gowalla IMHO)
-					newCandEndTimestamp = new Timestamp(
-							ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
-				}
-				else
-				{
-					newCandEndTimestamp = new Timestamp(
-							ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000);// added on 18 Dec 2018
-				}
-				// NOTE: going back matchingUnitHours FROM THE START TIMESTAMP and not the end timestamp.
+				// extracted logic to separate method on 7 Mar 2019
+				Triple<ArrayList<ActivityObject2018>, ActivityObject2018, Pair<Long, Long>> aosAndNextAOForCand = getAOsForNewCandidateTimelineMUHours(
+						trainingTimeline, matchingUnitInHours, ae);
 
-				// this cast is safe because in this case number of milliseconds won't be in decimals
-				long matchingUnitInMilliSeconds = (long) (matchingUnitInHours * 60 * 60 * 1000);// .multiply(new
-																								// BigDecimal(60*60*1000)).longValue();
-				Timestamp newCandStartTimestamp = new Timestamp(
-						ae.getStartTimestamp().getTime() - matchingUnitInMilliSeconds);
-
-				// $$System.out.println("\n\tStarttime of candidate timeline=" + newCandStartTimestamp);
-				// $$System.out.println("\tEndtime of candidate timeline=" + newCandEndTimestamp);
-
-				/*
-				 * Note: if newCandStartTimestamp here is earlier than when the training timeline started, even then
-				 * this works correctly since we are considering intersection of what is available
-				 */
-				ArrayList<ActivityObject2018> activityObjectsForCandidate = trainingTimeline
-						.getActivityObjectsBetweenTime(newCandStartTimestamp, newCandEndTimestamp);
-				ActivityObject2018 nextValidActivityForCandidate = trainingTimeline
-						.getNextValidActivityAfterActivityAtThisTime(newCandEndTimestamp);
+				ArrayList<ActivityObject2018> activityObjectsForCandidate = aosAndNextAOForCand.getFirst();
+				ActivityObject2018 nextValidActivityForCandidate = aosAndNextAOForCand.getSecond();
 
 				if (nextValidActivityForCandidate == null)
 				{
@@ -1849,9 +1847,12 @@ public class TimelineExtractors
 
 				if (VerbosityConstants.verbose)// sanity check Dec 18 2018
 				{
+					long matchingUnitInMilliSeconds = aosAndNextAOForCand.getThird().getFirst();
+					Timestamp newCandStartTimestampP = new Timestamp(aosAndNextAOForCand.getThird().getSecond());
+
 					System.out.println("\n index in timeline = " + i + "\nae= " + ae.getPrimaryDimensionVal("__") + ":"
 							+ ae.getStartTimestamp() + "--" + ae.getEndTimestamp() + "\nnewCandStartTimestamp="
-							+ newCandStartTimestamp + "\nmatchingUnitInMilliSeconds= " + matchingUnitInMilliSeconds
+							+ newCandStartTimestampP + "\nmatchingUnitInMilliSeconds= " + matchingUnitInMilliSeconds
 							+ "\nCandidateTimeline\n" + newCandidate.getActivityObjectNamesWithTimestampsInSequence());
 				}
 			}
@@ -1871,6 +1872,54 @@ public class TimelineExtractors
 		// }
 		// End of sanity check Dec 18 2018
 		return candidateTimelines;
+	}
+
+	/**
+	 * @param trainingTimeline
+	 * @param matchingUnitInHours
+	 * @param ae
+	 * @return Triple{activityObjectsForCandidate, nextValidActivityForCandidate, new Pair<>(matchingUnitInMilliSeconds,
+	 *         newCandEndTimestamp.getTime())}
+	 * @since 7 March 2019 (extracted from parent method for reusability)
+	 */
+	private static Triple<ArrayList<ActivityObject2018>, ActivityObject2018, Pair<Long, Long>> getAOsForNewCandidateTimelineMUHours(
+			Timeline trainingTimeline, double matchingUnitInHours, ActivityObject2018 ae)
+	{
+		Timestamp newCandEndTimestamp = null;
+		if (Constant.getDatabaseName().equals("dcu_data_2") || Constant.getDatabaseName().equals("geolife1"))
+		{// decreasing 1 second (because this convention followed in data generation (not for Gowalla IMHO)
+			newCandEndTimestamp = new Timestamp(
+					ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000 - 1000);
+		}
+		else
+		{
+			newCandEndTimestamp = new Timestamp(ae.getStartTimestamp().getTime() + ae.getDurationInSeconds() * 1000);
+			// added on 18 Dec 2018
+		}
+		// NOTE: going back matchingUnitHours FROM THE START TIMESTAMP and not the end timestamp.
+
+		// this cast is safe because in this case number of milliseconds won't be in decimals
+		long matchingUnitInMilliSeconds = (long) (matchingUnitInHours * 60 * 60 * 1000);// .multiply(new
+		// BigDecimal(60*60*1000)).longValue();
+		Timestamp newCandStartTimestamp = new Timestamp(ae.getStartTimestamp().getTime() - matchingUnitInMilliSeconds);
+
+		// $$System.out.println("\n\tStarttime of candidate timeline=" + newCandStartTimestamp);
+		// $$System.out.println("\tEndtime of candidate timeline=" + newCandEndTimestamp);
+
+		/*
+		 * Note: if newCandStartTimestamp here is earlier than when the training timeline started, even then this works
+		 * correctly since we are considering intersection of what is available
+		 */
+		ArrayList<ActivityObject2018> activityObjectsForCandidate = trainingTimeline
+				.getActivityObjectsBetweenTime(newCandStartTimestamp, newCandEndTimestamp);
+		ActivityObject2018 nextValidActivityForCandidate = trainingTimeline
+				.getNextValidActivityAfterActivityAtThisTime(newCandEndTimestamp);
+
+		Triple<ArrayList<ActivityObject2018>, ActivityObject2018, Pair<Long, Long>> aosAndNextAOForCand = new Triple<>(
+				activityObjectsForCandidate, nextValidActivityForCandidate,
+				new Pair<>(matchingUnitInMilliSeconds, newCandEndTimestamp.getTime()));
+
+		return aosAndNextAOForCand;
 	}
 
 	/**

@@ -382,10 +382,13 @@ public class RecommendationMasterMar2017GenSeqMultiDJul2018 implements Recommend
 			// //////////////////////////
 
 			long recommMasterT1 = System.currentTimeMillis();
-			System.out.println("Inside recomm master :trainTestTimelinesForAllUsers.size()= "
-					+ trainTestTimelinesForAllUsers.size() + " trainTimelinesAllUsersContinuous.size()="
-					+ trainTimelinesAllUsersContinuous.size());
 
+			if (Constant.collaborativeCandidates)
+			{
+				System.out.println("Inside recomm master :trainTestTimelinesForAllUsers.size()= "
+						+ trainTestTimelinesForAllUsers.size() + " trainTimelinesAllUsersContinuous.size()="
+						+ trainTimelinesAllUsersContinuous.size());
+			}
 			this.candidateTimelinesPrimDim = TimelineExtractors.extractCandidateTimelinesV2(trainingTimelines,
 					lookPastType, this.dateAtRecomm, /* this.timeAtRecomm, */ this.userIDAtRecomm,
 					matchingUnitInCountsOrHours, this.activityObjectAtRecommPoint, trainTestTimelinesForAllUsers,
