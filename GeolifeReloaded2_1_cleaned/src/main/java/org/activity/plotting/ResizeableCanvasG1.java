@@ -14,14 +14,14 @@ import javafx.scene.control.Tooltip;
  * binding its width and height to the width and height of the cell it will
  * automatically resize.
  */
-class ResizableCanvasG1 extends Canvas
+public class ResizeableCanvasG1 extends Canvas
 {
 	private List<List<String>> data = Collections.emptyList();
 	int indexOfStartTSInEachDataPoint;
 	int indexOfEndTSInEachDataPoint;
 	int indexOfActIDInEachDataPoint;
 
-	public ResizableCanvasG1()
+	public ResizeableCanvasG1()
 	{
 		final Tooltip tooltip = new Tooltip();
 		tooltip.setText("data.size()=" + data.size());

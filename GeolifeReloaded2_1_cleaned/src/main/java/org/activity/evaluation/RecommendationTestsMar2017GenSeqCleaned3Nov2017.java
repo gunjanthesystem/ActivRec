@@ -31,7 +31,6 @@ import org.activity.objects.Timeline;
 import org.activity.objects.Triple;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeqNov2017;
-import org.activity.recomm.RecommendationMasterMar2017GenSeqMultiDJul2018;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNGramBaseline;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqNov2017;
 import org.activity.recomm.RecommendationMasterRNN1Jun2018;
@@ -131,6 +130,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 				+ " " + caseType + " lengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
 		// PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
 		long recommTestsStarttime = System.currentTimeMillis();
+
+		if (Constant.doSecondaryDimension)
+		{
+			PopUps.printTracedErrorMsgWithExit(
+					"Error: doSecondaryDimension is true, hence expected to call RecommTestsMultiD version instead of RecommendationTestsMar2017GenSeqCleaned3Nov2017");
+		}
 
 		// start of added on 31 Dec 2018 for Jupyter baseline
 		if (Constant.doForJupyterBaselines)
@@ -475,13 +480,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						StringBuilder sbNumOfValidsAfterAnRT = new StringBuilder();
 
 						// int userCount = 0;
-						// /**
-						// * This can be made class variable and does not need to be repeated for each matching unit,
-						// but
-						// * in current setup we are doing it for each matching unit. Note: this is very small
-						// performance
-						// * effect, hence should not be of major concern. (UserId,ActName,RepresentativeAO)
-						// */
+						/**
+						 * This can be made class variable and does not need to be repeated for each matching unit, but
+						 * in current setup we are doing it for each matching unit. Note: this is very small performance
+						 * effect, hence should not be of major concern. (UserId,ActName,RepresentativeAO)
+						 */
 						// LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject2018>> mapOfRepAOs = new
 						// LinkedHashMap<>();
 						// LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>>
@@ -1107,17 +1110,19 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 										}
 
 										else
-										{
-											if (Constant.doSecondaryDimension)
-											{ // added on 18 July 2018
-												recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqMultiDJul2018(
-														userTrainingTimelines, userTestTimelines, dateToRecomm,
-														recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
-														matchingUnit, caseType, this.lookPastType, false,
-														repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
-														trainTimelinesAllUsersContinuousFiltrd);
-											}
-											else
+										{// disabled on 6 March 2018, we have a separate RecommTest for MultiD, hence it
+											// would be better to not allow doSecondaryDimension here.
+											// if (Constant.doSecondaryDimension)
+											// { // added on 18 July 2018
+											// recommMasters[seqIndex] = new
+											// RecommendationMasterMar2017GenSeqMultiDJul2018(
+											// userTrainingTimelines, userTestTimelines, dateToRecomm,
+											// recommTimesStrings[0], userId, thresholdValue, typeOfThreshold,
+											// matchingUnit, caseType, this.lookPastType, false,
+											// repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
+											// trainTimelinesAllUsersContinuousFiltrd);
+											// }
+											// else
 											{
 												recommMasters[seqIndex] = new RecommendationMasterMar2017GenSeqNov2017(
 														userTrainingTimelines, userTestTimelines, dateToRecomm,

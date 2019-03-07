@@ -15,20 +15,25 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
+import org.activity.constants.Enums.AltSeqPredictor;
 import org.activity.constants.Enums.CaseType;
 import org.activity.constants.Enums.LookPastType;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
+import org.activity.generator.DataTransformerForSessionBasedRecAlgos;
 import org.activity.io.ReadingFromFile;
+import org.activity.io.Serializer;
 import org.activity.io.WToFile;
 import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
+import org.activity.objects.Triple;
 import org.activity.recomm.RecommendationMasterMar2017AltAlgoSeqMultiDJul2018;
 import org.activity.recomm.RecommendationMasterMar2017GenSeqMultiDJul2018;
 import org.activity.recomm.RecommendationMasterMultiDI;
 import org.activity.sanityChecks.Sanity;
+import org.activity.sanityChecks.TimelineSanityChecks;
 import org.activity.spmf.AKOMSeqPredictorLighter;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
@@ -121,6 +126,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 		// PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
 		long recommTestsStarttime = System.currentTimeMillis();
 
+		AltSeqPredictor altSeqPredictor = Constant.altSeqPredictor;// added on 26 Dec 2018
 		this.primaryDimension = Constant.primaryDimension;
 		this.secondaryDimension = Constant.secondaryDimension;
 		this.databaseName = Constant.getDatabaseName();
@@ -156,9 +162,130 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 		// System.exit(-1);}
 
 		// setMatchingUnitArray(lookPastType);
-		this.matchingUnitArray = Constant.getMatchingUnitArray(lookPastType, Constant.altSeqPredictor);
+		this.matchingUnitArray = Constant.getMatchingUnitArray(lookPastType, altSeqPredictor);
 
 		// buildRepresentativeActivityObjectsForUsers()
+
+		// ----------------------------------------- Start of Added from single dimension recommTest
+		// Start of added on 20 Dec 2018
+		// Start of 20 Dec 2018 Curtain
+		// LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject2018>> mapOfRepAOs = new LinkedHashMap<>();
+		// LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDurationInms = new
+		// LinkedHashMap<>();
+
+		// training test DAY timelines for all users
+		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
+
+		// training test timelines for all users continuous
+		LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd = null;
+		// added on 27 Dec 2018, needed for baseline coll high occur and high dur
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelinesAllUsersDWFiltrd = null;
+
+		// {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
+		// $$Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>>
+		// repAOResultGenericUser = null;
+		// End of 20 Dec 2018 Curtain
+		// Split timelines into training-test for each user to be used collaboratively
+
+		trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(allUsersTimelines,
+				percentageInTraining, Constant.cleanTimelinesAgainInsideTrainTestSplit);
+
+		// PopUps.showMessage("allUsersTimelines.size() = "+allUsersTimelines.size());
+
+		trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+				.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
+						Constant.getRecentDaysInTrainingTimelines(), Constant.filterTrainingTimelinesByRecentDays);
+
+		// start of added on 27 Dec 2018
+		// added on 27 Dec 2018, needed for baseline coll high occur and high dur
+		trainTimelinesAllUsersDWFiltrd = RecommendationTestsUtils.getTrainingTimelinesWithFilterByRecentDaysV3(
+				trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines(),
+				Constant.filterTrainingTimelinesByRecentDays);
+
+		if (true)// can be disabled after initial run for speed
+		{
+			// start of sanity check // System.out.println("Sanity check 27 Dec 2018");
+			for (Map.Entry<String, LinkedHashMap<Date, Timeline>> e : trainTimelinesAllUsersDWFiltrd.entrySet())
+			{ // compare daywise and continuous timelines
+				// System.out.println
+				if ((TimelineSanityChecks.isDaywiseAndContinousTimelinesSameWRTAoNameTS(e.getValue(),
+						trainTimelinesAllUsersContinuousFiltrd.get(e.getKey()), false)) == false)
+				{
+					PopUps.printTracedErrorMsgWithExit("Error: isDaywiseAndContinousTimelinesSameWRTAoNameTS = false");
+				}
+			}
+		}
+		// end of sanity check OKAY.// System.exit(0);
+		// end of added on 27 Dec 2018
+		// else
+		// { // sampledUsersTimelines
+		// trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+		// .getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
+		// }
+
+		// start of added on 29 Dec 2018
+		if (false && Constant.doForJupyterBaselines)
+		{
+			DataTransformerForSessionBasedRecAlgos.writeSessionIDsForFilteredTrainAndTestDays(
+					trainTimelinesAllUsersDWFiltrd, trainTestTimelinesForAllUsersDW, Constant.getCommonPath());
+		}
+		// UserID,Date,IndexInDay
+		ArrayList<Triple<Integer, Date, Integer>> validRtsAsUserIdDateIndexInDay = new ArrayList<>();
+		// end of added on 29 Dec 2018
+		if (false)
+		{
+			Serializer.kryoSerializeThis(trainTimelinesAllUsersContinuousFiltrd,
+					Constant.getCommonPath() + "trainTimelinesAllUsersContinuousFiltrd.kryo");
+			System.exit(0);
+		}
+
+		StringBuilder sbT1 = new StringBuilder("User,NumOfAOsInTraining");
+		trainTimelinesAllUsersContinuousFiltrd.entrySet().stream()
+				.forEachOrdered(e -> sbT1.append(e.getKey() + "," + e.getValue().size() + "\n"));
+		WToFile.appendLineToFileAbs(sbT1.toString(), this.commonPath + "User_NumOfActsInTraining.csv");
+
+		///////////
+		LinkedHashMap<String, RepresentativeAOInfo> repAOInfoForEachUser = new LinkedHashMap<>();// new approach
+
+		// Start of curtain: incomplete: motive: faster speed
+		// PopUps.showMessage("repAOInfoForEachUser.keySet() empty =" + repAOInfoForEachUser.keySet()
+		// + " trainTestTimelinesForAllUsersDW.size()=" + trainTestTimelinesForAllUsersDW.size()
+		// + " trainTimelinesAllUsersContinuousFiltrd.size() = " + trainTimelinesAllUsersContinuousFiltrd.size());
+		if (Constant.lengthOfRecommendedSequence > 1)
+		{
+			repAOInfoForEachUser = RepresentativeAOInfo.buildRepresentativeAOInfosDec2018(
+					trainTimelinesAllUsersContinuousFiltrd, primaryDimension, databaseName,
+					Constant.collaborativeCandidates);
+
+			// PopUps.showMessage("repAOInfoForEachUser.keySet() empty =" + repAOInfoForEachUser.keySet());
+
+			System.out.println("repAOInfoForEachUser.keySet() =" + repAOInfoForEachUser.keySet());
+			// if (Constant.preBuildRepAOGenericUser)
+			// {// collaborative approach
+			// // disabled on 1 Aug 2017, will do just-in-time computation of representative act object
+			// // based only on candidate timelines
+			// // added on14Nov2018
+			// if (Constant.collaborativeCandidates)
+			// {
+			// repAOResultGenericUser = RepresentativeAOInfo.buildRepresentativeAOsAllUsersPDVCOllAllUsers(
+			// trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
+			// Constant.getUniqueActivityIDs(), primaryDimension, databaseName);
+			// }
+			// // end of curtain
+			// ////// END of build representative activity objects for this user.
+			// /// temp end
+			// // start of added on 20 Dec 2018
+			// else
+			// {
+			// repAOResultGenericUser = RepresentativeAOInfo.buildRepresentativeAOsAllUsersPDVCOllAllUsers(
+			// trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
+			// Constant.getUniqueActivityIDs(), primaryDimension, databaseName);
+			// }
+			// // end of added on 20 Dec 2018
+			// }
+		}
+		// End of added on 20 Dec 2018
+		// ----------------------------------------- End of Added from single dimension recommTest
 
 		for (Enums.TypeOfThreshold typeOfThreshold : typeOfThresholds)
 		{
@@ -291,6 +418,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 								.getBWForNewFile(commonPath + "dataBaseLineOccurrence.csv");
 						BufferedWriter baseLineDuration = WToFile
 								.getBWForNewFile(commonPath + "dataBaseLineDuration.csv");
+						// added 27 Dec 2018
+						BufferedWriter baseLineOccurrenceWithScore = WToFile
+								.getBWForNewFile(commonPath + "dataBaseLineOccurrenceWithScore.csv");
+						BufferedWriter baseLineDurationWithScore = WToFile
+								.getBWForNewFile(commonPath + "dataBaseLineDurationWithScore.csv");
 
 						BufferedWriter bwNumOfWeekendsInTraining = WToFile
 								.getBWForNewFile(commonPath + "NumberOfWeekendsInTraining.csv");
@@ -389,49 +521,53 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 						 * in current setup we are doing it for each matching unit. Note: this is very small performance
 						 * effect, hence should not be of major concern. (UserId,ActName,RepresentativeAO)
 						 */
-						LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject2018>> mapOfRepAOs = new LinkedHashMap<>();
-						LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>> mapOfMedianPreSuccDurationInms = new LinkedHashMap<>();
-						// PopUps.showMessage("Starting iteration over user");
+						// LinkedHashMap<Integer, LinkedHashMap<Integer, ActivityObject2018>> mapOfRepAOs = new
+						// LinkedHashMap<>();
+						// LinkedHashMap<Integer, LinkedHashMap<Integer, Pair<Double, Double>>>
+						// mapOfMedianPreSuccDurationInms = new LinkedHashMap<>();
+						// // PopUps.showMessage("Starting iteration over user");
+						//
+						// /**
+						// * training test DAY timelines for all users
+						// **/
+						// LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW =
+						// null;
+						//
+						// // training test timelines for all users continuous
+						// LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd = null;
+						//
+						// /**
+						// * {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
+						// */
+						// Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double,
+						// Double>>> repAOResultGenericUser = null;
 
-						/**
-						 * training test DAY timelines for all users
-						 **/
-						LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
-
-						// training test timelines for all users continuous
-						LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd = null;
-
-						/**
-						 * {ActID,RepAO}, {ActID,{medianDurFromPrevForEachActName, medianDurFromNextForEachActName}}
-						 */
-						Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResultGenericUser = null;
-
-						// Split timelines into training-test for each user to be used collaboratively
-						if (Constant.collaborativeCandidates)
-						{// TODO 23 Feb 2018: probably we can take this out of MU loop
-							trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(
-									allUsersTimelines, percentageInTraining,
-									Constant.cleanTimelinesAgainInsideTrainTestSplit);
-
-							if (Constant.filterTrainingTimelinesByRecentDays)
-							{
-								trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
-										.getContinousTrainingTimelinesWithFilterByRecentDaysV2(
-												trainTestTimelinesForAllUsersDW,
-												Constant.getRecentDaysInTrainingTimelines(),
-												Constant.filterTrainingTimelinesByRecentDays);
-							}
-							else
-							{ // sampledUsersTimelines
-								trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
-										.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
-							}
-							StringBuilder sbT1 = new StringBuilder();
-							trainTimelinesAllUsersContinuousFiltrd.entrySet().stream()
-									.forEachOrdered(e -> sbT1.append(e.getKey() + "," + e.getValue().size() + "\n"));
-							WToFile.appendLineToFileAbs(sbT1.toString(),
-									this.commonPath + "User_NumOfActsInTraining.csv");
-						}
+						// // Split timelines into training-test for each user to be used collaboratively
+						// if (Constant.collaborativeCandidates)
+						// {// 23 Feb 2018: probably we can take this out of MU loop
+						// trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(
+						// allUsersTimelines, percentageInTraining,
+						// Constant.cleanTimelinesAgainInsideTrainTestSplit);
+						//
+						// if (Constant.filterTrainingTimelinesByRecentDays)
+						// {
+						// trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+						// .getContinousTrainingTimelinesWithFilterByRecentDaysV2(
+						// trainTestTimelinesForAllUsersDW,
+						// Constant.getRecentDaysInTrainingTimelines(),
+						// Constant.filterTrainingTimelinesByRecentDays);
+						// }
+						// else
+						// { // sampledUsersTimelines
+						// trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+						// .getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
+						// }
+						// StringBuilder sbT1 = new StringBuilder();
+						// trainTimelinesAllUsersContinuousFiltrd.entrySet().stream()
+						// .forEachOrdered(e -> sbT1.append(e.getKey() + "," + e.getValue().size() + "\n"));
+						// WToFile.appendLineToFileAbs(sbT1.toString(),
+						// this.commonPath + "User_NumOfActsInTraining.csv");
+						// }
 						/// temp start
 						////// START of build representative activity objects for this user.
 						// if (true)// representativeAOsNotComputed == false) //do this
@@ -439,32 +575,36 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 						// unit, so we can take it out of the for loop, however, it that we will also need to
 						// take out the train-test splitting of timelines out of the loop, however that can be done
 						// as well
-						// Start of curtain: incomplete: motive: faster speed
-						if (Constant.preBuildRepAOGenericUser)
-						{// collaborative approach
-							// disabled on 1 Aug 2017, will do just-in-time computation of representative act object
-							// based only on candidate timelines
-							if (Constant.collaborativeCandidates)
-							{
-								repAOResultGenericUser = RepresentativeAOInfo
-										.buildRepresentativeAOsAllUsersPDVCOllAllUsers(trainTestTimelinesForAllUsersDW,
-												Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs(),
-												primaryDimension, databaseName);
-							}
-							// end of curtain
-							////// END of build representative activity objects for this user.
-							/// temp end
-							// start of added on 20 Dec 2018
-							else
-							{
+						// // Start of curtain: incomplete: motive: faster speed
+						// if (Constant.preBuildRepAOGenericUser)
+						// {// collaborative approach
+						// // disabled on 1 Aug 2017, will do just-in-time computation of representative act object
+						// // based only on candidate timelines
+						// if (Constant.collaborativeCandidates)
+						// {
+						// repAOResultGenericUser = RepresentativeAOInfo
+						// .buildRepresentativeAOsAllUsersPDVCOllAllUsers(trainTestTimelinesForAllUsersDW,
+						// Constant.getUniqueLocIDs(), Constant.getUniqueActivityIDs(),
+						// primaryDimension, databaseName);
+						// }
+						// // end of curtain
+						// ////// END of build representative activity objects for this user.
+						// /// temp end
+						// // start of added on 20 Dec 2018
+						// else
+						// {
+						//
+						// }
+						// // end of added on 20 Dec 2018
+						// }
 
-							}
-							// end of added on 20 Dec 2018
+						System.out.println(
+								"\nWill now loop over users in RecommTests: num of userIDs.length= " + userIDs.length);
+						if (Constant.collaborativeCandidates)
+						{
+							System.out.println(" trainTimelinesAllUsersContinuous.size()="
+									+ trainTimelinesAllUsersContinuousFiltrd.size());
 						}
-
-						System.out.println("\nWill now loop over users in RecommTests: num of userIDs.length= "
-								+ userIDs.length + " trainTimelinesAllUsersContinuous.size()="
-								+ trainTimelinesAllUsersContinuousFiltrd.size());
 
 						for (int userId : userIDs) // for(int userId=minTestUser;userId <=maxTestUser;userId++)
 						{ // int numberOfValidRTs = 0;// userCount += 1;
@@ -473,9 +613,9 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 							String userName = RecommendationTestsUtils.getUserNameFromUserID(userId, this.databaseName);
 
 							// Start of Added on 21 Dec 2017
-							if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
-									|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
-									|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
+							if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
+									|| altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+									|| altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 							{
 								AKOMSeqPredictorLighter.clearSeqPredictorsForEachUserStored();
 								LSTMCharModelling_SeqRecJun2018.clearLSTMPredictorsForEachUserStored();
@@ -564,35 +704,35 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 							// take out the train-test splitting of timelines out of the loop, however that can be done
 							// as well
 							Pair<LinkedHashMap<Integer, ActivityObject2018>, LinkedHashMap<Integer, Pair<Double, Double>>> repAOResult = null;
-							if (Constant.preBuildRepAOGenericUser == false)
-							{
-								if (Constant.collaborativeCandidates == false)
-								{
-									repAOResult = RepresentativeAOInfo.prebuildRepresentativeActivityObjects(
-											trainTestTimelinesForAllUsersDW, userId, userTrainingTimelines,
-											userTestTimelines, databaseName, primaryDimension);
-
-									LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = repAOResult
-											.getFirst();
-									mapOfRepAOs.put(userId, repAOsForThisUser);
-									mapOfMedianPreSuccDurationInms.put(userId, repAOResult.getSecond());
-								}
-								else
-								{// collaborative approach
-									// disabled on 1 Aug 2017, will do just-in-time computation of representative act
-									// object// based only on candidate timelines
-									if (Constant.buildRepAOJustInTime == false)
-									{
-										repAOResult = RepresentativeAOInfo.buildRepresentativeAOsForUserPDVCOll(userId,
-												trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
-												Constant.getUniqueActivityIDs(), databaseName, primaryDimension);
-										LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = repAOResult
-												.getFirst();
-										mapOfRepAOs.put(userId, repAOsForThisUser);
-										mapOfMedianPreSuccDurationInms.put(userId, repAOResult.getSecond());
-									}
-								}
-							}
+							// if (Constant.preBuildRepAOGenericUser == false)
+							// {
+							// if (Constant.collaborativeCandidates == false)
+							// {
+							// repAOResult = RepresentativeAOInfo.prebuildRepresentativeActivityObjects(
+							// trainTestTimelinesForAllUsersDW, userId, userTrainingTimelines,
+							// userTestTimelines, databaseName, primaryDimension);
+							//
+							// LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = repAOResult
+							// .getFirst();
+							// mapOfRepAOs.put(userId, repAOsForThisUser);
+							// mapOfMedianPreSuccDurationInms.put(userId, repAOResult.getSecond());
+							// }
+							// else
+							// {// collaborative approach
+							// // disabled on 1 Aug 2017, will do just-in-time computation of representative act
+							// // object// based only on candidate timelines
+							// if (Constant.buildRepAOJustInTime == false)
+							// {
+							// repAOResult = RepresentativeAOInfo.buildRepresentativeAOsForUserPDVCOll(userId,
+							// trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
+							// Constant.getUniqueActivityIDs(), databaseName, primaryDimension);
+							// LinkedHashMap<Integer, ActivityObject2018> repAOsForThisUser = repAOResult
+							// .getFirst();
+							// mapOfRepAOs.put(userId, repAOsForThisUser);
+							// mapOfMedianPreSuccDurationInms.put(userId, repAOResult.getSecond());
+							// }
+							// }
+							// }
 							////// END of build representative activity objects for this user.
 
 							if (Constant.collaborativeCandidates)
@@ -637,6 +777,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 							LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines = null;
 							String actNamesCountsWithoutCountOverTrain = "";
 							String actNamesDurationsWithoutDurationOverTrain = "";
+							String actNamesCountsWithCountOverTrain = "";
+							String actNamesDurationsWithDurationOverTrain = "";
 
 							// START OF Curtain disable trivial baselines
 							// if (Constant.DoBaselineDuration || Constant.DoBaselineOccurrence)
@@ -963,8 +1105,11 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										// $$ END of curtain 18 July since these not implemented for secondary dim
 										if (Constant.doSecondaryDimension)
 										{
-											if (Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
-													|| Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM))
+											if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
+													|| altSeqPredictor.equals(Enums.AltSeqPredictor.AKOM)
+													|| altSeqPredictor.equals(Enums.AltSeqPredictor.ClosestTime)
+													|| altSeqPredictor.equals(Enums.AltSeqPredictor.HighDur)
+													|| altSeqPredictor.equals(Enums.AltSeqPredictor.HighOccur))
 											// && (this.lookPastType.equals(Enums.LookPastType.Daywise)
 											{// added on 6 Aug 2018
 												recommMasters[seqIndex] = new RecommendationMasterMar2017AltAlgoSeqMultiDJul2018(
@@ -973,7 +1118,10 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 														matchingUnit, caseType, this.lookPastType, false,
 														repAOsFromPrevRecomms, trainTestTimelinesForAllUsersDW,
 														trainTimelinesAllUsersContinuousFiltrd,
-														Constant.altSeqPredictor);
+														Constant.altSeqPredictor, null, null);
+												// TODO
+												PopUps.showMessage(
+														"NEED TO IMPLEMENT THE OBJECTS FOR LAST TWO ARGS IN THE PREV CALL");
 											}
 											else
 											{
@@ -1134,26 +1282,41 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018
 										topRecommendedSecondaryDimensionVal[seqIndex] = splittedRankedRecommendedSecDimVals[1];
 
 										// TODO HERE WE COULD GET THE RESULTANT ACT OBJECT FROM THE TOP RECOMMENDATION
-										// OF PRIMARY
-										// AND SECONDARY DIMENSION, either from inside the RecommMaster or here itself.
+										// OF PRIMARY AND SECONDARY DIMENSION, either from inside the RecommMaster or
+										// here itself.
 
 										// PopUps.showMessage("here12_2");
-										ActivityObject2018 repAOForTopRecommActName = RepresentativeAOInfo
-												.getRepresentativeAOForActName(Constant.preBuildRepAOGenericUser,
-														Constant.collaborativeCandidates, Constant.buildRepAOJustInTime,
-														mapOfRepAOs, mapOfMedianPreSuccDurationInms,
-														repAOResultGenericUser, userId, recommendationTimes[seqIndex],
-														topRecommendedPrimaryDimensionVal[seqIndex], recommMaster,
-														this.primaryDimension, trainTimelinesAllUsersContinuousFiltrd,
-														commonPath);
-
-										// PopUps.showMessage("here12_3");
-										repAOsFromPrevRecomms.add(repAOForTopRecommActName);
 
 										if (seqIndex < (recommSeqLength - 1))
 										{
+											// ActivityObject2018 repAOForTopRecommActName = RepresentativeAOInfo
+											// .getRepresentativeAOForActName(Constant.preBuildRepAOGenericUser,
+											// Constant.collaborativeCandidates,
+											// Constant.buildRepAOJustInTime, mapOfRepAOs,
+											// mapOfMedianPreSuccDurationInms, repAOResultGenericUser,
+											// userId, recommendationTimes[seqIndex],
+											// topRecommendedPrimaryDimensionVal[seqIndex], recommMaster,
+											// this.primaryDimension,
+											// trainTimelinesAllUsersContinuousFiltrd, commonPath);
+
+											RepresentativeAOInfo ree1 = repAOInfoForEachUser
+													.get(String.valueOf(userId));
+											// System.out.println("String.valueOf(userId) = " + String.valueOf(userId));
+											// System.out.println("ree1 = " + ree1.toString());
+
+											ActivityObject2018 repAOForTopRecommActName = ree1
+													.getRepresentativeAOForActName(recommendationTimes[seqIndex],
+															Integer.valueOf(
+																	topRecommendedPrimaryDimensionVal[seqIndex]),
+															recommMaster, this.primaryDimension, databaseName);
+
+											// PopUps.showMessage("here12_3");
+											repAOsFromPrevRecomms.add(repAOForTopRecommActName);
 											recommendationTimes[seqIndex + 1] = repAOForTopRecommActName
 													.getEndTimestamp();
+
+											System.out.println("repAOForTopRecommActName = " + repAOForTopRecommActName
+													.toStringAllGowallaTSWithNameForHeaded(","));
 										} // PopUps.showMessage("here12_4");
 									} // END of loop over iterative recommendation for each seq index
 

@@ -2785,6 +2785,7 @@ public class ResultsDistributionEvaluation
 			Map<String, Integer> userIdentifierChosenMuMap, String dimensionPhrase, boolean statFileHasColHeader,
 			int[] firstToMaxInOrder, boolean statFileHasRowHeader, String valColHeader)
 	{
+		// PopUps.showMessage("Inside getResultChosenMU, host = " + host);
 		if (firstToMaxInOrder.length == 0)
 		{
 			System.out.println("Warning: since firstToMaxInOrder is of length: " + firstToMaxInOrder.length
@@ -2793,9 +2794,11 @@ public class ResultsDistributionEvaluation
 			doFirstToMaxZeroAware = false;
 		}
 
+		// PopUps.showMessage("here 00");
 		String passwd = ServerUtils.getPassWordForHost(host);
 		String user = ServerUtils.getUserForHost(host);
 
+		// PopUps.showMessage("here 02");
 		// MU , <list for each user, <list of first1,2,3 for that user and mu>>
 		Map<Integer, List<List<Double>>> muKeyAllValsMap = new LinkedHashMap<>();
 
@@ -2804,6 +2807,7 @@ public class ResultsDistributionEvaluation
 		Map<Integer, Map<Integer, List<Double>>> userMUKeyVals = null;
 
 		String userSetLabel = "";
+		// PopUps.showMessage("here 01");
 		try
 		{
 			// if PureAKOM, then mu is order of AKOM -1
@@ -2814,10 +2818,12 @@ public class ResultsDistributionEvaluation
 
 				splitted2[0] = splitted2[0].replace("NoTTFilter", "");// added on 1 Jan 2018
 				splitted2[0] = splitted2[0].replace("PNN500", "");// added on 1 Jan 2018
+				splitted2[0] = splitted2[0].replace("coll", "");// added on 7 March 2019
 				//
 
 				double muForOrder = Double.valueOf(splitted2[0]);
 				muArray = new double[] { muForOrder - 1 };
+				// PopUps.showMessage("muArray = " + muArray);
 			}
 			else if (pathToRead.contains("RNN1"))
 			{
@@ -2884,7 +2890,7 @@ public class ResultsDistributionEvaluation
 			writeUserMuKeyVals(userMUKeyVals,
 					pathToWrite + resultsLabel + "_" + statFileName + "userMUKeyVals" + dimensionPhrase + ".csv",
 					userSetLabel, valColHeader);
-
+			// PopUps.showMessage("here1");
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 			if (doFirstToMax)
 			{
@@ -2910,7 +2916,7 @@ public class ResultsDistributionEvaluation
 						+ "MinMUWithMaxFirst" + firstToMax + dimensionPhrase + ".csv");
 			}
 			/////////////////////////////////////////////////////////////////////////////////////////////////
-
+			// PopUps.showMessage("here2");
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 			if (doFirstToMaxZeroAware)
 			{
@@ -2937,7 +2943,7 @@ public class ResultsDistributionEvaluation
 						+ "MinMUWithMaxFirst0Aware" + dimensionPhrase + ".csv");
 			}
 			/////////////////////////////////////////////////////////////////////////////////////////////////
-
+			// PopUps.showMessage("here3");
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 			if (doChosenMUForEachUser)
 			{
@@ -2971,7 +2977,7 @@ public class ResultsDistributionEvaluation
 			String s = "pathToRead=" + pathToRead + "\nresultsLabel=" + resultsLabel + "\nstatFileNameToRead="
 					+ statFileName;
 			WToFile.appendLineToFileAbs(
-					PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResult()\n") + " \nfor:" + s,
+					PopUps.getCurrentStackTracedWarningMsg("\n\nException in getResultChosenMU()\n") + " \nfor:" + s,
 					pathToWrite + "ExceptionsEncountered" + dimensionPhrase + ".csv");
 
 			System.exit(-1);

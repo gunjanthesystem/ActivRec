@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.Enums;
+import org.activity.constants.Enums.AltSeqPredictor;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.distances.AlignmentBasedDistance;
@@ -20,11 +22,14 @@ import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
+import org.activity.objects.Triple;
 import org.activity.ui.PopUps;
+import org.activity.util.ComparatorUtils;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineExtractors;
+import org.activity.util.TimelineTrimmers;
 import org.activity.util.UtilityBelt;
 
 /**
@@ -148,6 +153,12 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 
 	private boolean errorExists;
 
+	// PARAMETER to set for BaselineClosestTime
+	/**
+	 * Score (A<sub>O</sub>) = ∑ { 1- min( 1, |Stcand - RT|/60mins) }
+	 **/
+	private Double timeInSecsForRankScoreNormalisation;// = 60 * 60; // 60 mins
+
 	public LinkedHashMap<String, String> getCandUserIDs()
 	{
 		return candUserIDsPrimaryDim;
@@ -162,7 +173,7 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 	 * @param userAtRecomm
 	 * @param thresholdVal
 	 * @param typeOfThreshold
-	 * @param matchingUnitInCountsOrHours
+	 * @param matchingUnitInCountsOrHoursPassed
 	 * @param caseType
 	 * @param lookPastType
 	 * @param dummy
@@ -170,6 +181,7 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 	 * @param trainTestTimelinesForAllUsers
 	 * @param trainTimelinesAllUsersContinuous
 	 * @param altSeqPredictor
+	 * @param mapsForCountDurationBaselines
 	 */
 	public RecommendationMasterMar2017AltAlgoSeqMultiDJul2018(LinkedHashMap<Date, Timeline> trainingTimelines,
 			LinkedHashMap<Date, Timeline> testTimelines, String dateAtRecomm, String timeAtRecomm, int userAtRecomm,
@@ -177,13 +189,26 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 			Enums.CaseType caseType, Enums.LookPastType lookPastType, boolean dummy,
 			ArrayList<ActivityObject2018> actObjsToAddToCurrentTimeline,
 			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsers,
-			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor)
+			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor,
+			LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForPrimDimCountDurationBaselines,
+			LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForSecDimCountDurationBaselines)
+	// TODO 6 Mar 2019, probably need mapsForCountDurationBaselines per location as well.
 	{
 		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
+		if (Constant.getDatabaseName().equals("dcu_data_2")) // added on 26 Dec 2018 for Baseline closest time
+		{
+			timeInSecsForRankScoreNormalisation = 60d * 60; // 60 mins
+		}
+		else
+		{
+			timeInSecsForRankScoreNormalisation = 5d * 60 * 60;// 5 hrs}
+		}
 		try
 		{
 			System.out.println("\n-----------Starting RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 "
-					+ lookPastType + "-------------");
+					+ lookPastType + "------------\ntrainTimelinesAllUsersContinuous.size() = "
+					+ trainTimelinesAllUsersContinuous.size() + " timeInSecsForRankScoreNormalisation = "
+					+ timeInSecsForRankScoreNormalisation);
 
 			String performanceFileName = Constant.getCommonPath() + "Performance.csv";
 			long recommMasterT0 = System.currentTimeMillis();
@@ -282,23 +307,57 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 			// || Constant.altSeqPredictor.equals(Enums.AltSeqPredictor.RNN1))
 			{
 				System.out.println("NO CAND EXTRACTION for PrimDim or SecDim!");
-				this.candidateTimelinesPrimDim = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
-				this.candidateTimelinesSecDim = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
-
-				// Only removing the current user's data from candidate.
-				Timeline removedCandCurrUser = candidateTimelinesPrimDim.remove(userIDAtRecomm);
-				Timeline removedCandCurrUserSecDim = candidateTimelinesSecDim.remove(userIDAtRecomm);
-
-				if (removedCandCurrUser != null && removedCandCurrUserSecDim != null)
+				if (Constant.collaborativeCandidates)
 				{
-					System.out.println("Removed userIDAtRecomm from cand and SecDimCand");
+					this.candidateTimelinesPrimDim = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
+					this.candidateTimelinesSecDim = new LinkedHashMap<>(trainTimelinesAllUsersContinuous);
+
+					// Only removing the current user's data from candidate.
+					Timeline removedCandCurrUser = candidateTimelinesPrimDim.remove(userIDAtRecomm);
+					Timeline removedCandCurrUserSecDim = candidateTimelinesSecDim.remove(userIDAtRecomm);
+
+					if (removedCandCurrUser != null && removedCandCurrUserSecDim != null)
+					{
+						System.out.println("Removed userIDAtRecomm from cand and SecDimCand");
+					}
+					else
+					{
+						if (Constant.getDatabaseName().equals("gowalla1")
+								&& Constant.useRandomlySampled100Users == false)
+						{
+							PopUps.showError("userIDAtRecomm:" + userIDAtRecomm
+									+ " supposed to be removed from cands was not in cand or SecDim or had null value.");
+						}
+						else
+						{
+							System.out.println("Warning: userIDAtRecomm:" + userIDAtRecomm
+									+ " supposed to be removed from cands was not in cands or had null value.");
+						}
+					}
 				}
 				else
 				{
-					PopUps.showError("userIDAtRecomm:" + userIDAtRecomm
-							+ " supposed to be removed from cands was not in cand or SecDim or had null value.");
+					this.candidateTimelinesPrimDim = new LinkedHashMap<>();
+					this.candidateTimelinesSecDim = new LinkedHashMap<>();
+					for (Entry<Date, Timeline> e : trainingTimelines.entrySet())
+					{
+						candidateTimelinesPrimDim.put(e.getKey().toString(), e.getValue());
+						candidateTimelinesSecDim.put(e.getKey().toString(), e.getValue());
+					}
 				}
 				// trainTimelinesAllUsersContinuous;//
+
+				// start of added on 28 Dec 2018
+				// need to remove invalid for dcu dataset
+				if (Constant.hasInvalidActivityNames)
+				{
+					candidateTimelinesPrimDim = TimelineTrimmers.expungeInvalids(candidateTimelinesPrimDim);
+					candidateTimelinesSecDim = TimelineTrimmers.expungeInvalids(candidateTimelinesSecDim);
+
+					activitiesGuidingRecomm = (ArrayList<ActivityObject2018>) activitiesGuidingRecomm.stream()
+							.filter(ao -> ao.isInvalidActivityName() == false).collect(Collectors.toList());
+				}
+				// end of added on 28 Dec 2018
 			}
 			else
 			{
@@ -617,16 +676,148 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 			// this.lookPastType, this.distancesSortedMap);
 			// Non relevant Curtain end
 
-			this.recommendedActivityNamesWithRankscores = RecommMasterAltAlgoSeqCommonUtils
-					.getTopPredictedAKOMActivityPDVals(this.activitiesGuidingRecomm, this.caseType, this.lookPastType,
-							this.candidateTimelinesPrimDim, 1, false, Constant.getAKOMHighestOrder(),
-							this.userIDAtRecomm, altSeqPredictor, this.primaryDimension);
+			if (altSeqPredictor.equals(AltSeqPredictor.PureAKOM) || altSeqPredictor.equals(AltSeqPredictor.AKOM))
+			{
+				this.recommendedActivityNamesWithRankscores = RecommMasterAltAlgoSeqCommonUtils
+						.getTopPredictedAKOMActivityPDVals(this.activitiesGuidingRecomm, this.caseType,
+								this.lookPastType, this.candidateTimelinesPrimDim, 1, false,
+								Constant.getAKOMHighestOrder(), this.userIDAtRecomm, altSeqPredictor,
+								this.primaryDimension);
 
-			this.recommendedSecondaryDimValsWithRankscores = RecommMasterAltAlgoSeqCommonUtils
-					.getTopPredictedAKOMActivityPDVals(this.activitiesGuidingRecomm, this.caseType, this.lookPastType,
-							this.candidateTimelinesPrimDim, 1, false, Constant.getAKOMHighestOrder(),
-							this.userIDAtRecomm, altSeqPredictor, this.secondaryDimension);
+				this.recommendedSecondaryDimValsWithRankscores = RecommMasterAltAlgoSeqCommonUtils
+						.getTopPredictedAKOMActivityPDVals(this.activitiesGuidingRecomm, this.caseType,
+								this.lookPastType, this.candidateTimelinesPrimDim, 1, false,
+								Constant.getAKOMHighestOrder(), this.userIDAtRecomm, altSeqPredictor,
+								this.secondaryDimension);
+			}
+			else if (altSeqPredictor.equals(AltSeqPredictor.HighDur))
+			{// added on 27 Dec 2018
+				LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForPrimDimCountDurationBaselines
+						.get("activityNameCountPairsOverAllTrainingDays");
+				ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
+				recommendedActivityNamesWithRankscores = new LinkedHashMap<>(
+						activityNameCountPairsOverAllTrainingDays.size());
+				for (Map.Entry<String, Long> e : activityNameCountPairsOverAllTrainingDays.entrySet())
+				{
+					recommendedActivityNamesWithRankscores.put(e.getKey(), Double.valueOf(e.getValue()));
+				}
+				/////////////////////////// do for secondary dimension ////////////////////////////
+				LinkedHashMap<String, Long> activityNameCountPairsSecDimOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForSecDimCountDurationBaselines
+						.get("secondaryDimensionNameCountPairsOverAllTrainingDays");
+				ComparatorUtils.assertNotNull(activityNameCountPairsSecDimOverAllTrainingDays);
+				recommendedSecondaryDimValsWithRankscores = new LinkedHashMap<>(
+						activityNameCountPairsSecDimOverAllTrainingDays.size());
+				for (Map.Entry<String, Long> e : activityNameCountPairsSecDimOverAllTrainingDays.entrySet())
+				{
+					recommendedSecondaryDimValsWithRankscores.put(e.getKey(), Double.valueOf(e.getValue()));
+				}
+			}
+			else if (altSeqPredictor.equals(AltSeqPredictor.HighOccur))
+			{// added on 27 Dec 2018
+				LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForPrimDimCountDurationBaselines
+						.get("activityNameDurationPairsOverAllTrainingDays");
+				ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
 
+				recommendedActivityNamesWithRankscores = new LinkedHashMap<>(
+						activityNameDurationPairsOverAllTrainingDays.size());
+				for (Map.Entry<String, Long> e : activityNameDurationPairsOverAllTrainingDays.entrySet())
+				{
+					recommendedActivityNamesWithRankscores.put(e.getKey(), Double.valueOf(e.getValue()));
+				}
+				/////////////////////////// do for secondary dimension ////////////////////////////
+				LinkedHashMap<String, Long> activityNameDurationPairsSecDimOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForSecDimCountDurationBaselines
+						.get("secondaryDimensionNameDurationPairsOverAllTrainingDays");
+				ComparatorUtils.assertNotNull(activityNameDurationPairsSecDimOverAllTrainingDays);
+
+				recommendedSecondaryDimValsWithRankscores = new LinkedHashMap<>(
+						activityNameDurationPairsSecDimOverAllTrainingDays.size());
+				for (Map.Entry<String, Long> e : activityNameDurationPairsSecDimOverAllTrainingDays.entrySet())
+				{
+					recommendedSecondaryDimValsWithRankscores.put(e.getKey(), Double.valueOf(e.getValue()));
+				}
+			}
+
+			///////////////////// start of added for closet time baseline
+			else if (altSeqPredictor.equals(AltSeqPredictor.ClosestTime))// added on 26 Dec 2018
+			{
+				////////////////////////////// Start of added on 26 Dec 2018
+				LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>> startTimeDistanceUnsortedMap = RecommendationMasterBaseClosestTimeMar2017
+						.getDistancesforCandidateTimelineString(candidateTimelinesPrimDim, activityObjectAtRecommPoint);
+				LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>> startTimeDistanceUnsortedMapSecDim = RecommendationMasterBaseClosestTimeMar2017
+						.getDistancesforCandidateTimelineString(candidateTimelinesSecDim, activityObjectAtRecommPoint);
+				// activitiesGuidingRecomm);
+
+				// ########Sanity check
+				if (startTimeDistanceUnsortedMap.size() != candidateTimelinesPrimDim.size())
+				{
+					System.err.println(
+							"Error at Sanity 161: startTimeDistanceUnsortedMap.size() != candidateTimelinesPrimDim.size()");
+					errorExists = true;
+				}
+				if (startTimeDistanceUnsortedMapSecDim.size() != candidateTimelinesSecDim.size())
+				{
+					System.err.println(
+							"Error at Sanity 161: startTimeDistanceUnsortedMapSecDim.size() != candidateTimelinesSecDim.size()");
+					errorExists = true;
+				}
+				// ##############
+
+				/**
+				 * {Cand Date, Pair{Index of ST nearest AO, distance as diff of this ST with ST of CO}}
+				 * 
+				 * distance is the difference of the start time of the Current Activity Object and the Activity Object
+				 * from the candidate timelines whose start time is nearest to the start time of current Activity
+				 * Object. this LinkedHashMap is sorted by the value of distance in ascending order
+				 * 
+				 */
+				LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>> startTimeDistanceSortedMap = (LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>>) ComparatorUtils
+						.sortByValueAscending5String(startTimeDistanceUnsortedMap);
+				LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>> startTimeDistanceSortedMapSecDim = (LinkedHashMap<String, Triple<Integer, ActivityObject2018, Double>>) ComparatorUtils
+						.sortByValueAscending5String(startTimeDistanceUnsortedMapSecDim);
+
+				System.out.println("---------startTimeDistanceSortedMap.size()=" + startTimeDistanceSortedMap.size());
+				System.out.println("---------startTimeDistanceUnsortedMapSecDim.size()="
+						+ startTimeDistanceUnsortedMapSecDim.size());
+
+				if (VerbosityConstants.verbose)
+				{
+					System.out.println(
+							">>>>>>>>>>>>>>startTimeDistanceSortedMap is:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n Date, Index of nearest, name of nearest, dist of nearest");
+					StringBuilder temp1 = new StringBuilder();
+					for (Map.Entry<String, Triple<Integer, ActivityObject2018, Double>> entry : startTimeDistanceSortedMap
+							.entrySet())
+					{
+						temp1.append("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__"
+								+ entry.getValue().getSecond().getPrimaryDimensionVal("_")/* .getActivityName() */
+								+ "__" + entry.getValue().getThird() + "\n");
+					}
+					System.out.println(temp1.toString());
+					///////////
+					System.out.println(
+							">>>>>>>>>>>>>>startTimeDistanceSortedMapSecDim is:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n Date, Index of nearest, name of nearest, dist of nearest");
+					StringBuilder temp2 = new StringBuilder();
+					for (Map.Entry<String, Triple<Integer, ActivityObject2018, Double>> entry : startTimeDistanceSortedMapSecDim
+							.entrySet())
+					{
+						temp2.append("\t" + entry.getKey() + ":" + entry.getValue().getFirst() + "__" + entry.getValue()
+								.getSecond().getGivenDimensionVal("_", secondaryDimension)/* .getActivityName() */
+								+ "__" + entry.getValue().getThird() + "\n");
+					}
+					System.out.println(temp2.toString());
+				}
+
+				this.recommendedActivityNamesWithRankscores = RecommendationMasterBaseClosestTimeMar2017
+						.createRankedTopRecommendedPDVals(startTimeDistanceSortedMap, primaryDimension,
+								timeInSecsForRankScoreNormalisation);
+
+				this.recommendedSecondaryDimValsWithRankscores = RecommendationMasterBaseClosestTimeMar2017
+						.createRankedTopRecommendedPDVals(startTimeDistanceSortedMapSecDim, secondaryDimension,
+								timeInSecsForRankScoreNormalisation);
+
+				/////////////////////////// end of added on 26 Dec 2018
+			}
+
+			//////////////////// end of added for closest time baseline
 			// null when there is no AKOM prediction.Happens when the current activity is not in training timelines.
 			if (recommendedActivityNamesWithRankscores == null)
 			{

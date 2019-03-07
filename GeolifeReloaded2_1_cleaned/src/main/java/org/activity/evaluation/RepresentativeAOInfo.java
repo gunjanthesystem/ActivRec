@@ -1937,12 +1937,17 @@ public class RepresentativeAOInfo
 	{
 		// PopUps.showMessage("Inside buildRepresentativeAOInfosDec2018 trainTimelinesAllUsersContinuousFiltrd.size()="
 		// + trainTimelinesAllUsersContinuousFiltrd.size());
+		StringBuilder sbLog = new StringBuilder("------ representativeAOInfosForAllUsers ------------------- \n");
+
 		LinkedHashMap<String, RepresentativeAOInfo> representativeAOInfosForAllUsers = new LinkedHashMap<>();
 
 		for (Entry<String, Timeline> userEntry : trainTimelinesAllUsersContinuousFiltrd.entrySet())
 		{
-			representativeAOInfosForAllUsers.put(userEntry.getKey(), new RepresentativeAOInfo(userEntry.getKey(),
-					primaryDimension, trainTimelinesAllUsersContinuousFiltrd, collaborativecandidates));
+			RepresentativeAOInfo repAOInfo = new RepresentativeAOInfo(userEntry.getKey(), primaryDimension,
+					trainTimelinesAllUsersContinuousFiltrd, collaborativecandidates);
+			representativeAOInfosForAllUsers.put(userEntry.getKey(), repAOInfo);
+
+			sbLog.append(userEntry.getKey() + "--\n" + repAOInfo.toString() + "\n");
 		}
 		// PopUps.showMessage("Inside buildRepresentativeAOInfosDec2018: representativeAOInfosForAllUsers.size()= "
 		// + representativeAOInfosForAllUsers.size() + "keySet = " + representativeAOInfosForAllUsers.keySet());
