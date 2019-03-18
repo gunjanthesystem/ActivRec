@@ -55,6 +55,8 @@ public class EvaluationSeq
 	boolean evaluatePostFiltering;// = false;
 	boolean evaluateSeqPrediction;
 
+	// String dimensionPhrase;
+
 	/**
 	 * FOR NO MUs, useful for baseline
 	 * 
@@ -71,7 +73,7 @@ public class EvaluationSeq
 		WToFile.writeToNewFile(Arrays.asList(groupsOf100UsersLabels).toString(),
 				Constant.getOutputCoreResultsPath() + "UserGroupsOrder.csv");
 		// PopUps.showMessage("here1_11");
-		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
+		PathConstants.initialise(Constant.For9kUsers, Constant.getDatabaseName());
 		// PopUps.showMessage("here1_21");
 		intialiseListOfFilenamesNoMU();
 		// PopUps.showMessage("here1_31");
@@ -186,10 +188,11 @@ public class EvaluationSeq
 	public EvaluationSeq(int seqLength, String outputCoreResultsPath, double[] matchingUnitArray,
 			String dimensionPhrase, boolean evaluatePostFiltering, boolean evaluatedSequencePrediction)// sdsd
 	{
+		// this.dimensionPhrase = dimensionPhrase;
 		// PopUps.showMessage("EvaluationSeq muArray = " + Arrays.toString(matchingUnitArray) + " outputCoreResultsPath=
 		// "
 		// + outputCoreResultsPath);
-		PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
+		PathConstants.initialise(Constant.For9kUsers, Constant.getDatabaseName());
 
 		this.evaluatePostFiltering = evaluatePostFiltering;
 		this.evaluateSeqPrediction = evaluatedSequencePrediction;
@@ -1291,8 +1294,13 @@ public class EvaluationSeq
 				// average over data points
 				EvalMetrics.writeAvgRecallsForAllKs(algoLabel, timeCategory, numOfUsers, dimensionPhrase, cp);
 				EvalMetrics.writeAvgFMeasuresForAllKs(algoLabel, timeCategory, numOfUsers, dimensionPhrase, cp);
-				EvalMetrics.writePerActMRRV2(algoLabel, timeCategory, /* activityNamesT, */ arrayActual,
-						dimensionPhrase, cp, DomainConstants.catIDNameDictionary);
+
+				if (Constant.doSecondaryDimension == false)
+				{// disabled on 14 March 2019 as generating NullPointerException which has not been resolved and the
+					// generated file is not used anyway.
+					EvalMetrics.writePerActMRRV2(algoLabel, timeCategory, /* activityNamesT, */ arrayActual,
+							dimensionPhrase, cp, DomainConstants.catIDNameDictionary);
+				}
 				// NEED to modify it to take in numOfUsers.
 			}
 		}

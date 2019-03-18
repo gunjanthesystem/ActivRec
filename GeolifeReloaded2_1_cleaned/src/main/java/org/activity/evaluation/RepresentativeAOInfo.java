@@ -1213,7 +1213,7 @@ public class RepresentativeAOInfo
 
 				if (Constant.useMedianCinsForRepesentationAO)
 				{
-					cins_count = RecommendationTestsUtils.getMedianCheckinsCountForGivePDVal(aosForEachPDVal, pdVal);
+					cins_count = RecommTestsUtils.getMedianCheckinsCountForGivePDVal(aosForEachPDVal, pdVal);
 				}
 
 				ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs,
@@ -1702,7 +1702,7 @@ public class RepresentativeAOInfo
 						.getPercentile(50);
 
 				// double medianSecondsFromMidnight =
-				Timestamp mediaStartTS = RecommendationTestsUtils.getMedianSecondsSinceMidnightTimestamp(
+				Timestamp mediaStartTS = RecommTestsUtils.getMedianSecondsSinceMidnightTimestamp(
 						aos.stream().map(ao -> ao.getStartTimestamp()).collect(Collectors.toList()), userID, actName);
 
 				double[] cinsCount = aos.stream().mapToDouble(ao -> ao.getCheckins_count()).toArray();

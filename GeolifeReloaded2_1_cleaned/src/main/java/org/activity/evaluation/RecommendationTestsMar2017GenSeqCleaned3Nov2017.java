@@ -211,13 +211,13 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 		// PopUps.showMessage("allUsersTimelines.size() = "+allUsersTimelines.size());
 
-		trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
-				.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
-						Constant.getRecentDaysInTrainingTimelines(), Constant.filterTrainingTimelinesByRecentDays);
+		trainTimelinesAllUsersContinuousFiltrd = RecommTestsUtils.getContinousTrainingTimelinesWithFilterByRecentDaysV2(
+				trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines(),
+				Constant.filterTrainingTimelinesByRecentDays);
 
 		// start of added on 27 Dec 2018
 		// added on 27 Dec 2018, needed for baseline coll high occur and high dur
-		trainTimelinesAllUsersDWFiltrd = RecommendationTestsUtils.getTrainingTimelinesWithFilterByRecentDaysV3(
+		trainTimelinesAllUsersDWFiltrd = RecommTestsUtils.getTrainingTimelinesWithFilterByRecentDaysV3(
 				trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines(),
 				Constant.filterTrainingTimelinesByRecentDays);
 
@@ -324,7 +324,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						Constant.setCurrentMatchingUnit(matchingUnit); // used for sanity checks
 						System.out.println("Executing RecommendationTests for matching unit: " + matchingUnit);
 
-						commonPath = RecommendationTestsUtils.computeCommonPath(matchingUnit, lookPastType,
+						commonPath = RecommTestsUtils.computeCommonPath(matchingUnit, lookPastType,
 								Constant.getOutputCoreResultsPath(), thresholdValue);
 						Constant.setCommonPath(commonPath);
 						System.out.println("Common path=" + Constant.getCommonPath());
@@ -577,7 +577,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						{ // int numberOfValidRTs = 0;// userCount += 1;
 
 							System.out.println("\nUser id=" + userId);// PopUps.showMessage("\nUser id=" + userId);
-							String userName = RecommendationTestsUtils.getUserNameFromUserID(userId, this.databaseName);
+							String userName = RecommTestsUtils.getUserNameFromUserID(userId, this.databaseName);
 
 							// Start of Added on 21 Dec 2017
 							if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
@@ -591,7 +591,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 							// PopUps.showMessage("before blacklisting");
 							if (Constant.blacklistingUsersWithLargeMaxActsPerDay
-									&& RecommendationTestsUtils.isBlackListedUser(userId))
+									&& RecommTestsUtils.isBlackListedUser(userId))
 							{
 								WToFile.appendLineToFileAbs("UserRejectedSinceInBlacklist:" + userId,
 										this.commonPath + "UserRejectedSinceInBlacklist.csv");
@@ -600,18 +600,18 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							// PopUps.showMessage("after blacklisting");
 
 							// replacing iterative write with StringBuilder for better performance
-							ArrayList<StringBuilder> sbsMaxNumOfDistinctRecommendations = RecommendationTestsUtils
+							ArrayList<StringBuilder> sbsMaxNumOfDistinctRecommendations = RecommTestsUtils
 									.createListOfStringBuilders(this.recommSeqLength);
 							sbsMaxNumOfDistinctRecommendations.parallelStream().forEach(sb -> sb.append(
 									"DateOfRecomm ,TimeOfRecomm ,Week_Day,MaxNumOfDistictRecommendation,NumOfCandidateTimelines(after applying Threshold)\n"));
 
 							// replacing iterative write with StringBuilder for better performance
-							ArrayList<StringBuilder> sbsNumOfCandTimelinesBelowThreshold = RecommendationTestsUtils
+							ArrayList<StringBuilder> sbsNumOfCandTimelinesBelowThreshold = RecommTestsUtils
 									.createListOfStringBuilders(this.recommSeqLength);
 							sbsNumOfCandTimelinesBelowThreshold.parallelStream().forEach(sb -> sb.append(
 									"DateOfRecomm ,TimeOfRecomm ,Week_Day,ThresholdAsDistance,NumOfCandidateTimelinesBelowThreshold,\n"));
 
-							ArrayList<StringBuilder> sbsRecommTimesWithEditDistances = RecommendationTestsUtils
+							ArrayList<StringBuilder> sbsRecommTimesWithEditDistances = RecommTestsUtils
 									.createListOfStringBuilders(this.recommSeqLength);
 							sbsRecommTimesWithEditDistances.parallelStream().forEach(sb -> sb.append("DateOfRecomm"
 									+ ",TimeOfRecomm,CandidateTimelineID,TargetActivity,EditDistanceOfCandidateTimeline,Diff_Start_Time,Diff_End_Time,EndIndexOf(Sub)Cand,CandidateTimeline,WeekDayOfRecomm\n"));
@@ -644,7 +644,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							LinkedHashMap<Date, Timeline> userTrainingTimelines = trainTestTimelines.get(0);
 							LinkedHashMap<Date, Timeline> userTestTimelines = trainTestTimelines.get(1);
 
-							RecommendationTestsUtils.sanityCheckTrainTestSplitSameForCollNonColl(
+							RecommTestsUtils.sanityCheckTrainTestSplitSameForCollNonColl(
 									trainTestTimelinesForAllUsersDW, userId, userTrainingTimelines);
 
 							// start of added on Nov 29
@@ -758,70 +758,27 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 							if (Constant.altSeqPredictor.equals(altSeqPredictor.HighOccur)
 									|| Constant.altSeqPredictor.equals(altSeqPredictor.HighDur))
 							{
-								boolean doWrite = true;
-								if (databaseName.equals("gowalla1"))
-								{
-									doWrite = false;
-								}
-								// this is content based approach
-								if (Constant.collaborativeCandidates == false)
-								{
-									// Okay but disabled on 27 Dec 2018 in favour of method with String keys which is
-									// also used for collaborative approach.
-									// mapsForCountDurationBaselines =
-									// WToFile.writeBasicActivityStatsAndGetBaselineMaps(
-									// userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines,
-									// Constant.primaryDimension, true, false);
-									mapsForCountDurationBaselines = WToFile
-											.writeBasicActivityStatsAndGetBaselineMapsStringKeys(userName,
-													TimelineUtils.toStringKeys(userAllDatesTimeslines),
-													TimelineUtils.toStringKeys(userTrainingTimelines),
-													TimelineUtils.toStringKeys(userTestTimelines),
-													Constant.primaryDimension, doWrite, false);
-								}
-								else
-								{
-									// give training timelines of other users except current user (as daywise timeline)
-									LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelinesDWForAllExceptCurrUser = new LinkedHashMap<>(
-											trainTimelinesAllUsersDWFiltrd);
+								boolean doWrite = databaseName.equals("gowalla1") ? false : true;
+								mapsForCountDurationBaselines = RecommTestsUtils.getMapsForCountDurationBaselines(
+										trainTimelinesAllUsersDWFiltrd, userAllDatesTimeslines, userId, userName,
+										userTrainingTimelines, userTestTimelines, doWrite, Constant.primaryDimension);
 
-									LinkedHashMap<Date, Timeline> removedSuccess = trainTimelinesDWForAllExceptCurrUser
-											.remove(String.valueOf(userId));
-									if (removedSuccess == null)
-									{
-										PopUps.printTracedErrorMsgWithExit(
-												"Error: remove curr user unsuccessful. userId = " + userId
-														+ " while keySet to match to :"
-														+ trainTimelinesDWForAllExceptCurrUser.keySet());
-									}
-
-									LinkedHashMap<String, Timeline> trainTimelinesDWForAllExceptCurrUserStringKeys = TimelineUtils
-											.toTogetherWithUserIDStringKeys(trainTimelinesDWForAllExceptCurrUser);
-
-									mapsForCountDurationBaselines = WToFile
-											.writeBasicActivityStatsAndGetBaselineMapsStringKeys(userName, null,
-													trainTimelinesDWForAllExceptCurrUserStringKeys, null,
-													Constant.primaryDimension, doWrite, true);
-								}
-
-								LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+								LinkedHashMap<String, Long> actNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
 										.get("activityNameCountPairsOverAllTrainingDays");
-								ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
-								actNamesCountsWithoutCountOverTrain = RecommendationTestsUtils
-										.getActivityNameCountPairsWithoutCount(
-												activityNameCountPairsOverAllTrainingDays);
-								actNamesCountsWithCountOverTrain = RecommendationTestsUtils
-										.getActivityNameCountPairsWithCount(activityNameCountPairsOverAllTrainingDays);
+								ComparatorUtils.assertNotNull(actNameCountPairsOverAllTrainingDays);
+								actNamesCountsWithoutCountOverTrain = RecommTestsUtils
+										.getActNameCountPairsWithoutCount(actNameCountPairsOverAllTrainingDays);
+								actNamesCountsWithCountOverTrain = RecommTestsUtils
+										.getActNameCountPairsWithCount(actNameCountPairsOverAllTrainingDays);
 
-								LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+								LinkedHashMap<String, Long> actNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
 										.get("activityNameDurationPairsOverAllTrainingDays");
-								ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
-								actNamesDurationsWithoutDurationOverTrain = RecommendationTestsUtils
-										.getActivityNameDurationPairsWithoutDuration(
-												activityNameDurationPairsOverAllTrainingDays);
-								actNamesDurationsWithDurationOverTrain = RecommendationTestsUtils
-										.getActivityNameDurationPairsWithDuration(
-												activityNameDurationPairsOverAllTrainingDays);
+								ComparatorUtils.assertNotNull(actNameDurationPairsOverAllTrainingDays);
+								actNamesDurationsWithoutDurationOverTrain = RecommTestsUtils
+										.getActNameDurationPairsWithoutDuration(
+												actNameDurationPairsOverAllTrainingDays);
+								actNamesDurationsWithDurationOverTrain = RecommTestsUtils
+										.getActNameDurationPairsWithDuration(actNameDurationPairsOverAllTrainingDays);
 							}
 							// END OF Curtain disable trivial baselines
 
@@ -874,14 +831,14 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 										.getActivityObjectsInDay();
 
 								////////// added to improve write speed
-								ArrayList<StringBuilder> sbsRawToWriteForThisUserDate = RecommendationTestsUtils
+								ArrayList<StringBuilder> sbsRawToWriteForThisUserDate = RecommTestsUtils
 										.createListOfStringBuilders(recommSeqLength);
 
 								StringBuilder metaToWriteForThisUserDate = new StringBuilder();
 								StringBuilder recommSequenceWithScoreForThisUserDate = new StringBuilder();
 								StringBuilder recommSequenceWithoutScoreForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> sbsDataActualToWriteForThisUserDate = RecommendationTestsUtils
+								ArrayList<StringBuilder> sbsDataActualToWriteForThisUserDate = RecommTestsUtils
 										.createListOfStringBuilders(recommSeqLength);
 
 								// Added on June 5 2018
@@ -892,16 +849,16 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 								StringBuilder dataActualSeqActsToWriteForThisUserDate = new StringBuilder();
 								StringBuilder metaIfCurrentTargetSameToWriteForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> sbsNumOfCandTimelinesForThisUserDate = RecommendationTestsUtils
+								ArrayList<StringBuilder> sbsNumOfCandTimelinesForThisUserDate = RecommTestsUtils
 										.createListOfStringBuilders(recommSeqLength);
 
 								StringBuilder topNextActsWithoutDistToWriteForThisUserDate = new StringBuilder();
 								StringBuilder topNextActsWithDistToWriteForThisUserDate = new StringBuilder();
 
-								ArrayList<StringBuilder> rankedRecommWithScoreToWriteForThisUserDate = RecommendationTestsUtils
+								ArrayList<StringBuilder> rankedRecommWithScoreToWriteForThisUserDate = RecommTestsUtils
 										.createListOfStringBuilders(recommSeqLength);
 
-								ArrayList<StringBuilder> rankedRecommWithoutScoreToWriteForThisUserDate = RecommendationTestsUtils
+								ArrayList<StringBuilder> rankedRecommWithoutScoreToWriteForThisUserDate = RecommTestsUtils
 										.createListOfStringBuilders(recommSeqLength);
 
 								StringBuilder baseLineOccurrenceToWriteForThisUserDate = new StringBuilder();
@@ -1317,7 +1274,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 									if (VerbosityConstants.WriteNumActsPerRTPerCand)
 									{
-										RecommendationTestsUtils.writeNumOfActsInEachCand(numActsInEachCandbw, userId,
+										RecommTestsUtils.writeNumOfActsInEachCand(numActsInEachCandbw, userId,
 												dateToRecomm, recommMasters, recommTimesStrings);
 									}
 
@@ -1647,23 +1604,22 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 						} // end of for over userID
 						numActsInEachCandbw.close();
 
-						RecommendationTestsUtils.closeBWs(metaBw, recommSeqWithoutScoreBw, recommSeqWithScoreBw,
-								actualSeqBw);
-						RecommendationTestsUtils.closeBWs(topNextActsWithoutDistance, topNextActsWithDistance);
-						RecommendationTestsUtils.closeBWs(rtsAllUsingRecommMasterWriter, rtsRejNoValidActAfterWriter,
+						RecommTestsUtils.closeBWs(metaBw, recommSeqWithoutScoreBw, recommSeqWithScoreBw, actualSeqBw);
+						RecommTestsUtils.closeBWs(topNextActsWithoutDistance, topNextActsWithDistance);
+						RecommTestsUtils.closeBWs(rtsAllUsingRecommMasterWriter, rtsRejNoValidActAfterWriter,
 								rtsRejWithNoCandsWriter, rtsRejWithNoCandsBelowThreshWriter,
 								rtsRejWithNoDWButMUCandsCands, rtsRejBlackListedWriter);
 						// changed 27 Dec 2018
-						RecommendationTestsUtils.closeBWs(baseLineOccurrence, baseLineDuration,
-								baseLineOccurrenceWithScore, baseLineDurationWithScore);
-						RecommendationTestsUtils.closeBWs(bwNumOfWeekendsInTraining, bwNumOfWeekendsInAll,
+						RecommTestsUtils.closeBWs(baseLineOccurrence, baseLineDuration, baseLineOccurrenceWithScore,
+								baseLineDurationWithScore);
+						RecommTestsUtils.closeBWs(bwNumOfWeekendsInTraining, bwNumOfWeekendsInAll,
 								bwCountTimeCategoryOfRecomm);
-						RecommendationTestsUtils.closeBWs(metaIfCurrentTargetSameWriter, bwNextActInvalid);
-						RecommendationTestsUtils.closeBWs(bwWriteNormalisationOfDistance, bwNumOfValidAOsAfterRTInDay);
+						RecommTestsUtils.closeBWs(metaIfCurrentTargetSameWriter, bwNextActInvalid);
+						RecommTestsUtils.closeBWs(bwWriteNormalisationOfDistance, bwNumOfValidAOsAfterRTInDay);
 
 						for (int i = 0; i < this.recommSeqLength; i++)
 						{
-							RecommendationTestsUtils.closeBWs(bwsRankedRecommWithScore.get(i),
+							RecommTestsUtils.closeBWs(bwsRankedRecommWithScore.get(i),
 									bwRankedRecommWithoutScore.get(i), bwsDataActual.get(i), bwsRaw.get(i),
 									numOfCandidateTimelinesWriter.get(i));
 						}

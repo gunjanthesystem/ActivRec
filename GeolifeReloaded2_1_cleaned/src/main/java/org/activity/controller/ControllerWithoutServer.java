@@ -26,7 +26,7 @@ import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018;
-import org.activity.evaluation.RecommendationTestsUtils;
+import org.activity.evaluation.RecommTestsUtils;
 import org.activity.generator.ToyTimelineUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
@@ -379,7 +379,7 @@ public class ControllerWithoutServer
 
 		// PopUps.showMessage("allUsersTimelines.size() = "+allUsersTimelines.size());
 
-		trainTimelinesAllUsersDWFiltrd = RecommendationTestsUtils.getTrainingTimelinesWithFilterByRecentDaysV3(
+		trainTimelinesAllUsersDWFiltrd = RecommTestsUtils.getTrainingTimelinesWithFilterByRecentDaysV3(
 				trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines(),
 				Constant.filterTrainingTimelinesByRecentDays);
 
@@ -886,7 +886,7 @@ public class ControllerWithoutServer
 
 			if (Constant.filterTrainingTimelinesByRecentDays)
 			{
-				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+				trainTimelinesAllUsersContinuousFiltrd = RecommTestsUtils
 						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
 								Constant.getRecentDaysInTrainingTimelines(),
 								Constant.filterTrainingTimelinesByRecentDays);
@@ -894,7 +894,7 @@ public class ControllerWithoutServer
 			else
 			{
 				// sampledUsersTimelines
-				trainTimelinesAllUsersContinuousFiltrd = RecommendationTestsUtils
+				trainTimelinesAllUsersContinuousFiltrd = RecommTestsUtils
 						.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
 			}
 		}

@@ -194,7 +194,7 @@ public class SuperController
 				PerformanceAnalytics.getHeapInformation() + "\nRunning experiments for database: " + databaseName);
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 		Constant.setDefaultTimeZone("UTC");
-		PathConstants.intialise(for9kUsers, databaseName);
+		PathConstants.initialise(for9kUsers, databaseName);
 		Constant.initialise(databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, true);
@@ -651,18 +651,23 @@ public class SuperController
 					// cleanUpSpace(commonPaths[i], 0.90);
 					System.out.println("finished runExperimentForGivenUsersAndConfig for commonPath = " + commonPath);
 
-					// start of added on 21 Nov 2018
-					List<List<String>> mrrStatsBestMUs = ReadingFromFile
-							.readLinesIntoListOfLists(commonPath + "mrrStatsOverUsersBestMUs.csv", ":");
-					String meanMRROverUsersBestMU = mrrStatsBestMUs.get(4).get(1);
-					String medianMRROverUsersBestMU = mrrStatsBestMUs.get(6).get(1);
+					if (false)
+					{// disable temporarily on 17 March 2019
+						// start of added on 21 Nov 2018
+						List<List<String>> mrrStatsBestMUs = ReadingFromFile
+								.readLinesIntoListOfLists(commonPath + "mrrStatsOverUsersBestMUs.csv", ":");
+						String meanMRROverUsersBestMU = mrrStatsBestMUs.get(4).get(1);
+						String medianMRROverUsersBestMU = mrrStatsBestMUs.get(6).get(1);
 
-					if (Constant.searchForOptimalFeatureWts)
-					{
-						String custodianFeatWtsInfo = iterationCountFeatWtSearch + "," + CustodianOfFeatWts.toCSVWts()
-								+ "," + meanMRROverUsersBestMU + "," + medianMRROverUsersBestMU + "\n";
-						WToFile.writeToNewFile(custodianFeatWtsInfo, commonPath + "CustodianOfFeatWts.csv");
-						WToFile.appendLineToFileAbs(custodianFeatWtsInfo, dataWrittenFolder + "CustodianOfFeatWts.csv");
+						if (Constant.searchForOptimalFeatureWts)
+						{
+							String custodianFeatWtsInfo = iterationCountFeatWtSearch + ","
+									+ CustodianOfFeatWts.toCSVWts() + "," + meanMRROverUsersBestMU + ","
+									+ medianMRROverUsersBestMU + "\n";
+							WToFile.writeToNewFile(custodianFeatWtsInfo, commonPath + "CustodianOfFeatWts.csv");
+							WToFile.appendLineToFileAbs(custodianFeatWtsInfo,
+									dataWrittenFolder + "CustodianOfFeatWts.csv");
+						}
 					}
 				} // ed of added on 21 Nov 2018
 			}
@@ -1176,10 +1181,11 @@ public class SuperController
 					}
 				}
 
-				extractAggregateEvalResultsOverMUs(commonPath, "");// for primary dimension
+				extractAggregateEvalResultsOverMUs(commonPath, "", true, true, true, true, true, true);// for primary
+																										// dimension
 				if (evalSecondaryDimension)// secondary dimension
-				{
-					extractAggregateEvalResultsOverMUs(commonPath, "SecDim");// for primary dimension
+				{// for primary dimension
+					extractAggregateEvalResultsOverMUs(commonPath, "SecDim", true, true, true, true, true, true);
 				}
 				// if (true)
 				// { if (Constant.doSecondaryDimension)
@@ -1451,32 +1457,54 @@ public class SuperController
 	 * 
 	 * @param commonPath
 	 * @param dimensionPhrase
+	 * @param extractForBestMU
+	 * @param extractForChosenMU
+	 *            the chosen MUs are extracted from the best MU file.
+	 * @param writeMRRStatsOverUsersBestMUs
+	 * @param writeRRForOptimalMUAllUsers
+	 * @param writeMRRByUserAndActualForChosenMU
+	 * @param writeRRByActualForChosenMU
+	 *            for category wise boxplots
 	 */
-	private static void extractAggregateEvalResultsOverMUs(String commonPath, String dimensionPhrase)
+	public static void extractAggregateEvalResultsOverMUs(String commonPath, String dimensionPhrase,
+			boolean extractForBestMU, boolean extractForChosenMU, boolean writeMRRStatsOverUsersBestMUs,
+			boolean writeRRForOptimalMUAllUsers, boolean writeMRRByUserAndActualForChosenMU,
+			boolean writeRRByActualForChosenMU)
 	{
 		// Start of added on 20 Nov 2018
 		String fileForChosenMU = "";
 		// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/NOV19ResultsDistributionFirstToMax1/FiveDays/geolife1_NOV19ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsNoTTFilter_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv";
+		PrintStream debugLog = WToFile.redirectConsoleOutput(commonPath + "extractAggregateEvalResultsOverMUsLog"
+				+ DateTimeUtils.getMonthDateHourMinLabel() + ".txt");
 
-		PrintStream debugLog = WToFile.redirectConsoleOutput(commonPath + "extractAggregateEvalResultsOverMUsLog.txt");
+		// boolean extractForBestMU = true;
+		// boolean extractForChosenMU = true;// the chosen MU are extracted from the best MU file.
+		// boolean writeMRRStatsOverUsersBestMUs = true;
+		// boolean writeRRForOptimalMUAllUsers = true;
+		// boolean writeMRRByUserAndActualForChosenMU = true;
+		// boolean writeRRByActualForChosenMU = true;
+
 		try
 		{
-			// Parse and aggregate results for multiple MUs, find optimal MUs for each user for each metric.
-			ResultsDistributionEvaluation.runNov20Results(commonPath, 1, dimensionPhrase, fileForChosenMU, true, true,
-					false);
-
 			String splitted[] = commonPath.split("/");
 			String resultsLabel = splitted[splitted.length - 1];
 
+			if (extractForBestMU)
+			{// Parse and aggregate results for multiple MUs, find optimal MUs for each user for each metric.
+				ResultsDistributionEvaluation.runNov20Results(commonPath, 1, dimensionPhrase, fileForChosenMU, true,
+						true, false);
+			}
+
 			fileForChosenMU = commonPath + resultsLabel + "_" + "AllMeanReciprocalRank_" + "MinMUWithMaxFirst0Aware"
 					+ dimensionPhrase + ".csv";// added on 17 Jan 2019
-			// use the optimal MU for MRR as fixed (chosen) MU to get corresponding values for other metrics,
-			ResultsDistributionEvaluation.runNov20Results(commonPath, 1, dimensionPhrase, fileForChosenMU, false, false,
-					true);// added on 17 Jan 2019
 
-			String[] groupsOf100UserLabels = DomainConstants.getGroupsOf100UsersLabels();
+			if (extractForChosenMU)
+			{// use the optimal MU for MRR as fixed (chosen) MU to get corresponding values for other metrics,
+				ResultsDistributionEvaluation.runNov20Results(commonPath, 1, dimensionPhrase, fileForChosenMU, false,
+						false, true);// added on 17 Jan 2019
+			}
 
-			for (String groupOf100User : groupsOf100UserLabels)
+			for (String groupOf100User : DomainConstants.getGroupsOf100UsersLabels())
 			{
 				// PopUps.showMessage("commonPath = " + commonPath);
 				// TODO: for more than 1 user groups, check this if this works correctly
@@ -1497,18 +1525,23 @@ public class SuperController
 				}
 
 				////////////////////////////////////////////////////////////////////////////////////////////////////
-				// Read optimal MUs as per highest Mean RR (per user)
-				List<Double> MRRValsForBestMU = ReadingFromFile.oneColumnReaderDouble(fileForChosenMU, ",", 2, true);
-				// MRRValsForBestMU.remove(0);// remove header
-				// commonPathToUse + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv",
 
-				DescriptiveStatistics mrrStatsOverUsersBestnMUs = StatsUtils.getDescriptiveStatistics(MRRValsForBestMU);
-				// PopUps.showMessage("commonPathToUse = " + commonPathToUse);
-				WToFile.writeToNewFile(mrrStatsOverUsersBestnMUs.toString(),
-						commonPathToUse + "mrrStatsOverUsersBestMUs.csv");
+				if (writeMRRStatsOverUsersBestMUs)
+				{// Read optimal MUs as per highest Mean RR (per user)
+					List<Double> MRRValsForBestMU = ReadingFromFile.oneColumnReaderDouble(fileForChosenMU, ",", 2,
+							true);
+					// MRRValsForBestMU.remove(0);// remove header
+					// commonPathToUse + resultsLabel + "_AllMeanReciprocalRank_MinMUWithMaxFirst0Aware.csv",
 
-				System.out.println("mrrStatsOverUsersBestMUs = " + mrrStatsOverUsersBestnMUs);
-				// End of added on 20 Nov 2018
+					DescriptiveStatistics mrrStatsOverUsersBestnMUs = StatsUtils
+							.getDescriptiveStatistics(MRRValsForBestMU);
+					// PopUps.showMessage("commonPathToUse = " + commonPathToUse);
+					WToFile.writeToNewFile(mrrStatsOverUsersBestnMUs.toString().replaceAll(":", ","),
+							commonPathToUse + "mrrStatsOverUsersBestMUs.csv");
+
+					System.out.println("mrrStatsOverUsersBestMUs = " + mrrStatsOverUsersBestnMUs);
+					// End of added on 20 Nov 2018
+				}
 
 				// Start of added on 15 Jan 2019
 				List<List<String>> MRRValsForBestMULines = ReadingFromFile.readLinesIntoListOfLists(fileForChosenMU,
@@ -1516,62 +1549,64 @@ public class SuperController
 				MRRValsForBestMULines.remove(0);// remove header
 				////////////////////////////////////////////////////////////////////////////////////////////////////
 
-				List<List<String>> RRForOptimalMUAllUsers = new ArrayList<>();
-				// PopUps.showMessage("here1_1");
-				for (List<String> l : MRRValsForBestMULines)
+				if (writeRRForOptimalMUAllUsers)
 				{
-					String userIndex = l.get(0);
-					String bestMU = l.get(1);
-					bestMU = bestMU.contains(".") ? bestMU : bestMU + ".0";
-
-					String RRFileForBestMUForThisUser = commonPathWithUserGroupLabel + "/MatchingUnit" + bestMU
-							+ "/AlgoStep0AllReciprocalRankUnrolled" + dimensionPhrase + ".csv";
-
-					if (bestMU.contains("999"))
+					List<List<String>> RRForOptimalMUAllUsers = new ArrayList<>();
+					// PopUps.showMessage("here1_1");
+					for (List<String> l : MRRValsForBestMULines)
 					{
-						RRFileForBestMUForThisUser = commonPathWithUserGroupLabel
-								+ "/AlgoStep0AllReciprocalRankUnrolled.csv";
-					}
-					if (Constant.lookPastType.equals(LookPastType.NHours) && (bestMU.trim().equals("0.0")))
-					{
-						RRFileForBestMUForThisUser = commonPathWithUserGroupLabel + "/MatchingUnit0.5"
+						String userIndex = l.get(0);
+						String bestMU = l.get(1);
+						bestMU = bestMU.contains(".") ? bestMU : bestMU + ".0";
+
+						String RRFileForBestMUForThisUser = commonPathWithUserGroupLabel + "/MatchingUnit" + bestMU
 								+ "/AlgoStep0AllReciprocalRankUnrolled" + dimensionPhrase + ".csv";
-					}
-					// PopUps.showMessage("here1_2: RRFileForBestMUForThisUser=\n" + RRFileForBestMUForThisUser
-					// + "\nbestMU=" + bestMU);
-					// PopUps.showMessage("RRFileForBestMUForThisUse=\n" + RRFileForBestMUForThisUser);
-					List<List<String>> RRForOptimalMU = ReadingFromFile
-							.readLinesIntoListOfLists(RRFileForBestMUForThisUser, ",");
-					RRForOptimalMU.remove(0);// remove header
 
-					// keep RR row only for current user //start of added 24 Jan 2019
-					List<List<String>> RRForOptimalMUOnlyCurrUser = new ArrayList<>();
-					int numOfUsersToSkip = Integer.valueOf(userIndex);
-					LinkedHashSet<String> uniqueUsersInSeq = new LinkedHashSet<>();
-					for (List<String> rrline : RRForOptimalMU)
-					{
-						uniqueUsersInSeq.add(rrline.get(0));
-						if (uniqueUsersInSeq.size() <= numOfUsersToSkip)
+						if (bestMU.contains("999"))
 						{
-							continue;
+							RRFileForBestMUForThisUser = commonPathWithUserGroupLabel
+									+ "/AlgoStep0AllReciprocalRankUnrolled.csv";
 						}
-						if (uniqueUsersInSeq.size() >= (numOfUsersToSkip + 2))
+						if (Constant.lookPastType.equals(LookPastType.NHours) && (bestMU.trim().equals("0.0")))
 						{
-							break;
+							RRFileForBestMUForThisUser = commonPathWithUserGroupLabel + "/MatchingUnit0.5"
+									+ "/AlgoStep0AllReciprocalRankUnrolled" + dimensionPhrase + ".csv";
 						}
-						RRForOptimalMUOnlyCurrUser.add(rrline);
+						// PopUps.showMessage("here1_2: RRFileForBestMUForThisUser=\n" + RRFileForBestMUForThisUser
+						// + "\nbestMU=" + bestMU);
+						// PopUps.showMessage("RRFileForBestMUForThisUse=\n" + RRFileForBestMUForThisUser);
+						List<List<String>> RRForOptimalMU = ReadingFromFile
+								.readLinesIntoListOfLists(RRFileForBestMUForThisUser, ",");
+						RRForOptimalMU.remove(0);// remove header
+
+						// keep RR row only for current user //start of added 24 Jan 2019
+						List<List<String>> RRForOptimalMUOnlyCurrUser = new ArrayList<>();
+						int numOfUsersToSkip = Integer.valueOf(userIndex);
+						LinkedHashSet<String> uniqueUsersInSeq = new LinkedHashSet<>();
+						for (List<String> rrline : RRForOptimalMU)
+						{
+							uniqueUsersInSeq.add(rrline.get(0));
+							if (uniqueUsersInSeq.size() <= numOfUsersToSkip)
+							{
+								continue;
+							}
+							if (uniqueUsersInSeq.size() >= (numOfUsersToSkip + 2))
+							{
+								break;
+							}
+							RRForOptimalMUOnlyCurrUser.add(rrline);
+						}
+						// end of added 24 Jan 2019
+						RRForOptimalMUAllUsers.addAll(RRForOptimalMUOnlyCurrUser);// RRForOptimalMU);
 					}
-					// end of added 24 Jan 2019
-					RRForOptimalMUAllUsers.addAll(RRForOptimalMUOnlyCurrUser);// RRForOptimalMU);
+					// PopUps.showMessage("here1_3");
+					WToFile.writeToNewFile("UserID,RTDate,RTTime,ActualAct,RR\n" + RRForOptimalMUAllUsers.stream()
+							.map(v -> (v.stream().collect(Collectors.joining(",")))).collect(Collectors.joining("\n")),
+							commonPathToUse + resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware"
+									+ dimensionPhrase + ".csv");
+					// PopUps.showMessage("here1_4");
+					// End of added on 15 Jan 2019
 				}
-				// PopUps.showMessage("here1_3");
-				WToFile.writeToNewFile("UserID,RTDate,RTTime,ActualAct,RR\n" + RRForOptimalMUAllUsers.stream()
-						.map(v -> (v.stream().collect(Collectors.joining(",")))).collect(Collectors.joining("\n")),
-						commonPathToUse + resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase
-								+ ".csv");
-				// PopUps.showMessage("here1_4");
-				// End of added on 15 Jan 2019
-
 				// Start of added on 13 Feb 2019
 				// aggregated RR results (which have been extracted for best MU for each user) by target activity and by
 				// users (note: the user wise aggregation
@@ -1581,9 +1616,36 @@ public class SuperController
 				// ReadingFromFile.readLinesIntoListOfLists(commonPathToUse + resultsLabel +
 				// "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase
 				// + ".csv", ",");
-				EvalMetrics.groupByUserAndActual(
-						resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase, commonPathToUse);
 				// End of added on 13 Feb 2019
+
+				if (writeMRRByUserAndActualForChosenMU)
+				{
+					EvalMetrics.summarizeByUserAndActualV2(
+							resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase,
+							commonPathToUse, 4, 3, 0);
+
+					/////////////////////////////////////////////////////////////////////////////////////
+					// Summarize MRR stats over target activities
+					List<Double> MRRValsForBestMUPerTargetActivity = ReadingFromFile
+							.oneColumnReaderDouble(
+									commonPathToUse + resultsLabel
+											+ "_AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual.csv",
+									",", 1, true);
+					DescriptiveStatistics mrrStatsOverTargetActsBestMUs = StatsUtils
+							.getDescriptiveStatistics(MRRValsForBestMUPerTargetActivity);
+					// PopUps.showMessage("commonPathToUse = " + commonPathToUse);
+					WToFile.writeToNewFile(mrrStatsOverTargetActsBestMUs.toString().replaceAll(":", ","),
+							commonPathToUse + "mrrStatsOverTargetActsBestMUs.csv");
+					System.out.println("mrrStatsOverTargetActsBestMUs = " + mrrStatsOverTargetActsBestMUs);
+				}
+
+				if (writeRRByActualForChosenMU)
+				{
+					EvalMetrics.distributionByActual(
+							resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase,
+							commonPathToUse, 4, 3, commonPathToUse + "CatIDNameDictionary.csv");
+				}
+
 			}
 
 		}
@@ -1592,6 +1654,7 @@ public class SuperController
 			PopUps.showException(e, "org.activity.controller.SuperController.extractAggregateEvalResultsOverMUs()");
 		}
 		debugLog.close();
+		WToFile.resetConsoleOutput();
 
 	}
 

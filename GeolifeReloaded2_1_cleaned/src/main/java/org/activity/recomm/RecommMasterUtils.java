@@ -98,15 +98,15 @@ public class RecommMasterUtils
 		{
 			switch (caseType)
 			{
-				case SimpleV3:
-					// createRankedTopRecommendedPDValsSimpleV3_3
-					return createRankedTopRecommendedGDValsSimpleV3_3(nextActivityObjectsFromCands, givenDimension);
-				case CaseBasedV1:
-					return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
-							similarityOfEndPointActObjCands);
-				default:
-					System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised case type = " + caseType));
-					return null;
+			case SimpleV3:
+				// createRankedTopRecommendedPDValsSimpleV3_3
+				return createRankedTopRecommendedGDValsSimpleV3_3(nextActivityObjectsFromCands, givenDimension);
+			case CaseBasedV1:
+				return createRankedTopRecommendedActivityNamesCaseBasedV1_3(nextActivityObjectsFromCands,
+						similarityOfEndPointActObjCands);
+			default:
+				System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised case type = " + caseType));
+				return null;
 			}
 		}
 		else
@@ -266,7 +266,8 @@ public class RecommMasterUtils
 
 		StringBuilder rankScoreCalc = new StringBuilder();
 
-		for (Map.Entry<String, Pair<ActivityObject2018, Double>> nextActObj : nextActivityObjectsWithDistance.entrySet())
+		for (Map.Entry<String, Pair<ActivityObject2018, Double>> nextActObj : nextActivityObjectsWithDistance
+				.entrySet())
 		{ // String candTimelineID = nextActObj.getKey();
 			String nextActivityName = nextActObj.getValue().getFirst().getActivityName();
 			double normEditDistanceVal = nextActObj.getValue().getSecond();
@@ -332,9 +333,10 @@ public class RecommMasterUtils
 		// <ActivityName,RankScore>
 		LinkedHashMap<String, Double> recommendedActivityGDValsRankscorePairs = new LinkedHashMap<>();
 
-		StringBuilder rankScoreCalc = new StringBuilder();
+		// StringBuilder rankScoreCalc = new StringBuilder();
 
-		for (Map.Entry<String, Pair<ActivityObject2018, Double>> nextActObj : nextActivityObjectsWithDistance.entrySet())
+		for (Map.Entry<String, Pair<ActivityObject2018, Double>> nextActObj : nextActivityObjectsWithDistance
+				.entrySet())
 		{ // String candTimelineID = nextActObj.getKey();
 			double normEditDistanceVal = nextActObj.getValue().getSecond();
 
@@ -343,8 +345,10 @@ public class RecommMasterUtils
 				String nextActivityGDVal = gdVal.toString();
 
 				// represents similarity
-				double simRankScore = (1d - normEditDistanceVal);// * simEndPointActivityObject;
-				rankScoreCalc.append("Simple RANK SCORE (1- normED) =" + "1-" + normEditDistanceVal + "\n");
+				// disabled on 18 Mar 2019double simRankScore = (1d - normEditDistanceVal);// *
+				// simEndPointActivityObject;
+				double simRankScore = distToSim(normEditDistanceVal);
+				// rankScoreCalc.append("Simple RANK SCORE (1- normED) =" + "1-" + normEditDistanceVal + "\n");
 
 				if (recommendedActivityGDValsRankscorePairs.containsKey(nextActivityGDVal) == false)
 				{
@@ -359,9 +363,9 @@ public class RecommMasterUtils
 
 		}
 
-		if (VerbosityConstants.verboseRankScoreCalcToConsole)
+		if (false && VerbosityConstants.verboseRankScoreCalcToConsole)
 		{
-			System.out.println(rankScoreCalc.toString());
+			// System.out.println(rankScoreCalc.toString());
 		}
 
 		// Sorted in descending order of ranked score: higher ranked score means more top in rank (larger numeric value
@@ -374,7 +378,44 @@ public class RecommMasterUtils
 			PopUps.printTracedErrorMsg("Error: recommendedActivityGDValsRankscorePairs.size() = "
 					+ recommendedActivityGDValsRankscorePairs.size());
 		}
+
+		// Start of sanity check
+		if (true)
+		{
+			StringBuilder sb = new StringBuilder(
+					"Sanity Check: createRankedTopRecommendedGDValsSimpleV3_3():\nnextActivityObjectsWithDistance = \n");
+			nextActivityObjectsWithDistance.entrySet().stream().forEachOrdered(
+					e -> sb.append(e.getKey() + "," + e.getValue().getFirst().getGivenDimensionVal("_", givenDimension)
+							+ "," + e.getValue().getSecond() + "\n"));
+			sb.append("--------------------------\nrecommendedActivityGDValsRankscorePairs = \n");
+			recommendedActivityGDValsRankscorePairs.entrySet().stream()
+					.forEachOrdered(e -> sb.append(e.getKey() + "," + e.getValue() + "\n"));
+			sb.append("=============================================\n");
+			WToFile.appendLineToFileAbs(sb.toString(),
+					Constant.getCommonPath() + "SanityCheckCreateRankedTopRecommendedGDValsSimpleV3_3.csv");
+		}
+
+		// End of sanity check
 		return recommendedActivityGDValsRankscorePairs;
+	}
+
+	/**
+	 * 
+	 * @param dist
+	 * @return
+	 */
+	private static final double distToSim(double dist)
+	{
+		switch (Constant.distToSimScoring)
+		{
+		case OneMinusD:
+			return 1d - dist;
+		case TwoMinusD:
+			return 2d - dist;
+		default:
+			PopUps.printTracedErrorMsgWithExit("Error: unknown distToSimScoring: " + Constant.distToSimScoring);
+			return Double.NaN;
+		}
 	}
 
 	/**
@@ -538,20 +579,19 @@ public class RecommMasterUtils
 
 		switch (lookPastType)
 		{
-			case Daywise:
-				return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines,
-						endPointIndicesForDaywise);
-			case NCount:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			case NHours:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			case ClosestTime:
-				return null;
-			case NGram:
-				return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
-			default:
-				System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
-				return null;
+		case Daywise:
+			return fetchNextActivityObjectsDaywise(editDistanceSorted, candidateTimelines, endPointIndicesForDaywise);
+		case NCount:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		case NHours:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		case ClosestTime:
+			return null;
+		case NGram:
+			return fetchNextActivityObjectsFromNext(editDistanceSorted, candidateTimelines);
+		default:
+			System.err.println(PopUps.getTracedErrorMsg("Error:unrecognised lookPastType = " + lookPastType));
+			return null;
 		}
 
 	}
@@ -708,16 +748,16 @@ public class RecommMasterUtils
 			LinkedHashMap<String, LinkedHashMap<String, Pair<String, Double>>> normalisedCandEditDistances)
 	{
 		LinkedHashMap<String, Pair<String, Double>> aggregatedFeatureWiseDistances = new LinkedHashMap<>();
-	
+
 		for (Map.Entry<String, LinkedHashMap<String, Pair<String, Double>>> entry : normalisedCandEditDistances
 				.entrySet()) // iterating over cands
 		{
 			String candID = entry.getKey();
 			LinkedHashMap<String, Pair<String, Double>> normalisedFeatureWiseDistances = entry.getValue();
-	
+
 			int featureIndex = 0;
 			double distanceAggregatedOverFeatures = 0;
-	
+
 			for (Map.Entry<String, Pair<String, Double>> distEntry : normalisedFeatureWiseDistances.entrySet())
 			// iterating over distance for each feature
 			{
@@ -725,7 +765,7 @@ public class RecommMasterUtils
 				distanceAggregatedOverFeatures += normalisedDistanceValue;
 				featureIndex++;
 			}
-	
+
 			distanceAggregatedOverFeatures = StatsUtils
 					.round(distanceAggregatedOverFeatures / Constant.getNumberOfFeatures(), 4);
 			aggregatedFeatureWiseDistances.put(candID, new Pair("", distanceAggregatedOverFeatures));
@@ -747,7 +787,7 @@ public class RecommMasterUtils
 			LinkedHashMap<String, Timeline> candidateTimelines, String userIDAtRecomm, String commonPath)
 	{
 		boolean errorExists = false;
-	
+
 		if (distancesMapUnsorted.size() != candidateTimelines.size())
 		{// Constant.nearestNeighbourCandEDThreshold > 0) // not expected when filtering is to be done
 			if (Constant.typeOfCandThresholdPrimDim != Enums.TypeOfCandThreshold.None
@@ -770,7 +810,7 @@ public class RecommMasterUtils
 						.map(e -> e.getKey() + " - " + e.getValue().getActivityObjectPDValsWithTimestampsInSequence())
 						// .getActivityObjectNamesWithTimestampsInSequence())
 						.collect(Collectors.joining("\n"));
-	
+
 				WToFile.appendLineToFileAbs(
 						"User = " + userIDAtRecomm + "\ndistancesMapUnsortedAsString =\n" + distancesMapUnsortedAsString
 								+ "\n\n candidateTimelinesAsString =\n" + candidateTimelinesAsString,
@@ -793,16 +833,16 @@ public class RecommMasterUtils
 			List<Integer> setOfActIDs, int numOfVals)
 	{
 		LinkedHashMap<String, Double> randomActScores = new LinkedHashMap<>(numOfVals);
-	
+
 		// StringBuilder topRankedString = new StringBuilder();// String topRankedString= new String();
 		// StringBuilder msg = new StringBuilder();
-	
+
 		for (int i = 0; i < numOfVals; i++)
 		{
 			randomActScores.put(String.valueOf(setOfActIDs.get(StatsUtils.randomInRange(0, setOfActIDs.size() - 1))),
 					1.0);
 		}
-	
+
 		return randomActScores;
 	}
 
@@ -822,7 +862,7 @@ public class RecommMasterUtils
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Inside pruneAboveThreshold:\n");
-	
+
 		double thresholdAsDistance = -1;
 		if (typeOfThreshold.equals(Enums.TypeOfThreshold.Global))/// IgnoreCase("Global"))
 		{
@@ -845,17 +885,17 @@ public class RecommMasterUtils
 		{
 			sb.append(e.getKey() + "--" + e.getValue().toString() + "\n");
 		}
-	
+
 		int countCandBeforeThresholdPruning = distancesMapUnsorted.size();// distanceScoresSorted.size();
 		distancesMapUnsorted = TimelineTrimmers.removeAboveThreshold4SSD(distancesMapUnsorted, thresholdAsDistance);//
 		int countCandAfterThresholdPruning = distancesMapUnsorted.size();
-	
+
 		sb.append("After pruning distancesMapUnsorted =\n");
 		for (Entry<String, Pair<String, Double>> e : distancesMapUnsorted.entrySet())
 		{
 			sb.append(e.getKey() + "--" + e.getValue().toString() + "\n");
 		}
-	
+
 		sb.append("thresholdAsDistance=" + thresholdAsDistance + " countCandBeforeThresholdPruning="
 				+ countCandBeforeThresholdPruning + "countCandAfterThresholdPruning=" + countCandAfterThresholdPruning
 				+ "\n");
@@ -864,7 +904,7 @@ public class RecommMasterUtils
 			System.out.println(sb.toString());
 		}
 		boolean thresholdPruningNoEffect = (countCandBeforeThresholdPruning == countCandAfterThresholdPruning);
-	
+
 		if (!thresholdPruningNoEffect)
 		{
 			// System.out.println("Ohh..threshold pruning is happening. Are you sure you wanted this?");// +msg);
@@ -893,10 +933,10 @@ public class RecommMasterUtils
 		// Timestamp tsOfAOAtRecommPoint = activityObjectAtRecommPoint.getStartTimestamp();
 		long timeInDayAOAtRecommPoint = DateTimeUtils.getTimeInDayInSecondsZoned(
 				actObjAtRecommPoint.getStartTimestampInms(), actObjAtRecommPoint.getTimeZoneId());
-	
+
 		StringBuilder sb = new StringBuilder(
 				"Debug12Feb Constant.filterCandByCurActTimeThreshInSecs=" + filterCandByCurActTimeThreshInSecs);
-	
+
 		if (verbose)
 		{
 			sb.append("\ntsOfAOAtRecommPoint:"
@@ -904,7 +944,7 @@ public class RecommMasterUtils
 							actObjAtRecommPoint.getTimeZoneId())
 					+ "\ntimeInDayAOAtRecommPoint=" + timeInDayAOAtRecommPoint);
 		}
-	
+
 		for (Entry<String, Timeline> candEntry : candidateTimelines.entrySet())
 		{
 			ArrayList<ActivityObject2018> aosInCand = candEntry.getValue().getActivityObjectsInTimeline();
@@ -913,9 +953,9 @@ public class RecommMasterUtils
 			// long timeInDayCurrInCand = DateTimeUtils.getTimeInDayInSeconds(tCurrInCand);
 			long timeInDayCurrInCand = DateTimeUtils.getTimeInDayInSecondsZoned(lastAO.getStartTimestampInms(),
 					lastAO.getTimeZoneId());
-	
+
 			long absDiff = Math.abs(timeInDayCurrInCand - timeInDayAOAtRecommPoint);
-	
+
 			if (verbose)
 			{
 				// sb.append("\ntCurrInCand:" + tCurrInCand + "\ntimeInDayCurrInCand=" + timeInDayCurrInCand
@@ -935,15 +975,15 @@ public class RecommMasterUtils
 				// $$sb.append("-Rejecting");
 			}
 		}
-	
+
 		if (verbose)
 		{
 			System.out.println("\n" + sb.toString());
 		}
-	
+
 		int sizeBeforeFiltering = candidateTimelines.size();
 		int sizeAfterFilering = filteredCands.size();
-	
+
 		if (VerbosityConstants.WriteFilterCandByCurActTimeThreshInSecs)
 		{
 			WToFile.appendLineToFileAbs(
@@ -971,7 +1011,7 @@ public class RecommMasterUtils
 			TypeOfCandThreshold typeOfCandThreshold, int nearestNeighbourCandEDThresholdGivenDim)
 	{
 		LinkedHashMap<String, Pair<String, Double>> givenDimDistancesSortedMap = null;
-	
+
 		if (typeOfCandThreshold.equals(Enums.TypeOfCandThreshold.NearestNeighbour)
 				&& nearestNeighbourCandEDThresholdGivenDim >= 1)
 		{ // because already sorted while filtering
@@ -982,7 +1022,7 @@ public class RecommMasterUtils
 			givenDimDistancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
 					.sortByValueAscendingStrStrDoub(givenDimDistancesUnSortedMap);
 		}
-	
+
 		// before 23 July 2018: this following commented out code was inside the constructor.
 		// if (Constant.typeOfCandThreshold == Enums.TypeOfCandThreshold.NearestNeighbour
 		// && Constant.nearestNeighbourCandEDThresholdPrimDim >= 1)
@@ -1004,7 +1044,7 @@ public class RecommMasterUtils
 		// secondaryDimDistancesSortedMap = (LinkedHashMap<String, Pair<String, Double>>) ComparatorUtils
 		// .sortByValueAscendingStrStrDoub(distancesMapSecondaryDimUnsorted);// added 17 July 2018
 		// }
-	
+
 		return givenDimDistancesSortedMap;
 	}
 

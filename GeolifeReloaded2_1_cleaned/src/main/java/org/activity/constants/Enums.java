@@ -149,4 +149,9 @@ public class Enums
 		ActivityID, LocationID, LocationGridID, Duration;// Duration added on Nov18 2018 but not checked to be fully
 															// implemented
 	}
+
+	public enum DistToSimScoring
+	{
+		OneMinusD, TwoMinusD;
+	}
 }

@@ -170,7 +170,7 @@ public class PathConstants
 	 * @param databaseName
 	 *            (added on 12 Oct 2018)
 	 */
-	public static final void intialise(boolean For9kUsers, String databaseName)
+	public static final void initialise(boolean For9kUsers, String databaseName)
 	{
 		if (databaseName.equals("fsny1"))
 		{
