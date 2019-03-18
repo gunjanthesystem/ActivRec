@@ -25,7 +25,7 @@ public class TimeZoneReader
 	public static void main(String args[])
 	{
 
-		PathConstants.intialise(false, "gowalla1");// added second argument on 2 Nov 2018
+		PathConstants.initialise(false, "gowalla1");// added second argument on 2 Nov 2018
 		Map<Integer, ZoneId> locIDZoneIdMap = createTimeZoneForGowallaLocations(
 				PathConstants.pathToLocationTimezoneInfo);
 		System.out.println("locIDZoneIdMap.size()=" + locIDZoneIdMap.size());

@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.controller.SuperController;
 import org.activity.io.CSVUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.SFTPFile;
@@ -32,7 +33,6 @@ import org.activity.sanityChecks.Sanity;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import com.jcraft.jsch.Session;
 
@@ -203,7 +203,9 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar6Temp2.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7Geolife.csv";
+		// + "/ResultsToReadMar7GowallaSecDim.csv";
+		// + "Mar6Temp2.csv";
 		// + "ResultsToReadTestGeoMar1.csv";
 		// + "ResultsToReadGeolifeImproveEDFeb14.csv";
 		// + "ResultsToReadJan15Gowalla1_2.csv";
@@ -225,20 +227,43 @@ public class ResultsDistributionEvaluation
 		// ResultsToReadDec8Truncated.csv";
 		// "ResultsToReadNov28_OnlyED1.csv";// 25_3.csv";
 		// dcu_data_2_JAN15H10M31ED1.0AllActsFDStFilter0hrsRTVPNN50NoTTFilterNC_AllReciprocalRank_MinMUWithMaxFirst0Aware.csv
+
+		if (false)
+		{
+			runSomePostExperimentEvals(resultsfileToRead, "");
+		}
 		if (true)
 		{
 			//
+			// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 1);
+			// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
+			// getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware", 2);
+			// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
+			// getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 2);
+			// getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
+			// getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 6);
+			// getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
+			// getResultsNov21(resuchltsfileToRead, "AllAvgPrecision_ChosenMU", 6);
+			// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);
 
-			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 1);
-			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
-			getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0Aware", 2);
-			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
+			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 1);
+			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);
+			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 2);
+			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 2);
 
-			getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 2);
-			getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
-			getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 6);
-			getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
-			getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 6);
+			if (false)
+			{
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUserSecDim", 1);
+				// #getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
+				getResultsNov21(resultsfileToRead, "AllMeanReciprocalRank_MinMUWithMaxFirst0AwareSecDim", 2);
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareSecDim", 4);
+
+				getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMUSecDim", 2);
+				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMUSecDim", 4);
+				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMUSecDim", 6);
+				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMUSecDim", 4);
+				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMUSecDim", 6);
+			}
 
 		}
 
@@ -282,7 +307,7 @@ public class ResultsDistributionEvaluation
 		try
 		{
 			List<List<String>> allLines = ReadingFromFile.readLinesIntoListOfLists(resultsfileToRead, ",");
-			Map<String, List<Double>> valsFromAllExperiments = new LinkedHashMap<>();
+			Map<String, List<String>> valsFromAllExperiments = new LinkedHashMap<>();
 
 			for (List<String> line : allLines)
 			{
@@ -297,11 +322,13 @@ public class ResultsDistributionEvaluation
 				System.out.println(expLabel);
 				// PopUps.showMessage(expLabel);
 				String fileToRead = path + expLabel + "_" + resultLabel + ".csv";
-				List<Double> valsRead = new ArrayList<>();
+				// List<Double> valsRead = new ArrayList<>();
+				List<String> valsRead = new ArrayList<>();
 
 				if (host.contains("local"))
 				{
-					valsRead = ReadingFromFile.oneColumnReaderDouble(fileToRead, ",", colIndexToRead, true);
+					// valsRead = ReadingFromFile.oneColumnReaderDouble(fileToRead, ",", colIndexToRead, true);
+					valsRead = ReadingFromFile.oneColumnReaderString(fileToRead, ",", colIndexToRead, true);
 				}
 				else
 				{
@@ -310,7 +337,7 @@ public class ResultsDistributionEvaluation
 					Pair<InputStream, Session> inputAndSession = SFTPFile.getInputStreamForSFTPFile(host, 22,
 							fileToRead, user, passwd);
 
-					valsRead = ReadingFromFile.oneColumnReaderDouble(inputAndSession.getFirst(), ",", colIndexToRead,
+					valsRead = ReadingFromFile.oneColumnReaderString(inputAndSession.getFirst(), ",", colIndexToRead,
 							true);
 				}
 				valsFromAllExperiments.put(expLabel, valsRead);
@@ -335,6 +362,57 @@ public class ResultsDistributionEvaluation
 		// PopUps.showMessage("End of getResultsNov21");
 	}
 
+	/**
+	 * 
+	 * @param resultsfileToRead
+	 * @param dimensionPhrase
+	 * @since 12 March 2019
+	 */
+	public static void runSomePostExperimentEvals(String resultsfileToRead, String dimensionPhrase)
+	{
+		boolean extractForBestMU = false;
+		boolean extractForChosenMU = false;
+		boolean writeMRRStatsOverUsersBestMUs = false;
+		boolean writeRRForOptimalMUAllUsers = false;
+		boolean writeMRRByUserAndActualForChosenMU = false;
+		boolean writeRRByActualForChosenMU = true;
+
+		try
+		{
+			List<List<String>> allLines = ReadingFromFile.readLinesIntoListOfLists(resultsfileToRead, ",");
+
+			for (List<String> line : allLines)
+			{
+				String host = line.get(1);
+				String path = line.get(2);
+				String commonPath = path.substring(0, path.length());// ignore the last char which is '/'
+				String splitted[] = path.split("/");
+				String expLabel = splitted[splitted.length - 1];
+
+				System.out.println("commonPath = " + commonPath + "\nexpLabel = " + expLabel);
+				if (host.contains("local"))
+				{
+
+					SuperController.extractAggregateEvalResultsOverMUs(commonPath, dimensionPhrase, extractForBestMU,
+							extractForChosenMU, writeMRRStatsOverUsersBestMUs, writeRRForOptimalMUAllUsers,
+							writeMRRByUserAndActualForChosenMU, writeRRByActualForChosenMU);
+				}
+				else
+				{
+					PopUps.showError(
+							"Error: runSomePostExperimentEvals() implemented for local (use sshfs to make local), while current path to read is: "
+									+ commonPath + "\nhost = " + host);
+				}
+
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	///
 	/**
 	 * 
 	 * 
@@ -1184,22 +1262,18 @@ public class ResultsDistributionEvaluation
 
 	}
 
-	//
 	/**
 	 * For of org.activity.evaluation.ResultsDistributionEvaluation.runApril10Results(String, int, String) to be run
-	 * during experiments
+	 * during experiments. For stat files:- AllPerDirectTopKAgreements_, AllPerDirectTopKAgreementsL1_,
+	 * AllAvgPrecision_, AllAvgRecall_, AllAvgFMeasure_, AllMeanReciprocalRank_, AllPerActivityMeanReciprocalRank_
 	 * 
 	 * @param pathToRead
 	 * @param firstToMax
 	 * @param dimensionPhrase
 	 * @param chosenFixedMUForEachUserFile
-	 * @param getDesStatsOverChosenFixedMU
-	 * @param statFileNames
-	 *            e..g, { "AllPerDirectTopKAgreements_", "AllPerDirectTopKAgreementsL1_" };
 	 * @param doFirstToMax
 	 * @param doFirstToMaxZeroAware
 	 * @param doChosenMUForEachUser
-	 * @return
 	 * @since Nov 20 2018
 	 */
 	public static void runNov20Results(String pathToRead, int firstToMax, String dimensionPhrase,
@@ -1214,7 +1288,7 @@ public class ResultsDistributionEvaluation
 		// boolean doFirstToMax = true;
 		// boolean doFirstToMaxZeroAware = true;
 
-		DescriptiveStatistics mrrStatsOverUsers = null;
+		// DescriptiveStatistics mrrStatsOverUsers = null;
 		String pathToWrite = pathToRead;
 		boolean doLevel1 = false;
 		String host = "local";
@@ -2818,8 +2892,9 @@ public class ResultsDistributionEvaluation
 
 				splitted2[0] = splitted2[0].replace("NoTTFilter", "");// added on 1 Jan 2018
 				splitted2[0] = splitted2[0].replace("PNN500", "");// added on 1 Jan 2018
+				splitted2[0] = splitted2[0].replace("PNN50", "");// added on 1 Jan 2018
+				splitted2[0] = splitted2[0].replace("PNN100", "");// added on 1 Jan 2018
 				splitted2[0] = splitted2[0].replace("coll", "");// added on 7 March 2019
-				//
 
 				double muForOrder = Double.valueOf(splitted2[0]);
 				muArray = new double[] { muForOrder - 1 };
@@ -2973,7 +3048,9 @@ public class ResultsDistributionEvaluation
 		}
 		catch (Exception e)
 		{
+
 			e.printStackTrace();
+			PopUps.showException(e, "getResultChosenMU()");
 			String s = "pathToRead=" + pathToRead + "\nresultsLabel=" + resultsLabel + "\nstatFileNameToRead="
 					+ statFileName;
 			WToFile.appendLineToFileAbs(

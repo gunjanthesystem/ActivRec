@@ -104,6 +104,47 @@ public class ReadingFromFile
 	}
 
 	/**
+	 * reads a column from a csv file and returns it as an arraylist of String
+	 * 
+	 * @param inputStream
+	 *            inputStream of fileNameToRead
+	 * @param delimiter
+	 * @param columnIndex
+	 *            starts from 0
+	 * @param hasHeader
+	 * @return
+	 */
+	public static List<String> oneColumnReaderString(InputStream inputStream, String delimiter, int columnIndex,
+			boolean hasHeader)
+	{
+		List<String> raw = new ArrayList<String>();
+		BufferedReader br = null;
+		try
+		{
+			br = new BufferedReader(new InputStreamReader(inputStream));
+
+			if (hasHeader)
+			{
+				raw = br.lines().skip(1).map((String s) -> (s.split(Pattern.quote(delimiter))[columnIndex]))
+						.collect(Collectors.toList());
+			}
+			else
+			{
+				raw = br.lines().map((String s) -> (s.split(Pattern.quote(delimiter))[columnIndex]))
+						.collect(Collectors.toList());
+			}
+			// System.out.println("Size of raw =" + raw.size());
+			br.close();
+		}
+
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return raw;
+	}
+
+	/**
 	 * reads a column from a csv file and returns it as an arraylist of long
 	 * 
 	 * @param absolutePath

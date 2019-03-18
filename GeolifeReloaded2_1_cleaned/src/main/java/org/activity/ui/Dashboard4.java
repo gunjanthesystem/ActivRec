@@ -134,7 +134,7 @@ public class Dashboard4 extends Application
 				UIConstants.haveTooltip = true;
 			}
 			Constant.setDatabaseName(databaseName);
-			PathConstants.intialise(Constant.For9kUsers, Constant.getDatabaseName());
+			PathConstants.initialise(Constant.For9kUsers, Constant.getDatabaseName());
 			Constant.initialise("./", databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 					PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 					PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap,

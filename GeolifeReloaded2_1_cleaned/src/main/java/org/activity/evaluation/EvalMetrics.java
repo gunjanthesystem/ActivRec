@@ -124,7 +124,7 @@ public class EvalMetrics
 					System.exit(-1);
 				}
 
-				LinkedHashMap<String, ArrayList<Double>> perActMRR = new LinkedHashMap<String, ArrayList<Double>>();
+				LinkedHashMap<String, ArrayList<Double>> perActMRR = new LinkedHashMap<>();
 				// initialised to maintain same order for activity names
 				// for (String actName : activityNames)
 				// {
@@ -153,6 +153,11 @@ public class EvalMetrics
 					String actualActName = dataActualForThisUser.get(tokenI);// dataActualValuesForThisUser[tokenI];
 					Double rrValue = Double.valueOf(rrValuesForThisUser[tokenI]);
 
+					// ignore RR which are less than 0 which is indicative of no recommendation for the RT
+					if (rrValue < 0)// added on 14 March 2019
+					{
+						continue;
+					}
 					// Start of Dec 16 debugging
 					System.out.println("dataActualForThisUser = " + dataActualForThisUser);
 					System.out.println("actualActName = " + actualActName);
@@ -160,7 +165,29 @@ public class EvalMetrics
 					System.out.println("perActMRR = " + perActMRR);
 					// End of Dec 16 debugging
 
-					perActMRR.get(actualActName).add(rrValue);
+					// start of debug Mar 14 2019
+					if (perActMRR == null)
+					{
+						System.out.println("perActMRR==null");
+					}
+					if (perActMRR.containsKey(actualActName) == false)
+					{
+						System.out.println("perActMRR.containsKey(actualActName) == false");
+					}
+					// end of debug Mar 14 2019
+
+					ArrayList<Double> listOfRRsForThisAct = perActMRR.get(actualActName);
+					if (listOfRRsForThisAct == null)
+					{
+						System.out.println("listOfRRsForThisAct == null");
+					}
+					if (rrValue == null)
+					{
+						System.out.println("rrValue == null");
+					}
+					listOfRRsForThisAct.add(rrValue);
+					// perActMRR.get(actualActName).add(rrValue);
+
 				}
 
 				bw.write("User_" + lineNumber);
@@ -350,6 +377,8 @@ public class EvalMetrics
 			String dimensionPhrase, String commonPath)
 	{
 		// String commonPath = Constant.getCommonPath();
+		// LinkedHashMap<String,Integer> numOfNeg
+
 		try
 		{
 			BufferedWriter bw = WToFile.getBWForNewFile(
@@ -556,7 +585,8 @@ public class EvalMetrics
 			/////////// start of added on 15 Jan 2019
 			// fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
 			String metricName = "ReciprocalRank";
-			groupByUserAndActual(fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase, commonPath);
+			summarizeByUserAndActualV2(fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase,
+					commonPath, 4, 3, 0);
 			// metricName);
 			/////////// end of added on 15 Jan 2019
 		}
@@ -566,24 +596,76 @@ public class EvalMetrics
 		}
 	}
 
+	// /**
+	// *
+	// * @param fileNamePhrase
+	// * @param commonPath
+	// * @since 15 jan 2019
+	// * @deprecated
+	// */
+	// public static void summarizeByUserAndActual(String fileNamePhrase, String commonPath)// , String metricName)
+	// {
+	// // fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
+	// List<List<String>> allRRRead = ReadingFromFile.readLinesIntoListOfLists(commonPath + fileNamePhrase + ".csv",
+	// ",");
+	//
+	// LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByUser = allRRRead.stream().skip(1)
+	// .collect(Collectors.groupingBy(e -> String.valueOf(e.get(0)), LinkedHashMap::new,
+	// Collectors.summarizingDouble(e -> Double.valueOf(e.get(4)))));
+	// LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByTargetAct = allRRRead.stream().skip(1)
+	// .collect(Collectors.groupingBy(e -> String.valueOf(e.get(3)), LinkedHashMap::new,
+	// Collectors.summarizingDouble(e -> Double.valueOf(e.get(4)))));
+	//
+	// WToFile.writeToNewFile(
+	// "User,MRR,Count\n" + allRRGrpByUser.entrySet().stream()
+	// .map(e -> e.getKey() + "," + StatsUtils.round(e.getValue().getAverage(), 4) + ","
+	// + e.getValue().getCount())
+	// .collect(Collectors.joining("\n")),
+	// commonPath + fileNamePhrase + "MeanPerUser.csv");
+	//
+	// WToFile.writeToNewFile(
+	// "Actual,MRR,Count\n" + allRRGrpByTargetAct.entrySet().stream()
+	// .map(e -> e.getKey() + "," + StatsUtils.round(e.getValue().getAverage(), 4) + ","
+	// + e.getValue().getCount())
+	// .collect(Collectors.joining("\n")),
+	// commonPath + fileNamePhrase + "MeanPerActual.csv");
+	// }
+
 	/**
+	 * Fork of summarizeByUserAndActual
+	 * <p>
+	 * ignore RR < 0
 	 * 
 	 * @param fileNamePhrase
 	 * @param commonPath
-	 * @since 15 jan 2019
+	 * @param indexOfRR
+	 * @param indexOfTargetAct
+	 * @param indexOfUser
+	 * @since 14 Mar 2019
 	 */
-	public static void groupByUserAndActual(String fileNamePhrase, String commonPath)// , String metricName)
+	public static void summarizeByUserAndActualV2(String fileNamePhrase, String commonPath, int indexOfRR,
+			int indexOfTargetAct, int indexOfUser)// , String metricName)
 	{
 		// fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
 		List<List<String>> allRRRead = ReadingFromFile.readLinesIntoListOfLists(commonPath + fileNamePhrase + ".csv",
 				",");
+		// 4,3,0
+		//////////////////////////////////////////////////
 
-		LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByUser = allRRRead.stream().skip(1)
-				.collect(Collectors.groupingBy(e -> String.valueOf(e.get(0)), LinkedHashMap::new,
-						Collectors.summarizingDouble(e -> Double.valueOf(e.get(4)))));
-		LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByTargetAct = allRRRead.stream().skip(1)
-				.collect(Collectors.groupingBy(e -> String.valueOf(e.get(3)), LinkedHashMap::new,
-						Collectors.summarizingDouble(e -> Double.valueOf(e.get(4)))));
+		List<List<String>> allRRReadOnlyValidRRs = allRRRead.stream().skip(1)
+				.filter(v -> Double.valueOf(v.get(indexOfRR)) >= 0).collect(Collectors.toList());
+
+		/// temp start
+		// List<List<String>> allRRReadOnlyValidRRs = allRRRead.stream().skip(1).collect(Collectors.toList());
+		/// temp end
+
+		//////////////////////////////////////////////////
+		LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByUser = allRRReadOnlyValidRRs.stream()
+				.collect(Collectors.groupingBy(e -> String.valueOf(e.get(indexOfUser)), LinkedHashMap::new,
+						Collectors.summarizingDouble(e -> Double.valueOf(e.get(indexOfRR)))));
+		LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByTargetAct = allRRReadOnlyValidRRs.stream()
+				.collect(Collectors.groupingBy(e -> String.valueOf(e.get(indexOfTargetAct)), LinkedHashMap::new,
+						Collectors.summarizingDouble(e -> Double.valueOf(e.get(indexOfRR)))));
 
 		WToFile.writeToNewFile(
 				"User,MRR,Count\n" + allRRGrpByUser.entrySet().stream()
@@ -598,6 +680,90 @@ public class EvalMetrics
 								+ e.getValue().getCount())
 						.collect(Collectors.joining("\n")),
 				commonPath + fileNamePhrase + "MeanPerActual.csv");
+	}
+
+	/**
+	 * 
+	 * @param fileNamePhrase
+	 * @param commonPath
+	 * @param indexOfRR
+	 * @param indexOfTargetAct
+	 * @param pathToCatIDNameDict
+	 */
+	public static void distributionByActual(String fileNamePhrase, String commonPath, int indexOfRR,
+			int indexOfTargetAct, String pathToCatIDNameDict)// , String metricName)
+	{
+		// fileNamePhrase = fileNamePhrase + timeCategory + metricName + "Unrolled" + dimensionPhrase
+		List<List<String>> allRRRead = ReadingFromFile.readLinesIntoListOfLists(commonPath + fileNamePhrase + ".csv",
+				",");
+
+		//////////////////////////////////////////////////
+		List<List<String>> allRRReadOnlyValidRRs = allRRRead.stream().skip(1)
+				.filter(v -> Double.valueOf(v.get(indexOfRR)) >= 0).collect(Collectors.toList());
+		//////////////////////////////////////////////////
+		// int indexOfRR = 4;
+		// int indexOfTargetAct = 3;
+
+		// LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByUser = allRRRead.stream().skip(1)
+		// .collect(Collectors.groupingBy(e -> String.valueOf(e.get(0)), LinkedHashMap::new,
+		// Collectors.summarizingDouble(e -> Double.valueOf(e.get(4)))));
+		// LinkedHashMap<String, DoubleSummaryStatistics> allRRGrpByTargetAct = allRRRead.stream().skip(1)
+		// .collect(Collectors.groupingBy(e -> String.valueOf(e.get(3)), LinkedHashMap::new,
+		// Collectors.summarizingDouble(e -> Double.valueOf(e.get(4)))));
+
+		// listPerTargetAct =
+		// allRRRead.stream().skip(1).collect(Collectors.groupingBy(e -> e.get(indexOfTargetAct), LinkedHashMap::new,
+		// Collectors.summarizingDouble(e -> Double.valueOf(e.get(indexOfRR)))));
+		LinkedHashMap<String, List<String>> listRRPerTargetAct = allRRReadOnlyValidRRs.stream()
+				.collect(Collectors.groupingBy(e -> e.get(indexOfTargetAct), LinkedHashMap::new,
+						Collectors.mapping(e -> e.get(indexOfRR), Collectors.toList())));
+		// allRRRead.stream().skip(1).collect(Collectors.groupingBy(e -> e.get(3), Collectors.toList()));
+		// e -> String.valueOf(e.get(3))));
+		// , // LinkedHashMap::new, Collectors.toList()));
+		// WToFile.writeToNewFile(
+		// "User,MRR,Count\n" + allRRGrpByUser.entrySet().stream()
+		// .map(e -> e.getKey() + "," + StatsUtils.round(e.getValue().getAverage(), 4) + ","
+		// + e.getValue().getCount())
+		// .collect(Collectors.joining("\n")),
+		// commonPath + fileNamePhrase + "MeanPerUser.csv");
+
+		// remove -1 RR
+		// listRRPerTargetAct.entrySet().stream().collect(Collectors.mapping(e -> e.getKey(),));
+		// LinkedHashMap<String, List<String>> listRRPerTargetActInvalidsRemoved = new LinkedHashMap<>(
+		// listRRPerTargetAct.size());
+		//
+		// for (Entry<String, List<String>> e : listRRPerTargetAct.entrySet())
+		// {
+		// listRRPerTargetActInvalidsRemoved.put(e.getKey(),
+		// e.getValue().stream().filter(v -> Double.valueOf(v.trim()) < 0).collect(Collectors.toList()));
+		// }
+
+		List<List<String>> catIDNameData = ReadingFromFile.readLinesIntoListOfLists(pathToCatIDNameDict, ",");
+		int indexOfCatID = 0;
+		int indexOfCatName = 1;
+		Map<String, String> catIDNameMap = catIDNameData.stream()
+				.collect(Collectors.toMap(e -> e.get(indexOfCatID), e -> e.get(indexOfCatName)));
+
+		StringBuilder sb = new StringBuilder("Actual,ActualName,RR\n");
+
+		for (Entry<String, List<String>> e : listRRPerTargetAct.entrySet())
+		{
+			String actID = e.getKey().trim();
+			String actName = catIDNameMap.getOrDefault(actID, "NotFoundInCatIDNameMap");
+
+			for (String le : e.getValue())
+			{
+				sb.append(actID + "," + actName + "," + le + "\n");
+			}
+		}
+
+		WToFile.writeToNewFile(sb.toString(), commonPath + fileNamePhrase + "ListRRPerActual.csv");
+		// WToFile.writeToNewFile(
+		// "Actual,MRR,Count\n" + allRRGrpByTargetAct.entrySet().stream()
+		// .map(e -> e.getKey() + "," + StatsUtils.round(e.getValue().getAverage(), 4) + ","
+		// + e.getValue().getCount())
+		// .collect(Collectors.joining("\n")),
+		// commonPath + fileNamePhrase + "MeanPerActual.csv");
 	}
 
 	/**
@@ -845,8 +1011,8 @@ public class EvalMetrics
 			String[] metricNames = { "Precision", "Recall", "FMeasure" };
 			for (String metricName : metricNames)
 			{
-				groupByUserAndActual(fileNamePhrase + timeCategory + "top" + theK + metricName + "Unrolled",
-						commonPath);// metricName);
+				summarizeByUserAndActualV2(fileNamePhrase + timeCategory + "top" + theK + metricName + "Unrolled",
+						commonPath, 4, 3, 0);// metricName);
 			}
 			System.out.println(consoleLogBuilder.toString());
 		}

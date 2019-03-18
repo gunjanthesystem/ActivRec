@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
-import org.activity.evaluation.RecommendationTestsUtils;
+import org.activity.evaluation.RecommTestsUtils;
 import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Dimension;
 import org.activity.objects.LocationGowalla;
@@ -354,7 +354,7 @@ public class TimelineWriters
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> testTimelinesAllUsers = new LinkedHashMap<>();
 			if (Constant.filterTrainingTimelinesByRecentDays)
 			{
-				trainTimelinesAllUsersContinuous = RecommendationTestsUtils
+				trainTimelinesAllUsersContinuous = RecommTestsUtils
 						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
 								Constant.getRecentDaysInTrainingTimelines(),
 								Constant.filterTrainingTimelinesByRecentDays);
@@ -363,7 +363,7 @@ public class TimelineWriters
 			else
 			{
 				// sampledUsersTimelines
-				trainTimelinesAllUsersContinuous = RecommendationTestsUtils
+				trainTimelinesAllUsersContinuous = RecommTestsUtils
 						.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
 			}
 

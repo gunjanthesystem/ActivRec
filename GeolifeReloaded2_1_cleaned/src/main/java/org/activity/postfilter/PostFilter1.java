@@ -79,7 +79,7 @@ public class PostFilter1
 		Constant.setCommonPath(outerPath);
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // added on April 21, 2016
 		Constant.setDefaultTimeZone("UTC");
-		PathConstants.intialise(Constant.For9kUsers, databaseName);
+		PathConstants.initialise(Constant.For9kUsers, databaseName);
 		Constant.initialise(outerPath, databaseName, PathConstants.pathToSerialisedCatIDsHierDist,
 				PathConstants.pathToSerialisedCatIDNameDictionary, PathConstants.pathToSerialisedLocationObjects,
 				PathConstants.pathToSerialisedUserObjects, PathConstants.pathToSerialisedGowallaLocZoneIdMap, false);

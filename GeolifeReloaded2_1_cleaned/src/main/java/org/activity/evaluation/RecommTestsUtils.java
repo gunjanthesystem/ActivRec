@@ -29,8 +29,10 @@ import org.activity.objects.Timeline;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.recomm.RecommendationMasterMultiDI;
 import org.activity.stats.StatsUtils;
+import org.activity.ui.PopUps;
 import org.activity.util.StringUtils;
 import org.activity.util.TimelineTransformers;
+import org.activity.util.TimelineUtils;
 
 /**
  * To keep common methods to different RecommendationTests classes together
@@ -40,7 +42,7 @@ import org.activity.util.TimelineTransformers;
  * @author gunjan
  * @since 20 Dec 2018
  */
-public class RecommendationTestsUtils
+public class RecommTestsUtils
 {
 
 	// public static ActivityObject2018 computeRepresentativeAOsDec2018(Integer topPrimaryDimensionVal, int userId,
@@ -185,7 +187,7 @@ public class RecommendationTestsUtils
 		return ts;
 	}
 
-	public static String getActivityNameCountPairsWithCount(LinkedHashMap<String, Long> nameCountPairsSorted)
+	public static String getActNameCountPairsWithCount(LinkedHashMap<String, Long> nameCountPairsSorted)
 	{
 		// String result = "";
 		StringBuilder result = new StringBuilder();
@@ -198,7 +200,7 @@ public class RecommendationTestsUtils
 		return result.toString();
 	}
 
-	public static String getActivityNameCountPairsWithoutCount(LinkedHashMap<String, Long> nameCountPairsSorted)
+	public static String getActNameCountPairsWithoutCount(LinkedHashMap<String, Long> nameCountPairsSorted)
 	{
 		// String result = "";
 		StringBuilder result = new StringBuilder();
@@ -211,7 +213,7 @@ public class RecommendationTestsUtils
 		return result.toString();
 	}
 
-	public static String getActivityNameDurationPairsWithDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
+	public static String getActNameDurationPairsWithDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
 	{
 		// String result = "";
 		StringBuilder result = new StringBuilder();
@@ -223,8 +225,7 @@ public class RecommendationTestsUtils
 		return result.toString();
 	}
 
-	public static String getActivityNameDurationPairsWithoutDuration(
-			LinkedHashMap<String, Long> nameDurationPairsSorted)
+	public static String getActNameDurationPairsWithoutDuration(LinkedHashMap<String, Long> nameDurationPairsSorted)
 	{
 		// String result = "";
 		StringBuilder result = new StringBuilder();
@@ -855,6 +856,61 @@ public class RecommendationTestsUtils
 		res = (int) StatsUtils.getDescriptiveStatistics(cinCounts).getPercentile(50);
 		System.out.println("Inside getMedianCheckinsCountForGivePDVal: median cin for PDVal:" + PDVal + " = " + res);
 		return res;
+	}
+
+	/**
+	 * @param trainTimelinesAllUsersDWFiltrd
+	 * @param userAllDatesTimeslines
+	 * @param userId
+	 * @param userName
+	 * @param userTrainingTimelines
+	 * @param userTestTimelines
+	 * @param doWrite
+	 * @param givenDimension
+	 * @return
+	 */
+	public static LinkedHashMap<String, LinkedHashMap<String, ?>> getMapsForCountDurationBaselines(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelinesAllUsersDWFiltrd,
+			LinkedHashMap<Date, Timeline> userAllDatesTimeslines, int userId, String userName,
+			LinkedHashMap<Date, Timeline> userTrainingTimelines, LinkedHashMap<Date, Timeline> userTestTimelines,
+			boolean doWrite, PrimaryDimension givenDimension)
+	{
+		LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines;
+		// this is content based approach
+		if (Constant.collaborativeCandidates == false)
+		{
+			// Okay but disabled on 27 Dec 2018 in favour of method with String keys which is
+			// also used for collaborative approach.
+			// mapsForCountDurationBaselines =
+			// WToFile.writeBasicActivityStatsAndGetBaselineMaps(
+			// userName, userAllDatesTimeslines, userTrainingTimelines, userTestTimelines,
+			// Constant.primaryDimension, true, false);
+			mapsForCountDurationBaselines = WToFile.writeBasicActivityStatsAndGetBaselineMapsStringKeys(userName,
+					TimelineUtils.toStringKeys(userAllDatesTimeslines),
+					TimelineUtils.toStringKeys(userTrainingTimelines), TimelineUtils.toStringKeys(userTestTimelines),
+					givenDimension, doWrite, false);
+		}
+		else
+		{
+			// give training timelines of other users except current user (as daywise timeline)
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelinesDWForAllExceptCurrUser = new LinkedHashMap<>(
+					trainTimelinesAllUsersDWFiltrd);
+
+			LinkedHashMap<Date, Timeline> removedSuccess = trainTimelinesDWForAllExceptCurrUser
+					.remove(String.valueOf(userId));
+			if (removedSuccess == null)
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: remove curr user unsuccessful. userId = " + userId
+						+ " while keySet to match to :" + trainTimelinesDWForAllExceptCurrUser.keySet());
+			}
+
+			LinkedHashMap<String, Timeline> trainTimelinesDWForAllExceptCurrUserStringKeys = TimelineUtils
+					.toTogetherWithUserIDStringKeys(trainTimelinesDWForAllExceptCurrUser);
+
+			mapsForCountDurationBaselines = WToFile.writeBasicActivityStatsAndGetBaselineMapsStringKeys(userName, null,
+					trainTimelinesDWForAllExceptCurrUserStringKeys, null, givenDimension, doWrite, true);
+		}
+		return mapsForCountDurationBaselines;
 	}
 
 }
