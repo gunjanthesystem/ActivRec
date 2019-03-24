@@ -229,8 +229,11 @@ public class Timeline implements Serializable
 
 	public ActivityObject2018 getNextValidActivityAfterActivityAtThisTime(Timestamp timestamp)
 	{
-		System.out
-				.println("getNextValidActivityAfterActivityAtThisTime: To find next activity object at :" + timestamp);
+		if (VerbosityConstants.verbose)
+		{
+			System.out.println(
+					"getNextValidActivityAfterActivityAtThisTime: To find next activity object at :" + timestamp);
+		}
 		int indexOfActivityObjectAtGivenTimestamp = getIndexOfActivityObjectAtTime(timestamp);
 		return getNextValidActivityAfterActivityAtThisPositionPD(indexOfActivityObjectAtGivenTimestamp);
 	}

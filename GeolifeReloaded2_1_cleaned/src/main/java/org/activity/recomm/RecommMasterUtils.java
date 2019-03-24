@@ -380,7 +380,7 @@ public class RecommMasterUtils
 		}
 
 		// Start of sanity check
-		if (true)
+		if (false)
 		{
 			StringBuilder sb = new StringBuilder(
 					"Sanity Check: createRankedTopRecommendedGDValsSimpleV3_3():\nnextActivityObjectsWithDistance = \n");

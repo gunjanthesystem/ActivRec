@@ -20,13 +20,11 @@ import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
 import org.activity.io.WToFile;
 import org.activity.objects.ActivityObject2018;
-import org.activity.objects.LeakyBucket;
 import org.activity.objects.Pair;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.recomm.RecommendationMasterI;
 import org.activity.sanityChecks.Sanity;
-import org.activity.spatial.SpatialUtils;
 import org.activity.stats.HilbertCurveUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
@@ -35,29 +33,22 @@ import org.activity.util.PerformanceAnalytics;
 import org.activity.util.TimelineTransformers;
 
 /**
- * One for each user.
+ * Fork of org.activity.evaluation.RepresentativeAOInfo One for each user.
  * 
  * @author gunjan
- * @since 20 Dec 2018
+ * @since 20 March 2019
  */
-public class RepresentativeAOInfo
+public class RepresentativeAOInfoV2
 {
 	Map<Integer, Double> aggValOfEachFeatForEachPDValDurationInSecsFromPrev;
 	Map<Integer, Double> aggValOfEachFeatForEachPDValDurationFromNext;
 	Map<Integer, ArrayList<String>> aggStartLatLongEndLatLong_;
-
-	// added on 21 March 2019
-	// actID, List of Pair(Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt)
-	Map<Integer, ArrayList<Pair<Pair<Pair<String, String>, Pair<String, String>>, String>>> aggStartLatLongEndLatLongAvgAlt;
-
-	// disabled temporarily on 22 Mar 2019 as not used and takes up significant space
 	Map<Integer, ArrayList<Pair<Long, Long>>> aggStartLatLongEndLatLongAsHSC;
-	static final boolean disableAggStartLatLongEndLatLongAsHSC = true;
 	Map<Integer, Double> aggValOfEachFeatForEachPDValDuration;
 	Map<Integer, Double> aggValOfEachFeatForEachPDValDistTrav;
 	Map<Integer, Double> aggValOfEachFeatForEachPDValAvgAlt;
 	Map<Integer, Double> aggValOfEachFeatForEachPDValDistFromPrev;
-	Map<Integer, Double> aggValOfEachFeatForEachPDValPopularity;
+	Map<Integer, Integer> aggValOfEachFeatForEachPDValPopularity;
 	Map<Integer, Integer> aggValOfEachFeatForEachPDValLocationID;// = new HashMap<>();
 	Map<Integer, Integer> aggValOfEachFeatForEachPDValActivityID;// = new HashMap<>();
 	String userId;
@@ -65,22 +56,30 @@ public class RepresentativeAOInfo
 	@Override
 	public String toString()
 	{
-		return "RepresentativeAOInfo [\naggValOfEachFeatForEachPDValDurationInSecsFromPrev="
-				+ aggValOfEachFeatForEachPDValDurationInSecsFromPrev
-				+ ", \naggValOfEachFeatForEachPDValDurationFromNext=" + aggValOfEachFeatForEachPDValDurationFromNext
-				+ ", \naggStartLatLongEndLatLong_=" + aggStartLatLongEndLatLong_
-				+ ", \naggStartLatLongEndLatLongAvgAlt=" + aggStartLatLongEndLatLongAvgAlt
-				+ ", \naggStartLatLongEndLatLongAsHSC=" + aggStartLatLongEndLatLongAsHSC
-				+ ", \naggValOfEachFeatForEachPDValDuration=" + aggValOfEachFeatForEachPDValDuration
-				+ ", \naggValOfEachFeatForEachPDValDistTrav=" + aggValOfEachFeatForEachPDValDistTrav
-				+ ", \naggValOfEachFeatForEachPDValAvgAlt=" + aggValOfEachFeatForEachPDValAvgAlt
-				+ ", \naggValOfEachFeatForEachPDValDistFromPrev=" + aggValOfEachFeatForEachPDValDistFromPrev
-				+ ", \naggValOfEachFeatForEachPDValPopularity=" + aggValOfEachFeatForEachPDValPopularity
-				+ ", \naggValOfEachFeatForEachPDValLocationID=" + aggValOfEachFeatForEachPDValLocationID
-				+ ", \naggValOfEachFeatForEachPDValActivityID=" + aggValOfEachFeatForEachPDValActivityID + ", userId="
-				+ userId + "\n]";
+		return "RepresentativeAOInfo [aggValOfEachFeatForEachPDValDurationInSecsFromPrev="
+				+ aggValOfEachFeatForEachPDValDurationInSecsFromPrev + ", aggValOfEachFeatForEachPDValDurationFromNext="
+				+ aggValOfEachFeatForEachPDValDurationFromNext + ", aggStartLatLongEndLatLong_="
+				+ aggStartLatLongEndLatLong_ + ", aggStartLatLongEndLatLongAsHSC=" + aggStartLatLongEndLatLongAsHSC
+				+ ", aggValOfEachFeatForEachPDValDuration=" + aggValOfEachFeatForEachPDValDuration
+				+ ", aggValOfEachFeatForEachPDValDistTrav=" + aggValOfEachFeatForEachPDValDistTrav
+				+ ", aggValOfEachFeatForEachPDValAvgAlt=" + aggValOfEachFeatForEachPDValAvgAlt
+				+ ", aggValOfEachFeatForEachPDValDistFromPrev=" + aggValOfEachFeatForEachPDValDistFromPrev
+				+ ", aggValOfEachFeatForEachPDValPopularity=" + aggValOfEachFeatForEachPDValPopularity
+				+ ", aggValOfEachFeatForEachPDValLocationID=" + aggValOfEachFeatForEachPDValLocationID
+				+ ", aggValOfEachFeatForEachPDValActivityID=" + aggValOfEachFeatForEachPDValActivityID + ", userId="
+				+ userId + "]";
 	}
 
+	/**
+	 * 
+	 * @param topPrimaryDimensionVal
+	 * @param recommTimestamp
+	 * @param string
+	 * @param recommMaster
+	 * @param primaryDimension
+	 * @param databaseName
+	 * @return
+	 */
 	/**
 	 * 
 	 * @param recommTimestamp
@@ -94,8 +93,6 @@ public class RepresentativeAOInfo
 			Integer topPrimaryDimensionValInt, RecommendationMasterI recommMaster, PrimaryDimension primaryDimension,
 			String databaseName)
 	{
-		System.out.println(
-				"Inside getRepresentativeAOForActName : for topPrimaryDimensionValInt = " + topPrimaryDimensionValInt);
 		// NOTE: we only need to take care of feature which are used for edit distance computation.
 		// Instantiate the representative activity object.
 		int activityID = -1;
@@ -135,15 +132,8 @@ public class RepresentativeAOInfo
 			break;
 		}
 
-		double aggValOdDurationInSecsFromPrevForThisPDVal = aggValOfEachFeatForEachPDValDurationInSecsFromPrev
-				.get(topPrimaryDimensionValInt);
-		if (aggValOdDurationInSecsFromPrevForThisPDVal < 1)
-		{
-			aggValOdDurationInSecsFromPrevForThisPDVal += 1;
-		}
 		long newRecommTimestampInMs = recommTimestamp.getTime()
-				+ (long) (1000 * aggValOdDurationInSecsFromPrevForThisPDVal);
-		// aggValOfEachFeatForEachPDValDurationInSecsFromPrev.get(topPrimaryDimensionValInt));
+				+ (long) (1000 * aggValOfEachFeatForEachPDValDurationInSecsFromPrev.get(topPrimaryDimensionValInt));
 
 		// ActivityObject2018 repAOForThisActNameForThisUser = new ActivityObject2018(activityID, locationIDs,
 		// activityName, "", newRecommTimestamp, "", "", "", String.valueOf(userId), -1, -1, -1, -1, -1, -1, -1,
@@ -153,50 +143,16 @@ public class RepresentativeAOInfo
 		switch (databaseName)
 		{
 		case "geolife1":
+			ArrayList<String> startLatLonEndLatLon_ = aggStartLatLongEndLatLong_.get(topPrimaryDimensionValInt);
+			String mostCommon = StatsUtils.mostCommon(startLatLonEndLatLon_);
+			String splitted[] = mostCommon.split("_");
+			String startLat = splitted[0];
+			String startLon = splitted[1];
+			String endLat = splitted[2];
+			String endLon = splitted[3];
 
-			String startLat, startLon, endLat, endLon;
-			Double avgAlt = Double.NaN;
-			Double distTravelled = Double.NaN;
-			if (false)
-			{// Simple approach: most common lat long for that PD val and median (agg value) of avg altitude. In this
-				// case, avg alt is not tied to the lat lon.
-				ArrayList<String> startLatLonEndLatLon_ = aggStartLatLongEndLatLong_.get(topPrimaryDimensionValInt);
-				String mostCommon = StatsUtils.mostCommon(startLatLonEndLatLon_);
-				String splitted[] = mostCommon.split("_");
-				startLat = splitted[0];
-				startLon = splitted[1];
-				endLat = splitted[2];
-				endLon = splitted[3];
-
-				avgAlt = aggValOfEachFeatForEachPDValAvgAlt.get(topPrimaryDimensionValInt);
-				distTravelled = aggValOfEachFeatForEachPDValDistTrav.get(topPrimaryDimensionValInt);
-			}
-			else
-			{
-				// of all the start and end geo pairs associated with that activity/pdval in the training timelines,
-				// find
-				// the start geo which is closest to the
-				// start geo of the last activity performed by the user.
-				// - also take avg altitude associated with the chosen geo-coordinates, since geo-coordinates and start
-				// altitude are tied to each other.
-				ActivityObject2018 currentAO = recommMaster.getActivityObjectAtRecomm();
-				Pair<Pair<Pair<String, String>, Pair<String, String>>, String> nearestLoc = getStartEndLatLongAvgAltNearestToCurrentAOEnd(
-						currentAO.getEndLatitude(), currentAO.getEndLongitude(),
-						aggStartLatLongEndLatLongAvgAlt.get(topPrimaryDimensionValInt));
-
-				startLat = nearestLoc.getFirst().getFirst().getFirst();
-				startLon = nearestLoc.getFirst().getFirst().getSecond();
-				endLat = nearestLoc.getFirst().getSecond().getFirst();
-				endLon = nearestLoc.getFirst().getSecond().getSecond();
-				avgAlt = Double.valueOf(nearestLoc.getSecond());
-
-				distTravelled = SpatialUtils.haversineFastMathV3NoRound(startLat, startLon, endLat, endLon);
-
-			}
 			durationInSecs = aggValOfEachFeatForEachPDValDuration.get(topPrimaryDimensionValInt).longValue();
-
-			// TODO : compute duration from the disTravelled and avg speed for this pd val.
-
+			Double avgAlt = aggValOfEachFeatForEachPDValAvgAlt.get(topPrimaryDimensionValInt);
 			// durationInSecs = Long
 			// .valueOf(aggValOfEachFeatForEachPDValDuration.get(topPrimaryDimensionValInt).toString());
 			// ActivityObject2018(String userID1, int activityID1, String activityName1, String workingLevelCatIDs1,
@@ -206,19 +162,17 @@ public class RepresentativeAOInfo
 
 			repAOForThisActNameForThisUser2 = new ActivityObject2018(userId, activityID, activityName,
 					workingLevelCatIDs, locationIDs, "", startLat, endLat, startLon, endLon, avgAlt.toString(),
-					distTravelled, (long) newRecommTimestampInMs,
+					aggValOfEachFeatForEachPDValDistTrav.get(topPrimaryDimensionValInt), (long) newRecommTimestampInMs,
 					(long) newRecommTimestampInMs + (durationInSecs * 1000), durationInSecs);
 			break;
-
 		case "gowalla1":
-			int popularity = aggValOfEachFeatForEachPDValPopularity.get(topPrimaryDimensionValInt).intValue();
-			double distFromPrev = aggValOfEachFeatForEachPDValDistFromPrev.get(topPrimaryDimensionValInt);
-			long durFromPrev = aggValOfEachFeatForEachPDValDurationInSecsFromPrev.get(topPrimaryDimensionValInt)
-					.longValue();
 
 			repAOForThisActNameForThisUser2 = new ActivityObject2018(activityID, locationIDs, activityName, "",
-					new Timestamp(newRecommTimestampInMs), "", "", "", userId, -1, popularity, -1, -1, -1, -1, -1,
-					workingLevelCatIDs, distFromPrev, durFromPrev, ZoneId.of("UTC"), -1, -1, -1);
+					new Timestamp(newRecommTimestampInMs), "", "", "", userId, -1,
+					aggValOfEachFeatForEachPDValPopularity.get(topPrimaryDimensionValInt), -1, -1, -1, -1, -1,
+					workingLevelCatIDs, aggValOfEachFeatForEachPDValDistFromPrev.get(topPrimaryDimensionValInt),
+					aggValOfEachFeatForEachPDValDurationInSecsFromPrev.get(topPrimaryDimensionValInt).longValue(),
+					ZoneId.of("UTC"), -1, -1, -1);
 			repAOForThisActNameForThisUser2.setUserID(userId);
 			break;
 		case "dcu_data_2":
@@ -262,64 +216,8 @@ public class RepresentativeAOInfo
 		}
 		// System.out.println("repAO=" + repAOForThisActNameForThisUser.toStringAllGowallaTS());
 
-		if (false)
-		{
-			String s = "\nrepAO()\nrecommTimestamp = " + recommTimestamp + "\ntopPrimaryDimensionValInt = "
-					+ topPrimaryDimensionValInt + "\ndatabaseName = " + databaseName
-					+ "\n------------\nrepAOForThisActNameForThisUser = \n"
-					+ ActivityObject2018.getHeaderForStringAllGowallaTSWithNameForHeaded24Dec(" ", ",") + "\n"
-					+ repAOForThisActNameForThisUser2.toStringAllGowallaTSWithNameForHeaded24Dec(",");
-			WToFile.appendLineToFileAbs(s, Constant.getCommonPath() + "DebugGetRepresentativeAOForActName.csv");
-		}
 		return repAOForThisActNameForThisUser2;
 
-	}
-
-	/**
-	 * 
-	 * @param endLatitude
-	 * @param endLongitude
-	 * @param listOfStartLatLongEndLatLongAvgAltForThisPDVal
-	 * @return
-	 * 
-	 * @since 21 March 2019
-	 */
-	private static Pair<Pair<Pair<String, String>, Pair<String, String>>, String> getStartEndLatLongAvgAltNearestToCurrentAOEnd(
-			String endLatitude, String endLongitude,
-			ArrayList<Pair<Pair<Pair<String, String>, Pair<String, String>>, String>> listOfStartLatLongEndLatLongAvgAltForThisPDVal)
-	{
-
-		Pair<Pair<Pair<String, String>, Pair<String, String>>, String> nearestLoc = new Pair<>();
-
-		double nearestDistInKms = Double.MAX_VALUE;
-		try
-		{
-			for (Pair<Pair<Pair<String, String>, Pair<String, String>>, String> e : listOfStartLatLongEndLatLongAvgAltForThisPDVal)
-			{
-				String startLat = e.getFirst().getFirst().getFirst();
-				String startLon = e.getFirst().getFirst().getSecond();
-				double dist = SpatialUtils.haversineFastMathV3NoRound(startLat, startLon, endLatitude, endLongitude);
-				if (dist < nearestDistInKms)
-				{
-					nearestLoc = e;
-					nearestDistInKms = dist;
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		if (VerbosityConstants.verbose || true)
-		{
-			System.out.print("Inside getStartEndLatLongAvgAltNearestToCurrentAOEnd: endLatitude = " + endLatitude
-					+ " endLongitude=" + endLongitude + " nearest loc = " + nearestLoc.toString()
-					+ " nearestDistInKms=");
-			System.out.printf("%f kms\n", nearestDistInKms);
-		}
-
-		return nearestLoc;
 	}
 
 	/**
@@ -338,10 +236,9 @@ public class RepresentativeAOInfo
 	 * @return
 	 * @since 20 Dec 2018
 	 */
-	public RepresentativeAOInfo(String userId, PrimaryDimension primaryDimension,
+	public RepresentativeAOInfoV2(String userId, PrimaryDimension primaryDimension,
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd, boolean isCollaborative)
 	{
-		PopUps.showMessage("Inside RepresentativeAOInfo()");
 		long t1 = System.currentTimeMillis();
 		this.userId = userId;
 		List<?> listOfFeats = Enums.getFeaturesForDatabase(Constant.getDatabaseName());
@@ -371,11 +268,8 @@ public class RepresentativeAOInfo
 
 		this.aggStartLatLongEndLatLong_ = new HashMap<>();
 		this.aggStartLatLongEndLatLongAsHSC = new HashMap<>();
-		this.aggStartLatLongEndLatLongAvgAlt = new HashMap<>();
-
 		this.aggValOfEachFeatForEachPDValDuration = new HashMap<>();
 		this.aggValOfEachFeatForEachPDValDistTrav = new HashMap<>();
-
 		this.aggValOfEachFeatForEachPDValAvgAlt = new HashMap<>();
 		this.aggValOfEachFeatForEachPDValDistFromPrev = new HashMap<>();
 		this.aggValOfEachFeatForEachPDValPopularity = new HashMap<>();
@@ -384,14 +278,11 @@ public class RepresentativeAOInfo
 
 		// ActivityObject2018 ao;
 		// ao.getLocationIDs()
-		// PopUps.showMessage("here1 RepresentativeAOInfo()\nlistOfFeats = " + listOfFeats);
 		for (Object f : listOfFeats)
 		{
-			String featureAsString = f.toString();
-			// PopUps.showMessage("here2 featureAsString = " + featureAsString);
-
-			switch (featureAsString)
+			switch (f.toString())
 			{
+
 			case "ActNameF":
 			{
 				mapOfEachFeatForEachPDValActivityIDs = getListOfFeatureVals(userId,
@@ -404,17 +295,17 @@ public class RepresentativeAOInfo
 
 			case "StartTimeF":
 			{
-				break;// no need since determined from recommender activity
+				break;
 			}
 
 			case "ActNameLevel1F":
-			{
-				break; // not used as of 20 Mar 2019
+			{// TODO
+				break;
 			}
 
 			case "DurationFromPrevF":
 			{
-				break;// already computed above
+				break;
 			}
 			case "DurationF":
 			{
@@ -439,7 +330,8 @@ public class RepresentativeAOInfo
 				// ActivityObject2018 ao;
 				mapOfEachFeatForEachPDValPopularity = getListOfFeatureVals(userId,
 						trainTimelinesAllUsersContinuousFiltrd, isCollaborative, ActivityObject2018::getCheckins_count);//
-				aggValOfEachFeatForEachPDValPopularity = mapOfEachFeatForEachPDValPopularity.entrySet().stream()
+				// aggValOfEachFeatForEachPDValPopularity =
+				mapOfEachFeatForEachPDValPopularity.entrySet().stream()
 						.collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.getPercentileInt(e.getValue(), 50)));
 				break;
 			}
@@ -448,14 +340,7 @@ public class RepresentativeAOInfo
 			{
 				aggStartLatLongEndLatLong_ = getStartAndEndGeoCoordinatesForEachPDVal(userId,
 						trainTimelinesAllUsersContinuousFiltrd, isCollaborative, "_");
-
-				if (!disableAggStartLatLongEndLatLongAsHSC)
-				{
-					aggStartLatLongEndLatLongAsHSC = getStartAndEndGeoCoordASHSCIndexForEachPDVal(userId,
-							trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
-				}
-				// added on 21 March 2019
-				aggStartLatLongEndLatLongAvgAlt = getStartAndEndGeoCoordinatesWithAvgAltForEachPDVal(userId,
+				aggStartLatLongEndLatLongAsHSC = getStartAndEndGeoCoordASHSCIndexForEachPDVal(userId,
 						trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
 				// mapOfEachFeatForEachPDValStartLat = getListOfFeatureVals(userId,
 				// trainTimelinesAllUsersContinuousFiltrd,
@@ -469,25 +354,17 @@ public class RepresentativeAOInfo
 			{
 				mapOfEachFeatForEachPDValLocationsIDs = getListOfFeatureValsColl(userId,
 						trainTimelinesAllUsersContinuousFiltrd, isCollaborative, ActivityObject2018::getLocationIDs);
-				// PopUps.showMessage("here locf0");
+
 				aggValOfEachFeatForEachPDValLocationID = mapOfEachFeatForEachPDValLocationsIDs.entrySet().stream()
 						.collect(Collectors.toMap(e -> e.getKey(), e -> StatsUtils.mostCommon(e.getValue())));
 
-				// PopUps.showMessage("here locf1");
 				if (aggStartLatLongEndLatLong_.size() == 0)
 				{
-					// PopUps.showMessage("here locf2");
 					aggStartLatLongEndLatLong_ = getStartAndEndGeoCoordinatesForEachPDVal(userId,
 							trainTimelinesAllUsersContinuousFiltrd, isCollaborative, "_");
 
-					// PopUps.showMessage("here locf3");
-					if (!disableAggStartLatLongEndLatLongAsHSC)
-					{
-						aggStartLatLongEndLatLongAsHSC = getStartAndEndGeoCoordASHSCIndexForEachPDVal(userId,
-								trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
-					}
-
-					// PopUps.showMessage("here locf4");
+					aggStartLatLongEndLatLongAsHSC = getStartAndEndGeoCoordASHSCIndexForEachPDVal(userId,
+							trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
 					// mapOfEachFeatForEachPDValStartLat = getListOfFeatureVals(userId,
 					// trainTimelinesAllUsersContinuousFiltrd, isCollaborative,
 					// ActivityObject2018::getStartLatitude);
@@ -495,15 +372,6 @@ public class RepresentativeAOInfo
 					// trainTimelinesAllUsersContinuousFiltrd, isCollaborative,
 					// ActivityObject2018::getStartLongitude);
 				}
-				// PopUps.showMessage("here locf5");
-				if (aggStartLatLongEndLatLongAvgAlt.size() == 0)
-				{
-					// PopUps.showMessage("here locf6");
-					// added on 21 March 2019
-					aggStartLatLongEndLatLongAvgAlt = getStartAndEndGeoCoordinatesWithAvgAltForEachPDVal(userId,
-							trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
-				}
-				// PopUps.showMessage("here locf7");
 				break;
 			}
 			case "EndGeoF":
@@ -512,17 +380,7 @@ public class RepresentativeAOInfo
 				{
 					aggStartLatLongEndLatLong_ = getStartAndEndGeoCoordinatesForEachPDVal(userId,
 							trainTimelinesAllUsersContinuousFiltrd, isCollaborative, "_");
-
-					if (!disableAggStartLatLongEndLatLongAsHSC)
-					{
-						aggStartLatLongEndLatLongAsHSC = getStartAndEndGeoCoordASHSCIndexForEachPDVal(userId,
-								trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
-					}
-				}
-				if (aggStartLatLongEndLatLongAvgAlt.size() == 0)
-				{
-					// added on 21 March 2019
-					aggStartLatLongEndLatLongAvgAlt = getStartAndEndGeoCoordinatesWithAvgAltForEachPDVal(userId,
+					aggStartLatLongEndLatLongAsHSC = getStartAndEndGeoCoordASHSCIndexForEachPDVal(userId,
 							trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
 				}
 				// mapOfEachFeatForEachPDValEndLat = getListOfFeatureVals(userId,
@@ -556,7 +414,6 @@ public class RepresentativeAOInfo
 		}
 		System.out.println(
 				"Time taken by  RepresentativeAOInfo= " + ((System.currentTimeMillis() - t1) / 1000) + " secs");
-		// PopUps.showMessage("Exiting RepresentativeAOInfo()");
 	}
 	//////////////////////////
 	// ActivityObject2018 repAO = mapOfRepAOs.get(userId).get(topPrimaryDimensionVal);
@@ -612,7 +469,7 @@ public class RepresentativeAOInfo
 	 * @param isCollaborative
 	 * @param delimiter
 	 * @return actID, list of Pairs {ao.getStartLatitude() + delimiter + ao.getStartLongitude() + delimiter +
-	 *         ao.getEndLatitude() + delimiter + ao.getEndLongitude();
+	 *         ao.getEndLatitude() + delimiter + ao.getEndLongitude();>
 	 * @since 20 Dec 2018
 	 */
 	private static Map<Integer, ArrayList<String>> getStartAndEndGeoCoordinatesForEachPDVal(String userId,
@@ -650,60 +507,6 @@ public class RepresentativeAOInfo
 			}
 		}
 		return mapOfStartLatLonEndLatLonForEachPDVal;
-	}
-
-	///////////
-	/**
-	 * Fork of getStartAndEndGeoCoordinatesForEachPDVal() to include AvgAltitude associated with each Start End geo
-	 * coorindates
-	 * 
-	 * @param userId
-	 * @param trainTimelinesAllUsersContinuousFiltrd
-	 * @param isCollaborative
-	 * @return actID, List of Pair(Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt)
-	 * @since 21 March 2019
-	 */
-	private static Map<Integer, ArrayList<Pair<Pair<Pair<String, String>, Pair<String, String>>, String>>> getStartAndEndGeoCoordinatesWithAvgAltForEachPDVal(
-			String userId, LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd,
-			boolean isCollaborative)
-	{
-		// List of Pair(Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt)
-		Map<Integer, ArrayList<Pair<Pair<Pair<String, String>, Pair<String, String>>, String>>> mapOfStartLatLonEndLatLonAvgAltForEachPDVal = new HashMap<>();
-
-		for (Entry<String, Timeline> e : trainTimelinesAllUsersContinuousFiltrd.entrySet())
-		{
-			String currUserID = (e.getKey());
-
-			if ((isCollaborative && currUserID.equals(userId) == false)
-					|| (!isCollaborative && currUserID.equals(userId)))
-			{
-				for (ActivityObject2018 ao : e.getValue().getActivityObjectsInTimeline())
-				{
-					ArrayList<Integer> pdVals = ao.getPrimaryDimensionVal();
-					for (Integer pdVal : pdVals)
-					{
-						ArrayList<Pair<Pair<Pair<String, String>, Pair<String, String>>, String>> listOfFeatureVals = mapOfStartLatLonEndLatLonAvgAltForEachPDVal
-								.get(pdVal);
-
-						if (listOfFeatureVals == null)
-						{
-							listOfFeatureVals = new ArrayList<>();
-						}
-
-						Pair<String, String> startGeoCoordinates = new Pair<>(ao.getStartLatitude(),
-								ao.getStartLongitude());
-						Pair<String, String> endGeoCoordinates = new Pair<>(ao.getEndLatitude(), ao.getEndLongitude());
-						// String val = ao.getStartLatitude() + delimiter + ao.getStartLongitude() + delimiter
-						// + ao.getEndLatitude() + delimiter + ao.getEndLongitude();
-						listOfFeatureVals.add(
-								new Pair<>(new Pair<>(startGeoCoordinates, endGeoCoordinates), ao.getAvgAltitude()));
-						// listOfDurationFromPrev.add(ao.getDurationInSecondsFromPrev());
-						mapOfStartLatLonEndLatLonAvgAltForEachPDVal.put(pdVal, listOfFeatureVals);
-					}
-				}
-			}
-		}
-		return mapOfStartLatLonEndLatLonAvgAltForEachPDVal;
 	}
 
 	/**
@@ -2149,51 +1952,35 @@ public class RepresentativeAOInfo
 	 * @param collaborativecandidates
 	 * @return
 	 */
-	public static LinkedHashMap<String, RepresentativeAOInfo> buildRepresentativeAOInfosDec2018(
+	public static LinkedHashMap<String, RepresentativeAOInfoV2> buildRepresentativeAOInfosDec2018(
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd, PrimaryDimension primaryDimension,
 			String databaseName, boolean collaborativecandidates)
 	{
 		// PopUps.showMessage("Inside buildRepresentativeAOInfosDec2018 trainTimelinesAllUsersContinuousFiltrd.size()="
 		// + trainTimelinesAllUsersContinuousFiltrd.size());
-		boolean verboseRepAOInfo = true;// databaseName.contains("oalla") ? false : true;
-		LeakyBucket lbWriter = new LeakyBucket(1000,
-				Constant.getCommonPath() + "buildRepresentativeAOInfosDec2018Log.txt", false);
-		lbWriter.addToLeakyBucketWithNewline(
-				"------Inside buildRepresentativeAOInfosDec2018: representativeAOInfosForAllUsers ------------------- ");
-		// StringBuilder sbLog = new StringBuilder();
-		LinkedHashMap<String, RepresentativeAOInfo> representativeAOInfosForAllUsers = new LinkedHashMap<>();
+		boolean verboseRepAOInfo = true;
+
+		StringBuilder sbLog = new StringBuilder("------ representativeAOInfosForAllUsers ------------------- \n");
+		LinkedHashMap<String, RepresentativeAOInfoV2> representativeAOInfosForAllUsers = new LinkedHashMap<>();
 
 		for (Entry<String, Timeline> userEntry : trainTimelinesAllUsersContinuousFiltrd.entrySet())
 		{
-			RepresentativeAOInfo repAOInfo = new RepresentativeAOInfo(userEntry.getKey(), primaryDimension,
+			RepresentativeAOInfoV2 repAOInfo = new RepresentativeAOInfoV2(userEntry.getKey(), primaryDimension,
 					trainTimelinesAllUsersContinuousFiltrd, collaborativecandidates);
 			representativeAOInfosForAllUsers.put(userEntry.getKey(), repAOInfo);
 
 			if (verboseRepAOInfo)
 			{
-				// since for gowalla dataset, the written file can be large, write it only for around 10% of the users.
-				if (!databaseName.contains("owalla") || Math.random() < 0.10)
-				{
-					lbWriter.addToLeakyBucketWithNewline(userEntry.getKey() + "--\n" + repAOInfo.toString());
-				}
-				// sbLog.append(userEntry.getKey() + "--\n" + repAOInfo.toString() + "\n");
+				sbLog.append(userEntry.getKey() + "--\n" + repAOInfo.toString() + "\n");
 			}
 		}
-		// PopUps.showMessage("here 1: buildRepresentativeAOInfosDec2018");
+
 		if (verboseRepAOInfo)
 		{// PopUps.showMessage
-
-			lbWriter.addToLeakyBucketWithNewline(
-					"representativeAOInfosForAllUsers.size()= " + representativeAOInfosForAllUsers.size() + "keySet = "
-							+ representativeAOInfosForAllUsers.keySet() + "\n\n");
-			lbWriter.flushLeakyBucket();
-			// String s = "\n***************\nInside buildRepresentativeAOInfosDec2018:
-			// representativeAOInfosForAllUsers.size()= "
-			// + representativeAOInfosForAllUsers.size() + "keySet = " + representativeAOInfosForAllUsers.keySet()
-			// + "\n-------\n" + sbLog.toString();
-
-			// WToFile.appendLineToFileAbs(s, Constant.getCommonPath() + "buildRepresentativeAOInfosDec2018Log.txt");
-			// System.exit(0);// TODO
+			String s = "\n***************\nInside buildRepresentativeAOInfosDec2018: representativeAOInfosForAllUsers.size()= "
+					+ representativeAOInfosForAllUsers.size() + "keySet = " + representativeAOInfosForAllUsers.keySet()
+					+ "\n-------\n" + sbLog.toString();
+			WToFile.appendLineToFileAbs(s, Constant.getCommonPath() + "buildRepresentativeAOInfosDec2018Log.txt");
 		}
 
 		//
@@ -3194,14 +2981,14 @@ public class RepresentativeAOInfo
 			// userId, recommendationTime, primaryDimension, repAOResultGenericUser);
 			// disabled on 9 Feb 2018 end
 
-			repAOForTopRecommActName = RepresentativeAOInfo.getRepresentativeAOCollGenericV2(
+			repAOForTopRecommActName = RepresentativeAOInfoV2.getRepresentativeAOCollGenericV2(
 					Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp,
 					primaryDimension, repAOResultGenericUser);
 
 			// Sanity check Feb8 Starts
 			if (false)
 			{
-				ActivityObject2018 aoTemp = RepresentativeAOInfo.getRepresentativeAOCollGenericV2(
+				ActivityObject2018 aoTemp = RepresentativeAOInfoV2.getRepresentativeAOCollGenericV2(
 						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp,
 						primaryDimension, repAOResultGenericUser);
 				WToFile.appendLineToFileAbs(
@@ -3216,7 +3003,7 @@ public class RepresentativeAOInfo
 			if (collaborativeCandidates && buildRepAOJustInTime)
 			{
 				// for just-in-time computation of representative activity object
-				repAOForTopRecommActName = RepresentativeAOInfo.getRepresentativeAOColl(
+				repAOForTopRecommActName = RepresentativeAOInfoV2.getRepresentativeAOColl(
 						Integer.valueOf(topRecommendedPrimarDimensionVal), userId, recommendationTimestamp,
 						primaryDimension, recommMaster);
 			}
@@ -3224,7 +3011,7 @@ public class RepresentativeAOInfo
 			{
 				if (Constant.getDatabaseName().equals("gowalla1"))
 				{
-					repAOForTopRecommActName = RepresentativeAOInfo.getRepresentativeAO(
+					repAOForTopRecommActName = RepresentativeAOInfoV2.getRepresentativeAO(
 							Integer.valueOf(topRecommendedPrimarDimensionVal), mapOfRepAOs,
 							mapOfMedianPreSuccDurationInms, userId, recommendationTimestamp, primaryDimension);
 				}

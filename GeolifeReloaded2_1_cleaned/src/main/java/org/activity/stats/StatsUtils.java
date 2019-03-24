@@ -809,6 +809,24 @@ public final class StatsUtils
 	 *            range: 0 -100
 	 * @return
 	 */
+	public static double getPercentileInt(List<Integer> valsReceived, double percentile)
+	{
+		double vals[] = new double[valsReceived.size()];
+		for (int i = 0; i < valsReceived.size(); i++)
+		{
+			vals[i] = valsReceived.get(i);
+		}
+		DescriptiveStatistics ds = new DescriptiveStatistics(vals);
+		return ds.getPercentile(percentile);
+	}
+
+	/**
+	 * 
+	 * @param vals
+	 * @param percentile
+	 *            range: 0 -100
+	 * @return
+	 */
 	public static double getPercentileL(List<Long> valsReceived, double percentile)
 	{
 		double vals[] = new double[valsReceived.size()];

@@ -24,9 +24,9 @@ import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.PathConstants;
 import org.activity.evaluation.EvaluationSeq;
+import org.activity.evaluation.RecommTestsUtils;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017;
 import org.activity.evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017MultiDJuly2018;
-import org.activity.evaluation.RecommTestsUtils;
 import org.activity.generator.ToyTimelineUtils;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
@@ -194,11 +194,13 @@ public class ControllerWithoutServer
 			{
 				TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
 			}
-			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true, false, databaseName);
+			boolean skipNonEssentialsForSpeed = true;
+			setDataVarietyConstants(usersCleanedDayTimelines, true, "UsersCleanedDTs_", true, skipNonEssentialsForSpeed,
+					databaseName);
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 
 			// System.exit(0);
-			if (true)// temporary enabled for verbose writing of user timeline
+			if (false)// temporary enabled for verbose writing of user timeline
 			{
 				writeDataObjects(databaseName, commonBasePath, usersCleanedDayTimelines);
 				// System.exit(0);
@@ -322,7 +324,8 @@ public class ControllerWithoutServer
 					usersCleanedDayTimelines = usersCleanedDayTimelinesOnlySampledUsers;
 				}
 
-				String commonPathForClassification = "./dataWritten/geolife1_MAR1H1M51ED1.0AllActsFDStFilter0hrsRTVPNN100NoTTFilterNC/";
+				String commonPathForClassification = "/mnt/sshServers/howitzer/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_MAR19H4M42ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC/";
+				// "./dataWritten/geolife1_MAR1H1M51ED1.0AllActsFDStFilter0hrsRTVPNN100NoTTFilterNC/";
 				// "./dataWritten/gowalla1_FEB28H13M42ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC/";
 				TimelineWEKAClusteringController2019 clustering = new TimelineWEKAClusteringController2019(
 						subsetTimelineToOnlyTrainingDays(usersCleanedDayTimelines), null, commonPathForClassification);
@@ -431,6 +434,7 @@ public class ControllerWithoutServer
 	private static void sampleUsersAndExectuteRecommendationExperiments(String commonBasePath, String commonPath,
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines) throws IOException
 	{
+		PopUps.showMessage("Inside sampleUsersAndExectuteRecommendationExperiments()");
 		if (Constant.For9kUsers)
 		{
 			System.out.println("For9kUsers :");
@@ -510,7 +514,7 @@ public class ControllerWithoutServer
 					DomainConstants.getUserIDUserObjectDictionary(), commonBasePath + "UniqueUserObjects.csv");
 		}
 
-		if (true)
+		if (false)
 		{
 			if (false)// only for Jupyter baselines
 			{
@@ -1262,8 +1266,8 @@ public class ControllerWithoutServer
 			List<Integer> userIndicesToSelect, String commonBasePath, int lengthOfRecommendedSequence,
 			String commonPath) throws IOException
 	{
-		// PopUps.showMessage("sampleUsersByIndicesExecuteRecommendationTests: usersCleanedDayTimelines.size()= "
-		// + usersCleanedDayTimelines.size());
+		PopUps.showMessage("sampleUsersByIndicesExecuteRecommendationTests: usersCleanedDayTimelines.size()= "
+				+ usersCleanedDayTimelines.size());
 		// LinkedHashMap<Integer, String> indexOfBlackListedUsers = new LinkedHashMap<>();
 		System.out.println(
 				"Inside sampleUsersByIndicesExecuteRecommendationTests: usersCleanedDayTimelines received size="

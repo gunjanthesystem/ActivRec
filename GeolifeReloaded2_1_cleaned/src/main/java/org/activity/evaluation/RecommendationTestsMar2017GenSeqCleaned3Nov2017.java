@@ -124,8 +124,8 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> allUsersTimelines)
 	{
 
-		// PopUps.showMessage("RecommendationTestsMar2017GenSeqCleaned3Nov2017: sampledUsersTimelines.size() ="
-		// + sampledUsersTimelines.size());
+		PopUps.showMessage("RecommendationTestsMar2017GenSeqCleaned3Nov2017: sampledUsersTimelines.size() ="
+				+ sampledUsersTimelines.size());
 		System.out.println("\n\n **********Entering RecommendationTestsMar2017GenSeqCleaned2********** " + lookPastType
 				+ " " + caseType + " lengthOfRecommendedSequence:" + lengthOfRecommendedSequence);
 		// PopUps.showMessage("Entering RecommendationTestsMar2017GenSeqCleaned2");
@@ -276,7 +276,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 					trainTimelinesAllUsersContinuousFiltrd, primaryDimension, databaseName,
 					Constant.collaborativeCandidates);
 
-			// PopUps.showMessage("repAOInfoForEachUser.keySet() empty =" + repAOInfoForEachUser.keySet());
+			PopUps.showMessage("repAOInfoForEachUser.keySet() =" + repAOInfoForEachUser.keySet());
 
 			System.out.println("repAOInfoForEachUser.keySet() =" + repAOInfoForEachUser.keySet());
 			// if (Constant.preBuildRepAOGenericUser)
@@ -648,7 +648,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									trainTestTimelinesForAllUsersDW, userId, userTrainingTimelines);
 
 							// start of added on Nov 29
-							if (true) // TODO
+							if (false) // TODO
 							{
 								FeatureStats.writeFeatDistributionForEachUsersTrainingTimelines(userId,
 										userTrainingTimelines,
@@ -759,6 +759,7 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 									|| Constant.altSeqPredictor.equals(altSeqPredictor.HighDur))
 							{
 								boolean doWrite = databaseName.equals("gowalla1") ? false : true;
+
 								mapsForCountDurationBaselines = RecommTestsUtils.getMapsForCountDurationBaselines(
 										trainTimelinesAllUsersDWFiltrd, userAllDatesTimeslines, userId, userName,
 										userTrainingTimelines, userTestTimelines, doWrite, Constant.primaryDimension);

@@ -991,11 +991,22 @@ public class SuperController
 			{
 				collLabel += "FW";
 			}
+
+			if (Constant.considerFeatureValOrValDiff)
+			{
+				collLabel += "VP";
+			}
 		}
 
 		if (Constant.ensureCandEndWithCurrAct == false)
 		{
 			collLabel += "NotEnsurEndCA";
+		}
+
+		String extraLabel = "";
+		if (Constant.lengthOfRecommendedSequence > 1)
+		{
+			extraLabel += "Seq";
 		}
 
 		if (Constant.purelyRandomPredictionNov25)
@@ -1006,7 +1017,7 @@ public class SuperController
 		{
 			return sampledUserSetLabel + predictorLabel + EDAlphaLabel + featuresUsedLabel + StFilterLabel
 					+ distNormalisationLabel + candThresholdingLabel + filterTrainingTimelinesLabel + toyTimelinesLabel
-					+ wtdEditDistanceLabel + timeDecayLabel + collLabel;
+					+ wtdEditDistanceLabel + timeDecayLabel + collLabel + extraLabel;
 		}
 	}
 
@@ -1644,6 +1655,25 @@ public class SuperController
 					EvalMetrics.distributionByActual(
 							resultsLabel + "_AllReciprocalRank_MinMUWithMaxFirst0Aware" + dimensionPhrase,
 							commonPathToUse, 4, 3, commonPathToUse + "CatIDNameDictionary.csv");
+				}
+
+				if (writeMRRStatsOverUsersBestMUs && writeMRRByUserAndActualForChosenMU)
+				{
+					String file1Label = "mrrStatsOverUsersBestMUs";
+					String file2Label = "mrrStatsOverTargetActsBestMUs";
+
+					List<List<String>> data1 = ReadingFromFile
+							.readLinesIntoListOfLists(commonPathToUse + file1Label + ".csv", ",");
+					List<List<String>> data2 = ReadingFromFile
+							.readLinesIntoListOfLists(commonPathToUse + file2Label + ".csv", ",");
+					StringBuilder sb = new StringBuilder();
+					sb.append(file1Label + "," + data1.get(4).stream().collect(Collectors.joining(",")) + "\n"
+							+ file1Label + "," + data1.get(6).stream().collect(Collectors.joining(",")) + "\n");
+					sb.append(file2Label + "," + data2.get(4).stream().collect(Collectors.joining(",")) + "\n"
+							+ file2Label + "," + data2.get(6).stream().collect(Collectors.joining(",")) + "\n");
+
+					WToFile.writeToNewFile(sb.toString(),
+							commonPathToUse + "mrrStatsOverUsersTargetsMeanMedianOnlyBestMUs.csv");
 				}
 
 			}

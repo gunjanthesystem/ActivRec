@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
 import java.util.EnumMap;
@@ -16,6 +17,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.ActDistType;
 import org.activity.constants.Enums.CaseType;
@@ -994,17 +996,18 @@ public class DistanceUtils
 		for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> e : candAEDFeatValPairs
 				.entrySet())
 		{
-			sb.append(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + e.getKey() + ","
-					+ e.getValue().getFirst() + "," + e.getValue().getSecond());
+			sb.append(userAtRecomm + "," + dateAtRecomm + "," + timeAtRecomm + "," + e.getKey()/* candID */ + ","
+					+ e.getValue().getFirst()/* trace */ + "," + e.getValue().getSecond())/* AED */;
 
-			// loop over Feature enum maps for each AO
-			for (EnumMap<GowGeoFeature, Pair<String, String>> listEntry : e.getValue().getThird())
+			// loop over Feature enum maps for each AO in this cand
+			for (EnumMap<GowGeoFeature, Pair<String, String>> aoEntry : e.getValue().getThird())
 			{
 				// loop over features of each AO.
-				for (Entry<GowGeoFeature, Pair<String, String>> q : listEntry.entrySet())
+				for (Entry<GowGeoFeature, Pair<String, String>> featureEntry : aoEntry.entrySet())
 				{
-					sb.append("," + q.getValue().getFirst() + "__" + q.getValue().getSecond());
+					sb.append("," + featureEntry.getValue().getFirst() + "__" + featureEntry.getValue().getSecond());
 				}
+				sb.append(",|");
 			}
 			sb.append("\n");
 		}
@@ -1473,12 +1476,18 @@ public class DistanceUtils
 		{
 			if (maxActEDOverAllCands < Constant.epsilonForFloatZero)
 			{
-				StringBuilder sb = new StringBuilder();
-				sb.append("Debug18July:maxActEDOverAllCands= " + maxActEDOverAllCands + "\n");
-				candAEDFeatDiffs.entrySet().stream()// .mapToDouble(e -> e.getValue().getSecond())
-						.forEachOrdered(
-								e -> sb.append(" " + e.getValue().getFirst() + "--" + e.getValue().getSecond() + ","));
-				System.out.println(sb.toString());
+				System.out.println("Warning maxActEDOverAllCands = " + maxActEDOverAllCands + " < "
+						+ Constant.epsilonForFloatZero);
+
+				if (VerbosityConstants.disableWritingToFileForSpeed)
+				{
+					StringBuilder sb = new StringBuilder();
+					sb.append("Debug18July:maxActEDOverAllCands= " + maxActEDOverAllCands + "\n");
+					candAEDFeatDiffs.entrySet().stream()// .mapToDouble(e -> e.getValue().getSecond())
+							.forEachOrdered(e -> sb
+									.append(" " + e.getValue().getFirst() + "--" + e.getValue().getSecond() + ","));
+					System.out.println(sb.toString());
+				}
 			}
 		}
 
@@ -2840,7 +2849,7 @@ public class DistanceUtils
 			EnumMap<GowGeoFeature, List<Pair<String, String>>> valsPairsForEachFeatAcrossAOsForThisCand = new EnumMap<>(
 					GowGeoFeature.class);
 			// if considerValOrValDiff is true: contains normalised val of each val in each val pair,
-			// ...........................else: contains normalised of diff vals in each val pair. (Pair.second empty)
+			// ...................else if false: contains normalised of diff vals in each val pair. (Pair.second empty)
 			EnumMap<GowGeoFeature, List<Pair<String, String>>> normValPairsOrDiffForEachFeatAcrossAOsForThisCand = new EnumMap<>(
 					GowGeoFeature.class);
 
@@ -2889,19 +2898,19 @@ public class DistanceUtils
 							}
 							else
 							{// normalise diff of each pairs of feat values
-								Double diff = null;
-								if (feature.equals(GowGeoFeature.StartGeoF) || feature.equals(GowGeoFeature.EndGeoF))
-								{
-									String[] splitted1 = RegexUtils.patternPipe.split(valPair.getFirst());
-									String[] splitted2 = RegexUtils.patternPipe.split(valPair.getSecond());
-									diff = SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0],
-											splitted2[1]);
-								}
-								else
-								{
-									diff = Math.abs(
-											Double.valueOf(valPair.getFirst()) - Double.valueOf(valPair.getSecond()));
-								}
+								Double diff = getDiffForFeature(feature, valPair.getFirst(), valPair.getSecond());// null
+								// if (feature.equals(GowGeoFeature.StartGeoF) || feature.equals(GowGeoFeature.EndGeoF))
+								// {
+								// String[] splitted1 = RegexUtils.patternPipe.split(valPair.getFirst());
+								// String[] splitted2 = RegexUtils.patternPipe.split(valPair.getSecond());
+								// diff = SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0],
+								// splitted2[1]);
+								// }
+								// else
+								// {
+								// diff = Math.abs(
+								// Double.valueOf(valPair.getFirst()) - Double.valueOf(valPair.getSecond()));
+								// }
 								double normDiff = StatsUtils.minMaxNormWORoundWithUpperBound(diff, maxForThisFeature,
 										minForThisFeature, 1.0d, false);
 								normalisedValPairs.add(new Pair<>(String.valueOf(normDiff), ""));
@@ -3112,6 +3121,120 @@ public class DistanceUtils
 
 	}
 
+	// TODO
+	/**
+	 * See: AlignmentBasedDistance.getFeatureLevelValPairsBetweenAOs(ActivityObject2018, ActivityObject2018) to find
+	 * what each feat val contains.
+	 * <p>
+	 * Note: an implementation to get feature diff for two given AO's already exist as
+	 * AlignmentBasedDistance.getFeatureLevelDiffsBetweenAOs(ActivityObject2018, ActivityObject2018). This was used in
+	 * former RTV ED implementation. However, this (below) method works at more lower level.
+	 * <p>
+	 * Note: AlignmentBasedDistance.getFeatureLevelValPairsBetweenAOs(ActivityObject2018, ActivityObject2018) take care:
+	 * (a) Which features to use.
+	 * 
+	 * @param feature
+	 * @param firstVal
+	 * @param secondVal
+	 * @return
+	 * 
+	 * @since 18 Mar 2019
+	 */
+	public static Double getDiffForFeature(GowGeoFeature feature, String firstVal, String secondVal)
+	{
+		Double resultDiff = Double.NaN;
+
+		switch (feature)
+		{
+		case ActNameF:
+			if (Constant.useHierarchicalDistance)
+			{
+				PopUps.printTracedErrorMsgWithExit(
+						"Exception: useHierarchicalDistance not implemented in org.activity.distances.DistanceUtils.getDiffForFeature()");
+			}
+			else
+			{
+				resultDiff = firstVal.equals(secondVal) ? 0d : 1d;
+			}
+			break;
+
+		case StartGeoF:
+			String[] splitted1 = RegexUtils.patternPipe.split(firstVal);
+			String[] splitted2 = RegexUtils.patternPipe.split(secondVal);
+			resultDiff = SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1]);
+			break;
+
+		case EndGeoF:
+			String[] splitted1_ = RegexUtils.patternPipe.split(firstVal);
+			String[] splitted2_ = RegexUtils.patternPipe.split(secondVal);
+			resultDiff = SpatialUtils.haversine(splitted1_[0], splitted1_[1], splitted2_[0], splitted2_[1]);
+			break;
+
+		case LocationF: // assuming location gridIDs
+			double diffLoc;
+			String[] splitted1__ = RegexUtils.patternPipe.split(firstVal);
+			String[] splitted2__ = RegexUtils.patternPipe.split(secondVal);
+
+			List<Integer> gridIndices1 = Arrays.stream(splitted1__).map(v -> Integer.valueOf(v))
+					.collect(Collectors.toList());
+			List<Integer> gridIndices2 = Arrays.stream(splitted2__).map(v -> Integer.valueOf(v))
+					.collect(Collectors.toList());
+
+			if (Constant.useHaversineDistInLocationFED)
+			{
+				diffLoc = DomainConstants.getMinHaversineDistForGridIndicesPairs(gridIndices1, gridIndices2);
+			}
+			else
+			{
+				if (UtilityBelt.getIntersection(gridIndices1, gridIndices1).size() == 0)
+				{ // if no matching locationIDs then add wt to dfeat
+					diffLoc = 1;
+				}
+				else
+				{
+					diffLoc = 0;// even if one location matches, location distance is 0
+				}
+			}
+			break;
+
+		////////////////
+		case StartTimeF:
+			// assuming the time values passed are timezoned
+			resultDiff = Math.abs(Double.valueOf(firstVal) - Double.valueOf(secondVal));
+			break;
+
+		case DurationF:
+			resultDiff = Math.abs(Double.valueOf(firstVal) - Double.valueOf(secondVal));
+			break;
+
+		case PopularityF:
+			// checkins count in case of gowalla
+			resultDiff = Math.abs(Double.valueOf(firstVal) - Double.valueOf(secondVal));
+			break;
+
+		case DistTravelledF:
+			resultDiff = Math.abs(Double.valueOf(firstVal) - Double.valueOf(secondVal));
+			break;
+
+		case DistFromPrevF:
+			resultDiff = Math.abs(Double.valueOf(firstVal) - Double.valueOf(secondVal));
+			break;
+
+		case DurationFromPrevF:
+			resultDiff = Math.abs(Double.valueOf(firstVal) - Double.valueOf(secondVal));
+			break;
+
+		case AvgAltitudeF:
+			resultDiff = Math.abs(Double.valueOf(firstVal) - Double.valueOf(secondVal));
+			break;
+		///////////////
+		default:
+			PopUps.printTracedErrorMsg("Error in getDiffForFeature(): unknown feature: " + feature);
+			break;
+		}
+		return resultDiff;
+	}
+
 	/**
 	 * 
 	 * @param listOfFeatures
@@ -3139,25 +3262,30 @@ public class DistanceUtils
 
 			if (considerValOrValDiff)
 			{// Need to diff as normValPairsForEachFeatAcrossAOsForThisCand contains normalised feature values
-				if (featureID.equals(GowGeoFeature.StartGeoF) || featureID.equals(GowGeoFeature.EndGeoF))
+				// if (featureID.equals(GowGeoFeature.StartGeoF) || featureID.equals(GowGeoFeature.EndGeoF))
+				// {
+				// for (Pair<String, String> valPair : normValPairsOrDiffForEachFeatAcrossAOsForThisCand
+				// .get(featureID))// featureEntry.getValue())
+				// {
+				// String[] splitted1 = RegexUtils.patternPipe.split(valPair.getFirst());
+				// String[] splitted2 = RegexUtils.patternPipe.split(valPair.getSecond());
+				// diffOfNormValPairsForThisFeatAcrossAllAOsInCand
+				// .add(SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1]));
+				// }
+				// }
+				// else
+				// {
+				// for (Pair<String, String> valPair : normValPairsOrDiffForEachFeatAcrossAOsForThisCand
+				// .get(featureID))
+				// {
+				// diffOfNormValPairsForThisFeatAcrossAllAOsInCand.add(
+				// Math.abs(Double.valueOf(valPair.getSecond()) - Double.valueOf(valPair.getFirst())));
+				// }
+				// }
+				for (Pair<String, String> valPair : normValPairsOrDiffForEachFeatAcrossAOsForThisCand.get(featureID))
 				{
-					for (Pair<String, String> valPair : normValPairsOrDiffForEachFeatAcrossAOsForThisCand
-							.get(featureID))// featureEntry.getValue())
-					{
-						String[] splitted1 = RegexUtils.patternPipe.split(valPair.getFirst());
-						String[] splitted2 = RegexUtils.patternPipe.split(valPair.getSecond());
-						diffOfNormValPairsForThisFeatAcrossAllAOsInCand
-								.add(SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1]));
-					}
-				}
-				else
-				{
-					for (Pair<String, String> valPair : normValPairsOrDiffForEachFeatAcrossAOsForThisCand
-							.get(featureID))
-					{
-						diffOfNormValPairsForThisFeatAcrossAllAOsInCand.add(
-								Math.abs(Double.valueOf(valPair.getSecond()) - Double.valueOf(valPair.getFirst())));
-					}
+					diffOfNormValPairsForThisFeatAcrossAllAOsInCand
+							.add(getDiffForFeature(featureID, valPair.getFirst(), valPair.getSecond()));
 				}
 			}
 			else

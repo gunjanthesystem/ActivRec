@@ -9,8 +9,10 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.objects.FlatActivityLogEntry;
 import org.json.JSONArray;
 
@@ -2259,6 +2261,25 @@ final public class ConnectDatabase
 			return Integer.valueOf(activityName);// because in gowalla dataset, we consider activity id as activity name
 													// as of 19 Sep 2016
 		}
+
+		// start of added on 19 Marh 2019
+		if (Constant.getDatabaseName().equals("geolife1"))
+		{
+
+			if (activityName.equals(Constant.INVALID_ACTIVITY1) || activityName.equals(Constant.INVALID_ACTIVITY2))
+			{
+				return -1;
+			}
+
+			for (Entry<Integer, String> e : DomainConstants.catIDNameDictionary.entrySet())
+			{
+				if (e.getValue().equals(activityName))
+				{
+					return e.getKey();
+				}
+			}
+		}
+		// start of added on 19 Marh 2019
 
 		if (activityNameIDMap.size() == 0)
 		{

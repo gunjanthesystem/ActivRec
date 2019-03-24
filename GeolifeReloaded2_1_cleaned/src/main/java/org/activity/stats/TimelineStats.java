@@ -3729,7 +3729,7 @@ public class TimelineStats
 			// BufferedWriter bw = WritingToFile.getBufferedWriterForNewFile(fileName);// new BufferedWriter(fw);
 
 			StringBuilder bwString = new StringBuilder();
-			bwString.append(",");
+			// $$bwString.append(",");
 			// bw.write(",");
 
 			// for (String activityName : activityNames)
@@ -4410,7 +4410,7 @@ public class TimelineStats
 
 			StringBuilder toWrite = new StringBuilder();
 
-			toWrite.append(",");
+			// $$toWrite.append(",");
 			// bw.write(",");
 
 			for (String pdVal : uniquePDVals)

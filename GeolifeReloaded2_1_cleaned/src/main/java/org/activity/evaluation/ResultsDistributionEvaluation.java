@@ -203,7 +203,9 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7Geolife.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7Gowalla4.csv";
+		boolean recommSeq = false;
+		boolean recommSecDim = false;
 		// + "/ResultsToReadMar7GowallaSecDim.csv";
 		// + "Mar6Temp2.csv";
 		// + "ResultsToReadTestGeoMar1.csv";
@@ -246,12 +248,32 @@ public class ResultsDistributionEvaluation
 			// getResultsNov21(resuchltsfileToRead, "AllAvgPrecision_ChosenMU", 6);
 			// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);
 
-			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 1);
-			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);
-			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 2);
-			getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 2);
+			if (!recommSeq)
+			{
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 1);
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 2);
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 2);
 
-			if (false)
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 1);
+
+				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
+
+				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
+				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 6);
+				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
+				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 6);
+			}
+
+			getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 2);
+			if (recommSeq)
+			{
+				getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 3);
+				getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 4);
+			}
+
+			if (recommSecDim)
 			{
 				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUserSecDim", 1);
 				// #getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
@@ -2895,6 +2917,7 @@ public class ResultsDistributionEvaluation
 				splitted2[0] = splitted2[0].replace("PNN50", "");// added on 1 Jan 2018
 				splitted2[0] = splitted2[0].replace("PNN100", "");// added on 1 Jan 2018
 				splitted2[0] = splitted2[0].replace("coll", "");// added on 7 March 2019
+				splitted2[0] = splitted2[0].replace("Seq", "");
 
 				double muForOrder = Double.valueOf(splitted2[0]);
 				muArray = new double[] { muForOrder - 1 };

@@ -504,10 +504,14 @@ public class AlignmentBasedDistance
 		costDeleteActivityObject = defaultCostDelete * wtFullActivityObject; // 1 cost of delete operation 4.5
 		costReplaceActivityObject = defaultCostReplace * wtFullActivityObject; // 2 cost of replace operation 9
 
-		StringBuilder sb = new StringBuilder("wtFullActivityObject = " + wtFullActivityObject
-				+ "\nfeatureWeightMap.size()" + featureWeightMap.size() + "\n");
-		featureWeightMap.entrySet().stream().forEachOrdered(e -> sb.append(e.getKey() + "--" + e.getValue() + "\n"));
-		System.out.println("Debug18Nov2018: " + sb.toString());
+		if (VerbosityConstants.disableWritingToFileForSpeed)
+		{
+			StringBuilder sb = new StringBuilder("wtFullActivityObject = " + wtFullActivityObject
+					+ "\nfeatureWeightMap.size()" + featureWeightMap.size() + "\n");
+			featureWeightMap.entrySet().stream()
+					.forEachOrdered(e -> sb.append(e.getKey() + "--" + e.getValue() + "\t"));
+			System.out.println("Debug18Nov2018: " + sb.toString());
+		}
 	}
 
 	/**
