@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
-import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums.ActDistType;
 import org.activity.constants.Enums.GowGeoFeature;
 import org.activity.constants.Enums.PrimaryDimension;
@@ -21,7 +20,6 @@ import org.activity.objects.ActivityObject2018;
 import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.sanityChecks.Sanity;
-import org.activity.spatial.SpatialUtils;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
@@ -1700,57 +1698,63 @@ public class HJEditDistance extends AlignmentBasedDistance
 	{
 		ArrayList<Double> allValsForThisFeatureOverList = new ArrayList<Double>();
 
-		if (gowallaFeature.equals(GowGeoFeature.ActNameF)
-				|| (gowallaFeature.equals(GowGeoFeature.LocationF) && Constant.useHaversineDistInLocationFED == false)
-				|| gowallaFeature.equals(GowGeoFeature.StartGeoF) || gowallaFeature.equals(GowGeoFeature.EndGeoF))
-		{// no meaning of summary stats in these cases
-			return null;
-		}
-
 		for (EnumMap<GowGeoFeature, Pair<String, String>> eForEachAOInCand : featureValPairList)
 		{
 			Pair<String, String> valPairForThisFeatForThisAO = eForEachAOInCand.get(gowallaFeature);
 
 			if (considerValOrValDiff)
 			{
+				if (gowallaFeature.equals(GowGeoFeature.ActNameF) || gowallaFeature.equals(GowGeoFeature.LocationF)
+				// && Constant.useHaversineDistInLocationFED == false)
+						|| gowallaFeature.equals(GowGeoFeature.StartGeoF)
+						|| gowallaFeature.equals(GowGeoFeature.EndGeoF))
+				{// no meaning of summary stats in these cases
+					return null;
+				}
 				allValsForThisFeatureOverList.add(Double.valueOf(valPairForThisFeatForThisAO.getFirst()));
 				allValsForThisFeatureOverList.add(Double.valueOf(valPairForThisFeatForThisAO.getSecond()));
 			}
 			else
-			{// need to take special care for geo-coordinates
-				if (gowallaFeature.equals(GowGeoFeature.StartGeoF) || gowallaFeature.equals(GowGeoFeature.EndGeoF))
-				{
-					String[] splitted1 = RegexUtils.patternPipe.split(valPairForThisFeatForThisAO.getFirst());
-					String[] splitted2 = RegexUtils.patternPipe.split(valPairForThisFeatForThisAO.getSecond());
-					allValsForThisFeatureOverList
-							.add(SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1]));
-					/// temp for debug start
-					// sbDebug20Feb.append("gowallaFeature = " + gowallaFeature + "\n Dist between"
-					// + valPairForThisFeatForThisAO.getFirst() + " and "
-					// + valPairForThisFeatForThisAO.getSecond() + " = "
-					// + SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1])
-					// + "splitted1 = " + Arrays.asList(splitted1) + " \nsplitted2 = "
-					// + Arrays.asList(splitted2) + "\nsplitted1[0] = " + splitted1[0] + "\nsplitted1[1] = "
-					// + splitted1[1] + "\nsplitted2[0] = " + splitted2[0] + "\nsplitted2[1] = "
-					// + splitted2[1]);
-					/// temp for debug end
-				}
-				else if (gowallaFeature.equals(GowGeoFeature.LocationF) && Constant.useHaversineDistInLocationFED)
-				{
-					String[] splitted1 = RegexUtils.patternPipe.split(valPairForThisFeatForThisAO.getFirst());
-					String[] splitted2 = RegexUtils.patternPipe.split(valPairForThisFeatForThisAO.getSecond());
-					List<Integer> grids1 = Arrays.stream(splitted1).map(v -> Integer.valueOf(v))
-							.collect(Collectors.toList());
-					List<Integer> grids2 = Arrays.stream(splitted2).map(v -> Integer.valueOf(v))
-							.collect(Collectors.toList());
-					allValsForThisFeatureOverList
-							.add(DomainConstants.getMinHaversineDistForGridIndicesPairs(grids1, grids2));
-				}
-				else
-				{
-					allValsForThisFeatureOverList.add(Math.abs(Double.valueOf(valPairForThisFeatForThisAO.getFirst())
-							- Double.valueOf(valPairForThisFeatForThisAO.getSecond())));
-				}
+			{
+				// // need to take special care for geo-coordinates
+				// if (gowallaFeature.equals(GowGeoFeature.StartGeoF) ||
+				// gowallaFeature.equals(GowGeoFeature.EndGeoF))
+				// {
+				// String[] splitted1 = RegexUtils.patternPipe.split(valPairForThisFeatForThisAO.getFirst());
+				// String[] splitted2 = RegexUtils.patternPipe.split(valPairForThisFeatForThisAO.getSecond());
+				// allValsForThisFeatureOverList
+				// .add(SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1]));
+				// /// temp for debug start
+				// // sbDebug20Feb.append("gowallaFeature = " + gowallaFeature + "\n Dist between"
+				// // + valPairForThisFeatForThisAO.getFirst() + " and "
+				// // + valPairForThisFeatForThisAO.getSecond() + " = "
+				// // + SpatialUtils.haversine(splitted1[0], splitted1[1], splitted2[0], splitted2[1])
+				// // + "splitted1 = " + Arrays.asList(splitted1) + " \nsplitted2 = "
+				// // + Arrays.asList(splitted2) + "\nsplitted1[0] = " + splitted1[0] + "\nsplitted1[1] = "
+				// // + splitted1[1] + "\nsplitted2[0] = " + splitted2[0] + "\nsplitted2[1] = "
+				// // + splitted2[1]);
+				// /// temp for debug end
+				// }
+				// else if (gowallaFeature.equals(GowGeoFeature.LocationF) &&
+				// Constant.useHaversineDistInLocationFED)
+				// {
+				// String[] splitted1 = RegexUtils.patternPipe.split(valPairForThisFeatForThisAO.getFirst());
+				// String[] splitted2 = RegexUtils.patternPipe.split(valPairForThisFeatForThisAO.getSecond());
+				// List<Integer> grids1 = Arrays.stream(splitted1).map(v -> Integer.valueOf(v))
+				// .collect(Collectors.toList());
+				// List<Integer> grids2 = Arrays.stream(splitted2).map(v -> Integer.valueOf(v))
+				// .collect(Collectors.toList());
+				// allValsForThisFeatureOverList
+				// .add(DomainConstants.getMinHaversineDistForGridIndicesPairs(grids1, grids2));
+				// }
+				// else
+				// {
+				// allValsForThisFeatureOverList
+				// .add(Math.abs(Double.valueOf(valPairForThisFeatForThisAO.getFirst())
+				// - Double.valueOf(valPairForThisFeatForThisAO.getSecond())));
+				// }
+				allValsForThisFeatureOverList.add(DistanceUtils.getDiffForFeature(gowallaFeature,
+						valPairForThisFeatForThisAO.getFirst(), valPairForThisFeatForThisAO.getSecond()));
 			}
 		}
 		return allValsForThisFeatureOverList;
@@ -2084,7 +2088,7 @@ public class HJEditDistance extends AlignmentBasedDistance
 			summaryFeatureDiffOverAllActs.put(gowallaFeature, pthPercentileForThisFeature);
 		}
 
-		if (true)// write the pth percentile of each feature
+		if (VerbosityConstants.WriteMInOfMinAndMaxOfMaxRTV)// write the pth percentile of each feature
 		{
 			StringBuilder sb = new StringBuilder("");
 			summaryFeatureDiffOverAllActs.entrySet().stream().forEachOrdered(e -> sb.append(e.getValue() + ","));

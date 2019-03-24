@@ -275,6 +275,76 @@ public class DataTransformerForSessionBasedRecAlgos
 				commonPath + "testSessionIDs.csv");
 	}
 
+	// start of added on 20 March 2019
+	/**
+	 * 
+	 * @param trainTimelinesAllUsersDWFiltrd
+	 * @param trainTestTimelinesForAllUsersDW
+	 * @param commonPath
+	 */
+	public static void writeActivityCountsFilteredTrainAndTestDays(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainTimelinesAllUsersDWFiltrd,
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
+			String commonPath)
+	{
+		// TODO INCOMPLETE
+		LinkedHashSet<Integer> trainSessionIDs = new LinkedHashSet<>();
+		LinkedHashSet<Integer> testSessionIDs = new LinkedHashSet<>();
+
+		if (uniqueUserIdDatesSessionIdMap == null || uniqueUserIdDatesSessionIdMap.size() == 0)
+		{
+			System.out.println(
+					"Warning: doing nothing in writeSessionIDsForFilteredTrainAndTestDays as : uniqueUserIdDatesSessionIdMap ="
+							+ uniqueUserIdDatesSessionIdMap);
+		}
+		else
+		{
+			// write trainSessionIDs
+			for (Entry<String, LinkedHashMap<Date, Timeline>> userEntry : trainTimelinesAllUsersDWFiltrd.entrySet())
+			{
+				String userId = userEntry.getKey();
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().entrySet())
+				{
+					String sessionIdKey = userId + sessionDelimiter + dateEntry.getKey().toString();
+					Integer sessionId = uniqueUserIdDatesSessionIdMap.get(sessionIdKey);
+					if (sessionId == null)
+					{
+						PopUps.printTracedErrorMsgWithExit(
+								"Error: train session not found for sessionKey: " + sessionIdKey);
+					}
+					trainSessionIDs.add(sessionId);
+				}
+			}
+
+			// write testSessionIDs
+			for (Entry<String, List<LinkedHashMap<Date, Timeline>>> userEntry : trainTestTimelinesForAllUsersDW
+					.entrySet())
+			{
+				String userId = userEntry.getKey();
+				for (Entry<Date, Timeline> dateEntry : userEntry.getValue().get(1).entrySet())
+				{
+					String sessionIdKey = userId + sessionDelimiter + dateEntry.getKey().toString();
+					Integer sessionId = uniqueUserIdDatesSessionIdMap.get(sessionIdKey);
+					if (sessionId == null)
+					{
+						PopUps.printTracedErrorMsgWithExit(
+								"Error: test session not found for sessionKey: " + sessionIdKey);
+					}
+					testSessionIDs.add(sessionId);
+				}
+			}
+		}
+
+		PopUps.showMessage("trainSessionIDs.size() = " + trainSessionIDs.size() + "\ntestSessionIDs.size() = "
+				+ testSessionIDs.size());
+		WToFile.writeToNewFile(trainSessionIDs.stream().map(i -> String.valueOf(i)).collect(Collectors.joining("\n")),
+				commonPath + "trainSessionIDs.csv");
+		WToFile.writeToNewFile(testSessionIDs.stream().map(i -> String.valueOf(i)).collect(Collectors.joining("\n")),
+				commonPath + "testSessionIDs.csv");
+	}
+
+	// end of added on 20 March 2019
+
 	/**
 	 * 
 	 * @param validRtsAsUserIdDateEndTS

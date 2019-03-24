@@ -250,7 +250,7 @@ public class TimelineWEKAClusteringController2019
 				clusteringRanges = gowallaClusteringRanges;
 				break;
 			case "geolife1":
-				clusteringRanges = geolifeClusteringRanges;
+				clusteringRanges = gowallaClusteringRanges;// geolifeClusteringRanges;
 				break;
 			default:
 				PopUps.printTracedErrorMsgWithExit("Unknown database name");

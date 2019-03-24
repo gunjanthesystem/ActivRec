@@ -180,7 +180,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor,
 			LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines)
 	{
-		// PopUps.showMessage("called RecommendationMasterMar2017GenSeq");
+		PopUps.showMessage("called RecommendationMasterMar2017AltAlgoSeqNov2017");
 		if (Constant.getDatabaseName().equals("dcu_data_2")) // added on 26 Dec 2018 for Baseline closest time
 		{
 			timeInSecsForRankScoreNormalisation = 60d * 60; // 60 mins
@@ -628,12 +628,13 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			}
 			else if (altSeqPredictor.equals(AltSeqPredictor.HighDur))
 			{// added on 27 Dec 2018
-				LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-						.get("activityNameCountPairsOverAllTrainingDays");
-				ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
+				LinkedHashMap<String, Long> activityNameDurPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+						.get("activityNameDurationPairsOverAllTrainingDays");// activityNameCountPairsOverAllTrainingDays
+				ComparatorUtils.assertNotNull(activityNameDurPairsOverAllTrainingDays);
 				recommendedActivityNamesWithRankscores = new LinkedHashMap<>(
-						activityNameCountPairsOverAllTrainingDays.size());
-				for (Map.Entry<String, Long> e : activityNameCountPairsOverAllTrainingDays.entrySet())
+						activityNameDurPairsOverAllTrainingDays.size());
+
+				for (Map.Entry<String, Long> e : activityNameDurPairsOverAllTrainingDays.entrySet())
 				{
 					recommendedActivityNamesWithRankscores.put(e.getKey(), Double.valueOf(e.getValue()));
 				}
@@ -659,13 +660,13 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			}
 			else if (altSeqPredictor.equals(AltSeqPredictor.HighOccur))
 			{// added on 27 Dec 2018
-				LinkedHashMap<String, Long> activityNameDurationPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
-						.get("activityNameDurationPairsOverAllTrainingDays");
-				ComparatorUtils.assertNotNull(activityNameDurationPairsOverAllTrainingDays);
+				LinkedHashMap<String, Long> activityNameCountPairsOverAllTrainingDays = (LinkedHashMap<String, Long>) mapsForCountDurationBaselines
+						.get("activityNameCountPairsOverAllTrainingDays");// activityNameDurationPairsOverAllTrainingDays
+				ComparatorUtils.assertNotNull(activityNameCountPairsOverAllTrainingDays);
 
 				recommendedActivityNamesWithRankscores = new LinkedHashMap<>(
-						activityNameDurationPairsOverAllTrainingDays.size());
-				for (Map.Entry<String, Long> e : activityNameDurationPairsOverAllTrainingDays.entrySet())
+						activityNameCountPairsOverAllTrainingDays.size());
+				for (Map.Entry<String, Long> e : activityNameCountPairsOverAllTrainingDays.entrySet())
 				{
 					recommendedActivityNamesWithRankscores.put(e.getKey(), Double.valueOf(e.getValue()));
 				}
