@@ -180,7 +180,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuous, Enums.AltSeqPredictor altSeqPredictor,
 			LinkedHashMap<String, LinkedHashMap<String, ?>> mapsForCountDurationBaselines)
 	{
-		PopUps.showMessage("called RecommendationMasterMar2017AltAlgoSeqNov2017");
+		// PopUps.showMessage("called RecommendationMasterMar2017AltAlgoSeqNov2017");
 		if (Constant.getDatabaseName().equals("dcu_data_2")) // added on 26 Dec 2018 for Baseline closest time
 		{
 			timeInSecsForRankScoreNormalisation = 60d * 60; // 60 mins

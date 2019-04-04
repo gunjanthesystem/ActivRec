@@ -471,8 +471,11 @@ public class TimelineUtils
 
 		List<Integer> gridIndicesWithMaxCount = (List<Integer>) ComparatorUtils.getKeysWithMaxValues(gridIndicesCount);
 
-		WToFile.appendLineToFileAbs(sbLog.toString(),
-				Constant.getCommonPath() + "LocIDGridIndexWhileCreatingTimelines.csv");
+		if (VerbosityConstants.writeGridIndicesPerCheckin)
+		{
+			WToFile.appendLineToFileAbs(sbLog.toString(),
+					Constant.getCommonPath() + "LocIDGridIndexWhileCreatingTimelines.csv");
+		}
 
 		WToFile.appendLineToFileAbs(
 				gridIndices.size() + "," + uniqueGridIndices.size() + ","
@@ -503,9 +506,13 @@ public class TimelineUtils
 		// gridIDsList.addAll(uniqueGridIDs);
 		int gridIndexToReturn = gridIndicesWithMaxCount.get(0);
 
-		WToFile.appendLineToFileAbs("locIDs\t" + locIDs.stream().map(v -> v.toString()).collect(Collectors.joining("|"))
-				+ "\tgridIndexToReturn\t" + gridIndexToReturn + "\tu\t" + userForLog + "\tts\t" + tsForLog + "\n",
-				Constant.getCommonPath() + "GridIndexPerCheckin.csv");
+		if (VerbosityConstants.writeGridIndicesPerCheckin)
+		{
+			WToFile.appendLineToFileAbs("locIDs\t"
+					+ locIDs.stream().map(v -> v.toString()).collect(Collectors.joining("|")) + "\tgridIndexToReturn\t"
+					+ gridIndexToReturn + "\tu\t" + userForLog + "\tts\t" + tsForLog + "\n",
+					Constant.getCommonPath() + "GridIndexPerCheckin.csv");
+		}
 
 		return gridIndexToReturn;
 	}

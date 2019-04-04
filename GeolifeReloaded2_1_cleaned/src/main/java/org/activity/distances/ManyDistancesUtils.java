@@ -25,7 +25,7 @@ public class ManyDistancesUtils
 		Enums.ActDistType[] distTypes = { ActDistType.MyLevenshtein };// , ActDistType.Jaccard };
 		// ActDistType.Jaccard, ActDistType.Jaro, ActDistType.Hamming,
 		// ActDistType.LongestCommonSubsequence, ActDistType.MyLevenshtein };
-
+		// Constant.useForeignAwareLevenshtein = true;
 		for (ActDistType distType : distTypes)
 		{
 			System.out.println("Target = " + target);
