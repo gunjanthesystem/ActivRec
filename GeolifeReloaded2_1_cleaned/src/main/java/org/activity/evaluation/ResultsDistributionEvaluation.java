@@ -203,7 +203,7 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7Gowalla4.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar22GeolifeSeq.csv";
 		boolean recommSeq = false;
 		boolean recommSecDim = false;
 		// + "/ResultsToReadMar7GowallaSecDim.csv";
@@ -1312,7 +1312,7 @@ public class ResultsDistributionEvaluation
 
 		// DescriptiveStatistics mrrStatsOverUsers = null;
 		String pathToWrite = pathToRead;
-		boolean doLevel1 = false;
+		boolean doLevel1 = Constant.getDatabaseName().contains("gowalla1") ? true : false;// false;
 		String host = "local";
 		WToFile.createDirectoryIfNotExists(pathToWrite);
 		WToFile.createDirectoryIfNotExists(pathToWrite + "ReadMe/");

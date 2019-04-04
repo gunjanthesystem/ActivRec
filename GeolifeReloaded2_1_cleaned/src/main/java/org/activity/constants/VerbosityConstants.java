@@ -104,6 +104,7 @@ public class VerbosityConstants
 	public static final boolean writeRNN1PredProbDistribution = true;
 	public static final boolean writeReplaceWtMultiplierMap = false;
 
+	public static final boolean writeGridIndicesPerCheckin = false;
 	// End of curtain 30 May 2018 for running Toy
 
 	// ======================================================================================

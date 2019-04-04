@@ -98,7 +98,7 @@ public final class Constant
 	public static final Enums.TypeOfExperiment typeOfExperiment = Enums.TypeOfExperiment.RecommendationTests;
 
 	// SWITCH_DEC20
-	public static Enums.LookPastType lookPastType = Enums.LookPastType.Daywise;//// TODO .NCount;//
+	public static Enums.LookPastType lookPastType = Enums.LookPastType.NCount;//// TODO .NCount;//
 	//// SWITCH_NOV10
 	// NCount;// ClosestTime;// .NGram;// .Daywise;
 	// Note that: current timeline extraction for PureAKOM is same as for NCount.
@@ -117,7 +117,7 @@ public final class Constant
 
 	public static final boolean ensureHasDaywiseCandsForEvalCompatibility = true;// TODO //added 14 Jan 2018
 
-	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;//// TODO SWITCH_NOV10
+	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
@@ -346,6 +346,12 @@ public final class Constant
 	public static final boolean searchForOptimalFeatureWts = false;// true;
 	public static final boolean purelyRandomPredictionNov25 = false;
 	public static final boolean doForJupyterBaselines = false;// addded on 31 Dec 2018
+
+	public static final boolean buildRepAOInfoPerUserForMemoryPerformance = true; // TODO done for single dimension
+																					// recommendation but not yet done
+																					// for multi dimension
+																					// recommendation. added on 4 April
+																					// 2019
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -972,7 +978,7 @@ public final class Constant
 			useRandomlySampled100Users = true;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = false;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = false; // false for gowalla// true for others;//
-			useHaversineDistInLocationFED = true;// true;// TEMP TODO IMPORTANT TODO TODO TODO
+			useHaversineDistInLocationFED = true;// TEMPtrue;// true;// TEMP TODO IMPORTANT TODO TODO TODO
 
 			break;
 
@@ -2009,6 +2015,7 @@ public final class Constant
 		s.append("\nsearchForOptimalFeatureWts:" + Constant.searchForOptimalFeatureWts);
 		s.append("\npurelyRandomPredictionNov25:" + Constant.purelyRandomPredictionNov25);
 		s.append("\ndoForJupyterBaselines:" + Constant.doForJupyterBaselines);
+		s.append("\nbuildRepAOInfoPerUserForMemoryPerformance:" + Constant.buildRepAOInfoPerUserForMemoryPerformance);
 		// s.append("\n:" + );
 		if (dynamicDistanceUsed.equals("FeatureWiseEditDistance"))
 		{

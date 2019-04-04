@@ -265,46 +265,51 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 		///////////
 		LinkedHashMap<String, RepresentativeAOInfo> repAOInfoForEachUser = new LinkedHashMap<>();// new approach
-
-		// Start of curtain: incomplete: motive: faster speed
-		// PopUps.showMessage("repAOInfoForEachUser.keySet() empty =" + repAOInfoForEachUser.keySet()
-		// + " trainTestTimelinesForAllUsersDW.size()=" + trainTestTimelinesForAllUsersDW.size()
-		// + " trainTimelinesAllUsersContinuousFiltrd.size() = " + trainTimelinesAllUsersContinuousFiltrd.size());
-		if (Constant.lengthOfRecommendedSequence > 1)
-		{
-			repAOInfoForEachUser = RepresentativeAOInfo.buildRepresentativeAOInfosDec2018(
-					trainTimelinesAllUsersContinuousFiltrd, primaryDimension, databaseName,
-					Constant.collaborativeCandidates);
-
-			PopUps.showMessage("repAOInfoForEachUser.keySet() =" + repAOInfoForEachUser.keySet());
-
-			System.out.println("repAOInfoForEachUser.keySet() =" + repAOInfoForEachUser.keySet());
-			// if (Constant.preBuildRepAOGenericUser)
-			// {// collaborative approach
-			// // disabled on 1 Aug 2017, will do just-in-time computation of representative act object
-			// // based only on candidate timelines
-			// // added on14Nov2018
-			// if (Constant.collaborativeCandidates)
-			// {
-			// repAOResultGenericUser = RepresentativeAOInfo.buildRepresentativeAOsAllUsersPDVCOllAllUsers(
-			// trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
-			// Constant.getUniqueActivityIDs(), primaryDimension, databaseName);
-			// }
-			// // end of curtain
-			// ////// END of build representative activity objects for this user.
-			// /// temp end
-			// // start of added on 20 Dec 2018
-			// else
-			// {
-			// repAOResultGenericUser = RepresentativeAOInfo.buildRepresentativeAOsAllUsersPDVCOllAllUsers(
-			// trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
-			// Constant.getUniqueActivityIDs(), primaryDimension, databaseName);
-			// }
-			// // end of added on 20 Dec 2018
-			// }
+		if (Constant.buildRepAOInfoPerUserForMemoryPerformance)
+		{// added on 4 April 2019, to save memory space by keeping info only for target user
+			repAOInfoForEachUser = null;
 		}
-		// End of added on 20 Dec 2018
+		else
+		{
+			// Start of curtain: incomplete: motive: faster speed
+			// PopUps.showMessage("repAOInfoForEachUser.keySet() empty =" + repAOInfoForEachUser.keySet()
+			// + " trainTestTimelinesForAllUsersDW.size()=" + trainTestTimelinesForAllUsersDW.size()
+			// + " trainTimelinesAllUsersContinuousFiltrd.size() = " + trainTimelinesAllUsersContinuousFiltrd.size());
+			if (Constant.lengthOfRecommendedSequence > 1)
+			{
+				repAOInfoForEachUser = RepresentativeAOInfo.buildRepresentativeAOInfosDec2018(
+						trainTimelinesAllUsersContinuousFiltrd, primaryDimension, databaseName,
+						Constant.collaborativeCandidates);
 
+				PopUps.showMessage("repAOInfoForEachUser.keySet() =" + repAOInfoForEachUser.keySet());
+
+				System.out.println("repAOInfoForEachUser.keySet() =" + repAOInfoForEachUser.keySet());
+				// if (Constant.preBuildRepAOGenericUser)
+				// {// collaborative approach
+				// // disabled on 1 Aug 2017, will do just-in-time computation of representative act object
+				// // based only on candidate timelines
+				// // added on14Nov2018
+				// if (Constant.collaborativeCandidates)
+				// {
+				// repAOResultGenericUser = RepresentativeAOInfo.buildRepresentativeAOsAllUsersPDVCOllAllUsers(
+				// trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
+				// Constant.getUniqueActivityIDs(), primaryDimension, databaseName);
+				// }
+				// // end of curtain
+				// ////// END of build representative activity objects for this user.
+				// /// temp end
+				// // start of added on 20 Dec 2018
+				// else
+				// {
+				// repAOResultGenericUser = RepresentativeAOInfo.buildRepresentativeAOsAllUsersPDVCOllAllUsers(
+				// trainTestTimelinesForAllUsersDW, Constant.getUniqueLocIDs(),
+				// Constant.getUniqueActivityIDs(), primaryDimension, databaseName);
+				// }
+				// // end of added on 20 Dec 2018
+				// }
+			}
+			// End of added on 20 Dec 2018
+		}
 		for (Enums.TypeOfThreshold typeOfThreshold : typeOfThresholds)
 		{
 			setThresholdsArray(typeOfThreshold);
@@ -578,6 +583,17 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 
 							System.out.println("\nUser id=" + userId);// PopUps.showMessage("\nUser id=" + userId);
 							String userName = RecommTestsUtils.getUserNameFromUserID(userId, this.databaseName);
+
+							//////// Start of added on April 4 2019
+							RepresentativeAOInfo repAOInfoForSingleUser = null;
+							if (Constant.buildRepAOInfoPerUserForMemoryPerformance)
+							{
+								repAOInfoForSingleUser = RepresentativeAOInfo
+										.buildRepresentativeAOInfosDec2018SingleUser(String.valueOf(userId),
+												trainTimelinesAllUsersContinuousFiltrd, primaryDimension, databaseName,
+												Constant.collaborativeCandidates);
+							}
+							//////// End of added on April 4 2019
 
 							// Start of Added on 21 Dec 2017
 							if (altSeqPredictor.equals(Enums.AltSeqPredictor.PureAKOM)
@@ -1227,9 +1243,15 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 											// topRecommendedPrimaryDimensionVal[seqIndex], recommMaster,
 											// this.primaryDimension,
 											// trainTimelinesAllUsersContinuousFiltrd);
-
-											RepresentativeAOInfo ree1 = repAOInfoForEachUser
-													.get(String.valueOf(userId));
+											RepresentativeAOInfo ree1 = null;
+											if (Constant.buildRepAOInfoPerUserForMemoryPerformance)
+											{
+												ree1 = repAOInfoForSingleUser;
+											}
+											else
+											{
+												ree1 = repAOInfoForEachUser.get(String.valueOf(userId));
+											}
 											// System.out.println("String.valueOf(userId) = " + String.valueOf(userId));
 											// System.out.println("ree1 = " + ree1.toString());
 
