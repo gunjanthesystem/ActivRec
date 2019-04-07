@@ -135,7 +135,7 @@ public class EvalMetrics
 				// }
 
 				// Start of Dec 16 debugging
-				System.out.println("catIDNameDict = " + catIDNameDict);
+				// $System.out.println("catIDNameDict = " + catIDNameDict);
 				// End of Dec 16 debugging
 
 				for (Entry<Integer, String> cEntry : catIDNameDict.entrySet())
@@ -159,11 +159,13 @@ public class EvalMetrics
 						continue;
 					}
 					// Start of Dec 16 debugging
-					System.out.println("dataActualForThisUser = " + dataActualForThisUser);
-					System.out.println("actualActName = " + actualActName);
-					System.out.println("rrValue = " + rrValue);
-					System.out.println("perActMRR = " + perActMRR);
-					// End of Dec 16 debugging
+					if (false)
+					{
+						System.out.println("dataActualForThisUser = " + dataActualForThisUser);
+						System.out.println("actualActName = " + actualActName);
+						System.out.println("rrValue = " + rrValue);
+						System.out.println("perActMRR = " + perActMRR);
+					} // End of Dec 16 debugging
 
 					// start of debug Mar 14 2019
 					if (perActMRR == null)
@@ -195,7 +197,7 @@ public class EvalMetrics
 
 				for (Map.Entry<String, ArrayList<Double>> e : perActMRR.entrySet())
 				{
-					System.out.println(" number of vals =" + e.getValue().size());
+					// $System.out.println(" number of vals =" + e.getValue().size());
 					bw.write("," + String.valueOf(StatsUtils.meanOfArrayList(e.getValue(), 4)));
 					bwDistri.write("," + String.valueOf(e.getValue().size()));
 				}

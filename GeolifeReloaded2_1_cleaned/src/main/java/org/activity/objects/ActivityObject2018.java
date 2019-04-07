@@ -178,7 +178,7 @@ public class ActivityObject2018 implements Serializable
 				.collect(Collectors.joining(delimiter));
 	}
 
-	public long getGridID()
+	public int getGridIndex() // changed return type from long to int as it was returning int.
 	{
 		return this.gridIndex;
 	}
@@ -337,7 +337,7 @@ public class ActivityObject2018 implements Serializable
 				return false;
 			}
 		case LocationGridID:
-			return this.gridIndex == ao2.getGridID();
+			return this.gridIndex == ao2.getGridIndex();
 		default:
 			PopUps.printTracedErrorMsgWithExit("Unknown primary dimension val = " + Constant.primaryDimension);
 			return false;
@@ -1676,7 +1676,17 @@ public class ActivityObject2018 implements Serializable
 		// locationIDs.stream().forEach(e -> sb.append(e + delimiter));
 		// return sb.toString();
 		// //Before 17 July 2017 End
-
+		if (locationIDs.size() == 0) // added on 5 April 2019
+		{
+			if (Constant.getDatabaseName().equals("geolife1") || Constant.getDatabaseName().equals("dcu_data_2"))
+			{
+				return "";
+			}
+			else
+			{
+				PopUps.printTracedErrorMsgWithExit("Error: locationIDs.size() == 0 ");
+			}
+		}
 		return locationIDs.stream().map(e -> e.toString()).collect(Collectors.joining(String.valueOf(delimiter)));
 	}
 

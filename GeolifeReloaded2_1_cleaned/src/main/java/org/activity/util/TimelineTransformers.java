@@ -501,6 +501,15 @@ public class TimelineTransformers
 		return r;
 	}
 
+	/**
+	 * TODO: probably can change Long to Integer as gridIndices are integer at the moment, but perhaps it would be wiser
+	 * to keep it long as number of locations might explode in the future. may be not, since int has max range of 2
+	 * billion.
+	 * 
+	 * @param ts
+	 * @param validsOnly
+	 * @return
+	 */
 	public static LinkedHashMap<String, LinkedHashMap<Timestamp, Long>> toLocationGridsFromActivityObjectsDummyTime(
 			LinkedHashMap<String, LinkedHashMap<Timestamp, ActivityObject2018>> ts, boolean validsOnly)
 	{
@@ -517,7 +526,7 @@ public class TimelineTransformers
 
 				if (!validsOnly || (ao.isInvalidActivityName() == false))
 				{
-					value = dataEntry.getValue().getGridID();
+					value = (long) dataEntry.getValue().getGridIndex();
 					// WritingToFile.appendLineToFile("Activity Name:" + dataEntry.getValue().getActivityName() + "," +
 					// value, "ActivityCodeForSeries");
 					dataToPut.put(time, value);
