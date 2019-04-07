@@ -117,7 +117,7 @@ public final class Constant
 
 	public static final boolean ensureHasDaywiseCandsForEvalCompatibility = true;// TODO //added 14 Jan 2018
 
-	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;//// TODO SWITCH_NOV10
+	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.None;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
 	private static int AKOMHighestOrder = 3;// 1;// 3;// SWITCH_NOV10
@@ -336,7 +336,7 @@ public final class Constant
 	// public static GridDistancesProvider gdDistProvider; // added on 26 July 2018
 	public static final double maxDistanceThresholdForLocGridDissmilarity = 25;// kms
 
-	static String DATABASE_NAME = "gowalla1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
+	static String DATABASE_NAME = "geolife1";// "geolife1";// "fsny1";// "dcu_data_2", "geolife1", "gowalla1"
 												// ,"fsny1"// default
 												// database name,
 	// dcu_data_2";// "geolife1";// "start_base_2";databaseName
@@ -347,11 +347,14 @@ public final class Constant
 	public static final boolean purelyRandomPredictionNov25 = false;
 	public static final boolean doForJupyterBaselines = false;// addded on 31 Dec 2018
 
-	public static final boolean buildRepAOInfoPerUserForMemoryPerformance = true; // TODO done for single dimension
+	public static final boolean buildRepAOInfoPerUserForMemoryPerformance = false; // TODO done for single dimension
 																					// recommendation but not yet done
 																					// for multi dimension
 																					// recommendation. added on 4 April
 																					// 2019
+
+	public static final boolean useBetterRepAOForLoc = false;// added on 6 April 2019
+
 	////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -2016,6 +2019,7 @@ public final class Constant
 		s.append("\npurelyRandomPredictionNov25:" + Constant.purelyRandomPredictionNov25);
 		s.append("\ndoForJupyterBaselines:" + Constant.doForJupyterBaselines);
 		s.append("\nbuildRepAOInfoPerUserForMemoryPerformance:" + Constant.buildRepAOInfoPerUserForMemoryPerformance);
+		s.append("\nuseBetterRepAOForLoc:" + Constant.useBetterRepAOForLoc);
 		// s.append("\n:" + );
 		if (dynamicDistanceUsed.equals("FeatureWiseEditDistance"))
 		{

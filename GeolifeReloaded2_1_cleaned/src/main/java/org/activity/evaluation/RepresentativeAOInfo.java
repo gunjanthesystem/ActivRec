@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -15,6 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.activity.constants.Constant;
+import org.activity.constants.DomainConstants;
 import org.activity.constants.Enums;
 import org.activity.constants.Enums.PrimaryDimension;
 import org.activity.constants.VerbosityConstants;
@@ -51,8 +53,8 @@ public class RepresentativeAOInfo
 	// actID, List of Triples(firstlocID, Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt)
 	// Map<Integer, ArrayList<Triple<String, Pair<Pair<String, String>, Pair<String, String>>, String>>>
 	// aggStartLatLongEndLatLongAvgAlt;
-	// actID, List of [firstlocID, StartLat,StartLon,EndLat,EndLon, AvgAlt]
-	Map<Integer, ArrayList<String[]>> aggStartLatLongEndLatLongAvgAltFaster;
+	// actID, List of [firstlocID, StartLat,StartLon,EndLat,EndLon, AvgAlt,GridIndex]
+	Map<Integer, ArrayList<String[]>> aggStartLatLongEndLatLongAvgAltGridIndxFaster;
 	static final boolean useAggStartLatLongEndLatLongAvgAlt = true; // to disable aggStartLatLongEndLatLong_ to save
 																	// memory space.
 
@@ -76,7 +78,12 @@ public class RepresentativeAOInfo
 				+ ", \naggValOfEachFeatForEachPDValDurationFromNext=" + aggValOfEachFeatForEachPDValDurationFromNext
 				+ ", \naggStartLatLongEndLatLong_=" + aggStartLatLongEndLatLong_
 				// + ", \naggStartLatLongEndLatLongAvgAlt=" + aggStartLatLongEndLatLongAvgAlt
-				+ ", \naggStartLatLongEndLatLongAvgAlt=" + aggStartLatLongEndLatLongAvgAltFaster
+				+ ", \naggStartLatLongEndLatLongAvgAltGridIndexFaster="
+				+ aggStartLatLongEndLatLongAvgAltGridIndxFaster.entrySet().stream()
+						.map(e -> e.getKey() + "->"
+								+ e.getValue().stream().map(v -> Arrays.asList(v).toString())
+										.collect(Collectors.joining(",")))
+						.collect(Collectors.joining("\n"))
 				+ ", \naggStartLatLongEndLatLongAsHSC=" + aggStartLatLongEndLatLongAsHSC
 				+ ", \naggValOfEachFeatForEachPDValDuration=" + aggValOfEachFeatForEachPDValDuration
 				+ ", \naggValOfEachFeatForEachPDValDistTrav=" + aggValOfEachFeatForEachPDValDistTrav
@@ -123,7 +130,10 @@ public class RepresentativeAOInfo
 			}
 			// Constant.getActivityNames()
 			// ArrayList<Integer> locID = new ArrayList<>();//disabled on 4 April 2019
-			locationIDs.add(aggValOfEachFeatForEachPDValLocationID.get(topPrimaryDimensionValInt));
+			if (aggValOfEachFeatForEachPDValLocationID.size() > 0) // added on 5 April since geolife wont have locID
+			{
+				locationIDs.add(aggValOfEachFeatForEachPDValLocationID.get(topPrimaryDimensionValInt));
+			}
 			break;
 		}
 		case LocationID:
@@ -158,14 +168,17 @@ public class RepresentativeAOInfo
 		// workingLevelCatIDs, -1, -1, new String[] { "" });
 		ActivityObject2018 repAOForThisActNameForThisUser2 = null;
 		Long durationInSecs = null;
+		// boolean userBetterRep = Constant.useBetterRepAOForLoc;// false;
+		String startLat = "", startLon = "", endLat = "", endLon = "";// added on 5 April 2019
+
 		switch (databaseName)
 		{
 		case "geolife1":
 
-			String startLat, startLon, endLat, endLon;
+			// String startLat, startLon, endLat, endLon;
 			Double avgAlt = Double.NaN;
 			Double distTravelled = Double.NaN;
-			if (false)
+			if (!Constant.useBetterRepAOForLoc)// TODO temp
 			{// Simple approach: most common lat long for that PD val and median (agg value) of avg altitude. In this
 				// case, avg alt is not tied to the lat lon.
 				ArrayList<String> startLatLonEndLatLon_ = aggStartLatLongEndLatLong_.get(topPrimaryDimensionValInt);
@@ -187,9 +200,9 @@ public class RepresentativeAOInfo
 				// altitude are tied to each other.
 				ActivityObject2018 currentAO = recommMaster.getActivityObjectAtRecomm();
 				// Triple<String, Pair<Pair<String, String>, Pair<String, String>>, String>
-				String[] nearestLoc = getStartEndLatLongAvgAltNearestToCurrentAOEndFaster(currentAO.getEndLatitude(),
-						currentAO.getEndLongitude(),
-						aggStartLatLongEndLatLongAvgAltFaster.get(topPrimaryDimensionValInt));
+				String[] nearestLoc = getStartEndLatLongAvgAltGridIndexNearestToCurrentAOEndFaster(
+						currentAO.getEndLatitude(), currentAO.getEndLongitude(),
+						aggStartLatLongEndLatLongAvgAltGridIndxFaster.get(topPrimaryDimensionValInt), -1);
 
 				startLat = nearestLoc[1];// .getSecond().getFirst().getFirst();
 				startLon = nearestLoc[2];// .getSecond().getFirst().getSecond();
@@ -211,6 +224,21 @@ public class RepresentativeAOInfo
 			// String startLongitude1, String endLongitude1, String avgAltitude1, double distanceTravelled1,
 			// long startTimestampInms1, long endTimestampInms1, long durationInSeconds1)
 
+			// start of debug 5 April 2019
+			if (false)
+			{
+				if (locationIDs == null)
+				{
+					PopUps.showMessage("Debug 5 April: locationIDs");
+				}
+				else
+				{
+					PopUps.showMessage(
+							"Debug 5 April: locationIDs.size() = " + locationIDs.size() + "\n locIDs = " + locationIDs);
+				}
+			}
+			// end of debug 5 April 2019
+
 			repAOForThisActNameForThisUser2 = new ActivityObject2018(userId, activityID, activityName,
 					workingLevelCatIDs, locationIDs, "", startLat, endLat, startLon, endLon, avgAlt.toString(),
 					distTravelled, (long) newStartTimestampInMs, (long) newStartTimestampInMs + (durationInSecs * 1000),
@@ -223,7 +251,7 @@ public class RepresentativeAOInfo
 			long durFromPrev = aggValOfEachFeatForEachPDValDurationInSecsFromPrev.get(topPrimaryDimensionValInt)
 					.longValue();
 
-			if (false)
+			if (!Constant.useBetterRepAOForLoc)
 			{
 				// use most popular locationID for this feature already assigned earlier
 				if (locationIDs.size() == 0)
@@ -238,9 +266,10 @@ public class RepresentativeAOInfo
 				// - also take avg altitude associated with the chosen geo-coordinates, since geo-coordinates and start
 				// altitude are tied to each other.
 				ActivityObject2018 currentAO = recommMaster.getActivityObjectAtRecomm();
-				String[] nearestLoc = getStartEndLatLongAvgAltNearestToCurrentAOEndFaster(currentAO.getStartLatitude(),
-						currentAO.getStartLongitude(),
-						aggStartLatLongEndLatLongAvgAltFaster.get(topPrimaryDimensionValInt));
+				String[] nearestLoc = getStartEndLatLongAvgAltGridIndexNearestToCurrentAOEndFaster(
+						currentAO.getStartLatitude(), currentAO.getStartLongitude(),
+						aggStartLatLongEndLatLongAvgAltGridIndxFaster.get(topPrimaryDimensionValInt),
+						currentAO.getGridIndex());
 				startLat = nearestLoc[1];// .getSecond().getFirst().getFirst();
 				startLon = nearestLoc[2];// .getSecond().getFirst().getSecond();
 
@@ -370,30 +399,67 @@ public class RepresentativeAOInfo
 	 * @param endLatitude
 	 * @param endLongitude
 	 * @param listOfStartLatLongEndLatLongAvgAltForThisPDValFaster
-	 * @return Triples(locIDDelimitedBy_, Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt)
+	 * @param gridID
+	 *            for gowalla, faster computation using gridIndices rather than haversinse
+	 * @return Triples(locIDDelimitedBy_, Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt, GridIndex)
 	 * 
 	 * @since 21 March 2019
 	 */
-	private static String[] getStartEndLatLongAvgAltNearestToCurrentAOEndFaster(String endLatitude, String endLongitude,
-			ArrayList<String[]> listOfStartLatLongEndLatLongAvgAltForThisPDValFaster)
+	private static String[] getStartEndLatLongAvgAltGridIndexNearestToCurrentAOEndFaster(String endLatitude,
+			String endLongitude, ArrayList<String[]> listOfStartLatLongEndLatLongAvgAltForThisPDValFaster, int gridID)
 	{
 
 		String[] nearestLoc = new String[6];
-
+		long t1 = -999, t2 = -999, t3 = -999, t4 = -999;
 		double nearestDistInKms = Double.MAX_VALUE;
 		try
 		{
-			for (String[] e : listOfStartLatLongEndLatLongAvgAltForThisPDValFaster)
+			if (gridID >= 0) // for gowalla
 			{
-				String startLat = e[1];// e.getSecond().getFirst().getFirst();
-				String startLon = e[2];// .getSecond().getFirst().getSecond();
-				double dist = SpatialUtils.haversineFastMathV3NoRound(startLat, startLon, endLatitude, endLongitude);
-
-				if (dist < nearestDistInKms)
+				if (Constant.useHaversineDistInLocationFED == false)
 				{
-					nearestLoc = e;
-					nearestDistInKms = dist;
+					// WToFile.writeToNewFile(
+					// "Error: Constant.useHaversineDistInLocationFED=false which means necessary objects storing
+					// precomputed haversine distances between gridIndices are not deserialised",
+					// Constant.getCommonPath() + "ErrorExceptionEncountered.txt");
+					PopUps.printTracedErrorMsgWithExit(
+							"Error: Constant.useHaversineDistInLocationFED=false which means necessary objects storingprecomputed haversine distances between gridIndices are not deserialised");
 				}
+				t1 = System.currentTimeMillis();
+				for (String[] e : listOfStartLatLongEndLatLongAvgAltForThisPDValFaster)
+				{
+					// String startLat = e[1];// e.getSecond().getFirst().getFirst();
+					// String startLon = e[2];// .getSecond().getFirst().getSecond();
+					double dist = (gridID == Integer.valueOf(e[6])) ? 0
+							: DomainConstants.getHaversineDistForGridIndexPairs(gridID, Integer.valueOf(e[6]));
+					// SpatialUtils.haversineFastMathV3NoRound(startLat, startLon, endLatitude,
+					// endLongitude);
+					if (dist < nearestDistInKms)
+					{
+						nearestLoc = e;
+						nearestDistInKms = dist;
+					}
+				}
+				t2 = System.currentTimeMillis();
+
+			}
+			else // disabled for comparison
+			{
+				t3 = System.currentTimeMillis();
+				for (String[] e : listOfStartLatLongEndLatLongAvgAltForThisPDValFaster)
+				{
+					String startLat = e[1];// e.getSecond().getFirst().getFirst();
+					String startLon = e[2];// .getSecond().getFirst().getSecond();
+					double dist = SpatialUtils.haversineFastMathV3NoRound(startLat, startLon, endLatitude,
+							endLongitude);
+
+					if (dist < nearestDistInKms)
+					{
+						nearestLoc = e;
+						nearestDistInKms = dist;
+					}
+				}
+				t4 = System.currentTimeMillis();
 			}
 		}
 		catch (Exception e)
@@ -408,6 +474,9 @@ public class RepresentativeAOInfo
 					+ " nearestDistInKms=");
 			System.out.printf("%f kms\n", nearestDistInKms);
 		}
+
+		// WToFile.appendLineToFileAbs((t2 - t1) + "," + (t4 - t3) + "," + ((t2 - t1) - (t4 - t3)) + "\n",
+		// Constant.getOutputCoreResultsPath() + "DebugApril6GridVsHaversineTime.csv");
 
 		return nearestLoc;
 	}
@@ -463,7 +532,7 @@ public class RepresentativeAOInfo
 		this.aggStartLatLongEndLatLong_ = new HashMap<>();
 		this.aggStartLatLongEndLatLongAsHSC = new HashMap<>();
 		// this.aggStartLatLongEndLatLongAvgAlt = new HashMap<>();
-		this.aggStartLatLongEndLatLongAvgAltFaster = new HashMap<>();
+		this.aggStartLatLongEndLatLongAvgAltGridIndxFaster = new HashMap<>();
 
 		this.aggValOfEachFeatForEachPDValDuration = new HashMap<>();
 		this.aggValOfEachFeatForEachPDValDistTrav = new HashMap<>();
@@ -547,7 +616,7 @@ public class RepresentativeAOInfo
 				// added on 21 March 2019
 				if (useAggStartLatLongEndLatLongAvgAlt)
 				{
-					aggStartLatLongEndLatLongAvgAltFaster = getStartAndEndGeoCoordinatesWithAvgAltForEachPDValFaster(
+					aggStartLatLongEndLatLongAvgAltGridIndxFaster = getStartAndEndGeoCoordinatesWithAvgAltForEachPDValFaster(
 							userId, trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
 				}
 				else
@@ -596,11 +665,11 @@ public class RepresentativeAOInfo
 					// ActivityObject2018::getStartLongitude);
 				}
 				// PopUps.showMessage("here locf5");
-				if (aggStartLatLongEndLatLongAvgAltFaster.size() == 0)
+				if (aggStartLatLongEndLatLongAvgAltGridIndxFaster.size() == 0)
 				{
 					// PopUps.showMessage("here locf6");
 					// added on 21 March 2019
-					aggStartLatLongEndLatLongAvgAltFaster = getStartAndEndGeoCoordinatesWithAvgAltForEachPDValFaster(
+					aggStartLatLongEndLatLongAvgAltGridIndxFaster = getStartAndEndGeoCoordinatesWithAvgAltForEachPDValFaster(
 							userId, trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
 				}
 				// PopUps.showMessage("here locf7");
@@ -619,10 +688,10 @@ public class RepresentativeAOInfo
 								trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
 					}
 				}
-				if (aggStartLatLongEndLatLongAvgAltFaster.size() == 0)
+				if (aggStartLatLongEndLatLongAvgAltGridIndxFaster.size() == 0)
 				{
 					// added on 21 March 2019
-					aggStartLatLongEndLatLongAvgAltFaster = getStartAndEndGeoCoordinatesWithAvgAltForEachPDValFaster(
+					aggStartLatLongEndLatLongAvgAltGridIndxFaster = getStartAndEndGeoCoordinatesWithAvgAltForEachPDValFaster(
 							userId, trainTimelinesAllUsersContinuousFiltrd, isCollaborative);
 				}
 				// mapOfEachFeatForEachPDValEndLat = getListOfFeatureVals(userId,
@@ -823,15 +892,15 @@ public class RepresentativeAOInfo
 	 * @param userId
 	 * @param trainTimelinesAllUsersContinuousFiltrd
 	 * @param isCollaborative
-	 * @return actID, List of Pair(Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt)
+	 * @return actID, List of Pair(Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt, gridIndex)
 	 * @since 21 March 2019
 	 */
 	private static Map<Integer, ArrayList<String[]>> getStartAndEndGeoCoordinatesWithAvgAltForEachPDValFaster(
 			String userId, LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd,
 			boolean isCollaborative)
 	{
-		// List of Pair(Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt)
-		Map<Integer, ArrayList<String[]>> mapOfStartLatLonEndLatLonAvgAltForEachPDVal = new HashMap<>();
+		// List of Pair(Pair(Pair(StartLat,StartLon),Pair(EndLat,EndLon)), AvgAlt, gridIndex)
+		Map<Integer, ArrayList<String[]>> mapOfStartLatLonEndLatLonAvgAltGridIndxForEachPDVal = new HashMap<>();
 
 		for (Entry<String, Timeline> e : trainTimelinesAllUsersContinuousFiltrd.entrySet())
 		{
@@ -845,20 +914,22 @@ public class RepresentativeAOInfo
 					ArrayList<Integer> pdVals = ao.getPrimaryDimensionVal();
 					for (Integer pdVal : pdVals)
 					{
-						ArrayList<String[]> listOfFeatureVals = mapOfStartLatLonEndLatLonAvgAltForEachPDVal.get(pdVal);
+						ArrayList<String[]> listOfFeatureVals = mapOfStartLatLonEndLatLonAvgAltGridIndxForEachPDVal
+								.get(pdVal);
 
 						if (listOfFeatureVals == null)
 						{
 							listOfFeatureVals = new ArrayList<>();
 						}
 
-						String[] valsToStore = new String[6];
+						String[] valsToStore = new String[7];
 						valsToStore[0] = String.valueOf(ao.getLocationIDs().get(0));
 						valsToStore[1] = ao.getStartLatitude();
 						valsToStore[2] = ao.getStartLongitude();
 						valsToStore[3] = ao.getEndLatitude();
 						valsToStore[4] = ao.getEndLongitude();
 						valsToStore[5] = ao.getAvgAltitude();
+						valsToStore[6] = String.valueOf(ao.getGridIndex());
 
 						// Pair<String, String> startGeoCoordinates = new Pair<>(ao.getStartLatitude(),
 						// ao.getStartLongitude());
@@ -875,14 +946,14 @@ public class RepresentativeAOInfo
 						// new Triple<String, Pair<Pair<String, String>, Pair<String, String>>, String>(locIDs,
 						// new Pair<>(startGeoCoordinates, endGeoCoordinates), ao.getAvgAltitude()));
 						// listOfDurationFromPrev.add(ao.getDurationInSecondsFromPrev());
-						mapOfStartLatLonEndLatLonAvgAltForEachPDVal.put(pdVal, listOfFeatureVals);
+						mapOfStartLatLonEndLatLonAvgAltGridIndxForEachPDVal.put(pdVal, listOfFeatureVals);
 					}
 				}
 			}
 		}
-		System.out.println("mapOfStartLatLonEndLatLonAvgAltForEachPDVal.size () = "
-				+ mapOfStartLatLonEndLatLonAvgAltForEachPDVal.size());
-		return mapOfStartLatLonEndLatLonAvgAltForEachPDVal;
+		System.out.println("mapOfStartLatLonEndLatLonAvgAltGridIdForEachPDVal.size () = "
+				+ mapOfStartLatLonEndLatLonAvgAltGridIndxForEachPDVal.size());
+		return mapOfStartLatLonEndLatLonAvgAltGridIndxForEachPDVal;
 	}
 
 	/**
@@ -2407,7 +2478,7 @@ public class RepresentativeAOInfo
 		if (verboseRepAOInfo)
 		{
 			// since for gowalla dataset, the written file can be large, write it only for around 2% of the users.
-			if (!databaseName.contains("gowalla1") || Math.random() < 0.01)
+			if (!databaseName.contains("gowalla1") || Math.random() < 0.007)
 			{
 				// LeakyBucket lbWriter = new LeakyBucket(1000,
 				// Constant.getCommonPath() + "buildRepresentativeAOInfosDec2018Log_User" + userID + ".txt",
@@ -2431,12 +2502,12 @@ public class RepresentativeAOInfo
 		// // "representativeAOInfosForAllUsers.size()= " + representativeAOInfosForAllUsers.size() + "keySet = "
 		// // + representativeAOInfosForAllUsers.keySet() + "\n\n");
 		//
-		// // String s = "\n***************\nInside buildRepresentativeAOInfosDec2018:
-		// // representativeAOInfosForAllUsers.size()= "
-		// // + representativeAOInfosForAllUsers.size() + "keySet = " + representativeAOInfosForAllUsers.keySet()
-		// // + "\n-------\n" + sbLog.toString();
+		// String s = "\n***************\nInside buildRepresentativeAOInfosDec2018:
+		// representativeAOInfosForAllUsers.size()= "
+		// + representativeAOInfosForAllUsers.size() + "keySet = " + representativeAOInfosForAllUsers.keySet()
+		// + "\n-------\n" + sbLog.toString();
 		//
-		// // WToFile.appendLineToFileAbs(s, Constant.getCommonPath() + "buildRepresentativeAOInfosDec2018Log.txt");
+		// WToFile.appendLineToFileAbs(s, Constant.getCommonPath() + "buildRepresentativeAOInfosDec2018Log.txt");
 		// // System.exit(0);//
 		// }
 

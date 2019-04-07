@@ -249,6 +249,7 @@ public class SuperController
 	public static void superControllerMain(String args[])// _importantMay10
 	{
 		String databaseName = Constant.getDatabaseName();
+		long t0 = System.currentTimeMillis();
 		initializeConstants("SuperController", Constant.For9kUsers, databaseName);
 		boolean doRecommendation = true;
 		boolean doEvaluation = true;
@@ -324,6 +325,9 @@ public class SuperController
 		}
 
 		// PopUps.showMessage("Exiting main");
+		WToFile.appendLineToFileAbs(
+				"Time Taken by SuperControllerMain()," + (System.currentTimeMillis() - t0) / (60 * 1000.0) + ",mins",
+				Constant.getOutputCoreResultsPath() + "TimeTakenSuperControllerMain.csv");
 		System.exit(0);
 	}
 

@@ -1266,6 +1266,12 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 											recommendationTimes[seqIndex + 1] = repAOForTopRecommActName
 													.getEndTimestamp();
 
+											// start of debug
+											// PopUps.showMessage(
+											// "here 123: locIDs = " + repAOForTopRecommActName.getLocationIDs()
+											// + "\n" + repAOForTopRecommActName.getLocationIDs('_'));
+											// end of debug
+
 											System.out.println("repAOForTopRecommActName = " + repAOForTopRecommActName
 													.toStringAllGowallaTSWithNameForHeaded(","));
 										} // PopUps.showMessage("here12_4");

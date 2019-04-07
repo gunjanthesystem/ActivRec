@@ -40,9 +40,10 @@ public class BackwardsCompatibilityConverters
 
 		Timeline newTimeline = new Timeline(newActObjs, true, true);
 
-		System.out.println("oldActObjs.size()= " + oldActObjs.size() + " newActObjs.size()" + newActObjs.size());
-		System.out.println("same num of aos = " + (oldActObjs.size() == newActObjs.size()));
-		System.out.println("Exiting convert2016UserDayTimelineTo2018Timeline():");
+		System.out.println("oldActObjs.size()= " + oldActObjs.size() + " newActObjs.size()" + newActObjs.size()
+				+ "\nsame num of aos = " + (oldActObjs.size() == newActObjs.size())
+				+ "\nExiting convert2016UserDayTimelineTo2018Timeline():");
+
 		return new Triple<>(newTimeline, actIDNameDict, locIDNameDict);
 	}
 

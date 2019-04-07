@@ -203,8 +203,11 @@ public class ResultsDistributionEvaluation
 
 	public static void main(String args[])
 	{
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar22GeolifeSeq.csv";
-		boolean recommSeq = false;
+		// Constant.setDatabaseName("gowalla1");
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadApr6GeolifeSeq.csv";
+		// + "ResultsToReadMar22GeolifeSeq.csv";
+		boolean recommSeq = true;
+		boolean hasLevel1 = false;
 		boolean recommSecDim = false;
 		// + "/ResultsToReadMar7GowallaSecDim.csv";
 		// + "Mar6Temp2.csv";
@@ -271,6 +274,13 @@ public class ResultsDistributionEvaluation
 			{
 				getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 3);
 				getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 4);
+
+				if (hasLevel1)
+				{
+					getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreementsL1_ChosenMU", 2);
+					getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreementsL1_ChosenMU", 3);
+					getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreementsL1_ChosenMU", 4);
+				}
 			}
 
 			if (recommSecDim)
