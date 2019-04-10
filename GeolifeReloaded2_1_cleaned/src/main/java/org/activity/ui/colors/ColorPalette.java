@@ -3,7 +3,6 @@ package org.activity.ui.colors;
 import java.util.Arrays;
 
 import org.activity.ui.PopUps;
-import org.geotools.brewer.color.ColorBrewer;
 
 import javafx.scene.paint.Color;
 
@@ -113,6 +112,18 @@ public class ColorPalette
 	static String[] twoToneMudCyanPallete = new String[] { "rgb(192,41,66)", "rgb(78,205,196)" };//
 	// "rgb(255,173,88)", "rgb(89,204,242)" };//
 
+	static final String[] ptol7Bright = new String[] { "#4477AA", "#EE6677", "#228833", "#CCBB44", "#66CCEE", "#AA3377",
+			"#BBBBBB" };
+
+	static final String[] ptol9Light = new String[] { "#77AADD", "#EE8866", "#EEDD88", "#FFAABB", "#99DDFF", "#44BB99",
+			"#BBCC33", "#AAAA00", "#DDDDDD" };
+
+	static final String[] ptol9Muted = new String[] { "#CC6677", "#332288", "#DDCC77", "#117733", "#88CCEE", "#882255",
+			"#44AA99", "#999933", "#AA4499" };
+
+	static final String[] brewer12QualSet3 = new String[] { "#8DD3C7", "#FFFFB3", "#BEBADA", "#FB8072", "#80B1D3",
+			"#FDB462", "#B3DE69", "#FCCDE5", "#D9D9D9", "#BC80BD", "#CCEBC5", "#FFED6F" };
+
 	public static Color getGoldFishColor(int id)
 	{
 		if (id > palleteGoldFish.length)
@@ -173,29 +184,49 @@ public class ColorPalette
 
 	public static void setColors(String paletteName, int size)
 	{
-		if (size <= 10 && paletteName.contains("Brewer"))
+		try
 		{
-			ColorBrewer brewer = ColorBrewer.instance();
-			// String paletteName = "GrBu";
-			colors = awtColorToJavaFXColor(brewer.getPalette(paletteName).getColors(size));
-		}
-		else if (size <= 12 && paletteName.contains("InsightSecondary"))
-		{
+			// PopUps.showMessage("size = " + size);
 			colors = new Color[size];
 			for (int i = 0; i < size; i++)
 			{
-				colors[i] = getInsightSecondaryColor(i);
+				if (size <= 7)
+				{
+					colors[i] = Color.web(ptol7Bright[i]);
+				}
+				else if (size <= 9)
+				{
+					colors[i] = Color.web(ptol9Light[i]);
+					// colors[i] = Color.web(ptol9Muted[i]);
+				}
+				else if (size <= 12 && paletteName.contains("Brewer"))
+				{
+					// ColorBrewer brewer = ColorBrewer.instance();// ColorBrewer.QUALITATIVE);
+					// // String paletteName = "GrBu";
+					// // Color[] colors = brewer.getPalette(paletteName).getColors(size);
+					// PopUps.showMessage(Arrays.asList(brewer.getPalette("GrBu").getColors(3)).stream().map(e ->
+					// e.toString())
+					// .collect(Collectors.joining(",")));
+					// colors = awtColorToJavaFXColor(brewer.getPalette("GrBu").getColors(size));
+					// System.out.println(Arrays.asList(colors));
+					colors[i] = Color.web(brewer12QualSet3[i]);
+					// colors[i] = Color.web(ptol9Muted[i]);
+				}
+				else if (size <= 12 && paletteName.contains("InsightSecondary"))
+				{
+					colors[i] = getInsightSecondaryColor(i);
+				}
+				else
+				{
+					colors[i] = getColors269Color(i);
+				}
 			}
 		}
-		else // if (size <= 12 && paletteName.contains("InsightSecondary"))
+		catch (Exception e)
 		{
-			colors = new Color[size];
-			for (int i = 0; i < size; i++)
-			{
-				colors[i] = getColors269Color(i);
-			}
+			e.printStackTrace();
 		}
-		System.out.println("size = " + size + "   " + Arrays.asList(colors));
+		System.out.println("size = " + size + " " + Arrays.asList(colors));
 	}
 
 	public static Color getColor(int index)

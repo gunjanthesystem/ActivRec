@@ -708,7 +708,11 @@ public final class SpatialUtils
 		// String)");
 		// }
 
+		// long t1 = System.nanoTime();
 		double c = 2 * Math.asin(Math.sqrt(a)); // TODO: #performanceEater
+		// long t2 = System.nanoTime();
+		// double c2 = 2 * FastMath.asin(Math.sqrt(a));//found to be slower than Math
+		// long t3 = System.nanoTime();
 		// System.out.println("c = " + c);
 
 		if (SanityConstants.checkForDistanceTravelledAnomaly
@@ -719,6 +723,8 @@ public final class SpatialUtils
 					+ "," + lon2s);
 		}
 
+		// WToFile.appendLineToFileAbs((t2 - t1) + "," + (t3 - t1) + "\n",
+		// Constant.getOutputCoreResultsPath() + "Debug9AprilHaversineAsinPerformanceNS.csv");
 		return StatsUtils.round(StatsUtils.radiusOfEarthInKMs * c, 4);
 	}
 
