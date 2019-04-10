@@ -149,7 +149,7 @@ public class Dashboard4 extends Application
 					false, databaseName);
 			// writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 			List<Integer> uniqueActIDs = new ArrayList<>(Constant.getUniqueActivityIDs());
-			ColorPalette.setColors("InsightSecondary", uniqueActIDs.size());// Insight //Paired//InsightSecondary
+			ColorPalette.setColors("Brewer", uniqueActIDs.size());// Insight //Paired//InsightSecondary
 			actIDIndexMap = IntStream.range(0, uniqueActIDs.size()).boxed()
 					.collect(Collectors.toMap(i -> uniqueActIDs.get(i), Function.identity()));
 			System.out.println("actIDIndexMap=\n" + actIDIndexMap);
@@ -274,8 +274,8 @@ public class Dashboard4 extends Application
 		final boolean doGivenDataCircleTimelines = false;
 		final boolean doGivenDataLineTimelines = false;
 		// final boolean doGivenDataCanvasTimelines = true;//not implemented
-		final boolean doGivenDataOnlyActIDSeq = false;
-		final boolean doGivenDataLinePlotFeatures = true;
+		final boolean doGivenDataOnlyActIDSeq = true;
+		final boolean doGivenDataLinePlotFeatures = false;
 		final boolean doGivenDataMapPlot = false;
 
 		final boolean doSyntheticDataCircleTimelines = false;// true;
@@ -753,9 +753,10 @@ public class Dashboard4 extends Application
 		LinkedHashMap<String, Timeline> continousTimelines = TimelineTransformers
 				.dayTimelinesToTimelines(usersCleanedDayToyTimelines);
 
-		double widthOfActRect = 50, widthOfUserRect = 150;
+		double widthOfActRect = 50, widthOfUserRect = 150, heightOfActRect = 50;
 
 		ScrollPane s1 = new ScrollPane();
+		s1.setPannable(true);
 
 		VBox vBox = new VBox();
 		vBox.setSpacing(10);
@@ -768,13 +769,13 @@ public class Dashboard4 extends Application
 			hBox.setAlignment(Pos.CENTER_LEFT);
 
 			hBox.getChildren().add(createStackPane(Color.WHITE, null, "User " + userEntry.getKey(), widthOfUserRect, "",
-					"rectangle", null));
+					"rectangle", null, heightOfActRect, true));
 
 			for (ActivityObject2018 ao : userEntry.getValue().getActivityObjectsInTimeline())
 			{
 				Color actColor = ColorPalette.getColor(Dashboard4.actIDIndexMap.get(ao.getActivityID()));
 				hBox.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
-						widthOfActRect, getTooltipFromAO(ao), "circle", null));
+						widthOfActRect, getTooltipFromAO(ao), "circle", null, heightOfActRect, true));
 			}
 			vBox.getChildren().add(hBox);
 		}
@@ -793,9 +794,10 @@ public class Dashboard4 extends Application
 	private Node createOnlyActIDsAsRectsV2(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
 	{
-		double widthOfActRect = 50, widthOfUserRect = 150;
+		double widthOfActRect = 50, widthOfUserRect = 150, heightOfActRect = 50;
 
 		ScrollPane s1 = new ScrollPane();
+		s1.setPannable(true);
 
 		VBox vBox = new VBox();
 		vBox.setSpacing(10);
@@ -807,7 +809,7 @@ public class Dashboard4 extends Application
 			// hBox.setSpacing(6);
 			hBox.setAlignment(Pos.CENTER_LEFT);
 			hBox.getChildren().add(createStackPane(Color.WHITE, null, "User " + userEntry.getKey(), widthOfUserRect, "",
-					"rectangle", null));
+					"rectangle", null, heightOfActRect, true));
 
 			boolean altDayToggle = false;
 
@@ -825,7 +827,7 @@ public class Dashboard4 extends Application
 				{
 					Color actColor = ColorPalette.getColor(Dashboard4.actIDIndexMap.get(ao.getActivityID()));
 					hBox.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
-							widthOfActRect, getTooltipFromAO(ao), "rectangle", borderForDay));
+							widthOfActRect, getTooltipFromAO(ao), "rectangle", borderForDay, heightOfActRect, true));
 				}
 
 			}
@@ -848,24 +850,27 @@ public class Dashboard4 extends Application
 	private Node createOnlyActIDsAsRectsV3(
 			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayToyTimelines)
 	{
-		double widthOfActRect = 50/* 50 */, widthOfUserRect = 150;
+		double widthOfActRect = 5/* 50 */, widthOfUserRect = 150, heightOfActRect = 15;
 
 		ScrollPane s1 = new ScrollPane();
+		s1.setPannable(true);
 
 		VBox vBox = new VBox();
 		vBox.setSpacing(10);
 		vBox.setAlignment(Pos.CENTER);
 
 		HBox hBoxActIDs = new HBox();
-		// hBox.setSpacing(6);
+		// HBox.set
+		// hBoxActIDs.setSpacing(2);
 		hBoxActIDs.setAlignment(Pos.CENTER_LEFT);// Pos.CENTER_LEFT);
-		hBoxActIDs.getChildren()
-				.add(createStackPane(Color.WHITE, null, "ActIDs: ", widthOfUserRect, "", "rectangle", null));
+		hBoxActIDs.getChildren().add(createStackPane(Color.WHITE, null, "ActIDs: ", widthOfUserRect, "", "rectangle",
+				null, heightOfActRect, true));
 
 		HBox hBoxDuration = new HBox();
+		// hBoxDuration.setSpacing(2);
 		hBoxDuration.setAlignment(Pos.CENTER_LEFT);
-		hBoxDuration.getChildren()
-				.add(createStackPane(Color.WHITE, null, "Duration: ", widthOfUserRect, "", "rectangle", null));
+		hBoxDuration.getChildren().add(createStackPane(Color.WHITE, null, "Duration: ", widthOfUserRect, "",
+				"rectangle", null, heightOfActRect, true));
 
 		Stream<ActivityObject2018> streamOfAOs = usersCleanedDayToyTimelines.entrySet().parallelStream()
 				.flatMap(e -> e.getValue().entrySet().parallelStream()
@@ -893,14 +898,14 @@ public class Dashboard4 extends Application
 				{
 					Color actColor = ColorPalette.getColor(Dashboard4.actIDIndexMap.get(ao.getActivityID()));
 					hBoxActIDs.getChildren().add(createStackPane(actColor, null, String.valueOf(ao.getActivityID()),
-							widthOfActRect, getTooltipFromAO(ao), "rectangle", borderForDay));
+							widthOfActRect, getTooltipFromAO(ao), "rectangle", borderForDay, heightOfActRect, false));
 
 					///////////////////////
 					long durInMins = ao.getDurationInSeconds();
 					hBoxDuration.getChildren()
 							.add(createStackPane2(actColor, null, String.valueOf(durInMins), widthOfActRect,
 									getTooltipFromAO(ao), "rectangle", borderForDay, (double) durInSecsStats.getMax(),
-									(double) durInSecsStats.getMin(), 200));
+									(double) durInSecsStats.getMin(), 200, false));
 				}
 			}
 
@@ -927,17 +932,17 @@ public class Dashboard4 extends Application
 		// return toolTipText;
 	}
 
-	private Rectangle createRectangle(Color fillColor, Color strokeColor, double width)
-	{
-		Rectangle rect1 = new Rectangle(0, 45, width, 50);
-		if (strokeColor != null)
-		{
-			rect1.setStroke(strokeColor);
-			rect1.setStrokeWidth(2);
-		}
-		rect1.setFill(fillColor);
-		return rect1;
-	}
+	// private Rectangle createRectangle(Color fillColor, Color strokeColor, double width)
+	// {
+	// Rectangle rect1 = new Rectangle(0, 45, width, 50);
+	// if (strokeColor != null)
+	// {
+	// rect1.setStroke(strokeColor);
+	// rect1.setStrokeWidth(2);
+	// }
+	// rect1.setFill(fillColor);
+	// return rect1;
+	// }
 
 	private Rectangle createRectangle2(Color fillColor, Color strokeColor, double width, double height)
 	{
@@ -996,10 +1001,12 @@ public class Dashboard4 extends Application
 	 * @param width
 	 * @param tooltipText
 	 * @param shape
+	 * @param border
+	 * @param height
 	 * @return
 	 */
 	private StackPane createStackPane(Color fillColor, Color strokeColor, String labelText, double width,
-			String tooltipText, String shape, Border border)
+			String tooltipText, String shape, Border border, double height, boolean addLabel)
 	{
 		final StackPane stack = new StackPane();
 		Node shapedNode = null;
@@ -1013,7 +1020,7 @@ public class Dashboard4 extends Application
 		switch (shape.toLowerCase())
 		{
 		case "rectangle":
-			shapedNode = createRectangle(fillColor, strokeColor, width);
+			shapedNode = createRectangle2(fillColor, strokeColor, width, height);
 			break;
 		case "circle":
 			shapedNode = createCircle(fillColor, strokeColor, width);
@@ -1022,7 +1029,11 @@ public class Dashboard4 extends Application
 			PopUps.showError("Error: unkown shape " + shape);
 		}
 
-		stack.getChildren().addAll(shapedNode, createText(labelText));
+		stack.getChildren().add(shapedNode);// , createText(labelText));
+		if (addLabel)
+		{
+			stack.getChildren().add(createText(labelText));
+		}
 		Tooltip.install(stack, createTooltip(tooltipText));
 		return stack;
 	}
@@ -1041,7 +1052,8 @@ public class Dashboard4 extends Application
 	 * @since 6 March 2019
 	 */
 	private StackPane createStackPane2(Color fillColor, Color strokeColor, String labelText, double width,
-			String tooltipText, String shape, Border border, double maxVal, double minVal, double maxHeight)
+			String tooltipText, String shape, Border border, double maxVal, double minVal, double maxHeight,
+			boolean addLabel)
 	{
 		final StackPane stack = new StackPane();
 		stack.setAlignment(Pos.BOTTOM_CENTER);
@@ -1070,12 +1082,16 @@ public class Dashboard4 extends Application
 
 		Text t = new Text();
 		// t.setFont(new Font(20));
-		Font f = Font.font(null, FontWeight.BOLD, 10);
+		Font f = Font.font(null, FontWeight.BOLD, 12);
 		t.setFont(f);
 		t.setRotate(-90);
 		t.setText(labelText);
 
-		stack.getChildren().addAll(shapedNode, t);
+		stack.getChildren().add(shapedNode);// , t);
+		if (addLabel)
+		{
+			stack.getChildren().add(t);
+		}
 		Tooltip.install(stack, createTooltip(tooltipText));
 		return stack;
 	}

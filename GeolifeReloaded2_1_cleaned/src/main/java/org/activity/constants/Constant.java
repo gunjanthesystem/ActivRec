@@ -52,7 +52,7 @@ public final class Constant
 	public static final boolean removeCurrentActivityNameFromRecommendations = false;// false;// true;
 
 	// addded as constant on 19 July 2018
-	public static final int lengthOfRecommendedSequence = 3;// TODO
+	public static final int lengthOfRecommendedSequence = 1;// TODO
 	/**
 	 * whether there threshold should be applied on candidate timelines based on edit distance
 	 */
@@ -84,7 +84,7 @@ public final class Constant
 	/**
 	 * Determines whether the sorting of candiates is stable or unstable
 	 */
-	public static final boolean breakTiesWithShuffle = true;// true; TEMP TODO
+	public static final boolean breakTiesWithShuffle = false;// true;// true; TEMP TODO
 
 	// public static boolean write = false; // public static boolean writeAllDayTimelinesPerUser = true;
 
@@ -107,9 +107,9 @@ public final class Constant
 	public static final ActDistType actLevelDistType = ActDistType.MyLevenshtein;// .MyLevenshtein;//MySimpleLevenshtein;//
 	// TODO
 
-	public static final boolean useForeignAwareLevenshtein = false; /// added on 9 Jan 2019//TODO
+	public static final boolean useForeignAwareLevenshtein = true; /// added on 9 Jan 2019//TODO
 
-	public static final boolean useJan7DistanceComputations = false;// TODO
+	public static final boolean useJan7DistanceComputations = true;// TODO
 	public static final boolean considerFeatureValOrValDiff = false;// TODO true for val, false for val diff
 
 	// ensureCandEndWithCurrAct ONLY IMPLEMENTED YET FOR NCOUNT
@@ -227,8 +227,9 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 0.5 };// , 1 };// , 1 };// 1/* , 0.5 */ };// 0.5, 0.4, 0.6, 1, 0.8, 0.7
-													// };// 0.6
+	public static final double[] EDAlphas = { 0.5 };// , 1 };// , 1 };// 1/* , 0.5 */ };// 0.5, 0.4, 0.6, 1, 0.8,
+													// 0.7
+	// };// 0.6
 	// };//0.5, 1, 1};// 0.5, 1 };// 0.4, 0.5, 0.7,1 // TODO // SWITCH_NOV20
 	// { 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 };= { 0.5, 1, 0.75, 0.25, 0.15, 0 };// -1 };// 0.5, 1, 0.75,
 	// 0, 0.25, 0.35, 0.15};//SWITCH_NOV10 added on 12 Sep 2018// , 0.75, 0.25, 0 };// 0.25, 0.75, 1, 0 };// 0.75/*

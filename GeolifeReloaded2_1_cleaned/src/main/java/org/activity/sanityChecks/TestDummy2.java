@@ -25,6 +25,7 @@ import org.activity.ui.PopUps;
 import org.activity.util.DateTimeUtils;
 import org.activity.util.RegexUtils;
 import org.activity.util.UtilityBelt;
+import org.apache.commons.math.util.FastMath;
 
 /**
  * Just to check/run some random snippets of code NOT IMPORTANT
@@ -116,6 +117,32 @@ public class TestDummy2
 	}
 
 	public static void main(String args[])
+	{
+		Random r = new Random();
+
+		int numOfIterations = 100000;
+		ArrayList<Long> fastMathTimes = new ArrayList<>(numOfIterations + 10);
+		ArrayList<Long> mathTimes = new ArrayList<>(numOfIterations + 10);
+
+		for (int i = 0; i < numOfIterations; i++)
+		{
+			double d = StatsUtils.randomInRange(0.1, 200);
+
+			long t1 = System.nanoTime();
+			double vFast = FastMath.asin(d);
+			long t2 = System.nanoTime();
+			double vMath = Math.asin(d);
+			long t3 = System.nanoTime();
+
+			fastMathTimes.add(t2 - t1);
+			mathTimes.add(t3 - t2);
+		}
+
+		System.out.println(fastMathTimes.stream().mapToLong(v -> v).average());
+		System.out.println(mathTimes.stream().mapToLong(v -> v).average());
+	}
+
+	public static void main0(String args[])
 	{
 		// mapCasts();
 		int numOfIterations = 1000;

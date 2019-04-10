@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.activity.constants.Constant;
 import org.activity.constants.DomainConstants;
@@ -1066,17 +1067,55 @@ public class DistanceUtils
 		EnumMap<GowGeoFeature, Double> minOfMinOfVals = null;
 		EnumMap<GowGeoFeature, Double> maxOfMaxOfVals = null;
 
+		// long t1 = System.currentTimeMillis();
+		String timeDiffParallelVsSeq = "";
+		boolean doParallel = true;// order in summaryStatForEachCand not important, hence we can parallelise
+		boolean doSanityCheckForParallel = false;
+		int isMinWithParallelSeqSame = -1, isMaxWithParallelSeqSame = -1, isEnumMapEqualsSane = -1;
 		// loop over all res to find max and min for normalisation
 		// For each candidate, finding max feature diff for each gowalla feature over all the activity objects in that
 		// candidate timeline. (horizontal aggregations)
 		List<EnumMap<GowGeoFeature, DoubleSummaryStatistics>> summaryStatForEachCand = null;
+		// List<EnumMap<GowGeoFeature, DoubleSummaryStatistics>> summaryStatForEachCandParallel = null;
+
 		if (shouldComputeFeatureLevelDistance)
 		{
-			summaryStatForEachCand = candAEDFeatValPairs.entrySet().stream()
-					.map(e -> HJEditDistance.getSummaryStatsForEachFeatureValsPairsOverListOfAOsInACand(
-							e.getValue().getThird(), userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
-							considerValOrValDiff))
-					.collect(Collectors.toList());
+			// long t11 = System.nanoTime();
+			if (!doParallel)
+			{
+				summaryStatForEachCand = candAEDFeatValPairs.entrySet().stream()
+						.map(e -> HJEditDistance.getSummaryStatsForEachFeatureValsPairsOverListOfAOsInACand(
+								e.getValue().getThird(), userAtRecomm, dateAtRecomm, timeAtRecomm, e.getKey(),
+								considerValOrValDiff))
+						.collect(Collectors.toList());
+			}
+			// long t12 = System.nanoTime();
+			/// Start of added on 10 April 2019 for performance improvement by parallelising
+			else
+			{// convert to array for better paralllisation
+				String[] candAEDFeatValPairskeys = new String[candAEDFeatValPairs.size()];
+				Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>[] candAEDFeatValPairsVals = new Triple[candAEDFeatValPairs
+						.size()];
+
+				int i = 0;
+				for (Entry<String, Triple<String, Double, List<EnumMap<GowGeoFeature, Pair<String, String>>>>> e : candAEDFeatValPairs
+						.entrySet())
+				{
+					candAEDFeatValPairskeys[i] = e.getKey();
+					candAEDFeatValPairsVals[i] = e.getValue();
+					i++;
+				}
+				// long t13 = System.nanoTime();
+				summaryStatForEachCand = IntStream.range(0, candAEDFeatValPairs.size()).parallel()
+						.mapToObj(v -> HJEditDistance.getSummaryStatsForEachFeatureValsPairsOverListOfAOsInACand(
+								candAEDFeatValPairsVals[v].getThird(), userAtRecomm, dateAtRecomm, timeAtRecomm,
+								candAEDFeatValPairskeys[v], considerValOrValDiff))
+						.collect(Collectors.toList());
+				// long t14 = System.nanoTime();
+			}
+			// timeDiffParallelVsSeq = (t12 - t11) + "," + (t14 - t13) + "," + (t14 - t12) + ","
+			// + ((t14 - t12) - (t12 - t11)) + "," + (((t14 - t12) - (t12 - t11)) * 100.0) / (t12 - t11);
+			/// End of added on 10 April 2019 for performance improvement by parallelising
 		}
 
 		// Aggregation (across candidate timelines) of aggregation (across activity objects in each cand
@@ -1104,15 +1143,36 @@ public class DistanceUtils
 			}
 			else // use the pth percentile max
 			{
+				double percentileForRTVerseMaxForFEDNorm = Constant.percentileForRTVerseMaxForFEDNorm;
+
+				// if (doParallel) {
 				minOfMinOfVals = HJEditDistance.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
 						summaryStatForEachCand, 0, userAtRecomm, dateAtRecomm, timeAtRecomm);
 
-				double percentileForRTVerseMaxForFEDNorm = Constant.percentileForRTVerseMaxForFEDNorm;
 				if (percentileForRTVerseMaxForFEDNorm == -1)
 				{
 					maxOfMaxOfVals = HJEditDistance.getSummaryStatOfSummaryStatForEachFeatureDiffOverList(
 							summaryStatForEachCand, 1, userAtRecomm, dateAtRecomm, timeAtRecomm);
 				}
+
+				// }
+				// if (doSanityCheckForParallel)
+				// {// sanity check if parallel and seq versions are yielding same result
+				// EnumMap<GowGeoFeature, Double> minOfMinOfValsSeq = HJEditDistance
+				// .getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 0,
+				// userAtRecomm, dateAtRecomm, timeAtRecomm);
+				//
+				// if (percentileForRTVerseMaxForFEDNorm == -1)
+				// {
+				// EnumMap<GowGeoFeature, Double> maxOfMaxOfValsSeq = HJEditDistance
+				// .getSummaryStatOfSummaryStatForEachFeatureDiffOverList(summaryStatForEachCand, 1,
+				// userAtRecomm, dateAtRecomm, timeAtRecomm);
+				//
+				// isMinWithParallelSeqSame = minOfMinOfVals.equals(minOfMinOfValsSeq) ? 0 : 1;
+				// isMaxWithParallelSeqSame = maxOfMaxOfVals.equals(maxOfMaxOfValsSeq) ? 0 : 1;
+				// isEnumMapEqualsSane = minOfMinOfVals.equals(maxOfMaxOfValsSeq) ? 1 : 0;
+				// }
+				// }
 				/////////////////// End of finding min max
 				// Start of May8 addition
 				else if (percentileForRTVerseMaxForFEDNorm > -1)// then replace maxOfMax by pth percentile val
@@ -1152,6 +1212,26 @@ public class DistanceUtils
 			// "minOfMinOfDiffsJan7.csv");
 			// WToFile.appendLineToFileAbs(sbMax.toString() + "\n", Constant.getCommonPath() +
 			// "maxOfMaxOfDiffsJan7.csv");
+		}
+
+		// long tf = System.currentTimeMillis();
+		// WToFile.appendLineToFileAbs((tf - t1) + ",ms\n", Constant.getOutputCoreResultsPath()
+		// + "Debug9AprilPerformanceGetMinOfMinsAndMaxOfMaxOfFeatureValPairs.csv");
+
+		// summaryStatForEachCand;/
+		if (doSanityCheckForParallel)
+		{
+			WToFile.appendLineToFileAbs(
+					timeDiffParallelVsSeq + "," + isMinWithParallelSeqSame + "," + isMaxWithParallelSeqSame + ","
+							+ isEnumMapEqualsSane + "\n",
+					Constant.getOutputCoreResultsPath()
+							+ "Debug10AprilPerformanceGetMinOfMinsAndMaxOfMaxOfFeatureValPairs.csv");
+
+			WToFile.appendLineToFileAbs(summaryStatForEachCand.toString() + "\n", Constant.getOutputCoreResultsPath()
+					+ "Debug10AprilSanityParallelGetMinOfMinsAndMaxOfMaxOfFeatureValPairs.csv");
+			// WToFile.appendLineToFileAbs(summaryStatForEachCandParallel.toString() + "\n",
+			// Constant.getOutputCoreResultsPath()
+			// + "Debug10ParAprilSanityParallelGetMinOfMinsAndMaxOfMaxOfFeatureValPairs.csv");
 		}
 		return new Pair<>(minOfMinOfVals, maxOfMaxOfVals);
 	}
