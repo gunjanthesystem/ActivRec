@@ -125,6 +125,7 @@ public class AKOMSeqPredictorLighter
 
 			AKOMSeqPredictorLighter p = new AKOMSeqPredictorLighter(trainingSet, 4, true, "dummy", null);
 			System.out.println("predictedNextSymbol = " + p.getAKOMPrediction(curr, true));
+			System.out.println("getAKOMTopKPredictions = " + p.getAKOMTopKPredictions(curr, true));
 		}
 	}
 
@@ -211,6 +212,8 @@ public class AKOMSeqPredictorLighter
 	 * @param currentTimeline
 	 * @param verbose
 	 * @return
+	 * @deprecated on April 24 2019 as it only recommends Top-1 and not Top-K (required to next activity
+	 *             recommendation). Superceded by getAKOMTopKPredictions()
 	 */
 	public Integer getAKOMPrediction(ArrayList<Integer> currentTimeline, boolean verbose)
 	{
@@ -255,6 +258,68 @@ public class AKOMSeqPredictorLighter
 			e.printStackTrace();
 		}
 		return predictedNextSymbol;
+	}
+
+	/**
+	 * Fork of getAKOMPrediction to predict topK instead of top-1 recommendation
+	 * 
+	 * @param currentTimeline
+	 * @param verbose
+	 * @return LinkedHashMap{predicted value, count of predicted values (score)}
+	 * @since April 24 2019
+	 */
+	public LinkedHashMap<Integer, Double> getAKOMTopKPredictions(ArrayList<Integer> currentTimeline, boolean verbose)
+	{
+		// int predictedNextSymbol = -1;
+		LinkedHashMap<Integer, Double> theTopKPredictions = null;
+
+		try
+		{
+			// create the current sequence
+			List<Item> items = currentTimeline.stream().map(i -> new Item(i)).collect(Collectors.toList());
+
+			// Start of added on 1 Feb 2018
+			// take only last n items
+			items = items.subList(items.size() > orderOfMarkovModel ? (items.size() - orderOfMarkovModel) : 0,
+					items.size());
+			// Sanity.eq(items.size(), this.orderOfMarkovModel, "Error in getAKOMPrediction");
+
+			// End of added on 1 Feb 2018
+
+			Sequence currentSeq = new Sequence(0, items);
+			System.out.println(
+					"In getAKOMPrediction: items.size()=" + items.size() + " currentSeq = " + currentSeq.toString());
+			// System.out.println("currentSeq = " + currentSeq);
+			// Then we perform the prediction
+			// Sequence thePrediction = predictionModel.Predict(currentSeq);
+			theTopKPredictions = predictionModel.PredictTopK(currentSeq);
+
+			if (theTopKPredictions == null || theTopKPredictions.size() == 0)
+			{
+				return null;
+			}
+			else
+			{
+				// if (theTopKPredictions.size() != 1)
+				// {
+				// System.err.println("Warning: in AKOMPredictor thePrediction.size()= " + theTopKPredictions.size()
+				// + "\n--" + trainingStats + "---\n");
+				// }
+
+				if (verbose)
+				{
+					System.out.println("For the sequence " + currentSeq.toString()
+							+ ", the prediction for the next symbol is: +" + theTopKPredictions);
+					System.out.println("Order of markov model = " + orderOfMarkovModel);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		return theTopKPredictions;
 	}
 
 	/**

@@ -19,7 +19,7 @@ import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.predictor.Markov.Marko
  * an intermediary to leverage the spmf package for All kth order markov model
  * 
  * @author gunjan
- *
+ * @deprecated in favour of AKOMSeqPredictorLighter
  */
 public class AKOMSeqPredictor
 {

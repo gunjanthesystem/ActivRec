@@ -2,6 +2,7 @@ package ca.pfv.spmf.algorithms.sequenceprediction.ipredict.predictor.Markov;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import ca.pfv.spmf.algorithms.sequenceprediction.ipredict.database.Item;
@@ -32,8 +33,8 @@ public class MarkovAllKPredictor extends Predictor
 	/**
 	 * order of the model (default value)
 	 */
+	// private int K = 5;
 	private int K = 5;
-
 	/**
 	 * contains a list of unique items (one or multiple) and their state in the Markov model
 	 */
@@ -73,7 +74,8 @@ public class MarkovAllKPredictor extends Predictor
 			List<Item> items = seq.getItems();
 			for (int i = 0; i < (items.size() - 1); i++)
 			{
-
+				// PopUps.showMessage("K= " + K);// gunjan
+				// PopUps.showMessage("parameters= " + parameters.toString());// gunjan
 				int k = parameters.paramIntOrDefault("order", K);
 				k = ((items.size() - i) > k) ? k : (items.size() - i - 1);
 
@@ -109,7 +111,11 @@ public class MarkovAllKPredictor extends Predictor
 		return true;
 	}
 
-	@Override
+	// @Override
+
+	/**
+	 * @deprecated on April 24 2019 in favour of PredictTopK to recommend Top-K instead of Top-1
+	 */
 	public Sequence Predict(Sequence target)
 	{
 
@@ -150,6 +156,54 @@ public class MarkovAllKPredictor extends Predictor
 
 		// In case of failure (no match)
 		return new Sequence(-1);
+	}
+
+	/**
+	 * Fork of Predict() to predict top-K instead of top-1
+	 * 
+	 * @author gunjan
+	 * @since April 24 2019
+	 */
+	public LinkedHashMap<Integer, Double> PredictTopK(Sequence target)
+	{
+
+		int k = parameters.paramIntOrDefault("order", K);
+		k = (target.size() >= k) ? k : (target.size());
+
+		// for each order (from K to 1) or until we have a match
+		for (int i = k; i > 0; i--)
+		{
+
+			// Building the key from the last i items of the target
+			String key = "";
+			for (int j = (target.size() - i); j < target.size(); j++)
+			{
+				key += target.get(j) + "_";
+			}
+			key = key.substring(0, key.length() - 1);
+
+			// Getting the associated state
+			MarkovState state = mDictionary.get(key);
+
+			// if the state is in the dictionary
+			if (state != null)
+			{
+				LinkedHashMap<Integer, Double> nextStateRankedList = state.getRankedListOfBestNextStates();
+				// Sequence predicted = new Sequence(-1);
+				// predicted.addItem(new Item(nextState));
+
+				if (i < K)
+				{
+					// return new Sequence(-1);
+				}
+
+				return nextStateRankedList;
+			}
+		}
+
+		System.out.println("Warning: no predictions");
+		// In case of failure (no match)
+		return null;// new Sequence(-1);
 	}
 
 	public long size()
@@ -220,6 +274,13 @@ public class MarkovAllKPredictor extends Predictor
 		seq4.addItem(new Item(4));
 		training.add(seq4);
 
+		// Here we set the order of the markov model to 5.
+		// String optionalParameters = "order:" + 5;
+
+		System.out.println("training = " + training);
+		System.out.println("predictor = " + predictor.toString());
+		System.out.println("predictor.parameters = " + predictor.parameters.toString());
+		// System.out.println("Train = " + Train);
 		predictor.Train(training);
 
 		// Testing
@@ -229,8 +290,10 @@ public class MarkovAllKPredictor extends Predictor
 		seqT.addItem(new Item(2));
 
 		Sequence result = predictor.Predict(seqT);
-
 		System.out.println(result.toString());
+
+		LinkedHashMap<Integer, Double> resultTopK = predictor.PredictTopK(seqT);
+		System.out.println(resultTopK.toString());
 	}
 
 }

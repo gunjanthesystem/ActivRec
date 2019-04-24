@@ -66,6 +66,7 @@ public class Sanity
 		}
 		else
 		{
+			errorMsgConsole += "\n " + a + " != " + b;
 			System.err.println(PopUps.getTracedErrorMsg(errorMsgConsole));
 			PopUps.showError(errorMsgConsole);
 			return false;

@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
 
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
+import org.activity.sanityChecks.Sanity;
 import org.activity.util.RegexUtils;
 
 public class Snippets
@@ -26,7 +27,74 @@ public class Snippets
 	public static void main(String args[])
 	{
 		// $$getActCountOverAllUsers(); // disabled on 22 April 2019
-		april22();
+		// april22();
+		april24();
+	}
+
+	public static void april24()
+	{
+		String fileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7Geolife4_newAKOM.csv";
+		String regexForFileToRead = "Constant";
+
+		String fileToWrite = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7Geolife4_newAKOM_daywiseCompat.csv";
+		try
+		{
+			List<String> pathsToRead = Files.lines(Paths.get(fileToRead)).map(l -> l.split(",")[2])
+					.collect(Collectors.toList());
+			List<Path> filesToRead = new ArrayList<>();
+
+			for (String pathToRead : pathsToRead)
+			{
+				filesToRead.addAll(Files.list(Paths.get(pathToRead)).filter(Files::isRegularFile)
+						.filter(f -> f.toString().contains(regexForFileToRead)).limit(1).collect(Collectors.toList()));
+			}
+
+			Sanity.eq(pathsToRead.size(), filesToRead.size(),
+					"Error: unexpected exactly one file to read per path but found more or less");
+
+			System.out.println("pathsToRead = \n" + pathsToRead.stream().collect(Collectors.joining("\n")));
+			System.out.println(
+					"filesToRead = \n" + filesToRead.stream().map(e -> e.toString()).collect(Collectors.joining("\n")));
+
+			List<String> matchedLines = readMatchedLineFromPaths(filesToRead,
+					"ensureHasDaywiseCandsForEvalCompatibility = ", fileToWrite);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	private static List<String> readMatchedLineFromPaths(List<Path> filesToRead, String stringToMatchInLine,
+			String fileToWrite)
+	{
+		List<String> matchedLines = new ArrayList<>();
+		StringBuilder sbToWrite = new StringBuilder();
+
+		try
+		{
+			for (Path f : filesToRead)
+			{
+				List<String> selectedLines = Files.lines(f).filter(s -> s.contains(stringToMatchInLine))
+						.collect(Collectors.toList());
+
+				if (selectedLines.size() == 0)
+				{
+					System.out.println("Warning " + f.getFileName() + " didnt have any selected line");
+				}
+				selectedLines.stream().forEachOrdered(s -> sbToWrite.append(f.toString() + "\t" + s + "\n"));
+				matchedLines.addAll(selectedLines);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		WToFile.writeToNewFile(sbToWrite.toString(), fileToWrite);
+		return matchedLines;
 	}
 
 	/**
