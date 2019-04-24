@@ -204,10 +204,11 @@ public class ResultsDistributionEvaluation
 	public static void main(String args[])
 	{
 		// Constant.setDatabaseName("gowalla1");
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadApr7Geolife4.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7DCU4.csv";
+		// + "/ResultsToReadApr7Geolife4.csv";
 		// + "ResultsToReadMar22GeolifeSeq.csv";
 		boolean recommSeq = false;
-		boolean hasLevel1 = false;
+		boolean hasLevel1 = true;
 		boolean recommSecDim = false;
 		// + "/ResultsToReadMar7GowallaSecDim.csv";
 		// + "Mar6Temp2.csv";
@@ -263,10 +264,17 @@ public class ResultsDistributionEvaluation
 
 				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
 
-				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
 				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 6);
-				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
+				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 5);
+				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
+				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 3);
+				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 2);
+				;
 				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 6);
+				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 5);
+				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
+				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 3);
+				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 2);
 			}
 
 			getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 2);

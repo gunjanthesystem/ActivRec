@@ -107,7 +107,7 @@ public final class Constant
 	public static final ActDistType actLevelDistType = ActDistType.MyLevenshtein;// .MyLevenshtein;//MySimpleLevenshtein;//
 	// TODO
 
-	public static final boolean useForeignAwareLevenshtein = true; /// added on 9 Jan 2019//TODO
+	public static final boolean useForeignAwareLevenshtein = false; /// added on 9 Jan 2019//TODO
 
 	public static final boolean useJan7DistanceComputations = true;// TODO
 	public static final boolean considerFeatureValOrValDiff = false;// TODO true for val, false for val diff

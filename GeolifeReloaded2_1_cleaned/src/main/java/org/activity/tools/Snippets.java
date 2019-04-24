@@ -1,10 +1,15 @@
 package org.activity.tools;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
@@ -20,7 +25,72 @@ public class Snippets
 
 	public static void main(String args[])
 	{
-		getActCountOverAllUsers();
+		// $$getActCountOverAllUsers(); // disabled on 22 April 2019
+		april22();
+	}
+
+	/**
+	 * Skip selective columns
+	 * 
+	 * @since April 22 1019
+	 */
+	public static void april22()
+	{
+		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ChosenResultsRecommNext/DCU/";
+		String pathToWrite = commonPathToRead + "VsBaselines/";
+		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite);
+		// WToFile.createDirectoryDeleteFormerIfExists(pathToCreate);
+		// System.out.println("here");
+		// String newFileNamePhase = "VsBaselines";
+
+		try
+		{
+			List<Path> filesInDirectory = Files.list(Paths.get(commonPathToRead)).filter(Files::isRegularFile)
+					.collect(Collectors.toList());
+
+			System.out.println("filesInDirectory\n"
+					+ filesInDirectory.stream().map(e -> e.toString()).collect(Collectors.joining("\n")));
+
+			// Set<Integer> indicesOfLinesToSkip = new HashSet<>(Arrays.asList(IntStream.range(7, 18)));
+			// decrease by 1 to get real index
+			Set<Integer> indicesOfLinesToSkip = IntStream.range(2, 7).mapToObj(i -> Integer.valueOf(i - 1))
+					.collect(Collectors.toSet());
+
+			// indicesOfLinesToSkip.add(16);
+			// indicesOfLinesToSkip.add(11);
+			indicesOfLinesToSkip.add(17);
+
+			// indicesOfLinesToSkip = indicesOfLinesToSkip.stream().map(i -> i - 1).collect(Collectors.toSet());
+			System.out.println("indicesOfLinesToSkip = " + indicesOfLinesToSkip);
+			for (Path f : filesInDirectory)
+			{
+				StringBuilder sbToWrite = new StringBuilder();
+
+				String fileNameToWrite = f.getFileName().toString();
+				String fileExtension = fileNameToWrite.substring(fileNameToWrite.length() - 4,
+						fileNameToWrite.length());
+
+				fileNameToWrite = pathToWrite + fileNameToWrite.substring(0, fileNameToWrite.length() - 4)
+						+ fileExtension;
+
+				List<String> linesInFile = Files.lines(f).collect(Collectors.toList());
+
+				for (int i = 0; i < linesInFile.size(); i++)
+				{
+					if (indicesOfLinesToSkip.contains(Integer.valueOf(i)) == false)
+					{
+						String line = linesInFile.get(i);
+						line = line.replace("RecNH", "RecHH");
+						sbToWrite.append(line + "\n");
+					}
+				}
+				WToFile.writeToNewFile(sbToWrite.toString(), fileNameToWrite);
+			}
+		}
+		catch (Exception e)
+		{
+
+		}
 	}
 
 	public static LinkedHashMap<String, String> getCatIDNameDict(String commonPath)
