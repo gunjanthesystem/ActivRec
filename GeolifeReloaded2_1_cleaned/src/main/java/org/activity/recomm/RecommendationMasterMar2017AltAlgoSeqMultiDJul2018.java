@@ -679,14 +679,14 @@ public class RecommendationMasterMar2017AltAlgoSeqMultiDJul2018 implements Recom
 			if (altSeqPredictor.equals(AltSeqPredictor.PureAKOM) || altSeqPredictor.equals(AltSeqPredictor.AKOM))
 			{
 				this.recommendedActivityNamesWithRankscores = RecommMasterAltAlgoSeqCommonUtils
-						.getTopPredictedAKOMActivityPDVals(this.activitiesGuidingRecomm, this.caseType,
-								this.lookPastType, this.candidateTimelinesPrimDim, 1, false,
+						.getTopKPredictedAKOMActivityPDVals(this.activitiesGuidingRecomm, this.caseType,
+								this.lookPastType, this.candidateTimelinesPrimDim, /* 1, */ false,
 								Constant.getAKOMHighestOrder(), this.userIDAtRecomm, altSeqPredictor,
 								this.primaryDimension);
 
 				this.recommendedSecondaryDimValsWithRankscores = RecommMasterAltAlgoSeqCommonUtils
-						.getTopPredictedAKOMActivityPDVals(this.activitiesGuidingRecomm, this.caseType,
-								this.lookPastType, this.candidateTimelinesPrimDim, 1, false,
+						.getTopKPredictedAKOMActivityPDVals(this.activitiesGuidingRecomm, this.caseType,
+								this.lookPastType, this.candidateTimelinesPrimDim, /* 1, */ false,
 								Constant.getAKOMHighestOrder(), this.userIDAtRecomm, altSeqPredictor,
 								this.secondaryDimension);
 			}

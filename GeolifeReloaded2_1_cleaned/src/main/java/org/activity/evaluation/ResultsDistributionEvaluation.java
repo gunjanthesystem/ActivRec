@@ -204,7 +204,7 @@ public class ResultsDistributionEvaluation
 	public static void main(String args[])
 	{
 		// Constant.setDatabaseName("gowalla1");
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7DCU4.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7Geolife4_newAKOM.csv";
 		// + "/ResultsToReadApr7Geolife4.csv";
 		// + "ResultsToReadMar22GeolifeSeq.csv";
 		boolean recommSeq = false;

@@ -623,7 +623,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 			if (altSeqPredictor.equals(AltSeqPredictor.PureAKOM) || altSeqPredictor.equals(AltSeqPredictor.AKOM))
 			{
 				this.recommendedActivityNamesWithRankscores = getTopPredictedAKOMActivityPDVals(
-						this.activitiesGuidingRecomm, this.caseType, this.lookPastType, this.candidateTimelines, 1,
+						this.activitiesGuidingRecomm, this.caseType, this.lookPastType, this.candidateTimelines, // 1,
 						false, Constant.getAKOMHighestOrder(), this.userIDAtRecomm, altSeqPredictor);
 			}
 			else if (altSeqPredictor.equals(AltSeqPredictor.HighDur))
@@ -817,7 +817,6 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 * @param caseType
 	 * @param lookPastType
 	 * @param candidateTimelines
-	 * @param constantValScore
 	 * @param verbose
 	 * @param highestOrder
 	 * @param userID
@@ -827,7 +826,7 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 	 */
 	private LinkedHashMap<String, Double> getTopPredictedAKOMActivityPDVals(
 			ArrayList<ActivityObject2018> activitiesGuidingRecomm, CaseType caseType, LookPastType lookPastType,
-			LinkedHashMap<String, Timeline> candidateTimelines, double constantValScore, boolean verbose,
+			LinkedHashMap<String, Timeline> candidateTimelines, /* double constantValScore, */ boolean verbose,
 			int highestOrder, String userID, Enums.AltSeqPredictor alternateSeqPredictor) throws Exception
 	{
 		LinkedHashMap<String, Double> res = new LinkedHashMap<>();
@@ -863,22 +862,50 @@ public class RecommendationMasterMar2017AltAlgoSeqNov2017 implements Recommendat
 
 			// System.out.println("predictedNextSymbol = ");
 			// TimelineTransformers.timelineToSeqOfActIDs(timeline, delimiter)
-			int predSymbol = RecommMasterAltAlgoSeqCommonUtils.getAKOMPredictedSymbol(highestOrder, userID, currSeq,
-					candidateTimelinesWithNextAppended, alternateSeqPredictor, Constant.primaryDimension);
-			// candTimelinesAsSeq);
-
-			// System.out.println("predictedNextSymbol = " +
-			// SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
-			Integer predictedActID = Integer.valueOf(predSymbol);
-			System.out.println(" = " + predictedActID.toString());
-
-			if (predictedActID.equals(-1))
+			if (false) // disabled on 24 April 2019 to favour top-K version instead of top-1 version.
 			{
-				System.out.println("Return null, no predictions");
-				return null;
+				// //Start of curtain 24 April 2019
+				// int predSymbol = RecommMasterAltAlgoSeqCommonUtils.getAKOMPredictedSymbol(highestOrder, userID,
+				// currSeq,
+				// candidateTimelinesWithNextAppended, alternateSeqPredictor, Constant.primaryDimension);
+				// // candTimelinesAsSeq);
+				//
+				// // System.out.println("predictedNextSymbol = " +
+				// // SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
+				// Integer predictedActID = Integer.valueOf(predSymbol);
+				// System.out.println(" = " + predictedActID.toString());
+				//
+				// if (predictedActID.equals(-1))
+				// {
+				// System.out.println("Return null, no predictions");
+				// return null;
+				// }
+				// res.put(predictedActID.toString(), constantValScore);
+				// //End of curtain 24 April 2019
 			}
+			if (true)
+			{
+				LinkedHashMap<Integer, Double> predSymbols = RecommMasterAltAlgoSeqCommonUtils
+						.getAKOMTopKPredictedSymbols(highestOrder, userID, currSeq, candidateTimelinesWithNextAppended,
+								alternateSeqPredictor, Constant.primaryDimension);
+				// candTimelinesAsSeq);
 
-			res.put(predictedActID.toString(), constantValScore);
+				// System.out.println("predictedNextSymbol = " +
+				// SeqPredictor p = new SeqPredictor(candTimelinesAsSeq, currSeq, highestOrder, verbose);
+				// Integer predictedActID = Integer.valueOf(predSymbol);
+				System.out.println("predSymbols = " + predSymbols);
+
+				if (predSymbols == null || predSymbols.size() == 0)
+				{
+					System.out.println("Return null, no predictions");
+					return null;
+				}
+
+				for (Entry<Integer, Double> e : predSymbols.entrySet())
+				{
+					res.put(String.valueOf(e.getKey()), e.getValue());
+				}
+			}
 			return res;
 			// return createRankedTopRecommendedActivityNamesClosestTime(distancesSortedMap);
 		}
