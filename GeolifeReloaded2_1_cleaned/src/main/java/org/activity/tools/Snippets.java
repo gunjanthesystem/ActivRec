@@ -27,8 +27,9 @@ public class Snippets
 	public static void main(String args[])
 	{
 		// $$getActCountOverAllUsers(); // disabled on 22 April 2019
-		// april22();
-		april24();
+		april22();// disabled on May 2
+		// replaceFirstColWithGivenVector();
+		// april24();
 	}
 
 	public static void april24()
@@ -104,7 +105,7 @@ public class Snippets
 	 */
 	public static void april22()
 	{
-		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ChosenResultsRecommNext/DCU/";
+		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ChosenResultsRecommNext/Geolife/";
 		String pathToWrite = commonPathToRead + "VsBaselines/";
 		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite);
 		// WToFile.createDirectoryDeleteFormerIfExists(pathToCreate);
@@ -121,7 +122,7 @@ public class Snippets
 
 			// Set<Integer> indicesOfLinesToSkip = new HashSet<>(Arrays.asList(IntStream.range(7, 18)));
 			// decrease by 1 to get real index
-			Set<Integer> indicesOfLinesToSkip = IntStream.range(2, 7).mapToObj(i -> Integer.valueOf(i - 1))
+			Set<Integer> indicesOfLinesToSkip = IntStream.range(2, 7).mapToObj(i -> Integer.valueOf(i - 1))// 7, 19
 					.collect(Collectors.toSet());
 
 			// indicesOfLinesToSkip.add(16);
@@ -157,7 +158,88 @@ public class Snippets
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
+		}
+	}
 
+	/**
+	 * @since May 2 2019
+	 */
+	public static void replaceFirstColWithGivenVector()
+	{
+		String commonPathToRead = "//home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ChosenResultsRecommNext/Geolife/May2/";
+		String pathToWrite = commonPathToRead + "temp2/";
+		// WToFile.createDirectoryDeleteFormerIfExists(pathToWrite);
+		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite);
+		// System.out.println("here");
+		// String newFileNamePhase = "VsBaselines";
+
+		// DCU
+		// String newCol[] = { "ActivRecNC0.5", "ActivRecNC1", "ActivRecNH0.5", "ActivRecNH1", "ActivRecDW0.5",
+		// "ActivRecDW1", "OccurRec", "DurationRec", "PopRec", "AKOM-5", "AKOM-3", "AKOM-2", "AKOM-1", "HGRU4Rec",
+		// "GRU4Rec", "FPMCRec", "Prod2VecRec", "PopularityRec" };
+		// gowalla
+		// String newCol[] = { "ActivRecNC0.5", "ActivRecNC1", "ActivRecNH0.5", "ActivRecNH1", "ActivRecDW0.5",
+		// "ActivRecDW1", "OccurRec", "PopRec", "AKOM-5", "AKOM-3", "AKOM-2", "AKOM-1", "HGRU4Rec", "GRU4Rec",
+		// "FPMCRec", "Prod2VecRec", "PopularityRec" };
+		// geolife
+		String newCol[] = { "ActivRecNC0.5", "ActivRecNC1", "ActivRecNH0.5", "ActivRecNH1", "ActivRecDW0.5",
+				"ActivRecDW1", "OccurRec", "DurationRec", "PopRec", "AKOM-5", "AKOM-3", "AKOM-2", "AKOM-1", "HGRU4Rec",
+				"GRU4Rec", "FPMCRec", "Prod2VecRec", "PopularityRec" };
+
+		int indexOfColToReplace = 0;
+
+		try
+		{
+			List<Path> filesInDirectory = Files.list(Paths.get(commonPathToRead)).filter(Files::isRegularFile)
+					.collect(Collectors.toList());
+
+			System.out.println("filesInDirectory\n"
+					+ filesInDirectory.stream().map(e -> e.toString()).collect(Collectors.joining("\n")));
+
+			// Set<Integer> indicesOfLinesToSkip = new HashSet<>(Arrays.asList(IntStream.range(7, 18)));
+			for (Path p : filesInDirectory)
+			{
+				String absFileNameRead = p.toAbsolutePath().toString();
+				String fileToWrite = pathToWrite + p.getFileName();
+
+				List<List<String>> readData = ReadingFromFile.nColumnReaderString(absFileNameRead, ",", false);
+				// System.out.println("readData = \n" + readData);
+				Sanity.eq(readData.size(), newCol.length, "Error: mismatched lengths: num of rows");
+
+				StringBuilder sb = new StringBuilder();
+
+				int rowIndex = -1;
+				for (List<String> line : readData)
+				{
+					rowIndex += 1;
+					for (int colIndex = 0; colIndex < line.size(); colIndex++)
+					{
+						if (colIndex == indexOfColToReplace)
+						{
+							sb.append(newCol[rowIndex]);
+						}
+						else
+						{
+							sb.append(line.get(colIndex));
+						}
+						if (colIndex == line.size() - 1)
+						{
+							sb.append("\n");
+						}
+						else
+						{
+							sb.append(",");
+						}
+					}
+				}
+				WToFile.writeToNewFile(sb.toString(), fileToWrite);
+			}
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 

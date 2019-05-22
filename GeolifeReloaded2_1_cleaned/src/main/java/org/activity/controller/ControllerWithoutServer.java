@@ -79,8 +79,8 @@ public class ControllerWithoutServer
 	public ControllerWithoutServer(String databaseName, String commonBasePath, boolean noRecommendations)
 	{
 		// PopUps.showMessage("Inside ControllerWithoutServer");
-		boolean runRecommendationExperiments = true;
-		boolean runWekaClusteringExperiments = false;
+		boolean runRecommendationExperiments = false;
+		boolean runWekaClusteringExperiments = true;
 		boolean runTimelineStats = false;
 
 		System.out.println("Starting ControllerWithoutServer>>>>\n" + PerformanceAnalytics.getHeapInformation() + "\n"
@@ -324,7 +324,10 @@ public class ControllerWithoutServer
 					usersCleanedDayTimelines = usersCleanedDayTimelinesOnlySampledUsers;
 				}
 
-				String commonPathForClassification = "/mnt/sshServers/howitzer/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_MAR19H4M42ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC/";
+				String geolifePathForClassification = "/mnt/sshServers/howitzer/SyncedWorkspace/JavaWorkspace/Mar2Merged/GeolifeReloaded2_1_cleaned/dataWritten/geolife1_MAR19H4M42ED0.5STimeDurDistTrStartGeoEndGeoAvgAltAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC/";
+				String gowallaPathForClassification = "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_MAR19H3M57ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NCcoll/";
+				String gowallaCOntentBaseed = "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_FEB28H13M42ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC/";
+				String commonPathForClassification = gowallaPathForClassification;
 				// "./dataWritten/geolife1_MAR1H1M51ED1.0AllActsFDStFilter0hrsRTVPNN100NoTTFilterNC/";
 				// "./dataWritten/gowalla1_FEB28H13M42ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrsFEDPerFS_10F_RTVPNN100NoTTFilterNC/";
 				TimelineWEKAClusteringController2019 clustering = new TimelineWEKAClusteringController2019(
