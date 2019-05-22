@@ -120,7 +120,7 @@ public final class Constant
 	public static Enums.AltSeqPredictor altSeqPredictor = Enums.AltSeqPredictor.PureAKOM;//// TODO SWITCH_NOV10
 	// .RNN1;AKOM
 
-	private static int AKOMHighestOrder = 2;// 1;// 3;// SWITCH_NOV10
+	private static int AKOMHighestOrder = 1;// 1;// 3;// SWITCH_NOV10
 	private static int RNNCurrentActivitityLength = 1;
 	public static final boolean sameAKOMForAllRTsOfAUser = true;// SWITCH_NOV10
 	public static final boolean sameRNNForAllRTsOfAUser = true;// SWITCH_NOV10
@@ -205,7 +205,7 @@ public final class Constant
 	public static double candEDValThresholdPrimDim = -1;
 	// -1 for no filter//SWITCH_NOV10
 	// added on 23 July 2018 to keep it separate from the threshold used for primary dimension
-	public static final int nearestNeighbourCandEDThresholdSecDim = 500;// 0;
+	public static final int nearestNeighbourCandEDThresholdSecDim = 100;// changed to 100 on 8th May 2019500;// 0;
 	public static final double candEDValThresholdSecDim = -1;// 0.5;
 
 	// End of parameters for Candidate timelines
@@ -227,7 +227,7 @@ public final class Constant
 	public static boolean noAED = false;// Nov 15 2018
 	// NOTE: if EDAlpha is not -1, then an alpha based combination of AED and FED is used. Here AED and FED can be
 	// normalised either through RTV normalisation or through max possible AED and max possible FED normalisation
-	public static final double[] EDAlphas = { 1 };// , 1 };// , 1 };// 1/* , 0.5 */ };// 0.5, 0.4, 0.6, 1, 0.8,
+	public static final double[] EDAlphas = { 0.5 };// , 1 };// , 1 };// 1/* , 0.5 */ };// 0.5, 0.4, 0.6, 1, 0.8,
 													// 0.7
 	// };// 0.6
 	// };//0.5, 1, 1};// 0.5, 1 };// 0.4, 0.5, 0.7,1 // TODO // SWITCH_NOV20
@@ -330,7 +330,7 @@ public final class Constant
 
 	public static final boolean mapLocIDToGridID = true;
 
-	public static final boolean doSecondaryDimension = false;
+	public static final boolean doSecondaryDimension = true;
 	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
 	public static final boolean debug18July2018 = false;
 	public static final boolean doWeightedEditDistanceForSecDim = false;// true;//SWITCH_AUG
@@ -982,7 +982,7 @@ public final class Constant
 			useRandomlySampled100Users = true;// //TODO toySwitch// SWITCH_NOV10
 			runForAllUsersAtOnce = false;// //TODO toySwitch // SWITCH_April8
 			reduceAndCleanTimelinesBeforeRecomm = false; // false for gowalla// true for others;//
-			useHaversineDistInLocationFED = true;// TEMPtrue;// true;// TEMP TODO IMPORTANT TODO TODO TODO
+			useHaversineDistInLocationFED = false;// TEMPtrue;// true;// TEMP TODO IMPORTANT TODO TODO TODO
 
 			break;
 

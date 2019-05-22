@@ -236,8 +236,10 @@ public class TimelineWEKAClusteringController2019
 			// create the clustering ranges
 			Map<String, Pair<Integer, Integer>> gowallaClusteringRanges = new LinkedHashMap<>(3);
 			gowallaClusteringRanges.put("FirstCluster__", new Pair<>(0, 0));
+			// gowallaClusteringRanges.put("SecondCluster__", new Pair<>(1, 3));
 			gowallaClusteringRanges.put("SecondCluster__", new Pair<>(1, 4));
 			gowallaClusteringRanges.put("ThirdCluster__", new Pair<>(5, 100));
+			// gowallaClusteringRanges.put("ThirdCluster__", new Pair<>(4, 100));
 
 			Map<String, Pair<Integer, Integer>> geolifeClusteringRanges = new LinkedHashMap<>(3);
 			geolifeClusteringRanges.put("FirstCluster__", new Pair<>(0, 1));
@@ -255,6 +257,8 @@ public class TimelineWEKAClusteringController2019
 			default:
 				PopUps.printTracedErrorMsgWithExit("Unknown database name");
 			}
+
+			System.out.println("clusteringRanges = " + clusteringRanges.toString());
 
 			LinkedHashMap<String, String> userIDIndex_ClusterLabel = createGroundTruthForData(fileToRead, colIndexUser,
 					colIndexMinMUWithMaxMRR, gowallaClusteringRanges);

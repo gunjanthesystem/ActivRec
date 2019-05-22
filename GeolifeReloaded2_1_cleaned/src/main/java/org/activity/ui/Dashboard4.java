@@ -271,12 +271,12 @@ public class Dashboard4 extends Application
 		// usersCleanedDayToyTimelines);
 		System.out.println("Entered createTabs()");
 
-		final boolean doGivenDataCircleTimelines = false;
-		final boolean doGivenDataLineTimelines = false;
+		final boolean doGivenDataCircleTimelines = true;
+		final boolean doGivenDataLineTimelines = true;
 		// final boolean doGivenDataCanvasTimelines = true;//not implemented
 		final boolean doGivenDataOnlyActIDSeq = true;
 		final boolean doGivenDataLinePlotFeatures = false;
-		final boolean doGivenDataMapPlot = false;
+		final boolean doGivenDataMapPlot = true;
 
 		final boolean doSyntheticDataCircleTimelines = false;// true;
 		final boolean doSyntheticDataCanvasTimelines = false;
@@ -582,7 +582,7 @@ public class Dashboard4 extends Application
 				// $$ BorderPane bp2 = osmapPane.getMapPane2(absFileNameForLatLonToReadAsMarkerTargetLocs, delimiter2,
 				// latColIndex2, lonColIndex2, labelColIndex2, fillIndex, 6);// , Color.rgb(0, 105, 106, 0.3));
 				osmMapTab.setContent(bp2);
-				osmMapTab.setClosable(false);
+				osmMapTab.setClosable(true);
 				tabsToAdd.add(osmMapTab);
 				long ttOSMmap2 = System.currentTimeMillis();
 				System.out.println("osm map = " + (ttOSMmap2 - ttOSMmap1));

@@ -72,7 +72,7 @@ public class PostFilter1
 
 		// System.exit(0);
 
-		boolean verbose = false;
+		boolean verbose = true;
 		String outerPath = pathToReadRecommendationResultsFrom;
 		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL25ED1.0AllActsFDStFilter0hrs100RTV500PDNTh100SDNTh/100R/";
 		// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/JUL19ED1.0STimeLocAllActsFDStFilter0hrs100RTV/100R/";
@@ -755,7 +755,7 @@ public class PostFilter1
 			LinkedHashMap<String, Double> topKWithScorePrimDim,
 			LinkedHashMap<String, Double> locGridAvailabilityScoreForEachActID, boolean strongFilter, boolean verbose)
 	{
-		// alpha not user here, keeping primary dimension ranking score
+		// alpha not used here, keeping primary dimension ranking score
 		if (verbose)
 		{
 			System.out.println("filterKeepingPrimDimScore called.");

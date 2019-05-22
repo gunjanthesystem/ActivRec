@@ -1193,6 +1193,7 @@ public class SuperController
 					for (String pfPhrase : pfFilterNames)// postfiltering
 					{
 						new EvaluationSeq(lengthOfRecommendedSequence, commonPath, muArray, pfPhrase, true, false);
+						extractAggregateEvalResultsOverMUs(commonPath, pfPhrase, true, true, true, true, true, true);
 					}
 				}
 
@@ -1552,7 +1553,7 @@ public class SuperController
 							.getDescriptiveStatistics(MRRValsForBestMU);
 					// PopUps.showMessage("commonPathToUse = " + commonPathToUse);
 					WToFile.writeToNewFile(mrrStatsOverUsersBestnMUs.toString().replaceAll(":", ","),
-							commonPathToUse + "mrrStatsOverUsersBestMUs.csv");
+							commonPathToUse + "mrrStatsOverUsersBestMUs" + dimensionPhrase + ".csv");
 
 					System.out.println("mrrStatsOverUsersBestMUs = " + mrrStatsOverUsersBestnMUs);
 					// End of added on 20 Nov 2018
@@ -1650,7 +1651,7 @@ public class SuperController
 							.getDescriptiveStatistics(MRRValsForBestMUPerTargetActivity);
 					// PopUps.showMessage("commonPathToUse = " + commonPathToUse);
 					WToFile.writeToNewFile(mrrStatsOverTargetActsBestMUs.toString().replaceAll(":", ","),
-							commonPathToUse + "mrrStatsOverTargetActsBestMUs.csv");
+							commonPathToUse + "mrrStatsOverTargetActsBestMUs" + dimensionPhrase + ".csv");
 					System.out.println("mrrStatsOverTargetActsBestMUs = " + mrrStatsOverTargetActsBestMUs);
 				}
 
@@ -1667,17 +1668,17 @@ public class SuperController
 					String file2Label = "mrrStatsOverTargetActsBestMUs";
 
 					List<List<String>> data1 = ReadingFromFile
-							.readLinesIntoListOfLists(commonPathToUse + file1Label + ".csv", ",");
+							.readLinesIntoListOfLists(commonPathToUse + file1Label + dimensionPhrase + ".csv", ",");
 					List<List<String>> data2 = ReadingFromFile
-							.readLinesIntoListOfLists(commonPathToUse + file2Label + ".csv", ",");
+							.readLinesIntoListOfLists(commonPathToUse + file2Label + dimensionPhrase + ".csv", ",");
 					StringBuilder sb = new StringBuilder();
 					sb.append(file1Label + "," + data1.get(4).stream().collect(Collectors.joining(",")) + "\n"
 							+ file1Label + "," + data1.get(6).stream().collect(Collectors.joining(",")) + "\n");
 					sb.append(file2Label + "," + data2.get(4).stream().collect(Collectors.joining(",")) + "\n"
 							+ file2Label + "," + data2.get(6).stream().collect(Collectors.joining(",")) + "\n");
 
-					WToFile.writeToNewFile(sb.toString(),
-							commonPathToUse + "mrrStatsOverUsersTargetsMeanMedianOnlyBestMUs.csv");
+					WToFile.writeToNewFile(sb.toString(), commonPathToUse
+							+ "mrrStatsOverUsersTargetsMeanMedianOnlyBestMUs" + dimensionPhrase + ".csv");
 				}
 
 			}

@@ -41,7 +41,7 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 	// LinkedHashMap<String, String> userIDActualClassMap;
 	LinkedHashMap<String, String> groundTruth; // the map containg (raw user id, manual cluster)
 
-	private final int minEpochSampEn = 1, maxEpochSampEn = 3;// 4;
+	private final int minEpochSampEn = 2, maxEpochSampEn = 3;// 4;
 
 	public LinkedHashMap<String, Integer> getUserIDInstanceID()
 	{
@@ -142,9 +142,13 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 			addDoubleAttributeToAttributeVectors(
 					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "StdDev", m),
 					"SampEn" + "StdDev" + m);
-			addDoubleAttributeToAttributeVectors(
-					getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Median", m),
-					"SampEn" + "Median" + m);
+
+			if (false) // disabling median on 6 May 2019
+			{
+				addDoubleAttributeToAttributeVectors(
+						getAggSampleEntropyAfterExpungingInvalids((usersDayTimelines), "Median", m),
+						"SampEn" + "Median" + m);
+			}
 		}
 
 		LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, Double>>> NGramFeatureVectors = getNGramAttributes(
@@ -466,8 +470,12 @@ public class TimelinesAttributesExtractionCleaned22Feb2019
 						dsFreqDistrVals.getMean() / (numberOfActivityObjectsInTimeline - n));
 				featuresForThisGram.put("MAX_Occur" + "_" + n + "Grams/Max_MAXR",
 						dsFreqDistrVals.getMax() / (numberOfActivityObjectsInTimeline - n));
-				featuresForThisGram.put("MEDIAN_Occur" + "_" + n + "Grams/Max_MEDIANR",
-						dsFreqDistrVals.getPercentile(50) / (numberOfActivityObjectsInTimeline - n));// median
+
+				if (false)// disabled on May 7
+				{
+					featuresForThisGram.put("MEDIAN_Occur" + "_" + n + "Grams/Max_MEDIANR",
+							dsFreqDistrVals.getPercentile(50) / (numberOfActivityObjectsInTimeline - n));// median
+				}
 				// //////////////////////////////////////////////////////
 
 				featuresForThisUser.put(new Integer(n), featuresForThisGram);

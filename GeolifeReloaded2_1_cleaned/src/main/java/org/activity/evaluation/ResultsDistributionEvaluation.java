@@ -204,12 +204,12 @@ public class ResultsDistributionEvaluation
 	public static void main(String args[])
 	{
 		// Constant.setDatabaseName("gowalla1");
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadMar7Geolife4_newAKOM.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadAPR24GowallaSecDim.csv";
 		// + "/ResultsToReadApr7Geolife4.csv";
 		// + "ResultsToReadMar22GeolifeSeq.csv";
 		boolean recommSeq = false;
 		boolean hasLevel1 = true;
-		boolean recommSecDim = false;
+		boolean recommSecDim = true;
 		// + "/ResultsToReadMar7GowallaSecDim.csv";
 		// + "Mar6Temp2.csv";
 		// + "ResultsToReadTestGeoMar1.csv";
@@ -254,27 +254,30 @@ public class ResultsDistributionEvaluation
 
 			if (!recommSeq)
 			{
-				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 1);
-				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);
-				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 2);
-				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 2);
 
 				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 1);
 				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 1);
-
 				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
 
-				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 6);
-				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 5);
-				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
-				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 3);
-				getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 2);
-				;
-				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 6);
-				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 5);
-				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
-				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 3);
-				getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 2);
+				if (false)
+				{
+					getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 1);
+					getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);
+					getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerActual", 2);
+					getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 2);
+
+					getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 6);
+					getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 5);
+					getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 4);
+					getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 3);
+					getResultsNov21(resultsfileToRead, "AllAvgRecall_ChosenMU", 2);
+
+					getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 6);
+					getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 5);
+					getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 4);
+					getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 3);
+					getResultsNov21(resultsfileToRead, "AllAvgPrecision_ChosenMU", 2);
+				}
 			}
 
 			getResultsNov21(resultsfileToRead, "AllPerDirectTopKAgreements_ChosenMU", 2);
@@ -1347,6 +1350,7 @@ public class ResultsDistributionEvaluation
 		String statFileNamesPRF[] = { "AllAvgPrecision_", "AllAvgRecall_", "AllAvgFMeasure_" };
 		String statFileNamesMRR[] = { "AllMeanReciprocalRank_" };
 		// added 17 Jan 2019
+		// $$temproarliy disabled on 8 May 2019
 		String statFileNamesPerUserPerActMRR[] = { "AllPerActivityMeanReciprocalRank_" };// , "AllNumOfRTsPerAct_"
 
 		double muArray[] = Constant.getMatchingUnitArray(Constant.lookPastType, Constant.altSeqPredictor);// Constant.matchingUnitAsPastCountFixed;//
@@ -1403,18 +1407,21 @@ public class ResultsDistributionEvaluation
 					statFileNamesMRR, host, 1, doFirstToMax, doFirstToMaxZeroAware, doChosenMUForEachUser,
 					userIdentifierChosenMuMap, dimensionPhrase);
 
-			int resSize4 = getResultsForEachStatFile_generic(pathToWrite, resultsLabel, pathToRead, muArray,
-					statFileNamesPerUserPerActMRR, host, -9999, false, false, doChosenMUForEachUser,
-					userIdentifierChosenMuMap, new int[] {}, true, true, dimensionPhrase);
-			// firstToMax as empty, only for chosen MU
-
-			if (!tempDisable20July2018)
+			if (false)// temproarily disabled on May 8 2019
 			{
-				Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
-				Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
-				Sanity.eq(resSize, resSize4, "Error resSize != resSize4");
-			}
+				int resSize4 = getResultsForEachStatFile_generic(pathToWrite, resultsLabel, pathToRead, muArray,
+						statFileNamesPerUserPerActMRR, host, -9999, false, false, doChosenMUForEachUser,
+						userIdentifierChosenMuMap, new int[] {}, true, true, dimensionPhrase);
 
+				// firstToMax as empty, only for chosen MU
+
+				if (!tempDisable20July2018)
+				{
+					Sanity.eq(resSize, resSize2, "Error resSize != resSize2");
+					Sanity.eq(resSize, resSize3, "Error resSize != resSize3");
+					Sanity.eq(resSize, resSize4, "Error resSize != resSize4");
+				}
+			}
 			// if (resSize2 < 0)
 			// {
 			// continue;
@@ -1427,7 +1434,9 @@ public class ResultsDistributionEvaluation
 			// }
 			debugLog.close();// added on 1 Jan 2018
 		}
-		catch (Exception e)
+		catch (
+
+		Exception e)
 		{
 			e.printStackTrace();
 		}
