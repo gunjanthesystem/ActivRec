@@ -79,8 +79,8 @@ public class ControllerWithoutServer
 	public ControllerWithoutServer(String databaseName, String commonBasePath, boolean noRecommendations)
 	{
 		// PopUps.showMessage("Inside ControllerWithoutServer");
-		boolean runRecommendationExperiments = false;
-		boolean runWekaClusteringExperiments = true;
+		boolean runRecommendationExperiments = true;
+		boolean runWekaClusteringExperiments = false;
 		boolean runTimelineStats = false;
 
 		System.out.println("Starting ControllerWithoutServer>>>>\n" + PerformanceAnalytics.getHeapInformation() + "\n"
@@ -200,7 +200,7 @@ public class ControllerWithoutServer
 			writeActIDNamesInFixedOrder(Constant.getCommonPath() + "CatIDNameMap.csv");
 
 			// System.exit(0);
-			if (false)// temporary enabled for verbose writing of user timeline
+			if (true)// temporary enabled for verbose writing of user timeline
 			{
 				writeDataObjects(databaseName, commonBasePath, usersCleanedDayTimelines);
 				// System.exit(0);
@@ -935,6 +935,74 @@ public class ControllerWithoutServer
 		}
 	}
 
+	// Start of 23 July 2019
+	/**
+	 * Fork of findUniqueLocationsInTrainTest
+	 * 
+	 * @param usersCleanedDayTimelines
+	 * @param exit
+	 */
+	private void findUniqueLocationsInTrainTest2(
+			LinkedHashMap<String, LinkedHashMap<Date, Timeline>> usersCleanedDayTimelines, boolean exit)
+	{
+		// temporary for 22 feb 2018, to find the unique locations in the training timelines (most recent five
+		// days) and test timelines, this chunk of code has been borrowed from
+		// RecommendationtestsMar2017GenSeq3Nov2017.java
+		LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW = null;
+		// training test timelines for all users continuous
+		LinkedHashMap<String, Timeline> trainTimelinesAllUsersContinuousFiltrd = null;
+
+		long tt1 = System.currentTimeMillis();
+		if (Constant.collaborativeCandidates)
+		{
+			trainTestTimelinesForAllUsersDW = TimelineUtils.splitAllUsersTestTrainingTimelines(usersCleanedDayTimelines,
+					Constant.percentageInTraining, Constant.cleanTimelinesAgainInsideTrainTestSplit);
+
+			if (Constant.filterTrainingTimelinesByRecentDays)
+			{
+				trainTimelinesAllUsersContinuousFiltrd = RecommTestsUtils
+						.getContinousTrainingTimelinesWithFilterByRecentDaysV2(trainTestTimelinesForAllUsersDW,
+								Constant.getRecentDaysInTrainingTimelines(),
+								Constant.filterTrainingTimelinesByRecentDays);
+			}
+			else
+			{
+				// sampledUsersTimelines
+				trainTimelinesAllUsersContinuousFiltrd = RecommTestsUtils
+						.getContinousTrainingTimelines(trainTestTimelinesForAllUsersDW);
+			}
+		}
+		System.out.println("time take for timeline train test splitting which might be save in experiment ="
+				+ ((System.currentTimeMillis() - tt1) * 1.0) / 1000 + " secs");
+
+		Set<Integer> uniqueLocTrains = TimelineUtils.getUniqueLocIDs(trainTimelinesAllUsersContinuousFiltrd, true,
+				Constant.getCommonPath() + "UniqueLocIDs5DaysTrain.csv");
+		Set<Integer> uniqueLocTests = TimelineUtils.getUniqueLocIDsFromTestOnly(trainTestTimelinesForAllUsersDW, true,
+				Constant.getCommonPath() + "UniqueLocIDsTest.csv");
+
+		Set<Integer> uniqueLocTrainsTests = new TreeSet<>();
+		uniqueLocTrainsTests.addAll(uniqueLocTrains);
+		uniqueLocTrainsTests.addAll(uniqueLocTests);
+
+		WToFile.writeToNewFile(
+				uniqueLocTrainsTests.stream().map(e -> e.toString()).collect(Collectors.joining("\n")).toString(),
+				Constant.getCommonPath() + "UniqueLocIDs5DaysTrainTest.csv");
+
+		TimelineWriters.writeLocationObjects(uniqueLocTrainsTests, DomainConstants.getLocIDLocationObjectDictionary(),
+				Constant.getCommonPath() + "UniqueLocationObjects5DaysTrainTest.csv");
+
+		TimelineWriters.writeAllActObjs(trainTimelinesAllUsersContinuousFiltrd,
+				Constant.getCommonPath() + "AllActObjs5DaysTrain.csv");
+		TimelineWriters.writeAllActObjsFromTestOnly(trainTestTimelinesForAllUsersDW,
+				Constant.getCommonPath() + "AllActObjsTest.csv");
+		// TimelineUtils.countNumOfMultipleLocationIDs(usersCleanedDayTimelines);
+		if (exit)
+		{
+			System.exit(0);
+		}
+	}
+
+	// End of 23 July 2019
 	/**
 	 * 
 	 * @param usersCleanedDayTimelines

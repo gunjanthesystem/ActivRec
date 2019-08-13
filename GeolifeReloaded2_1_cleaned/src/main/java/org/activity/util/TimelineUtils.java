@@ -2616,7 +2616,6 @@ public class TimelineUtils
 		return userIDActIDLocIDsMap;
 	}
 
-	//
 	/**
 	 * Extract unique location IDs from the given timelines.
 	 * <p>

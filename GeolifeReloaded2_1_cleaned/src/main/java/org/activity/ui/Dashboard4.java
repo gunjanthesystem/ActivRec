@@ -2,11 +2,13 @@ package org.activity.ui;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -114,7 +116,7 @@ public class Dashboard4 extends Application
 	public void start(Stage stage)
 	{
 		long t0 = System.currentTimeMillis();
-		String databaseName = "geolife1";
+		String databaseName = "gowalla1";
 
 		ScreenDetails.printScreensDetails();
 		reuse = new ReusableElements();
@@ -271,10 +273,10 @@ public class Dashboard4 extends Application
 		// usersCleanedDayToyTimelines);
 		System.out.println("Entered createTabs()");
 
-		final boolean doGivenDataCircleTimelines = true;
-		final boolean doGivenDataLineTimelines = true;
+		final boolean doGivenDataCircleTimelines = false;
+		final boolean doGivenDataLineTimelines = false;
 		// final boolean doGivenDataCanvasTimelines = true;//not implemented
-		final boolean doGivenDataOnlyActIDSeq = true;
+		final boolean doGivenDataOnlyActIDSeq = false;
 		final boolean doGivenDataLinePlotFeatures = false;
 		final boolean doGivenDataMapPlot = true;
 
@@ -558,7 +560,7 @@ public class Dashboard4 extends Application
 
 				BorderPane bp2 = null;
 				/// home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/FSDataWorks/DataProcessingFeb25_2019/placeIDLatLonMap.csv
-				if (true)
+				if (false)
 				{
 					bp2 = showFSNYAllAOsLocationsFeb18(osmapPane);
 				}
@@ -570,7 +572,12 @@ public class Dashboard4 extends Application
 					}
 					else if (databaseName.equals("gowalla1"))
 					{
-						bp2 = showGowallaAOLocationsFeb18(osmapPane);
+						if (false)// disabled on June 23
+						{
+							boolean showOnlyUnique = true;
+							bp2 = showGowallaAOLocationsFeb18(osmapPane, showOnlyUnique);
+						}
+						bp2 = showGowallaLocations(osmapPane);
 					}
 					else
 					{
@@ -660,26 +667,39 @@ public class Dashboard4 extends Application
 		// int latColIndex2 = 1, lonColIndex2 = 2, labelColIndex2 = 5;
 		int latColIndex2 = 9, lonColIndex2 = 10, labelColIndex2 = 12;
 
-		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
-				absFileNameForLatLon5MostRecenTrainTestJul10, ",", latColIndex2, lonColIndex2, labelColIndex2);
+		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile
+				.readListOfLocationsV2(absFileNameForLatLonAllJul10, ",", latColIndex2, lonColIndex2, labelColIndex2);// absFileNameForLatLon5MostRecenTrainTestJul10
 
 		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(listOfLocs, 5, Color.rgb(0, 105, 106, 0.75), false,
-				false, "\t\tShowing UniqueLocationObjects5DaysTrainTest");
+				false, "\t\tShowing UniqueLocationsTrainTest");
 		return bp2;
 	}
 
 	/**
 	 * @param osmapPane
+	 * @param onlyUnique
 	 * @return
 	 */
-	private static BorderPane showGowallaAOLocationsFeb18(GluonOSMMap osmapPane)
+	private static BorderPane showGowallaAOLocationsFeb18(GluonOSMMap osmapPane, boolean onlyUnique)
 	{
+		PopUps.showMessage("Inside showGowallaAOLocationsFeb18");
 		String fileToRead = PathConstants.pathToSerialisedGowallaCleanedTimelines12Feb2019 + "AllActObjs.csv";
 		int latColIndex2 = 10, lonColIndex2 = 11, labelColIndex2 = 4;
 
 		List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(fileToRead, ",",
 				latColIndex2, lonColIndex2, labelColIndex2);
 
+		System.out.println("listOfLocs.size() = " + listOfLocs.size());
+		PopUps.showMessage("listOfLocs.size() = " + listOfLocs.size());
+
+		if (onlyUnique)
+		{
+			Set<Triple<Double, Double, String>> listOfUniqueLocs = new HashSet<>();
+			listOfUniqueLocs.addAll(listOfLocs);
+			System.out.println("listOfUniqueLocs.size() = " + listOfUniqueLocs.size());
+			listOfLocs.clear();
+			listOfLocs.addAll(listOfUniqueLocs);
+		}
 		BorderPane bp2 = osmapPane.getMapPaneForListOfLocations(listOfLocs, 5, Color.rgb(0, 105, 106, 0.75), false,
 				false, "\t\tShowing Gowalla AO Locations");
 		return bp2;
