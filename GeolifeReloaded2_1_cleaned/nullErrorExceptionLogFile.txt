@@ -1,1 +1,0 @@
-Exception: java.nio.file.NoSuchFileException: /home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadAPR24DCU.csvsetConstantsForTimelineCreation: Error: unknown database :gowalla

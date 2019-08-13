@@ -204,12 +204,14 @@ public class ResultsDistributionEvaluation
 	public static void main(String args[])
 	{
 		// Constant.setDatabaseName("gowalla1");
-		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ResultsToReadAPR24GowallaSecDim.csv";
+		String resultsfileToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/"
+				+ "ResultsToReadAPR24Gowalla.csv";
+		// + "ResultsToReadAPR24GowallaSecDim.csv";
 		// + "/ResultsToReadApr7Geolife4.csv";
 		// + "ResultsToReadMar22GeolifeSeq.csv";
 		boolean recommSeq = false;
-		boolean hasLevel1 = true;
-		boolean recommSecDim = true;
+		boolean hasLevel1 = false;
+		boolean recommSecDim = false;
 		// + "/ResultsToReadMar7GowallaSecDim.csv";
 		// + "Mar6Temp2.csv";
 		// + "ResultsToReadTestGeoMar1.csv";
@@ -259,7 +261,9 @@ public class ResultsDistributionEvaluation
 				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareMeanPerUser", 1);
 				getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0Aware", 4);
 
-				if (false)
+				// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 1);
+				// getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);
+				if (true)
 				{
 					getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 1);
 					getResultsNov21(resultsfileToRead, "AllReciprocalRank_MinMUWithMaxFirst0AwareListRRPerActual", 2);

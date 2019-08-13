@@ -22,6 +22,8 @@ import org.activity.objects.LocationGowalla;
 import org.activity.objects.Timeline;
 import org.activity.objects.TimelineWithNext;
 import org.activity.objects.UserGowalla;
+import org.activity.sanityChecks.Sanity;
+import org.activity.ui.PopUps;
 import org.activity.util.RegexUtils;
 import org.activity.util.TimelineTransformers;
 import org.activity.util.TimelineUtils;
@@ -703,6 +705,51 @@ public class TimelineWriters
 		traverseDimensionIDNameValues(dimensionIDNameValues);
 		System.out.println("----Dimension attributes are: ");
 		dimensions.stream().forEach(d -> d.traverseDimensionAttributeNameValuepairs());
+	}
+
+	/**
+	 * To write all training and test timelines for dataset analysis.
+	 * 
+	 * @param trainTestTimelinesForAllUsersDW
+	 * @param absFileNameToWrite
+	 * 
+	 * @since 23 July 2019
+	 */
+	public static void writeTrainTestTimelinesAllActObjs(
+			LinkedHashMap<String, List<LinkedHashMap<Date, Timeline>>> trainTestTimelinesForAllUsersDW,
+			String absFileNameToWrite)
+	{
+		// StringBuilder sb = new StringBuilder("User,#DaysInTrain,#AOsInTrain,#DaysInTest,#AOsInTest\n");
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> trainingTimelinesFromAllUsers = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<Date, Timeline>> testTimelinesFromAllUsers = new LinkedHashMap<>();
+
+		for (Entry<String, List<LinkedHashMap<Date, Timeline>>> e : trainTestTimelinesForAllUsersDW.entrySet())
+		{
+			LinkedHashMap<Date, Timeline> trainDayTimelines = e.getValue().get(0);
+			LinkedHashMap<Date, Timeline> testDayTimelines = e.getValue().get(1);
+
+			trainingTimelinesFromAllUsers.put(e.getKey(), trainDayTimelines);
+			testTimelinesFromAllUsers.put(e.getKey(), testDayTimelines);
+			// TimelineWriters.writeAllActObjs(usersCleanedDayTimelines, commonBasePath + "AllActObjs.csv");
+			// long numOfAOsInTrainDayTimelines = trainDayTimelines.entrySet().stream().mapToLong(t ->
+			// t.getValue().size())
+			// .sum();
+			// long numOfAOsInTestDayTimelines = testDayTimelines.entrySet().stream().mapToLong(t ->
+			// t.getValue().size())
+			// .sum();
+			// sb.append(e.getKey() + "," + trainDayTimelines.size() + "," + numOfAOsInTrainDayTimelines + ","
+			// + testDayTimelines.size() + "," + numOfAOsInTestDayTimelines + "\n");
+		}
+
+		PopUps.showMessage("absFileNameToWrite + \"Train.csv\" = " + absFileNameToWrite + "Train.csv");
+		TimelineWriters.writeAllActObjs(trainingTimelinesFromAllUsers, absFileNameToWrite + "Train.csv");
+		TimelineWriters.writeAllActObjs(testTimelinesFromAllUsers, absFileNameToWrite + "Test.csv");
+
+		Sanity.eq(trainingTimelinesFromAllUsers.size(), testTimelinesFromAllUsers.size(),
+				"Error: trainingTimelinesFromAllUsers.size() != testTimelinesFromAllUsers.size()");
+
+		Sanity.eq(trainTestTimelinesForAllUsersDW.size(), testTimelinesFromAllUsers.size(),
+				"Error: trainTestTimelinesForAllUsersDW.size() != testTimelinesFromAllUsers.size()");
 	}
 
 }

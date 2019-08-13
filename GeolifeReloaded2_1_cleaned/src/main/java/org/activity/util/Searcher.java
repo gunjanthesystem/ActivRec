@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import org.activity.io.ReadingFromFile;
 import org.activity.io.WToFile;
+import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.probability.ProbabilityUtilityBelt;
 
@@ -297,6 +298,81 @@ public class Searcher
 		return new Triple<Set<Path>, Set<Path>, String>(pathsOfFoundFiles, pathsOfResultantFiles, res.toString());// res.toString();
 	}
 
+	///////////////
+	/**
+	 * 
+	 * @param rootPathToSearch
+	 * @param fileNamePatternToSearch
+	 * @param absFileNameOfMatchedLinesToWrite
+	 *            if non-empty, then write the matched lines to this file
+	 * @return ( Set of files whose name contain fileNamePatternToSearch, Result log)
+	 * @since 25 May 2019
+	 */
+	public static Pair<Set<Path>, String> searchFileNameOnly(String rootPathToSearch, String fileNamePatternToSearch,
+			String absFileNameOfMatchedLinesToWrite)
+	{
+		Set<Path> pathsOfFoundFiles = new TreeSet<>(); // filepaths matching the file name pattern
+		// Set<Path> pathsOfResultantFiles = new TreeSet<>();// filepaths matching the file name pattern and contains
+		// contentToMatch
+		Set<Path> pathsOfUnreadableFiles = new TreeSet<>();// find files which contains the givent content.
+
+		StringBuilder res = new StringBuilder();
+		res.append(
+				"\n--- Inside search3\n---  Root folder: " + Paths.get(rootPathToSearch).toAbsolutePath().toString());
+		res.append("\n--- fileNamePatternToSearch: " + fileNamePatternToSearch);
+		// res.append("\n--- content in file to search: " + contentToMatch);
+		res.append("\n absFileNameOfMatchedLinesToWrite: " + absFileNameOfMatchedLinesToWrite);
+
+		try
+		{
+			Stream<Path> allPaths = Files.walk(Paths.get(rootPathToSearch), FileVisitOption.FOLLOW_LINKS);
+
+			res.append("\n\n---   found files with names matching '" + fileNamePatternToSearch + "':\n ");
+			// find filepaths matching the file name pattern
+			pathsOfFoundFiles = allPaths.filter(e -> Files.isRegularFile(e))
+					.filter(e -> e.toString().contains(fileNamePatternToSearch))
+					.peek(e -> res.append("\t-" + e.toString() + "\n")).collect(Collectors.toSet());
+			res.append("---   num of files matching " + fileNamePatternToSearch + " = " + pathsOfFoundFiles.size()
+					+ " regular files.");
+
+			for (Path file : pathsOfFoundFiles)
+			{
+				// System.out.println(file.toString());
+				// Files.readAllLines(file).size();
+				if (Files.isReadable(file) == false)
+				{
+					pathsOfUnreadableFiles.add(file);
+					continue;
+				}
+
+				// // Start of disabled on 12 Feb 2018 in order to read very large files
+				// if (Files.readAllLines(file).stream()// .peek(System.out::println)
+				// .anyMatch(e -> e.contains(contentToMatch)))
+				// // Files.lines(file).anyMatch(line -> line.contains(contentToMatch)))
+				// // End of disabled on 12 Feb 2018 in order to read very large files*/
+			}
+
+			res.append("\n\n---   num of Unreadable files = " + pathsOfUnreadableFiles.size());
+			if (pathsOfUnreadableFiles.size() > 0)
+			{
+				res.append("\n\n--- Unreadable files:");
+				pathsOfUnreadableFiles.forEach(e -> res.append("\n").append(e.toString()));// System.out::println);
+			}
+			// pathsOfFoundFiles.stream().filter(path -> Files.lines(path).anyMatch(line ->
+			// line.contains(contentToMatch)))
+			// .forEach(System.out::println);
+			allPaths.close();
+			res.append("\n--- Exiting search2----------\n");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return new Pair<Set<Path>, String>(pathsOfFoundFiles, res.toString());// res.toString();
+	}
+
+	//////////////
+
 	/**
 	 * Find files which contains fileNamePatternToSearch in the name and contains contentToMatch in its contents. And
 	 * delete files having fileNamePatternToSearch in the name and NOT having contentToMatch in content with probability
@@ -325,17 +401,31 @@ public class Searcher
 																						// match
 			Set<Path> filesWithNameAndContentMatchOverAllContentsToMatch = new LinkedHashSet<>();
 
-			for (String contentToMatch : listOfContentsToMatch)
+			if (listOfContentsToMatch.size() == 0)
 			{
-				Triple<Set<Path>, Set<Path>, String> result = search2(rootPathToSearch, fileNamePatternToSearch,
-						contentToMatch, "");
+				res.append("\n--- listOfContentsToMatch.size() = 0");
+				Pair<Set<Path>, String> result = searchFileNameOnly(rootPathToSearch, fileNamePatternToSearch, "");
 				filesWithNameMatchOverAllContentsToMatch.addAll(result.getFirst());
-				filesWithNameAndContentMatchOverAllContentsToMatch.addAll(result.getSecond());
-
-				res.append("\n------------For content to match: " + contentToMatch + "------------\n");
-				res.append(result.getThird().toString()
+				// filesWithNameAndContentMatchOverAllContentsToMatch.addAll(result.getSecond());
+				res.append("\n------------ALERT! NO content to match: -----------\n");
+				res.append(result.getSecond().toString()
 						+ "\n--------------------------------------------------------------------\n");
 			}
+			else
+			{
+				for (String contentToMatch : listOfContentsToMatch)
+				{
+					Triple<Set<Path>, Set<Path>, String> result = search2(rootPathToSearch, fileNamePatternToSearch,
+							contentToMatch, "");
+					filesWithNameMatchOverAllContentsToMatch.addAll(result.getFirst());
+					filesWithNameAndContentMatchOverAllContentsToMatch.addAll(result.getSecond());
+
+					res.append("\n------------For content to match: " + contentToMatch + "------------\n");
+					res.append(result.getThird().toString()
+							+ "\n--------------------------------------------------------------------\n");
+				}
+			}
+
 			res.append("pathsOfFoundFilesOverAllContentsToMatch.size()="
 					+ filesWithNameMatchOverAllContentsToMatch.size());
 			filesWithNameMatchOverAllContentsToMatch.forEach(e -> res.append("\n").append(e.toString()));

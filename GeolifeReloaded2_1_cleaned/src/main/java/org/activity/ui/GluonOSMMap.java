@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import org.activity.objects.Pair;
 import org.activity.objects.Triple;
 import org.activity.stats.StatsUtils;
 import org.activity.ui.colors.ColorPalette;
+import org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer;
 
 import com.gluonhq.charm.down.ServiceFactory;
 import com.gluonhq.charm.down.Services;
@@ -27,6 +29,7 @@ import com.gluonhq.maps.MapPoint;
 import com.gluonhq.maps.MapView;
 import com.gluonhq.maps.demo.PoiLayer;
 import com.gluonhq.maps.demo.PoiLayer2Faster;
+import com.gluonhq.maps.demo.PoiLayerPolygon;
 import com.jfoenix.controls.JFXSlider;
 
 import jViridis.ColorMap;
@@ -114,6 +117,7 @@ public class GluonOSMMap extends Application
 	// String absFileNameForLatLonToReadAsMarker, String delimiter, int latColIndex,
 	// int lonColIndex, int labelColIndex, boolean useCustomMarker) throws Exception
 	{
+		boolean drawCellGrids = false;// added on June 23 2019
 		// List<Triple<Double, Double, String>> listOfLocs = ReadingFromFile.readListOfLocationsV2(
 		// absFileNameForLatLonToReadAsMarker, delimiter, latColIndex, lonColIndex, labelColIndex);
 
@@ -142,6 +146,12 @@ public class GluonOSMMap extends Application
 
 		// Start of April 8 2018
 		// Pane
+
+		if (drawCellGrids)
+		{
+			view.addLayer(positionLayerPolygons1(GLatLonToGridTransformer.getBoundaryCoordinatesOfHexCells(),
+					sizeOfIcon, Color.PINK));
+		}
 
 		BorderPane toolPane = new BorderPane();
 
@@ -429,6 +439,62 @@ public class GluonOSMMap extends Application
 		return answer;
 
 	}
+
+	// start of added on June 23 2019
+	/**
+	 * 
+	 * @param listOfLocs
+	 * @param sizeOfIcon
+	 * @param colorOfIcon
+	 * @return
+	 * @since June 23 2019
+	 */
+	private MapLayer positionLayerPolygons1(Map<String, ArrayList<String[]>> cellIDBoundaryLatLons, int sizeOfIcon,
+			Color colorOfIcon)
+	{
+		List<MapPoint> mapPoints = new ArrayList<>();
+		// Map<String, ArrayList<String[]>> cellIDBoundaryLatLons
+
+		PoiLayerPolygon poilayer = new PoiLayerPolygon();
+
+		for (Entry<String, ArrayList<String[]>> e : cellIDBoundaryLatLons.entrySet())
+		{
+			String cellID = e.getKey();
+
+			for (String[] boundaryPoints : e.getValue())
+			{
+				double lat = Double.valueOf(boundaryPoints[0]);
+				double lon = Double.valueOf(boundaryPoints[1]);
+				poilayer.addPoint(new MapPoint(lat, lon), new Circle(5, Color.BLUE));
+			}
+		}
+
+		// // for (Triple<Double, Double, String> locEntry : listOfLocs)
+		// // {
+		// // mapPoints.add(new MapPoint(locEntry.getFirst(), locEntry.getSecond()));
+		// // }
+		// // System.out.println(listOfLocs.toString());
+		// // System.out.println("listOfLocs.size()=" + listOfLocs.size());
+		// // System.out.println("mapPoints.size()=" + mapPoints.size());
+		// // LOGGER.log(Level.WARNING, "Position Service not available");
+		// PoiLayer2Faster answer = new PoiLayer2Faster(mapPoints.size());
+		// // mapPoint = new MapPoint(50., 4.);
+		// // answer.addPoint(mapPoint, new Circle(7, Color.RED));
+		// // Circle c = new Circle(5, Color.rgb(193, 49, 34, 0.65));
+		// for (MapPoint mp : mapPoints)
+		// {
+		// // Circle c = new Circle(3, Color.rgb(193, 49, 34, 0.65));
+		// Circle c = new Circle(sizeOfIcon, colorOfIcon);
+		// // c.setStroke(Color.BLACK);
+		// answer.addPoint(mp, c);
+		// }
+
+		// $$mapPoints.stream().forEach(mp -> answer.addPoint(mp, new Circle(5, Color.rgb(193, 49, 34,
+		// 0.65))));
+		return poilayer;
+
+	}
+	// end of added on June 23 2019
 
 	/**
 	 * 

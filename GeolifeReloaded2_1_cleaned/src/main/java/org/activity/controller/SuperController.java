@@ -261,6 +261,16 @@ public class SuperController
 		// runAllAKOMExperiments();
 		// $$cleanUpSpace("./dataWritten/Feb27ED0.5DurFPDistFPStFilter3hrs", 0.97);//
 		// $$cleanUpSpace("./dataWritten/xyz", 0.97, "Raw.csv");//
+		// "/run/user/1000/gvfs/sftp:host=ucd-katrina.insight-centre.org/home/MovedFiles18May2019/FromTheEngine/"
+		// cleanUpSpaceNoErrorCheck(
+		// "/mnt/sshServers/theengine/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/TOMOVE2/",
+		// // "/run/user/1000/gvfs/sftp:host=ucd-katrina.insight-centre.org/home/MovedFiles18May2019/FromTheEngine/",
+		// // "/run/user/1000/gvfs/sftp:host=ucd-katrina.insight-centre.org/home/MovedFilesJan2019/FromTheEngine/",
+		// 1, "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachAO.csv");
+		// // "consoleLog.txt");//
+		// // "LogOfgetRTVerseMinMaxNormalisedEditDistancesEachCand.csv");//
+		// System.exit(0);
+
 		// cleanUpSpace("./dataWritten/Feb28ED0.75DurFPDistFPStFilter3hrs ", 0.97);//
 		// $cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenNGramBaselineForUserNumInvestigation/",0.9);
 		// cleanUpSpace("/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWrittenClosestTimeBaseline/", 0.9);
@@ -480,12 +490,13 @@ public class SuperController
 				// "./dataToRead/ResultsToReadJan11Gowalla1ForEngineEval.csv",
 				// ResultsToReadJan15GeolifeSubset3.csv"
 				// $ ",", 2, false);
-				String databaseName = "gowalla1";// dcu_data_2
+				String databaseName = "dcu_data_2";// dcu_data_2
 				Constant.setDatabaseName(databaseName);
 				Constant.setDatabaseSpecificConstants(databaseName);
 				Constant.setConstantsForTimelineCreation(databaseName);
 
 				String[] pathsToReadPython = {
+						"/mnt/sshServers/theengine/PythonWorkspace/RecSysTutorial/sars_tutorial/datasets/dcu_data_2_DEC31H20M25HighDurNoTTFilter/HGRU4RecRecommender/"
 						// "///home/gunjan/GowallaWorkspace/JavaWorkspace/GeolifeReloaded2_1_cleaned/dataWritten/gowalla1_JAN11H13M52HighOccurPNN500collMyLevenshtein/"
 
 				};
@@ -585,11 +596,12 @@ public class SuperController
 					// start of added on 21 Nov 2018
 					List<List<String>> mrrStatsBestMUs = ReadingFromFile
 							.readLinesIntoListOfLists(commonPath1 + "mrrStatsOverUsersBestMUs.csv", ":");
-					String meanMRROverUsersBestMU = mrrStatsBestMUs.get(4).get(1);
-					String medianMRROverUsersBestMU = mrrStatsBestMUs.get(6).get(1);
 
 					if (Constant.searchForOptimalFeatureWts)
 					{
+						String meanMRROverUsersBestMU = mrrStatsBestMUs.get(4).get(1);
+						String medianMRROverUsersBestMU = mrrStatsBestMUs.get(6).get(1);
+
 						String custodianFeatWtsInfo = iterationCountFeatWtSearch + "," + CustodianOfFeatWts.toCSVWts()
 								+ "," + meanMRROverUsersBestMU + "," + medianMRROverUsersBestMU + "\n";
 						WToFile.writeToNewFile(custodianFeatWtsInfo, commonPath1 + "CustodianOfFeatWts.csv");
@@ -1739,6 +1751,31 @@ public class SuperController
 		// .getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
 		WToFile.writeToNewFile(deleteFilesMatchingFileNamePattern,
 				commonPath + "CleanUpSafelyRandomlyDelete" + fileNamePattern + "ForSpace"
+						+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".txt");
+	}
+
+	/**
+	 * Delete a given % of files including "fileNamePattern" in their name to save space.
+	 * 
+	 * @param commonPath
+	 * @param ratioOfPercentageFilesToDelete
+	 *            % of files including "fileNamePattern" in their name and having no error and exception to delete
+	 * @param fileNamePattern
+	 * 
+	 **/
+	public static void cleanUpSpaceNoErrorCheck(String commonPath, double ratioOfPercentageFilesToDelete,
+			String fileNamePattern)
+	{
+		System.out.println("cleanUpSpace called on commonPath=" + commonPath + "\n");
+
+		String deleteFilesMatchingFileNamePattern = Searcher.searchAndRandomDelete2(commonPath, fileNamePattern,
+				new ArrayList<String>(), ratioOfPercentageFilesToDelete);
+
+		System.out.println("result= " + deleteFilesMatchingFileNamePattern);
+
+		// .getMonth().toString().substring(0, 3) + LocalDateTime.now().getDayOfMonth()
+		WToFile.writeToNewFile(deleteFilesMatchingFileNamePattern,
+				commonPath + "CleanUpSpaceNoErrorCheckRandomlyDelete" + fileNamePattern + "ForSpace"
 						+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".txt");
 	}
 

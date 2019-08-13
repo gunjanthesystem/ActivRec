@@ -105,8 +105,8 @@ public class Snippets
 	 */
 	public static void april22()
 	{
-		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ChosenResultsRecommNext/Geolife/";
-		String pathToWrite = commonPathToRead + "VsBaselines/";
+		String commonPathToRead = "/home/gunjan/Documents/UCD/Projects/Gowalla/GowallaDataWorks/ChosenResultsRecommNext/DCU/";
+		String pathToWrite = commonPathToRead + "VsBaselinesWithAlpha1/";
 		WToFile.createDirectoryDeleteFormerIfExists(pathToWrite);
 		// WToFile.createDirectoryDeleteFormerIfExists(pathToCreate);
 		// System.out.println("here");
@@ -122,7 +122,8 @@ public class Snippets
 
 			// Set<Integer> indicesOfLinesToSkip = new HashSet<>(Arrays.asList(IntStream.range(7, 18)));
 			// decrease by 1 to get real index
-			Set<Integer> indicesOfLinesToSkip = IntStream.range(2, 7).mapToObj(i -> Integer.valueOf(i - 1))// 7, 19
+			Set<Integer> indicesOfLinesToSkip = IntStream.range(3/* 2 */, 7).mapToObj(i -> Integer.valueOf(i - 1))// 7,
+																													// 19
 					.collect(Collectors.toSet());
 
 			// indicesOfLinesToSkip.add(16);

@@ -330,7 +330,7 @@ public final class Constant
 
 	public static final boolean mapLocIDToGridID = true;
 
-	public static final boolean doSecondaryDimension = true;
+	public static final boolean doSecondaryDimension = false;// true;
 	public static final PrimaryDimension secondaryDimension = PrimaryDimension.LocationGridID;// LocationID;
 	public static final boolean debug18July2018 = false;
 	public static final boolean doWeightedEditDistanceForSecDim = false;// true;//SWITCH_AUG

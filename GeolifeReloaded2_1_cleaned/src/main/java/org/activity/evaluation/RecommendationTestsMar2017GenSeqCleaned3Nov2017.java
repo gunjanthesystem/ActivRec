@@ -23,6 +23,7 @@ import org.activity.constants.VerbosityConstants;
 import org.activity.generator.DataTransformerForSessionBasedRecAlgos;
 import org.activity.io.ReadingFromFile;
 import org.activity.io.Serializer;
+import org.activity.io.TimelineWriters;
 import org.activity.io.WToFile;
 import org.activity.nn.LSTMCharModelling_SeqRecJun2018;
 import org.activity.objects.ActivityObject2018;
@@ -220,6 +221,20 @@ public class RecommendationTestsMar2017GenSeqCleaned3Nov2017
 		trainTimelinesAllUsersDWFiltrd = RecommTestsUtils.getTrainingTimelinesWithFilterByRecentDaysV3(
 				trainTestTimelinesForAllUsersDW, Constant.getRecentDaysInTrainingTimelines(),
 				Constant.filterTrainingTimelinesByRecentDays);
+
+		/// Start of added on 23 July 2019 to write training test dataset for analysis
+		if (true)
+		{
+			TimelineWriters.writeTrainTestTimelinesAllActObjs(trainTestTimelinesForAllUsersDW,
+					Constant.getCommonPath() + "AllActObjsTrainTest");
+
+			TimelineWriters.writeAllActObjs(trainTimelinesAllUsersDWFiltrd,
+					Constant.getCommonPath() + "AllActObjsFilteredTrain.csv");
+			PopUps.showMessage("Exiting early just after writing training test timeline. "
+					+ "See: evaluation.RecommendationTestsMar2017GenSeqCleaned3Nov2017.RecommendationTestsMar2017GenSeqCleaned3Nov2017()");
+			System.exit(0);
+		}
+		/// End of added on 23 July 2019
 
 		if (true)// can be disabled after initial run for speed
 		{

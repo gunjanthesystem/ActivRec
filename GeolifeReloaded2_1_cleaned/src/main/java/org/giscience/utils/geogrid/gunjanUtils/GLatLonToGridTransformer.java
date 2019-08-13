@@ -145,6 +145,29 @@ public class GLatLonToGridTransformer
 		// $$ disabled on 4 Aug 2018//mainToComputeDistancesBetweenGrids();
 
 		readBoundaryCoordinatesOfHexCells();
+		// getBoundaryCoordinatesOfHexCells();
+	}
+
+	/**
+	 * @return
+	 * @since 23 June 2019
+	 */
+	public static Map<String, ArrayList<String[]>> getBoundaryCoordinatesOfHexCells()// String absPathToSerialisedFile)
+	{
+		String pathToWrite = "./dataWritten/Aug4GridAnalysis/";
+		Map<String, ArrayList<String[]>> cellIDBoundaryLatLons = null;
+		try
+		{
+			cellIDBoundaryLatLons = (Map<String, ArrayList<String[]>>) Serializer
+					.kryoDeSerializeThis(pathToWrite + "cellIDBoundaryLatLons.kryo");
+			System.out.println("size of cellIDBoundaryLatLons = " + cellIDBoundaryLatLons.size());
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return cellIDBoundaryLatLons;
 	}
 
 	/**
@@ -166,7 +189,7 @@ public class GLatLonToGridTransformer
 			WToFile.createDirectoryIfNotExists(pathToWrite);
 
 			List<List<String>> allData = ReadingFromFile.readLinesIntoListOfLists(fileToRead, ",");
-
+			allData.remove(0);
 			for (List<String> rowEntry : allData)
 			{
 				String cellID = rowEntry.get(indexOfCellID);
