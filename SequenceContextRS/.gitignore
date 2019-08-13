@@ -16,3 +16,4 @@
 *.zip
 *.tar.gz
 hs_err_pid*
+/.git.bfg-report/
