@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.StackPane;
 
-public class CanvasCell extends ListCell<YearEntry>
+class CanvasCell extends ListCell<YearEntry>
 {
 
 	private Label yearLabel;

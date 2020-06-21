@@ -6,12 +6,12 @@ import java.util.List;
 /**
  * Just some fake model object.
  */
-public class YearEntry
+class YearEntry
 {
 
 	private int year;
 
-	public YearEntry(int year)
+	YearEntry(int year)
 	{
 		this.year = year;
 	}

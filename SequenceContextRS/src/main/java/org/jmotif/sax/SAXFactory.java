@@ -1317,7 +1317,7 @@ public final class SAXFactory
 	 *            The end position
 	 * @return sub-series from start to end.
 	 */
-	public static double[] getSubSeries(double[] data, int start, int end)
+	private static double[] getSubSeries(double[] data, int start, int end)
 	{
 		double[] vals = new double[end - start];
 		for (int i = 0; i < end - start; i++)

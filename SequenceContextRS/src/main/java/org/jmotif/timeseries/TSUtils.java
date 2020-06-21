@@ -20,8 +20,8 @@ public final class TSUtils
 {
 
 	/** The latin alphabet, lower case letters a-z. */
-	static final char[] ALPHABET = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
-			'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+	private static final char[] ALPHABET = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+			'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
 	/**
 	 * Constructor.
@@ -983,7 +983,7 @@ public final class TSUtils
 	 *            the array of intervals.
 	 * @return character corresponding to numeric value.
 	 */
-	public static int num2index(double value, double[] cuts)
+	private static int num2index(double value, double[] cuts)
 	{
 		int count = 0;
 		while ((count < cuts.length) && (cuts[count] <= value))

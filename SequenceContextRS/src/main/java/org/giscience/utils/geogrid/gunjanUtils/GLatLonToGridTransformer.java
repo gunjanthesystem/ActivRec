@@ -38,8 +38,8 @@ import org.giscience.utils.geogrid.grids.ISEA3H;
  */
 public class GLatLonToGridTransformer
 {
-	static int gridResolution = 16;
-	ISEA3H theGrid;
+	private static int gridResolution = 16;
+	private ISEA3H theGrid;
 
 	/**
 	 * NOT USED
@@ -1124,7 +1124,7 @@ public class GLatLonToGridTransformer
 		return res;
 	}
 
-	public GLatLonToGridTransformer(int resolution) throws Exception
+	private GLatLonToGridTransformer(int resolution) throws Exception
 	{
 		// GRID
 		theGrid = new ISEA3H(resolution);
@@ -1148,7 +1148,7 @@ public class GLatLonToGridTransformer
 	 * @return
 	 * @throws Exception
 	 */
-	public Collection<GridCell> getGridCellsForBound(double lat0, double lat1, double lon0, double lon1)
+	private Collection<GridCell> getGridCellsForBound(double lat0, double lat1, double lon0, double lon1)
 			throws Exception
 	{
 		Collection<GridCell> cells = theGrid.cellsForBound(lat0, lat1, lon0, lon1);
@@ -1163,7 +1163,7 @@ public class GLatLonToGridTransformer
 	 * @return
 	 * @throws Exception
 	 */
-	public GridCell getCellForLatLon(double lat, double lon) throws Exception
+	private GridCell getCellForLatLon(double lat, double lon) throws Exception
 	{
 		return theGrid.cellForLocation(lat, lon);
 	}

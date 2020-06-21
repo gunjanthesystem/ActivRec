@@ -28,7 +28,7 @@ public class TimelineTrimmers
 	 * @param userAllDatesTimeslines
 	 * @return
 	 */
-	public static LinkedHashMap<Date, Timeline> removeWeekendDayTimelines(
+	private static LinkedHashMap<Date, Timeline> removeWeekendDayTimelines(
 			LinkedHashMap<Date, Timeline> userAllDatesTimeslines)
 	{
 		LinkedHashMap<Date, Timeline> datesTimelinesPruned = userAllDatesTimeslines;
