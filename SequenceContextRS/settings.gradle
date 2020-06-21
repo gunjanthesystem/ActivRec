@@ -16,7 +16,7 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'GeolifeReloaded2_1_cleaned'
+rootProject.name = 'SequenceContextRS'
 
 
 //include ':SPMFExperiments'
