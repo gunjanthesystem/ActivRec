@@ -1,14 +1,13 @@
 /.gradle/
 /build/
-/dataToRead*/
 /dataToPRead*/
 /dataWritten*/
 /DD*/
 /Error/
 /doc/
-/*.csv
-/*.ods
-/*.odt
+/**/*.ods
+/**/*.odt
+/**/.settings/*
 /nnTrainedStatsLog*/*
 /bin/
 *.class

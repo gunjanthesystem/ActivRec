@@ -3,6 +3,11 @@
 #### Description:
 This is a generic activity recommendation framework, which is suitable for generating recommendations based on context-rich user activity patterns. The key aspect which differentiates the generic activity recommendation framework proposed in this work from the traditional recommendation approaches is that it considers both sequence and context information in the user activities. The proposed activity recommendation framework considers sequence and context during the recommendation generation process as well as for the recommended output. (_This code is part of my PhD research work_). 
 
+
+#### Datasets
+The Gowalla and Geolife datasets used are publicly available, while the lifelog dataset is available on request. The datasets (user activity data) used in the experiments are available in csv format in './SequenceContextRecSys/dataToRead/', and in './BaselinesInPython/datasets/' for the baselines implemented in Python.
+
+
 #### Execution:
 For running the proposed Activity Recommendation Algorithms (ActivRec, in paper) and the Java-based baselines:
 1. Import './SequenceContextRecSys' as Gradle project.
