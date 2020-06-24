@@ -23,8 +23,8 @@ final public class ConnectDatabase
 	private static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/";// "jdbc:mysql://csserver.ucd.ie/";//
 
-	private static final String USER = "root";// "gkumar";//"root";
-	private static final String PASS = "root";// "V12xt!07";//"root";
+	private static final String USER = "root";
+	private static final String PASS = "root";
 
 	private static String databaseName;// = "geolife1";//"dcu_data_2" "start_base_2"; //"gkumar";
 	private static final String metaTableName = "meta";
