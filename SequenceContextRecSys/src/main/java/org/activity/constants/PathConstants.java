@@ -29,22 +29,15 @@ public class PathConstants
 	public static String pathToLocationTimezoneInfo;
 	public static String pathToSerialisedGowallaLocZoneIdMap;
 	// ./dataToRead/Feb26/UniqueLocationObjects5DaysTrainTestWithTZUsingPy.csv
-	public static String pathToToyTimelines6JUN;// =
-												// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN7ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTVToyRun6Chosen/ToyTimelinesManually6June.kryo";
-	public static String pathToToyTimelines12AUG;// =
-													// "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG12ToyTimelineCreation/ToyTimelinesManuallyAUG12.kryo";
-	public static String pathToFileWithIndicesOfGTZeroUsers;// =
-															// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/Concatenated/MinMUWithMaxFirst3_GTZero.csv";
+	public static String pathToToyTimelines6JUN;// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN7ED0.5STimeLocPopDistPrevDurPrevAllActsFDStFilter0hrs75RTVToyRun6Chosen/ToyTimelinesManually6June.kryo";
+	public static String pathToToyTimelines12AUG; // "/run/media/gunjan/BackupVault/GOWALLA/GowallaResults/AUG12ToyTimelineCreation/ToyTimelinesManuallyAUG12.kryo";
+	public static String pathToFileWithIndicesOfGTZeroUsers;// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/JUN29ResultsDistributionFirstToMax3/FiveDays/Concatenated/MinMUWithMaxFirst3_GTZero.csv";
 
 	// moved from SuperController on 12 Sep 2018
 	public static String[] pathToSetsOfRandomlySampled100Users;
-	// = {
-	// "./dataToRead/RandomlySample100UsersApril24_2018.csv",
-	// "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
-	// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",
-	// "./dataToRead/RandomlySample100UsersApril24_2018.SetD",
+	// "./dataToRead/RandomlySample100UsersApril24_2018.csv",// "./dataToRead/RandomlySample100UsersApril24_2018.SetB",
+	// "./dataToRead/RandomlySample100UsersApril24_2018.SetC",// "./dataToRead/RandomlySample100UsersApril24_2018.SetD",
 	// "./dataToRead/RandomlySample100UsersApril24_2018.SetE" };
-
 	// "/home/gunjan/git/GeolifeReloaded2_1_cleaned/dataWritten/MAY30Toy/ToyTimelinesManually28May.kryo";
 
 	/**
@@ -52,34 +45,28 @@ public class PathConstants
 	 * <p>
 	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).locIDGridIDMap
 	 */
-	public static String pathToSerialisedLocIDGridIDGowallaMap;// =
-																// "./dataToRead/HexGridRes16_JUL17/locIDGridIDMap.kryo";
+	public static String pathToSerialisedLocIDGridIDGowallaMap;// "./dataToRead/HexGridRes16_JUL17/locIDGridIDMap.kryo";
 
 	/**
 	 * Map<Long, Integer>
 	 * <p>
 	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).locIDGridIDMap
 	 */
-	public static String pathToSerialisedLocIDGridIndexGowallaMap;// =
-																	// "./dataToRead/HexGridRes16_JUL17/locIDGridIndexMap.kryo";
+	public static String pathToSerialisedLocIDGridIndexGowallaMap;// "./dataToRead/HexGridRes16_JUL17/locIDGridIndexMap.kryo";
 
 	/**
 	 * Map<Long, Set<Long>>
 	 * <p>
 	 * see: org.giscience.utils.geogrid.gunjanUtils.GLatLonToGridTransformer.main(String[]).gridIDLocIDs
 	 */
-	public static String pathToSerialisedGridIDLocIDsGowallaMap;// =
-																// "./dataToRead/HexGridRes16_JUL17/gridIDLocIDs.kryo";
+	public static String pathToSerialisedGridIDLocIDsGowallaMap;// "./dataToRead/HexGridRes16_JUL17/gridIDLocIDs.kryo";
 
-	public static String pathToSerialisedGridIndexPairDist;// =
-															// "./dataWritten/JUL25GridIndexDistances/pairedIndicesTo1DConverterIntDoubleWith1DConverter.kryo";
-	public static String pathToSerialisedGridIndexPairDistConverter;// =
-																	// "./dataWritten/JUL25GridIndexDistances/gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
+	public static String pathToSerialisedGridIndexPairDist;// "./dataWritten/JUL25GridIndexDistances/pairedIndicesTo1DConverterIntDoubleWith1DConverter.kryo";
+	public static String pathToSerialisedGridIndexPairDistConverter;// "./dataWritten/JUL25GridIndexDistances/gridIndexPairHaversineDistIntDoubleWith1DConverter.kryo";
 
 	public static String pathToSerialisedHaversineDistOnEngine;// = "./dataWritten/AUG2GridIndexDistances/";
 
-	public static String pathToJavaGridIndexRGridLatRGridLon;// =
-																// "./dataToRead/July30RGridIDJavaGridIndex/javaGridIndexRGridLatRGridLon.kryo";
+	public static String pathToJavaGridIndexRGridLatRGridLon; // "./dataToRead/July30RGridIDJavaGridIndex/javaGridIndexRGridLatRGridLon.kryo";
 
 	// start of added on 28 Dec 2018
 	public static final String pathToSerializedDCUCleanedTimelines28Dec = "./dataToRead/SerializedTimelines28Dec2018/dcu_data_2_DEC28H19M26HighDurNoTTFilter/usersCleanedDayTimelines.kryo";

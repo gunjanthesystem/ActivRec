@@ -1,25 +1,34 @@
 ### A Sequence-based and Context Modelling Framework for Recommendation (SequenceContextRecSys)
 
 #### Description:
-This is a generic activity recommendation framework, which is suitable for generating recommendations based on context-rich user activity patterns. The key aspect which differentiates the generic activity recommendation framework proposed in this work from the traditional recommendation approaches is that it considers both sequence and context information in the user activities. The proposed activity recommendation framework considers sequence and context during the recommendation generation process as well as for the recommended output. (_This code is part of my PhD research work_). 
+This is a generic activity recommendation framework, which is suitable for generating recommendations based on context-rich user activity patterns. The key aspect which differentiates the activity recommendation framework proposed in this work from the traditional recommendation approaches is that it considers both sequence and context information in the user activities, during the recommendation generation process (input) as well as for the recommended output. (_This code is part of my PhD research work_). 
 
 
 #### Datasets
-The Gowalla and Geolife datasets used are publicly available, while the lifelog dataset is available on request. The datasets (user activity data) used in the experiments are available in csv format in './SequenceContextRecSys/dataToRead/', and in './BaselinesInPython/datasets/' for the baselines implemented in Python.
+The Gowalla and Geolife datasets used are publicly available, while the lifelog dataset is available on request. The datasets (user activity data) used in the experiments are available in csv format in *./SequenceContextRecSys/dataToRead/*, and in *./BaselinesInPython/datasets/* for the baselines implemented in Python.
 
 
 #### Execution:
 For running the proposed Activity Recommendation Algorithms (ActivRec, in paper) and the Java-based baselines:
-1. Import './SequenceContextRecSys' as Gradle project.
-2. Set parameters in org.activity.constants.Constant 
-3. Execute org.activity.controller.SuperController 
+
+1. Import *./SequenceContextRecSys* as Gradle project and build using *./gradle build*.
+2. Set parameters:
+	- for the experiments and algorithms in *org.activity.constants.Constant*
+	- for domain/dataset in *org.activity.constants.DomainConstants*
+	- for setting paths for reading data (some pre-processed data) in *org.activity.constants.PathConstants*.
+		- Data to read is expected in *./dataToRead/*
+		- Output files are written to *./dataWritten/*
+	- for controlling verbosity of output and files to write in *org.activity.constants.VerbosityConstants*
+ 
+3. Execute *org.activity.controller.SuperController* via setting build.gradle and executing*./gradle run*.
 
 For running the Python-based baselines:
-- Use './BaselinesInPython/PythonBaselinesFromSarsTutorial.py'
-   (see https://github.com/mquad/sars_tutorial/ for initial setup)
+- Use *./BaselinesInPython/PythonBaselinesFromSarsTutorial.py*
+   (See https://github.com/mquad/sars_tutorial/ for Python-related initial setup.)
 
 #### Publications:
-Please cite the following papers related to this work:
+For reference to this work, please cite the following papers:
+
 1.  Kumar, G., Jerbi, H., Gurrin, C. and O'Mahony, M. P.,
     _Towards Activity Recommendation from Lifelogs_, 
     Proceedings of the 16th International Conference on Information Integration and Web-based Applications & Services, ACM, 2014, pp. 87-96
@@ -32,12 +41,13 @@ Please cite the following papers related to this work:
     _Towards the Recommendation of Personalised Activity Sequences in the Tourism Domain_,
     The 2nd ACM RecSys Workshop on Recommenders in Tourism (RecTour 2017), 2017 
 
-4.  Kumar, G., Jerbi, H. and O'Mahony, M. P., 2020 (_This latest publication is in-submission._)
+4.  Kumar, G., Jerbi, H. and O'Mahony, M. P., 2020 (_in-submission._)
 
-Additional documentation will be provided soon. Queries can be sent to gunjan.kumar@insight-centre.org
+Additional documentation will be added soon. Queries can be sent to gunjan.kumar@insight-centre.org
 
-#### Sources used for some baselines:    
+#### Sources used for some baselines recommenders:    
 The implementation for the following baselines are based on code from the following sources:  
+
 1. AKOM-order: (http://www.philippe-fournier-viger.com/spmf/) [Java]. 
 2. GRU4Rec: (https://github.com/hidasib/GRU4Rec) [Python].
 3. HGRU4Rec: (https://github.com/mquad/hgru4rec) [Python].
