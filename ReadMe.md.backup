@@ -5,7 +5,12 @@ This is a generic activity recommendation framework, which is suitable for gener
 
 
 #### Datasets
-The Gowalla and Geolife datasets used are publicly available, while the lifelog dataset is available on request. The datasets (user activity data) used in the experiments are available in csv format in *./ActivRec/dataToRead/*, and in *./BaselinesInPython/datasets/* for the baselines implemented in Python.
+The Gowalla and Geolife datasets used are publicly available, while the lifelog dataset is available on request. 
+-Gowalla dataset source:
+-Geolife dataset source:
+
+
+The datasets (user activity data) used in the experiments are available in csv format in *./ActivRec/dataToRead/*, and in *./BaselinesInPython/datasets/* for the baselines implemented in Python.
 
 
 #### Execution:
@@ -20,7 +25,7 @@ For running the proposed Activity Recommendation Algorithms (ActivRec, in paper)
 		- Output files are written to *./dataWritten/*
 	- for controlling verbosity of output and files to write in *org.activity.constants.VerbosityConstants*
  
-3. Execute *org.activity.controller.SuperController* via setting build.gradle and executing*./gradle run*.
+3. Execute *org.activity.controller.SuperController* via setting build.gradle and executing*gradle run*.
 
 For running the Python-based baselines:
 - Use *./BaselinesInPython/PythonBaselinesFromSarsTutorial.py*
