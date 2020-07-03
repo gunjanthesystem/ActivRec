@@ -20,7 +20,7 @@ For running the proposed Activity Recommendation Algorithms (ActivRec, in paper)
 		- Output files are written to *./dataWritten/*
 	- for controlling verbosity of output and files to write in *org.activity.constants.VerbosityConstants*
  
-3. Execute *org.activity.controller.SuperController* via setting build.gradle and executing*gradle run*.
+3. Execute *org.activity.controller.SuperController* via setting build.gradle and executing*./gradle run*.
 
 For running the Python-based baselines:
 - Use *./BaselinesInPython/PythonBaselinesFromSarsTutorial.py*

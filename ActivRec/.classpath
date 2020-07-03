@@ -1,0 +1,1648 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="output" path="bin/default"/>
+	<classpathentry output="bin/main" kind="src" path="src/main/java">
+		<attributes>
+			<attribute name="gradle_scope" value="main"/>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry output="bin/test" kind="src" path="src/test/java">
+		<attributes>
+			<attribute name="gradle_scope" value="test"/>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.zaxxer/HikariCP/2.5.1/5df01829bc864f8d8967efea8b320ef940964654/HikariCP-2.5.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.zaxxer/HikariCP/2.5.1/b896b711e2d98fedf403de590559a123b5fbf1a6/HikariCP-2.5.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.seninp/jmotif-sax/1.1.1/dece3398b7be667a3f3a0c20a9bf54ef1f017a7/jmotif-sax-1.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.seninp/jmotif-sax/1.1.1/22909acc5e5c67cd9a4517070a7fb4f7ef926ab3/jmotif-sax-1.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.zeroturnaround/zt-exec/1.9/1b5e751ca678233609b307a2540d849c3d71a590/zt-exec-1.9-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.zeroturnaround/zt-exec/1.9/a6c5747098b1ede9f4a6e9c36eaebb357a4430ed/zt-exec-1.9.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/arbiter-server/1.0.0-beta/92d029db8cac2ae8df46340fdd82579f668d8469/arbiter-server-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/arbiter-server/1.0.0-beta/a1c4b66eccec224d4b9347a01fcedaff699a85b6/arbiter-server-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/arbiter-ui_2.11/1.0.0-beta/bf3d2ad69247391b220644237188812f02a02f8/arbiter-ui_2.11-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/arbiter-ui_2.11/1.0.0-beta/e6f739a870adc96a9f20c33ea58ab3cff702bc7f/arbiter-ui_2.11-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/arbiter-deeplearning4j/1.0.0-beta/82d772d9d6409c641de73efbfd9f9cfb664a92c8/arbiter-deeplearning4j-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/arbiter-deeplearning4j/1.0.0-beta/b630462c77e5ac449120eeca847e3c368e422fa1/arbiter-deeplearning4j-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-ui_2.11/1.0.0-beta/8a1f2897f18fe2236c0a24ba0a8058d9e9c16779/deeplearning4j-ui_2.11-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-ui_2.11/1.0.0-beta/a79a072f418ff082b560f1b46dc8d0b5b2db13e4/deeplearning4j-ui_2.11-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-nlp/1.0.0-beta/13110076191346e51903f39a70065b12c87a9065/deeplearning4j-nlp-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-nlp/1.0.0-beta/a33379ea6e40369d71d5a470d18b8de736c6df30/deeplearning4j-nlp-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-play_2.11/1.0.0-beta/183be02bac4b6d87bdb0cd57320ad38d1fe81e83/deeplearning4j-play_2.11-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-play_2.11/1.0.0-beta/35f2f761a8bdedc79d0d85450e4d36e0dcb8f0ba/deeplearning4j-play_2.11-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-ui-model/1.0.0-beta/93a7efe37ff8de5cfd62d0952d12d45417b8c814/deeplearning4j-ui-model-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-ui-model/1.0.0-beta/c1d1a58ddfbc0a8e9c10430c0c2caaa73a156355/deeplearning4j-ui-model-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-core/1.0.0-beta/1741e5eadbe12637e27ff51c898c12c34b8d32d1/deeplearning4j-core-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-core/1.0.0-beta/1e434551943ffdcfa9d17abad3c60b47d8eb2b6b/deeplearning4j-core-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/arbiter-core/1.0.0-beta/6f6ab14f88d60a0af94a0bd1ce603ae9ce9485f8/arbiter-core-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/arbiter-core/1.0.0-beta/8b077f215ab35c600a7edb1fe5986645e7664d82/arbiter-core-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.rterp/GMapsFX/d4f4765/a6d749e8061131640044d3c3d3bdb1c3e28a76d6/GMapsFX-d4f4765-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.rterp/GMapsFX/d4f4765/f4c7c147aebe7c3e5d5b947e244368e1d34ae394/GMapsFX-d4f4765.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.maps/google-maps-services/0.2.6/3c0fe19c58e36c83c53993fa8fc87bd2f17d6710/google-maps-services-0.2.6-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.maps/google-maps-services/0.2.6/dc2bb0ac43d0aef6c408c37f0429fb9922a6b794/google-maps-services-0.2.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.12/2820c828d59e66efe424f2ea529f5a8b86b7254d/slf4j-simple-1.7.12-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.12/42db62298b899818ff17352cbc00050e940bbfb0/slf4j-simple-1.7.12.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-modelimport/1.0.0-beta/51b8742f735c84f32ea6c3136482aa795dcebbbe/deeplearning4j-modelimport-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-modelimport/1.0.0-beta/9410b6e5419241bc86daab9ba1e5537332f64d0c/deeplearning4j-modelimport-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-tsne/1.0.0-beta/5571971e2018c07878b8973052ccc6b0931442af/deeplearning4j-tsne-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-tsne/1.0.0-beta/12eb298ed2fd6836ae31d9dec24d8251f600cd60/deeplearning4j-tsne-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/nearestneighbor-core/1.0.0-beta/1dbc1c46160267af3f98c25982e1d5439f55ed8e/nearestneighbor-core-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/nearestneighbor-core/1.0.0-beta/9c713af2776ea0274f9c01363990c1dcce2c0f16/nearestneighbor-core-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-nn/1.0.0-beta/6e326a5f48cc4b8fcd357dd2cdfc0b58bdc479ae/deeplearning4j-nn-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-nn/1.0.0-beta/7772574c3c317797fe9a723f372598ea1611622/deeplearning4j-nn-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-utility-iterators/1.0.0-beta/8f2d6ea2b1fff08c3c2c72ba1ace51f1ccfbb38b/deeplearning4j-utility-iterators-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-utility-iterators/1.0.0-beta/aae197e3845f4c939effdf4c535ec44c24930da8/deeplearning4j-utility-iterators-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-datasets/1.0.0-beta/b42941fe8713665dc1234ca279b2beb6d62c4ab7/deeplearning4j-datasets-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-datasets/1.0.0-beta/ad2468f8e85341f78461b58137a6737b4d63187c/deeplearning4j-datasets-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-datavec-iterators/1.0.0-beta/9e46ef26c5b75a3f19574c58e9b3680601a951ff/deeplearning4j-datavec-iterators-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-datavec-iterators/1.0.0-beta/ef989d938ee9c2d862baa3c61e95c7aba2d204fe/deeplearning4j-datavec-iterators-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.datavec/datavec-data-image/1.0.0-beta/b2e14fd4c5ee57c0e60e982e0c6182530ab5fc7/datavec-data-image-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.datavec/datavec-data-image/1.0.0-beta/5576f281b46d73f65f30a614b99d75d5277106a7/datavec-data-image-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.datavec/datavec-api/1.0.0-beta/1d169a1ac9d1305cfa7051307504f865b1efa526/datavec-api-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.datavec/datavec-api/1.0.0-beta/83fd8cc37512327a6a66d9e3c928b5299838cb75/datavec-api-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0-platform/1.0.0-beta/c1f394bdc0958218a831d755a1b7b32428645ae1/nd4j-cuda-9.0-platform-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0-platform/1.0.0-beta/23cd29b92eef44d03d5fe657752c96ffe496f3e9/nd4j-cuda-9.0-platform-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/109edee6ed5c72586178d2483135fcac5f208a27/nd4j-cuda-9.0-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/42ef4339210a0e72d7d86c35039fc3adfa93496d/nd4j-cuda-9.0-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/109edee6ed5c72586178d2483135fcac5f208a27/nd4j-cuda-9.0-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/24fa316a16eea86e1280f8a4244be2fd32a8a73a/nd4j-cuda-9.0-1.0.0-beta-linux-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/109edee6ed5c72586178d2483135fcac5f208a27/nd4j-cuda-9.0-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/7a7d09a6730f99df6a3c6cb778340625c765d205/nd4j-cuda-9.0-1.0.0-beta-macosx-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/109edee6ed5c72586178d2483135fcac5f208a27/nd4j-cuda-9.0-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/9a8230961381ff51d9c468d1331aacbc2f49b11d/nd4j-cuda-9.0-1.0.0-beta-windows-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/109edee6ed5c72586178d2483135fcac5f208a27/nd4j-cuda-9.0-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-cuda-9.0/1.0.0-beta/627dab15d317646859fba924784ca3d6482bcf32/nd4j-cuda-9.0-1.0.0-beta-linux-ppc64le.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-native-api/1.0.0-beta/529136ce834fdebbc7ce6a27edc1bbe1bfd6ad5d/nd4j-native-api-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-native-api/1.0.0-beta/8166ac8b07107d5864b0621012ca97c3dc057dd5/nd4j-native-api-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-jackson/1.0.0-beta/20b82db4291a1e5219d6b3699f92f4dd8ad64f1f/nd4j-jackson-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-jackson/1.0.0-beta/fcc84a66752f5d2698adb445e26de1d647ef1fd7/nd4j-jackson-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-base64/1.0.0-beta/10dd1b07c74300e9ad5e307f3d97c9173c54247e/nd4j-base64-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-base64/1.0.0-beta/e64a88da440d8f3c125eb976d0a9f3488ca957ce/nd4j-base64-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-util/1.0.0-beta/d81c1603702269de816f0872e37b638d1cddaf39/deeplearning4j-util-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-util/1.0.0-beta/ddc1e02fb8e0a195462200a489aaa3e614d40c88/deeplearning4j-util-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-api/1.0.0-beta/34e984c0e341b88c9db2bef53bcd2c4a7dbe82e4/nd4j-api-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-api/1.0.0-beta/292e6a714d4e76dd220d82ba39913d89af39573/nd4j-api-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/tech.tablesaw/tablesaw-jsplot/0.30.4/6090cfe309a5cc1ca837c9496b9ae93645c9ad2d/tablesaw-jsplot-0.30.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/tech.tablesaw/tablesaw-jsplot/0.30.4/5083e2efaf4381a2c5efdc4f9ddaa26211c9a358/tablesaw-jsplot-0.30.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/io.pebbletemplates/pebble/2.6.0/829515df3e071e0ca94a035b8c6c4051e5a46b27/pebble-2.6.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/io.pebbletemplates/pebble/2.6.0/126050aa86aedb64f2a88611dbb1acdb6d92a822/pebble-2.6.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-java_2.11/2.4.8/46523d3ce3f26808069e93cfddb69dba6735988b/play-java_2.11-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-java_2.11/2.4.8/e1bb97638d4a35006c04ddd1c1815335b91c8c7c/play-java_2.11-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-netty-server_2.11/2.4.8/7ba243d5dbf7f4c96dbf40dcf79ae6b6f08fdd4f/play-netty-server_2.11-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-netty-server_2.11/2.4.8/2f9fe7673dcb0a2631093fc5609025d0a074a9e/play-netty-server_2.11-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-server_2.11/2.4.8/fd828ffc7bc7f303f9323a0efe352d8a6d672a43/play-server_2.11-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-server_2.11/2.4.8/a16cd2674d7aca4c0a3925ce3d46f7984c45cabf/play-server_2.11-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play_2.11/2.4.8/cebfb17540d47049e82519ff69258b6d70789a4f/play_2.11-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play_2.11/2.4.8/a23b2b55346a7b8ff4232482d8df13ca4fe0d5d8/play_2.11-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/ch.qos.logback/logback-classic/1.2.1/9fca3c77b4401de7541f01d858b2aec55f4fc51f/logback-classic-1.2.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/ch.qos.logback/logback-classic/1.2.1/706a8b8206ead3683ec639dd270d11fd948fbb0e/logback-classic-1.2.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-ui-components/1.0.0-beta/3ce1e18f29f176ce11efda2b8b2a5114fc3429f5/deeplearning4j-ui-components-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-ui-components/1.0.0-beta/ff1f2ed77f95484b2dd741f6f8fc51e85c333c01/deeplearning4j-ui-components-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-buffer/1.0.0-beta/69b1f0003fa1d35de938afd542fa0d8f08e37e54/nd4j-buffer-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-buffer/1.0.0-beta/b51af8074dbb8d279c551e63eb5a904ab8f0c4b9/nd4j-buffer-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-context/1.0.0-beta/249d44cc41a30aa73934d748d3f8689468c6287c/nd4j-context-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-context/1.0.0-beta/d930b2bf36873ed4680b095c120fc074c952c32f/nd4j-context-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-common/1.0.0-beta/6f9cffe357a54a918864ec94703f9aec6816129d/nd4j-common-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/nd4j-common/1.0.0-beta/f6a1f2673cc93f6865c6e360782ec07361abc9a4/nd4j-common-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-netty-utils/2.4.8/4bce08b6c79925864c1293451855da42bf675d6/play-netty-utils-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-netty-utils/2.4.8/a64688cd2a3296f89fc9d62bdb11a991bb832dec/play-netty-utils-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/jul-to-slf4j/1.7.21/5f537a1ecb32fe3173a95f3c2c233f35f250faef/jul-to-slf4j-1.7.21-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/jul-to-slf4j/1.7.21/2f22c882ffa479d1e9ff4eb0e8e2c29f2a0871ed/jul-to-slf4j-1.7.21.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/jcl-over-slf4j/1.7.21/c565ca9c1239b38fe4a70e4101086c4e880f6358/jcl-over-slf4j-1.7.21-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/jcl-over-slf4j/1.7.21/331b564a3a42f002a0004b039c1c430da89062cd/jcl-over-slf4j-1.7.21.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-slf4j_2.11/2.3.13/35a0322adcc0c3aab9552fa140fc3fe2a9881eee/akka-slf4j_2.11-2.3.13-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-slf4j_2.11/2.3.13/c638af2d3974faba6f36f152073ab80f08060245/akka-slf4j_2.11-2.3.13.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/962153db4a9ea71b79d047dfd1b2a0d80d8f4739/slf4j-api-1.7.25-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/da76ca59f6a57ee3102f8f9bd9cee742973efa8a/slf4j-api-1.7.25.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-csv/1.4/fde86fe0c44998b90a2a22ac038bc363121c9861/commons-csv-1.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-csv/1.4/fc2512d2109144df353501266ac4bbe179058afd/commons-csv-1.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-exec/1.3/efd2543e352e55ce5a685eed6db8af028b737905/commons-exec-1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-exec/1.3/8dfb9facd0830a27b1b5f29f84593f0aeee7773b/commons-exec-1.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/tech.tablesaw/tablesaw-core/0.30.4/e2873a3a6f8cd13968a2a6a6662063eee45af486/tablesaw-core-0.30.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/tech.tablesaw/tablesaw-core/0.30.4/7449e94b1a28c949e2bffd14e8cd5586280f1d27/tablesaw-core-0.30.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.wnameless/json-flattener/0.6.0/17601de41e2e76f578f346103fa14b9fe97bb995/json-flattener-0.6.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.wnameless/json-flattener/0.6.0/13a1d85e3ec0bfea866e9cfe801ae6e773bcab35/json-flattener-0.6.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.4/8f337be1d719810f0f894b0abb6416705af341df/commons-text-1.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.4/680b74de9c393bbf8d9e951af301659b16845907/commons-text-1.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.uzaygezen/uzaygezen-core/0.2/37c6928fad84d1dd77e4e786859be3200bec6cc5/uzaygezen-core-0.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.uzaygezen/uzaygezen-core/0.2/611b82d4c4b4f67cc3d83cf0697ec660fcee2fff/uzaygezen-core-0.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.moeaframework/moeaframework/2.12/3f127ac6979f6efb7cd1b596fb2e6e4752229350/moeaframework-2.12-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.moeaframework/moeaframework/2.12/e551643b97a0e708f5d423a41f1effa4a2a1035f/moeaframework-2.12.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/twirl-api_2.11/1.1.1/5da972d58f8ad8333d4e7448c59eb3a9a074a85f/twirl-api_2.11-1.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/twirl-api_2.11/1.1.1/b029d9500caec7fe30f9a485fc654ee82d40d404/twirl-api_2.11-1.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.7/e7e36219edde1c66c93495a75490d8f526c377cb/commons-lang3-3.7-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.7/557edd918fd41f9260963583ebf5a61a43a6b423/commons-lang3-3.7.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-math3/3.6.1/8fab23986ea8886af34818daf32a718e81dc98ba/commons-math3-3.6.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-math3/3.6.1/e4ba98f1d4b3c80ec46392f25e094a6a2e58fcbf/commons-math3-3.6.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/de.ruedigermoeller/fst/2.48/aabc7ad51241c7ffd540248f4a71676dc82ee584/fst-2.48-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/de.ruedigermoeller/fst/2.48/a04da9aca9ecc7dcf19c5e25b89bc21468e2a3e7/fst-2.48.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/kryo/4.0.0/8a2ebf62fff29eb72426887b977f07b39d719ca1/kryo-4.0.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/kryo/4.0.0/9f5c64c1315ec79bee0f56bb88e4ae94b65048ce/kryo-4.0.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka/weka-stable/3.8.0/fa6ebf413ea3241f6f684df3f18576e568db5555/weka-stable-3.8.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka/weka-stable/3.8.0/5f6547867e775b416982cdcaa2dbef67855a6669/weka-stable-3.8.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.json/json/20160810/92f4b89bc0bb4c7c3f7b52724568a901b7e0195b/json-20160810-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.json/json/20160810/aca5eb39e2a12fddd6c472b240afe9ebea3a6733/json-20160810.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.mariadb.jdbc/mariadb-java-client/1.5.4/65c0cf04ada628ae13a889e49f30f5149dac4a90/mariadb-java-client-1.5.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.mariadb.jdbc/mariadb-java-client/1.5.4/bd0e2e8494245c2885a79fc92bc3693c88cbfab4/mariadb-java-client-1.5.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.mchange/c3p0/0.9.5.2/147cbd16cde386d978a7d5f23f42778102a08cfc/c3p0-0.9.5.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.mchange/c3p0/0.9.5.2/5f86cb6130bc6e8475615ed82d5b5e6fb226a86a/c3p0-0.9.5.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.mgunlogson/cuckoofilter4j/1.0.1/de4a4869979216098beed0bc6e92c9bb907980de/cuckoofilter4j-1.0.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.mgunlogson/cuckoofilter4j/1.0.1/fd8534b00e9754e9aca283db6beb05aa3713cbff/cuckoofilter4j-1.0.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/de.lmu.ifi.dbs.elki/elki/0.7.1/7ee3a21d7d9b39886fd5a627cd975dedf639da20/elki-0.7.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/de.lmu.ifi.dbs.elki/elki/0.7.1/3919d41e0814f524420626006623e5b22cfe1d4c/elki-0.7.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.sf.trove4j/trove4j/3.0.3/109c5be93362e6e651e417c51d1863477a22969c/trove4j-3.0.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.sf.trove4j/trove4j/3.0.3/42ccaf4761f0dfdfa805c9e340d99a755907e2dd/trove4j-3.0.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.zaxxer/nuprocess/1.1.0/8f5ba57420baceeecc15b3fc863118c3a4c24a21/nuprocess-1.1.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.zaxxer/nuprocess/1.1.0/9479382344b61b36dd3ca1ec1b10aaa91295d632/nuprocess-1.1.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.controlsfx/controlsfx/8.40.13/f30b85c6566b883faeec5fe2eda3ec8e28adbe7/controlsfx-8.40.13-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.controlsfx/controlsfx/8.40.13/21561aa4b2e2f5baef45f1156a7c2cf53555466e/controlsfx-8.40.13.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.jfoenix/jfoenix/8.0.7/57540ddaf431440691f8ff24303285e4ff5a85e7/jfoenix-8.0.7-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.jfoenix/jfoenix/8.0.7/db5d75fca2ef27f160b4b03fa5205212dda298f3/jfoenix-8.0.7.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.vividsolutions/jts-core/1.14.0/143813b628e6756e458c835254f4db6e76d8104/jts-core-1.14.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.vividsolutions/jts-core/1.14.0/ff63492fba33a395f0da17720dd1716aba0d8c84/jts-core-1.14.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-script-engine/0.8.2527/a287243dbadf442a59f7066104eb6a68a293e0c4/renjin-script-engine-0.8.2527-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-script-engine/0.8.2527/d2108b7a344218f626f68a7702f695a634e97c9e/renjin-script-engine-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.54/91d6069df9be9e076bdb124e82fc2a9af9547616/jsch-0.1.54-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.54/da3584329a263616e277e15462b387addd1b208d/jsch-0.1.54.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.knowm.xchart/xchart/3.5.4/1a8decf4b23a1afb0b51a561de797ae579a6ed3d/xchart-3.5.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.knowm.xchart/xchart/3.5.4/a0840ad843e2d9a8f5a13f9c96b2b87ff9b8e862/xchart-3.5.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jfree/jfreechart/1.5.0/2ce0d4602a285a5e34a9c2a6a179949f61116f4/jfreechart-1.5.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jfree/jfreechart/1.5.0/bc7919249bac68c15c433ed51cb798a1bf8cd74e/jfreechart-1.5.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/xerces/xercesImpl/2.11.0/af86e59459a503adec5e9b47426dd9fa2ac5f1f6/xercesImpl-2.11.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/xerces/xercesImpl/2.11.0/9bb329db1cfc4e22462c9d6b43a8432f5850e92c/xercesImpl-2.11.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.gluonhq/maps/21f09e8/66c70a4fe7a2152a20dff371e5f8a07cb79707be/maps-21f09e8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.gluonhq/maps/21f09e8/25a7dd653b909a55852df81d37bbeb883a05056e/maps-21f09e8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.9.1/7539531ecf9b6e082fcab195f0835d4f69ead95e/okhttp-3.9.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.9.1/84b4b7d1c4a238e7899972b7446c250691e65f1f/okhttp-3.9.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.clearspring.analytics/stream/2.7.0/7abd440902be1e990f6c6794d7797cc83b3ee816/stream-2.7.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.clearspring.analytics/stream/2.7.0/9998f8cf87d329fef226405f8d519638cfe1431d/stream-2.7.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/it.unimi.dsi/fastutil/8.2.1/47e3859e2123a05a82e75b34af52719f2c18860c/fastutil-8.2.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/it.unimi.dsi/fastutil/8.2.1/5ad88f325e424f8dbc2be5459e21ea5cab3864e9/fastutil-8.2.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.module/jackson-module-scala_2.11/2.4.4/3771836ba9ae84332cca4553c18ad3970b84a465/jackson-module-scala_2.11-2.4.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.module/jackson-module-scala_2.11/2.4.4/506ac22fa6f0675a1a94411767cc4ac54d0130ac/jackson-module-scala_2.11-2.4.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-json_2.11/2.4.8/b4eea241686bd8d2a95246571a3a38eb19075908/play-json_2.11-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-json_2.11/2.4.8/adf3435f3a416725dfd9091150de77272ed2d9b0/play-json_2.11-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.5.4/200f47d33a9a156be388b5c1c5ca73475ccb5139/jackson-datatype-jdk8-2.5.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.5.4/2305eb7fe454e8707ec378a5328cef9279e72c/jackson-datatype-jdk8-2.5.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.5.4/643bec640e59fab2ee119bc20a7f7755ce5af9f8/jackson-datatype-jsr310-2.5.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.5.4/8180ce2f3808001fba5f3b3c85bd80f28b733876/jackson-datatype-jsr310-2.5.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.9.8/f66792d499a6fea6c7a743558f940e0ebf775ce3/jackson-databind-2.9.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.9.8/11283f21cc480aa86c4df7a0a3243ec508372ed2/jackson-databind-2.9.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.9.8/ecaea301e166a0b48f11615864246de739b6619b/jackson-core-2.9.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.9.8/f5a654e4675769c716e5b387830d19b501ca191/jackson-core-2.9.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.reflections/reflections/0.9.9/6876c8eae96dc59b457b0f7499636efa52026064/reflections-0.9.9-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.reflections/reflections/0.9.9/296d8adb2f22a38025f44b45cac89835ff0bbaf/reflections-0.9.9.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/build-link/2.4.8/c0688c4c75bac2b5e9aac16c4632a6532f674e64/build-link-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/build-link/2.4.8/c5954f2ec0e0824124139e3d9c26f299d84f8460/build-link-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.javassist/javassist/3.19.0-GA/37e6508aeea3eef21df5b7ee3ea3c708618c1b7b/javassist-3.19.0-GA-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.javassist/javassist/3.19.0-GA/50120f69224dd8684b445a6f3a5b08fe9b5c60f6/javassist-3.19.0-GA.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/methods/0.8.2527/b584fcd1e0cba7998663c366db8c17d346ed3574/methods-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/stats/0.8.2527/e5b0f8a359f19a588d3207ad5c3ffa0a388b4b83/stats-0.8.2527-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/stats/0.8.2527/6f1fffb98bbef473df7f245d0a2e6cc0f6272692/stats-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/datasets/0.8.2527/52284453c2f2a9f4c9bc2c4853da90c8c945bb9e/datasets-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/utils/0.8.2527/23cf1a60dbbe37402be47dcfa8c3c149227ba7aa/utils-0.8.2527-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/utils/0.8.2527/5b260a23e0f4b6492fd56d04b5d2beffabacf099/utils-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/graphics/0.8.2527/2ceb8f8e78d90bcd06df358b53aecc7761a29001/graphics-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/grDevices/0.8.2527/5a33356c61dc3b40501ad833f9e863bf589c6a11/grDevices-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-gnur-runtime/0.8.2527/24bb19f8d5394237e852ca740f809cf338bdc2d3/renjin-gnur-runtime-0.8.2527-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-gnur-runtime/0.8.2527/5376a9220bd259915d00f2016c95f5297670c210/renjin-gnur-runtime-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-core/0.8.2527/22635af8262d3d794b65ac20ebbeb739d93b381a/renjin-core-0.8.2527-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-core/0.8.2527/fa2049274a4975eb8d08ea284f0c9cfab2fb7410/renjin-core-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-compress/1.16.1/f7dde5c5163ac128750fc2d6ec00ae6a7ff624ab/commons-compress-1.16.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-compress/1.16.1/7b5cdabadb4cf12f5ee0f801399e70635583193f/commons-compress-1.16.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/uk.com.robust-it/cloning/1.9.3/72b2480974e81ece08f4a586a25613c2a05cd661/cloning-1.9.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/uk.com.robust-it/cloning/1.9.3/543bce6b30867ebccc79956528d4c46f0e491735/cloning-1.9.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/2.6/96614f514a1031296657bf0dde452dc15e42fcb8/objenesis-2.6-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/2.6/639033469776fd37c08358c6b92a4761feb2af4b/objenesis-2.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.cedarsoftware/java-util/1.9.0/125757610ebe95809028a359b2818a81d798aaaf/java-util-1.9.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.cedarsoftware/java-util/1.9.0/c5f6deb3213a693d0cc20a78b1052ecc9a2df09c/java-util-1.9.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/reflectasm/1.11.3/d70b212888d5acf77018d6b95acded6ee551da4d/reflectasm-1.11.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/reflectasm/1.11.3/8b102eed2f12412b254946811111ea48bc03a266/reflectasm-1.11.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/minlog/1.3.0/9ee9f7fe99d5acfcb974e28acbad9349fb33a765/minlog-1.3.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/minlog/1.3.0/ff07b5f1b01d2f92bb00a337f9a94873712f0827/minlog-1.3.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/java-cup-11b/2015.03.26/c30f96bae17174f7a898fdfd5a70a03ce722149a/java-cup-11b-2015.03.26-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/java-cup-11b/2015.03.26/6e97c5abd2e76d83220f09f72de0b89b6de18dc1/java-cup-11b-2015.03.26.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/java-cup-11b-runtime/2015.03.26/20803e7cd7d8400fd202ecfa6be11e7639dbef18/java-cup-11b-runtime-2015.03.26-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/java-cup-11b-runtime/2015.03.26/5466fad5c5866f33e3230c30ca623e7e8deff1f8/java-cup-11b-runtime-2015.03.26.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/bounce/0.18/25868ad43138bff53d4b81b1581f1229c867c759/bounce-0.18-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka.thirdparty/bounce/0.18/d774f9a0aa5cbe08dea8907720c64c417aed861/bounce-0.18.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.googlecode.matrix-toolkits-java/mtj/1.0.4/a330e7163ee69dcc9892a2d801521c8c399415d2/mtj-1.0.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.googlecode.matrix-toolkits-java/mtj/1.0.4/e14ed840ff5e15de92dba2d1af29201fa70a0f35/mtj-1.0.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/all/1.1.2/f235011206ac009adad2d6607f222649aba5ca9e/all-1.1.2.pom">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.googlecode.netlib-java/netlib-java/1.1/aa87d47a844918a53818f334fb780a5088ccb71a/netlib-java-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.googlecode.netlib-java/netlib-java/1.1/4a9c3b55b23430e5a6ad86101a88aea500ba8086/netlib-java-1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-osx-x86_64/1.1/a718a88953cc36d4eef4071e4326538b0db25d8d/netlib-native_ref-osx-x86_64-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-osx-x86_64/1.1/80da53ec862f283dc3b191b9dbd3166ea6671831/netlib-native_ref-osx-x86_64-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-x86_64/1.1/42648fe99a7239cabde04e8a6271c2533c364471/netlib-native_ref-linux-x86_64-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-x86_64/1.1/5a3e5787d03c39790d5ae08cce189dd1ccc4a38/netlib-native_ref-linux-x86_64-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-i686/1.1/6998737617780d050bfd48fee7f6dbc56e5fe6fa/netlib-native_ref-linux-i686-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-i686/1.1/eedd845b214aea560bce317d778ebb52f8f46038/netlib-native_ref-linux-i686-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-win-x86_64/1.1/f35995075180a8c47e090eb31cf2b94ae778da5/netlib-native_ref-win-x86_64-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-win-x86_64/1.1/4ab54511c2844546279d9f8e427c73953b794686/netlib-native_ref-win-x86_64-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-win-i686/1.1/3adf6f4eafbed1e16304bf28ffb08c54001171e/netlib-native_ref-win-i686-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-win-i686/1.1/167fb794a26cb0bfc74890c704c7137b1d5b50fd/netlib-native_ref-win-i686-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-armhf/1.1/e0bb1024e014af6240394cef2250392a1c023a27/netlib-native_ref-linux-armhf-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_ref-linux-armhf/1.1/ec467162f74710fd8897cff6888534ceaf297d9a/netlib-native_ref-linux-armhf-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/native_ref-java/1.1/60ee44e2252f61dcd2ef0fd85840e39b0a76955f/native_ref-java-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/native_ref-java/1.1/408c71ffbc3646dda7bee1e22bf19101e5e9ee90/native_ref-java-1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-osx-x86_64/1.1/3ce1daf45144aacb758099d19d883e37ddd4172/netlib-native_system-osx-x86_64-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-osx-x86_64/1.1/d724e33675dc8eaa5c8fcb05a3aaca6f3339afa7/netlib-native_system-osx-x86_64-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-x86_64/1.1/3a2f5005372138408622ff3cac0bd5642ad8fb99/netlib-native_system-linux-x86_64-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-x86_64/1.1/163e88facabe7fa29952890dc2d3429e28501120/netlib-native_system-linux-x86_64-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-i686/1.1/7be6e3d0654f93e92da7461841fc9674e86d393e/netlib-native_system-linux-i686-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-i686/1.1/dd43225560dbd9115d306f9be3ca195aed236b78/netlib-native_system-linux-i686-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-armhf/1.1/85a6bce62b6e11b60a6a900e262b75c355db1783/netlib-native_system-linux-armhf-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-linux-armhf/1.1/27ae9f6a9c88b3f8d12ffa52d62941615f8ed416/netlib-native_system-linux-armhf-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-win-x86_64/1.1/79b1727e88f14a81c4816bf33690348e9c87a2d5/netlib-native_system-win-x86_64-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-win-x86_64/1.1/222c7915be1daf1c26a4206f375d4957ae5f9d81/netlib-native_system-win-x86_64-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-win-i686/1.1/cd023117d74b74ac224f69de67e803b00bcaba9/netlib-native_system-win-i686-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/netlib-native_system-win-i686/1.1/c25fd1881cf93f7716f47b7deec859f6b6b7be50/netlib-native_system-win-i686-1.1-natives.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/native_system-java/1.1/33457123e29f41d05a7a1b659d9a218b4e9673a9/native_system-java-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/native_system-java/1.1/3c6a2455f96b354a6940dce1393abb35ed7641da/native_system-java-1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/core/1.1.2/db345b07c3809044d45f2acde54e2c9f6a5d3c4c/core-1.1.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil.netlib/core/1.1.2/574b480eca62f535fad6d259e144fee3ef24b66e/core-1.1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.sourceforge.f2j/arpack_combined_all/0.1/225619a060b42605b4d9fd4af11815664abf26eb/arpack_combined_all-0.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.mchange/mchange-commons-java/0.2.11/33a53955501fa830ecfc98d6ae611c6dc451946c/mchange-commons-java-0.2.11-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.mchange/mchange-commons-java/0.2.11/2a6a6c1fe25f28f5a073171956ce6250813467ef/mchange-commons-java-0.2.11.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/jackson/1.0.0-beta/cd5366a5aef337f77ed750c1a22fc5d7cc326a24/jackson-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.nd4j/jackson/1.0.0-beta/949b97457f9b44a4f6a33f4bb77aa55d5f5e5fe/jackson-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/joda-time/joda-time/2.9.9/29a9fcf32288cd678b37b372974786f731b982d1/joda-time-2.9.9-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/joda-time/joda-time/2.9.9/f7b520c458572890807d143670c9b24f4de90897/joda-time-2.9.9.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.guava/guava-testlib/19.0/cee012271e4e35c140a5c8d4ec4db0072241c621/guava-testlib-19.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.guava/guava-testlib/19.0/ce5b880b206de3f76d364988a6308c68c726f74a/guava-testlib-19.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/a6c32b40bf3d76eca54e3c601e5d1470c86fcdfa/junit-4.12-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/2973d150c0dc1fefe998f834810d68f278ea58ec/junit-4.12.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.beust/jcommander/1.48/6deefcf90f144dfca29d4950c665a592ba029d42/jcommander-1.48-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.beust/jcommander/1.48/bfcb96281ea3b59d626704f74bc6d625ff51cbce/jcommander-1.48.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.os72/protobuf-java-util-shaded-351/0.9/d6751f1692aa9b186ab886d2d6a27340b62b361e/protobuf-java-util-shaded-351-0.9-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.os72/protobuf-java-util-shaded-351/0.9/e4a45ffdf337c6d627bcf2edcb2de2d906bd6ee5/protobuf-java-util-shaded-351-0.9.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.mapdb/mapdb/3.0.5/e81cdbd325ee57e76a1a1c5b63d3d55d373c795/mapdb-3.0.5-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.mapdb/mapdb/3.0.5/931505a557a58ef9e3635a195f5bb1834a52fa32/mapdb-3.0.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.os72/protobuf-java-shaded-351/0.9/9de4ddac6f27589d28a8d94320c206edf58e2a85/protobuf-java-shaded-351-0.9.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.os72.protobuf-java-shaded-351/protobuf-java-util-shaded-351/0.9/3ade7ba3e796ac84cd6dc0c871606df9fb4c2f35/protobuf-java-util-shaded-351-0.9-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.os72.protobuf-java-shaded-351/protobuf-java-util-shaded-351/0.9/e1b7cbdce7c7560efdf4fdff6d4cc33f62c7900d/protobuf-java-util-shaded-351-0.9.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.inject.extensions/guice-assistedinject/4.0/579c00df760815a369a396e7877cb6c3441b4328/guice-assistedinject-4.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.inject.extensions/guice-assistedinject/4.0/8fa6431da1a2187817e3e52e967535899e2e46ca/guice-assistedinject-4.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.inject/guice/4.0/961359f8352b791c6443a207c847e25d6d3ca7cd/guice-4.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.inject/guice/4.0/f990a43d3725781b6db7cd0acf0a8b62dfd1649/guice-4.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-contrib_2.11/2.3.13/eca363fa262b9a77fb38e6551efee87e62e21615/akka-contrib_2.11-2.3.13-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-contrib_2.11/2.3.13/45119f393cfa6483796ce502c3e0210e292c2b71/akka-contrib_2.11-2.3.13.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-persistence-experimental_2.11/2.3.13/5f6aeaf9082d688cbc51c22125b3c3e92ad49f0e/akka-persistence-experimental_2.11-2.3.13-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-persistence-experimental_2.11/2.3.13/570415325b91c64e460475c26e1a7626af260021/akka-persistence-experimental_2.11-2.3.13.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.iq80.leveldb/leveldb/0.5/2cc1cd6afa2be61371977cd252008b1bee0f0231/leveldb-0.5-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.iq80.leveldb/leveldb/0.5/96d72bdcfa6e4b38f24816bbb66f4da6cc932ab1/leveldb-0.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/25.1-jre/ec0056d1a09168a8772c7a6459804a3c85ce8796/guava-25.1-jre-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/25.1-jre/6c57e4b22b44e89e548b5c9f70f0c45fe10fb0b4/guava-25.1-jre.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/677abe279b68c5e7490d6d50c6951376238d7d3e/log4j-1.2.17-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/5af35056b4d257e4b64b9e8069c0746e8b08629f/log4j-1.2.17.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/28a5d592b494fe54c120c64689087e779a7bf55b/jna-4.1.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/1c12d070e602efd8021891cdd7fd18bc129372d4/jna-4.1.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-io/commons-io/2.4/f2d8698c46d1167ff24b06a840a87d91a02db891/commons-io-2.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-io/commons-io/2.4/b1b6ea3b7e4aa4f492509a4952029cd8e48019ad/commons-io-2.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.10/11fb3d88ae7e3b757d70237064210ceb954a5a04/commons-codec-1.10-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.10/4b95f4897fa13f2cd904aee711aeafc0c5295cd8/commons-codec-1.10.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda-platform/9.0-7.0-1.3/32962d23d782650a36be440212e2d8f4e51b4a18/cuda-platform-9.0-7.0-1.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/javax.ws.rs/javax.ws.rs-api/2.0/6800b5f794beb9809d8fef83d21e157b0db6ee19/javax.ws.rs-api-2.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/javax.ws.rs/javax.ws.rs-api/2.0/61f0983eb190954ccdede31e786a9e0bd9767c4a/javax.ws.rs-api-2.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-ui-resources/1.0.0-beta/e3b7a8d1afb5ec01700838389bfcfc0d620fd993/deeplearning4j-ui-resources-1.0.0-beta-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.deeplearning4j/deeplearning4j-ui-resources/1.0.0-beta/7ea7f4d7524dc0214f6fb73006e346e96d07f980/deeplearning4j-ui-resources-1.0.0-beta.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/compiler/0.8.2527/32e2ed2fc78edb450cd9b6f81ca0e07d0851e252/compiler-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-cli/commons-cli/1.2/6c5459816530a1962ac18cd315cc775b1b384329/commons-cli-1.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-cli/commons-cli/1.2/2bf96b7aa8b611c177d329452af1dc933e14501c/commons-cli-1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jfree/jcommon/1.0.21/1dbf3b7d444c6b49c341963cd93941663ae6a5ca/jcommon-1.0.21-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jfree/jcommon/1.0.21/e354d6663dd3695bef264d95586fde66505492d9/jcommon-1.0.21.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fifesoft/rsyntaxtextarea/2.5.1/a0ad164b03018dcfeeac8e87d9dd2e1bfbb14858/rsyntaxtextarea-2.5.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fifesoft/rsyntaxtextarea/2.5.1/ccfcb4602866bc4f3dadd5597dd60f86400979dd/rsyntaxtextarea-2.5.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.univocity/univocity-parsers/2.7.5/6713d00ad6fe04fbeeea01b6a47594fdae309a49/univocity-parsers-2.7.5-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.univocity/univocity-parsers/2.7.5/194d7f8196cac66f134f7ca44d2686b4651caa19/univocity-parsers-2.7.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jsoup/jsoup/1.11.3/871302b15d8cee9bfb393c4f1d0386b17646d8d1/jsoup-1.11.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jsoup/jsoup/1.11.3/36da09a8f68484523fa2aaa100399d612b247d67/jsoup-1.11.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.roaringbitmap/RoaringBitmap/0.7.14/6a9c7d53e259190e03f17257e5f369298b1e0b6d/RoaringBitmap-0.7.14-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.roaringbitmap/RoaringBitmap/0.7.14/d0859b3d64ba0690b715755e374812c0b4d4b622/RoaringBitmap-0.7.14.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/de.erichseifert.vectorgraphics2d/VectorGraphics2D/0.13/ee04cd6e365a732bb8c884c36fd9782f96e01770/VectorGraphics2D-0.13-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/de.erichseifert.vectorgraphics2d/VectorGraphics2D/0.13/f1ad944da4c6b6a27d244d3a04ce1c67b8b026b6/VectorGraphics2D-0.13.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/xml-apis/xml-apis/1.4.01/5502da0c4c0a7916a604356ef19394ccfa30cd4b/xml-apis-1.4.01-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/xml-apis/xml-apis/1.4.01/3789d9fada2d3d458c4ba2de349d48780f381ee3/xml-apis-1.4.01.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.gluonhq/charm-down-plugin-position/3.7.0/7fc774d8688b14e468cc981c259370316ab9d429/charm-down-plugin-position-3.7.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.gluonhq/charm-down-plugin-position/3.7.0/dd8e92eba67bb0aee105457bbed27ce5594fd8ff/charm-down-plugin-position-3.7.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.gluonhq/charm-down-plugin-storage/3.7.0/b89e67f5223981e9c2906379ea26431127cd880d/charm-down-plugin-storage-3.7.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.gluonhq/charm-down-plugin-storage/3.7.0/ce25ec8df8d5d14abafaf56f0b94316e971f3e83/charm-down-plugin-storage-3.7.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.1/c10732c97eccba635e20596a02c3824fef0605bf/gson-2.8.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.1/2a8e0aa38a2e21cb39e2f5a7d6704cbdc941da0/gson-2.8.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.13.0/f4c91e12121af963e3ef76e81c82aa75ba6e8533/okio-1.13.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.13.0/a9283170b7305c8d92d25aff02a6ab7e45d06cbe/okio-1.13.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-vfs2/2.0/c29b15a44ebae8501f0e5a892736b27857a4f968/commons-vfs2-2.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-vfs2/2.0/b5af3b9c96b060d77c68fa5ac9384b402dd58013/commons-vfs2-2.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.1/f3f156cbff0e0fb0d64bfce31a352cce4a33bc19/commons-logging-1.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.1/5043bfebc3db072ed80fbd362e7caf00e885d8ae/commons-logging-1.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.cedarsoftware/json-io/2.5.1/7e1dd1cbd3b677f11a4a859ed58d44e99cb6638d/json-io-2.5.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.cedarsoftware/json-io/2.5.1/dd7fe37e5d02b93b014df08655da2b9e0dc2700a/json-io-2.5.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.ow2.asm/asm/5.0.4/112ff54474f1f04ccf1384c92e39fdc566f0bb5e/asm-5.0.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.ow2.asm/asm/5.0.4/da08b8cce7bbf903602a25a3a163ae252435795/asm-5.0.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/1dc37250fbc78e23a65a67fbbaf71d2e9cbc3c0b/hamcrest-core-1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/b19b5927c2c25b6c70f093767041e641ae0b1b35/jsr305-3.0.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.1.3/990fe1fd48078a2befecdfcebcad8e6e1bd195a0/error_prone_annotations-2.1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.1.3/39b109f2cd352b2d71b52a3b5a1a9850e1dc304b/error_prone_annotations-2.1.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.16.20/69ebf81bb97bdb3c9581c171762bb4929cb5289c/lombok-1.16.20-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.16.20/ac76d9b956045631d1561a09289cbf472e077c01/lombok-1.16.20.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.threadly/threadly/4.10.0/6879efa31f8c4e38a1545d37320e3c5105804e15/threadly-4.10.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.threadly/threadly/4.10.0/6b669a861f777e7a1087844f01a5fe8e5ed9aa23/threadly-4.10.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco/javacv/1.4.1/7a903dcd49eaa9eac8532986c6ba199cbf2f4196/javacv-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco/javacv/1.4.1/394adadafa4b21acc4ed3515f89eff16be0e7c0b/javacv-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/4594dcb470d43daa074cca9e18df810877f86e5d/cuda-9.0-7.0-1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/4cce934999ef0418e30d6729e31029dc2c6cdad0/cuda-9.0-7.0-1.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/4594dcb470d43daa074cca9e18df810877f86e5d/cuda-9.0-7.0-1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/ac5c38b85d7b21cce651dfcffefac23f33b3a146/cuda-9.0-7.0-1.3-linux-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/4594dcb470d43daa074cca9e18df810877f86e5d/cuda-9.0-7.0-1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/3bde9054739611feff83e1012a9edb58057bf878/cuda-9.0-7.0-1.3-linux-ppc64le.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/4594dcb470d43daa074cca9e18df810877f86e5d/cuda-9.0-7.0-1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/fe3750b9de37ac699fabd4a9598b39e949946191/cuda-9.0-7.0-1.3-macosx-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/4594dcb470d43daa074cca9e18df810877f86e5d/cuda-9.0-7.0-1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/cuda/9.0-7.0-1.3/53ec06917d088fdcf55603378aa3d3abec7d9737/cuda-9.0-7.0-1.3-windows-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5-platform/1.10.1-1.4.1/34c53a172a1087be0ab0562eac22efab48385ce4/hdf5-platform-1.10.1-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/851e884c0c7adcc3918d4bd8ab910245ba1f766b/hdf5-1.10.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/d0a5cbe7533c5b812fbd1793aac6f13d5a1bf7be/hdf5-1.10.1-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/851e884c0c7adcc3918d4bd8ab910245ba1f766b/hdf5-1.10.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/b8b245fcb3145c56fa422cdec4ed798bb2d635ea/hdf5-1.10.1-1.4.1-linux-x86.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/851e884c0c7adcc3918d4bd8ab910245ba1f766b/hdf5-1.10.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/114def51896628984020e9d14c6f45c9fa53adac/hdf5-1.10.1-1.4.1-linux-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/851e884c0c7adcc3918d4bd8ab910245ba1f766b/hdf5-1.10.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/67fe972f9363295603c7dd263040afc711e4528b/hdf5-1.10.1-1.4.1-linux-ppc64le.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/851e884c0c7adcc3918d4bd8ab910245ba1f766b/hdf5-1.10.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/34101fa3a530ce2a87a0a76c688011e41fdda719/hdf5-1.10.1-1.4.1-macosx-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/851e884c0c7adcc3918d4bd8ab910245ba1f766b/hdf5-1.10.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/207920fc80fbafa38d3e1660ec8398eac8a5ae0b/hdf5-1.10.1-1.4.1-windows-x86.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/851e884c0c7adcc3918d4bd8ab910245ba1f766b/hdf5-1.10.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/hdf5/1.10.1-1.4.1/9a788533a549ccc3a5ccd471b563bd0e28c8f0c5/hdf5-1.10.1-1.4.1-windows-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv-platform/3.4.1-1.4.1/3ea73676aabee2de294aa52999f8663c2940525d/opencv-platform-3.4.1-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/flandmark/1.07-1.4.1/9721400f9985b15f861c801b951bb1c357e00f16/flandmark-1.07-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/flandmark/1.07-1.4.1/cfb9fcd1b0e7706bf8b2a6c886ad2eb4eaaf1f24/flandmark-1.07-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/194c44a24da8ed085630d01d23f3e6d9a83c2a28/opencv-3.4.1-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/7604fe3cfa00207a51ee322b50f7db5372bead9b/opencv-3.4.1-1.4.1-android-arm.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/6c91c22a156ce9ea3c901afeb93d5efd037f0e96/opencv-3.4.1-1.4.1-android-arm64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/c58bca59002ce2250a979986b0bc937b0ad1400b/opencv-3.4.1-1.4.1-android-x86.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/85bb636369f3c72ab15f80e137b61d97f4b5306d/opencv-3.4.1-1.4.1-android-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/27fbe907ae96a5064300dc5d89e9db3f72c114d0/opencv-3.4.1-1.4.1-ios-arm64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/4ffcccf00eb5de5de8da6f5199a5f2757443e93b/opencv-3.4.1-1.4.1-ios-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/122eee45eab234c96d6b0877366728b530b1cd37/opencv-3.4.1-1.4.1-linux-x86.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/87ec5d89b3daf5dc8ca9fbe22023a22f5bead075/opencv-3.4.1-1.4.1-linux-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/cacaac51777468f064c2fa6968036f2aea92d45/opencv-3.4.1-1.4.1-linux-armhf.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/5f1e11a2b1c1361419ae6f895b16c4896dafd37f/opencv-3.4.1-1.4.1-linux-ppc64le.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/3abe640aae1e885105af1fd98bf10e0d32d24534/opencv-3.4.1-1.4.1-macosx-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/1b82c525881235468c6af2a7817cbc5d1a0bf7e4/opencv-3.4.1-1.4.1-windows-x86.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/14e708ea1ba5aa7de838575109b32a9f1a78018f/opencv-3.4.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/opencv/3.4.1-1.4.1/dd83d6d46d38febc1908870c7a501c6c224838e0/opencv-3.4.1-1.4.1-windows-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/ffmpeg/3.4.2-1.4.1/d53d15f0e2befa923997c7fb6e8e32fdff612d66/ffmpeg-3.4.2-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/ffmpeg/3.4.2-1.4.1/a495a3519973a4a109c331280170c985873d58c7/ffmpeg-3.4.2-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/flycapture/2.11.3.121-1.4.1/46c2d8702a261f38fc0e36edbecc1d6c9fc05afe/flycapture-2.11.3.121-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/flycapture/2.11.3.121-1.4.1/8e1e5d4abbc80c9dddc1230e96a2b55068240508/flycapture-2.11.3.121-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/libdc1394/2.2.5-1.4.1/e55dd49be9f08959596629e75ee092ed3b9c8937/libdc1394-2.2.5-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/libdc1394/2.2.5-1.4.1/9b7af46ebf69ab72f0ffecc68adaadf59813a73b/libdc1394-2.2.5-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/libfreenect/0.5.3-1.4.1/89034086b280df88a039b5b6f93937ed8fc55dba/libfreenect-0.5.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/libfreenect/0.5.3-1.4.1/ec464a03102421fc7bff937d35f2d831b73652e5/libfreenect-0.5.3-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/libfreenect2/0.2.0-1.4.1/b392babbc6b7b1cec14c115c07c53bd33723b59c/libfreenect2-0.2.0-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/libfreenect2/0.2.0-1.4.1/11c54067ba69b3b9ee7badab43dcdc47f071d215/libfreenect2-0.2.0-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/librealsense/1.12.1-1.4.1/2b8109db80485715fab62ebb1c587b6fd4669234/librealsense-1.12.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/librealsense/1.12.1-1.4.1/56d04c681b230fc1deb15dfc758f8326ad89a469/librealsense-1.12.1-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/videoinput/0.200-1.4.1/7ad5c198d9cd789ee97c4e5bd43d1fc0784c4390/videoinput-0.200-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/videoinput/0.200-1.4.1/b7a992bf873b3e6ed5fad2b0b2c29db4f544e5a/videoinput-0.200-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/artoolkitplus/2.3.1-1.4.1/f19bad0a1f419f3f8c0e4a533c5785c3ad582e9c/artoolkitplus-2.3.1-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/artoolkitplus/2.3.1-1.4.1/a1cd65919d5b34311baa3282607f320410469b3f/artoolkitplus-2.3.1-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica-platform/1.75.3-1.4.1/b0ecc72c14781a27e24acd0fe13e580d91956287/leptonica-platform-1.75.3-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/c2da8640b85202bbd70df994ebcf4556cbc303b5/leptonica-1.75.3-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/bc247cf6cf7b6d784e785f9d1d4a0ecc658a77dc/leptonica-1.75.3-1.4.1-android-arm.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/1c12bf4cea350ba020c5551ca3374774eb20e454/leptonica-1.75.3-1.4.1-android-arm64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/a227e29968f164d369da6ce6df94071fa6aee939/leptonica-1.75.3-1.4.1-android-x86.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b684397ff3b8d90926c952ecc55ea0d3586d8b2b/leptonica-1.75.3-1.4.1-android-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/f06b96a1ff36ddded4343ab21f5a390489d3cec9/leptonica-1.75.3-1.4.1-linux-x86.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/59f21ae8476697b366202512cfbfd721455fb53b/leptonica-1.75.3-1.4.1-linux-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/8b6885b9798e6b346554c6e3474b8874060ea385/leptonica-1.75.3-1.4.1-linux-armhf.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/8fe3340e756784041cc8535301b42b13f6ba74d0/leptonica-1.75.3-1.4.1-linux-ppc64le.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/7399bdcb69f66bd52999d6ad5c19e701d61e81ae/leptonica-1.75.3-1.4.1-macosx-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/bfe83a6dc7d7eb34bb62a26621d85d9c101bd2da/leptonica-1.75.3-1.4.1-windows-x86.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/b3602ccac9ed2d4067f96b67f7280ab6948b2f1f/leptonica-1.75.3-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/leptonica/1.75.3-1.4.1/9ea360641a752afb358fa1d5a87564f67f142f47/leptonica-1.75.3-1.4.1-windows-x86_64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco/javacpp/1.4.1/a184ef185810a96ea5d5aafd9d24452758a88fe0/javacpp-1.4.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.bytedeco/javacpp/1.4.1/94b0d8239434d88f1069033aab20a71f2e9f106b/javacpp-1.4.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.vlkan/flatbuffers/1.2.0-3f79e055/2ea1b5adf1b6873cf36a7c2b3d635362bd3e9255/flatbuffers-1.2.0-3f79e055-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.vlkan/flatbuffers/1.2.0-3f79e055/b4a3fa3b6f768a99c2540e8b96b83bbb051f926c/flatbuffers-1.2.0-3f79e055.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.ericaro/neoitertools/1.0.0/eb896e55dbacc0ce95263c18440758118947c6ea/neoitertools-1.0.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.ericaro/neoitertools/1.0.0/25fa0a0aaf12bc386ecdb19a6ee747b361c73a20/neoitertools-1.0.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.yaml/snakeyaml/1.15/7dc55271cad1cf73bb495e372164269e75d9345a/snakeyaml-1.15-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.yaml/snakeyaml/1.15/3b132bea69e8ee099f416044970997bde80f4ea6/snakeyaml-1.15.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.codehaus.woodstox/stax2-api/3.1.4/b40604d61c01cc081a4a7bdfc562aa9847ee8857/stax2-api-3.1.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.codehaus.woodstox/stax2-api/3.1.4/ac19014b1e6a7c08aad07fe114af792676b685b7/stax2-api-3.1.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/5991ca87ef1fb5544943d9abc5a9a37583fabe03/annotations-13.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.freemarker/freemarker/2.3.23/51b98b3e60f2d78624137437f34a3e70ab5d55ec/freemarker-2.3.23-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.freemarker/freemarker/2.3.23/cd143cd8c02a9f838e3cb75a6dfe133750437f6d/freemarker-2.3.23.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.sf.opencsv/opencsv/2.3/235993117036d44d126f76db9ea2202ee4884682/opencsv-2.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.sf.opencsv/opencsv/2.3/c23708cdb9e80a144db433e23344a788a1fd6599/opencsv-2.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.tdunning/t-digest/3.2/b1858d66a80a93f61f048cf542fc2751ec7971bf/t-digest-3.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.tdunning/t-digest/3.2/2ab94758b0276a8a26102adf8d528cf6d0567b9a/t-digest-3.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.jai-imageio/jai-imageio-core/1.3.0/38c73e1f0420a2c290ecff951e8a73945d22ccdd/jai-imageio-core-1.3.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.jai-imageio/jai-imageio-core/1.3.0/268feccd3a0fe32058ede66db41a21d9c7a9e535/jai-imageio-core-1.3.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-jpeg/3.1.1/d663f03ee9ede88475f322d6e0b01b38c2c0b585/imageio-jpeg-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-jpeg/3.1.1/464d6537504c7855c8aa3669b2726641ee3fd00c/imageio-jpeg-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-tiff/3.1.1/591b1c0f5b7be66f7d252e3d051c69465368740e/imageio-tiff-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-tiff/3.1.1/df54331a36fba97907e9413297c51defbe24a224/imageio-tiff-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-psd/3.1.1/9adb9161d6a143e6db381916d6591b33fe4aa2c/imageio-psd-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-psd/3.1.1/8073714c928c9343a9e6dc68b4f48ab9c51a41f0/imageio-psd-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-bmp/3.1.1/3133c62c044c5391826e06cdeaa46e4963ccbb4d/imageio-bmp-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-bmp/3.1.1/3b6f82168a6f76899e33a8a9f4058d0e127df30e/imageio-bmp-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.9.0/a0ad4e203304ccab7e01266fa814115850edb8a9/jackson-annotations-2.9.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.9.0/7c10d545325e3a6e72e06381afe469fd40eb701/jackson-annotations-2.9.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-cluster_2.11/2.3.13/f5506153ee92b6d7ae7accf87724c88c7af1bdb2/akka-cluster_2.11-2.3.13-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-cluster_2.11/2.3.13/3bee3c5705b82e8d3eb3efe1f1a7ea22f0bcae91/akka-cluster_2.11-2.3.13.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-lang/commons-lang/2.6/67313d715fbf0ea4fd0bdb69217fb77f807a8ce5/commons-lang-2.6-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-lang/commons-lang/2.6/ce1edb914c94ebc388f086c6827e8bdeec71ac2/commons-lang-2.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.agrona/Agrona/0.5.4/818b5d3bbfa621cd53395342df9827cadda196b3/Agrona-0.5.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.agrona/Agrona/0.5.4/a1857cb34acb08f2bb89faa126e5abd8b16429dc/Agrona-0.5.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.xerial/sqlite-jdbc/3.15.1/831b311c6726c38a738ec2c539b34b4eead4cb95/sqlite-jdbc-3.15.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.xerial/sqlite-jdbc/3.15.1/acb44214a86abebf2f3a8969ecbb697850dd9c8e/sqlite-jdbc-3.15.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-appl/0.8.2527/704d34a8595cda68b620f0cd28bc4c5e5af96900/renjin-appl-0.8.2527-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-appl/0.8.2527/a7c73f8d686a20116a165f6bcc464be3cbe91742/renjin-appl-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-nmath/0.8.2527/2872b7eb5e4bc7d7c9e3a98136d044bc6a13fc66/renjin-nmath-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-lapack/0.8.2527/d972a07c7d7842041c44b6e1794b21d2f6c3ee71/renjin-lapack-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-math/2.2/61dc823ea6dca58ce9aa8badc3cfcee057689e73/commons-math-2.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-math/2.2/4877b85d388275f994a5cfc7eceb73a8045d3006/commons-math-2.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-blas/0.8.2527/86218aa33c4bb87769165f991f84a3bd1f2ca66/renjin-blas-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-math-common/0.8.2527/d0b9b522040b8950d57c1ce4b92141dc953df36e/renjin-math-common-0.8.2527-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-math-common/0.8.2527/5d46ad605d9751ddcd732b5c02a705deca427e5/renjin-math-common-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/gcc-runtime/0.8.2527/71e47cc7182402ce832777ee5521bb3f523e3620/gcc-runtime-0.8.2527-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/gcc-runtime/0.8.2527/bbe98fdff70281f47aec428d2472a9cb95a4bfe1/gcc-runtime-0.8.2527.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-asm/5.0.4b/4c8d638998c68cc04ab7791222e1fac881879c17/renjin-asm-5.0.4b-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-asm/5.0.4b/4266a82e4f8dec308a72b9701221566d28fb5f14/renjin-asm-5.0.4b.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-guava/17.0b/8866b651c7d439ef1e917be336d88d94a3225b01/renjin-guava-17.0b-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.renjin/renjin-guava/17.0b/c55fb1ae3efb8459983657bb69e29295bd8cfeb9/renjin-guava-17.0b.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.sun.codemodel/codemodel/2.6/d24b0e6744bd8f38b36cb77f8ab7b2341590af93/codemodel-2.6-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.sun.codemodel/codemodel/2.6/cde4647fcebedb3663bccc79e21789e8e6755a19/codemodel-2.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/2.0.0/eb7f7d588d0aef07a2c89178053c2a9e4613947f/checker-qual-2.0.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/2.0.0/518929596ee3249127502a8573b2e008e2d51ed3/checker-qual-2.0.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/1.1/1efdf5b737b02f9b72ebdec4f72c37ec411302ff/j2objc-annotations-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/1.1/ed28ded51a8b1c6b112568def5f4b455e6809019/j2objc-annotations-1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.codehaus.mojo/animal-sniffer-annotations/1.14/886474da3f761d39fcbb723d97ecc5089e731f42/animal-sniffer-annotations-1.14-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.codehaus.mojo/animal-sniffer-annotations/1.14/775b7e22fb10026eed3f86e8dc556dfafe35f2d5/animal-sniffer-annotations-1.14.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.eclipsesource.minimal-json/minimal-json/0.9.5/1bbb62376e67556393d5d578348ff23d02ea9a0c/minimal-json-0.9.5-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.eclipsesource.minimal-json/minimal-json/0.9.5/8134f8babbfbb18373110ea0b5871fd34b9c77bf/minimal-json-0.9.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.coverity.security/coverity-escapers/1.1/42306f0c378727575bc3a06a1451354fc6baa2d1/coverity-escapers-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.coverity.security/coverity-escapers/1.1/5602837daaf4973eb1def46b7d898aea3785fc39/coverity-escapers-1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/ch.qos.logback/logback-core/1.2.1/8025b15884a6a3909c6b0fe881c81b647f2fc7fe/logback-core-1.2.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/ch.qos.logback/logback-core/1.2.1/378913dfc3c6c71e7e2a2853eff2c3e8ac27599/logback-core-1.2.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.gluonhq/charm-down-core/3.7.0/10122acb3f416118c31ef5df8c042cf20b285938/charm-down-core-3.7.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.gluonhq/charm-down-core/3.7.0/859eb76b0bf22ed1a1a90435929bb32ba9f23bfe/charm-down-core-3.7.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.os72.protobuf-java-shaded-351/protobuf-java-shaded-351/0.9/a37d32bad5e0f93fe7069955b31c01f215b80bc6/protobuf-java-shaded-351-0.9-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.os72.protobuf-java-shaded-351/protobuf-java-shaded-351/0.9/e1006c6a05fa23a0e7ace0a6b74fc5e2ea7b5124/protobuf-java-shaded-351-0.9.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-metadata/3.1.1/1256a0bfcf357b6545e438d6bb917a143c59b605/imageio-metadata-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-metadata/3.1.1/52b6b85601492e94fa8a08211c08179b1c888d91/imageio-metadata-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-core/3.1.1/9c04e9c1a77b2d91247984a508b5a1115e2aba6e/imageio-core-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-core/3.1.1/dbdf29da53ac89753d9abfc0f38802f6483821e/imageio-core-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-image/3.1.1/14672e0148350fe769b38ecf109339f85dd45d14/common-image-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-image/3.1.1/c86b3bc138b0caee17ce4193275636543cf28bfe/common-image-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-io/3.1.1/8cbce8bb845783fdf4f42eb9a9090793eece5a4e/common-io-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-io/3.1.1/b6aec796ca2d20b145b6fa88bbe068724a258450/common-io-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-lang/3.1.1/3bf19df83e5acbda0c86b7d34fe1d2dada290d67/common-lang-3.1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-lang/3.1.1/a9b5f8094211a8fbe5e9f469ebb266c1886d3666/common-lang-3.1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang.modules/scala-java8-compat_2.11/0.3.0/791523cd2f8853c6d4c83fb9b06642ff074ffe83/scala-java8-compat_2.11-0.3.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang.modules/scala-java8-compat_2.11/0.3.0/ec662f5a021f5e118b38249cebd291cb62db48f5/scala-java8-compat_2.11-0.3.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-remote_2.11/2.3.13/79a75384110eb788d763ff184cc1abac3ce4493e/akka-remote_2.11-2.3.13-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-remote_2.11/2.3.13/a136ef94f223c78c5ed5b20c8cd261e5b54d7002/akka-remote_2.11-2.3.13.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-reflect/2.11.6/fd5644437e1f723409c93962fc925f09a581ea89/scala-reflect-2.11.6-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-reflect/2.11.6/f539c9c9cf312472b3a7771ac85ecda859657a1d/scala-reflect-2.11.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-iteratees_2.11/2.4.8/e4ef201c9c3a385a5060cbfef55545692945a650/play-iteratees_2.11-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-iteratees_2.11/2.4.8/d35f5b7521c5ce7cd77664092663d9b2e40d1ff3/play-iteratees_2.11-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.1/34d013c02d0b73794ba2911552896dd9c00f34c3/scala-parser-combinators_2.11-1.0.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.1/f05d7345bf5a58924f2837c6c1f4d73a938e1ff0/scala-parser-combinators_2.11-1.0.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-actor_2.11/2.3.13/8d8fbeadf95fc8347eac537f4552488d625567b5/akka-actor_2.11-2.3.13-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-actor_2.11/2.3.13/2d3611639ec786bd963709f210cb9c5cf7cd985e/akka-actor_2.11-2.3.13.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-stm/scala-stm_2.11/0.7/4c087acd124ba7915f73339251ba8bbd4b466667/scala-stm_2.11-0.7-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-stm/scala-stm_2.11/0.7/acece510055e8e47e142ad6671a9a8cf11a45007/scala-stm_2.11-0.7.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-functional_2.11/2.4.8/c258a9a15c2a8c6d4e3027f91170a2ee38536ce3/play-functional_2.11-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-functional_2.11/2.4.8/ea85e989dc8b6f91924422b0fcfaea21d9895009/play-functional_2.11-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-datacommons_2.11/2.4.8/70030e7ec1c87145bf020d43e49b5005dd160684/play-datacommons_2.11-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-datacommons_2.11/2.4.8/8c039fa9114774edb4000c2bc7bcd4122aa89a6c/play-datacommons_2.11-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang.modules/scala-xml_2.11/1.0.1/a598f0c51693338901223a8cf1f74a2d86279e2d/scala-xml_2.11-1.0.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang.modules/scala-xml_2.11/1.0.1/21dbac0088b91b8ffb7ac385301f4340f8ebe71f/scala-xml_2.11-1.0.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-library/2.11.6/81e74f4ba7915a8256022e6bc1436a00a916fdbe/scala-library-2.11.6-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-library/2.11.6/be3457b4b748df35bffba675d8cddf44e9df4f7b/scala-library-2.11.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.hibernate/hibernate-validator/5.0.3.Final/268b9393804e278e15600fbd169b22726af8b4a2/hibernate-validator-5.0.3.Final-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.hibernate/hibernate-validator/5.0.3.Final/e0fa071d3ced426a05fc1a59d788cb72a1659c3c/hibernate-validator-5.0.3.Final.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jboss.logging/jboss-logging/3.2.1.Final/107183008a58bce4d729e4442203320fefc34e75/jboss-logging-3.2.1.Final-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jboss.logging/jboss-logging/3.2.1.Final/fedf11b3d4665a434b554a5891fe7f208f029f45/jboss-logging-3.2.1.Final.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.springframework/spring-context/4.1.6.RELEASE/90d95c820dabd0187ff5be4a854b912741e8fd36/spring-context-4.1.6.RELEASE-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.springframework/spring-context/4.1.6.RELEASE/15f0b22bf89ed468badbc4eec759af2b916d33e4/spring-context-4.1.6.RELEASE.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.springframework/spring-core/4.1.6.RELEASE/a09f8d7c0c2b861f0d9e256de451c78b55aec0cf/spring-core-4.1.6.RELEASE-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.springframework/spring-core/4.1.6.RELEASE/e2f486124d5dea2d91a9c2ea7d4456bc343ca2cc/spring-core-4.1.6.RELEASE.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.springframework/spring-beans/4.1.6.RELEASE/708d354f5210f253d345b3cb65013410cc770554/spring-beans-4.1.6.RELEASE-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.springframework/spring-beans/4.1.6.RELEASE/ce2d409d470948f11fad41ffdf37dcff4d28cd7c/spring-beans-4.1.6.RELEASE.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.jodah/typetools/0.4.3/8e9e462212505dd44165e2e02795d2a8be660a00/typetools-0.4.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.jodah/typetools/0.4.3/6c8f38d7f9526bd3d990cd5d1a7db1319c5490d5/typetools-0.4.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.tomcat/tomcat-servlet-api/8.0.21/2720553319e4d77a4fecaac70d8e72034992f932/tomcat-servlet-api-8.0.21-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.tomcat/tomcat-servlet-api/8.0.21/fed19191e861d66315d9ff00484ec92106c41644/tomcat-servlet-api-8.0.21.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.netty/netty-http-pipelining/1.1.4/4adf2f2253d78ec48b6d02a1136f3cf6e1cb33b3/netty-http-pipelining-1.1.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.netty/netty-http-pipelining/1.1.4/66aa09e227b29a61326c7b025eb7005ef4529b08/netty-http-pipelining-1.1.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/io.netty/netty/3.10.4.Final/bab8919306fa181e12de03244c854d2225c32bf8/netty-3.10.4.Final-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/io.netty/netty/3.10.4.Final/e3a9be13921594357946e337cbec55d094f3870e/netty-3.10.4.Final.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.thoughtworks.paranamer/paranamer/2.6/caaf8777e6bb374d653a81d38c9d38a02c6864c6/paranamer-2.6-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.thoughtworks.paranamer/paranamer/2.6/52c3c8d8876440d714e23036eb87bcc4244d9aa5/paranamer-2.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-net/commons-net/3.1/8cc516e03d35ecf8f4ca71511f7961f1a9339820/commons-net-3.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/commons-net/commons-net/3.1/2298164a7c2484406f2aa5ac85b205d39019896f/commons-net-3.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.0.7/24c9ac1effd53660f17d5ffe9c7e719d68022db6/kotlin-stdlib-1.0.7-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.0.7/b1724f4912eab4cc011b6750e2b4ed7dca96e66/kotlin-stdlib-1.0.7.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections-forkjoin/7.1.2/ecf5b6b9cf1070010d78930c9bc53dc2db2b387a/eclipse-collections-forkjoin-7.1.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections-forkjoin/7.1.2/875c64c3e482ca64ef9afe1af7867f9b2ed61b6e/eclipse-collections-forkjoin-7.1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections/7.1.2/ef307b44186c919f67496dd83b703485bf43d98a/eclipse-collections-7.1.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections/7.1.2/f3eceb974c65a3c6949ac9f2ade7e26d09227d39/eclipse-collections-7.1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections-api/7.1.2/af5014240fe0305a4fb0fef84410555eda3a180e/eclipse-collections-api-7.1.2-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.eclipse.collections/eclipse-collections-api/7.1.2/bed8cd92829056dc9e8f73f5bac949900abf8c54/eclipse-collections-api-7.1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.jpountz.lz4/lz4/1.3.0/31debfaa8a55bc4af1d4fe63a8ad0a2a7e851274/lz4-1.3.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.jpountz.lz4/lz4/1.3.0/c708bb2590c0652a642236ef45d9f99ff842a2ce/lz4-1.3.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.mapdb/elsa/3.0.0-M5/aaea162f6c70d60ba5f3ef5b985595bce9cb7a04/elsa-3.0.0-M5-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.mapdb/elsa/3.0.0-M5/d7c1920d084e741e04844f512af24012e745e809/elsa-3.0.0-M5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.maven.scm/maven-scm-provider-svnexe/1.4/15a971532cb654117767b4285c6d0ad8d7006ca5/maven-scm-provider-svnexe-1.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.maven.scm/maven-scm-provider-svnexe/1.4/b3213b40157b701ba079b738baac391e41418c18/maven-scm-provider-svnexe-1.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.maven.scm/maven-scm-provider-svn-commons/1.4/bc76e700d77e94f55bbb2fa90c5ba8718d6652dc/maven-scm-provider-svn-commons-1.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.maven.scm/maven-scm-provider-svn-commons/1.4/54bc1dc24c5d205b4d251a83f4ea63808c21a628/maven-scm-provider-svn-commons-1.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.maven.scm/maven-scm-api/1.4/d6d12c73b996ffb43fa57d40fc5ebb48d237304d/maven-scm-api-1.4-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.apache.maven.scm/maven-scm-api/1.4/e294693ce217bd6f470b728127854e6ca787fd29/maven-scm-api-1.4.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.joda/joda-convert/1.7/18580d7afd985e5e66b453465356794b26e3066a/joda-convert-1.7-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.joda/joda-convert/1.7/57c2432e54dc40f871f55295c676b22672713602/joda-convert-1.7.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/javax.transaction/jta/1.1/d5dad66d06246bd2e1e369cebff27faa9beb065a/jta-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/javax.transaction/jta/1.1/2ca09f0b36ca7d71b762e14ea2ff09d5eac57558/jta-1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/javax.validation/validation-api/1.1.0.Final/7d49b53caed9bd81d172807c3e096d24f3c57090/validation-api-1.1.0.Final-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/javax.validation/validation-api/1.1.0.Final/8613ae82954779d518631e05daa73a6a954817d5/validation-api-1.1.0.Final.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml/classmate/1.0.0/da0cec0cf5fa28fba22e44700d72259e0225f2e4/classmate-1.0.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.fasterxml/classmate/1.0.0/434efef28c81162b17c540e634cffa3bd9b09b4c/classmate-1.0.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/2.5.0/7a27a7fc815e481b367ead5df19b4a71ace4a419/protobuf-java-2.5.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/2.5.0/a10732c76bfacdbd633a7eb0f7968b1059a65dfa/protobuf-java-2.5.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.uncommons.maths/uncommons-maths/1.2.2a/bb01359792453974c40d34f49c84d703deff266b/uncommons-maths-1.2.2a-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.uncommons.maths/uncommons-maths/1.2.2a/e4e84f879d4160be9508aa3904516ec30c39e815/uncommons-maths-1.2.2a.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni-all/1.7/7da5b456576eca8853b57c74da30e8f4c81486cd/leveldbjni-all-1.7-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni-all/1.7/ea97366fc854111d14207d2446a237480f3c84fc/leveldbjni-all-1.7.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-runtime/1.0.7/f793f5b96f8c795f22e9c5bbe64089c0be6269a8/kotlin-runtime-1.0.7-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-runtime/1.0.7/abb45107a84b3c173a8681b8f51af89e73216524/kotlin-runtime-1.0.7.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.jcip/jcip-annotations/1.0/d853625d8001c00d40abed553e670279504699f9/jcip-annotations-1.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/net.jcip/jcip-annotations/1.0/afba4942caaeaf46aab0b976afd57cc7c181467e/jcip-annotations-1.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/1.5.6/f73353c888b7c6f938ddc17423087aba4f50d33e/plexus-utils-1.5.6-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/1.5.6/8fb6b798a4036048b3005e058553bf21a87802ed/plexus-utils-1.5.6.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/regexp/regexp/1.3/51ba0f7629a69bf12d31177f409a78672069f632/regexp-1.3-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/regexp/regexp/1.3/973df2b78b67bcd3144c3dbbb88da691065a3f8d/regexp-1.3.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil/jniloader/1.1/a571acfa8fff8f5c26334ce5a0571a25e2a1b98d/jniloader-1.1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.github.fommil/jniloader/1.1/4840f897eeb54d67ee14e478f8a45cc9937f3ce1/jniloader-1.1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-exceptions/2.4.8/66a720f150d7e180246963bc3ea570f2af585812/play-exceptions-2.4.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe.play/play-exceptions/2.4.8/6b7729a7b79a0754effbb178257b5ab8b88df4b/play-exceptions-2.4.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe/config/1.3.0/b7f40ce00f9c552576c2675ba81b19365b74f83a/config-1.3.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/com.typesafe/config/1.3.0/f533aa6ea13e443b50e639d070986c42d03efc35/config-1.3.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/a00123f261762a7c5e0ec916a2c7c8298d29c400/javax.inject-1-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/aopalliance/aopalliance/1.0/4a4b6d692e17846a9f3da036438a7ac491d3c814/aopalliance-1.0-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/aopalliance/aopalliance/1.0/235ba8b489512805ac13a8f9ea77a1ca5ebe3e8/aopalliance-1.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni-osx/1.5/88cdf3ac93cb51f262dd17fc5e6f09fe64f9026b/leveldbjni-osx-1.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni-linux32/1.5/39c24926f59ca607928753d54c5c7a555ea67113/leveldbjni-linux32-1.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni-linux64/1.5/1b97b5591ce37dd056e42eb39fca1bedcd3f67fd/leveldbjni-linux64-1.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni-win32/1.5/2aca3007b81c041f893180cce6a4b31e27078e13/leveldbjni-win32-1.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni-win64/1.5/36d5c9ea8833fa0ca974989d2e97ea05e433386a/leveldbjni-win64-1.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni/1.7/9d02d00a5fc2ae29c49c4e0f02a43d4943246a93/leveldbjni-1.7-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.leveldbjni/leveldbjni/1.7/39380a7e53f6c89b8c3a6fbda3e7c2c6b871dfc9/leveldbjni-1.7.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.iq80.leveldb/leveldb-api/0.5/c9a8e310a186423f9adfa494c490037a99089f54/leveldb-api-0.5-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.iq80.leveldb/leveldb-api/0.5/2521d1ea31a381c9a9bf3486c46b7929f320f742/leveldb-api-0.5.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.hawtjni/hawtjni-runtime/1.8/85eafe1c8a05f76a447b1c87953cba50b60f85a1/hawtjni-runtime-1.8-sources.jar" kind="lib" path="/home/gunjan/.gradle/caches/modules-2/files-2.1/org.fusesource.hawtjni/hawtjni-runtime/1.8/9d2d5739cf8f47d25afec240847fb72fe6ee86df/hawtjni-runtime-1.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/TEMPForGitTransferWC/ActivRec/libs/javanpst.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/TEMPForGitTransferWC/ActivRec/libs/jViridis.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/TEMPForGitTransferWC/ActivRec/libs/EditDistanceStandAlone-capsule.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/TEMPForGitTransferWC/ActivRec/libs/spmf.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/gunjan/TEMPForGitTransferWC/ActivRec/libs/hgapi83_amidst-64.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+</classpath>
