@@ -16,7 +16,7 @@ The processed Gowalla and Geolife datasets used in the experiments are available
 #### Execution:
 For running the proposed Activity Recommendation Algorithms (ActivRec, in paper) and the Java-based baselines:
 
-1. Import *./SequenceContextRecSys* as Gradle project and build using *gradle build*.
+1. Import *./ActivRec* as Gradle project and build using *gradle build*.
 2. Set parameters:
 	- for the experiments and algorithms in *org.activity.constants.Constant*
 	- for domain/dataset in *org.activity.constants.DomainConstants*
