@@ -5,11 +5,12 @@ This is a generic activity recommendation framework, which is suitable for gener
 
 
 #### Datasets
-The Gowalla and Geolife datasets used are publicly available, while the lifelog dataset is available on request. 
--Gowalla dataset source:
--Geolife dataset source:
+The Gowalla and Geolife datasets used are publicly available at the following links, while the lifelog dataset is available on request. 
 
-The processed Gowalla and Geolife datasets (user activity data) used in the experiments are available in csv format in *./ActivRec/dataToRead/*, and in *./BaselinesInPython/datasets/* for the baselines implemented in Python.
+- [Gowalla dataset source](https://www.yongliu.org/datasets)
+- [Geolife dataset source](https://www.microsoft.com/en-us/download/details.aspx?id=52367&from=https%3A%2F%2Fresearch.microsoft.com%2Fen-us%2Fdownloads%2Fb16d359d-d164-469e-9fd4-daa38f2b2e13%2Fdefault.aspx)
+
+The processed Gowalla and Geolife datasets used in the experiments are available in csv format in *./ActivRec/dataToRead/*, and in *./BaselinesInPython/datasets/* for the baselines implemented in Python.
 
 
 #### Execution:
