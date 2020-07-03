@@ -287,7 +287,7 @@ public class CandDistCorrelation
 
 			if (Constant.getDatabaseName().equals("dcu_data_2"))
 			{
-				userIDString = DomainConstants.userNamesDCUData[uIterator];
+				userIDString = DomainConstants.userNamesLifelogData[uIterator];
 			}
 			else
 				userIDString = Integer.toString(userID);
