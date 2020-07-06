@@ -10,7 +10,7 @@ The Gowalla and Geolife datasets used are available (for research purposes) at t
 - [Gowalla dataset source](https://www.yongliu.org/datasets) (released solely for research purpose)
 - [Geolife dataset source](https://www.microsoft.com/en-us/download/details.aspx?id=52367&from=https%3A%2F%2Fresearch.microsoft.com%2Fen-us%2Fdownloads%2Fb16d359d-d164-469e-9fd4-daa38f2b2e13%2Fdefault.aspx) (Microsoft Research License Agreement-Non-Commercial Use Only)
 
-Additionally, the processed Gowalla datasets used in the experiments are available in csv format in *./ActivRec/dataToRead/*, and in *./BaselinesInPython/datasets/* for the baselines implemented in Python.
+Additionally, the processed Gowalla dataset used in the experiments are available in csv format in *./ActivRec/dataToRead/*, and in *./BaselinesInPython/datasets/* for the baselines implemented in Python.
 
 
 #### Execution:
